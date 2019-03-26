@@ -186,11 +186,11 @@ export function deleteDirectory(dirPath: string)
   }
 }
 
-const logValueWhiteSpace = 50;
+const logValueWhiteSpace = 40;
 
 export function log(msg: string)
 {
-  if (vscode.workspace.getConfiguration('taskView', null).get('debug') === true)
+  if (vscode.workspace.getConfiguration('taskView').get('debug') === true)
 	{
     console.log(msg);
   }
@@ -198,7 +198,7 @@ export function log(msg: string)
 
 export function logValue(msg: string, value: any)
 {
-  if (vscode.workspace.getConfiguration('taskView', null).get('debug') === true)
+  if (vscode.workspace.getConfiguration('taskView').get('debug') === true)
 	{
     var logMsg = msg;
     for (var i = msg.length; i < logValueWhiteSpace; i++)
@@ -207,6 +207,7 @@ export function logValue(msg: string, value: any)
     }
     if (value)
     {
+      logMsg += ': ';
       logMsg += value.toString();
     }
     console.log(logMsg);
