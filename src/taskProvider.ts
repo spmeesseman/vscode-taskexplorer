@@ -48,7 +48,7 @@ export class TaskTreeDataProvider implements vscode.TreeDataProvider<TreeTask>
 						console.log('   added task to view');
 					}
 					
-					WorkspaceFolder de;
+					//WorkspaceFolder de;
 
 					taskNames[i] = new TreeTask(tasks[i].definition.type, 
 												tasks[i].name, 
