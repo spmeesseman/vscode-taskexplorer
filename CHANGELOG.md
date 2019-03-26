@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/spmeesseman/vscode-taskview/compare/v1.1.0...v1.2.0) (2019-03-26)
+
+
+### Features
+
+* bulk check in initial replica of vscode npm scripts explorer view, but with tasks [skip ci] ([dac97c1](https://github.com/spmeesseman/vscode-taskview/commit/dac97c1))
+
 # [1.1.0](https://github.com/spmeesseman/vscode-taskview/compare/v1.0.2...v1.1.0) (2019-03-26)
 
 
