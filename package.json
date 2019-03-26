@@ -5,25 +5,46 @@
     "icon": "res/launch.png",
     "version": "1.2.0",
     "publisher": "spmeesseman",
+    "enableProposedApi": true,
     "repository": {
         "type": "git",
         "url": "https://github.com/spmeesseman/vscode-taskview.git"
     },
     "engines": {
-        "vscode": "^1.26.0"
+        "vscode": "^1.32.0"
     },
     "categories": [
         "Other"
     ],
     "keywords": [
         "tasks",
-        "execute"
+        "task",
+        "launcher",
+        "launch",
+        "execute",
+        "script",
+        "scripts",
+        "view",
+        "explorer"
     ],
     "main": "./out/extension",
     "config": {
         "commitizen": {
             "path": "cz-conventional-changelog"
         }
+    },
+    "scripts": {
+        "package": "vsce package",
+        "publish": "vsce publish",
+        "vscode:prepublish": "npm run build",
+        "build": "npx tsc -p ./",
+        "compile": "npx tsc -p ./",
+        "semantic-release": "semantic-release",
+        "semantic-release-no-ci": "semantic-release --no-ci",
+        "semantic-release-dry": "semantic-release --dry-run",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
     },
     "activationEvents": [
         "onCommand:workbench.action.tasks.runTask",
@@ -221,6 +242,12 @@
                     "items": {
                         "type": "string"
                     },
+                    "default": [
+                        "**/ext/**",
+                        "**/packages/**",
+                        "**/.vscode-test/**",
+                        "**/build/**"
+                    ],
                     "description": "%config.taskView.exclude%",
                     "scope": "resource"
                 },
@@ -296,19 +323,6 @@
             }
         ]
     },
-    "scripts": {
-        "package": "vsce package",
-        "publish": "vsce publish",
-        "vscode:prepublish": "npm run build",
-        "build": "npx tsc -p ./",
-        "compile": "npx tsc -p ./",
-        "semantic-release": "semantic-release",
-        "semantic-release-no-ci": "semantic-release --no-ci",
-        "semantic-release-dry": "semantic-release --dry-run",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test"
-    },
     "dependencies": {
         "jsonc-parser": "^2.0.2",
         "minimatch": "^3.0.4",
@@ -328,6 +342,8 @@
         "@types/minimatch": "^3.0.3",
         "typescript": "^3.0.3",
         "vscode": "^1.1.30",
+        "vsce": "1.48.0",
+        "vscode-nls-dev": "3.2.5",
         "tslint": "^5.8.0",
         "remap-istanbul": "^0.13.0",
         "semantic-release": "^15.13.3",
