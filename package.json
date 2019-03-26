@@ -36,6 +36,21 @@
                     "type": "boolean",
                     "description": "Auto-refresh when task.json files are modified",
                     "default": true
+                },
+                "taskView.autorefresh": {
+                    "type": "boolean",
+                    "description": "Auto-refresh when task files are modified",
+                    "default": true
+                },
+                "taskView.shownpm": {
+                    "type": "boolean",
+                    "description": "Show npm tasks",
+                    "default": false
+                },
+                "taskView.debug": {
+                    "type": "boolean",
+                    "description": "Show npm tasks",
+                    "default": true
                 }
             }
         },
