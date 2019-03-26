@@ -43,7 +43,8 @@
         "semantic-release-dry": "semantic-release --dry-run",
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test"
+        "test": "node ./node_modules/vscode/bin/test",
+        "commit": "npx git-cz"
     },
     "activationEvents": [
         "onCommand:workbench.action.tasks.runTask",
