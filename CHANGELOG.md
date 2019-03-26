@@ -1,3 +1,16 @@
+# [1.1.0](https://github.com/spmeesseman/vscode-taskview/compare/v1.0.2...v1.1.0) (2019-03-26)
+
+
+### Bug Fixes
+
+* invalid console.log ([07169ce](https://github.com/spmeesseman/vscode-taskview/commit/07169ce))
+* rogue text ([d6f2597](https://github.com/spmeesseman/vscode-taskview/commit/d6f2597))
+
+
+### Features
+
+* first round of changes [skip ci] ([a06ed57](https://github.com/spmeesseman/vscode-taskview/commit/a06ed57))
+
 ## [1.0.2](https://github.com/spmeesseman/vscode-taskview/compare/v1.0.1...v1.0.2) (2019-03-26)
 
 ## [1.0.1](https://github.com/spmeesseman/vscode-taskview/compare/v1.0.0...v1.0.1) (2019-03-26)

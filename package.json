@@ -3,7 +3,7 @@
     "displayName": "Task View for Explorer",
     "description": "Extension to view and run VSCode tasks from Explorer",
     "icon": "res/launch.png",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "publisher": "spmeesseman",
     "repository": {
         "type": "git",
@@ -32,11 +32,6 @@
         "configuration": {
             "title": "VSCode Task View",
             "properties": {
-                "taskView.autorefresh": {
-                    "type": "boolean",
-                    "description": "Auto-refresh when task.json files are modified",
-                    "default": true
-                },
                 "taskView.autorefresh": {
                     "type": "boolean",
                     "description": "Auto-refresh when task files are modified",
