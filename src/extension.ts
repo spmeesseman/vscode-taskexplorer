@@ -77,9 +77,11 @@ function registerTaskProvider(context: vscode.ExtensionContext): vscode.Disposab
 
 function registerExplorer(context: vscode.ExtensionContext): TaskTreeDataProvider | undefined 
 {
+	console.log('here');
 	if (vscode.workspace.workspaceFolders) {
+		let showCollapseAll = true;
 		let treeDataProvider = new TaskTreeDataProvider(context);
-		const view = vscode.window.createTreeView('taskView', { treeDataProvider: treeDataProvider });
+		const view = vscode.window.createTreeView('taskView', { treeDataProvider: treeDataProvider, showCollapseAll: true });
 		context.subscriptions.push(view);
 		return treeDataProvider;
 	}
