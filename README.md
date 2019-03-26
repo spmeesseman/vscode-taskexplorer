@@ -17,9 +17,17 @@
 
 > Provides a drawer in the file explorer that displays VSCode tasks in the same manner as the built in drawer for npm scripts.
 
+## Important Notes
+
+> Disable auto detection of scripts in the Npm settings.  Otherwise npm scripts will be displayed twice.
+
+## TODO
+
+> 'Open' command for tasks from tasks.json file does not work yet
+
 ## Screenshots
 
-<!--![extension ss1](https://github.com/spmeesseman/vscode-taskview/blob/master/res/taskview.jpg?raw=true)-->
+![extension ss1](https://github.com/spmeesseman/vscode-taskview/blob/master/res/taskview.png?raw=true)
 
 ## Settings
 
