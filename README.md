@@ -4,7 +4,6 @@
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/spmeesseman.vscode-task-runner.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-task-runner)
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating-short/spmeesseman.vscode-task-runner.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-task-runner)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![Greenkeeper badge](https://badges.greenkeeper.io/spmeesseman/vscode-task-runner.svg)](https://greenkeeper.io/)
 [![Build Status](https://dev.azure.com/spmeesseman/vscode-vscode-task-runner/_apis/build/status/spmeesseman.vscode-task-runner?branchName=master)](https://dev.azure.com/spmeesseman/vscode-vscode-task-runner/_build/latest?definitionId=4&branchName=master)
 
 [![Known Vulnerabilities](https://snyk.io/test/github/spmeesseman/vscode-task-runner/badge.svg)](https://snyk.io/test/github/spmeesseman/vscode-task-runner)
@@ -20,4 +19,4 @@
 
 ## Screenshots
 
-<!--![extension demo](https://github.com/spmeesseman/vscode-taskview/blob/master/res/taskview.jpg?raw=true)-->
+<!--![extension ss1](https://github.com/spmeesseman/vscode-taskview/blob/master/res/taskview.jpg?raw=true)-->
