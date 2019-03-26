@@ -491,11 +491,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 				util.log('');
 				util.log('Processing task ' + taskCt.toString() + ' of ' + tasks.length.toString());
-				util.log('   type = ' + each.definition.type);	
-				util.log('   source = ' + each.source);
-				util.log('   scope.name = ' + each.scope.name);
-				util.log('   scope.uri.path = ' + each.scope.uri.path);
-				util.log('   scope.uri.fsPath = ' + each.scope.uri.fsPath);
+				util.logValue('   name', each.name);	
+				util.logValue('   type', each.definition.type);	
+				util.logValue('   source', each.source);
+				util.logValue('   scope.name', each.scope.name);
+				util.logValue('   scope.uri.path', each.scope.uri.path);
+				util.logValue('   scope.uri.fsPath', each.scope.uri.fsPath);
 
 				if (each.source === 'npm' && vscode.workspace.getConfiguration('taskView').get('enableNpmScripts') === true)
 				{

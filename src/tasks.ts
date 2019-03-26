@@ -418,7 +418,7 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 					if (script === 'label')
 					{
 						script = value;
-						scripts[value] = '';
+						scripts[value] = ''; // TODO
 					}
 					else
 					{
@@ -432,15 +432,15 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 			if (property === 'scripts') {
 				inScripts = true;
 			}
+			else if (inScripts && !script) {
+				script = property;
+			} 
 			else if (property === 'tasks') {
 				inTasks = true;
 			}
 			else if (property === 'label' && inTasks && !script) {
 				script = property;
 			}
-			else if (inScripts && !script) {
-				script = property;
-			} 
 			else { // nested object which is invalid, ignore the script
 				script = undefined;
 			}
