@@ -1,34 +1,110 @@
-'use strict';
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
 
+import * as httpRequest from 'request-light';
 import * as vscode from 'vscode';
-import { TaskTreeDataProvider } from './taskProvider'
+import { addJSONProviders } from './features/jsonContributions';
+import { TaskTreeDataProvider } from './taskView';
+import { invalidateTasksCache, NpmTaskProvider } from './tasks';
+import { invalidateHoverScriptsCache, NpmScriptHoverProvider } from './scriptHover';
+import { runSelectedScript } from './commands';
 
-export function activate(context: vscode.ExtensionContext) 
+let treeDataProvider: TaskTreeDataProvider | undefined;
+
+export async function activate(context: vscode.ExtensionContext): Promise<void> 
 {
-	const taskTreeDataProvider = new TaskTreeDataProvider(context);
+	registerTaskProvider(context);
+	treeDataProvider = registerExplorer(context);
+	registerHoverProvider(context);
 
-	vscode.window.registerTreeDataProvider('taskView', taskTreeDataProvider);
-	vscode.commands.registerCommand('taskView.refresh', () => taskTreeDataProvider.refresh());
-
-	vscode.commands.registerCommand('taskView.executeTask', function(task) 
-	{
-		if (vscode.workspace.getConfiguration('taskView').get('debug') === true)
-		{
-			console.log(task);	
+	configureHttpRequest();
+	let d = vscode.workspace.onDidChangeConfiguration((e) => {
+		configureHttpRequest();
+		if (e.affectsConfiguration('taskView.exclude')) {
+			invalidateTasksCache();
+			if (treeDataProvider) {
+				treeDataProvider.refresh();
+			}
 		}
-
-		vscode.tasks.executeTask(task).then(function (value) 
-		{
-			return value;
-		}, 
-		function(e) 
-		{
-			console.error('Error executing task');
-		});
+		if (e.affectsConfiguration('taskView.tasksExplorerAction')) {
+			if (treeDataProvider) {
+				treeDataProvider.refresh();
+			}
+		}
 	});
+	context.subscriptions.push(d);
+
+	d = vscode.workspace.onDidChangeTextDocument((e) => {
+		invalidateHoverScriptsCache(e.document);
+	});
+	context.subscriptions.push(d);
+	context.subscriptions.push(vscode.commands.registerCommand('taskView.runSelectedScript', runSelectedScript));
+	context.subscriptions.push(addJSONProviders(httpRequest.xhr));
 }
 
-export function deactivate(): void 
+function registerTaskProvider(context: vscode.ExtensionContext): vscode.Disposable | undefined 
 {
-	
+
+	function invalidateScriptCaches() 
+	{
+		invalidateHoverScriptsCache();
+		invalidateTasksCache();
+		if (treeDataProvider) {
+			treeDataProvider.refresh();
+		}
+	}
+
+	if (vscode.workspace.workspaceFolders) 
+	{
+		let watcher = vscode.workspace.createFileSystemWatcher('**/package.json');
+		watcher.onDidChange((_e) => invalidateScriptCaches());
+		watcher.onDidDelete((_e) => invalidateScriptCaches());
+		watcher.onDidCreate((_e) => invalidateScriptCaches());
+		context.subscriptions.push(watcher);
+
+		let workspaceWatcher = vscode.workspace.onDidChangeWorkspaceFolders((_e) => invalidateScriptCaches());
+		context.subscriptions.push(workspaceWatcher);
+
+		let provider: vscode.TaskProvider = new NpmTaskProvider();
+		let disposable = vscode.workspace.registerTaskProvider('taskView', provider);
+		context.subscriptions.push(disposable);
+		return disposable;
+	}
+	return undefined;
+}
+
+function registerExplorer(context: vscode.ExtensionContext): TaskTreeDataProvider | undefined 
+{
+	if (vscode.workspace.workspaceFolders) {
+		let treeDataProvider = new TaskTreeDataProvider(context);
+		const view = vscode.window.createTreeView('taskView', { treeDataProvider: treeDataProvider });
+		context.subscriptions.push(view);
+		return treeDataProvider;
+	}
+	return undefined;
+}
+
+function registerHoverProvider(context: vscode.ExtensionContext): NpmScriptHoverProvider | undefined 
+{
+	if (vscode.workspace.workspaceFolders) {
+		let npmSelector: vscode.DocumentSelector = {
+			language: 'json',
+			scheme: 'file',
+			pattern: '**/package.json'
+		};
+		let provider = new NpmScriptHoverProvider(context);
+		context.subscriptions.push(vscode.languages.registerHoverProvider(npmSelector, provider));
+		return provider;
+	}
+	return undefined;
+}
+
+function configureHttpRequest() {
+	const httpSettings = vscode.workspace.getConfiguration('http');
+	httpRequest.configure(httpSettings.get<string>('proxy', ''), httpSettings.get<boolean>('proxyStrictSSL', true));
+}
+
+export function deactivate(): void {
 }

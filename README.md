@@ -13,6 +13,10 @@
 [![Dependencies Status](https://david-dm.org/spmeesseman/vscode-taskview/status.svg)](https://david-dm.org/spmeesseman/vscode-taskview)
 [![DevDependencies Status](https://david-dm.org/spmeesseman/vscode-taskview/dev-status.svg)](https://david-dm.org/spmeesseman/vscode-taskview?type=dev)
 
+## IMPORTANT NOTE
+
+> This extension is in testing and not ready yet.  Curse semantic-release for setting version to 1.0 and 1.1 (accidents, and of course not cursing semantic-release, which is a small piece of genius in itself).
+
 ## Description
 
 > Provides a drawer in the file explorer that displays VSCode tasks in the same manner as the built in drawer for npm scripts.

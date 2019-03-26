@@ -3,15 +3,22 @@ import * as path from "path";
 import * as util from "util";
 import { commands, Event, window } from "vscode";
 import { Operation } from "./common/types";
+import * as vscode from 'vscode';
 
-export interface IDisposable {
+export interface IDisposable 
+{
   dispose(): void;
 }
 
-export function done<T>(promise: Promise<T>): Promise<void> {
+
+export function done<T>(promise: Promise<T>): Promise<void> 
+{
   return promise.then<void>(() => void 0);
 }
-export function anyEvent<T>(...events: Array<Event<T>>): Event<T> {
+
+
+export function anyEvent<T>(...events: Array<Event<T>>): Event<T> 
+{
   return (listener: any, thisArgs = null, disposables?: any) => {
     const result = combinedDisposable(
       events.map(event => event((i: any) => listener.call(thisArgs, i)))
@@ -25,10 +32,9 @@ export function anyEvent<T>(...events: Array<Event<T>>): Event<T> {
   };
 }
 
-export function filterEvent<T>(
-  event: Event<T>,
-  filter: (e: T) => boolean
-): Event<T> {
+
+export function filterEvent<T>(event: Event<T>, filter: (e: T) => boolean): Event<T> 
+{
   return (listener: any, thisArgs = null, disposables?: any) =>
     event(
       (e: any) => filter(e) && listener.call(thisArgs, e),
@@ -37,21 +43,29 @@ export function filterEvent<T>(
     );
 }
 
-export function dispose(disposables: any[]): any[] {
+
+export function dispose(disposables: any[]): any[] 
+{
   disposables.forEach(disposable => disposable.dispose());
 
   return [];
 }
 
-export function combinedDisposable(disposables: IDisposable[]): IDisposable {
+
+export function combinedDisposable(disposables: IDisposable[]): IDisposable 
+{
   return toDisposable(() => dispose(disposables));
 }
 
-export function toDisposable(dispose: () => void): IDisposable {
+
+export function toDisposable(dispose: () => void): IDisposable 
+{
   return { dispose };
 }
 
-export function onceEvent<T>(event: Event<T>): Event<T> {
+
+export function onceEvent<T>(event: Event<T>): Event<T> 
+{
   return (listener: any, thisArgs = null, disposables?: any) => {
     const result = event(
       (e: any) => {
@@ -66,19 +80,26 @@ export function onceEvent<T>(event: Event<T>): Event<T> {
   };
 }
 
-export function eventToPromise<T>(event: Event<T>): Promise<T> {
+
+export function eventToPromise<T>(event: Event<T>): Promise<T> 
+{
   return new Promise<T>(c => onceEvent(event)(c));
 }
 
+
 const regexNormalizePath = new RegExp(path.sep === "/" ? "\\\\" : "/", "g");
 const regexNormalizeWindows = new RegExp("^\\\\(\\w:)", "g");
-export function fixPathSeparator(file: string) {
+
+export function fixPathSeparator(file: string) 
+{
   file = file.replace(regexNormalizePath, path.sep);
   file = file.replace(regexNormalizeWindows, "$1"); // "\t:\test" => "t:\test"
   return file;
 }
 
-export function normalizePath(file: string) {
+
+export function normalizePath(file: string) 
+{
   file = fixPathSeparator(file);
 
   // IF Windows
@@ -89,7 +110,9 @@ export function normalizePath(file: string) {
   return file;
 }
 
-export function isDescendant(parent: string, descendant: string): boolean {
+
+export function isDescendant(parent: string, descendant: string): boolean 
+{
   parent = parent.replace(/[\\\/]/g, path.sep);
   descendant = descendant.replace(/[\\\/]/g, path.sep);
 
@@ -110,7 +133,9 @@ export function isDescendant(parent: string, descendant: string): boolean {
   return descendant.startsWith(parent);
 }
 
-export function camelcase(name: string) {
+
+export function camelcase(name: string) 
+{
   return name
     .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
       return index === 0 ? letter.toLowerCase() : letter.toUpperCase();
@@ -118,13 +143,17 @@ export function camelcase(name: string) {
     .replace(/[\s\-]+/g, "");
 }
 
+
 /* tslint:disable:no-empty */
 
-export function timeout(ms: number) {
+export function timeout(ms: number) 
+{
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function isReadOnly(operation: Operation): boolean {
+
+export function isReadOnly(operation: Operation): boolean 
+{
   switch (operation) {
     case Operation.CurrentBranch:
     case Operation.Log:
@@ -136,12 +165,14 @@ export function isReadOnly(operation: Operation): boolean {
   }
 }
 
+
 /**
  * Remove directory recursively
  * @param {string} dirPath
  * @see https://stackoverflow.com/a/42505874/3027390
  */
-export function deleteDirectory(dirPath: string) {
+export function deleteDirectory(dirPath: string) 
+{
   if (fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
     fs.readdirSync(dirPath).forEach((entry: string) => {
       const entryPath = path.join(dirPath, entry);
@@ -155,7 +186,36 @@ export function deleteDirectory(dirPath: string) {
   }
 }
 
-export function unwrap<T>(maybeT?: T): T {
+const logValueWhiteSpace = 50;
+
+export function log(msg: string)
+{
+  if (vscode.workspace.getConfiguration('taskView', null).get('debug') === true)
+	{
+    console.log(msg);
+  }
+}
+
+export function logValue(msg: string, value: any)
+{
+  if (vscode.workspace.getConfiguration('taskView', null).get('debug') === true)
+	{
+    var logMsg = msg;
+    for (var i = msg.length; i < logValueWhiteSpace; i++)
+    {
+      logMsg += ' ';
+    }
+    if (value)
+    {
+      logMsg += value.toString();
+    }
+    console.log(logMsg);
+  }
+}
+
+
+export function unwrap<T>(maybeT?: T): T 
+{
   if (maybeT === undefined) {
     throw new Error("undefined unwrap");
   }
