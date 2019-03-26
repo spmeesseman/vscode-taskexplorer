@@ -29,8 +29,8 @@ jobs:
   #- job: Windows
   #  strategy:
   #    matrix:
-  #      Code26:
-  #        CODE_VERSION: '1.26.0'
+  #      Code32:
+  #        CODE_VERSION: '1.32.0'
   #      CodeCurrent:
   #        CODE_VERSION:
   #      CodeInssiders:
@@ -81,8 +81,8 @@ jobs:
   #- job: macOS
   #  strategy:
   #    matrix:
-  #      Code26:
-  #        CODE_VERSION: '1.26.0'
+  #      Code32:
+  #        CODE_VERSION: '1.32.0'
   #      CodeCurrent:
   #        CODE_VERSION: 
   #      CodeInssiders:
@@ -133,8 +133,8 @@ jobs:
   - job: Linux
     strategy:
       matrix:
-        Code26:
-          CODE_VERSION: '1.26.0'
+        Code32:
+          CODE_VERSION: '1.32.0'
         CodeCurrent:
           CODE_VERSION:
         CodeInssiders:
