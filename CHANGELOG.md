@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/spmeesseman/vscode-taskview/compare/v1.2.0...v1.3.0) (2019-03-26)
+
+
+### Features
+
+* add collapse all button ([58204e9](https://github.com/spmeesseman/vscode-taskview/commit/58204e9))
+
 # [1.2.0](https://github.com/spmeesseman/vscode-taskview/compare/v1.1.0...v1.2.0) (2019-03-26)
 
 
