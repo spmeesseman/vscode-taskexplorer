@@ -208,13 +208,11 @@
                 "taskView.enableNpmScripts": {
                     "type": "boolean",
                     "default": true,
-                    "scope": "resource",
                     "markdownDescription": "%config.taskView.enableNpmScripts%"
                 },
                 "taskView.debug": {
                     "type": "boolean",
                     "default": true,
-                    "scope": "resource",
                     "markdownDescription": "%config.taskView.runSilent%"
                 },
                 "taskView.runSilent": {
