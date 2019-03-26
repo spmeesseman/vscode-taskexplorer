@@ -3,15 +3,13 @@
     "displayName": "Task View for Explorer",
     "description": "Extension to view and run VSCode tasks from Explorer",
     "icon": "res/launch.png",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "publisher": "spmeesseman",
-    "repository":
-    {
+    "repository": {
         "type": "git",
         "url": "https://github.com/spmeesseman/vscode-taskview.git"
     },
-    "engines":
-    {
+    "engines": {
         "vscode": "^1.26.0"
     },
     "categories": [
@@ -25,44 +23,38 @@
         "*"
     ],
     "main": "./out/extension",
-    "config":
-    {
-        "commitizen":
-        {
+    "config": {
+        "commitizen": {
             "path": "cz-conventional-changelog"
         }
     },
-    "contributes":
-    {
-        "configuration":
-        {
+    "contributes": {
+        "configuration": {
             "title": "VSCode Task View",
-            "properties":
-            {
-                "taskView.autorefresh":
-                {
+            "properties": {
+                "taskView.autorefresh": {
                     "type": "boolean",
                     "description": "Auto-refresh when task.json files are modified",
                     "default": true
                 }
             }
         },
-        "views":
-        {
+        "views": {
             "explorer": [
-            {
-                "id": "taskView",
-                "name": "VSCode Tasks"
-            }]
+                {
+                    "id": "taskView",
+                    "name": "VSCode Tasks"
+                }
+            ]
         },
         "commands": [
-        {
-            "command": "taskView.executeTask",
-            "title": "Execute"
-        }]
+            {
+                "command": "taskView.executeTask",
+                "title": "Execute"
+            }
+        ]
     },
-    "scripts":
-    {
+    "scripts": {
         "package": "vsce package",
         "publish": "vsce publish",
         "vscode:prepublish": "npm run build",
@@ -74,8 +66,7 @@
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "node ./node_modules/vscode/bin/test"
     },
-    "devDependencies":
-    {
+    "devDependencies": {
         "@types/glob": "^7.1.1",
         "@types/istanbul": "^0.4.30",
         "@types/mocha": "^5.2.6",
@@ -102,29 +93,28 @@
         "mocha": "^6.0.2",
         "mocha-junit-reporter": "^1.18.0"
     },
-    "release":
-    {
+    "release": {
         "plugins": [
             [
                 "@semantic-release/commit-analyzer",
                 {
                     "preset": "angular",
                     "releaseRules": [
-                    {
-                        "type": "docs",
-                        "scope": "readme",
-                        "release": "patch"
-                    },
-                    {
-                        "type": "refactor",
-                        "release": "patch"
-                    },
-                    {
-                        "type": "style",
-                        "release": "patch"
-                    }],
-                    "parserOpts":
-                    {
+                        {
+                            "type": "docs",
+                            "scope": "readme",
+                            "release": "patch"
+                        },
+                        {
+                            "type": "refactor",
+                            "release": "patch"
+                        },
+                        {
+                            "type": "style",
+                            "release": "patch"
+                        }
+                    ],
+                    "parserOpts": {
                         "noteKeywords": [
                             "BREAKING CHANGE",
                             "BREAKING CHANGES"
