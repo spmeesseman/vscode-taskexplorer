@@ -22,58 +22,58 @@ trigger:
 # 
 
 jobs:
-  - job: Windows
-    strategy:
-      matrix:
-        Code26:
-          CODE_VERSION: '1.26.0'
-        CodeCurrent:
-          CODE_VERSION:
-        CodeInssiders:
-          CODE_VERSION: 'insiders'
-    pool:
-      name: Hosted VS2017
-      demands: npm
-    steps:
-      - task: NodeTool@0
-        displayName: 'Use Node 8.x'
-        inputs:
-          versionSpec: 8.x
-      - task: Npm@1
-        displayName: 'Install dependencies'
-        inputs:
-          verbose: false
-      - task: Npm@1
-        displayName: 'Compile sources'
-        inputs:
-          command: custom
-          verbose: false
-          customCommand: 'run build'
-      - bash: sed -i.bak 's/"\*"//g' package.json
-        displayName: 'Enable full coverage'
-      - task: Npm@1
-        displayName: 'Run tests'
-        inputs:
-          command: custom
-          verbose: false
-          customCommand: 'run test --silent'
-      - task: PublishTestResults@2
-        displayName: 'Publish Test Results'
-        inputs:
-          testResultsFormat: 'JUnit'
-          testResultsFiles: 'test-reports/*.xml'
-          mergeTestResults: true
-          testRunTitle: '$(Agent.OS) $(Agent.JobName)'
-      - task: PublishCodeCoverageResults@1
-        displayName: 'Publish Code Coverage to Azure'
-        inputs:
-          codeCoverageTool: Cobertura
-          summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
-          reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
-      - script: node_modules\.bin\codecov --disable=gcov
-        displayName: 'Publish Code Coverage to Codecov'
-        env:
-          CODECOV_TOKEN: $(codecovToken)
+  #- job: Windows
+  #  strategy:
+  #    matrix:
+  #      Code26:
+  #        CODE_VERSION: '1.26.0'
+  #      CodeCurrent:
+  #        CODE_VERSION:
+  #      CodeInssiders:
+  #        CODE_VERSION: 'insiders'
+  #  pool:
+  #    name: Hosted VS2017
+  #    demands: npm
+  #  steps:
+  #    - task: NodeTool@0
+  #      displayName: 'Use Node 8.x'
+  #      inputs:
+  #        versionSpec: 8.x
+  #    - task: Npm@1
+  #      displayName: 'Install dependencies'
+  #      inputs:
+  #        verbose: false
+  #    - task: Npm@1
+  #      displayName: 'Compile sources'
+  #      inputs:
+  #        command: custom
+  #        verbose: false
+  #        customCommand: 'run build'
+  #    - bash: sed -i.bak 's/"\*"//g' package.json
+  #      displayName: 'Enable full coverage'
+  #    - task: Npm@1
+  #      displayName: 'Run tests'
+  #      inputs:
+  #        command: custom
+  #        verbose: false
+  #        customCommand: 'run test --silent'
+  #    - task: PublishTestResults@2
+  #      displayName: 'Publish Test Results'
+  #      inputs:
+  #        testResultsFormat: 'JUnit'
+  #        testResultsFiles: 'test-reports/*.xml'
+  #        mergeTestResults: true
+  #        testRunTitle: '$(Agent.OS) $(Agent.JobName)'
+  #    - task: PublishCodeCoverageResults@1
+  #      displayName: 'Publish Code Coverage to Azure'
+  #      inputs:
+  #        codeCoverageTool: Cobertura
+  #        summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+  #        reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
+  #    - script: node_modules\.bin\codecov --disable=gcov
+  #      displayName: 'Publish Code Coverage to Codecov'
+  #      env:
+  #        CODECOV_TOKEN: $(codecovToken)
   - job: macOS
     strategy:
       matrix:
@@ -188,7 +188,7 @@ jobs:
   - job: Release
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     dependsOn:
-    - Windows
+    #- Windows
     - macOS
     - Linux
     pool:
