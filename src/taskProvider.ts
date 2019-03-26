@@ -38,7 +38,7 @@ export class TaskTreeDataProvider implements vscode.TreeDataProvider<TreeTask>
 					console.log('Processing task ' + i.toString() + ' of ' + tasks.length.toString());
 					console.log('   type = ' + tasks[i].definition.type);	
 					console.log('   source = ' + tasks[i].source);	
-					console.log('   scope = ' + tasks[i].scope.WorkspaceFolder.name);
+					//console.log('   scope = ' + tasks[i].scope.WorkspaceFolder.name);
 				}
 
 				if (tasks[i].source === 'Workspace' || vscode.workspace.getConfiguration('taskView').get('shownpm'))
