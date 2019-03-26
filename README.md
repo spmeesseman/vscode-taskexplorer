@@ -11,7 +11,7 @@
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/spmeesseman/vscode-task-runner.svg)](https://isitmaintained.com/project/spmeesseman/vscode-task-runner "Average time to resolve an issue")
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/spmeesseman/vscode-task-runner.svg)](https://isitmaintained.com/project/spmeesseman/vscode-task-runner "Percentage of issues still open")
 [![Dependencies Status](https://david-dm.org/spmeesseman/vscode-task-runner/status.svg)](https://david-dm.org/spmeesseman/vscode-task-runner)
-[![DevDependencies Status](https://david-dm.org/spmeesseman/vscode-task-runner/dev-status.svg)](https://david-dm.org/spmeesseman/vscode-task-runner?type=dev)
+[![DevDependencies Status](https://david-dm.org/spmeesseman/vscode-task-runner/dev-status.svg)](https://david-dm.org/spmeesseman/vscode-task-runner?type=dev) [![Greenkeeper badge](https://badges.greenkeeper.io/spmeesseman/vscode-taskview.svg)](https://greenkeeper.io/)
 
 ## Description
 
