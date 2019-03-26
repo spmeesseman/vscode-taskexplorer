@@ -59,7 +59,7 @@ class PackageJSON extends TreeItem
 	}
 
 	constructor(folder: Folder, relativePath: string) {
-		super(PackageJSON.getLabel(folder.label!, relativePath), TreeItemCollapsibleState.Expanded);
+		super(PackageJSON.getLabel(folder.label!, relativePath), TreeItemCollapsibleState.Collapsed);
 		this.folder = folder;
 		this.path = relativePath;
 		this.contextValue = 'packageJSON';
@@ -92,7 +92,7 @@ class TasksJSON extends TreeItem
 	}
 
 	constructor(folder: Folder, relativePath: string) {
-		super(TasksJSON.getLabel(folder.label!, relativePath), TreeItemCollapsibleState.Expanded);
+		super(TasksJSON.getLabel(folder.label!, relativePath), TreeItemCollapsibleState.Collapsed);
 		this.folder = folder;
 		this.path = relativePath;
 		this.contextValue = 'tasksJSON';
