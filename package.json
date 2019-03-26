@@ -1,0 +1,170 @@
+{
+    "name": "vscode-taskview",
+    "displayName": "Task View for Explorer",
+    "description": "Extension to view and run VSCode tasks from Explorer",
+    "icon": "res/launch.png",
+    "version": "0.0.1",
+    "publisher": "spmeesseman",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/spmeesseman/vscode-taskview.git"
+    },
+    "engines":
+    {
+        "vscode": "^1.26.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "tasks",
+        "execute"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "main": "./out/extension",
+    "config":
+    {
+        "commitizen":
+        {
+            "path": "cz-conventional-changelog"
+        }
+    },
+    "contributes":
+    {
+        "configuration":
+        {
+            "title": "VSCode Task View",
+            "properties":
+            {
+                "taskView.autorefresh":
+                {
+                    "type": "boolean",
+                    "description": "Auto-refresh when task.json files are modified",
+                    "default": true
+                }
+            }
+        },
+        "views":
+        {
+            "explorer": [
+            {
+                "id": "taskView",
+                "name": "VSCode Tasks"
+            }]
+        },
+        "commands": [
+        {
+            "command": "taskView.executeTask",
+            "title": "Execute"
+        }]
+    },
+    "scripts":
+    {
+        "package": "vsce package",
+        "publish": "vsce publish",
+        "vscode:prepublish": "npm run build",
+        "build": "npx tsc -p ./",
+        "semantic-release": "semantic-release",
+        "semantic-release-no-ci": "semantic-release --no-ci",
+        "semantic-release-dry": "semantic-release --dry-run",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies":
+    {
+        "@types/glob": "^7.1.1",
+        "@types/istanbul": "^0.4.30",
+        "@types/mocha": "^5.2.6",
+        "@types/node": "^11.11.3",
+        "@types/semver": "^5.5.0",
+        "@types/tmp": "0.0.34",
+        "@types/xml2js": "^0.4.3",
+        "@semantic-release/changelog": "^3.0.2",
+        "@semantic-release/git": "^7.0.8",
+        "typescript": "^3.0.3",
+        "vscode": "^1.1.30",
+        "tslint": "^5.8.0",
+        "remap-istanbul": "^0.13.0",
+        "semantic-release": "^15.13.3",
+        "semantic-release-vsce": "^2.2.6",
+        "codecov": "^3.2.0",
+        "commitizen": "^3.0.7",
+        "cz-conventional-changelog": "^2.1.0",
+        "decache": "^4.5.1",
+        "glob": "^7.1.2",
+        "iconv-lite": "^0.4.23",
+        "istanbul": "^0.4.5",
+        "jschardet": "^2.1.0",
+        "mocha": "^6.0.2",
+        "mocha-junit-reporter": "^1.18.0"
+    },
+    "release":
+    {
+        "plugins": [
+            [
+                "@semantic-release/commit-analyzer",
+                {
+                    "preset": "angular",
+                    "releaseRules": [
+                    {
+                        "type": "docs",
+                        "scope": "readme",
+                        "release": "patch"
+                    },
+                    {
+                        "type": "refactor",
+                        "release": "patch"
+                    },
+                    {
+                        "type": "style",
+                        "release": "patch"
+                    }],
+                    "parserOpts":
+                    {
+                        "noteKeywords": [
+                            "BREAKING CHANGE",
+                            "BREAKING CHANGES"
+                        ]
+                    }
+                }
+            ],
+            "@semantic-release/release-notes-generator",
+            "@semantic-release/changelog",
+            "@semantic-release/npm",
+            "@semantic-release/github",
+            "@semantic-release/git"
+        ],
+        "verifyConditions": [
+            "@semantic-release/github",
+            "@semantic-release/git",
+            "@semantic-release/changelog",
+            "semantic-release-vsce"
+        ],
+        "prepare": [
+            "@semantic-release/npm",
+            "@semantic-release/changelog",
+            {
+                "path": "@semantic-release/git",
+                "assets": [
+                    "CHANGELOG.md",
+                    "package.json",
+                    "package-lock.json"
+                ],
+                "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+            },
+            "semantic-release-vsce"
+        ],
+        "publish": [
+            "semantic-release-vsce",
+            {
+                "path": "@semantic-release/github",
+                "assets": "vscode-taskview.vsix"
+            }
+        ],
+        "packageVsix": "vscode-taskview.vsix"
+    }
+}
