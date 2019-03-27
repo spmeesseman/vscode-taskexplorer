@@ -24,7 +24,10 @@
         "script",
         "scripts",
         "view",
-        "explorer"
+        "explorer",
+        "run",
+        "ant",
+        "target"
     ],
     "main": "./out/extension",
     "config": {
@@ -211,10 +214,20 @@
                     "default": true,
                     "markdownDescription": "%config.taskView.enableNpmScripts%"
                 },
+                "taskView.enableAntTargets": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskView.enableAntTargets%"
+                },
+                "taskView.enableCodeTasks": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskView.enableCodeTasks%"
+                },
                 "taskView.debug": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskView.runSilent%"
+                    "markdownDescription": "%config.taskView.debug%"
                 },
                 "taskView.runSilent": {
                     "type": "boolean",
@@ -289,6 +302,22 @@
         "taskDefinitions": [
             {
                 "type": "npm",
+                "required": [
+                    "script"
+                ],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.script%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.path%"
+                    }
+                }
+            },
+            {
+                "type": "ant",
                 "required": [
                     "script"
                 ],

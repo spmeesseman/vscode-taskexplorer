@@ -9,6 +9,7 @@ import {
 } from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import { parseString } from 'xml2js';
 import * as minimatch from 'minimatch';
 import * as nls from 'vscode-nls';
 import * as util from './util';
@@ -23,6 +24,14 @@ export interface NpmTaskDefinition extends TaskDefinition
 	script: string;
 	path?: string;
 }
+
+
+export interface AntTaskDefinition extends TaskDefinition 
+{
+	script: string;
+	path?: string;
+}
+
 
 type AutoDetect = 'on' | 'off';
 
@@ -42,6 +51,22 @@ export class NpmTaskProvider implements TaskProvider
 		return undefined;
 	}
 }
+
+
+export class AntTaskProvider implements TaskProvider 
+{
+	constructor() {
+	}
+
+	public provideTasks() {
+		return provideAntScripts();
+	}
+
+	public resolveTask(_task: Task): Task | undefined {
+		return undefined;
+	}
+}
+
 
 export function invalidateTasksCache() 
 {
@@ -158,10 +183,51 @@ async function detectNpmScripts(): Promise<Task[]>
 }
 
 
+async function detectAntScripts(): Promise<Task[]> 
+{
+
+	let emptyTasks: Task[] = [];
+	let allTasks: Task[] = [];
+	let visitedPackageJsonFiles: Set<string> = new Set();
+
+	let folders = workspace.workspaceFolders;
+	if (!folders) {
+		return emptyTasks;
+	}
+	try {
+		for (const folder of folders) {
+			if (isAutoDetectionEnabled(folder)) {
+				let relativePattern = new RelativePattern(folder, '**/build.xml');
+				let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
+				for (const path of paths) {
+					if (!isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
+						let tasks = await provideAntScriptsForFolder(path);
+						visitedPackageJsonFiles.add(path.fsPath);
+						allTasks.push(...tasks);
+					}
+				}
+			}
+		}
+		return allTasks;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+
 export async function provideNpmScripts(): Promise<Task[]> 
 {
 	if (!cachedTasks) {
 		cachedTasks = await detectNpmScripts();
+	}
+	return cachedTasks;
+}
+
+
+export async function provideAntScripts(): Promise<Task[]> 
+{
+	if (!cachedTasks) {
+		cachedTasks = await detectAntScripts();
 	}
 	return cachedTasks;
 }
@@ -242,6 +308,32 @@ async function provideNpmScriptsForFolder(packageJsonUri: Uri): Promise<Task[]>
 }
 
 
+async function provideAntScriptsForFolder(packageJsonUri: Uri): Promise<Task[]> 
+{
+	let emptyTasks: Task[] = [];
+
+	let folder = workspace.getWorkspaceFolder(packageJsonUri);
+	if (!folder) {
+		return emptyTasks;
+	}
+	let scripts = await getScripts(packageJsonUri);
+	if (!scripts) {
+		return emptyTasks;
+	}
+
+	const result: Task[] = [];
+
+	Object.keys(scripts).forEach(each => {
+		const task = createAntTask(each, `run ${each}`, folder!, packageJsonUri);
+		const lowerCaseTaskName = each.toLowerCase();
+		task.group = TaskGroup.Build;
+		result.push(task);
+	});
+
+	return result;
+}
+
+
 export function getTaskName(script: string, relativePath: string | undefined) 
 {
 	if (relativePath && relativePath.length) {
@@ -281,27 +373,60 @@ export function createTask(script: string, cmd: string, folder: WorkspaceFolder,
 }
 
 
+export function createAntTask(script: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri, matcher?: any): Task {
+
+	function getCommandLine(folder: WorkspaceFolder, cmd: string): string {
+		let packageManager = getPackageManager(folder);
+		if (workspace.getConfiguration('taskView', folder.uri).get<boolean>('runSilent')) {
+			return `${packageManager} --silent ${cmd}`;
+		}
+		return `${packageManager} ${cmd}`;
+	}
+
+	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string {
+		let rootUri = folder.uri;
+		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.length - 'package.json'.length);
+		return absolutePath.substring(rootUri.path.length + 1);
+	}
+
+	let kind: AntTaskDefinition = {
+		type: 'ant',
+		script: script
+	};
+	let relativePackageJson = getRelativePath(folder, packageJsonUri);
+	if (relativePackageJson.length) {
+		kind.path = getRelativePath(folder, packageJsonUri);
+	}
+	let taskName = getTaskName(script, relativePackageJson);
+	let cwd = path.dirname(packageJsonUri.fsPath);
+	return new Task(kind, folder, taskName, 'ant', new ShellExecution(getCommandLine(folder, cmd), { cwd: cwd }), matcher);
+}
+
+
 export function getPackageJsonUriFromTask(task: Task): Uri | null 
 {
 	let uri:Uri = null;
 
 	util.log('');
 	util.log('getPackageJsonUriFromTask');
+	util.logValue('   task name', task.name);
+	util.logValue('   task source', task.source);
+	util.logValue('   task type', task.definition.type);
 
 	if (isWorkspaceFolder(task.scope)) 
 	{
 		let relPath: string = task.definition.path;
 
-		if (task.source === 'Workspace')
+		if (task.source === 'Workspace' && task.definition.type === 'shell')
 		{
 			relPath = '.vscode';
 		}
 
 		if (relPath) {
-			uri = Uri.file(path.join(task.scope.uri.fsPath, relPath, task.source !== 'Workspace' ? 'package.json'  : 'tasks.json'));
+			uri = Uri.file(path.join(task.scope.uri.fsPath, relPath, task.source === 'npm' ? 'package.json'  : (task.source === 'ant' ? 'build.xml' : 'tasks.json')));
 		} 
 		else {
-			uri = Uri.file(path.join(task.scope.uri.fsPath, task.source !== 'Workspace' ? 'package.json'  : 'tasks.json'));
+			uri = Uri.file(path.join(task.scope.uri.fsPath, task.source === 'npm' ? 'package.json'  : (task.source === 'ant' ? 'build.xml' : 'tasks.json')));
 		}
 	}
 
@@ -402,10 +527,12 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 	let script: string | undefined = undefined;
 	let inScripts = false;
 	let inTasks = false;
+	let inTargets = false;
+	let inTargetRoot = false;
 
 	let visitor: JSONVisitor = {
 		onError(_error: ParseErrorCode, _offset: number, _length: number) {
-			console.log(_error);
+			console.log(_error + 'h');
 		},
 		onObjectEnd() {
 			if (inScripts) {
@@ -415,12 +542,20 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 		onLiteralValue(value: any, _offset: number, _length: number) {
 			if (script) {
 				if (typeof value === 'string') {
-					if (script === 'label')
+					if (script === 'label')  // VSCODE
 					{
 						script = value;
 						scripts[value] = ''; // TODO
 					}
-					else
+					else if (inTargetRoot && script === 'name')  // ANT
+					{
+						if (value.indexOf('**') === -1)
+						{
+							script = value;
+							scripts[value] = ''; // TODO
+						}
+					}
+					else 
 					{
 						scripts[script] = value;
 					}
@@ -438,7 +573,16 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 			else if (property === 'tasks') {
 				inTasks = true;
 			}
+			else if (property === 'target') {
+				inTargets= true;
+			}
+			else if (inTargets && property === '$') {
+				inTargetRoot= true;
+			}
 			else if (property === 'label' && inTasks && !script) {
+				script = property;
+			}
+			else if (property === 'name' && inTargetRoot && !script) {
 				script = property;
 			}
 			else { // nested object which is invalid, ignore the script
@@ -448,6 +592,22 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 	};
 	visit(buffer, visitor);
 	return scripts;
+}
+
+
+async function findAllAntScripts(buffer: string): Promise<StringMap> 
+{
+	let xml: string = '';
+
+	util.log('findAllAntScripts');
+
+	parseString(buffer, function (err, result) {
+		xml = JSON.stringify(result);
+	});
+
+	//util.logValue('   converted json', xml);
+
+	return findAllScripts(xml);
 }
 
 
@@ -535,21 +695,37 @@ export function findScriptAtPosition(buffer: string, offset: number): string | u
 
 export async function getScripts(packageJsonUri: Uri): Promise<StringMap | undefined> 
 {
+	util.log('');
+	util.log('getScripts');
+	util.logValue('   uri', packageJsonUri.fsPath);
 
-	if (packageJsonUri.scheme !== 'file') {
+	if (packageJsonUri.scheme !== 'file') 
+	{
 		return undefined;
 	}
 
 	let packageJson = packageJsonUri.fsPath;
-	if (!await exists(packageJson)) {
+	if (!await exists(packageJson)) 
+	{
 		return undefined;
 	}
 
-	try {
+	try 
+	{
 		let contents = await readFile(packageJson);
-		let json = findAllScripts(contents);//JSON.parse(contents);
+		let json = null;
+
+		if (packageJsonUri.fsPath.indexOf('uild.xml') === -1)
+		{
+			json = findAllScripts(contents);//JSON.parse(contents);
+		}
+		else
+		{
+			json = findAllAntScripts(contents);
+		}
 		return json;
-	} catch (e) {
+	} 
+	catch (e) {
 		let localizedParseError = localize('taskview.parseError', 'Script detection: failed to parse the file {0}', packageJsonUri.fsPath);
 		throw new Error(localizedParseError);
 	}

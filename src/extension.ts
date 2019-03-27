@@ -7,7 +7,7 @@ import * as httpRequest from 'request-light';
 import * as vscode from 'vscode';
 import { addJSONProviders } from './features/jsonContributions';
 import { TaskTreeDataProvider } from './taskView';
-import { invalidateTasksCache, NpmTaskProvider } from './tasks';
+import { invalidateTasksCache, NpmTaskProvider, AntTaskProvider } from './tasks';
 import { invalidateHoverScriptsCache, NpmScriptHoverProvider } from './scriptHover';
 import { runSelectedScript } from './commands';
 
@@ -70,6 +70,10 @@ function registerTaskProvider(context: vscode.ExtensionContext): vscode.Disposab
 		let provider: vscode.TaskProvider = new NpmTaskProvider();
 		let disposable = vscode.workspace.registerTaskProvider('taskView', provider);
 		context.subscriptions.push(disposable);
+
+		let provider2 = new AntTaskProvider();
+		let disposable2 = vscode.workspace.registerTaskProvider('taskView', provider2);
+
 		return disposable;
 	}
 	return undefined;
@@ -77,7 +81,6 @@ function registerTaskProvider(context: vscode.ExtensionContext): vscode.Disposab
 
 function registerExplorer(context: vscode.ExtensionContext): TaskTreeDataProvider | undefined 
 {
-	console.log('here');
 	if (vscode.workspace.workspaceFolders) {
 		let showCollapseAll = true;
 		let treeDataProvider = new TaskTreeDataProvider(context);
