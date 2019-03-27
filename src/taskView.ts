@@ -52,9 +52,9 @@ class PackageJSON extends TreeItem
 
 	static getLabel(_folderName: string, relativePath: string): string {
 		if (relativePath.length > 0) {
-			return 'NPM Scripts (' + relativePath + ')';
+			return 'NPM (' + relativePath.substring(0, relativePath.length - 1) + ')';
 		}
-		return 'NPM Scripts';
+		return 'NPM';
 	}
 
 	constructor(folder: Folder, relativePath: string) {
@@ -84,9 +84,9 @@ class TasksJSON extends TreeItem
 
 	static getLabel(_folderName: string, relativePath: string): string {
 		if (relativePath.length > 0 && relativePath !== '.vscode') {
-			return 'VSCode Tasks (' + relativePath + ')';
+			return 'VSCode (' + relativePath.substring(0, relativePath.length - 1) + ')';
 		}
-		return 'VSCode Tasks';
+		return 'VSCode';
 	}
 
 	constructor(folder: Folder, relativePath: string) {
@@ -116,9 +116,9 @@ class AntJSON extends TreeItem
 
 	static getLabel(_folderName: string, relativePath: string): string {
 		if (relativePath.length > 0) {
-			return 'Ant Targets (' + relativePath + ')';
+			return 'ANT (' + relativePath.substring(0, relativePath.length - 1) + ')';
 		}
-		return 'Ant Targets';
+		return 'ANT';
 	}
 
 	constructor(folder: Folder, relativePath: string) {
@@ -244,12 +244,12 @@ class TasksScript extends TreeItem
 			};
 		}
 
-		let uri = getPackageJsonUriFromTask(task);
-		getScripts(uri!).then(scripts => {
-			if (scripts && scripts[task.definition['script']]) {
-				this.tooltip = scripts[task.definition['script']];
-			}
-		});
+		//let uri = getPackageJsonUriFromTask(task);
+		//getScripts(uri!).then(scripts => {
+		//	if (scripts && scripts[task.definition['script']]) {
+		//		this.tooltip = scripts[task.definition['script']];
+		//	}
+		//});
 	}
 
 	getFolder(): WorkspaceFolder {
@@ -300,12 +300,12 @@ class AntScript extends TreeItem
 			};
 		}
 
-		let uri = getPackageJsonUriFromTask(task);
-		getScripts(uri!).then(scripts => {
-			if (scripts && scripts[task.definition['script']]) {
-				this.tooltip = scripts[task.definition['script']];
-			}
-		});
+		// let uri = getPackageJsonUriFromTask(task);
+		// getScripts(uri!).then(scripts => {
+		// 	if (scripts && scripts[task.definition['script']]) {
+		// 		this.tooltip = scripts[task.definition['script']];
+		// 	}
+		// });
 	}
 
 	getFolder(): WorkspaceFolder {
@@ -411,7 +411,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 	private scriptNotValid(task: Task) {
-		let message = localize('scriptInvalid', 'Could not find the script "{0}". Try to refresh the view.', task.name);
+		let message = localize('scriptInvalid', 'Task View - Could not find the script "{0}". Try to refresh the view.', task.name);
 		window.showErrorMessage(message);
 	}
 
