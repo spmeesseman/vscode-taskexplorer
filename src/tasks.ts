@@ -324,7 +324,7 @@ async function provideAntScriptsForFolder(packageJsonUri: Uri): Promise<Task[]>
 	const result: Task[] = [];
 
 	Object.keys(scripts).forEach(each => {
-		const task = createAntTask(each, `run ${each}`, folder!, packageJsonUri);
+		const task = createAntTask(each, `${each}`, folder!, packageJsonUri);
 		const lowerCaseTaskName = each.toLowerCase();
 		task.group = TaskGroup.Build;
 		result.push(task);
@@ -373,17 +373,19 @@ export function createTask(script: string, cmd: string, folder: WorkspaceFolder,
 }
 
 
-export function createAntTask(script: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri, matcher?: any): Task {
-
-	function getCommandLine(folder: WorkspaceFolder, cmd: string): string {
+export function createAntTask(script: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri, matcher?: any): Task 
+{
+	function getCommandLine(folder: WorkspaceFolder, cmd: string): string 
+	{
 		let packageManager = getPackageManager(folder);
 		if (workspace.getConfiguration('taskView', folder.uri).get<boolean>('runSilent')) {
-			return `ant --silent ${cmd}`;
+			return `ant -silent ${cmd}`;
 		}
-		return `ant ${cmd}`;
+		return `ant ${cmd}`; 
 	}
 
-	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string {
+	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string 
+	{
 		let rootUri = folder.uri;
 		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.length - 'build.xml'.length);
 		return absolutePath.substring(rootUri.path.length + 1);
@@ -393,13 +395,13 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 		type: 'ant',
 		script: script
 	};
+
 	let relativePackageJson = getRelativePath(folder, packageJsonUri);
 	if (relativePackageJson.length) {
 		kind.path = getRelativePath(folder, packageJsonUri);
 	}
 	let taskName = getTaskName(script, relativePackageJson);
-	let cwd = path.dirname(packageJsonUri.fsPath);
-	return new Task(kind, folder, taskName, 'ant', new ShellExecution(getCommandLine(folder, cmd), { cwd: cwd }), matcher);
+	let cwd = path.dirname(packageJsonUri.fsPath);return new Task(kind, folder, taskName, 'ant', new ShellExecution(getCommandLine(folder, cmd), options), matcher);
 }
 
 
