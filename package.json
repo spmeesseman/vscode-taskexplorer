@@ -16,18 +16,13 @@
         "Other"
     ],
     "keywords": [
-        "tasks",
-        "task",
-        "launcher",
-        "launch",
-        "execute",
-        "script",
-        "scripts",
-        "view",
-        "explorer",
-        "run",
-        "ant",
-        "target"
+        "task view", "taskview",
+        "tasks", "task", "task launcher", "task runner",
+        "launcher", "launch", "execute",
+        "script", "scripts",
+        "explorer", "explorer view",
+        "run script", "run target", "run task",
+        "ant", "ant script", "ant target"
     ],
     "main": "./out/extension",
     "config": {
@@ -90,9 +85,7 @@
         "mocha-junit-reporter": "^1.18.0"
     },
     "activationEvents": [
-        "onCommand:workbench.action.tasks.runTask",
-        "onLanguage:json",
-        "onView:taskView"
+        "*"
     ],
     "contributes": {
         "languages": [
@@ -238,25 +231,33 @@
             "type": "object",
             "title": "Task View",
             "properties": {
-                "taskView.autoDetect": {
-                    "type": "string",
-                    "enum": [
-                        "off",
-                        "on"
-                    ],
-                    "default": "on",
-                    "scope": "resource",
-                    "description": "%config.taskView.autoDetect%"
-                },
                 "taskView.enableNpmScripts": {
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "%config.taskView.enableNpmScripts%"
                 },
+                "taskView.enableGruntTasks": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "%config.taskView.enableGruntTasks%"
+                },
                 "taskView.enableAntTargets": {
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "%config.taskView.enableAntTargets%"
+                },
+                "taskView.pathToAnt": {
+                    "type": "string",
+                    "markdownDescription": "%config.taskView.pathToAnt%"
+                },
+                "taskView.enableAnsiconForAnt": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskView.enableAnsiconForAnt%"
+                },
+                "taskView.pathToAnsicon": {
+                    "type": "string",
+                    "markdownDescription": "%config.taskView.pathToAnsicon%"
                 },
                 "taskView.enableCodeTasks": {
                     "type": "boolean",
