@@ -52,9 +52,9 @@ class PackageJSON extends TreeItem
 
 	static getLabel(_folderName: string, relativePath: string): string {
 		if (relativePath.length > 0) {
-			return 'NPM (' + relativePath.substring(0, relativePath.length - 1) + ')';
+			return 'npm (' + relativePath.substring(0, relativePath.length - 1) + ')';
 		}
-		return 'NPM';
+		return 'npm';
 	}
 
 	constructor(folder: Folder, relativePath: string) {
@@ -84,9 +84,9 @@ class TasksJSON extends TreeItem
 
 	static getLabel(_folderName: string, relativePath: string): string {
 		if (relativePath.length > 0 && relativePath !== '.vscode') {
-			return 'VSCode (' + relativePath.substring(0, relativePath.length - 1) + ')';
+			return 'vscode (' + relativePath.substring(0, relativePath.length - 1) + ')';
 		}
-		return 'VSCode';
+		return 'vscode';
 	}
 
 	constructor(folder: Folder, relativePath: string) {
@@ -116,9 +116,9 @@ class AntJSON extends TreeItem
 
 	static getLabel(_folderName: string, relativePath: string): string {
 		if (relativePath.length > 0) {
-			return 'ANT (' + relativePath.substring(0, relativePath.length - 1) + ')';
+			return 'ant (' + relativePath.substring(0, relativePath.length - 1) + ')';
 		}
-		return 'ANT';
+		return 'ant';
 	}
 
 	constructor(folder: Folder, relativePath: string) {
