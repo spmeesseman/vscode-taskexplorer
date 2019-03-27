@@ -1,4 +1,4 @@
-# VSCode Task Runner
+# Explorer View - Open and Launch VSCode Tasks / NPM Scripts / Ant Targets
 
 [![Version](https://vsmarketplacebadge.apphb.com/version-short/spmeesseman.vscode-taskview.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskview)
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/spmeesseman.vscode-taskview.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskview)
@@ -16,24 +16,42 @@
 
 ## Description
 
-> Provides a drawer in the file explorer that displays VSCode tasks in the same manner as the built in drawer for npm scripts.
+> Provides a view in the Explorer that conveniently displays VSCode tasks, NPM scripts, and Ant targets, grouped within their respective task nodes.  Tasks can be either opened or executed.  See Important Notes section below.
 
 ## Important Notes
 
-> Disable auto detection of scripts in the Npm settings.  Otherwise npm scripts will be displayed twice.
+> For now, you must disable auto detection of npm scripts in the Npm settings, otherwise npm scripts will be displayed twice within each package.json node.  This will be corrected in a future release.
 
-## TODO
+## Features
 
-> 'Open' command for tasks from tasks.json file does not work yet
+Open and launch tasks from one single view in Explorer:
+
+* Open and launch Visual Studio Code tasks
+* Open and launch NPM scripts as tasks
+* Open and launch Ant targets as tasks (beta)
 
 ## Screenshots
 
 ![extension ss1](https://github.com/spmeesseman/vscode-taskview/blob/master/res/taskview.png?raw=true)
 
+## Feedback & Contributing
+
+* Please report any bugs, suggestions or documentation requests via the
+  [Issues](https://github.com/spmeesseman/vscode-taskview/issues)
+* Feel free to submit
+  [pull requests](https://github.com/spmeesseman/vscode-taskview/pulls)
+* [Contributors](https://github.com/spmeesseman/vscode-taskview/graphs/contributors)
+
 ## Settings
 
 |Config|Description|Default|
 |-|-|-|
-|`taskView.autorefresh`|Auto-refresh when task files are modified|`true`|
-|`taskView.debug`|Write debug output to console|`false`|
-|`taskView.shownpm`|Show npm tasks|`false`|
+|`taskView.enableCodeTasks`|Enable/show visual studio code tasks|`true`|
+|`taskView.enableNpmScripts`|Enable/show npm scripts as tasks|`true`|
+|`taskView.enableAntTargets`|Enable/show ant targets as tasks|`true`|
+|`taskView.autoDetect`|Controls whether npm scripts and ant tasks should be automatically detected|`true`|
+|`taskView.debug`|Turn on logging|`false`|
+|`taskView.runSilent`|Run commands with the `--silent` option|`false`|
+|`taskView.packageManager`|The package manager used to run npm scripts|`npm`|
+|`taskView.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/ext/**", "**/packages/**", "**/.vscode-test/**""**/build**"]`|
+|`taskView.fetchOnlinePackageInfo`|Fetch data from https://registry.npmjs.org and https://registry.bower.io to provide auto-completion and information on hover features on npm dependencies|`true`|
