@@ -331,6 +331,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	private findScript(document: TextDocument, script?: NpmScript): number {
 		let scriptOffset = 0;
 		let inScripts = false;
+		let inTasks = false;
+		let inTaskLabel = undefined;
 
 		let visitor: JSONVisitor = {
 			onError() {
@@ -339,6 +341,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			onObjectEnd() {
 				if (inScripts) {
 					inScripts = false;
+				}
+			},
+			onLiteralValue(value: any, offset: number, _length: number) {
+				if (inTaskLabel) {
+					if (typeof value === 'string') {
+						if (inTaskLabel === 'label')
+						{
+							if (script.task.name === value) {
+								scriptOffset = offset;
+							}
+						}
+					}
+					inTaskLabel = undefined;
 				}
 			},
 			onObjectProperty(property: string, offset: number, _length: number) {
@@ -353,6 +368,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					if (script.task.name === label) {
 						scriptOffset = offset;
 					}
+				}
+				else if (property === 'tasks') {
+					inTasks = true;
+					if (!inTaskLabel) { // select the script section
+						scriptOffset = offset;
+					}
+				}
+				else if (property === 'label' && inTasks && !inTaskLabel) {
+					inTaskLabel = 'label';
+					if (!inTaskLabel) { // select the script section
+						scriptOffset = offset;
+					}
+				}
+				else { // nested object which is invalid, ignore the script
+					inTaskLabel = undefined;
 				}
 			}
 		};
@@ -376,19 +406,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private async openScript(selection: PackageJSON | NpmScript) 
+	private async openScript(selection: PackageJSON | NpmScript | TasksJSON | TasksScript) 
 	{
 		let uri: Uri | undefined = undefined;
-		if (selection instanceof PackageJSON) {
+		if (selection instanceof PackageJSON || selection instanceof TasksJSON) {
 			uri = selection.resourceUri!;
-		} else if (selection instanceof NpmScript) {
+		} else if (selection instanceof NpmScript || selection instanceof TasksScript) {
 			uri = selection.package.resourceUri;
 		}
 		if (!uri) {
 			return;
 		}
 		let document: TextDocument = await workspace.openTextDocument(uri);
-		let offset = this.findScript(document, selection instanceof NpmScript ? selection : undefined);
+		let offset = this.findScript(document, selection instanceof NpmScript || selection instanceof TasksScript ? selection : undefined);
 		let position = document.positionAt(offset);
 		await window.showTextDocument(document, { selection: new Selection(position, position) });
 	}
