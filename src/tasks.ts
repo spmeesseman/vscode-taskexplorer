@@ -377,11 +377,21 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 {
 	function getCommandLine(folder: WorkspaceFolder, cmd: string): string 
 	{
-		let packageManager = getPackageManager(folder);
-		if (workspace.getConfiguration('taskView', folder.uri).get<boolean>('runSilent')) {
-			return `ant -silent ${cmd}`;
+		let ant = "ant";
+
+		if (workspace.getConfiguration('taskView').get('pathToAnt')) {
+			ant = workspace.getConfiguration('taskView').get('pathToAnt'); // path.join();
 		}
-		return `ant ${cmd}`; 
+
+		if (workspace.getConfiguration('taskView', folder.uri).get<boolean>('runSilent')) {
+			ant += ' -silent';
+		}
+
+		if (workspace.getConfiguration('taskView').get('enableAnsiconForAnt') === true) {
+			ant += ' -logger org.apache.tools.ant.listener.AnsiColorLogger';
+		}
+
+		return `${ant} ${cmd}`; 
 	}
 
 	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string 
@@ -390,7 +400,7 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.length - 'build.xml'.length);
 		return absolutePath.substring(rootUri.path.length + 1);
 	}
-
+	
 	let kind: AntTaskDefinition = {
 		type: 'ant',
 		script: script
@@ -401,7 +411,33 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 		kind.path = getRelativePath(folder, packageJsonUri);
 	}
 	let taskName = getTaskName(script, relativePackageJson);
-	let cwd = path.dirname(packageJsonUri.fsPath);return new Task(kind, folder, taskName, 'ant', new ShellExecution(getCommandLine(folder, cmd), options), matcher);
+	let cwd = path.dirname(packageJsonUri.fsPath);
+
+	let options = null;
+	let ansicon = "ansicon.exe";
+
+	if (workspace.getConfiguration('taskView').get('enableAnsiconForAnt') === true)
+	{
+		if (workspace.getConfiguration('taskView').get('pathToAnsicon'))
+		{
+			ansicon = workspace.getConfiguration('taskView').get('pathToAnsicon');
+		}
+		
+		options = {
+			"cwd": cwd,
+			"shell": {
+				"executable": ansicon
+			}
+		};
+	}
+	else
+	{
+		options = {
+			"cwd": cwd
+		};
+	}
+	
+	return new Task(kind, folder, taskName, 'ant', new ShellExecution(getCommandLine(folder, cmd), options), matcher);
 }
 
 
