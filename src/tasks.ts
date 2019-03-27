@@ -336,9 +336,9 @@ async function provideAntScriptsForFolder(packageJsonUri: Uri): Promise<Task[]>
 
 export function getTaskName(script: string, relativePath: string | undefined) 
 {
-	if (relativePath && relativePath.length) {
-		return `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
-	}
+	//if (relativePath && relativePath.length) {
+	//	return `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
+	//}
 	return script;
 }
 
@@ -378,14 +378,14 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 	function getCommandLine(folder: WorkspaceFolder, cmd: string): string {
 		let packageManager = getPackageManager(folder);
 		if (workspace.getConfiguration('taskView', folder.uri).get<boolean>('runSilent')) {
-			return `${packageManager} --silent ${cmd}`;
+			return `ant --silent ${cmd}`;
 		}
-		return `${packageManager} ${cmd}`;
+		return `ant ${cmd}`;
 	}
 
 	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string {
 		let rootUri = folder.uri;
-		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.length - 'package.json'.length);
+		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.length - 'build.xml'.length);
 		return absolutePath.substring(rootUri.path.length + 1);
 	}
 
@@ -554,6 +554,7 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 							script = value;
 							scripts[value] = ''; // TODO
 						}
+						inTargetRoot = false;
 					}
 					else 
 					{
@@ -574,7 +575,7 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 				inTasks = true;
 			}
 			else if (property === 'target') {
-				inTargets= true;
+				inTargets = true;
 			}
 			else if (inTargets && property === '$') {
 				inTargetRoot= true;
