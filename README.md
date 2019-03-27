@@ -50,7 +50,9 @@ Open and launch tasks from one single view in Explorer:
 |`taskView.enableCodeTasks`|Enable/show visual studio code tasks|`true`|
 |`taskView.enableNpmScripts`|Enable/show npm scripts as tasks|`true`|
 |`taskView.enableAntTargets`|Enable/show ant targets as tasks|`true`|
-|`taskView.autoDetect`|Controls whether npm scripts and ant tasks should be automatically detected|`true`|
+|`taskView.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
+|`taskView.pathToAnt`|The path to the ant program, if not registered in system path||",
+|`taskView.pathToAnsicon`|The path to the ansicon binary, if not registered in system path||",
 |`taskView.debug`|Turn on logging|`false`|
 |`taskView.runSilent`|Run commands with the `--silent` option|`false`|
 |`taskView.packageManager`|The package manager used to run npm scripts|`npm`|
