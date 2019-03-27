@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/spmeesseman/vscode-taskview/compare/v1.4.0...v1.4.1) (2019-03-27)
+
+
+### Bug Fixes
+
+* add required new xml2js runtime dep. ([91a1422](https://github.com/spmeesseman/vscode-taskview/commit/91a1422))
+
 # [1.4.0](https://github.com/spmeesseman/vscode-taskview/compare/v1.3.5...v1.4.0) (2019-03-27)
 
 
