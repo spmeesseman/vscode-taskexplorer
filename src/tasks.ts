@@ -192,7 +192,7 @@ async function detectAntScripts(): Promise<Task[]>
 	}
 	try {
 		for (const folder of folders) {
-			let relativePattern = new RelativePattern(folder, '**/build.xml');
+			let relativePattern = new RelativePattern(folder, '**/[Bb]uild.xml');
 			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
 			for (const path of paths) {
 				if (!isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
@@ -626,6 +626,7 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
 {
 	let xml: string = '';
 
+	util.log('');
 	util.log('findAllAntScripts');
 
 	parseString(buffer, function (err, result) {
