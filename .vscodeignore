@@ -5,5 +5,11 @@ out/**/*.map
 src/**
 .gitignore
 tsconfig.json
+coverconfig.json
+.codecov.yml
+.jsbeautify
+azure-pipelines.yml
 vsc-extension-quickstart.md
 tslint.json
+*.vsix
+test-reports
