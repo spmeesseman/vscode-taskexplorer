@@ -1,3 +1,17 @@
+# [1.5.0](https://github.com/spmeesseman/vscode-taskview/compare/v1.4.1...v1.5.0) (2019-03-27)
+
+
+### Bug Fixes
+
+* (1) open command for ant targets found in subfolders of project root. (2) invalid path displayed in view ([09c7a27](https://github.com/spmeesseman/vscode-taskview/commit/09c7a27))
+* cannot launch ant tasks if build.xml is not in root project folder ([24d0c8d](https://github.com/spmeesseman/vscode-taskview/commit/24d0c8d))
+
+
+### Features
+
+* add ansicon support, override ant path ([f36b612](https://github.com/spmeesseman/vscode-taskview/commit/f36b612))
+* name file tree nodes with respective task types, put relative paths in parenthesis ([f558d68](https://github.com/spmeesseman/vscode-taskview/commit/f558d68))
+
 ## [1.4.1](https://github.com/spmeesseman/vscode-taskview/compare/v1.4.0...v1.4.1) (2019-03-27)
 
 
