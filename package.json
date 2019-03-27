@@ -10,7 +10,7 @@
         "url": "https://github.com/spmeesseman/vscode-taskview.git"
     },
     "engines": {
-        "vscode": "^1.32.0"
+        "vscode": "^1.30.0"
     },
     "categories": [
         "Other"
@@ -48,6 +48,46 @@
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "node ./node_modules/vscode/bin/test",
         "commit": "npx git-cz"
+    },
+    "dependencies": {
+        "jsonc-parser": "^2.0.2",
+        "minimatch": "^3.0.4",
+        "request-light": "^0.2.4",
+        "vscode-nls": "^4.0.0",
+        "is-utf8": "^0.2.1",
+        "semver": "^5.6.0",
+        "tmp": "0.0.33",
+        "xml2js": "^0.4.19"
+    },
+    "devDependencies": {
+        "@types/glob": "^7.1.1",
+        "@types/istanbul": "^0.4.30",
+        "@types/mocha": "^5.2.6",
+        "@types/node": "^11.11.3",
+        "@types/semver": "^5.5.0",
+        "@types/tmp": "0.0.34",
+        "@types/xml2js": "^0.4.3",
+        "@semantic-release/changelog": "^3.0.2",
+        "@semantic-release/git": "^7.0.8",
+        "@types/minimatch": "^3.0.3",
+        "typescript": "^3.0.3",
+        "vscode": "^1.1.30",
+        "vsce": "^1.48.0",
+        "vscode-nls-dev": "3.2.6",
+        "tslint": "^5.8.0",
+        "remap-istanbul": "^0.13.0",
+        "semantic-release": "^15.13.3",
+        "semantic-release-vsce": "^2.2.6",
+        "codecov": "^3.2.0",
+        "commitizen": "^3.0.7",
+        "cz-conventional-changelog": "^2.1.0",
+        "decache": "^4.5.1",
+        "glob": "^7.1.2",
+        "iconv-lite": "^0.4.23",
+        "istanbul": "^0.4.5",
+        "jschardet": "^2.1.0",
+        "mocha": "^6.0.2",
+        "mocha-junit-reporter": "^1.18.0"
     },
     "activationEvents": [
         "onCommand:workbench.action.tasks.runTask",
@@ -332,42 +372,6 @@
                 }
             }
         ]
-    },
-    "dependencies": {
-        "jsonc-parser": "^2.0.2",
-        "minimatch": "^3.0.4",
-        "request-light": "^0.2.4",
-        "vscode-nls": "^4.0.0"
-    },
-    "devDependencies": {
-        "@types/glob": "^7.1.1",
-        "@types/istanbul": "^0.4.30",
-        "@types/mocha": "^5.2.6",
-        "@types/node": "^11.11.3",
-        "@types/semver": "^5.5.0",
-        "@types/tmp": "0.0.34",
-        "@types/xml2js": "^0.4.3",
-        "@semantic-release/changelog": "^3.0.2",
-        "@semantic-release/git": "^7.0.8",
-        "@types/minimatch": "^3.0.3",
-        "typescript": "^3.0.3",
-        "vscode": "^1.1.30",
-        "vsce": "^1.48.0",
-        "vscode-nls-dev": "3.2.6",
-        "tslint": "^5.8.0",
-        "remap-istanbul": "^0.13.0",
-        "semantic-release": "^15.13.3",
-        "semantic-release-vsce": "^2.2.6",
-        "codecov": "^3.2.0",
-        "commitizen": "^3.0.7",
-        "cz-conventional-changelog": "^2.1.0",
-        "decache": "^4.5.1",
-        "glob": "^7.1.2",
-        "iconv-lite": "^0.4.23",
-        "istanbul": "^0.4.5",
-        "jschardet": "^2.1.0",
-        "mocha": "^6.0.2",
-        "mocha-junit-reporter": "^1.18.0"
     },
     "release": {
         "plugins": [
