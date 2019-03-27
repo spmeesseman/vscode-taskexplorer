@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/spmeesseman/vscode-taskview/compare/v1.3.5...v1.4.0) (2019-03-27)
+
+
+### Features
+
+* add ant target support ([bba8552](https://github.com/spmeesseman/vscode-taskview/commit/bba8552))
+
 ## [1.3.5](https://github.com/spmeesseman/vscode-taskview/compare/v1.3.4...v1.3.5) (2019-03-27)
 
 
