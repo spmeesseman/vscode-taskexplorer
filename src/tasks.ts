@@ -136,12 +136,10 @@ export async function hasNpmScripts(): Promise<boolean>
 	}
 	try {
 		for (const folder of folders) {
-			if (isAutoDetectionEnabled(folder)) {
-				let relativePattern = new RelativePattern(folder, '**/package.json');
-				let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
-				if (paths.length > 0) {
-					return true;
-				}
+			let relativePattern = new RelativePattern(folder, '**/package.json');
+			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
+			if (paths.length > 0) {
+				return true;
 			}
 		}
 		return false;
@@ -164,15 +162,13 @@ async function detectNpmScripts(): Promise<Task[]>
 	}
 	try {
 		for (const folder of folders) {
-			if (isAutoDetectionEnabled(folder)) {
-				let relativePattern = new RelativePattern(folder, '**/package.json');
-				let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
-				for (const path of paths) {
-					if (!isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
-						let tasks = await provideNpmScriptsForFolder(path);
-						visitedPackageJsonFiles.add(path.fsPath);
-						allTasks.push(...tasks);
-					}
+			let relativePattern = new RelativePattern(folder, '**/package.json');
+			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
+			for (const path of paths) {
+				if (!isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
+					let tasks = await provideNpmScriptsForFolder(path);
+					visitedPackageJsonFiles.add(path.fsPath);
+					allTasks.push(...tasks);
 				}
 			}
 		}
@@ -196,15 +192,13 @@ async function detectAntScripts(): Promise<Task[]>
 	}
 	try {
 		for (const folder of folders) {
-			if (isAutoDetectionEnabled(folder)) {
-				let relativePattern = new RelativePattern(folder, '**/build.xml');
-				let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
-				for (const path of paths) {
-					if (!isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
-						let tasks = await provideAntScriptsForFolder(path);
-						visitedPackageJsonFiles.add(path.fsPath);
-						allTasks.push(...tasks);
-					}
+			let relativePattern = new RelativePattern(folder, '**/build.xml');
+			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
+			for (const path of paths) {
+				if (!isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
+					let tasks = await provideAntScriptsForFolder(path);
+					visitedPackageJsonFiles.add(path.fsPath);
+					allTasks.push(...tasks);
 				}
 			}
 		}
@@ -230,12 +224,6 @@ export async function provideAntScripts(): Promise<Task[]>
 		cachedTasks = await detectAntScripts();
 	}
 	return cachedTasks;
-}
-
-
-function isAutoDetectionEnabled(folder: WorkspaceFolder): boolean 
-{
-	return workspace.getConfiguration('taskView', folder.uri).get<AutoDetect>('autoDetect') === 'on';
 }
 
 
