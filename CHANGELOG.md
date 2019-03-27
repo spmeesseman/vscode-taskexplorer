@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/spmeesseman/vscode-taskview/compare/v1.5.0...v1.5.1) (2019-03-27)
+
+
+### Performance Improvements
+
+* remove tooltip loading for vscode tasks and ant targets ([64e7033](https://github.com/spmeesseman/vscode-taskview/commit/64e7033))
+
 # [1.5.0](https://github.com/spmeesseman/vscode-taskview/compare/v1.4.1...v1.5.0) (2019-03-27)
 
 

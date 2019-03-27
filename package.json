@@ -3,7 +3,7 @@
     "displayName": "Task View for Explorer",
     "description": "Extension to view and run VSCode tasks from Explorer",
     "icon": "res/launch.png",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "publisher": "spmeesseman",
     "repository": {
         "type": "git",
