@@ -67,8 +67,7 @@
             "explorer": [
                 {
                     "id": "taskView",
-                    "name": "%view.name%",
-                    "when": "config.taskView.enableTasksExplorer"
+                    "name": "%view.name%"
                 }
             ]
         },
@@ -261,22 +260,6 @@
                     ],
                     "description": "%config.taskView.exclude%",
                     "scope": "resource"
-                },
-                "taskView.enableTasksExplorer": {
-                    "type": "boolean",
-                    "default": true,
-                    "scope": "resource",
-                    "description": "%config.taskView.enableTasksExplorer%"
-                },
-                "taskView.tasksExplorerAction": {
-                    "type": "string",
-                    "enum": [
-                        "open",
-                        "run"
-                    ],
-                    "markdownDescription": "%config.taskView.tasksExplorerAction%",
-                    "scope": "window",
-                    "default": "open"
                 },
                 "taskView.fetchOnlinePackageInfo": {
                     "type": "boolean",

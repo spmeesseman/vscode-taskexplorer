@@ -151,7 +151,7 @@ class NpmScript extends TreeItem
 	
 	constructor(context: ExtensionContext, packageJson: PackageJSON, task: Task) {
 		super(task.name, TreeItemCollapsibleState.None);
-		const command: ExplorerCommands = workspace.getConfiguration('taskView').get<ExplorerCommands>('tasksExplorerAction') || 'open';
+		const command: ExplorerCommands = 'open';
 
 		//{ 
 		//	command: 'taskView.executeTask', 
@@ -212,7 +212,7 @@ class TasksScript extends TreeItem
 	constructor(context: ExtensionContext, packageJson: TasksJSON, task: Task) 
 	{
 		super(task.name, TreeItemCollapsibleState.None);
-		const command: ExplorerCommands = workspace.getConfiguration('taskView').get<ExplorerCommands>('tasksExplorerAction') || 'open';
+		const command: ExplorerCommands = 'open';
 
 		const commandList = {
 			'open': {
@@ -268,7 +268,7 @@ class AntScript extends TreeItem
 	constructor(context: ExtensionContext, packageJson: AntJSON, task: Task) 
 	{
 		super(task.name, TreeItemCollapsibleState.None);
-		const command: ExplorerCommands = workspace.getConfiguration('taskView').get<ExplorerCommands>('tasksExplorerAction') || 'open';
+		const command: ExplorerCommands = 'open';
 
 		const commandList = {
 			'open': {

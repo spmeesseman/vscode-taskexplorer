@@ -28,11 +28,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void>
 				treeDataProvider.refresh();
 			}
 		}
-		if (e.affectsConfiguration('taskView.tasksExplorerAction')) {
-			if (treeDataProvider) {
-				treeDataProvider.refresh();
-			}
-		}
 	});
 	context.subscriptions.push(d);
 
