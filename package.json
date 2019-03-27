@@ -341,7 +341,7 @@
         "typescript": "^3.0.3",
         "vscode": "^1.1.30",
         "vsce": "^1.48.0",
-        "vscode-nls-dev": "3.2.5",
+        "vscode-nls-dev": "3.2.6",
         "tslint": "^5.8.0",
         "remap-istanbul": "^0.13.0",
         "semantic-release": "^15.13.3",
