@@ -417,14 +417,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		window.showErrorMessage(message);
 	}
 
-	private findScript(document: TextDocument, script?: any): number {
+	private findScriptPosition(document: TextDocument, script?: any): number 
+	{
 		let scriptOffset = 0;
 		let inScripts = false;
 		let inTasks = false;
 		let inTaskLabel = undefined;
 
+		util.log('findScriptPosition');
+
 		if (script instanceof AntScript)
 		{
+			util.log('   Ant XML');
+			util.logValue('   task name', script.task.name);
+			//util.logValue('   document text', document.getText());
+
 			scriptOffset = document.getText().indexOf("name=\"" + script.task.name);
 			if (scriptOffset === -1)
 			{
@@ -521,7 +528,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			return;
 		}
 		let document: TextDocument = await workspace.openTextDocument(uri);
-		let offset = this.findScript(document, selection instanceof NpmScript || selection instanceof TasksScript || selection instanceof AntScript ? selection : undefined);
+		let offset = this.findScriptPosition(document, selection instanceof NpmScript || selection instanceof TasksScript || selection instanceof AntScript ? selection : undefined);
 		let position = document.positionAt(offset);
 		await window.showTextDocument(document, { selection: new Selection(position, position) });
 	}
