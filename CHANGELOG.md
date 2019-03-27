@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/spmeesseman/vscode-taskview/compare/v1.3.4...v1.3.5) (2019-03-27)
+
+
+### Bug Fixes
+
+* open command for vs code tasks ([1a9b374](https://github.com/spmeesseman/vscode-taskview/commit/1a9b374))
+
 ## [1.3.4](https://github.com/spmeesseman/vscode-taskview/compare/v1.3.3...v1.3.4) (2019-03-27)
 
 ## [1.3.3](https://github.com/spmeesseman/vscode-taskview/compare/v1.3.2...v1.3.3) (2019-03-27)
