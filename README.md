@@ -16,11 +16,12 @@
 
 ## Description
 
-> Provides a view in the Explorer that conveniently displays VSCode tasks, NPM scripts, and Ant targets, grouped within their respective task nodes.  Tasks can be either opened or executed.  See Important Notes section below.
+> Provides a view in the Explorer that conveniently displays VSCode tasks, NPM scripts, and Ant targets, grouped within their respective task nodes.  Tasks can be either opened or executed.  See Requirements section below.
 
-## Important Notes
+## Requirements
 
-> For now, you must disable auto detection of npm scripts in the Npm settings, otherwise npm scripts will be displayed twice within each package.json node.  This will be corrected in a future release.
+* Visual Studio Code v1.30 or higher
+* For now, you must disable auto detection of npm scripts in the Npm settings, otherwise npm scripts will be displayed twice within each package.json node (this extension also register as an NPM script provider).  This will be corrected in a future release.
 
 ## Features
 
