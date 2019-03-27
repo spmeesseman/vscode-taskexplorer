@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as util from "util";
+import { logOutputChannel } from "./extension";
 import { commands, Event, window } from "vscode";
 import { Operation } from "./common/types";
 import * as vscode from 'vscode';
@@ -194,24 +195,26 @@ export function log(msg: string)
 	{
     console.log(msg);
   }
+  logOutputChannel.appendLine(msg);
 }
 
 export function logValue(msg: string, value: any)
 {
+  var logMsg = msg;
+  for (var i = msg.length; i < logValueWhiteSpace; i++)
+  {
+    logMsg += ' ';
+  }
+  if (value)
+  {
+    logMsg += ': ';
+    logMsg += value.toString();
+  }
   if (vscode.workspace.getConfiguration('taskView').get('debug') === true)
 	{
-    var logMsg = msg;
-    for (var i = msg.length; i < logValueWhiteSpace; i++)
-    {
-      logMsg += ' ';
-    }
-    if (value)
-    {
-      logMsg += ': ';
-      logMsg += value.toString();
-    }
     console.log(logMsg);
   }
+  logOutputChannel.appendLine(logMsg);
 }
 
 
