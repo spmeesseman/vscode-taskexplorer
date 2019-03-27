@@ -43,7 +43,6 @@ class Folder extends TreeItem
 	}
 }
 
-const packageName = 'package.json';
 
 class PackageJSON extends TreeItem 
 {
@@ -53,9 +52,9 @@ class PackageJSON extends TreeItem
 
 	static getLabel(_folderName: string, relativePath: string): string {
 		if (relativePath.length > 0) {
-			return path.join(relativePath, packageName);
+			return 'NPM Scripts (' + relativePath + ')';
 		}
-		return packageName;
+		return 'NPM Scripts';
 	}
 
 	constructor(folder: Folder, relativePath: string) {
@@ -64,9 +63,9 @@ class PackageJSON extends TreeItem
 		this.path = relativePath;
 		this.contextValue = 'packageJSON';
 		if (relativePath) {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, packageName));
+			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, 'package.json'));
 		} else {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, packageName));
+			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, 'package.json'));
 		}
 		this.iconPath = ThemeIcon.File;
 	}
@@ -76,7 +75,6 @@ class PackageJSON extends TreeItem
 	}
 }
 
-const tasksName = 'tasks.json';
 
 class TasksJSON extends TreeItem 
 {
@@ -86,9 +84,9 @@ class TasksJSON extends TreeItem
 
 	static getLabel(_folderName: string, relativePath: string): string {
 		if (relativePath.length > 0 && relativePath !== '.vscode') {
-			return path.join(relativePath, tasksName);
+			return 'VSCode Tasks (' + relativePath + ')';
 		}
-		return tasksName;
+		return 'VSCode Tasks';
 	}
 
 	constructor(folder: Folder, relativePath: string) {
@@ -97,9 +95,9 @@ class TasksJSON extends TreeItem
 		this.path = relativePath;
 		this.contextValue = 'tasksJSON';
 		if (relativePath) {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, tasksName));
+			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, 'tasks.json'));
 		} else {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, tasksName));
+			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, 'tasks.json'));
 		}
 		this.iconPath = ThemeIcon.File;
 	}
@@ -109,7 +107,7 @@ class TasksJSON extends TreeItem
 	}
 }
 
-const antName = 'build.xml';
+
 class AntJSON extends TreeItem 
 {
 	path: string;
@@ -118,9 +116,9 @@ class AntJSON extends TreeItem
 
 	static getLabel(_folderName: string, relativePath: string): string {
 		if (relativePath.length > 0) {
-			return path.join(relativePath, antName);
+			return 'Ant Targets (' + relativePath + ')';
 		}
-		return antName;
+		return 'Ant Targets';
 	}
 
 	constructor(folder: Folder, relativePath: string) {
@@ -129,9 +127,9 @@ class AntJSON extends TreeItem
 		this.path = relativePath;
 		this.contextValue = 'antJSON';
 		if (relativePath) {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, antName));
+			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, 'build.xml'));
 		} else {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, antName));
+			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, 'build.xml'));
 		}
 		this.iconPath = ThemeIcon.File;
 	}
