@@ -2,7 +2,6 @@
 	"description": "Extension to add support for vscode and npm tasks.",
 	"displayName": "Task view support for VS Code",
 	"config.taskView.debug": "Turn on logging.",
-	"config.taskView.autoDetect": "Controls whether tasks should be automatically detected.",
 	"config.taskView.runSilent": "Run commands with the `--silent` option.",
 	"config.taskView.packageManager": "The package manager used to run npm scripts.",
 	"config.taskView.exclude": "Configure glob patterns for folders that should be excluded from automatic script detection.",
