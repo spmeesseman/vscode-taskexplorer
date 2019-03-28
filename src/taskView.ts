@@ -2,12 +2,12 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-import * as vscode from 'vscode';
+
 import * as path from 'path';
 import * as util from './util';
 
 import {
-	Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
+	Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskExecution,
 	TextDocument, ThemeIcon, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
 	WorkspaceFolder, commands, window, workspace, tasks, Selection, TaskGroup
 } from 'vscode';
@@ -19,11 +19,14 @@ import * as nls from 'vscode-nls';
 
 const localize = nls.loadMessageBundle();
 
+type ExplorerCommands = 'open' | 'run';
+
+
 class Folder extends TreeItem 
 {
-	packages: PackageJSON[] = [];
-	tasks: TasksJSON[] = [];
-	workspaceFolder: WorkspaceFolder;
+	public taskFiles: TaskFile[] = [];
+	public tasks: TaskItem[] = [];
+	public workspaceFolder: WorkspaceFolder;
 
 	constructor(folder: WorkspaceFolder) {
 		super(folder.name, TreeItemCollapsibleState.Expanded);
@@ -33,120 +36,84 @@ class Folder extends TreeItem
 		this.iconPath = ThemeIcon.Folder;
 	}
 
-	addPackage(packageJson: PackageJSON) {
-		this.packages.push(packageJson);
-	}
-
-	addTasks(tasksJson: TasksJSON) {
-		this.tasks.push(tasksJson);
+	addTaskFile(taskFile: TaskFile) {
+		this.taskFiles.push(taskFile);
 	}
 }
 
 
-class PackageJSON extends TreeItem 
+class TaskFile extends TreeItem 
 {
-	path: string;
-	folder: Folder;
-	scripts: NpmScript[] = [];
+	public path: string;
+	public folder: Folder;
+	public scripts: TaskItem[] = [];
 
-	static getLabel(_folderName: string, relativePath: string): string {
-		if (relativePath.length > 0) {
-			return 'npm (' + relativePath.substring(0, relativePath.length - 1) + ')';
+	public readonly taskSource: string;
+
+	static getLabel(_source: string, relativePath: string): string 
+	{
+		let label = 'npm';
+
+		if (_source.indexOf('ant') !== -1) {
+			label = 'ant';
 		}
-		return 'npm';
+		else if (_source.indexOf('Workspace') !== -1) {
+			label = 'vscode';
+		}
+		else if (_source.indexOf('tsc') !== -1) {
+			label = 'tsc';
+		}
+		else if (_source.indexOf('grunt') !== -1) {
+			label = 'grunt';
+		}
+		else if (_source.indexOf('gulp') !== -1) {
+			label = 'gulp';
+		}
+
+		if (relativePath.length > 0 && relativePath !== '.vscode') {
+			return label + ' (' + relativePath.substring(0, relativePath.length - 1) + ')';
+		}
+		return label;
 	}
 
-	constructor(folder: Folder, relativePath: string) {
-		super(PackageJSON.getLabel(folder.label!, relativePath), TreeItemCollapsibleState.Collapsed);
+	constructor(context: ExtensionContext, folder: Folder, source: string, relativePath: string) 
+	{
+		super(TaskFile.getLabel(source, relativePath), TreeItemCollapsibleState.Collapsed);
 		this.folder = folder;
 		this.path = relativePath;
-		this.contextValue = 'packageJSON';
+		this.taskSource = source;
+		this.contextValue = 'taskFile';
+		
 		if (relativePath) {
 			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, 'package.json'));
 		} else {
 			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, 'package.json'));
 		}
-		this.iconPath = ThemeIcon.File;
+
+		//this.iconPath = ThemeIcon.File;
+		this.iconPath = {
+			light: context.asAbsolutePath(path.join('res', 'sources', this.taskSource + '.svg')),
+			dark: context.asAbsolutePath(path.join('res', 'sources', this.taskSource + '.svg'))
+		};
 	}
 
-	addScript(script: NpmScript) {
+	addScript(script: TaskItem) {
 		this.scripts.push(script);
 	}
 }
 
 
-class TasksJSON extends TreeItem 
+class TaskItem extends TreeItem 
 {
-	path: string;
-	folder: Folder;
-	scripts: TasksScript[] = [];
+	public static readonly defaultSource = "Workspace";
 
-	static getLabel(_folderName: string, relativePath: string): string {
-		if (relativePath.length > 0 && relativePath !== '.vscode') {
-			return 'vscode (' + relativePath.substring(0, relativePath.length - 1) + ')';
-		}
-		return 'vscode';
-	}
+    public readonly task: Task | undefined;
+    public readonly taskSource: string;
+	public readonly execution: TaskExecution | undefined;
 
-	constructor(folder: Folder, relativePath: string) {
-		super(TasksJSON.getLabel(folder.label!, relativePath), TreeItemCollapsibleState.Collapsed);
-		this.folder = folder;
-		this.path = relativePath;
-		this.contextValue = 'tasksJSON';
-		if (relativePath) {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, 'tasks.json'));
-		} else {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, 'tasks.json'));
-		}
-		this.iconPath = ThemeIcon.File;
-	}
-
-	addScript(script: TasksScript) {
-		this.scripts.push(script);
-	}
-}
-
-
-class AntJSON extends TreeItem 
-{
-	path: string;
-	folder: Folder;
-	scripts: AntScript[] = [];
-
-	static getLabel(_folderName: string, relativePath: string): string {
-		if (relativePath.length > 0) {
-			return 'ant (' + relativePath.substring(0, relativePath.length - 1) + ')';
-		}
-		return 'ant';
-	}
-
-	constructor(folder: Folder, relativePath: string) {
-		super(AntJSON.getLabel(folder.label!, relativePath), TreeItemCollapsibleState.Collapsed);
-		this.folder = folder;
-		this.path = relativePath;
-		this.contextValue = 'antJSON';
-		if (relativePath) {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, 'build.xml'));
-		} else {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, 'build.xml'));
-		}
-		this.iconPath = ThemeIcon.File;
-	}
-
-	addScript(script: AntScript) {
-		this.scripts.push(script);
-	}
-}
-
-
-type ExplorerCommands = 'open' | 'run';
-
-class NpmScript extends TreeItem 
-{
-	task: Task;
-	package: PackageJSON;
+	package: TaskFile;
 	
-	constructor(context: ExtensionContext, packageJson: PackageJSON, task: Task) 
+	constructor(context: ExtensionContext, taskFile: TaskFile, task: Task) 
 	{
 		let taskName = task.name;
 		if (taskName.indexOf(' - ') !== -1 && taskName.indexOf('/') !== -1) {
@@ -174,18 +141,24 @@ class NpmScript extends TreeItem
 				arguments: [this]
 			}
 		};
+
 		this.contextValue = 'script';
 		if (task.group && task.group === TaskGroup.Rebuild) {
 			this.contextValue = 'debugScript';
 		}
-		this.package = packageJson;
+
+		this.package = taskFile;
 		this.task = task;
 		this.command = commandList[command];
+		this.taskSource = task.source;
+        this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source);
+			
+		this.contextValue = this.execution ? "runningScript" : "script";
 
-		if (task.group && task.group === TaskGroup.Clean) {
+		if (this.execution) {
 			this.iconPath = {
-				light: context.asAbsolutePath(path.join('res', 'light', 'prepostscript.svg')),
-				dark: context.asAbsolutePath(path.join('res', 'dark', 'prepostscript.svg'))
+				light: context.asAbsolutePath(path.join('res', 'light', 'sync.svg')),
+				dark: context.asAbsolutePath(path.join('res', 'dark', 'sync.svg'))
 			};
 		} else {
 			this.iconPath = {
@@ -194,124 +167,16 @@ class NpmScript extends TreeItem
 			};
 		}
 
-		let uri = getPackageJsonUriFromTask(task);
-		getScripts(uri!).then(scripts => {
-			if (scripts && scripts[task.definition['script']]) {
-				this.tooltip = scripts[task.definition['script']];
-			}
-		});
-	}
-
-	getFolder(): WorkspaceFolder {
-		return this.package.folder.workspaceFolder;
-	}
-}
-
-
-class TasksScript extends TreeItem 
-{
-	task: Task;
-	package: TasksJSON;
-
-	constructor(context: ExtensionContext, packageJson: TasksJSON, task: Task) 
-	{
-		super(task.name, TreeItemCollapsibleState.None);
-		const command: ExplorerCommands = 'open';
-
-		const commandList = {
-			'open': {
-				title: 'Edit Script',
-				command: 'taskView.openScript',
-				arguments: [this]
-			},
-			'run': {
-				title: 'Run Script',
-				command: 'taskView.runScript',
-				arguments: [this]
-			}
-		};
-		this.contextValue = 'script';
-		if (task.group && task.group === TaskGroup.Rebuild) {
-			this.contextValue = 'debugScript';
+		this.tooltip = task.name;
+		if (task.source === 'npm')
+		{
+			let uri = getPackageJsonUriFromTask(task);
+			getScripts(uri!).then(scripts => {
+				if (scripts && scripts[task.definition['script']]) {
+					this.tooltip = scripts[task.definition['script']];
+				}
+			});
 		}
-		this.package = packageJson;
-		this.task = task;
-		this.command = commandList[command];
-
-		if (task.group && task.group === TaskGroup.Clean) {
-			this.iconPath = {
-				light: context.asAbsolutePath(path.join('res', 'light', 'prepostscript.svg')),
-				dark: context.asAbsolutePath(path.join('res', 'dark', 'prepostscript.svg'))
-			};
-		} else {
-			this.iconPath = {
-				light: context.asAbsolutePath(path.join('res', 'light', 'script.svg')),
-				dark: context.asAbsolutePath(path.join('res', 'dark', 'script.svg'))
-			};
-		}
-
-		//let uri = getPackageJsonUriFromTask(task);
-		//getScripts(uri!).then(scripts => {
-		//	if (scripts && scripts[task.definition['script']]) {
-		//		this.tooltip = scripts[task.definition['script']];
-		//	}
-		//});
-	}
-
-	getFolder(): WorkspaceFolder {
-		return this.package.folder.workspaceFolder;
-	}
-}
-
-
-class AntScript extends TreeItem 
-{
-	task: Task;
-	package: AntJSON;
-
-	constructor(context: ExtensionContext, packageJson: AntJSON, task: Task) 
-	{
-		super(task.name, TreeItemCollapsibleState.None);
-		const command: ExplorerCommands = 'open';
-
-		const commandList = {
-			'open': {
-				title: 'Edit Script',
-				command: 'taskView.openScript',
-				arguments: [this]
-			},
-			'run': {
-				title: 'Run Script',
-				command: 'taskView.runScript',
-				arguments: [this]
-			}
-		};
-		this.contextValue = 'script';
-		if (task.group && task.group === TaskGroup.Rebuild) {
-			this.contextValue = 'debugScript';
-		}
-		this.package = packageJson;
-		this.task = task;
-		this.command = commandList[command];
-
-		if (task.group && task.group === TaskGroup.Clean) {
-			this.iconPath = {
-				light: context.asAbsolutePath(path.join('res', 'light', 'prepostscript.svg')),
-				dark: context.asAbsolutePath(path.join('res', 'dark', 'prepostscript.svg'))
-			};
-		} else {
-			this.iconPath = {
-				light: context.asAbsolutePath(path.join('res', 'light', 'script.svg')),
-				dark: context.asAbsolutePath(path.join('res', 'dark', 'script.svg'))
-			};
-		}
-
-		// let uri = getPackageJsonUriFromTask(task);
-		// getScripts(uri!).then(scripts => {
-		// 	if (scripts && scripts[task.definition['script']]) {
-		// 		this.tooltip = scripts[task.definition['script']];
-		// 	}
-		// });
 	}
 
 	getFolder(): WorkspaceFolder {
@@ -331,7 +196,7 @@ class NoScripts extends TreeItem
 
 export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
  {
-	private taskTree: Folder[] | PackageJSON[] | NoScripts[] | null = null;
+	private taskTree: Folder[] | TaskFile[] | NoScripts[] | null = null;
 	private extensionContext: ExtensionContext;
 	private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
 	readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
@@ -341,6 +206,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		const subscriptions = context.subscriptions;
 		this.extensionContext = context;
 		subscriptions.push(commands.registerCommand('taskView.runScript', this.runScript, this));
+		subscriptions.push(commands.registerCommand('taskView.stopScript', (taskTreeItem: TaskItem) => 
+		{
+            if (taskTreeItem.execution) {
+                taskTreeItem.execution.terminate();
+            }
+        }, this));
 		subscriptions.push(commands.registerCommand('taskView.openScript', this.openScript, this));
 		subscriptions.push(commands.registerCommand('taskView.refresh', this.refresh, this));
 	}
@@ -374,7 +245,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private async runScript(script: NpmScript) 
+	private async runScript(script: TaskItem) 
 	{
 		let task = script.task;
 		let pkg = script.package;
@@ -385,6 +256,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			this.scriptNotValid(task);
 			return;
 		}
+
+		//vscode.tasks.onDidStartTask(() => (fileUri?: vscode.Uri): void => {
+			script.contextValue = 'runningScript';
+		//});
+
+		//vscode.tasks.onDidEndTask(() => (fileUri?: vscode.Uri): void => {
+		//	script.contextValue = 'script';
+		//});
+	
 		tasks.executeTask(script.task);
 	}
 
@@ -395,7 +275,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private findScriptPosition(document: TextDocument, script?: any): number 
+	private findScriptPosition(document: TextDocument, script?: TaskItem): number 
 	{
 		let scriptOffset = 0;
 		let inScripts = false;
@@ -404,7 +284,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 		util.log('findScriptPosition');
 
-		if (script instanceof AntScript)
+		if (script.taskSource === 'ant')
 		{
 			util.log('   Ant XML');
 			util.logValue('   task name', script.task.name);
@@ -419,6 +299,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			{
 				scriptOffset = 0;
 			}
+
 			return scriptOffset;
 		}
 
@@ -480,19 +361,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private async openScript(selection: PackageJSON | NpmScript | TasksJSON | TasksScript | AntJSON | AntScript) 
+	private async openScript(selection: TaskFile | TaskItem) 
 	{
 		let uri: Uri | undefined = undefined;
-		if (selection instanceof PackageJSON || selection instanceof TasksJSON || selection instanceof AntJSON) {
+		if (selection instanceof TaskFile) {
 			uri = selection.resourceUri!;
-		} else if (selection instanceof NpmScript || selection instanceof TasksScript || selection instanceof AntScript) {
+		} else if (selection instanceof TaskItem) {
 			uri = selection.package.resourceUri;
 		}
 		if (!uri) {
 			return;
 		}
 		let document: TextDocument = await workspace.openTextDocument(uri);
-		let offset = this.findScriptPosition(document, selection instanceof NpmScript || selection instanceof TasksScript || selection instanceof AntScript ? selection : undefined);
+		let offset = this.findScriptPosition(document, selection instanceof TaskItem ? selection : undefined);
 		let position = document.positionAt(offset);
 		await window.showTextDocument(document, { selection: new Selection(position, position) });
 	}
@@ -516,10 +397,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		if (element instanceof Folder) {
 			return null;
 		}
-		if (element instanceof PackageJSON || element instanceof TasksJSON || element instanceof AntJSON) {
+		if (element instanceof TaskFile) {
 			return element.folder;
 		}
-		if (element instanceof NpmScript || element instanceof TasksScript || element instanceof AntScript) {
+		if (element instanceof TaskItem) {
 			return element.package;
 		}
 		if (element instanceof NoScripts) {
@@ -542,12 +423,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			}
 		}
 		if (element instanceof Folder) {
-			return element.packages;
+			return element.taskFiles;
 		}
-		if (element instanceof PackageJSON || element instanceof TasksJSON || element instanceof AntJSON) {
+		if (element instanceof TaskFile) {
 			return element.scripts;
 		}
-		if (element instanceof NpmScript || element instanceof TasksScript || element instanceof AntScript) {
+		if (element instanceof TaskItem) {
 			return [];
 		}
 		if (element instanceof NoScripts) {
@@ -569,16 +450,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private buildTaskTree(tasks: Task[]): Folder[] | PackageJSON[] | NoScripts[] 
+	private buildTaskTree(tasks: Task[]): Folder[] | TaskFile[] | NoScripts[] 
 	{
 		var taskCt = 0;
 		let folders: Map<String, Folder> = new Map();
-		let packages: Map<String, PackageJSON> = new Map();
-		let vsctasks: Map<String, TasksJSON> = new Map();
-		let anttargets: Map<String, PackageJSON> = new Map();
+		let files: Map<String, TaskFile> = new Map();
 
 		let folder = null;
-		let packageJson = null;
+		let taskFile = null;
 
 		tasks.forEach(each => 
 		{
@@ -605,55 +484,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				util.logValue('   scope.uri.path', each.scope.uri.path);
 				util.logValue('   scope.uri.fsPath', each.scope.uri.fsPath);
 
-				if ((each.source === 'npm' || each.source === 'Workspace' && definition.script) && 
-				     vscode.workspace.getConfiguration('taskView').get('enableNpmScripts') === true)
-				{
-					let relativePath = definition.path ? definition.path : '';
-					let fullPath = path.join(each.scope.name, relativePath);
+				let relativePath = definition.path ? definition.path : '';
+				let id = each.source + ':' + path.join(each.scope.name, relativePath);
 
-					packageJson = packages.get(fullPath);
-					if (!packageJson) 
-					{
-						packageJson = new PackageJSON(folder, relativePath);
-						folder.addPackage(packageJson);
-						packages.set(fullPath, packageJson);
-						util.log('   Added npm package file container');
-					}
-					let script = new NpmScript(this.extensionContext, packageJson, each);
-					packageJson.addScript(script);
-				}
-				else if (each.source === 'ant' && vscode.workspace.getConfiguration('taskView').get('enableAntTargets') === true)
+				taskFile = files.get(id);
+				if (!taskFile) 
 				{
-					let relativePath = definition.path ? definition.path : '';
-					let fullPath = path.join(each.scope.name, relativePath);
-
-					packageJson = anttargets.get(fullPath);
-					if (!packageJson) 
-					{
-						packageJson = new AntJSON(folder, relativePath);
-						folder.addPackage(packageJson);
-						anttargets.set(fullPath, packageJson);
-						util.log('   Added ant target file container');
-					}
-					let script = new AntScript(this.extensionContext, packageJson, each);
-					packageJson.addScript(script);
+					taskFile = new TaskFile(this.extensionContext, folder, each.source, relativePath);
+					folder.addTaskFile(taskFile);
+					files.set(id, taskFile);
+					util.logValue('   Added source file container', each.source);
 				}
-				else if (each.source === 'Workspace' && each.definition.type === 'shell' && vscode.workspace.getConfiguration('taskView').get('enableCodeTasks') === true)
-				{
-					let relativePath = definition.path ? definition.path : '.vscode';
-					let fullPath = path.join(each.scope.name, relativePath);
-
-					packageJson = vsctasks.get(fullPath);
-					if (!packageJson) 
-					{
-						packageJson = new TasksJSON(folder, relativePath);
-						folder.addPackage(packageJson);
-						vsctasks.set(fullPath, packageJson);
-						util.log('   Added vscode tasks file container');
-					}
-					let script = new TasksScript(this.extensionContext, packageJson, each);
-					packageJson.addScript(script);
-				}
+				let taskItem = new TaskItem(this.extensionContext, taskFile, each);
+				taskFile.addScript(taskItem);
 			}
 		});
 
