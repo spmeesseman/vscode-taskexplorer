@@ -16,20 +16,27 @@
 
 ## Description
 
-> Provides a view in the Explorer that conveniently displays VSCode tasks, NPM scripts, and Ant targets, grouped within their respective task nodes.  Tasks can be either opened or executed.  See Requirements section below.
+> Provides a single view in the Explorer that conveniently displays all VSCode tasks, NPM scripts, Gulp tasks, Grunt tasks, and Ant targets, grouped within their respective task nodes.  Tasks can be either opened or executed.  See Requirements section below.
 
 ## Requirements
 
 * Visual Studio Code v1.30 or higher
-* For now, you must disable auto detection of npm scripts in the Npm settings, otherwise npm scripts will be displayed twice within each package.json node (this extension also register as an NPM script provider).  This will be corrected in a future release.
+* For npm, grunt, and gulp tasks, the 'Auto Detect' vscode setting must be turned 'On' for each respective task provider.
 
 ## Features
 
-Open and launch tasks from one single view in Explorer:
-
 * Open and launch Visual Studio Code tasks
 * Open and launch NPM scripts as tasks
-* Open and launch Ant targets as tasks (beta)
+* Open and launch Ant targets as tasks
+
+## Coming Soon
+
+* Open and launch Gulp tasks
+* Open and launch Grunt tasks
+* Open and launch C/C++ Makefiles
+* Progress icons for running tasks
+* Stop execution button for running tasks
+* Updated icons
 
 ## Screenshots
 
@@ -48,6 +55,8 @@ Open and launch tasks from one single view in Explorer:
 |Config|Description|Default|
 |-|-|-|
 |`taskView.enableCodeTasks`|Enable/show visual studio code tasks|`true`|
+|`taskView.enableGulpTasks`|Enable/show ant targets as tasks|`true`|
+|`taskView.enableGruntTasks`|Enable/show ant targets as tasks|`true`|
 |`taskView.enableNpmScripts`|Enable/show npm scripts as tasks|`true`|
 |`taskView.enableAntTargets`|Enable/show ant targets as tasks|`true`|
 |`taskView.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
