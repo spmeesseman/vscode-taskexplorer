@@ -1,3 +1,10 @@
+## [1.5.7](https://github.com/spmeesseman/vscode-taskview/compare/v1.5.6...v1.5.7) (2019-03-28)
+
+
+### Bug Fixes
+
+* the open command for any task group other than npm does not work ([30fedc0](https://github.com/spmeesseman/vscode-taskview/commit/30fedc0))
+
 ## [1.5.6](https://github.com/spmeesseman/vscode-taskview/compare/v1.5.5...v1.5.6) (2019-03-28)
 
 ## [1.5.5](https://github.com/spmeesseman/vscode-taskview/compare/v1.5.4...v1.5.5) (2019-03-28)
