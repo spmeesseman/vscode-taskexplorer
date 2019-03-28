@@ -104,27 +104,6 @@ export function getPackageManager(folder: WorkspaceFolder): string
 }
 
 
-export async function hasNpmScripts(): Promise<boolean> 
-{
-	let folders = workspace.workspaceFolders;
-	if (!folders) {
-		return false;
-	}
-	try {
-		for (const folder of folders) {
-			let relativePattern = new RelativePattern(folder, '**/package.json');
-			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
-			if (paths.length > 0) {
-				return true;
-			}
-		}
-		return false;
-	} catch (error) {
-		return Promise.reject(error);
-	}
-}
-
-
 async function detectAntScripts(): Promise<Task[]> 
 {
 
@@ -373,33 +352,6 @@ export function extractDebugArgFromScript(scriptValue: string): [string, number]
 		}
 	}
 	return undefined;
-}
-
-
-export function startDebugging(scriptName: string, protocol: string, port: number, folder: WorkspaceFolder) 
-{
-	let p = 'inspector';
-	if (protocol === 'debug') {
-		p = 'legacy';
-	}
-
-	let packageManager = getPackageManager(folder);
-	const config: DebugConfiguration = {
-		type: 'node',
-		request: 'launch',
-		name: `Debug ${scriptName}`,
-		runtimeExecutable: packageManager,
-		runtimeArgs: [
-			'run',
-			scriptName,
-		],
-		port: port,
-		protocol: p
-	};
-
-	if (folder) {
-		debug.startDebugging(folder, config);
-	}
 }
 
 

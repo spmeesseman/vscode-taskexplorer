@@ -13,8 +13,7 @@ import {
 } from 'vscode';
 import { visit, JSONVisitor } from 'jsonc-parser';
 import {
-	AntTaskDefinition, getPackageJsonUriFromTask, getScripts,
-	isWorkspaceFolder, getTaskName, createAntTask, extractDebugArgFromScript, startDebugging
+	getPackageJsonUriFromTask, getScripts, isWorkspaceFolder, getTaskName
 } from './tasks';
 import * as nls from 'vscode-nls';
 
@@ -147,8 +146,15 @@ class NpmScript extends TreeItem
 	task: Task;
 	package: PackageJSON;
 	
-	constructor(context: ExtensionContext, packageJson: PackageJSON, task: Task) {
-		super(task.name, TreeItemCollapsibleState.None);
+	constructor(context: ExtensionContext, packageJson: PackageJSON, task: Task) 
+	{
+		let taskName = task.name;
+		if (taskName.indexOf(' - ') !== -1 && taskName.indexOf('/') !== -1) {
+			taskName = task.name.substring(0, task.name.indexOf(' - '));
+		}
+
+		super(taskName, TreeItemCollapsibleState.None);
+
 		const command: ExplorerCommands = 'open';
 
 		//{ 
@@ -335,7 +341,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		const subscriptions = context.subscriptions;
 		this.extensionContext = context;
 		subscriptions.push(commands.registerCommand('taskView.runScript', this.runScript, this));
-		subscriptions.push(commands.registerCommand('taskView.debugScript', this.debugScript, this));
 		subscriptions.push(commands.registerCommand('taskView.openScript', this.openScript, this));
 		subscriptions.push(commands.registerCommand('taskView.refresh', this.refresh, this));
 	}
@@ -352,6 +357,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			let label = getTaskName(script, task.definition.path);
 			util.log('   label = ' + label);
 			if (task.name === label) 
+			{
+				util.log('   found!');
+				return true;
+			}
+			if (task.name.indexOf(' - ') !== -1 && label === task.name.substring(0, task.name.indexOf(' - '))) 
 			{
 				util.log('   found!');
 				return true;
@@ -378,41 +388,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		tasks.executeTask(script.task);
 	}
 
-	
-	private extractDebugArg(scripts: any, task: Task): [string, number] | undefined 
-	{
-		return extractDebugArgFromScript(scripts[task.name]);
-	}
-
-	private async debugScript(script: NpmScript) 
-	{
-		let task = script.task;
-		let uri = getPackageJsonUriFromTask(task);
-		let scripts = await getScripts(uri!);
-
-		if (!this.scriptIsValid(scripts, task)) {
-			this.scriptNotValid(task);
-			return;
-		}
-
-		let debugArg = this.extractDebugArg(scripts, task);
-		if (!debugArg) {
-			let message = localize('noDebugOptions', 'Could not launch "{0}" for debugging because the scripts lacks a node debug option, e.g. "--inspect-brk".', task.name);
-			let learnMore = localize('learnMore', 'Learn More');
-			let ok = localize('ok', 'OK');
-			let result = await window.showErrorMessage(message, { modal: true }, ok, learnMore);
-			if (result === learnMore) {
-				commands.executeCommand('vscode.open', Uri.parse('https://code.visualstudio.com/docs/nodejs/nodejs-debugging#_launch-configuration-support-for-npm-and-other-tools'));
-			}
-			return;
-		}
-		startDebugging(task.name, debugArg[0], debugArg[1], script.getFolder());
-	}
 
 	private scriptNotValid(task: Task) {
 		let message = localize('scriptInvalid', 'Task View - Could not find the script "{0}". Try to refresh the view.', task.name);
 		window.showErrorMessage(message);
 	}
+
 
 	private findScriptPosition(document: TextDocument, script?: any): number 
 	{

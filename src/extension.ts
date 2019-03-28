@@ -7,22 +7,16 @@ import * as httpRequest from 'request-light';
 import {
 	commands,
 	Disposable,
-	DocumentSelector,
 	ExtensionContext,
 	OutputChannel,
-	TaskProvider,
-	languages,
 	workspace,
 	window
   } from "vscode";
 import { addJSONProviders } from './features/jsonContributions';
 import { TaskTreeDataProvider } from './taskView';
 import { invalidateTasksCache, AntTaskProvider } from './tasks';
-import { invalidateHoverScriptsCache, NpmScriptHoverProvider } from './scriptHover';
-import { runSelectedScript } from './commands';
 import { configuration } from "./common/configuration";
 import { log } from './util';
-import { utils } from 'mocha';
 
 let treeDataProvider: TaskTreeDataProvider | undefined;
 export let logOutputChannel: OutputChannel | undefined;
@@ -54,7 +48,6 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 	{
 		registerAntTaskProvider(context);
 		treeDataProvider = registerExplorer(context);
-		registerHoverProvider(context);
 
 		configureHttpRequest();
 		let d = workspace.onDidChangeConfiguration((e) => {
@@ -68,11 +61,6 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 		});
 		context.subscriptions.push(d);
 
-		d = workspace.onDidChangeTextDocument((e) => {
-			invalidateHoverScriptsCache(e.document);
-		});
-		context.subscriptions.push(d);
-		context.subscriptions.push(commands.registerCommand('taskView.runSelectedScript', runSelectedScript));
 		context.subscriptions.push(addJSONProviders(httpRequest.xhr));
 
 		log('Tasks View started successfully');
@@ -87,7 +75,6 @@ function registerAntTaskProvider(context: ExtensionContext): Disposable | undefi
 
 	function invalidateScriptCaches() 
 	{
-		invalidateHoverScriptsCache();
 		invalidateTasksCache();
 		if (treeDataProvider) {
 			treeDataProvider.refresh();
@@ -134,22 +121,6 @@ function registerExplorer(context: ExtensionContext): TaskTreeDataProvider | und
 		const view = window.createTreeView('taskView', { treeDataProvider: treeDataProvider, showCollapseAll: true });
 		context.subscriptions.push(view);
 		return treeDataProvider;
-	}
-	return undefined;
-}
-
-
-function registerHoverProvider(context: ExtensionContext): NpmScriptHoverProvider | undefined 
-{
-	if (workspace.workspaceFolders) {
-		let npmSelector: DocumentSelector = {
-			language: 'json',
-			scheme: 'file',
-			pattern: '**/package.json'
-		};
-		let provider = new NpmScriptHoverProvider(context);
-		context.subscriptions.push(languages.registerHoverProvider(npmSelector, provider));
-		return provider;
 	}
 	return undefined;
 }
