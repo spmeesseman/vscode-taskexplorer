@@ -1,7 +1,7 @@
 {
     "name": "vscode-taskview",
     "displayName": "Task Explorer",
-    "description": "Extension to view and run tasks from Explorer",
+    "description": "View and run tasks from Explorer",
     "icon": "res/launch.png",
     "version": "1.5.6",
     "publisher": "spmeesseman",
