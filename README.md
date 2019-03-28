@@ -32,11 +32,14 @@
 * Open and launch Visual Studio Code tasks
 * Open and launch NPM scripts as tasks
 * Open and launch Ant targets as tasks
+* Convenient layout - groups all tasks by project folder, by task file, by task
+* Ant task provider
 
 ## Coming Soon
 
 * Open and launch Gulp tasks
 * Open and launch Grunt tasks
+* C/C++ Makefile Task Provider
 * Open and launch C/C++ Makefiles
 * Progress icons for running tasks
 * Stop execution button for running tasks
