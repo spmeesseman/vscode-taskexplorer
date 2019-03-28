@@ -184,7 +184,7 @@
         "configuration": {
             "id": "taskExplorer",
             "type": "object",
-            "title": "Task View",
+            "title": "Task Explorer",
             "properties": {
                 "taskExplorer.enableNpmScripts": {
                     "type": "boolean",
