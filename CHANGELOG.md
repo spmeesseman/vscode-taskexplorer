@@ -1,3 +1,11 @@
+## [1.5.2](https://github.com/spmeesseman/vscode-taskview/compare/v1.5.1...v1.5.2) (2019-03-28)
+
+
+### Bug Fixes
+
+* ant files named Build.xml are not recognized, only build.xml ([66c0fc2](https://github.com/spmeesseman/vscode-taskview/commit/66c0fc2))
+* non-target xml nodes with name parameter are showing as targets ([85c734d](https://github.com/spmeesseman/vscode-taskview/commit/85c734d))
+
 ## [1.5.1](https://github.com/spmeesseman/vscode-taskview/compare/v1.5.0...v1.5.1) (2019-03-27)
 
 
