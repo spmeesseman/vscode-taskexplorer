@@ -220,12 +220,40 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 }
 
 
-export function getPackageJsonUriFromTask(task: Task): Uri | null 
+export function getFileNameFromSource(source: string, incRelPathForCode?: boolean): string | null
+{
+	let fileName: string = 'package.json';
+
+	if (source === 'ant') {
+		fileName = 'build.xml';
+	}
+	else if (source === 'Workspace') {
+		if (incRelPathForCode === true) {
+			fileName = '.vscode\\tasks.json';
+		}
+		else {
+			fileName = 'tasks.json';
+		}
+	}
+	else if (source === 'tsc') {
+		fileName = 'tsconfig.json';
+	}
+	else if (source === 'grunt') {
+		fileName = 'grunt.json';
+	}
+	else if (source === 'gulp') {
+		fileName = 'gulp.json';
+	}
+
+	return fileName;
+}
+
+export function getUriFromTask(task: Task): Uri | null 
 {
 	let uri:Uri = null;
 
 	util.log('');
-	util.log('getPackageJsonUriFromTask');
+	util.log('getUriFromTask');
 	util.logValue('   task name', task.name);
 	util.logValue('   task source', task.source);
 	util.logValue('   task type', task.definition.type);
@@ -233,17 +261,18 @@ export function getPackageJsonUriFromTask(task: Task): Uri | null
 	if (isWorkspaceFolder(task.scope)) 
 	{
 		let relPath: string = task.definition.path;
+		let fileName: string = this.getFileNameFromSource(task.source);
 
-		if (task.source === 'Workspace' && task.definition.type === 'shell')
+		if (task.source === 'Workspace')
 		{
 			relPath = '.vscode';
 		}
 
 		if (relPath) {
-			uri = Uri.file(path.join(task.scope.uri.fsPath, relPath, task.source === 'npm' ? 'package.json'  : (task.source === 'ant' ? 'build.xml' : 'tasks.json')));
+			uri = Uri.file(path.join(task.scope.uri.fsPath, relPath, fileName));
 		} 
 		else {
-			uri = Uri.file(path.join(task.scope.uri.fsPath, task.source === 'npm' ? 'package.json'  : (task.source === 'ant' ? 'build.xml' : 'tasks.json')));
+			uri = Uri.file(path.join(task.scope.uri.fsPath, fileName));
 		}
 	}
 

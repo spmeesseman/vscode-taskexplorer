@@ -13,7 +13,7 @@ import {
 } from 'vscode';
 import { visit, JSONVisitor } from 'jsonc-parser';
 import {
-	getPackageJsonUriFromTask, getScripts, isWorkspaceFolder, isExcluded
+	getUriFromTask, getFileNameFromSource, getScripts, isWorkspaceFolder, isExcluded
 } from './tasks';
 import * as nls from 'vscode-nls';
 
@@ -47,7 +47,7 @@ class TaskFile extends TreeItem
 	public path: string;
 	public folder: Folder;
 	public scripts: TaskItem[] = [];
-
+	public fileName: string;
 	public readonly taskSource: string;
 
 	static getLabel(_source: string, relativePath: string): string 
@@ -85,9 +85,9 @@ class TaskFile extends TreeItem
 		this.contextValue = 'taskFile';
 		
 		if (relativePath) {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, 'package.json'));
+			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, getFileNameFromSource(source, true)));
 		} else {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, 'package.json'));
+			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, getFileNameFromSource(source, true)));
 		}
 
 		//this.iconPath = ThemeIcon.File;
@@ -170,7 +170,7 @@ class TaskItem extends TreeItem
 		this.tooltip = task.name;
 		if (task.source === 'npm')
 		{
-			let uri = getPackageJsonUriFromTask(task);
+			let uri = getUriFromTask(task);
 			getScripts(uri!).then(scripts => {
 				if (scripts && scripts[task.definition['script']]) {
 					this.tooltip = scripts[task.definition['script']];
@@ -249,7 +249,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	{
 		let task = script.task;
 		let pkg = script.package;
-		let uri = getPackageJsonUriFromTask(task);
+		let uri = getUriFromTask(task);
 		let scripts = await getScripts(uri!);
 
 		if (!this.scriptIsValid(scripts, task)) {
@@ -277,6 +277,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 	private findScriptPosition(document: TextDocument, script?: TaskItem): number 
 	{
+		let me = this;
 		let scriptOffset = 0;
 		let inScripts = false;
 		let inTasks = false;
@@ -288,18 +289,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		{
 			util.log('   Ant XML');
 			util.logValue('   task name', script.task.name);
-			//util.logValue('   document text', document.getText());
+			util.logValue('   document text', document.getText());
 
 			scriptOffset = document.getText().indexOf("name=\"" + script.task.name);
-			if (scriptOffset === -1)
-			{
+			if (scriptOffset === -1) {
 				scriptOffset = document.getText().indexOf("name='" + script.task.name);
 			}
-			if (scriptOffset === -1)
-			{
+			if (scriptOffset === -1) {
 				scriptOffset = 0;
 			}
+			else {
+				scriptOffset += 6;
+			}
 
+			util.logValue('   Offset', scriptOffset);
 			return scriptOffset;
 		}
 
@@ -333,7 +336,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					}
 				}
 				else if (inScripts && script) {
-					let label = this.getTaskName(property, script.task.definition.path);
+					let label = me.getTaskName(property, script.task.definition.path, true);
 					if (script.task.name === label) {
 						scriptOffset = offset;
 					}
@@ -355,7 +358,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				}
 			}
 		};
+
 		visit(document.getText(), visitor);
+
+		util.logValue('   Offset', scriptOffset);
 		return scriptOffset;
 
 	}
@@ -372,6 +378,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		if (!uri) {
 			return;
 		}
+
+		util.log('Open script at position');
+		util.logValue('   command', selection.command);
+		util.logValue('   source', selection.taskSource);
+		util.logValue('   path', uri.fsPath);
+		util.logValue('   file path', uri.fsPath);
+
 		let document: TextDocument = await workspace.openTextDocument(uri);
 		let offset = this.findScriptPosition(document, selection instanceof TaskItem ? selection : undefined);
 		let position = document.positionAt(offset);
@@ -450,11 +463,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private getTaskName(script: string, relativePath: string | undefined) 
+	private getTaskName(script: string, relativePath: string | undefined, forcePathInName?: boolean) 
 	{
-		//if (relativePath && relativePath.length) {
-		//	return `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
-		//}
+		if (relativePath && relativePath.length && forcePathInName === true) {
+			return `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
+		}
 		return script;
 	}
 
