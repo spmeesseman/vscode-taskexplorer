@@ -18,6 +18,7 @@ import { utils } from 'mocha';
 
 const localize = nls.loadMessageBundle();
 
+type StringMap = { [s: string]: string; };
 
 export interface AntTaskDefinition extends TaskDefinition 
 {
@@ -50,57 +51,9 @@ export function invalidateTasksCache()
 }
 
 
-const buildNames: string[] = ['build', 'compile', 'watch'];
-function isBuildTask(name: string): boolean {
-	for (let buildName of buildNames) {
-		if (name.indexOf(buildName) !== -1) {
-			return true;
-		}
-	}
-	return false;
-}
-
-
-const testNames: string[] = ['test'];
-function isTestTask(name: string): boolean 
+export function isWorkspaceFolder(value: any): value is WorkspaceFolder 
 {
-	for (let testName of testNames) {
-		if (name === testName) {
-			return true;
-		}
-	}
-	return false;
-}
-
-
-function getPrePostScripts(scripts: any): Set<string> 
-{
-	const prePostScripts: Set<string> = new Set([
-		'preuninstall', 'postuninstall', 'prepack', 'postpack', 'preinstall', 'postinstall',
-		'prepack', 'postpack', 'prepublish', 'postpublish', 'preversion', 'postversion',
-		'prestop', 'poststop', 'prerestart', 'postrestart', 'preshrinkwrap', 'postshrinkwrap',
-		'pretest', 'postest', 'prepublishOnly'
-	]);
-	let keys = Object.keys(scripts);
-	for (const script of keys) {
-		const prepost = ['pre' + script, 'post' + script];
-		prepost.forEach(each => {
-			if (scripts[each] !== undefined) {
-				prePostScripts.add(each);
-			}
-		});
-	}
-	return prePostScripts;
-}
-
-
-export function isWorkspaceFolder(value: any): value is WorkspaceFolder {
 	return value && typeof value !== 'number';
-}
-
-export function getPackageManager(folder: WorkspaceFolder): string 
-{
-	return workspace.getConfiguration('taskView', folder.uri).get<string>('packageManager', 'npm');
 }
 
 
@@ -143,7 +96,7 @@ export async function provideAntScripts(): Promise<Task[]>
 }
 
 
-function isExcluded(folder: WorkspaceFolder, packageJsonUri: Uri) 
+export function isExcluded(folder: WorkspaceFolder, packageJsonUri: Uri) 
 {
 	function testForExclusionPattern(path: string, pattern: string): boolean {
 		return minimatch(path, pattern, { dot: true });
@@ -164,13 +117,6 @@ function isExcluded(folder: WorkspaceFolder, packageJsonUri: Uri)
 		}
 	}
 	return false;
-}
-
-
-function isDebugScript(script: string): boolean 
-{
-	let match = script.match(/--(inspect|debug)(-brk)?(=((\[[0-9a-fA-F:]*\]|[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|[a-zA-Z0-9\.]*):)?(\d+))?/);
-	return match !== null;
 }
 
 
@@ -200,16 +146,7 @@ async function provideAntScriptsForFolder(packageJsonUri: Uri): Promise<Task[]>
 }
 
 
-export function getTaskName(script: string, relativePath: string | undefined) 
-{
-	//if (relativePath && relativePath.length) {
-	//	return `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
-	//}
-	return script;
-}
-
-
-export function createAntTask(script: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri, matcher?: any): Task 
+export function createAntTask(script: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri): Task 
 {
 	function getCommandLine(folder: WorkspaceFolder, cmd: string): string 
 	{
@@ -242,11 +179,10 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 		script: script
 	};
 
-	let relativePackageJson = getRelativePath(folder, packageJsonUri);
-	if (relativePackageJson.length) {
-		kind.path = getRelativePath(folder, packageJsonUri);
+	let relativePath = getRelativePath(folder, packageJsonUri);
+	if (relativePath.length) {
+		kind.path = relativePath;
 	}
-	let taskName = getTaskName(script, relativePackageJson);
 	let cwd = path.dirname(packageJsonUri.fsPath);
 
 	let options = null;
@@ -272,8 +208,15 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 			"cwd": cwd
 		};
 	}
+
+	let scriptName = script;
+	if (relativePath && relativePath.length) {
+		scriptName = `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
+	}
+
+	let execution = new ShellExecution(getCommandLine(folder, cmd), options);
 	
-	return new Task(kind, folder, taskName, 'ant', new ShellExecution(getCommandLine(folder, cmd), options), matcher);
+	return new Task(kind, folder, script, 'ant', execution, undefined);
 }
 
 
@@ -354,8 +297,6 @@ export function extractDebugArgFromScript(scriptValue: string): [string, number]
 	return undefined;
 }
 
-
-export type StringMap = { [s: string]: string; };
 
 async function findAllScripts(buffer: string): Promise<StringMap> 
 {

@@ -13,7 +13,7 @@ import {
 } from 'vscode';
 import { visit, JSONVisitor } from 'jsonc-parser';
 import {
-	getPackageJsonUriFromTask, getScripts, isWorkspaceFolder, getTaskName
+	getPackageJsonUriFromTask, getScripts, isWorkspaceFolder, isExcluded
 } from './tasks';
 import * as nls from 'vscode-nls';
 
@@ -225,7 +225,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 		for (const script in scripts) 
 		{
-			let label = getTaskName(script, task.definition.path);
+			let label = this.getTaskName(script, task.definition.path);
 			util.log('   label = ' + label);
 			if (task.name === label) 
 			{
@@ -333,7 +333,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					}
 				}
 				else if (inScripts && script) {
-					let label = getTaskName(property, script.task.definition.path);
+					let label = this.getTaskName(property, script.task.definition.path);
 					if (script.task.name === label) {
 						scriptOffset = offset;
 					}
@@ -445,8 +445,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 	private isInstallTask(task: Task): boolean 
 	{
-		let fullName = getTaskName('install', task.definition.path);
+		let fullName = this.getTaskName('install', task.definition.path);
 		return fullName === task.name;
+	}
+
+
+	private getTaskName(script: string, relativePath: string | undefined) 
+	{
+		//if (relativePath && relativePath.length) {
+		//	return `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
+		//}
+		return script;
 	}
 
 
@@ -487,16 +496,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				let relativePath = definition.path ? definition.path : '';
 				let id = each.source + ':' + path.join(each.scope.name, relativePath);
 
-				taskFile = files.get(id);
-				if (!taskFile) 
+				if (!isExcluded(each.scope, each.scope.uri))
 				{
-					taskFile = new TaskFile(this.extensionContext, folder, each.source, relativePath);
-					folder.addTaskFile(taskFile);
-					files.set(id, taskFile);
-					util.logValue('   Added source file container', each.source);
+					taskFile = files.get(id);
+					if (!taskFile) 
+					{
+						taskFile = new TaskFile(this.extensionContext, folder, each.source, relativePath);
+						folder.addTaskFile(taskFile);
+						files.set(id, taskFile);
+						util.logValue('   Added source file container', each.source);
+					}
+					let taskItem = new TaskItem(this.extensionContext, taskFile, each);
+					taskFile.addScript(taskItem);
 				}
-				let taskItem = new TaskItem(this.extensionContext, taskFile, each);
-				taskFile.addScript(taskItem);
 			}
 		});
 
