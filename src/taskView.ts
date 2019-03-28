@@ -258,7 +258,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		}
 
 		//vscode.tasks.onDidStartTask(() => (fileUri?: vscode.Uri): void => {
-			script.contextValue = 'runningScript';
+			//script.contextValue = 'runningScript';
 		//});
 
 		//vscode.tasks.onDidEndTask(() => (fileUri?: vscode.Uri): void => {
@@ -302,7 +302,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				scriptOffset += 6;
 			}
 
-			util.logValue('   Offset', scriptOffset);
+			//util.logValue('   Offset', scriptOffset);
 			return scriptOffset;
 		}
 
