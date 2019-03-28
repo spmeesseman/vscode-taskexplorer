@@ -101,7 +101,7 @@ export function destroyAllTempPaths() {
 
 export function activeExtension() {
   return new Promise<void>((resolve, reject) => {
-    const extension = extensions.getExtension("spmeesseman.vscode-taskview");
+    const extension = extensions.getExtension("spmeesseman.vscode-taskexplorer");
     if (!extension) {
       reject();
       return;

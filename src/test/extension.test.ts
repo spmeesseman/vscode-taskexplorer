@@ -24,7 +24,7 @@ suite("Extension Tests", () => {
   });
 
   test("should be present", () => {
-    assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskview"));
+    assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
   });
 
   // Defines a Mocha unit test
@@ -40,7 +40,7 @@ suite("Extension Tests", () => {
 
     this.timeout(60 * 1000);
     const extension = vscode.extensions.getExtension(
-      "spmeesseman.vscode-taskview"
+      "spmeesseman.vscode-taskexplorer"
     ) as vscode.Extension<any>;
 
     if (!extension) {

@@ -1,5 +1,5 @@
 {
-    "name": "vscode-taskview",
+    "name": "vscode-taskexplorer",
     "displayName": "Task Explorer",
     "description": "Control tasks from Explorer",
     "icon": "res/launch.png",
@@ -7,7 +7,7 @@
     "publisher": "spmeesseman",
     "repository": {
         "type": "git",
-        "url": "https://github.com/spmeesseman/vscode-taskview.git"
+        "url": "https://github.com/spmeesseman/vscode-taskexplorer.git"
     },
     "engines": {
         "vscode": "^1.30.0"
@@ -365,9 +365,9 @@
             "semantic-release-vsce",
             {
                 "path": "@semantic-release/github",
-                "assets": "vscode-taskview.vsix"
+                "assets": "vscode-taskexplorer.vsix"
             }
         ],
-        "packageVsix": "vscode-taskview.vsix"
+        "packageVsix": "vscode-taskexplorer.vsix"
     }
 }
