@@ -122,6 +122,9 @@ function registerExplorer(context: ExtensionContext): TaskTreeDataProvider | und
 		context.subscriptions.push(view);
 		return treeDataProvider;
 	}
+	else {
+		log('Error - Not using workspace folders!!!');
+	}
 	return undefined;
 }
 
