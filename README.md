@@ -40,6 +40,7 @@
 ## Screenshots
 
 ![extension ss1](https://github.com/spmeesseman/vscode-taskview/blob/master/res/taskview.png?raw=true)
+![extension ss2](https://github.com/spmeesseman/vscode-taskview/blob/master/res/taskview2.png?raw=true)
 
 ## Feedback & Contributing
 
