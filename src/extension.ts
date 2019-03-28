@@ -13,7 +13,7 @@ import {
 	window
   } from "vscode";
 import { addJSONProviders } from './features/jsonContributions';
-import { TaskTreeDataProvider } from './taskExplorer';
+import { TaskTreeDataProvider } from './taskView';
 import { invalidateTasksCache, AntTaskProvider } from './tasks';
 import { configuration } from "./common/configuration";
 import { log } from './util';
