@@ -4,7 +4,7 @@
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer)
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating-short/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![Build Status](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_apis/build/status/spmeesseman.vscode-taskexplorer?branchName=master)](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_build/latest?definitionId=6&branchName=master)
+[![Build Status](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_apis/build/status/spmeesseman.vscode-taskexplorer?branchName=master)](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_build/latest?definitionId=10&branchName=master)
 
 [![Known Vulnerabilities](https://snyk.io/test/github/spmeesseman/vscode-taskexplorer/badge.svg)](https://snyk.io/test/github/spmeesseman/vscode-taskexplorer)
 [![codecov](https://codecov.io/gh/spmeesseman/vscode-taskexplorer/branch/master/graph/badge.svg)](https://codecov.io/gh/spmeesseman/vscode-taskexplorer)
@@ -53,15 +53,15 @@
 
 |Config|Description|Default|
 |-|-|-|
-|`taskView.enableCodeTasks`|Enable/show visual studio code tasks|`true`|
-|`taskView.enableGulpTasks`|Enable/show ant targets as tasks|`true`|
-|`taskView.enableGruntTasks`|Enable/show ant targets as tasks|`true`|
-|`taskView.enableNpmScripts`|Enable/show npm scripts as tasks|`true`|
-|`taskView.enableAntTargets`|Enable/show ant targets as tasks|`true`|
-|`taskView.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
-|`taskView.pathToAnt`|The path to the ant program, if not registered in system path||",
-|`taskView.pathToAnsicon`|The path to the ansicon binary, if not registered in system path||",
-|`taskView.debug`|Turn on logging|`false`|
-|`taskView.runSilent`|Run commands with the `--silent` option|`false`|
-|`taskView.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/ext/**", "**/packages/**", "**/.vscode-test/**""**/build**"]`|
-|`taskView.fetchOnlinePackageInfo`|Fetch data from https://registry.npmjs.org and https://registry.bower.io to provide auto-completion and information on hover features on npm dependencies|`true`|
+|`taskExplorer.enableCodeTasks`|Enable/show visual studio code tasks|`true`|
+|`taskExplorer.enableGulpTasks`|Enable/show ant targets as tasks|`true`|
+|`taskExplorer.enableGruntTasks`|Enable/show ant targets as tasks|`true`|
+|`taskExplorer.enableNpmScripts`|Enable/show npm scripts as tasks|`true`|
+|`taskExplorer.enableAntTargets`|Enable/show ant targets as tasks|`true`|
+|`taskExplorer.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
+|`taskExplorer.pathToAnt`|The path to the ant program, if not registered in system path||",
+|`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path||",
+|`taskExplorer.debug`|Turn on logging|`false`|
+|`taskExplorer.runSilent`|Run commands with the `--silent` option|`false`|
+|`taskExplorer.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/ext/**", "**/packages/**", "**/.vscode-test/**""**/build**"]`|
+|`taskExplorer.fetchOnlinePackageInfo`|Fetch data from https://registry.npmjs.org and https://registry.bower.io to provide auto-completion and information on hover features on npm dependencies|`true`|

@@ -102,7 +102,7 @@ export function isExcluded(folder: WorkspaceFolder, packageJsonUri: Uri)
 		return minimatch(path, pattern, { dot: true });
 	}
 
-	let exclude = workspace.getConfiguration('taskView', folder.uri).get<string | string[]>('exclude');
+	let exclude = workspace.getConfiguration('taskExplorer', folder.uri).get<string | string[]>('exclude');
 	let packageJsonFolder = path.dirname(packageJsonUri.fsPath);
 
 	if (exclude) {
@@ -152,15 +152,15 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 	{
 		let ant = "ant";
 
-		if (workspace.getConfiguration('taskView').get('pathToAnt')) {
-			ant = workspace.getConfiguration('taskView').get('pathToAnt'); // path.join();
+		if (workspace.getConfiguration('taskExplorer').get('pathToAnt')) {
+			ant = workspace.getConfiguration('taskExplorer').get('pathToAnt'); // path.join();
 		}
 
-		if (workspace.getConfiguration('taskView', folder.uri).get<boolean>('runSilent')) {
+		if (workspace.getConfiguration('taskExplorer', folder.uri).get<boolean>('runSilent')) {
 			ant += ' -silent';
 		}
 
-		if (workspace.getConfiguration('taskView').get('enableAnsiconForAnt') === true) {
+		if (workspace.getConfiguration('taskExplorer').get('enableAnsiconForAnt') === true) {
 			ant += ' -logger org.apache.tools.ant.listener.AnsiColorLogger';
 		}
 
@@ -188,11 +188,11 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 	let options = null;
 	let ansicon = "ansicon.exe";
 
-	if (workspace.getConfiguration('taskView').get('enableAnsiconForAnt') === true)
+	if (workspace.getConfiguration('taskExplorer').get('enableAnsiconForAnt') === true)
 	{
-		if (workspace.getConfiguration('taskView').get('pathToAnsicon'))
+		if (workspace.getConfiguration('taskExplorer').get('pathToAnsicon'))
 		{
-			ansicon = workspace.getConfiguration('taskView').get('pathToAnsicon');
+			ansicon = workspace.getConfiguration('taskExplorer').get('pathToAnsicon');
 		}
 		
 		options = {

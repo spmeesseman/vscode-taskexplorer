@@ -191,7 +191,7 @@ const logValueWhiteSpace = 40;
 
 export function log(msg: string)
 {
-  if (vscode.workspace.getConfiguration('taskView').get('debug') === true)
+  if (vscode.workspace.getConfiguration('taskExplorer').get('debug') === true)
 	{
     console.log(msg);
   }
@@ -210,7 +210,7 @@ export function logValue(msg: string, value: any)
     logMsg += ': ';
     logMsg += value.toString();
   }
-  if (vscode.workspace.getConfiguration('taskView').get('debug') === true)
+  if (vscode.workspace.getConfiguration('taskExplorer').get('debug') === true)
 	{
     console.log(logMsg);
   }

@@ -125,19 +125,19 @@ class TaskItem extends TreeItem
 		const command: ExplorerCommands = 'open';
 
 		//{ 
-		//	command: 'taskView.executeTask', 
+		//	command: 'taskExplorer.executeTask', 
 		//	title: "Execute", arguments: [tasks[i]] 
 	    //}
 
 		const commandList = {
 			'open': {
 				title: 'Edit Script',
-				command: 'taskView.openScript',
+				command: 'taskExplorer.openScript',
 				arguments: [this]
 			},
 			'run': {
 				title: 'Run Script',
-				command: 'taskView.runScript',
+				command: 'taskExplorer.runScript',
 				arguments: [this]
 			}
 		};
@@ -205,15 +205,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	{
 		const subscriptions = context.subscriptions;
 		this.extensionContext = context;
-		subscriptions.push(commands.registerCommand('taskView.runScript', this.runScript, this));
-		subscriptions.push(commands.registerCommand('taskView.stopScript', (taskTreeItem: TaskItem) => 
+		subscriptions.push(commands.registerCommand('taskExplorer.runScript', this.runScript, this));
+		subscriptions.push(commands.registerCommand('taskExplorer.stopScript', (taskTreeItem: TaskItem) => 
 		{
             if (taskTreeItem.execution) {
                 taskTreeItem.execution.terminate();
             }
         }, this));
-		subscriptions.push(commands.registerCommand('taskView.openScript', this.openScript, this));
-		subscriptions.push(commands.registerCommand('taskView.refresh', this.refresh, this));
+		subscriptions.push(commands.registerCommand('taskExplorer.openScript', this.openScript, this));
+		subscriptions.push(commands.registerCommand('taskExplorer.refresh', this.refresh, this));
 	}
 
 

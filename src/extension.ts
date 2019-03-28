@@ -13,7 +13,7 @@ import {
 	window
   } from "vscode";
 import { addJSONProviders } from './features/jsonContributions';
-import { TaskTreeDataProvider } from './taskView';
+import { TaskTreeDataProvider } from './taskExplorer';
 import { invalidateTasksCache, AntTaskProvider } from './tasks';
 import { configuration } from "./common/configuration";
 import { log } from './util';
@@ -36,7 +36,7 @@ export async function activate(context: ExtensionContext)
 async function _activate(context: ExtensionContext, disposables: Disposable[])
 {
 	logOutputChannel = window.createOutputChannel("Task View");
-	commands.registerCommand("taskView.showOutput", () => logOutputChannel.show());
+	commands.registerCommand("taskExplorer.showOutput", () => logOutputChannel.show());
 	disposables.push(logOutputChannel);
 
 	const showOutput = configuration.get<boolean>("showOutput");
@@ -52,7 +52,7 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 		configureHttpRequest();
 		let d = workspace.onDidChangeConfiguration((e) => {
 			configureHttpRequest();
-			if (e.affectsConfiguration('taskView.exclude')) {
+			if (e.affectsConfiguration('taskExplorer.exclude')) {
 				invalidateTasksCache();
 				if (treeDataProvider) {
 					treeDataProvider.refresh();
@@ -118,7 +118,7 @@ function registerExplorer(context: ExtensionContext): TaskTreeDataProvider | und
 	if (workspace.workspaceFolders) {
 		let showCollapseAll = true;
 		let treeDataProvider = new TaskTreeDataProvider(context);
-		const view = window.createTreeView('taskView', { treeDataProvider: treeDataProvider, showCollapseAll: true });
+		const view = window.createTreeView('taskExplorer', { treeDataProvider: treeDataProvider, showCollapseAll: true });
 		context.subscriptions.push(view);
 		return treeDataProvider;
 	}

@@ -89,14 +89,14 @@
         "views": {
             "explorer": [
                 {
-                    "id": "taskView",
+                    "id": "taskExplorer",
                     "name": "%view.name%"
                 }
             ]
         },
         "commands": [
             {
-                "command": "taskView.runScript",
+                "command": "taskExplorer.runScript",
                 "title": "%command.run%",
                 "icon": {
                     "light": "res/light/continue.svg",
@@ -104,7 +104,7 @@
                 }
             },
             {
-                "command": "taskView.stopScript",
+                "command": "taskExplorer.stopScript",
                 "title": "%command.stop%",
                 "icon": {
                     "dark": "res/dark/stop.svg",
@@ -112,15 +112,15 @@
                 }
             },
             {
-                "command": "taskView.openScript",
+                "command": "taskExplorer.openScript",
                 "title": "%command.openScript%"
             },
             {
-                "command": "taskView.runInstall",
+                "command": "taskExplorer.runInstall",
                 "title": "%command.runInstall%"
             },
             {
-                "command": "taskView.refresh",
+                "command": "taskExplorer.refresh",
                 "title": "%command.refresh%",
                 "icon": {
                     "light": "res/light/refresh.svg",
@@ -131,107 +131,107 @@
         "menus": {
             "commandPalette": [
                 {
-                    "command": "taskView.refresh",
+                    "command": "taskExplorer.refresh",
                     "when": "false"
                 },
                 {
-                    "command": "taskView.runScript",
+                    "command": "taskExplorer.runScript",
                     "when": "false"
                 },
                 {
-                    "command": "taskView.openScript",
+                    "command": "taskExplorer.openScript",
                     "when": "false"
                 }
             ],
             "view/title": [
                 {
-                    "command": "taskView.refresh",
-                    "when": "view == taskView",
+                    "command": "taskExplorer.refresh",
+                    "when": "view == taskExplorer",
                     "group": "navigation"
                 }
             ],
             "view/item/context": [
                 {
-                    "command": "taskView.openScript",
-                    "when": "view == taskView && viewItem == taskFile",
+                    "command": "taskExplorer.openScript",
+                    "when": "view == taskExplorer && viewItem == taskFile",
                     "group": "navigation@1"
                 },
                 {
-                    "command": "taskView.runInstall",
-                    "when": "view == taskView && viewItem == taskFile",
+                    "command": "taskExplorer.runInstall",
+                    "when": "view == taskExplorer && viewItem == taskFile",
                     "group": "navigation@2"
                 },
                 {
-                    "command": "taskView.openScript",
-                    "when": "view == taskView && viewItem == script",
+                    "command": "taskExplorer.openScript",
+                    "when": "view == taskExplorer && viewItem == script",
                     "group": "navigation@1"
                 },
                 {
-                    "command": "taskView.runScript",
-                    "when": "view == taskView && viewItem == script",
+                    "command": "taskExplorer.runScript",
+                    "when": "view == taskExplorer && viewItem == script",
                     "group": "navigation@2"
                 },
                 {
-                    "command": "taskView.runScript",
-                    "when": "view == taskView && viewItem == script",
+                    "command": "taskExplorer.runScript",
+                    "when": "view == taskExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
-                    "command": "taskView.stopScript",
-                    "when": "view == taskView && viewItem == runningScript",
+                    "command": "taskExplorer.stopScript",
+                    "when": "view == taskExplorer && viewItem == runningScript",
                     "group": "inline"
                 }
             ]
         },
         "configuration": {
-            "id": "taskView",
+            "id": "taskExplorer",
             "type": "object",
             "title": "Task View",
             "properties": {
-                "taskView.enableNpmScripts": {
+                "taskExplorer.enableNpmScripts": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskView.enableNpmScripts%"
+                    "markdownDescription": "%config.taskExplorer.enableNpmScripts%"
                 },
-                "taskView.enableGruntTasks": {
+                "taskExplorer.enableGruntTasks": {
                     "type": "boolean",
                     "default": false,
-                    "markdownDescription": "%config.taskView.enableGruntTasks%"
+                    "markdownDescription": "%config.taskExplorer.enableGruntTasks%"
                 },
-                "taskView.enableGulpTasks": {
+                "taskExplorer.enableGulpTasks": {
                     "type": "boolean",
                     "default": false,
-                    "markdownDescription": "%config.taskView.enableGruntTasks%"
+                    "markdownDescription": "%config.taskExplorer.enableGruntTasks%"
                 },
-                "taskView.enableAntTargets": {
+                "taskExplorer.enableAntTargets": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskView.enableAntTargets%"
+                    "markdownDescription": "%config.taskExplorer.enableAntTargets%"
                 },
-                "taskView.pathToAnt": {
+                "taskExplorer.pathToAnt": {
                     "type": "string",
-                    "markdownDescription": "%config.taskView.pathToAnt%"
+                    "markdownDescription": "%config.taskExplorer.pathToAnt%"
                 },
-                "taskView.enableAnsiconForAnt": {
+                "taskExplorer.enableAnsiconForAnt": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskView.enableAnsiconForAnt%"
+                    "markdownDescription": "%config.taskExplorer.enableAnsiconForAnt%"
                 },
-                "taskView.pathToAnsicon": {
+                "taskExplorer.pathToAnsicon": {
                     "type": "string",
-                    "markdownDescription": "%config.taskView.pathToAnsicon%"
+                    "markdownDescription": "%config.taskExplorer.pathToAnsicon%"
                 },
-                "taskView.enableCodeTasks": {
+                "taskExplorer.enableCodeTasks": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskView.enableCodeTasks%"
+                    "markdownDescription": "%config.taskExplorer.enableCodeTasks%"
                 },
-                "taskView.debug": {
+                "taskExplorer.debug": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskView.debug%"
+                    "markdownDescription": "%config.taskExplorer.debug%"
                 },
-                "taskView.debugLevel": {
+                "taskExplorer.debugLevel": {
                     "type": "number",
                     "enum": [
                         1,
@@ -241,15 +241,15 @@
                         5
                     ],
                     "default": 1,
-                    "description": "%config.taskView.debugLevel%"
+                    "description": "%config.taskExplorer.debugLevel%"
                 },
-                "taskView.runSilent": {
+                "taskExplorer.runSilent": {
                     "type": "boolean",
                     "default": false,
                     "scope": "resource",
-                    "markdownDescription": "%config.taskView.runSilent%"
+                    "markdownDescription": "%config.taskExplorer.runSilent%"
                 },
-                "taskView.exclude": {
+                "taskExplorer.exclude": {
                     "type": [
                         "string",
                         "array"
@@ -263,12 +263,12 @@
                         "**/.vscode-test/**",
                         "**/build/**"
                     ],
-                    "description": "%config.taskView.exclude%",
+                    "description": "%config.taskExplorer.exclude%",
                     "scope": "resource"
                 },
-                "taskView.fetchOnlinePackageInfo": {
+                "taskExplorer.fetchOnlinePackageInfo": {
                     "type": "boolean",
-                    "description": "%config.taskView.fetchOnlinePackageInfo%",
+                    "description": "%config.taskExplorer.fetchOnlinePackageInfo%",
                     "default": true,
                     "scope": "window",
                     "tags": [

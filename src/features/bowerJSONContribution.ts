@@ -35,7 +35,7 @@ export class BowerJSONContribution implements IJSONContribution {
 	}
 
 	private onlineEnabled() {
-		return !!workspace.getConfiguration('taskView').get('fetchOnlinePackageInfo');
+		return !!workspace.getConfiguration('taskExplorer').get('fetchOnlinePackageInfo');
 	}
 
 	public collectDefaultSuggestions(_resource: string, collector: ISuggestionsCollector): Thenable<any> {

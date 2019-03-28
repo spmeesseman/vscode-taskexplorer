@@ -54,7 +54,7 @@ export class PackageJSONContribution implements IJSONContribution {
 	}
 
 	private onlineEnabled() {
-		return !!workspace.getConfiguration('taskView').get('fetchOnlinePackageInfo');
+		return !!workspace.getConfiguration('taskExplorer').get('fetchOnlinePackageInfo');
 	}
 
 	public collectPropertySuggestions(
