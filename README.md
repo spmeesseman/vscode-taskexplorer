@@ -1,4 +1,4 @@
-# Task Explorer - Open and Launch Tasks from Explorer View
+# Task Explorer - Control Tasks from Explorer View
 
 [![Version](https://vsmarketplacebadge.apphb.com/version-short/spmeesseman.vscode-taskview.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskview)
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/spmeesseman.vscode-taskview.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskview)
