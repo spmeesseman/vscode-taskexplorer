@@ -36,7 +36,6 @@
 * Open and launch C/C++ Makefiles
 * Progress icons for running tasks
 * Stop execution button for running tasks
-* Updated icons
 
 ## Screenshots
 
