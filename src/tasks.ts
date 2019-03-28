@@ -537,7 +537,7 @@ export async function getScripts(packageJsonUri: Uri): Promise<StringMap | undef
 		return json;
 	} 
 	catch (e) {
-		let localizedParseError = localize('taskview.parseError', 'Script detection: failed to parse the file {0}', packageJsonUri.fsPath);
+		let localizedParseError = localize('taskExplorer.parseError', 'Script detection: failed to parse the file {0}', packageJsonUri.fsPath);
 		throw new Error(localizedParseError);
 	}
 }
