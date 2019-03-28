@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/spmeesseman/vscode-taskview/compare/v1.5.2...v1.5.3) (2019-03-28)
+
+
+### Performance Improvements
+
+* remove built in npm task provider, use vscode internal npm task provider ([221fa9d](https://github.com/spmeesseman/vscode-taskview/commit/221fa9d))
+
 ## [1.5.2](https://github.com/spmeesseman/vscode-taskview/compare/v1.5.1...v1.5.2) (2019-03-28)
 
 
