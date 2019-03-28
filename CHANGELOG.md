@@ -1,3 +1,5 @@
+## [1.5.6](https://github.com/spmeesseman/vscode-taskview/compare/v1.5.5...v1.5.6) (2019-03-28)
+
 ## [1.5.5](https://github.com/spmeesseman/vscode-taskview/compare/v1.5.4...v1.5.5) (2019-03-28)
 
 ## [1.5.4](https://github.com/spmeesseman/vscode-taskview/compare/v1.5.3...v1.5.4) (2019-03-28)
