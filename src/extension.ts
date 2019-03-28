@@ -17,7 +17,7 @@ import {
   } from "vscode";
 import { addJSONProviders } from './features/jsonContributions';
 import { TaskTreeDataProvider } from './taskView';
-import { invalidateTasksCache, NpmTaskProvider, AntTaskProvider } from './tasks';
+import { invalidateTasksCache, AntTaskProvider } from './tasks';
 import { invalidateHoverScriptsCache, NpmScriptHoverProvider } from './scriptHover';
 import { runSelectedScript } from './commands';
 import { configuration } from "./common/configuration";
@@ -52,7 +52,7 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 
 	const tryInit = async () => 
 	{
-		registerTaskProvider(context);
+		registerAntTaskProvider(context);
 		treeDataProvider = registerExplorer(context);
 		registerHoverProvider(context);
 
@@ -82,7 +82,7 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 	await tryInit();
 }
 
-function registerTaskProvider(context: ExtensionContext): Disposable | undefined 
+function registerAntTaskProvider(context: ExtensionContext): Disposable | undefined 
 {
 
 	function invalidateScriptCaches() 
@@ -96,21 +96,29 @@ function registerTaskProvider(context: ExtensionContext): Disposable | undefined
 
 	if (workspace.workspaceFolders) 
 	{
-		let watcher = workspace.createFileSystemWatcher('**/package.json');
+		let watcher = workspace.createFileSystemWatcher('**/[Bb]uild.xml');
 		watcher.onDidChange((_e) => invalidateScriptCaches());
 		watcher.onDidDelete((_e) => invalidateScriptCaches());
 		watcher.onDidCreate((_e) => invalidateScriptCaches());
 		context.subscriptions.push(watcher);
+		
+		let watcher2 = workspace.createFileSystemWatcher('**/package.json');
+		watcher2.onDidChange((_e) => invalidateScriptCaches());
+		watcher2.onDidDelete((_e) => invalidateScriptCaches());
+		watcher2.onDidCreate((_e) => invalidateScriptCaches());
+		context.subscriptions.push(watcher2);
+
+		let watcher3 = workspace.createFileSystemWatcher('**/.vscode/tasks.json');
+		watcher3.onDidChange((_e) => invalidateScriptCaches());
+		watcher3.onDidDelete((_e) => invalidateScriptCaches());
+		watcher3.onDidCreate((_e) => invalidateScriptCaches());
+		context.subscriptions.push(watcher3);
 
 		let workspaceWatcher = workspace.onDidChangeWorkspaceFolders((_e) => invalidateScriptCaches());
 		context.subscriptions.push(workspaceWatcher);
 
-		let provider: TaskProvider = new NpmTaskProvider();
-		let disposable = workspace.registerTaskProvider('taskView', provider);
-		context.subscriptions.push(disposable);
-
-		let provider2 = new AntTaskProvider();
-		let disposable2 = workspace.registerTaskProvider('taskView', provider2);
+		let provider = new AntTaskProvider();
+		let disposable = workspace.registerTaskProvider('ant', provider);
 
 		return disposable;
 	}

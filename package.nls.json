@@ -7,7 +7,7 @@
 	"config.taskView.exclude": "Configure glob patterns for folders that should be excluded from automatic script detection.",
 	"config.taskView.enableNpmScripts": "Enable/show npm scripts as tasks.",
 	"config.taskView.enableCodeTasks": "Enable/show vscode tasks as tasks.",
-	"config.taskView.enableGruntTasks": "Enable/show grunt tasks as tasks (not supported yet).",
+	"config.taskView.enableGruntTasks": "Enable/show grunt tasks (not supported yet).",
 	"config.taskView.enableAntTargets": "Enable/show ant targets as tasks.",
 	"config.taskView.pathToAnt": "The path to the ant binary, if not registered in system path",
 	"config.taskView.enableAnsiconForAnt": "Enable ansicon output colorization for ant tasks.",

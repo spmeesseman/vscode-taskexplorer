@@ -19,13 +19,6 @@ import { utils } from 'mocha';
 const localize = nls.loadMessageBundle();
 
 
-export interface NpmTaskDefinition extends TaskDefinition 
-{
-	script: string;
-	path?: string;
-}
-
-
 export interface AntTaskDefinition extends TaskDefinition 
 {
 	script: string;
@@ -33,24 +26,7 @@ export interface AntTaskDefinition extends TaskDefinition
 }
 
 
-type AutoDetect = 'on' | 'off';
-
 let cachedTasks: Task[] | undefined = undefined;
-
-
-export class NpmTaskProvider implements TaskProvider 
-{
-	constructor() {
-	}
-
-	public provideTasks() {
-		return provideNpmScripts();
-	}
-
-	public resolveTask(_task: Task): Task | undefined {
-		return undefined;
-	}
-}
 
 
 export class AntTaskProvider implements TaskProvider 
@@ -149,36 +125,6 @@ export async function hasNpmScripts(): Promise<boolean>
 }
 
 
-async function detectNpmScripts(): Promise<Task[]> 
-{
-
-	let emptyTasks: Task[] = [];
-	let allTasks: Task[] = [];
-	let visitedPackageJsonFiles: Set<string> = new Set();
-
-	let folders = workspace.workspaceFolders;
-	if (!folders) {
-		return emptyTasks;
-	}
-	try {
-		for (const folder of folders) {
-			let relativePattern = new RelativePattern(folder, '**/package.json');
-			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
-			for (const path of paths) {
-				if (!isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
-					let tasks = await provideNpmScriptsForFolder(path);
-					visitedPackageJsonFiles.add(path.fsPath);
-					allTasks.push(...tasks);
-				}
-			}
-		}
-		return allTasks;
-	} catch (error) {
-		return Promise.reject(error);
-	}
-}
-
-
 async function detectAntScripts(): Promise<Task[]> 
 {
 
@@ -206,15 +152,6 @@ async function detectAntScripts(): Promise<Task[]>
 	} catch (error) {
 		return Promise.reject(error);
 	}
-}
-
-
-export async function provideNpmScripts(): Promise<Task[]> 
-{
-	if (!cachedTasks) {
-		cachedTasks = await detectNpmScripts();
-	}
-	return cachedTasks;
 }
 
 
@@ -258,44 +195,6 @@ function isDebugScript(script: string): boolean
 }
 
 
-async function provideNpmScriptsForFolder(packageJsonUri: Uri): Promise<Task[]> 
-{
-	let emptyTasks: Task[] = [];
-
-	let folder = workspace.getWorkspaceFolder(packageJsonUri);
-	if (!folder) {
-		return emptyTasks;
-	}
-	let scripts = await getScripts(packageJsonUri);
-	if (!scripts) {
-		return emptyTasks;
-	}
-
-	const result: Task[] = [];
-
-	const prePostScripts = getPrePostScripts(scripts);
-	Object.keys(scripts).forEach(each => {
-		const task = createTask(each, `run ${each}`, folder!, packageJsonUri);
-		const lowerCaseTaskName = each.toLowerCase();
-		if (isBuildTask(lowerCaseTaskName)) {
-			task.group = TaskGroup.Build;
-		} else if (isTestTask(lowerCaseTaskName)) {
-			task.group = TaskGroup.Test;
-		}
-		if (prePostScripts.has(each)) {
-			task.group = TaskGroup.Clean; // hack: use Clean group to tag pre/post scripts
-		}
-		if (isDebugScript(scripts![each])) {
-			task.group = TaskGroup.Rebuild; // hack: use Rebuild group to tag debug scripts
-		}
-		result.push(task);
-	});
-	// always add npm install (without a problem matcher)
-	result.push(createTask('install', 'install', folder, packageJsonUri, []));
-	return result;
-}
-
-
 async function provideAntScriptsForFolder(packageJsonUri: Uri): Promise<Task[]> 
 {
 	let emptyTasks: Task[] = [];
@@ -328,36 +227,6 @@ export function getTaskName(script: string, relativePath: string | undefined)
 	//	return `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
 	//}
 	return script;
-}
-
-
-export function createTask(script: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri, matcher?: any): Task {
-
-	function getCommandLine(folder: WorkspaceFolder, cmd: string): string {
-		let packageManager = getPackageManager(folder);
-		if (workspace.getConfiguration('taskView', folder.uri).get<boolean>('runSilent')) {
-			return `${packageManager} --silent ${cmd}`;
-		}
-		return `${packageManager} ${cmd}`;
-	}
-
-	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string {
-		let rootUri = folder.uri;
-		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.length - 'package.json'.length);
-		return absolutePath.substring(rootUri.path.length + 1);
-	}
-
-	let kind: NpmTaskDefinition = {
-		type: 'npm',
-		script: script
-	};
-	let relativePackageJson = getRelativePath(folder, packageJsonUri);
-	if (relativePackageJson.length) {
-		kind.path = getRelativePath(folder, packageJsonUri);
-	}
-	let taskName = getTaskName(script, relativePackageJson);
-	let cwd = path.dirname(packageJsonUri.fsPath);
-	return new Task(kind, folder, taskName, 'npm', new ShellExecution(getCommandLine(folder, cmd), { cwd: cwd }), matcher);
 }
 
 
@@ -482,17 +351,6 @@ async function readFile(file: string): Promise<string>
 			resolve(data.toString());
 		});
 	});
-}
-
-
-export function runScript(script: string, document: TextDocument)
- {
-	let uri = document.uri;
-	let folder = workspace.getWorkspaceFolder(uri);
-	if (folder) {
-		let task = createTask(script, `run ${script}`, folder, uri);
-		tasks.executeTask(task);
-	}
 }
 
 

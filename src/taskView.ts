@@ -7,14 +7,14 @@ import * as path from 'path';
 import * as util from './util';
 
 import {
-	Event, EventEmitter, ExtensionContext, Task,
+	Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
 	TextDocument, ThemeIcon, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
 	WorkspaceFolder, commands, window, workspace, tasks, Selection, TaskGroup
 } from 'vscode';
 import { visit, JSONVisitor } from 'jsonc-parser';
 import {
-	NpmTaskDefinition, getPackageJsonUriFromTask, getScripts,
-	isWorkspaceFolder, getTaskName, createTask, extractDebugArgFromScript, startDebugging
+	AntTaskDefinition, getPackageJsonUriFromTask, getScripts,
+	isWorkspaceFolder, getTaskName, createAntTask, extractDebugArgFromScript, startDebugging
 } from './tasks';
 import * as nls from 'vscode-nls';
 
@@ -338,7 +338,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		subscriptions.push(commands.registerCommand('taskView.debugScript', this.debugScript, this));
 		subscriptions.push(commands.registerCommand('taskView.openScript', this.openScript, this));
 		subscriptions.push(commands.registerCommand('taskView.refresh', this.refresh, this));
-		subscriptions.push(commands.registerCommand('taskView.runInstall', this.runInstall, this));
 	}
 
 
@@ -500,20 +499,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private async runInstall(selection: PackageJSON) 
-	{
-		let uri: Uri | undefined = undefined;
-		if (selection instanceof PackageJSON) {
-			uri = selection.resourceUri;
-		}
-		if (!uri) {
-			return;
-		}
-		let task = createTask('install', 'install', selection.folder.workspaceFolder, uri, []);
-		tasks.executeTask(task);
-	}
-
-
 	private async openScript(selection: PackageJSON | NpmScript | TasksJSON | TasksScript | AntJSON | AntScript) 
 	{
 		let uri: Uri | undefined = undefined;
@@ -625,7 +610,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					folder = new Folder(each.scope);
 					folders.set(each.scope.name, folder);
 				}
-				let definition: NpmTaskDefinition = <NpmTaskDefinition>each.definition;
+				let definition: TaskDefinition = <TaskDefinition>each.definition;
 				
 				util.log('');
 				util.log('Processing task ' + taskCt.toString() + ' of ' + tasks.length.toString());
