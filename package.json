@@ -1,7 +1,7 @@
 {
     "name": "vscode-taskview",
-    "displayName": "Task View for Explorer",
-    "description": "Extension to view and run VSCode tasks from Explorer",
+    "displayName": "Task Explorer",
+    "description": "Extension to view and run tasks from Explorer",
     "icon": "res/launch.png",
     "version": "1.5.2",
     "publisher": "spmeesseman",
@@ -16,25 +16,11 @@
         "Other"
     ],
     "keywords": [
-        "task view",
-        "taskview",
-        "tasks",
-        "task",
-        "task launcher",
-        "task runner",
+        "grunt",
+        "gulp",
+        "npm",
         "launcher",
-        "launch",
-        "execute",
-        "script",
-        "scripts",
-        "explorer",
-        "explorer view",
-        "run script",
-        "run target",
-        "run task",
-        "ant",
-        "ant script",
-        "ant target"
+        "ant"
     ],
     "main": "./out/extension",
     "config": {
@@ -100,14 +86,6 @@
         "*"
     ],
     "contributes": {
-        "languages": [
-            {
-                "id": "ignore",
-                "filenames": [
-                    ".npmignore"
-                ]
-            }
-        ],
         "views": {
             "explorer": [
                 {
@@ -126,14 +104,6 @@
                 }
             },
             {
-                "command": "taskView.debugScript",
-                "title": "%command.debug%",
-                "icon": {
-                    "light": "res/light/debug.svg",
-                    "dark": "res/dark/debug.svg"
-                }
-            },
-            {
                 "command": "taskView.openScript",
                 "title": "%command.openScript%"
             },
@@ -148,10 +118,6 @@
                     "light": "res/light/refresh.svg",
                     "dark": "res/dark/refresh.svg"
                 }
-            },
-            {
-                "command": "taskView.runSelectedScript",
-                "title": "%command.runSelectedScript%"
             }
         ],
         "menus": {
@@ -165,27 +131,8 @@
                     "when": "false"
                 },
                 {
-                    "command": "taskView.debugScript",
-                    "when": "false"
-                },
-                {
                     "command": "taskView.openScript",
                     "when": "false"
-                },
-                {
-                    "command": "taskView.runInstall",
-                    "when": "false"
-                },
-                {
-                    "command": "taskView.runSelectedScript",
-                    "when": "false"
-                }
-            ],
-            "editor/context": [
-                {
-                    "command": "taskView.runSelectedScript",
-                    "when": "resourceFilename == 'package.json'",
-                    "group": "navigation@+1"
                 }
             ],
             "view/title": [
@@ -225,16 +172,6 @@
                     "command": "taskView.runScript",
                     "when": "view == taskView && viewItem == debugScript",
                     "group": "inline"
-                },
-                {
-                    "command": "taskView.debugScript",
-                    "when": "view == taskView && viewItem == debugScript",
-                    "group": "inline"
-                },
-                {
-                    "command": "taskView.debugScript",
-                    "when": "view == taskView && viewItem == script",
-                    "group": "navigation@3"
                 }
             ]
         },
@@ -249,6 +186,11 @@
                     "markdownDescription": "%config.taskView.enableNpmScripts%"
                 },
                 "taskView.enableGruntTasks": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "%config.taskView.enableGruntTasks%"
+                },
+                "taskView.enableGulpTasks": {
                     "type": "boolean",
                     "default": false,
                     "markdownDescription": "%config.taskView.enableGruntTasks%"
