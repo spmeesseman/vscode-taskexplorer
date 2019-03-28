@@ -16,11 +16,9 @@
         "Other"
     ],
     "keywords": [
-        "grunt",
-        "gulp",
-        "npm",
-        "launcher",
-        "ant"
+        "task",
+        "explorer",
+        "manage"
     ],
     "main": "./out/extension",
     "config": {
