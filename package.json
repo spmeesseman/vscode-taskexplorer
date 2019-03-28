@@ -231,6 +231,12 @@
                     "default": true,
                     "markdownDescription": "%config.taskView.debug%"
                 },
+                "taskView.debugLevel": {
+                    "type": "number",
+                    "enum": [1, 2, 3, 4, 5],
+                    "default": 1,
+                    "description": "%config.taskView.debugLevel%"
+                },
                 "taskView.runSilent": {
                     "type": "boolean",
                     "default": false,
