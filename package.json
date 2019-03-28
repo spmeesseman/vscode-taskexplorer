@@ -104,6 +104,14 @@
                 }
             },
             {
+                "command": "taskView.stopScript",
+                "title": "%command.stop%",
+                "icon": {
+                    "dark": "res/dark/stop.svg",
+                    "light": "res/light/stop.svg"
+                }
+            },
+            {
                 "command": "taskView.openScript",
                 "title": "%command.openScript%"
             },
@@ -145,12 +153,12 @@
             "view/item/context": [
                 {
                     "command": "taskView.openScript",
-                    "when": "view == taskView && viewItem == packageJSON",
+                    "when": "view == taskView && viewItem == taskFile",
                     "group": "navigation@1"
                 },
                 {
                     "command": "taskView.runInstall",
-                    "when": "view == taskView && viewItem == packageJSON",
+                    "when": "view == taskView && viewItem == taskFile",
                     "group": "navigation@2"
                 },
                 {
@@ -169,8 +177,8 @@
                     "group": "inline"
                 },
                 {
-                    "command": "taskView.runScript",
-                    "when": "view == taskView && viewItem == debugScript",
+                    "command": "taskView.stopScript",
+                    "when": "view == taskView && viewItem == runningScript",
                     "group": "inline"
                 }
             ]
@@ -229,16 +237,6 @@
                     "scope": "resource",
                     "markdownDescription": "%config.taskView.runSilent%"
                 },
-                "taskView.packageManager": {
-                    "scope": "resource",
-                    "type": "string",
-                    "enum": [
-                        "npm",
-                        "yarn"
-                    ],
-                    "default": "npm",
-                    "description": "%config.taskView.packageManager%"
-                },
                 "taskView.exclude": {
                     "type": [
                         "string",
@@ -279,39 +277,7 @@
         ],
         "taskDefinitions": [
             {
-                "type": "npm",
-                "required": [
-                    "script"
-                ],
-                "properties": {
-                    "script": {
-                        "type": "string",
-                        "description": "%taskdef.script%"
-                    },
-                    "path": {
-                        "type": "string",
-                        "description": "%taskdef.path%"
-                    }
-                }
-            },
-            {
                 "type": "ant",
-                "required": [
-                    "script"
-                ],
-                "properties": {
-                    "script": {
-                        "type": "string",
-                        "description": "%taskdef.script%"
-                    },
-                    "path": {
-                        "type": "string",
-                        "description": "%taskdef.path%"
-                    }
-                }
-            },
-            {
-                "type": "shell",
                 "required": [
                     "script"
                 ],
