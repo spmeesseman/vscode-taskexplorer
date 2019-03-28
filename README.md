@@ -64,6 +64,5 @@
 |`taskView.pathToAnsicon`|The path to the ansicon binary, if not registered in system path||",
 |`taskView.debug`|Turn on logging|`false`|
 |`taskView.runSilent`|Run commands with the `--silent` option|`false`|
-|`taskView.packageManager`|The package manager used to run npm scripts|`npm`|
 |`taskView.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/ext/**", "**/packages/**", "**/.vscode-test/**""**/build**"]`|
 |`taskView.fetchOnlinePackageInfo`|Fetch data from https://registry.npmjs.org and https://registry.bower.io to provide auto-completion and information on hover features on npm dependencies|`true`|
