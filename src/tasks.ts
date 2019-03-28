@@ -553,8 +553,6 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 	let script: string | undefined = undefined;
 	let inScripts = false;
 	let inTasks = false;
-	let inTargets = false;
-	let inTargetRoot = false;
 
 	let visitor: JSONVisitor = {
 		onError(_error: ParseErrorCode, _offset: number, _length: number) {
@@ -571,18 +569,9 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 					if (script === 'label')  // VSCODE
 					{
 						script = value;
-						scripts[value] = ''; // TODO
+						scripts[value] = '';
 					}
-					else if (inTargetRoot && script === 'name')  // ANT
-					{
-						if (value.indexOf('**') === -1)
-						{
-							script = value;
-							scripts[value] = ''; // TODO
-						}
-						inTargetRoot = false;
-					}
-					else 
+					else
 					{
 						scripts[script] = value;
 					}
@@ -600,16 +589,7 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 			else if (property === 'tasks') {
 				inTasks = true;
 			}
-			else if (property === 'target') {
-				inTargets = true;
-			}
-			else if (inTargets && property === '$') {
-				inTargetRoot= true;
-			}
 			else if (property === 'label' && inTasks && !script) {
-				script = property;
-			}
-			else if (property === 'name' && inTargetRoot && !script) {
 				script = property;
 			}
 			else { // nested object which is invalid, ignore the script
@@ -624,18 +604,41 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 
 async function findAllAntScripts(buffer: string): Promise<StringMap> 
 {
-	let xml: string = '';
+	let json: any = '';
+	let scripts: StringMap = {};
 
 	util.log('');
-	util.log('findAllAntScripts');
+	util.log('FindAllAntScripts');
 
 	parseString(buffer, function (err, result) {
-		xml = JSON.stringify(result);
+		json = result;
 	});
 
-	//util.logValue('   converted json', xml);
+	if (!json.project)
+	{
+		util.log('   Script file does not contain a <project> root');
+		return scripts;
+	}
 
-	return findAllScripts(xml);
+	if (!json.project)
+	{
+		util.log('   Script file does not contain any targets');
+		return scripts;
+	}
+
+	let targets = json.project.target;
+	for (var tgt in targets)
+	{
+		if (targets[tgt].$ && targets[tgt].$.name) {
+			util.logValue('   Found target', targets[tgt].$.name);
+			scripts[targets[tgt].$.name] = '';
+		}
+		else {
+			util.log('   Invalid target found');
+		}
+	}
+
+	return scripts;
 }
 
 

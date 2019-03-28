@@ -626,17 +626,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					folders.set(each.scope.name, folder);
 				}
 				let definition: NpmTaskDefinition = <NpmTaskDefinition>each.definition;
-
+				
 				util.log('');
 				util.log('Processing task ' + taskCt.toString() + ' of ' + tasks.length.toString());
 				util.logValue('   name', each.name);	
-				util.logValue('   type', each.definition.type);	
+				util.logValue('   type', definition.type);	
+				if (definition.script) {
+					util.logValue('   script', definition.script);	
+				}
 				util.logValue('   source', each.source);
 				util.logValue('   scope.name', each.scope.name);
 				util.logValue('   scope.uri.path', each.scope.uri.path);
 				util.logValue('   scope.uri.fsPath', each.scope.uri.fsPath);
 
-				if (each.source === 'npm' && vscode.workspace.getConfiguration('taskView').get('enableNpmScripts') === true)
+				if ((each.source === 'npm' || each.source === 'Workspace' && definition.script) && 
+				     vscode.workspace.getConfiguration('taskView').get('enableNpmScripts') === true)
 				{
 					let relativePath = definition.path ? definition.path : '';
 					let fullPath = path.join(each.scope.name, relativePath);
