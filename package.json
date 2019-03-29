@@ -3,7 +3,7 @@
     "displayName": "Task Explorer",
     "description": "Task launcher and manager for Explorer",
     "icon": "res/launch.png",
-    "version": "1.5.14",
+    "version": "1.5.15",
     "publisher": "spmeesseman",
     "repository": {
         "type": "git",
