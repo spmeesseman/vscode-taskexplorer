@@ -1,7 +1,7 @@
 {
     "name": "vscode-taskexplorer",
-    "displayName": "View and run tasks from Explorer",
-    "description": "Task launcher and manager for Explorer",
+    "displayName": "Task Explorer",
+    "description": "View and run tasks from Explorer",
     "icon": "res/launch.png",
     "version": "1.5.18",
     "publisher": "spmeesseman",
