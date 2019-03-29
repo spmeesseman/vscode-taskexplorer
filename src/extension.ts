@@ -35,7 +35,7 @@ export async function activate(context: ExtensionContext)
 
 async function _activate(context: ExtensionContext, disposables: Disposable[])
 {
-	logOutputChannel = window.createOutputChannel("Task View");
+	logOutputChannel = window.createOutputChannel("Task Explorer");
 	commands.registerCommand("taskExplorer.showOutput", () => logOutputChannel.show());
 	disposables.push(logOutputChannel);
 
