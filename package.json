@@ -3,7 +3,7 @@
     "displayName": "Task Explorer",
     "description": "Control tasks from Explorer",
     "icon": "res/launch.png",
-    "version": "1.5.13",
+    "version": "1.5.14",
     "publisher": "spmeesseman",
     "repository": {
         "type": "git",
