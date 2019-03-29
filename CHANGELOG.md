@@ -1,3 +1,10 @@
+## [1.5.16](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.15...v1.5.16) (2019-03-29)
+
+
+### Performance Improvements
+
+* set logging to false on install ([0c4696c](https://github.com/spmeesseman/vscode-taskexplorer/commit/0c4696c))
+
 ## [1.5.15](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.14...v1.5.15) (2019-03-29)
 
 ## [1.5.14](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.13...v1.5.14) (2019-03-29)
