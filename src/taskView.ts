@@ -270,7 +270,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 
 	private scriptNotValid(task: Task) {
-		let message = localize('scriptInvalid', 'Task View - Could not find the script "{0}". Try to refresh the view.', task.name);
+		let message = localize('scriptInvalid', 'Task Explorer - Could not find the script "{0}". Try to refresh the view.', task.name);
 		window.showErrorMessage(message);
 	}
 
