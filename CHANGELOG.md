@@ -1,3 +1,5 @@
+## [1.5.21](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.20...v1.5.21) (2019-03-29)
+
 ## [1.5.20](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.19...v1.5.20) (2019-03-29)
 
 ## [1.5.19](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.18...v1.5.19) (2019-03-29)
