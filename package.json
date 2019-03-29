@@ -227,7 +227,7 @@
                 },
                 "taskExplorer.debug": {
                     "type": "boolean",
-                    "default": true,
+                    "default": false,
                     "markdownDescription": "%config.taskExplorer.debug%"
                 },
                 "taskExplorer.debugLevel": {

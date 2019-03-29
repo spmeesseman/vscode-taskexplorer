@@ -193,9 +193,9 @@ export function log(msg: string)
 {
   if (vscode.workspace.getConfiguration('taskExplorer').get('debug') === true)
 	{
-    console.log(msg);
+    //console.log(msg);
+    logOutputChannel.appendLine(msg);
   }
-  logOutputChannel.appendLine(msg);
 }
 
 export function logValue(msg: string, value: any)
@@ -212,9 +212,9 @@ export function logValue(msg: string, value: any)
   }
   if (vscode.workspace.getConfiguration('taskExplorer').get('debug') === true)
 	{
-    console.log(logMsg);
+    //console.log(logMsg);
+    logOutputChannel.appendLine(logMsg);
   }
-  logOutputChannel.appendLine(logMsg);
 }
 
 
