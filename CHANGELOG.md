@@ -1,3 +1,11 @@
+## [1.5.12](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.11...v1.5.12) (2019-03-29)
+
+
+### Bug Fixes
+
+* display correct extension name in error messages ([668d15a](https://github.com/spmeesseman/vscode-taskexplorer/commit/668d15a))
+* show correct extension name in output window ([df1283a](https://github.com/spmeesseman/vscode-taskexplorer/commit/df1283a))
+
 ## [1.5.11](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.10...v1.5.11) (2019-03-28)
 
 ## [1.5.10](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.9...v1.5.10) (2019-03-28)
