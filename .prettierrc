@@ -4,13 +4,12 @@
     "tabWidth": 4,
     "useTabs": false,
     "overrides": [
-        {
-            "files": ".prettierrc",
-            "options": { "parser": "json" }
-        },
-        {
-            "files": "*.md",
-            "options": { "tabWidth": 2 }
-        }
-    ]
+    {
+        "files": ".prettierrc",
+        "options": { "parser": "json" }
+    },
+    {
+        "files": "*.md",
+        "options": { "tabWidth": 4 }
+    }]
 }

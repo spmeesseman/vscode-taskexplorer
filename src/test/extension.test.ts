@@ -6,21 +6,23 @@
 //
 
 // The module 'assert' provides assertion methods from node
-import * as assert from "assert";
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
+import * as assert from 'assert';
 import * as vscode from "vscode";
+import * as util from '../util';
 import { Uri } from "vscode";
 import * as testUtil from "./testUtil";
+import { utils } from 'mocha';
 
 // Defines a Mocha test suite to group tests of similar kind together
-suite("Extension Tests", () => {
+suite("Extension Tests", () => 
+{
   // Before Each
   setup(async () => { });
 
   teardown(() => {
-    testUtil.destroyAllTempPaths();
+    //try{
+      testUtil.destroyAllTempPaths();
+    //} catch(e) {}
   });
 
   test("should be present", () => {
@@ -60,6 +62,9 @@ suite("Extension Tests", () => {
       done();
     }
   });
+
+  
+
 });
 
 
