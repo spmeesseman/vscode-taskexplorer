@@ -18,7 +18,8 @@
     "keywords": [
         "task",
         "explorer",
-        "manage"
+        "manage",
+        "task explorer"
     ],
     "main": "./out/extension",
     "config": {
