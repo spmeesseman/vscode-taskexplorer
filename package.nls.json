@@ -16,7 +16,7 @@
 	"taskExplorer.parseError": "Task Explorer task detection: failed to parse the file {0}",
 	"taskdef.script": "The vscode task to customize.",
 	"taskdef.path": "The path to the folder of the tasks.json file that provides the script. Can be omitted.",
-	"view.name": "Tasks",
+	"view.name": "Task Explorer",
 	"command.refresh": "Refresh",
 	"command.run": "Run",
 	"command.stop": "Stop",
