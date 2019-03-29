@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "displayName": "Task Explorer",
+    "displayName": "View and run tasks from Explorer",
     "description": "Task launcher and manager for Explorer",
     "icon": "res/launch.png",
     "version": "1.5.17",
@@ -16,10 +16,29 @@
         "Other"
     ],
     "keywords": [
+        "task view",
+        "taskview",
+        "tasks",
         "task",
+        "task launcher",
+        "task runner",
+        "launcher",
+        "launch",
+        "ant",
+        "grunt",
+        "gulp",
+        "tsc",
+        "npm",
+        "execute",
+        "script",
+        "scripts",
         "explorer",
-        "manage",
-        "task explorer"
+        "explorer view",
+        "run script",
+        "run target",
+        "run task",
+        "ant script",
+        "ant target"
     ],
     "main": "./out/extension",
     "config": {
