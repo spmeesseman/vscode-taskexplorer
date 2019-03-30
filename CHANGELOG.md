@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.0...v1.7.1) (2019-03-30)
+
+
+### Bug Fixes
+
+* double text in sidebar view title ([436a826](https://github.com/spmeesseman/vscode-taskexplorer/commit/436a826))
+
 # [1.7.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.6.0...v1.7.0) (2019-03-30)
 
 
