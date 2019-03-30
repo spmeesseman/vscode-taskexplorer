@@ -310,6 +310,7 @@ export function extractDebugArgFromScript(scriptValue: string): [string, number]
 	// matches --debug, --debug=1234, --debug-brk, debug-brk=1234, --inspect,
 	// --inspect=1234, --inspect-brk, --inspect-brk=1234,
 	// --inspect=localhost:1245, --inspect=127.0.0.1:1234, --inspect=[aa:1:0:0:0]:1234, --inspect=:1234
+	/*
 	let match = scriptValue.match(/--(inspect|debug)(-brk)?(=((\[[0-9a-fA-F:]*\]|[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|[a-zA-Z0-9\.]*):)?(\d+))?/);
 
 	if (match) {
@@ -322,7 +323,7 @@ export function extractDebugArgFromScript(scriptValue: string): [string, number]
 		if (match[1] === 'debug') {
 			return [match[1], 5858];
 		}
-	}
+	}*/
 	return undefined;
 }
 
@@ -422,88 +423,6 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
 	}
 
 	return scripts;
-}
-
-
-export function findAllScriptRanges(buffer: string): Map<string, [number, number, string]> 
-{
-	let scripts: Map<string, [number, number, string]> = new Map();
-	let script: string | undefined = undefined;
-	let offset: number;
-	let length: number;
-
-	let inScripts = false;
-
-	let visitor: JSONVisitor = {
-		onError(_error: ParseErrorCode, _offset: number, _length: number) {
-		},
-		onObjectEnd() {
-			if (inScripts) {
-				inScripts = false;
-			}
-		},
-		onLiteralValue(value: any, _offset: number, _length: number) {
-			if (script) {
-				scripts.set(script, [offset, length, value]);
-				script = undefined;
-			}
-		},
-		onObjectProperty(property: string, off: number, len: number) {
-			if (property === 'scripts') {
-				inScripts = true;
-			}
-			else if (inScripts) {
-				script = property;
-				offset = off;
-				length = len;
-			}
-		}
-	};
-	visit(buffer, visitor);
-	return scripts;
-}
-
-
-export function findScriptAtPosition(buffer: string, offset: number): string | undefined 
-{
-	let script: string | undefined = undefined;
-	let foundScript: string | undefined = undefined;
-	let inScripts = false;
-	let scriptStart: number | undefined;
-	let visitor: JSONVisitor = {
-		onError(_error: ParseErrorCode, _offset: number, _length: number) {
-		},
-		onObjectEnd() {
-			if (inScripts) {
-				inScripts = false;
-				scriptStart = undefined;
-			}
-		},
-		onLiteralValue(value: any, nodeOffset: number, nodeLength: number) {
-			if (inScripts && scriptStart) {
-				if (typeof value === 'string' && offset >= scriptStart && offset < nodeOffset + nodeLength) {
-					// found the script
-					inScripts = false;
-					foundScript = script;
-				} else {
-					script = undefined;
-				}
-			}
-		},
-		onObjectProperty(property: string, nodeOffset: number) {
-			if (property === 'scripts') {
-				inScripts = true;
-			}
-			else if (inScripts) {
-				scriptStart = nodeOffset;
-				script = property;
-			} else { // nested object which is invalid, ignore the script
-				script = undefined;
-			}
-		}
-	};
-	visit(buffer, visitor);
-	return foundScript;
 }
 
 
