@@ -2,7 +2,7 @@
     "name": "vscode-taskexplorer",
     "displayName": "Task Explorer",
     "description": "View and run tasks from Explorer",
-    "icon": "res/launch.png",
+    "icon": "res/gears-r.png",
     "version": "1.7.2",
     "publisher": "spmeesseman",
     "repository": {
@@ -114,7 +114,7 @@
                 {
                     "id": "taskActivity",
                     "title": "%view.name%",
-                    "icon": "res/gears.svg"
+                    "icon": "res/gears-r.svg"
                 }
             ]
         },
@@ -430,6 +430,11 @@
                         {
                             "type": "docs",
                             "scope": "readme",
+                            "release": "patch"
+                        },
+                        {
+                            "type": "docs",
+                            "scope": "vsce",
                             "release": "patch"
                         },
                         {
