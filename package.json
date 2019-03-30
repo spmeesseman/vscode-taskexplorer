@@ -41,6 +41,9 @@
         "ant target"
     ],
     "main": "./out/extension",
+    "activationEvents": [
+        "*"
+    ],
     "config": {
         "commitizen": {
             "path": "cz-conventional-changelog"
@@ -57,55 +60,54 @@
         "semantic-release-dry": "semantic-release --dry-run",
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test",
         "commit": "npx git-cz"
     },
     "dependencies": {
+        "is-utf8": "^0.2.1",
         "jsonc-parser": "^2.0.2",
         "minimatch": "^3.0.4",
         "request-light": "^0.2.4",
-        "vscode-nls": "^4.0.0",
-        "is-utf8": "^0.2.1",
         "semver": "^6.0.0",
         "tmp": "0.1.0",
+        "vscode-nls": "^4.0.0",
         "xml2js": "^0.4.19"
     },
     "devDependencies": {
+        "@semantic-release/changelog": "^3.0.2",
+        "@semantic-release/git": "^7.0.8",
         "@types/glob": "^7.1.1",
         "@types/istanbul": "^0.4.30",
+        "@types/minimatch": "^3.0.3",
         "@types/mocha": "^5.2.6",
         "@types/node": "^11.11.3",
         "@types/semver": "^5.5.0",
         "@types/tmp": "0.0.34",
         "@types/xml2js": "^0.4.3",
-        "@semantic-release/changelog": "^3.0.2",
-        "@semantic-release/git": "^7.0.8",
-        "@types/minimatch": "^3.0.3",
-        "typescript": "^3.0.3",
-        "vscode": "^1.1.30",
-        "vsce": "^1.48.0",
-        "vscode-nls-dev": "3.2.6",
-        "tslint": "^5.8.0",
-        "prettier": "^1.16.4",
-        "prettylint": "^1.0.0",
-        "remap-istanbul": "^0.13.0",
-        "semantic-release": "^15.13.3",
-        "semantic-release-vsce": "^2.2.6",
         "codecov": "^3.2.0",
         "commitizen": "^3.0.7",
         "cz-conventional-changelog": "^2.1.0",
         "decache": "^4.5.1",
+        "eslint-plugin-prettier": "^3.0.1",
         "glob": "^7.1.2",
         "iconv-lite": "^0.4.23",
         "istanbul": "^0.4.5",
         "jschardet": "^2.1.0",
         "mocha": "^6.0.2",
-        "mocha-junit-reporter": "^1.18.0"
+        "mocha-junit-reporter": "^1.18.0",
+        "mocha-multi-reporters": "^1.1.7",
+        "prettier": "^1.16.4",
+        "prettylint": "^1.0.0",
+        "remap-istanbul": "^0.13.0",
+        "semantic-release": "^15.13.3",
+        "semantic-release-vsce": "^2.2.6",
+        "tslint": "^5.8.0",
+        "typescript": "^3.0.3",
+        "vsce": "^1.48.0",
+        "vscode": "^1.1.30",
+        "vscode-nls-dev": "3.2.6"
     },
-    "activationEvents": [
-        "*"
-    ],
-    "contributes": {
+   "contributes": {
         "views": {
             "explorer": [
                 {
@@ -116,7 +118,7 @@
         },
         "commands": [
             {
-                "command": "taskExplorer.runScript",
+                "command": "taskExplorer.run",
                 "title": "%command.run%",
                 "icon": {
                     "light": "res/light/continue.svg",
@@ -124,7 +126,7 @@
                 }
             },
             {
-                "command": "taskExplorer.stopScript",
+                "command": "taskExplorer.stop",
                 "title": "%command.stop%",
                 "icon": {
                     "dark": "res/dark/stop.svg",
@@ -132,8 +134,8 @@
                 }
             },
             {
-                "command": "taskExplorer.openScript",
-                "title": "%command.openScript%"
+                "command": "taskExplorer.open",
+                "title": "%command.open%"
             },
             {
                 "command": "taskExplorer.runInstall",
@@ -155,11 +157,11 @@
                     "when": "false"
                 },
                 {
-                    "command": "taskExplorer.runScript",
+                    "command": "taskExplorer.run",
                     "when": "false"
                 },
                 {
-                    "command": "taskExplorer.openScript",
+                    "command": "taskExplorer.open",
                     "when": "false"
                 }
             ],
@@ -172,7 +174,7 @@
             ],
             "view/item/context": [
                 {
-                    "command": "taskExplorer.openScript",
+                    "command": "taskExplorer.open",
                     "when": "view == taskExplorer && viewItem == taskFile",
                     "group": "navigation@1"
                 },
@@ -182,22 +184,22 @@
                     "group": "navigation@2"
                 },
                 {
-                    "command": "taskExplorer.openScript",
+                    "command": "taskExplorer.open",
                     "when": "view == taskExplorer && viewItem == script",
                     "group": "navigation@1"
                 },
                 {
-                    "command": "taskExplorer.runScript",
+                    "command": "taskExplorer.run",
                     "when": "view == taskExplorer && viewItem == script",
                     "group": "navigation@2"
                 },
                 {
-                    "command": "taskExplorer.runScript",
+                    "command": "taskExplorer.run",
                     "when": "view == taskExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
-                    "command": "taskExplorer.stopScript",
+                    "command": "taskExplorer.stop",
                     "when": "view == taskExplorer && viewItem == runningScript",
                     "group": "inline"
                 }
@@ -280,6 +282,7 @@
                     "default": [
                         "**/ext/**",
                         "**/packages/**",
+                        "**/test/**",
                         "**/.vscode-test/**",
                         "**/build/**"
                     ],
