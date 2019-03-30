@@ -334,12 +334,9 @@ async function findAllScripts(buffer: string): Promise<StringMap>
 	let inScripts = false;
 	let inTasks = false;
 
-	util.log('');
-	util.log('Find all scripts');
-
 	let visitor: JSONVisitor = {
 		onError(_error: ParseErrorCode, _offset: number, _length: number) {
-			util.logValue('   json visitor error', _error.toString());
+			console.log(_error + 'h');
 		},
 		onObjectEnd() {
 			if (inScripts) {

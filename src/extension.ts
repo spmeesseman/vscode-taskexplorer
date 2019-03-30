@@ -18,7 +18,7 @@ import { invalidateTasksCache, AntTaskProvider } from './tasks';
 import { configuration } from "./common/configuration";
 import { log } from './util';
 
-export let treeDataProvider: TaskTreeDataProvider | undefined;
+let treeDataProvider: TaskTreeDataProvider | undefined;
 export let logOutputChannel: OutputChannel | undefined;
 
 
@@ -32,12 +32,13 @@ export async function activate(context: ExtensionContext)
 	await _activate(context, disposables).catch(err => console.error(err));
 }
 
+
 async function _activate(context: ExtensionContext, disposables: Disposable[])
 {
 	logOutputChannel = window.createOutputChannel("Task Explorer");
-	disposables.push(logOutputChannel);
 	commands.registerCommand("taskExplorer.showOutput", () => logOutputChannel.show());
-	
+	disposables.push(logOutputChannel);
+
 	const showOutput = configuration.get<boolean>("showOutput");
 	if (showOutput) {
 		logOutputChannel.show();
@@ -45,10 +46,7 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 
 	const tryInit = async () => 
 	{
-		log('');
-		log('Init extension');
-
-		register(context);
+		registerAntTaskProvider(context);
 		treeDataProvider = registerExplorer(context);
 
 		configureHttpRequest();
@@ -64,14 +62,15 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 		context.subscriptions.push(d);
 
 		context.subscriptions.push(addJSONProviders(httpRequest.xhr));
-		
-		log('   Task Explorer activated');
+
+		log('Tasks View started successfully');
+		log(' ');
 	};
 
 	await tryInit();
 }
 
-function register(context: ExtensionContext): Disposable | undefined 
+function registerAntTaskProvider(context: ExtensionContext): Disposable | undefined 
 {
 
 	function invalidateScriptCaches() 
@@ -124,7 +123,7 @@ function registerExplorer(context: ExtensionContext): TaskTreeDataProvider | und
 		return treeDataProvider;
 	}
 	else {
-		log('No workspace folders!!!');
+		log('Error - Not using workspace folders!!!');
 	}
 	return undefined;
 }
@@ -136,3 +135,7 @@ function configureHttpRequest()
 	httpRequest.configure(httpSettings.get<string>('proxy', ''), httpSettings.get<boolean>('proxyStrictSSL', true));
 }
 
+
+export function deactivate(): void 
+{
+}
