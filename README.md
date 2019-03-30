@@ -20,7 +20,7 @@
 
 ## Description
 
-> Provides a single view in the Explorer that conveniently displays all VSCode tasks, NPM scripts, Gulp tasks, Grunt tasks, and Ant targets, grouped within their respective task nodes.  Tasks can be either opened or executed.  See Requirements section below.
+> Provides a single view in either (or both) the SideBar and Explorer that conveniently displays all VSCode tasks, NPM scripts, Gulp tasks, Grunt tasks, and Ant targets, grouped within their respective task nodes.  Tasks can be either opened or executed.  See Requirements section below.  Note that Gulp and Grunt tasks are not supported yet, coming soon.
 
 ## Requirements
 
@@ -29,20 +29,20 @@
 
 ## Features
 
-* Open and launch Visual Studio Code tasks
-* Open and launch NPM scripts as tasks
-* Open and launch Ant targets as tasks
-* Convenient layout - groups all tasks by project folder, by task file, by task
-* Ant task provider
+* v1.7 - Two view types!! - Use one or both of either SideBar View and/or Explorer Tray.
+* v1.6 - Progress icons for running tasks
+* v1.6 - Stop execution button for running tasks
+* v1.5 - Ant task provider - Open and launch Ant targets as tasks
+* v1.4 - Open and launch TSC tasks
+* v1.3 - Open and launch Visual Studio Code tasks
+* v1.2 - Convenient layout - groups all tasks by project folder, by task file, by task
+* v1.0 - Open and launch NPM scripts as tasks
 
 ## Coming Soon
 
 * Open and launch Gulp tasks
 * Open and launch Grunt tasks
-* C/C++ Makefile Task Provider
-* Open and launch C/C++ Makefiles
-* Progress icons for running tasks
-* Stop execution button for running tasks
+* C/C++ Makefile Task Provider - Open and launch C/C++ Makefiles
 
 ## Screenshots
 
