@@ -114,11 +114,14 @@ export async function destroyPath(fullPath: string)
 
 export function destroyAllTempPaths() 
 {
-  let dir;
-  while ((dir = tempDirList.shift())) {
-    try {
-      dir.removeCallback();
-    } catch (error) {}
+  if (tempDirList.length)
+  {
+    let dir;
+    while ((dir = tempDirList.shift())) {
+      try {
+        dir.removeCallback();
+      } catch (error) {}
+    }
   }
 }
 
