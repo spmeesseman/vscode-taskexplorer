@@ -10,7 +10,7 @@ import * as path from "path";
 import { commands, Uri, workspace, window, TextDocument } from "vscode";
 import * as testUtil from "./testUtil";
 import { timeout } from "../util";
-import { treeDataProvider } from "../extension";
+import { treeDataProvider2 } from "../extension";
 
 suite("NPM tests", () => 
 {
@@ -40,7 +40,7 @@ suite("NPM tests", () =>
     await window.showTextDocument(document);
 
     
-    await treeDataProvider.getChildren(); // mock explorer open view which would call this function
+    await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
     await timeout(1000);
     
     fs.unlinkSync(file);
