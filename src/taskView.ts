@@ -132,12 +132,12 @@ class TaskItem extends TreeItem
 		const commandList = {
 			'open': {
 				title: 'Edit Script',
-				command: 'taskExplorer.openScript',
+				command: 'taskExplorer.open',
 				arguments: [this]
 			},
 			'run': {
 				title: 'Run Script',
-				command: 'taskExplorer.runScript',
+				command: 'taskExplorer.run',
 				arguments: [this]
 			}
 		};
@@ -195,7 +195,7 @@ class NoScripts extends TreeItem
 
 
 export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
- {
+{
 	private taskTree: Folder[] | TaskFile[] | NoScripts[] | null = null;
 	private extensionContext: ExtensionContext;
 	private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
@@ -205,15 +205,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	{
 		const subscriptions = context.subscriptions;
 		this.extensionContext = context;
-		subscriptions.push(commands.registerCommand('taskExplorer.runScript', this.runScript, this));
-		subscriptions.push(commands.registerCommand('taskExplorer.stopScript', (taskTreeItem: TaskItem) => 
+		subscriptions.push(commands.registerCommand('taskExplorer.run', this.run, this));
+		subscriptions.push(commands.registerCommand('taskExplorer.stop', (taskTreeItem: TaskItem) => 
 		{
             if (taskTreeItem.execution) {
-                taskTreeItem.execution.terminate();
+				taskTreeItem.execution.terminate();
             }
         }, this));
-		subscriptions.push(commands.registerCommand('taskExplorer.openScript', this.openScript, this));
+		subscriptions.push(commands.registerCommand('taskExplorer.open', this.open, this));
 		subscriptions.push(commands.registerCommand('taskExplorer.refresh', this.refresh, this));
+
+		tasks.onDidStartTask(() => this.refresh());
+		tasks.onDidEndTask(() => this.refresh());
 	}
 
 
@@ -245,7 +248,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private async runScript(script: TaskItem) 
+	private async run(script: TaskItem) 
 	{
 		let task = script.task;
 		let pkg = script.package;
@@ -367,7 +370,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private async openScript(selection: TaskFile | TaskItem) 
+	private async open(selection: TaskFile | TaskItem) 
 	{
 		let uri: Uri | undefined = undefined;
 		if (selection instanceof TaskFile) {
