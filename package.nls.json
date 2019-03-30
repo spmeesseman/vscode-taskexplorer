@@ -21,7 +21,7 @@
 	"command.run": "Run",
 	"command.stop": "Stop",
 	"command.debug": "Debug",
-	"command.openScript": "Open",
+	"command.open": "Open",
 	"command.runInstall": "Run Install",
 	"command.runSelectedScript": "Run Script"
 }
