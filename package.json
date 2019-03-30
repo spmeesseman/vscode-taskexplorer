@@ -3,7 +3,7 @@
     "displayName": "Task Explorer",
     "description": "View and run tasks from Explorer",
     "icon": "res/launch.png",
-    "version": "1.5.21",
+    "version": "1.6.0",
     "publisher": "spmeesseman",
     "repository": {
         "type": "git",
@@ -107,7 +107,7 @@
         "vscode": "^1.1.30",
         "vscode-nls-dev": "3.2.6"
     },
-   "contributes": {
+    "contributes": {
         "views": {
             "explorer": [
                 {

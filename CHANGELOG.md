@@ -1,3 +1,15 @@
+# [1.6.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.21...v1.6.0) (2019-03-30)
+
+
+### Features
+
+* display status for running task, stop running tasks ([4cf8af9](https://github.com/spmeesseman/vscode-taskexplorer/commit/4cf8af9))
+
+
+### Performance Improvements
+
+* make logging asynchronous ([c080a3d](https://github.com/spmeesseman/vscode-taskexplorer/commit/c080a3d))
+
 ## [1.5.21](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.20...v1.5.21) (2019-03-29)
 
 ## [1.5.20](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.19...v1.5.20) (2019-03-29)
