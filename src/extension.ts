@@ -12,7 +12,6 @@ import {
 	workspace,
 	window
   } from "vscode";
-import { addJSONProviders } from './features/jsonContributions';
 import { TaskTreeDataProvider } from './taskView';
 import { invalidateTasksCache, AntTaskProvider } from './tasks';
 import { configuration } from "./common/configuration";
@@ -92,9 +91,7 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 			}
 		});
 		context.subscriptions.push(d);
-		
-		context.subscriptions.push(addJSONProviders(httpRequest.xhr));
-		
+
 		log('   Task Explorer activated');
 	};
 
