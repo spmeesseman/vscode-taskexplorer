@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.6.0...v1.7.0) (2019-03-30)
+
+
+### Features
+
+* add sidebar view ([2595a39](https://github.com/spmeesseman/vscode-taskexplorer/commit/2595a39))
+
 # [1.6.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.5.21...v1.6.0) (2019-03-30)
 
 

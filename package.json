@@ -3,7 +3,7 @@
     "displayName": "Task Explorer",
     "description": "View and run tasks from Explorer",
     "icon": "res/launch.png",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "publisher": "spmeesseman",
     "repository": {
         "type": "git",
@@ -111,11 +111,11 @@
     "contributes": {
         "viewsContainers": {
             "activitybar": [
-              {
-                "id": "taskActivity",
-                "title": "%view.name%",
-                "icon": "res/gears.svg"
-              }
+                {
+                    "id": "taskActivity",
+                    "title": "%view.name%",
+                    "icon": "res/gears.svg"
+                }
             ]
         },
         "views": {
@@ -127,11 +127,12 @@
                 }
             ],
             "taskActivity": [
-            {
-                "id": "taskExplorerSideBar",
-                "name": "%view.name%",
-                "when": "config.taskExplorer.enableSideBar"
-            }]
+                {
+                    "id": "taskExplorerSideBar",
+                    "name": "%view.name%",
+                    "when": "config.taskExplorer.enableSideBar"
+                }
+            ]
         },
         "commands": [
             {
