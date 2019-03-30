@@ -1,43 +1,52 @@
 /* tslint:disable */
 
 //
-// Note: This example test is leveraging the Mocha test framework.
-// Please refer to their documentation on https://mochajs.org/ for help.
+// Documentation on https://mochajs.org/ for help.
 //
-/*
-// The module 'assert' provides assertion methods from node
-import * as assert from "assert";
 
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
+import * as assert from "assert";
 import * as fs from "original-fs";
 import * as path from "path";
-import { commands, Uri } from "vscode";
+import { commands, Uri, workspace, window, TextDocument } from "vscode";
 import * as testUtil from "./testUtil";
 import { timeout } from "../util";
+import { treeDataProvider } from "../extension";
 
-// Defines a Mocha test suite to group tests of similar kind together
-suite("NPM Tests", () => {
-  let repoUri: Uri;
-  let checkoutDir: Uri;
-
+suite("NPM tests", () => 
+{
   suiteSetup(async () => {
     await testUtil.activeExtension();
-    repoUri = await testUtil.createRepoServer();
-    await testUtil.createStandardLayout(testUtil.getSvnUrl(repoUri));
-    checkoutDir = await testUtil.createNpmDir();
   });
 
   suiteTeardown(() => {
-    testUtil.destroyAllTempPaths();
+    //testUtil.destroyAllTempPaths();
   });
 
-  test("File Open", async function() {
-    const file = path.join(checkoutDir.fsPath, "package.json");
-    fs.writeFileSync(file, "test");
+  test("File Open", async function() 
+  {
+    const dir = path.join(workspace.rootPath, "npm_test_");
+    const file = path.join(dir, "package.json");
 
-    //await commands.executeCommand("svn.fileOpen", Uri.file(file));
+    //await testUtil.createTempDir(dir);
+
+    if (!fs.existsSync(dir))
+    {
+      fs.mkdirSync(dir);
+    }
+    fs.writeFileSync(file, '{"scripts":{"test":"node ./node_modules/vscode/bin/test","compile":"npx tsc -p ./"}');
+
+    let document: TextDocument;
+    document = await workspace.openTextDocument(file);
+    await window.showTextDocument(document);
+
+    
+    await treeDataProvider.getChildren(); // mock explorer open view which would call this function
+    await timeout(1000);
+    
+    fs.unlinkSync(file);
+    fs.rmdirSync(dir);
+    assert('ok');
+
   });
 
 });
-*/

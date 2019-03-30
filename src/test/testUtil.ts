@@ -14,11 +14,6 @@ tmp.setGracefulCleanup();
 
 const tempDirList: tmp.SynchrounousResult[] = [];
 
-export function getSvnUrl(uri: Uri) {
-  const url = uri.toString();
-
-  return url.replace(/%3A/g, ":");
-}
 
 export function spawn(
   command: string,
@@ -49,7 +44,8 @@ export function spawn(
   return proc;
 }
 
-export function newTempDir(prefix: string) {
+export function newTempDir(prefix: string) 
+{
   const dir = tmp.dirSync({
     prefix,
     unsafeCleanup: true
@@ -60,74 +56,32 @@ export function newTempDir(prefix: string) {
   return dir.name;
 }
 
-export function createRepoServer() {
+
+export async function createTempDir(dir: string) 
+{
+  const fullpath = newTempDir(dir);
+  //const fullpath = newTempDir("svn_layout_");
+  //const dirname = path.basename(fullpath);
+
+  //fs.mkdirSync(path.join(fullpath, trunk));
+  //fs.mkdirSync(path.join(fullpath, branches));
+  //fs.mkdirSync(path.join(fullpath, tags));
+
+  return fullpath;
+}
+
+
+export async function createTempDir2(dir: string)
+{
   return new Promise<Uri>((resolve, reject) => {
-    const fullpath = newTempDir("svn_server_");
-    const dirname = path.basename(fullpath);
-
-    if (fs.existsSync(fullpath)) {
-      destroyPath(fullpath);
-    }
-
-    const proc = spawn("svnadmin", ["create", dirname], {
-      cwd: path.dirname(fullpath)
-    });
-
-    proc.once("exit", exitCode => {
-      if (exitCode === 0) {
-        resolve(Uri.file(fullpath));
-      }
-      reject();
-    });
-  });
-}
-
-export function importToRepoServer(
-  url: string,
-  path: string,
-  message = "imported",
-  cwd?: string
-) {
-  return new Promise<void>((resolve, reject) => {
-    const proc = spawn("svn", ["import", path, url, "-m", message], {
-      cwd
-    });
-
-    proc.once("exit", exitCode => {
-      if (exitCode === 0) {
-        resolve();
-      }
-      reject();
-    });
-  });
-}
-
-export async function createStandardLayout(
-  url: string,
-  trunk = "trunk",
-  branches = "branches",
-  tags = "tags"
-) {
-  const fullpath = newTempDir("svn_layout_");
-  const dirname = path.basename(fullpath);
-
-  fs.mkdirSync(path.join(fullpath, trunk));
-  fs.mkdirSync(path.join(fullpath, branches));
-  fs.mkdirSync(path.join(fullpath, tags));
-
-  await importToRepoServer(url, fullpath, "Created Standard Layout");
-
-  destroyPath(fullpath);
-}
-
-export function createNpmDir() {
-  return new Promise<Uri>((resolve, reject) => {
-    const fullpath = newTempDir("npm_test_");
+    const fullpath = newTempDir(dir);
     resolve(Uri.file(fullpath));
   });
 }
 
-export async function destroyPath(fullPath: string) {
+
+export async function destroyPath(fullPath: string) 
+{
   fullPath = fullPath.replace(/^file\:\/\/\//, "");
 
   if (!fs.existsSync(fullPath)) {
@@ -157,7 +111,9 @@ export async function destroyPath(fullPath: string) {
   return true;
 }
 
-export function destroyAllTempPaths() {
+
+export function destroyAllTempPaths() 
+{
   let dir;
   while ((dir = tempDirList.shift())) {
     try {
@@ -182,15 +138,21 @@ export function activeExtension() {
   });
 }
 
+
 const overridesShowInputBox: any[] = [];
 
-export function overrideNextShowInputBox(value: any) {
+
+export function overrideNextShowInputBox(value: any) 
+{
   overridesShowInputBox.push(value);
 }
 
+
 const originalShowInputBox = window.showInputBox;
 
-window.showInputBox = (...args: any[]) => {
+
+window.showInputBox = (...args: any[]) => 
+{
   const next = overridesShowInputBox.shift();
   if (typeof next === "undefined") {
     return originalShowInputBox.call(null, args as any);
@@ -200,13 +162,17 @@ window.showInputBox = (...args: any[]) => {
   });
 };
 
+
 const overridesShowQuickPick: any[] = [];
 
-export function overrideNextShowQuickPick(value: any) {
+
+export function overrideNextShowQuickPick(value: any) 
+{
   overridesShowQuickPick.push(value);
 }
 
 const originalShowQuickPick = window.showQuickPick;
+
 
 window.showQuickPick = (
   items: any[] | Thenable<any[]>,
