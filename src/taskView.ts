@@ -157,8 +157,8 @@ class TaskItem extends TreeItem
 
 		if (this.execution) {
 			this.iconPath = {
-				light: context.asAbsolutePath(path.join('res', 'light', 'sync.svg')),
-				dark: context.asAbsolutePath(path.join('res', 'dark', 'sync.svg'))
+				light: context.asAbsolutePath(path.join('res', 'light', 'loading.svg')),
+				dark: context.asAbsolutePath(path.join('res', 'dark', 'loading.svg'))
 			};
 		} else {
 			this.iconPath = {
