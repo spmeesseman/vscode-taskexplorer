@@ -219,7 +219,7 @@
                 },
                 {
                     "command": "taskExplorerSideBar.refresh",
-                    "when": "view == taskExplorer",
+                    "when": "view == taskExplorerSideBar",
                     "group": "navigation"
                 }
             ],
