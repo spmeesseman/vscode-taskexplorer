@@ -3,7 +3,7 @@
     "displayName": "Task Explorer",
     "description": "View and run tasks from Explorer",
     "icon": "res/launch.png",
-    "version": "1.7.1",
+    "version": "1.7.2",
     "publisher": "spmeesseman",
     "repository": {
         "type": "git",
