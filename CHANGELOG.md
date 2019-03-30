@@ -1,3 +1,16 @@
+## [1.7.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.4...v1.7.5) (2019-03-30)
+
+
+### Bug Fixes
+
+* call destroyAllTempPath breaks promise if there are no temp dirs ([cd4e711](https://github.com/spmeesseman/vscode-taskexplorer/commit/cd4e711))
+* refresh button in sidebar is missing ([0cbb946](https://github.com/spmeesseman/vscode-taskexplorer/commit/0cbb946))
+
+
+### Performance Improvements
+
+* remove jsonprovider requests to npmjs ([db037df](https://github.com/spmeesseman/vscode-taskexplorer/commit/db037df))
+
 ## [1.7.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.3...v1.7.4) (2019-03-30)
 
 ## [1.7.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.2...v1.7.3) (2019-03-30)
