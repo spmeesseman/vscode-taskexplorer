@@ -9,7 +9,7 @@ export function timeout(ms: number)
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function log(msg: string)
+export async function log(msg: string)
 {
   if (workspace.getConfiguration('taskExplorer').get('debug') === true)
 	{
@@ -18,7 +18,7 @@ export function log(msg: string)
   }
 }
 
-export function logValue(msg: string, value: any)
+export async function logValue(msg: string, value: any)
 {
   var logMsg = msg;
   for (var i = msg.length; i < logValueWhiteSpace; i++)
