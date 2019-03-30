@@ -6,10 +6,8 @@
 
 import * as assert from 'assert';
 import * as vscode from "vscode";
-import * as util from '../util';
-import { Uri } from "vscode";
 import * as testUtil from "./testUtil";
-import { utils } from 'mocha';
+import { configuration } from "../common/configuration";
 
 
 suite("Extension Tests", () => 
@@ -27,16 +25,10 @@ suite("Extension Tests", () =>
     assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
   });
 
-  // Defines a Mocha unit test
-  // test("Something 1", function () {
-  //   assert.equal(-1, [1, 2, 3].indexOf(5));
-  //   assert.equal(-1, [1, 2, 3].indexOf(0));
-  // });
 
-  // The extension is already activated by vscode before running mocha test framework.
-  // No need to test activate any more. So commenting this case.
   // tslint:disable-next-line: only-arrow-functions
-  test("Activate extension", function (done) {
+  test("Activate extension", function (done) 
+  {
 
     this.timeout(60 * 1000);
 
@@ -59,7 +51,8 @@ suite("Extension Tests", () =>
         }
       );
     } else {
-      assert(vscode.workspace.getConfiguration('taskExplorer').update('debug', true));
+      assert(vscode.workspace.getConfiguration('taskExplorer').update('debug', false));
+      assert(configuration.update('debug', false));
       assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
       done();
     }
