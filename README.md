@@ -32,10 +32,11 @@
 * v1.7 - Two view types!! - Use one or both of either SideBar View and/or Explorer Tray.
 * v1.6 - Progress icons for running tasks
 * v1.6 - Stop execution button for running tasks
-* v1.5 - Ant task provider - Open and launch Ant targets as tasks
+* v1.5 - Ant task provider - Open and launch ANT targets as tasks
 * v1.4 - Open and launch TSC tasks
 * v1.3 - Open and launch Visual Studio Code tasks
 * v1.2 - Convenient layout - groups all tasks by project folder, by task file, by task
+* v1.1 - Supports multi-root or single-root workspaces
 * v1.0 - Open and launch NPM scripts as tasks
 
 ## Coming Soon
@@ -62,7 +63,9 @@
 
 |Config|Description|Default|
 |-|-|-|
-|`taskExplorer.enableCodeTasks`|Enable/show visual studio code tasks|`true`|
+|`taskExplorer.enableSideBar`|Enable/show visual studio code tasks|`true`|
+|`taskExplorer.enableExplorerView`|Enable a task explorer view in the sidebar|`true`|
+|`taskExplorer.enableCodeTasks`|Enable a task explorer tray in the Explorer sidebar view|`true`|
 |`taskExplorer.enableGulpTasks`|Enable/show ant targets as tasks|`true`|
 |`taskExplorer.enableGruntTasks`|Enable/show ant targets as tasks|`true`|
 |`taskExplorer.enableNpmScripts`|Enable/show npm scripts as tasks|`true`|
