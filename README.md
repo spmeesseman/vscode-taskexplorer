@@ -63,7 +63,7 @@
 
 |Config|Description|Default|
 |-|-|-|
-|`taskExplorer.enableSideBar`|Enable/show visual studio code tasks|`true`|
+|`taskExplorer.enableSideBar`|Enable/show visual studio code tasks|`false`|
 |`taskExplorer.enableExplorerView`|Enable a task explorer view in the sidebar|`true`|
 |`taskExplorer.enableCodeTasks`|Enable a task explorer tray in the Explorer sidebar view|`true`|
 |`taskExplorer.enableGulpTasks`|Enable/show ant targets as tasks|`true`|
