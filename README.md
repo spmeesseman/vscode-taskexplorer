@@ -46,8 +46,9 @@
 
 ## Screenshots
 
-![extension ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview.png?raw=true)
-![extension ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)
+|New Sidebar view!!|Calssic Explorer Tray|Support for Ant targets|
+|-|-|-|
+|![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview.png?raw=true)|
 
 ## Feedback & Contributing
 
