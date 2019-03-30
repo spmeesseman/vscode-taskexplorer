@@ -22,7 +22,7 @@ const localize = nls.loadMessageBundle();
 type ExplorerCommands = 'open' | 'run';
 
 
-class Folder extends TreeItem 
+export class Folder extends TreeItem 
 {
 	public taskFiles: TaskFile[] = [];
 	public tasks: TaskItem[] = [];
@@ -42,7 +42,7 @@ class Folder extends TreeItem
 }
 
 
-class TaskFile extends TreeItem 
+export class TaskFile extends TreeItem 
 {
 	public path: string;
 	public folder: Folder;
@@ -103,7 +103,7 @@ class TaskFile extends TreeItem
 }
 
 
-class TaskItem extends TreeItem 
+export class TaskItem extends TreeItem 
 {
 	public static readonly defaultSource = "Workspace";
 
