@@ -201,19 +201,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
 	readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
 
-	constructor(context: ExtensionContext) 
+	constructor(name: string, context: ExtensionContext) 
 	{
 		const subscriptions = context.subscriptions;
 		this.extensionContext = context;
-		subscriptions.push(commands.registerCommand('taskExplorer.run', this.run, this));
-		subscriptions.push(commands.registerCommand('taskExplorer.stop', (taskTreeItem: TaskItem) => 
+		subscriptions.push(commands.registerCommand(name + '.run', this.run, this));
+		subscriptions.push(commands.registerCommand(name + '.stop', (taskTreeItem: TaskItem) => 
 		{
             if (taskTreeItem.execution) {
 				taskTreeItem.execution.terminate();
             }
         }, this));
-		subscriptions.push(commands.registerCommand('taskExplorer.open', this.open, this));
-		subscriptions.push(commands.registerCommand('taskExplorer.refresh', this.refresh, this));
+		subscriptions.push(commands.registerCommand(name + '.open', this.open, this));
+		subscriptions.push(commands.registerCommand(name + '.refresh', this.refresh, this));
 
 		tasks.onDidStartTask(() => this.refresh());
 		tasks.onDidEndTask(() => this.refresh());
@@ -260,19 +260,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			return;
 		}
 
-		//vscode.tasks.onDidStartTask(() => (fileUri?: vscode.Uri): void => {
-			//script.contextValue = 'runningScript';
-		//});
-
-		//vscode.tasks.onDidEndTask(() => (fileUri?: vscode.Uri): void => {
-		//	script.contextValue = 'script';
-		//});
-	
 		tasks.executeTask(script.task);
 	}
 
 
-	private scriptNotValid(task: Task) {
+	private scriptNotValid(task: Task) 
+	{
 		let message = localize('scriptInvalid', 'Task Explorer - Could not find the script "{0}". Try to refresh the view.', task.name);
 		window.showErrorMessage(message);
 	}

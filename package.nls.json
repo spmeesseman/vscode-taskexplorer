@@ -11,6 +11,8 @@
 	"config.taskExplorer.enableAntTargets": "Enable/show ant targets as tasks.",
 	"config.taskExplorer.pathToAnt": "The path to the ant binary, if not registered in system path",
 	"config.taskExplorer.enableAnsiconForAnt": "Enable ansicon output colorization for ant tasks.",
+	"config.taskExplorer.enableSideBar": "Enable a task explorer view in the sidebar.",
+	"config.taskExplorer.enableExplorerView": "Enable a task explorer tray in the Explorer sidebar view.",
 	"config.taskExplorer.pathToAnsicon": "The path to the ansicon binary, if not registered in system path",
 	"config.taskExplorer.fetchOnlinePackageInfo": "Fetch data from https://registry.npmjs.org and https://registry.bower.io to provide auto-completion and information on hover features on npm dependencies.",
 	"taskExplorer.parseError": "Task Explorer task detection: failed to parse the file {0}",

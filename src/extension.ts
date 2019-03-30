@@ -19,6 +19,7 @@ import { configuration } from "./common/configuration";
 import { log } from './util';
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
+export let treeDataProvider2: TaskTreeDataProvider | undefined;
 export let logOutputChannel: OutputChannel | undefined;
 
 
@@ -49,7 +50,13 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 		log('Init extension');
 
 		register(context);
-		treeDataProvider = registerExplorer(context);
+
+		if (configuration.get<boolean>("enableSideBar")) {
+			treeDataProvider = registerExplorer("taskExplorerSideBar", context);
+		}
+		if (configuration.get<boolean>("enableExplorerView")) {
+			treeDataProvider2 = registerExplorer("taskExplorer", context);
+		}
 
 		configureHttpRequest();
 		let d = workspace.onDidChangeConfiguration((e) => {
@@ -59,10 +66,33 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 				if (treeDataProvider) {
 					treeDataProvider.refresh();
 				}
+				if (treeDataProvider2) {
+					treeDataProvider2.refresh();
+				}
+			}
+			if (e.affectsConfiguration('taskExplorer.enableSideBar')) {
+				if (configuration.get<boolean>("enableSideBar")) {
+					if (treeDataProvider) {
+						treeDataProvider.refresh();
+					}
+					else {
+						treeDataProvider = registerExplorer("taskExplorerSideBar", context);
+					}
+				}
+			}
+			if (e.affectsConfiguration('taskExplorer.enableExplorerView')) {
+				if (configuration.get<boolean>("enableExplorerView")) {
+					if (treeDataProvider2) {
+						treeDataProvider2.refresh();
+					}
+					else {
+						treeDataProvider2 = registerExplorer("taskExplorer", context);
+					}
+				}
 			}
 		});
 		context.subscriptions.push(d);
-
+		
 		context.subscriptions.push(addJSONProviders(httpRequest.xhr));
 		
 		log('   Task Explorer activated');
@@ -77,8 +107,11 @@ function register(context: ExtensionContext): Disposable | undefined
 	function invalidateScriptCaches() 
 	{
 		invalidateTasksCache();
-		if (treeDataProvider) {
+		if (configuration.get<boolean>("enableSideBar") && treeDataProvider) {
 			treeDataProvider.refresh();
+		}
+		if (configuration.get<boolean>("enableExplorerView") && treeDataProvider2) {
+			treeDataProvider2.refresh();
 		}
 	}
 
@@ -114,12 +147,11 @@ function register(context: ExtensionContext): Disposable | undefined
 }
 
 
-function registerExplorer(context: ExtensionContext): TaskTreeDataProvider | undefined 
+function registerExplorer(name: string, context: ExtensionContext): TaskTreeDataProvider | undefined 
 {
 	if (workspace.workspaceFolders) {
-		let showCollapseAll = true;
-		let treeDataProvider = new TaskTreeDataProvider(context);
-		const view = window.createTreeView('taskExplorer', { treeDataProvider: treeDataProvider, showCollapseAll: true });
+		let treeDataProvider = new TaskTreeDataProvider(name, context);
+		const view = window.createTreeView(name, { treeDataProvider: treeDataProvider, showCollapseAll: true });
 		context.subscriptions.push(view);
 		return treeDataProvider;
 	}

@@ -34,6 +34,7 @@
         "scripts",
         "explorer",
         "explorer view",
+        "multi-root ready",
         "run script",
         "run target",
         "run task",
@@ -108,18 +109,72 @@
         "vscode-nls-dev": "3.2.6"
     },
     "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+              {
+                "id": "taskActivity",
+                "title": "%view.name%",
+                "icon": "res/gears.svg"
+              }
+            ]
+        },
         "views": {
             "explorer": [
                 {
                     "id": "taskExplorer",
-                    "name": "%view.name%"
+                    "name": "%view.name%",
+                    "when": "config.taskExplorer.enableExplorerView"
                 }
-            ]
+            ],
+            "taskActivity": [
+            {
+                "id": "taskExplorerSideBar",
+                "name": "%view.name%",
+                "when": "config.taskExplorer.enableSideBar"
+            }]
         },
         "commands": [
             {
+                "command": "taskExplorerSideBar.run",
+                "title": "%command.run%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "light": "res/light/continue.svg",
+                    "dark": "res/dark/continue.svg"
+                }
+            },
+            {
+                "command": "taskExplorerSideBar.stop",
+                "title": "%command.stop%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "dark": "res/dark/stop.svg",
+                    "light": "res/light/stop.svg"
+                }
+            },
+            {
+                "command": "taskExplorerSideBar.open",
+                "title": "%command.open%",
+                "when": "config.taskExplorer.enableSideBar"
+            },
+            {
+                "command": "taskExplorerSideBar.runInstall",
+                "title": "%command.runInstall%",
+                "when": "config.taskExplorer.enableSideBar"
+            },
+            {
+                "command": "taskExplorerSideBar.refresh",
+                "title": "%command.refresh%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "light": "res/light/refresh.svg",
+                    "dark": "res/dark/refresh.svg"
+                }
+            },
+            {
                 "command": "taskExplorer.run",
                 "title": "%command.run%",
+                "when": "config.taskExplorer.enableExplorerView",
                 "icon": {
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
@@ -128,6 +183,7 @@
             {
                 "command": "taskExplorer.stop",
                 "title": "%command.stop%",
+                "when": "config.taskExplorer.enableExplorerView",
                 "icon": {
                     "dark": "res/dark/stop.svg",
                     "light": "res/light/stop.svg"
@@ -135,15 +191,18 @@
             },
             {
                 "command": "taskExplorer.open",
-                "title": "%command.open%"
+                "title": "%command.open%",
+                "when": "config.taskExplorer.enableExplorerView"
             },
             {
                 "command": "taskExplorer.runInstall",
-                "title": "%command.runInstall%"
+                "title": "%command.runInstall%",
+                "when": "config.taskExplorer.enableExplorerView"
             },
             {
                 "command": "taskExplorer.refresh",
                 "title": "%command.refresh%",
+                "when": "config.taskExplorer.enableExplorerView",
                 "icon": {
                     "light": "res/light/refresh.svg",
                     "dark": "res/dark/refresh.svg"
@@ -151,23 +210,14 @@
             }
         ],
         "menus": {
-            "commandPalette": [
-                {
-                    "command": "taskExplorer.refresh",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.run",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.open",
-                    "when": "false"
-                }
-            ],
             "view/title": [
                 {
                     "command": "taskExplorer.refresh",
+                    "when": "view == taskExplorer",
+                    "group": "navigation"
+                },
+                {
+                    "command": "taskExplorerSideBar.refresh",
                     "when": "view == taskExplorer",
                     "group": "navigation"
                 }
@@ -175,32 +225,62 @@
             "view/item/context": [
                 {
                     "command": "taskExplorer.open",
-                    "when": "view == taskExplorer && viewItem == taskFile",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFile",
                     "group": "navigation@1"
                 },
                 {
                     "command": "taskExplorer.runInstall",
-                    "when": "view == taskExplorer && viewItem == taskFile",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFile",
                     "group": "navigation@2"
                 },
                 {
                     "command": "taskExplorer.open",
-                    "when": "view == taskExplorer && viewItem == script",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script",
                     "group": "navigation@1"
                 },
                 {
                     "command": "taskExplorer.run",
-                    "when": "view == taskExplorer && viewItem == script",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script",
                     "group": "navigation@2"
                 },
                 {
                     "command": "taskExplorer.run",
-                    "when": "view == taskExplorer && viewItem == script",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.stop",
-                    "when": "view == taskExplorer && viewItem == runningScript",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == runningScript",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskExplorerSideBar.open",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFile",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "taskExplorerSideBar.runInstall",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFile",
+                    "group": "navigation@2"
+                },
+                {
+                    "command": "taskExplorerSideBar.open",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "taskExplorerSideBar.run",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
+                    "group": "navigation@2"
+                },
+                {
+                    "command": "taskExplorerSideBar.run",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskExplorerSideBar.stop",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == runningScript",
                     "group": "inline"
                 }
             ]
@@ -210,6 +290,16 @@
             "type": "object",
             "title": "Task Explorer",
             "properties": {
+                "taskExplorer.enableExplorerView": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.enableExplorerView%"
+                },
+                "taskExplorer.enableSideBar": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "%config.taskExplorer.enableSideBar%"
+                },
                 "taskExplorer.enableNpmScripts": {
                     "type": "boolean",
                     "default": true,
