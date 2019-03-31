@@ -1,3 +1,10 @@
+## [1.7.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.5...v1.7.6) (2019-03-31)
+
+
+### Bug Fixes
+
+* change package icon color ([0ed4bea](https://github.com/spmeesseman/vscode-taskexplorer/commit/0ed4bea))
+
 ## [1.7.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.4...v1.7.5) (2019-03-30)
 
 
