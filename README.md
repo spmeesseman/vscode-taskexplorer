@@ -16,7 +16,7 @@
 
 ## Description
 
-> Provides a single view in either (or both) the SideBar and Explorer that conveniently displays all VSCode tasks, NPM scripts, Gulp tasks, Grunt tasks, and Ant targets, grouped within their respective task nodes.  Tasks can be either opened or executed.  See Requirements section below.  Note that Gulp and Grunt tasks are not supported yet, coming soon.
+> Provides a single view in either (or both) the SideBar and/or Explorer that conveniently displays all VSCode tasks, NPM scripts and Ant targets (Gulp and Grunt tasks coming soon), grouped within their respective task nodes.  Tasks can be either opened or executed.  See Requirements section below.
 
 ## Requirements
 
