@@ -14,10 +14,6 @@
 [![Dependencies Status](https://david-dm.org/spmeesseman/vscode-taskexplorer/status.svg)](https://david-dm.org/spmeesseman/vscode-taskexplorer)
 [![DevDependencies Status](https://david-dm.org/spmeesseman/vscode-taskexplorer/dev-status.svg)](https://david-dm.org/spmeesseman/vscode-taskexplorer?type=dev)
 
-## Important Note
-
-> This extension replaces the recently released 'vscode-taskview' extension (just a simple package rename).  Active development will be done on this extension.
-
 ## Description
 
 > Provides a single view in either (or both) the SideBar and Explorer that conveniently displays all VSCode tasks, NPM scripts, Gulp tasks, Grunt tasks, and Ant targets, grouped within their respective task nodes.  Tasks can be either opened or executed.  See Requirements section below.  Note that Gulp and Grunt tasks are not supported yet, coming soon.
