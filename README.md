@@ -40,6 +40,7 @@
 * Open and launch Gulp tasks
 * Open and launch Grunt tasks
 * C/C++ Makefile Task Provider - Open and launch C/C++ Makefiles
+* NSIS Task Provider - Open and launch NSIS installer scripts
 
 ## Known Issues
 
