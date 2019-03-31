@@ -16,6 +16,7 @@
         "Other"
     ],
     "keywords": [
+        "multi-root ready",
         "task",
         "tasks",
         "task explorer",
@@ -28,18 +29,7 @@
         "grunt",
         "gulp",
         "tsc",
-        "npm",
-        "execute",
-        "script",
-        "scripts",
-        "explorer",
-        "explorer view",
-        "multi-root ready",
-        "run script",
-        "run target",
-        "run task",
-        "ant script",
-        "ant target"
+        "npm"
     ],
     "main": "./out/extension",
     "activationEvents": [
