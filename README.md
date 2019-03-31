@@ -23,10 +23,6 @@
 * Visual Studio Code v1.30 or higher
 * For npm, grunt, and gulp tasks, the 'Auto Detect' vscode setting must be turned 'On' for each respective task provider.
 
-## Known Issues
-
-* Ansicon colorization of Ant output not working
-
 ## Features
 
 * v1.7 - Two view types!! - Use one or both of either SideBar View and/or Explorer Tray.
@@ -44,6 +40,10 @@
 * Open and launch Gulp tasks
 * Open and launch Grunt tasks
 * C/C++ Makefile Task Provider - Open and launch C/C++ Makefiles
+
+## Known Issues
+
+* Ansicon colorization of Ant output not working
 
 ## Screenshots
 
