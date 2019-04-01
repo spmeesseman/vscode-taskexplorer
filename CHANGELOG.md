@@ -1,3 +1,10 @@
+## [1.7.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.6...v1.7.7) (2019-04-01)
+
+
+### Bug Fixes
+
+* extension stops working after reading an Ant build file with no targets ([76a0593](https://github.com/spmeesseman/vscode-taskexplorer/commit/76a0593))
+
 ## [1.7.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.5...v1.7.6) (2019-03-31)
 
 
