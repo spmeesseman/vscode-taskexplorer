@@ -1,7 +1,7 @@
 
 import {
     Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition
+    workspace, TaskProvider, TaskDefinition, TextEditorRevealType, Range, window
 } from 'vscode';
 import * as path from 'path';
 import * as util from './util';
@@ -106,7 +106,7 @@ async function provideAntScriptsForFolder(packageJsonUri: Uri): Promise<Task[]>
 }
 
 
-export async function findAllAntScripts(buffer: string): Promise<StringMap> 
+async function findAllAntScripts(buffer: string): Promise<StringMap> 
 {
 	let json: any = '';
 	let scripts: StringMap = {};
@@ -146,25 +146,24 @@ export async function findAllAntScripts(buffer: string): Promise<StringMap>
 }
 
 
-export function createAntTask(script: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri): Task 
+function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri): Task 
 {
-	function getCommandLine(folder: WorkspaceFolder, cmd: string): string 
+	function getCommand(folder: WorkspaceFolder, cmd: string): string 
 	{
 		let ant = "ant";
 
+		if (process.platform === 'win32') {
+			ant = "ant.bat";
+		}
+
 		if (workspace.getConfiguration('taskExplorer').get('pathToAnt')) {
-			ant = workspace.getConfiguration('taskExplorer').get('pathToAnt'); // path.join();
+			ant = workspace.getConfiguration('taskExplorer').get('pathToAnt');
+			if (process.platform === 'win32' && ant.endsWith("\\ant")) {
+				ant += '.bat';
+			}
 		}
 
-		if (workspace.getConfiguration('taskExplorer', folder.uri).get<boolean>('runSilent')) {
-			ant += ' -silent';
-		}
-
-		if (workspace.getConfiguration('taskExplorer').get('enableAnsiconForAnt') === true) {
-			ant += ' -logger org.apache.tools.ant.listener.AnsiColorLogger';
-		}
-
-		return `${ant} ${cmd}`; 
+		return ant; 
 	}
 
 	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string 
@@ -176,7 +175,7 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 	
 	let kind: AntTaskDefinition = {
 		type: 'ant',
-		script: script
+		script: target
 	};
 
 	let relativePath = getRelativePath(folder, packageJsonUri);
@@ -185,21 +184,27 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 	}
 	let cwd = path.dirname(packageJsonUri.fsPath);
 
+	let args = [ target ];
 	let options = null;
-	let ansicon = "ansicon.exe";
-
-	if (workspace.getConfiguration('taskExplorer').get('enableAnsiconForAnt') === true)
+	
+	if (process.platform === 'win32' && workspace.getConfiguration('taskExplorer').get('enableAnsiconForAnt') === true)
 	{
-		if (workspace.getConfiguration('taskExplorer').get('pathToAnsicon'))
-		{
-			ansicon = workspace.getConfiguration('taskExplorer').get('pathToAnsicon');
+		let ansicon = "ansicon.exe";
+		let ansiPath: string = workspace.getConfiguration('taskExplorer').get('pathToAnsicon');
+		if (ansiPath && util.pathExists(ansiPath)) {
+			ansicon = ansiPath;
+			if (!ansicon.endsWith('ansicon.exe') && !ansicon.endsWith('\\')) {
+				ansicon = path.join(ansicon, 'ansicon.exe');
+			}
+			else if (!ansicon.endsWith('ansicon.exe')) {
+				ansicon += 'ansicon.exe';
+			}
 		}
 		
+		args = [ "-logger", "org.apache.tools.ant.listener.AnsiColorLogger", target ];
 		options = {
 			"cwd": cwd,
-			"shell": {
-				"executable": ansicon
-			}
+			"executable": ansicon
 		};
 	}
 	else
@@ -209,12 +214,12 @@ export function createAntTask(script: string, cmd: string, folder: WorkspaceFold
 		};
 	}
 
-	let scriptName = script;
-	//if (relativePath && relativePath.length) {
-	//	scriptName = `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
-	//}
+	let targetName = target;
+	if (relativePath && relativePath.length) {
+		targetName = `${target} - ${relativePath.substring(0, relativePath.length - 1)}`;
+	}
 
-	let execution = new ShellExecution(getCommandLine(folder, cmd), options);
+	let execution = new ShellExecution(getCommand(folder, cmd), args, options);
 	
-	return new Task(kind, folder, scriptName, 'ant', execution, undefined);
+	return new Task(kind, folder, targetName, 'ant', execution, undefined);
 }
