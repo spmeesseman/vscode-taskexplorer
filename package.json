@@ -341,12 +341,6 @@
                     "default": 1,
                     "description": "%config.taskExplorer.debugLevel%"
                 },
-                "taskExplorer.runSilent": {
-                    "type": "boolean",
-                    "default": false,
-                    "scope": "resource",
-                    "markdownDescription": "%config.taskExplorer.runSilent%"
-                },
                 "taskExplorer.exclude": {
                     "type": [
                         "string",
@@ -364,15 +358,6 @@
                     ],
                     "description": "%config.taskExplorer.exclude%",
                     "scope": "resource"
-                },
-                "taskExplorer.fetchOnlinePackageInfo": {
-                    "type": "boolean",
-                    "description": "%config.taskExplorer.fetchOnlinePackageInfo%",
-                    "default": true,
-                    "scope": "window",
-                    "tags": [
-                        "usesOnlineServices"
-                    ]
                 }
             }
         },

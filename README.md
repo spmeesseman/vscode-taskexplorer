@@ -75,6 +75,4 @@
 |`taskExplorer.pathToAnt`|The path to the ant program, if not registered in system path||",
 |`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path||",
 |`taskExplorer.debug`|Turn on logging|`false`|
-|`taskExplorer.runSilent`|Run commands with the `--silent` option|`false`|
 |`taskExplorer.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/ext/**", "**/packages/**", "**/.vscode-test/**", "**/build**"]`|
-|`taskExplorer.fetchOnlinePackageInfo`|Fetch data from https://registry.npmjs.org and https://registry.bower.io to provide auto-completion and information on hover features on npm dependencies|`true`|
