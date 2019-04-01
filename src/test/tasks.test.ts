@@ -11,7 +11,9 @@ import { commands, workspace } from "vscode";
 import * as testUtil from "./testUtil";
 import { timeout } from "../util";
 import { treeDataProvider2 } from "../extension";
-import { Folder, TaskFile, TaskItem } from "../taskView";
+import { TaskFolder } from "../taskFolder";
+import { TaskFile} from "../taskFile";
+import { TaskItem } from "../taskItem";
 import { configuration } from "../common/configuration";
 
 let tempFiles: Array<string> = [];
@@ -137,7 +139,7 @@ suite("Task tests", () =>
       let item: any;
       while ((item = treeItems.shift())) {
         try {
-          if (item instanceof Folder) {
+          if (item instanceof TaskFolder) {
             let treeFiles: any[] = await treeDataProvider2.getChildren(item);
             if (treeFiles.length) {
               let item2: any;
