@@ -61,6 +61,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 	private async run(taskItem: TaskItem) 
 	{
+		//
+		// Execute task
+		//
 		tasks.executeTask(taskItem.task);
 	}
 
