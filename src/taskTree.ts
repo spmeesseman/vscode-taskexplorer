@@ -13,7 +13,7 @@ import {
 } from 'vscode';
 import { visit, JSONVisitor } from 'jsonc-parser';
 import {
-	getUriFromTask, getScripts, isWorkspaceFolder, isExcluded
+	getUriFromTask, isWorkspaceFolder, isExcluded
 } from './tasks';
 import * as nls from 'vscode-nls';
 import { TaskFolder } from './taskFolder';
@@ -59,54 +59,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private scriptIsValid(scripts: any, task: Task): boolean 
+	private async run(taskItem: TaskItem) 
 	{
-		util.log('');
-		util.log('Checking script validity');
-		util.log('   task name = ' + task.name);
-
-		for (const script in scripts) 
-		{
-			let label = this.getTaskName(script, task.definition.path);
-			util.log('   label = ' + label);
-			if (task.name === label) 
-			{
-				util.log('   found!');
-				return true;
-			}
-			if (task.name.indexOf(' - ') !== -1 && label === task.name.substring(0, task.name.indexOf(' - '))) 
-			{
-				util.log('   found!');
-				return true;
-			}
-		}
-
-		util.log('   not found!');
-		
-		return false;
-	}
-
-
-	private async run(script: TaskItem) 
-	{
-		let task = script.task;
-		let pkg = script.package;
-		let uri = getUriFromTask(task);
-		let scripts = await getScripts(uri!);
-
-		if (!this.scriptIsValid(scripts, task)) {
-			this.scriptNotValid(task);
-			return;
-		}
-
-		tasks.executeTask(script.task);
-	}
-
-
-	private scriptNotValid(task: Task) 
-	{
-		let message = localize('scriptInvalid', 'Task Explorer - Could not find the script "{0}". Try to refresh the view.', task.name);
-		window.showErrorMessage(message);
+		tasks.executeTask(taskItem.task);
 	}
 
 
@@ -208,7 +163,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		if (selection instanceof TaskFile) {
 			uri = selection.resourceUri!;
 		} else if (selection instanceof TaskItem) {
-			uri = selection.package.resourceUri;
+			uri = selection.taskFile.resourceUri;
 		}
 		if (!uri) {
 			return;
@@ -249,7 +204,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			return element.folder;
 		}
 		if (element instanceof TaskItem) {
-			return element.package;
+			return element.taskFile;
 		}
 		if (element instanceof NoScripts) {
 			return null;

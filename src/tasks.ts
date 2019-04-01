@@ -12,8 +12,6 @@ import * as fs from 'fs';
 import * as minimatch from 'minimatch';
 import * as nls from 'vscode-nls';
 import * as util from './util';
-import { findAllAntScripts } from './taskProviderAnt';
-import { JSONVisitor, visit, ParseErrorCode } from 'jsonc-parser';
 
 const localize = nls.loadMessageBundle();
 
@@ -112,16 +110,6 @@ export function getUriFromTask(task: Task): Uri | null
 }
 
 
-async function exists(file: string): Promise<boolean> 
-{
-	return new Promise<boolean>((resolve, _reject) => {
-		fs.exists(file, (value) => {
-			resolve(value);
-		});
-	});
-}
-
-
 export async function readFile(file: string): Promise<string> 
 {
 	return new Promise<string>((resolve, reject) => {
@@ -158,98 +146,4 @@ export function extractDebugArgFromScript(scriptValue: string): [string, number]
 }
 
 
-async function findAllScripts(buffer: string): Promise<StringMap> 
-{
-	let scripts: StringMap = {};
-	let script: string | undefined = undefined;
-	let inScripts = false;
-	let inTasks = false;
 
-	util.log('');
-	util.log('Find all scripts');
-
-	let visitor: JSONVisitor = {
-		onError(_error: ParseErrorCode, _offset: number, _length: number) {
-			util.logValue('   json visitor error', _error.toString());
-		},
-		onObjectEnd() {
-			if (inScripts) {
-				inScripts = false;
-			}
-		},
-		onLiteralValue(value: any, _offset: number, _length: number) {
-			if (script) {
-				if (typeof value === 'string') {
-					if (script === 'label')  // VSCODE
-					{
-						script = value;
-						scripts[value] = '';
-					}
-					else
-					{
-						scripts[script] = value;
-					}
-				}
-				script = undefined;
-			}
-		},
-		onObjectProperty(property: string, _offset: number, _length: number) {
-			if (property === 'scripts') {
-				inScripts = true;
-			}
-			else if (inScripts && !script) {
-				script = property;
-			} 
-			else if (property === 'tasks') {
-				inTasks = true;
-			}
-			else if (property === 'label' && inTasks && !script) {
-				script = property;
-			}
-			else { // nested object which is invalid, ignore the script
-				script = undefined;
-			}
-		}
-	};
-	visit(buffer, visitor);
-	return scripts;
-}
-
-
-export async function getScripts(packageJsonUri: Uri): Promise<StringMap | undefined> 
-{
-	util.log('');
-	util.log('getScripts');
-	util.logValue('   uri', packageJsonUri.fsPath);
-
-	if (packageJsonUri.scheme !== 'file') 
-	{
-		return undefined;
-	}
-
-	let packageJson = packageJsonUri.fsPath;
-	if (!await exists(packageJson)) 
-	{
-		return undefined;
-	}
-
-	try 
-	{
-		let contents = await readFile(packageJson);
-		let json = null;
-
-		if (packageJsonUri.fsPath.indexOf('uild.xml') === -1)
-		{
-			json = findAllScripts(contents);//JSON.parse(contents);
-		}
-		else
-		{
-			json = findAllAntScripts(contents);
-		}
-		return json;
-	} 
-	catch (e) {
-		let localizedParseError = localize('taskExplorer.parseError', 'Script detection: failed to parse the file {0}', packageJsonUri.fsPath);
-		throw new Error(localizedParseError);
-	}
-}
