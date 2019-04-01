@@ -1,3 +1,16 @@
+## [1.7.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.7...v1.7.8) (2019-04-01)
+
+
+### Bug Fixes
+
+* ansicon for ant output colorization ([acf17fc](https://github.com/spmeesseman/vscode-taskexplorer/commit/acf17fc))
+* vscode tasks of type 'npm' are not found when ran ([1b4ca1d](https://github.com/spmeesseman/vscode-taskexplorer/commit/1b4ca1d))
+
+
+### Performance Improvements
+
+* remove command lookups for tooltips in npm scripts for faster loading time in large workspaces ([77edcc4](https://github.com/spmeesseman/vscode-taskexplorer/commit/77edcc4))
+
 ## [1.7.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.6...v1.7.7) (2019-04-01)
 
 
