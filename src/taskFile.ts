@@ -5,9 +5,7 @@ import {
 import { TaskFolder } from './taskFolder';
 import { TaskItem } from './taskItem';
 import * as path from 'path';
-import {
-	getUriFromTask, getFileNameFromSource, getScripts, isWorkspaceFolder, isExcluded
-} from './tasks';
+import { getFileNameFromSource } from './tasks';
 
 
 export class TaskFile extends TreeItem 
