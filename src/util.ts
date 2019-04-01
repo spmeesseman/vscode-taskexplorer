@@ -1,13 +1,27 @@
 
 import { logOutputChannel } from "./extension";
 import { workspace } from "vscode";
+import { accessSync } from "original-fs";
 
 const logValueWhiteSpace = 40;
+
 
 export function timeout(ms: number) 
 {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+
+export function pathExists (path: string) 
+{
+  try {
+    accessSync(path);
+  } catch (err) {
+    return false;
+  }
+  return true;
+}
+
 
 export async function log(msg: string)
 {
@@ -17,6 +31,7 @@ export async function log(msg: string)
     logOutputChannel.appendLine(msg);
   }
 }
+
 
 export async function logValue(msg: string, value: any)
 {
