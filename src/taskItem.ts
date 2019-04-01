@@ -4,7 +4,6 @@ import {
 	ExtensionContext, Task, TaskExecution, TreeItem, TreeItemCollapsibleState,
 	WorkspaceFolder, tasks, TaskGroup
 } from 'vscode';
-import { getUriFromTask } from './tasks';
 import { TaskFile } from './taskFile';
 import * as path from 'path';
 

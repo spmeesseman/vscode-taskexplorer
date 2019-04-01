@@ -40,7 +40,12 @@ suite("Extension Tests", () =>
       assert.fail("Extension not found");
     }
 
-    if (!extension.isActive) {
+    assert(configuration.update('enableExplorerView', true));
+    assert(configuration.update('enableSideBar', true));
+    assert(configuration.update('debug', true));
+
+    if (!extension.isActive) 
+    {
       extension.activate().then(
         api => {
           assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
@@ -51,8 +56,6 @@ suite("Extension Tests", () =>
         }
       );
     } else {
-      assert(vscode.workspace.getConfiguration('taskExplorer').update('debug', false));
-      assert(configuration.update('debug', false));
       assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
       done();
     }

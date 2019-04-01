@@ -76,39 +76,6 @@ export function getFileNameFromSource(source: string, incRelPathForCode?: boolea
 	return fileName;
 }
 
-export function getUriFromTask(task: Task): Uri | null 
-{
-	let uri:Uri = null;
-
-	util.log('');
-	util.log('getUriFromTask');
-	util.logValue('   task name', task.name);
-	util.logValue('   task source', task.source);
-	util.logValue('   task type', task.definition.type);
-
-	if (isWorkspaceFolder(task.scope)) 
-	{
-		let relPath: string = task.definition.path;
-		let fileName: string = this.getFileNameFromSource(task.source);
-
-		if (task.source === 'Workspace')
-		{
-			relPath = '.vscode';
-		}
-
-		if (relPath) {
-			uri = Uri.file(path.join(task.scope.uri.fsPath, relPath, fileName));
-		} 
-		else {
-			uri = Uri.file(path.join(task.scope.uri.fsPath, fileName));
-		}
-	}
-
-	util.logValue('   uri path', uri.fsPath);
-
-	return uri;
-}
-
 
 export async function readFile(file: string): Promise<string> 
 {
@@ -122,13 +89,13 @@ export async function readFile(file: string): Promise<string>
 	});
 }
 
-
+/*
 export function extractDebugArgFromScript(scriptValue: string): [string, number] | undefined 
 {
 	// matches --debug, --debug=1234, --debug-brk, debug-brk=1234, --inspect,
 	// --inspect=1234, --inspect-brk, --inspect-brk=1234,
 	// --inspect=localhost:1245, --inspect=127.0.0.1:1234, --inspect=[aa:1:0:0:0]:1234, --inspect=:1234
-	/*
+	
 	let match = scriptValue.match(/--(inspect|debug)(-brk)?(=((\[[0-9a-fA-F:]*\]|[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|[a-zA-Z0-9\.]*):)?(\d+))?/);
 
 	if (match) {
@@ -141,9 +108,8 @@ export function extractDebugArgFromScript(scriptValue: string): [string, number]
 		if (match[1] === 'debug') {
 			return [match[1], 5858];
 		}
-	}*/
+	}
 	return undefined;
 }
-
-
+*/
 

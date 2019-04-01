@@ -12,9 +12,7 @@ import {
 	commands, window, workspace, tasks, Selection
 } from 'vscode';
 import { visit, JSONVisitor } from 'jsonc-parser';
-import {
-	getUriFromTask, isWorkspaceFolder, isExcluded
-} from './tasks';
+import { isWorkspaceFolder, isExcluded } from './tasks';
 import * as nls from 'vscode-nls';
 import { TaskFolder } from './taskFolder';
 import { TaskFile } from './taskFile';

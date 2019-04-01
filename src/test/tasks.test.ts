@@ -26,10 +26,13 @@ suite("Task tests", () =>
 {
   suiteSetup(async () => {
     await testUtil.activeExtension();
+
     dirName = path.join(workspace.rootPath, 'tasks_test_');
     dirNameCode = path.join(workspace.rootPath, '.vscode');
+
     await workspace.getConfiguration('taskExplorer').update('exclude', []);
     await configuration.update('exclude', []);
+
     if (!fs.existsSync(dirName)) {
       fs.mkdirSync(dirName);
       //await testUtil.createTempDir(dirName);
