@@ -4,12 +4,9 @@ import {
 	ExtensionContext, Task, TaskExecution, TreeItem, TreeItemCollapsibleState,
 	WorkspaceFolder, tasks, TaskGroup
 } from 'vscode';
-import { getUriFromTask, getScripts } from './tasks';
+import { getUriFromTask } from './tasks';
 import { TaskFile } from './taskFile';
 import * as path from 'path';
-
-
-type ExplorerCommands = 'open' | 'run';
 
 
 export class TaskItem extends TreeItem 
@@ -20,7 +17,7 @@ export class TaskItem extends TreeItem
     public readonly taskSource: string;
 	public readonly execution: TaskExecution | undefined;
 
-	package: TaskFile;
+	taskFile: TaskFile;
 	
 	constructor(context: ExtensionContext, taskFile: TaskFile, task: Task) 
 	{
@@ -31,34 +28,14 @@ export class TaskItem extends TreeItem
 
 		super(taskName, TreeItemCollapsibleState.None);
 
-		const command: ExplorerCommands = 'open';
-
-		//{ 
-		//	command: 'taskExplorer.executeTask', 
-		//	title: "Execute", arguments: [tasks[i]] 
-	    //}
-
-		const commandList = {
-			'open': {
-				title: 'Edit Script',
-				command: 'taskExplorer.open',
-				arguments: [this]
-			},
-			'run': {
-				title: 'Run Script',
-				command: 'taskExplorer.run',
-				arguments: [this]
-			}
-		};
-
 		this.contextValue = 'script';
-		if (task.group && task.group === TaskGroup.Rebuild) {
-			this.contextValue = 'debugScript';
-		}
-
-		this.package = taskFile;
+		this.taskFile = taskFile;
 		this.task = task;
-		this.command = commandList[command];
+		this.command = {
+			title: 'Open definition',
+			command: 'taskExplorer.open',
+			arguments: [this]
+		};
 		this.taskSource = task.source;
         this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source);
 			
@@ -77,18 +54,9 @@ export class TaskItem extends TreeItem
 		}
 
 		this.tooltip = task.name;
-		if (task.source === 'npm')
-		{
-			let uri = getUriFromTask(task);
-			getScripts(uri!).then(scripts => {
-				if (scripts && scripts[task.definition['script']]) {
-					this.tooltip = scripts[task.definition['script']];
-				}
-			});
-		}
 	}
 
 	getFolder(): WorkspaceFolder {
-		return this.package.folder.workspaceFolder;
+		return this.taskFile.folder.workspaceFolder;
 	}
 }
