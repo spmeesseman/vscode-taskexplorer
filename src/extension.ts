@@ -12,14 +12,20 @@ import {
 	workspace,
 	window
   } from "vscode";
-import { TaskTreeDataProvider } from './taskView';
-import { invalidateTasksCache, AntTaskProvider } from './tasks';
+import { TaskTreeDataProvider } from './taskTree';
+import { invalidateTasksCacheAnt, AntTaskProvider } from './taskProviderAnt';
 import { configuration } from "./common/configuration";
 import { log } from './util';
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
 export let logOutputChannel: OutputChannel | undefined;
+
+
+function invalidateTasksCache() 
+{
+	invalidateTasksCacheAnt();
+}
 
 
 export async function activate(context: ExtensionContext) 
@@ -57,9 +63,8 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 			treeDataProvider2 = registerExplorer("taskExplorer", context);
 		}
 
-		configureHttpRequest();
-		let d = workspace.onDidChangeConfiguration((e) => {
-			configureHttpRequest();
+		let d = workspace.onDidChangeConfiguration((e) => 
+		{
 			if (e.affectsConfiguration('taskExplorer.exclude')) {
 				invalidateTasksCache();
 				if (treeDataProvider) {
@@ -156,12 +161,5 @@ function registerExplorer(name: string, context: ExtensionContext): TaskTreeData
 		log('No workspace folders!!!');
 	}
 	return undefined;
-}
-
-
-function configureHttpRequest() 
-{
-	const httpSettings = workspace.getConfiguration('http');
-	httpRequest.configure(httpSettings.get<string>('proxy', ''), httpSettings.get<boolean>('proxyStrictSSL', true));
 }
 

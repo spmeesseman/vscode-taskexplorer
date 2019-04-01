@@ -8,17 +8,10 @@ import * as util from './util';
 import { StringMap, isExcluded, readFile } from './tasks';
 import { parseString } from 'xml2js';
 
-
-let cachedTasks: Task[] | undefined = undefined;
-
-
-export function invalidateTasksCache() 
-{
-	cachedTasks = undefined;
-}
+let cachedTasks: Task[] = undefined;
 
 
-export interface AntTaskDefinition extends TaskDefinition 
+interface AntTaskDefinition extends TaskDefinition 
 {
 	script: string;
 	path?: string;
@@ -37,6 +30,13 @@ export class AntTaskProvider implements TaskProvider
 		return undefined;
 	}
 }
+
+
+export function invalidateTasksCacheAnt() 
+{
+	cachedTasks = undefined;
+}
+
 
 async function detectAntScripts(): Promise<Task[]> 
 {
