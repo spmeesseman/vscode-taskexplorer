@@ -125,11 +125,21 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
 	util.log('');
 	util.log('FindAllAntScripts');
 
-	parseString(buffer, function (err, result) {
-		json = result;
-	});
+	try {
+		parseString(buffer, function (err, result) {
+			if (err) {
+				util.log('   Script file cannot be parsed');
+				return scripts;
+			}
+			json = result;
+		});
+	}
+	catch(e) {
+		util.log('   Script file cannot be parsed');
+				return scripts;
+	}
 
-	if (!json.project)
+	if (!json || !json.project)
 	{
 		util.log('   Script file does not contain a <project> root');
 		return scripts;
