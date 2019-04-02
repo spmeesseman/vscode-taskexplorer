@@ -5,8 +5,8 @@ import {
 } from 'vscode';
 import * as path from 'path';
 import * as util from './util';
-import { StringMap, isExcluded, readFile } from './tasks';
 import { parseString } from 'xml2js';
+type StringMap = { [s: string]: string; };
 
 let cachedTasks: Task[] = undefined;
 
@@ -65,7 +65,7 @@ async function detectAntScripts(): Promise<Task[]>
 			}
 			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
 			for (const path of paths) {
-				if (!isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
+				if (!util.isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
 					let tasks = await provideAntScriptsForFolder(path);
 					visitedPackageJsonFiles.add(path.fsPath);
 					allTasks.push(...tasks);
@@ -97,7 +97,7 @@ async function provideAntScriptsForFolder(packageJsonUri: Uri): Promise<Task[]>
 		return emptyTasks;
     }
     
-    let contents = await readFile(packageJsonUri.fsPath);
+    let contents = await util.readFile(packageJsonUri.fsPath);
 
 	let scripts = await findAllAntScripts(contents);
 	if (!scripts) {
