@@ -68,8 +68,13 @@ suite("Task tests", () =>
   {
     const file = path.join(dirName, "build.xml");
     const file2 = path.join(dirName, "test.xml");
+    const file3 = path.join(dirName, "emptytarget.xml");
+    const file4 = path.join(dirName, "emtyproject.xml");
+    
     tempFiles.push(file);
     tempFiles.push(file2);
+    tempFiles.push(file3);
+    tempFiles.push(file4);
 
     fs.writeFileSync(file, '<?xml version="1.0"?>' +
                            '<project basedir="." default="test1">' +
@@ -85,6 +90,14 @@ suite("Task tests", () =>
                            '    <target name="test3"></target>' +
                            '    <target name="test4"></target>' +
                            '</project>');
+
+    fs.writeFileSync(file3,'<?xml version="1.0"?>' +
+                           '<project basedir="." default="test1">' +
+                           '    <property environment="env" />' +
+                           '    <property name="test" value="test" />' +
+                           '</project>');
+
+    fs.writeFileSync(file4, '<?xml version="1.0"?>');
   });
 
 
@@ -101,6 +114,28 @@ suite("Task tests", () =>
                            '}');
   });
 
+  test("Create tsc config files", async function() 
+  {
+    const file = path.join(dirName, "tsconfig.json");
+    tempFiles.push(file);
+
+    fs.writeFileSync(file, '{' +
+                           '    "compilerOptions": ' +
+                           '  {' +
+                           '    "target": "es6",' +
+                           '    "lib": ["es2016"],' +
+                           '    "module": "commonjs",' +
+                           '    "outDir": "./out",' +
+                           '    "typeRoots": ["./node_modules/@types"],' +
+                           '    "strict": true,' +
+                           '    "experimentalDecorators": true,' +
+                           '    "sourceMap": true,' +
+                           '    "noImplicitThis": false' +
+                           '  },' +
+                           '  "include": ["**/*"],' +
+                           '  "exclude": ["node_modules"]' +
+                           '}');
+  });
 
   test("Create gulp task files", async function() 
   {

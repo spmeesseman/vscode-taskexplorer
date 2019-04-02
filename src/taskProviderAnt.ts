@@ -5,8 +5,8 @@ import {
 } from 'vscode';
 import * as path from 'path';
 import * as util from './util';
-import { StringMap, isExcluded, readFile } from './tasks';
 import { parseString } from 'xml2js';
+type StringMap = { [s: string]: string; };
 
 let cachedTasks: Task[] = undefined;
 
@@ -50,11 +50,22 @@ async function detectAntScripts(): Promise<Task[]>
 		return emptyTasks;
 	}
 	try {
-		for (const folder of folders) {
+		for (const folder of folders) 
+		{
 			let relativePattern = new RelativePattern(folder, '**/[Bb]uild.xml');
+			let xtraIncludes: string[] = workspace.getConfiguration('taskExplorer').get('includeAnt');
+			if (xtraIncludes && xtraIncludes.length > 0) {
+				let multiFilePattern: string = '{**/[Bb]uild.xml';
+				for (var i in xtraIncludes) {
+					multiFilePattern += ',';
+					multiFilePattern += xtraIncludes[i];
+				}
+				multiFilePattern += '}';
+				relativePattern = new RelativePattern(folder, multiFilePattern);
+			}
 			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
 			for (const path of paths) {
-				if (!isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
+				if (!util.isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
 					let tasks = await provideAntScriptsForFolder(path);
 					visitedPackageJsonFiles.add(path.fsPath);
 					allTasks.push(...tasks);
@@ -86,7 +97,7 @@ async function provideAntScriptsForFolder(packageJsonUri: Uri): Promise<Task[]>
 		return emptyTasks;
     }
     
-    let contents = await readFile(packageJsonUri.fsPath);
+    let contents = await util.readFile(packageJsonUri.fsPath);
 
 	let scripts = await findAllAntScripts(contents);
 	if (!scripts) {
@@ -114,11 +125,21 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
 	util.log('');
 	util.log('FindAllAntScripts');
 
-	parseString(buffer, function (err, result) {
-		json = result;
-	});
+	try {
+		parseString(buffer, function (err, result) {
+			if (err) {
+				util.log('   Script file cannot be parsed');
+				return scripts;
+			}
+			json = result;
+		});
+	}
+	catch(e) {
+		util.log('   Script file cannot be parsed');
+				return scripts;
+	}
 
-	if (!json.project)
+	if (!json || !json.project)
 	{
 		util.log('   Script file does not contain a <project> root');
 		return scripts;
@@ -169,10 +190,12 @@ function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, pac
 	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string 
 	{
 		let rootUri = folder.uri;
-		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.length - 'build.xml'.length);
+		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.lastIndexOf('/') + 1);
 		return absolutePath.substring(rootUri.path.length + 1);
 	}
 	
+	let antFile = packageJsonUri.path.substring(packageJsonUri.path.lastIndexOf('/') + 1);
+
 	let kind: AntTaskDefinition = {
 		type: 'ant',
 		script: target
@@ -215,8 +238,12 @@ function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, pac
 	}
 
 	let targetName = target;
-	if (relativePath && relativePath.length) {
-		targetName = `${target} - ${relativePath.substring(0, relativePath.length - 1)}`;
+
+	if (antFile !== 'build.xml' && antFile !== 'Build.xml')
+	{
+		args.push('-f');
+		args.push(antFile);
+		targetName += ' (' + antFile + ')';
 	}
 
 	let execution = new ShellExecution(getCommand(folder, cmd), args, options);

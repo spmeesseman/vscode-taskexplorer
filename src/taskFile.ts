@@ -5,7 +5,6 @@ import {
 import { TaskFolder } from './taskFolder';
 import { TaskItem } from './taskItem';
 import * as path from 'path';
-import { getFileNameFromSource } from './tasks';
 
 
 export class TaskFile extends TreeItem 
@@ -42,6 +41,35 @@ export class TaskFile extends TreeItem
 		return label;
 	}
 
+	static getFileNameFromSource(source: string, incRelPathForCode?: boolean): string | null
+	{
+		let fileName: string = 'package.json';
+
+		if (source === 'ant') {
+			fileName = 'build.xml';
+		}
+		else if (source === 'Workspace') {
+			if (incRelPathForCode === true) {
+				fileName = '.vscode\\tasks.json';
+			}
+			else {
+				fileName = 'tasks.json';
+			}
+		}
+		else if (source === 'tsc') {
+			fileName = 'tsconfig.json';
+		}
+		else if (source === 'grunt') {
+			fileName = 'grunt.json';
+		}
+		else if (source === 'gulp') {
+			fileName = 'gulp.json';
+		}
+
+		return fileName;
+	}
+
+
 	constructor(context: ExtensionContext, folder: TaskFolder, source: string, relativePath: string) 
 	{
 		super(TaskFile.getLabel(source, relativePath), TreeItemCollapsibleState.Collapsed);
@@ -51,9 +79,9 @@ export class TaskFile extends TreeItem
 		this.contextValue = 'taskFile';
 		
 		if (relativePath) {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, getFileNameFromSource(source, true)));
+			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, TaskFile.getFileNameFromSource(source, true)));
 		} else {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, getFileNameFromSource(source, true)));
+			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, TaskFile.getFileNameFromSource(source, true)));
 		}
 
 		//this.iconPath = ThemeIcon.File;

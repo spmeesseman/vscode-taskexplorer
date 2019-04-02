@@ -1,7 +1,8 @@
-# Task Explorer - View and Run Tasks from Explorer
+# Task Explorer - View and Run Tasks from Visual Studio Code
 
 [![Version](https://vsmarketplacebadge.apphb.com/version-short/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer)
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer)
+[![Downloads](https://vsmarketplacebadge.apphb.com/downloads-short/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer)
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating-short/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![Build Status](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_apis/build/status/spmeesseman.vscode-taskexplorer?branchName=master)](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_build/latest?definitionId=10&branchName=master)
@@ -18,6 +19,12 @@
 
 > Provides a single view in either (or both) the SideBar and/or Explorer that conveniently displays all VSCode tasks, NPM scripts and Ant targets (Gulp and Grunt tasks coming soon), grouped within their respective task nodes.  Tasks can be either opened or executed.  See Requirements section below.
 
+## Screenshots
+
+|New Sidebar view!!|Calssic Explorer Tray|Support for Ant targets|
+|-|-|-|
+|![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview.png?raw=true)|
+
 ## Requirements
 
 * Visual Studio Code v1.30 or higher
@@ -25,7 +32,8 @@
 
 ## Features
 
-* v1.7 - Two view types!! - Use one or both of either SideBar View and/or Explorer Tray.
+* v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
+* v1.7 - Two view types!! - Use one or both of either SideBar View and/or Explorer Tray
 * v1.6 - Progress icons for running tasks
 * v1.6 - Stop execution button for running tasks
 * v1.5 - Ant task provider - Open and launch ANT targets as tasks
@@ -46,11 +54,11 @@
 
 * Ansicon colorization of Ant output not working
 
-## Screenshots
+## Configuring excludes and ant inicludes with glob patterns
 
-|New Sidebar view!!|Calssic Explorer Tray|Support for Ant targets|
-|-|-|-|
-|![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview.png?raw=true)|
+The settings 'exclude' and 'includeAnt' are arrays of strings used to define file patterns to ignore, or file patterns to include which would have normally been ignored.  The strings must be glob patterns, for example:
+
+    taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/copy.xml" ]
 
 ## Feedback & Contributing
 

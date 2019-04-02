@@ -1,9 +1,9 @@
 {
     "name": "vscode-taskexplorer",
     "displayName": "Task Explorer",
-    "description": "View and run tasks from Explorer",
+    "description": "Run and manage tasks for VS Code",
     "icon": "res/gears-r-colors.png",
-    "version": "1.7.8",
+    "version": "1.8.0",
     "publisher": "spmeesseman",
     "repository": {
         "type": "git",
@@ -358,21 +358,21 @@
                         "**/.vscode-test/**",
                         "**/build/**"
                     ],
-                    "description": "%config.taskExplorer.exclude%",
-                    "scope": "resource"
+                    "description": "%config.taskExplorer.exclude%"
+                },
+                "taskExplorer.includeAnt": {
+                    "type": [
+                        "string",
+                        "array"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "%config.taskExplorer.includeAnt%"
                 }
             }
         },
-        "jsonValidation": [
-            {
-                "fileMatch": "package.json",
-                "url": "https://schemastore.azurewebsites.net/schemas/json/package.json"
-            },
-            {
-                "fileMatch": "bower.json",
-                "url": "https://schemastore.azurewebsites.net/schemas/json/bower.json"
-            }
-        ],
         "taskDefinitions": [
             {
                 "type": "ant",

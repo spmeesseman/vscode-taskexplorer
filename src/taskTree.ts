@@ -9,10 +9,9 @@ import * as util from './util';
 import {
 	Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
 	TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
-	commands, window, workspace, tasks, Selection
+	commands, window, workspace, tasks, Selection, WorkspaceFolder
 } from 'vscode';
 import { visit, JSONVisitor } from 'jsonc-parser';
-import { isWorkspaceFolder, isExcluded } from './tasks';
 import * as nls from 'vscode-nls';
 import { TaskFolder } from './taskFolder';
 import { TaskFile } from './taskFile';
@@ -263,6 +262,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
+	private isWorkspaceFolder(value: any): value is WorkspaceFolder 
+	{
+		return value && typeof value !== 'number';
+	}
+
+
 	private buildTaskTree(tasks: Task[]): TaskFolder[] | TaskFile[] | NoScripts[] 
 	{
 		var taskCt = 0;
@@ -274,7 +279,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 		tasks.forEach(each => 
 		{
-			if (isWorkspaceFolder(each.scope) && !this.isInstallTask(each)) 
+			if (this.isWorkspaceFolder(each.scope) && !this.isInstallTask(each)) 
 			{
 				taskCt++;
 
@@ -300,7 +305,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				let relativePath = definition.path ? definition.path : '';
 				let id = each.source + ':' + path.join(each.scope.name, relativePath);
 
-				if (!isExcluded(each.scope, each.scope.uri))
+				if (!util.isExcluded(each.scope, each.scope.uri))
 				{
 					taskFile = files.get(id);
 					if (!taskFile) 
