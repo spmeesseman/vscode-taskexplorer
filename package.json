@@ -1,7 +1,7 @@
 {
     "name": "vscode-taskexplorer",
     "displayName": "Task Explorer",
-    "description": "View and run tasks from Explorer",
+    "description": "Run and manage tasks for VS Code",
     "icon": "res/gears-r-colors.png",
     "version": "1.7.8",
     "publisher": "spmeesseman",
