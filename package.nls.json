@@ -4,6 +4,7 @@
 	"config.taskExplorer.debug": "Turn on logging.",
 	"config.taskExplorer.debugLevel": "Set debug verbosity (1 - Low / 5 - High).",
 	"config.taskExplorer.exclude": "Configure glob patterns for folders that should be excluded from automatic script detection.",
+	"config.taskExplorer.includeAnt": "Configure glob patterns for locating ant files not named b(B)uild.xml.",
 	"config.taskExplorer.enableNpmScripts": "Enable/show npm scripts as tasks.",
 	"config.taskExplorer.enableCodeTasks": "Enable/show vscode tasks as tasks.",
 	"config.taskExplorer.enableGruntTasks": "Enable/show grunt tasks (not supported yet).",

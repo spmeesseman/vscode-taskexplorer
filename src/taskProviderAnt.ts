@@ -50,8 +50,19 @@ async function detectAntScripts(): Promise<Task[]>
 		return emptyTasks;
 	}
 	try {
-		for (const folder of folders) {
+		for (const folder of folders) 
+		{
 			let relativePattern = new RelativePattern(folder, '**/[Bb]uild.xml');
+			let xtraIncludes: string[] = workspace.getConfiguration('taskExplorer').get('includeAnt');
+			if (xtraIncludes && xtraIncludes.length > 0) {
+				let multiFilePattern: string = '{**/[Bb]uild.xml';
+				for (var i in xtraIncludes) {
+					multiFilePattern += ',';
+					multiFilePattern += xtraIncludes[i];
+				}
+				multiFilePattern += '}';
+				relativePattern = new RelativePattern(folder, multiFilePattern);
+			}
 			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
 			for (const path of paths) {
 				if (!isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
@@ -169,10 +180,12 @@ function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, pac
 	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string 
 	{
 		let rootUri = folder.uri;
-		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.length - 'build.xml'.length);
+		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.lastIndexOf('/') + 1);
 		return absolutePath.substring(rootUri.path.length + 1);
 	}
 	
+	let antFile = packageJsonUri.path.substring(packageJsonUri.path.lastIndexOf('/') + 1);
+
 	let kind: AntTaskDefinition = {
 		type: 'ant',
 		script: target
@@ -215,8 +228,12 @@ function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, pac
 	}
 
 	let targetName = target;
-	if (relativePath && relativePath.length) {
-		targetName = `${target} - ${relativePath.substring(0, relativePath.length - 1)}`;
+
+	if (antFile !== 'build.xml' && antFile !== 'Build.xml')
+	{
+		args.push('-f');
+		args.push(antFile);
+		targetName += ' (' + antFile + ')';
 	}
 
 	let execution = new ShellExecution(getCommand(folder, cmd), args, options);

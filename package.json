@@ -356,8 +356,18 @@
                         "**/.vscode-test/**",
                         "**/build/**"
                     ],
-                    "description": "%config.taskExplorer.exclude%",
-                    "scope": "resource"
+                    "description": "%config.taskExplorer.exclude%"
+                },
+                "taskExplorer.includeAnt": {
+                    "type": [
+                        "string",
+                        "array"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "%config.taskExplorer.includeAnt%"
                 }
             }
         },

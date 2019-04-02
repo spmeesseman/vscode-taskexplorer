@@ -74,6 +74,15 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 					treeDataProvider2.refresh();
 				}
 			}
+			if (e.affectsConfiguration('taskExplorer.includeAnt')) {
+				invalidateTasksCache();
+				if (treeDataProvider) {
+					treeDataProvider.refresh();
+				}
+				if (treeDataProvider2) {
+					treeDataProvider2.refresh();
+				}
+			}
 			if (e.affectsConfiguration('taskExplorer.enableSideBar')) {
 				if (configuration.get<boolean>("enableSideBar")) {
 					if (treeDataProvider) {
@@ -125,6 +134,17 @@ function register(context: ExtensionContext): Disposable | undefined
 		watcher.onDidCreate((_e) => invalidateScriptCaches());
 		context.subscriptions.push(watcher);
 		
+		let includeAnt: string[] = workspace.getConfiguration('taskExplorer').get('includeAnt');
+		if (includeAnt && includeAnt.length > 0) {
+			for (var i = 0; i < includeAnt.length; i++) {
+				let cwatcher = workspace.createFileSystemWatcher(includeAnt[i]);
+				cwatcher.onDidChange((_e) => invalidateScriptCaches());
+				cwatcher.onDidDelete((_e) => invalidateScriptCaches());
+				cwatcher.onDidCreate((_e) => invalidateScriptCaches());
+				context.subscriptions.push(cwatcher);
+			}
+		}
+
 		let watcher2 = workspace.createFileSystemWatcher('**/package.json');
 		watcher2.onDidChange((_e) => invalidateScriptCaches());
 		watcher2.onDidDelete((_e) => invalidateScriptCaches());
