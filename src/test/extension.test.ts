@@ -42,6 +42,7 @@ suite("Extension Tests", () =>
 
     assert(configuration.update('enableExplorerView', true));
     assert(configuration.update('enableSideBar', true));
+    assert(configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]));
     assert(configuration.update('debug', true));
 
     if (!extension.isActive) 
