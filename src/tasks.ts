@@ -30,7 +30,7 @@ export function isExcluded(folder: WorkspaceFolder, packageJsonUri: Uri)
 		return minimatch(path, pattern, { dot: true });
 	}
 
-	let exclude = workspace.getConfiguration('taskExplorer', folder.uri).get<string | string[]>('exclude');
+	let exclude = workspace.getConfiguration('taskExplorer').get<string | string[]>('exclude');
 	let packageJsonFolder = path.dirname(packageJsonUri.fsPath);
 
 	if (exclude) {
