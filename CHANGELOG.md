@@ -1,3 +1,16 @@
+# [1.8.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.8...v1.8.0) (2019-04-02)
+
+
+### Bug Fixes
+
+* empty file labeled as an ant file causes extension to stop working after parsing ([2051532](https://github.com/spmeesseman/vscode-taskexplorer/commit/2051532))
+* make exclude setting non-resource type ([7cb2740](https://github.com/spmeesseman/vscode-taskexplorer/commit/7cb2740))
+
+
+### Features
+
+* add new setting to parse ant files not named B/build.xml ([4253452](https://github.com/spmeesseman/vscode-taskexplorer/commit/4253452))
+
 ## [1.7.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.7...v1.7.8) (2019-04-01)
 
 
