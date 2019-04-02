@@ -52,6 +52,12 @@
 |-|-|-|
 |![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview.png?raw=true)|
 
+## Configuring excludes and ant inicludes with glob patterns
+
+The settings 'exclude' and 'includeAnt' are arrays of strings used to define file patterns to ignore, or file patterns to include which would have normally been ignored.  The strings must be glob patterns, for example:
+
+    taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/copy.xml" ]
+
 ## Feedback & Contributing
 
 * Please report any bugs, suggestions or documentation requests via the
