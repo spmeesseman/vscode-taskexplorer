@@ -76,6 +76,8 @@
         "decache": "^4.5.1",
         "eslint-plugin-prettier": "^3.0.1",
         "glob": "^7.1.2",
+        "grunt": "^1.0.4",
+        "gulp": "^4.0.0",
         "iconv-lite": "^0.4.23",
         "istanbul": "^0.4.5",
         "jschardet": "^2.1.0",

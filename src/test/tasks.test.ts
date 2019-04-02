@@ -102,6 +102,19 @@ suite("Task tests", () =>
   });
 
 
+  test("Create gulp task files", async function() 
+  {
+    const file = path.join(workspace.rootPath, 'gulpfile.js');
+    tempFiles.push(file);
+
+    fs.writeFileSync(file, "var gulp = require('gulp');" +
+                           "var sass = require('gulp-sass');" +                      
+                           "gulp.task('hello', function() {" +
+                           "    console.log('Hello Cam!');" +
+                           "});");
+  });
+
+  
   test("Create vscode task files", async function() 
   {
     const file = path.join(dirNameCode, 'tasks.json');
@@ -137,6 +150,13 @@ suite("Task tests", () =>
 
   test("Verify tree validity and open tasks", async function() 
   {
+    let foundAnt: boolean = false;
+    let foundGrunt: boolean = false;
+    let foundGulp: boolean = false;
+    let foundNpm: boolean = false;
+    let foundTsc: boolean = false;
+    let foundVscode: boolean = false;
+
     if (treeItems.length)
     {
       let item: any;
@@ -154,28 +174,74 @@ suite("Task tests", () =>
                     while ((item3 = treeTasks.shift())) {
                       if (item3 instanceof TaskItem) {
                         await commands.executeCommand("taskExplorer.open", item3);
+                        if (item3.taskSource === 'ant') {
+                          foundAnt = true;
+                        }
+                        else if (item3.taskSource === 'gulp') {
+                          foundGulp = true;
+                        }
+                        else if (item3.taskSource === 'grunt') {
+                          foundGrunt = true;
+                        }
+                        else if (item3.taskSource === 'npm') {
+                          foundNpm = true;
+                        }
+                        else if (item3.taskSource === 'tsc') {
+                          foundTsc = true;
+                        }
+                        else if (item3.taskSource === 'Workspace') {
+                          foundVscode = true;
+                        }
                       }
                       else {
                         assert.fail('Invalid taskitem node found');
+                        return;
                       }
                     }
                   }
                 }
                 else {
                   assert.fail('Invalid taskfile node found');
+                  return;
                 }
               }
             }
             else {
               assert.fail('No task files found');
+              return;
             }
           }
           else {
             assert.fail('Invalid root folder');
+            return;
           }
         } catch (error) {}
       }
     }
+    else {
+      assert.fail('No tree items found');
+      return;
+    }
+
+    if (!foundAnt) {
+      assert.fail('No ant items found');
+    }
+    else if (!foundGulp) {
+      assert.fail('No gulp items found');
+    }/*
+    else if (!foundGrunt) {
+      assert.fail('No grunt items found');
+    }*/
+    else if (!foundNpm) {
+      assert.fail('No npm items found');
+    }
+    else if (!foundTsc) {
+      assert.fail('No tsc items found');
+    }
+    else if (!foundVscode) {
+      assert.fail('No vscode items found');
+    }
+
   });
 
 });

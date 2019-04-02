@@ -67,10 +67,10 @@ export function getFileNameFromSource(source: string, incRelPathForCode?: boolea
 		fileName = 'tsconfig.json';
 	}
 	else if (source === 'grunt') {
-		fileName = 'grunt.json';
+		fileName = 'gruntfile.js';
 	}
 	else if (source === 'gulp') {
-		fileName = 'gulp.json';
+		fileName = 'gulpfile.js';
 	}
 
 	return fileName;
