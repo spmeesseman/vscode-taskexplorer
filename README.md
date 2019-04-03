@@ -21,7 +21,7 @@
 
 ## Screenshots
 
-|New Sidebar view!!|Calssic Explorer Tray|Support for Ant targets|
+|New Sidebar view!!|Calssic Explorer Tray|Support for Ant/npm/gulp/vscode/tsc tasks|
 |-|-|-|
 |![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview.png?raw=true)|
 
@@ -30,8 +30,9 @@
 * Visual Studio Code v1.30 or higher
 * For npm, grunt, and gulp tasks, the 'Auto Detect' vscode setting must be turned 'On' for each respective task provider.
 
-## Features
+## Features by Version
 
+* v1.9 - Support for gulp tasks
 * v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
 * v1.7 - Two view types!! - Use one or both of either SideBar View and/or Explorer Tray
 * v1.6 - Progress icons for running tasks
@@ -45,14 +46,10 @@
 
 ## Coming Soon
 
-* Open and launch Gulp tasks
-* Open and launch Grunt tasks
-* C/C++ Makefile Task Provider - Open and launch C/C++ Makefiles
-* NSIS Task Provider - Open and launch NSIS installer scripts
-
-## Known Issues
-
-* Ansicon colorization of Ant output not working
+* v1.10 - Open and launch Grunt tasks
+* v1.11 - C/C++ Makefile Task Provider - Open and launch C/C++ Makefiles
+* v1.12 - Batch/Bash file Task Provider - Open and launch batch scripts in Windows and bash scripts in Unix
+* v1.13 - NSIS Task Provider - Open and launch NSIS installer scripts
 
 ## Configuring excludes and ant inicludes with glob patterns
 
