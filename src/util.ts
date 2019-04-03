@@ -9,6 +9,24 @@ import * as minimatch from 'minimatch';
 const logValueWhiteSpace = 40;
 
 
+export function camelCase(name: string, indexUpper: number) {
+  return name
+    .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
+      return index !== indexUpper ? letter.toLowerCase() : letter.toUpperCase();
+    })
+    .replace(/[\s\-]+/g, "");
+}
+
+
+export function properCase(name: string, indexUpper: number) {
+  return name
+    .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
+      return index !== 0 ? letter.toLowerCase() : letter.toUpperCase();
+    })
+    .replace(/[\s\-]+/g, "");
+}
+
+
 export function isExcluded(folder: WorkspaceFolder, packageJsonUri: Uri) 
 {
 	function testForExclusionPattern(path: string, pattern: string): boolean {
@@ -80,10 +98,15 @@ export async function logValue(msg: string, value: any)
   {
     logMsg += ' ';
   }
-  if (value)
-  {
+  if (value || value === 0) {
     logMsg += ': ';
     logMsg += value.toString();
+  }
+  else if (value === undefined) {
+    logMsg += ': undefined';
+  }
+  else if (value === null) {
+    logMsg += ': null';
   }
   if (workspace.getConfiguration('taskExplorer').get('debug') === true)
 	{
