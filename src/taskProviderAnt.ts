@@ -15,6 +15,7 @@ interface AntTaskDefinition extends TaskDefinition
 {
 	script: string;
 	path?: string;
+	fileName?: string;
 }
 
 export class AntTaskProvider implements TaskProvider 
@@ -194,11 +195,13 @@ function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, pac
 		return absolutePath.substring(rootUri.path.length + 1);
 	}
 	
-	let antFile = packageJsonUri.path.substring(packageJsonUri.path.lastIndexOf('/') + 1);
+	let antFile = path.basename(packageJsonUri.path);
 
 	let kind: AntTaskDefinition = {
 		type: 'ant',
-		script: target
+		script: target,
+		path: '', // populated below if relativePath is non-empty
+		fileName: antFile
 	};
 
 	let relativePath = getRelativePath(folder, packageJsonUri);
@@ -243,7 +246,6 @@ function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, pac
 	{
 		args.push('-f');
 		args.push(antFile);
-		targetName += ' (' + antFile + ')';
 	}
 
 	let execution = new ShellExecution(getCommand(folder, cmd), args, options);
