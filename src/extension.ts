@@ -134,7 +134,7 @@ function register(context: ExtensionContext): Disposable | undefined
 		watcher.onDidCreate((_e) => invalidateScriptCaches());
 		context.subscriptions.push(watcher);
 		
-		let includeAnt: string[] = workspace.getConfiguration('taskExplorer').get('includeAnt');
+		let includeAnt: string[] = configuration.get('includeAnt');
 		if (includeAnt && includeAnt.length > 0) {
 			for (var i = 0; i < includeAnt.length; i++) {
 				let cwatcher = workspace.createFileSystemWatcher(includeAnt[i]);
