@@ -300,10 +300,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 		tasks.forEach(each => 
 		{
+			taskCt++;
+			util.log('');
+			util.log('Processing task ' + taskCt.toString() + ' of ' + tasks.length.toString());
+			util.logValue('   name', each.name);	
+			util.logValue('   source', each.source);
+
 			if (this.isWorkspaceFolder(each.scope) && !this.isInstallTask(each)) 
 			{
-				taskCt++;
-
 				folder = folders.get(each.scope.name);
 				if (!folder) {
 					folder = new TaskFolder(each.scope);
@@ -316,15 +320,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					id = path.join(id, definition.fileName);
 				}
 
-				//
-				// Logging
-				//
-				util.log('');
-				util.log('Processing task ' + taskCt.toString() + ' of ' + tasks.length.toString());
-				util.logValue('   name', each.name);	
+				util.logValue('   scope.name', each.scope.name);
+				util.logValue('   scope.uri.path', each.scope.uri.path);
+				util.logValue('   scope.uri.fsPath', each.scope.uri.fsPath);
+				util.logValue('   relative Path', relativePath);
 				util.logValue('   type', definition.type);	
 				if (definition.script) {
-					util.logValue('   script', definition.script);	
+					util.logValue('   script', definition.script);	// if 'script' is defined, this is type npm
 				}
 				if (definition.path) {
 					util.logValue('   path', definition.path);	
@@ -332,11 +334,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				if (definition.fileName) {
 					util.logValue('   file name', definition.fileName);	
 				}	
-				util.logValue('   source', each.source);
-				util.logValue('   scope.name', each.scope.name);
-				util.logValue('   scope.uri.path', each.scope.uri.path);
-				util.logValue('   scope.uri.fsPath', each.scope.uri.fsPath);
-				util.logValue('   relative Path', relativePath);
 
 				if (!util.isExcluded(each.scope, each.scope.uri))
 				{
@@ -354,6 +351,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					let taskItem = new TaskItem(this.extensionContext, taskFile, each);
 					taskFile.addScript(taskItem);
 				}
+			}
+			else {
+				util.log('   Skipping');
+				util.logValue('   is install task', this.isInstallTask(each));
 			}
 		});
 
