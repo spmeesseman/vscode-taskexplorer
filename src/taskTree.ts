@@ -74,13 +74,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		let inTaskLabel = undefined;
 
 		util.log('findScriptPosition');
+		util.logValue('   task source', script.taskSource);
+		util.logValue('   task name', script.task.name);
 
-		if (script.taskSource === 'ant')
+		if (script.taskSource === 'tsc')
 		{
-			util.log('   Ant XML');
-			util.logValue('   task name', script.task.name);
-			util.logValue('   document text', document.getText());
-
+			scriptOffset = 0;
+		}
+		else if (script.taskSource === 'ant')
+		{
+			//
+			// This is crap - need regex search
+			//
 			scriptOffset = document.getText().indexOf("name=\"" + script.task.name);
 			if (scriptOffset === -1) {
 				scriptOffset = document.getText().indexOf("name='" + script.task.name);
@@ -91,69 +96,80 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			else {
 				scriptOffset += 6;
 			}
-
-			//util.logValue('   Offset', scriptOffset);
-			return scriptOffset;
 		}
-
-		let visitor: JSONVisitor = {
-			onError() {
-				return scriptOffset;
-			},
-			onObjectEnd() {
-				if (inScripts) {
-					inScripts = false;
-				}
-			},
-			onLiteralValue(value: any, offset: number, _length: number) {
-				if (inTaskLabel) {
-					if (typeof value === 'string') {
-						if (inTaskLabel === 'label')
-						{
-							if (script.task.name === value) {
-								scriptOffset = offset;
+		else if (script.taskSource === 'gulp')
+		{
+			//
+			// This is crap - need regex search
+			//
+			scriptOffset = document.getText().indexOf("gulp.task('" + script.task.name);
+			if (scriptOffset === -1) {
+				scriptOffset = document.getText().indexOf("gulp.task(\"" + script.task.name);
+			}
+			if (scriptOffset === -1) {
+				scriptOffset = 0;
+			}
+		}
+		else // npm, tasks.json
+		{
+			let visitor: JSONVisitor = {
+				onError() {
+					return scriptOffset;
+				},
+				onObjectEnd() {
+					if (inScripts) {
+						inScripts = false;
+					}
+				},
+				onLiteralValue(value: any, offset: number, _length: number) {
+					if (inTaskLabel) {
+						if (typeof value === 'string') {
+							if (inTaskLabel === 'label')
+							{
+								if (script.task.name === value) {
+									scriptOffset = offset;
+								}
 							}
 						}
+						inTaskLabel = undefined;
 					}
-					inTaskLabel = undefined;
-				}
-			},
-			onObjectProperty(property: string, offset: number, _length: number) {
-				if (property === 'scripts') {
-					inScripts = true;
-					if (!script) { // select the script section
-						scriptOffset = offset;
+				},
+				onObjectProperty(property: string, offset: number, _length: number) {
+					if (property === 'scripts') {
+						inScripts = true;
+						if (!script) { // select the script section
+							scriptOffset = offset;
+						}
+					}
+					else if (inScripts && script) {
+						let label = me.getTaskName(property, script.task.definition.path, true);
+						if (script.task.name === label) {
+							scriptOffset = offset;
+						}
+					}
+					else if (property === 'tasks') {
+						inTasks = true;
+						if (!inTaskLabel) { // select the script section
+							scriptOffset = offset;
+						}
+					}
+					else if (property === 'label' && inTasks && !inTaskLabel) {
+						inTaskLabel = 'label';
+						if (!inTaskLabel) { // select the script section
+							scriptOffset = offset;
+						}
+					}
+					else { // nested object which is invalid, ignore the script
+						inTaskLabel = undefined;
 					}
 				}
-				else if (inScripts && script) {
-					let label = me.getTaskName(property, script.task.definition.path, true);
-					if (script.task.name === label) {
-						scriptOffset = offset;
-					}
-				}
-				else if (property === 'tasks') {
-					inTasks = true;
-					if (!inTaskLabel) { // select the script section
-						scriptOffset = offset;
-					}
-				}
-				else if (property === 'label' && inTasks && !inTaskLabel) {
-					inTaskLabel = 'label';
-					if (!inTaskLabel) { // select the script section
-						scriptOffset = offset;
-					}
-				}
-				else { // nested object which is invalid, ignore the script
-					inTaskLabel = undefined;
-				}
-			}
-		};
+			};
 
-		visit(document.getText(), visitor);
+			visit(document.getText(), visitor);
+		}
 
 		util.logValue('   Offset', scriptOffset);
 		return scriptOffset;
-
 	}
 
 
@@ -170,15 +186,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		}
 
 		util.log('Open script at position');
-		util.logValue('   command', selection.command);
+		util.logValue('   command', selection.command.command);
 		util.logValue('   source', selection.taskSource);
-		util.logValue('   path', uri.fsPath);
+		util.logValue('   path', uri.path);
 		util.logValue('   file path', uri.fsPath);
 
-		let document: TextDocument = await workspace.openTextDocument(uri);
-		let offset = this.findScriptPosition(document, selection instanceof TaskItem ? selection : undefined);
-		let position = document.positionAt(offset);
-		await window.showTextDocument(document, { selection: new Selection(position, position) });
+		if (util.pathExists(uri.fsPath)) {
+			let document: TextDocument = await workspace.openTextDocument(uri);
+			let offset = this.findScriptPosition(document, selection instanceof TaskItem ? selection : undefined);
+			let position = document.positionAt(offset);
+			await window.showTextDocument(document, { selection: new Selection(position, position) });
+		}
+		else {
+			util.log('Invalid path for file, cannot open');
+		}
 	}
 
 
@@ -289,7 +310,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					folders.set(each.scope.name, folder);
 				}
 				let definition: TaskDefinition = <TaskDefinition>each.definition;
-				
+				let relativePath = definition.path ? definition.path : '';
+				let id = each.source + ':' + path.join(each.scope.name, relativePath);
+				if (definition.fileName) {
+					id = path.join(id, definition.fileName);
+				}
+
+				//
+				// Logging
+				//
 				util.log('');
 				util.log('Processing task ' + taskCt.toString() + ' of ' + tasks.length.toString());
 				util.logValue('   name', each.name);	
@@ -297,20 +326,27 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				if (definition.script) {
 					util.logValue('   script', definition.script);	
 				}
+				if (definition.path) {
+					util.logValue('   path', definition.path);	
+				}
+				if (definition.fileName) {
+					util.logValue('   file name', definition.fileName);	
+				}	
 				util.logValue('   source', each.source);
 				util.logValue('   scope.name', each.scope.name);
 				util.logValue('   scope.uri.path', each.scope.uri.path);
 				util.logValue('   scope.uri.fsPath', each.scope.uri.fsPath);
-
-				let relativePath = definition.path ? definition.path : '';
-				let id = each.source + ':' + path.join(each.scope.name, relativePath);
+				util.logValue('   relative Path', relativePath);
 
 				if (!util.isExcluded(each.scope, each.scope.uri))
 				{
 					taskFile = files.get(id);
+					//
+					// Create taskfile node if needed
+					//
 					if (!taskFile) 
 					{
-						taskFile = new TaskFile(this.extensionContext, folder, each.source, relativePath);
+						taskFile = new TaskFile(this.extensionContext, folder, definition, each.source, relativePath);
 						folder.addTaskFile(taskFile);
 						files.set(id, taskFile);
 						util.logValue('   Added source file container', each.source);
