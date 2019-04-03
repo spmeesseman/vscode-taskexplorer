@@ -45,7 +45,7 @@ async function detectAntScripts(): Promise<Task[]>
 
 	let emptyTasks: Task[] = [];
 	let allTasks: Task[] = [];
-	let visitedPackageJsonFiles: Set<string> = new Set();
+	let visitedFiles: Set<string> = new Set();
 
 	let folders = workspace.workspaceFolders;
 	if (!folders) {
@@ -77,14 +77,14 @@ async function detectAntScripts(): Promise<Task[]>
 			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
 			for (const fpath of paths) 
 			{
-				if (!util.isExcluded(fpath.path) && !visitedPackageJsonFiles.has(fpath.fsPath)) {
-					let tasks = await provideAntScriptsForFolder(fpath);
-					visitedPackageJsonFiles.add(fpath.fsPath);
+				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
+					let tasks = await readAntScripts(fpath);
+					visitedFiles.add(fpath.fsPath);
 					allTasks.push(...tasks);
 				}
 			}
 		}
-		return allTasks;
+		return Promise.resolve(allTasks);
 	} catch (error) {
 		return Promise.reject(error);
 	}
@@ -100,32 +100,31 @@ export async function provideAntScripts(): Promise<Task[]>
 }
 
 
-async function provideAntScriptsForFolder(packageJsonUri: Uri): Promise<Task[]> 
+async function readAntScripts(packageJsonUri: Uri): Promise<Task[]> 
 {
 	let emptyTasks: Task[] = [];
 
 	let folder = workspace.getWorkspaceFolder(packageJsonUri);
 	if (!folder) {
-		return emptyTasks;
+		return Promise.resolve(emptyTasks);
     }
     
     let contents = await util.readFile(packageJsonUri.fsPath);
 
 	let scripts = await findAllAntScripts(contents);
 	if (!scripts) {
-		return emptyTasks;
+		return Promise.resolve(emptyTasks);
 	}
 
 	const result: Task[] = [];
 
 	Object.keys(scripts).forEach(each => {
 		const task = createAntTask(each, `${each}`, folder!, packageJsonUri);
-		const lowerCaseTaskName = each.toLowerCase();
 		task.group = TaskGroup.Build;
 		result.push(task);
 	});
 
-	return result;
+	return Promise.resolve(result);
 }
 
 
@@ -175,7 +174,7 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
 		}
 	}
 
-	return scripts;
+	return Promise.resolve(scripts);
 }
 
 
