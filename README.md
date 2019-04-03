@@ -17,11 +17,11 @@
 
 ## Description
 
-> Provides a single view in either (or both) the SideBar and/or Explorer that conveniently displays all VSCode tasks, NPM scripts and Ant targets (Gulp and Grunt tasks coming soon), grouped within their respective task nodes.  Tasks can be either opened or executed.  See Requirements section below.
+> Provides a single view in either (or both) the SideBar and/or Explorer that conveniently displays VSCode, NPM, Ant, and Gulp tasks (Grunt, Batch/Bash, NSIS coming soon), grouped within their respective task nodes and project folders.  Tasks can be opened for view/edit, executed, and stopped.
 
 ## Screenshots
 
-|New Sidebar view!!|Calssic Explorer Tray|Support for Ant/npm/gulp/vscode/tsc tasks|
+|Sidebar View|Explorer Tray|Support for Ant/npm/gulp/vscode/tsc tasks|
 |-|-|-|
 |![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview.png?raw=true)|
 
@@ -29,6 +29,7 @@
 
 * Visual Studio Code v1.30 or higher
 * For npm, grunt, and gulp tasks, the 'Auto Detect' vscode setting must be turned 'On' for each respective task provider.
+* Typescript tsconfig.json tasks supported at root project folder only
 
 ## Features by Version
 
@@ -55,7 +56,7 @@
 
 The settings 'exclude' and 'includeAnt' are arrays of strings used to define file patterns to ignore, or file patterns to include which would have normally been ignored.  The strings must be glob patterns, for example:
 
-    taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/copy.xml" ]
+    taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]
 
 ## Feedback & Contributing
 
