@@ -100,7 +100,7 @@ export class TaskFile extends TreeItem
 				//
 				// upper casing first leter
 				//
-				fileName = util.properCase(fileName.toLowerCase(), tmpIdx);
+				fileName = util.properCase(fileName);
 				if (!util.pathExists(filePath)) {
 					//
 					// upper case
