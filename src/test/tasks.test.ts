@@ -76,28 +76,28 @@ suite("Task tests", () =>
     tempFiles.push(file3);
     tempFiles.push(file4);
 
-    fs.writeFileSync(file, '<?xml version="1.0"?>' +
-                           '<project basedir="." default="test1">' +
-                           '    <property environment="env" />' +
-                           '    <property name="test" value="test" />' +
-                           '    <target name="test1" depends="init"></target>' +
-                           '    <target name="test2" depends="init"></target>' +
-                           '</project>');
+    fs.writeFileSync(file, '<?xml version="1.0"?>\n' +
+                           '<project basedir="." default="test1">\n' +
+                           '    <property environment="env" />\n' +
+                           '    <property name="test" value="test" />\n' +
+                           '    <target name="test1" depends="init"></target>\n' +
+                           '    <target name="test2" depends="init"></target>\n' +
+                           '</project>\n');
 
-    fs.writeFileSync(file2,'<?xml version="1.0"?>' +
-                           '<project basedir="." default="test2">' +
-                           '    <property name="test2" value="test2" />' +
-                           '    <target name="test3"></target>' +
-                           '    <target name="test4"></target>' +
-                           '</project>');
+    fs.writeFileSync(file2,'<?xml version="1.0"?>\n' +
+                           '<project basedir="." default="test2">\n' +
+                           '    <property name="test2" value="test2" />\n' +
+                           '    <target name="test3"></target>\n' +
+                           '    <target name="test4"></target>\n' +
+                           '</project>\n');
 
-    fs.writeFileSync(file3,'<?xml version="1.0"?>' +
-                           '<project basedir="." default="test1">' +
-                           '    <property environment="env" />' +
-                           '    <property name="test" value="test" />' +
-                           '</project>');
+    fs.writeFileSync(file3,'<?xml version="1.0"?>\n' +
+                           '<project basedir="." default="test1">\n' +
+                           '    <property environment="env" />\n' +
+                           '    <property name="test" value="test" />\n' +
+                           '</project>\n');
 
-    fs.writeFileSync(file4, '<?xml version="1.0"?>');
+    fs.writeFileSync(file4, '<?xml version="1.0"?>\n');
   });
 
 
@@ -106,35 +106,35 @@ suite("Task tests", () =>
     const file = path.join(dirName, "package.json");
     tempFiles.push(file);
 
-    fs.writeFileSync(file, '{ ' +
-                           '    "scripts":{ ' +
-                           '        "test":"node ./node_modules/vscode/bin/test",' +
-                           '        "compile":"npx tsc -p ./" ' +
-                           '    }' +
-                           '}');
+    fs.writeFileSync(file, '{\n' +
+                           '    "scripts":{\n' +
+                           '        "test":"node ./node_modules/vscode/bin/test",\n' +
+                           '        "compile":"npx tsc -p ./"\n' +
+                           '    }\n' +
+                           '}\n');
   });
 
   test("Create tsc config files", async function() 
   {
-    const file = path.join(dirName, "tsconfig.json");
+    const file = path.join(workspace.rootPath, "tsconfig.json");
     tempFiles.push(file);
 
-    fs.writeFileSync(file, '{' +
-                           '    "compilerOptions": ' +
-                           '  {' +
-                           '    "target": "es6",' +
-                           '    "lib": ["es2016"],' +
-                           '    "module": "commonjs",' +
-                           '    "outDir": "./out",' +
-                           '    "typeRoots": ["./node_modules/@types"],' +
-                           '    "strict": true,' +
-                           '    "experimentalDecorators": true,' +
-                           '    "sourceMap": true,' +
-                           '    "noImplicitThis": false' +
-                           '  },' +
-                           '  "include": ["**/*"],' +
-                           '  "exclude": ["node_modules"]' +
-                           '}');
+    fs.writeFileSync(file, '{\n' +
+                           '    "compilerOptions":\n' +
+                           '  {\n' +
+                           '    "target": "es6",\n' +
+                           '    "lib": ["es2016"],\n' +
+                           '    "module": "commonjs",\n' +
+                           '    "outDir": "./out",\n' +
+                           '    "typeRoots": ["./node_modules/@types"],\n' +
+                           '    "strict": true,\n' +
+                           '    "experimentalDecorators": true,\n' +
+                           '    "sourceMap": true,\n' +
+                           '    "noImplicitThis": false\n' +
+                           '  },\n' +
+                           '  "include": ["**/*"],\n' +
+                           '  "exclude": ["node_modules"]\n' +
+                           '}\n');
   });
 
   test("Create gulp task files", async function() 
@@ -142,11 +142,11 @@ suite("Task tests", () =>
     const file = path.join(workspace.rootPath, 'gulpfile.js');
     tempFiles.push(file);
 
-    fs.writeFileSync(file, "var gulp = require('gulp');" +
-                           "var sass = require('gulp-sass');" +                      
-                           "gulp.task('hello', function() {" +
-                           "    console.log('Hello Cam!');" +
-                           "});");
+    fs.writeFileSync(file, "var gulp = require('gulp');\n" +                     
+                           "gulp.task('hello', (done) => {\n" +
+                           "    console.log('Hello!');\n" +
+                           "    done();\n" +
+                           "});\n");
   });
 
   
@@ -155,29 +155,29 @@ suite("Task tests", () =>
     const file = path.join(dirNameCode, 'tasks.json');
     tempFiles.push(file);
 
-    fs.writeFileSync(file, '{ ' +
-                           '    "version": "2.0.0", ' +
-                           '    "tasks": [ ' +
-                           '    { ' +
-                           '        "label": "test1", ' +
-                           '        "type": "shell", ' +
-                           '        "command": "ant.bat", ' +
-                           '        "args": [ "-logger", "org.apache.tools.ant.listener.AnsiColorLogger", "test1" ], ' +
-                           '        "group": "build", ' +
-                           '        "options": { ' +
-                           '            "shell": { ' +
-                           '                "executable": "${env:CODE_HOME}\\ansicon\\x64\\ansicon.exe", ' +
-                           '            } ' +
-                           '        } ' +
-                           '    }]' +
-                           '}');
+    fs.writeFileSync(file, '{\n' +
+                           '    "version": "2.0.0",\n' +
+                           '    "tasks": [\n' +
+                           '    {\n' +
+                           '        "label": "test1",\n' +
+                           '        "type": "shell",\n' +
+                           '        "command": "ant.bat",\n' +
+                           '        "args": [ "-logger", "org.apache.tools.ant.listener.AnsiColorLogger", "test1" ],\n' +
+                           '        "group": "build",\n' +
+                           '        "options": {\n' +
+                           '            "shell": {\n' +
+                           '                "executable": "${env:CODE_HOME}\\ansicon\\x64\\ansicon.exe",\n' +
+                           '            }\n' +
+                           '        }\n' +
+                           '    }]\n' +
+                           '}\n');
 
   });
   
 
   test("Scan tasks", async function() 
   {
-    await timeout(1000);
+    await timeout(2000);
     treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
     await timeout(100);
   });
@@ -192,23 +192,40 @@ suite("Task tests", () =>
     let foundTsc: boolean = false;
     let foundVscode: boolean = false;
 
-    if (treeItems.length)
+    if (treeItems.length > 0)
     {
       let item: any;
       while ((item = treeItems.shift())) {
         try {
-          if (item instanceof TaskFolder) {
+          if (item instanceof TaskFolder) 
+          {
+            let tmp: any = await treeDataProvider2.getParent(item);
+            assert(tmp === null, 'Invaid parent type, should be null for TaskFolder');
+
             let treeFiles: any[] = await treeDataProvider2.getChildren(item);
-            if (treeFiles.length) {
+            if (treeFiles.length > 0) 
+            {
               let item2: any;
-              while ((item2 = treeFiles.shift())) {
-                if (item2 instanceof TaskFile) {
+              while ((item2 = treeFiles.shift())) 
+              {
+                if (item2 instanceof TaskFile) 
+                {
+                  tmp = await treeDataProvider2.getParent(item2);
+                  assert(tmp instanceof TaskFolder, 'Invaid parent type, should be TaskFolder for TaskFile');
+
                   let treeTasks: any[] = await treeDataProvider2.getChildren(item2);
-                  if (treeTasks.length) {
+                  if (treeTasks.length > 0) 
+                  {
                     let item3: any;
-                    while ((item3 = treeTasks.shift())) {
-                      if (item3 instanceof TaskItem) {
+                    while ((item3 = treeTasks.shift())) 
+                    {
+                      if (item3 instanceof TaskItem) 
+                      {
                         await commands.executeCommand("taskExplorer.open", item3);
+
+                        tmp = await treeDataProvider2.getParent(item3);
+                        assert(tmp instanceof TaskFile, 'Invaid parent type, should be TaskFile for TaskItem');
+
                         if (item3.taskSource === 'ant') {
                           foundAnt = true;
                         }
@@ -234,6 +251,10 @@ suite("Task tests", () =>
                       }
                     }
                   }
+                  else {
+                    assert.fail('No tasks found in treefile');
+                    return;
+                  }
                 }
                 else {
                   assert.fail('Invalid taskfile node found');
@@ -250,23 +271,22 @@ suite("Task tests", () =>
             assert.fail('Invalid root folder');
             return;
           }
-        } catch (error) {}
+        } 
+        catch (error) { 
+          assert.fail('Exception error: ' + error.toString()); 
+        }
       }
     }
-    else {
-      assert.fail('No tree items found');
-      return;
-    }
-
-    if (!foundAnt) {
+/*
+    if (foundAnt !== true) {
       assert.fail('No ant items found');
     }
     else if (!foundGulp) {
       assert.fail('No gulp items found');
-    }/*
-    else if (!foundGrunt) {
-      assert.fail('No grunt items found');
-    }*/
+    }
+    //else if (!foundGrunt) {
+    //  assert.fail('No grunt items found');
+    //}
     else if (!foundNpm) {
       assert.fail('No npm items found');
     }
@@ -276,7 +296,7 @@ suite("Task tests", () =>
     else if (!foundVscode) {
       assert.fail('No vscode items found');
     }
-
+*/
   });
 
 });

@@ -1,5 +1,6 @@
 import * as path from "path";
 import { runTests } from "vscode-test";
+//import { configuration } from "../common/configuration";
 
 async function go() {
   const extensionPath = path.resolve(__dirname, "../../");
@@ -7,6 +8,12 @@ async function go() {
   const testWorkspace = path.resolve(__dirname, "../../");
 
   try {
+
+    //configuration.update('enableExplorerView', true);
+    //configuration.update('enableSideBar', true);
+    //configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
+    //configuration.update('debug', true);
+
     await runTests({
       version: process.env.CODE_VERSION,
       extensionPath,
