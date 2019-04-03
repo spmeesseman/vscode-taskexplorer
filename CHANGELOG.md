@@ -1,3 +1,11 @@
+## [1.9.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.9.0...v1.9.1) (2019-04-03)
+
+
+### Bug Fixes
+
+* exclude paths are working on some paths but not on others ([5dc7691](https://github.com/spmeesseman/vscode-taskexplorer/commit/5dc7691))
+* tsc each task name displays relative path instead of file node ([757e4cb](https://github.com/spmeesseman/vscode-taskexplorer/commit/757e4cb))
+
 # [1.9.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.8.0...v1.9.0) (2019-04-03)
 
 
