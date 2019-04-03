@@ -1,3 +1,10 @@
+## [1.9.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.9.1...v1.9.2) (2019-04-03)
+
+
+### Bug Fixes
+
+* task names with a dash surrounded by spaces ( - ) are being cut off in display ([4d72df7](https://github.com/spmeesseman/vscode-taskexplorer/commit/4d72df7))
+
 ## [1.9.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.9.0...v1.9.1) (2019-04-03)
 
 
