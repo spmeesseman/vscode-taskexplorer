@@ -21,7 +21,7 @@ export class TaskItem extends TreeItem
 	constructor(context: ExtensionContext, taskFile: TaskFile, task: Task) 
 	{
 		let taskName = task.name;
-		if (taskName.indexOf(' - ') !== -1 && taskName.indexOf('/') !== -1) {
+		if (taskName.indexOf(' - ') !== -1) {
 			taskName = task.name.substring(0, task.name.indexOf(' - '));
 		}
 
