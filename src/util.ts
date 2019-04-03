@@ -98,7 +98,7 @@ export async function logValue(msg: string, value: any)
   {
     logMsg += ' ';
   }
-  if (value || value === 0) {
+  if (value || value === 0 || value === '') {
     logMsg += ': ';
     logMsg += value.toString();
   }
