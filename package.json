@@ -382,11 +382,15 @@
                 "properties": {
                     "script": {
                         "type": "string",
-                        "description": "%taskdef.script%"
+                        "description": "%taskdef.ant.script%"
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.path%"
+                        "description": "%taskdef.ant.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.ant.fileName%"
                     }
                 }
             }
