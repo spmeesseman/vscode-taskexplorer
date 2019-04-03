@@ -16,6 +16,10 @@
     "categories": [
         "Other"
     ],
+    "galleryBanner": {
+        "color": "#EEEEEE",
+        "theme": "dark"
+    },
     "keywords": [
         "task",
         "tasks",
