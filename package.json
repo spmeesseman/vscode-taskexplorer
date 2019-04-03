@@ -16,15 +16,19 @@
         "Other"
     ],
     "keywords": [
-        "multi-root ready",
         "task",
         "tasks",
-        "launch",
         "npm",
         "ant",
+        "launch",
+        "multi-root ready",
+        "c c++",
         "grunt",
         "gulp",
-        "tsc"
+        "tsc",
+        "nsis",
+        "batch",
+        "bash"
     ],
     "main": "./out/extension",
     "activationEvents": [
