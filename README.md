@@ -21,7 +21,7 @@
 
 ## Screenshots
 
-|Sidebar View|Explorer Tray|Support for Ant/npm/gulp/vscode/tsc tasks|
+|Sidebar View|Explorer Tray|Support for various task types|
 |-|-|-|
 |![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview.png?raw=true)|
 
@@ -52,9 +52,15 @@
 * v1.12 - Batch/Bash file Task Provider - Open and launch batch scripts in Windows and bash scripts in Unix
 * v1.13 - NSIS Task Provider - Open and launch NSIS installer scripts
 
-## Configuring excludes and ant inicludes with glob patterns
+## Configuring excludes and ant includes with glob patterns
 
-The settings 'exclude' and 'includeAnt' are arrays of strings used to define file patterns to ignore, or file patterns to include which would have normally been ignored.  The strings must be glob patterns, for example:
+> Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default in all cases.
+
+The setting 'exclude' defines a string or an array of strings of file patterns to ignore.  The setting applies to all script types.  The string(s) must be glob pattern(s), for example:
+
+    taskExplorer.exclude: [ "**/.vscode-test/**", "**/out/**" ]
+
+The setting 'includeAnt' is a string or an array of strings used to define file patterns to include which would have normally been ignored by the internal Ant Task Provider.  By default, only ant files named [Bb]uild.xml are considered.  The string(s) must be glob pattern(s), for example:
 
     taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]
 
