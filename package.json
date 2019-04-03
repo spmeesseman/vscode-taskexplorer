@@ -5,6 +5,7 @@
     "icon": "res/gears-r-colors.png",
     "version": "1.9.0",
     "publisher": "spmeesseman",
+    "license": "AGPL-3.0+",
     "repository": {
         "type": "git",
         "url": "https://github.com/spmeesseman/vscode-taskexplorer.git"
