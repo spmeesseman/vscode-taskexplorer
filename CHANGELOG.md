@@ -1,3 +1,17 @@
+# [1.9.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.8.0...v1.9.0) (2019-04-03)
+
+
+### Bug Fixes
+
+* for ant files display file name on task file node if not named build.xml ([70d773f](https://github.com/spmeesseman/vscode-taskexplorer/commit/70d773f))
+* logValue for output window doesnt log empty string ([421bfd6](https://github.com/spmeesseman/vscode-taskexplorer/commit/421bfd6))
+* task file cannot be found when opening if filename is not all lowercase ([9672798](https://github.com/spmeesseman/vscode-taskexplorer/commit/9672798))
+
+
+### Features
+
+* gulp task detection support ([5f05830](https://github.com/spmeesseman/vscode-taskexplorer/commit/5f05830))
+
 # [1.8.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.7.8...v1.8.0) (2019-04-02)
 
 
