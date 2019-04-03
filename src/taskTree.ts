@@ -315,6 +315,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				}
 				let definition: TaskDefinition = <TaskDefinition>each.definition;
 				let relativePath = definition.path ? definition.path : '';
+
+				//
+				// TSC tasks are returned with no path value, the relative path is in the task name:
+				//
+				//     watch - tsconfig.json
+				//     watch - .vscode-test\vscode-1.32.3\resources\app\tsconfig.schema.json
+				//
+				if (each.source === 'tsc')
+				{
+					if (each.name.indexOf(' - ') !== -1 && each.name.indexOf(' - tsconfig.json') === -1)
+					{
+						relativePath = path.dirname(each.name.substring(each.name.indexOf(' - ') + 3));
+					}
+				}
+
 				let id = each.source + ':' + path.join(each.scope.name, relativePath);
 				if (definition.fileName) {
 					id = path.join(id, definition.fileName);
@@ -335,7 +350,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					util.logValue('   file name', definition.fileName);	
 				}	
 
-				if (!util.isExcluded(each.scope, each.scope.uri))
+				let excluded: boolean = false;
+				if (relativePath) {
+					excluded = util.isExcluded(path.join(each.scope.uri.path, relativePath));
+				}
+				else {
+					excluded = util.isExcluded(each.scope.uri.path);
+				}
+
+				if (!excluded)
 				{
 					taskFile = files.get(id);
 					//

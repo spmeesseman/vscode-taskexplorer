@@ -6,6 +6,7 @@ import {
 import * as path from 'path';
 import * as util from './util';
 import { parseString } from 'xml2js';
+import { configuration } from "./common/configuration";
 type StringMap = { [s: string]: string; };
 
 let cachedTasks: Task[] = undefined;
@@ -54,21 +55,31 @@ async function detectAntScripts(): Promise<Task[]>
 		for (const folder of folders) 
 		{
 			let relativePattern = new RelativePattern(folder, '**/[Bb]uild.xml');
-			let xtraIncludes: string[] = workspace.getConfiguration('taskExplorer').get('includeAnt');
+
+			let xtraIncludes: string[] = configuration.get('includeAnt');
 			if (xtraIncludes && xtraIncludes.length > 0) {
 				let multiFilePattern: string = '{**/[Bb]uild.xml';
-				for (var i in xtraIncludes) {
+				if (Array.isArray(xtraIncludes)) 
+				{
+					for (var i in xtraIncludes) {
+						multiFilePattern += ',';
+						multiFilePattern += xtraIncludes[i];
+					}
+				}
+				else {
 					multiFilePattern += ',';
-					multiFilePattern += xtraIncludes[i];
+					multiFilePattern += xtraIncludes;
 				}
 				multiFilePattern += '}';
 				relativePattern = new RelativePattern(folder, multiFilePattern);
 			}
+			
 			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
-			for (const path of paths) {
-				if (!util.isExcluded(folder, path) && !visitedPackageJsonFiles.has(path.fsPath)) {
-					let tasks = await provideAntScriptsForFolder(path);
-					visitedPackageJsonFiles.add(path.fsPath);
+			for (const fpath of paths) 
+			{
+				if (!util.isExcluded(fpath.path) && !visitedPackageJsonFiles.has(fpath.fsPath)) {
+					let tasks = await provideAntScriptsForFolder(fpath);
+					visitedPackageJsonFiles.add(fpath.fsPath);
 					allTasks.push(...tasks);
 				}
 			}
