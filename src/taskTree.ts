@@ -51,6 +51,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }, this));
 		subscriptions.push(commands.registerCommand(name + '.open', this.open, this));
 		subscriptions.push(commands.registerCommand(name + '.refresh', this.refresh, this));
+		subscriptions.push(commands.registerCommand(name + '.runInstall', this.runInstall, this));
 
 		tasks.onDidStartTask(() => this.refresh());
 		tasks.onDidEndTask(() => this.refresh());
@@ -246,6 +247,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	{
 		this.taskTree = null;
 		this._onDidChangeTreeData.fire();
+	}
+
+
+	public runInstall() 
+	{
+		util.log('run install not implemented');
 	}
 
 
