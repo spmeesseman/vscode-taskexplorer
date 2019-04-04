@@ -2,7 +2,7 @@
 
 import {
 	ExtensionContext, Task, TaskExecution, TreeItem, TreeItemCollapsibleState,
-	WorkspaceFolder, tasks, TaskGroup
+	WorkspaceFolder, tasks
 } from 'vscode';
 import { TaskFile } from './taskFile';
 import * as path from 'path';

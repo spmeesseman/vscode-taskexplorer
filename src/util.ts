@@ -1,8 +1,7 @@
 import { logOutputChannel } from './extension';
-import { WorkspaceFolder, Uri, workspace } from 'vscode';
+import { workspace } from 'vscode';
 import { accessSync } from 'original-fs';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as minimatch from 'minimatch';
 import { configuration } from './common/configuration';
 

@@ -5,7 +5,6 @@ import {
 import { TaskFolder } from './taskFolder';
 import { TaskItem } from './taskItem';
 import * as path from 'path';
-import { utils } from 'mocha';
 import* as util from './util';
 
 export class TaskFile extends TreeItem 
