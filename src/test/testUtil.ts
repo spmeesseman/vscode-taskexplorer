@@ -6,13 +6,8 @@ import * as fs from "original-fs";
 import * as os from "os";
 import { type } from "os";
 import * as path from "path";
-import * as tmp from "tmp";
 import { extensions, Uri, window } from "vscode";
 import { timeout } from "../util";
-
-tmp.setGracefulCleanup();
-
-const tempDirList: tmp.SynchrounousResult[] = [];
 
 
 export function spawn(
@@ -44,86 +39,6 @@ export function spawn(
   return proc;
 }
 
-export function newTempDir(prefix: string) 
-{
-  const dir = tmp.dirSync({
-    prefix,
-    unsafeCleanup: true
-  });
-
-  tempDirList.push(dir);
-
-  return dir.name;
-}
-
-
-export async function createTempDir(dir: string) 
-{
-  const fullpath = newTempDir(dir);
-  //const fullpath = newTempDir("svn_layout_");
-  //const dirname = path.basename(fullpath);
-
-  //fs.mkdirSync(path.join(fullpath, trunk));
-  //fs.mkdirSync(path.join(fullpath, branches));
-  //fs.mkdirSync(path.join(fullpath, tags));
-
-  return fullpath;
-}
-
-
-export async function createTempDir2(dir: string)
-{
-  return new Promise<Uri>((resolve, reject) => {
-    const fullpath = newTempDir(dir);
-    resolve(Uri.file(fullpath));
-  });
-}
-
-
-export async function destroyPath(fullPath: string) 
-{
-  fullPath = fullPath.replace(/^file\:\/\/\//, "");
-
-  if (!fs.existsSync(fullPath)) {
-    return false;
-  }
-
-  if (!fs.lstatSync(fullPath).isDirectory()) {
-    fs.unlinkSync(fullPath);
-    return true;
-  }
-
-  const files = fs.readdirSync(fullPath);
-  for (const file of files) {
-    destroyPath(path.join(fullPath, file));
-  }
-
-  // Error in windows with anti-malware
-  for (let i = 0; i < 3; i++) {
-    try {
-      fs.rmdirSync(fullPath);
-      break;
-    } catch (error) {
-      await timeout(3000);
-      console.error(error);
-    }
-  }
-  return true;
-}
-
-
-export function destroyAllTempPaths() 
-{
-  if (tempDirList.length)
-  {
-    let dir;
-    while ((dir = tempDirList.shift())) {
-      try {
-        dir.removeCallback();
-      } catch (error) {}
-    }
-  }
-}
 
 export function activeExtension() {
   return new Promise<void>((resolve, reject) => {

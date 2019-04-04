@@ -16,9 +16,7 @@ suite("Extension Tests", () =>
   setup(async () => { });
 
   teardown(() => {
-    //try{
-      testUtil.destroyAllTempPaths();
-    //} catch(e) {}
+    
   });
 
   test("Get extension", () => {

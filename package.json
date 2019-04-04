@@ -36,9 +36,7 @@
         "bash"
     ],
     "main": "./out/extension",
-    "activationEvents": [
-        "*"
-    ],
+    "activationEvents": [],
     "config": {
         "commitizen": {
             "path": "cz-conventional-changelog"
@@ -63,7 +61,6 @@
         "jsonc-parser": "^2.0.2",
         "minimatch": "^3.0.4",
         "semver": "^6.0.0",
-        "tmp": "0.1.0",
         "vscode-nls": "^4.0.0",
         "xml2js": "^0.4.19"
     },
@@ -76,7 +73,6 @@
         "@types/mocha": "^5.2.6",
         "@types/node": "^11.13.0",
         "@types/semver": "^6.0.0",
-        "@types/tmp": "0.0.34",
         "@types/xml2js": "^0.4.3",
         "codecov": "^3.2.0",
         "commitizen": "^3.0.7",

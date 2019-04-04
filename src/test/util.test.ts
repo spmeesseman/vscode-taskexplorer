@@ -5,7 +5,7 @@
 //
 
 import * as assert from "assert";
-import { workspace, Uri, ConfigurationTarget } from "vscode";
+import { workspace, Uri } from "vscode";
 import * as testUtil from "./testUtil";
 import * as util from "../util";
 
@@ -21,8 +21,7 @@ suite("Util tests", () =>
   });
 
   suiteTeardown(() => {
-    //workspace.getConfiguration('taskExplorer').update('debug', false, ConfigurationTarget.Global);
-    testUtil.destroyAllTempPaths();
+    
   });
 
   test("Turn logging on", () => {
