@@ -1,3 +1,12 @@
+## [1.9.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.9.2...v1.9.3) (2019-04-04)
+
+
+### Bug Fixes
+
+* 'open' grunt tasks does not position cursor on task properly ([7a5a474](https://github.com/spmeesseman/vscode-taskexplorer/commit/7a5a474))
+* enable/disable script types in settings has no effect ([02c08d2](https://github.com/spmeesseman/vscode-taskexplorer/commit/02c08d2))
+* util camelcase fn returns invalud value ([2da68e9](https://github.com/spmeesseman/vscode-taskexplorer/commit/2da68e9))
+
 ## [1.9.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.9.1...v1.9.2) (2019-04-03)
 
 
