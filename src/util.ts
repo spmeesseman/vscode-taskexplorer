@@ -16,7 +16,7 @@ export function camelCase(name: string, indexUpper: number)
     }
 
     return name
-        .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
+        .replace(/(?:^\w|[A-Za-z]|\b\w)/g, (letter, index) => {
             return index !== indexUpper ? letter.toLowerCase() : letter.toUpperCase();
         })
         .replace(/[\s\-]+/g, '');
