@@ -36,7 +36,9 @@
         "bash"
     ],
     "main": "./out/extension",
-    "activationEvents": [],
+    "activationEvents": [
+        "*"
+    ],
     "config": {
         "commitizen": {
             "path": "cz-conventional-changelog"
@@ -136,6 +138,15 @@
                 }
             },
             {
+                "command": "taskExplorerSideBar.runInstall",
+                "title": "%command.runInstall%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "light": "res/light/continue.svg",
+                    "dark": "res/dark/continue.svg"
+                }
+            },
+            {
                 "command": "taskExplorerSideBar.stop",
                 "title": "%command.stop%",
                 "when": "config.taskExplorer.enableSideBar",
@@ -166,6 +177,15 @@
             {
                 "command": "taskExplorer.run",
                 "title": "%command.run%",
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "light": "res/light/continue.svg",
+                    "dark": "res/dark/continue.svg"
+                }
+            },
+            {
+                "command": "taskExplorer.runInstall",
+                "title": "%command.runInstall%",
                 "when": "config.taskExplorer.enableExplorerView",
                 "icon": {
                     "light": "res/light/continue.svg",
@@ -216,13 +236,8 @@
             ],
             "view/item/context": [
                 {
-                    "command": "taskExplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFile",
-                    "group": "navigation@1"
-                },
-                {
                     "command": "taskExplorer.runInstall",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFile",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm",
                     "group": "navigation@2"
                 },
                 {
@@ -246,13 +261,8 @@
                     "group": "inline"
                 },
                 {
-                    "command": "taskExplorerSideBar.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFile",
-                    "group": "navigation@1"
-                },
-                {
                     "command": "taskExplorerSideBar.runInstall",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFile",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm",
                     "group": "navigation@2"
                 },
                 {
@@ -409,6 +419,22 @@
                     "fileName": {
                         "type": "string",
                         "description": "%taskdef.ant.fileName%"
+                    }
+                }
+            },
+            {
+                "type": "make",
+                "required": [
+                    "script"
+                ],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.make.script%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.make.path%"
                     }
                 }
             }

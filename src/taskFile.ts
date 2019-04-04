@@ -124,7 +124,7 @@ export class TaskFile extends TreeItem
 		this.folder = folder;
 		this.path = relativePath;
 		this.taskSource = source;
-		this.contextValue = 'taskFile';
+		this.contextValue = 'taskFile' + util.properCase(this.taskSource);
 		this.fileName = TaskFile.getFileNameFromSource(source, folder, taskDef, relativePath, true);
 
 		if (relativePath) {
