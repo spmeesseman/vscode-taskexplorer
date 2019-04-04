@@ -17,7 +17,7 @@
 
 ## Description
 
-> Provides a single view in either (or both) the SideBar and/or Explorer that conveniently displays VSCode, NPM, Ant, Make, Grunt and Gulp tasks (Batch/Bash, NSIS coming soon).  Tasks are organized into a treeview, with respective task file nodes and project folders (perfect for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.
+> Provides an organized view in either (or both) the SideBar and/or Explorer that conveniently displays VSCode, NPM, Ant, Make, Grunt and Gulp tasks (Shell scripts and NSIS coming soon).  Tasks are organized into a treeview, with respective task file nodes and project folders (perfect for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.
 
 ## Screenshots
 
@@ -29,11 +29,10 @@
 
 * Visual Studio Code v1.30 or higher
 * For npm, grunt, and gulp tasks, the 'Auto Detect' vscode setting must be turned 'On' for each respective task provider.
-* Typescript tsconfig.json tasks supported at root project folder only
 
 ## Features by Version
 
-* v1.10- C/C++ Makefile Task Provider - Open and launch C/C++ Makefile targets
+* v1.10 - C/C++ Makefile Task Provider - Open and launch C/C++ Makefile targets
 * v1.9 - Support for gulp and grunt tasks
 * v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
 * v1.7 - Two view types!! - Use one or both of either SideBar View and/or Explorer Tray
@@ -48,8 +47,8 @@
 
 ## Coming Soon
 
-* v1.11 - Batch/Bash file Task Provider - Open and launch batch scripts in Windows and bash scripts in Unix
-* v1.12- NSIS Task Provider - Open and launch NSIS installer scripts
+* v1.11 - Script file Task Provider - Open and launch scripts (batch, bash, python, powershell, etc)
+* v1.12 - NSIS Task Provider - Open and launch NSIS installer scripts
 
 ## Configuring excludes and ant includes with glob patterns
 
