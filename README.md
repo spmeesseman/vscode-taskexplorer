@@ -17,7 +17,7 @@
 
 ## Description
 
-> Provides a single view in either (or both) the SideBar and/or Explorer that conveniently displays VSCode, NPM, Ant, and Gulp tasks (Grunt, Batch/Bash, NSIS coming soon), grouped within their respective task nodes and project folders.  Tasks can be opened for view/edit, executed, and stopped.
+> Provides a single view in either (or both) the SideBar and/or Explorer that conveniently displays VSCode, NPM, Ant, Grunt and Gulp tasks (Batch/Bash, NSIS coming soon).  Tasks are organized into a treeview, with respective task file nodes and project folders (perfect for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.
 
 ## Screenshots
 
@@ -33,7 +33,7 @@
 
 ## Features by Version
 
-* v1.9 - Support for gulp tasks
+* v1.9 - Support for gulp and grunt tasks
 * v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
 * v1.7 - Two view types!! - Use one or both of either SideBar View and/or Explorer Tray
 * v1.6 - Progress icons for running tasks
@@ -47,10 +47,9 @@
 
 ## Coming Soon
 
-* v1.10 - Open and launch Grunt tasks
-* v1.11 - C/C++ Makefile Task Provider - Open and launch C/C++ Makefiles
-* v1.12 - Batch/Bash file Task Provider - Open and launch batch scripts in Windows and bash scripts in Unix
-* v1.13 - NSIS Task Provider - Open and launch NSIS installer scripts
+* v1.10 - C/C++ Makefile Task Provider - Open and launch C/C++ Makefiles
+* v1.11 - Batch/Bash file Task Provider - Open and launch batch scripts in Windows and bash scripts in Unix
+* v1.12- NSIS Task Provider - Open and launch NSIS installer scripts
 
 ## Configuring excludes and ant includes with glob patterns
 
@@ -78,13 +77,14 @@ The setting 'includeAnt' is a string or an array of strings used to define file 
 |-|-|-|
 |`taskExplorer.enableSideBar`|Enable/show visual studio code tasks|`false`|
 |`taskExplorer.enableExplorerView`|Enable a task explorer view in the sidebar|`true`|
-|`taskExplorer.enableCodeTasks`|Enable a task explorer tray in the Explorer sidebar view|`true`|
-|`taskExplorer.enableGulpTasks`|Enable/show ant targets as tasks|`true`|
-|`taskExplorer.enableGruntTasks`|Enable/show ant targets as tasks|`true`|
-|`taskExplorer.enableNpmScripts`|Enable/show npm scripts as tasks|`true`|
-|`taskExplorer.enableAntTargets`|Enable/show ant targets as tasks|`true`|
+|`taskExplorer.enableAnt`|Enable/show ant targets as tasks|`true`|
+|`taskExplorer.enableGrunt`|Enable/show grunt tasks|`true`|
+|`taskExplorer.enableGulp`|Enable/show gulp tasks|`true`|
+|`taskExplorer.enableNpm`|Enable/show npm scripts as tasks|`true`|
+|`taskExplorer.enableWorkspace`|Enable/show vscode tasks|`true`|
 |`taskExplorer.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
 |`taskExplorer.pathToAnt`|The path to the ant program, if not registered in system path||",
 |`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path||",
 |`taskExplorer.debug`|Turn on logging|`false`|
 |`taskExplorer.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/ext/**", "**/packages/**", "**/.vscode-test/**", "**/build**"]`|
+|`taskExplorer.includeAnt`|Configure glob patterns for files that should be included in ANT script detection|[]|
