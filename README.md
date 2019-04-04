@@ -17,7 +17,7 @@
 
 ## Description
 
-> Provides a single view in either (or both) the SideBar and/or Explorer that conveniently displays VSCode, NPM, Ant, Grunt and Gulp tasks (Batch/Bash, NSIS coming soon).  Tasks are organized into a treeview, with respective task file nodes and project folders (perfect for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.
+> Provides a single view in either (or both) the SideBar and/or Explorer that conveniently displays VSCode, NPM, Ant, Make, Grunt and Gulp tasks (Batch/Bash, NSIS coming soon).  Tasks are organized into a treeview, with respective task file nodes and project folders (perfect for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.
 
 ## Screenshots
 
@@ -33,6 +33,7 @@
 
 ## Features by Version
 
+* v1.10- C/C++ Makefile Task Provider - Open and launch C/C++ Makefile targets
 * v1.9 - Support for gulp and grunt tasks
 * v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
 * v1.7 - Two view types!! - Use one or both of either SideBar View and/or Explorer Tray
@@ -47,7 +48,6 @@
 
 ## Coming Soon
 
-* v1.10 - C/C++ Makefile Task Provider - Open and launch C/C++ Makefiles
 * v1.11 - Batch/Bash file Task Provider - Open and launch batch scripts in Windows and bash scripts in Unix
 * v1.12- NSIS Task Provider - Open and launch NSIS installer scripts
 
@@ -59,7 +59,7 @@ The setting 'exclude' defines a string or an array of strings of file patterns t
 
     taskExplorer.exclude: [ "**/.vscode-test/**", "**/out/**" ]
 
-The setting 'includeAnt' is a string or an array of strings used to define file patterns to include which would have normally been ignored by the internal Ant Task Provider.  By default, only ant files named [Bb]uild.xml are considered.  The string(s) must be glob pattern(s), for example:
+The setting 'includeAnt' is a string or an array of strings used to define file patterns to include which would have normally been ignored by the internal Ant Task Provider.  By default, only ant files named [Bb]uild.xml are considered.  The string(s) must be glob pattern(s) and should include the .xml extension, for example:
 
     taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]
 
@@ -82,9 +82,11 @@ The setting 'includeAnt' is a string or an array of strings used to define file 
 |`taskExplorer.enableGulp`|Enable/show gulp tasks|`true`|
 |`taskExplorer.enableNpm`|Enable/show npm scripts as tasks|`true`|
 |`taskExplorer.enableWorkspace`|Enable/show vscode tasks|`true`|
+|`taskExplorer.enableMake`|Enable/show Makefile targets as tasks|`true`|
 |`taskExplorer.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
-|`taskExplorer.pathToAnt`|The path to the ant program, if not registered in system path||",
-|`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path||",
+|`taskExplorer.pathToMake`|The path to the make program, if not registered in system path|`'nmake' for Windows, 'make' for Unix`|",
+|`taskExplorer.pathToAnt`|The path to the ant program, if not registered in system path|`'ant.bat' for Windows, 'ant' for Unix`|",
+|`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path|`ansicon.exe`|",
 |`taskExplorer.debug`|Turn on logging|`false`|
 |`taskExplorer.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/ext/**", "**/packages/**", "**/.vscode-test/**", "**/build**"]`|
-|`taskExplorer.includeAnt`|Configure glob patterns for files that should be included in ANT script detection|[]|
+|`taskExplorer.includeAnt`|Configure glob patterns for files that should be included in ANT script detection|`["**/[Bb]uild.xml/**"]`|
