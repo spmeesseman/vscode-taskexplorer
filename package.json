@@ -297,25 +297,30 @@
                     "default": false,
                     "markdownDescription": "%config.taskExplorer.enableSideBar%"
                 },
-                "taskExplorer.enableNpmScripts": {
+                "taskExplorer.enableNpm": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableNpmScripts%"
+                    "markdownDescription": "%config.taskExplorer.enableNpm%"
                 },
-                "taskExplorer.enableGruntTasks": {
-                    "type": "boolean",
-                    "default": false,
-                    "markdownDescription": "%config.taskExplorer.enableGruntTasks%"
-                },
-                "taskExplorer.enableGulpTasks": {
-                    "type": "boolean",
-                    "default": false,
-                    "markdownDescription": "%config.taskExplorer.enableGruntTasks%"
-                },
-                "taskExplorer.enableAntTargets": {
+                "taskExplorer.enableTsc": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableAntTargets%"
+                    "markdownDescription": "%config.taskExplorer.enableTsc%"
+                },
+                "taskExplorer.enableGrunt": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.enableGrunt%"
+                },
+                "taskExplorer.enableGulp": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.enableGulp%"
+                },
+                "taskExplorer.enableAnt": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.enableAnt%"
                 },
                 "taskExplorer.pathToAnt": {
                     "type": "string",

@@ -16,6 +16,7 @@ import * as nls from 'vscode-nls';
 import { TaskFolder } from './taskFolder';
 import { TaskFile } from './taskFile';
 import { TaskItem } from './taskItem';
+import { configuration } from "./common/configuration";
 
 
 const localize = nls.loadMessageBundle();
@@ -84,6 +85,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		else if (script.taskSource === 'ant')
 		{
 			//
+			// TODO
 			// This is crap - need regex search
 			//
 			scriptOffset = document.getText().indexOf("name=\"" + script.task.name);
@@ -100,11 +102,26 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		else if (script.taskSource === 'gulp')
 		{
 			//
+			// TODO
 			// This is crap - need regex search
 			//
 			scriptOffset = document.getText().indexOf("gulp.task('" + script.task.name);
 			if (scriptOffset === -1) {
 				scriptOffset = document.getText().indexOf("gulp.task(\"" + script.task.name);
+			}
+			if (scriptOffset === -1) {
+				scriptOffset = 0;
+			}
+		}
+		else if (script.taskSource === 'grunt')
+		{
+			//
+			// TODO
+			// This is crap - need regex search
+			//
+			scriptOffset = document.getText().indexOf("grunt.registerTask('" + script.task.name);
+			if (scriptOffset === -1) {
+				scriptOffset = document.getText().indexOf("grunt.registerTask(\"" + script.task.name);
 			}
 			if (scriptOffset === -1) {
 				scriptOffset = 0;
@@ -306,7 +323,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			util.logValue('   name', each.name);	
 			util.logValue('   source', each.source);
 
-			if (this.isWorkspaceFolder(each.scope) && !this.isInstallTask(each)) 
+			let settingName: string = 'enable' + util.properCase(each.source);
+			if (configuration.get(settingName) && this.isWorkspaceFolder(each.scope) && !this.isInstallTask(each)) 
 			{
 				folder = folders.get(each.scope.name);
 				if (!folder) {
@@ -346,6 +364,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				if (definition.path) {
 					util.logValue('   path', definition.path);	
 				}
+				//
+				// Internal task providers will set a fileName property
+				//
 				if (definition.fileName) {
 					util.logValue('   file name', definition.fileName);	
 				}	
@@ -371,12 +392,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 						files.set(id, taskFile);
 						util.logValue('   Added source file container', each.source);
 					}
+					//
+					// Create and add task item to task file node
+					//
 					let taskItem = new TaskItem(this.extensionContext, taskFile, each);
 					taskFile.addScript(taskItem);
 				}
 			}
 			else {
 				util.log('   Skipping');
+				util.logValue('   enabled', configuration.get(settingName));
 				util.logValue('   is install task', this.isInstallTask(each));
 			}
 		});
