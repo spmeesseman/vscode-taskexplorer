@@ -1,3 +1,17 @@
+# [1.10.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.9.3...v1.10.0) (2019-04-04)
+
+
+### Bug Fixes
+
+* register run install command for npm ([02d04b9](https://github.com/spmeesseman/vscode-taskexplorer/commit/02d04b9))
+* run install command should be only for npm file nodes ([b1938e8](https://github.com/spmeesseman/vscode-taskexplorer/commit/b1938e8))
+* wordage in settings for show view type ([acb3ea2](https://github.com/spmeesseman/vscode-taskexplorer/commit/acb3ea2))
+
+
+### Features
+
+* add support for makefile targets as tasks ([b75dbd5](https://github.com/spmeesseman/vscode-taskexplorer/commit/b75dbd5))
+
 ## [1.9.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.9.2...v1.9.3) (2019-04-04)
 
 
