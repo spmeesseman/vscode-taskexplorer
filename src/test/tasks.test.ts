@@ -195,14 +195,14 @@ suite("Task tests", () =>
 
   test("Scan tasks", async function() 
   {
-    await timeout(2500);
+    await timeout(2000);
     //
     // Refresh for better coverage
     //
+    treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
+    await timeout(100);
     await configuration.update('exclude', "**/coveronly/**");
-    await timeout(100);
     await treeDataProvider2.refresh();
-    await timeout(100);
     treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
   });
 
