@@ -129,15 +129,15 @@ async function findTargets(fsPath: string): Promise<StringMap>
 		    !line.startsWith('#') && !line.startsWith('$') && line.indexOf(':') > 0) 
 		{
 			let tgtName = line.substring(0, line.indexOf(':')).trim();
-			let cmdName = line.substring(line.indexOf(':') + 1).trim();
+			let dependsName = line.substring(line.indexOf(':') + 1).trim();
 			//
 			// Don't incude object targets
 			//
 			if (tgtName.indexOf('/') === -1 && tgtName.indexOf('\\') === -1) {
-				scripts[tgtName] = cmdName;
+				scripts[tgtName] = '';
 				util.log('   found target');
 				util.logValue('      name', tgtName);
-				util.logValue('      command', cmdName);
+				util.logValue('      depends target', dependsName);
 			}
 		}
 
