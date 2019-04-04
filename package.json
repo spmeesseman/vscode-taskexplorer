@@ -138,15 +138,6 @@
                 }
             },
             {
-                "command": "taskExplorerSideBar.runInstall",
-                "title": "%command.runInstall%",
-                "when": "config.taskExplorer.enableSideBar",
-                "icon": {
-                    "light": "res/light/continue.svg",
-                    "dark": "res/dark/continue.svg"
-                }
-            },
-            {
                 "command": "taskExplorerSideBar.stop",
                 "title": "%command.stop%",
                 "when": "config.taskExplorer.enableSideBar",
@@ -177,15 +168,6 @@
             {
                 "command": "taskExplorer.run",
                 "title": "%command.run%",
-                "when": "config.taskExplorer.enableExplorerView",
-                "icon": {
-                    "light": "res/light/continue.svg",
-                    "dark": "res/dark/continue.svg"
-                }
-            },
-            {
-                "command": "taskExplorer.runInstall",
-                "title": "%command.runInstall%",
                 "when": "config.taskExplorer.enableExplorerView",
                 "icon": {
                     "light": "res/light/continue.svg",
@@ -295,69 +277,69 @@
                 "taskExplorer.enableExplorerView": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableExplorerView%"
+                    "description": "%config.taskExplorer.enableExplorerView%"
                 },
                 "taskExplorer.enableSideBar": {
                     "type": "boolean",
                     "default": false,
-                    "markdownDescription": "%config.taskExplorer.enableSideBar%"
+                    "description": "%config.taskExplorer.enableSideBar%"
                 },
                 "taskExplorer.enableNpm": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableNpm%"
+                    "description": "%config.taskExplorer.enableNpm%"
                 },
                 "taskExplorer.enableTsc": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableTsc%"
+                    "description": "%config.taskExplorer.enableTsc%"
                 },
                 "taskExplorer.enableGrunt": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableGrunt%"
+                    "description": "%config.taskExplorer.enableGrunt%"
                 },
                 "taskExplorer.enableGulp": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableGulp%"
+                    "description": "%config.taskExplorer.enableGulp%"
                 },
                 "taskExplorer.enableAnt": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableAnt%"
+                    "description": "%config.taskExplorer.enableAnt%"
                 },
                 "taskExplorer.enableMake": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableMake%"
+                    "description": "%config.taskExplorer.enableMake%"
                 },
                 "taskExplorer.pathToMake": {
                     "type": "string",
-                    "markdownDescription": "%config.taskExplorer.pathToMake%"
+                    "description": "%config.taskExplorer.pathToMake%"
                 },
                 "taskExplorer.pathToAnt": {
                     "type": "string",
-                    "markdownDescription": "%config.taskExplorer.pathToAnt%"
+                    "description": "%config.taskExplorer.pathToAnt%"
                 },
                 "taskExplorer.enableAnsiconForAnt": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableAnsiconForAnt%"
+                    "description": "%config.taskExplorer.enableAnsiconForAnt%"
                 },
                 "taskExplorer.pathToAnsicon": {
                     "type": "string",
-                    "markdownDescription": "%config.taskExplorer.pathToAnsicon%"
+                    "description": "%config.taskExplorer.pathToAnsicon%"
                 },
                 "taskExplorer.enableWorkspace": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableWorkspace%"
+                    "description": "%config.taskExplorer.enableWorkspace%"
                 },
                 "taskExplorer.debug": {
                     "type": "boolean",
                     "default": false,
-                    "markdownDescription": "%config.taskExplorer.debug%"
+                    "description": "%config.taskExplorer.debug%"
                 },
                 "taskExplorer.debugLevel": {
                     "type": "number",
