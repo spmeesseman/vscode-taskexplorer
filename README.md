@@ -52,9 +52,9 @@
 
 ## Configuring excludes and ant includes with glob patterns
 
-> Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default in all cases.
-
 The setting 'exclude' defines a string or an array of strings of file patterns to ignore.  The setting applies to all script types.  The string(s) must be glob pattern(s), for example:
+
+> Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.
 
     taskExplorer.exclude: [ "**/.vscode-test/**", "**/out/**" ]
 
