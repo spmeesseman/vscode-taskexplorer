@@ -30,8 +30,7 @@ suite("Task tests", () =>
     dirName = path.join(workspace.rootPath, 'tasks_test_');
     dirNameCode = path.join(workspace.rootPath, '.vscode');
 
-    await workspace.getConfiguration('taskExplorer').update('exclude', []);
-    await configuration.update('exclude', []);
+    await configuration.update('exclude', [ "**/coveronly/**"]);
 
     if (!fs.existsSync(dirName)) {
       fs.mkdirSync(dirName);
@@ -87,7 +86,7 @@ suite("Task tests", () =>
     fs.writeFileSync(file2,'<?xml version="1.0"?>\n' +
                            '<project basedir="." default="test2">\n' +
                            '    <property name="test2" value="test2" />\n' +
-                           '    <target name="test3"></target>\n' +
+                           '    <target name=\'test3\'></target>\n' +
                            '    <target name="test4"></target>\n' +
                            '</project>\n');
 
@@ -110,6 +109,7 @@ suite("Task tests", () =>
                            '    "scripts":{\n' +
                            '        "test":"node ./node_modules/vscode/bin/test",\n' +
                            '        "compile":"npx tsc -p ./"\n' +
+                           '        "install":"npm install"\n' +
                            '    }\n' +
                            '}\n');
   });
@@ -137,6 +137,7 @@ suite("Task tests", () =>
                            '}\n');
   });
 
+
   test("Create gulp task files", async function() 
   {
     const file = path.join(workspace.rootPath, 'gulpfile.js');
@@ -146,10 +147,27 @@ suite("Task tests", () =>
                            "gulp.task('hello', (done) => {\n" +
                            "    console.log('Hello!');\n" +
                            "    done();\n" +
+                           "});\n" +
+                           "gulp.task(\"hello2\", (done) => {\n" +
+                           "    console.log('Hello2!');\n" +
+                           "    done();\n" +
                            "});\n");
   });
 
-  
+
+  test("Create grunt task files", async function() 
+  {
+    const file = path.join(workspace.rootPath, 'GRUNTFILE.js');
+
+    tempFiles.push(file);
+
+    fs.writeFileSync(file, "module.exports = function(grunt) {\n" +
+                           "    grunt.registerTask('default', ['jshint:myproject']);\n" +
+                           "    grunt.registerTask(\"upload\", ['s3']);\n" +
+                           "};\n");
+  });
+
+
   test("Create vscode task files", async function() 
   {
     const file = path.join(dirNameCode, 'tasks.json');
@@ -177,9 +195,15 @@ suite("Task tests", () =>
 
   test("Scan tasks", async function() 
   {
-    await timeout(2000);
-    treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
+    await timeout(2500);
+    //
+    // Refresh for better coverage
+    //
+    await configuration.update('exclude', "**/coveronly/**");
     await timeout(100);
+    await treeDataProvider2.refresh();
+    await timeout(100);
+    treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
   });
 
 

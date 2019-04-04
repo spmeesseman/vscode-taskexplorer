@@ -37,6 +37,14 @@ suite("Util tests", () =>
     assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", "true"));
   });
 
+  test("Camel case a value", () => {
+    assert(util.camelCase("taskexplorer", 4) == 'taskExplorer');
+  });
+
+  test("Proper case a value", () => {
+    assert(util.properCase("taskexplorer") == 'Taskexplorer');
+  });
+
   //test("Turn logging off", () => {
   //  assert.ok(workspace.getConfiguration('taskExplorer').update('debug', false));
   //});
