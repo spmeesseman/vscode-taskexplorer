@@ -84,7 +84,7 @@ async function detectAntScripts(): Promise<Task[]>
 				}
 			}
 		}
-		return Promise.resolve(allTasks);
+		return allTasks;
 	} catch (error) {
 		return Promise.reject(error);
 	}
@@ -106,14 +106,14 @@ async function readAntScripts(packageJsonUri: Uri): Promise<Task[]>
 
 	let folder = workspace.getWorkspaceFolder(packageJsonUri);
 	if (!folder) {
-		return Promise.resolve(emptyTasks);
+		return emptyTasks;
     }
     
     let contents = await util.readFile(packageJsonUri.fsPath);
 
 	let scripts = await findAllAntScripts(contents);
 	if (!scripts) {
-		return Promise.resolve(emptyTasks);
+		return emptyTasks;
 	}
 
 	const result: Task[] = [];
@@ -124,7 +124,7 @@ async function readAntScripts(packageJsonUri: Uri): Promise<Task[]>
 		result.push(task);
 	});
 
-	return Promise.resolve(result);
+	return result;
 }
 
 
@@ -174,7 +174,7 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
 		}
 	}
 
-	return Promise.resolve(scripts);
+	return scripts;
 }
 
 
