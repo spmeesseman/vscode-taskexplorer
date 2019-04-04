@@ -6,7 +6,7 @@
 	"config.taskExplorer.exclude": "Configure glob patterns for folders that should be excluded from automatic script detection.",
 	"config.taskExplorer.includeAnt": "Configure glob patterns for locating ant files not named b(B)uild.xml.",
 	"config.taskExplorer.enableNpm": "Enable/show npm scripts as tasks.",
-	"config.taskExplorer.enableCode": "Enable/show vscode tasks.",
+	"config.taskExplorer.enableWorkspace": "Enable/show vscode tasks.",
 	"config.taskExplorer.enableGrunt": "Enable/show grunt tasks.",
 	"config.taskExplorer.enableGulp": "Enable/show gulp tasks.",
 	"config.taskExplorer.enableAnt": "Enable/show ant targets as tasks.",

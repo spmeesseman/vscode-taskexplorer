@@ -335,10 +335,10 @@
                     "type": "string",
                     "markdownDescription": "%config.taskExplorer.pathToAnsicon%"
                 },
-                "taskExplorer.enableCodeTasks": {
+                "taskExplorer.enableWorkspace": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.enableCodeTasks%"
+                    "markdownDescription": "%config.taskExplorer.enableWorkspace%"
                 },
                 "taskExplorer.debug": {
                     "type": "boolean",
