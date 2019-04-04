@@ -15,6 +15,8 @@
 [![Dependencies Status](https://david-dm.org/spmeesseman/vscode-taskexplorer/status.svg)](https://david-dm.org/spmeesseman/vscode-taskexplorer)
 [![DevDependencies Status](https://david-dm.org/spmeesseman/vscode-taskexplorer/dev-status.svg)](https://david-dm.org/spmeesseman/vscode-taskexplorer?type=dev)
 
+|![src0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/npm.png?raw=true)|![src1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ant.png?raw=true)|![src2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/grunt.png?raw=true)|![src3](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/gulp.png?raw=true)|![src4](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/vscode.png?raw=true)|![src5](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/make.jpg?raw=true)
+
 ## Description
 
 > Provides an organized view in either (or both) the SideBar and/or Explorer that conveniently displays VSCode, NPM, Ant, Make, Grunt and Gulp tasks (Shell scripts and NSIS coming soon).  Tasks are organized into a treeview, with respective task file nodes and project folders (perfect for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.
