@@ -1,11 +1,8 @@
 
 import {
-	Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskExecution,
-	TextDocument, ThemeIcon, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
-	WorkspaceFolder, commands, window, workspace, tasks, Selection, TaskGroup
+	ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder
 } from 'vscode';
 import { TaskFile } from './taskFile';
-//import { TaskItem } from './taskItem';
 
 export class TaskFolder extends TreeItem 
 {

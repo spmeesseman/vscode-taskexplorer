@@ -1,6 +1,6 @@
 
 import {
-	ExtensionContext, TreeItem, TreeItemCollapsibleState, Uri, TaskDefinition
+	ExtensionContext, TreeItem, TreeItemCollapsibleState, Uri, TaskDefinition, ThemeIcon
 } from 'vscode';
 import { TaskFolder } from './taskFolder';
 import { TaskItem } from './taskItem';
@@ -77,6 +77,10 @@ export class TaskFile extends TreeItem
 			fileName = 'gulpfile.js';
 			tmpIdx = 4;
 		}
+		else if (source === 'make') {
+			fileName = 'makefile';
+			tmpIdx = 4;
+		}
 
 		//
 		// Check for casing, technically this isnt needed for windows but still
@@ -130,11 +134,16 @@ export class TaskFile extends TreeItem
 			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, this.fileName));
 		}
 
-		//this.iconPath = ThemeIcon.File;
-		this.iconPath = {
-			light: context.asAbsolutePath(path.join('res', 'sources', this.taskSource + '.svg')),
-			dark: context.asAbsolutePath(path.join('res', 'sources', this.taskSource + '.svg'))
-		};
+		if (util.pathExists(context.asAbsolutePath(path.join('res', 'sources', this.taskSource + '.svg'))))
+		{
+			this.iconPath = {
+				light: context.asAbsolutePath(path.join('res', 'sources', this.taskSource + '.svg')),
+				dark: context.asAbsolutePath(path.join('res', 'sources', this.taskSource + '.svg'))
+			};
+		}
+		else {
+			this.iconPath = ThemeIcon.File;
+		}
 	}
 
 	addScript(script: TaskItem) {

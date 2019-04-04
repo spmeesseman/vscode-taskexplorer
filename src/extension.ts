@@ -14,6 +14,7 @@ import {
   } from "vscode";
 import { TaskTreeDataProvider } from './taskTree';
 import { invalidateTasksCacheAnt, AntTaskProvider } from './taskProviderAnt';
+import { invalidateTasksCacheMake, MakeTaskProvider } from './taskProviderMake';
 import { configuration } from "./common/configuration";
 import { log } from './util';
 
@@ -25,6 +26,7 @@ export let logOutputChannel: OutputChannel | undefined;
 function invalidateTasksCache() 
 {
 	invalidateTasksCacheAnt();
+	invalidateTasksCacheMake();
 }
 
 
@@ -65,16 +67,10 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 
 		let d = workspace.onDidChangeConfiguration((e) => 
 		{
-			if (e.affectsConfiguration('taskExplorer.exclude')) {
-				invalidateTasksCache();
-				if (treeDataProvider) {
-					treeDataProvider.refresh();
-				}
-				if (treeDataProvider2) {
-					treeDataProvider2.refresh();
-				}
-			}
-			if (e.affectsConfiguration('taskExplorer.includeAnt')) {
+			if (e.affectsConfiguration('taskExplorer.exclude') || e.affectsConfiguration('taskExplorer.enableAnt') ||
+			    e.affectsConfiguration('taskExplorer.enableMake') || e.affectsConfiguration('taskExplorer.enableNpm') ||
+				e.affectsConfiguration('taskExplorer.enableGrunt') || e.affectsConfiguration('taskExplorer.enableGulp') ||
+				e.affectsConfiguration('taskExplorer.enableTsc') || e.affectsConfiguration('taskExplorer.includeAnt')) {
 				invalidateTasksCache();
 				if (treeDataProvider) {
 					treeDataProvider.refresh();
@@ -112,7 +108,7 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 	await tryInit();
 }
 
-function register(context: ExtensionContext): Disposable | undefined 
+function register(context: ExtensionContext) 
 {
 
 	function invalidateScriptCaches() 
@@ -163,9 +159,10 @@ function register(context: ExtensionContext): Disposable | undefined
 		let provider = new AntTaskProvider();
 		let disposable = workspace.registerTaskProvider('ant', provider);
 
-		return disposable;
+		let providerMake = new MakeTaskProvider();
+		let disposableMake = workspace.registerTaskProvider('make', providerMake);
 	}
-	return undefined;
+	return;
 }
 
 

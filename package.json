@@ -322,6 +322,15 @@
                     "default": true,
                     "markdownDescription": "%config.taskExplorer.enableAnt%"
                 },
+                "taskExplorer.enableMake": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.enableMake%"
+                },
+                "taskExplorer.pathToMake": {
+                    "type": "string",
+                    "markdownDescription": "%config.taskExplorer.pathToMake%"
+                },
                 "taskExplorer.pathToAnt": {
                     "type": "string",
                     "markdownDescription": "%config.taskExplorer.pathToAnt%"

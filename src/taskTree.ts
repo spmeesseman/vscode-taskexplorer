@@ -73,6 +73,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		let inScripts = false;
 		let inTasks = false;
 		let inTaskLabel = undefined;
+		let documentText = document.getText();
 
 		util.log('findScriptPosition');
 		util.logValue('   task source', script.taskSource);
@@ -82,15 +83,36 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		{
 			scriptOffset = 0;
 		}
+		if (script.taskSource === 'make')
+		{
+			scriptOffset = documentText.indexOf(script.task.name + ":");
+			if (scriptOffset === -1) {
+				scriptOffset = documentText.indexOf(script.task.name);
+				let bLine = documentText.lastIndexOf('\n', scriptOffset) + 1;
+				let eLine = documentText.indexOf('\n', scriptOffset);
+				if (eLine === -1) { eLine = documentText.length; }
+				let line = documentText.substring(bLine, eLine).trim();
+				while (bLine !== scriptOffset && scriptOffset !== -1 && line.indexOf(':') === -1) {
+					scriptOffset = documentText.indexOf(script.task.name, scriptOffset + 1);
+					bLine = documentText.lastIndexOf('\n', scriptOffset) + 1;
+					eLine = documentText.indexOf('\n', scriptOffset);
+					if (eLine === -1) { eLine = documentText.length; }
+					line = documentText.substring(bLine, eLine).trim();
+				}
+				if (scriptOffset === -1) {
+					scriptOffset = 0;
+				}
+			}
+		}
 		else if (script.taskSource === 'ant')
 		{
 			//
 			// TODO
 			// This is crap - need regex search
 			//
-			scriptOffset = document.getText().indexOf("name=\"" + script.task.name);
+			scriptOffset = documentText.indexOf("name=\"" + script.task.name);
 			if (scriptOffset === -1) {
-				scriptOffset = document.getText().indexOf("name='" + script.task.name);
+				scriptOffset = documentText.indexOf("name='" + script.task.name);
 			}
 			if (scriptOffset === -1) {
 				scriptOffset = 0;
@@ -105,9 +127,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			// TODO
 			// This is crap - need regex search
 			//
-			scriptOffset = document.getText().indexOf("gulp.task('" + script.task.name);
+			scriptOffset = documentText.indexOf("gulp.task('" + script.task.name);
 			if (scriptOffset === -1) {
-				scriptOffset = document.getText().indexOf("gulp.task(\"" + script.task.name);
+				scriptOffset = documentText.indexOf("gulp.task(\"" + script.task.name);
 			}
 			if (scriptOffset === -1) {
 				scriptOffset = 0;
@@ -119,15 +141,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			// TODO
 			// This is crap - need regex search
 			//
-			scriptOffset = document.getText().indexOf("grunt.registerTask('" + script.task.name);
+			scriptOffset = documentText.indexOf("grunt.registerTask('" + script.task.name);
 			if (scriptOffset === -1) {
-				scriptOffset = document.getText().indexOf("grunt.registerTask(\"" + script.task.name);
+				scriptOffset = documentText.indexOf("grunt.registerTask(\"" + script.task.name);
 			}
 			if (scriptOffset === -1) {
 				scriptOffset = 0;
 			}
 		}
-		else // npm, tasks.json
+		else if (script.taskSource === 'npm' || script.taskSource === 'Workspace')
 		{
 			let visitor: JSONVisitor = {
 				onError() {
@@ -182,7 +204,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				}
 			};
 
-			visit(document.getText(), visitor);
+			visit(documentText, visitor);
 		}
 
 		util.logValue('   Offset', scriptOffset);
