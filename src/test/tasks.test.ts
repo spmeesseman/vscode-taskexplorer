@@ -155,6 +155,18 @@ suite("Task tests", () =>
   });
 
 
+  test("Create makefiles", async function() 
+  {
+    const file = path.join(dirName, 'Makefile');
+    tempFiles.push(file);
+
+    fs.writeFileSync(file, "all   : temp.exe\r\n" +
+                           "    @echo Building app\r\n" +
+                           "clean: t1\r\n" +
+                           "    rmdir /q /s ../build\r\n");
+  });
+
+
   test("Create grunt task files", async function() 
   {
     const file = path.join(workspace.rootPath, 'GRUNTFILE.js');
