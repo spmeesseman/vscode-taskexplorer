@@ -16,6 +16,7 @@ interface BatchTaskDefinition extends TaskDefinition
 	path?: string;
 	fileName?: string;
 	scriptFile: boolean;
+	requiresArgs: boolean;
 }
 
 export class BatchTaskProvider implements TaskProvider 
@@ -59,7 +60,8 @@ async function detectBatchFiles(): Promise<Task[]>
 			{
 				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
 					visitedFiles.add(fpath.fsPath);
-					allTasks.push(createBatchTask('run', '', folder!, fpath));
+					let contents = await util.readFile(fpath.fsPath);
+					allTasks.push(createBatchTask('run', '', folder!, fpath, contents));
 				}
 			}
 		}
@@ -79,7 +81,7 @@ export async function provideBatchFiles(): Promise<Task[]>
 }
 
 
-function createBatchTask(target: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri): Task 
+function createBatchTask(target: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri, contents: string): Task 
 {
 	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string 
 	{
@@ -96,7 +98,8 @@ function createBatchTask(target: string, cmd: string, folder: WorkspaceFolder, p
 		script: target,
 		fileName: fileName,
 		scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
-		path: ''
+		path: '',
+		requiresArgs: (new RegExp("%[1-9]")).test(contents)
 	};
 
 	let relativePath = getRelativePath(folder, packageJsonUri);

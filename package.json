@@ -37,7 +37,7 @@
     ],
     "main": "./out/extension",
     "activationEvents": [
-        
+        "*"
     ],
     "config": {
         "commitizen": {
@@ -446,6 +446,10 @@
                     "scriptFile": {
                         "type": "boolean",
                         "description": "%taskdef.batch.scriptFile%"
+                    },
+                    "requiresArgs": {
+                        "type": "boolean",
+                        "description": "%taskdef.batch.requiresArgs%"
                     }
                 }
             }

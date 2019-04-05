@@ -399,6 +399,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				if (definition.fileName) {
 					util.logValue('   file name', definition.fileName);	
 				}	
+				//
+				// Script task providers will set a fileName property
+				//
+				if (definition.requiresArgs) {
+					util.logValue('   requires args', 'true');	
+				}
 
 				let excluded: boolean = false;
 				if (relativePath) {
