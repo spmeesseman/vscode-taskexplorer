@@ -1,3 +1,5 @@
+## [1.11.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.11.0...v1.11.1) (2019-04-05)
+
 # [1.11.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.10.0...v1.11.0) (2019-04-05)
 
 
