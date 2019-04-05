@@ -53,7 +53,7 @@ async function detectBatchFiles(): Promise<Task[]>
 	try {
 		for (const folder of folders) 
 		{
-			let relativePattern = new RelativePattern(folder, '**/*.bat');
+			let relativePattern = new RelativePattern(folder, '{**/*.bat,**/*.BAT}');
 			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
 			for (const fpath of paths) 
 			{

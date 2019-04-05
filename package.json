@@ -37,7 +37,7 @@
     ],
     "main": "./out/extension",
     "activationEvents": [
-        "*"
+        
     ],
     "config": {
         "commitizen": {
@@ -422,6 +422,30 @@
                     "path": {
                         "type": "string",
                         "description": "%taskdef.make.path%"
+                    }
+                }
+            },
+            {
+                "type": "batch",
+                "required": [
+                    "script"
+                ],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.batch.script%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.batch.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.batch.fileName%"
+                    },
+                    "scriptFile": {
+                        "type": "boolean",
+                        "description": "%taskdef.batch.scriptFile%"
                     }
                 }
             }

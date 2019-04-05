@@ -167,6 +167,19 @@ suite("Task tests", () =>
   });
 
 
+  test("Create batch files", async function() 
+  {
+    const file = path.join(dirName, 'test.bat');
+    tempFiles.push(file);
+
+    const file2 = path.join(dirName, 'test2.BAT');
+    tempFiles.push(file2);
+
+    fs.writeFileSync(file, "@echo testing batch file\r\n");
+    fs.writeFileSync(file2, "@echo testing batch file 2\r\n");
+  });
+
+
   test("Create grunt task files", async function() 
   {
     const file = path.join(workspace.rootPath, 'GRUNTFILE.js');

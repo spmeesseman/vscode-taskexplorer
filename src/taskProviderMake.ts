@@ -94,7 +94,7 @@ async function readMakefiles(packageJsonUri: Uri): Promise<Task[]>
 
 	const result: Task[] = [];
 
-	Object.keys(scripts).forEach(each => { console.log('huh');
+	Object.keys(scripts).forEach(each => {
 		const task = createMakeTask(each, `${each}`, folder!, packageJsonUri);
 		task.group = TaskGroup.Build;
 		result.push(task);
