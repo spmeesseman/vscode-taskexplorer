@@ -9,7 +9,8 @@ import * as util from './util';
 import {
 	Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
 	TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
-	commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions, CancellationToken
+	commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions, 
+	CancellationToken, ShellExecution
 } from 'vscode';
 import { visit, JSONVisitor } from 'jsonc-parser';
 import * as nls from 'vscode-nls';
@@ -70,17 +71,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			{
 				if (str !== undefined) 
 				{
-					let origArgs = taskItem.task.execution.args ? taskItem.task.execution.args.slice(0) : []; // clone
+					//let origArgs = taskItem.task.execution.args ? taskItem.task.execution.args.slice(0) : []; // clone
 					if (str) {
-						taskItem.task.execution.args = str.split(' ');
-						//console.log('44: ' + taskItem.task.execution.args.toString());
+						//if (taskItem.task.execution.args) {
+						//	taskItem.task.execution.args.push(...str.split(' '));
+						//}
+						//else {
+						//	taskItem.task.execution.args = str.split(' ');
+						//}
+						taskItem.task.execution  = new ShellExecution(taskItem.task.definition.fileName, str.split(' '), taskItem.task.execution.options);
+					}
+					else {
+						taskItem.task.execution  = new ShellExecution(taskItem.task.definition.fileName, taskItem.task.execution.options);
 					}
 					tasks.executeTask(taskItem.task)
 					.then(function(execution) {
-						taskItem.task.execution.args = origArgs.slice(0); // clone
+						//taskItem.task.execution.args = origArgs.slice(0); // clone
 					},
 					function(reason) {
-						taskItem.task.execution.args = origArgs.slice(0); // clone
+						//taskItem.task.execution.args = origArgs.slice(0); // clone
 					});
 				}
 			});

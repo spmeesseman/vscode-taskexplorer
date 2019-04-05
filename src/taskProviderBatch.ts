@@ -118,7 +118,7 @@ function createBatchTask(target: string, cmd: string, folder: WorkspaceFolder, p
 		"executable": "cmd.exe"
 	};
 
-	let execution = new ShellExecution(fileName, options);
+	let execution = new ShellExecution(fileName, args, options);
 	
 	return new Task(kind, folder, fileName, 'batch', execution, undefined);
 }
