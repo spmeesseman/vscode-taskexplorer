@@ -175,8 +175,6 @@ function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, pa
 		return absolutePath.substring(rootUri.path.length + 1);
 	}
 	
-	let antFile = path.basename(packageJsonUri.path);
-
 	let kind: MakeTaskDefinition = {
 		type: 'make',
 		script: target,

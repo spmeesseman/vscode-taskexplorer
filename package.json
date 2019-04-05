@@ -309,6 +309,11 @@
                     "default": true,
                     "description": "%config.taskExplorer.enableAnt%"
                 },
+                "taskExplorer.enableBatch": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.enableBatch%"
+                },
                 "taskExplorer.enableMake": {
                     "type": "boolean",
                     "default": true,

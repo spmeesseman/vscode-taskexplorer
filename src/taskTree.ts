@@ -378,7 +378,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				}
 
 				let id = each.source + ':' + path.join(each.scope.name, relativePath);
-				if (definition.fileName) {
+				if (definition.fileName && !definition.scriptFile) {
 					id = path.join(id, definition.fileName);
 				}
 

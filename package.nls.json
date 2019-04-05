@@ -10,6 +10,7 @@
 	"config.taskExplorer.enableGrunt": "Enable/show grunt tasks.",
 	"config.taskExplorer.enableGulp": "Enable/show gulp tasks.",
 	"config.taskExplorer.enableAnt": "Enable/show ant targets as tasks.",
+	"config.taskExplorer.enableBatch": "Enable/show batch scripts as tasks.",
 	"config.taskExplorer.enableMake": "Enable/show makefiles as tasks.",
 	"config.taskExplorer.enableTsc": "Enable/show tsc node with npm tasks.",
 	"config.taskExplorer.pathToAnt": "The path to the ant binary, if not registered in system path",

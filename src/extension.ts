@@ -14,6 +14,7 @@ import {
 import { TaskTreeDataProvider } from './taskTree';
 import { invalidateTasksCacheAnt, AntTaskProvider } from './taskProviderAnt';
 import { invalidateTasksCacheMake, MakeTaskProvider } from './taskProviderMake';
+import { invalidateTasksCacheBatch, BatchTaskProvider } from './taskProviderBatch';
 import { configuration } from "./common/configuration";
 import { log } from './util';
 
@@ -26,6 +27,7 @@ function invalidateTasksCache()
 {
 	invalidateTasksCacheAnt();
 	invalidateTasksCacheMake();
+	invalidateTasksCacheBatch();
 }
 
 
@@ -160,6 +162,9 @@ function register(context: ExtensionContext)
 
 		let providerMake = new MakeTaskProvider();
 		let disposableMake = workspace.registerTaskProvider('make', providerMake);
+
+		let providerBatch = new BatchTaskProvider();
+		let disposableBatch= workspace.registerTaskProvider('batch', providerBatch);
 	}
 	return;
 }
