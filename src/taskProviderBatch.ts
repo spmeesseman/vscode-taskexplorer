@@ -1,7 +1,7 @@
 
 import {
     Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition
+    workspace, TaskProvider, TaskDefinition, ShellExecutionOptions
 } from 'vscode';
 import * as path from 'path';
 import * as util from './util';
@@ -111,12 +111,14 @@ function createBatchTask(target: string, cmd: string, folder: WorkspaceFolder, p
 	// TODO - prompt for args
 	//
 	
-	let args = [ '/c', fileName ];
-	let options = {
-		"cwd": cwd
+	let args = [];
+	let options: ShellExecutionOptions = {
+		"cwd": cwd,
+		"shellArgs": [ '/c' ],
+		"executable": "cmd.exe"
 	};
 
-	let execution = new ShellExecution('cmd', args, options);
+	let execution = new ShellExecution(fileName, options);
 	
 	return new Task(kind, folder, fileName, 'batch', execution, undefined);
 }
