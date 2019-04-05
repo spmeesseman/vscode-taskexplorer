@@ -3,7 +3,7 @@
     "displayName": "Task Explorer",
     "description": "Run and manage tasks for VS Code",
     "icon": "res/gears-r-colors.png",
-    "version": "1.10.0",
+    "version": "1.11.0",
     "publisher": "spmeesseman",
     "license": "AGPL-3.0+",
     "repository": {
