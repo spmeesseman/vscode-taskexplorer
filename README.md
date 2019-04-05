@@ -92,4 +92,4 @@ The setting 'includeAnt' is a string or an array of strings used to define file 
 |`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path|`ansicon.exe`|",
 |`taskExplorer.debug`|Turn on logging|`false`|
 |`taskExplorer.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/ext/**", "**/packages/**", "**/.vscode-test/**", "**/build**"]`|
-|`taskExplorer.includeAnt`|Configure glob patterns for files that should be included in ANT script detection|`["**/[Bb]uild.xml/**"]`|
+|`taskExplorer.includeAnt`|Configure glob patterns for files that should be included in ANT script detection|`["**/[Bb]uild.xml"]`|
