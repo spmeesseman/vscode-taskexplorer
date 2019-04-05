@@ -9,7 +9,7 @@ import * as util from './util';
 import {
 	Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
 	TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
-	commands, window, workspace, tasks, Selection, WorkspaceFolder
+	commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions, CancellationToken
 } from 'vscode';
 import { visit, JSONVisitor } from 'jsonc-parser';
 import * as nls from 'vscode-nls';
@@ -61,9 +61,37 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	private async run(taskItem: TaskItem) 
 	{
 		//
-		// Execute task
+		// If this is a script, check to see if args are required
 		//
-		tasks.executeTask(taskItem.task);
+		if (taskItem.task.definition.requiresArgs === true)
+		{
+			let opts: InputBoxOptions = { prompt: 'Enter command line arguments separated by spaces'};
+			window.showInputBox(opts).then(function(str)
+			{
+				if (str !== undefined) 
+				{
+					let origArgs = taskItem.task.execution.args ? taskItem.task.execution.args.slice(0) : []; // clone
+					if (str) {
+						taskItem.task.execution.args = str.split(' ');
+						//console.log('44: ' + taskItem.task.execution.args.toString());
+					}
+					tasks.executeTask(taskItem.task)
+					.then(function(execution) {
+						taskItem.task.execution.args = origArgs.slice(0); // clone
+					},
+					function(reason) {
+						taskItem.task.execution.args = origArgs.slice(0); // clone
+					});
+				}
+			});
+		}
+		else
+		{
+			//
+			// Execute task
+			//
+			tasks.executeTask(taskItem.task);
+		}
 	}
 
 
