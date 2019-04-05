@@ -19,7 +19,7 @@
 
 ## Description
 
-> Provides an organized view in either (or both) the SideBar and/or Explorer that conveniently displays VSCode, NPM, Ant, Make, Grunt and Gulp tasks (Shell scripts and NSIS coming soon).  Tasks are organized into a treeview, with respective task file nodes and project folders (perfect for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.
+> Provides an organized view in either (or both) the SideBar and/or Explorer that conveniently displays all supported tasks, organized into a treeview, with parent task file nodes and project folders (perfect for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.  'npm install' is supported in the context menu of all npm file nodes.
 
 ## Screenshots
 
@@ -34,7 +34,8 @@
 
 ## Features by Version
 
-* v1.10 - C/C++ Makefile Task Provider - Open and launch C/C++ Makefile targets
+* v1.11 - Batch file Task Provider - Open and launch batch file scripts
+* v1.10 - Makefile Task Provider - Open and launch C/C++ Makefile targets
 * v1.9 - Support for gulp and grunt tasks
 * v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
 * v1.7 - Two view types!! - Use one or both of either SideBar View and/or Explorer Tray
@@ -49,16 +50,16 @@
 
 ## Coming Soon
 
-* v1.11 - Script file Task Provider - Open and launch scripts (batch, bash, python, powershell, etc)
-* v1.12 - NSIS Task Provider - Open and launch NSIS installer scripts
+* Script file Task Providers - bash, python, powershell
+* NSIS Task Provider - Open and launch NSIS installer scripts
 
 ## Configuring excludes and ant includes with glob patterns
 
 The setting 'exclude' defines a string or an array of strings of file patterns to ignore.  The setting applies to all script types.  The string(s) must be glob pattern(s), for example:
 
-> Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.
-
     taskExplorer.exclude: [ "**/.vscode-test/**", "**/out/**" ]
+
+> Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.
 
 The setting 'includeAnt' is a string or an array of strings used to define file patterns to include which would have normally been ignored by the internal Ant Task Provider.  By default, only ant files named [Bb]uild.xml are considered.  The string(s) must be glob pattern(s) and should include the .xml extension, for example:
 
@@ -79,6 +80,7 @@ The setting 'includeAnt' is a string or an array of strings used to define file 
 |`taskExplorer.enableSideBar`|Enable/show visual studio code tasks|`false`|
 |`taskExplorer.enableExplorerView`|Enable a task explorer view in the sidebar|`true`|
 |`taskExplorer.enableAnt`|Enable/show ant targets as tasks|`true`|
+|`taskExplorer.enableBatch`|Enable/show batch file scripts as tasks|`true`|
 |`taskExplorer.enableGrunt`|Enable/show grunt tasks|`true`|
 |`taskExplorer.enableGulp`|Enable/show gulp tasks|`true`|
 |`taskExplorer.enableNpm`|Enable/show npm scripts as tasks|`true`|
