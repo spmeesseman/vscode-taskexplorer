@@ -1,3 +1,11 @@
+# [1.11.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.10.0...v1.11.0) (2019-04-05)
+
+
+### Features
+
+* add support for batch scripts ([24b1bbb](https://github.com/spmeesseman/vscode-taskexplorer/commit/24b1bbb))
+* auto prompt for script cmd line args ([7f99598](https://github.com/spmeesseman/vscode-taskexplorer/commit/7f99598))
+
 # [1.10.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.9.3...v1.10.0) (2019-04-04)
 
 
