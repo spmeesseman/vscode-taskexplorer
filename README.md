@@ -80,10 +80,16 @@ The setting 'includeAnt' is a string or an array of strings used to define file 
 |`taskExplorer.enableSideBar`|Enable/show visual studio code tasks|`false`|
 |`taskExplorer.enableExplorerView`|Enable a task explorer view in the sidebar|`true`|
 |`taskExplorer.enableAnt`|Enable/show ant targets as tasks|`true`|
+|`taskExplorer.enableBash`|Enable/show bash scripts as tasks|`true`|
 |`taskExplorer.enableBatch`|Enable/show batch file scripts as tasks|`true`|
 |`taskExplorer.enableGrunt`|Enable/show grunt tasks|`true`|
 |`taskExplorer.enableGulp`|Enable/show gulp tasks|`true`|
 |`taskExplorer.enableNpm`|Enable/show npm scripts as tasks|`true`|
+|`taskExplorer.enableNsis`|Enable/show nullsoft installer scripts as tasks|`true`|
+|`taskExplorer.enablePowershell`|Enable/show powershell scripts as tasks|`true`|
+|`taskExplorer.enablePython`|Enable/show python scripts as tasks|`true`|
+|`taskExplorer.enableRuby`|Enable/show ruby scripts as tasks|`true`|
+|`taskExplorer.enableTsc`|Enable/show tsc npm configs as tasks|`true`|
 |`taskExplorer.enableWorkspace`|Enable/show vscode tasks|`true`|
 |`taskExplorer.enableMake`|Enable/show Makefile targets as tasks|`true`|
 |`taskExplorer.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
