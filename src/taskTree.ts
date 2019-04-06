@@ -287,9 +287,26 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	public runInstall() 
+	public runInstall(taskFile: TaskFile) 
 	{
-		util.log('run install not implemented');
+		if (taskFile.label === 'npm')
+		{
+			let options = {
+				"cwd": path.dirname(taskFile.resourceUri.fsPath)
+			};
+			let execution = new ShellExecution('npm', [ 'install' ], options);
+			let kind: TaskDefinition = {
+				type: 'npm',
+				script: 'install',
+				path: path.dirname(taskFile.resourceUri.fsPath)
+			};
+			let task = new Task(kind, taskFile.folder.workspaceFolder, 'install', 'npm', execution, undefined);
+
+			tasks.executeTask(task);
+		}
+		else{
+			window.showInformationMessage('Only npm nodes can run npm installs');
+		}
 	}
 
 
