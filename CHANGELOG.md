@@ -1,3 +1,24 @@
+## [1.12.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.0...v1.12.1) (2019-04-06)
+
+
+### Build System
+
+* **npm:** add dev dependency conventional-changelog-spm ([fd35851](https://github.com/spmeesseman/vscode-taskexplorer/commit/fd35851))
+* **semantic-release:** cleanup config file ([23673d1](https://github.com/spmeesseman/vscode-taskexplorer/commit/23673d1))
+* **semantic-release:** use separate releaserc.json config ([cb93891](https://github.com/spmeesseman/vscode-taskexplorer/commit/cb93891))
+* **semantic-release:** use spm custom changelog preset ([a58a6c7](https://github.com/spmeesseman/vscode-taskexplorer/commit/a58a6c7))
+
+
+### Code Refactoring
+
+* lowercase file item labels ([6a1a86b](https://github.com/spmeesseman/vscode-taskexplorer/commit/6a1a86b))
+
+
+### Documentation
+
+* **readme:** update coming soon and test check in name [skip ci] ([5d4432b](https://github.com/spmeesseman/vscode-taskexplorer/commit/5d4432b))
+* **readme:** update coming soon, test checkin username [skip ci] ([843e329](https://github.com/spmeesseman/vscode-taskexplorer/commit/843e329))
+
 # [1.12.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.11.2...v1.12.0) (2019-04-06)
 
 

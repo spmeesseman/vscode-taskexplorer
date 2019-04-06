@@ -3,7 +3,7 @@
     "displayName": "Task Explorer",
     "description": "Run and manage tasks for npm, vscode, ant, make, grunt, gulp, batch, bash, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
-    "version": "1.12.0",
+    "version": "1.12.1",
     "publisher": "spmeesseman",
     "license": "AGPL-3.0+",
     "repository": {
