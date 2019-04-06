@@ -1,3 +1,21 @@
+## [1.12.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.1...v1.12.2) (2019-04-06)
+
+
+### Bug Fixes
+
+* task file labels still show uppercase letters ([4e91243](https://github.com/spmeesseman/vscode-taskexplorer/commit/4e91243))
+
+
+### Build System
+
+* **npm:** bump min version conventional-changelog-spm to 1.1.2 ([d081678](https://github.com/spmeesseman/vscode-taskexplorer/commit/d081678))
+* **npm:** bump min version of conventional-changelog-spm to 1.1.3 ([7794095](https://github.com/spmeesseman/vscode-taskexplorer/commit/7794095))
+
+
+### Documentation
+
+* **readme:** add new settings descriptions ([3f46d5f](https://github.com/spmeesseman/vscode-taskexplorer/commit/3f46d5f))
+
 ## [1.12.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.0...v1.12.1) (2019-04-06)
 
 
