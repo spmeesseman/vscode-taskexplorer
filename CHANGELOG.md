@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.11.2...v1.12.0) (2019-04-06)
+
+
+### Features
+
+* add support for bash, python, perl, powershell, nsis, and ruby scripts ([17244d1](https://github.com/spmeesseman/vscode-taskexplorer/commit/17244d1))
+
 ## [1.11.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.11.1...v1.11.2) (2019-04-06)
 
 
