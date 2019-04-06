@@ -50,8 +50,9 @@
 
 ## Coming Soon
 
-* Script file Task Providers - bash, python, powershell
+* Script file Task Providers - bash, python, powershell, perl
 * NSIS Task Provider - Open and launch NSIS installer scripts
+* Include/exclude glob patterns by resource/folder
 
 ## Configuring excludes and ant includes with glob patterns
 
