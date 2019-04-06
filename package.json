@@ -78,6 +78,7 @@
         "@types/xml2js": "^0.4.3",
         "codecov": "^3.2.0",
         "commitizen": "^3.0.7",
+        "conventional-changelog-spm": "^1.0.0",
         "cz-conventional-changelog": "^2.1.0",
         "decache": "^4.5.1",
         "eslint-plugin-prettier": "^3.0.1",
@@ -493,70 +494,5 @@
                 }
             }
         ]
-    },
-    "release": {
-        "plugins": [
-            [
-                "@semantic-release/commit-analyzer",
-                {
-                    "preset": "angular",
-                    "releaseRules": [
-                        {
-                            "type": "docs",
-                            "scope": "readme",
-                            "release": "patch"
-                        },
-                        {
-                            "type": "docs",
-                            "scope": "vsce",
-                            "release": "patch"
-                        },
-                        {
-                            "type": "refactor",
-                            "release": "patch"
-                        }
-                    ],
-                    "parserOpts": {
-                        "noteKeywords": [
-                            "BREAKING CHANGE",
-                            "BREAKING CHANGES"
-                        ]
-                    }
-                }
-            ],
-            "@semantic-release/release-notes-generator",
-            "@semantic-release/changelog",
-            "@semantic-release/npm",
-            "@semantic-release/github",
-            "@semantic-release/git"
-        ],
-        "verifyConditions": [
-            "@semantic-release/github",
-            "@semantic-release/git",
-            "@semantic-release/changelog",
-            "semantic-release-vsce"
-        ],
-        "prepare": [
-            "@semantic-release/npm",
-            "@semantic-release/changelog",
-            {
-                "path": "@semantic-release/git",
-                "assets": [
-                    "CHANGELOG.md",
-                    "package.json",
-                    "package-lock.json"
-                ],
-                "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-            },
-            "semantic-release-vsce"
-        ],
-        "publish": [
-            "semantic-release-vsce",
-            {
-                "path": "@semantic-release/github",
-                "assets": "vscode-taskexplorer.vsix"
-            }
-        ],
-        "packageVsix": "vscode-taskexplorer.vsix"
     }
 }
