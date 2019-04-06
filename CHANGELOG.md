@@ -1,3 +1,11 @@
+## [1.11.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.11.1...v1.11.2) (2019-04-06)
+
+
+### Bug Fixes
+
+* make run install command from npm node asynchronous ([eb52c7e](https://github.com/spmeesseman/vscode-taskexplorer/commit/eb52c7e))
+* run install command does not work in npm file node context menu ([a9895b3](https://github.com/spmeesseman/vscode-taskexplorer/commit/a9895b3))
+
 ## [1.11.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.11.0...v1.11.1) (2019-04-05)
 
 # [1.11.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.10.0...v1.11.0) (2019-04-05)
