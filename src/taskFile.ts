@@ -36,7 +36,7 @@ export class TaskFile extends TreeItem
 			return label + ' (' + relativePath.substring(0, relativePath.length - 1) + ')';
 		}
 
-		return label;
+		return label.toLowerCase();
 	}
 
 	static getFileNameFromSource(source: string, folder: TaskFolder, taskDef: TaskDefinition, relativePath: string, incRelPathForCode?: boolean): string | null
