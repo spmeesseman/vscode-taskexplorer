@@ -287,7 +287,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	public runInstall(taskFile: TaskFile) 
+	private async runInstall(taskFile: TaskFile) 
 	{
 		if (taskFile.label === 'npm')
 		{
