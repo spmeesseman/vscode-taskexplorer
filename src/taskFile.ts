@@ -7,7 +7,7 @@ import { TaskItem } from './taskItem';
 import * as path from 'path';
 import* as util from './util';
 
-export class TaskFile extends TreeItem 
+export class TaskFile extends TreeItem
 {
 	public path: string;
 	public folder: TaskFolder;
@@ -15,7 +15,7 @@ export class TaskFile extends TreeItem
 	public fileName: string;
 	public readonly taskSource: string;
 
-	static getLabel(taskDef: TaskDefinition, source: string, relativePath: string): string 
+	static getLabel(taskDef: TaskDefinition, source: string, relativePath: string): string
 	{
 		let label = source;
 
@@ -26,14 +26,14 @@ export class TaskFile extends TreeItem
 		if (source === 'ant') {
 			if (taskDef.fileName && taskDef.fileName !== 'build.xml' && taskDef.fileName !== 'Build.xml') {
 				if (relativePath.length > 0 && relativePath !== '.vscode') {
-					return label + ' (' + relativePath.substring(0, relativePath.length - 1) + '/' + taskDef.fileName + ')';
+					return label + ' (' + relativePath.substring(0, relativePath.length - 1).toLowerCase() + '/' + taskDef.fileName.toLowerCase() + ')';
 				}
-				return label + ' (' + taskDef.fileName + ')';
+				return (label + ' (' + taskDef.fileName.toLowerCase() + ')');
 			}
 		}
 
 		if (relativePath.length > 0 && relativePath !== '.vscode') {
-			return label + ' (' + relativePath.substring(0, relativePath.length - 1) + ')';
+			return label + ' (' + relativePath.substring(0, relativePath.length - 1).toLowerCase() + ')';
 		}
 
 		return label.toLowerCase();
@@ -85,7 +85,7 @@ export class TaskFile extends TreeItem
 		// Check for casing, technically this isnt needed for windows but still
 		// want it covered in local tests
 		//
-		
+
 		let dirPath: string;
 		if (relativePath) {
 			dirPath = path.join(folder!.resourceUri!.fsPath, relativePath);
@@ -112,12 +112,12 @@ export class TaskFile extends TreeItem
 				}
 			}
 		}
-		
+
 		return fileName;
 	}
 
 
-	constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string) 
+	constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string)
 	{
 		super(TaskFile.getLabel(taskDef, source, relativePath), TreeItemCollapsibleState.Collapsed);
 
