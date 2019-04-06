@@ -1,0 +1,15 @@
+  
+<project basedir="." default="test-build">
+
+   <property environment="env"/>
+
+   <target name="test-build">
+         
+      <echo message="Test build"/>
+      <echo message="The path is:"/>
+      <echo message="${env.Path}"/>
+
+   </target>
+   
+</project>
+
