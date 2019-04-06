@@ -1,0 +1,70 @@
+{
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "angular",
+        "releaseRules": [
+          {
+            "type": "docs",
+            "scope": "readme",
+            "release": "patch"
+          },
+          {
+            "type": "docs",
+            "scope": "vsce",
+            "release": "patch"
+          },
+          {
+            "type": "refactor",
+            "release": "patch"
+          }
+        ]
+      }
+    ],
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "angular",
+        "parserOpts": {
+          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "REFACTOR"]
+        },
+        "writerOpts": {
+          "commitsSort": ["subject", "scope"]
+        }
+      }
+    ],
+    "@semantic-release/changelog",
+    "@semantic-release/npm",
+    "@semantic-release/github",
+    "@semantic-release/git"
+  ],
+  "verifyConditions": [
+    "@semantic-release/github",
+    "@semantic-release/git",
+    "@semantic-release/changelog",
+    "semantic-release-vsce"
+  ],
+  "prepare": [
+    "@semantic-release/npm",
+    "@semantic-release/changelog",
+    {
+      "path": "@semantic-release/git",
+      "assets": [
+        "CHANGELOG.md",
+        "package.json",
+        "package-lock.json"
+      ],
+      "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+    },
+    "semantic-release-vsce"
+  ],
+  "publish": [
+    "semantic-release-vsce",
+    {
+      "path": "@semantic-release/github",
+      "assets": "vscode-taskexplorer.vsix"
+    }
+  ],
+  "packageVsix": "vscode-taskexplorer.vsix"
+}
