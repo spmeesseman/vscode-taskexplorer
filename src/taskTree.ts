@@ -64,6 +64,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		//
 		// If this is a script, check to see if args are required
 		//
+		// A script task will set the 'requiresArgs' parameter to true if command line arg
+		// parameters are detected in the scripts contents when inported.  For example, if a
+		// batch script contains %1, %2, etc, the task definition's requiresArgs parameter
+		// will be set.
+		//
 		if (taskItem.task.definition.requiresArgs === true)
 		{
 			let opts: InputBoxOptions = { prompt: 'Enter command line arguments separated by spaces'};
@@ -73,16 +78,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				{
 					//let origArgs = taskItem.task.execution.args ? taskItem.task.execution.args.slice(0) : []; // clone
 					if (str) {
-						//if (taskItem.task.execution.args) {
-						//	taskItem.task.execution.args.push(...str.split(' '));
-						//}
-						//else {
-						//	taskItem.task.execution.args = str.split(' ');
-						//}
-						taskItem.task.execution  = new ShellExecution(taskItem.task.definition.fileName, str.split(' '), taskItem.task.execution.options);
+						//origArgs.push(...str.split(' '));
+						taskItem.task.execution  = new ShellExecution(taskItem.task.definition.cmdLine + ' ' + str, taskItem.task.execution.options);
 					}
 					else {
-						taskItem.task.execution  = new ShellExecution(taskItem.task.definition.fileName, taskItem.task.execution.options);
+						taskItem.task.execution  = new ShellExecution(taskItem.task.definition.cmdLine, taskItem.task.execution.options);
 					}
 					tasks.executeTask(taskItem.task)
 					.then(function(execution) {
@@ -90,7 +90,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					},
 					function(reason) {
 						//taskItem.task.execution.args = origArgs.slice(0); // clone
-					});
+					});				
 				}
 			});
 		}
@@ -441,6 +441,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				util.logValue('   scope.uri.fsPath', each.scope.uri.fsPath);
 				util.logValue('   relative Path', relativePath);
 				util.logValue('   type', definition.type);	
+				if (definition.scriptType) {
+					util.logValue('      script type', definition.scriptType);	// if 'script' is defined, this is type npm
+				}
 				if (definition.script) {
 					util.logValue('   script', definition.script);	// if 'script' is defined, this is type npm
 				}
@@ -457,7 +460,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				// Script task providers will set a fileName property
 				//
 				if (definition.requiresArgs) {
-					util.logValue('   requires args', 'true');	
+					util.logValue('   script requires args', 'true');	
+				}
+				if (definition.cmdLine) {
+					util.logValue('   script cmd line', definition.cmdLine);	
 				}
 
 				let excluded: boolean = false;

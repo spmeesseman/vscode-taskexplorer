@@ -15,7 +15,7 @@
 [![Dependencies Status](https://david-dm.org/spmeesseman/vscode-taskexplorer/status.svg)](https://david-dm.org/spmeesseman/vscode-taskexplorer)
 [![DevDependencies Status](https://david-dm.org/spmeesseman/vscode-taskexplorer/dev-status.svg)](https://david-dm.org/spmeesseman/vscode-taskexplorer?type=dev)
 
-![src0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/npm.png?raw=true) ![src1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ant.png?raw=true) ![src2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/grunt.png?raw=true) ![src3](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/gulp.png?raw=true) ![src4](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/workspace.png?raw=true) ![src5](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/make.png?raw=true) ![src6](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ts.png?raw=true) ![src7](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/bat.png?raw=true)
+![src0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/npm.png?raw=true) ![src1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ant.png?raw=true) ![src2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/grunt.png?raw=true) ![src3](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/gulp.png?raw=true) ![src4](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/workspace.png?raw=true) ![src5](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/make.png?raw=true) ![src6](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ts.png?raw=true) ![src7](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/bat.png?raw=true) ![src8](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ruby.png?raw=true) ![src9](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/powershell.png?raw=true) ![src10](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/bash.png?raw=true) ![src11](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/python.png?raw=true) ![src12](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/nsis.png?raw=true)
 
 ## Description
 
@@ -23,9 +23,9 @@
 
 ## Screenshots
 
-|Sidebar View|Explorer Tray|
-|-|-|
-|![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview4.png?raw=true)|
+|Sidebar View|Explorer Tray|Supports most task types|
+|-|-|-|
+|![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview4.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|
 
 ## Requirements
 
@@ -34,7 +34,8 @@
 
 ## Features by Version
 
-* v1.11 - Batch file Task Provider - Open and launch batch file scripts
+* v1.12 - Script Task Provider - Open and launch bash, batch, perl, powershell, python, ruby, and nsis scripts
+* v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
 * v1.10 - Makefile Task Provider - Open and launch C/C++ Makefile targets
 * v1.9 - Support for gulp and grunt tasks
 * v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
@@ -50,8 +51,6 @@
 
 ## Coming Soon
 
-* Script file Task Providers - bash, python, powershell, perl
-* NSIS Task Provider - Open and launch NSIS installer scripts
 * Include/exclude glob patterns by resource/folder
 
 ## Configuring excludes and ant includes with glob patterns

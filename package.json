@@ -1,7 +1,7 @@
 {
     "name": "vscode-taskexplorer",
     "displayName": "Task Explorer",
-    "description": "Run and manage tasks for VS Code",
+    "description": "Run and manage tasks for npm, vscode, ant, make, grunt, gulp, batch, bash, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
     "version": "1.11.2",
     "publisher": "spmeesseman",
@@ -314,6 +314,36 @@
                     "default": true,
                     "description": "%config.taskExplorer.enableBatch%"
                 },
+                "taskExplorer.enablePerl": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.enablePerl%"
+                },
+                "taskExplorer.enableRuby": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.enableRuby%"
+                },
+                "taskExplorer.enablePython": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.enablePython%"
+                },
+                "taskExplorer.enablePowershell": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.enablePowershell%"
+                },
+                "taskExplorer.enableBash": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.enableShell%"
+                },
+                "taskExplorer.enableNsis": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.enableNsis%"
+                },
                 "taskExplorer.enableMake": {
                     "type": "boolean",
                     "default": true,
@@ -427,30 +457,38 @@
                 }
             },
             {
-                "type": "batch",
+                "type": "script",
                 "required": [
-                    "script"
+                    "scriptType",
+                    "cmdLine",
+                    "fileName"
                 ],
                 "properties": {
-                    "script": {
+                    "scriptType": {
                         "type": "string",
-                        "description": "%taskdef.batch.script%"
+                        "description": "%taskdef.script.scriptType%"
+                    },
+                    "cmdLine": {
+                        "type": "string",
+                        "description": "%taskdef.script.cmdLine%"
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.batch.path%"
+                        "description": "%taskdef.script.path%"
                     },
                     "fileName": {
                         "type": "string",
-                        "description": "%taskdef.batch.fileName%"
+                        "description": "%taskdef.script.fileName%"
                     },
                     "scriptFile": {
                         "type": "boolean",
-                        "description": "%taskdef.batch.scriptFile%"
+                        "description": "%taskdef.script.scriptFile%",
+                        "default": true
                     },
                     "requiresArgs": {
                         "type": "boolean",
-                        "description": "%taskdef.batch.requiresArgs%"
+                        "description": "%taskdef.script.requiresArgs%",
+                        "default": false
                     }
                 }
             }
