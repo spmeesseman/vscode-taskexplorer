@@ -27,7 +27,7 @@
       {
         "preset": "spm",
         "parserOpts": {
-          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "REFACTOR"]
+          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
         },
         "writerOpts": {
           "commitsSort": ["subject", "scope"]
