@@ -52,6 +52,7 @@
 ## Coming Soon
 
 * Include/exclude glob patterns by resource/folder
+* For script tasks, enter command line args on the fly when ran
 
 ## Configuring excludes and ant includes with glob patterns
 
