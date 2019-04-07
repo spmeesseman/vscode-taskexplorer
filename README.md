@@ -32,8 +32,9 @@
 * Visual Studio Code v1.30 or higher
 * For npm, grunt, and gulp tasks, the 'Auto Detect' vscode setting must be turned 'On' for each respective task provider.
 
-## Features by Version
+## Features
 
+* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/TODO?raw=true)
 * v1.12 - Script Task Provider - Open and launch bash, batch, perl, powershell, python, ruby, and nsis scripts
 * v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
 * v1.10 - Makefile Task Provider - Open and launch C/C++ Makefile targets
@@ -49,15 +50,11 @@
 * v1.1 - Supports multi-root or single-root workspaces
 * v1.0 - Open and launch NPM scripts as tasks
 
-## Coming Soon
-
-* Include/exclude glob patterns by resource/folder
-
 ## Configuring excludes and ant includes with glob patterns
 
 The setting 'exclude' defines a string or an array of strings of file patterns to ignore.  The setting applies to all script types.  The string(s) must be glob pattern(s), for example:
 
-    taskExplorer.exclude: [ "**/.vscode-test/**", "**/out/**" ]
+    taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**" ]
 
 > Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.
 
