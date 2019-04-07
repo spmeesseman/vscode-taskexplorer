@@ -1,3 +1,20 @@
+## [1.12.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.2...v1.12.3) (2019-04-07)
+
+
+### Bug Fixes
+
+* add settings for specifying script intepreter location ([cda2c2e](https://github.com/spmeesseman/vscode-taskexplorer/commit/cda2c2e))
+
+
+### Code Refactoring
+
+* update todo ([735da5e](https://github.com/spmeesseman/vscode-taskexplorer/commit/735da5e))
+
+
+### Documentation
+
+* **readme:**  add link to todos ([5d39799](https://github.com/spmeesseman/vscode-taskexplorer/commit/5d39799))
+
 ## [1.12.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.1...v1.12.2) (2019-04-06)
 
 
