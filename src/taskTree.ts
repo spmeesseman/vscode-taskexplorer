@@ -9,7 +9,7 @@ import * as util from './util';
 import {
 	Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
 	TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
-	commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions, 
+	commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
 	CancellationToken, ShellExecution
 } from 'vscode';
 import { visit, JSONVisitor } from 'jsonc-parser';
@@ -23,7 +23,7 @@ import { configuration } from "./common/configuration";
 const localize = nls.loadMessageBundle();
 
 
-class NoScripts extends TreeItem 
+class NoScripts extends TreeItem
 {
 	constructor() {
 		super(localize('noScripts', 'No scripts found'), TreeItemCollapsibleState.None);
@@ -39,12 +39,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
 	readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
 
-	constructor(name: string, context: ExtensionContext) 
+	constructor(name: string, context: ExtensionContext)
 	{
 		const subscriptions = context.subscriptions;
 		this.extensionContext = context;
 		subscriptions.push(commands.registerCommand(name + '.run', this.run, this));
-		subscriptions.push(commands.registerCommand(name + '.stop', (taskTreeItem: TaskItem) => 
+		subscriptions.push(commands.registerCommand(name + '.stop', (taskTreeItem: TaskItem) =>
 		{
             if (taskTreeItem.execution) {
 				taskTreeItem.execution.terminate();
@@ -59,7 +59,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private async run(taskItem: TaskItem) 
+	private async run(taskItem: TaskItem)
 	{
 		//
 		// If this is a script, check to see if args are required
@@ -74,7 +74,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			let opts: InputBoxOptions = { prompt: 'Enter command line arguments separated by spaces'};
 			window.showInputBox(opts).then(function(str)
 			{
-				if (str !== undefined) 
+				if (str !== undefined)
 				{
 					//let origArgs = taskItem.task.execution.args ? taskItem.task.execution.args.slice(0) : []; // clone
 					if (str) {
@@ -90,7 +90,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					},
 					function(reason) {
 						//taskItem.task.execution.args = origArgs.slice(0); // clone
-					});				
+					});
 				}
 			});
 		}
@@ -104,7 +104,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private findScriptPosition(document: TextDocument, script?: TaskItem): number 
+	private findScriptPosition(document: TextDocument, script?: TaskItem): number
 	{
 		let me = this;
 		let scriptOffset = 0;
@@ -145,8 +145,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		else if (script.taskSource === 'ant')
 		{
 			//
-			// TODO
-			// This is crap - need regex search
+			// TODO This is crap - need regex search
 			//
 			scriptOffset = documentText.indexOf("name=\"" + script.task.name);
 			if (scriptOffset === -1) {
@@ -162,8 +161,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		else if (script.taskSource === 'gulp')
 		{
 			//
-			// TODO
-			// This is crap - need regex search
+			// TODO This is crap - need regex search
 			//
 			scriptOffset = documentText.indexOf("gulp.task('" + script.task.name);
 			if (scriptOffset === -1) {
@@ -176,8 +174,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		else if (script.taskSource === 'grunt')
 		{
 			//
-			// TODO
-			// This is crap - need regex search
+			// TODO This is crap - need regex search
 			//
 			scriptOffset = documentText.indexOf("grunt.registerTask('" + script.task.name);
 			if (scriptOffset === -1) {
@@ -250,7 +247,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private async open(selection: TaskFile | TaskItem) 
+	private async open(selection: TaskFile | TaskItem)
 	{
 		let uri: Uri | undefined = undefined;
 		if (selection instanceof TaskFile) {
@@ -280,14 +277,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	public refresh() 
+	public refresh()
 	{
 		this.taskTree = null;
 		this._onDidChangeTreeData.fire();
 	}
 
 
-	private async runInstall(taskFile: TaskFile) 
+	private async runInstall(taskFile: TaskFile)
 	{
 		if (taskFile.label === 'npm')
 		{
@@ -310,13 +307,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	getTreeItem(element: TreeItem): TreeItem 
+	getTreeItem(element: TreeItem): TreeItem
 	{
 		return element;
 	}
 
 
-	getParent(element: TreeItem): TreeItem | null 
+	getParent(element: TreeItem): TreeItem | null
 	{
 		if (element instanceof TaskFolder) {
 			return null;
@@ -334,7 +331,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	async getChildren(element?: TreeItem): Promise<TreeItem[]> 
+	async getChildren(element?: TreeItem): Promise<TreeItem[]>
 	{
 		if (!this.taskTree) {
 			//let taskItems = await tasks.fetchTasks({ type: 'npm' });
@@ -367,14 +364,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private isInstallTask(task: Task): boolean 
+	private isInstallTask(task: Task): boolean
 	{
 		let fullName = this.getTaskName('install', task.definition.path);
 		return fullName === task.name;
 	}
 
 
-	private getTaskName(script: string, relativePath: string | undefined, forcePathInName?: boolean) 
+	private getTaskName(script: string, relativePath: string | undefined, forcePathInName?: boolean)
 	{
 		if (relativePath && relativePath.length && forcePathInName === true) {
 			return `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
@@ -383,13 +380,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private isWorkspaceFolder(value: any): value is WorkspaceFolder 
+	private isWorkspaceFolder(value: any): value is WorkspaceFolder
 	{
 		return value && typeof value !== 'number';
 	}
 
 
-	private buildTaskTree(tasks: Task[]): TaskFolder[] | TaskFile[] | NoScripts[] 
+	private buildTaskTree(tasks: Task[]): TaskFolder[] | TaskFile[] | NoScripts[]
 	{
 		var taskCt = 0;
 		let folders: Map<String, TaskFolder> = new Map();
@@ -398,16 +395,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		let folder = null;
 		let taskFile = null;
 
-		tasks.forEach(each => 
+		tasks.forEach(each =>
 		{
 			taskCt++;
 			util.log('');
 			util.log('Processing task ' + taskCt.toString() + ' of ' + tasks.length.toString());
-			util.logValue('   name', each.name);	
+			util.logValue('   name', each.name);
 			util.logValue('   source', each.source);
 
 			let settingName: string = 'enable' + util.properCase(each.source);
-			if (configuration.get(settingName) && this.isWorkspaceFolder(each.scope) && !this.isInstallTask(each)) 
+			if (configuration.get(settingName) && this.isWorkspaceFolder(each.scope) && !this.isInstallTask(each))
 			{
 				folder = folders.get(each.scope.name);
 				if (!folder) {
@@ -440,7 +437,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				util.logValue('   scope.uri.path', each.scope.uri.path);
 				util.logValue('   scope.uri.fsPath', each.scope.uri.fsPath);
 				util.logValue('   relative Path', relativePath);
-				util.logValue('   type', definition.type);	
+				util.logValue('   type', definition.type);
 				if (definition.scriptType) {
 					util.logValue('      script type', definition.scriptType);	// if 'script' is defined, this is type npm
 				}
@@ -448,22 +445,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					util.logValue('   script', definition.script);	// if 'script' is defined, this is type npm
 				}
 				if (definition.path) {
-					util.logValue('   path', definition.path);	
+					util.logValue('   path', definition.path);
 				}
 				//
 				// Internal task providers will set a fileName property
 				//
 				if (definition.fileName) {
-					util.logValue('   file name', definition.fileName);	
-				}	
+					util.logValue('   file name', definition.fileName);
+				}
 				//
 				// Script task providers will set a fileName property
 				//
 				if (definition.requiresArgs) {
-					util.logValue('   script requires args', 'true');	
+					util.logValue('   script requires args', 'true');
 				}
 				if (definition.cmdLine) {
-					util.logValue('   script cmd line', definition.cmdLine);	
+					util.logValue('   script cmd line', definition.cmdLine);
 				}
 
 				let excluded: boolean = false;
@@ -480,7 +477,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					//
 					// Create taskfile node if needed
 					//
-					if (!taskFile) 
+					if (!taskFile)
 					{
 						taskFile = new TaskFile(this.extensionContext, folder, definition, each.source, relativePath);
 						folder.addTaskFile(taskFile);

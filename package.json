@@ -350,27 +350,43 @@
                     "default": true,
                     "description": "%config.taskExplorer.enableMake%"
                 },
-                "taskExplorer.pathToMake": {
-                    "type": "string",
-                    "description": "%config.taskExplorer.pathToMake%"
-                },
-                "taskExplorer.pathToAnt": {
-                    "type": "string",
-                    "description": "%config.taskExplorer.pathToAnt%"
+                "taskExplorer.enableWorkspace": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.enableWorkspace%"
                 },
                 "taskExplorer.enableAnsiconForAnt": {
                     "type": "boolean",
                     "default": true,
                     "description": "%config.taskExplorer.enableAnsiconForAnt%"
                 },
+                "taskExplorer.pathToAnt": {
+                    "type": "string",
+                    "description": "%config.taskExplorer.pathToAnt%"
+                },
                 "taskExplorer.pathToAnsicon": {
                     "type": "string",
                     "description": "%config.taskExplorer.pathToAnsicon%"
                 },
-                "taskExplorer.enableWorkspace": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "%config.taskExplorer.enableWorkspace%"
+                "taskExplorer.pathToMake": {
+                    "type": "string",
+                    "description": "%config.taskExplorer.pathToMake%"
+                },
+                "taskExplorer.pathToNsis": {
+                    "type": "string",
+                    "description": "%config.taskExplorer.pathToNsis%"
+                },
+                "taskExplorer.pathToPerl": {
+                    "type": "string",
+                    "description": "%config.taskExplorer.pathToPerl%"
+                },
+                "taskExplorer.pathToPython": {
+                    "type": "string",
+                    "description": "%config.taskExplorer.pathToPython%"
+                },
+                "taskExplorer.pathToRuby": {
+                    "type": "string",
+                    "description": "%config.taskExplorer.pathToRuby%"
                 },
                 "taskExplorer.debug": {
                     "type": "boolean",
@@ -398,12 +414,20 @@
                         "type": "string"
                     },
                     "default": [
-                        "**/ext/**",
                         "**/packages/**",
                         "**/test/**",
                         "**/.vscode-test/**",
                         "**/build/**",
-                        "**/vendor/**"
+                        "**/vendor/**",
+                        "**/out/**",
+                        "**/output/**",
+                        "**/release/**",
+                        "**/releases/**",
+                        "**/static/**",
+                        "**/target/**",
+                        "**/third_party/**",
+                        "**/dist/**",
+                        "**/docs/**"
                     ],
                     "description": "%config.taskExplorer.exclude%"
                 },

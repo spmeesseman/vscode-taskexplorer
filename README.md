@@ -93,9 +93,13 @@ The setting 'includeAnt' is a string or an array of strings used to define file 
 |`taskExplorer.enableWorkspace`|Enable/show vscode tasks|`true`|
 |`taskExplorer.enableMake`|Enable/show Makefile targets as tasks|`true`|
 |`taskExplorer.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
-|`taskExplorer.pathToMake`|The path to the make program, if not registered in system path|`'nmake' for Windows, 'make' for Unix`|",
 |`taskExplorer.pathToAnt`|The path to the ant program, if not registered in system path|`'ant.bat' for Windows, 'ant' for Unix`|",
 |`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path|`ansicon.exe`|",
+|`taskExplorer.pathToMake`|The path to the make program, if not registered in system path|`'nmake' for Windows, 'make' for Unix`|",
+|`taskExplorer.pathToNsis`|The path to the nsis program, if not registered in system path|`nsis.exe`|",
+|`taskExplorer.pathToPerl`|The path to the perl program, if not registered in system path|`perl`|",
+|`taskExplorer.pathToPython`|The path to the python program, if not registered in system path|`python`|",
+|`taskExplorer.pathToRuby`|The path to the ruby program, if not registered in system path|`ruby`|",
 |`taskExplorer.debug`|Turn on logging|`false`|
-|`taskExplorer.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/ext/**", "**/packages/**", "**/.vscode-test/**", "**/build**"]`|
+|`taskExplorer.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/packages/**", "**/test/**", "**/.vscode-test/**", "**/build/**", "**/vendor/**", "**/out/**", "**/output/**", "**/release/**", "**/releases/**", "**/static/**", "**/target/**", "**/third_party/**", "**/dist/**", "**/docs/**"]`|
 |`taskExplorer.includeAnt`|Configure glob patterns for files that should be included in ANT script detection|`["**/[Bb]uild.xml"]`|

@@ -20,13 +20,13 @@ let scriptTable = {
 		enabled: configuration.get('enableBash')
 	},
 	python: {
-		exec: 'python',
+		exec: configuration.get('pathToPython') ? configuration.get('pathToPython') : 'python',
 		type: 'python',
 		args: [],
 		enabled: configuration.get('enablePython')
 	},
 	ruby: {
-		exec: 'ruby',
+		exec: configuration.get('pathToRuby') ? configuration.get('pathToRuby') : 'ruby',
 		type: 'ruby',
 		args: [],
 		enabled: configuration.get('enableRuby')
@@ -38,7 +38,7 @@ let scriptTable = {
 		enabled: configuration.get('enablePowershell')
 	},
 	perl: {
-		exec: 'perl',
+		exec: configuration.get('pathToPerl') ? configuration.get('pathToPerl') : 'perl',
 		type: 'perl',
 		args: [],
 		enabled: configuration.get('enablePerl')
@@ -50,14 +50,14 @@ let scriptTable = {
 		enabled: configuration.get('enableBatch')
 	},
 	nsis: {
-		exec: 'nsis.exe',
+		exec: configuration.get('pathToNsis') ? configuration.get('pathToNsis') : 'nsis.exe',
 		type: 'nsis',
 		args: [],
 		enabled: configuration.get('enableNsis')
 	}
 };
 
-interface ScriptTaskDefinition extends TaskDefinition 
+interface ScriptTaskDefinition extends TaskDefinition
 {
 	scriptType: string;
 	cmdLine: string;
@@ -67,7 +67,7 @@ interface ScriptTaskDefinition extends TaskDefinition
 	requiresArgs?: boolean;
 }
 
-export class ScriptTaskProvider implements TaskProvider 
+export class ScriptTaskProvider implements TaskProvider
 {
 	constructor() {
 	}
@@ -82,13 +82,13 @@ export class ScriptTaskProvider implements TaskProvider
 }
 
 
-export function invalidateTasksCacheScript() 
+export function invalidateTasksCacheScript()
 {
 	cachedTasks = undefined;
 }
 
 
-async function detectScriptFiles(): Promise<Task[]> 
+async function detectScriptFiles(): Promise<Task[]>
 {
 
 	let emptyTasks: Task[] = [];
@@ -100,11 +100,11 @@ async function detectScriptFiles(): Promise<Task[]>
 		return emptyTasks;
 	}
 	try {
-		for (const folder of folders) 
+		for (const folder of folders)
 		{
 			let relativePattern = new RelativePattern(folder, '**/*.{sh,py,rb,ps1,pl,bat,cmd,vbs,ahk,nsi}'); //,**/*.{SH,PY,RB,PS1,PL,BAT,CMD,VBS,AHK,NSI}}');
 			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
-			for (const fpath of paths) 
+			for (const fpath of paths)
 			{
 				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
 					visitedFiles.add(fpath.fsPath);
@@ -129,7 +129,7 @@ async function detectScriptFiles(): Promise<Task[]>
 }
 
 
-export async function provideScriptFiles(): Promise<Task[]> 
+export async function provideScriptFiles(): Promise<Task[]>
 {
 	if (!cachedTasks) {
 		cachedTasks = await detectScriptFiles();
@@ -138,25 +138,26 @@ export async function provideScriptFiles(): Promise<Task[]>
 }
 
 
-function createScriptTask(scriptDef: any, folder: WorkspaceFolder, packageJsonUri: Uri, contents: string): Task 
+function createScriptTask(scriptDef: any, folder: WorkspaceFolder, packageJsonUri: Uri, contents: string): Task
 {
-	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string 
+	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string
 	{
 		let rootUri = folder.uri;
 		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.lastIndexOf('/') + 1);
 		return absolutePath.substring(rootUri.path.length + 1);
 	}
-	
+
 	let cwd = path.dirname(packageJsonUri.fsPath);
 	let fileName = path.basename(packageJsonUri.fsPath);
-	
+    let sep: string = (process.platform === 'win32' ? "\\" : "/");
+
 	let kind: ScriptTaskDefinition = {
 		type: 'script',
 		scriptType: scriptDef.type,
 		fileName: fileName,
 		scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
 		path: '',
-		cmdLine: scriptDef.exec,
+		cmdLine: (scriptDef.exec.indexOf(" ") !== -1 ? "\"" + scriptDef.exec + "\"" : scriptDef.exec),
 		requiresArgs: false
 	};
 
@@ -177,7 +178,7 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, packageJsonUr
 	if (relativePath.length) {
 		kind.path = relativePath;
 	}
-	
+
 	//
 	// Set current working dircetory in oprions to relative script dir
 	//
@@ -196,7 +197,6 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, packageJsonUr
 		}
 	}
 
-	let sep: string = (process.platform === 'win32' ? "\\" : "/");
 	//
 	// Add the file name to the command line following the exec.  Quote if ecessary.  Prepend './' as
 	// powershell script requires this
@@ -208,6 +208,6 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, packageJsonUr
 	// Create the shell execution object
 	//
 	let execution = new ShellExecution(kind.cmdLine, options);
-	
+
 	return new Task(kind, folder, fileName, scriptDef.type, execution, undefined);
 }
