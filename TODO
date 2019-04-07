@@ -1,5 +1,22 @@
 
+This file utilizes the ToDo+ extension (fabiospampinato.vscode-todo-plus)
+ALT+S - Started
+ALT+ENTER - Box
+ALT+C - Cancel
+ALT+D - Done
+CTL+SHIFT+A - Archive
+
 vscode-taskexplorer:
 
-    ☐ Discover gulp tasks in subdirectories
-    ☐ Discover grunt tasks in subdirectories
+    ☐ Discover gulp tasks in subdirectories @1d
+    ☐ Discover grunt tasks in subdirectories @1d
+    ☐ Group Ant files within the same directory into an additional node @1d
+    ☐ Better script argument support @2d
+    ☐ Update NSIS node svg @15m
+    ☐ Update Bash node svg @15m
+    ☐ Update Batch node svg @15m
+    ☐ Update Perl node svg @15m
+    ☐ Update Python node svg @15m
+    ☐ Update Powershell node svg @15m
+    ☐ Update Ruby node svg @15m
+    ☐ Resource specific excludes and includes settings
