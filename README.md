@@ -34,7 +34,7 @@
 
 ## Features
 
-* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/TODO?raw=true)
+* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/TODO)
 * v1.12 - Script Task Provider - Open and launch bash, batch, perl, powershell, python, ruby, and nsis scripts
 * v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
 * v1.10 - Makefile Task Provider - Open and launch C/C++ Makefile targets
