@@ -10,13 +10,13 @@ vscode-taskexplorer:
 
     ☐ Discover gulp tasks in subdirectories @1d
     ☐ Discover grunt tasks in subdirectories @1d
-    ☐ Group Ant files within the same directory into an additional node @1d
+    ☐ Group task types within the same directory into an additional node @1d
     ☐ Better script argument support @2d
-    ☐ Update NSIS node svg @15m
-    ☐ Update Bash node svg @15m
-    ☐ Update Batch node svg @15m
-    ☐ Update Perl node svg @15m
-    ☐ Update Python node svg @15m
-    ☐ Update Powershell node svg @15m
-    ☐ Update Ruby node svg @15m
+    ☐ Update NSIS node svg from embedded FileIcon @15m
+    ☐ Update Bash node svg from embedded FileIcon @15m
+    ☐ Update Batch node svg from embedded FileIcon @15m
+    ☐ Update Perl node svg from embedded FileIcon @15m
+    ☐ Update Python node svg from embedded FileIcon @15m
+    ☐ Update Powershell node svg from embedded FileIcon @15m
+    ☐ Update Ruby node svg from embedded FileIcon @15m
     ☐ Resource specific excludes and includes settings
