@@ -338,7 +338,7 @@
                 "taskExplorer.enableBash": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableShell%"
+                    "description": "%config.taskExplorer.enableBash%"
                 },
                 "taskExplorer.enableNsis": {
                     "type": "boolean",
