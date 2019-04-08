@@ -1,3 +1,10 @@
+## [1.12.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.3...v1.12.4) (2019-04-08)
+
+
+### Documentation
+
+* **readme:** fixed todo link ([a26bc4c](https://github.com/spmeesseman/vscode-taskexplorer/commit/a26bc4c))
+
 ## [1.12.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.2...v1.12.3) (2019-04-07)
 
 
