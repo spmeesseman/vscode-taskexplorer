@@ -414,20 +414,25 @@
                         "type": "string"
                     },
                     "default": [
-                        "**/packages/**",
-                        "**/test/**",
                         "**/.vscode-test/**",
+                        "**/bin/**", 
                         "**/build/**",
-                        "**/vendor/**",
+                        "**/CompiledOutput/**",
+                        "**/dist/**",
+                        "**/doc/**",
+                        "**/ext/**",
                         "**/out/**",
                         "**/output/**",
+                        "**/packages/**",
                         "**/release/**",
                         "**/releases/**",
+                        "**/samples/**",
+                        "**/sdks/**",
                         "**/static/**",
                         "**/target/**",
+                        "**/test/**",
                         "**/third_party/**",
-                        "**/dist/**",
-                        "**/docs/**"
+                        "**/vendor/**"
                     ],
                     "description": "%config.taskExplorer.exclude%"
                 },
