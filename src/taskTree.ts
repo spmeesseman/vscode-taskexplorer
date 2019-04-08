@@ -386,7 +386,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private buildTaskTree(tasks: Task[]): TaskFolder[] | TaskFile[] | NoScripts[]
+	private buildTaskTree(tasks: Task[]): TaskFolder[] | NoScripts[]
 	{
 		var taskCt = 0;
 		let folders: Map<String, TaskFolder> = new Map();
@@ -514,14 +514,45 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		// of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
 		// its entirley random as to when the individual providers report tasks to the engine
 		//
-		folders.forEach((folder, key) => {
+		let subfolders: Map<String, TaskFile> = new Map();
+		
+		folders.forEach((folder, key) => 
+		{
 			folder.taskFiles.forEach(each => {
 				each.scripts.sort(function(a, b) {
 					return a.label.localeCompare(b.label);
 				});
 			});
+
 			folder.taskFiles.sort(function(a, b) {
 				return a.taskSource.localeCompare(b.taskSource);
+			});
+
+			let prevTask: TaskFile;
+			let taskTypesRmv: Array<string> = [];
+
+			folder.taskFiles.forEach(each => 
+			{
+				if (prevTask && prevTask.taskSource === each.taskSource)
+				{
+					let subfolder: TaskFile = subfolders.get(each.taskSource);
+					if (!subfolder) {
+						subfolder = new TaskFile(this.extensionContext, folder, each.scripts[0].task.definition, each.taskSource, each.path); //(each.scripts[0].getFolder());
+						subfolders.set(each.taskSource, subfolder);
+						folder.addTaskFile(subfolder);
+						subfolder.addScript(prevTask);
+					}
+					subfolder.addScript(each);
+				}
+				prevTask = each;
+			});
+
+			folder.taskFiles.forEach(each => 
+			{
+				if (!each.isGroup && subfolders.get(each.taskSource))
+				{
+					folder.removeTaskFile(each);
+				}
 			});
 		});
 

@@ -14,6 +14,7 @@ export class TaskFile extends TreeItem
 	public scripts: TaskItem[] = [];
 	public fileName: string;
 	public readonly taskSource: string;
+	public readonly isGroup: boolean;
 
 	static getLabel(taskDef: TaskDefinition, source: string, relativePath: string): string
 	{
@@ -117,7 +118,7 @@ export class TaskFile extends TreeItem
 	}
 
 
-	constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string)
+	constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean)
 	{
 		super(TaskFile.getLabel(taskDef, source, relativePath), TreeItemCollapsibleState.Collapsed);
 
@@ -126,6 +127,7 @@ export class TaskFile extends TreeItem
 		this.taskSource = source;
 		this.contextValue = 'taskFile' + util.properCase(this.taskSource);
 		this.fileName = TaskFile.getFileNameFromSource(source, folder, taskDef, relativePath, true);
+		this.isGroup = (group === true);
 
 		if (relativePath) {
 			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, this.fileName));
@@ -145,7 +147,7 @@ export class TaskFile extends TreeItem
 		}
 	}
 
-	addScript(script: TaskItem) {
+	addScript(script: any) {
 		this.scripts.push(script);
 	}
 }
