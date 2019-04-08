@@ -40,7 +40,7 @@ export function isExcluded(uriPath: string)
 {
     function testForExclusionPattern(path: string, pattern: string): boolean 
     {
-        return minimatch(path, pattern, { dot: true });
+        return minimatch(path, pattern, { dot: true, nocase: true });
     }
 
     let exclude = configuration.get<string | string[]>('exclude');
