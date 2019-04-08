@@ -16,7 +16,7 @@ export class TaskFile extends TreeItem
 	public readonly taskSource: string;
 	public readonly isGroup: boolean;
 
-	static getLabel(taskDef: TaskDefinition, source: string, relativePath: string): string
+	static getLabel(taskDef: TaskDefinition, source: string, relativePath: string, group: boolean): string
 	{
 		let label = source;
 
@@ -24,17 +24,19 @@ export class TaskFile extends TreeItem
 			label = 'vscode';
 		}
 
-		if (source === 'ant') {
-			if (taskDef.fileName && taskDef.fileName !== 'build.xml' && taskDef.fileName !== 'Build.xml') {
-				if (relativePath.length > 0 && relativePath !== '.vscode') {
-					return label + ' (' + relativePath.substring(0, relativePath.length - 1).toLowerCase() + '/' + taskDef.fileName.toLowerCase() + ')';
+		if (group !== true) {
+			if (source === 'ant') {
+				if (taskDef.fileName && taskDef.fileName !== 'build.xml' && taskDef.fileName !== 'Build.xml') {
+					if (relativePath.length > 0 && relativePath !== '.vscode') {
+						return label + ' (' + relativePath.substring(0, relativePath.length - 1).toLowerCase() + '/' + taskDef.fileName.toLowerCase() + ')';
+					}
+					return (label + ' (' + taskDef.fileName.toLowerCase() + ')');
 				}
-				return (label + ' (' + taskDef.fileName.toLowerCase() + ')');
 			}
-		}
-
-		if (relativePath.length > 0 && relativePath !== '.vscode') {
-			return label + ' (' + relativePath.substring(0, relativePath.length - 1).toLowerCase() + ')';
+		
+			if (relativePath.length > 0 && relativePath !== '.vscode') {
+				return label + ' (' + relativePath.substring(0, relativePath.length - 1).toLowerCase() + ')';
+			}
 		}
 
 		return label.toLowerCase();
@@ -120,7 +122,7 @@ export class TaskFile extends TreeItem
 
 	constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean)
 	{
-		super(TaskFile.getLabel(taskDef, source, relativePath), TreeItemCollapsibleState.Collapsed);
+		super(TaskFile.getLabel(taskDef, source, relativePath, group), TreeItemCollapsibleState.Collapsed);
 
 		this.folder = folder;
 		this.path = relativePath;

@@ -529,15 +529,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			});
 
 			let prevTask: TaskFile;
-			let taskTypesRmv: Array<string> = [];
-
 			folder.taskFiles.forEach(each => 
 			{
 				if (prevTask && prevTask.taskSource === each.taskSource)
 				{
 					let subfolder: TaskFile = subfolders.get(each.taskSource);
 					if (!subfolder) {
-						subfolder = new TaskFile(this.extensionContext, folder, each.scripts[0].task.definition, each.taskSource, each.path); //(each.scripts[0].getFolder());
+						subfolder = new TaskFile(this.extensionContext, folder, each.scripts[0].task.definition, each.taskSource, each.path, true); //(each.scripts[0].getFolder());
 						subfolders.set(each.taskSource, subfolder);
 						folder.addTaskFile(subfolder);
 						subfolder.addScript(prevTask);
@@ -547,12 +545,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				prevTask = each;
 			});
 
-			folder.taskFiles.forEach(each => 
-			{
-				if (!each.isGroup && subfolders.get(each.taskSource))
-				{
-					folder.removeTaskFile(each);
+			let taskTypesRmv: Array<TaskFile> = [];
+			folder.taskFiles.forEach(each => {
+				if (!each.isGroup && subfolders.get(each.taskSource)) {
+					taskTypesRmv.push(each);
 				}
+			});
+
+			taskTypesRmv.forEach(each => {
+				folder.removeTaskFile(each);
+			});
+
+			//
+			// Resort after making adds/removes
+			//
+			folder.taskFiles.sort(function(a, b) {
+				return a.taskSource.localeCompare(b.taskSource);
 			});
 		});
 
