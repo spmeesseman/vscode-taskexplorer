@@ -1,3 +1,15 @@
+## [1.12.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.5...v1.12.6) (2019-04-08)
+
+
+### Bug Fixes
+
+* make glob pattern excludes case insensitive ([4104252](https://github.com/spmeesseman/vscode-taskexplorer/commit/4104252))
+
+
+### Documentation
+
+* **readme:** update info and default path excludes [skip ci] ([e88471f](https://github.com/spmeesseman/vscode-taskexplorer/commit/e88471f))
+
 ## [1.12.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.4...v1.12.5) (2019-04-08)
 
 
