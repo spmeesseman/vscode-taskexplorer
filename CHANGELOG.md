@@ -1,3 +1,22 @@
+## [1.12.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.4...v1.12.5) (2019-04-08)
+
+
+### Bug Fixes
+
+* **settings:** fix blank label ([e0d34d4](https://github.com/spmeesseman/vscode-taskexplorer/commit/e0d34d4))
+
+
+### Code Refactoring
+
+* lighten ant icon in file nodes to gray ([1ea196d](https://github.com/spmeesseman/vscode-taskexplorer/commit/1ea196d))
+* sort task file nodes by task source ([a39dbf2](https://github.com/spmeesseman/vscode-taskexplorer/commit/a39dbf2))
+
+
+### Documentation
+
+* **readme:** reorder badges, place gk badge next to dep status badges ([de16924](https://github.com/spmeesseman/vscode-taskexplorer/commit/de16924))
+* **todo:** update info ([a91d283](https://github.com/spmeesseman/vscode-taskexplorer/commit/a91d283))
+
 ## [1.12.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.3...v1.12.4) (2019-04-08)
 
 
