@@ -391,10 +391,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		var taskCt = 0;
 		let folders: Map<String, TaskFolder> = new Map();
 		let files: Map<String, TaskFile> = new Map();
-
 		let folder = null;
 		let taskFile = null;
 
+		//
+		// Loop through each task provided by the engine and build a task tree
+		//
 		tasks.forEach(each =>
 		{
 			taskCt++;
@@ -428,11 +430,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					}
 				}
 
+				//
+				// Create an id so group tasks together with
+				//
 				let id = each.source + ':' + path.join(each.scope.name, relativePath);
 				if (definition.fileName && !definition.scriptFile) {
 					id = path.join(id, definition.fileName);
 				}
 
+				//
+				// Logging
+				//
 				util.logValue('   scope.name', each.scope.name);
 				util.logValue('   scope.uri.path', each.scope.uri.path);
 				util.logValue('   scope.uri.fsPath', each.scope.uri.fsPath);
@@ -463,6 +471,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					util.logValue('   script cmd line', definition.cmdLine);
 				}
 
+				//
+				// Check excluded globs before further processing
+				//
 				let excluded: boolean = false;
 				if (relativePath) {
 					excluded = util.isExcluded(path.join(each.scope.uri.path, relativePath));
@@ -498,7 +509,23 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			}
 		});
 
-		//if (folders.size === 1) {
+		//
+		// Sort nodes.  By default the project folders are sorted in the same order as that
+		// of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
+		// its entirley random as to when the individual providers report tasks to the engine
+		//
+		folders.forEach((folder, key) => {
+			folder.taskFiles.forEach(each => {
+				each.scripts.sort(function(a, b) {
+					return a.label.localeCompare(b.label);
+				});
+			});
+			folder.taskFiles.sort(function(a, b) {
+				return a.taskSource.localeCompare(b.taskSource);
+			});
+		});
+
+		//if (folders.size === 1) { // return just fi
 		//	return [...packages.values()];
 		//}
 		return [...folders.values()];
