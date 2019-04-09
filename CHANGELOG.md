@@ -1,3 +1,22 @@
+# [1.13.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.6...v1.13.0) (2019-04-09)
+
+
+### Bug Fixes
+
+* multi-root groupings not working for some tasks after feature merge ([a721e66](https://github.com/spmeesseman/vscode-taskexplorer/commit/a721e66))
+
+
+### Documentation
+
+* **todo:** update [skip ci] ([78125ee](https://github.com/spmeesseman/vscode-taskexplorer/commit/78125ee))
+* **todo:** update [skip ci] ([ba4669e](https://github.com/spmeesseman/vscode-taskexplorer/commit/ba4669e))
+* **todo:** update [skip ci] ([0a422b1](https://github.com/spmeesseman/vscode-taskexplorer/commit/0a422b1))
+
+
+### Features
+
+* add taskfile group nodes ([53ac139](https://github.com/spmeesseman/vscode-taskexplorer/commit/53ac139))
+
 ## [1.12.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.5...v1.12.6) (2019-04-08)
 
 
