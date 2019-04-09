@@ -8,18 +8,19 @@ CTL+SHIFT+A - Archive
 
 Tasks:
 
-    ☐ Discover gulp tasks in subdirectories @1d @high
-    ☐ Discover grunt tasks in subdirectories @1d @high
     ☐ Group task types within the same directory into an additional node @high @1d @started(19-04-08 19:11)
-    ☐ Script argument support @2d @low
-    ☐ Update NSIS node svg from embedded FileIcon @15m @low
-    ☐ Update Bash node svg from embedded FileIcon @15m @low
-    ☐ Update Batch node svg from embedded FileIcon @15m @low
-    ☐ Update Perl node svg from embedded FileIcon @15m @low
-    ☐ Update Python node svg from embedded FileIcon @15m @low
-    ☐ Update Powershell node svg from embedded FileIcon @15m @low
-    ☐ Update Ruby node svg from embedded FileIcon @15m @low
-    ☐ Resource specific excludes and includes settings @low
-    ☐ Test Istanbul with fs, remove original-fs type @4h @low
-    ☐ Show tasks status in status bar @4h @low 
-    ☐ Show # of running tasks badge on sidebar view icon @4h @low
+    ☐ Script argument support @low @15m
+    ☐ Update NSIS node svg from embedded FileIcon @low @15m
+    ☐ Update Bash node svg from embedded FileIcon @low @15m
+    ☐ Update Batch node svg from embedded FileIcon @low @15m
+    ☐ Update Perl node svg from embedded FileIcon @low @15m
+    ☐ Update Python node svg from embedded FileIcon @low @15m
+    ☐ Update Powershell node svg from embedded FileIcon @low @15m
+    ☐ Update Ruby node svg from embedded FileIcon @low @15m
+    ☐ Discover gulp tasks in subdirectories @high @1d
+    ☐ Discover grunt tasks in subdirectories @high @1d
+    ☐ Resource specific excludes and includes settings @low @4h
+    ☐ Test Istanbul with fs, remove original-fs type @4h 
+    ☐ Show tasks status in status bar @low @4h
+    ☐ Show # of running tasks badge on sidebar view @low @4h
+    ☐ Yarn support for package.json f@low @low @2h
