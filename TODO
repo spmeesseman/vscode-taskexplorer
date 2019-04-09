@@ -21,3 +21,5 @@ Tasks:
     ☐ Update Ruby node svg from embedded FileIcon @15m @low
     ☐ Resource specific excludes and includes settings @low
     ☐ Test Istanbul with fs, remove original-fs type @4h @low
+    ☐ Show tasks status in status bar @4h @low 
+    ☐ Show # of running tasks badge on sidebar view icon @4h @low
