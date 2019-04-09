@@ -31,10 +31,12 @@
 
 * Visual Studio Code v1.30 or higher
 * For npm, grunt, and gulp tasks, the 'Auto Detect' vscode setting must be turned 'On' for each respective task provider.
+* Some task types inherit the associated file type icon from VSCode.  You must have an icon set installed and active (for example, the [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme)) for these task types to display icons in the tree nodes.
 
 ## Features
 
 * Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/TODO)
+* v1.13 - Multiple task files of the same type are now placed within a group node for less clutter in folder level nodes
 * v1.12 - Script Task Provider - Open and launch bash, batch, perl, powershell, python, ruby, and nsis scripts
 * v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
 * v1.10 - Makefile Task Provider - Open and launch C/C++ Makefile targets
