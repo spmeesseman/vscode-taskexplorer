@@ -8,19 +8,24 @@ CTL+SHIFT+A - Archive
 
 Tasks:
 
-    ☐ Group task types within the same directory into an additional node @high @1d @started(19-04-08 19:11)
-    ☐ Script argument support @low @15m
-    ☐ Update NSIS node svg from embedded FileIcon @low @15m
-    ☐ Update Bash node svg from embedded FileIcon @low @15m
-    ☐ Update Batch node svg from embedded FileIcon @low @15m
-    ☐ Update Perl node svg from embedded FileIcon @low @15m
-    ☐ Update Python node svg from embedded FileIcon @low @15m
-    ☐ Update Powershell node svg from embedded FileIcon @low @15m
-    ☐ Update Ruby node svg from embedded FileIcon @low @15m
-    ☐ Discover gulp tasks in subdirectories @high @1d
-    ☐ Discover grunt tasks in subdirectories @high @1d
-    ☐ Resource specific excludes and includes settings @low @4h
-    ☐ Test Istanbul with fs, remove original-fs type @4h 
-    ☐ Show tasks status in status bar @low @4h
-    ☐ Show # of running tasks badge on sidebar view @low @4h
-    ☐ Yarn support for package.json f@low @low @2h
+    Features:
+
+        ✔ Group task types within the same directory into an additional node @high @1d @started(19-04-08 19:11) @done(19-04-09 12:51) @lasted(17h40m10s)
+        ☐ Script argument support @low @15m
+        ☐ Show tasks status in status bar @low @4h
+        ☐ Show # of running tasks badge on sidebar view @low @4h
+        ☐ Yarn support for package.json @low @2h
+        ☐ Support for VSCode compound tasks @low @8h
+
+    Style:
+        ☐ Update NSIS node svg from embedded FileIcon @low @15m
+        ☐ Update Bash node svg from embedded FileIcon @low @15m
+        ☐ Update Batch node svg from embedded FileIcon @low @15m
+        ☐ Update Perl node svg from embedded FileIcon @low @15m
+        ☐ Update Python node svg from embedded FileIcon @low @15m
+        ☐ Update Powershell node svg from embedded FileIcon @low @15m
+        ☐ Update Ruby node svg from embedded FileIcon @low @15m
+
+    Tests:
+
+        ☐ Test Istanbul with fs, remove original-fs type @low @4h 
