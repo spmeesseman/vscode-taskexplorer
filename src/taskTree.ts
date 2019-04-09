@@ -533,10 +533,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			{
 				if (prevTask && prevTask.taskSource === each.taskSource)
 				{
-					let subfolder: TaskFile = subfolders.get(each.taskSource);
+					let id = folder.label + each.taskSource;
+					let subfolder: TaskFile = subfolders.get(id);
 					if (!subfolder) {
 						subfolder = new TaskFile(this.extensionContext, folder, each.scripts[0].task.definition, each.taskSource, each.path, true); //(each.scripts[0].getFolder());
-						subfolders.set(each.taskSource, subfolder);
+						subfolders.set(id, subfolder);
 						folder.addTaskFile(subfolder);
 						subfolder.addScript(prevTask);
 					}
@@ -547,7 +548,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 			let taskTypesRmv: Array<TaskFile> = [];
 			folder.taskFiles.forEach(each => {
-				if (!each.isGroup && subfolders.get(each.taskSource)) {
+				let id = folder.label + each.taskSource;
+				if (!each.isGroup && subfolders.get(id)) {
 					taskTypesRmv.push(each);
 				}
 			});
