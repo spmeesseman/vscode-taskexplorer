@@ -53,7 +53,7 @@ export class TaskItem extends TreeItem
 			};
 		}
 
-		this.tooltip = task.name;
+		this.tooltip = 'Open ' + task.name;
 	}
 
 	getFolder(): WorkspaceFolder {
