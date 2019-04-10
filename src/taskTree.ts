@@ -286,7 +286,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 	private async runInstall(taskFile: TaskFile)
 	{
-		if (taskFile.label === 'npm')
+		if (taskFile.label.startsWith('npm'))
 		{
 			let options = {
 				"cwd": path.dirname(taskFile.resourceUri.fsPath)
