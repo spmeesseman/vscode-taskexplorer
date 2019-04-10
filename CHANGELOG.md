@@ -1,3 +1,27 @@
+## [1.13.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.0...v1.13.1) (2019-04-10)
+
+
+### Bug Fixes
+
+* node icon for ant tasks is not centered ([532f4e8](https://github.com/spmeesseman/vscode-taskexplorer/commit/532f4e8))
+
+
+### Build System
+
+* **conventional-changelog-spm:** update to 1.1.4 ([7a1ee94](https://github.com/spmeesseman/vscode-taskexplorer/commit/7a1ee94))
+
+
+### Documentation
+
+* **todo:** update [skip ci] ([e7b9933](https://github.com/spmeesseman/vscode-taskexplorer/commit/e7b9933))
+* **readme:** update 1.13 info, add note about icon set ([92be78c](https://github.com/spmeesseman/vscode-taskexplorer/commit/92be78c))
+* **readme:** update screenshots ([09b7f1f](https://github.com/spmeesseman/vscode-taskexplorer/commit/09b7f1f))
+
+
+### Minor Features
+
+* add "Open [taskname]" tooltip when hover over task nodes ([7ebe446](https://github.com/spmeesseman/vscode-taskexplorer/commit/7ebe446))
+
 # [1.13.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.6...v1.13.0) (2019-04-09)
 
 
