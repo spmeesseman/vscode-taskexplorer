@@ -23,15 +23,15 @@
 
 ## Screenshots
 
-|Sidebar View|Explorer Tray|Supports most task types|
+Original Explorer Tray|Sidebar View (v1.7)|Task Type Groups (v1.13)|
 |-|-|-|
-|![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview4.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|
+|![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview1.png?raw=true)|
 
 ## Requirements
 
 * Visual Studio Code v1.30 or higher
-* For npm, grunt, and gulp tasks, the 'Auto Detect' vscode setting must be turned 'On' for each respective task provider.
-* Some task types inherit the associated file type icon from VSCode.  You must have an icon set installed and active (for example, the [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme)) for these task types to display icons in the tree nodes.
+* To display npm, grunt, and gulp tasks, the 'Auto Detect' setting must be turned 'On' in VSCode for each respective task provider.
+* Some task types inherit the associated file type icon from VSCode when displayed in the task tree.  You must have an icon set installed and active (for example, the [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme)) for these task types to display icons in the tree nodes.
 
 ## Features
 
