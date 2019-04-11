@@ -1,3 +1,19 @@
+## [1.13.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.2...v1.13.3) (2019-04-11)
+
+
+### Bug Fixes
+
+* task tree does not auto refresh when enabling/disabling certain task types in settings ([256df86](https://github.com/spmeesseman/vscode-taskexplorer/commit/256df86))
+* task tree doesnt refresh after editing a task file for most task types ([64208a2](https://github.com/spmeesseman/vscode-taskexplorer/commit/64208a2))
+* tree refreshes multiple times when settings change ([2fdd0ea](https://github.com/spmeesseman/vscode-taskexplorer/commit/2fdd0ea))
+
+
+### Documentation
+
+* **todo:** update ([a80380f](https://github.com/spmeesseman/vscode-taskexplorer/commit/a80380f))
+* **todo:** update info ([e578f6d](https://github.com/spmeesseman/vscode-taskexplorer/commit/e578f6d))
+* **todo:** updated info ([abfee5f](https://github.com/spmeesseman/vscode-taskexplorer/commit/abfee5f))
+
 ## [1.13.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.1...v1.13.2) (2019-04-11)
 
 
