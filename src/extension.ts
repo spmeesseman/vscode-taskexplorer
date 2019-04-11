@@ -78,49 +78,56 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 				//
 				let d = workspace.onDidChangeConfiguration(e => 
 				{
-						if (e.affectsConfiguration('taskExplorer.exclude')) 
-						{
-								
+						let refresh: boolean = false;
+
+						if (e.affectsConfiguration('taskExplorer.exclude')) {
+								refresh = true;
 						}
 
-            if (e.affectsConfiguration('taskExplorer.exclude') || e.affectsConfiguration('taskExplorer.enableAnt') ||
-                e.affectsConfiguration('taskExplorer.enableBash') || e.affectsConfiguration('taskExplorer.enableBatch') ||
+						if (e.affectsConfiguration('taskExplorer.enableAnt') || e.affectsConfiguration('taskExplorer.includeAnt')) {
+								//registerFileWatcherAnt(context, configuration.get<boolean>('enableAnt'));
+								refresh = true;
+						}
+
+            if (e.affectsConfiguration('taskExplorer.enableBash') || e.affectsConfiguration('taskExplorer.enableBatch') ||
                 e.affectsConfiguration('taskExplorer.enableMake') || e.affectsConfiguration('taskExplorer.enableNpm') ||
                 e.affectsConfiguration('taskExplorer.enableGrunt') || e.affectsConfiguration('taskExplorer.enableGulp') ||
 								e.affectsConfiguration('taskExplorer.enablePerl') || e.affectsConfiguration('taskExplorer.enablePowershell') ||
                 e.affectsConfiguration('taskExplorer.enablePython') || e.affectsConfiguration('taskExplorer.enableRuby') ||
-                e.affectsConfiguration('taskExplorer.enableTsc') || e.affectsConfiguration('taskExplorer.enableWorkspace') ||
-								e.affectsConfiguration('taskExplorer.includeAnt')) 
+                e.affectsConfiguration('taskExplorer.enableTsc') || e.affectsConfiguration('taskExplorer.enableWorkspace')) 
 						{
-                invalidateTasksCache();
-                if (treeDataProvider) {
-                    treeDataProvider.refresh();
-                }
-                if (treeDataProvider2) {
-                    treeDataProvider2.refresh();
-                }
+								refresh = true;
 						}
 						
 						if (e.affectsConfiguration('taskExplorer.enableSideBar')) 
 						{
-                if (configuration.get<boolean>('enableSideBar')) {
+								if (configuration.get<boolean>('enableSideBar')) 
+								{
                     if (treeDataProvider) {
-                        treeDataProvider.refresh();
-                    } else {
+                        refresh = true;
+										} 
+										else {
                         treeDataProvider = registerExplorer('taskExplorerSideBar', context);
                     }
                 }
 						}
 						
-            if (e.affectsConfiguration('taskExplorer.enableExplorerView')) {
-                if (configuration.get<boolean>('enableExplorerView')) {
+						if (e.affectsConfiguration('taskExplorer.enableExplorerView')) 
+						{
+								if (configuration.get<boolean>('enableExplorerView')) 
+								{
                     if (treeDataProvider2) {
-                        treeDataProvider2.refresh();
-                    } else {
+												refresh = true;
+										} 
+										else {
                         treeDataProvider2 = registerExplorer('taskExplorer', context);
                     }
                 }
-            }
+						}
+						
+						if (refresh) {
+							refreshTree();
+						}
 				});
 				
         context.subscriptions.push(d);
@@ -132,7 +139,7 @@ async function _activate(context: ExtensionContext, disposables: Disposable[])
 }
 
 
-function refresh()
+function refreshTree()
 {
 		invalidateTasksCache();
 		if (treeDataProvider) {
@@ -141,6 +148,8 @@ function refresh()
 		if (treeDataProvider2) {
 				treeDataProvider2.refresh();
 		}
+
+		return;
 }
 
 
