@@ -23,7 +23,7 @@
 
 ## Screenshots
 
-Original Explorer Tray|Sidebar View (v1.7)|Task Type Groups (v1.13)|
+|Original Explorer Tray|Sidebar View (v1.7)|Task Type Groups (v1.13)|
 |-|-|-|
 |![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview1.png?raw=true)|
 
