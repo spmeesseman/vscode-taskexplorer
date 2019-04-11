@@ -1,3 +1,20 @@
+## [1.13.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.1...v1.13.2) (2019-04-11)
+
+
+### Bug Fixes
+
+* cant run install command on npm nodes that are not in the project root ([2b0c091](https://github.com/spmeesseman/vscode-taskexplorer/commit/2b0c091))
+
+
+### Code Refactoring
+
+* include deactivate() implementation in extension ([e5aed57](https://github.com/spmeesseman/vscode-taskexplorer/commit/e5aed57))
+
+
+### Documentation
+
+* **readme:** fix screenshot table layout ([3ef94e7](https://github.com/spmeesseman/vscode-taskexplorer/commit/3ef94e7))
+
 ## [1.13.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.0...v1.13.1) (2019-04-10)
 
 
