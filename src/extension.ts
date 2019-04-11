@@ -15,34 +15,43 @@ export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
 export let logOutputChannel: OutputChannel | undefined;
 
-function invalidateTasksCache() {
+
+function invalidateTasksCache() 
+{
     invalidateTasksCacheAnt();
     invalidateTasksCacheMake();
     invalidateTasksCacheScript();
 }
 
-export async function activate(context: ExtensionContext) {
+
+export async function activate(context: ExtensionContext) 
+{
     const disposables: Disposable[] = [];
     context.subscriptions.push(new Disposable(() => Disposable.from(...disposables).dispose()));
 
     await _activate(context, disposables).catch(err => console.error(err));
 }
 
-async function _activate(context: ExtensionContext, disposables: Disposable[]) {
-    logOutputChannel = window.createOutputChannel('Task Explorer');
-    disposables.push(logOutputChannel);
-    commands.registerCommand('taskExplorer.showOutput', () => logOutputChannel.show());
 
+async function _activate(context: ExtensionContext, disposables: Disposable[]) 
+{
+    logOutputChannel = window.createOutputChannel('Task Explorer');
+		disposables.push(logOutputChannel);
+		
+		//
+		// Set up a log in the Output window
+		//
+    commands.registerCommand('taskExplorer.showOutput', () => logOutputChannel.show());
     const showOutput = configuration.get<boolean>('showOutput');
     if (showOutput) {
         logOutputChannel.show();
     }
 
-    const tryInit = async () => {
+    const tryInit = async() => {
         log('');
         log('Init extension');
 
-        register(context);
+        registerTaskProviders(context);
 
         if (configuration.get<boolean>('enableSideBar')) {
             treeDataProvider = registerExplorer('taskExplorerSideBar', context);
@@ -51,24 +60,38 @@ async function _activate(context: ExtensionContext, disposables: Disposable[]) {
             treeDataProvider2 = registerExplorer('taskExplorer', context);
         }
 
-        let d = workspace.onDidChangeConfiguration(e => {
-            if (
-                e.affectsConfiguration('taskExplorer.exclude') ||
-                e.affectsConfiguration('taskExplorer.enableAnt') ||
-                e.affectsConfiguration('taskExplorer.enableBash') ||
-                e.affectsConfiguration('taskExplorer.enableBatch') ||
-                e.affectsConfiguration('taskExplorer.enableMake') ||
-                e.affectsConfiguration('taskExplorer.enableNpm') ||
-                e.affectsConfiguration('taskExplorer.enableGrunt') ||
-                e.affectsConfiguration('taskExplorer.enableGulp') ||
-								e.affectsConfiguration('taskExplorer.enablePerl') ||
-								e.affectsConfiguration('taskExplorer.enablePowershell') ||
-                e.affectsConfiguration('taskExplorer.enablePython') ||
-								e.affectsConfiguration('taskExplorer.enableRuby') ||
-                e.affectsConfiguration('taskExplorer.enableTsc') ||
-								e.affectsConfiguration('taskExplorer.enableWorkspace') ||
-								e.affectsConfiguration('taskExplorer.includeAnt')
-            ) {
+				//
+				// Register file type watchers
+				//
+				registerFileWatcherAnt(context);
+				registerFileWatcher(context, '**/package.json');
+				registerFileWatcher(context, '**/.vscode/tasks.json');
+				
+				//
+				// Refresh tree when folders are added/removed from the workspace
+				//
+        let workspaceWatcher = workspace.onDidChangeWorkspaceFolders(_e => invalidateScriptCaches());
+				context.subscriptions.push(workspaceWatcher);
+				
+				//
+				// Register configurations/settings change watcher
+				//
+				let d = workspace.onDidChangeConfiguration(e => 
+				{
+						if (e.affectsConfiguration('taskExplorer.exclude')) 
+						{
+								
+						}
+
+            if (e.affectsConfiguration('taskExplorer.exclude') || e.affectsConfiguration('taskExplorer.enableAnt') ||
+                e.affectsConfiguration('taskExplorer.enableBash') || e.affectsConfiguration('taskExplorer.enableBatch') ||
+                e.affectsConfiguration('taskExplorer.enableMake') || e.affectsConfiguration('taskExplorer.enableNpm') ||
+                e.affectsConfiguration('taskExplorer.enableGrunt') || e.affectsConfiguration('taskExplorer.enableGulp') ||
+								e.affectsConfiguration('taskExplorer.enablePerl') || e.affectsConfiguration('taskExplorer.enablePowershell') ||
+                e.affectsConfiguration('taskExplorer.enablePython') || e.affectsConfiguration('taskExplorer.enableRuby') ||
+                e.affectsConfiguration('taskExplorer.enableTsc') || e.affectsConfiguration('taskExplorer.enableWorkspace') ||
+								e.affectsConfiguration('taskExplorer.includeAnt')) 
+						{
                 invalidateTasksCache();
                 if (treeDataProvider) {
                     treeDataProvider.refresh();
@@ -76,8 +99,10 @@ async function _activate(context: ExtensionContext, disposables: Disposable[]) {
                 if (treeDataProvider2) {
                     treeDataProvider2.refresh();
                 }
-            }
-            if (e.affectsConfiguration('taskExplorer.enableSideBar')) {
+						}
+						
+						if (e.affectsConfiguration('taskExplorer.enableSideBar')) 
+						{
                 if (configuration.get<boolean>('enableSideBar')) {
                     if (treeDataProvider) {
                         treeDataProvider.refresh();
@@ -85,7 +110,8 @@ async function _activate(context: ExtensionContext, disposables: Disposable[]) {
                         treeDataProvider = registerExplorer('taskExplorerSideBar', context);
                     }
                 }
-            }
+						}
+						
             if (e.affectsConfiguration('taskExplorer.enableExplorerView')) {
                 if (configuration.get<boolean>('enableExplorerView')) {
                     if (treeDataProvider2) {
@@ -95,7 +121,8 @@ async function _activate(context: ExtensionContext, disposables: Disposable[]) {
                     }
                 }
             }
-        });
+				});
+				
         context.subscriptions.push(d);
 
         log('   Task Explorer activated');
@@ -104,72 +131,83 @@ async function _activate(context: ExtensionContext, disposables: Disposable[]) {
     await tryInit();
 }
 
-function register(context: ExtensionContext) {
-    function invalidateScriptCaches() {
-        invalidateTasksCache();
-        if (configuration.get<boolean>('enableSideBar') && treeDataProvider) {
-            treeDataProvider.refresh();
-        }
-        if (configuration.get<boolean>('enableExplorerView') && treeDataProvider2) {
-            treeDataProvider2.refresh();
-        }
-    }
 
-    if (workspace.workspaceFolders) {
-        let watcher = workspace.createFileSystemWatcher('**/[Bb]uild.xml');
-        watcher.onDidChange(_e => invalidateScriptCaches());
-        watcher.onDidDelete(_e => invalidateScriptCaches());
-        watcher.onDidCreate(_e => invalidateScriptCaches());
-        context.subscriptions.push(watcher);
+function refresh()
+{
+		invalidateTasksCache();
+		if (treeDataProvider) {
+				treeDataProvider.refresh();
+		}
+		if (treeDataProvider2) {
+				treeDataProvider2.refresh();
+		}
+}
 
-        let includeAnt: string[] = configuration.get('includeAnt');
-        if (includeAnt && includeAnt.length > 0) {
-            for (var i = 0; i < includeAnt.length; i++) {
-                let cwatcher = workspace.createFileSystemWatcher(includeAnt[i]);
-                cwatcher.onDidChange(_e => invalidateScriptCaches());
-                cwatcher.onDidDelete(_e => invalidateScriptCaches());
-                cwatcher.onDidCreate(_e => invalidateScriptCaches());
-                context.subscriptions.push(cwatcher);
-            }
-        }
 
-        let watcher2 = workspace.createFileSystemWatcher('**/package.json');
-        watcher2.onDidChange(_e => invalidateScriptCaches());
-        watcher2.onDidDelete(_e => invalidateScriptCaches());
-        watcher2.onDidCreate(_e => invalidateScriptCaches());
-        context.subscriptions.push(watcher2);
+function registerTaskProviders(context: ExtensionContext) 
+{
+		//
+		// Internal Task Providers
+		//
+		// These tak types are provided internally by the extension.  Some task types (npm, grunt,
+		//  gulp) are provided by VSCode itself
+		//
+		workspace.registerTaskProvider('ant', new AntTaskProvider());
+		workspace.registerTaskProvider('make', new MakeTaskProvider());
+		workspace.registerTaskProvider('script', new ScriptTaskProvider());
 
-        let watcher3 = workspace.createFileSystemWatcher('**/.vscode/tasks.json');
-        watcher3.onDidChange(_e => invalidateScriptCaches());
-        watcher3.onDidDelete(_e => invalidateScriptCaches());
-        watcher3.onDidCreate(_e => invalidateScriptCaches());
-        context.subscriptions.push(watcher3);
-
-        let workspaceWatcher = workspace.onDidChangeWorkspaceFolders(_e => invalidateScriptCaches());
-        context.subscriptions.push(workspaceWatcher);
-
-        let provider = new AntTaskProvider();
-        let disposable = workspace.registerTaskProvider('ant', provider);
-
-        let providerMake = new MakeTaskProvider();
-        let disposableMake = workspace.registerTaskProvider('make', providerMake);
-
-        let providerScript = new ScriptTaskProvider();
-        let disposableScript = workspace.registerTaskProvider('script', providerScript);
-    }
     return;
 }
 
-function registerExplorer(name: string, context: ExtensionContext): TaskTreeDataProvider | undefined {
-    if (workspace.workspaceFolders) {
+
+function registerFileWatcherAnt(context: ExtensionContext, enabled?: boolean)
+{
+		let includeAnt: string[] = configuration.get('includeAnt');
+		registerFileWatcher(context, '**/[Bb]uild.xml');
+		if (includeAnt && includeAnt.length > 0) {
+				for (var i = 0; i < includeAnt.length; i++) {
+						registerFileWatcher(context, includeAnt[i]);
+				}
+		}
+}
+
+
+function registerFileWatcher(context: ExtensionContext, fileBlob: string, enabled?: boolean)
+{
+		let watcher = workspace.createFileSystemWatcher(fileBlob);
+		watcher.onDidChange(_e => invalidateScriptCaches());
+		watcher.onDidDelete(_e => invalidateScriptCaches());
+		watcher.onDidCreate(_e => invalidateScriptCaches());
+		context.subscriptions.push(watcher);
+}
+
+
+function invalidateScriptCaches() 
+{
+		invalidateTasksCache();
+		if (configuration.get<boolean>('enableSideBar') && treeDataProvider) {
+				treeDataProvider.refresh();
+		}
+		if (configuration.get<boolean>('enableExplorerView') && treeDataProvider2) {
+				treeDataProvider2.refresh();
+		}
+}
+		
+
+function registerExplorer(name: string, context: ExtensionContext): TaskTreeDataProvider | undefined 
+{
+		if (workspace.workspaceFolders) 
+		{
         let treeDataProvider = new TaskTreeDataProvider(name, context);
         const view = window.createTreeView(name, { treeDataProvider: treeDataProvider, showCollapseAll: true });
         context.subscriptions.push(view);
         return treeDataProvider;
-    } else {
+		} 
+		else {
         log('No workspace folders!!!');
     }
     return undefined;
 }
+
 
 export function deactivate() {}
