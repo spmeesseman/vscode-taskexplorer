@@ -4,17 +4,17 @@
 // Documentation on https://mochajs.org/ for help.
 //
 
-import * as assert from "assert";
-import * as fs from "original-fs";
-import * as path from "path";
-import { commands, workspace } from "vscode";
-import * as testUtil from "./testUtil";
-import { timeout } from "../util";
-import { treeDataProvider2 } from "../extension";
-import { TaskFolder } from "../taskFolder";
-import { TaskFile} from "../taskFile";
-import { TaskItem } from "../taskItem";
-import { configuration } from "../common/configuration";
+import * as assert from 'assert';
+import * as fs from 'original-fs';
+import * as path from 'path';
+import { commands, workspace } from 'vscode';
+import * as testUtil from './testUtil';
+import { timeout } from '../util';
+import { treeDataProvider2 } from '../extension';
+import { TaskFolder } from '../taskFolder';
+import { TaskFile } from '../taskFile';
+import { TaskItem } from '../taskItem';
+import { configuration } from '../common/configuration';
 
 let tempFiles: Array<string> = [];
 let dirName: string = '';
@@ -22,218 +22,277 @@ let dirNameCode: string = '';
 let treeItems: any[] = [];
 let didCodeDirExist: boolean = false;
 
-suite("Task tests", () => 
+suite('Task tests', () => 
 {
-  suiteSetup(async () => {
-    await testUtil.activeExtension();
-
-    dirName = path.join(workspace.rootPath, 'tasks_test_');
-    dirNameCode = path.join(workspace.rootPath, '.vscode');
-
-    await configuration.update('exclude', [ "**/coveronly/**"]);
-
-    if (!fs.existsSync(dirName)) {
-      fs.mkdirSync(dirName);
-      //await testUtil.createTempDir(dirName);
-    }
-    if (!fs.existsSync(dirNameCode)) {
-      fs.mkdirSync(dirNameCode);
-    }
-    else {
-      didCodeDirExist = true;
-    }
-  });
-
-
-  suiteTeardown(() => {
-    //testUtil.destroyAllTempPaths();
-    if (tempFiles.length)
+    suiteSetup(async () => 
     {
-      let file;
-      while ((file = tempFiles.shift())) {
-        try {
-          fs.unlinkSync(file);
-        } catch (error) { console.log(error);}
-      }
-    }
-    if (!didCodeDirExist) {
-      fs.rmdirSync(dirNameCode);
-    }
-    fs.rmdirSync(dirName);
-  });
+        await testUtil.activeExtension();
+
+        dirName = path.join(workspace.rootPath, 'tasks_test_');
+        dirNameCode = path.join(workspace.rootPath, '.vscode');
+
+        await configuration.update('exclude', ['**/coveronly/**']);
+
+        if (!fs.existsSync(dirName)) {
+            fs.mkdirSync(dirName);
+            //await testUtil.createTempDir(dirName);
+        }
+        if (!fs.existsSync(dirNameCode)) {
+            fs.mkdirSync(dirNameCode);
+        } 
+        else {
+            didCodeDirExist = true;
+        }
+    });
+
+    suiteTeardown(() => 
+    {
+        //testUtil.destroyAllTempPaths();
+        if (tempFiles.length) {
+            let file;
+            while ((file = tempFiles.shift())) 
+            {
+                try {
+                    fs.unlinkSync(file);
+                } 
+                catch (error) {
+                    console.log(error);
+                }
+            }
+        }
+        if (!didCodeDirExist) {
+            fs.rmdirSync(dirNameCode);
+        }
+        fs.rmdirSync(dirName);
+    });
 
 
-  test("Create ant target files", async function()
-  {
-    const file = path.join(dirName, "build.xml");
-    const file2 = path.join(dirName, "test.xml");
-    const file3 = path.join(dirName, "emptytarget.xml");
-    const file4 = path.join(dirName, "emtyproject.xml");
-    
-    tempFiles.push(file);
-    tempFiles.push(file2);
-    tempFiles.push(file3);
-    tempFiles.push(file4);
+    test('Create ant target files', async function() 
+    {
+        const file = path.join(dirName, 'build.xml');
+        const file2 = path.join(dirName, 'test.xml');
+        const file3 = path.join(dirName, 'emptytarget.xml');
+        const file4 = path.join(dirName, 'emtyproject.xml');
 
-    fs.writeFileSync(file, '<?xml version="1.0"?>\n' +
-                           '<project basedir="." default="test1">\n' +
-                           '    <property environment="env" />\n' +
-                           '    <property name="test" value="test" />\n' +
-                           '    <target name="test1" depends="init"></target>\n' +
-                           '    <target name="test2" depends="init"></target>\n' +
-                           '</project>\n');
+        tempFiles.push(file);
+        tempFiles.push(file2);
+        tempFiles.push(file3);
+        tempFiles.push(file4);
 
-    fs.writeFileSync(file2,'<?xml version="1.0"?>\n' +
-                           '<project basedir="." default="test2">\n' +
-                           '    <property name="test2" value="test2" />\n' +
-                           '    <target name=\'test3\'></target>\n' +
-                           '    <target name="test4"></target>\n' +
-                           '</project>\n');
+        fs.writeFileSync(
+            file,
+            '<?xml version="1.0"?>\n' +
+            '<project basedir="." default="test1">\n' +
+            '    <property environment="env" />\n' +
+            '    <property name="test" value="test" />\n' +
+            '    <target name="test1" depends="init"></target>\n' +
+            '    <target name="test2" depends="init"></target>\n' +
+            '</project>\n'
+        );
 
-    fs.writeFileSync(file3,'<?xml version="1.0"?>\n' +
-                           '<project basedir="." default="test1">\n' +
-                           '    <property environment="env" />\n' +
-                           '    <property name="test" value="test" />\n' +
-                           '</project>\n');
+        fs.writeFileSync(
+            file2,
+            '<?xml version="1.0"?>\n' +
+            '<project basedir="." default="test2">\n' +
+            '    <property name="test2" value="test2" />\n' +
+            "    <target name='test3'></target>\n" +
+            '    <target name="test4"></target>\n' +
+            '</project>\n'
+        );
 
-    fs.writeFileSync(file4, '<?xml version="1.0"?>\n');
-  });
+        fs.writeFileSync(
+            file3,
+            '<?xml version="1.0"?>\n' +
+            '<project basedir="." default="test1">\n' +
+            '    <property environment="env" />\n' +
+            '    <property name="test" value="test" />\n' +
+            '</project>\n'
+        );
 
-
-  test("Create npm package files", async function() 
-  {
-    const file = path.join(dirName, "package.json");
-    tempFiles.push(file);
-
-    fs.writeFileSync(file, '{\n' +
-                           '    "scripts":{\n' +
-                           '        "test":"node ./node_modules/vscode/bin/test",\n' +
-                           '        "compile":"npx tsc -p ./"\n' +
-                           '        "install":"npm install"\n' +
-                           '    }\n' +
-                           '}\n');
-  });
-
-  test("Create tsc config files", async function() 
-  {
-    const file = path.join(workspace.rootPath, "tsconfig.json");
-    tempFiles.push(file);
-
-    fs.writeFileSync(file, '{\n' +
-                           '    "compilerOptions":\n' +
-                           '  {\n' +
-                           '    "target": "es6",\n' +
-                           '    "lib": ["es2016"],\n' +
-                           '    "module": "commonjs",\n' +
-                           '    "outDir": "./out",\n' +
-                           '    "typeRoots": ["./node_modules/@types"],\n' +
-                           '    "strict": true,\n' +
-                           '    "experimentalDecorators": true,\n' +
-                           '    "sourceMap": true,\n' +
-                           '    "noImplicitThis": false\n' +
-                           '  },\n' +
-                           '  "include": ["**/*"],\n' +
-                           '  "exclude": ["node_modules"]\n' +
-                           '}\n');
-  });
+        fs.writeFileSync(file4, '<?xml version="1.0"?>\n');
+    });
 
 
-  test("Create gulp task files", async function() 
-  {
-    const file = path.join(workspace.rootPath, 'gulpfile.js');
-    tempFiles.push(file);
+    test('Create npm package files', async function() 
+    {
+        const file = path.join(dirName, 'package.json');
+        tempFiles.push(file);
 
-    fs.writeFileSync(file, "var gulp = require('gulp');\n" +                     
-                           "gulp.task('hello', (done) => {\n" +
-                           "    console.log('Hello!');\n" +
-                           "    done();\n" +
-                           "});\n" +
-                           "gulp.task(\"hello2\", (done) => {\n" +
-                           "    console.log('Hello2!');\n" +
-                           "    done();\n" +
-                           "});\n");
-  });
-
-
-  test("Create makefiles", async function() 
-  {
-    const file = path.join(dirName, 'Makefile');
-    tempFiles.push(file);
-
-    fs.writeFileSync(file, "all   : temp.exe\r\n" +
-                           "    @echo Building app\r\n" +
-                           "clean: t1\r\n" +
-                           "    rmdir /q /s ../build\r\n");
-  });
+        fs.writeFileSync(
+            file,
+            '{\n' +
+            '    "scripts":{\n' +
+            '        "test":"node ./node_modules/vscode/bin/test",\n' +
+            '        "compile":"npx tsc -p ./"\n' +
+            '        "install":"npm install"\n' +
+            '    }\n' +
+            '}\n'
+        );
+    });
 
 
-  test("Create batch files", async function() 
-  {
-    const file = path.join(dirName, 'test.bat');
-    tempFiles.push(file);
+    test('Create tsc config files', async function() 
+    {
+        const file = path.join(workspace.rootPath, 'tsconfig.json');
+        tempFiles.push(file);
 
-    const file2 = path.join(dirName, 'test2.BAT');
-    tempFiles.push(file2);
-
-    fs.writeFileSync(file, "@echo testing batch file\r\n");
-    fs.writeFileSync(file2, "@echo testing batch file 2\r\n");
-  });
-
-
-  test("Create grunt task files", async function() 
-  {
-    const file = path.join(workspace.rootPath, 'GRUNTFILE.js');
-
-    tempFiles.push(file);
-
-    fs.writeFileSync(file, "module.exports = function(grunt) {\n" +
-                           "    grunt.registerTask('default', ['jshint:myproject']);\n" +
-                           "    grunt.registerTask(\"upload\", ['s3']);\n" +
-                           "};\n");
-  });
-
-
-  test("Create vscode task files", async function() 
-  {
-    const file = path.join(dirNameCode, 'tasks.json');
-    tempFiles.push(file);
-
-    fs.writeFileSync(file, '{\n' +
-                           '    "version": "2.0.0",\n' +
-                           '    "tasks": [\n' +
-                           '    {\n' +
-                           '        "label": "test1",\n' +
-                           '        "type": "shell",\n' +
-                           '        "command": "ant.bat",\n' +
-                           '        "args": [ "-logger", "org.apache.tools.ant.listener.AnsiColorLogger", "test1" ],\n' +
-                           '        "group": "build",\n' +
-                           '        "options": {\n' +
-                           '            "shell": {\n' +
-                           '                "executable": "${env:CODE_HOME}\\ansicon\\x64\\ansicon.exe",\n' +
-                           '            }\n' +
-                           '        }\n' +
-                           '    }]\n' +
-                           '}\n');
-
-  });
-  
-
-  test("Scan tasks", async function() 
-  {
-    await timeout(2000);
-    //
-    // Refresh for better coverage
-    //
-    treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
-    await timeout(100);
-    await configuration.update('exclude', "**/coveronly/**");
-    await treeDataProvider2.refresh();
-    treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
-  });
+        fs.writeFileSync(
+            file,
+            '{\n' +
+            '    "compilerOptions":\n' +
+            '  {\n' +
+            '    "target": "es6",\n' +
+            '    "lib": ["es2016"],\n' +
+            '    "module": "commonjs",\n' +
+            '    "outDir": "./out",\n' +
+            '    "typeRoots": ["./node_modules/@types"],\n' +
+            '    "strict": true,\n' +
+            '    "experimentalDecorators": true,\n' +
+            '    "sourceMap": true,\n' +
+            '    "noImplicitThis": false\n' +
+            '  },\n' +
+            '  "include": ["**/*"],\n' +
+            '  "exclude": ["node_modules"]\n' +
+            '}\n'
+        );
+    });
 
 
-  test("Verify tree validity and open tasks", async function() 
-  {
+    test('Create gulp task files', async function() 
+    {
+        const file = path.join(workspace.rootPath, 'gulpfile.js');
+        tempFiles.push(file);
+
+        fs.writeFileSync(
+            file,
+            "var gulp = require('gulp');\n" +
+            "gulp.task('hello', (done) => {\n" +
+            "    console.log('Hello!');\n" +
+            '    done();\n' +
+            '});\n' +
+            'gulp.task("hello2", (done) => {\n' +
+            "    console.log('Hello2!');\n" +
+            '    done();\n' +
+            '});\n'
+        );
+    });
+
+
+
+    test('Create makefiles', async function() 
+    {
+        const file = path.join(dirName, 'Makefile');
+        tempFiles.push(file);
+
+        fs.writeFileSync(
+            file,
+            'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n'
+        );
+    });
+
+
+    test('Create batch files', async function() 
+    {
+        const file = path.join(dirName, 'test.bat');
+        tempFiles.push(file);
+
+        const file2 = path.join(dirName, 'test2.BAT');
+        tempFiles.push(file2);
+
+        fs.writeFileSync(file, '@echo testing batch file\r\n');
+        fs.writeFileSync(file2, '@echo testing batch file 2\r\n');
+    });
+
+
+    test('Create grunt task files', async function() 
+    {
+        const file = path.join(workspace.rootPath, 'GRUNTFILE.js');
+
+        tempFiles.push(file);
+
+        fs.writeFileSync(
+            file,
+            'module.exports = function(grunt) {\n' +
+            "    grunt.registerTask('default', ['jshint:myproject']);\n" +
+            '    grunt.registerTask("upload", [\'s3\']);\n' +
+            '};\n'
+        );
+    });
+
+
+    test('Create vscode task files', async function() 
+    {
+        const file = path.join(dirNameCode, 'tasks.json');
+        tempFiles.push(file);
+
+        fs.writeFileSync(
+            file,
+            '{\n' +
+            '    "version": "2.0.0",\n' +
+            '    "tasks": [\n' +
+            '    {\n' +
+            '        "label": "test1",\n' +
+            '        "type": "shell",\n' +
+            '        "command": "ant.bat",\n' +
+            '        "args": [ "-logger", "org.apache.tools.ant.listener.AnsiColorLogger", "test1" ],\n' +
+            '        "group": "build",\n' +
+            '        "options": {\n' +
+            '            "shell": {\n' +
+            '                "executable": "${env:CODE_HOME}\\ansicon\\x64\\ansicon.exe",\n' +
+            '            }\n' +
+            '        }\n' +
+            '    }]\n' +
+            '}\n'
+        );
+    });
+
+
+    test('Scan tasks', async function() 
+    {
+        await timeout(2000);
+        //
+        // Refresh for better coverage
+        //
+        treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
+        await timeout(100);
+        await configuration.update('exclude', '**/coveronly/**');
+        await configuration.update('pathToAnt', 'ant.bat');
+        await treeDataProvider2.refresh();
+        treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
+    });
+
+
+    test('Verify tree validity and open tasks', async function() 
+    {
+        await scanTasks();   
+        await configuration.update('enableAnt', false);
+        await scanTasks(); 
+        await configuration.update('enableBash', false);
+        await scanTasks(); 
+        await configuration.update('enableBatch', false);
+        await scanTasks(); 
+        await configuration.update('enableGrunt', false);
+        await scanTasks(); 
+        await configuration.update('enableGulp', false);
+        await scanTasks(); 
+        await configuration.update('enableNpm', false);
+        await scanTasks(); 
+        await configuration.update('enablePowershell', false);
+        await scanTasks(); 
+        await configuration.update('enablePerl', false);
+        await scanTasks(); 
+        await configuration.update('enablePython', false);
+        await scanTasks(); 
+        await configuration.update('enableRuby', false);
+        await scanTasks(); 
+        await configuration.update('enableWorkspace', false);
+        await scanTasks(); 
+    });
+});
+
+
+async function scanTasks()
+{
     let foundAnt: boolean = false;
     let foundGrunt: boolean = false;
     let foundGulp: boolean = false;
@@ -241,92 +300,172 @@ suite("Task tests", () =>
     let foundTsc: boolean = false;
     let foundVscode: boolean = false;
 
-    if (treeItems.length > 0)
-    {
-      let item: any;
-      while ((item = treeItems.shift())) {
-        try {
-          if (item instanceof TaskFolder) 
-          {
-            let tmp: any = await treeDataProvider2.getParent(item);
-            assert(tmp === null, 'Invaid parent type, should be null for TaskFolder');
+    if (treeItems.length > 0) {
+        let item: any;
+        while ((item = treeItems.shift())) 
+        {
+            try {
+                if (item instanceof TaskFolder) {
+                    let tmp: any = await treeDataProvider2.getParent(item);
+                    assert(tmp === null, 'Invaid parent type, should be null for TaskFolder');
 
-            let treeFiles: any[] = await treeDataProvider2.getChildren(item);
-            if (treeFiles.length > 0) 
-            {
-              let item2: any;
-              while ((item2 = treeFiles.shift())) 
-              {
-                if (item2 instanceof TaskFile) 
-                {
-                  tmp = await treeDataProvider2.getParent(item2);
-                  assert(tmp instanceof TaskFolder, 'Invaid parent type, should be TaskFolder for TaskFile');
+                    console.log('0:1: ');
 
-                  let treeTasks: any[] = await treeDataProvider2.getChildren(item2);
-                  if (treeTasks.length > 0) 
-                  {
-                    let item3: any;
-                    while ((item3 = treeTasks.shift())) 
+                    let treeFiles: any[] = await treeDataProvider2.getChildren(item);
+                    if (treeFiles.length > 0) 
                     {
-                      if (item3 instanceof TaskItem) 
-                      {
-                        await commands.executeCommand("taskExplorer.open", item3);
+                        console.log('0:1: ' + treeFiles.length);
 
-                        tmp = await treeDataProvider2.getParent(item3);
-                        assert(tmp instanceof TaskFile, 'Invaid parent type, should be TaskFile for TaskItem');
+                        let item2: any;
+                        while ((item2 = treeFiles.shift())) 
+                        {
+                            if (item2 instanceof TaskFile && !item2.isGroup) 
+                            {
+                                tmp = await treeDataProvider2.getParent(item2);
+                                assert(
+                                    tmp instanceof TaskFolder,
+                                    'Invaid parent type, should be TaskFolder for TaskFile'
+                                );
 
-                        if (item3.taskSource === 'ant') {
-                          foundAnt = true;
+                                let treeTasks: any[] = await treeDataProvider2.getChildren(item2);
+                                if (treeTasks.length > 0) 
+                                {
+                                    console.log('1: ' + treeTasks.length);
+                                    let item3: any;
+                                    while ((item3 = treeTasks.shift()))
+                                     {
+                                        if (item3 instanceof TaskItem) 
+                                        {
+                                            console.log('exec: ' + item3.task.name);
+                                            await commands.executeCommand('taskExplorer.open', item3);
+
+                                            tmp = await treeDataProvider2.getParent(item3);
+                                            assert(
+                                                tmp instanceof TaskFile,
+                                                'Invaid parent type, should be TaskFile for TaskItem'
+                                            );
+
+                                            if (item3.taskSource === 'ant') {
+                                                foundAnt = true;
+                                            } else if (item3.taskSource === 'gulp') {
+                                                foundGulp = true;
+                                            } else if (item3.taskSource === 'grunt') {
+                                                foundGrunt = true;
+                                            } else if (item3.taskSource === 'npm') {
+                                                foundNpm = true;
+                                            } else if (item3.taskSource === 'tsc') {
+                                                foundTsc = true;
+                                            } else if (item3.taskSource === 'Workspace') {
+                                                foundVscode = true;
+                                            }
+                                        } 
+                                        else {
+                                            console.log('exec: fail');
+                                            assert.fail('Invalid taskitem node found');
+                                            return;
+                                        }
+                                    }
+                                } 
+                                else {
+                                    assert.fail('No tasks found in treefile');
+                                    return;
+                                }
+                            }
+                            else if (item2 instanceof TaskFile && item2.isGroup) 
+                            {
+                                let itreeFiles: any[] = await treeDataProvider2.getChildren(item2);
+                                if (itreeFiles.length > 0) 
+                                {
+                                    console.log('1:1: ' + itreeFiles.length);
+
+                                    let item2: any;
+                                    while ((item2 = itreeFiles.shift())) 
+                                    {
+                                        if (item2 instanceof TaskFile && !item2.isGroup) 
+                                        {
+                                            tmp = await treeDataProvider2.getParent(item2);
+                                            assert(
+                                                tmp instanceof TaskFolder,
+                                                'Invaid parent type, should be TaskFolder for TaskFile'
+                                            );
+
+                                            let treeTasks: any[] = await treeDataProvider2.getChildren(item2);
+                                            if (treeTasks.length > 0) 
+                                            {
+                                                console.log('2: ' + treeTasks.length);
+                                                let item3: any;
+                                                while ((item3 = treeTasks.shift()))
+                                                {
+                                                    if (item3 instanceof TaskItem) 
+                                                    {
+                                                        console.log('exec: ' + item3.task.name);
+                                                        await commands.executeCommand('taskExplorer.open', item3);
+
+                                                        tmp = await treeDataProvider2.getParent(item3);
+                                                        assert(
+                                                            tmp instanceof TaskFile,
+                                                            'Invaid parent type, should be TaskFile for TaskItem'
+                                                        );
+
+                                                        if (item3.taskSource === 'ant') {
+                                                            foundAnt = true;
+                                                        } else if (item3.taskSource === 'gulp') {
+                                                            foundGulp = true;
+                                                        } else if (item3.taskSource === 'grunt') {
+                                                            foundGrunt = true;
+                                                        } else if (item3.taskSource === 'npm') {
+                                                            foundNpm = true;
+                                                        } else if (item3.taskSource === 'tsc') {
+                                                            foundTsc = true;
+                                                        } else if (item3.taskSource === 'Workspace') {
+                                                            foundVscode = true;
+                                                        }
+                                                    } 
+                                                    else {
+                                                        console.log('exec: fail');
+                                                        assert.fail('Invalid taskitem node found');
+                                                        return;
+                                                    }
+                                                }
+                                            } 
+                                            else {
+                                                assert.fail('No tasks found in treefile');
+                                                return;
+                                            }
+                                        }
+                                        else {
+                                            assert.fail('Invalid taskfile node found');
+                                            return;
+                                        }
+                                    }
+                                } 
+                                else {
+                                    assert.fail('No task files found');
+                                    return;
+                                }
+                            }
+                            else {
+                                assert.fail('Invalid taskfile node found');
+                                return;
+                            }
                         }
-                        else if (item3.taskSource === 'gulp') {
-                          foundGulp = true;
-                        }
-                        else if (item3.taskSource === 'grunt') {
-                          foundGrunt = true;
-                        }
-                        else if (item3.taskSource === 'npm') {
-                          foundNpm = true;
-                        }
-                        else if (item3.taskSource === 'tsc') {
-                          foundTsc = true;
-                        }
-                        else if (item3.taskSource === 'Workspace') {
-                          foundVscode = true;
-                        }
-                      }
-                      else {
-                        assert.fail('Invalid taskitem node found');
+                    } 
+                    else {
+                        assert.fail('No task files found');
                         return;
-                      }
                     }
-                  }
-                  else {
-                    assert.fail('No tasks found in treefile');
-                    return;
-                  }
-                }
+                } 
                 else {
-                  assert.fail('Invalid taskfile node found');
-                  return;
+                    assert.fail('Invalid root folder');
+                    return;
                 }
-              }
+            } 
+            catch (error) {
+                assert.fail('Exception error: ' + error.toString());
             }
-            else {
-              assert.fail('No task files found');
-              return;
-            }
-          }
-          else {
-            assert.fail('Invalid root folder');
-            return;
-          }
-        } 
-        catch (error) { 
-          assert.fail('Exception error: ' + error.toString()); 
         }
-      }
     }
-/*
+    /*
     if (foundAnt !== true) {
       assert.fail('No ant items found');
     }
@@ -345,7 +484,5 @@ suite("Task tests", () =>
     else if (!foundVscode) {
       assert.fail('No vscode items found');
     }
-*/
-  });
-
-});
+    */
+}
