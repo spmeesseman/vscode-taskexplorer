@@ -35,17 +35,14 @@ export class TaskFolder extends TreeItem
 		let idx2: number = -1;
 
 		this.taskFiles.forEach(each => {
-			idx++;console.log('4');
+			idx++;
 			if (taskFile === each) {
-				idx2 = idx;console.log('5');
+				idx2 = idx;
 			}
 		});
 
 		if (idx2 !== -1 && idx2 < this.taskFiles.length) {
-			console.log('removing task file ' + taskFile.label);
-			console.log('arrlen1 ' + this.taskFiles.length);
 			this.taskFiles.splice(idx2, 1);
-			console.log('arrlen2 ' + this.taskFiles.length);
 		}
 	}
 }
