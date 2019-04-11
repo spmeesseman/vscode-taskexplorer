@@ -18,12 +18,14 @@ export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
 export let logOutputChannel: OutputChannel | undefined;
 
-type WatcherMap = { [s: string]: FileSystemWatcher; };
-let watchers: WatcherMap = {} ;
+let watchers: Map<String, FileSystemWatcher> = new Map();
 
 
 function invalidateTasksCache() 
 {
+		//
+		// All internal task providers export an invalidate() function...
+		//
     invalidateTasksCacheAnt();
     invalidateTasksCacheMake();
     invalidateTasksCacheScript();
@@ -275,11 +277,25 @@ function registerFileWatcherAnt(context: ExtensionContext, enabled?: boolean)
 {
 		registerFileWatcher(context, 'ant', '**/[Bb]uild.xml', enabled);
 
+		//
+		// For extra file globs configured in settings, we need to first go through and disable
+		// all current watchers since there is no way of knowing which glob patterns were
+		// removed (if any).
+		//
+		for (var key in watchers.keys) {
+				if (key.startsWith('ant') && key !== 'ant') {
+						let watcher = watchers.get(key);
+						watcher.onDidChange(_e => undefined);
+						watcher.onDidDelete(_e => undefined);
+						watcher.onDidCreate(_e => undefined);
+				}
+		}
+
 		let includeAnt: string[] = configuration.get('includeAnt');
 		if (includeAnt && includeAnt.length > 0) 
 		{
 				for (var i = 0; i < includeAnt.length; i++) {
-						registerFileWatcher(context, 'ant' + i.toString(), includeAnt[i], enabled);
+						registerFileWatcher(context, 'ant-' + includeAnt[i], includeAnt[i], enabled);
 				}
 		}
 }
@@ -287,25 +303,25 @@ function registerFileWatcherAnt(context: ExtensionContext, enabled?: boolean)
 
 function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, enabled?: boolean)
 {
-		let watcher: FileSystemWatcher = watchers[taskType];
+		let watcher: FileSystemWatcher = watchers.get(taskType);
 
 		if (enabled !== false)
 		{
-				if (!watchers[taskType])
+				if (!watcher)
 				{
 						watcher = workspace.createFileSystemWatcher(fileBlob);
-						watchers[taskType] = watcher;
+						watchers.set(taskType, watcher);
 						context.subscriptions.push(watcher);
 				}
 				watcher.onDidChange(_e => invalidateScriptCaches());
 				watcher.onDidDelete(_e => invalidateScriptCaches());
 				watcher.onDidCreate(_e => invalidateScriptCaches());
 		}
-		else if (watchers[taskType])
+		else if (watchers.get(taskType))
 		{
-				watchers[taskType].onDidChange(_e => undefined);
-				watchers[taskType].onDidDelete(_e => undefined);
-				watchers[taskType].onDidCreate(_e => undefined);
+				watcher.onDidChange(_e => undefined);
+				watcher.onDidDelete(_e => undefined);
+				watcher.onDidCreate(_e => undefined);
 		}
 }
 
