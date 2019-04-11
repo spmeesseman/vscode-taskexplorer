@@ -20,6 +20,7 @@ Todos:
         ☐ If debug output was open when VS closes, re-open it when VSCode is started next @low @1h
         ☐ Create setting for each task type file glob (like we have for ant) @low @2h
         ☐ Include B[b]uild.xml ant file glob in setting (together with task above) @low @30m
+        ☐ support for detecting Visual Studio projects, and building them as tasks @low @16h
 
     Style:
 
