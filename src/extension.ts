@@ -184,3 +184,4 @@ function registerExplorer(name: string, context: ExtensionContext): TaskTreeData
 	return undefined;
 }
 
+export function deactivate() {}
