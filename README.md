@@ -35,7 +35,7 @@
 
 ## Features
 
-* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/TODO)
+* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo)
 * v1.13 - Multiple task files of the same type are now placed within a group node for less clutter in folder level nodes
 * v1.12 - Script Task Provider - Open and launch bash, batch, perl, powershell, python, ruby, and nsis scripts
 * v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
