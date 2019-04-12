@@ -25,7 +25,11 @@
 
 |Original Explorer Tray|Sidebar View (v1.7)|Task Type Groups (v1.13)|
 |-|-|-|
-|![ss0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview2.png?raw=true)|![ss1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview3.png?raw=true)|![ss2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/taskview1.png?raw=true)|
+|![ss0](res/taskview1.png?raw=true)|![ss1](res/taskview2.png?raw=true)|![ss2](res/taskview3.png?raw=true)|
+
+|Grunt/Gulp in Subfolders (v1.14)|||
+|-|-|-|
+|![ss3](res/taskview4.png?raw=true)|||
 
 ## Requirements
 
