@@ -11,6 +11,8 @@ import { TaskTreeDataProvider } from './taskTree';
 import { invalidateTasksCacheAnt, AntTaskProvider } from './taskProviderAnt';
 import { invalidateTasksCacheMake, MakeTaskProvider } from './taskProviderMake';
 import { invalidateTasksCacheScript, ScriptTaskProvider } from './taskProviderScript';
+import { invalidateTasksCacheGrunt, GruntTaskProvider } from './taskProviderGrunt';
+import { invalidateTasksCacheGulp, GulpTaskProvider } from './taskProviderGulp';
 import { configuration } from './common/configuration';
 import { log } from './util';
 
@@ -29,6 +31,8 @@ function invalidateTasksCache()
     invalidateTasksCacheAnt();
     invalidateTasksCacheMake();
     invalidateTasksCacheScript();
+    invalidateTasksCacheGrunt();
+    invalidateTasksCacheGulp();
 }
 
 
@@ -266,6 +270,8 @@ function registerTaskProviders(context: ExtensionContext)
     context.subscriptions.push(workspace.registerTaskProvider('ant', new AntTaskProvider()));
     context.subscriptions.push(workspace.registerTaskProvider('make', new MakeTaskProvider()));
     context.subscriptions.push(workspace.registerTaskProvider('script', new ScriptTaskProvider()));
+    context.subscriptions.push(workspace.registerTaskProvider('grunt', new GruntTaskProvider()));
+    context.subscriptions.push(workspace.registerTaskProvider('gulp', new GulpTaskProvider()));
 }
 
 

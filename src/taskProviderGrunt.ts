@@ -10,19 +10,19 @@ type StringMap = { [s: string]: string; };
 let cachedTasks: Task[] = undefined;
 
 
-interface MakeTaskDefinition extends TaskDefinition 
+interface GruntTaskDefinition extends TaskDefinition 
 {
 	script: string;
 	path?: string;
 }
 
-export class MakeTaskProvider implements TaskProvider 
+export class GruntTaskProvider implements TaskProvider 
 {
 	constructor() {
 	}
 
 	public provideTasks() {
-		return provideMakefiles();
+		return provideGruntfiles();
 	}
 
 	public resolveTask(_task: Task): Task | undefined {
@@ -31,13 +31,13 @@ export class MakeTaskProvider implements TaskProvider
 }
 
 
-export function invalidateTasksCacheMake() 
+export function invalidateTasksCacheGrunt() 
 {
 	cachedTasks = undefined;
 }
 
 
-async function detectMakefiles(): Promise<Task[]> 
+async function detectGruntfiles(): Promise<Task[]> 
 {
 
 	let emptyTasks: Task[] = [];
@@ -51,12 +51,16 @@ async function detectMakefiles(): Promise<Task[]>
 	try {
 		for (const folder of folders) 
 		{
-			let relativePattern = new RelativePattern(folder, '**/[Mm]akefile');
+			//
+			// Note - pattern will ignore gruntfiles in root project dir, which would be picked
+			// up by VSCoces internal Grunt task provider
+			//
+			let relativePattern = new RelativePattern(folder, '**/*/gruntfile.js');
 			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
 			for (const fpath of paths) 
 			{
 				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-					let tasks = await readMakefiles(fpath);
+					let tasks = await readGruntfiles(fpath);
 					visitedFiles.add(fpath.fsPath);
 					allTasks.push(...tasks);
 				}
@@ -69,16 +73,16 @@ async function detectMakefiles(): Promise<Task[]>
 }
 
 
-export async function provideMakefiles(): Promise<Task[]> 
+export async function provideGruntfiles(): Promise<Task[]> 
 {
 	if (!cachedTasks) {
-		cachedTasks = await detectMakefiles();
+		cachedTasks = await detectGruntfiles();
 	}
 	return cachedTasks;
 }
 
 
-async function readMakefiles(packageJsonUri: Uri): Promise<Task[]> 
+async function readGruntfiles(packageJsonUri: Uri): Promise<Task[]> 
 {
 	let emptyTasks: Task[] = [];
 
@@ -95,7 +99,7 @@ async function readMakefiles(packageJsonUri: Uri): Promise<Task[]>
 	const result: Task[] = [];
 
 	Object.keys(scripts).forEach(each => {
-		const task = createMakeTask(each, `${each}`, folder!, packageJsonUri);
+		const task = createGruntTask(each, `${each}`, folder!, packageJsonUri);
 		if (task) {
 			task.group = TaskGroup.Build;
 			result.push(task);
@@ -112,7 +116,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
 	let scripts: StringMap = {};
 
 	util.log('');
-	util.log('Find makefile targets');
+	util.log('Find gruntfile targets');
 
 	let contents = await util.readFile(fsPath);
 	let idx = 0;
@@ -121,25 +125,28 @@ async function findTargets(fsPath: string): Promise<StringMap>
 	while (eol !== -1)
 	{
 		let line: string = contents.substring(idx, eol).trim();
-		//
-		// Target names always start at position 0 of the line.  
-		//
-		// TODO = Skip targets that are environment variable names, for now.  Need to
-		// parse value if set in makefile and apply here for $() target names.
-		//
-		if (line.length > 0 && !line.startsWith('\t') && !line.startsWith(' ') &&
-		    !line.startsWith('#') && !line.startsWith('$') && line.indexOf(':') > 0) 
+		if (line.length > 0 && line.toLowerCase().trimLeft().startsWith('grunt.registertask')) 
 		{
-			let tgtName = line.substring(0, line.indexOf(':')).trim();
-			let dependsName = line.substring(line.indexOf(':') + 1).trim();
-			//
-			// Don't incude object targets
-			//
-			if (tgtName.indexOf('/') === -1 && tgtName.indexOf('\\') === -1) {
-				scripts[tgtName] = '';
-				util.log('   found target');
-				util.logValue('      name', tgtName);
-				util.logValue('      depends target', dependsName);
+			let idx1 = line.indexOf('\'') + 1;
+			if (idx1 === -1) {
+				idx1 = line.indexOf('"') + 1;
+			}
+			if (idx1 !== -1)
+			{
+				let idx2 = line.indexOf('\'', idx1);
+				if (idx2 === -1) {
+					idx2 = line.indexOf('"');
+				}
+				if (idx2 !== -1) 
+				{
+					let tgtName = line.trimLeft().substring(idx1, idx2).trim();
+
+					if (tgtName) {
+						scripts[tgtName] = '';
+						util.log('   found target');
+						util.logValue('      name', tgtName);
+					}
+				}
 			}
 		}
 
@@ -153,37 +160,37 @@ async function findTargets(fsPath: string): Promise<StringMap>
 }
 
 
-function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri): Task 
+function createGruntTask(target: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri): Task 
 {
 	function getCommand(folder: WorkspaceFolder, cmd: string): string 
 	{
-		let make = "make";
+		let grunt = folder.uri.fsPath + "/node_modules/.bin/grunt";
 
 		if (process.platform === 'win32') {
-			make = "nmake";
+			grunt = folder.uri.fsPath + "\\node_modules\\.bin\\grunt.cmd";
 		}
 
-		if (workspace.getConfiguration('taskExplorer').get('pathToMake')) {
-			make = workspace.getConfiguration('taskExplorer').get('pathToMake');
+		if (workspace.getConfiguration('taskExplorer').get('pathToGrunt')) {
+			grunt = workspace.getConfiguration('taskExplorer').get('pathToGrunt');
 		}
 
-		return make; 
+		return grunt; 
 	}
 
 	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string 
 	{
 		let rootUri = folder.uri;
-		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.lastIndexOf('/') + 1);
+		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.lastIndexOf('/') + 1);console.log('3:' + absolutePath);
 		return absolutePath.substring(rootUri.path.length + 1);
 	}
 	
-	let kind: MakeTaskDefinition = {
-		type: 'make',
+	let kind: GruntTaskDefinition = {
+		type: 'grunt',
 		script: target,
 		path: ''
 	};
 
-	let relativePath = getRelativePath(folder, packageJsonUri);
+	let relativePath = getRelativePath(folder, packageJsonUri);console.log('4:' + relativePath);
 	if (relativePath.length) {
 		kind.path = relativePath;
 	}
@@ -191,26 +198,10 @@ function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, pa
 
 	let args = [ target ];
 	let options = {
-		"cwd": cwd//,
-		//"env": {
-		//	"ECLIPSE_HOME": "${env:VSCODE_HOME}"
-		//}
+		"cwd": cwd
 	};
 
 	let execution = new ShellExecution(getCommand(folder, cmd), args, options);
-	
-	let pm = {
-		"owner": "cpp",
-		"fileLocation": ["absolute"],
-		"pattern": {
-			"regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-			"file": 1,
-			"line": 2,
-			"column": 3,
-			"severity": 4,
-			"message": 5
-		}
-	};
 
-	return new Task(kind, folder, target, 'make', execution, 'cpp');
+	return new Task(kind, folder, target, 'grunt', execution, undefined);
 }

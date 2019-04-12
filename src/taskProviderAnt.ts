@@ -120,8 +120,10 @@ async function readAntScripts(packageJsonUri: Uri): Promise<Task[]>
 
 	Object.keys(scripts).forEach(each => {
 		const task = createAntTask(each, `${each}`, folder!, packageJsonUri);
-		task.group = TaskGroup.Build;
-		result.push(task);
+		if (task) {
+			task.group = TaskGroup.Build;
+			result.push(task);
+		}
 	});
 
 	return result;

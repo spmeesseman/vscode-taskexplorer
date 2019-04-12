@@ -471,6 +471,38 @@
                 }
             },
             {
+                "type": "grunt",
+                "required": [
+                    "script"
+                ],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.ant.script%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.ant.path%"
+                    }
+                }
+            },
+            {
+                "type": "gulp",
+                "required": [
+                    "script"
+                ],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.ant.script%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.ant.path%"
+                    }
+                }
+            },
+            {
                 "type": "make",
                 "required": [
                     "script"
