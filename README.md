@@ -36,6 +36,7 @@
 ## Features
 
 * Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo)
+* v1.14 - Support for grunt and gulp task files not located in the project root
 * v1.13 - Multiple task files of the same type are now placed within a group node for less clutter in folder level nodes
 * v1.12 - Script Task Provider - Open and launch bash, batch, perl, powershell, python, ruby, and nsis scripts
 * v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
@@ -63,6 +64,10 @@ The setting 'exclude' defines a string or an array of strings of file patterns t
 The setting 'includeAnt' is a string or an array of strings used to define file patterns to include which would have normally been ignored by the internal Ant Task Provider.  By default, only ant files named [Bb]uild.xml are considered.  The string(s) must be glob pattern(s) and should include the .xml extension, for example:
 
     taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]
+
+## Grunt and Gulp Task Providers
+
+VSCode includes task providers for Grunt and Gulp internally.  The Grunt and Gulp task providers in this extension (introduced in v1.14) will ignore grunt and gulpfiles in the root project directory in lieu of that fact, i.e. it will only provide tasks located in subdirectories of the project root.  Note that the internal VSCode Gulp provider will not even refresh your tasks if you edit your gulp file.  In a future release, settings will be added to include files found in the project root, where a user can turn off internal VSCode task detection for gulp and/or grunt.
 
 ## Feedback & Contributing
 
