@@ -1,3 +1,18 @@
+# [1.14.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.3...v1.14.0) (2019-04-13)
+
+
+### Documentation
+
+* **todo:** rename todo file to . convention [skip ci] ([6324dea](https://github.com/spmeesseman/vscode-taskexplorer/commit/6324dea))
+* **todo:** update 1.14 finished tasks ([e938d32](https://github.com/spmeesseman/vscode-taskexplorer/commit/e938d32))
+* **readme:** update screenshots ([2dd81e0](https://github.com/spmeesseman/vscode-taskexplorer/commit/2dd81e0))
+* **readme:** update v1.14 info ([8c69e32](https://github.com/spmeesseman/vscode-taskexplorer/commit/8c69e32))
+
+
+### Features
+
+* add support for grunt and gulp files not located in project root ([ced2462](https://github.com/spmeesseman/vscode-taskexplorer/commit/ced2462))
+
 ## [1.13.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.2...v1.13.3) (2019-04-11)
 
 
