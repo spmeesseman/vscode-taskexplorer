@@ -15,7 +15,7 @@
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/spmeesseman/vscode-taskexplorer.svg)](https://isitmaintained.com/project/spmeesseman/vscode-taskexplorer "Average time to resolve an issue")
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/spmeesseman/vscode-taskexplorer.svg)](https://isitmaintained.com/project/spmeesseman/vscode-taskexplorer "Percentage of issues still open")
 
-![src0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/npm.png?raw=true) ![src1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ant.png?raw=true) ![src2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/grunt.png?raw=true) ![src3](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/gulp.png?raw=true) ![src4](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/workspace.png?raw=true) ![src5](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/make.png?raw=true) ![src6](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ts.png?raw=true) ![src7](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/bat.png?raw=true) ![src8](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ruby.png?raw=true) ![src9](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/powershell.png?raw=true) ![src10](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/bash.png?raw=true) ![src11](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/python.png?raw=true) ![src12](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/nsis.png?raw=true)
+![src0](res/sources/npm.png?raw=true) ![src1](res/sources/ant.png?raw=true) ![src2](res/sources/grunt.png?raw=true) ![src3](res/sources/gulp.png?raw=true) ![src13](res/sources/gradle.png?raw=true) ![src4](res/sources/workspace.png?raw=true) ![src5](res/sources/make.png?raw=true) ![src6](res/sources/ts.png?raw=true) ![src7](res/sources/bat.png?raw=true) ![src8](res/sources/ruby.png?raw=true) ![src9](res/sources/powershell.png?raw=true) ![src10](res/sources/bash.png?raw=true) ![src11](res/sources/python.png?raw=true) ![src12](res/sources/nsis.png?raw=true)
 
 ## Description
 
@@ -39,7 +39,8 @@
 
 ## Features
 
-* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo)
+* Check out the [todo list](.todo)
+* v1.15 - Support for gradke tasks
 * v1.14 - Support for grunt and gulp task files not located in the project root
 * v1.13 - Multiple task files of the same type are now placed within a group node for less clutter in folder level nodes
 * v1.12 - Script Task Provider - Open and launch bash, batch, perl, powershell, python, ruby, and nsis scripts
