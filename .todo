@@ -15,12 +15,12 @@ Todos:
         ☐ Show tasks status in status bar @low @4h
         ☐ Show # of running tasks badge on sidebar view @low @4h
         ☐ Yarn support for package.json @low @2h
+        ✔ Apply exclude globs to underlying search when finding tasks (perf) @medium @2h @done(19-04-14 00:22)
         ✔ Support for gulp and grunt task files not located in project root @low @4h @done(19-04-12 00:04)
         ☐ Support for VSCode compound tasks @low @8h
         ☐ If debug output was open when VS closes, re-open it when VSCode is started next @low @1h
-        ☐ Create setting for each task type file glob (like we have for ant) @low @2h
-        ☐ Include B[b]uild.xml ant file glob in setting (together with task above) @low @30m
-        ☐ support for detecting Visual Studio projects, and building them as tasks @low @16h
+        ☐ Support for detecting Visual Studio projects, and building them as tasks @low @16h
+        ☐ Support for gradle tasks
 
     Style:
 
