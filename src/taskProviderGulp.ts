@@ -133,10 +133,10 @@ async function findTargets(fsPath: string): Promise<StringMap>
 			}
 			if (idx1 !== -1)
 			{
-				idx++;
+				idx1++;
 				let idx2 = line.indexOf('\'', idx1);
 				if (idx2 === -1) {
-					idx2 = line.indexOf('"');
+					idx2 = line.indexOf('"', idx1);
 				}
 				if (idx2 !== -1) 
 				{
