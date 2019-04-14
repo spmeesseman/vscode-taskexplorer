@@ -1,3 +1,27 @@
+## [1.14.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.0...v1.14.1) (2019-04-14)
+
+
+### Bug Fixes
+
+* changing debug level in settings does not affect log output ([ce660bd](https://github.com/spmeesseman/vscode-taskexplorer/commit/ce660bd))
+* nsis type tasks are not found unless the idleberg.nsis extension is installed ([c2c36ef](https://github.com/spmeesseman/vscode-taskexplorer/commit/c2c36ef))
+
+
+### Code Refactoring
+
+* double check exclsuion after finding scripts - vscode findFiles is case sensitive glabs ([cb0c5f5](https://github.com/spmeesseman/vscode-taskexplorer/commit/cb0c5f5))
+
+
+### Documentation
+
+* **todo:** update completed tasks, add gradle task support ([3154e5b](https://github.com/spmeesseman/vscode-taskexplorer/commit/3154e5b))
+* **readme:** update screenshots ([af5232a](https://github.com/spmeesseman/vscode-taskexplorer/commit/af5232a))
+
+
+### Performance Improvements
+
+* apply excludes glob list to the underlying  file search for faster tree loading. ([87588a5](https://github.com/spmeesseman/vscode-taskexplorer/commit/87588a5))
+
 # [1.14.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.3...v1.14.0) (2019-04-13)
 
 
