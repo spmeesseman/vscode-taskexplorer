@@ -374,6 +374,10 @@
                     "type": "string",
                     "description": "%config.taskExplorer.pathToAnsicon%"
                 },
+                "taskExplorer.pathToGradle": {
+                    "type": "string",
+                    "description": "%config.taskExplorer.pathToGradle%"
+                },
                 "taskExplorer.pathToMake": {
                     "type": "string",
                     "description": "%config.taskExplorer.pathToMake%"

@@ -91,6 +91,7 @@ VSCode includes task providers for Grunt and Gulp internally.  The Grunt and Gul
 |`taskExplorer.enableAnt`|Enable/show ant targets as tasks|`true`|
 |`taskExplorer.enableBash`|Enable/show bash scripts as tasks|`true`|
 |`taskExplorer.enableBatch`|Enable/show batch file scripts as tasks|`true`|
+|`taskExplorer.enableGradle`|Enable/show gradle tasks|`true`|
 |`taskExplorer.enableGrunt`|Enable/show grunt tasks|`true`|
 |`taskExplorer.enableGulp`|Enable/show gulp tasks|`true`|
 |`taskExplorer.enableNpm`|Enable/show npm scripts as tasks|`true`|
@@ -104,6 +105,7 @@ VSCode includes task providers for Grunt and Gulp internally.  The Grunt and Gul
 |`taskExplorer.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
 |`taskExplorer.pathToAnt`|The path to the ant program, if not registered in system path|`ant.bat` for Windows, `ant` for Unix|",
 |`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path|`ansicon.exe`|",
+|`taskExplorer.pathToGradle`|The path to the gradle program, if not registered in system path|`gradle.bat` for Windows, `gradle` for Unix|",
 |`taskExplorer.pathToMake`|The path to the make program, if not registered in system path|`nmake` for Windows, `make` for Unix|",
 |`taskExplorer.pathToNsis`|The path to the nsis make program, if not registered in system path|`makensis.exe`|",
 |`taskExplorer.pathToPerl`|The path to the perl program, if not registered in system path|`perl`|",

@@ -25,6 +25,7 @@
 	"config.taskExplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
 	"config.taskExplorer.pathToAnsicon": "The path to the ansicon program, if not registered in system path",
 	"config.taskExplorer.pathToAnt": "The path to the ant program, if not registered in system path",
+	"config.taskExplorer.pathToGradle": "The path to the gradle program, if not registered in system path.",
 	"config.taskExplorer.pathToMake": "The path to the make program, if not registered in system path.",
 	"config.taskExplorer.pathToNsis": "The path to the nsis program, if not registered in system path.",
 	"config.taskExplorer.pathToPerl": "The path to the perl program, if not registered in system path.",
