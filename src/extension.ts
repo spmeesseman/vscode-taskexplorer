@@ -8,11 +8,11 @@ import {
     workspace, window, FileSystemWatcher, ConfigurationChangeEvent
 } from 'vscode';
 import { TaskTreeDataProvider } from './taskTree';
-import { invalidateTasksCacheAnt, AntTaskProvider } from './taskProviderAnt';
-import { invalidateTasksCacheMake, MakeTaskProvider } from './taskProviderMake';
-import { invalidateTasksCacheScript, ScriptTaskProvider } from './taskProviderScript';
-import { invalidateTasksCacheGrunt, GruntTaskProvider } from './taskProviderGrunt';
-import { invalidateTasksCacheGulp, GulpTaskProvider } from './taskProviderGulp';
+import { AntTaskProvider } from './taskProviderAnt';
+import { MakeTaskProvider } from './taskProviderMake';
+import { ScriptTaskProvider } from './taskProviderScript';
+import { GruntTaskProvider } from './taskProviderGrunt';
+import { GulpTaskProvider } from './taskProviderGulp';
 import { configuration } from './common/configuration';
 import { log } from './util';
 
@@ -21,19 +21,6 @@ export let treeDataProvider2: TaskTreeDataProvider | undefined;
 export let logOutputChannel: OutputChannel | undefined;
 
 let watchers: Map<String, FileSystemWatcher> = new Map();
-
-
-function invalidateTasksCache() 
-{
-    //
-    // All internal task providers export an invalidate() function...
-    //
-    invalidateTasksCacheAnt();
-    invalidateTasksCacheMake();
-    invalidateTasksCacheScript();
-    invalidateTasksCacheGrunt();
-    invalidateTasksCacheGulp();
-}
 
 
 export async function activate(context: ExtensionContext, disposables: Disposable[]) 
@@ -76,7 +63,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     //
     // Refresh tree when folders are added/removed from the workspace
     //
-    let workspaceWatcher = workspace.onDidChangeWorkspaceFolders(_e => invalidateScriptCaches());
+    let workspaceWatcher = workspace.onDidChangeWorkspaceFolders(_e => refreshTree());
     context.subscriptions.push(workspaceWatcher);
 
     //
@@ -249,11 +236,10 @@ function registerFileWatchers(context: ExtensionContext)
 
 function refreshTree() 
 {
-    invalidateTasksCache();
-    if (treeDataProvider) {
+    if (configuration.get<boolean>('enableSideBar') && treeDataProvider) {
         treeDataProvider.refresh();
     }
-    if (treeDataProvider2) {
+    if (configuration.get<boolean>('enableExplorerView') && treeDataProvider2) {
         treeDataProvider2.refresh();
     }
 }
@@ -314,26 +300,14 @@ function registerFileWatcher(context: ExtensionContext, taskType: string, fileBl
             watchers.set(taskType, watcher);
             context.subscriptions.push(watcher);
         }
-        watcher.onDidChange(_e => invalidateScriptCaches());
-        watcher.onDidDelete(_e => invalidateScriptCaches());
-        watcher.onDidCreate(_e => invalidateScriptCaches());
+        watcher.onDidChange(_e => refreshTree());
+        watcher.onDidDelete(_e => refreshTree());
+        watcher.onDidCreate(_e => refreshTree());
     } 
     else if (watchers.get(taskType)) {
         watcher.onDidChange(_e => undefined);
         watcher.onDidDelete(_e => undefined);
         watcher.onDidCreate(_e => undefined);
-    }
-}
-
-
-function invalidateScriptCaches() 
-{
-    invalidateTasksCache();
-    if (configuration.get<boolean>('enableSideBar') && treeDataProvider) {
-        treeDataProvider.refresh();
-    }
-    if (configuration.get<boolean>('enableExplorerView') && treeDataProvider2) {
-        treeDataProvider2.refresh();
     }
 }
 

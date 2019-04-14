@@ -18,6 +18,11 @@ import { TaskFolder } from './taskFolder';
 import { TaskFile } from './taskFile';
 import { TaskItem } from './taskItem';
 import { configuration } from "./common/configuration";
+import { invalidateTasksCacheAnt } from './taskProviderAnt';
+import { invalidateTasksCacheMake } from './taskProviderMake';
+import { invalidateTasksCacheScript } from './taskProviderScript';
+import { invalidateTasksCacheGrunt } from './taskProviderGrunt';
+import { invalidateTasksCacheGulp } from './taskProviderGulp';
 
 
 const localize = nls.loadMessageBundle();
@@ -56,6 +61,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 		tasks.onDidStartTask(() => this.refresh());
 		tasks.onDidEndTask(() => this.refresh());
+	}
+
+
+	private invalidateTasksCache() 
+	{
+		//
+		// All internal task providers export an invalidate() function...
+		//
+		invalidateTasksCacheAnt();
+		invalidateTasksCacheMake();
+		invalidateTasksCacheScript();
+		invalidateTasksCacheGrunt();
+		invalidateTasksCacheGulp();
 	}
 
 
@@ -280,6 +298,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	public refresh()
 	{
 		this.taskTree = null;
+		this.invalidateTasksCache();
 		this._onDidChangeTreeData.fire();
 	}
 

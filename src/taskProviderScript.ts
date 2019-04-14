@@ -114,8 +114,6 @@ async function detectScriptFiles(): Promise<Task[]>
 					//for (const type of Object.keys(scriptTable)) {
 						//if (textFile.languageId === type) {
 							//if (scriptTable[type].enabled) {
-								console.log(path.extname(fpath.fsPath));
-								util.log(path.extname(fpath.fsPath));
 								allTasks.push(createScriptTask(scriptTable[path.extname(fpath.fsPath).substring(1)], folder!, fpath));
 							//}
 							//break;
