@@ -1,1 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 32 32"><title>file_type_vscode</title><path d="M11.72,18.685,4.837,23.869,2,22.922,9,16,2,9.077,4.837,8.13l6.883,5.184,11.433-11.3L30,4.922V27.077l-6.847,2.909ZM15.287,16l7.865,5.923V10.076Z" style="fill:#0e99f7"/></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="300" height="300" version="1.1" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <style>.icon-canvas-transparent{fill:#f6f6f6;opacity:0;}.icon-white{fill:#fff;}</style>
+ </defs>
+ <title>BrandVisualStudioCode</title>
+ <path class="icon-canvas-transparent" d="m21.356 278.24v19.119h-19.119v-19.119z" opacity="0" stroke-width=".79661"/>
+ <path d="m218.62 29.953-105.41 96.92-58.909-44.403l-24.346 14.17 58.068 53.359-58.068 53.359 24.346 14.212 58.909-44.402 105.41 96.878 51.424-24.976v-190.14zm0 63.744v112.6l-74.719-56.302z" fill="#2196f3" stroke-width="17.15"/>
+</svg>
