@@ -43,12 +43,16 @@ async function detectGradlefiles(): Promise<Task[]>
 	let emptyTasks: Task[] = [];
 	let allTasks: Task[] = [];
 	let visitedFiles: Set<string> = new Set();
-
 	let folders = workspace.workspaceFolders;
+
+	util.log('', 1);
+	util.log('Find gradlefiles', 1);
+
 	if (!folders) {
 		return emptyTasks;
 	}
-	try {
+	try 
+	{
 		for (const folder of folders) 
 		{
 			//
@@ -60,14 +64,18 @@ async function detectGradlefiles(): Promise<Task[]>
 			for (const fpath of paths) 
 			{
 				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
+					util.log('   found ' + fpath.fsPath, 1);
 					let tasks = await readGradlefiles(fpath);
 					visitedFiles.add(fpath.fsPath);
 					allTasks.push(...tasks);
 				}
 			}
 		}
+
+		util.log('   done');
 		return allTasks;
-	} catch (error) {
+	} 
+	catch (error) {
 		return Promise.reject(error);
 	}
 }
@@ -115,8 +123,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
 	let json: any = '';
 	let scripts: StringMap = {};
 
-	util.log('');
-	util.log('Find gradlefile targets');
+	util.log('   Find gradlefile targets');
 
 	let contents = await util.readFile(fsPath);
 	let idx = 0;
@@ -125,7 +132,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
 	while (eol !== -1)
 	{
 		let line: string = contents.substring(idx, eol).trim();
-		if (line.length > 0 && line.toLowerCase().trimLeft().startsWith('gradle.task')) 
+		if (line.length > 0 && line.toLowerCase().trimLeft().startsWith('task ')) 
 		{
 			let idx1 = line.trimLeft().indexOf(' ');
 			if (idx1 !== -1)
@@ -138,8 +145,8 @@ async function findTargets(fsPath: string): Promise<StringMap>
 
 					if (tgtName) {
 						scripts[tgtName] = '';
-						util.log('   found target');
-						util.logValue('      name', tgtName);
+						util.log('      found target');
+						util.logValue('         name', tgtName);
 					}
 				}
 			}
@@ -148,8 +155,6 @@ async function findTargets(fsPath: string): Promise<StringMap>
 		idx = eol + 1;
 		eol = contents.indexOf('\n', idx);
 	}
-
-	util.log('   done');
 
 	return scripts;
 }
