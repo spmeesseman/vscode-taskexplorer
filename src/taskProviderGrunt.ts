@@ -127,12 +127,13 @@ async function findTargets(fsPath: string): Promise<StringMap>
 		let line: string = contents.substring(idx, eol).trim();
 		if (line.length > 0 && line.toLowerCase().trimLeft().startsWith('grunt.registertask')) 
 		{
-			let idx1 = line.indexOf('\'') + 1;
+			let idx1 = line.indexOf('\'');
 			if (idx1 === -1) {
-				idx1 = line.indexOf('"') + 1;
+				idx1 = line.indexOf('"');
 			}
 			if (idx1 !== -1)
 			{
+				idx++;
 				let idx2 = line.indexOf('\'', idx1);
 				if (idx2 === -1) {
 					idx2 = line.indexOf('"');
