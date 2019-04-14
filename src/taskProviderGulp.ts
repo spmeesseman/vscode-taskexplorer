@@ -181,7 +181,7 @@ function createGulpTask(target: string, cmd: string, folder: WorkspaceFolder, pa
 	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string 
 	{
 		let rootUri = folder.uri;
-		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.lastIndexOf('/') + 1);console.log('3:' + absolutePath);
+		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.lastIndexOf('/') + 1);
 		return absolutePath.substring(rootUri.path.length + 1);
 	}
 	
@@ -191,7 +191,7 @@ function createGulpTask(target: string, cmd: string, folder: WorkspaceFolder, pa
 		path: ''
 	};
 
-	let relativePath = getRelativePath(folder, packageJsonUri);console.log('4:' + relativePath);
+	let relativePath = getRelativePath(folder, packageJsonUri);
 	if (relativePath.length) {
 		kind.path = relativePath;
 	}

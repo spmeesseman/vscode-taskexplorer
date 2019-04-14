@@ -145,7 +145,6 @@ export async function log(msg: string, level?: number)
 
     if (workspace.getConfiguration('taskExplorer').get('debug') === true) 
     {
-        //console.log(msg);
         logOutputChannel.appendLine(msg);
     }
 }
@@ -175,7 +174,6 @@ export async function logValue(msg: string, value: any, level?: number)
     }
 
     if (workspace.getConfiguration('taskExplorer').get('debug') === true) {
-        //console.log(logMsg);
         logOutputChannel.appendLine(logMsg);
     }
 }

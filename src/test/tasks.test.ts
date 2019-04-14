@@ -309,13 +309,9 @@ async function scanTasks()
                     let tmp: any = await treeDataProvider2.getParent(item);
                     assert(tmp === null, 'Invaid parent type, should be null for TaskFolder');
 
-                    console.log('0:1: ');
-
                     let treeFiles: any[] = await treeDataProvider2.getChildren(item);
                     if (treeFiles.length > 0) 
                     {
-                        console.log('0:1: ' + treeFiles.length);
-
                         let item2: any;
                         while ((item2 = treeFiles.shift())) 
                         {
@@ -330,13 +326,11 @@ async function scanTasks()
                                 let treeTasks: any[] = await treeDataProvider2.getChildren(item2);
                                 if (treeTasks.length > 0) 
                                 {
-                                    console.log('1: ' + treeTasks.length);
                                     let item3: any;
                                     while ((item3 = treeTasks.shift()))
                                      {
                                         if (item3 instanceof TaskItem) 
                                         {
-                                            console.log('exec: ' + item3.task.name);
                                             await commands.executeCommand('taskExplorer.open', item3);
 
                                             tmp = await treeDataProvider2.getParent(item3);
@@ -360,7 +354,6 @@ async function scanTasks()
                                             }
                                         } 
                                         else {
-                                            console.log('exec: fail');
                                             assert.fail('Invalid taskitem node found');
                                             return;
                                         }
@@ -376,8 +369,6 @@ async function scanTasks()
                                 let itreeFiles: any[] = await treeDataProvider2.getChildren(item2);
                                 if (itreeFiles.length > 0) 
                                 {
-                                    console.log('1:1: ' + itreeFiles.length);
-
                                     let item2: any;
                                     while ((item2 = itreeFiles.shift())) 
                                     {
@@ -392,13 +383,11 @@ async function scanTasks()
                                             let treeTasks: any[] = await treeDataProvider2.getChildren(item2);
                                             if (treeTasks.length > 0) 
                                             {
-                                                console.log('2: ' + treeTasks.length);
                                                 let item3: any;
                                                 while ((item3 = treeTasks.shift()))
                                                 {
                                                     if (item3 instanceof TaskItem) 
                                                     {
-                                                        console.log('exec: ' + item3.task.name);
                                                         await commands.executeCommand('taskExplorer.open', item3);
 
                                                         tmp = await treeDataProvider2.getParent(item3);
@@ -422,7 +411,6 @@ async function scanTasks()
                                                         }
                                                     } 
                                                     else {
-                                                        console.log('exec: fail');
                                                         assert.fail('Invalid taskitem node found');
                                                         return;
                                                     }
