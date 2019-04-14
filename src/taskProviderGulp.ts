@@ -59,9 +59,11 @@ async function detectGulpfiles(): Promise<Task[]>
 			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
 			for (const fpath of paths) 
 			{
-				let tasks = await readGulpfiles(fpath);
-				visitedFiles.add(fpath.fsPath);
-				allTasks.push(...tasks);
+				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
+					let tasks = await readGulpfiles(fpath);
+					visitedFiles.add(fpath.fsPath);
+					allTasks.push(...tasks);
+				}
 			}
 		}
 		return allTasks;
