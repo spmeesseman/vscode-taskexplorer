@@ -140,7 +140,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
 				}
 				if (idx2 !== -1) 
 				{
-					let tgtName = line.trimLeft().substring(idx1, idx2).trim();
+					let tgtName = line.substring(idx1, idx2).trim();
 
 					if (tgtName) {
 						scripts[tgtName] = '';
