@@ -1,5 +1,5 @@
 import { logOutputChannel } from './extension';
-import { workspace } from 'vscode';
+import { workspace, RelativePattern, WorkspaceFolder } from 'vscode';
 import { accessSync } from 'original-fs';
 import * as fs from 'fs';
 import * as minimatch from 'minimatch';
@@ -36,6 +36,32 @@ export function properCase(name: string)
 }
 
 
+export function getExcludesGlob(folder: string | WorkspaceFolder) : RelativePattern
+{
+    let relativePattern = new RelativePattern(folder, '**/node_modules/**');
+    let excludes: string[] = configuration.get('exclude');
+
+    if (excludes && excludes.length > 0) {
+        let multiFilePattern: string = '{**/node_modules/**';
+        if (Array.isArray(excludes)) 
+        {
+            for (var i in excludes) {
+                multiFilePattern += ',';
+                multiFilePattern += excludes[i];
+            }
+        }
+        else {
+            multiFilePattern += ',';
+            multiFilePattern += excludes;
+        }
+        multiFilePattern += '}';
+        relativePattern = new RelativePattern(folder, multiFilePattern);
+    }
+
+    return relativePattern;
+}
+
+
 export function isExcluded(uriPath: string) 
 {
     function testForExclusionPattern(path: string, pattern: string): boolean 
@@ -45,32 +71,32 @@ export function isExcluded(uriPath: string)
 
     let exclude = configuration.get<string | string[]>('exclude');
 
-    this.log('');
-    this.log('Check exclusion');
-    this.logValue('   path', uriPath);
+    this.log('', 2);
+    this.log('Check exclusion', 2);
+    this.logValue('   path', uriPath, 2);
 
     if (exclude) 
     {
         if (Array.isArray(exclude)) 
         {
             for (let pattern of exclude) {
-                this.logValue('   checking pattern', pattern);
+                this.logValue('   checking pattern', pattern, 2);
                 if (testForExclusionPattern(uriPath, pattern)) {
-                    this.log('   Excluded!');
+                    this.log('   Excluded!', 2);
                     return true;
                 }
             }
         } 
         else {
-            this.logValue('   checking pattern', exclude);
+            this.logValue('   checking pattern', exclude, 2);
             if (testForExclusionPattern(uriPath, exclude)) {
-              this.log('   Excluded!');
+              this.log('   Excluded!', 2);
               return true;
             }
         }
     }
 
-    this.log('   Not excluded');
+    this.log('   Not excluded', 2);
     return false;
 }
 
@@ -107,7 +133,9 @@ export async function readFile(file: string): Promise<string>
 
 export async function log(msg: string, level?: number) 
 {
-    //let cfgLevel = configuration.get<number>('logLevel');
+    if (level && level > configuration.get<number>('debugLevel')) {
+        return;
+    }
 
     if (workspace.getConfiguration('taskExplorer').get('debug') === true) 
     {
@@ -121,7 +149,9 @@ export async function logValue(msg: string, value: any, level?: number)
 {
     var logMsg = msg;
 
-    //let cfgLevel = configuration.get<number>('logLevel');
+    if (level && level > configuration.get<number>('debugLevel')) {
+        return;
+    }
 
     for (var i = msg.length; i < logValueWhiteSpace; i++) {
         logMsg += ' ';
