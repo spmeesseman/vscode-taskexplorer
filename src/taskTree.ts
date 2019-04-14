@@ -333,7 +333,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 	async getChildren(element?: TreeItem): Promise<TreeItem[]>
 	{
-		if (!this.taskTree) {
+		let items: any = [];
+		
+		util.log('');
+		util.log('Tree get children');
+
+		if (!this.taskTree) 
+		{
+			util.log('   Build task tree');
+			//
+			// TODO - search enable* settings and apply enabled types to filter
+			//
 			//let taskItems = await tasks.fetchTasks({ type: 'npm' });
 			let taskItems = await tasks.fetchTasks();
 			if (taskItems) {
@@ -343,24 +353,23 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				}
 			}
 		}
+
 		if (element instanceof TaskFolder) {
-			return element.taskFiles;
+			util.log('   Get folder task files');
+			items = element.taskFiles;
 		}
-		if (element instanceof TaskFile) {
-			return element.scripts;
+		else if (element instanceof TaskFile) {
+			util.log('   Get file tasks/scripts');
+			items = element.scripts;
 		}
-		if (element instanceof TaskItem) {
-			return [];
-		}
-		if (element instanceof NoScripts) {
-			return [];
-		}
-		if (!element) {
+		else if (!element) {
+			util.log('   Get task tree');
 			if (this.taskTree) {
-				return this.taskTree;
+				items = this.taskTree;
 			}
 		}
-		return [];
+
+		return items;
 	}
 
 
@@ -402,8 +411,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			taskCt++;
 			util.log('');
 			util.log('Processing task ' + taskCt.toString() + ' of ' + tasks.length.toString());
-			util.logValue('   name', each.name);
-			util.logValue('   source', each.source);
+			util.logValue('   name', each.name, 2);
+			util.logValue('   source', each.source, 2);
 
 			let settingName: string = 'enable' + util.properCase(each.source);
 			if (configuration.get(settingName) && this.isWorkspaceFolder(each.scope) && !this.isInstallTask(each))
@@ -441,66 +450,52 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				//
 				// Logging
 				//
-				util.logValue('   scope.name', each.scope.name);
-				util.logValue('   scope.uri.path', each.scope.uri.path);
-				util.logValue('   scope.uri.fsPath', each.scope.uri.fsPath);
-				util.logValue('   relative Path', relativePath);
-				util.logValue('   type', definition.type);
+				util.logValue('   scope.name', each.scope.name, 2);
+				util.logValue('   scope.uri.path', each.scope.uri.path, 2);
+				util.logValue('   scope.uri.fsPath', each.scope.uri.fsPath, 2);
+				util.logValue('   relative Path', relativePath, 2);
+				util.logValue('   type', definition.type, 2);
 				if (definition.scriptType) {
-					util.logValue('      script type', definition.scriptType);	// if 'script' is defined, this is type npm
+					util.logValue('      script type', definition.scriptType, 2);	// if 'script' is defined, this is type npm
 				}
 				if (definition.script) {
-					util.logValue('   script', definition.script);	// if 'script' is defined, this is type npm
+					util.logValue('   script', definition.script, 2);	// if 'script' is defined, this is type npm
 				}
 				if (definition.path) {
-					util.logValue('   path', definition.path);
+					util.logValue('   path', definition.path, 2);
 				}
 				//
 				// Internal task providers will set a fileName property
 				//
 				if (definition.fileName) {
-					util.logValue('   file name', definition.fileName);
+					util.logValue('   file name', definition.fileName, 2);
 				}
 				//
 				// Script task providers will set a fileName property
 				//
 				if (definition.requiresArgs) {
-					util.logValue('   script requires args', 'true');
+					util.logValue('   script requires args', 'true', 2);
 				}
 				if (definition.cmdLine) {
-					util.logValue('   script cmd line', definition.cmdLine);
+					util.logValue('   script cmd line', definition.cmdLine, 2);
 				}
 
+				taskFile = files.get(id);
 				//
-				// Check excluded globs before further processing
+				// Create taskfile node if needed
 				//
-				let excluded: boolean = false;
-				if (relativePath) {
-					excluded = util.isExcluded(path.join(each.scope.uri.path, relativePath));
-				}
-				else {
-					excluded = util.isExcluded(each.scope.uri.path);
-				}
-
-				if (!excluded)
+				if (!taskFile)
 				{
-					taskFile = files.get(id);
-					//
-					// Create taskfile node if needed
-					//
-					if (!taskFile)
-					{
-						taskFile = new TaskFile(this.extensionContext, folder, definition, each.source, relativePath);
-						folder.addTaskFile(taskFile);
-						files.set(id, taskFile);
-						util.logValue('   Added source file container', each.source);
-					}
-					//
-					// Create and add task item to task file node
-					//
-					let taskItem = new TaskItem(this.extensionContext, taskFile, each);
-					taskFile.addScript(taskItem);
+					taskFile = new TaskFile(this.extensionContext, folder, definition, each.source, relativePath);
+					folder.addTaskFile(taskFile);
+					files.set(id, taskFile);
+					util.logValue('   Added source file container', each.source);
 				}
+				//
+				// Create and add task item to task file node
+				//
+				let taskItem = new TaskItem(this.extensionContext, taskFile, each);
+				taskFile.addScript(taskItem);
 			}
 			else {
 				util.log('   Skipping');

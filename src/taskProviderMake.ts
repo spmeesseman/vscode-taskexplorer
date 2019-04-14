@@ -52,14 +52,12 @@ async function detectMakefiles(): Promise<Task[]>
 		for (const folder of folders) 
 		{
 			let relativePattern = new RelativePattern(folder, '**/[Mm]akefile');
-			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
+			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
 			for (const fpath of paths) 
 			{
-				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-					let tasks = await readMakefiles(fpath);
-					visitedFiles.add(fpath.fsPath);
-					allTasks.push(...tasks);
-				}
+				let tasks = await readMakefiles(fpath);
+				visitedFiles.add(fpath.fsPath);
+				allTasks.push(...tasks);
 			}
 		}
 		return allTasks;

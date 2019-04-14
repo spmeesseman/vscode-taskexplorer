@@ -103,21 +103,18 @@ async function detectScriptFiles(): Promise<Task[]>
 		for (const folder of folders)
 		{
 			let relativePattern = new RelativePattern(folder, '**/*.{sh,py,rb,ps1,pl,bat,cmd,vbs,ahk,nsi}'); //,**/*.{SH,PY,RB,PS1,PL,BAT,CMD,VBS,AHK,NSI}}');
-			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
+			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
 			for (const fpath of paths)
 			{
-				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-					visitedFiles.add(fpath.fsPath);
-
-					let contents = await util.readFile(fpath.fsPath);
-					let textFile: TextDocument = await workspace.openTextDocument(fpath);
-					for (const type of Object.keys(scriptTable)) {
-						if (textFile.languageId === type) {
-							if (scriptTable[type].enabled) {
-								allTasks.push(createScriptTask(scriptTable[type], folder!, textFile.uri, contents));
-							}
-							break;
+				visitedFiles.add(fpath.fsPath);
+				let contents = await util.readFile(fpath.fsPath);
+				let textFile: TextDocument = await workspace.openTextDocument(fpath);
+				for (const type of Object.keys(scriptTable)) {
+					if (textFile.languageId === type) {
+						if (scriptTable[type].enabled) {
+							allTasks.push(createScriptTask(scriptTable[type], folder!, textFile.uri, contents));
 						}
+						break;
 					}
 				}
 			}

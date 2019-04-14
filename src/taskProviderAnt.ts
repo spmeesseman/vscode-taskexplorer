@@ -74,14 +74,12 @@ async function detectAntScripts(): Promise<Task[]>
 				relativePattern = new RelativePattern(folder, multiFilePattern);
 			}
 			
-			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
+			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
 			for (const fpath of paths) 
 			{
-				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-					let tasks = await readAntScripts(fpath);
-					visitedFiles.add(fpath.fsPath);
-					allTasks.push(...tasks);
-				}
+				let tasks = await readAntScripts(fpath);
+				visitedFiles.add(fpath.fsPath);
+				allTasks.push(...tasks);
 			}
 		}
 		return allTasks;

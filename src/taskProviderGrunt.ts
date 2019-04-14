@@ -56,14 +56,12 @@ async function detectGruntfiles(): Promise<Task[]>
 			// up by VSCoces internal Grunt task provider
 			//
 			let relativePattern = new RelativePattern(folder, '**/*/gruntfile.js');
-			let paths = await workspace.findFiles(relativePattern, '**/node_modules/**');
+			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
 			for (const fpath of paths) 
 			{
-				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-					let tasks = await readGruntfiles(fpath);
-					visitedFiles.add(fpath.fsPath);
-					allTasks.push(...tasks);
-				}
+				let tasks = await readGruntfiles(fpath);
+				visitedFiles.add(fpath.fsPath);
+				allTasks.push(...tasks);
 			}
 		}
 		return allTasks;
