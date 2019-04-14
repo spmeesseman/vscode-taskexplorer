@@ -24,13 +24,13 @@ Todos:
 
     Style:
 
-        ☐ Update NSIS node svg from embedded FileIcon @medium @30m
-        ☐ Update Bash node svg from embedded FileIcon @low @30m
-        ☐ Update Batch node svg from embedded FileIcon @low @30m
-        ☐ Update Perl node svg from embedded FileIcon @low @30m
-        ☐ Update Python node svg from embedded FileIcon @low @30m
-        ☐ Update Powershell node svg from embedded FileIcon @low @30m
-        ☐ Update Ruby node svg from embedded FileIcon @low @30m
+        ✔ Update NSIS node svg from embedded FileIcon @medium @30m @done(19-04-14 13:56)
+        ✔ Update Bash node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
+        ✔ Update Batch node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
+        ✔ Update Perl node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
+        ✔ Update Python node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
+        ✔ Update Powershell node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
+        ✔ Update Ruby node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
         ☐ Update folder node svg from embedded FolderIcon w/ open/closed state @medium @2h
 
     Tests:
