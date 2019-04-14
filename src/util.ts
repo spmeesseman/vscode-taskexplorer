@@ -80,7 +80,7 @@ export function isExcluded(uriPath: string)
         if (Array.isArray(exclude)) 
         {
             for (let pattern of exclude) {
-                this.logValue('   checking pattern', pattern, 2);
+                this.logValue('   checking pattern', pattern, 3);
                 if (testForExclusionPattern(uriPath, pattern)) {
                     this.log('   Excluded!', 2);
                     return true;
@@ -88,7 +88,7 @@ export function isExcluded(uriPath: string)
             }
         } 
         else {
-            this.logValue('   checking pattern', exclude, 2);
+            this.logValue('   checking pattern', exclude, 3);
             if (testForExclusionPattern(uriPath, exclude)) {
               this.log('   Excluded!', 2);
               return true;
@@ -128,6 +128,12 @@ export async function readFile(file: string): Promise<string>
             resolve(data.toString());
         });
     });
+}
+
+
+export function readFileSync(file: string)
+{
+    return fs.readFileSync(file).toString();
 }
 
 

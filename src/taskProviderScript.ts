@@ -13,31 +13,31 @@ type StringMap = { [s: string]: string; };
 let cachedTasks: Task[] = undefined;
 
 let scriptTable = {
-	shellscript: {
+	sh: {
 		exec: '',
 		type: 'bash',
 		args: [],
 		enabled: configuration.get('enableBash')
 	},
-	python: {
+	py: {
 		exec: configuration.get('pathToPython') ? configuration.get('pathToPython') : 'python',
 		type: 'python',
 		args: [],
 		enabled: configuration.get('enablePython')
 	},
-	ruby: {
+	rb: {
 		exec: configuration.get('pathToRuby') ? configuration.get('pathToRuby') : 'ruby',
 		type: 'ruby',
 		args: [],
 		enabled: configuration.get('enableRuby')
 	},
-	powershell: {
+	ps1: {
 		exec: 'powershell',
 		type: 'powershell',
 		args: [],
 		enabled: configuration.get('enablePowershell')
 	},
-	perl: {
+	pl: {
 		exec: configuration.get('pathToPerl') ? configuration.get('pathToPerl') : 'perl',
 		type: 'perl',
 		args: [],
@@ -49,7 +49,7 @@ let scriptTable = {
 		args: ['/c'],
 		enabled: configuration.get('enableBatch')
 	},
-	nsis: {
+	nsi: {
 		exec: configuration.get('pathToNsis') ? configuration.get('pathToNsis') : 'nsis.exe',
 		type: 'nsis',
 		args: [],
@@ -102,20 +102,25 @@ async function detectScriptFiles(): Promise<Task[]>
 	try {
 		for (const folder of folders)
 		{
-			let relativePattern = new RelativePattern(folder, '**/*.{sh,py,rb,ps1,pl,bat,cmd,vbs,ahk,nsi}'); //,**/*.{SH,PY,RB,PS1,PL,BAT,CMD,VBS,AHK,NSI}}');
+			let relativePattern = new RelativePattern(folder, '**/*.{sh,py,rb,ps1,pl,bat,nsi}'); //,**/*.{SH,PY,RB,PS1,PL,BAT,CMD,VBS,AHK,NSI}}');
 			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
 			for (const fpath of paths)
 			{
-				visitedFiles.add(fpath.fsPath);
-				let contents = await util.readFile(fpath.fsPath);
-				let textFile: TextDocument = await workspace.openTextDocument(fpath);
-				for (const type of Object.keys(scriptTable)) {
-					if (textFile.languageId === type) {
-						if (scriptTable[type].enabled) {
-							allTasks.push(createScriptTask(scriptTable[type], folder!, textFile.uri, contents));
-						}
-						break;
-					}
+				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
+
+					visitedFiles.add(fpath.fsPath);
+					//let contents = await util.readFile(fpath.fsPath);
+					//let textFile: TextDocument = await workspace.openTextDocument(fpath);
+					//for (const type of Object.keys(scriptTable)) {
+						//if (textFile.languageId === type) {
+							//if (scriptTable[type].enabled) {
+								console.log(path.extname(fpath.fsPath));
+								util.log(path.extname(fpath.fsPath));
+								allTasks.push(createScriptTask(scriptTable[path.extname(fpath.fsPath).substring(1)], folder!, fpath));
+							//}
+							//break;
+						//}
+					//}
 				}
 			}
 		}
@@ -135,7 +140,7 @@ export async function provideScriptFiles(): Promise<Task[]>
 }
 
 
-function createScriptTask(scriptDef: any, folder: WorkspaceFolder, packageJsonUri: Uri, contents: string): Task
+function createScriptTask(scriptDef: any, folder: WorkspaceFolder, packageJsonUri: Uri): Task
 {
 	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string
 	{
@@ -165,6 +170,7 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, packageJsonUr
 	//
 	if (scriptDef.type === 'batch')
 	{
+		let contents = util.readFileSync(packageJsonUri.fsPath);
 		kind.requiresArgs = (new RegExp("%[1-9]")).test(contents);
 	}
 
