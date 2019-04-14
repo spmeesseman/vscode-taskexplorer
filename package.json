@@ -295,6 +295,11 @@
                     "default": true,
                     "description": "%config.taskExplorer.enableTsc%"
                 },
+                "taskExplorer.enableGradle": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.enableGradle%"
+                },
                 "taskExplorer.enableGrunt": {
                     "type": "boolean",
                     "default": true,
@@ -471,6 +476,22 @@
                 }
             },
             {
+                "type": "gradle",
+                "required": [
+                    "script"
+                ],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.gradle.script%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.gradle.path%"
+                    }
+                }
+            },
+            {
                 "type": "grunt",
                 "required": [
                     "script"
@@ -478,11 +499,11 @@
                 "properties": {
                     "script": {
                         "type": "string",
-                        "description": "%taskdef.ant.script%"
+                        "description": "%taskdef.grunt.script%"
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.ant.path%"
+                        "description": "%taskdef.grunt.path%"
                     }
                 }
             },
@@ -494,11 +515,11 @@
                 "properties": {
                     "script": {
                         "type": "string",
-                        "description": "%taskdef.ant.script%"
+                        "description": "%taskdef.gulp.script%"
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.ant.path%"
+                        "description": "%taskdef.gulp.path%"
                     }
                 }
             },

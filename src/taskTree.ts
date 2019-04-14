@@ -21,6 +21,7 @@ import { configuration } from "./common/configuration";
 import { invalidateTasksCacheAnt } from './taskProviderAnt';
 import { invalidateTasksCacheMake } from './taskProviderMake';
 import { invalidateTasksCacheScript } from './taskProviderScript';
+import { invalidateTasksCacheGradle } from './taskProviderGradle';
 import { invalidateTasksCacheGrunt } from './taskProviderGrunt';
 import { invalidateTasksCacheGulp } from './taskProviderGulp';
 
@@ -72,6 +73,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		invalidateTasksCacheAnt();
 		invalidateTasksCacheMake();
 		invalidateTasksCacheScript();
+		invalidateTasksCacheGradle();
 		invalidateTasksCacheGrunt();
 		invalidateTasksCacheGulp();
 	}
