@@ -20,7 +20,7 @@ Todos:
         ☐ Support for VSCode compound tasks @low @8h
         ☐ If debug output was open when VS closes, re-open it when VSCode is started next @low @1h
         ☐ Support for detecting Visual Studio projects, and building them as tasks @low @16h
-        ☐ Support for gradle tasks
+        ✔ Support for gradle tasks @done(19-04-14 13:30)
 
     Style:
 
