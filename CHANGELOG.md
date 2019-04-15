@@ -1,3 +1,11 @@
+## [1.14.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.2...v1.14.3) (2019-04-15)
+
+
+### Bug Fixes
+
+* exclude globs have no effect on typescript tasks in subfolders ([75bcbda](https://github.com/spmeesseman/vscode-taskexplorer/commit/75bcbda))
+* grouped nodes have a tooltip of one of the task files within ([6d02dd5](https://github.com/spmeesseman/vscode-taskexplorer/commit/6d02dd5))
+
 ## [1.14.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.1...v1.14.2) (2019-04-15)
 
 
