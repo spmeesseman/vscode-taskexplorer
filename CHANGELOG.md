@@ -1,3 +1,11 @@
+## [1.14.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.1...v1.14.2) (2019-04-15)
+
+
+### Bug Fixes
+
+* gulp and grunt tasks in subdirs display incorrect task name. ([3d3f5bd](https://github.com/spmeesseman/vscode-taskexplorer/commit/3d3f5bd))
+* refreshing task tree does not pick up new task files ([289c110](https://github.com/spmeesseman/vscode-taskexplorer/commit/289c110))
+
 ## [1.14.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.0...v1.14.1) (2019-04-14)
 
 
