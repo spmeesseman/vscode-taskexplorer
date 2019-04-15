@@ -35,7 +35,6 @@
 
 * Visual Studio Code v1.30 or higher
 * To display npm, grunt, and gulp tasks, the 'Auto Detect' setting must be turned 'On' in VSCode for each respective task provider.
-* Some task types inherit the associated file type icon from VSCode when displayed in the task tree.  You must have an icon set installed and active (for example, the [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme)) for these task types to display icons in the tree nodes.
 
 ## Features
 
@@ -81,6 +80,10 @@ VSCode includes task providers for Grunt and Gulp internally.  The Grunt and Gul
 * Feel free to submit
   [pull requests](https://github.com/spmeesseman/vscode-taskexplorer/pulls)
 * [Contributors](https://github.com/spmeesseman/vscode-taskexplorer/graphs/contributors)
+
+## Credits
+
+* The [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme)) for some of the task type icons.
 
 ## Settings
 
