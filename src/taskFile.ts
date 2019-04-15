@@ -131,10 +131,20 @@ export class TaskFile extends TreeItem
 		this.fileName = TaskFile.getFileNameFromSource(source, folder, taskDef, relativePath, true);
 		this.isGroup = (group === true);
 
-		if (relativePath) {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, this.fileName));
-		} else {
-			this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, this.fileName));
+		if (!group) {
+			if (relativePath) {
+				this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, this.fileName));
+			} else {
+				this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, this.fileName));
+			}
+		}
+		else {
+			if (relativePath) {
+				this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath));
+			} else {
+				this.resourceUri = Uri.file(folder!.resourceUri!.fsPath);
+			}
+			this.tooltip = util.properCase(source) + " Tasks";
 		}
 
 		if (util.pathExists(context.asAbsolutePath(path.join('res', 'sources', this.taskSource + '.svg'))))
