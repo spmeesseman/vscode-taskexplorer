@@ -455,6 +455,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					if (each.name.indexOf(' - ') !== -1 && each.name.indexOf(' - tsconfig.json') === -1)
 					{
 						relativePath = path.dirname(each.name.substring(each.name.indexOf(' - ') + 3));
+						let excluded: boolean = false;
+						if (util.isExcluded(path.join(each.scope.uri.path, relativePath))) {
+							return; // continue forEach loop
+						}
+						
 					}
 				}
 
