@@ -1,3 +1,11 @@
+## [1.14.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.3...v1.14.4) (2019-04-16)
+
+
+### Bug Fixes
+
+* running a composite task (no shell) displays loading icon and stop icon, and is stuck in that state. ([d346c09](https://github.com/spmeesseman/vscode-taskexplorer/commit/d346c09))
+* starting and stopping a task is invalidating the tree before refreshing. ([32abff3](https://github.com/spmeesseman/vscode-taskexplorer/commit/32abff3))
+
 ## [1.14.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.2...v1.14.3) (2019-04-15)
 
 
