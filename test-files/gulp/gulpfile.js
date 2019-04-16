@@ -1,21 +1,21 @@
 //构建目录
 process.chdir(__dirname);
 
-var pkg = require("./package.json");
+var pkg = require("../../package.json");
 
 var gulp = require("gulp");
-var uglify = require("gulp-uglify");
-var cssmin = require("gulp-minify-css");
-var htmlmin= require("gulp-htmlmin");
-var header = require("gulp-header");
-var cheerio= require("gulp-cheerio");
-var fs  = require("fs");
-var del = require("del");
-var path= require("path");
-var plumber = require("gulp-plumber");
-var util = require("gulp-util");
-var gulpSequence = require("gulp-sequence");
-var javascriptObfuscator = require('gulp-javascript-obfuscator');
+// var uglify = require("gulp-uglify");
+// var cssmin = require("gulp-minify-css");
+// var htmlmin= require("gulp-htmlmin");
+// var header = require("gulp-header");
+// var cheerio= require("gulp-cheerio");
+// var fs  = require("fs");
+// var del = require("del");
+// var path= require("path");
+// var plumber = require("gulp-plumber");
+// var util = require("gulp-util");
+// var gulpSequence = require("gulp-sequence");
+// var javascriptObfuscator = require('gulp-javascript-obfuscator');
 
 function errorHandler(e) {
     util.beep();
@@ -164,8 +164,17 @@ gulp.task("mv", task.mv);
 //构建核心源文件
 gulp.task(
     "default",
-    [],
-    gulpSequence("clear", "minHtml", "minJs", "minCss", "mv", function() {
-        gulp.start("done");
-    })
+    //[],
+    (done) => {
+        console.log('why is this task always ran?');
+        done();
+    }
+    //gulpSequence("clear", "minHtml", "minJs", "minCss", "mv", function() {
+    //    gulp.start("done");
+    //}) 
 );
+
+gulp.task('test', (done) => {
+    console.log('test gulp subdir task!');
+    done();
+});
