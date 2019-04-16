@@ -59,8 +59,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		subscriptions.push(commands.registerCommand(name + '.refresh', this.refresh, this));
 		subscriptions.push(commands.registerCommand(name + '.runInstall', this.runInstall, this));
 
-		tasks.onDidStartTask(() => this.refresh());
-		tasks.onDidEndTask(() => this.refresh());
+		tasks.onDidStartTask(() => this.refresh(false));
+		tasks.onDidEndTask(() => this.refresh(false));
 	}
 
 
@@ -295,10 +295,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	public refresh()
+	public refresh(invalidate?: boolean)
 	{
 		this.taskTree = null;
-		this.invalidateTasksCache();
+		if (invalidate !== false) {
+			this.invalidateTasksCache();
+		}
 		this._onDidChangeTreeData.fire();
 	}
 
