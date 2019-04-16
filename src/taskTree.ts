@@ -148,12 +148,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				let eLine = documentText.indexOf('\n', scriptOffset);
 				if (eLine === -1) { eLine = documentText.length; }
 				let line = documentText.substring(bLine, eLine).trim();
-				while (bLine !== scriptOffset && scriptOffset !== -1 && line.indexOf(':') === -1) {
+				while (bLine !== -1 && bLine !== scriptOffset && scriptOffset !== -1 && line.indexOf(':') === -1) {
 					scriptOffset = documentText.indexOf(script.task.name, scriptOffset + 1);
 					bLine = documentText.lastIndexOf('\n', scriptOffset) + 1;
 					eLine = documentText.indexOf('\n', scriptOffset);
-					if (eLine === -1) { eLine = documentText.length; }
-					line = documentText.substring(bLine, eLine).trim();
+					if (bLine !== -1) {
+						if (eLine === -1) { eLine = documentText.length; }
+						line = documentText.substring(bLine, eLine).trim();
+					}
 				}
 				if (scriptOffset === -1) {
 					scriptOffset = 0;
