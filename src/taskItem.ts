@@ -39,9 +39,9 @@ export class TaskItem extends TreeItem
 		this.taskSource = task.source;
         this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source);
 			
-		this.contextValue = this.execution ? "runningScript" : "script";
+		this.contextValue = this.execution && task.definition.type !=="$composite" ? "runningScript" : "script";
 
-		if (this.execution) {
+		if (this.execution&& task.definition.type !=="$composite") {
 			this.iconPath = {
 				light: context.asAbsolutePath(path.join('res', 'light', 'loading.svg')),
 				dark: context.asAbsolutePath(path.join('res', 'dark', 'loading.svg'))
