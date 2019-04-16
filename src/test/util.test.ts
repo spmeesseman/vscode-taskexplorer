@@ -36,6 +36,14 @@ suite("Util tests", () =>
     assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", "true"));
   });
 
+  test("Log a null value to output window", () => {
+    assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", null));
+  });
+
+  test("Log undefined value to output window", () => {
+    assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", undefined));
+  });
+
   test("Camel case a value", () => {
     assert(util.camelCase("taskexplorer", 4) == 'taskExplorer');
   });

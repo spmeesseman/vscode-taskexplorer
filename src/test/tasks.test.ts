@@ -60,10 +60,14 @@ suite('Task tests', () =>
                 }
             }
         }
-        if (!didCodeDirExist) {
-            fs.rmdirSync(dirNameCode);
+        
+        try {
+            if (!didCodeDirExist) {
+                fs.rmdirSync(dirNameCode);
+            }
+            fs.rmdirSync(dirName);
         }
-        fs.rmdirSync(dirName);
+        catch {}
     });
 
 
@@ -136,8 +140,31 @@ suite('Task tests', () =>
         const file = path.join(workspace.rootPath, 'tsconfig.json');
         tempFiles.push(file);
 
+        const file2 = path.join(dirName, 'tsconfig.json');
+        tempFiles.push(file2);
+
         fs.writeFileSync(
             file,
+            '{\n' +
+            '    "compilerOptions":\n' +
+            '  {\n' +
+            '    "target": "es6",\n' +
+            '    "lib": ["es2016"],\n' +
+            '    "module": "commonjs",\n' +
+            '    "outDir": "./out",\n' +
+            '    "typeRoots": ["./node_modules/@types"],\n' +
+            '    "strict": true,\n' +
+            '    "experimentalDecorators": true,\n' +
+            '    "sourceMap": true,\n' +
+            '    "noImplicitThis": false\n' +
+            '  },\n' +
+            '  "include": ["**/*"],\n' +
+            '  "exclude": ["node_modules"]\n' +
+            '}\n'
+        );
+
+        fs.writeFileSync(
+            file2,
             '{\n' +
             '    "compilerOptions":\n' +
             '  {\n' +
@@ -163,15 +190,31 @@ suite('Task tests', () =>
         const file = path.join(workspace.rootPath, 'gulpfile.js');
         tempFiles.push(file);
 
+        const file2 = path.join(dirName, 'Gulpfile.js');
+        tempFiles.push(file2);
+
         fs.writeFileSync(
             file,
             "var gulp = require('gulp');\n" +
-            "gulp.task('hello', (done) => {\n" +
+            "gulp.task(\n'hello', (done) => {\n" +
             "    console.log('Hello!');\n" +
             '    done();\n' +
             '});\n' +
-            'gulp.task("hello2", (done) => {\n' +
+            'gulp.task(\n       "hello2", (done) => {\n' +
             "    console.log('Hello2!');\n" +
+            '    done();\n' +
+            '});\n'
+        );
+
+        fs.writeFileSync(
+            file2,
+            "var gulp = require('gulp');\n" +
+            "gulp.task('hello3', (done) => {\n" +
+            "    console.log('Hello3!');\n" +
+            '    done();\n' +
+            '});\n' +
+            'gulp.task(\n"hello4", (done) => {\n' +
+            "    console.log('Hello4!');\n" +
             '    done();\n' +
             '});\n'
         );
@@ -181,11 +224,20 @@ suite('Task tests', () =>
 
     test('Create makefiles', async function() 
     {
-        const file = path.join(dirName, 'Makefile');
+        const file = path.join(workspace.rootPath, 'Makefile');
         tempFiles.push(file);
+
+        const file2 = path.join(dirName, 'Makefile');
+        tempFiles.push(file2);
 
         fs.writeFileSync(
             file,
+            'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n'
+        );
+
+        fs.writeFileSync(
+            file2,
+            '# all tasks comment\n' +
             'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n'
         );
     });
@@ -207,14 +259,24 @@ suite('Task tests', () =>
     test('Create grunt task files', async function() 
     {
         const file = path.join(workspace.rootPath, 'GRUNTFILE.js');
-
         tempFiles.push(file);
+
+        const file2 = path.join(dirName, 'Gruntfile.js');
+        tempFiles.push(file2);
 
         fs.writeFileSync(
             file,
             'module.exports = function(grunt) {\n' +
-            "    grunt.registerTask('default', ['jshint:myproject']);\n" +
+            "    grunt.registerTask(\n'default', ['jshint:myproject']);\n" +
             '    grunt.registerTask("upload", [\'s3\']);\n' +
+            '};\n'
+        );
+
+        fs.writeFileSync(
+            file2,
+            'module.exports = function(grunt) {\n' +
+            '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
+            '    grunt.registerTask("upload2", ["s3"]);\n' +
             '};\n'
         );
     });
