@@ -55,7 +55,7 @@ async function detectGruntfiles(): Promise<Task[]>
 			// Note - pattern will ignore gruntfiles in root project dir, which would be picked
 			// up by VSCoces internal Grunt task provider
 			//
-			let relativePattern = new RelativePattern(folder, '**/*/gruntfile.js');
+			let relativePattern = new RelativePattern(folder, '**/*/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]');
 			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
 			for (const fpath of paths) 
 			{
