@@ -131,6 +131,24 @@ async function findTargets(fsPath: string): Promise<StringMap>
 			if (idx1 === -1) {
 				idx1 = line.indexOf('"');
 			}
+
+			if (idx1 === -1) // check next line for task name
+			{
+				let eol2 = eol + 1;
+				eol2 = contents.indexOf('\n', eol2);
+				line = contents.substring(eol + 1, eol2).trim();
+				if (line.startsWith('\'') || line.startsWith('"'))
+				{
+					idx1 = line.indexOf('\'');
+					if (idx1 === -1) {
+						idx1 = line.indexOf('"');
+					}
+					if (idx1 !== -1) {
+						eol = eol2;
+					}
+				}
+			}
+
 			if (idx1 !== -1)
 			{
 				idx1++;
@@ -163,13 +181,14 @@ async function findTargets(fsPath: string): Promise<StringMap>
 
 function createGruntTask(target: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri): Task 
 {
-	function getCommand(folder: WorkspaceFolder, cmd: string): string 
+	function getCommand(folder: WorkspaceFolder, relativePath: string, cmd: string): string 
 	{
-		let grunt = folder.uri.fsPath + "/node_modules/.bin/grunt";
+		//let grunt = 'folder.uri.fsPath + "/node_modules/.bin/grunt";
+		let grunt = 'grunt';
 
-		if (process.platform === 'win32') {
-			grunt = folder.uri.fsPath + "\\node_modules\\.bin\\grunt.cmd";
-		}
+		//if (process.platform === 'win32') {
+		//	grunt = folder.uri.fsPath + "\\node_modules\\.bin\\grunt.cmd";
+		//}
 
 		if (workspace.getConfiguration('taskExplorer').get('pathToGrunt')) {
 			grunt = workspace.getConfiguration('taskExplorer').get('pathToGrunt');
@@ -197,12 +216,12 @@ function createGruntTask(target: string, cmd: string, folder: WorkspaceFolder, p
 	}
 	let cwd = path.dirname(packageJsonUri.fsPath);
 
-	let args = [ target ];
+	let args = [ getCommand(folder, relativePath, cmd), target ];
 	let options = {
 		"cwd": cwd
 	};
 
-	let execution = new ShellExecution(getCommand(folder, cmd), args, options);
+	let execution = new ShellExecution('npx', args, options);
 
 	return new Task(kind, folder, target, 'grunt', execution, undefined);
 }
