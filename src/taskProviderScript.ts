@@ -50,7 +50,7 @@ let scriptTable = {
 		enabled: configuration.get('enableBatch')
 	},
 	nsi: {
-		exec: configuration.get('pathToNsis') ? configuration.get('pathToNsis') : 'nsis.exe',
+		exec: configuration.get('pathToNsis') ? configuration.get('pathToNsis') : 'makensis.exe',
 		type: 'nsis',
 		args: [],
 		enabled: configuration.get('enableNsis')
