@@ -1,3 +1,13 @@
+## [1.14.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.4...v1.14.5) (2019-04-17)
+
+
+### Bug Fixes
+
+* (1) grunt and gulp tasks found in subdirectories of the project root throw an error when ran, (2) tasks whose name occurs on a newline are not found ([1f04979](https://github.com/spmeesseman/vscode-taskexplorer/commit/1f04979))
+* gruntfiles and gulpfiles that are not all lowercase are not found ([b9e397d](https://github.com/spmeesseman/vscode-taskexplorer/commit/b9e397d))
+* makefile target parsing fails if a target name exists elsewhere in the file ([f7fb40d](https://github.com/spmeesseman/vscode-taskexplorer/commit/f7fb40d))
+* running an nsis task uses nsis.exe, should use makensis.exe ([f1598d4](https://github.com/spmeesseman/vscode-taskexplorer/commit/f1598d4))
+
 ## [1.14.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.3...v1.14.4) (2019-04-16)
 
 
