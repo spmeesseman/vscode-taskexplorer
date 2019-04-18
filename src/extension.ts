@@ -4,8 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {
-    commands, Disposable, ExtensionContext, OutputChannel,
-    workspace, window, FileSystemWatcher, ConfigurationChangeEvent
+    commands, Disposable, ExtensionContext, OutputChannel, Uri,
+    workspace, window, FileSystemWatcher, ConfigurationChangeEvent,
 } from 'vscode';
 import { TaskTreeDataProvider } from './taskTree';
 import { AntTaskProvider } from './taskProviderAnt';
@@ -234,13 +234,13 @@ function registerFileWatchers(context: ExtensionContext)
 }
 
 
-function refreshTree(taskType?: string) 
+function refreshTree(taskType?: string, uri?: Uri) 
 {
     if (configuration.get<boolean>('enableSideBar') && treeDataProvider) {
-        treeDataProvider.refresh(taskType);
+        treeDataProvider.refresh(taskType, uri);
     }
     if (configuration.get<boolean>('enableExplorerView') && treeDataProvider2) {
-        treeDataProvider2.refresh(taskType);
+        treeDataProvider2.refresh(taskType, uri);
     }
 }
 
@@ -300,9 +300,9 @@ function registerFileWatcher(context: ExtensionContext, taskType: string, fileBl
             watchers.set(taskType, watcher);
             context.subscriptions.push(watcher);
         }
-        watcher.onDidChange(_e => refreshTree(taskType));
-        watcher.onDidDelete(_e => refreshTree(taskType));
-        watcher.onDidCreate(_e => refreshTree(taskType));
+        watcher.onDidChange(_e => refreshTree(taskType, _e));
+        watcher.onDidDelete(_e => refreshTree(taskType, _e));
+        watcher.onDidCreate(_e => refreshTree(taskType, _e));
     } 
     else if (watchers.get(taskType)) {
         watcher.onDidChange(_e => undefined);
@@ -312,18 +312,31 @@ function registerFileWatcher(context: ExtensionContext, taskType: string, fileBl
 }
 
 
-function registerExplorer(name: string, context: ExtensionContext): TaskTreeDataProvider | undefined 
+function registerExplorer(name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined 
 {
-    if (workspace.workspaceFolders) 
+    if (enabled !== false)
     {
-        let treeDataProvider = new TaskTreeDataProvider(name, context);
-        const view = window.createTreeView(name, { treeDataProvider: treeDataProvider, showCollapseAll: true });
-        context.subscriptions.push(view);
-        return treeDataProvider;
-    } 
-    else {
-        log('No workspace folders!!!');
+        if (workspace.workspaceFolders) 
+        {
+            let treeDataProvider = new TaskTreeDataProvider(name, context);
+            const view = window.createTreeView(name, { treeDataProvider: treeDataProvider, showCollapseAll: true });
+            context.subscriptions.push(view);
+            return treeDataProvider;
+        } 
+        else {
+            log('No workspace folders!!!');
+        }
     }
+    //else
+    //{
+    //    context.subscriptions.forEach(each => {
+    //        let treeView: TreeView<TreeItem> = each as TreeView<TreeItem>;
+    //        treeView.
+    //        if (each instanceof TreeView) {
+    //
+    //        }
+    //    });
+    //}
     return undefined;
 }
 

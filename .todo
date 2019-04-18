@@ -21,6 +21,8 @@ Todos:
         ☐ If debug output was open when VS closes, re-open it when VSCode is started next @low @1h
         ☐ Support for detecting Visual Studio projects, and building them as tasks @low @16h
         ☐ Support for gradle tasks
+        ✔ Increase performance by invalidating select dirty files in cache instead of entire script file cache @low @4h @done(19-04-18 13:25)
+        ☐ Increase performance by invalidating parts of tree ui instead of whole tree @low @8h
 
     Style:
 

@@ -452,9 +452,7 @@
         "taskDefinitions": [
             {
                 "type": "ant",
-                "required": [
-                    "script"
-                ],
+                "required": [],
                 "properties": {
                     "script": {
                         "type": "string",
@@ -467,14 +465,16 @@
                     "fileName": {
                         "type": "string",
                         "description": "%taskdef.ant.fileName%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.ant.fileName%"
                     }
                 }
             },
             {
                 "type": "grunt",
-                "required": [
-                    "script"
-                ],
+                "required": [],
                 "properties": {
                     "script": {
                         "type": "string",
@@ -483,14 +483,20 @@
                     "path": {
                         "type": "string",
                         "description": "%taskdef.ant.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.ant.fileName%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.ant.fileName%"
                     }
                 }
             },
             {
                 "type": "gulp",
-                "required": [
-                    "script"
-                ],
+                "required": [],
                 "properties": {
                     "script": {
                         "type": "string",
@@ -499,14 +505,20 @@
                     "path": {
                         "type": "string",
                         "description": "%taskdef.ant.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.ant.fileName%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.ant.fileName%"
                     }
                 }
             },
             {
                 "type": "make",
-                "required": [
-                    "script"
-                ],
+                "required": [],
                 "properties": {
                     "script": {
                         "type": "string",
@@ -515,6 +527,14 @@
                     "path": {
                         "type": "string",
                         "description": "%taskdef.make.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.ant.fileName%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.ant.fileName%"
                     }
                 }
             },
@@ -551,6 +571,10 @@
                         "type": "boolean",
                         "description": "%taskdef.script.requiresArgs%",
                         "default": false
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.ant.fileName%"
                     }
                 }
             }

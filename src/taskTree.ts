@@ -10,7 +10,7 @@ import {
 	Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
 	TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
 	commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-	CancellationToken, ShellExecution
+	CancellationToken, ShellExecution, TaskStartEvent, TaskEndEvent, TaskExecution
 } from 'vscode';
 import { visit, JSONVisitor } from 'jsonc-parser';
 import * as nls from 'vscode-nls';
@@ -59,32 +59,38 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		subscriptions.push(commands.registerCommand(name + '.refresh', this.refresh, this));
 		subscriptions.push(commands.registerCommand(name + '.runInstall', this.runInstall, this));
 
-		tasks.onDidStartTask(() => this.refresh(false));
-		tasks.onDidEndTask(() => this.refresh(false));
+		tasks.onDidStartTask((_e) => this.refresh(false));
+		tasks.onDidEndTask((_e) => this.refresh(false));
 	}
 
 
-	private invalidateTasksCache(invalidate?: any) 
+	private invalidateTasksCache(opt1: string, opt2: Uri) 
 	{
 		//
 		// All internal task providers export an invalidate() function...
 		//
-		if (invalidate && typeof invalidate === 'string')
+		// If 'opt1' is a string then a filesystemwatcher or taskevent was triggered for the
+		// task type defined in the 'opt1' parameter.
+		//
+		// 'opt2' should contain the Uri of the file that was edited, or the Task if this was 
+		// a task event
+		//
+		if (opt1)
 		{
-			if (invalidate === 'ant') {
-				invalidateTasksCacheAnt();
+			if (opt1 === 'ant') {
+				invalidateTasksCacheAnt(opt2);
 			}
-			else if (invalidate === 'grunt') {
-				invalidateTasksCacheGrunt();
+			else if (opt1 === 'grunt') {
+				invalidateTasksCacheGrunt(opt2);
 			}
-			else if (invalidate === 'gulp') {
-				invalidateTasksCacheGulp();
+			else if (opt1 === 'gulp') {
+				invalidateTasksCacheGulp(opt2);
 			}
-			else if (invalidate === 'make') {
-				invalidateTasksCacheMake();
+			else if (opt1 === 'make') {
+				invalidateTasksCacheMake(opt2);
 			}
 			else {
-				invalidateTasksCacheScript();
+				invalidateTasksCacheScript(opt2);
 			}
 		}
 		else
@@ -318,12 +324,26 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	public refresh(invalidate?: any)
+	public refresh(invalidate?: any, opt?: Uri)
 	{
+		//
+		// TODO - performance enhancement
+		// Can only invalidate a section of the tree depending on tasktype/uri?
+		//
 		this.taskTree = null;
+
+		//
+		// If invalidate is false, then this is a task start/stop
+		//
+		// If invalidate is truthy but opt is falsey, then the refresh button was clicked
+		//
+		// If invalidate and opt are both truthy, then a filesystemwatcher event or a 
+		// task start/finish event just triggered
+		//
 		if (invalidate !== false) {
-			this.invalidateTasksCache(invalidate);
+			this.invalidateTasksCache(invalidate, opt);
 		}
+
 		this._onDidChangeTreeData.fire();
 	}
 

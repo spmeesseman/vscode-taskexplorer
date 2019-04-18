@@ -14,9 +14,10 @@ let cachedTasks: Task[] = undefined;
 
 interface AntTaskDefinition extends TaskDefinition 
 {
-	script: string;
+	script?: string;
 	path?: string;
 	fileName?: string;
+	uri?: Uri;
 }
 
 export class AntTaskProvider implements TaskProvider 
@@ -34,9 +35,56 @@ export class AntTaskProvider implements TaskProvider
 }
 
 
-export function invalidateTasksCacheAnt() 
+export async function invalidateTasksCacheAnt(opt?: Uri) : Promise<void> 
 {
+	if (opt) 
+	{
+		util.log('');
+		util.log('invalidateTasksCacheAnt');
+
+		let rmvTasks: Task[] = [];
+		let uri: Uri = opt as Uri;
+
+		cachedTasks.forEach(async each => {
+			let cstDef: AntTaskDefinition = each.definition;
+			if (cstDef.uri.fsPath === opt.fsPath) {
+				rmvTasks.push(each);
+			}
+		});
+
+		if (rmvTasks.length > 0)
+		{
+			rmvTasks.forEach(each => {
+				util.log('   removing old task ' + each.name);
+				removeTask(each);
+			});
+		}
+
+		let tasks = await readAntfile(opt);
+		cachedTasks.push(...tasks);
+
+		return;
+	}
+
 	cachedTasks = undefined;
+}
+
+
+function removeTask(task: Task) 
+{
+	let idx: number = -1;
+	let idx2: number = -1;
+
+	cachedTasks.forEach(each => {
+		idx++;
+		if (task === each) {
+			idx2 = idx;
+		}
+	});
+
+	if (idx2 !== -1 && idx2 < cachedTasks.length) {
+		cachedTasks.splice(idx2, 1);
+	}
 }
 
 
@@ -78,7 +126,7 @@ async function detectAntScripts(): Promise<Task[]>
 			for (const fpath of paths) 
 			{
 				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-					let tasks = await readAntScripts(fpath);
+					let tasks = await readAntfile(fpath);
 					visitedFiles.add(fpath.fsPath);
 					allTasks.push(...tasks);
 				}
@@ -100,16 +148,16 @@ export async function provideAntScripts(): Promise<Task[]>
 }
 
 
-async function readAntScripts(packageJsonUri: Uri): Promise<Task[]> 
+async function readAntfile(uri: Uri): Promise<Task[]> 
 {
 	let emptyTasks: Task[] = [];
 
-	let folder = workspace.getWorkspaceFolder(packageJsonUri);
+	let folder = workspace.getWorkspaceFolder(uri);
 	if (!folder) {
 		return emptyTasks;
     }
     
-    let contents = await util.readFile(packageJsonUri.fsPath);
+    let contents = await util.readFile(uri.fsPath);
 
 	let scripts = await findAllAntScripts(contents);
 	if (!scripts) {
@@ -119,7 +167,7 @@ async function readAntScripts(packageJsonUri: Uri): Promise<Task[]>
 	const result: Task[] = [];
 
 	Object.keys(scripts).forEach(each => {
-		const task = createAntTask(each, `${each}`, folder!, packageJsonUri);
+		const task = createAntTask(each, `${each}`, folder!, uri);
 		if (task) {
 			task.group = TaskGroup.Build;
 			result.push(task);
@@ -180,7 +228,7 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
 }
 
 
-function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, packageJsonUri: Uri): Task 
+function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task 
 {
 	function getCommand(folder: WorkspaceFolder, cmd: string): string 
 	{
@@ -200,27 +248,28 @@ function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, pac
 		return ant; 
 	}
 
-	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string 
+	function getRelativePath(folder: WorkspaceFolder, uri: Uri): string 
 	{
 		let rootUri = folder.uri;
-		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.lastIndexOf('/') + 1);
+		let absolutePath = uri.path.substring(0, uri.path.lastIndexOf('/') + 1);
 		return absolutePath.substring(rootUri.path.length + 1);
 	}
 	
-	let antFile = path.basename(packageJsonUri.path);
+	let antFile = path.basename(uri.path);
 
 	let kind: AntTaskDefinition = {
 		type: 'ant',
 		script: target,
 		path: '', // populated below if relativePath is non-empty
-		fileName: antFile
+		fileName: antFile,
+		uri: uri
 	};
 
-	let relativePath = getRelativePath(folder, packageJsonUri);
+	let relativePath = getRelativePath(folder, uri);
 	if (relativePath.length) {
 		kind.path = relativePath;
 	}
-	let cwd = path.dirname(packageJsonUri.fsPath);
+	let cwd = path.dirname(uri.fsPath);
 
 	let args = [ target ];
 	let options = null;

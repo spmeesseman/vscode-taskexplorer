@@ -65,6 +65,7 @@ interface ScriptTaskDefinition extends TaskDefinition
 	scriptFile: boolean;
 	path?: string;
 	requiresArgs?: boolean;
+	uri?: Uri;
 }
 
 export class ScriptTaskProvider implements TaskProvider
@@ -82,9 +83,66 @@ export class ScriptTaskProvider implements TaskProvider
 }
 
 
-export function invalidateTasksCacheScript()
+export async function invalidateTasksCacheScript(opt?: Uri) : Promise<void> 
 {
+	util.log('');
+	util.log('invalidateTasksCacheScript');
+
+	if (opt) 
+	{
+		let rmvTasks: Task[] = [];
+		let uri: Uri = opt as Uri;
+		let folder = workspace.getWorkspaceFolder(uri);
+
+		cachedTasks.forEach(async each => {
+			let cstDef: ScriptTaskDefinition = each.definition as ScriptTaskDefinition;
+			if (cstDef.uri.fsPath === opt.fsPath) {
+				rmvTasks.push(each);
+			}
+		});
+
+		if (rmvTasks.length > 0)
+		{
+			rmvTasks.forEach(each => {
+				util.log('   removing old task ' + each.name);
+				removeTask(each);
+			});
+		}
+
+		let task = createScriptTask(scriptTable[path.extname(opt.fsPath).substring(1)], folder!,  opt);
+		cachedTasks.push(task);
+
+		return;
+	}
+
 	cachedTasks = undefined;
+}
+
+
+function removeTask(task: Task) 
+{
+	let idx: number = -1;
+	let idx2: number = -1;
+
+	cachedTasks.forEach(each => {
+		idx++;
+		if (task === each) {
+			idx2 = idx;
+		}
+	});
+
+	if (idx2 !== -1 && idx2 < cachedTasks.length) {
+		cachedTasks.splice(idx2, 1);
+	}
+}
+
+
+async function provideScriptFiles(): Promise<Task[]>
+{
+	if (!cachedTasks) {
+		cachedTasks = await detectScriptFiles();
+	}
+	return cachedTasks;
 }
 
 
@@ -129,26 +187,17 @@ async function detectScriptFiles(): Promise<Task[]>
 }
 
 
-export async function provideScriptFiles(): Promise<Task[]>
+function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Task
 {
-	if (!cachedTasks) {
-		cachedTasks = await detectScriptFiles();
-	}
-	return cachedTasks;
-}
-
-
-function createScriptTask(scriptDef: any, folder: WorkspaceFolder, packageJsonUri: Uri): Task
-{
-	function getRelativePath(folder: WorkspaceFolder, packageJsonUri: Uri): string
+	function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
 	{
 		let rootUri = folder.uri;
-		let absolutePath = packageJsonUri.path.substring(0, packageJsonUri.path.lastIndexOf('/') + 1);
+		let absolutePath = uri.path.substring(0, uri.path.lastIndexOf('/') + 1);
 		return absolutePath.substring(rootUri.path.length + 1);
 	}
 
-	let cwd = path.dirname(packageJsonUri.fsPath);
-	let fileName = path.basename(packageJsonUri.fsPath);
+	let cwd = path.dirname(uri.fsPath);
+	let fileName = path.basename(uri.fsPath);
     let sep: string = (process.platform === 'win32' ? "\\" : "/");
 
 	let kind: ScriptTaskDefinition = {
@@ -158,7 +207,8 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, packageJsonUr
 		scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
 		path: '',
 		cmdLine: (scriptDef.exec.indexOf(" ") !== -1 ? "\"" + scriptDef.exec + "\"" : scriptDef.exec),
-		requiresArgs: false
+		requiresArgs: false,
+		uri: uri
 	};
 
 	//
@@ -168,14 +218,14 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, packageJsonUr
 	//
 	if (scriptDef.type === 'batch')
 	{
-		let contents = util.readFileSync(packageJsonUri.fsPath);
+		let contents = util.readFileSync(uri.fsPath);
 		kind.requiresArgs = (new RegExp("%[1-9]")).test(contents);
 	}
 
 	//
 	// Get relative dir to workspace folder
 	//
-	let relativePath = getRelativePath(folder, packageJsonUri);
+	let relativePath = getRelativePath(folder, uri);
 	if (relativePath.length) {
 		kind.path = relativePath;
 	}
