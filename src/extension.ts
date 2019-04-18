@@ -120,6 +120,11 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
         registerFileWatcher(context, 'npm', '**/package.json', configuration.get<boolean>('enableNpm'));
         refresh = true;
     }
+    
+    if (e.affectsConfiguration('taskExplorer.enableNsis')) {
+        registerFileWatcher(context, 'nsis', '**/*.nsi', configuration.get<boolean>('enableNsis'));
+        refresh = true;
+    }
 
     if (e.affectsConfiguration('taskExplorer.enablePerl')) {
         registerFileWatcher(context, 'perl', '**/*.pl', configuration.get<boolean>('enablePerl'));
@@ -206,6 +211,10 @@ function registerFileWatchers(context: ExtensionContext)
 
     if (configuration.get<boolean>('enableNpm')) {
         registerFileWatcher(context, 'npm', '**/package.json');
+    }
+
+    if (configuration.get<boolean>('enableNsis')) {
+        registerFileWatcher(context, 'npm', '**/*.nsi');
     }
 
     if (configuration.get<boolean>('enablePerl')) {
