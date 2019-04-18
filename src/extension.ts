@@ -234,13 +234,13 @@ function registerFileWatchers(context: ExtensionContext)
 }
 
 
-function refreshTree() 
+function refreshTree(taskType?: string) 
 {
     if (configuration.get<boolean>('enableSideBar') && treeDataProvider) {
-        treeDataProvider.refresh();
+        treeDataProvider.refresh(taskType);
     }
     if (configuration.get<boolean>('enableExplorerView') && treeDataProvider2) {
-        treeDataProvider2.refresh();
+        treeDataProvider2.refresh(taskType);
     }
 }
 
@@ -300,9 +300,9 @@ function registerFileWatcher(context: ExtensionContext, taskType: string, fileBl
             watchers.set(taskType, watcher);
             context.subscriptions.push(watcher);
         }
-        watcher.onDidChange(_e => refreshTree());
-        watcher.onDidDelete(_e => refreshTree());
-        watcher.onDidCreate(_e => refreshTree());
+        watcher.onDidChange(_e => refreshTree(taskType));
+        watcher.onDidDelete(_e => refreshTree(taskType));
+        watcher.onDidCreate(_e => refreshTree(taskType));
     } 
     else if (watchers.get(taskType)) {
         watcher.onDidChange(_e => undefined);

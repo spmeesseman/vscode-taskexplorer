@@ -64,16 +64,37 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private invalidateTasksCache() 
+	private invalidateTasksCache(invalidate?: any) 
 	{
 		//
 		// All internal task providers export an invalidate() function...
 		//
-		invalidateTasksCacheAnt();
-		invalidateTasksCacheMake();
-		invalidateTasksCacheScript();
-		invalidateTasksCacheGrunt();
-		invalidateTasksCacheGulp();
+		if (invalidate && typeof invalidate === 'string')
+		{
+			if (invalidate === 'ant') {
+				invalidateTasksCacheAnt();
+			}
+			else if (invalidate === 'grunt') {
+				invalidateTasksCacheGrunt();
+			}
+			else if (invalidate === 'gulp') {
+				invalidateTasksCacheGulp();
+			}
+			else if (invalidate === 'make') {
+				invalidateTasksCacheMake();
+			}
+			else {
+				invalidateTasksCacheScript();
+			}
+		}
+		else
+		{
+			invalidateTasksCacheAnt();
+			invalidateTasksCacheMake();
+			invalidateTasksCacheScript();
+			invalidateTasksCacheGrunt();
+			invalidateTasksCacheGulp();
+		}
 	}
 
 
@@ -297,11 +318,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	public refresh(invalidate?: boolean)
+	public refresh(invalidate?: any)
 	{
 		this.taskTree = null;
 		if (invalidate !== false) {
-			this.invalidateTasksCache();
+			this.invalidateTasksCache(invalidate);
 		}
 		this._onDidChangeTreeData.fire();
 	}
