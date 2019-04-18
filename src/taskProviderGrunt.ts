@@ -50,13 +50,10 @@ export async function invalidateTasksCacheGrunt(opt?: Uri) : Promise<void>
 			}
 		});
 
-		if (rmvTasks.length > 0)
-		{
-			rmvTasks.forEach(each => {
-				util.log('   removing old task ' + each.name);
-				removeTask(each);
-			});
-		}
+		rmvTasks.forEach(each => {
+			util.log('   removing old task ' + each.name);
+			util.removeFromArray(cachedTasks, each);
+		});
 
 		let tasks = await readGruntfile(opt);
 		cachedTasks.push(...tasks);
@@ -65,24 +62,6 @@ export async function invalidateTasksCacheGrunt(opt?: Uri) : Promise<void>
 	}
 
 	cachedTasks = undefined;
-}
-
-
-function removeTask(task: Task) 
-{
-	let idx: number = -1;
-	let idx2: number = -1;
-
-	cachedTasks.forEach(each => {
-		idx++;
-		if (task === each) {
-			idx2 = idx;
-		}
-	});
-
-	if (idx2 !== -1 && idx2 < cachedTasks.length) {
-		cachedTasks.splice(idx2, 1);
-	}
 }
 
 

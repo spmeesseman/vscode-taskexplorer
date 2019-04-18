@@ -137,6 +137,24 @@ export function readFileSync(file: string)
 }
 
 
+export async function removeFromArray(arr: any[], item: any)
+{
+    let idx: number = -1;
+	let idx2: number = -1;
+
+	arr.forEach(each => {
+		idx++;
+		if (item === each) {
+			idx2 = idx;
+		}
+	});
+
+	if (idx2 !== -1 && idx2 < arr.length) {
+		arr.splice(idx2, 1);
+	}
+}
+
+
 export async function log(msg: string, level?: number) 
 {
     if (level && level > configuration.get<number>('debugLevel')) {
