@@ -17,6 +17,7 @@ import * as nls from 'vscode-nls';
 import { TaskFolder } from './taskFolder';
 import { TaskFile } from './taskFile';
 import { TaskItem } from './taskItem';
+import { views } from './extension';
 import { configuration } from "./common/configuration";
 import { invalidateTasksCacheAnt } from './taskProviderAnt';
 import { invalidateTasksCacheMake } from './taskProviderMake';
@@ -39,6 +40,7 @@ class NoScripts extends TreeItem
 
 export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 {
+	private name: string;
 	private taskTree: TaskFolder[] | TaskFile[] | NoScripts[] | null = null;
 	private extensionContext: ExtensionContext;
 	private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
@@ -48,6 +50,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	{
 		const subscriptions = context.subscriptions;
 		this.extensionContext = context;
+		this.name = name;
 		subscriptions.push(commands.registerCommand(name + '.run', this.run, this));
 		subscriptions.push(commands.registerCommand(name + '.stop', (taskTreeItem: TaskItem) =>
 		{
@@ -327,6 +330,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	public refresh(invalidate?: any, opt?: Uri)
 	{
 		//
+		// If a view was turned off in settings, the disposable view still remains
+		// ans will still receive events.  CHeck visibility property, and of this view
+		// is hidden/disabled, then exit
+		//
+		if (views.get(this.name))
+		{
+			if (!views.get(this.name).visible) {
+				return;
+			}
+		}
+
+		//
 		// TODO - performance enhancement
 		// Can only invalidate a section of the tree depending on tasktype/uri?
 		//
@@ -592,6 +607,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				return a.taskSource.localeCompare(b.taskSource);
 			});
 
+			//
+			// Create groupings
+			//
 			let prevTask: TaskFile;
 			folder.taskFiles.forEach(each => 
 			{
@@ -600,7 +618,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					let id = folder.label + each.taskSource;
 					let subfolder: TaskFile = subfolders.get(id);
 					if (!subfolder) {
-						subfolder = new TaskFile(this.extensionContext, folder, each.scripts[0].task.definition, each.taskSource, each.path, true); //(each.scripts[0].getFolder());
+						subfolder = new TaskFile(this.extensionContext, folder, each.scripts[0].task.definition, each.taskSource, each.path, true);
 						subfolders.set(id, subfolder);
 						folder.addTaskFile(subfolder);
 						subfolder.addScript(prevTask);
@@ -627,6 +645,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			//
 			folder.taskFiles.sort(function(a, b) {
 				return a.taskSource.localeCompare(b.taskSource);
+			});
+			folder.taskFiles.forEach(each => {
+				if (each.isGroup) {
+					each.scripts.sort(function(a, b) {
+						return a.label.localeCompare(b.label);
+					});
+				}
 			});
 		});
 
