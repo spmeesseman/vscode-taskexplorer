@@ -1,3 +1,10 @@
+## [1.14.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.5...v1.14.6) (2019-04-18)
+
+
+### Performance Improvements
+
+* after edit a task file, invalidate only that task tree node ([554394b](https://github.com/spmeesseman/vscode-taskexplorer/commit/554394b))
+
 ## [1.14.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.4...v1.14.5) (2019-04-17)
 
 
