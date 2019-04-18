@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {
-    commands, Disposable, ExtensionContext, OutputChannel, Uri,
+    commands, Disposable, ExtensionContext, OutputChannel, Uri, TreeView, TreeItem,
     workspace, window, FileSystemWatcher, ConfigurationChangeEvent,
 } from 'vscode';
 import { TaskTreeDataProvider } from './taskTree';
@@ -19,7 +19,7 @@ import { log } from './util';
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
 export let logOutputChannel: OutputChannel | undefined;
-
+export let views: Map<String, TreeView<TreeItem>> = new Map();
 let watchers: Map<String, FileSystemWatcher> = new Map();
 
 
@@ -319,8 +319,8 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
         if (workspace.workspaceFolders) 
         {
             let treeDataProvider = new TaskTreeDataProvider(name, context);
-            const view = window.createTreeView(name, { treeDataProvider: treeDataProvider, showCollapseAll: true });
-            context.subscriptions.push(view);
+            views.set(name, window.createTreeView(name, { treeDataProvider: treeDataProvider, showCollapseAll: true }));
+            context.subscriptions.push(views.get(name));
             return treeDataProvider;
         } 
         else {
