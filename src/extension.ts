@@ -92,67 +92,67 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     }
 
     if (e.affectsConfiguration('taskExplorer.enableBash')) {
-        registerFileWatcher(context, 'bash', '**/*.sh', configuration.get<boolean>('enableBash'));
+        registerFileWatcher(context, 'bash', '**/*.sh', true, configuration.get<boolean>('enableBash'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableBatch')) {
-        registerFileWatcher(context, 'batch', '**/*.bat', configuration.get<boolean>('enableBatch'));
+        registerFileWatcher(context, 'batch', '**/*.bat', true, configuration.get<boolean>('enableBatch'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableGrunt')) {
-        registerFileWatcher(context, 'grunt', '**/gruntfile.js', configuration.get<boolean>('enableGrunt'));
+        registerFileWatcher(context, 'grunt', '**/gruntfile.js', false, configuration.get<boolean>('enableGrunt'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableGulp')) {
-        registerFileWatcher(context, 'gulp', '**/gulpfile.js', configuration.get<boolean>('enableGulp'));
+        registerFileWatcher(context, 'gulp', '**/gulpfile.js', false, configuration.get<boolean>('enableGulp'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableMake')) {
-        registerFileWatcher(context, 'bash', '**/*.sh', configuration.get<boolean>('enableMake'));
+        registerFileWatcher(context, 'bash', '**/Makefile', false, configuration.get<boolean>('enableMake'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableNpm')) {
-        registerFileWatcher(context, 'npm', '**/package.json', configuration.get<boolean>('enableNpm'));
+        registerFileWatcher(context, 'npm', '**/package.json', false, configuration.get<boolean>('enableNpm'));
         refresh = true;
     }
     
     if (e.affectsConfiguration('taskExplorer.enableNsis')) {
-        registerFileWatcher(context, 'nsis', '**/*.nsi', configuration.get<boolean>('enableNsis'));
+        registerFileWatcher(context, 'nsis', '**/*.nsi', true, configuration.get<boolean>('enableNsis'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enablePerl')) {
-        registerFileWatcher(context, 'perl', '**/*.pl', configuration.get<boolean>('enablePerl'));
+        registerFileWatcher(context, 'perl', '**/*.pl', true, configuration.get<boolean>('enablePerl'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enablePowershell')) {
-        registerFileWatcher(context, 'powershell', '**/*.ps1', configuration.get<boolean>('enablePowershell'));
+        registerFileWatcher(context, 'powershell', '**/*.ps1', true, configuration.get<boolean>('enablePowershell'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enablePython')) {
-        registerFileWatcher(context, 'python', '**/*.py', configuration.get<boolean>('enablePython'));
+        registerFileWatcher(context, 'python', '**/*.py', true, configuration.get<boolean>('enablePython'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableRuby')) {
-        registerFileWatcher(context, 'ruby', '**/*.rb', configuration.get<boolean>('enableRuby'));
+        registerFileWatcher(context, 'ruby', '**/*.rb', true, configuration.get<boolean>('enableRuby'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableTsc')) {
-        registerFileWatcher(context, 'tsc', '**/tsconfig.json', configuration.get<boolean>('enableTsc'));
+        registerFileWatcher(context, 'tsc', '**/tsconfig.json', false, configuration.get<boolean>('enableTsc'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableWorkspace')) {
-        registerFileWatcher(context, 'workspace', '**/.vscode/tasks.json', configuration.get<boolean>('enableWorkspace'));
+        registerFileWatcher(context, 'workspace', '**/.vscode/tasks.json', false, configuration.get<boolean>('enableWorkspace'));
         refresh = true;
     }
 
@@ -190,11 +190,11 @@ function registerFileWatchers(context: ExtensionContext)
         registerFileWatcherAnt(context);
     }
     if (configuration.get<boolean>('enableBash')) {
-        registerFileWatcher(context, 'bash', '**/*.sh');
+        registerFileWatcher(context, 'bash', '**/*.sh', true);
     }
 
     if (configuration.get<boolean>('enableBatch')) {
-        registerFileWatcher(context, 'batch', '**/*.bat');
+        registerFileWatcher(context, 'batch', '**/*.bat', true);
     }
 
     if (configuration.get<boolean>('enableGrunt')) {
@@ -206,7 +206,7 @@ function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>('enableMake')) {
-        registerFileWatcher(context, 'bash', '**/*.sh');
+        registerFileWatcher(context, 'bash', '**/Makefile');
     }
 
     if (configuration.get<boolean>('enableNpm')) {
@@ -214,23 +214,23 @@ function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>('enableNsis')) {
-        registerFileWatcher(context, 'npm', '**/*.nsi');
+        registerFileWatcher(context, 'nsis', '**/*.nsi', true);
     }
 
     if (configuration.get<boolean>('enablePerl')) {
-        registerFileWatcher(context, 'perl', '**/*.pl');
+        registerFileWatcher(context, 'perl', '**/*.pl', true);
     }
 
     if (configuration.get<boolean>('enablePowershell')) {
-        registerFileWatcher(context, 'powershell', '**/*.ps1');
+        registerFileWatcher(context, 'powershell', '**/*.ps1', true);
     }
 
     if (configuration.get<boolean>('enablePython')) {
-        registerFileWatcher(context, 'python', '**/*.py');
+        registerFileWatcher(context, 'python', '**/*.py', true);
     }
 
     if (configuration.get<boolean>('enableRuby')) {
-        registerFileWatcher(context, 'ruby', '**/*.rb');
+        registerFileWatcher(context, 'ruby', '**/*.rb', true);
     }
 
     if (configuration.get<boolean>('enableTsc')) {
@@ -272,7 +272,7 @@ function registerTaskProviders(context: ExtensionContext)
 
 function registerFileWatcherAnt(context: ExtensionContext, enabled?: boolean)
  {
-    registerFileWatcher(context, 'ant', '**/[Bb]uild.xml', enabled);
+    registerFileWatcher(context, 'ant', '**/[Bb]uild.xml', false, enabled);
 
     //
     // For extra file globs configured in settings, we need to first go through and disable
@@ -293,13 +293,13 @@ function registerFileWatcherAnt(context: ExtensionContext, enabled?: boolean)
     let includeAnt: string[] = configuration.get('includeAnt');
     if (includeAnt && includeAnt.length > 0) {
         for (var i = 0; i < includeAnt.length; i++) {
-            registerFileWatcher(context, 'ant-' + includeAnt[i], includeAnt[i], enabled);
+            registerFileWatcher(context, 'ant-' + includeAnt[i], includeAnt[i], false, enabled);
         }
     }
 }
 
 
-function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, enabled?: boolean) 
+function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, isScriptType?: boolean, enabled?: boolean) 
 {
     let watcher: FileSystemWatcher = watchers.get(taskType);
 
@@ -309,12 +309,16 @@ function registerFileWatcher(context: ExtensionContext, taskType: string, fileBl
             watchers.set(taskType, watcher);
             context.subscriptions.push(watcher);
         }
-        watcher.onDidChange(_e => refreshTree(taskType, _e));
+        if (!isScriptType) {
+            watcher.onDidChange(_e => refreshTree(taskType, _e));
+        }
         watcher.onDidDelete(_e => refreshTree(taskType, _e));
         watcher.onDidCreate(_e => refreshTree(taskType, _e));
     } 
     else if (watchers.get(taskType)) {
-        watcher.onDidChange(_e => undefined);
+        if (!isScriptType) {
+            watcher.onDidChange(_e => undefined);
+        }
         watcher.onDidDelete(_e => undefined);
         watcher.onDidCreate(_e => undefined);
     }

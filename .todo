@@ -24,6 +24,11 @@ Todos:
         ✔ Increase performance by invalidating select dirty files in cache instead of entire script file cache @low @4h @done(19-04-18 13:25)
         ☐ Increase performance by invalidating parts of tree ui instead of whole tree @low @8h
 
+    Bugs:
+
+        ☐ Delete task file that is in a "grouped" node and it does not get removed from tree until manual refresh @low @4h
+        ☐ Delete task file in a grouped node with only one other task file, it should "ungroup".  It does not, until lmanual refresh. @low @4h
+
     Style:
 
         ☐ Update NSIS node svg from embedded FileIcon @medium @30m
