@@ -18,6 +18,10 @@
           {
             "type": "refactor",
             "release": "patch"
+          },
+          {
+              "type": "featmin",
+              "release": "patch"
           }
         ]
       }
@@ -27,7 +31,7 @@
       {
         "preset": "spm",
         "parserOpts": {
-          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "MAJOR RELEASE"]
         },
         "writerOpts": {
           "commitsSort": ["subject", "scope"]
