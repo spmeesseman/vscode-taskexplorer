@@ -1,3 +1,18 @@
+## [1.14.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.6...v1.14.7) (2019-04-19)
+
+
+### Bug Fixes
+
+* stop processing a views events if it was turned off in settings ([aed18ac](https://github.com/spmeesseman/vscode-taskexplorer/commit/aed18ac))
+* task nodes within a task type group in the tree are not alphabetized correctly ([a9d66ff](https://github.com/spmeesseman/vscode-taskexplorer/commit/a9d66ff))
+* task tree does not auto refresh when nsis files are created/edited ([a316843](https://github.com/spmeesseman/vscode-taskexplorer/commit/a316843))
+* when a script type task is edited (batch, bash, perl, etc), do not refresh the tree ui ([f40e970](https://github.com/spmeesseman/vscode-taskexplorer/commit/f40e970))
+
+
+### Performance Improvements
+
+* reduce tree refresh time by 20-40% after editing a task file ([1f1e054](https://github.com/spmeesseman/vscode-taskexplorer/commit/1f1e054))
+
 ## [1.14.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.5...v1.14.6) (2019-04-18)
 
 
