@@ -22,12 +22,14 @@ Todos:
         ☐ Support for detecting Visual Studio projects, and building them as tasks @low @16h
         ☐ Support for gradle tasks
         ✔ Increase performance by invalidating select dirty files in cache instead of entire script file cache @low @4h @done(19-04-18 13:25)
+        ☐ Internally detect gulp/gruntfiles in project root and ignore VSCode provided tasks @low @2h
         ☐ Increase performance by invalidating parts of tree ui instead of whole tree @low @8h
+        ☐ Add more npm comands to task node context menu - audit, audit fix, etc @low @4h
 
     Bugs:
 
         ☐ Delete task file that is in a "grouped" node and it does not get removed from tree until manual refresh @low @4h
-        ☐ Delete task file in a grouped node with only one other task file, it should "ungroup".  It does not, until lmanual refresh. @low @4h
+        ☐ Delete task file in a grouped node with only one other task file, it should "ungroup".  It does not, until manual refresh. @low @4h
 
     Style:
 
