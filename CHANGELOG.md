@@ -1,3 +1,20 @@
+## [1.14.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.7...v1.14.8) (2019-04-19)
+
+
+### Bug Fixes
+
+* saving a gulp/gruntfile causes an extra task group node to appear in tree ([452ec79](https://github.com/spmeesseman/vscode-taskexplorer/commit/452ec79)), closes [#20](https://github.com/spmeesseman/vscode-taskexplorer/issues/20)
+
+
+### Build System
+
+* **semantic-release:** add extra keywords for commit analyzer and notes generator ([1f45e37](https://github.com/spmeesseman/vscode-taskexplorer/commit/1f45e37))
+
+
+### Documentation
+
+* **todo:** update ([44f7259](https://github.com/spmeesseman/vscode-taskexplorer/commit/44f7259))
+
 ## [1.14.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.6...v1.14.7) (2019-04-19)
 
 
