@@ -49,23 +49,14 @@ export async function invalidateTasksCacheGulp(opt?: Uri) : Promise<void>
 				rmvTasks.push(each);
 			}
 		});
-		
-		if (rmvTasks.length > 0)
-		{
-			rmvTasks.forEach(each => {
-				util.log('   removing old task ' + each.name);
-				util.removeFromArray(cachedTasks, each);
-			});
 
-			let tasks = await readGulpfile(opt);
-			cachedTasks.push(...tasks);
-		}
-		else {
-			// This is most likely an invalidation for a vscode provided gulpfile,
-			// which we do not read.  Nothing tdo do.  Note that the internal vscode
-			// provider does not refresh the tasks on save.
-			util.log('   Skip invalidation on vscode provided gulpfile/tasks');
-		}
+		rmvTasks.forEach(each => {
+			util.log('   removing old task ' + each.name);
+			util.removeFromArray(cachedTasks, each);
+		});
+
+		let tasks = await readGulpfile(opt);
+		cachedTasks.push(...tasks);
 
 		return;
 	}
