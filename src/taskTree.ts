@@ -505,6 +505,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				let relativePath = definition.path ? definition.path : '';
 
 				//
+				// Ignore VSCode provided gulp and grunt tasks, which are always and only from a gulp/gruntfile
+				// in a workspace folder root directory.  All internaly provided tasks will have the 'uri' property
+				// set in its task definition
+				//
+				if (!definition.uri && (each.source === "gulp" || each.source === "grunt"))
+				{
+					return; // continue forEach() loop
+				}
+
+				//
 				// TSC tasks are returned with no path value, the relative path is in the task name:
 				//
 				//     watch - tsconfig.json
@@ -553,6 +563,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				//
 				if (definition.fileName) {
 					util.logValue('   file name', definition.fileName, 2);
+				}
+				//
+				// Internal task providers will set a uri property
+				//
+				if (definition.uri) {
+					util.logValue('   file path', definition.uri.fsPath, 2);
 				}
 				//
 				// Script task providers will set a fileName property

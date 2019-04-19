@@ -101,7 +101,7 @@ async function detectGulpfiles(): Promise<Task[]>
 			// Note - pattern will ignore gulpfiles in root project dir, which would be picked
 			// up by VSCoces internal Gulp task provider
 			//
-			let relativePattern = new RelativePattern(folder, '**/*/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]');
+			let relativePattern = new RelativePattern(folder, '**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]');
 			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
 			for (const fpath of paths) 
 			{
