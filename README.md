@@ -39,7 +39,7 @@
 
 ## Features
 
-* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo)
+* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo) (thanks to [Todo+](https://marketplace.visualstudio.com/itemdetails?itemName=fabiospampinato.vscode-todo-plus))
 * v1.14 - Support for grunt and gulp task files not located in the project root
 * v1.13 - Multiple task files of the same type are now placed within a group node for less clutter in folder level nodes
 * v1.12 - Script Task Provider - Open and launch bash, batch, perl, powershell, python, ruby, and nsis scripts
