@@ -30,6 +30,8 @@ Todos:
 
         ☐ Delete task file that is in a "grouped" node and it does not get removed from tree until manual refresh @low @4h
         ☐ Delete task file in a grouped node with only one other task file, it should "ungroup".  It does not, until manual refresh. @low @4h
+        ☐ Delete a directory with task files in it, and tree item exception occurs on the auto refresh, code must be restarted @high @4h
+        ☐ GitHub Issue #19 - VSCode bug can be addressed by providing root gulp/gruntfile tasks internally
 
     Style:
 
