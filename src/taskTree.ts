@@ -222,17 +222,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		let treeItem: TreeItem;
 
 		if (invalidate !== false) {
-			this.tasks = null;
 			await this.invalidateTasksCache(invalidate, opt);
 		}
-		else if (task && task.definition)
-		{
-			// TODO
-			//
-			// Get tree item that the task belongs to
-			//
+
+		if (task) {
 			treeItem = task.definition.treeItem;
-			//let tasks: TaskItem[];
 		}
 		else {
 			this.tasks = null;
