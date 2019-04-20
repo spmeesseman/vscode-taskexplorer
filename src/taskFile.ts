@@ -139,12 +139,12 @@ export class TaskFile extends TreeItem
 			}
 		}
 		else {
-			if (relativePath) {
-				this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath));
-			} else {
-				this.resourceUri = Uri.file(folder!.resourceUri!.fsPath);
-			}
-			this.tooltip = util.properCase(source) + " Tasks";
+			// When a grouped node is created, the definition for the first task is passed to this
+			// function.  Remove the filename part of tha path for this resource
+			//
+			this.fileName = path.dirname(this.fileName);      // change to name of directory
+			// Use a custom toolip (default is to display resource uri)
+			this.tooltip = util.properCase(source) + " Task Files";
 		}
 
 		if (util.pathExists(context.asAbsolutePath(path.join('res', 'sources', this.taskSource + '.svg'))))
