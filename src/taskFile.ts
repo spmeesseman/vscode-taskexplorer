@@ -127,11 +127,11 @@ export class TaskFile extends TreeItem
 		this.folder = folder;
 		this.path = relativePath;
 		this.taskSource = source;
-		this.contextValue = 'taskFile' + util.properCase(this.taskSource);
-		this.fileName = TaskFile.getFileNameFromSource(source, folder, taskDef, relativePath, true);
 		this.isGroup = (group === true);
 
 		if (!group) {
+			this.contextValue = 'taskFile' + util.properCase(this.taskSource);
+			this.fileName = TaskFile.getFileNameFromSource(source, folder, taskDef, relativePath, true);
 			if (relativePath) {
 				this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, this.fileName));
 			} else {
@@ -139,17 +139,13 @@ export class TaskFile extends TreeItem
 			}
 		}
 		else {
-			if (relativePath) {
-				this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath));
-			} else {
-				this.resourceUri = Uri.file(folder!.resourceUri!.fsPath);
-			}
 			// When a grouped node is created, the definition for the first task is passed to this
 			// function.  Remove the filename part of tha path for this resource
 			//
-			this.fileName = path.dirname(this.fileName);      // change to name of directory
+			this.fileName = "group";      // change to name of directory
 			// Use a custom toolip (default is to display resource uri)
 			this.tooltip = util.properCase(source) + " Task Files";
+			this.contextValue = "taskGroup" + util.properCase(this.taskSource);
 		}
 
 		if (util.pathExists(context.asAbsolutePath(path.join('res', 'sources', this.taskSource + '.svg'))))
