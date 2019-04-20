@@ -212,9 +212,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		//
 		// If invalidate is truthy but opt is falsey, then the refresh button was clicked
 		//
-		// If invalidate is false and opt is truthy, then a task has started/stopped, opt
-		// will be the task deifnition's 'uri' property, note that task types not internally
-		// provided will not contain this property.
+		// If task is truthy, then a task has started/stopped, opt will be the task 
+		// deifnition's 'uri' property, note that task types not internally provided will 
+		// not contain this property.
 		//
 		// If invalidate and opt are both truthy, then a filesystemwatcher event or a 
 		// task just triggered
