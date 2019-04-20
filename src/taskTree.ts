@@ -22,6 +22,7 @@ import { configuration } from "./common/configuration";
 import { invalidateTasksCacheAnt } from './taskProviderAnt';
 import { invalidateTasksCacheMake } from './taskProviderMake';
 import { invalidateTasksCacheScript } from './taskProviderScript';
+import { invalidateTasksCacheGradle } from './taskProviderGradle';
 import { invalidateTasksCacheGrunt } from './taskProviderGrunt';
 import { invalidateTasksCacheGulp } from './taskProviderGulp';
 
@@ -83,6 +84,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			if (opt1 === 'ant') {
 				await invalidateTasksCacheAnt(opt2);
 			}
+			else if (opt1 === 'gradle') {
+				await invalidateTasksCacheGradle(opt2);
+			}
 			else if (opt1 === 'grunt') {
 				await invalidateTasksCacheGrunt(opt2);
 			}
@@ -101,6 +105,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			await invalidateTasksCacheAnt();
 			await invalidateTasksCacheMake();
 			await invalidateTasksCacheScript();
+			await invalidateTasksCacheGradle();
 			await invalidateTasksCacheGrunt();
 			await invalidateTasksCacheGulp();
 		}

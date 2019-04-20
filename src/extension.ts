@@ -11,6 +11,7 @@ import { TaskTreeDataProvider } from './taskTree';
 import { AntTaskProvider } from './taskProviderAnt';
 import { MakeTaskProvider } from './taskProviderMake';
 import { ScriptTaskProvider } from './taskProviderScript';
+import { GradleTaskProvider } from './taskProviderGradle';
 import { GruntTaskProvider } from './taskProviderGrunt';
 import { GulpTaskProvider } from './taskProviderGulp';
 import { configuration } from './common/configuration';
@@ -98,6 +99,11 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
 
     if (e.affectsConfiguration('taskExplorer.enableBatch')) {
         registerFileWatcher(context, 'batch', '**/*.bat', true, configuration.get<boolean>('enableBatch'));
+        refresh = true;
+    }
+
+    if (e.affectsConfiguration('taskExplorer.enableGradle')) {
+        registerFileWatcher(context, 'grunt', '**/*.gradle', configuration.get<boolean>('enableGradle'));
         refresh = true;
     }
 
@@ -197,6 +203,10 @@ function registerFileWatchers(context: ExtensionContext)
         registerFileWatcher(context, 'batch', '**/*.bat', true);
     }
 
+    if (configuration.get<boolean>('enableGradle')) {
+        registerFileWatcher(context, 'grunt', '**/*.gradle');
+    }
+
     if (configuration.get<boolean>('enableGrunt')) {
         registerFileWatcher(context, 'grunt', '**/gruntfile.js');
     }
@@ -267,6 +277,7 @@ function registerTaskProviders(context: ExtensionContext)
     context.subscriptions.push(workspace.registerTaskProvider('script', new ScriptTaskProvider()));
     context.subscriptions.push(workspace.registerTaskProvider('grunt', new GruntTaskProvider()));
     context.subscriptions.push(workspace.registerTaskProvider('gulp', new GulpTaskProvider()));
+    context.subscriptions.push(workspace.registerTaskProvider('gradle', new GradleTaskProvider()));
 }
 
 
