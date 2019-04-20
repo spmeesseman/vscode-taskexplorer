@@ -63,8 +63,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		subscriptions.push(commands.registerCommand(name + '.refresh', this.refresh, this));
 		subscriptions.push(commands.registerCommand(name + '.runInstall', this.runInstall, this));
 
-		tasks.onDidStartTask((_e) => this.refresh(false));
-		tasks.onDidEndTask((_e) => this.refresh(false));
+		tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri));
+		tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri));
 	}
 
 
@@ -149,10 +149,112 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		}
 		else
 		{
-			//
 			// Execute task
 			//
 			tasks.executeTask(taskItem.task);
+		}
+	}
+
+
+	private async open(selection: TaskFile | TaskItem)
+	{
+		let uri: Uri | undefined = undefined;
+		if (selection instanceof TaskFile) {
+			uri = selection.resourceUri!;
+		} else if (selection instanceof TaskItem) {
+			uri = selection.taskFile.resourceUri;
+		}
+		if (!uri) {
+			return;
+		}
+
+		util.log('Open script at position');
+		util.logValue('   command', selection.command.command);
+		util.logValue('   source', selection.taskSource);
+		util.logValue('   path', uri.path);
+		util.logValue('   file path', uri.fsPath);
+
+		if (util.pathExists(uri.fsPath)) {
+			let document: TextDocument = await workspace.openTextDocument(uri);
+			let offset = this.findScriptPosition(document, selection instanceof TaskItem ? selection : undefined);
+			let position = document.positionAt(offset);
+			await window.showTextDocument(document, { selection: new Selection(position, position) });
+		}
+		else {
+			util.log('Invalid path for file, cannot open');
+		}
+	}
+
+
+	public async refresh(invalidate?: any, opt?: Uri)
+	{
+		//
+		// If a view was turned off in settings, the disposable view still remains
+		// ans will still receive events.  CHeck visibility property, and of this view
+		// is hidden/disabled, then exit
+		//
+		if (views.get(this.name))
+		{
+			if (!views.get(this.name).visible) {
+				return;
+			}
+		}
+
+		//
+		// TODO - performance enhancement
+		// Can only invalidate a section of the tree depending on tasktype/uri?
+		//
+		this.taskTree = null;
+
+		//
+		// If invalidate is false, then this is a task start/stop
+		//
+		// If invalidate is truthy but opt is falsey, then the refresh button was clicked
+		//
+		// If invalidate is false and opt is truthy, then a task has started/stopped, opt
+		// will be the task deifnition's 'uri' property, note that task types not internally
+		// provided will not contain this property.
+		//
+		// If invalidate and opt are both truthy, then a filesystemwatcher event or a 
+		// task start/finish event just triggered
+		//
+		let treeItem: TreeItem;
+
+		if (invalidate !== false) {
+			await this.invalidateTasksCache(invalidate, opt);
+		}
+		else if (opt)
+		{
+			// TODO
+			//
+			// Get tree item that the task belongs to
+			//
+			//treeItem = ?;
+		}
+
+		this._onDidChangeTreeData.fire(treeItem);
+	}
+
+
+	private async runInstall(taskFile: TaskFile)
+	{
+		if (taskFile.label.startsWith('npm'))
+		{
+			let options = {
+				"cwd": path.dirname(taskFile.resourceUri.fsPath)
+			};
+			let execution = new ShellExecution('npm', [ 'install' ], options);
+			let kind: TaskDefinition = {
+				type: 'npm',
+				script: 'install',
+				path: path.dirname(taskFile.resourceUri.fsPath)
+			};
+			let task = new Task(kind, taskFile.folder.workspaceFolder, 'install', 'npm', execution, undefined);
+
+			tasks.executeTask(task);
+		}
+		else{
+			window.showInformationMessage('Only npm nodes can run npm installs');
 		}
 	}
 
@@ -299,95 +401,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 		util.logValue('   Offset', scriptOffset);
 		return scriptOffset;
-	}
-
-
-	private async open(selection: TaskFile | TaskItem)
-	{
-		let uri: Uri | undefined = undefined;
-		if (selection instanceof TaskFile) {
-			uri = selection.resourceUri!;
-		} else if (selection instanceof TaskItem) {
-			uri = selection.taskFile.resourceUri;
-		}
-		if (!uri) {
-			return;
-		}
-
-		util.log('Open script at position');
-		util.logValue('   command', selection.command.command);
-		util.logValue('   source', selection.taskSource);
-		util.logValue('   path', uri.path);
-		util.logValue('   file path', uri.fsPath);
-
-		if (util.pathExists(uri.fsPath)) {
-			let document: TextDocument = await workspace.openTextDocument(uri);
-			let offset = this.findScriptPosition(document, selection instanceof TaskItem ? selection : undefined);
-			let position = document.positionAt(offset);
-			await window.showTextDocument(document, { selection: new Selection(position, position) });
-		}
-		else {
-			util.log('Invalid path for file, cannot open');
-		}
-	}
-
-
-	public async refresh(invalidate?: any, opt?: Uri)
-	{
-		//
-		// If a view was turned off in settings, the disposable view still remains
-		// ans will still receive events.  CHeck visibility property, and of this view
-		// is hidden/disabled, then exit
-		//
-		if (views.get(this.name))
-		{
-			if (!views.get(this.name).visible) {
-				return;
-			}
-		}
-
-		//
-		// TODO - performance enhancement
-		// Can only invalidate a section of the tree depending on tasktype/uri?
-		//
-		this.taskTree = null;
-
-		//
-		// If invalidate is false, then this is a task start/stop
-		//
-		// If invalidate is truthy but opt is falsey, then the refresh button was clicked
-		//
-		// If invalidate and opt are both truthy, then a filesystemwatcher event or a 
-		// task start/finish event just triggered
-		//
-		if (invalidate !== false) {
-			await this.invalidateTasksCache(invalidate, opt);
-		}
-
-		this._onDidChangeTreeData.fire();
-	}
-
-
-	private async runInstall(taskFile: TaskFile)
-	{
-		if (taskFile.label.startsWith('npm'))
-		{
-			let options = {
-				"cwd": path.dirname(taskFile.resourceUri.fsPath)
-			};
-			let execution = new ShellExecution('npm', [ 'install' ], options);
-			let kind: TaskDefinition = {
-				type: 'npm',
-				script: 'install',
-				path: path.dirname(taskFile.resourceUri.fsPath)
-			};
-			let task = new Task(kind, taskFile.folder.workspaceFolder, 'install', 'npm', execution, undefined);
-
-			tasks.executeTask(task);
-		}
-		else{
-			window.showInformationMessage('Only npm nodes can run npm installs');
-		}
 	}
 
 
