@@ -15,7 +15,7 @@
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/spmeesseman/vscode-taskexplorer.svg)](https://isitmaintained.com/project/spmeesseman/vscode-taskexplorer "Average time to resolve an issue")
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/spmeesseman/vscode-taskexplorer.svg)](https://isitmaintained.com/project/spmeesseman/vscode-taskexplorer "Percentage of issues still open")
 
-![src0](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/npm.png?raw=true) ![src1](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ant.png?raw=true) ![src2](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/grunt.png?raw=true) ![src3](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/gulp.png?raw=true) ![src4](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/workspace.png?raw=true) ![src5](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/make.png?raw=true) ![src6](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ts.png?raw=true) ![src7](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/bat.png?raw=true) ![src8](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/ruby.png?raw=true) ![src9](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/powershell.png?raw=true) ![src10](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/bash.png?raw=true) ![src11](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/python.png?raw=true) ![src12](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/res/sources/nsis.png?raw=true)
+![src0](res/sources/npm.png?raw=true) ![src1](res/sources/ant.png?raw=true) ![src2](res/sources/grunt.png?raw=true) ![src3](res/sources/gulp.png?raw=true) ![src13](res/sources/gradle.png?raw=true) ![src4](res/sources/workspace.png?raw=true) ![src5](res/sources/make.png?raw=true) ![src6](res/sources/ts.png?raw=true) ![src7](res/sources/bat.png?raw=true) ![src8](res/sources/ruby.png?raw=true) ![src9](res/sources/powershell.png?raw=true) ![src10](res/sources/bash.png?raw=true) ![src11](res/sources/python.png?raw=true) ![src12](res/sources/nsis.png?raw=true)
 
 ## Description
 
@@ -35,11 +35,11 @@
 
 * Visual Studio Code v1.30 or higher
 * To display npm, grunt, and gulp tasks, the 'Auto Detect' setting must be turned 'On' in VSCode for each respective task provider.
-* Some task types inherit the associated file type icon from VSCode when displayed in the task tree.  You must have an icon set installed and active (for example, the [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme)) for these task types to display icons in the tree nodes.
 
 ## Features
 
 * Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo) (thanks to [Todo+](https://marketplace.visualstudio.com/itemdetails?itemName=fabiospampinato.vscode-todo-plus))
+* v1.15 - Support for gradle tasks
 * v1.14 - Support for grunt and gulp task files not located in the project root
 * v1.13 - Multiple task files of the same type are now placed within a group node for less clutter in folder level nodes
 * v1.12 - Script Task Provider - Open and launch bash, batch, perl, powershell, python, ruby, and nsis scripts
@@ -81,6 +81,10 @@ VSCode includes task providers for Grunt and Gulp internally.  The Grunt and Gul
   [pull requests](https://github.com/spmeesseman/vscode-taskexplorer/pulls)
 * [Contributors](https://github.com/spmeesseman/vscode-taskexplorer/graphs/contributors)
 
+## Credits
+
+* The [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme)) for some of the task type icons.
+
 ## Settings
 
 |Config|Description|Default|
@@ -90,6 +94,7 @@ VSCode includes task providers for Grunt and Gulp internally.  The Grunt and Gul
 |`taskExplorer.enableAnt`|Enable/show ant targets as tasks|`true`|
 |`taskExplorer.enableBash`|Enable/show bash scripts as tasks|`true`|
 |`taskExplorer.enableBatch`|Enable/show batch file scripts as tasks|`true`|
+|`taskExplorer.enableGradle`|Enable/show gradle tasks|`true`|
 |`taskExplorer.enableGrunt`|Enable/show grunt tasks|`true`|
 |`taskExplorer.enableGulp`|Enable/show gulp tasks|`true`|
 |`taskExplorer.enableNpm`|Enable/show npm scripts as tasks|`true`|
@@ -103,6 +108,7 @@ VSCode includes task providers for Grunt and Gulp internally.  The Grunt and Gul
 |`taskExplorer.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
 |`taskExplorer.pathToAnt`|The path to the ant program, if not registered in system path|`ant.bat` for Windows, `ant` for Unix|",
 |`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path|`ansicon.exe`|",
+|`taskExplorer.pathToGradle`|The path to the gradle program, if not registered in system path|`gradle.bat` for Windows, `gradle` for Unix|",
 |`taskExplorer.pathToMake`|The path to the make program, if not registered in system path|`nmake` for Windows, `make` for Unix|",
 |`taskExplorer.pathToNsis`|The path to the nsis make program, if not registered in system path|`makensis.exe`|",
 |`taskExplorer.pathToPerl`|The path to the perl program, if not registered in system path|`perl`|",
