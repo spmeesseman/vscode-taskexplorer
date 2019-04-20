@@ -1,7 +1,7 @@
 {
     "name": "vscode-taskexplorer",
     "displayName": "Task Explorer",
-    "description": "Run and manage tasks for npm, vscode, ant, make, grunt, gulp, batch, bash, python, perl, powershell, ruby, and nsis",
+    "description": "Run and manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
     "version": "1.14.9",
     "publisher": "spmeesseman",
@@ -30,6 +30,7 @@
         "c c++",
         "grunt",
         "gulp",
+        "gradle",
         "tsc",
         "nsis",
         "batch",
@@ -295,6 +296,11 @@
                     "default": true,
                     "description": "%config.taskExplorer.enableTsc%"
                 },
+                "taskExplorer.enableGradle": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.enableGradle%"
+                },
                 "taskExplorer.enableGrunt": {
                     "type": "boolean",
                     "default": true,
@@ -367,6 +373,10 @@
                 "taskExplorer.pathToAnsicon": {
                     "type": "string",
                     "description": "%config.taskExplorer.pathToAnsicon%"
+                },
+                "taskExplorer.pathToGradle": {
+                    "type": "string",
+                    "description": "%config.taskExplorer.pathToGradle%"
                 },
                 "taskExplorer.pathToMake": {
                     "type": "string",
@@ -473,16 +483,40 @@
                 }
             },
             {
+                "type": "gradle",
+                "required": [
+                    "script"
+                ],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.gradle.script%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.gradle.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.ant.fileName%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.ant.fileName%"
+                    }
+                }
+            },
+            {
                 "type": "grunt",
                 "required": [],
                 "properties": {
                     "script": {
                         "type": "string",
-                        "description": "%taskdef.ant.script%"
+                        "description": "%taskdef.grunt.script%"
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.ant.path%"
+                        "description": "%taskdef.grunt.path%"
                     },
                     "fileName": {
                         "type": "string",
@@ -500,11 +534,11 @@
                 "properties": {
                     "script": {
                         "type": "string",
-                        "description": "%taskdef.ant.script%"
+                        "description": "%taskdef.gulp.script%"
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.ant.path%"
+                        "description": "%taskdef.gulp.path%"
                     },
                     "fileName": {
                         "type": "string",
