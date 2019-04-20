@@ -67,7 +67,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private invalidateTasksCache(opt1: string, opt2: Uri) 
+	private async invalidateTasksCache(opt1: string, opt2: Uri) 
 	{
 		//
 		// All internal task providers export an invalidate() function...
@@ -81,28 +81,28 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		if (opt1)
 		{
 			if (opt1 === 'ant') {
-				invalidateTasksCacheAnt(opt2);
+				await invalidateTasksCacheAnt(opt2);
 			}
 			else if (opt1 === 'grunt') {
-				invalidateTasksCacheGrunt(opt2);
+				await invalidateTasksCacheGrunt(opt2);
 			}
 			else if (opt1 === 'gulp') {
-				invalidateTasksCacheGulp(opt2);
+				await invalidateTasksCacheGulp(opt2);
 			}
 			else if (opt1 === 'make') {
-				invalidateTasksCacheMake(opt2);
+				await invalidateTasksCacheMake(opt2);
 			}
 			else {
-				invalidateTasksCacheScript(opt2);
+				await invalidateTasksCacheScript(opt2);
 			}
 		}
 		else
 		{
-			invalidateTasksCacheAnt();
-			invalidateTasksCacheMake();
-			invalidateTasksCacheScript();
-			invalidateTasksCacheGrunt();
-			invalidateTasksCacheGulp();
+			await invalidateTasksCacheAnt();
+			await invalidateTasksCacheMake();
+			await invalidateTasksCacheScript();
+			await invalidateTasksCacheGrunt();
+			await invalidateTasksCacheGulp();
 		}
 	}
 
@@ -327,7 +327,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	public refresh(invalidate?: any, opt?: Uri)
+	public async refresh(invalidate?: any, opt?: Uri)
 	{
 		//
 		// If a view was turned off in settings, the disposable view still remains
@@ -356,7 +356,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		// task start/finish event just triggered
 		//
 		if (invalidate !== false) {
-			this.invalidateTasksCache(invalidate, opt);
+			await this.invalidateTasksCache(invalidate, opt);
 		}
 
 		this._onDidChangeTreeData.fire();
