@@ -20,7 +20,7 @@ Todos:
         ☐ Support for VSCode compound tasks @low @8h
         ☐ If debug output was open when VS closes, re-open it when VSCode is started next @low @1h
         ☐ Support for detecting Visual Studio projects, and building them as tasks @low @16h
-        ☐ Support for gradle tasks
+        ✔ Support for gradle tasks @done(19-04-14 13:30)
         ✔ Increase performance by invalidating select dirty files in cache instead of entire script file cache @low @4h @done(19-04-18 13:25)
         ✔ Internally detect gulp/gruntfiles in project root and ignore VSCode provided tasks @low @2h @done(19-04-19 15:49)
         ☐ Increase performance by invalidating parts of tree ui instead of whole tree @low @8h
@@ -35,13 +35,13 @@ Todos:
 
     Style:
 
-        ☐ Update NSIS node svg from embedded FileIcon @medium @30m
-        ☐ Update Bash node svg from embedded FileIcon @low @30m
-        ☐ Update Batch node svg from embedded FileIcon @low @30m
-        ☐ Update Perl node svg from embedded FileIcon @low @30m
-        ☐ Update Python node svg from embedded FileIcon @low @30m
-        ☐ Update Powershell node svg from embedded FileIcon @low @30m
-        ☐ Update Ruby node svg from embedded FileIcon @low @30m
+        ✔ Update NSIS node svg from embedded FileIcon @medium @30m @done(19-04-14 13:56)
+        ✔ Update Bash node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
+        ✔ Update Batch node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
+        ✔ Update Perl node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
+        ✔ Update Python node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
+        ✔ Update Powershell node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
+        ✔ Update Ruby node svg from embedded FileIcon @low @30m @done(19-04-14 13:56)
         ☐ Update folder node svg from embedded FolderIcon w/ open/closed state @medium @2h
 
     Tests:
