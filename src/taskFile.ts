@@ -139,6 +139,11 @@ export class TaskFile extends TreeItem
 			}
 		}
 		else {
+			if (relativePath) {
+				this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath));
+			} else {
+				this.resourceUri = Uri.file(folder!.resourceUri!.fsPath);
+			}
 			// When a grouped node is created, the definition for the first task is passed to this
 			// function.  Remove the filename part of tha path for this resource
 			//
