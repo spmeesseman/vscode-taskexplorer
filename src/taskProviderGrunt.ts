@@ -5,6 +5,7 @@ import {
 } from 'vscode';
 import * as path from 'path';
 import * as util from './util';
+import { TaskItem } from './taskItem';
 type StringMap = { [s: string]: string; };
 
 let cachedTasks: Task[] = undefined;
@@ -16,6 +17,7 @@ interface GruntTaskDefinition extends TaskDefinition
 	path?: string;
 	fileName?: string;
 	uri?: Uri;
+	treeItem?: TaskItem;
 }
 
 export class GruntTaskProvider implements TaskProvider 

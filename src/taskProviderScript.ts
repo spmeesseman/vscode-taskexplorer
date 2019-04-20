@@ -6,7 +6,7 @@ import {
 import * as path from 'path';
 import * as util from './util';
 import { configuration } from "./common/configuration";
-import { downloadAndUnzipVSCode } from 'vscode-test';
+import { TaskItem } from './taskItem';
 
 type StringMap = { [s: string]: string; };
 
@@ -66,6 +66,7 @@ interface ScriptTaskDefinition extends TaskDefinition
 	path?: string;
 	requiresArgs?: boolean;
 	uri?: Uri;
+	treeItem?: TaskItem;
 }
 
 export class ScriptTaskProvider implements TaskProvider

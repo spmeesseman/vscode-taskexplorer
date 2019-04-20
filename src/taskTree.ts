@@ -43,6 +43,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 {
 	private name: string;
 	private taskTree: TaskFolder[] | TaskFile[] | NoScripts[] | null = null;
+	private tasks: Task[] = null;
 	private extensionContext: ExtensionContext;
 	private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
 	readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
@@ -63,8 +64,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		subscriptions.push(commands.registerCommand(name + '.refresh', this.refresh, this));
 		subscriptions.push(commands.registerCommand(name + '.runInstall', this.runInstall, this));
 
-		tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri));
-		tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri));
+		tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
+		tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
 	}
 
 
@@ -186,7 +187,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	public async refresh(invalidate?: any, opt?: Uri)
+	public async refresh(invalidate?: any, opt?: Uri, task?: Task)
 	{
 		//
 		// If a view was turned off in settings, the disposable view still remains
@@ -216,20 +217,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		// provided will not contain this property.
 		//
 		// If invalidate and opt are both truthy, then a filesystemwatcher event or a 
-		// task start/finish event just triggered
+		// task just triggered
 		//
 		let treeItem: TreeItem;
 
 		if (invalidate !== false) {
+			this.tasks = null;
 			await this.invalidateTasksCache(invalidate, opt);
 		}
-		else if (opt)
+		else if (task && task.definition)
 		{
 			// TODO
 			//
 			// Get tree item that the task belongs to
 			//
-			//treeItem = ?;
+			treeItem = task.definition.treeItem;
+			//let tasks: TaskItem[];
+		}
+		else {
+			this.tasks = null;
 		}
 
 		this._onDidChangeTreeData.fire(treeItem);
@@ -442,9 +448,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			// TODO - search enable* settings and apply enabled types to filter
 			//
 			//let taskItems = await tasks.fetchTasks({ type: 'npm' });
-			let taskItems = await tasks.fetchTasks();
-			if (taskItems) {
-				this.taskTree = this.buildTaskTree(taskItems);
+			if (!this.tasks) {
+				this.tasks= await tasks.fetchTasks();
+			}
+			if (this.tasks) {
+				this.taskTree = this.buildTaskTree(this.tasks);
 				if (this.taskTree.length === 0) {
 					this.taskTree = [new NoScripts()];
 				}
@@ -613,6 +621,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				// Create and add task item to task file node
 				//
 				let taskItem = new TaskItem(this.extensionContext, taskFile, each);
+				taskItem.task.definition.taskItem = taskItem;
 				taskFile.addScript(taskItem);
 			}
 			else {

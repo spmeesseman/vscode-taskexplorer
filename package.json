@@ -466,19 +466,23 @@
                 "properties": {
                     "script": {
                         "type": "string",
-                        "description": "%taskdef.ant.script%"
+                        "description": "%taskdef.task.script%"
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.ant.path%"
+                        "description": "%taskdef.task.path%"
                     },
                     "fileName": {
                         "type": "string",
-                        "description": "%taskdef.ant.fileName%"
+                        "description": "%taskdef.task.fileName%"
                     },
                     "uri": {
                         "type": "object",
-                        "description": "%taskdef.ant.fileName%"
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "treeItem": {
+                        "type": "object",
+                        "description": "%taskdef.task.treeItem%"
                     }
                 }
             },
@@ -490,19 +494,23 @@
                 "properties": {
                     "script": {
                         "type": "string",
-                        "description": "%taskdef.gradle.script%"
+                        "description": "%taskdef.task.script%"
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.gradle.path%"
+                        "description": "%taskdef.task.path%"
                     },
                     "fileName": {
                         "type": "string",
-                        "description": "%taskdef.ant.fileName%"
+                        "description": "%taskdef.task.fileName%"
                     },
                     "uri": {
                         "type": "object",
-                        "description": "%taskdef.ant.fileName%"
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "treeItem": {
+                        "type": "object",
+                        "description": "%taskdef.task.treeItem%"
                     }
                 }
             },
@@ -512,19 +520,23 @@
                 "properties": {
                     "script": {
                         "type": "string",
-                        "description": "%taskdef.grunt.script%"
+                        "description": "%taskdef.task.script%"
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.grunt.path%"
+                        "description": "%taskdef.task.path%"
                     },
                     "fileName": {
                         "type": "string",
-                        "description": "%taskdef.ant.fileName%"
+                        "description": "%taskdef.task.fileName%"
                     },
                     "uri": {
                         "type": "object",
-                        "description": "%taskdef.ant.fileName%"
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "treeItem": {
+                        "type": "object",
+                        "description": "%taskdef.task.treeItem%"
                     }
                 }
             },
@@ -534,19 +546,23 @@
                 "properties": {
                     "script": {
                         "type": "string",
-                        "description": "%taskdef.gulp.script%"
+                        "description": "%taskdef.task.script%"
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.gulp.path%"
+                        "description": "%taskdef.task.path%"
                     },
                     "fileName": {
                         "type": "string",
-                        "description": "%taskdef.ant.fileName%"
+                        "description": "%taskdef.task.fileName%"
                     },
                     "uri": {
                         "type": "object",
-                        "description": "%taskdef.ant.fileName%"
+                        "description": "%taskdef.task.uri%"
+                    },
+                    "treeItem": {
+                        "type": "object",
+                        "description": "%taskdef.task.treeItem%"
                     }
                 }
             },
@@ -556,19 +572,23 @@
                 "properties": {
                     "script": {
                         "type": "string",
-                        "description": "%taskdef.make.script%"
+                        "description": "%taskdef.task.script%"
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.make.path%"
+                        "description": "%taskdef.task.path%"
                     },
                     "fileName": {
                         "type": "string",
-                        "description": "%taskdef.ant.fileName%"
+                        "description": "%taskdef.task.fileName%"
                     },
                     "uri": {
                         "type": "object",
-                        "description": "%taskdef.ant.fileName%"
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "treeItem": {
+                        "type": "object",
+                        "description": "%taskdef.task.treeItem%"
                     }
                 }
             },
@@ -590,11 +610,11 @@
                     },
                     "path": {
                         "type": "string",
-                        "description": "%taskdef.script.path%"
+                        "description": "%taskdef.task.path%"
                     },
                     "fileName": {
                         "type": "string",
-                        "description": "%taskdef.script.fileName%"
+                        "description": "%taskdef.task.fileName%"
                     },
                     "scriptFile": {
                         "type": "boolean",
@@ -608,7 +628,11 @@
                     },
                     "uri": {
                         "type": "object",
-                        "description": "%taskdef.ant.fileName%"
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "treeItem": {
+                        "type": "object",
+                        "description": "%taskdef.task.treeItem%"
                     }
                 }
             }

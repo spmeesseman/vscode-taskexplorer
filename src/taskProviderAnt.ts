@@ -7,6 +7,7 @@ import * as path from 'path';
 import * as util from './util';
 import { parseString } from 'xml2js';
 import { configuration } from "./common/configuration";
+import { TaskItem } from './taskItem';
 type StringMap = { [s: string]: string; };
 
 let cachedTasks: Task[] = undefined;
@@ -18,6 +19,7 @@ interface AntTaskDefinition extends TaskDefinition
 	path?: string;
 	fileName?: string;
 	uri?: Uri;
+	treeItem?: TaskItem;
 }
 
 export class AntTaskProvider implements TaskProvider 
