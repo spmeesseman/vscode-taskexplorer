@@ -1,3 +1,26 @@
+## [1.14.9](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.8...v1.14.9) (2019-04-20)
+
+
+### Bug Fixes
+
+* tasks found in root gulpfile run first task regardless of the specific task desired. ([17e796b](https://github.com/spmeesseman/vscode-taskexplorer/commit/17e796b)), closes [#19](https://github.com/spmeesseman/vscode-taskexplorer/issues/19)
+
+
+### Build System
+
+* **npm:** update security vulnerablities.  manual changes needed for tar vulnerability. ([e57944c](https://github.com/spmeesseman/vscode-taskexplorer/commit/e57944c))
+
+
+### Code Refactoring
+
+* remove resourcUri property from group nodes, use toolip "TaskType Task Files" ([37e4bf1](https://github.com/spmeesseman/vscode-taskexplorer/commit/37e4bf1))
+
+
+### Documentation
+
+* **readme:** add mention of the todo list extension ([69704ed](https://github.com/spmeesseman/vscode-taskexplorer/commit/69704ed))
+* **todo:** update [skip ci] ([e2801a1](https://github.com/spmeesseman/vscode-taskexplorer/commit/e2801a1))
+
 ## [1.14.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.7...v1.14.8) (2019-04-19)
 
 
