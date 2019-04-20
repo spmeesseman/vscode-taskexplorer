@@ -19,7 +19,7 @@
 
 ## Description
 
-> Provides an organized view in either (or both) the SideBar and/or Explorer that conveniently displays all supported tasks, organized into a treeview, with parent task file nodes and project folders (perfect for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.  'npm install' is supported in the context menu of all npm file nodes.
+> Provides a view in either (or both) the SideBar and/or Explorer that displays all supported tasks organized into a treeview, with parent task file nodes, grouped nodes, and project folders (convenient for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.  NPM file nodes support special npm command(s) (i.e. 'install') via context menu.
 
 ## Screenshots
 
@@ -38,21 +38,21 @@
 
 ## Features
 
-* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo) (thanks to [Todo+](https://marketplace.visualstudio.com/itemdetails?itemName=fabiospampinato.vscode-todo-plus))
-* v1.15 - Support for gradle tasks
+* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo) (made with [Todo+](https://marketplace.visualstudio.com/itemdetails?itemName=fabiospampinato.vscode-todo-plus))
+* v1.15 - Support for gradle tasks (includes provider)
 * v1.14 - Support for grunt and gulp task files not located in the project root
-* v1.13 - Multiple task files of the same type are now placed within a group node for less clutter in folder level nodes
-* v1.12 - Script Task Provider - Open and launch bash, batch, perl, powershell, python, ruby, and nsis scripts
+* v1.13 - Multiple task files of the same type placed within a group node for less clutter in folder level nodes
+* v1.12 - Support for bash, batch, perl, powershell, python, ruby, and nsis scripts (includes provider)
 * v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
-* v1.10 - Makefile Task Provider - Open and launch C/C++ Makefile targets
-* v1.9 - Support for gulp and grunt tasks
+* v1.10 - Support for Makefiles (includes provider)
+* v1.9 - Support for gulp and grunt tasks (includes provider)
 * v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
-* v1.7 - Two view types!! - Use one or both of either SideBar View and/or Explorer Tray
+* v1.7 - Two view types - Use one or both of either SideBar View and/or Explorer Tray
 * v1.6 - Progress icons for running tasks
 * v1.6 - Stop execution button for running tasks
-* v1.5 - Ant task provider - Open and launch ANT targets as tasks
-* v1.4 - Open and launch TSC tasks
-* v1.3 - Open and launch Visual Studio Code tasks
+* v1.5 - Support for Apache Ant tasks (includes provider)
+* v1.4 - Support for TSC tasks
+* v1.3 - Support for Visual Studio Code tasks
 * v1.2 - Convenient layout - groups all tasks by project folder, by task file, by task
 * v1.1 - Supports multi-root or single-root workspaces
 * v1.0 - Open and launch NPM scripts as tasks
@@ -69,10 +69,6 @@ The setting 'includeAnt' is a string or an array of strings used to define file 
 
     taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]
 
-## Grunt and Gulp Task Providers
-
-VSCode includes task providers for Grunt and Gulp internally.  The Grunt and Gulp task providers in this extension (introduced in v1.14) will ignore grunt and gulpfiles in the root project directory in lieu of that fact, i.e. it will only provide tasks located in subdirectories of the project root.  Note that the internal VSCode Gulp provider will not even refresh your tasks if you edit your gulp file.  In a future release, settings will be added to include files found in the project root, where a user can turn off internal VSCode task detection for gulp and/or grunt.
-
 ## Feedback & Contributing
 
 * Please report any bugs, suggestions or documentation requests via the
@@ -83,7 +79,7 @@ VSCode includes task providers for Grunt and Gulp internally.  The Grunt and Gul
 
 ## Credits
 
-* The [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme)) for some of the task type icons.
+* The [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme) for some of the task type icons.
 
 ## Settings
 
