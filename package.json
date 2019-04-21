@@ -45,6 +45,12 @@
             "path": "cz-conventional-changelog"
         }
     },
+    "files": [
+        "res",
+        "src/*.js",
+        "src/common/*.js",
+        "types"
+	],
     "scripts": {
         "package": "vsce package",
         "publish": "vsce publish",
