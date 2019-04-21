@@ -11,13 +11,17 @@ Todos:
     Features:
 
         ✔ Group task types within the same directory into an additional node @high @1d @started(19-04-08 19:11) @done(19-04-09 12:51) @lasted(17h40m10s)
-        ☐ Script argument support @low @8h
-        ☐ Show tasks status in status bar @low @4h
-        ☐ Show # of running tasks badge on sidebar view @low @4h
+        ☐ Script argument support @low @20h
+        Status bar widget: @low
+            ☐ Show tasks status in status bar @4h
+            ☐ Custom info popup that allows newlines @4h
+            ☐ A 'run last task' button in status bar popup or status bar action itself @1h
+            ☐ Running list of tasks ran, status, start/finish times, display with status bar popup button in md file @4h
+        ✘ Show # of running tasks badge on sidebar view @low @4h @cancelled(19-04-20 23:51)
         ☐ Yarn support for package.json files @low @2h
         ✔ Apply exclude globs to underlying search when finding tasks (perf) @medium @2h @done(19-04-14 00:22)
         ✔ Support for gulp and grunt task files not located in project root @low @4h @done(19-04-12 00:04)
-        ☐ Support for VSCode compound tasks @low @8h
+        ✔ Support for VSCode compound tasks @low @8h @done(19-04-13 23:50)
         ☐ If debug output was open when VS closes, re-open it when VSCode is started next @low @1h
         ☐ Support for detecting Visual Studio projects, and building them as tasks @low @16h
         ✔ Support for gradle tasks @done(19-04-14 13:30)
