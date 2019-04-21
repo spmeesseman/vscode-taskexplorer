@@ -1,3 +1,10 @@
+## [1.15.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.3...v1.15.4) (2019-04-21)
+
+
+### Bug Fixes
+
+* final file blacklist to decrease size of extension ([4431b43](https://github.com/spmeesseman/vscode-taskexplorer/commit/4431b43))
+
 ## [1.15.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.2...v1.15.3) (2019-04-21)
 
 
