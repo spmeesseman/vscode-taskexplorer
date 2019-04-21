@@ -1,3 +1,51 @@
+# [1.15.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.9...v1.15.0) (2019-04-21)
+
+
+### Bug Fixes
+
+* editing package.json file throws exception in scriptProvider (introduced 1.14.7) ([1379a74](https://github.com/spmeesseman/vscode-taskexplorer/commit/1379a74))
+
+
+### Build System
+
+* **npm:** update to gradle support ([0d15e1a](https://github.com/spmeesseman/vscode-taskexplorer/commit/0d15e1a))
+
+
+### Code Refactoring
+
+* add setting for path to gradle program ([ebb24e5](https://github.com/spmeesseman/vscode-taskexplorer/commit/ebb24e5))
+* change bash script icon color to green ([7f35369](https://github.com/spmeesseman/vscode-taskexplorer/commit/7f35369))
+* need to tweak taskFile properties again. ([6b9aac5](https://github.com/spmeesseman/vscode-taskexplorer/commit/6b9aac5))
+* post merge touch gradle task provider with latest provider fixes ([1abff6f](https://github.com/spmeesseman/vscode-taskexplorer/commit/1abff6f))
+
+
+### Documentation
+
+* **readme:** fix typo in v1.15 feature note ([27c8f85](https://github.com/spmeesseman/vscode-taskexplorer/commit/27c8f85))
+* **todo:** mark gradle support complete ([815c4f3](https://github.com/spmeesseman/vscode-taskexplorer/commit/815c4f3))
+* **readme:** post merge update ([db2d6c1](https://github.com/spmeesseman/vscode-taskexplorer/commit/db2d6c1))
+* **todo:** update ([a4bc7b0](https://github.com/spmeesseman/vscode-taskexplorer/commit/a4bc7b0))
+* **readme:** update all task type icons in header row ([32b3bf7](https://github.com/spmeesseman/vscode-taskexplorer/commit/32b3bf7))
+* **readme:** update grunt and nsis task type icons ([0c878d9](https://github.com/spmeesseman/vscode-taskexplorer/commit/0c878d9))
+* **eadme:** update marketplace icon smoother edges ([630d689](https://github.com/spmeesseman/vscode-taskexplorer/commit/630d689))
+* **readme:** update material icon theme info to credits ([58776e6](https://github.com/spmeesseman/vscode-taskexplorer/commit/58776e6))
+* **readme:** update non transparent task type icons to show nice in dark theme ([da541ac](https://github.com/spmeesseman/vscode-taskexplorer/commit/da541ac))
+* **todo:** update to v1.15 icon update info ([33a7ea8](https://github.com/spmeesseman/vscode-taskexplorer/commit/33a7ea8))
+* **readme:** update to v1.15 info ([2dcdb31](https://github.com/spmeesseman/vscode-taskexplorer/commit/2dcdb31))
+* **readme:** update to v1.15 info ([30441d7](https://github.com/spmeesseman/vscode-taskexplorer/commit/30441d7))
+
+
+### Features
+
+* add gradle support ([a8c1dc6](https://github.com/spmeesseman/vscode-taskexplorer/commit/a8c1dc6)), closes [#15](https://github.com/spmeesseman/vscode-taskexplorer/issues/15)
+* display tree icons for all task types even if no icon theme is installed ([84ecabb](https://github.com/spmeesseman/vscode-taskexplorer/commit/84ecabb))
+* support for gradle tasks ([bed6021](https://github.com/spmeesseman/vscode-taskexplorer/commit/bed6021))
+
+
+### Performance Improvements
+
+* reduce tree/icon refresh time when starting/stopping task. ([15b2823](https://github.com/spmeesseman/vscode-taskexplorer/commit/15b2823))
+
 ## [1.14.9](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.8...v1.14.9) (2019-04-20)
 
 
