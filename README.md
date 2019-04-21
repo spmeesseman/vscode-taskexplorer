@@ -57,17 +57,30 @@
 * v1.1 - Supports multi-root or single-root workspaces
 * v1.0 - Open and launch NPM scripts as tasks
 
-## Configuring excludes and ant includes with glob patterns
+## Configuring Global Excludes and Apache Ant Includes with Glob Patterns
 
 The setting 'exclude' defines a string or an array of strings of file patterns to ignore.  The setting applies to all script types.  The string(s) must be glob pattern(s), for example:
 
-    taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**" ]
+`taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**" ]`
 
-> Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.
+Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.
 
-The setting 'includeAnt' is a string or an array of strings used to define file patterns to include which would have normally been ignored by the internal Ant Task Provider.  By default, only ant files named [Bb]uild.xml are considered.  The string(s) must be glob pattern(s) and should include the .xml extension, for example:
+Since Apache Ant uses a .xml file extension, the setting 'includeAnt' can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting is a string or an array of strings and must be glob pattern(s) including the .xml extension, for example:
 
-    taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]
+`taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]`
+
+Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the ant includes list in all cases.
+
+## Internally Provided Tasks vs. VSCode Provided Tasks
+
+The following tasks are provided by VSCode:
+
+* Workspace (.vscode/tasks.json)
+* NPM (**/package.json)
+
+All other tasks are internaly provided.  Workspace tasks are detected by VSCode in all cases.  However, NPM tasks are detected only if the setting `'Npm -> Auto Detect'` is turned on in VSCode Settings.  By default this is turned on.  If NPM tasks are not displaying, please check this setting.
+
+Detection of all internally provided task types can be turned on/off in Settings - `'Task Explorer -> Enable [Tasktype]'`.
 
 ## Feedback & Contributing
 
