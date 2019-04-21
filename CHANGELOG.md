@@ -1,3 +1,13 @@
+## [1.15.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.0...v1.15.1) (2019-04-21)
+
+
+### Documentation
+
+* **readme:** update build by me section ([9ed6d91](https://github.com/spmeesseman/vscode-taskexplorer/commit/9ed6d91))
+* **readme:** update info, more detail on vscode provided tasks and ant includes [skip ci] ([0b531ba](https://github.com/spmeesseman/vscode-taskexplorer/commit/0b531ba))
+* **todo:** update post 1.15 [skip ci] ([43fc8ee](https://github.com/spmeesseman/vscode-taskexplorer/commit/43fc8ee))
+* **license:** update to mit [skip ci] ([d80340f](https://github.com/spmeesseman/vscode-taskexplorer/commit/d80340f))
+
 # [1.15.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.9...v1.15.0) (2019-04-21)
 
 
