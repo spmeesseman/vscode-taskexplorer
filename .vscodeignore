@@ -9,6 +9,7 @@ coverconfig.json
 jsconfig.json
 out/test/**
 out/tools/**
+out/**/*.map
 package-lock.json
 src/**
 test/**
@@ -18,3 +19,5 @@ vsc-extension-quickstart.md
 azurepipelines.yml
 codecov.yml
 .prettier*
+*.vsix
+test-reports
