@@ -16,8 +16,7 @@ test/**
 tsconfig.json
 tslint.json
 vsc-extension-quickstart.md
-azurepipelines.yml
-codecov.yml
-.prettier*
+*.yml
 *.vsix
 test-reports
+test-files
