@@ -3,7 +3,7 @@
     "displayName": "Task Explorer",
     "description": "Manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
-    "version": "1.15.1",
+    "version": "1.15.2",
     "publisher": "spmeesseman",
     "license": "MIT",
     "repository": {
@@ -50,7 +50,7 @@
         "src/*.js",
         "src/common/*.js",
         "types"
-	],
+    ],
     "scripts": {
         "package": "vsce package",
         "publish": "vsce publish",
