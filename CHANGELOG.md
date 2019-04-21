@@ -1,3 +1,10 @@
+## [1.15.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.1...v1.15.2) (2019-04-21)
+
+
+### Documentation
+
+* **readme:**  style/refresh info post 1.15 reelease ([e818c29](https://github.com/spmeesseman/vscode-taskexplorer/commit/e818c29))
+
 ## [1.15.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.0...v1.15.1) (2019-04-21)
 
 
