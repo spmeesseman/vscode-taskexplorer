@@ -1,3 +1,15 @@
+## [1.15.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.2...v1.15.3) (2019-04-21)
+
+
+### Bug Fixes
+
+* build included non-included not needed files ([4cb2423](https://github.com/spmeesseman/vscode-taskexplorer/commit/4cb2423))
+
+
+### Build System
+
+* complete ignore list from extension build ([f47e395](https://github.com/spmeesseman/vscode-taskexplorer/commit/f47e395))
+
 ## [1.15.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.1...v1.15.2) (2019-04-21)
 
 
