@@ -38,9 +38,9 @@
 
 ## Features
 
-* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo) (made with [Todo+](https://marketplace.visualstudio.com/itemdetails?itemName=fabiospampinato.vscode-todo-plus))
-* v1.15 - Support for gradle tasks (includes provider)
-* v1.14 - Support for grunt and gulp task files not located in the project root
+* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo) (kept with [Todo+](https://marketplace.visualstudio.com/itemdetails?itemName=fabiospampinato.vscode-todo-plus))
+* v1.15 - Support for gradle tasks (includes provider) (closes [#15](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
+* v1.14 - Support for grunt and gulp task files not located in the project root (closes [#12](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
 * v1.13 - Multiple task files of the same type placed within a group node for less clutter in folder level nodes
 * v1.12 - Support for bash, batch, perl, powershell, python, ruby, and nsis scripts (includes provider)
 * v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
@@ -61,13 +61,13 @@
 
 The setting 'exclude' defines a string or an array of strings of file patterns to ignore.  The setting applies to all script types.  The string(s) must be glob pattern(s), for example:
 
-`taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**" ]`
+* `taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**" ]`
 
 Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.
 
 Since Apache Ant uses a .xml file extension, the setting 'includeAnt' can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting is a string or an array of strings and must be glob pattern(s) including the .xml extension, for example:
 
-`taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]`
+* `taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]`
 
 Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the ant includes list in all cases.
 
@@ -90,7 +90,7 @@ Detection of all internally provided task types can be turned on/off in Settings
   [pull requests](https://github.com/spmeesseman/vscode-taskexplorer/pulls)
 * [Contributors](https://github.com/spmeesseman/vscode-taskexplorer/graphs/contributors)
 
-## Credits
+## Thank You
 
 * The [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme) for some of the task type icons.
 
