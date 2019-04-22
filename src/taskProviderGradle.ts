@@ -38,15 +38,15 @@ export class GradleTaskProvider implements TaskProvider
 
 export async function invalidateTasksCacheGradle(opt?: Uri) : Promise<void> 
 {
-	if (opt) 
-	{
-		util.log('');
-		util.log('invalidateTasksCacheAnt');
+	util.log('');
+	util.log('invalidateTasksCacheAnt');
 
+	if (opt && cachedTasks) 
+	{
 		let rmvTasks: Task[] = [];
 		let uri: Uri = opt as Uri;
 
-		cachedTasks.forEach(async each => {
+		cachedTasks.forEach(each => {
 			let cstDef: GradleTaskDefinition = each.definition;
 			if (cstDef.uri.fsPath === opt.fsPath) {
 				rmvTasks.push(each);
@@ -58,10 +58,15 @@ export async function invalidateTasksCacheGradle(opt?: Uri) : Promise<void>
 			util.removeFromArray(cachedTasks, each);
 		});
 
-		let tasks = await readGradlefile(opt);
-		cachedTasks.push(...tasks);
+		if (util.pathExists(opt.fsPath))
+		{
+			let tasks = await readGradlefile(opt);
+			cachedTasks.push(...tasks);
+		}
 
-		return;
+		if (cachedTasks.length > 0) {
+			return;
+		}
 	}
 
 	cachedTasks = undefined;
@@ -90,7 +95,7 @@ async function detectGradlefiles(): Promise<Task[]>
 			// Note - pattern will ignore gradlefiles in root project dir, which would be picked
 			// up by VSCoces internal Gradle task provider
 			//
-			let relativePattern = new RelativePattern(folder, '**/*.gradle');
+			let relativePattern = new RelativePattern(folder, '**/*.[Gg][Rr][Aa][Dd][Ll][Ee]');
 			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
 			for (const fpath of paths) 
 			{
@@ -210,9 +215,12 @@ function createGradleTask(target: string, cmd: string, folder: WorkspaceFolder, 
 
 	function getRelativePath(folder: WorkspaceFolder, uri: Uri): string 
 	{
-		let rootUri = folder.uri;
-		let absolutePath = uri.path.substring(0, uri.path.lastIndexOf('/') + 1);
-		return absolutePath.substring(rootUri.path.length + 1);
+		if (folder) {
+			let rootUri = folder.uri;
+			let absolutePath = uri.path.substring(0, uri.path.lastIndexOf('/') + 1);
+			return absolutePath.substring(rootUri.path.length + 1);
+		}
+		return '';
 	}
 	
 	let kind: GradleTaskDefinition = {
