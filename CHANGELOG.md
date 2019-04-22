@@ -1,3 +1,12 @@
+## [1.15.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.4...v1.15.5) (2019-04-22)
+
+
+### Bug Fixes
+
+* deleting a task file and exiting vscode before tree finishes refreshing throws exception ([0b09e4c](https://github.com/spmeesseman/vscode-taskexplorer/commit/0b09e4c))
+* gradle files with upperacse extensions are not found ([9b622dd](https://github.com/spmeesseman/vscode-taskexplorer/commit/9b622dd))
+* new batch file creation does not display in task tree after auto-refresh ([422ff51](https://github.com/spmeesseman/vscode-taskexplorer/commit/422ff51))
+
 ## [1.15.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.3...v1.15.4) (2019-04-21)
 
 
