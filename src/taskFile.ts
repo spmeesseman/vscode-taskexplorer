@@ -52,8 +52,9 @@ export class TaskFile extends TreeItem
 		}
 
 		//
-		// Since tasks are returned from VSCode API without a filename that they were found in,
-		// we must deduce the filename from the task source
+		// Since tasks are returned from VSCode API without a filename that they were found
+		// in we must deduce the filename from the task source.  This includes npm, tsc, and 
+		// vscode (workspace) tasks
 		//
 
 		let fileName: string = 'package.json';
@@ -71,18 +72,6 @@ export class TaskFile extends TreeItem
 			fileName = 'tsconfig.json';
 			tmpIdx = 2;
 		}
-		else if (source === 'grunt') {
-			fileName = 'gruntfile.js';
-			tmpIdx = 5;
-		}
-		else if (source === 'gulp') {
-			fileName = 'gulpfile.js';
-			tmpIdx = 4;
-		}
-		else if (source === 'make') {
-			fileName = 'makefile';
-			tmpIdx = 4;
-		}
 
 		//
 		// Check for casing, technically this isnt needed for windows but still
@@ -96,25 +85,25 @@ export class TaskFile extends TreeItem
 			dirPath = folder!.resourceUri!.fsPath;
 		}
 
-		let filePath = path.join(dirPath, fileName);
-		if (!util.pathExists(filePath)) {
-			//
-			// try camelcasing
-			//
-			fileName = util.camelCase(fileName, tmpIdx);
-			if (!util.pathExists(filePath)) {
-				//
-				// upper casing first leter
-				//
-				fileName = util.properCase(fileName);
-				if (!util.pathExists(filePath)) {
-					//
-					// upper case
-					//
-					fileName = fileName.toUpperCase();
-				}
-			}
-		}
+		//let filePath = path.join(dirPath, fileName);
+		//if (!util.pathExists(filePath)) {
+		//	//
+		//	// try camelcasing
+		//	//
+		//	fileName = util.camelCase(fileName, tmpIdx);
+		//	if (!util.pathExists(filePath)) {
+		//		//
+		//		// upper casing first leter
+		//		//
+		//		fileName = util.properCase(fileName);
+		//		if (!util.pathExists(filePath)) {
+		//			//
+		//			// upper case
+		//			//
+		//			fileName = fileName.toUpperCase();
+		//		}
+		//	}
+		//}
 
 		return fileName;
 	}
