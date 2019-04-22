@@ -40,12 +40,12 @@ export async function invalidateTasksCacheMake(opt?: Uri) : Promise<void>
 	util.log('');
 	util.log('invalidateTasksCacheMake');
 
-	if (opt) 
+	if (opt && cachedTasks) 
 	{
 		let rmvTasks: Task[] = [];
 		let uri: Uri = opt as Uri;
 
-		cachedTasks.forEach(async each => {
+		cachedTasks.forEach(each => {
 			let cstDef: MakeTaskDefinition = each.definition;
 			if (cstDef.uri.fsPath === opt.fsPath) {
 				rmvTasks.push(each);
@@ -57,10 +57,15 @@ export async function invalidateTasksCacheMake(opt?: Uri) : Promise<void>
 			util.removeFromArray(cachedTasks, each);
 		});
 
-		let tasks = await readMakefile(opt);
-		cachedTasks.push(...tasks);
+		if (util.pathExists(opt.fsPath))
+		{
+			let tasks = await readMakefile(opt);
+			cachedTasks.push(...tasks);
+		}
 
-		return;
+		if (cachedTasks.length > 0) {
+			return;
+		}
 	}
 
 	cachedTasks = undefined;
@@ -202,9 +207,12 @@ function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, ur
 
 	function getRelativePath(folder: WorkspaceFolder, uri: Uri): string 
 	{
-		let rootUri = folder.uri;
-		let absolutePath = uri.path.substring(0, uri.path.lastIndexOf('/') + 1);
-		return absolutePath.substring(rootUri.path.length + 1);
+		if (folder) {
+			let rootUri = folder.uri;
+			let absolutePath = uri.path.substring(0, uri.path.lastIndexOf('/') + 1);
+			return absolutePath.substring(rootUri.path.length + 1);
+		}
+		return '';
 	}
 	
 	let kind: MakeTaskDefinition = {

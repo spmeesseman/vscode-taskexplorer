@@ -39,15 +39,14 @@ export class AntTaskProvider implements TaskProvider
 
 export async function invalidateTasksCacheAnt(opt?: Uri) : Promise<void> 
 {
-	if (opt) 
+	util.log('');
+	util.log('invalidateTasksCacheAnt');
+
+	if (opt && cachedTasks) 
 	{
-		util.log('');
-		util.log('invalidateTasksCacheAnt');
-
 		let rmvTasks: Task[] = [];
-		let uri: Uri = opt as Uri;
 
-		cachedTasks.forEach(async each => {
+		cachedTasks.forEach(each => {
 			let cstDef: AntTaskDefinition = each.definition;
 			if (cstDef.uri.fsPath === opt.fsPath) {
 				rmvTasks.push(each);
@@ -59,10 +58,18 @@ export async function invalidateTasksCacheAnt(opt?: Uri) : Promise<void>
 			util.removeFromArray(cachedTasks, each);
 		});
 
-		let tasks = await readAntfile(opt);
-		cachedTasks.push(...tasks);
+		//
+		// If this isn't a 'delete file' event then read the file for tasks
+		//
+		if (util.pathExists(opt.fsPath))
+		{
+			let tasks = await readAntfile(opt);
+			cachedTasks.push(...tasks);
+		}
 
-		return;
+		if (cachedTasks.length > 0) {
+			return;
+		}
 	}
 
 	cachedTasks = undefined;
@@ -231,9 +238,12 @@ function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, uri
 
 	function getRelativePath(folder: WorkspaceFolder, uri: Uri): string 
 	{
-		let rootUri = folder.uri;
-		let absolutePath = uri.path.substring(0, uri.path.lastIndexOf('/') + 1);
-		return absolutePath.substring(rootUri.path.length + 1);
+		if (folder) {
+			let rootUri = folder.uri;
+			let absolutePath = uri.path.substring(0, uri.path.lastIndexOf('/') + 1);
+			return absolutePath.substring(rootUri.path.length + 1);
+		}
+		return '';
 	}
 	
 	let antFile = path.basename(uri.path);
@@ -255,10 +265,10 @@ function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, uri
 	let args = [ target ];
 	let options = null;
 	
-	if (process.platform === 'win32' && workspace.getConfiguration('taskExplorer').get('enableAnsiconForAnt') === true)
+	if (process.platform === 'win32' && configuration.get('enableAnsiconForAnt') === true)
 	{
 		let ansicon = "ansicon.exe";
-		let ansiPath: string = workspace.getConfiguration('taskExplorer').get('pathToAnsicon');
+		let ansiPath: string = configuration.get('pathToAnsicon');
 		if (ansiPath && util.pathExists(ansiPath)) {
 			ansicon = ansiPath;
 			if (!ansicon.endsWith('ansicon.exe') && !ansicon.endsWith('\\')) {
@@ -284,7 +294,7 @@ function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, uri
 
 	let targetName = target;
 
-	if (antFile !== 'build.xml' && antFile !== 'Build.xml')
+	if (antFile.toLowerCase() !== 'build.xml')
 	{
 		args.push('-f');
 		args.push(antFile);

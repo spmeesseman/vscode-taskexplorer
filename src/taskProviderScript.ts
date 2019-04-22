@@ -89,13 +89,12 @@ export async function invalidateTasksCacheScript(opt?: Uri) : Promise<void>
 	util.log('');
 	util.log('invalidateTasksCacheScript');
 
-	if (opt) 
+	if (opt && cachedTasks) 
 	{
 		let rmvTasks: Task[] = [];
-		let uri: Uri = opt as Uri;
-		let folder = workspace.getWorkspaceFolder(uri);
+		let folder = workspace.getWorkspaceFolder(opt);
 
-		cachedTasks.forEach(async each => {
+		cachedTasks.forEach(each => {
 			let cstDef: ScriptTaskDefinition = each.definition as ScriptTaskDefinition;
 			if (cstDef.uri.fsPath === opt.fsPath) {
 				rmvTasks.push(each);
@@ -107,10 +106,15 @@ export async function invalidateTasksCacheScript(opt?: Uri) : Promise<void>
 			util.removeFromArray(cachedTasks, each);
 		});
 
-		let task = createScriptTask(scriptTable[path.extname(opt.fsPath).substring(1)], folder!,  opt);
-		cachedTasks.push(task);
+		if (util.pathExists(opt.fsPath))
+		{
+			let task = createScriptTask(scriptTable[path.extname(opt.fsPath).substring(1)], folder!,  opt);
+			cachedTasks.push(task);
+		}
 
-		return;
+		if (cachedTasks.length > 0) {
+			return;
+		}
 	}
 
 	cachedTasks = undefined;
@@ -140,23 +144,14 @@ async function detectScriptFiles(): Promise<Task[]>
 	try {
 		for (const folder of folders)
 		{
-			let relativePattern = new RelativePattern(folder, '**/*.{sh,py,rb,ps1,pl,bat,nsi}'); //,**/*.{SH,PY,RB,PS1,PL,BAT,CMD,VBS,AHK,NSI}}');
+			let relativePattern = new RelativePattern(folder, '**/*.{sh,py,rb,ps1,pl,bat,nsi}'); //,SH,PY,RB,PS1,PL,BAT,NSI');
 			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
 			for (const fpath of paths)
 			{
 				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
 
 					visitedFiles.add(fpath.fsPath);
-					//let contents = await util.readFile(fpath.fsPath);
-					//let textFile: TextDocument = await workspace.openTextDocument(fpath);
-					//for (const type of Object.keys(scriptTable)) {
-						//if (textFile.languageId === type) {
-							//if (scriptTable[type].enabled) {
-								allTasks.push(createScriptTask(scriptTable[path.extname(fpath.fsPath).substring(1)], folder!, fpath));
-							//}
-							//break;
-						//}
-					//}
+					allTasks.push(createScriptTask(scriptTable[path.extname(fpath.fsPath).substring(1)], folder!, fpath));
 				}
 			}
 		}
@@ -171,9 +166,12 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
 {
 	function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
 	{
-		let rootUri = folder.uri;
-		let absolutePath = uri.path.substring(0, uri.path.lastIndexOf('/') + 1);
-		return absolutePath.substring(rootUri.path.length + 1);
+		if (folder) {
+			let rootUri = folder.uri;
+			let absolutePath = uri.path.substring(0, uri.path.lastIndexOf('/') + 1);
+			return absolutePath.substring(rootUri.path.length + 1);
+		}
+		return '';
 	}
 
 	let cwd = path.dirname(uri.fsPath);
