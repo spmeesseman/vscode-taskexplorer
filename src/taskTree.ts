@@ -194,7 +194,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		// ans will still receive events.  CHeck visibility property, and of this view
 		// is hidden/disabled, then exit
 		//
-		if (views.get(this.name))
+		if (!opt && views.get(this.name))
 		{
 			if (!views.get(this.name).visible) {
 				return;
