@@ -1,3 +1,10 @@
+## [1.15.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.5...v1.15.6) (2019-04-23)
+
+
+### Bug Fixes
+
+* if the view is changed while a task runs and finishes, the status icon of that task gets stuck at loading ([a290d01](https://github.com/spmeesseman/vscode-taskexplorer/commit/a290d01))
+
 ## [1.15.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.4...v1.15.5) (2019-04-22)
 
 
