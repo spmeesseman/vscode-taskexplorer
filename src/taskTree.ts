@@ -62,7 +62,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }, this));
 		subscriptions.push(commands.registerCommand(name + '.open', this.open, this));
 		subscriptions.push(commands.registerCommand(name + '.refresh', this.refresh, this));
-		subscriptions.push(commands.registerCommand(name + '.runInstall', this.runInstall, this));
+		subscriptions.push(commands.registerCommand(name + '.runInstall', function(taskFile: TaskFile) { this.runNpmCommand(taskFile, 'install'); }, this));
+		subscriptions.push(commands.registerCommand(name + '.runUpdate', function(taskFile: TaskFile) { this.runNpmCommand(taskFile, 'update'); }, this));
+		subscriptions.push(commands.registerCommand(name + '.runUpdatePackage', function(taskFile: TaskFile) { this.runNpmCommand(taskFile, 'update <packagename>'); }, this));
+		subscriptions.push(commands.registerCommand(name + '.runAudit', function(taskFile: TaskFile) { this.runNpmCommand(taskFile, 'audit'); }, this));
+		subscriptions.push(commands.registerCommand(name + '.runAuditFix', function(taskFile: TaskFile) { this.runNpmCommand(taskFile, 'audit fix'); }, this));
 
 		tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
 		tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
@@ -236,22 +240,39 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	}
 
 
-	private async runInstall(taskFile: TaskFile)
+	private async runNpmCommand(taskFile: TaskFile, command: string)
 	{
 		if (taskFile.label.startsWith('npm'))
 		{
 			let options = {
 				"cwd": path.dirname(taskFile.resourceUri.fsPath)
 			};
-			let execution = new ShellExecution('npm', [ 'install' ], options);
+			
 			let kind: TaskDefinition = {
 				type: 'npm',
 				script: 'install',
 				path: path.dirname(taskFile.resourceUri.fsPath)
 			};
-			let task = new Task(kind, taskFile.folder.workspaceFolder, 'install', 'npm', execution, undefined);
 
-			tasks.executeTask(task);
+			if (command.indexOf('<packagename>') === -1) 
+			{
+				let execution = new ShellExecution('npm ' + command, options);
+				let task = new Task(kind, taskFile.folder.workspaceFolder, command, 'npm', execution, undefined);
+				tasks.executeTask(task).then(function(execution) {}, function(reason) {});
+			}
+			else 
+			{
+				let opts: InputBoxOptions = { prompt: 'Enter package name to ' + command };
+				window.showInputBox(opts).then(function(str)
+				{
+					if (str !== undefined)
+					{
+						let execution = new ShellExecution('npm ' + command.replace('<packagename>','').trim() + str.trim(), options);
+						let task = new Task(kind, taskFile.folder.workspaceFolder, command.replace('<packagename>','').trim() + str.trim(), 'npm', execution, undefined);
+						tasks.executeTask(task).then(function(execution) {}, function(reason) {});
+					}
+				});
+			}
 		}
 		else{
 			window.showInformationMessage('Only npm nodes can run npm installs');

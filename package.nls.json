@@ -47,6 +47,10 @@
 	"command.stop": "Stop",
 	"command.debug": "Debug",
 	"command.open": "Open",
-	"command.runInstall": "Run Install",
+	"command.runInstall": "Run npm install",
+	"command.runAudit": "Run npm audit",
+	"command.runAuditFix": "Run npm audit fix",
+	"command.runUpdate": "Run npm update",
+	"command.runUpdatePackage": "Run npm update [package]",
 	"command.runSelectedScript": "Run Script"
 }

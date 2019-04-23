@@ -27,9 +27,9 @@
 |-|-|-|
 |![ss0](res/taskview1.png?raw=true)|![ss1](res/taskview2.png?raw=true)|![ss2](res/taskview3.png?raw=true)|
 
-|Grunt/Gulp in Subfolders (v1.14)|||
+|Grunt/Gulp in Subfolders (v1.14)|Npm Commands (v1.16)||
 |-|-|-|
-|![ss3](res/taskview4.png?raw=true)|||
+|![ss3](res/taskview4.png?raw=true)|![ss3](res/taskview5.png?raw=true)||
 
 ## Requirements
 
