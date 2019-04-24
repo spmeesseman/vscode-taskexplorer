@@ -255,11 +255,18 @@ function registerFileWatchers(context: ExtensionContext)
 
 function refreshTree(taskType?: string, uri?: Uri) 
 {
+    let refreshedTasks: boolean = false;
     if (configuration.get<boolean>('enableSideBar') && treeDataProvider) {
+        refreshedTasks = true;
         treeDataProvider.refresh(taskType, uri);
     }
     if (configuration.get<boolean>('enableExplorerView') && treeDataProvider2) {
-        treeDataProvider2.refresh(taskType, uri);
+        if (!refreshedTasks) {
+            treeDataProvider2.refresh(taskType, uri);
+        }
+        else {
+            treeDataProvider2.refresh(false, uri);
+        }
     }
 }
 
