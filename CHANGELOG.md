@@ -1,3 +1,17 @@
+## [1.15.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.6...v1.15.7) (2019-04-24)
+
+
+### Bug Fixes
+
+* add/remove/edit ant files defined in includeAnt setting does not show in tree correctly after auto-refresh ([34da3ea](https://github.com/spmeesseman/vscode-taskexplorer/commit/34da3ea))
+* editing a non-script type task file results in duplicate task nodes in tree after saving ([0d77a00](https://github.com/spmeesseman/vscode-taskexplorer/commit/0d77a00))
+
+
+### Documentation
+
+* **todo:** update [skip ci] ([6e1412c](https://github.com/spmeesseman/vscode-taskexplorer/commit/6e1412c))
+* **todo:** update to current date ([b442837](https://github.com/spmeesseman/vscode-taskexplorer/commit/b442837))
+
 ## [1.15.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.5...v1.15.6) (2019-04-23)
 
 
