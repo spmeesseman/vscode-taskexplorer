@@ -31,20 +31,21 @@ Todos:
         ✔ Apply exclude globs to underlying search when finding tasks (perf) @medium @2h @done(19-04-14 00:22)
         ✔ Support for gulp and grunt task files not located in project root @low @4h @done(19-04-12 00:04)
         ✔ Support for VSCode compound tasks @low @8h @done(19-04-13 23:50)
-        ☐ If debug output was open when VS closes, re-open it when VSCode is started next @low @1h
+        ✘ If debug output was open when VS closes, re-open it when VSCode is started next @low @1h @cancelled(19-04-23 21:33)
         ☐ Support for detecting Visual Studio projects, and building them as tasks @low @16h
         ✔ Support for gradle tasks @done(19-04-14 13:30)
         ✔ Increase performance by invalidating select dirty files in cache instead of entire script file cache @low @4h @done(19-04-18 13:25)
         ✔ Internally detect gulp/gruntfiles in project root and ignore VSCode provided tasks @low @2h @done(19-04-19 15:49)
         ☐ Increase performance by invalidating parts of tree ui instead of whole tree @low @8h
         Add more npm comands to task node context menu:
-            ☐ Command - audit @1h
-            ☐ Command - audit fix @1h
-            ☐ Command - update @1h
-            ☐ Add parameter prompt for some command may take a module name as an arg i.e. 'npm update extjs-pkg-plyr' @2h
+            ✔ Command - audit @1h @done(19-04-23 21:33)
+            ✔ Command - audit fix @1h @done(19-04-23 21:33)
+            ✔ Command - update @1h @done(19-04-23 21:33)
+            ✔ Add parameter prompt for some command may take a module name as an arg i.e. 'npm update extjs-pkg-plyr' @2h @done(19-04-23 21:33)
+            ☐ Merge to master
         ☐ A 'run last task' button in title bars (sidebar and explorer) @1h
 
-    Bugs:
+    Known Bugs:
 
         ☐ Delete task file that is in a "grouped" node and it does not get removed from tree until manual refresh @low @4h
         ☐ Delete task file in a grouped node with only one other task file, it should "ungroup".  It does not, until manual refresh. @low @4h
