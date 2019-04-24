@@ -256,6 +256,22 @@ function registerFileWatchers(context: ExtensionContext)
 function refreshTree(taskType?: string, uri?: Uri) 
 {
     let refreshedTasks: boolean = false;
+
+    //
+    // If the task type received from a filewatcher event is 'ant-*' then it is a custom
+    // defined ant file in the includeAnt setting, named accordingly so that the watchers
+    // can be tracked.  change the taskType to 'ant' here
+    //
+    if (taskType.indexOf('ant-') !== -1) {
+        taskType = 'ant';
+    }
+
+    //
+    // Refresh tree
+    //
+    // Note the task cache only needs to be refreshed once if both the explorer view and
+    // the sidebar view are being used and/or enabled
+    //
     if (configuration.get<boolean>('enableSideBar') && treeDataProvider) {
         refreshedTasks = true;
         treeDataProvider.refresh(taskType, uri);
