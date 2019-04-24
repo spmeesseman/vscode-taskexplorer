@@ -14,14 +14,14 @@
 * gradle files with upperacse extensions are not found ([9b622dd](https://github.com/spmeesseman/vscode-taskexplorer/commit/9b622dd))
 * new batch file creation does not display in task tree after auto-refresh ([422ff51](https://github.com/spmeesseman/vscode-taskexplorer/commit/422ff51))
 
-## [1.15.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.3...v1.15.4) (2019-04-21)
+## [1.15.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.3...v1.15.4) (2019-04-13)
 
 
 ### Bug Fixes
 
 * final file blacklist to decrease size of extension ([4431b43](https://github.com/spmeesseman/vscode-taskexplorer/commit/4431b43))
 
-## [1.15.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.2...v1.15.3) (2019-04-21)
+## [1.15.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.2...v1.15.3) (2019-04-13)
 
 
 ### Bug Fixes
@@ -33,14 +33,14 @@
 
 * complete ignore list from extension build ([f47e395](https://github.com/spmeesseman/vscode-taskexplorer/commit/f47e395))
 
-## [1.15.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.1...v1.15.2) (2019-04-21)
+## [1.15.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.1...v1.15.2) (2019-04-13)
 
 
 ### Documentation
 
 * **readme:**  style/refresh info post 1.15 reelease ([e818c29](https://github.com/spmeesseman/vscode-taskexplorer/commit/e818c29))
 
-## [1.15.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.0...v1.15.1) (2019-04-21)
+## [1.15.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.0...v1.15.1) (2019-04-13)
 
 
 ### Documentation
@@ -50,7 +50,7 @@
 * **todo:** update post 1.15 [skip ci] ([43fc8ee](https://github.com/spmeesseman/vscode-taskexplorer/commit/43fc8ee))
 * **license:** update to mit [skip ci] ([d80340f](https://github.com/spmeesseman/vscode-taskexplorer/commit/d80340f))
 
-# [1.15.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.9...v1.15.0) (2019-04-21)
+# [1.15.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.9...v1.15.0) (2019-04-13)
 
 
 ### Bug Fixes
@@ -98,7 +98,7 @@
 
 * reduce tree/icon refresh time when starting/stopping task. ([15b2823](https://github.com/spmeesseman/vscode-taskexplorer/commit/15b2823))
 
-## [1.14.9](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.8...v1.14.9) (2019-04-20)
+## [1.14.9](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.8...v1.14.9) (2019-04-12)
 
 
 ### Bug Fixes
@@ -121,7 +121,7 @@
 * **readme:** add mention of the todo list extension ([69704ed](https://github.com/spmeesseman/vscode-taskexplorer/commit/69704ed))
 * **todo:** update [skip ci] ([e2801a1](https://github.com/spmeesseman/vscode-taskexplorer/commit/e2801a1))
 
-## [1.14.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.7...v1.14.8) (2019-04-19)
+## [1.14.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.7...v1.14.8) (2019-04-12)
 
 
 ### Bug Fixes
@@ -138,7 +138,7 @@
 
 * **todo:** update ([44f7259](https://github.com/spmeesseman/vscode-taskexplorer/commit/44f7259))
 
-## [1.14.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.6...v1.14.7) (2019-04-19)
+## [1.14.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.6...v1.14.7) (2019-04-12)
 
 
 ### Bug Fixes
@@ -153,14 +153,14 @@
 
 * reduce tree refresh time by 20-40% after editing a task file ([1f1e054](https://github.com/spmeesseman/vscode-taskexplorer/commit/1f1e054))
 
-## [1.14.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.5...v1.14.6) (2019-04-18)
+## [1.14.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.5...v1.14.6) (2019-04-12)
 
 
 ### Performance Improvements
 
 * after edit a task file, invalidate only that task tree node ([554394b](https://github.com/spmeesseman/vscode-taskexplorer/commit/554394b))
 
-## [1.14.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.4...v1.14.5) (2019-04-17)
+## [1.14.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.4...v1.14.5) (2019-04-12)
 
 
 ### Bug Fixes
@@ -170,7 +170,7 @@
 * makefile target parsing fails if a target name exists elsewhere in the file ([f7fb40d](https://github.com/spmeesseman/vscode-taskexplorer/commit/f7fb40d))
 * running an nsis task uses nsis.exe, should use makensis.exe ([f1598d4](https://github.com/spmeesseman/vscode-taskexplorer/commit/f1598d4))
 
-## [1.14.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.3...v1.14.4) (2019-04-16)
+## [1.14.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.3...v1.14.4) (2019-04-12)
 
 
 ### Bug Fixes
@@ -178,7 +178,7 @@
 * running a composite task (no shell) displays loading icon and stop icon, and is stuck in that state. ([d346c09](https://github.com/spmeesseman/vscode-taskexplorer/commit/d346c09))
 * starting and stopping a task is invalidating the tree before refreshing. ([32abff3](https://github.com/spmeesseman/vscode-taskexplorer/commit/32abff3))
 
-## [1.14.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.2...v1.14.3) (2019-04-15)
+## [1.14.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.2...v1.14.3) (2019-04-07)
 
 
 ### Bug Fixes
@@ -186,7 +186,7 @@
 * exclude globs have no effect on typescript tasks in subfolders ([75bcbda](https://github.com/spmeesseman/vscode-taskexplorer/commit/75bcbda))
 * grouped nodes have a tooltip of one of the task files within ([6d02dd5](https://github.com/spmeesseman/vscode-taskexplorer/commit/6d02dd5))
 
-## [1.14.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.1...v1.14.2) (2019-04-15)
+## [1.14.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.1...v1.14.2) (2019-04-07)
 
 
 ### Bug Fixes
@@ -194,7 +194,7 @@
 * gulp and grunt tasks in subdirs display incorrect task name. ([3d3f5bd](https://github.com/spmeesseman/vscode-taskexplorer/commit/3d3f5bd))
 * refreshing task tree does not pick up new task files ([289c110](https://github.com/spmeesseman/vscode-taskexplorer/commit/289c110))
 
-## [1.14.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.0...v1.14.1) (2019-04-14)
+## [1.14.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.14.0...v1.14.1) (2019-04-07)
 
 
 ### Bug Fixes
@@ -218,7 +218,7 @@
 
 * apply excludes glob list to the underlying  file search for faster tree loading. ([87588a5](https://github.com/spmeesseman/vscode-taskexplorer/commit/87588a5))
 
-# [1.14.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.3...v1.14.0) (2019-04-13)
+# [1.14.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.3...v1.14.0) (2019-04-07)
 
 
 ### Documentation
@@ -233,7 +233,7 @@
 
 * add support for grunt and gulp files not located in project root ([ced2462](https://github.com/spmeesseman/vscode-taskexplorer/commit/ced2462))
 
-## [1.13.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.2...v1.13.3) (2019-04-11)
+## [1.13.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.2...v1.13.3) (2019-04-06)
 
 
 ### Bug Fixes
@@ -249,7 +249,7 @@
 * **todo:** update info ([e578f6d](https://github.com/spmeesseman/vscode-taskexplorer/commit/e578f6d))
 * **todo:** updated info ([abfee5f](https://github.com/spmeesseman/vscode-taskexplorer/commit/abfee5f))
 
-## [1.13.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.1...v1.13.2) (2019-04-11)
+## [1.13.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.1...v1.13.2) (2019-04-06)
 
 
 ### Bug Fixes
@@ -266,7 +266,7 @@
 
 * **readme:** fix screenshot table layout ([3ef94e7](https://github.com/spmeesseman/vscode-taskexplorer/commit/3ef94e7))
 
-## [1.13.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.0...v1.13.1) (2019-04-10)
+## [1.13.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.13.0...v1.13.1) (2019-04-06)
 
 
 ### Bug Fixes
@@ -290,7 +290,7 @@
 
 * add "Open [taskname]" tooltip when hover over task nodes ([7ebe446](https://github.com/spmeesseman/vscode-taskexplorer/commit/7ebe446))
 
-# [1.13.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.6...v1.13.0) (2019-04-09)
+# [1.13.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.6...v1.13.0) (2019-04-06)
 
 
 ### Bug Fixes
@@ -309,7 +309,7 @@
 
 * add taskfile group nodes ([53ac139](https://github.com/spmeesseman/vscode-taskexplorer/commit/53ac139))
 
-## [1.12.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.5...v1.12.6) (2019-04-08)
+## [1.12.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.5...v1.12.6) (2019-04-06)
 
 
 ### Bug Fixes
@@ -321,7 +321,7 @@
 
 * **readme:** update info and default path excludes [skip ci] ([e88471f](https://github.com/spmeesseman/vscode-taskexplorer/commit/e88471f))
 
-## [1.12.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.4...v1.12.5) (2019-04-08)
+## [1.12.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.4...v1.12.5) (2019-04-06)
 
 
 ### Bug Fixes
@@ -340,14 +340,14 @@
 * **readme:** reorder badges, place gk badge next to dep status badges ([de16924](https://github.com/spmeesseman/vscode-taskexplorer/commit/de16924))
 * **todo:** update info ([a91d283](https://github.com/spmeesseman/vscode-taskexplorer/commit/a91d283))
 
-## [1.12.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.3...v1.12.4) (2019-04-08)
+## [1.12.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.3...v1.12.4) (2019-04-06)
 
 
 ### Documentation
 
 * **readme:** fixed todo link ([a26bc4c](https://github.com/spmeesseman/vscode-taskexplorer/commit/a26bc4c))
 
-## [1.12.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.2...v1.12.3) (2019-04-07)
+## [1.12.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.2...v1.12.3) (2019-04-05)
 
 
 ### Bug Fixes
@@ -364,7 +364,7 @@
 
 * **readme:**  add link to todos ([5d39799](https://github.com/spmeesseman/vscode-taskexplorer/commit/5d39799))
 
-## [1.12.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.1...v1.12.2) (2019-04-06)
+## [1.12.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.1...v1.12.2) (2019-04-05)
 
 
 ### Bug Fixes
@@ -382,7 +382,7 @@
 
 * **readme:** add new settings descriptions ([3f46d5f](https://github.com/spmeesseman/vscode-taskexplorer/commit/3f46d5f))
 
-## [1.12.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.0...v1.12.1) (2019-04-06)
+## [1.12.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.12.0...v1.12.1) (2019-04-05)
 
 
 ### Build System
@@ -403,14 +403,14 @@
 * **readme:** update coming soon and test check in name [skip ci] ([5d4432b](https://github.com/spmeesseman/vscode-taskexplorer/commit/5d4432b))
 * **readme:** update coming soon, test checkin username [skip ci] ([843e329](https://github.com/spmeesseman/vscode-taskexplorer/commit/843e329))
 
-# [1.12.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.11.2...v1.12.0) (2019-04-06)
+# [1.12.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.11.2...v1.12.0) (2019-04-05)
 
 
 ### Features
 
 * add support for bash, python, perl, powershell, nsis, and ruby scripts ([17244d1](https://github.com/spmeesseman/vscode-taskexplorer/commit/17244d1))
 
-## [1.11.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.11.1...v1.11.2) (2019-04-06)
+## [1.11.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.11.1...v1.11.2) (2019-04-05)
 
 
 ### Bug Fixes
