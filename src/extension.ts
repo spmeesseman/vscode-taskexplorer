@@ -269,7 +269,7 @@ function refreshTree(taskType?: string, uri?: Uri)
     // defined ant file in the includeAnt setting, named accordingly so that the watchers
     // can be tracked.  change the taskType to 'ant' here
     //
-    if (taskType.indexOf('ant-') !== -1) {
+    if (taskType && taskType.indexOf('ant-') !== -1) {
         taskType = 'ant';
     }
 
