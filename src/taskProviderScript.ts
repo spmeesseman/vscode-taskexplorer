@@ -84,6 +84,20 @@ export class ScriptTaskProvider implements TaskProvider
 }
 
 
+function refreshScriptTable()
+{
+	scriptTable.py.exec = configuration.get('pathToPython') ? configuration.get('pathToPython') : 'python';
+	scriptTable.rb.exec = configuration.get('pathToRuby') ? configuration.get('pathToRuby') : 'ruby';
+	scriptTable.ps1.exec = configuration.get('pathToPerl') ? configuration.get('pathToPerl') : 'perl';
+	scriptTable.nsi.exec = configuration.get('pathToNsis') ? configuration.get('pathToNsis') : 'makensis.exe';
+
+	scriptTable.py.enabled = configuration.get('enablePython');
+	scriptTable.rb.enabled = configuration.get('enableRuby');
+	scriptTable.ps1.enabled = configuration.get('enablePerl');
+	scriptTable.nsi.enabled = configuration.get('enableNsis');
+}
+
+
 export async function invalidateTasksCacheScript(opt?: Uri) : Promise<void> 
 {
 	util.log('');
@@ -124,6 +138,7 @@ export async function invalidateTasksCacheScript(opt?: Uri) : Promise<void>
 async function provideScriptFiles(): Promise<Task[]>
 {
 	if (!cachedTasks) {
+		refreshScriptTable();
 		cachedTasks = await detectScriptFiles();
 	}
 	return cachedTasks;
