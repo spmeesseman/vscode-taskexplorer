@@ -47,7 +47,7 @@ export async function invalidateTasksCacheMake(opt?: Uri) : Promise<void>
 
 		cachedTasks.forEach(each => {
 			let cstDef: MakeTaskDefinition = each.definition;
-			if (cstDef.uri.fsPath === opt.fsPath) {
+			if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
 				rmvTasks.push(each);
 			}
 		});

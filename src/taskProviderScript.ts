@@ -96,7 +96,7 @@ export async function invalidateTasksCacheScript(opt?: Uri) : Promise<void>
 
 		cachedTasks.forEach(each => {
 			let cstDef: ScriptTaskDefinition = each.definition as ScriptTaskDefinition;
-			if (cstDef.uri.fsPath === opt.fsPath) {
+			if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
 				rmvTasks.push(each);
 			}
 		});

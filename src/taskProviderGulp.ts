@@ -47,7 +47,7 @@ export async function invalidateTasksCacheGulp(opt?: Uri) : Promise<void>
 
 		cachedTasks.forEach(each => {
 			let cstDef: GulpTaskDefinition = each.definition;
-			if (cstDef.uri.fsPath === opt.fsPath) {
+			if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
 				rmvTasks.push(each);
 			}
 		});

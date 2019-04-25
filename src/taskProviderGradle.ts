@@ -48,7 +48,7 @@ export async function invalidateTasksCacheGradle(opt?: Uri) : Promise<void>
 
 		cachedTasks.forEach(each => {
 			let cstDef: GradleTaskDefinition = each.definition;
-			if (cstDef.uri.fsPath === opt.fsPath) {
+			if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
 				rmvTasks.push(each);
 			}
 		});
