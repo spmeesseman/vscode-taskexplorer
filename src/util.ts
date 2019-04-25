@@ -1,8 +1,9 @@
 import { logOutputChannel } from './extension';
-import { workspace, RelativePattern, WorkspaceFolder } from 'vscode';
+import { workspace, RelativePattern, WorkspaceFolder, Uri } from 'vscode';
 import { accessSync } from 'original-fs';
 import * as fs from 'fs';
 import * as minimatch from 'minimatch';
+//import * as path from 'path';
 import { configuration } from './common/configuration';
 
 const logValueWhiteSpace = 40;
@@ -34,6 +35,49 @@ export function properCase(name: string)
         })
         .replace(/[\s\-]+/g, '');
 }
+
+
+//export function getTaskType(uri: Uri)
+//{
+//    let ext = path.extname(uri.fsPath);
+//    let fileName = path.basename(uri.fsPath).toLowerCase();
+//
+//    if (fileName === "package.json") {
+//        return "npm";
+//    }
+//    else if (fileName === "tasks.json") {
+//        return "Workspace";
+//    }
+//    else if (fileName === "gruntfile.js") {
+//        return "grunt";
+//    }
+//    else if (fileName === "gulpfile.js") {
+//        return "gulp";
+//    }
+//    else if (fileName === "makefile") {
+//        return "make";
+//    }
+//    else if (ext === ".gradle") {
+//        return "gradle";
+//    }
+//    else if (ext === ".py") {
+//        return "python";
+//    }
+//    else if (ext === ".rb") {
+//        return "ruby";
+//    }
+//    else if (ext === ".ps1") {
+//        return "powershell";
+//    }
+//    else if (ext === ".nsi") {
+//        return "nsis";
+//    }
+//    else if (ext === ".xml") {
+//        return "ant";
+//    }
+//
+//    return null;
+//}
 
 
 export function getExcludesGlob(folder: string | WorkspaceFolder) : RelativePattern

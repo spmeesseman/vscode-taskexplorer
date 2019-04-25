@@ -5,7 +5,7 @@
 
 import {
     commands, Disposable, ExtensionContext, OutputChannel, Uri, TreeView, TreeItem,
-    workspace, window, FileSystemWatcher, ConfigurationChangeEvent,
+    workspace, window, FileSystemWatcher, ConfigurationChangeEvent
 } from 'vscode';
 import { TaskTreeDataProvider } from './taskTree';
 import { AntTaskProvider } from './taskProviderAnt';
@@ -351,11 +351,11 @@ function registerFileWatcher(context: ExtensionContext, taskType: string, fileBl
         }
         watcher.onDidDelete(_e => {
             logFileWatcherEvent(_e, "delete");
-                refreshTree(taskType, _e);
+            refreshTree(taskType, _e);
         });
         watcher.onDidCreate(_e => {
             logFileWatcherEvent(_e, "create");
-                refreshTree(taskType, _e);
+            refreshTree(taskType, _e);
         });
     } 
     else if (watchers.get(taskType)) {
