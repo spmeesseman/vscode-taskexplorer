@@ -15,7 +15,7 @@ import { GradleTaskProvider } from './taskProviderGradle';
 import { GruntTaskProvider } from './taskProviderGrunt';
 import { GulpTaskProvider } from './taskProviderGulp';
 import { configuration } from './common/configuration';
-import { log } from './util';
+import { log, logValue } from './util';
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
@@ -344,10 +344,19 @@ function registerFileWatcher(context: ExtensionContext, taskType: string, fileBl
             context.subscriptions.push(watcher);
         }
         if (!isScriptType) {
-            watcher.onDidChange(_e => refreshTree(taskType, _e));
+            watcher.onDidChange(_e => {
+                logFileWatcherEvent(_e, "change");
+                refreshTree(taskType, _e);
+            });
         }
-        watcher.onDidDelete(_e => refreshTree(taskType, _e));
-        watcher.onDidCreate(_e => refreshTree(taskType, _e));
+        watcher.onDidDelete(_e => {
+            logFileWatcherEvent(_e, "delete");
+                refreshTree(taskType, _e);
+        });
+        watcher.onDidCreate(_e => {
+            logFileWatcherEvent(_e, "create");
+                refreshTree(taskType, _e);
+        });
     } 
     else if (watchers.get(taskType)) {
         if (!isScriptType) {
@@ -356,6 +365,14 @@ function registerFileWatcher(context: ExtensionContext, taskType: string, fileBl
         watcher.onDidDelete(_e => undefined);
         watcher.onDidCreate(_e => undefined);
     }
+}
+
+
+function logFileWatcherEvent(uri: Uri, type: string)
+{
+    log('file change event');
+    logValue('   type', type);
+    logValue('   file', uri.fsPath);
 }
 
 
