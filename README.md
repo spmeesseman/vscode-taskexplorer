@@ -33,8 +33,7 @@
 
 ## Requirements
 
-* Visual Studio Code v1.30 or higher
-* To display npm, grunt, and gulp tasks, the 'Auto Detect' setting must be turned 'On' in VSCode for each respective task provider.
+* Visual Studio Code v1.30+
 
 ## Features
 
@@ -78,7 +77,7 @@ The following tasks are provided by VSCode:
 * Workspace (.vscode/tasks.json)
 * NPM (**/package.json)
 
-All other tasks are internaly provided.  Workspace tasks are detected by VSCode in all cases.  However, NPM tasks are detected only if the setting `'Npm -> Auto Detect'` is turned on in VSCode Settings.  By default this is turned on.  If NPM tasks are not displaying, please check this setting.
+All other tasks are internaly provided.  Workspace tasks are detected by VSCode in all cases.  However, NPM tasks are detected only if the setting `'Npm -> Auto Detect'` is turned on in VSCode Settings.  By default this is turned on, but if NPM tasks are not displaying, please check this setting, also check the setting that turns npm package management off in favor of Yarn `'Npm -> Package manager'`.  A future release will contain internally provided NPM and Yarn tasks.
 
 Detection of all internally provided task types can be turned on/off in Settings - `'Task Explorer -> Enable [Tasktype]'`.
 
