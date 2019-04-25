@@ -1,3 +1,21 @@
+## [1.15.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.7...v1.15.8) (2019-04-25)
+
+
+### Bug Fixes
+
+* renaming a task file doesnt remove old node in tree on auto-refresh ([92d6d8d](https://github.com/spmeesseman/vscode-taskexplorer/commit/92d6d8d))
+
+
+### Code Refactoring
+
+* log file watcher events [skip ci] ([04de746](https://github.com/spmeesseman/vscode-taskexplorer/commit/04de746))
+
+
+### Documentation
+
+* **todo:** update known bugs [skip ci] ([b7027f9](https://github.com/spmeesseman/vscode-taskexplorer/commit/b7027f9))
+* **todo:** update known bugs [skip ci] ([7e84efe](https://github.com/spmeesseman/vscode-taskexplorer/commit/7e84efe))
+
 ## [1.15.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.6...v1.15.7) (2019-04-24)
 
 
