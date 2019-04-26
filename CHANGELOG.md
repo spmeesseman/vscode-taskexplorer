@@ -1,3 +1,17 @@
+## [1.15.9](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.8...v1.15.9) (2019-04-26)
+
+
+### Bug Fixes
+
+* changing a "path to" setting does not take effect until vscode restarts ([c09b157](https://github.com/spmeesseman/vscode-taskexplorer/commit/c09b157))
+* tree is not auto refreshing after saving certain settings (regression) ([9396bc9](https://github.com/spmeesseman/vscode-taskexplorer/commit/9396bc9))
+
+
+### Documentation
+
+* **todo:** update features list ([d00c459](https://github.com/spmeesseman/vscode-taskexplorer/commit/d00c459))
+* **eradme:** update requirements and task provider info ([428ce1e](https://github.com/spmeesseman/vscode-taskexplorer/commit/428ce1e))
+
 ## [1.15.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.7...v1.15.8) (2019-04-25)
 
 
