@@ -199,6 +199,22 @@ export async function removeFromArray(arr: any[], item: any)
 }
 
 
+export async function existsInArray(arr: any[], item: any)
+{
+    let idx: number = -1;
+	let idx2: number = -1;
+
+	arr.forEach(each => {
+		idx++;
+		if (item === each) {
+			return true;
+		}
+	});
+
+	return false;
+}
+
+
 export async function log(msg: string, level?: number) 
 {
     if (level && level > configuration.get<number>('debugLevel')) {

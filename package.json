@@ -146,6 +146,15 @@
                 }
             },
             {
+                "command": "taskExplorerSideBar.runLastTask",
+                "title": "%command.runLastTask%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "light": "res/light/continue.svg",
+                    "dark": "res/dark/continue.svg"
+                }
+            },
+            {
                 "command": "taskExplorerSideBar.stop",
                 "title": "%command.stop%",
                 "when": "config.taskExplorer.enableSideBar",
@@ -203,6 +212,15 @@
                 }
             },
             {
+                "command": "taskExplorer.runLastTask",
+                "title": "%command.runLastTask%",
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "light": "res/light/continue.svg",
+                    "dark": "res/dark/continue.svg"
+                }
+            },
+            {
                 "command": "taskExplorer.stop",
                 "title": "%command.stop%",
                 "when": "config.taskExplorer.enableExplorerView",
@@ -253,6 +271,16 @@
         ],
         "menus": {
             "view/title": [
+                {
+                    "command": "taskExplorer.runLastTask",
+                    "when": "view == taskExplorer",
+                    "group": "navigation"
+                },
+                {
+                    "command": "taskExplorerSideBar.runLastTask",
+                    "when": "view == taskExplorerSideBar",
+                    "group": "navigation"
+                },
                 {
                     "command": "taskExplorer.refresh",
                     "when": "view == taskExplorer",
@@ -542,6 +570,17 @@
                     },
                     "default": [],
                     "description": "%config.taskExplorer.includeAnt%"
+                },
+                "taskExplorer.lastTasks": {
+                    "type": [
+                        "string",
+                        "array"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "%config.taskExplorer.lastTasks%"
                 }
             }
         },

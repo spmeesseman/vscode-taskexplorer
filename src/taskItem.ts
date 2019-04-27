@@ -28,6 +28,7 @@ export class TaskItem extends TreeItem
 
 		super(taskName, TreeItemCollapsibleState.None);
 
+		this.id = taskFile.resourceUri.fsPath + ":" + task.name;
 		this.contextValue = 'script';
 		this.taskFile = taskFile;
 		this.task = task;

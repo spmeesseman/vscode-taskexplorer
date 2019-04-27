@@ -52,9 +52,10 @@ Todos:
             ✔ Command - audit fix @1h @done(19-04-23 21:33)
             ✔ Command - update @1h @done(19-04-23 21:33)
             ✔ Add parameter prompt for some command may take a module name as an arg i.e. 'npm update extjs-pkg-plyr' @2h @done(19-04-23 21:33)
-            ☐ Merge to master
+            ✔ Merge to master @done(19-04-27 09:03)
 
-        ☐ A 'run last task' button in title bars (sidebar and explorer) @1h
+        ✔ A 'run last task' button in title bars (sidebar and explorer) @1h @done(19-04-27 11:03)
+        ☐ Along with 'run last' button, a context menu in the title with a list of the most recently used tasks, can open/run
 
         Internal Compound Task Support:
             ☐ Create branch
@@ -62,6 +63,8 @@ Todos:
             ☐ Task builder window design - Select tasks in order of execution or select parallel execution @16h
             ☐ Store/save/provide created compound tasks @4h
             ☐ Merge branch
+
+        ☐ An 'ignore file' action in the context menu of file nodes, where an indivudual task file (or group) can be auto added to excludes list @3h
 
     Known Bugs:
 
