@@ -6,7 +6,8 @@ import {
   EventEmitter,
   Uri,
   workspace,
-  WorkspaceConfiguration
+  WorkspaceConfiguration,
+  ConfigurationTarget
 } from "vscode";
 
 const taskExplorer = "taskExplorer";
@@ -39,7 +40,7 @@ class Configuration {
   }
 
   public update(section: string, value: any): Thenable<void> {
-    return this.configuration.update(section, value);
+    return this.configuration.update(section, value, ConfigurationTarget.Global);
   }
 
   public inspect(section: string) {
