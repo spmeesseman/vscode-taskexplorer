@@ -64,7 +64,7 @@ Todos:
             ☐ Store/save/provide created compound tasks @4h
             ☐ Merge branch
 
-        ☐ An 'ignore file' action in the context menu of file nodes, where an indivudual task file (or group) can be auto added to excludes list @3h
+        ✔ An 'ignore file' action in the context menu of file nodes, where an indivudual task file (or group) can be auto added to excludes list @3h @done(19-04-27 18:07)
 
     Known Bugs:
 
