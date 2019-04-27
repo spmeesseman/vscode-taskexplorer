@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.9...v1.16.0) (2019-04-27)
+
+
+### Features
+
+* add additional npm commands in npm file node context menu ([0a2b7b1](https://github.com/spmeesseman/vscode-taskexplorer/commit/0a2b7b1))
+
 ## [1.15.9](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.8...v1.15.9) (2019-04-26)
 
 
