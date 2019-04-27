@@ -38,6 +38,8 @@
 ## Features
 
 * Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo) (kept with [Todo+](https://marketplace.visualstudio.com/itemdetails?itemName=fabiospampinato.vscode-todo-plus))
+* v1.17 - Added 'Run last task' button to titlebar
+* v1.16 - Added npm management tasks to npm file node context menus
 * v1.15 - Support for gradle tasks (includes provider) (closes [#15](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
 * v1.14 - Support for grunt and gulp task files not located in the project root (closes [#12](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
 * v1.13 - Multiple task files of the same type placed within a group node for less clutter in folder level nodes
@@ -102,8 +104,8 @@ Detection of all internally provided task types can be turned on/off in Settings
 |extjs-pkg-tinymce|ExtJS Open Tooling|[GitHub](https://github.com/spmeesseman/extjs-pkg-tinymce)|[Npmjs.org Registry](https://www.npmjs.com/package/extjs-pkg-tinymce)|
 |extjs-pkg-websocket|ExtJS Open Tooling|[GitHub](https://github.com/spmeesseman/extjs-pkg-websocket)|[Npmjs.org Registry](https://www.npmjs.com/package/extjs-pkg-websocket)|
 |extjs-pkg-webworker|ExtJS Open Tooling|[GitHub](https://github.com/spmeesseman/extjs-pkg-webworker)|[Npmjs.org Registry](https://www.npmjs.com/package/extjs-pkg-webworker)|
-|extjs-server-net|ExtJS Open Tooling|[GitHub](https://github.com/spmeesseman/extjs-server-net)|[Npmjs.org Registry](https://www.npmjs.com/package/extjs-server-net)|
-|extjs-theme-graphite-small|ExtJS Open Tooling|[GitHub](https://github.com/spmeesseman/extjs-theme-graphite-small)|[Npmjs.org Registry](https://www.npmjs.com/package/extjs-theme-graphite-small)|
+|extjs-server-net|ExtJS Open Tooling|[GitHub](https://github.com/spmeesseman/extjs-server-net)|Private|
+|extjs-theme-graphite-small|ExtJS Open Tooling|[GitHub](https://github.com/spmeesseman/extjs-theme-graphite-small)|Private|
 |extjs-theme-amethyst|ExtJS Open Tooling|[GitHub](https://github.com/spmeesseman/extjs-theme-amethyst)|[Npmjs.org Registry](https://www.npmjs.com/package/extjs-theme-amethyst)|
 |svn-scm-ext|Visual Studio Code|[GitHub](https://github.com/spmeesseman/svn-scm-ext)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.svn-scm-ext)|
 |vscode-taskexplorer|Visual Studio Code|[GitHub](https://github.com/spmeesseman/vscode-taskexplorer)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-taskexplorer)|
@@ -139,5 +141,6 @@ Detection of all internally provided task types can be turned on/off in Settings
 |`taskExplorer.pathToPython`|The path to the python program, if not registered in system path|`python`|",
 |`taskExplorer.pathToRuby`|The path to the ruby program, if not registered in system path|`ruby`|",
 |`taskExplorer.debug`|Turn on logging|`false`|
+|`taskExplorer.debugLevel`|Verbosity level of logging (if turned on)|`1`|
 |`taskExplorer.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/.vscode-test/**", "**/bin/**", "**/build/**", "**/CompiledOutput/**", "**/dist/**", "**/doc/**", "**/ext/**", "**/out/**", "**/output/**", "**/packages/**", "**/release/**", "**/releases/**", "**/samples/**", "**/sdks/**", "**/static/**", "**/target/**", "**/test/**", "**/third_party/**", "**/vendor/**"]`  By default, `"**/node_modules/**"` is always applied|
 |`taskExplorer.includeAnt`|Configure glob patterns for files that should be included in ANT script detection|`[]`  By default, `"**/[Bb]uild.xml"` is always applied|
