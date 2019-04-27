@@ -295,38 +295,31 @@
             "view/item/context": [
                 {
                     "command": "taskExplorer.runAudit",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm",
-                    "group": "navigation@1"
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskExplorer.runAuditFix",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm",
-                    "group": "navigation@2"
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskExplorer.runInstall",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm",
-                    "group": "navigation@3"
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskExplorer.runUpdate",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm",
-                    "group": "navigation@4"
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskExplorer.runUpdatePackage",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm",
-                    "group": "navigation@5"
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskExplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script",
-                    "group": "navigation@1"
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
                 },
                 {
                     "command": "taskExplorer.run",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script",
-                    "group": "navigation@2"
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
                 },
                 {
                     "command": "taskExplorer.run",
@@ -340,38 +333,31 @@
                 },
                 {
                     "command": "taskExplorerSideBar.runAudit",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm",
-                    "group": "navigation@1"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskExplorerSideBar.runAuditFix",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm",
-                    "group": "navigation@2"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskExplorerSideBar.runInstall",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm",
-                    "group": "navigation@3"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskExplorerSideBar.runUpdate",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm",
-                    "group": "navigation@4"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskExplorerSideBar.runUpdatePackage",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm",
-                    "group": "navigation@5"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskExplorerSideBar.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
-                    "group": "navigation@1"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
                 },
                 {
                     "command": "taskExplorerSideBar.run",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
-                    "group": "navigation@2"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
                 },
                 {
                     "command": "taskExplorerSideBar.run",
