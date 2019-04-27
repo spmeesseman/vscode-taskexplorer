@@ -1,3 +1,15 @@
+# [1.17.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.16.0...v1.17.0) (2019-04-27)
+
+
+### Bug Fixes
+
+* regression - open and refresh commands no longer work ([00a7d10](https://github.com/spmeesseman/vscode-taskexplorer/commit/00a7d10))
+
+
+### Features
+
+* add "run last task" button to titlebar ([4b445de](https://github.com/spmeesseman/vscode-taskexplorer/commit/4b445de))
+
 # [1.16.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.15.9...v1.16.0) (2019-04-27)
 
 
