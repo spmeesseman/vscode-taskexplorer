@@ -165,6 +165,26 @@
                 "when": "config.taskExplorer.enableSideBar"
             },
             {
+                "command": "taskExplorerSideBar.runUpdate",
+                "title": "%command.runUpdate%",
+                "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
+                "command": "taskExplorerSideBar.runUpdatePackage",
+                "title": "%command.runUpdatePackage%",
+                "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
+                "command": "taskExplorerSideBar.runAudit",
+                "title": "%command.runAudit%",
+                "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
+                "command": "taskExplorerSideBar.runAuditFix",
+                "title": "%command.runAuditFix%",
+                "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
                 "command": "taskExplorerSideBar.refresh",
                 "title": "%command.refresh%",
                 "when": "config.taskExplorer.enableSideBar",
@@ -202,6 +222,26 @@
                 "when": "config.taskExplorer.enableExplorerView"
             },
             {
+                "command": "taskExplorer.runUpdate",
+                "title": "%command.runUpdate%",
+                "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
+                "command": "taskExplorer.runUpdatePackage",
+                "title": "%command.runUpdatePackage%",
+                "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
+                "command": "taskExplorer.runAudit",
+                "title": "%command.runAudit%",
+                "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
+                "command": "taskExplorer.runAuditFix",
+                "title": "%command.runAuditFix%",
+                "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
                 "command": "taskExplorer.refresh",
                 "title": "%command.refresh%",
                 "when": "config.taskExplorer.enableExplorerView",
@@ -226,9 +266,29 @@
             ],
             "view/item/context": [
                 {
-                    "command": "taskExplorer.runInstall",
+                    "command": "taskExplorer.runAudit",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "taskExplorer.runAuditFix",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm",
                     "group": "navigation@2"
+                },
+                {
+                    "command": "taskExplorer.runInstall",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm",
+                    "group": "navigation@3"
+                },
+                {
+                    "command": "taskExplorer.runUpdate",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm",
+                    "group": "navigation@4"
+                },
+                {
+                    "command": "taskExplorer.runUpdatePackage",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm",
+                    "group": "navigation@5"
                 },
                 {
                     "command": "taskExplorer.open",
@@ -251,9 +311,29 @@
                     "group": "inline"
                 },
                 {
-                    "command": "taskExplorerSideBar.runInstall",
+                    "command": "taskExplorerSideBar.runAudit",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "taskExplorerSideBar.runAuditFix",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm",
                     "group": "navigation@2"
+                },
+                {
+                    "command": "taskExplorerSideBar.runInstall",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm",
+                    "group": "navigation@3"
+                },
+                {
+                    "command": "taskExplorerSideBar.runUpdate",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm",
+                    "group": "navigation@4"
+                },
+                {
+                    "command": "taskExplorerSideBar.runUpdatePackage",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm",
+                    "group": "navigation@5"
                 },
                 {
                     "command": "taskExplorerSideBar.open",
