@@ -25,6 +25,7 @@ import { invalidateTasksCacheScript } from './taskProviderScript';
 import { invalidateTasksCacheGradle } from './taskProviderGradle';
 import { invalidateTasksCacheGrunt } from './taskProviderGrunt';
 import { invalidateTasksCacheGulp } from './taskProviderGulp';
+import { stringify } from 'querystring';
 
 
 const localize = nls.loadMessageBundle();
@@ -54,6 +55,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		this.extensionContext = context;
 		this.name = name;
 		subscriptions.push(commands.registerCommand(name + '.run', this.run, this));
+		subscriptions.push(commands.registerCommand(name + '.runLastTask', this.runLastTask, this));
+
 		subscriptions.push(commands.registerCommand(name + '.stop', (taskTreeItem: TaskItem) =>
 		{
             if (taskTreeItem.execution) {
@@ -119,6 +122,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 	private async run(taskItem: TaskItem)
 	{
+		var me = this;
 		//
 		// If this is a script, check to see if args are required
 		//
@@ -145,6 +149,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 					tasks.executeTask(taskItem.task)
 					.then(function(execution) {
 						//taskItem.task.execution.args = origArgs.slice(0); // clone
+						me.saveRunTask(taskItem);
 					},
 					function(reason) {
 						//taskItem.task.execution.args = origArgs.slice(0); // clone
@@ -156,8 +161,169 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		{
 			// Execute task
 			//
-			tasks.executeTask(taskItem.task);
+			tasks.executeTask(taskItem.task)
+			.then(function(execution) {
+				me.saveRunTask(taskItem);
+			},
+			function(reason) {});
 		}
+	}
+
+
+	private async runLastTask()
+	{
+		let item: any;
+		let item2: any;
+		let item3: any;
+		let taskItem: TaskItem;
+		let lastTaskId: string;
+		let lastTasks = configuration.get<Array<string>>("lastTasks");
+		if (lastTasks && lastTasks.length > 0) {
+			lastTaskId = lastTasks[lastTasks.length - 1];
+		}
+
+		if (!lastTaskId) {
+			window.showInformationMessage("No saved tasks!");
+			return;
+		}
+
+		let treeItems = await this.getChildren();
+		if (!treeItems || treeItems.length === 0) {
+			window.showInformationMessage("No tasks found!");
+			configuration.update("lastTasks", []);
+			return;
+		}
+		
+		while (item = treeItems.shift()) 
+		{
+			try 
+			{
+				//if (!(item instanceof TaskFolder)) {
+				//	util.log('    Invalid Task Folder', 3);
+				//	continue;
+				//}
+
+				util.log('    Task Folder ' +item.label + ':  ' + item.resourceUri.fsPath, 3);
+
+				let treeFiles: any[] = await this.getChildren(item);
+				if (!treeFiles || treeFiles.length === 0) {
+					continue;
+				}
+
+				while ((item2 = treeFiles.shift())) 
+				{
+					if (item2 instanceof TaskFile && !item2.isGroup) 
+					{
+						util.log('        Task File: ' + item2.path + item2.fileName, 3);
+
+						let treeTasks: any[] = await this.getChildren(item2);
+
+						if (!treeTasks || treeTasks.length === 0) {
+							continue;
+						}
+						
+						while ((item3 = treeTasks.shift())) {
+							if (item3 instanceof TaskItem) 
+							{
+								if (item3.id === lastTaskId) {
+									taskItem = item3;
+								}
+							} 
+							else {
+								util.log('Invalid taskitem node found');
+								return;
+							}
+						}
+					}
+					else if (item2 instanceof TaskFile && item2.isGroup) // GROUPED
+					{
+						let itreeFiles: any[] = await this.getChildren(item2);
+
+						if (!itreeFiles || itreeFiles.length === 0) {
+							continue;
+						}
+
+						let item3: any;
+						while ((item3 = itreeFiles.shift())) 
+						{
+							if (item3 instanceof TaskFile && !item3.isGroup) 
+							{
+								util.log('        Task File (grouped): ' + item3.path + item3.fileName);
+
+								let treeTasks: any[] = await this.getChildren(item3);
+								if (!treeTasks || treeTasks.length === 0) {
+									continue;
+								}
+
+								let item4: any;
+								while ((item4 = treeTasks.shift()))
+								{
+									if (item4 instanceof TaskItem) 
+									{
+										if (item4.id === lastTaskId) {
+											taskItem = item4;
+										}
+									} 
+									else {
+										util.log('Invalid taskitem node found');
+										return;
+									}
+								}
+							}
+							else {
+								util.log('Invalid taskfile node found', 3);
+								return;
+							}
+						}
+					}
+					else {
+						util.log('Invalid taskfile node found', 3);
+						return;
+					}
+				}
+			} 
+			catch (error) {
+				util.log('Exception error: ' + error.toString());
+				window.showInformationMessage("Error traversiong task tree!  Check log for details");
+			}
+		}
+
+		if (taskItem) {
+			this.run(taskItem);
+		}
+		else {
+			window.showInformationMessage("Task not found!  Check log for details");
+			util.removeFromArray(lastTasks, lastTaskId);
+			configuration.update("lastTasks", lastTasks);
+		}
+	}
+
+
+	private saveRunTask(taskItem: TaskItem)
+	{
+		let lastTasks = configuration.get<Array<string>>("lastTasks");
+		if (util.existsInArray(lastTasks, taskItem.id)) {
+			util.removeFromArray(lastTasks, taskItem.id);
+		}
+		if (lastTasks.length > 4) {
+			lastTasks = lastTasks.slice(1);
+		}
+		lastTasks.push(taskItem.id);
+		configuration.update("lastTasks", lastTasks);
+	}
+
+
+	private async pickLastTask()
+	{
+		//let taskItem: TaskItem;
+
+		//let lastTasks = configuration.get<Array<string>>("lastTasks");
+		//lastTasks.forEach(each =>
+		//{
+
+		//});
+
+		//this.run(taskItem);
 	}
 
 
