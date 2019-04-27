@@ -61,7 +61,7 @@ export async function invalidateTasksCacheAnt(opt?: Uri) : Promise<void>
 		//
 		// If this isn't a 'delete file' event then read the file for tasks
 		//
-		if (util.pathExists(opt.fsPath))
+		if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
 		{
 			let tasks = await readAntfile(opt);
 			cachedTasks.push(...tasks);

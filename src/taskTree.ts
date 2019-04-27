@@ -70,6 +70,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		subscriptions.push(commands.registerCommand(name + '.runUpdatePackage', function(taskFile: TaskFile) { this.runNpmCommand(taskFile, 'update <packagename>'); }, this));
 		subscriptions.push(commands.registerCommand(name + '.runAudit', function(taskFile: TaskFile) { this.runNpmCommand(taskFile, 'audit'); }, this));
 		subscriptions.push(commands.registerCommand(name + '.runAuditFix', function(taskFile: TaskFile) { this.runNpmCommand(taskFile, 'audit fix'); }, this));
+		subscriptions.push(commands.registerCommand(name + '.addToExcludes', this.addToExcludes, this));
 
 		tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
 		tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
@@ -403,6 +404,29 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		}
 
 		this._onDidChangeTreeData.fire(treeItem);
+	}
+
+
+	private async addToExcludes(selection: TaskFile)
+	{
+		let uri: Uri | undefined = undefined;
+
+		if (selection instanceof TaskFile) {
+			uri = selection.resourceUri!;
+		} 
+		if (!uri) {
+			return;
+		}
+
+		util.log('Add to exlcudes');
+		util.logValue('  File glob', uri.path);
+
+		let excludes = configuration.get<Array<string>>("exclude");
+		if (!util.existsInArray(excludes, uri.path)) {
+			excludes.push(uri.path);
+			configuration.update("exclude", excludes);
+			this.refresh(selection.taskSource, uri)
+		}
 	}
 
 

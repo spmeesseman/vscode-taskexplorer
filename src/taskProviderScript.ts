@@ -120,7 +120,7 @@ export async function invalidateTasksCacheScript(opt?: Uri) : Promise<void>
 			util.removeFromArray(cachedTasks, each);
 		});
 
-		if (util.pathExists(opt.fsPath))
+		if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
 		{
 			let task = createScriptTask(scriptTable[path.extname(opt.fsPath).substring(1)], folder!,  opt);
 			cachedTasks.push(task);

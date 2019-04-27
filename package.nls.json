@@ -46,6 +46,7 @@
 	"command.refresh": "Refresh",
 	"command.run": "Run",
 	"command.runLastTask": "Run last task",
+	"command.addToExcludes": "Add to excludes list",
 	"command.stop": "Stop",
 	"command.debug": "Debug",
 	"command.open": "Open",

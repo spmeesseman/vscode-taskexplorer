@@ -181,7 +181,7 @@ export function readFileSync(file: string)
 }
 
 
-export async function removeFromArray(arr: any[], item: any)
+export function removeFromArray(arr: any[], item: any)
 {
     let idx: number = -1;
 	let idx2: number = -1;
@@ -189,7 +189,8 @@ export async function removeFromArray(arr: any[], item: any)
 	arr.forEach(each => {
 		idx++;
 		if (item === each) {
-			idx2 = idx;
+            idx2 = idx;
+            return false;
 		}
 	});
 
@@ -199,19 +200,17 @@ export async function removeFromArray(arr: any[], item: any)
 }
 
 
-export async function existsInArray(arr: any[], item: any)
+export function existsInArray(arr: any[], item: any)
 {
-    let idx: number = -1;
-	let idx2: number = -1;
-
-	arr.forEach(each => {
-		idx++;
+    let exists = false;
+    arr.forEach(each => {
 		if (item === each) {
-			return true;
+            exists = true;
+            return false;
 		}
 	});
 
-	return false;
+	return exists;
 }
 
 

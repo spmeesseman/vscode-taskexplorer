@@ -6,6 +6,8 @@ import {
 import * as path from 'path';
 import * as util from './util';
 import { TaskItem } from './taskItem';
+import { configuration } from "./common/configuration";
+
 type StringMap = { [s: string]: string; };
 
 let cachedTasks: Task[] = undefined;
@@ -57,7 +59,7 @@ export async function invalidateTasksCacheGrunt(opt?: Uri) : Promise<void>
 			util.removeFromArray(cachedTasks, each);
 		});
 
-		if (util.pathExists(opt.fsPath))
+		if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
 		{
 			let tasks = await readGruntfile(opt);
 			cachedTasks.push(...tasks);

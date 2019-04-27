@@ -155,6 +155,11 @@
                 }
             },
             {
+                "command": "taskExplorerSideBar.addToExcludes",
+                "title": "%command.addToExcludes%",
+                "when": "config.taskExplorer.enableSideBar"
+            },
+            {
                 "command": "taskExplorerSideBar.stop",
                 "title": "%command.stop%",
                 "when": "config.taskExplorer.enableSideBar",
@@ -219,6 +224,11 @@
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
                 }
+            },
+            {
+                "command": "taskExplorer.addToExcludes",
+                "title": "%command.addToExcludes%",
+                "when": "config.taskExplorer.enableExplorerView"
             },
             {
                 "command": "taskExplorer.stop",
@@ -322,6 +332,62 @@
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
                 },
                 {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileWorkspace"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePython"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileAnt"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePerl"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGradle"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileMake"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGrunt"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGulp"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileBash"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileBatch"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePowershell"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileRuby"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNsis"
+                },
+                {
                     "command": "taskExplorer.run",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script",
                     "group": "inline"
@@ -358,6 +424,62 @@
                 {
                     "command": "taskExplorerSideBar.run",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFileNpm"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFileWorkspace"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFilePython"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFileAnt"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFilePerl"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFileGradle"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFileMake"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGrunt"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFileGulp"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFileBash"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFileBatch"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFilePowershell"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFileRuby"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorer && viewItem == taskFileNsis"
                 },
                 {
                     "command": "taskExplorerSideBar.run",
