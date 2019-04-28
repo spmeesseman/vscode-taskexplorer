@@ -103,7 +103,7 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     }
 
     if (e.affectsConfiguration('taskExplorer.enableGradle')) {
-        registerFileWatcher(context, 'grunt', '**/*.gradle', configuration.get<boolean>('enableGradle'));
+        registerFileWatcher(context, 'grunt', '**/*.gradle', false, configuration.get<boolean>('enableGradle'));
         refresh = true;
     }
 
