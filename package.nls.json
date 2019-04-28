@@ -26,6 +26,7 @@
 	"config.taskExplorer.lastTasks": "Array of recently used task id(s).  Do not modify.",
 	"config.taskExplorer.pathToAnsicon": "The path to the ansicon program, if not registered in system path",
 	"config.taskExplorer.pathToAnt": "The path to the ant program, if not registered in system path",
+	"config.taskExplorer.pathToBash": "The path to the bash/sh program (on Windows, if not registered in system path)",
 	"config.taskExplorer.pathToGradle": "The path to the gradle program, if not registered in system path.",
 	"config.taskExplorer.pathToMake": "The path to the make program, if not registered in system path.",
 	"config.taskExplorer.pathToNsis": "The path to the nsis program, if not registered in system path.",
