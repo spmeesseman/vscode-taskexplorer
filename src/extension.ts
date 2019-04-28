@@ -187,7 +187,8 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     if (e.affectsConfiguration('taskExplorer.pathToAnsicon') || e.affectsConfiguration('taskExplorer.pathToAnt') ||
         e.affectsConfiguration('taskExplorer.pathToGradle') || e.affectsConfiguration('taskExplorer.pathToMake') ||
         e.affectsConfiguration('taskExplorer.pathToNsis') || e.affectsConfiguration('taskExplorer.pathToPerl') ||
-        e.affectsConfiguration('taskExplorer.pathToPython') || e.affectsConfiguration('taskExplorer.pathToRuby')) {
+        e.affectsConfiguration('taskExplorer.pathToPython') || e.affectsConfiguration('taskExplorer.pathToRuby')  || 
+        e.affectsConfiguration('taskExplorer.pathToBash')) {
         refresh = true;
     }
 
