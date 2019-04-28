@@ -418,7 +418,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			return;
 		}
 
-		util.log('Add to exlcudes');
+		util.log('Add to excludes');
 		util.logValue('  File glob', uri.path);
 
 		let excludes = configuration.get<Array<string>>("exclude");
