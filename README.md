@@ -84,6 +84,10 @@ All other tasks are internaly provided.  Workspace tasks are detected by VSCode 
 
 Detection of all internally provided task types can be turned on/off in Settings - `'Task Explorer -> Enable [Tasktype]'`.
 
+## Running bash/sh scripts in Windows Environment
+
+Bash/sh scripts in Windows will have the shell executable automatically set to a bash shell (if the default shell set in VSCode is not bash).  The shell executable used can be set in Settings using the `pathToBash` setting.  If there is no value set in Settings, and Git Bash exists at the default installation installation, Git Bash will be used (MinGW).  If Git Bash does not exist at the default install location, it is assumed the the path to bash.exe is part of the system PATH variable.  If you experience errors running Bash scripts in Windows, please check these items.
+
 ## Feedback & Contributing
 
 * Please report any bugs, suggestions or documentation requests via the
