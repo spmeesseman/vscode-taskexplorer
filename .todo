@@ -76,7 +76,7 @@ Todos:
         ✔ Changing a "path to..." setting has no effect on the tasks commands until VSCode restarts @1h @done(19-04-25 12:32)
         ✔ Renaming a task file shows the new node with the new name but doesnt remove the node with the old name after auto-refresh @2h @done(19-04-25 12:10)
         ☐ If VSCode is minimized while a task is running and it finishes, when VSCode is brought back up the loader icon is still showing for that task @2h
-        ☐ Saving bash files causes auto refreshing of tree (not needed for script type tasks) @1h
+        ✔ Saving bash files causes auto refreshing of tree (not needed for script type tasks) @1h @done(19-04-28 13:45)
 
     Style:
 
