@@ -224,7 +224,7 @@ function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>('enableMake')) {
-        registerFileWatcher(context, 'bash', '**/Makefile');
+        registerFileWatcher(context, 'make', '**/Makefile');
     }
 
     if (configuration.get<boolean>('enableNpm')) {
@@ -366,7 +366,7 @@ function registerFileWatcher(context: ExtensionContext, taskType: string, fileBl
             refreshTree(taskType, _e);
         });
     } 
-    else if (watchers.get(taskType)) {
+    else if (watcher) {
         if (!isScriptType) {
             watcher.onDidChange(_e => undefined);
         }
