@@ -56,6 +56,7 @@ Todos:
 
         ✔ A 'run last task' button in title bars (sidebar and explorer) @1h @done(19-04-27 11:03)
         ☐ Along with 'run last' button, a context menu in the title with a list of the most recently used tasks, can open/run
+        ☐ Add confirmation dialog when the 'add to excludes' command is used, dont execute directly @15m
 
         Internal Compound Task Support:
             ☐ Create branch
@@ -74,6 +75,8 @@ Todos:
         ✔ GitHub Issue #19 - VSCode bug can be addressed by providing root gulp/gruntfile tasks internally @done(19-04-19 15:50)
         ✔ Changing a "path to..." setting has no effect on the tasks commands until VSCode restarts @1h @done(19-04-25 12:32)
         ✔ Renaming a task file shows the new node with the new name but doesnt remove the node with the old name after auto-refresh @2h @done(19-04-25 12:10)
+        ☐ If VSCode is minimized while a task is running and it finishes, when VSCode is brought back up the loader icon is still showing for that task @2h
+        ☐ Saving batch files is not auto refreshing the tree @1h
 
     Style:
 
