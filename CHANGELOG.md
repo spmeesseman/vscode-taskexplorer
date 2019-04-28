@@ -1,3 +1,22 @@
+## [1.18.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.0...v1.18.1) (2019-04-28)
+
+
+### Bug Fixes
+
+* add to excludes command is displayed twice in Explorer file node context menus ([2318d00](https://github.com/spmeesseman/vscode-taskexplorer/commit/2318d00))
+* executing a batch script with an argument causes task to disappear from tree ([f0efeee](https://github.com/spmeesseman/vscode-taskexplorer/commit/f0efeee))
+
+
+### Code Refactoring
+
+* modify settings descriptions ([8152334](https://github.com/spmeesseman/vscode-taskexplorer/commit/8152334))
+
+
+### Documentation
+
+* **todo:** update known bugs ([d694dd7](https://github.com/spmeesseman/vscode-taskexplorer/commit/d694dd7))
+* **todo:** update known bugs @ 1.18 ([468e881](https://github.com/spmeesseman/vscode-taskexplorer/commit/468e881))
+
 # [1.18.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.17.0...v1.18.0) (2019-04-28)
 
 
