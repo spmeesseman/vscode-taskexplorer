@@ -1,3 +1,28 @@
+# [1.18.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.17.0...v1.18.0) (2019-04-28)
+
+
+### Bug Fixes
+
+* bash script tasks do not work in windows ([184ace2](https://github.com/spmeesseman/vscode-taskexplorer/commit/184ace2))
+* save configuration values to user settings not workspace ([d9ca51e](https://github.com/spmeesseman/vscode-taskexplorer/commit/d9ca51e))
+
+
+### Code Refactoring
+
+* add user setting taskExplorer.pathToBash ([2263b4f](https://github.com/spmeesseman/vscode-taskexplorer/commit/2263b4f))
+
+
+### Documentation
+
+* **readme:** update to 1.17 info ([9c36bad](https://github.com/spmeesseman/vscode-taskexplorer/commit/9c36bad))
+* update to 1.18 info ([c60a2ad](https://github.com/spmeesseman/vscode-taskexplorer/commit/c60a2ad))
+* **readme:** update with bash in wnidows info ([32ca416](https://github.com/spmeesseman/vscode-taskexplorer/commit/32ca416))
+
+
+### Features
+
+* add an "add to excludes" action to task file nodes ([aa4ebdb](https://github.com/spmeesseman/vscode-taskexplorer/commit/aa4ebdb))
+
 # [1.17.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.16.0...v1.17.0) (2019-04-27)
 
 
