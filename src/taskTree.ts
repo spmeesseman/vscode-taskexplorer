@@ -132,6 +132,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		// batch script contains %1, %2, etc, the task definition's requiresArgs parameter
 		// will be set.
 		//
+		/*
 		if (taskItem.task.definition.requiresArgs === true)
 		{
 			let opts: InputBoxOptions = { prompt: 'Enter command line arguments separated by spaces'};
@@ -159,7 +160,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			});
 		}
 		else
-		{
+		{*/
 			// Execute task
 			//
 			tasks.executeTask(taskItem.task)
@@ -167,7 +168,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 				me.saveRunTask(taskItem);
 			},
 			function(reason) {});
-		}
+		//}
 	}
 
 
