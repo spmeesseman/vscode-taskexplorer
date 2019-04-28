@@ -95,6 +95,9 @@ function refreshScriptTable()
 	scriptTable.rb.enabled = configuration.get('enableRuby');
 	scriptTable.ps1.enabled = configuration.get('enablePerl');
 	scriptTable.nsi.enabled = configuration.get('enableNsis');
+	scriptTable.nsi.enabled = configuration.get('enablePowershell');
+	scriptTable.sh.enabled = configuration.get('enableBash');
+	scriptTable.bat.enabled = configuration.get('enableBatch');
 }
 
 
@@ -123,7 +126,12 @@ export async function invalidateTasksCacheScript(opt?: Uri) : Promise<void>
 		if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
 		{
 			let task = createScriptTask(scriptTable[path.extname(opt.fsPath).substring(1)], folder!,  opt);
-			cachedTasks.push(task);
+			if (task) {
+				cachedTasks.push(task);
+			}
+			else {
+				util.log('   !!! could not create script task from ' + opt.fsPath);
+			}
 		}
 
 		if (cachedTasks.length > 0) {
@@ -231,6 +239,24 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
 	};
 
 	//
+	// Handle bash script on windows - set the shell executable as bash.exe.  This can be set by user
+	// in settings, otherwise Git Bash will be tried in the default install location ("C:\Program Files\Git\bin).
+	// Otherwise, use 'bash.exe' and assume the command and other shell commands are in PATH
+	//
+	if (process.platform === 'win32' && scriptDef.type === 'bash') {
+		let bash = configuration.get<string>('pathToBash');
+		if (!bash) {
+			bash = "C:\\Program Files\\Git\\bin\\bash.exe";
+		}
+		if (!bash || !util.pathExists(bash)) {
+			bash = "bash.exe";
+			//return null;
+		}
+		options.executable = bash;
+		sep = "/"; // convert path separator to unix-style
+	}
+
+	//
 	// Add any defined arguments to the command line for the script type
 	//
 	if (scriptDef.args)
@@ -243,9 +269,12 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
 
 	//
 	// Add the file name to the command line following the exec.  Quote if ecessary.  Prepend './' as
-	// powershell script requires this
+	// powershell script requires this.  If this is for a shell/bash/sh task, then skip the space
+	// character as the script itself is considered "executable"
 	//
-	kind.cmdLine += ' ';
+	if (scriptDef.type !== 'bash') {
+		kind.cmdLine += ' ';
+	}
 	kind.cmdLine += (fileName.indexOf(" ") !== -1 ? "\"" + '.' + sep + fileName + "\"" : '.' + sep + fileName);
 
 	//
