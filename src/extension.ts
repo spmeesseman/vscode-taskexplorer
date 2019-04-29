@@ -268,7 +268,7 @@ function registerFileWatchers(context: ExtensionContext)
 }
 
 
-function refreshTree(taskType?: string, uri?: Uri) 
+async function refreshTree(taskType?: string, uri?: Uri) 
 {
     let refreshedTasks: boolean = false;
 
@@ -288,15 +288,14 @@ function refreshTree(taskType?: string, uri?: Uri)
     // the sidebar view are being used and/or enabled
     //
     if (configuration.get<boolean>('enableSideBar') && treeDataProvider) {
-        refreshedTasks = true;
-        treeDataProvider.refresh(taskType, uri);
+        refreshedTasks = await treeDataProvider.refresh(taskType, uri);
     }
     if (configuration.get<boolean>('enableExplorerView') && treeDataProvider2) {
         if (!refreshedTasks) {
-            treeDataProvider2.refresh(taskType, uri);
+            await treeDataProvider2.refresh(taskType, uri);
         }
         else {
-            treeDataProvider2.refresh(false, uri);
+            await treeDataProvider2.refresh(false, uri);
         }
     }
 }
@@ -398,7 +397,14 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
         if (workspace.workspaceFolders) 
         {
             let treeDataProvider = new TaskTreeDataProvider(name, context);
-            views.set(name, window.createTreeView(name, { treeDataProvider: treeDataProvider, showCollapseAll: true }));
+            let treeView = window.createTreeView(name, { treeDataProvider: treeDataProvider, showCollapseAll: true });
+            treeView.onDidChangeVisibility(_e => {
+                if (_e.visible) {
+                    log("view visibility change event");
+                    refreshTree();
+                }
+            });
+            views.set(name, treeView);
             context.subscriptions.push(views.get(name));
             return treeDataProvider;
         } 
