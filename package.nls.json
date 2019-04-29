@@ -23,7 +23,6 @@
 	"config.taskExplorer.enableAnsiconForAnt": "Enable ansicon output colorization for ant tasks.",
 	"config.taskExplorer.enableSideBar": "Add a task explorer to the the sidebar.",
 	"config.taskExplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
-	"config.taskExplorer.lastTasks": "Array of recently used task id(s).  Do not modify.",
 	"config.taskExplorer.pathToAnsicon": "The path to the ansicon program, if not registered in system path",
 	"config.taskExplorer.pathToAnt": "The path to the ant program, if not registered in system path",
 	"config.taskExplorer.pathToBash": "The path to the bash/sh program (on Windows, if not registered in system path)",

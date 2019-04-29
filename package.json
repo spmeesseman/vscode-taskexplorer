@@ -682,17 +682,6 @@
                     },
                     "default": [],
                     "description": "%config.taskExplorer.includeAnt%"
-                },
-                "taskExplorer.lastTasks": {
-                    "type": [
-                        "string",
-                        "array"
-                    ],
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [],
-                    "description": "%config.taskExplorer.lastTasks%"
                 }
             }
         },

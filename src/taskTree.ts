@@ -17,7 +17,7 @@ import * as nls from 'vscode-nls';
 import { TaskFolder } from './taskFolder';
 import { TaskFile } from './taskFile';
 import { TaskItem } from './taskItem';
-import { views } from './extension';
+import { views, storage } from './extension';
 import { configuration } from "./common/configuration";
 import { invalidateTasksCacheAnt } from './taskProviderAnt';
 import { invalidateTasksCacheMake } from './taskProviderMake';
@@ -179,7 +179,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		let item3: any;
 		let taskItem: TaskItem;
 		let lastTaskId: string;
-		let lastTasks = configuration.get<Array<string>>("lastTasks");
+		let lastTasks = storage.get<Array<string>>("lastTasks", []);
 		if (lastTasks && lastTasks.length > 0) {
 			lastTaskId = lastTasks[lastTasks.length - 1];
 		}
@@ -192,7 +192,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		let treeItems = await this.getChildren();
 		if (!treeItems || treeItems.length === 0) {
 			window.showInformationMessage("No tasks found!");
-			configuration.update("lastTasks", []);
+			storage.update("lastTasks", []);
 			return;
 		}
 		
@@ -296,22 +296,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		else {
 			window.showInformationMessage("Task not found!  Check log for details");
 			util.removeFromArray(lastTasks, lastTaskId);
-			configuration.update("lastTasks", lastTasks);
+			storage.update("lastTasks", lastTasks);
 		}
 	}
 
 
 	private saveRunTask(taskItem: TaskItem)
 	{
-		let lastTasks = configuration.get<Array<string>>("lastTasks");
+		let lastTasks = storage.get<Array<string>>("lastTasks", []);
 		if (util.existsInArray(lastTasks, taskItem.id)) {
 			util.removeFromArray(lastTasks, taskItem.id);
 		}
-		if (lastTasks.length > 4) {
-			lastTasks = lastTasks.slice(1);
+		if (lastTasks.length > 4) { // store max 5 tasks
+			lastTasks.shift();
 		}
 		lastTasks.push(taskItem.id);
-		configuration.update("lastTasks", lastTasks);
+		storage.update("lastTasks", lastTasks);
 	}
 
 
@@ -319,7 +319,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	{
 		//let taskItem: TaskItem;
 
-		//let lastTasks = configuration.get<Array<string>>("lastTasks");
+		//let lastTasks = storage.get<Array<string>>("lastTasks", []);
 		//lastTasks.forEach(each =>
 		//{
 

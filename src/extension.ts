@@ -15,11 +15,13 @@ import { GradleTaskProvider } from './taskProviderGradle';
 import { GruntTaskProvider } from './taskProviderGrunt';
 import { GulpTaskProvider } from './taskProviderGulp';
 import { configuration } from './common/configuration';
+import { Storage } from './common/storage';
 import { log, logValue } from './util';
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
 export let logOutputChannel: OutputChannel | undefined;
+export let storage: Storage | undefined;
 export let views: Map<String, TreeView<TreeItem>> = new Map();
 let watchers: Map<String, FileSystemWatcher> = new Map();
 
@@ -74,6 +76,11 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         processConfigChanges(context, e);
     });
     context.subscriptions.push(d);
+
+    //
+    // Set up extension custom storage
+    //
+    storage = new Storage(context.globalState);
 
     log('   Task Explorer activated');
 }
