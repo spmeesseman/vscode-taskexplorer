@@ -203,13 +203,15 @@ export function removeFromArray(arr: any[], item: any)
 export function existsInArray(arr: any[], item: any)
 {
     let exists = false;
-    arr.forEach(each => {
-		if (item === each) {
-            exists = true;
-            return false;
-		}
-	});
-
+    if (arr) {
+        arr.forEach(each => {
+            if (item === each) {
+                exists = true;
+                return false;
+            }
+        });
+    }
+    
 	return exists;
 }
 
