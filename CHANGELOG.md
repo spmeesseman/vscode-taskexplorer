@@ -1,3 +1,17 @@
+## [1.18.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.1...v1.18.2) (2019-04-29)
+
+
+### Bug Fixes
+
+* changing the pathToBash setting has no effect until next tree refresh ([e300af1](https://github.com/spmeesseman/vscode-taskexplorer/commit/e300af1))
+* edit/save a gradle task file does not auto refresh tree ([b716f7b](https://github.com/spmeesseman/vscode-taskexplorer/commit/b716f7b))
+* saving a bash/sh file causes tree to auto-refresh (script type tasks should not) ([314ab30](https://github.com/spmeesseman/vscode-taskexplorer/commit/314ab30))
+
+
+### Documentation
+
+* **todo:** update fixed known bugs ([7de81f6](https://github.com/spmeesseman/vscode-taskexplorer/commit/7de81f6))
+
 ## [1.18.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.0...v1.18.1) (2019-04-28)
 
 
