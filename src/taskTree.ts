@@ -369,7 +369,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		if (!opt && views.get(this.name))
 		{
 			if (!views.get(this.name).visible) {
-				return;
+				return false;
 			}
 		}
 
@@ -405,11 +405,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		}
 
 		this._onDidChangeTreeData.fire(treeItem);
+
+		return true;
 	}
 
 
 	private async addToExcludes(selection: TaskFile)
 	{
+		let me = this;
 		let uri: Uri | undefined = undefined;
 
 		if (selection instanceof TaskFile) {
@@ -422,12 +425,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		util.log('Add to excludes');
 		util.logValue('  File glob', uri.path);
 
-		let excludes = configuration.get<Array<string>>("exclude");
-		if (!util.existsInArray(excludes, uri.path)) {
-			excludes.push(uri.path);
-			configuration.update("exclude", excludes);
-			this.refresh(selection.taskSource, uri);
-		}
+		let opts: InputBoxOptions = { prompt: 'Add the following file to excluded tasks list?', value: uri.path };
+		window.showInputBox(opts).then(function(str: string)
+		{
+			if (str !== undefined)
+			{
+				let excludes = configuration.get<Array<string>>("exclude");
+				if (!util.existsInArray(excludes, str)) {
+					excludes.push(str);
+					configuration.update("exclude", excludes);
+					me.refresh(selection.taskSource, uri);
+				}
+			}
+		});
 	}
 
 
