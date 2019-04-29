@@ -88,7 +88,7 @@ function refreshScriptTable()
 {
 	scriptTable.py.exec = configuration.get('pathToPython') ? configuration.get('pathToPython') : 'python';
 	scriptTable.rb.exec = configuration.get('pathToRuby') ? configuration.get('pathToRuby') : 'ruby';
-	scriptTable.ps1.exec = configuration.get('pathToPerl') ? configuration.get('pathToPerl') : 'perl';
+	scriptTable.pl.exec = configuration.get('pathToPerl') ? configuration.get('pathToPerl') : 'perl';
 	scriptTable.nsi.exec = configuration.get('pathToNsis') ? configuration.get('pathToNsis') : 'makensis.exe';
 
 	scriptTable.py.enabled = configuration.get('enablePython');
