@@ -1,3 +1,21 @@
+## [1.18.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.2...v1.18.3) (2019-04-29)
+
+
+### Bug Fixes
+
+* regression - powershell scripts no longer work, are bing ran as perl scripts ([99a06d0](https://github.com/spmeesseman/vscode-taskexplorer/commit/99a06d0))
+* util function exception on empty last tasks array ([27a5ddd](https://github.com/spmeesseman/vscode-taskexplorer/commit/27a5ddd))
+
+
+### Code Refactoring
+
+* use extenison storage instead of user settings for saving last tasks. ([375c42b](https://github.com/spmeesseman/vscode-taskexplorer/commit/375c42b))
+
+
+### Documentation
+
+* **readme:** update builds section ([0a61b2b](https://github.com/spmeesseman/vscode-taskexplorer/commit/0a61b2b))
+
 ## [1.18.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.1...v1.18.2) (2019-04-29)
 
 
