@@ -426,7 +426,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		if (!util.existsInArray(excludes, uri.path)) {
 			excludes.push(uri.path);
 			configuration.update("exclude", excludes);
-			this.refresh(selection.taskSource, uri)
+			this.refresh(selection.taskSource, uri);
 		}
 	}
 
