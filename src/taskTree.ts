@@ -433,40 +433,34 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 	private async runNpmCommand(taskFile: TaskFile, command: string)
 	{
-		if (taskFile.label.startsWith('npm'))
-		{
-			let options = {
-				"cwd": path.dirname(taskFile.resourceUri.fsPath)
-			};
-			
-			let kind: TaskDefinition = {
-				type: 'npm',
-				script: 'install',
-				path: path.dirname(taskFile.resourceUri.fsPath)
-			};
+		let options = {
+			"cwd": path.dirname(taskFile.resourceUri.fsPath)
+		};
+		
+		let kind: TaskDefinition = {
+			type: 'npm',
+			script: 'install',
+			path: path.dirname(taskFile.resourceUri.fsPath)
+		};
 
-			if (command.indexOf('<packagename>') === -1) 
-			{
-				let execution = new ShellExecution('npm ' + command, options);
-				let task = new Task(kind, taskFile.folder.workspaceFolder, command, 'npm', execution, undefined);
-				tasks.executeTask(task).then(function(execution) {}, function(reason) {});
-			}
-			else 
-			{
-				let opts: InputBoxOptions = { prompt: 'Enter package name to ' + command };
-				window.showInputBox(opts).then(function(str)
-				{
-					if (str !== undefined)
-					{
-						let execution = new ShellExecution('npm ' + command.replace('<packagename>','').trim() + str.trim(), options);
-						let task = new Task(kind, taskFile.folder.workspaceFolder, command.replace('<packagename>','').trim() + str.trim(), 'npm', execution, undefined);
-						tasks.executeTask(task).then(function(execution) {}, function(reason) {});
-					}
-				});
-			}
+		if (command.indexOf('<packagename>') === -1) 
+		{
+			let execution = new ShellExecution('npm ' + command, options);
+			let task = new Task(kind, taskFile.folder.workspaceFolder, command, 'npm', execution, undefined);
+			tasks.executeTask(task).then(function(execution) {}, function(reason) {});
 		}
-		else{
-			window.showInformationMessage('Only npm nodes can run npm installs');
+		else 
+		{
+			let opts: InputBoxOptions = { prompt: 'Enter package name to ' + command };
+			window.showInputBox(opts).then(function(str)
+			{
+				if (str !== undefined)
+				{
+					let execution = new ShellExecution('npm ' + command.replace('<packagename>','').trim() + str.trim(), options);
+					let task = new Task(kind, taskFile.folder.workspaceFolder, command.replace('<packagename>','').trim() + str.trim(), 'npm', execution, undefined);
+					tasks.executeTask(task).then(function(execution) {}, function(reason) {});
+				}
+			});
 		}
 	}
 
