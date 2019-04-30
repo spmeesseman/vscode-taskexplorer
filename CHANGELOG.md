@@ -1,3 +1,10 @@
+## [1.18.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.4...v1.18.5) (2019-04-30)
+
+
+### Bug Fixes
+
+* do not use shift as keybinding start ([a086dc3](https://github.com/spmeesseman/vscode-taskexplorer/commit/a086dc3))
+
 ## [1.18.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.3...v1.18.4) (2019-04-30)
 
 
