@@ -1,3 +1,21 @@
+## [1.18.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.3...v1.18.4) (2019-04-30)
+
+
+### Bug Fixes
+
+* removing exclude globs manually in settings.json has no effect on explorer tree until next refresh. Works in sidebar tree. ([ef27223](https://github.com/spmeesseman/vscode-taskexplorer/commit/ef27223))
+
+
+### Documentation
+
+* **todo:** add refactoring ([45aff9d](https://github.com/spmeesseman/vscode-taskexplorer/commit/45aff9d))
+
+
+### Minor Features
+
+* add key binding for "run last task" - shift+r t ([c8c0ca9](https://github.com/spmeesseman/vscode-taskexplorer/commit/c8c0ca9))
+* prompt for confirmation when adding a file to excluded tasks list. ([5747829](https://github.com/spmeesseman/vscode-taskexplorer/commit/5747829))
+
 ## [1.18.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.2...v1.18.3) (2019-04-29)
 
 
