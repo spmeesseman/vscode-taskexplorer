@@ -282,12 +282,12 @@
         "keybindings": [
             {
                 "command": "taskExplorer.runLastTask",
-                "key": "shift+r t",
+                "key": "alt+r t",
                 "when": "config.taskExplorer.enableExplorerView"
             },
             {
                 "command": "taskExplorerSideBar.runLastTask",
-                "key": "shift+r t",
+                "key": "alt+r t",
                 "when": "config.taskExplorer.enableSideBar"
             }
         ],
