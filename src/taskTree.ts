@@ -45,6 +45,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 	private name: string;
 	private taskTree: TaskFolder[] | TaskFile[] | NoScripts[] | null = null;
 	private tasks: Task[] = null;
+	private needsRefresh: any[] = [];
 	private extensionContext: ExtensionContext;
 	private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
 	readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
@@ -364,13 +365,46 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		//
 		// If a view was turned off in settings, the disposable view still remains
 		// ans will still receive events.  CHeck visibility property, and of this view
-		// is hidden/disabled, then exit
+		// is hidden/disabled, then exit.  Unless opt is defined, in which case this is just a
+		// task ending, so we can proceed just invalidating that task set
 		//
-		if (!opt && views.get(this.name))
+		if (this.taskTree && views.get(this.name))
 		{
 			if (!views.get(this.name).visible) {
+				this.needsRefresh.push({ "invalidate": invalidate, "opt": opt, "task": task });
 				return false;
 			}
+		}
+
+		//
+		// The invalidate param will be equal to 'visible-event' when this method is called from the
+		// visibility change event in extension.ts.
+		//
+		// If a view isnt visible on any refresh request, a requested refresh will exit and record the refresh
+		// parameters in an object (above block of code).  When the view becomes visible again, we refresh if we 
+		// need to, if not then just exit on this refresh request
+		//
+		if (this.taskTree && invalidate === 'visible-event') 
+		{
+			if (this.needsRefresh && this.needsRefresh.length > 0) 
+			{
+				// If theres more than one pending refresh request, just refresh the tree
+				//
+				if (this.needsRefresh.length > 1 || this.needsRefresh[0].invalidate === undefined) {
+					this.refresh();
+				}
+				else {
+					this.refresh(this.needsRefresh[0].invalidate, this.needsRefresh[0].uri, this.needsRefresh[0].task);
+				}
+
+				this.needsRefresh = [];
+			}
+
+			return;
+		}
+
+		if (invalidate === 'visible-event') {
+			invalidate = undefined;
 		}
 
 		//
