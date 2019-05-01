@@ -100,32 +100,32 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     }
 
     if (e.affectsConfiguration('taskExplorer.enableBash')) {
-        registerFileWatcher(context, 'bash', '**/*.sh', true, configuration.get<boolean>('enableBash'));
+        registerFileWatcher(context, 'bash', '**/*.[Ss][Hh]', true, configuration.get<boolean>('enableBash'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableBatch')) {
-        registerFileWatcher(context, 'batch', '**/*.bat', true, configuration.get<boolean>('enableBatch'));
+        registerFileWatcher(context, 'batch', '**/*.[Bb][Aa][Tt]', true, configuration.get<boolean>('enableBatch'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableGradle')) {
-        registerFileWatcher(context, 'grunt', '**/*.gradle', false, configuration.get<boolean>('enableGradle'));
+        registerFileWatcher(context, 'grunt', '**/*.[Gg][Rr][Aa][Dd][Ll][Ee]', false, configuration.get<boolean>('enableGradle'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableGrunt')) {
-        registerFileWatcher(context, 'grunt', '**/gruntfile.js', false, configuration.get<boolean>('enableGrunt'));
+        registerFileWatcher(context, 'grunt', '**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]', false, configuration.get<boolean>('enableGrunt'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableGulp')) {
-        registerFileWatcher(context, 'gulp', '**/gulpfile.js', false, configuration.get<boolean>('enableGulp'));
+        registerFileWatcher(context, 'gulp', '**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]', false, configuration.get<boolean>('enableGulp'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enableMake')) {
-        registerFileWatcher(context, 'bash', '**/Makefile', false, configuration.get<boolean>('enableMake'));
+        registerFileWatcher(context, 'bash', '**/[Mm]akefile', false, configuration.get<boolean>('enableMake'));
         refresh = true;
     }
 
@@ -135,22 +135,22 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     }
     
     if (e.affectsConfiguration('taskExplorer.enableNsis')) {
-        registerFileWatcher(context, 'nsis', '**/*.nsi', true, configuration.get<boolean>('enableNsis'));
+        registerFileWatcher(context, 'nsis', '**/*.[Nn][Ss][Ii]', true, configuration.get<boolean>('enableNsis'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enablePerl')) {
-        registerFileWatcher(context, 'perl', '**/*.pl', true, configuration.get<boolean>('enablePerl'));
+        registerFileWatcher(context, 'perl', '**/*.[Pp][Ll]', true, configuration.get<boolean>('enablePerl'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enablePowershell')) {
-        registerFileWatcher(context, 'powershell', '**/*.ps1', true, configuration.get<boolean>('enablePowershell'));
+        registerFileWatcher(context, 'powershell', '**/*.[Pp][Ss]1', true, configuration.get<boolean>('enablePowershell'));
         refresh = true;
     }
 
     if (e.affectsConfiguration('taskExplorer.enablePython')) {
-        registerFileWatcher(context, 'python', '**/*.py', true, configuration.get<boolean>('enablePython'));
+        registerFileWatcher(context, 'python', '**/*.[Pp][Yy]', true, configuration.get<boolean>('enablePython'));
         refresh = true;
     }
 
@@ -211,27 +211,27 @@ function registerFileWatchers(context: ExtensionContext)
         registerFileWatcherAnt(context);
     }
     if (configuration.get<boolean>('enableBash')) {
-        registerFileWatcher(context, 'bash', '**/*.sh', true);
+        registerFileWatcher(context, 'bash', '**/*.[Ss][Hh]', true);
     }
 
     if (configuration.get<boolean>('enableBatch')) {
-        registerFileWatcher(context, 'batch', '**/*.bat', true);
+        registerFileWatcher(context, 'batch', '**/*.[Bb][Aa][Tt]', true);
     }
 
     if (configuration.get<boolean>('enableGradle')) {
-        registerFileWatcher(context, 'grunt', '**/*.gradle');
+        registerFileWatcher(context, 'grunt', '**/*.[Gg][Rr][Aa][Dd][Ll][Ee]');
     }
 
     if (configuration.get<boolean>('enableGrunt')) {
-        registerFileWatcher(context, 'grunt', '**/gruntfile.js');
+        registerFileWatcher(context, 'grunt', '**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]');
     }
 
     if (configuration.get<boolean>('enableGulp')) {
-        registerFileWatcher(context, 'gulp', '**/gulpfile.js');
+        registerFileWatcher(context, 'gulp', '**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]');
     }
 
     if (configuration.get<boolean>('enableMake')) {
-        registerFileWatcher(context, 'make', '**/Makefile');
+        registerFileWatcher(context, 'make', '**/[Mm]akefile');
     }
 
     if (configuration.get<boolean>('enableNpm')) {
@@ -239,23 +239,23 @@ function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>('enableNsis')) {
-        registerFileWatcher(context, 'nsis', '**/*.nsi', true);
+        registerFileWatcher(context, 'nsis', '**/*.[Nn][Ss][Ii]', true);
     }
 
     if (configuration.get<boolean>('enablePerl')) {
-        registerFileWatcher(context, 'perl', '**/*.pl', true);
+        registerFileWatcher(context, 'perl', '**/*.[Pp][Ll]', true);
     }
 
     if (configuration.get<boolean>('enablePowershell')) {
-        registerFileWatcher(context, 'powershell', '**/*.ps1', true);
+        registerFileWatcher(context, 'powershell', '**/*.[Pp][Ss]1', true);
     }
 
     if (configuration.get<boolean>('enablePython')) {
-        registerFileWatcher(context, 'python', '**/*.py', true);
+        registerFileWatcher(context, 'python', '**/*.[Pp][Yy]', true);
     }
 
     if (configuration.get<boolean>('enableRuby')) {
-        registerFileWatcher(context, 'ruby', '**/*.rb', true);
+        registerFileWatcher(context, 'ruby', '**/*.[Rr][Bb]', true);
     }
 
     if (configuration.get<boolean>('enableTsc')) {
@@ -295,7 +295,7 @@ async function refreshTree(taskType?: string, uri?: Uri)
             await treeDataProvider2.refresh(taskType, uri);
         }
         else {
-            await treeDataProvider2.refresh(false, uri);
+            await treeDataProvider2.refresh(taskType !== 'visible-event' ? false : taskType, uri);
         }
     }
 }
@@ -401,7 +401,7 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
             treeView.onDidChangeVisibility(_e => {
                 if (_e.visible) {
                     log("view visibility change event");
-                    refreshTree();
+                    refreshTree('visible-event');
                 }
             });
             views.set(name, treeView);
