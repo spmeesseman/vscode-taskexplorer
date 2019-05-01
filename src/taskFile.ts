@@ -35,7 +35,12 @@ export class TaskFile extends TreeItem
 			}
 		
 			if (relativePath.length > 0 && relativePath !== '.vscode') {
-				return label + ' (' + relativePath.substring(0, relativePath.length - 1).toLowerCase() + ')';
+				if (relativePath.endsWith("\\") || relativePath.endsWith("/")) {
+					return label + ' (' + relativePath.substring(0, relativePath.length - 1).toLowerCase() + ')';
+				}
+				else {
+					return label + ' (' + relativePath.toLowerCase() + ')';
+				}
 			}
 		}
 
