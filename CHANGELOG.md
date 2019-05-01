@@ -1,3 +1,21 @@
+## [1.18.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.5...v1.18.6) (2019-05-01)
+
+
+### Bug Fixes
+
+* tsc task file nodes show path with missing last character ([5062da9](https://github.com/spmeesseman/vscode-taskexplorer/commit/5062da9))
+
+
+### Documentation
+
+* **readme:** remove builds info ([af00ea4](https://github.com/spmeesseman/vscode-taskexplorer/commit/af00ea4))
+* **readme:** update thanks section for nsis icons ([4f9e9c8](https://github.com/spmeesseman/vscode-taskexplorer/commit/4f9e9c8))
+
+
+### Minor Features
+
+* update nsis tree icon to nsis logo ([b9dafbd](https://github.com/spmeesseman/vscode-taskexplorer/commit/b9dafbd))
+
 ## [1.18.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.4...v1.18.5) (2019-04-30)
 
 
