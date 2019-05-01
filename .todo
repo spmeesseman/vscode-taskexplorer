@@ -65,6 +65,7 @@ Todos:
             ☐ Merge branch
 
         ✔ An 'ignore file' action in the context menu of file nodes, where an indivudual task file (or group) can be auto added to excludes list @3h @done(19-04-27 18:07)
+        ☐ Set a flag on tree updates when view is not visible, if not set then dont refresh tree in OnVisible() event @15m
 
     Known Bugs:
 
