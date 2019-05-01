@@ -99,6 +99,7 @@ Bash/sh scripts in Windows will have the shell executable automatically set to a
 ## Thank You
 
 * The [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme) for some of the task type icons.
+* The author of the [NSIS Extension](https://marketplace.visualstudio.com/items?itemName=idleberg.nsis) idleberg for NSIS graphics.
 
 ## Settings
 
