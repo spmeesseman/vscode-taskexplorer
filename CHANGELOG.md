@@ -1,3 +1,16 @@
+## [1.18.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.6...v1.18.7) (2019-05-02)
+
+
+### Bug Fixes
+
+* only lowercase task file names are auto-refreshing the tree when edited ([378b5cd](https://github.com/spmeesseman/vscode-taskexplorer/commit/378b5cd))
+* view is refreshing every time it is made visible even when it does not need to ([cbb5d6a](https://github.com/spmeesseman/vscode-taskexplorer/commit/cbb5d6a))
+
+
+### Documentation
+
+* **todo:** update features list [skip ci] ([e34e6c2](https://github.com/spmeesseman/vscode-taskexplorer/commit/e34e6c2))
+
 ## [1.18.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.5...v1.18.6) (2019-05-01)
 
 
