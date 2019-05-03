@@ -500,7 +500,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			{
 				if (str !== undefined)
 				{
-					let execution = new ShellExecution('npm ' + command.replace('<packagename>','').trim() + str.trim(), options);
+					let execution = new ShellExecution('npm ' + command.replace('<packagename>','').trim() + ' ' + str.trim(), options);
 					let task = new Task(kind, taskFile.folder.workspaceFolder, command.replace('<packagename>','').trim() + str.trim(), 'npm', execution, undefined);
 					tasks.executeTask(task).then(function(execution) {}, function(reason) {});
 				}
