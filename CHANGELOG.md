@@ -1,3 +1,10 @@
+## [1.18.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.7...v1.18.8) (2019-05-04)
+
+
+### Bug Fixes
+
+* running npm update package from npm task node fails with invalid command ([fb1ea1e](https://github.com/spmeesseman/vscode-taskexplorer/commit/fb1ea1e))
+
 ## [1.18.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.6...v1.18.7) (2019-05-02)
 
 
