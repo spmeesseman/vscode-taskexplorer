@@ -17,6 +17,7 @@ Todos:
         ☐ Support for detecting Visual Studio projects, and building them as tasks @16h
         ☐ Along with 'run last' button, a context menu in the title with a list of the most recently used tasks, can open/run
         ☐ Add confirmation dialog when the 'add to excludes' command is used, dont execute directly @15m
+        ☐ Add "virtual" groups under file nodes to group tasks visually within the file node @16h
 
         Script argument support:
             ✔ Create branch
