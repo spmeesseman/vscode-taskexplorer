@@ -4,7 +4,7 @@
     "description": "Manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
     "version": "1.18.8",
-    "publisher": "spmeesseman",
+    "author": "spmeesseman",
     "license": "MIT",
     "repository": {
         "type": "git",

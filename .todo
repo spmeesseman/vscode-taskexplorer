@@ -12,12 +12,14 @@ Todos:
     Features:
 
         ☐ Support for VBS script as tasks @2h
-        ☐ API for prividing external/custom tasks (ref #22) @20h
+        ☐ API for prividing external/custom tasks (ref #22) @30h
         ☐ Functionality to bring a task's terminal to forefront (if running) (ref #23) @1h
         ☐ Support for detecting Visual Studio projects, and building them as tasks @16h
         ☐ Along with 'run last' button, a context menu in the title with a list of the most recently used tasks, can open/run
         ☐ Add confirmation dialog when the 'add to excludes' command is used, dont execute directly @15m
-        ☐ Add "virtual" groups under file nodes to group tasks visually within the file node @16h
+        ☐ Add "virtual" groups under file nodes to group tasks visually within the file node (drag/drop to ex.?) @8h
+        ☐ On grouped file nodes, add cmd in context menu to give the tree node a custom name instead of "tasktype (path)" @4h
+        ☐ Support for vscode tasks (tasks.json) not located in .vscode folder and/or *.json files in .vscode folder. @2h
 
         Script argument support:
             ✔ Create branch
@@ -88,6 +90,7 @@ Todos:
     Refactoring:
 
         ☐ Try to remove taskExplorerSidebar references for commands in package.json contributions, use just taskExplorer @4h
+        ☐ Create extension npm and vscode task providers, ignore vscode internal providers @6h
         ☐ Create base task provider class for all to inherit @6h
 
     Style:
