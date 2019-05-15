@@ -38,7 +38,8 @@ export class TaskItem extends TreeItem
 			arguments: [this]
 		};
 		this.taskSource = task.source;
-        this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source);
+		this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source && 
+			                                       e.task.scope === task.scope);
 			
 		this.contextValue = this.execution && task.definition.type !=="$composite" ? "runningScript" : "script";
 

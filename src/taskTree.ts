@@ -799,7 +799,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 						if (util.isExcluded(path.join(each.scope.uri.path, relativePath))) {
 							return; // continue forEach loop
 						}
-						
 					}
 				}
 
