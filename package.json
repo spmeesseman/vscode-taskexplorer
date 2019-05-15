@@ -1,19 +1,19 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "1.18.8",
+    "version": "1.18.9",
     "displayName": "Task Explorer",
     "description": "Manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
     "publisher": "spmeesseman",
     "license": "MIT",
     "homepage": "https://github.com/spmeesseman/vscode-taskexplorer/blob/master/README.md",
-	"author": {
+    "author": {
         "name": "Scott Meesseman"
     },
     "bugs": {
-		"url": "https://github.com/spmeesseman/vscode-taskexplorer/issues"
-	},
-	"repository": {
+        "url": "https://github.com/spmeesseman/vscode-taskexplorer/issues"
+    },
+    "repository": {
         "type": "git",
         "url": "https://github.com/spmeesseman/vscode-taskexplorer.git"
     },

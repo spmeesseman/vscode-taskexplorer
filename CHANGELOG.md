@@ -1,3 +1,23 @@
+## [1.18.9](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.8...v1.18.9) (2019-05-15)
+
+
+### Bug Fixes
+
+* running a task shows spinner icon for tasks with same name under different task nodes ([97877a0](https://github.com/spmeesseman/vscode-taskexplorer/commit/97877a0))
+
+
+### Build System
+
+* **npm:** package.json cleanup [skip ci] ([03567d2](https://github.com/spmeesseman/vscode-taskexplorer/commit/03567d2))
+* **npm:** re-add bugs and homepage properties ([260d837](https://github.com/spmeesseman/vscode-taskexplorer/commit/260d837))
+
+
+### Documentation
+
+* **todo:** update features todo [skip ci] ([39b7355](https://github.com/spmeesseman/vscode-taskexplorer/commit/39b7355))
+* **todo:** update features todo [skip ci] ([525363a](https://github.com/spmeesseman/vscode-taskexplorer/commit/525363a))
+* **todo:** update todo list ([f427a5a](https://github.com/spmeesseman/vscode-taskexplorer/commit/f427a5a))
+
 ## [1.18.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.7...v1.18.8) (2019-05-04)
 
 
