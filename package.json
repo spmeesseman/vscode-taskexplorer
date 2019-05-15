@@ -5,11 +5,15 @@
     "description": "Manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
     "publisher": "spmeesseman",
-    "author": {
+    "license": "MIT",
+    "homepage": "https://github.com/spmeesseman/vscode-taskexplorer/blob/master/README.md",
+	"author": {
         "name": "Scott Meesseman"
     },
-    "license": "MIT",
-    "repository": {
+    "bugs": {
+		"url": "https://github.com/spmeesseman/vscode-taskexplorer/issues"
+	},
+	"repository": {
         "type": "git",
         "url": "https://github.com/spmeesseman/vscode-taskexplorer.git"
     },
