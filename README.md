@@ -21,6 +21,21 @@
 
 > Provides a view in either (or both) the SideBar and/or Explorer that displays all supported tasks organized into a treeview, with parent task file nodes, grouped nodes, and project folders (convenient for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.  NPM file nodes support special npm command(s) (i.e. 'install') via context menu.
 
+## Table of Contents
+
+- [Task Explorer - View and Run Tasks from Visual Studio Code](#Task-Explorer---View-and-Run-Tasks-from-Visual-Studio-Code)
+  - [Description](#Description)
+  - [Table of Contents](#Table-of-Contents)
+  - [Screenshots](#Screenshots)
+  - [Requirements](#Requirements)
+  - [Features](#Features)
+  - [Configuring Global Excludes and Apache Ant Includes with Glob Patterns](#Configuring-Global-Excludes-and-Apache-Ant-Includes-with-Glob-Patterns)
+  - [Internally Provided Tasks vs. VSCode Provided Tasks](#Internally-Provided-Tasks-vs-VSCode-Provided-Tasks)
+  - [Running bash/sh scripts in Windows Environment](#Running-bashsh-scripts-in-Windows-Environment)
+  - [Feedback & Contributing](#Feedback--Contributing)
+  - [Thank You](#Thank-You)
+  - [Settings](#Settings)
+  
 ## Screenshots
 
 |Original Explorer Tray|Sidebar View (v1.7)|Task Type Groups (v1.13)|
