@@ -1,3 +1,10 @@
+## [1.18.10](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.9...v1.18.10) (2019-05-18)
+
+
+### Documentation
+
+* **readme:** add toc ([fcdd8ff](https://github.com/spmeesseman/vscode-taskexplorer/commit/fcdd8ff))
+
 ## [1.18.9](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.8...v1.18.9) (2019-05-15)
 
 
