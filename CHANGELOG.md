@@ -1,3 +1,10 @@
+# [1.19.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.10...v1.19.0) (2019-05-27)
+
+
+### Features
+
+* add support for app-publisher tasks for upcoming app-publisher release ([be2713c](https://github.com/spmeesseman/vscode-taskexplorer/commit/be2713c))
+
 ## [1.18.10](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.9...v1.18.10) (2019-05-18)
 
 
