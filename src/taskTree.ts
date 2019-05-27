@@ -25,6 +25,7 @@ import { invalidateTasksCacheScript } from './taskProviderScript';
 import { invalidateTasksCacheGradle } from './taskProviderGradle';
 import { invalidateTasksCacheGrunt } from './taskProviderGrunt';
 import { invalidateTasksCacheGulp } from './taskProviderGulp';
+import { invalidateTasksCacheAppPublisher } from './taskProviderAppPublisher';
 import { stringify } from 'querystring';
 
 
@@ -106,6 +107,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			else if (opt1 === 'make') {
 				await invalidateTasksCacheMake(opt2);
 			}
+			else if (opt1 === 'app-publisher') {
+				await invalidateTasksCacheAppPublisher(opt2);
+			}
 			else if (opt1 === 'bash' || opt1 === 'batch' || opt1 === 'nsis' || opt1 === 'perl' || opt1 === 'powershell' || opt1 === 'python' || opt1 === 'ruby') {
 				await invalidateTasksCacheScript(opt2);
 			}
@@ -118,6 +122,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 			await invalidateTasksCacheGradle();
 			await invalidateTasksCacheGrunt();
 			await invalidateTasksCacheGulp();
+			await invalidateTasksCacheAppPublisher();
 		}
 	}
 

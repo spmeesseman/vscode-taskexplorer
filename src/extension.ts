@@ -14,6 +14,7 @@ import { ScriptTaskProvider } from './taskProviderScript';
 import { GradleTaskProvider } from './taskProviderGradle';
 import { GruntTaskProvider } from './taskProviderGrunt';
 import { GulpTaskProvider } from './taskProviderGulp';
+import { AppPublisherTaskProvider } from './taskProviderAppPublisher';
 import { configuration } from './common/configuration';
 import { Storage } from './common/storage';
 import { log, logValue } from './util';
@@ -99,6 +100,11 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
         refresh = true;
     }
 
+    if (e.affectsConfiguration('taskExplorer.enableAppPublisher')) {
+        registerFileWatcher(context, 'app-publisher', '**/.publishrc*', false, configuration.get<boolean>('enableAppPublisher'));
+        refresh = true;
+    }
+
     if (e.affectsConfiguration('taskExplorer.enableBash')) {
         registerFileWatcher(context, 'bash', '**/*.[Ss][Hh]', true, configuration.get<boolean>('enableBash'));
         refresh = true;
@@ -125,7 +131,7 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     }
 
     if (e.affectsConfiguration('taskExplorer.enableMake')) {
-        registerFileWatcher(context, 'bash', '**/[Mm]akefile', false, configuration.get<boolean>('enableMake'));
+        registerFileWatcher(context, 'make', '**/[Mm]akefile', false, configuration.get<boolean>('enableMake'));
         refresh = true;
     }
 
@@ -195,7 +201,7 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
         e.affectsConfiguration('taskExplorer.pathToGradle') || e.affectsConfiguration('taskExplorer.pathToMake') ||
         e.affectsConfiguration('taskExplorer.pathToNsis') || e.affectsConfiguration('taskExplorer.pathToPerl') ||
         e.affectsConfiguration('taskExplorer.pathToPython') || e.affectsConfiguration('taskExplorer.pathToRuby')  || 
-        e.affectsConfiguration('taskExplorer.pathToBash')) {
+        e.affectsConfiguration('taskExplorer.pathToBash') || e.affectsConfiguration('taskExplorer.pathToAppPublisher')) {
         refresh = true;
     }
 
@@ -210,6 +216,11 @@ function registerFileWatchers(context: ExtensionContext)
     if (configuration.get<boolean>('enableAnt')) {
         registerFileWatcherAnt(context);
     }
+
+    if (configuration.get<boolean>('enableAppPublisher')) {
+        registerFileWatcher(context, 'app-publisher', '**/.publishrc*', true);
+    }
+
     if (configuration.get<boolean>('enableBash')) {
         registerFileWatcher(context, 'bash', '**/*.[Ss][Hh]', true);
     }
@@ -315,6 +326,7 @@ function registerTaskProviders(context: ExtensionContext)
     context.subscriptions.push(workspace.registerTaskProvider('grunt', new GruntTaskProvider()));
     context.subscriptions.push(workspace.registerTaskProvider('gulp', new GulpTaskProvider()));
     context.subscriptions.push(workspace.registerTaskProvider('gradle', new GradleTaskProvider()));
+    context.subscriptions.push(workspace.registerTaskProvider('app-publisher', new AppPublisherTaskProvider()));
 }
 
 

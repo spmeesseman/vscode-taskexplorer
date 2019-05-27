@@ -557,6 +557,11 @@
                     "default": true,
                     "description": "%config.taskExplorer.enableAnt%"
                 },
+                "taskExplorer.enableApp-publisher": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.enableApp-publisher%"
+                },
                 "taskExplorer.enableBatch": {
                     "type": "boolean",
                     "default": true,
@@ -610,6 +615,10 @@
                 "taskExplorer.pathToAnt": {
                     "type": "string",
                     "description": "%config.taskExplorer.pathToAnt%"
+                },
+                "taskExplorer.pathToAppPublisher": {
+                    "type": "string",
+                    "description": "%config.taskExplorer.pathToAppPublisher%"
                 },
                 "taskExplorer.pathToAnsicon": {
                     "type": "string",
@@ -787,6 +796,32 @@
             },
             {
                 "type": "gulp",
+                "required": [],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.task.script%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.task.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.task.uri%"
+                    },
+                    "treeItem": {
+                        "type": "object",
+                        "description": "%taskdef.task.treeItem%"
+                    }
+                }
+            },
+            {
+                "type": "app-publisher",
                 "required": [],
                 "properties": {
                     "script": {
