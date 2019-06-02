@@ -224,7 +224,7 @@ jobs:
         inputs:
           command: custom
           verbose: false
-          customCommand: 'run semantic-release'
+          customCommand: 'run semantic-release --allow-same-version'
         env:
           VSCE_TOKEN: $(vsceToken)
           GH_TOKEN: $(githubToken)
