@@ -828,6 +828,10 @@
                         "type": "string",
                         "description": "%taskdef.task.script%"
                     },
+                    "cmdLine": {
+                        "type": "string",
+                        "description": "%taskdef.task.cmdLine%"
+                    },
                     "path": {
                         "type": "string",
                         "description": "%taskdef.task.path%"

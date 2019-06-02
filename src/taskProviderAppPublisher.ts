@@ -20,6 +20,7 @@ interface AppPublisherTaskDefinition extends TaskDefinition
     fileName?: string;
     uri?: Uri;
     treeItem?: TaskItem;
+    cmdLine?: string;
 }
 
 export class AppPublisherTaskProvider implements TaskProvider
@@ -143,8 +144,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
         type: "app-publisher",
         fileName,
         path: "",
-        //cmdLine: "app-publisher -p node --no-ci",
-        cmdLine: "npx ./build/bin/app-publisher.js -p node --no-ci",
+        cmdLine: "app-publisher -p node --no-ci",
         requiresArgs: false,
         uri
     };
@@ -154,7 +154,6 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
         fileName,
         path: "",
         cmdLine: "app-publisher -p node --no-ci --dry-run",
-        requiresArgs: false,
         uri
     };
 
@@ -163,7 +162,6 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
         fileName,
         path: "",
         cmdLine: "app-publisher -p ps --no-ci",
-        requiresArgs: false,
         uri
     };
 
@@ -171,9 +169,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
         type: "app-publisher",
         fileName,
         path: "",
-        // cmdLine: "app-publisher -p ps --no-ci --dry-run",
-        cmdLine: "npx ./build/bin/app-publisher.js -p ps --no-ci --dry-run",
-        requiresArgs: false,
+        cmdLine: "app-publisher -p ps --no-ci --dry-run",
         uri
     };
 
