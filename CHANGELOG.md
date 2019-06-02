@@ -1,3 +1,16 @@
+## [1.19.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.19.0...v1.19.1) (2019-06-02)
+
+
+### Bug Fixes
+
+* all app-publisher tasks always launch first task ([35f0c1c](https://github.com/spmeesseman/vscode-taskexplorer/commit/35f0c1c))
+* gradle tasks without parentheses are not detected ([d76f72d](https://github.com/spmeesseman/vscode-taskexplorer/commit/d76f72d)), closes [#28](https://github.com/spmeesseman/vscode-taskexplorer/issues/28)
+
+
+### Documentation
+
+* **readme:** remove some badges for less width taken ([310f21c](https://github.com/spmeesseman/vscode-taskexplorer/commit/310f21c))
+
 # [1.19.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.18.10...v1.19.0) (2019-05-27)
 
 
