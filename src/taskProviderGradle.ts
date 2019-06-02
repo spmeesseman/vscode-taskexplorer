@@ -192,7 +192,10 @@ async function findTargets(fsPath: string): Promise<StringMap>
             {
                 idx1++;
                 let idx2 = line.indexOf("(", idx1);
-                if (idx2 !== -1) 
+                if (idx2 === -1) {
+                    idx2 = line.indexOf("{", idx1);
+                }
+                if (idx2 !== -1)
                 {
                     let tgtName = line.substring(idx1, idx2).trim();
 
