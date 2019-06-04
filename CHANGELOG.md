@@ -1,3 +1,10 @@
+## [1.19.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.19.1...v1.19.2) (2019-06-04)
+
+
+### Bug Fixes
+
+* use npx to start app-publisher tasks (internal use only at this time) ([0f64e4c](https://github.com/spmeesseman/vscode-taskexplorer/commit/0f64e4c))
+
 ## [1.19.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.19.0...v1.19.1) (2019-06-02)
 
 
