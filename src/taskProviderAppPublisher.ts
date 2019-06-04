@@ -144,7 +144,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
         type: "app-publisher",
         fileName,
         path: "",
-        cmdLine: "app-publisher -p node --no-ci",
+        cmdLine: "npx app-publisher -p node --no-ci",
         requiresArgs: false,
         uri
     };
@@ -153,7 +153,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
         type: "app-publisher",
         fileName,
         path: "",
-        cmdLine: "app-publisher -p node --no-ci --dry-run",
+        cmdLine: "npx app-publisher -p node --no-ci --dry-run",
         uri
     };
 
@@ -161,7 +161,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
         type: "app-publisher",
         fileName,
         path: "",
-        cmdLine: "app-publisher -p ps --no-ci",
+        cmdLine: "npx app-publisher -p ps --no-ci",
         uri
     };
 
@@ -169,7 +169,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
         type: "app-publisher",
         fileName,
         path: "",
-        cmdLine: "app-publisher -p ps --no-ci --dry-run",
+        cmdLine: "npx app-publisher -p ps --no-ci --dry-run",
         uri
     };
 
