@@ -156,7 +156,7 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     }
 
     if (e.affectsConfiguration('taskExplorer.enablePython')) {
-        registerFileWatcher(context, 'python', '**/*.[Pp][Yy]', true, configuration.get<boolean>('enablePython'));
+        registerFileWatcher(context, 'python', '**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]', true, configuration.get<boolean>('enablePython'));
         refresh = true;
     }
 
@@ -262,7 +262,7 @@ function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>('enablePython')) {
-        registerFileWatcher(context, 'python', '**/*.[Pp][Yy]', true);
+        registerFileWatcher(context, 'python', '**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]', true);
     }
 
     if (configuration.get<boolean>('enableRuby')) {
