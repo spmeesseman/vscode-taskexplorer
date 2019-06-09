@@ -830,7 +830,7 @@
                     },
                     "cmdLine": {
                         "type": "string",
-                        "description": "%taskdef.task.cmdLine%"
+                        "description": "%taskdef.script.cmdLine%"
                     },
                     "path": {
                         "type": "string",
