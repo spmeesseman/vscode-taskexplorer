@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "1.19.2",
+    "version": "1.19.3",
     "displayName": "Task Explorer",
     "description": "Manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
@@ -830,7 +830,7 @@
                     },
                     "cmdLine": {
                         "type": "string",
-                        "description": "%taskdef.task.cmdLine%"
+                        "description": "%taskdef.script.cmdLine%"
                     },
                     "path": {
                         "type": "string",

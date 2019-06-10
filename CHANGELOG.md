@@ -1,3 +1,11 @@
+## [1.19.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.19.2...v1.19.3) (2019-06-09)
+
+
+### Bug Fixes
+
+* error is shown when loading "taskdef.task.cmdLine" not defined ([4bb4583](https://github.com/spmeesseman/vscode-taskexplorer/commit/4bb4583))
+* python builds are not working, too many tasks detected ([d059ae9](https://github.com/spmeesseman/vscode-taskexplorer/commit/d059ae9))
+
 ## [1.19.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.19.1...v1.19.2) (2019-06-04)
 
 
