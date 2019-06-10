@@ -51,6 +51,7 @@
 ## Features
 
 * Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo) (kept with [Todo+](https://marketplace.visualstudio.com/itemdetails?itemName=fabiospampinato.vscode-todo-plus))
+* v1.19 - App-Publisher task support for BETA testing
 * v1.18 - Added 'Add to excludes' action in task file node context menu
 * v1.17 - Added 'Run last task' button to titlebar
 * v1.16 - Added npm management tasks to npm file node context menus
