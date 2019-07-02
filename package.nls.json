@@ -47,6 +47,7 @@
 	"view.name": "Task Explorer",
 	"command.refresh": "Refresh",
 	"command.run": "Run",
+	"command.restart": "Restart",
 	"command.runLastTask": "Run last task",
 	"command.addToExcludes": "Add to excludes list",
 	"command.stop": "Stop",
