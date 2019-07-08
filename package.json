@@ -114,7 +114,7 @@
         "typescript": "^3.0.3",
         "vsce": "^1.48.0",
         "vscode": "^1.1.30",
-        "vscode-nls-dev": "3.2.6"
+        "vscode-nls-dev": "3.2.7"
     },
     "contributes": {
         "viewsContainers": {
