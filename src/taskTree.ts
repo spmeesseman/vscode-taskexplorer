@@ -60,14 +60,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         this.name = name;
         subscriptions.push(commands.registerCommand(name + ".run", this.run, this));
         subscriptions.push(commands.registerCommand(name + ".runLastTask", this.runLastTask, this));
-
-        subscriptions.push(commands.registerCommand(name + ".stop", (taskTreeItem: TaskItem) =>
-        {
-            if (taskTreeItem.execution)
-            {
-                taskTreeItem.execution.terminate();
-            }
-        }, this));
+        subscriptions.push(commands.registerCommand(name + ".stop", this.stop, this));
+        subscriptions.push(commands.registerCommand(name + ".restart", this.restart, this));
         subscriptions.push(commands.registerCommand(name + ".open", this.open, this));
         subscriptions.push(commands.registerCommand(name + ".refresh", this.refresh, this));
         subscriptions.push(commands.registerCommand(name + ".runInstall", function (taskFile: TaskFile) { this.runNpmCommand(taskFile, "install"); }, this));
@@ -180,13 +174,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // Execute task
         //
         console.log(taskItem.task.definition);
-        tasks.executeTask(taskItem.task)
-            .then(function (execution)
-            {
-                me.saveRunTask(taskItem);
-            },
-                function (reason) { });
-        //}
+        try {
+            await tasks.executeTask(taskItem.task)
+            me.saveRunTask(taskItem);
+        }
+        catch {}
+    }
+
+    private async stop(taskItem: TaskItem) {
+        if (taskItem.execution)
+            taskItem.execution.terminate()
+    }
+
+    private async restart(taskItem: TaskItem){
+        this.stop(taskItem)
+        this.run(taskItem)
     }
 
 

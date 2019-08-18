@@ -176,6 +176,15 @@
                 }
             },
             {
+                "command": "taskExplorerSideBar.restart",
+                "title": "%command.restart%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "dark": "res/dark/restart.svg",
+                    "light": "res/light/restart.svg"
+                }
+            },
+            {
                 "command": "taskExplorerSideBar.open",
                 "title": "%command.open%",
                 "when": "config.taskExplorer.enableSideBar"
@@ -244,6 +253,15 @@
                 "icon": {
                     "dark": "res/dark/stop.svg",
                     "light": "res/light/stop.svg"
+                }
+            },
+            {
+                "command": "taskExplorer.restart",
+                "title": "%command.restart%",
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "dark": "res/dark/restart.svg",
+                    "light": "res/light/restart.svg"
                 }
             },
             {
@@ -417,6 +435,11 @@
                     "group": "inline"
                 },
                 {
+                    "command": "taskExplorer.restart",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == runningScript",
+                    "group": "inline"
+                },
+                {
                     "command": "taskExplorerSideBar.runAudit",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
@@ -507,6 +530,11 @@
                 },
                 {
                     "command": "taskExplorerSideBar.stop",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == runningScript",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskExplorerSideBar.restart",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == runningScript",
                     "group": "inline"
                 }
