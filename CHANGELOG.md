@@ -1,3 +1,21 @@
+# [1.20.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.19.3...v1.20.0) (2019-08-18)
+
+
+### Code Refactoring
+
+* remove unused nodejs tasks from app-publisher node ([d881cb2](https://github.com/spmeesseman/vscode-taskexplorer/commit/d881cb2))
+
+
+### Documentation
+
+* **readme:** update 1.19 info w app-publisher note [skip ci] ([55ed11b](https://github.com/spmeesseman/vscode-taskexplorer/commit/55ed11b))
+* **readme:** update badges with github issues counts ([406268a](https://github.com/spmeesseman/vscode-taskexplorer/commit/406268a))
+
+
+### Features
+
+* add restart button ([c268ffd](https://github.com/spmeesseman/vscode-taskexplorer/commit/c268ffd))
+
 ## [1.19.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.19.2...v1.19.3) (2019-06-09)
 
 
