@@ -1,3 +1,10 @@
+## [1.20.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.20.0...v1.20.1) (2019-08-21)
+
+
+### Bug Fixes
+
+* running an app-publisher task incorrectly causes all publish task icons ina ll nodes to display with the running spinner icon. ([0f1ead7](https://github.com/spmeesseman/vscode-taskexplorer/commit/0f1ead7))
+
 # [1.20.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.19.3...v1.20.0) (2019-08-18)
 
 
