@@ -167,12 +167,12 @@
                 "when": "config.taskExplorer.enableSideBar"
             },
             {
-                "command": "taskExplorerSideBar.stop",
-                "title": "%command.stop%",
+                "command": "taskExplorerSideBar.pause",
+                "title": "%command.pause%",
                 "when": "config.taskExplorer.enableSideBar",
                 "icon": {
-                    "dark": "res/dark/stop.svg",
-                    "light": "res/light/stop.svg"
+                    "dark": "res/dark/pause.svg",
+                    "light": "res/light/pause.svg"
                 }
             },
             {
@@ -182,6 +182,15 @@
                 "icon": {
                     "dark": "res/dark/restart.svg",
                     "light": "res/light/restart.svg"
+                }
+            },
+            {
+                "command": "taskExplorerSideBar.stop",
+                "title": "%command.stop%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "dark": "res/dark/stop.svg",
+                    "light": "res/light/stop.svg"
                 }
             },
             {
@@ -247,12 +256,12 @@
                 "when": "config.taskExplorer.enableExplorerView"
             },
             {
-                "command": "taskExplorer.stop",
-                "title": "%command.stop%",
+                "command": "taskExplorer.pause",
+                "title": "%command.pause%",
                 "when": "config.taskExplorer.enableExplorerView",
                 "icon": {
-                    "dark": "res/dark/stop.svg",
-                    "light": "res/light/stop.svg"
+                    "dark": "res/dark/pause.svg",
+                    "light": "res/light/pause.svg"
                 }
             },
             {
@@ -262,6 +271,15 @@
                 "icon": {
                     "dark": "res/dark/restart.svg",
                     "light": "res/light/restart.svg"
+                }
+            },
+            {
+                "command": "taskExplorer.stop",
+                "title": "%command.stop%",
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "dark": "res/dark/stop.svg",
+                    "light": "res/light/stop.svg"
                 }
             },
             {
@@ -430,12 +448,12 @@
                     "group": "inline"
                 },
                 {
-                    "command": "taskExplorer.stop",
+                    "command": "taskExplorer.restart",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == runningScript",
                     "group": "inline"
                 },
                 {
-                    "command": "taskExplorer.restart",
+                    "command": "taskExplorer.stop",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == runningScript",
                     "group": "inline"
                 },
@@ -529,12 +547,12 @@
                     "group": "inline"
                 },
                 {
-                    "command": "taskExplorerSideBar.stop",
+                    "command": "taskExplorerSideBar.restart",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == runningScript",
                     "group": "inline"
                 },
                 {
-                    "command": "taskExplorerSideBar.restart",
+                    "command": "taskExplorerSideBar.stop",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == runningScript",
                     "group": "inline"
                 }
@@ -639,6 +657,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "%config.taskExplorer.enableAnsiconForAnt%"
+                },
+                "taskExplorer.keepTermOnStop": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%config.taskExplorer.keepTermOnStop%"
                 },
                 "taskExplorer.pathToAnt": {
                     "type": "string",

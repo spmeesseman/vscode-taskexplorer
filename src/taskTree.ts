@@ -8,7 +8,7 @@ import * as util from "./util";
 
 import
 {
-    Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
+    Event, EventEmitter, ExtensionContext, Task, TaskDefinition, Terminal,
     TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
     CancellationToken, ShellExecution, TaskStartEvent, TaskEndEvent, TaskExecution
@@ -49,6 +49,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private taskTree: TaskFolder[] | TaskFile[] | NoScripts[] | null = null;
     private tasks: Task[] = null;
     private needsRefresh: any[] = [];
+    //private processIds: any[] = [];
     private extensionContext: ExtensionContext;
     private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
     readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
@@ -62,6 +63,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".runLastTask", this.runLastTask, this));
         subscriptions.push(commands.registerCommand(name + ".stop", this.stop, this));
         subscriptions.push(commands.registerCommand(name + ".restart", this.restart, this));
+        subscriptions.push(commands.registerCommand(name + ".pause", this.pause, this));
         subscriptions.push(commands.registerCommand(name + ".open", this.open, this));
         subscriptions.push(commands.registerCommand(name + ".refresh", this.refresh, this));
         subscriptions.push(commands.registerCommand(name + ".runInstall", function (taskFile: TaskFile) { this.runNpmCommand(taskFile, "install"); }, this));
@@ -173,22 +175,123 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		{*/
         // Execute task
         //
-        console.log(taskItem.task.definition);
-        try {
-            await tasks.executeTask(taskItem.task)
-            me.saveRunTask(taskItem);
+        if (taskItem.paused)
+        {
+            window.terminals.forEach(async (term, idx) =>
+            {
+                const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+                if (term.name.toLowerCase() === termTaskName.toLowerCase())
+                {
+                    term.sendText("N", true);
+                    taskItem.paused = false;
+                    //taskItem.contextValue = "runningScript";
+                }
+            });
         }
-        catch {}
+        else
+        {
+            try {
+                await tasks.executeTask(taskItem.task).then(async (execution) =>
+                {
+                    //me.saveRunTask(taskItem);
+                });
+                me.saveRunTask(taskItem);
+            }
+            catch {}
+        }
     }
 
-    private async stop(taskItem: TaskItem) {
+
+    private async pause(taskItem: TaskItem)
+    {
         if (taskItem.execution)
-            taskItem.execution.terminate()
+        {
+            const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+            window.terminals.forEach(async (term, idx) =>
+            {
+                if (termTaskName.toLowerCase().replace("task - ", "").indexOf(term.name.toLowerCase().replace("task - ", "")) !== -1)
+                {
+                    if (taskItem.paused)
+                    {
+                        taskItem.paused = false;
+                        term.sendText("N");
+                        //taskItem.contextValue = "runningScript";
+                    }
+                    else
+                    {
+                        //taskItem.paused = true;
+                        term.sendText("\u0003");
+                        function yes() {
+                            term.sendText("Y", true);
+                        }
+                        setTimeout(yes, 100);
+                        //taskItem.contextValue = "pausedScript";
+                    }
+                }
+            });
+        }
     }
 
-    private async restart(taskItem: TaskItem){
-        this.stop(taskItem)
-        this.run(taskItem)
+
+    private async stop(taskItem: TaskItem)
+    {
+        if (taskItem.execution)
+        {
+            //if (taskItem.paused)
+            //{
+            //    window.terminals.forEach(async (term, idx) =>
+            //    {
+            //        const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+            //        if (term.name.toLowerCase() === termTaskName.toLowerCase())
+            //        {
+            //            term.sendText("Y", true);
+            //            taskItem.paused = false;
+            //            //taskItem.contextValue = "script";
+            //        }
+            //    });
+            //}
+            //else {
+            //    taskItem.execution.terminate();
+            //}
+
+            if (configuration.get<boolean>("keepTermOnStop") === true)
+            {
+                const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+                window.terminals.forEach(async (term, idx) =>
+                {
+                    if (termTaskName.toLowerCase().replace("task - ", "").indexOf(term.name.toLowerCase().replace("task - ", "")) !== -1)
+                    {
+                        if (taskItem.paused)
+                        {
+                            taskItem.paused = false;
+                            term.sendText("N");
+                            //taskItem.contextValue = "runningScript";
+                        }
+                        else
+                        {
+                            //taskItem.paused = true;
+                            term.sendText("\u0003");
+                            function yes() {
+                                term.sendText("Y", true);
+                            }
+                            setTimeout(yes, 300);
+                            //taskItem.contextValue = "pausedScript";
+                        }
+                    }
+                });
+            }
+            else
+            {
+                taskItem.execution.terminate();
+            }
+        }
+    }
+
+
+    private async restart(taskItem: TaskItem)
+    {
+        this.stop(taskItem);
+        this.run(taskItem);
     }
 
 

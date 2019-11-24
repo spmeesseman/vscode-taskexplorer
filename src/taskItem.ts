@@ -15,6 +15,7 @@ export class TaskItem extends TreeItem
     public readonly task: Task | undefined;
     public readonly taskSource: string;
 	public readonly execution: TaskExecution | undefined;
+    public paused: boolean;
 
 	taskFile: TaskFile;
 	
@@ -28,7 +29,8 @@ export class TaskItem extends TreeItem
 
 		super(taskName, TreeItemCollapsibleState.None);
 
-		this.id = taskFile.resourceUri.fsPath + ":" + task.name;
+        this.id = taskFile.resourceUri.fsPath + ":" + task.name;
+        this.paused = false;
 		this.contextValue = 'script';
 		this.taskFile = taskFile;
 		this.task = task;
