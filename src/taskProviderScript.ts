@@ -32,7 +32,7 @@ const scriptTable = {
         enabled: configuration.get("enableRuby")
     },
     ps1: {
-        exec: "powershell",
+        exec: configuration.get("pathToPowershell") ? configuration.get("pathToPowershell") : "powershell",
         type: "powershell",
         args: [],
         enabled: configuration.get("enablePowershell")
@@ -96,6 +96,7 @@ function refreshScriptTable()
     scriptTable.rb.exec = configuration.get("pathToRuby") ? configuration.get("pathToRuby") : "ruby";
     scriptTable.pl.exec = configuration.get("pathToPerl") ? configuration.get("pathToPerl") : "perl";
     scriptTable.nsi.exec = configuration.get("pathToNsis") ? configuration.get("pathToNsis") : "makensis.exe";
+    scriptTable.ps1.exec = configuration.get("pathToPowershell") ? configuration.get("pathToPowershell") : "powershell";
 
     scriptTable.py.enabled = configuration.get("enablePython");
     scriptTable.rb.enabled = configuration.get("enableRuby");

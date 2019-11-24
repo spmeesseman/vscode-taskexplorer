@@ -699,6 +699,10 @@
                     "type": "string",
                     "description": "%config.taskExplorer.pathToPython%"
                 },
+                "taskExplorer.pathToPowershell": {
+                    "type": "string",
+                    "description": "%config.taskExplorer.pathToPowershell%"
+                },
                 "taskExplorer.pathToRuby": {
                     "type": "string",
                     "description": "%config.taskExplorer.pathToRuby%"

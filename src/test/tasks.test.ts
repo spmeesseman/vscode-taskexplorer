@@ -383,6 +383,7 @@ suite('Task tests', () =>
         await configuration.update('pathToMake', 'nmake');
         await configuration.update('pathToPerl', 'perl');
         await configuration.update('pathToPython', 'python');
+        await configuration.update('pathToPowershell', 'powershell');
         await treeDataProvider2.refresh();
         treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
 

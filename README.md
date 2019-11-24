@@ -146,6 +146,7 @@ Bash/sh scripts in Windows will have the shell executable automatically set to a
 |`taskExplorer.pathToNsis`|The path to the nsis make program, if not registered in system path|`makensis.exe`|",
 |`taskExplorer.pathToPerl`|The path to the perl program, if not registered in system path|`perl`|",
 |`taskExplorer.pathToPython`|The path to the python program, if not registered in system path|`python`|",
+|`taskExplorer.pathToPowershell`|The path to the powershell program, if not registered in system path|`powershell`|",
 |`taskExplorer.pathToRuby`|The path to the ruby program, if not registered in system path|`ruby`|",
 |`taskExplorer.debug`|Turn on logging|`false`|
 |`taskExplorer.debugLevel`|Verbosity level of logging (if turned on)|`1`|

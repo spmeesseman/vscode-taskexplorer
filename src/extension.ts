@@ -202,7 +202,8 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
         e.affectsConfiguration('taskExplorer.pathToGradle') || e.affectsConfiguration('taskExplorer.pathToMake') ||
         e.affectsConfiguration('taskExplorer.pathToNsis') || e.affectsConfiguration('taskExplorer.pathToPerl') ||
         e.affectsConfiguration('taskExplorer.pathToPython') || e.affectsConfiguration('taskExplorer.pathToRuby')  || 
-        e.affectsConfiguration('taskExplorer.pathToBash') || e.affectsConfiguration('taskExplorer.pathToAppPublisher')) {
+        e.affectsConfiguration('taskExplorer.pathToBash') || e.affectsConfiguration('taskExplorer.pathToAppPublisher') ||
+        e.affectsConfiguration('taskExplorer.pathToPowershell')) {
         refresh = true;
     }
 
