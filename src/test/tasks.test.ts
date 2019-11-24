@@ -373,7 +373,7 @@ suite('Task tests', () =>
         //
         // Refresh for better coverage
         //
-        treeItems = await extension.treeDataProvider2.getChildren(); // mock explorer open view which would call this function
+        treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
         await timeout(300);
         await configuration.update('exclude', '**/coveronly/**');
         await configuration.update('pathToAnt', 'ant.bat');
