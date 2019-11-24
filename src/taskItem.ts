@@ -15,6 +15,7 @@ export class TaskItem extends TreeItem
     public readonly task: Task | undefined;
     public readonly taskSource: string;
 	public readonly execution: TaskExecution | undefined;
+    public paused: boolean;
 
 	taskFile: TaskFile;
 	
@@ -28,7 +29,8 @@ export class TaskItem extends TreeItem
 
 		super(taskName, TreeItemCollapsibleState.None);
 
-		this.id = taskFile.resourceUri.fsPath + ":" + task.name;
+        this.id = taskFile.resourceUri.fsPath + ":" + task.name;
+        this.paused = false;
 		this.contextValue = 'script';
 		this.taskFile = taskFile;
 		this.task = task;
@@ -39,7 +41,7 @@ export class TaskItem extends TreeItem
 		};
 		this.taskSource = task.source;
 		this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source && 
-			                                       e.task.scope === task.scope);
+			                                       e.task.scope === task.scope && e.task.definition.path === task.definition.path);
 			
 		this.contextValue = this.execution && task.definition.type !=="$composite" ? "runningScript" : "script";
 
