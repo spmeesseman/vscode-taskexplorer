@@ -1,3 +1,18 @@
+# [1.21.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.20.1...v1.21.0) (2019-11-24)
+
+
+### Documentation
+
+* **readme:** update version info [closes [#51](https://github.com/spmeesseman/vscode-taskexplorer/issues/51)] ([e6265d8](https://github.com/spmeesseman/vscode-taskexplorer/commit/e6265d8))
+
+
+### Features
+
+* add option to keep a terminal open if a task is stopped ([17debdb](https://github.com/spmeesseman/vscode-taskexplorer/commit/17debdb))
+* add option to set the path to the preferred powershell program. [closes [#42](https://github.com/spmeesseman/vscode-taskexplorer/issues/42)] ([7981519](https://github.com/spmeesseman/vscode-taskexplorer/commit/7981519))
+* add support for .cmd script files [closes [#44](https://github.com/spmeesseman/vscode-taskexplorer/issues/44)] ([5f5b57c](https://github.com/spmeesseman/vscode-taskexplorer/commit/5f5b57c))
+* add support to mark the default task in the Ant tasks node [closes [#50](https://github.com/spmeesseman/vscode-taskexplorer/issues/50)] ([df65eea](https://github.com/spmeesseman/vscode-taskexplorer/commit/df65eea))
+
 ## [1.20.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.20.0...v1.20.1) (2019-08-21)
 
 
