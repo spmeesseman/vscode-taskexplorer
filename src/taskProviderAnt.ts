@@ -155,7 +155,7 @@ async function readAntfile(uri: Uri): Promise<Task[]>
 	const result: Task[] = [];
 
 	Object.keys(scripts).forEach(each => {
-		const task = createAntTask(each, `${each}`, folder!, uri);
+		const task = createAntTask(scripts[`${each}`] ? scripts[`${each}`] : `${each}`, each, folder!, uri);
 		if (task) {
 			task.group = TaskGroup.Build;
 			result.push(task);
@@ -200,12 +200,19 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
 		return scripts;
 	}
 
+	let defaultTask = json.project.$.default;
+
+	//if (json.project.$.default) {
+    //util.logValue('   Found default target', json.project.$.default);
+	//	scripts["Default (" + json.project.$.default + ")"] = json.project.$.default;
+	//}
+
 	let targets = json.project.target;
 	for (var tgt in targets)
 	{
 		if (targets[tgt].$ && targets[tgt].$.name) {
 			util.logValue('   Found target', targets[tgt].$.name);
-			scripts[targets[tgt].$.name] = '';
+			scripts[defaultTask === targets[tgt].$.name ? targets[tgt].$.name + " - Default" : targets[tgt].$.name] = targets[tgt].$.name;
 		}
 		else {
 			util.log('   Invalid target found');
@@ -216,9 +223,9 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
 }
 
 
-function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task 
+function createAntTask(target: string, cmdName: string, folder: WorkspaceFolder, uri: Uri): Task 
 {
-	function getCommand(folder: WorkspaceFolder, cmd: string): string 
+	function getCommand(folder: WorkspaceFolder): string 
 	{
 		let ant = "ant";
 
@@ -292,15 +299,13 @@ function createAntTask(target: string, cmd: string, folder: WorkspaceFolder, uri
 		};
 	}
 
-	let targetName = target;
-
 	if (antFile.toLowerCase() !== 'build.xml')
 	{
 		args.push('-f');
 		args.push(antFile);
 	}
 
-	let execution = new ShellExecution(getCommand(folder, cmd), args, options);
+	let execution = new ShellExecution(getCommand(folder), args, options);
 	
-	return new Task(kind, folder, targetName, 'ant', execution, undefined);
+	return new Task(kind, folder, cmdName ? cmdName : target, 'ant', execution, undefined);
 }
