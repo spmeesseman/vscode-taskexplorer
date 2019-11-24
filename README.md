@@ -21,18 +21,18 @@
 
 ## Table of Contents
 
-- [Task Explorer - View and Run Tasks from Visual Studio Code](#Task-Explorer---View-and-Run-Tasks-from-Visual-Studio-Code)
-  - [Description](#Description)
-  - [Table of Contents](#Table-of-Contents)
-  - [Screenshots](#Screenshots)
-  - [Requirements](#Requirements)
-  - [Features](#Features)
-  - [Configuring Global Excludes and Apache Ant Includes with Glob Patterns](#Configuring-Global-Excludes-and-Apache-Ant-Includes-with-Glob-Patterns)
-  - [Internally Provided Tasks vs. VSCode Provided Tasks](#Internally-Provided-Tasks-vs-VSCode-Provided-Tasks)
-  - [Running bash/sh scripts in Windows Environment](#Running-bashsh-scripts-in-Windows-Environment)
-  - [Feedback & Contributing](#Feedback--Contributing)
-  - [Thank You](#Thank-You)
-  - [Settings](#Settings)
+- [Task Explorer - View and Run Tasks from Visual Studio Code](#task-explorer---view-and-run-tasks-from-visual-studio-code)
+  - [Description](#description)
+  - [Table of Contents](#table-of-contents)
+  - [Screenshots](#screenshots)
+  - [Requirements](#requirements)
+  - [Features](#features)
+  - [Configuring Global Excludes and Apache Ant Includes with Glob Patterns](#configuring-global-excludes-and-apache-ant-includes-with-glob-patterns)
+  - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
+  - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
+  - [Feedback & Contributing](#feedback--contributing)
+  - [Thank You](#thank-you)
+  - [Settings](#settings)
   
 ## Screenshots
 
@@ -51,6 +51,8 @@
 ## Features
 
 * Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo) (kept with [Todo+](https://marketplace.visualstudio.com/itemdetails?itemName=fabiospampinato.vscode-todo-plus))
+* v1.21 - Add option to keep terminal open after stopping task [closes #51]
+* v1.20 - Add support for restarting task (thank you *antfu*)
 * v1.19 - App-Publisher task support for BETA testing
 * v1.18 - Added 'Add to excludes' action in task file node context menu
 * v1.17 - Added 'Run last task' button to titlebar
@@ -136,6 +138,7 @@ Bash/sh scripts in Windows will have the shell executable automatically set to a
 |`taskExplorer.enableWorkspace`|Enable/show vscode tasks|`true`|
 |`taskExplorer.enableMake`|Enable/show Makefile targets as tasks|`true`|
 |`taskExplorer.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
+|`taskExplorer.keepTermOnStop`|Keep terminal open on when stopping a task|`false`|
 |`taskExplorer.pathToAnt`|The path to the ant program, if not registered in system path|`ant.bat` for Windows, `ant` for Unix|",
 |`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path|`ansicon.exe`|",
 |`taskExplorer.pathToGradle`|The path to the gradle program, if not registered in system path|`gradle.bat` for Windows, `gradle` for Unix|",

@@ -1,3 +1,28 @@
+## [1.20.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.20.0...v1.20.1) (2019-08-21)
+
+
+### Bug Fixes
+
+* running an app-publisher task incorrectly causes all publish task icons ina ll nodes to display with the running spinner icon. ([0f1ead7](https://github.com/spmeesseman/vscode-taskexplorer/commit/0f1ead7))
+
+# [1.20.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.19.3...v1.20.0) (2019-08-18)
+
+
+### Code Refactoring
+
+* remove unused nodejs tasks from app-publisher node ([d881cb2](https://github.com/spmeesseman/vscode-taskexplorer/commit/d881cb2))
+
+
+### Documentation
+
+* **readme:** update 1.19 info w app-publisher note [skip ci] ([55ed11b](https://github.com/spmeesseman/vscode-taskexplorer/commit/55ed11b))
+* **readme:** update badges with github issues counts ([406268a](https://github.com/spmeesseman/vscode-taskexplorer/commit/406268a))
+
+
+### Features
+
+* add restart button ([c268ffd](https://github.com/spmeesseman/vscode-taskexplorer/commit/c268ffd))
+
 ## [1.19.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.19.2...v1.19.3) (2019-06-09)
 
 
