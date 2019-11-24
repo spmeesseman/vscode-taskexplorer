@@ -8,6 +8,7 @@ import * as fs from 'original-fs';
 import * as path from 'path';
 import { commands, workspace, Uri, tasks } from 'vscode';
 import * as testUtil from './testUtil';
+//import * as extension from '../extension';
 import { timeout } from '../util';
 import { treeDataProvider2 } from '../extension';
 import { TaskFolder } from '../taskFolder';
@@ -28,6 +29,14 @@ suite('Task tests', () =>
     suiteSetup(async () => 
     {
         await testUtil.activeExtension();
+
+        //let bSuccess = workspace.updateWorkspaceFolders(0, null, { uri: Uri.file("/")});
+        //console.log(bSuccess);
+        //let f = workspace.getWorkspaceFolder(Uri.file("/"));
+        //console.log(f);
+
+        //dirName = path.join(workspace.workspaceFolders[0].uri.fsPath, 'tasks_test_');
+        //dirNameCode = path.join(workspace.workspaceFolders[0].uri.fsPath, '.vscode');
 
         dirName = path.join(workspace.rootPath, 'tasks_test_');
         dirNameCode = path.join(workspace.rootPath, '.vscode');
@@ -364,7 +373,7 @@ suite('Task tests', () =>
         //
         // Refresh for better coverage
         //
-        treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
+        treeItems = await extension.treeDataProvider2.getChildren(); // mock explorer open view which would call this function
         await timeout(300);
         await configuration.update('exclude', '**/coveronly/**');
         await configuration.update('pathToAnt', 'ant.bat');

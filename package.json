@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "1.19.3",
+    "version": "1.20.1",
     "displayName": "Task Explorer",
     "description": "Manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
@@ -87,11 +87,11 @@
         "@types/istanbul": "^0.4.30",
         "@types/minimatch": "^3.0.3",
         "@types/mocha": "^5.2.6",
-        "@types/node": "^11.13.0",
+        "@types/node": "^12.0.1",
         "@types/semver": "^6.0.0",
         "@types/xml2js": "^0.4.3",
         "codecov": "^3.2.0",
-        "commitizen": "^3.0.7",
+        "commitizen": "^4.0.0",
         "conventional-changelog-spm": "^1.2.3",
         "cz-conventional-changelog": "^3.0.0",
         "decache": "^4.5.1",
@@ -99,7 +99,7 @@
         "glob": "^7.1.2",
         "grunt": "^1.0.4",
         "gulp": "^4.0.0",
-        "iconv-lite": "^0.4.23",
+        "iconv-lite": "^0.5.0",
         "istanbul": "^0.4.5",
         "jschardet": "^2.1.0",
         "mocha": "^6.1.4",
@@ -114,7 +114,7 @@
         "typescript": "^3.0.3",
         "vsce": "^1.48.0",
         "vscode": "^1.1.30",
-        "vscode-nls-dev": "3.2.6"
+        "vscode-nls-dev": "3.2.7"
     },
     "contributes": {
         "viewsContainers": {
@@ -165,6 +165,24 @@
                 "command": "taskExplorerSideBar.addToExcludes",
                 "title": "%command.addToExcludes%",
                 "when": "config.taskExplorer.enableSideBar"
+            },
+            {
+                "command": "taskExplorerSideBar.pause",
+                "title": "%command.pause%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "dark": "res/dark/pause.svg",
+                    "light": "res/light/pause.svg"
+                }
+            },
+            {
+                "command": "taskExplorerSideBar.restart",
+                "title": "%command.restart%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "dark": "res/dark/restart.svg",
+                    "light": "res/light/restart.svg"
+                }
             },
             {
                 "command": "taskExplorerSideBar.stop",
@@ -236,6 +254,24 @@
                 "command": "taskExplorer.addToExcludes",
                 "title": "%command.addToExcludes%",
                 "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
+                "command": "taskExplorer.pause",
+                "title": "%command.pause%",
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "dark": "res/dark/pause.svg",
+                    "light": "res/light/pause.svg"
+                }
+            },
+            {
+                "command": "taskExplorer.restart",
+                "title": "%command.restart%",
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "dark": "res/dark/restart.svg",
+                    "light": "res/light/restart.svg"
+                }
             },
             {
                 "command": "taskExplorer.stop",
@@ -412,6 +448,11 @@
                     "group": "inline"
                 },
                 {
+                    "command": "taskExplorer.restart",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == runningScript",
+                    "group": "inline"
+                },
+                {
                     "command": "taskExplorer.stop",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == runningScript",
                     "group": "inline"
@@ -503,6 +544,11 @@
                 {
                     "command": "taskExplorerSideBar.run",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskExplorerSideBar.restart",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == runningScript",
                     "group": "inline"
                 },
                 {
@@ -611,6 +657,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "%config.taskExplorer.enableAnsiconForAnt%"
+                },
+                "taskExplorer.keepTermOnStop": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%config.taskExplorer.keepTermOnStop%"
                 },
                 "taskExplorer.pathToAnt": {
                     "type": "string",

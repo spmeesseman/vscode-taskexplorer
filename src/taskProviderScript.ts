@@ -49,6 +49,12 @@ const scriptTable = {
         args: ["/c"],
         enabled: configuration.get("enableBatch")
     },
+    cmd: {
+        exec: "cmd.exe",
+        type: "batch",
+        args: ["/c"],
+        enabled: configuration.get("enableBatch")
+    },
     nsi: {
         exec: configuration.get("pathToNsis") ? configuration.get("pathToNsis") : "makensis.exe",
         type: "nsis",
@@ -167,7 +173,7 @@ async function detectScriptFiles(): Promise<Task[]>
     try {
         for (const folder of folders)
         {
-            const relativePattern = new RelativePattern(folder, "{**/*.sh,**/*.rb,**/*.ps1,**/*.pl,**/*.bat,**/*.nsi,**/setup.py}"); //,SH,PY,RB,PS1,PL,BAT,NSI');
+            const relativePattern = new RelativePattern(folder, "{**/*.sh,**/*.rb,**/*.ps1,**/*.pl,**/*.bat,**/*.cmd,**/*.nsi,**/setup.py}"); //,SH,PY,RB,PS1,PL,BAT,CMD/NSI');
             const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
             for (const fpath of paths)
             {

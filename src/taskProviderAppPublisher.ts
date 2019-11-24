@@ -140,6 +140,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
     const cwd = path.dirname(uri.fsPath);
     const fileName = path.basename(uri.fsPath);
 
+    /*
     const kind: AppPublisherTaskDefinition = {
         type: "app-publisher",
         fileName,
@@ -156,7 +157,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
         cmdLine: "npx app-publisher -p node --no-ci --dry-run",
         uri
     };
-
+*/
     const kind3: AppPublisherTaskDefinition = {
         type: "app-publisher",
         fileName,
@@ -178,8 +179,8 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
     //
     const relativePath = getRelativePath(folder, uri);
     if (relativePath.length) {
-        kind.path = relativePath;
-        kind2.path = relativePath;
+        // kind.path = relativePath;
+        // kind2.path = relativePath;
         kind3.path = relativePath;
         kind4.path = relativePath;
     }
@@ -194,13 +195,11 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
     //
     // Create the shell execution objects
     //
-    const execution = new ShellExecution(kind.cmdLine, options);
-    const execution2 = new ShellExecution(kind2.cmdLine, options);
+    // const execution = new ShellExecution(kind.cmdLine, options);
+    // const execution2 = new ShellExecution(kind2.cmdLine, options);
     const execution3 = new ShellExecution(kind3.cmdLine, options);
     const execution4 = new ShellExecution(kind4.cmdLine, options);
 
-    return [ new Task(kind, folder, "app-publisher-node", "app-publisher", execution, undefined),
-             new Task(kind2, folder, "app-publisher-node-dry", "app-publisher", execution2, undefined),
-             new Task(kind3, folder, "app-publisher-ps", "app-publisher", execution3, undefined),
-             new Task(kind4, folder, "app-publisher-ps-dry", "app-publisher", execution4, undefined) ];
+    return [ new Task(kind3, folder, "Publish", "app-publisher", execution3, undefined),
+             new Task(kind4, folder, "Dry Run", "app-publisher", execution4, undefined) ];
 }
