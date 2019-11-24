@@ -112,6 +112,7 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
 
     if (e.affectsConfiguration('taskExplorer.enableBatch')) {
         registerFileWatcher(context, 'batch', '**/*.[Bb][Aa][Tt]', true, configuration.get<boolean>('enableBatch'));
+        registerFileWatcher(context, 'batch', '**/*.[Cc][Mm][Dd]', true, configuration.get<boolean>('enableBatch'));
         refresh = true;
     }
 
@@ -227,6 +228,7 @@ function registerFileWatchers(context: ExtensionContext)
 
     if (configuration.get<boolean>('enableBatch')) {
         registerFileWatcher(context, 'batch', '**/*.[Bb][Aa][Tt]', true);
+        registerFileWatcher(context, 'batch', '**/*.[Cc][Mm][Dd]', true);
     }
 
     if (configuration.get<boolean>('enableGradle')) {
