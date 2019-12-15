@@ -33,7 +33,7 @@
   - [Feedback & Contributing](#feedback--contributing)
   - [Thank You](#thank-you)
   - [Settings](#settings)
-  
+
 ## Screenshots
 
 |Original Explorer Tray|Sidebar View (v1.7)|Task Type Groups (v1.13)|
@@ -143,7 +143,7 @@ Bash/sh scripts in Windows will have the shell executable automatically set to a
 |`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path|`ansicon.exe`|",
 |`taskExplorer.pathToGradle`|The path to the gradle program, if not registered in system path|`gradle.bat` for Windows, `gradle` for Unix|",
 |`taskExplorer.pathToMake`|The path to the make program, if not registered in system path|`nmake` for Windows, `make` for Unix|",
-|`taskExplorer.pathToNsis`|The path to the nsis make program, if not registered in system path|`makensis.exe`|",
+|`taskExplorer.pathToNsis`|The path to the nsis make program, if not registered in system path|``|",
 |`taskExplorer.pathToPerl`|The path to the perl program, if not registered in system path|`perl`|",
 |`taskExplorer.pathToPython`|The path to the python program, if not registered in system path|`python`|",
 |`taskExplorer.pathToPowershell`|The path to the powershell program, if not registered in system path|`powershell`|",
