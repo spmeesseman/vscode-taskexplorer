@@ -1,6 +1,6 @@
 
 import {
-    Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
+    Task, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
     workspace, TaskProvider, TaskDefinition, ShellExecutionOptions
 } from "vscode";
 import * as path from "path";
@@ -43,7 +43,7 @@ export async function invalidateTasksCacheAppPublisher(opt?: Uri) : Promise<void
     util.log("");
     util.log("invalidateTasksCacheAppPublisher");
 
-    if (opt && cachedTasks) 
+    if (opt && cachedTasks)
     {
         const rmvTasks: Task[] = [];
         const folder = workspace.getWorkspaceFolder(opt);
@@ -108,9 +108,9 @@ async function detectAppPublisherfiles(): Promise<Task[]>
             // Note - pattern will ignore gruntfiles in root project dir, which would be picked
             // up by VSCoces internal Grunt task provider
             //
-            const relativePattern = new RelativePattern(folder, "**/.publishrc*");
+            const relativePattern = new RelativePattern(folder, "**/.publishrc.json");
             const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-            for (const fpath of paths) 
+            for (const fpath of paths)
             {
                 if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
                     visitedFiles.add(fpath.fsPath);
@@ -140,12 +140,12 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
     const cwd = path.dirname(uri.fsPath);
     const fileName = path.basename(uri.fsPath);
 
-    /*
-    const kind: AppPublisherTaskDefinition = {
+
+    const kind1: AppPublisherTaskDefinition = {
         type: "app-publisher",
         fileName,
         path: "",
-        cmdLine: "npx app-publisher -p node --no-ci",
+        cmdLine: "npx app-publisher -p ps --no-ci --republish",
         requiresArgs: false,
         uri
     };
@@ -154,10 +154,10 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
         type: "app-publisher",
         fileName,
         path: "",
-        cmdLine: "npx app-publisher -p node --no-ci --dry-run",
+        cmdLine: "npx app-publisher -p ps --no-ci --email-only",
         uri
     };
-*/
+
     const kind3: AppPublisherTaskDefinition = {
         type: "app-publisher",
         fileName,
@@ -174,15 +174,33 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
         uri
     };
 
+    const kind5: AppPublisherTaskDefinition = {
+        type: "app-publisher",
+        fileName,
+        path: "",
+        cmdLine: "npx app-publisher -p ps --no-ci --mantis-only",
+        uri
+    };
+
+    const kind6: AppPublisherTaskDefinition = {
+        type: "app-publisher",
+        fileName,
+        path: "",
+        cmdLine: "npx app-publisher -p ps --no-ci --prompt-version",
+        uri
+    };
+
     //
     // Get relative dir to workspace folder
     //
     const relativePath = getRelativePath(folder, uri);
     if (relativePath.length) {
-        // kind.path = relativePath;
-        // kind2.path = relativePath;
+        kind1.path = relativePath;
+        kind2.path = relativePath;
         kind3.path = relativePath;
         kind4.path = relativePath;
+        kind5.path = relativePath;
+        kind6.path = relativePath;
     }
 
     //
@@ -195,11 +213,17 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
     //
     // Create the shell execution objects
     //
-    // const execution = new ShellExecution(kind.cmdLine, options);
-    // const execution2 = new ShellExecution(kind2.cmdLine, options);
+    const execution1 = new ShellExecution(kind1.cmdLine, options);
+    const execution2 = new ShellExecution(kind2.cmdLine, options);
     const execution3 = new ShellExecution(kind3.cmdLine, options);
     const execution4 = new ShellExecution(kind4.cmdLine, options);
+    const execution5 = new ShellExecution(kind5.cmdLine, options);
+    const execution6 = new ShellExecution(kind5.cmdLine, options);
 
-    return [ new Task(kind3, folder, "Publish", "app-publisher", execution3, undefined),
-             new Task(kind4, folder, "Dry Run", "app-publisher", execution4, undefined) ];
+    return [ new Task(kind4, folder, "Dry Run", "app-publisher", execution4, undefined),
+             new Task(kind3, folder, "Publish", "app-publisher", execution3, undefined),
+             new Task(kind1, folder, "Re-publish", "app-publisher", execution1, undefined),
+             new Task(kind1, folder, "Publish Mantis Release", "app-publisher", execution1, undefined),
+             new Task(kind5, folder, "Send Release Email", "app-publisher", execution5, undefined),
+             new Task(kind6, folder, "Publish (Prompt Version)", "app-publisher", execution6, undefined) ];
 }

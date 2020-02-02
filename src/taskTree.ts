@@ -959,7 +959,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             util.logValue("   name", each.name, 2);
             util.logValue("   source", each.source, 2);
 
-            const settingName: string = "enable" + util.properCase(each.source);
+            let settingName: string = "enable" + util.properCase(each.source);
+            if (settingName === "enableApp-publisher") {
+                settingName = "enableAppPublisher";
+            }
+
             if (configuration.get(settingName) && this.isWorkspaceFolder(each.scope) && !this.isInstallTask(each))
             {
                 folder = folders.get(each.scope.name);
