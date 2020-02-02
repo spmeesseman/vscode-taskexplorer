@@ -489,7 +489,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         util.log("Open script at position");
         util.logValue("   command", selection.command.command);
         util.logValue("   source", selection.taskSource);
-        util.logValue("   path", uri.path);
+        util.logValue("   uri path", uri.path);
         util.logValue("   file path", uri.fsPath);
 
         if (util.pathExists(uri.fsPath))

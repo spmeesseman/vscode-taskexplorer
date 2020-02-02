@@ -67,7 +67,7 @@ export class TaskFile extends TreeItem
 
 		if (source === 'Workspace') {
 			if (incRelPathForCode === true) {
-				fileName = '.vscode\\tasks.json';
+				fileName = '.vscode/tasks.json';
 			}
 			else {
 				fileName = 'tasks.json';
