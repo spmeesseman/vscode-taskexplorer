@@ -65,6 +65,7 @@
             "check-whitespace"
         ],
         "prefer-const": true,
+        "prefer-for-of": false,
         "quotemark": [true,
             "double",
             "avoid-escape"

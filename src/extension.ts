@@ -25,9 +25,9 @@ export let logOutputChannel: OutputChannel | undefined;
 export let storage: Storage | undefined;
 export let views: Map<string, TreeView<TreeItem>> = new Map();
 export let filesCache: Map<string, Set<any>> = new Map();
-let watchers: Map<string, FileSystemWatcher> = new Map();
+const watchers: Map<string, FileSystemWatcher> = new Map();
 
-export async function activate(context: ExtensionContext, disposables: Disposable[]) 
+export async function activate(context: ExtensionContext, disposables: Disposable[])
 {
     //
     // Set up a log in the Output window
@@ -76,7 +76,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         for (const r in _e.removed)
         {
             log("Workspace folder removed: " + _e.removed[r].name, 1);
-            //window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
+            // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
             for (const key in filesCache.keys)
             {
                 const toRemove = [];
@@ -93,7 +93,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
                     }
                 }
             }
-            //window.setStatusBarMessage("");
+            // window.setStatusBarMessage("");
         }
         refreshTree();
     });
@@ -102,7 +102,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     //
     // Register configurations/settings change watcher
     //
-    let d = workspace.onDidChangeConfiguration(e => {
+    const d = workspace.onDidChangeConfiguration(e => {
         processConfigChanges(context, e);
     });
     context.subscriptions.push(d);
@@ -116,7 +116,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 }
 
 
-function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent) 
+function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
 {
     let refresh: boolean;
 
@@ -230,7 +230,7 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     if (e.affectsConfiguration("taskExplorer.pathToAnsicon") || e.affectsConfiguration("taskExplorer.pathToAnt") ||
         e.affectsConfiguration("taskExplorer.pathToGradle") || e.affectsConfiguration("taskExplorer.pathToMake") ||
         e.affectsConfiguration("taskExplorer.pathToNsis") || e.affectsConfiguration("taskExplorer.pathToPerl") ||
-        e.affectsConfiguration("taskExplorer.pathToPython") || e.affectsConfiguration("taskExplorer.pathToRuby")  || 
+        e.affectsConfiguration("taskExplorer.pathToPython") || e.affectsConfiguration("taskExplorer.pathToRuby")  ||
         e.affectsConfiguration("taskExplorer.pathToBash") || e.affectsConfiguration("taskExplorer.pathToAppPublisher") ||
         e.affectsConfiguration("taskExplorer.pathToPowershell")) {
         refresh = true;
@@ -373,7 +373,7 @@ async function buildCache(taskAlias: string, taskType: string, fileBlob: string,
                     for (const fpath of paths)
                     {
                         if (!isExcluded(fpath.path)) {
-                        //if (!isExcluded(fpath.path) && !fCache.has(fpath)) {
+                        // if (!isExcluded(fpath.path) && !fCache.has(fpath)) {
                             fCache.add({
                                 uri: fpath,
                                 folder
@@ -381,6 +381,7 @@ async function buildCache(taskAlias: string, taskType: string, fileBlob: string,
                         }
                     }
                 }
+            // tslint:disable-next-line: no-empty
             } catch (error) {}
         }
     }
@@ -394,7 +395,7 @@ async function buildCache(taskAlias: string, taskType: string, fileBlob: string,
         for (const fpath of paths)
         {
             if (!isExcluded(fpath.path)) {
-            //if (!isExcluded(fpath.path) && !fCache.has(fpath)) {
+            // if (!isExcluded(fpath.path) && !fCache.has(fpath)) {
                 fCache.add({
                     uri: fpath,
                     folder: wsfolder
@@ -476,10 +477,10 @@ async function registerFileWatchers(context: ExtensionContext)
 }
 
 
-async function refreshTree(taskType?: string, uri?: Uri) 
+async function refreshTree(taskType?: string, uri?: Uri)
 {
     let refreshedTasks = false;
-    //window.setStatusBarMessage("$(loading) Task Explorer - Refreshing tasks...");
+    // window.setStatusBarMessage("$(loading) Task Explorer - Refreshing tasks...");
 
     //
     // If the task type received from a filewatcher event is "ant-*" then it is a custom
@@ -508,11 +509,11 @@ async function refreshTree(taskType?: string, uri?: Uri)
         }
     }
 
-    //window.setStatusBarMessage("");
+    // window.setStatusBarMessage("");
 }
 
 
-function registerTaskProviders(context: ExtensionContext) 
+function registerTaskProviders(context: ExtensionContext)
 {
     //
     // Internal Task Providers
@@ -539,11 +540,11 @@ async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boole
     // all current watchers since there is no way of knowing which glob patterns were
     // removed (if any).
     //
-    for (const key in watchers.keys) 
+    for (const key in watchers.keys)
     {
-        if (key.startsWith("ant") && key !== "ant") 
+        if (key.startsWith("ant") && key !== "ant")
         {
-            let watcher = watchers.get(key);
+            const watcher = watchers.get(key);
             watcher.onDidChange(_e => undefined);
             watcher.onDidDelete(_e => undefined);
             watcher.onDidCreate(_e => undefined);
@@ -559,7 +560,7 @@ async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boole
 }
 
 
-async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, isScriptType?: boolean, enabled?: boolean) 
+async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, isScriptType?: boolean, enabled?: boolean)
 {
     let watcher: FileSystemWatcher = watchers.get(taskType);
 
@@ -587,7 +588,7 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
             addFileToCache(taskType, _e);
             refreshTree(taskType, _e);
         });
-    } 
+    }
     else if (watcher) {
         if (!isScriptType) {
             watcher.onDidChange(_e => undefined);
@@ -606,11 +607,11 @@ function logFileWatcherEvent(uri: Uri, type: string)
 }
 
 
-function registerExplorer(name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined 
+function registerExplorer(name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined
 {
     if (enabled !== false)
     {
-        if (workspace.workspaceFolders) 
+        if (workspace.workspaceFolders)
         {
             const treeDataProvider = new TaskTreeDataProvider(name, context);
             const treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
@@ -623,7 +624,7 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
             views.set(name, treeView);
             context.subscriptions.push(views.get(name));
             return treeDataProvider;
-        } 
+        }
         else {
             log("No workspace folders!!!");
         }
@@ -632,4 +633,5 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
 }
 
 
+// tslint:disable-next-line: no-empty
 export function deactivate() {}
