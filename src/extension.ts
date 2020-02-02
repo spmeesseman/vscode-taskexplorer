@@ -242,7 +242,7 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
 }
 
 
-async function addFolderToCache(folder: WorkspaceFolder)
+export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
 {
     if (configuration.get<boolean>("enableAnt")) {
         await buildCache("ant", "ant", "**/[Bb]uild.xml", folder);
@@ -352,7 +352,10 @@ async function buildCache(taskAlias: string, taskType: string, fileBlob: string,
         filesCache.set(taskAlias, new Set());
     }
     const fCache = filesCache.get(taskAlias);
-
+    let dispTaskType = properCase(taskType);
+    if (dispTaskType.indexOf("Ant") !== -1) {
+        dispTaskType = "Ant";
+    }
     if (!wsfolder)
     {
         log("Scan all projects");
@@ -364,7 +367,7 @@ async function buildCache(taskAlias: string, taskType: string, fileBlob: string,
                 for (const folder of workspace.workspaceFolders)
                 {
                     log("   Scan project: " + folder.name);
-                    window.setStatusBarMessage("$(loading) Scanning for " + properCase(taskType) + " tasks in project " + folder.name + "...");
+                    window.setStatusBarMessage("$(loading) Scanning for " + dispTaskType + " tasks in project " + folder.name + "...");
                     const relativePattern = new RelativePattern(folder, fileBlob);
                     const paths = await workspace.findFiles(relativePattern, getExcludesGlob(folder));
                     for (const fpath of paths)
