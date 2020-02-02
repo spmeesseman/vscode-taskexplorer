@@ -1,3 +1,25 @@
+# [1.22.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.21.0...v1.22.0) (2020-02-02)
+
+
+### Build System
+
+* **npm:** full npm dependency update ([21bf24a](https://github.com/spmeesseman/vscode-taskexplorer/commit/21bf24a))
+
+
+### Code Refactoring
+
+* kick of azure build test ([7d307f1](https://github.com/spmeesseman/vscode-taskexplorer/commit/7d307f1))
+
+
+### Features
+
+* add new app-publisher tasks: MantisRelease, PromptVersion ([7872746](https://github.com/spmeesseman/vscode-taskexplorer/commit/7872746))
+
+
+### Performance Improvements
+
+* task providers more responsive, warnings in VSCode near eliminated ([95e91a0](https://github.com/spmeesseman/vscode-taskexplorer/commit/95e91a0))
+
 # [1.21.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.20.1...v1.21.0) (2019-11-24)
 
 
