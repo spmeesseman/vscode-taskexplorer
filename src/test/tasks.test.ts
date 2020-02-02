@@ -15,7 +15,6 @@ import { TaskFolder } from '../taskFolder';
 import { TaskFile } from '../taskFile';
 import { TaskItem } from '../taskItem';
 import { configuration } from '../common/configuration';
-import { getSingleRootWorkspace } from "../utils/workspaceUtils";
 
 let tempFiles: Array<string> = [];
 let dirName: string = '';
