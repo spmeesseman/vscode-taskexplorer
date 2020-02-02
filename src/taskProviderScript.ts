@@ -183,7 +183,6 @@ async function detectScriptFiles(): Promise<Task[]>
                 for (const fpath of paths)
                 {
                     if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-                        console.log(fpath.fsPath);
                         visitedFiles.add(fpath.fsPath);
                         allTasks.push(createScriptTask(scriptTable[path.extname(fpath.fsPath).substring(1).toLowerCase()], folder!, fpath));
                     }
@@ -194,9 +193,7 @@ async function detectScriptFiles(): Promise<Task[]>
         {
             for (const fobj of paths)
             {
-                console.log(fobj);
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    console.log(fobj.uri.fsPath);
                     visitedFiles.add(fobj.uri.fsPath);
                     allTasks.push(createScriptTask(scriptTable[path.extname(fobj.uri.fsPath).substring(1).toLowerCase()], fobj.folder!, fobj.uri));
                 }
