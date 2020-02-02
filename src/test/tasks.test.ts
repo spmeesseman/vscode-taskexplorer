@@ -456,30 +456,30 @@ suite('Task tests', () =>
 
         await treeDataProvider2.invalidateTasksCache(undefined, undefined);
 
-        //if (!taskMap.get('ant'))
-        //{
-        //    assert.fail('No ant items found');
-        //}
-        //else if (!taskMap.get('gulp'))
-        //{
-        //    assert.fail('No gulp items found');
-        //}
-        //else if (!taskMap.get('grunt')) 
-        //{
-        //  assert.fail('No grunt items found');
-        //}
-        ////else if (!taskMap.get('npm') === undefined)
-        ////{
-        ////    assert.fail('No npm items found');
-        ////}
-        //else if (!taskMap.get('tsc') === undefined)
-        //{
-        //    assert.fail('No tsc items found');
-        //}
-        //else if (!taskMap.get('Workspace') === undefined)
-        //{
-        //    assert.fail('No vscode items found');
-        //}
+        if (!taskMap.get('ant'))
+        {
+            assert.fail('No ant items found');
+        }
+        else if (!taskMap.get('gulp'))
+        {
+            assert.fail('No gulp items found');
+        }
+        else if (!taskMap.get('grunt')) 
+        {
+          assert.fail('No grunt items found');
+        }
+        else if (!taskMap.get('npm') === undefined)
+        {
+            assert.fail('No npm items found');
+        }
+        else if (!taskMap.get('tsc') === undefined)
+        {
+            assert.fail('No tsc items found');
+        }
+        else if (!taskMap.get('Workspace') === undefined)
+        {
+            assert.fail('No vscode items found');
+        }
     });
 });
 
