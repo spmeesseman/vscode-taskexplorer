@@ -32,7 +32,6 @@
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
   - [Feedback & Contributing](#feedback--contributing)
   - [Thank You](#thank-you)
-  - [Settings](#settings)
 
 ## Screenshots
 
@@ -51,8 +50,9 @@
 ## Features
 
 * Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo) (kept with [Todo+](https://marketplace.visualstudio.com/itemdetails?itemName=fabiospampinato.vscode-todo-plus))
+* v1.22 - Major performance enhancements - Task Tree / Task Scanning
 * v1.21 - Add option to keep terminal open after stopping task [closes #51]
-* v1.20 - Add support for restarting task (thank you *antfu*)
+* v1.20 - Add support for restarting task (thank you **antfu**)
 * v1.19 - App-Publisher task support for BETA testing
 * v1.18 - Added 'Add to excludes' action in task file node context menu
 * v1.17 - Added 'Run last task' button to titlebar
@@ -77,17 +77,17 @@
 
 ## Configuring Global Excludes and Apache Ant Includes with Glob Patterns
 
-The setting 'exclude' defines a string or an array of strings of file patterns to ignore.  The setting applies to all script types.  The string(s) must be glob pattern(s), for example:
+The setting *exclude* defines a string or an array of strings of file patterns to ignore.  The setting applies to all script types.  The string(s) must be glob pattern(s), for example:
 
 * `taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**" ]`
 
-Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.
+Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.  Using the *exclude* configuration can greatly improve performance in large workspaces if configured correctly.
 
-Since Apache Ant uses a .xml file extension, the setting 'includeAnt' can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting is a string or an array of strings and must be glob pattern(s) including the .xml extension, for example:
+**Apache Ant** uses an .xml file extension, the setting *includeAnt* can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting is a string or an array of strings and must be glob pattern(s) including the .xml extension, for example:
 
 * `taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]`
 
-Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the ant includes list in all cases.
+Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **Ant** includes list in all cases.
 
 ## Internally Provided Tasks vs. VSCode Provided Tasks
 
@@ -96,7 +96,7 @@ The following tasks are provided by VSCode:
 * Workspace (.vscode/tasks.json)
 * NPM (**/package.json)
 
-All other tasks are internaly provided.  Workspace tasks are detected by VSCode in all cases.  However, NPM tasks are detected only if the setting `'Npm -> Auto Detect'` is turned on in VSCode Settings.  By default this is turned on, but if NPM tasks are not displaying, please check this setting, also check the setting that turns npm package management off in favor of Yarn `'Npm -> Package manager'`.  A future release will contain internally provided NPM and Yarn tasks.
+All other tasks are internaly provided.  Workspace tasks are detected by VSCode in all cases.  However, NPM tasks are detected only if the setting `'Npm -> Auto Detect'` is turned on in VSCode Settings.  By default this is turned on, but if NPM tasks are not displaying, please check this setting, also check the setting that turns npm package management off in favor of Yarn `'Npm -> Package manager'`.  A future release will contain internally provided NPM and Yarn tasks.  Note these tasks are still displayed in the Task Tree, just not "provided" by this extension.
 
 Detection of all internally provided task types can be turned on/off in Settings - `'Task Explorer -> Enable [Tasktype]'`.
 
@@ -116,39 +116,3 @@ Bash/sh scripts in Windows will have the shell executable automatically set to a
 
 * The [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme) for some of the task type icons.
 * The author of the [NSIS Extension](https://marketplace.visualstudio.com/items?itemName=idleberg.nsis) idleberg for NSIS graphics.
-
-## Settings
-
-|Config|Description|Default|
-|-|-|-|
-|`taskExplorer.enableSideBar`|Enable/show visual studio code tasks|`false`|
-|`taskExplorer.enableExplorerView`|Enable a task explorer view in the sidebar|`true`|
-|`taskExplorer.enableAnt`|Enable/show ant targets as tasks|`true`|
-|`taskExplorer.enableBash`|Enable/show bash scripts as tasks|`true`|
-|`taskExplorer.enableBatch`|Enable/show batch file scripts as tasks|`true`|
-|`taskExplorer.enableGradle`|Enable/show gradle tasks|`true`|
-|`taskExplorer.enableGrunt`|Enable/show grunt tasks|`true`|
-|`taskExplorer.enableGulp`|Enable/show gulp tasks|`true`|
-|`taskExplorer.enableNpm`|Enable/show npm scripts as tasks|`true`|
-|`taskExplorer.enableNsis`|Enable/show nullsoft installer scripts as tasks|`true`|
-|`taskExplorer.enablePowershell`|Enable/show powershell scripts as tasks|`true`|
-|`taskExplorer.enablePython`|Enable/show python scripts as tasks|`true`|
-|`taskExplorer.enableRuby`|Enable/show ruby scripts as tasks|`true`|
-|`taskExplorer.enableTsc`|Enable/show tsc npm configs as tasks|`true`|
-|`taskExplorer.enableWorkspace`|Enable/show vscode tasks|`true`|
-|`taskExplorer.enableMake`|Enable/show Makefile targets as tasks|`true`|
-|`taskExplorer.enableAnsiconForAnt`|Enable ansicon output colorization for ant tasks|`false`|",
-|`taskExplorer.keepTermOnStop`|Keep terminal open on when stopping a task|`false`|
-|`taskExplorer.pathToAnt`|The path to the ant program, if not registered in system path|`ant.bat` for Windows, `ant` for Unix|",
-|`taskExplorer.pathToAnsicon`|The path to the ansicon binary, if not registered in system path|`ansicon.exe`|",
-|`taskExplorer.pathToGradle`|The path to the gradle program, if not registered in system path|`gradle.bat` for Windows, `gradle` for Unix|",
-|`taskExplorer.pathToMake`|The path to the make program, if not registered in system path|`nmake` for Windows, `make` for Unix|",
-|`taskExplorer.pathToNsis`|The path to the nsis make program, if not registered in system path|``|",
-|`taskExplorer.pathToPerl`|The path to the perl program, if not registered in system path|`perl`|",
-|`taskExplorer.pathToPython`|The path to the python program, if not registered in system path|`python`|",
-|`taskExplorer.pathToPowershell`|The path to the powershell program, if not registered in system path|`powershell`|",
-|`taskExplorer.pathToRuby`|The path to the ruby program, if not registered in system path|`ruby`|",
-|`taskExplorer.debug`|Turn on logging|`false`|
-|`taskExplorer.debugLevel`|Verbosity level of logging (if turned on)|`1`|
-|`taskExplorer.exclude`|Configure glob patterns for folders that should be excluded from automatic script detection|`["**/.vscode-test/**", "**/bin/**", "**/build/**", "**/CompiledOutput/**", "**/dist/**", "**/doc/**", "**/ext/**", "**/out/**", "**/output/**", "**/packages/**", "**/release/**", "**/releases/**", "**/samples/**", "**/sdks/**", "**/static/**", "**/target/**", "**/test/**", "**/third_party/**", "**/vendor/**"]`  By default, `"**/node_modules/**"` is always applied|
-|`taskExplorer.includeAnt`|Configure glob patterns for files that should be included in ANT script detection|`[]`  By default, `"**/[Bb]uild.xml"` is always applied|
