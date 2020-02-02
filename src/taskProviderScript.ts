@@ -56,7 +56,7 @@ const scriptTable = {
         enabled: configuration.get("enableBatch")
     },
     nsi: {
-        exec: configuration.get("pathToNsis") ? configuration.get("pathToNsis") : "makensis.exe",
+        exec: configuration.get("pathToNsis") ? configuration.get("pathToNsis") : "makensis",
         type: "nsis",
         args: [],
         enabled: configuration.get("enableNsis")
@@ -95,7 +95,7 @@ function refreshScriptTable()
     scriptTable.py.exec = configuration.get("pathToPython") ? configuration.get("pathToPython") : "python";
     scriptTable.rb.exec = configuration.get("pathToRuby") ? configuration.get("pathToRuby") : "ruby";
     scriptTable.pl.exec = configuration.get("pathToPerl") ? configuration.get("pathToPerl") : "perl";
-    scriptTable.nsi.exec = configuration.get("pathToNsis") ? configuration.get("pathToNsis") : "makensis.exe";
+    scriptTable.nsi.exec = configuration.get("pathToNsis") ? configuration.get("pathToNsis") : "makensis";
     scriptTable.ps1.exec = configuration.get("pathToPowershell") ? configuration.get("pathToPowershell") : "powershell";
 
     scriptTable.py.enabled = configuration.get("enablePython");
@@ -108,12 +108,12 @@ function refreshScriptTable()
 }
 
 
-export async function invalidateTasksCacheScript(opt?: Uri) : Promise<void> 
+export async function invalidateTasksCacheScript(opt?: Uri) : Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheScript");
 
-    if (opt && cachedTasks) 
+    if (opt && cachedTasks)
     {
         const rmvTasks: Task[] = [];
         const folder = workspace.getWorkspaceFolder(opt);
@@ -257,7 +257,7 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
     // in settings, otherwise Git Bash will be tried in the default install location ("C:\Program Files\Git\bin).
     // Otherwise, use 'bash.exe' and assume the command and other shell commands are in PATH
     //
-    else if (process.platform === "win32" && scriptDef.type === "bash") 
+    else if (process.platform === "win32" && scriptDef.type === "bash")
     {
         let bash = configuration.get<string>("pathToBash");
         if (!bash) {
