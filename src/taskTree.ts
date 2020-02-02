@@ -18,7 +18,7 @@ import * as nls from "vscode-nls";
 import { TaskFolder } from "./taskFolder";
 import { TaskFile } from "./taskFile";
 import { TaskItem } from "./taskItem";
-import { views, storage } from "./extension";
+import { views, storage, filesCache, addFolderToCache } from "./extension";
 import { configuration } from "./common/configuration";
 import { invalidateTasksCacheAnt } from "./taskProviderAnt";
 import { invalidateTasksCacheMake } from "./taskProviderMake";
@@ -65,7 +65,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".restart", this.restart, this));
         subscriptions.push(commands.registerCommand(name + ".pause", this.pause, this));
         subscriptions.push(commands.registerCommand(name + ".open", this.open, this));
-        subscriptions.push(commands.registerCommand(name + ".refresh", this.refresh, this));
+        subscriptions.push(commands.registerCommand(name + ".refresh", function (taskFile: TaskFile) { this.refresh(true, false); }, this));
         subscriptions.push(commands.registerCommand(name + ".runInstall", function (taskFile: TaskFile) { this.runNpmCommand(taskFile, "install"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runUpdate", function (taskFile: TaskFile) { this.runNpmCommand(taskFile, "update"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runUpdatePackage", function (taskFile: TaskFile) { this.runNpmCommand(taskFile, "update <packagename>"); }, this));
@@ -518,7 +518,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             if (!views.get(this.name).visible)
             {
-                this.needsRefresh.push({ "invalidate": invalidate, "opt": opt, "task": task });
+                this.needsRefresh.push({ invalidate, opt, task });
                 return false;
             }
         }
@@ -566,7 +566,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // If invalidate is false, then this is a task start/stop
         //
-        // If invalidate is truthy but opt is falsey, then the refresh button was clicked
+        // If invalidate is true and opt is false, then the refresh button was clicked
+        //
+        // If invalidate and opt are both undefined, then extension.refreshTree() called in
         //
         // If task is truthy, then a task has started/stopped, opt will be the task
         // deifnition's 'uri' property, note that task types not internally provided will
@@ -579,6 +581,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (invalidate !== false)
         {
+            if (invalidate === true && !opt) {
+                filesCache.clear();
+                await addFolderToCache();
+            }
             await this.invalidateTasksCache(invalidate, opt);
         }
 
