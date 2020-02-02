@@ -313,7 +313,10 @@ async function addFolderToCache(folder: WorkspaceFolder)
 
 async function addFileToCache(taskAlias: string, uri: Uri)
 {
-    const taskCache = filesCache.get("taskAlias");
+    if (!filesCache.get(taskAlias)) {
+        filesCache.set(taskAlias, new Set());
+    }
+    const taskCache = filesCache.get(taskAlias);
     taskCache.add({
         uri,
         folder: workspace.getWorkspaceFolder(uri)
@@ -323,7 +326,10 @@ async function addFileToCache(taskAlias: string, uri: Uri)
 
 async function removeFileFromCache(taskAlias: string, uri: Uri)
 {
-    const taskCache = filesCache.get("taskAlias");
+    if (!filesCache.get(taskAlias)) {
+        return;
+    }
+    const taskCache = filesCache.get(taskAlias);
     const toRemove = [];
     taskCache.forEach((item) =>
     {
