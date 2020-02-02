@@ -15,6 +15,7 @@ import { TaskFolder } from '../taskFolder';
 import { TaskFile } from '../taskFile';
 import { TaskItem } from '../taskItem';
 import { configuration } from '../common/configuration';
+import { getSingleRootWorkspace } from "../utils/workspaceUtils";
 
 let tempFiles: Array<string> = [];
 let dirName: string = '';
@@ -30,16 +31,23 @@ suite('Task tests', () =>
     {
         await testUtil.activeExtension();
 
-        //let bSuccess = workspace.updateWorkspaceFolders(0, null, { uri: Uri.file("/")});
-        //console.log(bSuccess);
-        //let f = workspace.getWorkspaceFolder(Uri.file("/"));
-        //console.log(f);
+        //if (!fs.existsSync("project_dir")) {
+        //    fs.mkdirSync("project_dir");
+        //}
 
+        //let bSuccess = workspace.updateWorkspaceFolders(0, 0, { uri: Uri.file("/project_dir")});
+        //console.log(bSuccess);
+        //let f = workspace.getWorkspaceFolder(Uri.file("/project_dir"));
+        //console.log(f);
+        //console.log(workspace.workspaceFolders[0]);
         //dirName = path.join(workspace.workspaceFolders[0].uri.fsPath, 'tasks_test_');
         //dirNameCode = path.join(workspace.workspaceFolders[0].uri.fsPath, '.vscode');
 
-        dirName = path.join(workspace.rootPath, 'tasks_test_');
-        dirNameCode = path.join(workspace.rootPath, '.vscode');
+        //console.log("1");
+        //console.log(workspace.rootPath);
+        dirName = path.join(workspace.rootPath ? workspace.rootPath  : "", 'tasks_test_');
+        dirNameCode = path.join(workspace.rootPath ? workspace.rootPath  : "", '.vscode');
+        //console.log(dirName);
 
         await configuration.update('exclude', ['**/coveronly/**']);
 
@@ -83,7 +91,7 @@ suite('Task tests', () =>
 
     test('Create npm package files', async function() 
     {
-        const file = path.join(workspace.rootPath, 'package.json');
+        const file = path.join(workspace.rootPath ? workspace.rootPath  : "", 'package.json');
         tempFiles.push(file);
 
         const file2 = path.join(dirName, 'package.json');
@@ -247,7 +255,7 @@ suite('Task tests', () =>
 
     test('Create tsc config files', async function() 
     {
-        const file = path.join(workspace.rootPath, 'tsconfig.json');
+        const file = path.join(workspace.rootPath ? workspace.rootPath  : "", 'tsconfig.json');
         tempFiles.push(file);
     
         fs.writeFileSync(
@@ -274,7 +282,7 @@ suite('Task tests', () =>
 
     test('Create gulp task files', async function() 
     {
-        const file = path.join(workspace.rootPath, 'gulpfile.js');
+        const file = path.join(workspace.rootPath ? workspace.rootPath  : "", 'gulpfile.js');
         tempFiles.push(file);
 
         const file2 = path.join(dirName, 'Gulpfile.js');
@@ -309,7 +317,7 @@ suite('Task tests', () =>
 
     test('Create makefiles', async function() 
     {
-        const file = path.join(workspace.rootPath, 'Makefile');
+        const file = path.join(workspace.rootPath ? workspace.rootPath  : "", 'Makefile');
         tempFiles.push(file);
 
         const file2 = path.join(dirName, 'Makefile');
@@ -343,7 +351,7 @@ suite('Task tests', () =>
 
     test('Create grunt task files', async function() 
     {
-        const file = path.join(workspace.rootPath, 'GRUNTFILE.js');
+        const file = path.join(workspace.rootPath ? workspace.rootPath  : "", 'GRUNTFILE.js');
         tempFiles.push(file);
 
         const file2 = path.join(dirName, 'Gruntfile.js');
