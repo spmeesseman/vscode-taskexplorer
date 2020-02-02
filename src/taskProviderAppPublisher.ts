@@ -7,10 +7,10 @@ import * as path from "path";
 import * as util from "./util";
 import { TaskItem } from "./taskItem";
 import { configuration } from "./common/configuration";
+import { filesCache } from "./extension";
 
-type StringMap = { [s: string]: string; };
 
-let cachedTasks: Task[] = undefined;
+let cachedTasks: Task[];
 
 
 interface AppPublisherTaskDefinition extends TaskDefinition
@@ -25,8 +25,7 @@ interface AppPublisherTaskDefinition extends TaskDefinition
 
 export class AppPublisherTaskProvider implements TaskProvider
 {
-    constructor() {
-    }
+    constructor() {}
 
     public provideTasks() {
         return provideAppPublisherfiles();
@@ -38,7 +37,7 @@ export class AppPublisherTaskProvider implements TaskProvider
 }
 
 
-export async function invalidateTasksCacheAppPublisher(opt?: Uri) : Promise<void> 
+export async function invalidateTasksCacheAppPublisher(opt?: Uri) : Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheAppPublisher");
@@ -81,7 +80,7 @@ export async function invalidateTasksCacheAppPublisher(opt?: Uri) : Promise<void
 }
 
 
-async function provideAppPublisherfiles(): Promise<Task[]> 
+async function provideAppPublisherfiles(): Promise<Task[]>
 {
     if (!cachedTasks) {
         cachedTasks = await detectAppPublisherfiles();
@@ -90,36 +89,55 @@ async function provideAppPublisherfiles(): Promise<Task[]>
 }
 
 
-async function detectAppPublisherfiles(): Promise<Task[]> 
+async function detectAppPublisherfiles(): Promise<Task[]>
 {
 
     const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
+    const paths = filesCache.get("app-publisher");
 
-    const folders = workspace.workspaceFolders;
-    if (!folders) {
-        return emptyTasks;
-    }
-    try {
-        for (const folder of folders) 
+    try
+    {
+        if (!paths)
         {
-            //
-            // Note - pattern will ignore gruntfiles in root project dir, which would be picked
-            // up by VSCoces internal Grunt task provider
-            //
-            const relativePattern = new RelativePattern(folder, "**/.publishrc.json");
-            const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-            for (const fpath of paths)
+            const folders = workspace.workspaceFolders;
+            if (!folders) {
+                return emptyTasks;
+            }
+
+            for (const folder of folders)
             {
-                if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-                    visitedFiles.add(fpath.fsPath);
-                    allTasks.push(...createAppPublisherTask(folder!, fpath));
+                //
+                // Note - pattern will ignore gruntfiles in root project dir, which would be picked
+                // up by VSCoces internal Grunt task provider
+                //
+                const relativePattern = new RelativePattern(folder, "**/.publishrc.json");
+                const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
+                for (const fpath of paths)
+                {
+                    if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
+                        visitedFiles.add(fpath.fsPath);
+                        allTasks.push(...createAppPublisherTask(folder!, fpath));
+                    }
                 }
             }
         }
+        else
+        {
+            for (const fobj of paths)
+            {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                    visitedFiles.add(fobj.uri.fsPath);
+                    allTasks.push(...createAppPublisherTask(fobj.folder!, fobj.uri));
+                }
+            }
+        }
+
         return allTasks;
-    } catch (error) {
+    }
+    catch (error)
+    {
         return Promise.reject(error);
     }
 }

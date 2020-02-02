@@ -8,6 +8,7 @@ import * as path from "path";
 import * as util from "./util";
 import { TaskItem } from "./taskItem";
 import { configuration } from "./common/configuration";
+import { filesCache } from "./extension";
 
 type StringMap = { [s: string]: string; };
 
@@ -88,6 +89,7 @@ async function detectMakefiles(): Promise<Task[]>
     const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
+    const paths = filesCache.get('make');
 
     const folders = workspace.workspaceFolders;
     if (!folders)
@@ -96,16 +98,30 @@ async function detectMakefiles(): Promise<Task[]>
     }
     try
     {
-        for (const folder of folders) 
+        if (!paths)
         {
-            const relativePattern = new RelativePattern(folder, "**/[Mm]akefile");
-            const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-            for (const fpath of paths) 
+            for (const folder of folders) 
             {
-                if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath))
+                const relativePattern = new RelativePattern(folder, "**/[Mm]akefile");
+                const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
+                for (const fpath of paths) 
                 {
-                    const tasks = await readMakefile(fpath);
-                    visitedFiles.add(fpath.fsPath);
+                    if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath))
+                    {
+                        const tasks = await readMakefile(fpath);
+                        visitedFiles.add(fpath.fsPath);
+                        allTasks.push(...tasks);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (const fobj of paths)
+            {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+					visitedFiles.add(fobj.uri.fsPath);
+					const tasks = await readMakefile(fobj.uri);
                     allTasks.push(...tasks);
                 }
             }

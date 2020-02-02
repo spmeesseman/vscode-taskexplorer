@@ -8,6 +8,7 @@ import * as path from "path";
 import * as util from "./util";
 import { TaskItem } from "./taskItem";
 import { configuration } from "./common/configuration";
+import { filesCache } from "./extension";
 
 type StringMap = { [s: string]: string; };
 
@@ -89,6 +90,7 @@ async function detectGradlefiles(): Promise<Task[]>
     let allTasks: Task[] = [];
     let visitedFiles: Set<string> = new Set();
     let folders = workspace.workspaceFolders;
+    const paths = filesCache.get('gradle');
 
     util.log("", 1);
     util.log("Find gradlefiles", 1);
@@ -99,21 +101,35 @@ async function detectGradlefiles(): Promise<Task[]>
     }
     try 
     {
-        for (const folder of folders) 
+        if (!paths)
         {
-            //
-            // Note - pattern will ignore gradlefiles in root project dir, which would be picked
-            // up by VSCoces internal Gradle task provider
-            //
-            let relativePattern = new RelativePattern(folder, "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]");
-            let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-            for (const fpath of paths) 
+            for (const folder of folders) 
             {
-                if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath))
+                //
+                // Note - pattern will ignore gradlefiles in root project dir, which would be picked
+                // up by VSCoces internal Gradle task provider
+                //
+                let relativePattern = new RelativePattern(folder, "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]");
+                let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
+                for (const fpath of paths) 
                 {
-                    util.log("   found " + fpath.fsPath, 1);
-                    let tasks = await readGradlefile(fpath);
-                    visitedFiles.add(fpath.fsPath);
+                    if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath))
+                    {
+                        util.log("   found " + fpath.fsPath, 1);
+                        let tasks = await readGradlefile(fpath);
+                        visitedFiles.add(fpath.fsPath);
+                        allTasks.push(...tasks);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (const fobj of paths)
+            {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+					visitedFiles.add(fobj.uri.fsPath);
+					const tasks = await readGradlefile(fobj.uri);
                     allTasks.push(...tasks);
                 }
             }

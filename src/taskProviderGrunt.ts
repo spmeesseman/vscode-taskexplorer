@@ -7,6 +7,7 @@ import * as path from 'path';
 import * as util from './util';
 import { TaskItem } from './taskItem';
 import { configuration } from "./common/configuration";
+import { filesCache } from "./extension";
 
 type StringMap = { [s: string]: string; };
 
@@ -89,29 +90,44 @@ async function detectGruntfiles(): Promise<Task[]>
 	let emptyTasks: Task[] = [];
 	let allTasks: Task[] = [];
 	let visitedFiles: Set<string> = new Set();
+    const paths = filesCache.get('grunt');
 
 	let folders = workspace.workspaceFolders;
 	if (!folders) {
 		return emptyTasks;
 	}
 	try {
-		for (const folder of folders) 
-		{
-			//
-			// Note - pattern will ignore gruntfiles in root project dir, which would be picked
-			// up by VSCoces internal Grunt task provider
-			//
-			let relativePattern = new RelativePattern(folder, '**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]');
-			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-			for (const fpath of paths) 
+		if (!paths)
+        {
+            for (const folder of folders) 
 			{
-				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-					let tasks = await readGruntfile(fpath);
-					visitedFiles.add(fpath.fsPath);
-					allTasks.push(...tasks);
+				//
+				// Note - pattern will ignore gruntfiles in root project dir, which would be picked
+				// up by VSCoces internal Grunt task provider
+				//
+				let relativePattern = new RelativePattern(folder, '**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]');
+				let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
+				for (const fpath of paths) 
+				{
+					if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
+						let tasks = await readGruntfile(fpath);
+						visitedFiles.add(fpath.fsPath);
+						allTasks.push(...tasks);
+					}
 				}
 			}
 		}
+        else
+        {
+            for (const fobj of paths)
+            {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+					visitedFiles.add(fobj.uri.fsPath);
+					const tasks = await readGruntfile(fobj.uri);
+                    allTasks.push(...tasks);
+                }
+            }
+        }
 		return allTasks;
 	} catch (error) {
 		return Promise.reject(error);

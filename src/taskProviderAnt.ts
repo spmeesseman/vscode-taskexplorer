@@ -9,6 +9,7 @@ import { parseString } from 'xml2js';
 import { configuration } from "./common/configuration";
 import { TaskItem } from './taskItem';
 type StringMap = { [s: string]: string; };
+import { filesCache } from "./extension";
 
 let cachedTasks: Task[] = undefined;
 
@@ -82,44 +83,60 @@ async function detectAntScripts(): Promise<Task[]>
 	let emptyTasks: Task[] = [];
 	let allTasks: Task[] = [];
 	let visitedFiles: Set<string> = new Set();
+    const paths = filesCache.get('ant');
 
 	let folders = workspace.workspaceFolders;
 	if (!folders) {
 		return emptyTasks;
 	}
 	try {
-		for (const folder of folders) 
-		{
-			let relativePattern = new RelativePattern(folder, '**/[Bb]uild.xml');
-
-			let xtraIncludes: string[] = configuration.get('includeAnt');
-			if (xtraIncludes && xtraIncludes.length > 0) {
-				let multiFilePattern: string = '{**/[Bb]uild.xml';
-				if (Array.isArray(xtraIncludes)) 
-				{
-					for (var i in xtraIncludes) {
-						multiFilePattern += ',';
-						multiFilePattern += xtraIncludes[i];
-					}
-				}
-				else {
-					multiFilePattern += ',';
-					multiFilePattern += xtraIncludes;
-				}
-				multiFilePattern += '}';
-				relativePattern = new RelativePattern(folder, multiFilePattern);
-			}
-			
-			let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-			for (const fpath of paths) 
+		if (!paths)
+        {
+            for (const folder of folders) 
 			{
-				if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-					let tasks = await readAntfile(fpath);
-					visitedFiles.add(fpath.fsPath);
-					allTasks.push(...tasks);
+				let relativePattern = new RelativePattern(folder, '**/[Bb]uild.xml');
+
+				let xtraIncludes: string[] = configuration.get('includeAnt');
+				if (xtraIncludes && xtraIncludes.length > 0) {
+					let multiFilePattern: string = '{**/[Bb]uild.xml';
+					if (Array.isArray(xtraIncludes)) 
+					{
+						for (var i in xtraIncludes) {
+							multiFilePattern += ',';
+							multiFilePattern += xtraIncludes[i];
+						}
+					}
+					else {
+						multiFilePattern += ',';
+						multiFilePattern += xtraIncludes;
+					}
+					multiFilePattern += '}';
+					relativePattern = new RelativePattern(folder, multiFilePattern);
+				}
+				
+				let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
+				for (const fpath of paths) 
+				{
+					if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
+						let tasks = await readAntfile(fpath);
+						visitedFiles.add(fpath.fsPath);
+						allTasks.push(...tasks);
+					}
 				}
 			}
 		}
+        else
+        {
+            for (const fobj of paths)
+            {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+					visitedFiles.add(fobj.uri.fsPath);
+					const tasks = await readAntfile(fobj.uri);
+                    allTasks.push(...tasks);
+                }
+            }
+        }
+
 		return allTasks;
 	} catch (error) {
 		return Promise.reject(error);

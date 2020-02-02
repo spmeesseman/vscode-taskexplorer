@@ -7,6 +7,7 @@ import * as path from "path";
 import * as util from "./util";
 import { configuration } from "./common/configuration";
 import { TaskItem } from "./taskItem";
+import { filesCache } from "./extension";
 
 type StringMap = { [s: string]: string; };
 
@@ -166,22 +167,36 @@ async function detectScriptFiles(): Promise<Task[]>
     const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
+    const paths = filesCache.get("script");
 
     const folders = workspace.workspaceFolders;
     if (!folders) {
         return emptyTasks;
     }
     try {
-        for (const folder of folders)
+        if (!paths)
         {
-            const relativePattern = new RelativePattern(folder, "{**/*.sh,**/*.rb,**/*.ps1,**/*.pl,**/*.bat,**/*.cmd,**/*.nsi,**/setup.py}"); //,SH,PY,RB,PS1,PL,BAT,CMD/NSI');
-            const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-            for (const fpath of paths)
+            for (const folder of folders)
             {
-                if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
+                const relativePattern = new RelativePattern(folder, "{**/*.sh,**/*.rb,**/*.ps1,**/*.pl,**/*.bat,**/*.cmd,**/*.nsi,**/setup.py}"); //,SH,PY,RB,PS1,PL,BAT,CMD/NSI");
+                const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
+                for (const fpath of paths)
+                {
+                    if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
 
-                    visitedFiles.add(fpath.fsPath);
-                    allTasks.push(createScriptTask(scriptTable[path.extname(fpath.fsPath).substring(1)], folder!, fpath));
+                        visitedFiles.add(fpath.fsPath);
+                        allTasks.push(createScriptTask(scriptTable[path.extname(fpath.fsPath).substring(1)], folder!, fpath));
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (const fobj of paths)
+            {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                    visitedFiles.add(fobj.uri.fsPath);
+                    allTasks.push(createScriptTask(scriptTable[path.extname(fobj.uri.fsPath).substring(1)], fobj.folder!, fobj.uri));
                 }
             }
         }
@@ -255,7 +270,7 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
     //
     // Handle bash script on windows - set the shell executable as bash.exe.  This can be set by user
     // in settings, otherwise Git Bash will be tried in the default install location ("C:\Program Files\Git\bin).
-    // Otherwise, use 'bash.exe' and assume the command and other shell commands are in PATH
+    // Otherwise, use "bash.exe" and assume the command and other shell commands are in PATH
     //
     else if (process.platform === "win32" && scriptDef.type === "bash")
     {
@@ -283,7 +298,7 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
     }
 
     //
-    // Add the file name to the command line following the exec.  Quote if ecessary.  Prepend './' as
+    // Add the file name to the command line following the exec.  Quote if ecessary.  Prepend "./" as
     // powershell script requires this.  If this is for a shell/bash/sh task, then skip the space
     // character as the script itself is considered "executable"
     //
