@@ -367,7 +367,7 @@ async function buildCache(taskAlias: string, taskType: string, fileBlob: string,
                 for (const folder of workspace.workspaceFolders)
                 {
                     log("   Scan project: " + folder.name);
-                    window.setStatusBarMessage("$(loading) Scanning for " + dispTaskType + " tasks in project " + folder.name + "...");
+                    window.setStatusBarMessage("$(loading~spin) Scanning for " + dispTaskType + " tasks in project " + folder.name + "...");
                     const relativePattern = new RelativePattern(folder, fileBlob);
                     const paths = await workspace.findFiles(relativePattern, getExcludesGlob(folder));
                     for (const fpath of paths)
@@ -387,7 +387,7 @@ async function buildCache(taskAlias: string, taskType: string, fileBlob: string,
     else
     {
         log("Scan project: " + wsfolder.name);
-        window.setStatusBarMessage("$(loading) Scanning for tasks in project " + wsfolder.name + "...");
+        window.setStatusBarMessage("$(loading~spin) Scanning for tasks in project " + wsfolder.name + "...");
 
         const relativePattern = new RelativePattern(wsfolder, fileBlob);
         const paths = await workspace.findFiles(relativePattern, getExcludesGlob(wsfolder));
