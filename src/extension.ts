@@ -17,7 +17,7 @@ import { GulpTaskProvider } from "./taskProviderGulp";
 import { AppPublisherTaskProvider } from "./taskProviderAppPublisher";
 import { configuration } from "./common/configuration";
 import { Storage } from "./common/storage";
-import { log, logValue, getExcludesGlob, isExcluded } from "./util";
+import { log, logValue, getExcludesGlob, isExcluded, properCase } from "./util";
 import * as fs from "fs";
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
@@ -245,68 +245,68 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
 async function addFolderToCache(folder: WorkspaceFolder)
 {
     if (configuration.get<boolean>("enableAnt")) {
-        await buildCache("ant", "**/[Bb]uild.xml", folder);
+        await buildCache("ant", "ant", "**/[Bb]uild.xml", folder);
     }
 
     if (configuration.get<boolean>("enableAppPublisher")) {
-        await buildCache("app-publisher", "**/.publishrc*", folder);
+        await buildCache("app-publisher", "app-publisher", "**/.publishrc*", folder);
     }
 
     if (configuration.get<boolean>("enableBash")) {
-        await buildCache("script", "**/*.[Ss][Hh]", folder);
+        await buildCache("script", "bash", "**/*.[Ss][Hh]", folder);
     }
 
     if (configuration.get<boolean>("enableBatch")) {
-        await buildCache("script", "**/*.[Bb][Aa][Tt]", folder);
-        await buildCache("script", "**/*.[Cc][Mm][Dd]", folder);
+        await buildCache("script", "batch", "**/*.[Bb][Aa][Tt]", folder);
+        await buildCache("script", "batch", "**/*.[Cc][Mm][Dd]", folder);
     }
 
     if (configuration.get<boolean>("enableGradle")) {
-        await buildCache("gradle", "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]", folder);
+        await buildCache("gradle", "gradle", "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]", folder);
     }
 
     if (configuration.get<boolean>("enableGrunt")) {
-        await buildCache("grunt", "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]", folder);
+        await buildCache("grunt", "grunt", "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]", folder);
     }
 
     if (configuration.get<boolean>("enableGulp")) {
-        await buildCache("gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]", folder);
+        await buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]", folder);
     }
 
     if (configuration.get<boolean>("enableMake")) {
-        await buildCache("make", "**/[Mm]akefile", folder);
+        await buildCache("make", "make", "**/[Mm]akefile", folder);
     }
 
     if (configuration.get<boolean>("enableNpm")) {
-        await buildCache("npm", "**/package.json", folder);
+        await buildCache("npm", "npm", "**/package.json", folder);
     }
 
     if (configuration.get<boolean>("enableNsis")) {
-        await buildCache("script", "**/*.[Nn][Ss][Ii]", folder);
+        await buildCache("script", "nsis", "**/*.[Nn][Ss][Ii]", folder);
     }
 
     if (configuration.get<boolean>("enablePerl")) {
-        await buildCache("script", "**/*.[Pp][Ll]", folder);
+        await buildCache("script", "perl", "**/*.[Pp][Ll]", folder);
     }
 
     if (configuration.get<boolean>("enablePowershell")) {
-        await buildCache("script", "**/*.[Pp][Ss]1", folder);
+        await buildCache("script", "powershell", "**/*.[Pp][Ss]1", folder);
     }
 
     if (configuration.get<boolean>("enablePython")) {
-        await buildCache("script", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", folder);
+        await buildCache("script", "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", folder);
     }
 
     if (configuration.get<boolean>("enableRuby")) {
-        await buildCache("script", "**/*.[Rr][Bb]", folder);
+        await buildCache("script", "ruby", "**/*.[Rr][Bb]", folder);
     }
 
     if (configuration.get<boolean>("enableTsc")) {
-        await buildCache("app-publisher", "**/tsconfig.json", folder);
+        await buildCache("tsc", "tsc", "**/tsconfig.json", folder);
     }
 
     if (configuration.get<boolean>("enableWorkspace")) {
-        await buildCache("workspace", "**/.vscode/tasks.json", folder);
+        await buildCache("workspace", "workspace", "**/.vscode/tasks.json", folder);
     }
 }
 
@@ -340,7 +340,7 @@ async function removeFileFromCache(taskAlias: string, uri: Uri)
 }
 
 
-async function buildCache(taskAlias: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined)
+async function buildCache(taskAlias: string, taskType: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined)
 {
     if (!filesCache.get(taskAlias)) {
         filesCache.set(taskAlias, new Set());
@@ -358,7 +358,7 @@ async function buildCache(taskAlias: string, fileBlob: string, wsfolder?: Worksp
                 for (const folder of workspace.workspaceFolders)
                 {
                     log("   Scan project: " + folder.name);
-                    window.setStatusBarMessage("$(loading) Task Explorer - Scanning project " + folder.name + "...");
+                    window.setStatusBarMessage("$(loading) Scanning for " + properCase(taskType) + " tasks in project " + folder.name + "...");
                     const relativePattern = new RelativePattern(folder, fileBlob);
                     const paths = await workspace.findFiles(relativePattern, getExcludesGlob(folder));
                     for (const fpath of paths)
@@ -378,7 +378,7 @@ async function buildCache(taskAlias: string, fileBlob: string, wsfolder?: Worksp
     else
     {
         log("Scan project: " + wsfolder.name);
-        window.setStatusBarMessage("$(loading) Task Explorer - Scanning project " + wsfolder.name + "...");
+        window.setStatusBarMessage("$(loading) Scanning for tasks in project " + wsfolder.name + "...");
 
         const relativePattern = new RelativePattern(wsfolder, fileBlob);
         const paths = await workspace.findFiles(relativePattern, getExcludesGlob(wsfolder));
@@ -554,7 +554,7 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
 {
     let watcher: FileSystemWatcher = watchers.get(taskType);
 
-    await buildCache(isScriptType && taskType !== "app-publisher" ? "script" : taskType, fileBlob);
+    await buildCache(isScriptType && taskType !== "app-publisher" ? "script" : taskType, taskType, fileBlob);
 
     if (enabled !== false) {
         if (!watcher) {
