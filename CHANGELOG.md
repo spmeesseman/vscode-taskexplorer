@@ -1,3 +1,16 @@
+## [1.22.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.22.0...v1.22.1) (2020-02-04)
+
+
+### Bug Fixes
+
+* **open:** backslash in file path prevents open command for tasks.json when running in Linux. [fixes [#72](https://github.com/spmeesseman/vscode-taskexplorer/issues/72)] ([1ffa667](https://github.com/spmeesseman/vscode-taskexplorer/commit/1ffa667))
+* the refresh button no longer works in v1.22 ([36874cc](https://github.com/spmeesseman/vscode-taskexplorer/commit/36874cc))
+
+
+### Documentation
+
+* **readme:** update 1.22 info, remove settings section ([da21b2a](https://github.com/spmeesseman/vscode-taskexplorer/commit/da21b2a))
+
 # [1.22.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.21.0...v1.22.0) (2020-02-02)
 
 
