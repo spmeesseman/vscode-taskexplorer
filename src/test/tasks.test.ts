@@ -409,6 +409,7 @@ suite('Task tests', () =>
         }
 
         await configuration.update('enableAnt', false);
+        await configuration.update('enableAppPublisher', false);
         await configuration.update('enableBash', false);
         await configuration.update('enableBatch', false);
         await configuration.update('enableGradle', false);
@@ -423,6 +424,7 @@ suite('Task tests', () =>
         await configuration.update('enableWorkspace', false);
 
         await configuration.update('enableAnt', true);
+        await configuration.update('enableAppPublisher', true);
         await configuration.update('enableBash', true);
         await configuration.update('enableBatch', true);
         await configuration.update('enableGradle', true);
@@ -444,20 +446,6 @@ suite('Task tests', () =>
         if (!treeDataProvider2) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
-
-        await configuration.update('enableAnt', false);
-        await configuration.update('enableBash', false);
-        await configuration.update('enableBatch', false);
-        await configuration.update('enableGradle', false);
-        await configuration.update('enableGrunt', false);
-        await configuration.update('enableGulp', false);
-        await configuration.update('enableMake', false);
-        await configuration.update('enableNpm', false);
-        await configuration.update('enablePowershell', false);
-        await configuration.update('enablePerl', false);
-        await configuration.update('enablePython', false);
-        await configuration.update('enableRuby', false);
-        await configuration.update('enableWorkspace', false);
 
         await taskMap.forEach(async(value: Uri, key: string) =>  {
             if (value) {
