@@ -36,11 +36,31 @@ suite("Extension Tests", () =>
             "spmeesseman.vscode-taskexplorer"
         ) as vscode.Extension<any>;
 
-        if (!extension)
-        {
+        if (!extension) {
             assert.fail("Extension not found");
         }
 
+        if (!extension.isActive) 
+        {
+            extension.activate().then(
+                api => {
+                    assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
+                    done();
+                },
+                () => {
+                    assert.fail("Failed to activate extension");
+                }
+            );
+        } 
+        else {
+            assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
+            done();
+        }
+    });
+
+
+    test("Enable all options", function(done) 
+    {
         //
         // Enable views
         //
@@ -54,7 +74,6 @@ suite("Extension Tests", () =>
         //
         // Enable all task types
         //
-        console.log('        Enabling all task types');
         assert(configuration.update('enableAnt', true));
         assert(configuration.update('enableAppPublisher', true));
         assert(configuration.update('enableBash', true));
@@ -71,25 +90,7 @@ suite("Extension Tests", () =>
         assert(configuration.update('enableRuby', true));
         assert(configuration.update('enableWorkspace', true));
 
-        if (!extension.isActive) 
-        {
-            console.log('        Manually activating extension');
-            extension.activate().then(
-                api =>
-                {
-                    assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
-                    done();
-                },
-                () =>
-                {
-                    assert.fail("Failed to activate extension");
-                }
-            );
-        } else
-        {
-            assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
-            done();
-        }
+        done();
     });
 
 
