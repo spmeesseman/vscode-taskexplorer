@@ -455,6 +455,7 @@ suite('Task tests', () =>
         await configuration.update('enableGulp', false);
         await configuration.update('enableMake', false);
         await configuration.update('enableNpm', false);
+        await configuration.update('enableNsis', false);
         await configuration.update('enablePowershell', false);
         await configuration.update('enablePerl', false);
         await configuration.update('enablePython', false);
