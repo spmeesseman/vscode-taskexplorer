@@ -8,6 +8,8 @@ import { configuration } from "./common/configuration";
 
 const logValueWhiteSpace = 40;
 
+let writeToConsole = false;
+
 
 export function camelCase(name: string, indexUpper: number)
 {
@@ -216,19 +218,24 @@ export function existsInArray(arr: any[], item: any)
 }
 
 
+export function setWriteToConsole(set: boolean)
+{
+    writeToConsole = set;
+}
+
+
 export async function log(msg: string, level?: number)
 {
     if (level && level > configuration.get<number>("debugLevel")) {
-        //if (workspace.getConfiguration("taskExplorer").get("debug") === true) {
-        //    console.log(msg);
-        //}
         return;
     }
 
     if (workspace.getConfiguration("taskExplorer").get("debug") === true)
     {
         logOutputChannel.appendLine(msg);
-        console.log(msg);
+        if (writeToConsole === true) {
+            console.log(msg);
+        }
     }
 }
 

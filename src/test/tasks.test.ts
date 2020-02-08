@@ -8,9 +8,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { commands, workspace, Uri, tasks } from 'vscode';
 import * as testUtil from './testUtil';
-//import * as extension from '../extension';
-import { timeout } from '../util';
-import { treeDataProvider2, addFolderToCache } from '../extension';
+import { timeout, setWriteToConsole } from '../util';
+import { treeDataProvider2 } from '../extension';
 import { TaskFolder } from '../taskFolder';
 import { TaskFile } from '../taskFile';
 import { TaskItem } from '../taskItem';
@@ -30,10 +29,11 @@ suite('Task tests', () =>
     {
         await testUtil.activeExtension();
 
+        setWriteToConsole(true); // write debug logging from exiension to console
+        
         //if (!fs.existsSync("project_dir")) {
         //    fs.mkdirSync("project_dir");
         //}
-
         //let bSuccess = workspace.updateWorkspaceFolders(0, 0, { uri: Uri.file("/project_dir")});
         //console.log(bSuccess);
         //let f = workspace.getWorkspaceFolder(Uri.file("/project_dir"));
@@ -41,9 +41,9 @@ suite('Task tests', () =>
         //console.log(workspace.workspaceFolders[0]);
         //dirName = path.join(workspace.workspaceFolders[0].uri.fsPath, 'tasks_test_');
         //dirNameCode = path.join(workspace.workspaceFolders[0].uri.fsPath, '.vscode');
-
         //console.log("1");
         //console.log(workspace.rootPath);
+
         dirName = path.join(workspace.rootPath ? workspace.rootPath  : "", 'tasks_test_');
         dirNameCode = path.join(workspace.rootPath ? workspace.rootPath  : "", '.vscode');
         //console.log(dirName);

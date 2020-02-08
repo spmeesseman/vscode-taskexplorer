@@ -12,52 +12,59 @@ import * as util from "../util";
 
 suite("Util tests", () => 
 {
-  let repoUri: Uri;
-  let checkoutDir: Uri;
+    suiteSetup(async () =>
+    {
+        await testUtil.activeExtension();
+        //workspace.getConfiguration('taskExplorer').update('debug', true, ConfigurationTarget.Global);
+    });
 
-  suiteSetup(async () => {
-    await testUtil.activeExtension();
-    //workspace.getConfiguration('taskExplorer').update('debug', true, ConfigurationTarget.Global);
-  });
+    suiteTeardown(() =>
+    {
 
-  suiteTeardown(() => {
-    
-  });
+    });
 
-  test("Turn logging on", () => {
-    assert.ok(workspace.getConfiguration('taskExplorer').update('debug', true));
-  });
+    test("Turn logging on", () =>
+    {
+        assert.ok(workspace.getConfiguration('taskExplorer').update('debug', true));
+    });
 
-  test("Log to output window", () => {
-    assert.ok(util.log("spmeesseman.vscode-taskexplorer"));
-  });
+    test("Log to output window", () =>
+    {
+        assert.ok(util.log("spmeesseman.vscode-taskexplorer"));
+    });
 
-  test("Log value to output window", () => {
-    assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", "true"));
-  });
+    test("Log value to output window", () =>
+    {
+        assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", "true"));
+    });
 
-  test("Log a null value to output window", () => {
-    assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", null));
-  });
+    test("Log a null value to output window", () =>
+    {
+        assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", null));
+    });
 
-  test("Log undefined value to output window", () => {
-    assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", undefined));
-  });
+    test("Log undefined value to output window", () =>
+    {
+        assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", undefined));
+    });
 
-  test("Camel case a value", () => {
-    assert(util.camelCase("taskexplorer", 4) == 'taskExplorer');
-  });
+    test("Camel case a value", () =>
+    {
+        assert(util.camelCase("taskexplorer", 4) == 'taskExplorer');
+    });
 
-  test("Proper case a value", () => {
-    assert(util.properCase("taskexplorer") == 'Taskexplorer');
-  });
+    test("Proper case a value", () =>
+    {
+        assert(util.properCase("taskexplorer") == 'Taskexplorer');
+    });
 
-  //test("Turn logging off", () => {
-  //  assert.ok(workspace.getConfiguration('taskExplorer').update('debug', false));
-  //});
+    //test("Turn logging off", () => {
+    //  assert.ok(workspace.getConfiguration('taskExplorer').update('debug', false));
+    //});
 
-  test("Timeout", () => {
-    assert.ok(util.timeout(500));
-  });
+    test("Timeout", () =>
+    {
+        assert.ok(util.timeout(500));
+    });
 
 });

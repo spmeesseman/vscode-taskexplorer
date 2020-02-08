@@ -41,14 +41,11 @@ export function activeExtension()
     return new Promise<void>((resolve, reject) =>
     {
         const extension = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-        if (!extension)
-        {
+        if (!extension) {
             reject();
             return;
         }
-
-        if (!extension.isActive)
-        {
+        if (!extension.isActive) {
             extension.activate().then(() => resolve(), () => reject());
         } else
         {
