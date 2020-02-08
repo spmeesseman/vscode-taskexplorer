@@ -50,6 +50,7 @@ suite("Extension Tests", () =>
         //
         assert(configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]));
         assert(configuration.update('debug', true));
+        assert(configuration.update('debugLevel', 3));
         //
         // Enable all task types
         //

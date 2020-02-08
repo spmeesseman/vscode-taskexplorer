@@ -382,6 +382,8 @@ suite('Task tests', () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
+        await timeout(3500); // wait for filesystem change events
+
         //
         // Refresh for better coverage
         //
