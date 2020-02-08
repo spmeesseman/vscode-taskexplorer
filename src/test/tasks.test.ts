@@ -406,7 +406,7 @@ suite('Task tests', () =>
     });
 
 
-    test('Verify tree validity and open tasks', async function(done) 
+    test('Verify tree validity and open tasks', async function() 
     {
         if (!trees.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
@@ -438,11 +438,9 @@ suite('Task tests', () =>
         {
             assert.fail('No vscode items found');
         }
-        
-        done();
     });
 
-    test('Invalidation tests', async function(done) 
+    test('Invalidation tests', async function() 
     {
         if (!trees.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
@@ -471,8 +469,6 @@ suite('Task tests', () =>
         });
 
         await trees.explorerProvider.invalidateTasksCache(undefined, undefined);
-        
-        done();
     });
 });
 
