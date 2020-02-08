@@ -408,52 +408,7 @@ suite('Task tests', () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
 
-        await configuration.update('enableAnt', false);
-        await configuration.update('enableAppPublisher', false);
-        await configuration.update('enableBash', false);
-        await configuration.update('enableBatch', false);
-        await configuration.update('enableGradle', false);
-        await configuration.update('enableGrunt', false);
-        await configuration.update('enableGulp', false);
-        await configuration.update('enableMake', false);
-        await configuration.update('enableNpm', false);
-        await configuration.update('enablePowershell', false);
-        await configuration.update('enablePerl', false);
-        await configuration.update('enablePython', false);
-        await configuration.update('enableRuby', false);
-        await configuration.update('enableWorkspace', false);
-
-        await configuration.update('enableAnt', true);
-        await configuration.update('enableAppPublisher', true);
-        await configuration.update('enableBash', true);
-        await configuration.update('enableBatch', true);
-        await configuration.update('enableGradle', true);
-        await configuration.update('enableGrunt', true);
-        await configuration.update('enableGulp', true);
-        await configuration.update('enableMake', true);
-        await configuration.update('enableNpm', true);
-        await configuration.update('enablePowershell', true);
-        await configuration.update('enablePerl', true);
-        await configuration.update('enablePython', true);
-        await configuration.update('enableRuby', true);
-        await configuration.update('enableWorkspace', true);
-
         await scanTasks();
-    });
-
-    test('Invalidation tests', async function() 
-    {
-        if (!treeDataProvider2) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
-        }
-
-        await taskMap.forEach(async(value: Uri, key: string) =>  {
-            if (value) {
-                await treeDataProvider2.invalidateTasksCache(key, value);
-            }
-        });
-
-        await treeDataProvider2.invalidateTasksCache(undefined, undefined);
 
         if (!taskMap.get('ant'))
         {
@@ -479,6 +434,36 @@ suite('Task tests', () =>
         {
             assert.fail('No vscode items found');
         }
+    });
+
+    test('Invalidation tests', async function() 
+    {
+        if (!treeDataProvider2) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist")
+        }
+
+        await configuration.update('enableAnt', false);
+        await configuration.update('enableAppPublisher', false);
+        await configuration.update('enableBash', false);
+        await configuration.update('enableBatch', false);
+        await configuration.update('enableGradle', false);
+        await configuration.update('enableGrunt', false);
+        await configuration.update('enableGulp', false);
+        await configuration.update('enableMake', false);
+        await configuration.update('enableNpm', false);
+        await configuration.update('enablePowershell', false);
+        await configuration.update('enablePerl', false);
+        await configuration.update('enablePython', false);
+        await configuration.update('enableRuby', false);
+        await configuration.update('enableWorkspace', false);
+
+        await taskMap.forEach(async(value: Uri, key: string) =>  {
+            if (value) {
+                await treeDataProvider2.invalidateTasksCache(key, value);
+            }
+        });
+
+        await treeDataProvider2.invalidateTasksCache(undefined, undefined);
     });
 });
 
