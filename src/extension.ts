@@ -18,7 +18,6 @@ import { AppPublisherTaskProvider } from "./taskProviderAppPublisher";
 import { configuration } from "./common/configuration";
 import { Storage } from "./common/storage";
 import { log, logValue, getExcludesGlob, isExcluded, properCase } from "./util";
-import * as fs from "fs";
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
 export let logOutputChannel: OutputChannel | undefined;
@@ -26,6 +25,14 @@ export let storage: Storage | undefined;
 export let views: Map<string, TreeView<TreeItem>> = new Map();
 export let filesCache: Map<string, Set<any>> = new Map();
 const watchers: Map<string, FileSystemWatcher> = new Map();
+
+export function getTreeDataProvider(name?: string)
+{
+    if (name === "taskExplorerSideBar") {
+        return treeDataProvider;
+    }
+    return treeDataProvider2;
+}
 
 export async function activate(context: ExtensionContext, disposables: Disposable[])
 {
@@ -623,9 +630,11 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
             });
             views.set(name, treeView);
             context.subscriptions.push(views.get(name));
+            console.log('Registered!!!' + name);
             return treeDataProvider;
         }
         else {
+            console.log("✘ Task Explorer - No workspace folders!!!");
             log("No workspace folders!!!");
         }
     }

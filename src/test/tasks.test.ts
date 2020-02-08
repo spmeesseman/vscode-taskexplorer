@@ -4,7 +4,7 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from 'assert';
-import * as fs from 'original-fs';
+import * as fs from 'fs';
 import * as path from 'path';
 import { commands, workspace, Uri, tasks } from 'vscode';
 import * as testUtil from './testUtil';
@@ -375,8 +375,11 @@ suite('Task tests', () =>
 
 
     test('Scan tasks', async function() 
-    {
-        await timeout(2500);
+    {;
+        if (!treeDataProvider2) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
+        }
+
         //
         // Refresh for better coverage
         //
@@ -401,6 +404,10 @@ suite('Task tests', () =>
 
     test('Verify tree validity and open tasks', async function() 
     {
+        if (!treeDataProvider2) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist")
+        }
+
         await configuration.update('enableAnt', false);
         await configuration.update('enableBash', false);
         await configuration.update('enableBatch', false);
@@ -434,6 +441,10 @@ suite('Task tests', () =>
 
     test('Invalidation tests', async function() 
     {
+        if (!treeDataProvider2) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist")
+        }
+
         await configuration.update('enableAnt', false);
         await configuration.update('enableBash', false);
         await configuration.update('enableBatch', false);
