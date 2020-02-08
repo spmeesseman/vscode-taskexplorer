@@ -411,9 +411,6 @@ suite('Task tests', () =>
 
         taskItems = await tasks.fetchTasks({ type: 'gulp' });
         assert(taskItems.length > 0, 'No gulp tasks registered');
-
-        taskItems = await tasks.fetchTasks({ type: 'tsc' });
-        assert(taskItems.length > 0, 'No tsc tasks registered');
     });
 
 
