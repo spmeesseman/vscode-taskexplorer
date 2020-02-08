@@ -630,7 +630,6 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
             });
             views.set(name, treeView);
             context.subscriptions.push(views.get(name));
-            console.log('Registered!!!' + name);
             return treeDataProvider;
         }
         else {
