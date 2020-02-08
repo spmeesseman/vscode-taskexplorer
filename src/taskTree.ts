@@ -25,7 +25,6 @@ import { invalidateTasksCacheGradle } from "./taskProviderGradle";
 import { invalidateTasksCacheGrunt } from "./taskProviderGrunt";
 import { invalidateTasksCacheGulp } from "./taskProviderGulp";
 import { invalidateTasksCacheAppPublisher } from "./taskProviderAppPublisher";
-import { stringify } from "querystring";
 
 
 const localize = nls.loadMessageBundle();

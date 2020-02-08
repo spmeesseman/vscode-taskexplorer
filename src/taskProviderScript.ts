@@ -1,7 +1,7 @@
 
 import {
-    Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition, ShellExecutionOptions, TextDocument
+    Task, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
+    workspace, TaskProvider, TaskDefinition, ShellExecutionOptions
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
@@ -11,7 +11,7 @@ import { filesCache } from "./extension";
 
 type StringMap = { [s: string]: string; };
 
-let cachedTasks: Task[] = undefined;
+let cachedTasks: Task[];
 
 const scriptTable = {
     sh: {

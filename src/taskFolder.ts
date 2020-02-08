@@ -1,6 +1,5 @@
 
-import
-{
+import {
     ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder
 } from "vscode";
 import { TaskFile } from "./taskFile";

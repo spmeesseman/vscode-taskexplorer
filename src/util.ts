@@ -3,7 +3,6 @@ import { workspace, RelativePattern, WorkspaceFolder, Uri } from "vscode";
 import { accessSync } from "original-fs";
 import * as fs from "fs";
 import * as minimatch from "minimatch";
-//import * as path from "path";
 import { configuration } from "./common/configuration";
 
 const logValueWhiteSpace = 40;

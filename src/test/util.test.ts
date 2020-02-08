@@ -5,7 +5,7 @@
 //
 
 import * as assert from "assert";
-import { workspace, Uri } from "vscode";
+import { workspace } from "vscode";
 import * as testUtil from "./testUtil";
 import * as util from "../util";
 

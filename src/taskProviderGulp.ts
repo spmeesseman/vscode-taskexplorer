@@ -2,10 +2,10 @@
 import {
     Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
     workspace, TaskProvider, TaskDefinition
-} from 'vscode';
-import * as path from 'path';
-import * as util from './util';
-import { TaskItem } from './taskItem';
+} from "vscode";
+import * as path from "path";
+import * as util from "./util";
+import { TaskItem } from "./taskItem";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./extension";
 
@@ -16,272 +16,270 @@ let cachedTasks: Task[] = undefined;
 
 interface GulpTaskDefinition extends TaskDefinition 
 {
-	script?: string;
-	path?: string;
-	fileName?: string;
-	uri?: Uri;
-	treeItem?: TaskItem;
+    script?: string;
+    path?: string;
+    fileName?: string;
+    uri?: Uri;
+    treeItem?: TaskItem;
 }
 
 export class GulpTaskProvider implements TaskProvider 
 {
-	constructor() {
-	}
+    constructor() {}
 
-	public provideTasks() {
-		return provideGulpfiles();
-	}
+    public provideTasks() {
+        return provideGulpfiles();
+    }
 
-	public resolveTask(_task: Task): Task | undefined {
-		return undefined;
-	}
+    public resolveTask(_task: Task): Task | undefined {
+        return undefined;
+    }
 }
 
 
 export async function invalidateTasksCacheGulp(opt?: Uri) : Promise<void> 
 {
-	util.log('');
-	util.log('invalidateTasksCacheGulp');
+    util.log("");
+    util.log("invalidateTasksCacheGulp");
 
-	if (opt && cachedTasks) 
-	{
-		let rmvTasks: Task[] = [];
-		let uri: Uri = opt as Uri;
+    if (opt && cachedTasks) 
+    {
+        const rmvTasks: Task[] = [];
 
-		cachedTasks.forEach(each => {
-			let cstDef: GulpTaskDefinition = each.definition;
-			if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
-				rmvTasks.push(each);
-			}
-		});
+        cachedTasks.forEach(each => {
+            const cstDef: GulpTaskDefinition = each.definition;
+            if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
+                rmvTasks.push(each);
+            }
+        });
 
-		rmvTasks.forEach(each => {
-			util.log('   removing old task ' + each.name);
-			util.removeFromArray(cachedTasks, each);
-		});
+        rmvTasks.forEach(each => {
+            util.log("   removing old task " + each.name);
+            util.removeFromArray(cachedTasks, each);
+        });
 
-		if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
-		{
-			let tasks = await readGulpfile(opt);
-			cachedTasks.push(...tasks);
-		}
+        if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+        {
+            const tasks = await readGulpfile(opt);
+            cachedTasks.push(...tasks);
+        }
 
-		if (cachedTasks.length > 0) {
-			return;
-		}
-	}
+        if (cachedTasks.length > 0) {
+            return;
+        }
+    }
 
-	cachedTasks = undefined;
+    cachedTasks = undefined;
 }
 
 
 async function provideGulpfiles(): Promise<Task[]> 
 {
-	if (!cachedTasks) {
-		cachedTasks = await detectGulpfiles();
-	}
-	return cachedTasks;
+    if (!cachedTasks) {
+        cachedTasks = await detectGulpfiles();
+    }
+    return cachedTasks;
 }
 
 
 async function detectGulpfiles(): Promise<Task[]> 
 {
 
-	let emptyTasks: Task[] = [];
-	let allTasks: Task[] = [];
-	let visitedFiles: Set<string> = new Set();
-    const paths = filesCache.get('gulp');
+    const emptyTasks: Task[] = [];
+    const allTasks: Task[] = [];
+    const visitedFiles: Set<string> = new Set();
+    const paths = filesCache.get("gulp");
 
-	let folders = workspace.workspaceFolders;
-	if (!folders) {
-		return emptyTasks;
-	}
-	try {
-		if (!paths)
+    const folders = workspace.workspaceFolders;
+    if (!folders) {
+        return emptyTasks;
+    }
+    try {
+        if (!paths)
         {
             for (const folder of folders) 
-			{
-				//
-				// Note - pattern will ignore gulpfiles in root project dir, which would be picked
-				// up by VSCoces internal Gulp task provider
-				//
-				let relativePattern = new RelativePattern(folder, '**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]');
-				let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-				for (const fpath of paths) 
-				{
-					if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-						let tasks = await readGulpfile(fpath);
-						visitedFiles.add(fpath.fsPath);
-						allTasks.push(...tasks);
-					}
-				}
-			}
-		}
+            {
+                //
+                // Note - pattern will ignore gulpfiles in root project dir, which would be picked
+                // up by VSCoces internal Gulp task provider
+                //
+                const relativePattern = new RelativePattern(folder, "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]");
+                const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
+                for (const fpath of paths) 
+                {
+                    if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
+                        const tasks = await readGulpfile(fpath);
+                        visitedFiles.add(fpath.fsPath);
+                        allTasks.push(...tasks);
+                    }
+                }
+            }
+        }
         else
         {
             for (const fobj of paths)
             {
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-					visitedFiles.add(fobj.uri.fsPath);
-					const tasks = await readGulpfile(fobj.uri);
+                    visitedFiles.add(fobj.uri.fsPath);
+                    const tasks = await readGulpfile(fobj.uri);
                     allTasks.push(...tasks);
                 }
             }
         }
-		return allTasks;
-	} catch (error) {
-		return Promise.reject(error);
-	}
+        return allTasks;
+    } catch (error) {
+        return Promise.reject(error);
+    }
 }
 
 
 async function readGulpfile(uri: Uri): Promise<Task[]> 
 {
-	let emptyTasks: Task[] = [];
+    const emptyTasks: Task[] = [];
 
-	let folder = workspace.getWorkspaceFolder(uri);
-	if (!folder) {
-		return emptyTasks;
+    const folder = workspace.getWorkspaceFolder(uri);
+    if (!folder) {
+        return emptyTasks;
     }
-    
-    let scripts = await findTargets(uri.fsPath);
-	if (!scripts) {
-		return emptyTasks;
-	}
 
-	const result: Task[] = [];
+    const scripts = await findTargets(uri.fsPath);
+    if (!scripts) {
+        return emptyTasks;
+    }
 
-	Object.keys(scripts).forEach(each => {
-		const task = createGulpTask(each, `${each}`, folder!, uri);
-		if (task) {
-			task.group = TaskGroup.Build;
-			result.push(task);
-		}
-	});
+    const result: Task[] = [];
 
-	return result;
+    Object.keys(scripts).forEach(each => {
+        const task = createGulpTask(each, `${each}`, folder!, uri);
+        if (task) {
+            task.group = TaskGroup.Build;
+            result.push(task);
+        }
+    });
+
+    return result;
 }
 
 
 async function findTargets(fsPath: string): Promise<StringMap> 
 {
-	let json: any = '';
-	let scripts: StringMap = {};
+    const json: any = "";
+    const scripts: StringMap = {};
 
-	util.log('');
-	util.log('Find gulpfile targets');
+    util.log("");
+    util.log("Find gulpfile targets");
 
-	let contents = await util.readFile(fsPath);
-	let idx = 0;
-	let eol = contents.indexOf('\n', 0);
+    const contents = await util.readFile(fsPath);
+    let idx = 0;
+    let eol = contents.indexOf("\n", 0);
 
-	while (eol !== -1)
-	{
-		let line: string = contents.substring(idx, eol).trim();
-		if (line.length > 0 && line.toLowerCase().trimLeft().startsWith('gulp.task')) 
-		{
-			let idx1 = line.indexOf('\'');
-			if (idx1 === -1) {
-				idx1 = line.indexOf('"');
-			}
+    while (eol !== -1)
+    {
+        let line: string = contents.substring(idx, eol).trim();
+        if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("gulp.task")) 
+        {
+            let idx1 = line.indexOf("'");
+            if (idx1 === -1) {
+                idx1 = line.indexOf('"');
+            }
 
-			if (idx1 === -1) // check next line for task name
-			{
-				let eol2 = eol + 1;
-				eol2 = contents.indexOf('\n', eol2);
-				line = contents.substring(eol + 1, eol2).trim();
-				if (line.startsWith('\'') || line.startsWith('"'))
-				{
-					idx1 = line.indexOf('\'');
-					if (idx1 === -1) {
-						idx1 = line.indexOf('"');
-					}
-					if (idx1 !== -1) {
-						eol = eol2;
-					}
-				}
-			}
+            if (idx1 === -1) // check next line for task name
+            {
+                let eol2 = eol + 1;
+                eol2 = contents.indexOf("\n", eol2);
+                line = contents.substring(eol + 1, eol2).trim();
+                if (line.startsWith("'") || line.startsWith('"'))
+                {
+                    idx1 = line.indexOf("'");
+                    if (idx1 === -1) {
+                        idx1 = line.indexOf('"');
+                    }
+                    if (idx1 !== -1) {
+                        eol = eol2;
+                    }
+                }
+            }
 
-			if (idx1 !== -1)
-			{
-				idx1++;
-				let idx2 = line.indexOf('\'', idx1);
-				if (idx2 === -1) {
-					idx2 = line.indexOf('"', idx1);
-				}
-				if (idx2 !== -1) 
-				{
-					let tgtName = line.substring(idx1, idx2).trim();
+            if (idx1 !== -1)
+            {
+                idx1++;
+                let idx2 = line.indexOf("'", idx1);
+                if (idx2 === -1) {
+                    idx2 = line.indexOf('"', idx1);
+                }
+                if (idx2 !== -1) 
+                {
+                    const tgtName = line.substring(idx1, idx2).trim();
 
-					if (tgtName) {
-						scripts[tgtName] = '';
-						util.log('   found target');
-						util.logValue('      name', tgtName);
-					}
-				}
-			}
-		}
+                    if (tgtName) {
+                        scripts[tgtName] = "";
+                        util.log("   found target");
+                        util.logValue("      name", tgtName);
+                    }
+                }
+            }
+        }
 
-		idx = eol + 1;
-		eol = contents.indexOf('\n', idx);
-	}
+        idx = eol + 1;
+        eol = contents.indexOf("\n", idx);
+    }
 
-	util.log('   done');
+    util.log("   done");
 
-	return scripts;
+    return scripts;
 }
 
 
 function createGulpTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task 
 {
-	function getCommand(folder: WorkspaceFolder, relativePath: string, cmd: string): string 
-	{
-		let gulp = 'gulp';
-		//let gulp = folder.uri.fsPath + "/node_modules/.bin/gulp";
-		//if (process.platform === 'win32') {
-		//	gulp = folder.uri.fsPath + "\\node_modules\\.bin\\gulp.cmd";
-		//}
-		//if (relativePath) {
-		//	gulp += (' --gulpfile ' + path.join(relativePath, 'gulpfile.js'));
-		//}
-
-		//if (workspace.getConfiguration('taskExplorer').get('pathToGulp')) {
-		//	gulp = workspace.getConfiguration('taskExplorer').get('pathToGulp');
-		//}
+    function getCommand(folder: WorkspaceFolder, relativePath: string, cmd: string): string 
+    {
+        const gulp = "gulp";
+        // let gulp = folder.uri.fsPath + "/node_modules/.bin/gulp";
+        // if (process.platform === 'win32') {
+        //     gulp = folder.uri.fsPath + "\\node_modules\\.bin\\gulp.cmd";
+        // }
+        // if (relativePath) {
+        //     gulp += (' --gulpfile ' + path.join(relativePath, 'gulpfile.js'));
+        // }
  
-		return gulp; 
-	}
+        // if (workspace.getConfiguration('taskExplorer').get('pathToGulp')) {
+        //     gulp = workspace.getConfiguration('taskExplorer').get('pathToGulp');
+        // }
+ 
+        return gulp; 
+    }
 
-	function getRelativePath(folder: WorkspaceFolder, uri: Uri): string 
-	{
-		if (folder) {
-			let rootUri = folder.uri;
-			let absolutePath = uri.path.substring(0, uri.path.lastIndexOf('/') + 1);
-			return absolutePath.substring(rootUri.path.length + 1);
-		}
-		return '';
-	}
-	
-	let kind: GulpTaskDefinition = {
-		type: 'gulp',
-		script: target,
-		path: '',
-		fileName: path.basename(uri.path),
-		uri: uri
-	};
+    function getRelativePath(folder: WorkspaceFolder, uri: Uri): string 
+    {
+        if (folder) {
+            const rootUri = folder.uri;
+            const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
+            return absolutePath.substring(rootUri.path.length + 1);
+        }
+        return "";
+    }
 
-	let relativePath = getRelativePath(folder, uri);
-	if (relativePath.length) {
-		kind.path = relativePath;
-	}
-	let cwd = path.dirname(uri.fsPath);
+    const kind: GulpTaskDefinition = {
+        type: "gulp",
+        script: target,
+        path: "",
+        fileName: path.basename(uri.path),
+        uri
+    };
 
-	let args = [ getCommand(folder, relativePath, cmd), target ];
-	let options = {
-		"cwd": cwd
-	};
+    const relativePath = getRelativePath(folder, uri);
+    if (relativePath.length) {
+        kind.path = relativePath;
+    }
+    const cwd = path.dirname(uri.fsPath);
 
-	let execution = new ShellExecution('npx', args, options);
+    const args = [ getCommand(folder, relativePath, cmd), target ];
+    const options = {
+        cwd
+    };
 
-	return new Task(kind, folder, target, 'gulp', execution, undefined);
+    const execution = new ShellExecution("npx", args, options);
+
+    return new Task(kind, folder, target, "gulp", execution, undefined);
 }

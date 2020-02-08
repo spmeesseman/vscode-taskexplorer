@@ -1,7 +1,6 @@
 
 
-import
-{
+import {
     ExtensionContext, Task, TaskExecution, TreeItem, TreeItemCollapsibleState,
     WorkspaceFolder, tasks
 } from "vscode";

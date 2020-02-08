@@ -6,9 +6,8 @@
 
 import * as assert from 'assert';
 import * as vscode from "vscode";
-import { timeout } from '../util';
 import { configuration } from "../common/configuration";
-import { views, treeDataProvider2, getTreeDataProvider } from "../extension";
+import { getTreeDataProvider } from "../extension";
 
 suite("Extension Tests", () => 
 {

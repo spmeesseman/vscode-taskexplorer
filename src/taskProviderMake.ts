@@ -12,10 +12,10 @@ import { filesCache } from "./extension";
 
 type StringMap = { [s: string]: string; };
 
-let cachedTasks: Task[] = undefined;
+let cachedTasks: Task[];
 
 
-interface MakeTaskDefinition extends TaskDefinition 
+interface MakeTaskDefinition extends TaskDefinition
 {
     script?: string;
     path?: string;
@@ -24,7 +24,7 @@ interface MakeTaskDefinition extends TaskDefinition
     treeItem?: TaskItem;
 }
 
-export class MakeTaskProvider implements TaskProvider 
+export class MakeTaskProvider implements TaskProvider
 {
     constructor()
     {
@@ -42,15 +42,14 @@ export class MakeTaskProvider implements TaskProvider
 }
 
 
-export async function invalidateTasksCacheMake(opt?: Uri): Promise<void> 
+export async function invalidateTasksCacheMake(opt?: Uri): Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheMake");
 
-    if (opt && cachedTasks) 
+    if (opt && cachedTasks)
     {
         const rmvTasks: Task[] = [];
-        const uri: Uri = opt as Uri;
 
         cachedTasks.forEach(each =>
         {
@@ -83,13 +82,13 @@ export async function invalidateTasksCacheMake(opt?: Uri): Promise<void>
 }
 
 
-async function detectMakefiles(): Promise<Task[]> 
+async function detectMakefiles(): Promise<Task[]>
 {
 
     const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
-    const paths = filesCache.get('make');
+    const paths = filesCache.get("make");
 
     const folders = workspace.workspaceFolders;
     if (!folders)
@@ -100,11 +99,11 @@ async function detectMakefiles(): Promise<Task[]>
     {
         if (!paths)
         {
-            for (const folder of folders) 
+            for (const folder of folders)
             {
                 const relativePattern = new RelativePattern(folder, "**/[Mm]akefile");
                 const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-                for (const fpath of paths) 
+                for (const fpath of paths)
                 {
                     if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath))
                     {
@@ -120,8 +119,8 @@ async function detectMakefiles(): Promise<Task[]>
             for (const fobj of paths)
             {
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-					visitedFiles.add(fobj.uri.fsPath);
-					const tasks = await readMakefile(fobj.uri);
+                    visitedFiles.add(fobj.uri.fsPath);
+                    const tasks = await readMakefile(fobj.uri);
                     allTasks.push(...tasks);
                 }
             }
@@ -134,7 +133,7 @@ async function detectMakefiles(): Promise<Task[]>
 }
 
 
-async function provideMakefiles(): Promise<Task[]> 
+async function provideMakefiles(): Promise<Task[]>
 {
     if (!cachedTasks)
     {
@@ -144,7 +143,7 @@ async function provideMakefiles(): Promise<Task[]>
 }
 
 
-async function readMakefile(uri: Uri): Promise<Task[]> 
+async function readMakefile(uri: Uri): Promise<Task[]>
 {
     const emptyTasks: Task[] = [];
 
@@ -176,7 +175,7 @@ async function readMakefile(uri: Uri): Promise<Task[]>
 }
 
 
-async function findTargets(fsPath: string): Promise<StringMap> 
+async function findTargets(fsPath: string): Promise<StringMap>
 {
     const json: any = "";
     const scripts: StringMap = {};
@@ -192,13 +191,13 @@ async function findTargets(fsPath: string): Promise<StringMap>
     {
         const line: string = contents.substring(idx, eol).trim();
         //
-        // Target names always start at position 0 of the line.  
+        // Target names always start at position 0 of the line.
         //
         // TODO = Skip targets that are environment variable names, for now.  Need to
         // parse value if set in makefile and apply here for $() target names.
         //
         if (line.length > 0 && !line.startsWith("\t") && !line.startsWith(" ") &&
-            !line.startsWith("#") && !line.startsWith("$") && line.indexOf(":") > 0) 
+            !line.startsWith("#") && !line.startsWith("$") && line.indexOf(":") > 0)
         {
             const tgtName = line.substring(0, line.indexOf(":")).trim();
             const dependsName = line.substring(line.indexOf(":") + 1).trim();
@@ -224,9 +223,9 @@ async function findTargets(fsPath: string): Promise<StringMap>
 }
 
 
-function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task 
+function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
 {
-    function getCommand(folder: WorkspaceFolder, cmd: string): string 
+    function getCommand(folder: WorkspaceFolder, cmd: string): string
     {
         let make = "make";
 
@@ -243,7 +242,7 @@ function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, ur
         return make;
     }
 
-    function getRelativePath(folder: WorkspaceFolder, uri: Uri): string 
+    function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
     {
         if (folder)
         {

@@ -12,7 +12,7 @@ import { filesCache } from "./extension";
 
 type StringMap = { [s: string]: string; };
 
-let cachedTasks: Task[] = undefined;
+let cachedTasks: Task[];
 
 
 interface GradleTaskDefinition extends TaskDefinition 
@@ -49,12 +49,11 @@ export async function invalidateTasksCacheGradle(opt?: Uri): Promise<void>
 
     if (opt && cachedTasks) 
     {
-        let rmvTasks: Task[] = [];
-        let uri: Uri = opt as Uri;
+        const rmvTasks: Task[] = [];
 
         cachedTasks.forEach(each =>
         {
-            let cstDef: GradleTaskDefinition = each.definition;
+            const cstDef: GradleTaskDefinition = each.definition;
             if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath))
             {
                 rmvTasks.push(each);
@@ -69,7 +68,7 @@ export async function invalidateTasksCacheGradle(opt?: Uri): Promise<void>
 
         if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
         {
-            let tasks = await readGradlefile(opt);
+            const tasks = await readGradlefile(opt);
             cachedTasks.push(...tasks);
         }
 
@@ -86,11 +85,11 @@ export async function invalidateTasksCacheGradle(opt?: Uri): Promise<void>
 async function detectGradlefiles(): Promise<Task[]> 
 {
 
-    let emptyTasks: Task[] = [];
-    let allTasks: Task[] = [];
-    let visitedFiles: Set<string> = new Set();
-    let folders = workspace.workspaceFolders;
-    const paths = filesCache.get('gradle');
+    const emptyTasks: Task[] = [];
+    const allTasks: Task[] = [];
+    const visitedFiles: Set<string> = new Set();
+    const folders = workspace.workspaceFolders;
+    const paths = filesCache.get("gradle");
 
     util.log("", 1);
     util.log("Find gradlefiles", 1);
@@ -109,14 +108,14 @@ async function detectGradlefiles(): Promise<Task[]>
                 // Note - pattern will ignore gradlefiles in root project dir, which would be picked
                 // up by VSCoces internal Gradle task provider
                 //
-                let relativePattern = new RelativePattern(folder, "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]");
-                let paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
+                const relativePattern = new RelativePattern(folder, "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]");
+                const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
                 for (const fpath of paths) 
                 {
                     if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath))
                     {
                         util.log("   found " + fpath.fsPath, 1);
-                        let tasks = await readGradlefile(fpath);
+                        const tasks = await readGradlefile(fpath);
                         visitedFiles.add(fpath.fsPath);
                         allTasks.push(...tasks);
                     }
@@ -128,8 +127,8 @@ async function detectGradlefiles(): Promise<Task[]>
             for (const fobj of paths)
             {
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-					visitedFiles.add(fobj.uri.fsPath);
-					const tasks = await readGradlefile(fobj.uri);
+                    visitedFiles.add(fobj.uri.fsPath);
+                    const tasks = await readGradlefile(fobj.uri);
                     allTasks.push(...tasks);
                 }
             }
@@ -157,15 +156,15 @@ export async function provideGradlefiles(): Promise<Task[]>
 
 async function readGradlefile(uri: Uri): Promise<Task[]> 
 {
-    let emptyTasks: Task[] = [];
+    const emptyTasks: Task[] = [];
 
-    let folder = workspace.getWorkspaceFolder(uri);
+    const folder = workspace.getWorkspaceFolder(uri);
     if (!folder)
     {
         return emptyTasks;
     }
 
-    let scripts = await findTargets(uri.fsPath);
+    const scripts = await findTargets(uri.fsPath);
     if (!scripts)
     {
         return emptyTasks;
@@ -189,18 +188,18 @@ async function readGradlefile(uri: Uri): Promise<Task[]>
 
 async function findTargets(fsPath: string): Promise<StringMap> 
 {
-    let json: any = "";
-    let scripts: StringMap = {};
+    const json: any = "";
+    const scripts: StringMap = {};
 
     util.log("   Find gradlefile targets");
 
-    let contents = await util.readFile(fsPath);
+    const contents = await util.readFile(fsPath);
     let idx = 0;
     let eol = contents.indexOf("\n", 0);
 
     while (eol !== -1)
     {
-        let line: string = contents.substring(idx, eol).trim();
+        const line: string = contents.substring(idx, eol).trim();
         if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("task ")) 
         {
             let idx1 = line.trimLeft().indexOf(" ");
@@ -213,7 +212,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
                 }
                 if (idx2 !== -1)
                 {
-                    let tgtName = line.substring(idx1, idx2).trim();
+                    const tgtName = line.substring(idx1, idx2).trim();
 
                     if (tgtName)
                     {
@@ -256,34 +255,34 @@ function createGradleTask(target: string, cmd: string, folder: WorkspaceFolder, 
     {
         if (folder)
         {
-            let rootUri = folder.uri;
-            let absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
+            const rootUri = folder.uri;
+            const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
             return absolutePath.substring(rootUri.path.length + 1);
         }
         return "";
     }
 
-    let kind: GradleTaskDefinition = {
+    const kind: GradleTaskDefinition = {
         type: "gradle",
         script: target,
         path: "",
         fileName: path.basename(uri.path),
-        uri: uri
+        uri
     };
 
-    let relativePath = getRelativePath(folder, uri);
+    const relativePath = getRelativePath(folder, uri);
     if (relativePath.length)
     {
         kind.path = relativePath;
     }
-    let cwd = path.dirname(uri.fsPath);
+    const cwd = path.dirname(uri.fsPath);
 
-    let args = [target];
-    let options = {
-        "cwd": cwd
+    const args = [target];
+    const options = {
+        cwd
     };
 
-    let execution = new ShellExecution(getCommand(folder, cmd), args, options);
+    const execution = new ShellExecution(getCommand(folder, cmd), args, options);
 
     return new Task(kind, folder, target, "gradle", execution, undefined);
 }
