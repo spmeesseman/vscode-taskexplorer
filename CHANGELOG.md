@@ -1,3 +1,10 @@
+## [1.22.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.22.1...v1.22.2) (2020-02-08)
+
+
+### Bug Fixes
+
+* the 'add to excludes' context menu item isn't displayed on group nodes. ([62e08ec](https://github.com/spmeesseman/vscode-taskexplorer/commit/62e08ec))
+
 ## [1.22.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.22.0...v1.22.1) (2020-02-04)
 
 
