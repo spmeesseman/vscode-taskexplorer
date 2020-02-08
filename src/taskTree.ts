@@ -5,13 +5,11 @@
 
 import * as path from "path";
 import * as util from "./util";
-
-import
-{
-    Event, EventEmitter, ExtensionContext, Task, TaskDefinition, Terminal,
+import {
+    Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
     TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    CancellationToken, ShellExecution, TaskStartEvent, TaskEndEvent, TaskExecution
+    ShellExecution
 } from "vscode";
 import { visit, JSONVisitor } from "jsonc-parser";
 import * as nls from "vscode-nls";
@@ -612,26 +610,52 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             uri = selection.resourceUri!;
         }
-        if (!uri)
+        if (!uri && !selection.isGroup)
         {
             return;
         }
 
         util.log("Add to excludes");
-        util.logValue("  File glob", uri.path);
+        let pathValue = "";
 
-        const opts: InputBoxOptions = { prompt: "Add the following file to excluded tasks list?", value: uri.path };
+        if (selection.isGroup)
+        {
+            util.log("  File group");
+            pathValue = "";
+            selection.scripts.forEach(each =>
+            {
+                pathValue += each.resourceUri.path;
+                pathValue += ",";
+            });
+            if (pathValue) {
+                pathValue = pathValue.substring(0, pathValue.length - 1);
+            }
+        }
+        else
+        {
+            util.logValue("  File glob", uri.path);
+            pathValue = uri.path;
+        }
+
+        if (!pathValue)
+        {
+            return;
+        }
+
+        const opts: InputBoxOptions = { prompt: "Add the following file to excluded tasks list?", value: pathValue };
         window.showInputBox(opts).then(function (str: string)
         {
             if (str !== undefined)
             {
                 const excludes = configuration.get<Array<string>>("exclude");
-                if (!util.existsInArray(excludes, str))
-                {
-                    excludes.push(str);
-                    configuration.update("exclude", excludes);
-                    me.refresh(selection.taskSource, uri);
+                const strs = str.split(",");
+                for (const s in strs) {
+                    if (!util.existsInArray(excludes, strs[s])) {
+                        excludes.push(strs[s]);
+                    }
                 }
+                configuration.update("exclude", excludes);
+                me.refresh(selection.taskSource, uri);
             }
         });
     }

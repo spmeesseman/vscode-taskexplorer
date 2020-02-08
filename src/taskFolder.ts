@@ -1,48 +1,53 @@
 
-import {
-	ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder
-} from 'vscode';
-import { TaskFile } from './taskFile';
-import { timingSafeEqual } from 'crypto';
+import
+{
+    ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder
+} from "vscode";
+import { TaskFile } from "./taskFile";
 
 export class TaskFolder extends TreeItem 
 {
-	public taskFiles: TaskFile[] = [];
-	public taskFolders: TaskFolder[] = [];
+    public taskFiles: TaskFile[] = [];
+    public taskFolders: TaskFolder[] = [];
 
-	//public tasks: TaskItem[] = [];
-	public workspaceFolder: WorkspaceFolder;
+    public workspaceFolder: WorkspaceFolder;
 
-	constructor(folder: WorkspaceFolder) {
-		super(folder.name, TreeItemCollapsibleState.Expanded);
-		this.contextValue = 'folder';
-		this.resourceUri = folder.uri;
-		this.workspaceFolder = folder;
-		this.iconPath = ThemeIcon.Folder;
-	}
+    constructor(folder: WorkspaceFolder)
+    {
+        super(folder.name, TreeItemCollapsibleState.Expanded);
+        this.contextValue = "folder";
+        this.resourceUri = folder.uri;
+        this.workspaceFolder = folder;
+        this.iconPath = ThemeIcon.Folder;
+    }
 
-	addTaskFile(taskFile: TaskFile) {
-		this.taskFiles.push(taskFile);
-	}
+    addTaskFile(taskFile: TaskFile)
+    {
+        this.taskFiles.push(taskFile);
+    }
 
-	addTaskFolder(taskFolder: TaskFolder) {
-		this.taskFolders.push(taskFolder);
-	}
+    addTaskFolder(taskFolder: TaskFolder)
+    {
+        this.taskFolders.push(taskFolder);
+    }
 
-	removeTaskFile(taskFile: TaskFile) 
-	{
-		let idx: number = -1;
-		let idx2: number = -1;
+    removeTaskFile(taskFile: TaskFile) 
+    {
+        let idx = -1;
+        let idx2 = -1;
 
-		this.taskFiles.forEach(each => {
-			idx++;
-			if (taskFile === each) {
-				idx2 = idx;
-			}
-		});
+        this.taskFiles.forEach(each =>
+        {
+            idx++;
+            if (taskFile === each)
+            {
+                idx2 = idx;
+            }
+        });
 
-		if (idx2 !== -1 && idx2 < this.taskFiles.length) {
-			this.taskFiles.splice(idx2, 1);
-		}
-	}
+        if (idx2 !== -1 && idx2 < this.taskFiles.length)
+        {
+            this.taskFiles.splice(idx2, 1);
+        }
+    }
 }
