@@ -378,7 +378,7 @@ suite('Task tests', () =>
     {
         //addFolderToCache(dirName);
 
-        if (!treeDataProvider2) {
+        if (!trees.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
@@ -387,7 +387,7 @@ suite('Task tests', () =>
         //
         // Refresh for better coverage
         //
-        treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
+        treeItems = await trees.explorerProvider.getChildren(); // mock explorer open view which would call this function
         await timeout(300);
         await configuration.update('exclude', '**/coveronly/**');
         await configuration.update('pathToAnt', 'ant.bat');
@@ -398,8 +398,8 @@ suite('Task tests', () =>
         await configuration.update('pathToPerl', 'perl');
         await configuration.update('pathToPython', 'python');
         await configuration.update('pathToPowershell', 'powershell');
-        await treeDataProvider2.refresh();
-        treeItems = await treeDataProvider2.getChildren(); // mock explorer open view which would call this function
+        await trees.explorerProvider.refresh();
+        treeItems = await trees.explorerProvider.getChildren(); // mock explorer open view which would call this function
 
         let taskItems = await tasks.fetchTasks({ type: 'npm' });
         console.log("npmTASKCOUNT???: " + taskItems.length);
