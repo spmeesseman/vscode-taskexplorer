@@ -7,7 +7,9 @@
 import * as assert from 'assert';
 import * as vscode from "vscode";
 import { configuration } from "../common/configuration";
-import { getTreeDataProvider } from "../extension";
+
+export let trees: any;
+
 
 suite("Extension Tests", () => 
 {
@@ -26,7 +28,7 @@ suite("Extension Tests", () =>
     });
 
 
-    test("Activate extension", function (done) 
+    test("Activate extension", function(done) 
     {
 
         this.timeout(60 * 1000);
@@ -74,6 +76,7 @@ suite("Extension Tests", () =>
             console.log('        Manually activating extension');
             extension.activate().then(
                 api => {
+                    trees = api;
                     assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
                     done();
                 },
@@ -89,45 +92,13 @@ suite("Extension Tests", () =>
     });
 
 
-    test("Enable all options", function(done) 
+    test("Check tree providers", function(done) 
     {
-        //
-        // Enable views
-        //
-        assert(configuration.update('enableExplorerView', true));
-        assert(configuration.update('enableSideBar', true));
-        //
-        // Set misc settings
-        //
-        assert(configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]));
-        assert(configuration.update('debug', true));
-        //
-        // Enable all task types
-        //
-        assert(configuration.update('enableAnt', true));
-        assert(configuration.update('enableAppPublisher', true));
-        assert(configuration.update('enableBash', true));
-        assert(configuration.update('enableBatch', true));
-        assert(configuration.update('enableGradle', true));
-        assert(configuration.update('enableGrunt', true));
-        assert(configuration.update('enableGulp', true));
-        assert(configuration.update('enableMake', true));
-        assert(configuration.update('enableNpm', true));
-        assert(configuration.update('enableNsis', true));
-        assert(configuration.update('enablePowershell', true));
-        assert(configuration.update('enablePerl', true));
-        assert(configuration.update('enablePython', true));
-        assert(configuration.update('enableRuby', true));
-        assert(configuration.update('enableWorkspace', true));
-        
-        done();
-    });
-
-
-    test("Check tree data provider", function (done) 
-    {
-        if (!getTreeDataProvider()) {
+        if (!trees.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
+        }
+        if (!trees.sidebarProvider) {
+            assert.fail("        ✘ Task Explorer sidebar tree instance does not exist");
         }
         done();
     });

@@ -124,6 +124,11 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     storage = new Storage(context.globalState);
 
     log("   Task Explorer activated");
+
+    return {
+        explorerProvider: treeDataProvider2,
+        sidebarProvider: treeDataProvider
+    }
 }
 
 

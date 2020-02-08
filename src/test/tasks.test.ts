@@ -9,7 +9,7 @@ import * as path from 'path';
 import { commands, workspace, Uri, tasks } from 'vscode';
 import * as testUtil from './testUtil';
 import { timeout, setWriteToConsole } from '../util';
-import { treeDataProvider2 } from '../extension';
+import { trees } from './extension.test';
 import { TaskFolder } from '../taskFolder';
 import { TaskFile } from '../taskFile';
 import { TaskItem } from '../taskItem';
@@ -406,9 +406,9 @@ suite('Task tests', () =>
     });
 
 
-    test('Verify tree validity and open tasks', async function() 
+    test('Verify tree validity and open tasks', async function(done) 
     {
-        if (!treeDataProvider2) {
+        if (!trees.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
 
@@ -438,11 +438,13 @@ suite('Task tests', () =>
         {
             assert.fail('No vscode items found');
         }
+        
+        done();
     });
 
-    test('Invalidation tests', async function() 
+    test('Invalidation tests', async function(done) 
     {
-        if (!treeDataProvider2) {
+        if (!trees.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
 
@@ -462,13 +464,15 @@ suite('Task tests', () =>
         await configuration.update('enableRuby', false);
         await configuration.update('enableWorkspace', false);
 
-        await taskMap.forEach(async(value: Uri, key: string) =>  {
+        taskMap.forEach(async(value: Uri, key: string) =>  {
             if (value) {
-                await treeDataProvider2.invalidateTasksCache(key, value);
+                await trees.explorerProvider.invalidateTasksCache(key, value);
             }
         });
 
-        await treeDataProvider2.invalidateTasksCache(undefined, undefined);
+        await trees.explorerProvider.invalidateTasksCache(undefined, undefined);
+        
+        done();
     });
 });
 
@@ -483,12 +487,12 @@ async function scanTasks()
             try {
                 if (item instanceof TaskFolder) 
                 {
-                    let tmp: any = await treeDataProvider2.getParent(item);
+                    let tmp: any = await trees.explorerProvider.getParent(item);
                     assert(tmp === null, 'Invaid parent type, should be null for TaskFolder');
 
                     console.log('    Task Folder ' +item.label + ':  ' + item.resourceUri.fsPath);
 
-                    let treeFiles: any[] = await treeDataProvider2.getChildren(item);
+                    let treeFiles: any[] = await trees.explorerProvider.getChildren(item);
                     if (treeFiles.length > 0) 
                     {
                         let item2: any;
@@ -498,13 +502,13 @@ async function scanTasks()
                             {
                                 console.log('        Task File: ' + item2.path + item2.fileName);
 
-                                tmp = await treeDataProvider2.getParent(item2);
+                                tmp = await trees.explorerProvider.getParent(item2);
                                 assert(
                                     tmp instanceof TaskFolder,
                                     'Invaid parent type, should be TaskFolder for TaskFile'
                                 );
 
-                                let treeTasks: any[] = await treeDataProvider2.getChildren(item2);
+                                let treeTasks: any[] = await trees.explorerProvider.getChildren(item2);
 
                                 if (treeTasks.length > 0) 
                                 {
@@ -515,7 +519,7 @@ async function scanTasks()
                                         {
                                             await commands.executeCommand('taskExplorer.open', item3);
                                             
-                                            tmp = await treeDataProvider2.getParent(item3);
+                                            tmp = await trees.explorerProvider.getParent(item3);
                                             assert(
                                                 tmp instanceof TaskFile,
                                                 'Invaid parent type, should be TaskFile for TaskItem'
@@ -545,7 +549,7 @@ async function scanTasks()
                             }
                             else if (item2 instanceof TaskFile && item2.isGroup) 
                             {
-                                let itreeFiles: any[] = await treeDataProvider2.getChildren(item2);
+                                let itreeFiles: any[] = await trees.explorerProvider.getChildren(item2);
                                 if (itreeFiles.length > 0) 
                                 {
                                     let item2: any;
@@ -555,13 +559,13 @@ async function scanTasks()
                                         {
                                             console.log('        Task File (grouped): ' + item2.path + item2.fileName);
 
-                                            tmp = await treeDataProvider2.getParent(item2);
+                                            tmp = await trees.explorerProvider.getParent(item2);
                                             assert(
                                                 tmp instanceof TaskFolder,
                                                 'Invaid parent type, should be TaskFolder for TaskFile'
                                             );
 
-                                            let treeTasks: any[] = await treeDataProvider2.getChildren(item2);
+                                            let treeTasks: any[] = await trees.explorerProvider.getChildren(item2);
                                             if (treeTasks.length > 0) 
                                             {
                                                 let item3: any;
@@ -571,7 +575,7 @@ async function scanTasks()
                                                     {
                                                         await commands.executeCommand('taskExplorer.open', item3);
 
-                                                        tmp = await treeDataProvider2.getParent(item3);
+                                                        tmp = await trees.explorerProvider.getParent(item3);
                                                         assert(
                                                             tmp instanceof TaskFile,
                                                             'Invaid parent type, should be TaskFile for TaskItem'
