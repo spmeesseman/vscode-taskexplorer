@@ -10,7 +10,7 @@ import { commands, workspace, Uri, tasks } from 'vscode';
 import * as testUtil from './testUtil';
 //import * as extension from '../extension';
 import { timeout } from '../util';
-import { treeDataProvider2 } from '../extension';
+import { treeDataProvider2, addFolderToCache } from '../extension';
 import { TaskFolder } from '../taskFolder';
 import { TaskFile } from '../taskFile';
 import { TaskItem } from '../taskItem';
@@ -375,7 +375,9 @@ suite('Task tests', () =>
 
 
     test('Scan tasks', async function() 
-    {;
+    {
+        //addFolderToCache(dirName);
+
         if (!treeDataProvider2) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }

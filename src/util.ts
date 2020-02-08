@@ -219,12 +219,16 @@ export function existsInArray(arr: any[], item: any)
 export async function log(msg: string, level?: number)
 {
     if (level && level > configuration.get<number>("debugLevel")) {
+        //if (workspace.getConfiguration("taskExplorer").get("debug") === true) {
+        //    console.log(msg);
+        //}
         return;
     }
 
     if (workspace.getConfiguration("taskExplorer").get("debug") === true)
     {
         logOutputChannel.appendLine(msg);
+        console.log(msg);
     }
 }
 

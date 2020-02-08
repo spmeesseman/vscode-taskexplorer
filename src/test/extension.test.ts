@@ -40,8 +40,38 @@ suite("Extension Tests", () =>
             assert.fail("Extension not found");
         }
 
+        //
+        // Enable views
+        //
+        assert(configuration.update('enableExplorerView', true));
+        assert(configuration.update('enableSideBar', true));
+        //
+        // Set misc settings
+        //
+        assert(configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]));
+        assert(configuration.update('debug', true));
+        //
+        // Enable all task types
+        //
+        assert(configuration.update('enableAnt', true));
+        assert(configuration.update('enableAppPublisher', true));
+        assert(configuration.update('enableBash', true));
+        assert(configuration.update('enableBatch', true));
+        assert(configuration.update('enableGradle', true));
+        assert(configuration.update('enableGrunt', true));
+        assert(configuration.update('enableGulp', true));
+        assert(configuration.update('enableMake', true));
+        assert(configuration.update('enableNpm', true));
+        assert(configuration.update('enableNsis', true));
+        assert(configuration.update('enablePowershell', true));
+        assert(configuration.update('enablePerl', true));
+        assert(configuration.update('enablePython', true));
+        assert(configuration.update('enableRuby', true));
+        assert(configuration.update('enableWorkspace', true));
+
         if (!extension.isActive) 
         {
+            console.log('        Manually activating extension');
             extension.activate().then(
                 api => {
                     assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
@@ -89,7 +119,7 @@ suite("Extension Tests", () =>
         assert(configuration.update('enablePython', true));
         assert(configuration.update('enableRuby', true));
         assert(configuration.update('enableWorkspace', true));
-
+        
         done();
     });
 
