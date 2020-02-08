@@ -13,7 +13,6 @@ import { trees } from './extension.test';
 import { TaskFolder } from '../taskFolder';
 import { TaskFile } from '../taskFile';
 import { TaskItem } from '../taskItem';
-import { configuration } from '../common/configuration';
 
 let tempFiles: Array<string> = [];
 let dirName: string = '';
@@ -48,7 +47,7 @@ suite('Task tests', () =>
         dirNameCode = path.join(workspace.rootPath ? workspace.rootPath  : "", '.vscode');
         //console.log(dirName);
 
-        await configuration.update('exclude', ['**/coveronly/**']);
+        await trees.configuration.update('exclude', ['**/coveronly/**']);
 
         if (!fs.existsSync(dirName)) {
             fs.mkdirSync(dirName);
@@ -389,20 +388,32 @@ suite('Task tests', () =>
         //
         treeItems = await trees.explorerProvider.getChildren(); // mock explorer open view which would call this function
         await timeout(300);
-        await configuration.update('exclude', '**/coveronly/**');
-        await configuration.update('pathToAnt', 'ant.bat');
-        await configuration.update('pathToGradle', 'gradle.bat');
-        //await configuration.update('pathToGrunt', 'grunt.bat');
-        //await configuration.update('pathToGulp', 'gulp.bat');
-        await configuration.update('pathToMake', 'nmake');
-        await configuration.update('pathToPerl', 'perl');
-        await configuration.update('pathToPython', 'python');
-        await configuration.update('pathToPowershell', 'powershell');
+        await trees.configuration.update('exclude', '**/coveronly/**');
+        await trees.configuration.update('pathToAnt', 'ant.bat');
+        await trees.configuration.update('pathToGradle', 'gradle.bat');
+        //await trees.configuration.update('pathToGrunt', 'grunt.bat');
+        //await trees.configuration.update('pathToGulp', 'gulp.bat');
+        await trees.configuration.update('pathToMake', 'nmake');
+        await trees.configuration.update('pathToPerl', 'perl');
+        await trees.configuration.update('pathToPython', 'python');
+        await trees.configuration.update('pathToPowershell', 'powershell');
         await trees.explorerProvider.refresh();
         treeItems = await trees.explorerProvider.getChildren(); // mock explorer open view which would call this function
 
         let taskItems = await tasks.fetchTasks({ type: 'npm' });
-        console.log("npmTASKCOUNT???: " + taskItems.length);
+        assert(taskItems.length > 0, 'No npm tasks registered');
+
+        taskItems = await tasks.fetchTasks({ type: 'ant' });
+        assert(taskItems.length > 0, 'No ant tasks registered');
+
+        taskItems = await tasks.fetchTasks({ type: 'grunt' });
+        assert(taskItems.length > 0, 'No grunt tasks registered');
+
+        taskItems = await tasks.fetchTasks({ type: 'gulp' });
+        assert(taskItems.length > 0, 'No gulp tasks registered');
+
+        taskItems = await tasks.fetchTasks({ type: 'tsc' });
+        assert(taskItems.length > 0, 'No tsc tasks registered');
     });
 
 
@@ -446,21 +457,21 @@ suite('Task tests', () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
 
-        await configuration.update('enableAnt', false);
-        await configuration.update('enableAppPublisher', false);
-        await configuration.update('enableBash', false);
-        await configuration.update('enableBatch', false);
-        await configuration.update('enableGradle', false);
-        await configuration.update('enableGrunt', false);
-        await configuration.update('enableGulp', false);
-        await configuration.update('enableMake', false);
-        await configuration.update('enableNpm', false);
-        await configuration.update('enableNsis', false);
-        await configuration.update('enablePowershell', false);
-        await configuration.update('enablePerl', false);
-        await configuration.update('enablePython', false);
-        await configuration.update('enableRuby', false);
-        await configuration.update('enableWorkspace', false);
+        await trees.configuration.update('enableAnt', false);
+        await trees.configuration.update('enableAppPublisher', false);
+        await trees.configuration.update('enableBash', false);
+        await trees.configuration.update('enableBatch', false);
+        await trees.configuration.update('enableGradle', false);
+        await trees.configuration.update('enableGrunt', false);
+        await trees.configuration.update('enableGulp', false);
+        await trees.configuration.update('enableMake', false);
+        await trees.configuration.update('enableNpm', false);
+        await trees.configuration.update('enableNsis', false);
+        await trees.configuration.update('enablePowershell', false);
+        await trees.configuration.update('enablePerl', false);
+        await trees.configuration.update('enablePython', false);
+        await trees.configuration.update('enableRuby', false);
+        await trees.configuration.update('enableWorkspace', false);
 
         taskMap.forEach(async(value: Uri, key: string) =>  {
             if (value) {

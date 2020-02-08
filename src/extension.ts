@@ -127,8 +127,9 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 
     return {
         explorerProvider: treeDataProvider2,
-        sidebarProvider: treeDataProvider
-    }
+        sidebarProvider: treeDataProvider,
+        configuration
+    };
 }
 
 
