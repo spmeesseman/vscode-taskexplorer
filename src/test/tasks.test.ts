@@ -441,10 +441,6 @@ suite('Task tests', () =>
         {
             assert.fail('No npm items found');
         }
-        else if (!taskMap.get('tsc') === undefined)
-        {
-            assert.fail('No tsc items found');
-        }
         else if (!taskMap.get('Workspace') === undefined)
         {
             assert.fail('No vscode items found');
