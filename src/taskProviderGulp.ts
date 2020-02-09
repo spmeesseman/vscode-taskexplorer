@@ -5,16 +5,16 @@ import {
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
-import { TaskItem } from "./taskItem";
+import { TaskItem } from "./tasks";
 import { configuration } from "./common/configuration";
-import { filesCache } from "./extension";
+import { filesCache } from "./cache";
 
 type StringMap = { [s: string]: string; };
 
-let cachedTasks: Task[] = undefined;
+let cachedTasks: Task[];
 
 
-interface GulpTaskDefinition extends TaskDefinition 
+interface GulpTaskDefinition extends TaskDefinition
 {
     script?: string;
     path?: string;
@@ -23,7 +23,7 @@ interface GulpTaskDefinition extends TaskDefinition
     treeItem?: TaskItem;
 }
 
-export class GulpTaskProvider implements TaskProvider 
+export class GulpTaskProvider implements TaskProvider
 {
     constructor() {}
 
@@ -37,12 +37,12 @@ export class GulpTaskProvider implements TaskProvider
 }
 
 
-export async function invalidateTasksCacheGulp(opt?: Uri) : Promise<void> 
+export async function invalidateTasksCacheGulp(opt?: Uri) : Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheGulp");
 
-    if (opt && cachedTasks) 
+    if (opt && cachedTasks)
     {
         const rmvTasks: Task[] = [];
 
@@ -73,7 +73,7 @@ export async function invalidateTasksCacheGulp(opt?: Uri) : Promise<void>
 }
 
 
-async function provideGulpfiles(): Promise<Task[]> 
+async function provideGulpfiles(): Promise<Task[]>
 {
     if (!cachedTasks) {
         cachedTasks = await detectGulpfiles();
@@ -82,7 +82,7 @@ async function provideGulpfiles(): Promise<Task[]>
 }
 
 
-async function detectGulpfiles(): Promise<Task[]> 
+async function detectGulpfiles(): Promise<Task[]>
 {
 
     const emptyTasks: Task[] = [];
@@ -97,7 +97,7 @@ async function detectGulpfiles(): Promise<Task[]>
     try {
         if (!paths)
         {
-            for (const folder of folders) 
+            for (const folder of folders)
             {
                 //
                 // Note - pattern will ignore gulpfiles in root project dir, which would be picked
@@ -105,7 +105,7 @@ async function detectGulpfiles(): Promise<Task[]>
                 //
                 const relativePattern = new RelativePattern(folder, "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]");
                 const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-                for (const fpath of paths) 
+                for (const fpath of paths)
                 {
                     if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
                         const tasks = await readGulpfile(fpath);
@@ -133,7 +133,7 @@ async function detectGulpfiles(): Promise<Task[]>
 }
 
 
-async function readGulpfile(uri: Uri): Promise<Task[]> 
+async function readGulpfile(uri: Uri): Promise<Task[]>
 {
     const emptyTasks: Task[] = [];
 
@@ -161,7 +161,7 @@ async function readGulpfile(uri: Uri): Promise<Task[]>
 }
 
 
-async function findTargets(fsPath: string): Promise<StringMap> 
+async function findTargets(fsPath: string): Promise<StringMap>
 {
     const json: any = "";
     const scripts: StringMap = {};
@@ -176,7 +176,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
     while (eol !== -1)
     {
         let line: string = contents.substring(idx, eol).trim();
-        if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("gulp.task")) 
+        if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("gulp.task"))
         {
             let idx1 = line.indexOf("'");
             if (idx1 === -1) {
@@ -207,7 +207,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
                 if (idx2 === -1) {
                     idx2 = line.indexOf('"', idx1);
                 }
-                if (idx2 !== -1) 
+                if (idx2 !== -1)
                 {
                     const tgtName = line.substring(idx1, idx2).trim();
 
@@ -230,9 +230,9 @@ async function findTargets(fsPath: string): Promise<StringMap>
 }
 
 
-function createGulpTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task 
+function createGulpTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
 {
-    function getCommand(folder: WorkspaceFolder, relativePath: string, cmd: string): string 
+    function getCommand(folder: WorkspaceFolder, relativePath: string, cmd: string): string
     {
         const gulp = "gulp";
         // let gulp = folder.uri.fsPath + "/node_modules/.bin/gulp";
@@ -242,15 +242,15 @@ function createGulpTask(target: string, cmd: string, folder: WorkspaceFolder, ur
         // if (relativePath) {
         //     gulp += (' --gulpfile ' + path.join(relativePath, 'gulpfile.js'));
         // }
- 
+
         // if (workspace.getConfiguration('taskExplorer').get('pathToGulp')) {
         //     gulp = workspace.getConfiguration('taskExplorer').get('pathToGulp');
         // }
- 
-        return gulp; 
+
+        return gulp;
     }
 
-    function getRelativePath(folder: WorkspaceFolder, uri: Uri): string 
+    function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
     {
         if (folder) {
             const rootUri = folder.uri;

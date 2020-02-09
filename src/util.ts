@@ -1,5 +1,5 @@
-import { logOutputChannel } from "./extension";
-import { workspace, RelativePattern, WorkspaceFolder, Uri } from "vscode";
+
+import { workspace, RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext, commands, window } from "vscode";
 import * as fs from "original-fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./common/configuration";
@@ -7,6 +7,21 @@ import { configuration } from "./common/configuration";
 const logValueWhiteSpace = 40;
 
 let writeToConsole = false;
+let logOutputChannel: OutputChannel | undefined;
+
+
+export function initLog(context: ExtensionContext)
+{
+    // Set up a log in the Output window
+    //
+    logOutputChannel = window.createOutputChannel("Task Explorer");
+    context.subscriptions.push(logOutputChannel);
+    context.subscriptions.push(commands.registerCommand("taskExplorer.showOutput", () => logOutputChannel.show()));
+    const showOutput = configuration.get<boolean>("showOutput");
+    if (showOutput) {
+        logOutputChannel.show();
+    }
+}
 
 
 export function camelCase(name: string, indexUpper: number)

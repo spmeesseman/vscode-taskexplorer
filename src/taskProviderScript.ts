@@ -6,8 +6,8 @@ import {
 import * as path from "path";
 import * as util from "./util";
 import { configuration } from "./common/configuration";
-import { TaskItem } from "./taskItem";
-import { filesCache } from "./extension";
+import { TaskItem } from "./tasks";
+import { filesCache } from "./cache";
 
 type StringMap = { [s: string]: string; };
 
@@ -290,7 +290,7 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
     //
     if (scriptDef.args)
     {
-        for (var i = 0; i < scriptDef.args.length; i++) {
+        for (let i = 0; i < scriptDef.args.length; i++) {
             kind.cmdLine += " ";
             kind.cmdLine += scriptDef.args[i];
         }

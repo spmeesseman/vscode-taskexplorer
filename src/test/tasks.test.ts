@@ -10,9 +10,7 @@ import { commands, workspace, Uri, tasks } from 'vscode';
 import * as testUtil from './testUtil';
 import { timeout, setWriteToConsole } from '../util';
 import { trees } from './extension.test';
-import { TaskFolder } from '../taskFolder';
-import { TaskFile } from '../taskFile';
-import { TaskItem } from '../taskItem';
+import { TaskFolder, TaskFile, TaskItem } from '../tasks';
 
 let tempFiles: Array<string> = [];
 let dirName: string = '';

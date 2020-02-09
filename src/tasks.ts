@@ -1,11 +1,72 @@
 
 import {
-    ExtensionContext, TreeItem, TreeItemCollapsibleState, Uri, TaskDefinition, ThemeIcon
+    Task, TaskExecution, ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder,
+    TaskDefinition, ExtensionContext, tasks, Uri
 } from "vscode";
-import { TaskFolder } from "./taskFolder";
-import { TaskItem } from "./taskItem";
 import * as path from "path";
 import * as util from "./util";
+
+export class TaskItem extends TreeItem 
+{
+    public static readonly defaultSource = "Workspace";
+
+    public readonly task: Task | undefined;
+    public readonly taskSource: string;
+    public readonly execution: TaskExecution | undefined;
+    public paused: boolean;
+
+    taskFile: TaskFile;
+
+    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task) 
+    {
+        let taskName = task.name;
+        if (taskName.indexOf(" - ") !== -1 && (taskName.indexOf("/") !== -1 || taskName.indexOf("\\") !== -1 ||
+            taskName.indexOf(" - tsconfig.json") !== -1))
+        {
+            taskName = task.name.substring(0, task.name.indexOf(" - "));
+        }
+
+        super(taskName, TreeItemCollapsibleState.None);
+
+        this.id = taskFile.resourceUri.fsPath + ":" + task.name + Math.floor(Math.random() * 1000000);
+        this.paused = false;
+        this.contextValue = "script";
+        this.taskFile = taskFile;
+        this.task = task;
+        this.command = {
+            title: "Open definition",
+            command: "taskExplorer.open",
+            arguments: [this]
+        };
+        this.taskSource = task.source;
+        this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
+            e.task.scope === task.scope && e.task.definition.path === task.definition.path);
+
+        this.contextValue = this.execution && task.definition.type !== "$composite" ? "runningScript" : "script";
+
+        if (this.execution && task.definition.type !== "$composite")
+        {
+            this.iconPath = {
+                light: context.asAbsolutePath(path.join("res", "light", "loading.svg")),
+                dark: context.asAbsolutePath(path.join("res", "dark", "loading.svg"))
+            };
+        } else
+        {
+            this.iconPath = {
+                light: context.asAbsolutePath(path.join("res", "light", "script.svg")),
+                dark: context.asAbsolutePath(path.join("res", "dark", "script.svg"))
+            };
+        }
+
+        this.tooltip = "Open " + task.name;
+    }
+
+    getFolder(): WorkspaceFolder
+    {
+        return this.taskFile.folder.workspaceFolder;
+    }
+}
+
 
 export class TaskFile extends TreeItem
 {
@@ -177,5 +238,52 @@ export class TaskFile extends TreeItem
     addScript(script: any)
     {
         this.scripts.push(script);
+    }
+}
+
+export class TaskFolder extends TreeItem 
+{
+    public taskFiles: TaskFile[] = [];
+    public taskFolders: TaskFolder[] = [];
+
+    public workspaceFolder: WorkspaceFolder;
+
+    constructor(folder: WorkspaceFolder)
+    {
+        super(folder.name, TreeItemCollapsibleState.Expanded);
+        this.contextValue = "folder";
+        this.resourceUri = folder.uri;
+        this.workspaceFolder = folder;
+        this.iconPath = ThemeIcon.Folder;
+    }
+
+    addTaskFile(taskFile: TaskFile)
+    {
+        this.taskFiles.push(taskFile);
+    }
+
+    addTaskFolder(taskFolder: TaskFolder)
+    {
+        this.taskFolders.push(taskFolder);
+    }
+
+    removeTaskFile(taskFile: TaskFile) 
+    {
+        let idx = -1;
+        let idx2 = -1;
+
+        this.taskFiles.forEach(each =>
+        {
+            idx++;
+            if (taskFile === each)
+            {
+                idx2 = idx;
+            }
+        });
+
+        if (idx2 !== -1 && idx2 < this.taskFiles.length)
+        {
+            this.taskFiles.splice(idx2, 1);
+        }
     }
 }

@@ -1,14 +1,23 @@
 "use strict";
 
-import
-{
-    Memento
+import {
+    Memento, ExtensionContext
 } from "vscode";
 
-export class Storage 
+export let storage: Memento | undefined;
+
+export function initStorage(context: ExtensionContext)
+{
+    //
+    // Set up extension custom storage
+    //
+    storage = new Storage(context.globalState);
+}
+
+class Storage
 {
     private storage: Memento;
-    
+
     constructor(storageMemento: Memento)
     {
         this.storage = storageMemento;

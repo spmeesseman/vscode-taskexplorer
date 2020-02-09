@@ -6,9 +6,9 @@ import
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
-import { TaskItem } from "./taskItem";
+import { TaskItem } from "./tasks";
 import { configuration } from "./common/configuration";
-import { filesCache } from "./extension";
+import { filesCache } from "./cache";
 
 type StringMap = { [s: string]: string; };
 

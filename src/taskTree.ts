@@ -13,10 +13,10 @@ import {
 } from "vscode";
 import { visit, JSONVisitor } from "jsonc-parser";
 import * as nls from "vscode-nls";
-import { TaskFolder } from "./taskFolder";
-import { TaskFile } from "./taskFile";
-import { TaskItem } from "./taskItem";
-import { views, storage, filesCache, addFolderToCache } from "./extension";
+import { TaskFolder, TaskFile, TaskItem } from "./tasks";
+import { storage } from "./common/storage";
+import { views } from "./views";
+import { filesCache, addFolderToCache } from "./cache";
 import { configuration } from "./common/configuration";
 import { invalidateTasksCacheAnt } from "./taskProviderAnt";
 import { invalidateTasksCacheMake } from "./taskProviderMake";

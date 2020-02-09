@@ -7,8 +7,8 @@ import * as path from "path";
 import * as util from "./util";
 import { parseString } from "xml2js";
 import { configuration } from "./common/configuration";
-import { TaskItem } from "./taskItem";
-import { filesCache } from "./extension";
+import { TaskItem } from "./tasks";
+import { filesCache } from "./cache";
 
 type StringMap = { [s: string]: string; };
 let cachedTasks: Task[];
