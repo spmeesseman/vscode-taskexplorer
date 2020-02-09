@@ -1,7 +1,6 @@
 import { logOutputChannel } from "./extension";
 import { workspace, RelativePattern, WorkspaceFolder, Uri } from "vscode";
-import { accessSync } from "original-fs";
-import * as fs from "fs";
+import * as fs from "original-fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./common/configuration";
 
@@ -155,7 +154,7 @@ export function timeout(ms: number)
 export function pathExists(path: string)
 {
     try {
-        accessSync(path);
+        fs.accessSync(path);
     } catch (err) {
         return false;
     }
