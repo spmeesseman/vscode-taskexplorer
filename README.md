@@ -32,6 +32,7 @@
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
   - [Feedback & Contributing](#feedback--contributing)
   - [Thank You](#thank-you)
+  - [Other Code Extensions by spmeesseman](#other-code-extensions-by-spmeesseman)
 
 ## Screenshots
 
@@ -49,7 +50,6 @@
 
 ## Features
 
-* Check out the [todo list](https://github.com/spmeesseman/vscode-taskexplorer/blob/master/.todo) (kept with [Todo+](https://marketplace.visualstudio.com/itemdetails?itemName=fabiospampinato.vscode-todo-plus))
 * v1.22 - Major performance enhancements - Task Tree / Task Scanning
 * v1.21 - Add option to keep terminal open after stopping task [closes #51]
 * v1.20 - Add support for restarting task (thank you **antfu**)
@@ -109,10 +109,17 @@ Bash/sh scripts in Windows will have the shell executable automatically set to a
 * Please report any bugs, suggestions or documentation requests via the
   [Issues](https://github.com/spmeesseman/vscode-taskexplorer/issues)
 * Feel free to submit
-  [pull requests](https://github.com/spmeesseman/vscode-taskexplorer/pulls)
+  [Pull Requests](https://github.com/spmeesseman/vscode-taskexplorer/pulls)
 * [Contributors](https://github.com/spmeesseman/vscode-taskexplorer/graphs/contributors)
 
 ## Thank You
 
 * The [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme) for some of the task type icons.
 * The author of the [NSIS Extension](https://marketplace.visualstudio.com/items?itemName=idleberg.nsis) idleberg for NSIS graphics.
+
+## Other Code Extensions by spmeesseman
+
+|Package|Repository|Marketplace|
+|-|-|-|
+|svn-scm-ext|[GitHub](https://github.com/spmeesseman/svn-scm-ext)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.svn-scm-ext)|
+|vscode-vslauncher|[GitHub](https://github.com/spmeesseman/vscode-vslauncher)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-vslauncher)|
