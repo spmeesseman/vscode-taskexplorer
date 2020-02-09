@@ -45,7 +45,7 @@
     ],
     "main": "./out/extension",
     "activationEvents": [
-        
+        "*"
     ],
     "config": {
         "commitizen": {
