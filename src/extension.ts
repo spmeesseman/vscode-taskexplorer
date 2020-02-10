@@ -18,7 +18,9 @@ import { AppPublisherTaskProvider } from "./taskProviderAppPublisher";
 import { configuration } from "./common/configuration";
 import { initStorage } from "./common/storage";
 import { views } from "./views";
-import { filesCache, addFolderToCache, buildCache } from "./cache";
+import {
+    filesCache, addFolderToCache, buildCache, addFileToCache, removeFileFromCache
+} from "./cache";
 import { initLog, log, logValue } from "./util";
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
@@ -242,44 +244,6 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
         refreshTree();
     }
 }
-
-
-async function addFileToCache(taskAlias: string, uri: Uri)
-{
-    if (!filesCache.get(taskAlias)) {
-        filesCache.set(taskAlias, new Set());
-    }
-    const taskCache = filesCache.get(taskAlias);
-    taskCache.add({
-        uri,
-        folder: workspace.getWorkspaceFolder(uri)
-    });
-}
-
-
-async function removeFileFromCache(taskAlias: string, uri: Uri)
-{
-    if (!filesCache.get(taskAlias)) {
-        return;
-    }
-    const taskCache = filesCache.get(taskAlias);
-    const toRemove = [];
-    taskCache.forEach((item) =>
-    {
-        if (item.uri.fsPath === uri.fsPath) {
-            toRemove.push(item);
-        }
-    });
-    if (toRemove.length > 0) {
-        for (const tr in toRemove) {
-            taskCache.delete(toRemove[tr]);
-        }
-    }
-
-}
-
-
-
 
 
 async function registerFileWatchers(context: ExtensionContext)

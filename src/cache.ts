@@ -1,15 +1,46 @@
 
-import {
-    workspace, window, RelativePattern, WorkspaceFolder
-} from "vscode";
-import { log, getExcludesGlob, isExcluded, properCase } from "./util";
+import { workspace, window, RelativePattern, WorkspaceFolder, Uri } from "vscode";
+import { log, getExcludesGlob, isExcluded, properCase, timeout } from "./util";
 import { configuration } from "./common/configuration";
 
 export let filesCache: Map<string, Set<any>> = new Map();
+export let cacheBuilding = false;
+
+let cancel = false;
+
+
+// export async function cancelBuildCache()
+// {
+//     let waitCount = 20;
+//     if (!cacheBuilding) {
+//         return;
+//     }
+//     cancel = true;
+//     while (cacheBuilding && waitCount > 0) {
+//         waitCount--;
+//         await timeout(500);
+//     }
+// }
+
+
+export async function rebuildCache()
+{
+    filesCache.clear();
+    await addFolderToCache();
+}
 
 
 export async function buildCache(taskAlias: string, taskType: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined)
 {
+    //
+    // If buildCache is already running in another scope, then cancel and wait
+    //
+    // if (cacheBuilding === true) {
+    //     await cancelBuildCache();
+    // }
+
+    cacheBuilding = true;
+
     if (!filesCache.get(taskAlias)) {
         filesCache.set(taskAlias, new Set());
     }
@@ -28,14 +59,26 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
             try {
                 for (const folder of workspace.workspaceFolders)
                 {
+                    if (cancel) {
+                        cancel = false;
+                        cacheBuilding = false;
+                        window.setStatusBarMessage("");
+                        return;
+                    }
+
                     log("   Scan project " + folder.name + " for " + dispTaskType + " tasks");
                     window.setStatusBarMessage("$(loading~spin) Scanning for " + dispTaskType + " tasks in project " + folder.name + "...");
                     const relativePattern = new RelativePattern(folder, fileBlob);
                     const paths = await workspace.findFiles(relativePattern, getExcludesGlob(folder));
                     for (const fpath of paths)
                     {
+                        if (cancel) {
+                            cancel = false;
+                            cacheBuilding = false;
+                            window.setStatusBarMessage("");
+                            return;
+                        }
                         if (!isExcluded(fpath.path)) {
-                        // if (!isExcluded(fpath.path) && !fCache.has(fpath)) {
                             fCache.add({
                                 uri: fpath,
                                 folder
@@ -56,6 +99,12 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
         const paths = await workspace.findFiles(relativePattern, getExcludesGlob(wsfolder));
         for (const fpath of paths)
         {
+            if (cancel) {
+                cancel = false;
+                cacheBuilding = false;
+                window.setStatusBarMessage("");
+                return;
+            }
             if (!isExcluded(fpath.path)) {
             // if (!isExcluded(fpath.path) && !fCache.has(fpath)) {
                 fCache.add({
@@ -67,6 +116,43 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
     }
 
     window.setStatusBarMessage("");
+    cancel = false;
+    cacheBuilding = false;
+}
+
+
+export async function addFileToCache(taskAlias: string, uri: Uri)
+{
+    if (!filesCache.get(taskAlias)) {
+        filesCache.set(taskAlias, new Set());
+    }
+    const taskCache = filesCache.get(taskAlias);
+    taskCache.add({
+        uri,
+        folder: workspace.getWorkspaceFolder(uri)
+    });
+}
+
+
+export async function removeFileFromCache(taskAlias: string, uri: Uri)
+{
+    if (!filesCache.get(taskAlias)) {
+        return;
+    }
+    const taskCache = filesCache.get(taskAlias);
+    const toRemove = [];
+    taskCache.forEach((item) =>
+    {
+        if (item.uri.fsPath === uri.fsPath) {
+            toRemove.push(item);
+        }
+    });
+    if (toRemove.length > 0) {
+        for (const tr in toRemove) {
+            taskCache.delete(toRemove[tr]);
+        }
+    }
+
 }
 
 

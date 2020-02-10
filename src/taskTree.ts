@@ -16,7 +16,7 @@ import * as nls from "vscode-nls";
 import { TaskFolder, TaskFile, TaskItem } from "./tasks";
 import { storage } from "./common/storage";
 import { views } from "./views";
-import { filesCache, addFolderToCache } from "./cache";
+import { rebuildCache } from "./cache";
 import { configuration } from "./common/configuration";
 import { invalidateTasksCacheAnt } from "./taskProviderAnt";
 import { invalidateTasksCacheMake } from "./taskProviderMake";
@@ -579,8 +579,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (invalidate !== false)
         {
             if (invalidate === true && !opt) {
-                filesCache.clear();
-                await addFolderToCache();
+                await rebuildCache();
             }
             await this.invalidateTasksCache(invalidate, opt);
         }
@@ -603,7 +602,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async addToExcludes(selection: TaskFile)
     {
         const me = this;
-        let uri: Uri | undefined = undefined;
+        let uri: Uri | undefined;
 
         if (selection instanceof TaskFile)
         {
