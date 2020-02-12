@@ -1,3 +1,10 @@
+## [1.22.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.22.2...v1.22.3) (2020-02-12)
+
+
+### Documentation
+
+* **readme:** update info ([8734985](https://github.com/spmeesseman/vscode-taskexplorer/commit/8734985))
+
 ## [1.22.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.22.1...v1.22.2) (2020-02-08)
 
 
