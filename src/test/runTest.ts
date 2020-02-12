@@ -21,7 +21,7 @@ async function go() {
       testWorkspace
     });
   } catch (err) {
-    console.error("Failed to run tests");
+    console.error(`Failed to run tests: ${err}\n${err.stack}`);
     process.exit(1);
   }
 }
