@@ -48,11 +48,11 @@ suite('Task tests', () =>
         await trees.configuration.update('exclude', ['**/coveronly/**']);
 
         if (!fs.existsSync(dirName)) {
-            fs.mkdirSync(dirName);
+            fs.mkdirSync(dirName, { mode: 0o770 });
             //await testUtil.createTempDir(dirName);
         }
         if (!fs.existsSync(dirNameCode)) {
-            fs.mkdirSync(dirNameCode);
+            fs.mkdirSync(dirNameCode, { mode: 0o770 });
         } 
         else {
             didCodeDirExist = true;
