@@ -27,7 +27,8 @@
   - [Screenshots](#screenshots)
   - [Requirements](#requirements)
   - [Features](#features)
-  - [Configuring Global Excludes and Apache Ant Includes with Glob Patterns](#configuring-global-excludes-and-apache-ant-includes-with-glob-patterns)
+  - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
+  - [Using Dashed Groups](#using-dashed-groups)
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
   - [Feedback & Contributing](#feedback--contributing)
@@ -50,6 +51,7 @@
 
 ## Features
 
+* v1.23 - Deeper groupings with dashed task groups (default OFF)
 * v1.22 - Major performance enhancements - Task Tree / Task Scanning
 * v1.21 - Add option to keep terminal open after stopping task [closes #51]
 * v1.20 - Add support for restarting task (thank you **antfu**)
@@ -75,19 +77,55 @@
 * v1.1 - Supports multi-root or single-root workspaces
 * v1.0 - Open and launch NPM scripts as tasks
 
-## Configuring Global Excludes and Apache Ant Includes with Glob Patterns
+## Configuring Global Excludes and Apache Ant Includes
 
-The setting *exclude* defines a string or an array of strings of file patterns to ignore.  The setting applies to all script types.  The string(s) must be glob pattern(s), for example:
+The setting *exclude* defines a file/directory pattern or an array of file/directory patterns to ignore using *Glob Patterns* or a valid *File URI*.  The setting applies to all script types.  For example:
 
-* `taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**" ]`
+* `taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**", "/c:/projects/project1/src/theme/test/package.json" ]`
 
 Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.  Using the *exclude* configuration can greatly improve performance in large workspaces if configured correctly.
 
-**Apache Ant** uses an .xml file extension, the setting *includeAnt* can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting is a string or an array of strings and must be glob pattern(s) including the .xml extension, for example:
+Task files that are found by Task Expolorer can also be added to the *excludes* list via the tree node context menu, by right clicking the task file or task group node, and selecting *Add to Excludes*.
 
-* `taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]`
+**Apache Ant** uses an .xml file extension, the setting *includeAnt* can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting defines a file pattern or an array of file patterns to include using *Glob Patterns* or a valid *File URI*, for example:
+
+* `taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml", "/c:/projects/project1/scripts/test/antetests.xml" ]`
 
 Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **Ant** includes list in all cases.
+
+## Using Dashed Groups
+
+*Dashed Groups* are simply an extra level of task groupings that can be made based on a dash (-) character in the script name.  This option can be turned on/off with the *Group Dashed* option in Settings, the default is OFF.
+
+For example, consider 10 npm tasks, 5 of which all start with the string *dev-*, 5 of which start with the string *prod-*.  Prior to Version 1.23, this would create 10 individual task nodes within the main npm task node in the task tree:
+
+    npm
+        dev-build
+        dev-build-server
+        dev-build-themes
+        dev-cp-from-bin
+        dev-clean
+        prod-build
+        prod-build-server
+        prod-build-themes
+        prod-cp-from-bin
+        prod-clean
+
+By enabling the *Group Dashed* option in Settings, two new grouped nodes would be created underneath the main npm node, one called *dev* and the other called *prod*.  Each of these two sub-nodes of course would contain the respective *dev-* and *prod-* scrtips/tasks, minus the prepended group name:
+
+    npm
+        dev
+            build
+            build-server
+            build-themes
+            cp-from-bin
+            clean
+        prod
+            build
+            build-server
+            build-themes
+            cp-from-bin
+            clean
 
 ## Internally Provided Tasks vs. VSCode Provided Tasks
 
