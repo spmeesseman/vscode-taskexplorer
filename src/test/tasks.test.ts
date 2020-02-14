@@ -59,7 +59,6 @@ suite('Task tests', () =>
 
     suiteTeardown(() => 
     {
-        //testUtil.destroyAllTempPaths();
         if (tempFiles.length) {
             let file;
             while ((file = tempFiles.shift())) 

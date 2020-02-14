@@ -163,6 +163,12 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
 {
     if (configuration.get<boolean>("enableAnt")) {
         await buildCache("ant", "ant", "**/[Bb]uild.xml", folder);
+        const includeAnt: string[] = configuration.get("includeAnt");
+        if (includeAnt && includeAnt.length > 0) {
+            for (let i = 0; i < includeAnt.length; i++) {
+                await buildCache("ant" + includeAnt[i], "ant", includeAnt[i], folder);
+            }
+        }
     }
 
     if (configuration.get<boolean>("enableAppPublisher")) {
