@@ -923,7 +923,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
         else if (script.taskSource === "npm" || script.taskSource === "Workspace")
         {
-            this.findPosWithJsonVisitor(documentText, script);
+            scriptOffset = this.findPosWithJsonVisitor(documentText, script);
         }
 
         util.logValue("   Offset", scriptOffset);
