@@ -52,7 +52,7 @@
 		"no-null-keyword": true,
 		"no-string-throw": true,
 		"no-unused-expression": true,
-		"no-duplicate-variable": true,
+        "no-duplicate-variable": true,
         "no-switch-case-fall-through": true,
         "no-this-assignment": false,
         "no-trailing-whitespace": [true, "ignore-template-strings"],
@@ -101,7 +101,7 @@
             "check-type"
         ],
 
-        "no-implicit-dependencies": [true, "dev"],
+        "no-implicit-dependencies": [true, "dev", ["vscode"] ],
         "object-literal-key-quotes": [true, "consistent-as-needed"],
         "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
 

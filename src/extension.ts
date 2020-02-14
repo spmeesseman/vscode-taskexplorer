@@ -413,7 +413,9 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
         taskAlias = "ant";
     }
 
-    await buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, taskType, fileBlob);
+    if (workspace.workspaceFolders) {
+        await buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, taskType, fileBlob);
+    }
 
     if (enabled !== false) {
         if (!watcher) {
@@ -458,6 +460,8 @@ function logFileWatcherEvent(uri: Uri, type: string)
 
 function registerExplorer(name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined
 {
+    log("Register explorer view / tree provider '" + name + "'");
+
     if (enabled !== false)
     {
         if (workspace.workspaceFolders)
@@ -472,13 +476,14 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
             });
             views.set(name, treeView);
             context.subscriptions.push(views.get(name));
+            log("   Tree data provider registered'" + name + "'");
             return treeDataProvider;
         }
         else {
-            console.log("✘ Task Explorer - No workspace folders!!!");
-            log("No workspace folders!!!");
+            log("✘ No workspace folders!!!");
         }
     }
+
     return undefined;
 }
 

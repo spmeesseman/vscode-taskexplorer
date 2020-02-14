@@ -3,7 +3,7 @@ import {
     workspace, RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext, 
     commands, window
 } from "vscode";
-import * as fs from "original-fs";
+import * as fs from "fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./common/configuration";
 

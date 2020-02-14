@@ -5,7 +5,7 @@
 
 import * as path from "path";
 import * as util from "./util";
-import * as assert from 'assert';
+import * as assert from "assert";
 import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
     TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
@@ -47,7 +47,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private taskTree: TaskFolder[] | TaskFile[] | NoScripts[] | null = null;
     private tasks: Task[] = null;
     private needsRefresh: any[] = [];
-    //private processIds: any[] = [];
+    // private processIds: any[] = [];
     private extensionContext: ExtensionContext;
     private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
     readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
