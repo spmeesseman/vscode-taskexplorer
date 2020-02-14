@@ -86,11 +86,6 @@ async function detectAntScripts(): Promise<Task[]>
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("ant");
 
-    filesCache.forEach((v,k) =>
-    {
-        console.log(k);
-        console.log(v.values.length);
-    });
     const folders = workspace.workspaceFolders;
     if (!folders) {
         return emptyTasks;
