@@ -37,7 +37,7 @@
         "interface-name": [true, "never-prefix"],
         "interface-over-type-literal": true,
         "jsdoc-format": true,
-        "linebreak-style": [true, "CRLF"],
+        "linebreak-style": false,
         "next-line": [true,
             "check-catch",
             "check-else"
@@ -49,7 +49,7 @@
         "no-increment-decrement": true,
         "no-inferrable-types": true,
         "no-internal-module": true,
-		"no-null-keyword": true,
+		"no-null-keyword": false,
 		"no-string-throw": true,
 		"no-unused-expression": true,
         "no-duplicate-variable": true,

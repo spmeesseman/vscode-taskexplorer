@@ -505,21 +505,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async pickLastTask()
     {
-        //let taskItem: TaskItem;
-
-        //let lastTasks = storage.get<Array<string>>("lastTasks", []);
-        //lastTasks.forEach(each =>
-        //{
-
-        //});
-
-        //this.run(taskItem);
+        // let taskItem: TaskItem;
+ 
+        // let lastTasks = storage.get<Array<string>>("lastTasks", []);
+        // lastTasks.forEach(each =>
+        // {
+ 
+        // });
+ 
+        // this.run(taskItem);
     }
 
 
     private async open(selection: TaskFile | TaskItem)
     {
-        let uri: Uri | undefined = undefined;
+        let uri: Uri | undefined;
         if (selection instanceof TaskFile)
         {
             uri = selection.resourceUri!;
@@ -717,7 +717,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async runNpmCommand(taskFile: TaskFile, command: string)
     {
         const options = {
-            "cwd": path.dirname(taskFile.resourceUri.fsPath)
+            cwd: path.dirname(taskFile.resourceUri.fsPath)
         };
 
         const kind: TaskDefinition = {
@@ -730,18 +730,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             const execution = new ShellExecution("npm " + command, options);
             const task = new Task(kind, taskFile.folder.workspaceFolder, command, "npm", execution, undefined);
-            tasks.executeTask(task).then(function (execution) { }, function (reason) { });
+            tasks.executeTask(task).then(execution => { }, reason => { });
         }
         else
         {
             const opts: InputBoxOptions = { prompt: "Enter package name to " + command };
-            window.showInputBox(opts).then(function (str)
+            window.showInputBox(opts).then(str =>
             {
                 if (str !== undefined)
                 {
                     const execution = new ShellExecution("npm " + command.replace("<packagename>", "").trim() + " " + str.trim(), options);
                     const task = new Task(kind, taskFile.folder.workspaceFolder, command.replace("<packagename>", "").trim() + str.trim(), "npm", execution, undefined);
-                    tasks.executeTask(task).then(function (execution) { }, function (reason) { });
+                    tasks.executeTask(task).then(execution => { }, reason => { });
                 }
             });
         }
@@ -754,7 +754,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let scriptOffset = 0;
         let inScripts = false;
         let inTasks = false;
-        let inTaskLabel = undefined;
+        let inTaskLabel: any;
         const documentText = document.getText();
 
         util.log("findScriptPosition");
@@ -962,7 +962,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             // TODO - search enable* settings and apply enabled types to filter
             //
-            //let taskItems = await tasks.fetchTasks({ type: 'npm' });
+            // let taskItems = await tasks.fetchTasks({ type: 'npm' });
             if (!this.tasks)
             {
                 this.tasks = await tasks.fetchTasks();
@@ -1025,7 +1025,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private buildTaskTree(tasks: Task[]): TaskFolder[] | NoScripts[]
     {
-        var taskCt = 0;
+        let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
         const files: Map<string, TaskFile> = new Map();
         let folder = null;
@@ -1055,7 +1055,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     folder = new TaskFolder(each.scope);
                     folders.set(each.scope.name, folder);
                 }
-                const definition: TaskDefinition = <TaskDefinition>each.definition;
+                const definition: TaskDefinition = each.definition;
                 let relativePath = definition.path ? definition.path : "";
 
                 //
@@ -1079,7 +1079,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     if (each.name.indexOf(" - ") !== -1 && each.name.indexOf(" - tsconfig.json") === -1)
                     {
                         relativePath = path.dirname(each.name.substring(each.name.indexOf(" - ") + 3));
-                        const excluded: boolean = false;
                         if (util.isExcluded(path.join(each.scope.uri.path, relativePath)))
                         {
                             return; // continue forEach loop
@@ -1173,7 +1172,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
         // its entirley random as to when the individual providers report tasks to the engine
         //
-        const subfolders: Map<String, TaskFile> = new Map();
+        const subfolders: Map<string, TaskFile> = new Map();
 
         folders.forEach((folder, key) =>
         {

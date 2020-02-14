@@ -131,6 +131,7 @@ export function isExcluded(uriPath: string, logPad = "")
 
 export function timeout(ms: number)
 {
+    // tslint:disable-next-line: ban
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
