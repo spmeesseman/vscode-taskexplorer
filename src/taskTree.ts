@@ -625,7 +625,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (invalidate !== false)
         {
-            if (invalidate === true && !opt) {
+            if ((invalidate === true || invalidate === "tests") && !opt) {
                 await rebuildCache();
             }
             await this.invalidateTasksCache(invalidate, opt);

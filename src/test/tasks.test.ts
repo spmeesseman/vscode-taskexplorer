@@ -4,7 +4,7 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from 'assert';
-import * as fs from 'original-fs';
+import * as fs from 'fs';
 import * as path from 'path';
 import { workspace, Uri, tasks } from 'vscode';
 import * as testUtil from './testUtil';
@@ -414,7 +414,7 @@ suite('Task tests', () =>
         await trees.configuration.update('pathToPython', 'python');
         await trees.configuration.update('pathToPowershell', 'powershell');
 
-        await trees.explorerProvider.refresh();
+        await trees.explorerProvider.refresh("tests");
         treeItems = await trees.explorerProvider.getChildren(); // mock explorer open view which would call this function
 
         let taskItems = await tasks.fetchTasks({ type: 'npm' });
