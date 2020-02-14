@@ -116,7 +116,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
     }
     else
     {
-        log("Scan project: " + wsfolder.name);
+        log("Build cache - Scan project '" + wsfolder.name + "' for taskType '" + taskType + "'");
         window.setStatusBarMessage("$(loading~spin) Scanning for tasks in project " + wsfolder.name + "...");
 
         const relativePattern = new RelativePattern(wsfolder, fileBlob);

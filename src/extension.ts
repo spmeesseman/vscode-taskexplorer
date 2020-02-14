@@ -408,7 +408,18 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
     log("Register file watcher for task type '" + taskType + "'");
 
     let watcher: FileSystemWatcher = watchers.get(taskType);
-    await buildCache(isScriptType && taskType !== "app-publisher" ? "script" : taskType, taskType, fileBlob);
+
+    let taskAlias = taskType;
+    //
+    // If the task type received from a filewatcher event is "ant-*" then it is a custom
+    // defined ant file in the includeAnt setting, named accordingly so that the watchers
+    // can be tracked.  change the taskType to "ant" here
+    //
+    if (taskType && taskType.indexOf("ant-") !== -1) {
+        taskAlias = "ant";
+    }
+
+    await buildCache(isScriptType && taskType !== "app-publisher" ? "script" : taskAlias, taskType, fileBlob);
 
     if (enabled !== false) {
         if (!watcher) {
