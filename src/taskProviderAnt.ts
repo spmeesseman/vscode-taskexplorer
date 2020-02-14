@@ -1,7 +1,7 @@
 
 import {
     Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition, TextEditorRevealType, Range, window
+    workspace, TaskProvider, TaskDefinition
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
@@ -78,6 +78,8 @@ export async function invalidateTasksCacheAnt(opt?: Uri) : Promise<void>
 
 async function detectAntScripts(): Promise<Task[]>
 {
+    util.log("");
+    util.log("detectAntScripts");
 
     const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];

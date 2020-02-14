@@ -91,6 +91,8 @@ async function provideAppPublisherfiles(): Promise<Task[]>
 
 async function detectAppPublisherfiles(): Promise<Task[]>
 {
+    util.log("");
+    util.log("detectAppPublisherfiles");
 
     const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];

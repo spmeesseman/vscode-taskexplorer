@@ -9,8 +9,8 @@ import { configuration } from "./common/configuration";
 import { TaskItem } from "./tasks";
 import { filesCache } from "./cache";
 
-type StringMap = { [s: string]: string; };
 
+type StringMap = { [s: string]: string; };
 let cachedTasks: Task[];
 
 const scriptTable = {
@@ -163,6 +163,8 @@ async function provideScriptFiles(): Promise<Task[]>
 
 async function detectScriptFiles(): Promise<Task[]>
 {
+    util.log("");
+    util.log("detectScriptFiles");
 
     const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];

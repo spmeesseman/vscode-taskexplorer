@@ -1,6 +1,5 @@
 
-import
-{
+import {
     Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
     workspace, TaskProvider, TaskDefinition
 } from "vscode";
@@ -10,8 +9,8 @@ import { TaskItem } from "./tasks";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 
-type StringMap = { [s: string]: string; };
 
+type StringMap = { [s: string]: string; };
 let cachedTasks: Task[];
 
 
@@ -84,6 +83,8 @@ export async function invalidateTasksCacheMake(opt?: Uri): Promise<void>
 
 async function detectMakefiles(): Promise<Task[]>
 {
+    util.log("");
+    util.log("detectMakefiles");
 
     const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];

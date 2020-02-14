@@ -1,6 +1,6 @@
 
 import { workspace, window, RelativePattern, WorkspaceFolder, Uri } from "vscode";
-import { log, getExcludesGlob, isExcluded, properCase, timeout } from "./util";
+import { log, getExcludesGlob, isExcluded, properCase } from "./util";
 import { configuration } from "./common/configuration";
 
 export let filesCache: Map<string, Set<any>> = new Map();

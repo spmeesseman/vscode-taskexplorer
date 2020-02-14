@@ -1,6 +1,5 @@
 
-import
-{
+import {
     Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
     workspace, TaskProvider, TaskDefinition
 } from "vscode";
@@ -10,8 +9,8 @@ import { TaskItem } from "./tasks";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 
-type StringMap = { [s: string]: string; };
 
+type StringMap = { [s: string]: string; };
 let cachedTasks: Task[];
 
 
@@ -26,9 +25,7 @@ interface GradleTaskDefinition extends TaskDefinition
 
 export class GradleTaskProvider implements TaskProvider 
 {
-    constructor()
-    {
-    }
+    constructor() {}
 
     public provideTasks()
     {
@@ -84,16 +81,14 @@ export async function invalidateTasksCacheGradle(opt?: Uri): Promise<void>
 
 async function detectGradlefiles(): Promise<Task[]> 
 {
+    util.log("");
+    util.log("detectGradlefiles");
 
     const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const folders = workspace.workspaceFolders;
     const paths = filesCache.get("gradle");
-
-    util.log("", 1);
-    util.log("Find gradlefiles", 1);
-
     if (!folders)
     {
         return emptyTasks;

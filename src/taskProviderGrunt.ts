@@ -9,8 +9,8 @@ import { TaskItem } from "./tasks";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 
-type StringMap = { [s: string]: string; };
 
+type StringMap = { [s: string]: string; };
 let cachedTasks: Task[];
 
 
@@ -84,6 +84,8 @@ async function provideGruntfiles(): Promise<Task[]>
 
 async function detectGruntfiles(): Promise<Task[]>
 {
+    util.log("");
+    util.log("detectGruntfiles");
 
     const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];
