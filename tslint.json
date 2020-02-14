@@ -112,6 +112,7 @@
         "no-conditional-assignment": false,
         "no-console": false,
         "no-debugger": false,
+        "no-empty": false,
         "no-empty-interface": false,
         "no-object-literal-type-assertion": false,
         "no-shadowed-variable": false,
