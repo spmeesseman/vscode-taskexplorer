@@ -37,7 +37,7 @@ export class GruntTaskProvider implements TaskProvider
 }
 
 
-export async function invalidateTasksCacheGrunt(opt?: Uri) : Promise<void>
+export async function invalidateTasksCacheGrunt(opt?: Uri): Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheGrunt");

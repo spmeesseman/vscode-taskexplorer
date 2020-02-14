@@ -263,7 +263,7 @@ export class TaskFile extends TreeItem
     }
 }
 
-export class TaskFolder extends TreeItem 
+export class TaskFolder extends TreeItem
 {
     public taskFiles: TaskFile[] = [];
     public taskFolders: TaskFolder[] = [];
@@ -289,7 +289,7 @@ export class TaskFolder extends TreeItem
         this.taskFolders.push(taskFolder);
     }
 
-    removeTaskFile(taskFile: TaskFile) 
+    removeTaskFile(taskFile: TaskFile)
     {
         let idx = -1;
         let idx2 = -1;

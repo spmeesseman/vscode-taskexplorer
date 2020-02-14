@@ -108,7 +108,7 @@ function refreshScriptTable()
 }
 
 
-export async function invalidateTasksCacheScript(opt?: Uri) : Promise<void>
+export async function invalidateTasksCacheScript(opt?: Uri): Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheScript");
@@ -179,7 +179,7 @@ async function detectScriptFiles(): Promise<Task[]>
         {
             for (const folder of folders)
             {
-                const relativePattern = new RelativePattern(folder, "{**/*.[Ss][Hh],**/*.[Rr][Bb],**/*.[Pp][Ss]1,**/*.[Pp][Ll],**/*.[Bb][Aa][Tt],**/*.[Cc][Mm][Dd],**/*.[Nn][Ss][Ii],**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]}"); //,SH,PY,RB,PS1,PL,BAT,CMD/NSI");
+                const relativePattern = new RelativePattern(folder, "{**/*.[Ss][Hh],**/*.[Rr][Bb],**/*.[Pp][Ss]1,**/*.[Pp][Ll],**/*.[Bb][Aa][Tt],**/*.[Cc][Mm][Dd],**/*.[Nn][Ss][Ii],**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]}"); // ,SH,PY,RB,PS1,PL,BAT,CMD/NSI");
                 const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
                 for (const fpath of paths)
                 {

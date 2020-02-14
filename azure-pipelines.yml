@@ -9,21 +9,21 @@ trigger:
      - master
      - greenkeeper/*
 
-# 
+#
 # pool:
 #   vmImage: 'Ubuntu-16.04'
-# 
+#
 # steps:
 # - task: NodeTool@0
 #   inputs:
 #     versionSpec: '10.x'
 #   displayName: 'Install Node.js'
-# 
+#
 # - script: |
 #     npm install
 #     npm run build
 #   displayName: 'npm install and build'
-# 
+#
 
 jobs:
   - job: Windows
@@ -71,7 +71,7 @@ jobs:
         Code40:
           CODE_VERSION: '1.40.0'
         CodeCurrent:
-          CODE_VERSION: 
+          CODE_VERSION:
         CodeInssiders:
           CODE_VERSION: 'insiders'
     pool:

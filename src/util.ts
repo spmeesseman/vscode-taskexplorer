@@ -1,6 +1,6 @@
 
 import {
-    workspace, RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext, 
+    workspace, RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext,
     commands, window
 } from "vscode";
 import * as fs from "fs";
@@ -64,7 +64,7 @@ export function properCase(name: string)
 }
 
 
-export function getExcludesGlob(folder: string | WorkspaceFolder) : RelativePattern
+export function getExcludesGlob(folder: string | WorkspaceFolder): RelativePattern
 {
     let relativePattern = new RelativePattern(folder, "**/node_modules/**");
     const excludes: string[] = configuration.get("exclude");
@@ -131,7 +131,6 @@ export function isExcluded(uriPath: string, logPad = "")
 
 export function timeout(ms: number)
 {
-    // tslint:disable-next-line: ban
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 

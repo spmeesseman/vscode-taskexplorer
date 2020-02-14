@@ -201,7 +201,7 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
             json = result;
         });
     }
-    catch(e) {
+    catch (e) {
         util.log("   Script file cannot be parsed");
                 return scripts;
     }

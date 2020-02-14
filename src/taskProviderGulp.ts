@@ -37,7 +37,7 @@ export class GulpTaskProvider implements TaskProvider
 }
 
 
-export async function invalidateTasksCacheGulp(opt?: Uri) : Promise<void>
+export async function invalidateTasksCacheGulp(opt?: Uri): Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheGulp");
