@@ -643,11 +643,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (task)
         {
             treeItem = task.definition.treeItem;
-            this._onDidChangeTreeData.fire(treeItem);
         }
         else {
             this.tasks = null;
         }
+
+        this._onDidChangeTreeData.fire(treeItem);
 
         return true;
     }
