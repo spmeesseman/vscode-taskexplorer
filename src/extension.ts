@@ -128,6 +128,10 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
         refresh = true;
     }
 
+    if (e.affectsConfiguration("taskExplorer.groupDashed")) {
+        refresh = true;
+    }
+
     if (e.affectsConfiguration("taskExplorer.enableAnt") || e.affectsConfiguration("taskExplorer.includeAnt")) {
         registerFileWatcherAnt(context, configuration.get<boolean>("enableAnt"));
         refresh = true;
