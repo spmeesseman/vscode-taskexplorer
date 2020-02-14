@@ -1,3 +1,21 @@
+# [1.23.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.22.3...v1.23.0) (2020-02-14)
+
+
+### Bug Fixes
+
+* run last task button no longer works ([17640bc](https://github.com/spmeesseman/vscode-taskexplorer/commit/17640bc))
+
+
+### Documentation
+
+* **readme:** add v1.23 screenshot ([afc15f0](https://github.com/spmeesseman/vscode-taskexplorer/commit/afc15f0))
+* **readme:** update to version info, add section on new 'group dashed' feature. ([51b3f93](https://github.com/spmeesseman/vscode-taskexplorer/commit/51b3f93))
+
+
+### Features
+
+* add support to group task items further using dashes in the script name.  enabled by the 'groupd dashed' setting. ([3325d2e](https://github.com/spmeesseman/vscode-taskexplorer/commit/3325d2e))
+
 ## [1.22.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.22.2...v1.22.3) (2020-02-12)
 
 
