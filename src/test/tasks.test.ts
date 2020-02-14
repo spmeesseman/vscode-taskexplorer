@@ -8,9 +8,10 @@ import * as fs from 'original-fs';
 import * as path from 'path';
 import { workspace, Uri, tasks } from 'vscode';
 import * as testUtil from './testUtil';
-import { timeout, setWriteToConsole } from '../util';
+import { timeout } from '../util';
 import { trees } from './extension.test';
 import { TaskItem } from '../tasks';
+import { waitForCache } from '../cache';
 
 let tempFiles: Array<string> = [];
 let dirName: string = '';
@@ -396,6 +397,7 @@ suite('Task tests', () =>
         }
 
         await timeout(5000); // wait for filesystem change events
+        await waitForCache();
 
         //
         // Refresh for better coverage

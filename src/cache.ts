@@ -1,7 +1,8 @@
 
 import { workspace, window, RelativePattern, WorkspaceFolder, Uri } from "vscode";
-import { log, logValue, getExcludesGlob, isExcluded, properCase } from "./util";
+import { log, logValue, timeout, getExcludesGlob, isExcluded, properCase } from "./util";
 import { configuration } from "./common/configuration";
+import { utils } from "mocha";
 
 export let filesCache: Map<string, Set<any>> = new Map();
 export let cacheBuilding = false;
@@ -21,6 +22,14 @@ let cancel = false;
 //         await timeout(500);
 //     }
 // }
+
+
+export async function waitForCache()
+{
+    while (cacheBuilding) {
+        await timeout(100);
+    }
+}
 
 
 export async function rebuildCache()
@@ -172,6 +181,8 @@ export async function removeFileFromCache(taskAlias: string, uri: Uri)
 export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
 {
     cacheBuilding = true;
+    log("Start cache building");
+    logValue("   Cache entire workspace", folder ? "true" : "false");
 
     if (configuration.get<boolean>("enableAnt")) {
         await buildCache("ant", "ant", "**/[Bb]uild.xml", folder, false);
@@ -245,5 +256,6 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
     }
 
     cacheBuilding = false;
+    log("Cache building complete");
 }
 
