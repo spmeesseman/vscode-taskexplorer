@@ -171,6 +171,8 @@ async function detectScriptFiles(): Promise<Task[]>
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("script");
 
+    console.log('0');
+
     const folders = workspace.workspaceFolders;
     if (!folders) {
         return emptyTasks;
@@ -178,12 +180,15 @@ async function detectScriptFiles(): Promise<Task[]>
     try {
         if (!paths)
         {
+            console.log('1');
             for (const folder of folders)
             {
+                console.log('2');
                 const relativePattern = new RelativePattern(folder, "{**/*.[Ss][Hh],**/*.[Rr][Bb],**/*.[Pp][Ss]1,**/*.[Pp][Ll],**/*.[Bb][Aa][Tt],**/*.cmd,**/*.[Nn][Ss][Ii],**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]}"); //,SH,PY,RB,PS1,PL,BAT,CMD/NSI");
                 const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
                 for (const fpath of paths)
                 {
+                    console.log('3: ' + fpath);
                     if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
                         visitedFiles.add(fpath.fsPath);
                         allTasks.push(createScriptTask(scriptTable[path.extname(fpath.fsPath).substring(1).toLowerCase()], folder!, fpath));
@@ -195,8 +200,10 @@ async function detectScriptFiles(): Promise<Task[]>
         }
         else
         {
+            console.log('A');
             for (const fobj of paths)
             {
+                console.log('B: ' + fobj.uri.fsPath);
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
                     visitedFiles.add(fobj.uri.fsPath);
                     allTasks.push(createScriptTask(scriptTable[path.extname(fobj.uri.fsPath).substring(1).toLowerCase()], fobj.folder!, fobj.uri));
@@ -206,7 +213,7 @@ async function detectScriptFiles(): Promise<Task[]>
             }
         }
         return allTasks;
-    } 
+    }
     catch (error) {
         return Promise.reject(error);
     }

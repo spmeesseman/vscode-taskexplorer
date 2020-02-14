@@ -27,19 +27,10 @@ suite("Extension Tests", () =>
         assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
     });
 
-
-    test("Activate extension", async function() 
+   
+    test("Enable required testing options", async function()
     {
-
-        this.timeout(60 * 1000);
-
-        const extension = vscode.extensions.getExtension(
-            "spmeesseman.vscode-taskexplorer"
-        ) as vscode.Extension<any>;
-
-        if (!extension) {
-            assert.fail("Extension not found");
-        }
+        assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
 
         //
         // Enable views
@@ -53,7 +44,7 @@ suite("Extension Tests", () =>
         await configuration.update('debug', true);
         await configuration.update('debugLevel', 3);
         //
-        // Enable all task types
+        // Enabled all options
         //
         await configuration.update('enableAnt', true);
         await configuration.update('enableAppPublisher', true);
@@ -70,6 +61,21 @@ suite("Extension Tests", () =>
         await configuration.update('enablePython', true);
         await configuration.update('enableRuby', true);
         await configuration.update('enableWorkspace', true);
+    });
+
+
+    test("Activate extension", async function() 
+    {
+
+        this.timeout(30 * 1000);
+
+        const extension = vscode.extensions.getExtension(
+            "spmeesseman.vscode-taskexplorer"
+        ) as vscode.Extension<any>;
+
+        if (!extension) {
+            assert.fail("Extension not found");
+        }
 
         if (!extension.isActive) 
         {
@@ -86,41 +92,7 @@ suite("Extension Tests", () =>
             assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
         }
     });
-
     
-    // test("Enable required testing options", async function()
-    // {
-    //     //
-    //     // Enable views
-    //     //
-    //     await trees.configuration.update('enableExplorerView', true);
-    //     await trees.configuration.update('enableSideBar', true);
-    //     //
-    //     // Set misc settings
-    //     //
-    //     await trees.configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
-    //     await trees.configuration.update('debug', true);
-    //     await trees.configuration.update('debugLevel', 3);
-    //     //
-    //     // Enabled all options
-    //     //
-    //     await trees.configuration.update('enableAnt', true);
-    //     await trees.configuration.update('enableAppPublisher', true);
-    //     await trees.configuration.update('enableBash', true);
-    //     await trees.configuration.update('enableBatch', true);
-    //     await trees.configuration.update('enableGradle', true);
-    //     await trees.configuration.update('enableGrunt', true);
-    //     await trees.configuration.update('enableGulp', true);
-    //     await trees.configuration.update('enableMake', true);
-    //     await trees.configuration.update('enableNpm', true);
-    //     await trees.configuration.update('enableNsis', true);
-    //     await trees.configuration.update('enablePowershell', true);
-    //     await trees.configuration.update('enablePerl', true);
-    //     await trees.configuration.update('enablePython', true);
-    //     await trees.configuration.update('enableRuby', true);
-    //     await trees.configuration.update('enableWorkspace', true);
-    // });
-
 
     test("Check tree providers", function(done) 
     {
