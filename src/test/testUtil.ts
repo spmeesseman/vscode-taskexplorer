@@ -9,12 +9,11 @@ import { TaskItem } from "../tasks";
 
 export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
 {
-    let found = false;
+    let found = 0;
     taskMap.forEach(task =>
     {
         if (task.id.includes(id)) {
-            found = true;
-            return false; // break forEach
+            found++;
         }
     });
     return found;

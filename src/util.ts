@@ -207,7 +207,7 @@ export function setWriteToConsole(set: boolean, level = 2)
 }
 
 
-export function log(msg: string, level?: number)
+export async function log(msg: string, level?: number)
 {
     if (msg === null || msg === undefined) {
         return;
@@ -227,7 +227,7 @@ export function log(msg: string, level?: number)
 }
 
 
-export function logValue(msg: string, value: any, level?: number)
+export async function logValue(msg: string, value: any, level?: number)
 {
     let logMsg = msg;
 

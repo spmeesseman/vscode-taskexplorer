@@ -439,26 +439,44 @@ suite('Task tests', () =>
 
         await scanTasks();
 
-        if (!testUtil.findIdInTaskMap('ant', taskMap)) {
-            assert.fail('No ant items found');
+        let taskCount = testUtil.findIdInTaskMap('ant', taskMap);
+        if (taskCount < 4) {
+            assert.fail('Unexpected Ant task count (Found ' + taskCount + ' of 4)');
         }
-        else if (!testUtil.findIdInTaskMap('gulp', taskMap)) {
-            assert.fail('No gulp items found');
+        
+        taskCount = testUtil.findIdInTaskMap('app-publisher', taskMap);
+        if (taskCount < 6) {
+            assert.fail('Unexpected App-Publisher task count (Found ' + taskCount + ' of 6)');
         }
-        else if (!testUtil.findIdInTaskMap('grunt', taskMap)) {
-          assert.fail('No grunt items found');
+
+        taskCount = testUtil.findIdInTaskMap('batch', taskMap);
+        if (taskCount < 2) {
+            assert.fail('Unexpected App-Publisher task count (Found ' + taskCount + ' of 2)');
         }
-        else if (!testUtil.findIdInTaskMap('npm', taskMap)) {
-            assert.fail('No npm items found');
+
+        taskCount = testUtil.findIdInTaskMap('gradle', taskMap);
+        if (taskCount < 2) {
+            assert.fail('Unexpected Gradle task count (Found ' + taskCount + ' of 2)');
         }
-        else if (!testUtil.findIdInTaskMap('Workspace', taskMap)) {
-            assert.fail('No vscode items found');
+
+        taskCount = testUtil.findIdInTaskMap('gulp', taskMap);
+        if (taskCount < 4) {
+            assert.fail('Unexpected Gulp task count (Found ' + taskCount + ' of 4)');
         }
-        else if (!testUtil.findIdInTaskMap('app-publisher', taskMap)) {
-            assert.fail('No app-publisher items found');
+
+        taskCount = testUtil.findIdInTaskMap('npm', taskMap);
+        if (taskCount < 7) {
+            assert.fail('Unexpected NPM task count (Found ' + taskCount + ' of 7)');
         }
-        else if (!testUtil.findIdInTaskMap('batch', taskMap)) {
-            assert.fail('No batch items found');
+
+        taskCount = testUtil.findIdInTaskMap('grunt', taskMap);
+        if (taskCount < 4) {
+            assert.fail('Unexpected Grunt task count (Found ' + taskCount + ' of 4)');
+        }
+
+        taskCount = testUtil.findIdInTaskMap('Workspace', taskMap);
+        if (taskCount < 3) {
+            assert.fail('Unexpected VSCode task count (Found ' + taskCount + ' of 3)');
         }
     });
 
