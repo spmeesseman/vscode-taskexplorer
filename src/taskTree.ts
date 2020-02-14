@@ -87,7 +87,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // 'opt2' should contain the Uri of the file that was edited, or the Task if this was
         // a task event
         //
-        if (opt1)
+        if (opt1 && opt1 !== "tests")
         {
             if (opt1 === "ant")
             {
