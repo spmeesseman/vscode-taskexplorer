@@ -78,7 +78,6 @@ suite("Extension Tests", () =>
                 api => {
                     trees = api;
                     assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
-                    done();
                 },
                 () => {
                     assert.fail("Failed to activate extension");
