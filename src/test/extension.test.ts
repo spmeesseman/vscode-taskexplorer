@@ -28,7 +28,7 @@ suite("Extension Tests", () =>
     });
 
 
-    test("Activate extension", function(done) 
+    test("Activate extension", async function(done) 
     {
 
         this.timeout(60 * 1000);
@@ -44,54 +44,50 @@ suite("Extension Tests", () =>
         //
         // Enable views
         //
-        assert(configuration.update('enableExplorerView', true));
-        assert(configuration.update('enableSideBar', true));
+        await configuration.update('enableExplorerView', true);
+        await configuration.update('enableSideBar', true);
         //
         // Set misc settings
         //
-        assert(configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]));
-        assert(configuration.update('debug', true));
-        assert(configuration.update('debugLevel', 3));
+        await configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
+        await configuration.update('debug', true);
+        await configuration.update('debugLevel', 3);
         //
         // Enable all task types
         //
-        assert(configuration.update('enableAnt', true));
-        assert(configuration.update('enableAppPublisher', true));
-        assert(configuration.update('enableBash', true));
-        assert(configuration.update('enableBatch', true));
-        assert(configuration.update('enableGradle', true));
-        assert(configuration.update('enableGrunt', true));
-        assert(configuration.update('enableGulp', true));
-        assert(configuration.update('enableMake', true));
-        assert(configuration.update('enableNpm', true));
-        assert(configuration.update('enableNsis', true));
-        assert(configuration.update('enablePowershell', true));
-        assert(configuration.update('enablePerl', true));
-        assert(configuration.update('enablePython', true));
-        assert(configuration.update('enableRuby', true));
-        assert(configuration.update('enableWorkspace', true));
+        await configuration.update('enableAnt', true);
+        await configuration.update('enableAppPublisher', true);
+        await configuration.update('enableBash', true);
+        await configuration.update('enableBatch', true);
+        await configuration.update('enableGradle', true);
+        await configuration.update('enableGrunt', true);
+        await configuration.update('enableGulp', true);
+        await configuration.update('enableMake', true);
+        await configuration.update('enableNpm', true);
+        await configuration.update('enableNsis', true);
+        await configuration.update('enablePowershell', true);
+        await configuration.update('enablePerl', true);
+        await configuration.update('enablePython', true);
+        await configuration.update('enableRuby', true);
+        await configuration.update('enableWorkspace', true);
 
-        configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]).then(() =>
+        if (!extension.isActive) 
         {
-            if (!extension.isActive) 
-            {
-                console.log('        Manually activating extension');
-                extension.activate().then(
-                    api => {
-                        trees = api;
-                        assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
-                        done();
-                    },
-                    () => {
-                        assert.fail("Failed to activate extension");
-                    }
-                );
-            } 
-            else {
-                assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
-                done();
-            }
-        });
+            console.log('        Manually activating extension');
+            await extension.activate().then(
+                api => {
+                    trees = api;
+                    assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
+                    done();
+                },
+                () => {
+                    assert.fail("Failed to activate extension");
+                }
+            );
+        } 
+        else {
+            assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
+        }
     });
 
     
