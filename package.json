@@ -794,7 +794,7 @@
                 },
                 "taskExplorer.groupDashed": {
                     "type": "boolean",
-                    "default": true,
+                    "default": false,
                     "description": "%config.taskExplorer.groupDashed%"
                 },
                 "taskExplorer.pathToAnt": {
