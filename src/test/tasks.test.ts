@@ -465,8 +465,8 @@ suite('Task tests', () =>
         }
 
         taskCount = testUtil.findIdInTaskMap(':npm:', taskMap);
-        if (taskCount < 7) {
-            assert.fail('Unexpected NPM task count (Found ' + taskCount + ' of 7)');
+        if (taskCount < 6) {
+            assert.fail('Unexpected NPM task count (Found ' + taskCount + ' of 6)');
         }
 
         taskCount = testUtil.findIdInTaskMap(':grunt:', taskMap);
