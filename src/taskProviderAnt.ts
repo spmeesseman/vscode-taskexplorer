@@ -193,7 +193,7 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
     util.log("FindAllAntScripts");
 
     try {
-        parseString(buffer, function(err, result) {
+        parseString(buffer, (err, result) => {
             if (err) {
                 util.log("   Script file cannot be parsed");
                 return scripts;

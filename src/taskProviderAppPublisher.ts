@@ -37,7 +37,7 @@ export class AppPublisherTaskProvider implements TaskProvider
 }
 
 
-export async function invalidateTasksCacheAppPublisher(opt?: Uri) : Promise<void>
+export async function invalidateTasksCacheAppPublisher(opt?: Uri): Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheAppPublisher");
