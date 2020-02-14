@@ -948,7 +948,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (!this.taskTree)
         {
             util.log(logPad + "   Build task tree");
-            this.isBusy = true;
             //
             // TODO - search enable* settings and apply enabled types to filter
             //
@@ -965,7 +964,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     this.taskTree = [new NoScripts()];
                 }
             }
-            this.isBusy = false;
         }
 
         if (element instanceof TaskFolder)
