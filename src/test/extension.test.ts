@@ -7,6 +7,7 @@
 import * as assert from 'assert';
 import * as vscode from "vscode";
 import { configuration } from "../common/configuration";
+import { setWriteToConsole } from '../util';
 
 export let trees: any;
 
@@ -61,6 +62,8 @@ suite("Extension Tests", () =>
         await configuration.update('enablePython', true);
         await configuration.update('enableRuby', true);
         await configuration.update('enableWorkspace', true);
+
+        setWriteToConsole(true); // write debug logging from exiension to console
     });
 
     // test("Activate extension", function(done) 

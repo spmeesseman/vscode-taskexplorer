@@ -26,8 +26,6 @@ suite('Task tests', () =>
     {
         await testUtil.activeExtension();
 
-        setWriteToConsole(true); // write debug logging from exiension to console
-        
         //if (!fs.existsSync("project_dir")) {
         //    fs.mkdirSync("project_dir");
         //}
