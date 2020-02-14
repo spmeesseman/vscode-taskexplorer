@@ -28,7 +28,7 @@ suite("Extension Tests", () =>
     });
 
 
-    test("Activate extension", async function(done) 
+    test("Activate extension", async function() 
     {
 
         this.timeout(60 * 1000);
@@ -74,15 +74,14 @@ suite("Extension Tests", () =>
         if (!extension.isActive) 
         {
             console.log('        Manually activating extension');
-            await extension.activate().then(
-                api => {
-                    trees = api;
-                    assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
-                },
-                () => {
-                    assert.fail("Failed to activate extension");
-                }
-            );
+            try {
+                let ext = await extension.activate();
+                trees = ext.api;
+                assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
+            }
+            catch(e) {
+                assert.fail("Failed to activate extension");
+            }
         } 
         else {
             assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
