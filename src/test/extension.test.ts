@@ -75,8 +75,7 @@ suite("Extension Tests", () =>
         {
             console.log('        Manually activating extension');
             try {
-                let ext = await extension.activate();
-                trees = ext.api;
+                trees = await extension.activate();
                 assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
             }
             catch(e) {
