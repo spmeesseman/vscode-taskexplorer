@@ -554,6 +554,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     public async refresh(invalidate?: any, opt?: Uri, task?: Task)
     {
+        util.log("Refresh task tree");
+        util.logValue("   invalidate", invalidate, 2);
+        util.logValue("   opt fsPath", opt ? opt.fsPath : "n/a", 2);
+        util.logValue("   task name", task ? task.name : "n/a", 2);
+
         //
         // If a view was turned off in settings, the disposable view still remains
         // ans will still receive events.  CHeck visibility property, and of this view
@@ -564,6 +569,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             if (!views.get(this.name).visible)
             {
+                util.log("   Delay refresh, exit");
                 this.needsRefresh.push({ invalidate, opt, task });
                 return false;
             }
@@ -579,6 +585,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (this.taskTree && invalidate === "visible-event")
         {
+            util.log("   Handling 'visible' event");
             if (this.needsRefresh && this.needsRefresh.length > 0)
             {
                 // If theres more than one pending refresh request, just refresh the tree
@@ -626,21 +633,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (invalidate !== false)
         {
             if ((invalidate === true || invalidate === "tests") && !opt) {
+                util.log("   Handling 'rebuild cache' event");
                 await rebuildCache();
             }
+            util.log("   Handling 'invalidate tasks cache' event");
             await this.invalidateTasksCache(invalidate, opt);
         }
 
         if (task)
         {
             treeItem = task.definition.treeItem;
+            this._onDidChangeTreeData.fire(treeItem);
         }
-        else
-        {
+        else {
             this.tasks = null;
         }
-
-        this._onDidChangeTreeData.fire(treeItem);
 
         return true;
     }
