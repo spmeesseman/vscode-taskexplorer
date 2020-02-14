@@ -198,7 +198,7 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
         const includeAnt: string[] = configuration.get("includeAnt");
         if (includeAnt && includeAnt.length > 0) {
             for (let i = 0; i < includeAnt.length; i++) {
-                await buildCache("ant", "ant" + includeAnt[i], includeAnt[i], folder, false);
+                await buildCache("ant-" + includeAnt[i], "ant-" + includeAnt[i], includeAnt[i], folder, false);
             }
         }
     }
