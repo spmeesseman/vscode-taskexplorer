@@ -474,9 +474,9 @@ suite('Task tests', () =>
             assert.fail('Unexpected Grunt task count (Found ' + taskCount + ' of 4)');
         }
 
-        taskCount = testUtil.findIdInTaskMap(':typescript:', taskMap);
+        taskCount = testUtil.findIdInTaskMap(':tsc:', taskMap);
         if (taskCount < 2) {
-            assert.fail('Unexpected Grunt task count (Found ' + taskCount + ' of 2)');
+            assert.fail('Unexpected Typescript task count (Found ' + taskCount + ' of 2)');
         }
 
         taskCount = testUtil.findIdInTaskMap(':Workspace:', taskMap);
