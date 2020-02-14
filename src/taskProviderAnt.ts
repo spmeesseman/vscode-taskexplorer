@@ -10,7 +10,7 @@ import { configuration } from "./common/configuration";
 import { TaskItem } from "./tasks";
 import { filesCache } from "./cache";
 
-type StringMap = { [s: string]: string; };
+interface StringMap { [s: string]: string; }
 let cachedTasks: Task[];
 
 

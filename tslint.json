@@ -12,8 +12,7 @@
         "array-type": [true, "array"],
         "ban": [
             true,
-            "setInterval",
-            "setTimeout"
+            "setInterval"
         ],
         "ban-types": {
             "options": [
