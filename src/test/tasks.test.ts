@@ -234,7 +234,7 @@ suite('Task tests', () =>
 
         fs.writeFileSync(
             file2,
-            'task fatJar(type: Jar) {\n' +
+            'task fatJar2(type: Jar) {\n' +
             '    manifest {\n' +
             '        attributes \'Implementation-Title\': \'Gradle Jar File Example\',\n' +  
             '            \'Implementation-Version\': version,\n' +
@@ -334,7 +334,7 @@ suite('Task tests', () =>
 
     test('Create batch files', async function() 
     {
-        const file = path.join(dirName, 'test.bat');
+        const file = path.join(workspace.rootPath ? workspace.rootPath  : "", 'test.bat');
         tempFiles.push(file);
 
         const file2 = path.join(dirName, 'test2.BAT');
