@@ -37,7 +37,7 @@ export class AntTaskProvider implements TaskProvider
 }
 
 
-export async function invalidateTasksCacheAnt(opt?: Uri) : Promise<void>
+export async function invalidateTasksCacheAnt(opt?: Uri): Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheAnt");

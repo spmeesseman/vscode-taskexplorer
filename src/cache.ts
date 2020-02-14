@@ -43,7 +43,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
 {
     log("Start cache building");
     logValue("   task alias", taskAlias, 2);
-    logValue("   task type", taskAlias, 2);
+    logValue("   task type", taskType, 2);
     logValue("   blob", fileBlob, 2);
     logValue("   folder", !wsfolder ? "entire workspace" : wsfolder.name);
     logValue("   setCacheBuilding", setCacheBuilding.toString(), 2);
