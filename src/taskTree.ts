@@ -565,7 +565,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // is hidden/disabled, then exit.  Unless opt is defined, in which case this is just a
         // task ending, so we can proceed just invalidating that task set
         //
-        if (this.taskTree && views.get(this.name))
+        if (this.taskTree && views.get(this.name) && invalidate !== "tests")
         {
             if (!views.get(this.name).visible)
             {
