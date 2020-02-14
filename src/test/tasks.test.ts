@@ -6,18 +6,18 @@
 import * as assert from 'assert';
 import * as fs from 'original-fs';
 import * as path from 'path';
-import { commands, workspace, Uri, tasks } from 'vscode';
+import { workspace, Uri, tasks } from 'vscode';
 import * as testUtil from './testUtil';
 import { timeout, setWriteToConsole } from '../util';
 import { trees } from './extension.test';
-import { TaskFolder, TaskFile, TaskItem } from '../tasks';
+import { TaskItem } from '../tasks';
 
 let tempFiles: Array<string> = [];
 let dirName: string = '';
 let dirNameCode: string = '';
 let treeItems: any[] = [];
 let didCodeDirExist: boolean = false;
-let taskMap: Map<string, Uri> = new Map();
+let taskMap: Map<string, TaskItem> = new Map();
 
 
 suite('Task tests', () => 
@@ -420,25 +420,26 @@ suite('Task tests', () =>
 
         await scanTasks();
 
-        if (!taskMap.get('ant'))
-        {
+        if (!testUtil.findIdInTaskMap('ant', taskMap)) {
             assert.fail('No ant items found');
         }
-        else if (!taskMap.get('gulp'))
-        {
+        else if (!testUtil.findIdInTaskMap('gulp', taskMap)) {
             assert.fail('No gulp items found');
         }
-        else if (!taskMap.get('grunt')) 
-        {
+        else if (!testUtil.findIdInTaskMap('grunt', taskMap)) {
           assert.fail('No grunt items found');
         }
-        else if (!taskMap.get('npm') === undefined)
-        {
+        else if (!testUtil.findIdInTaskMap('npm', taskMap)) {
             assert.fail('No npm items found');
         }
-        else if (!taskMap.get('Workspace') === undefined)
-        {
+        else if (!testUtil.findIdInTaskMap('Workspace', taskMap)) {
             assert.fail('No vscode items found');
+        }
+        else if (!testUtil.findIdInTaskMap('app-publisher', taskMap)) {
+            assert.fail('No app-publisher items found');
+        }
+        else if (!testUtil.findIdInTaskMap('batch', taskMap)) {
+            assert.fail('No batch items found');
         }
     });
 
@@ -464,9 +465,9 @@ suite('Task tests', () =>
         await trees.configuration.update('enableRuby', false);
         await trees.configuration.update('enableWorkspace', false);
 
-        taskMap.forEach(async(value: Uri, key: string) =>  {
+        taskMap.forEach(async(value: TaskItem) =>  {
             if (value) {
-                await trees.explorerProvider.invalidateTasksCache(key, value);
+                await trees.explorerProvider.invalidateTasksCache(value.taskSource, value.task.definition.uri);
             }
         });
 
@@ -477,168 +478,6 @@ suite('Task tests', () =>
 
 async function scanTasks()
 {
-    if (treeItems.length > 0) 
-    {
-        let item: any;
-        while (item = treeItems.shift()) 
-        {
-            try {
-                if (item instanceof TaskFolder) 
-                {
-                    let tmp: any = await trees.explorerProvider.getParent(item);
-                    assert(tmp === null, 'Invaid parent type, should be null for TaskFolder');
-
-                    console.log('    Task Folder ' +item.label + ':  ' + item.resourceUri.fsPath);
-
-                    let treeFiles: any[] = await trees.explorerProvider.getChildren(item);
-                    if (treeFiles.length > 0) 
-                    {
-                        let item2: any;
-                        while ((item2 = treeFiles.shift())) 
-                        {
-                            if (item2 instanceof TaskFile && !item2.isGroup) 
-                            {
-                                console.log('        Task File: ' + item2.path + item2.fileName);
-
-                                tmp = await trees.explorerProvider.getParent(item2);
-                                assert(
-                                    tmp instanceof TaskFolder,
-                                    'Invaid parent type, should be TaskFolder for TaskFile'
-                                );
-
-                                let treeTasks: any[] = await trees.explorerProvider.getChildren(item2);
-
-                                if (treeTasks.length > 0) 
-                                {
-                                    let item3: any;
-                                    while ((item3 = treeTasks.shift()))
-                                    {
-                                        if (item3 instanceof TaskItem) 
-                                        {
-                                            await commands.executeCommand('taskExplorer.open', item3);
-                                            
-                                            tmp = await trees.explorerProvider.getParent(item3);
-                                            assert(
-                                                tmp instanceof TaskFile,
-                                                'Invaid parent type, should be TaskFile for TaskItem'
-                                            );
-                                            if (item3.task.definition)
-                                            {
-                                                let tpath: string = item3.task.definition.uri ? item3.task.definition.uri.fsPath : 
-                                                                    (item3.task.definition.path ? item3.task.definition.path : 'root');
-                                                console.log('            ✔ Processed ' + item3.label + ':  type ' + item3.taskSource + ' @ ' + tpath);
-                                                taskMap.set(item3.taskSource, item3.task.definition.uri ? item3.task.definition.uri : null);
-                                            }
-                                            else
-                                            {
-                                                console.log('            ✘ ' + item3.label + 'does not contain a task definition');
-                                            }
-                                        } 
-                                        else {
-                                            assert.fail('Invalid taskitem node found');
-                                            return;
-                                        }
-                                    }
-                                } 
-                                else {
-                                    assert.fail('No tasks found in treefile');
-                                    return;
-                                }
-                            }
-                            else if (item2 instanceof TaskFile && item2.isGroup) 
-                            {
-                                let itreeFiles: any[] = await trees.explorerProvider.getChildren(item2);
-                                if (itreeFiles.length > 0) 
-                                {
-                                    let item2: any;
-                                    while ((item2 = itreeFiles.shift())) 
-                                    {
-                                        if (item2 instanceof TaskFile && !item2.isGroup) 
-                                        {
-                                            console.log('        Task File (grouped): ' + item2.path + item2.fileName);
-
-                                            tmp = await trees.explorerProvider.getParent(item2);
-                                            assert(
-                                                tmp instanceof TaskFolder,
-                                                'Invaid parent type, should be TaskFolder for TaskFile'
-                                            );
-
-                                            let treeTasks: any[] = await trees.explorerProvider.getChildren(item2);
-                                            if (treeTasks.length > 0) 
-                                            {
-                                                let item3: any;
-                                                while ((item3 = treeTasks.shift()))
-                                                {
-                                                    if (item3 instanceof TaskItem) 
-                                                    {
-                                                        await commands.executeCommand('taskExplorer.open', item3);
-
-                                                        tmp = await trees.explorerProvider.getParent(item3);
-                                                        assert(
-                                                            tmp instanceof TaskFile,
-                                                            'Invaid parent type, should be TaskFile for TaskItem'
-                                                        );
-                                                        
-                                                        if (item3.task.definition)
-                                                        {
-                                                            let tpath: string = item3.task.definition.uri ? item3.task.definition.uri.fsPath : 
-                                                                    (item3.task.definition.path ? item3.task.definition.path : 'root');
-                                                            console.log('            ✔ Processed ' + item3.label + ':  type ' + item3.taskSource + ' @ ' + tpath);
-                                                            taskMap.set(item3.taskSource, item3.task.definition.uri ? item3.task.definition.uri : null);
-                                                        }
-                                                        else
-                                                        {
-                                                            console.log('            ✘ ' + item3.label + 'does not contain a task definition');
-                                                        }
-
-                                                        if (item3.label === 'hello2' && item3.taskSource === 'gulp')
-                                                        {
-                                                            await commands.executeCommand("taskExplorer.run", item3);
-                                                        }
-                                                    } 
-                                                    else {
-                                                        assert.fail('Invalid taskitem node found');
-                                                        return;
-                                                    }
-                                                }
-                                            } 
-                                            else {
-                                                assert.fail('No tasks found in treefile');
-                                                return;
-                                            }
-                                        }
-                                        else {
-                                            assert.fail('Invalid taskfile node found');
-                                            return;
-                                        }
-                                    }
-                                } 
-                                else {
-                                    assert.fail('No task files found');
-                                    return;
-                                }
-                            }
-                            else {
-                                assert.fail('Invalid taskfile node found');
-                                return;
-                            }
-                        }
-                    } 
-                    else {
-                        assert.fail('No task files found');
-                        return;
-                    }
-                } 
-                else {
-                    assert.fail('Invalid root folder');
-                    return;
-                }
-            } 
-            catch (error) {
-                assert.fail('Exception error: ' + error.toString());
-            }
-        }
-
-        console.log('    ✔ Scanning complete');
-    }
+    taskMap = await trees.explorerProvider.getTaskItems();
+    console.log('    ✔ Scanning complete');
 }

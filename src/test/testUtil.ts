@@ -2,14 +2,26 @@
 
 import * as cp from "child_process";
 import { ChildProcess, SpawnOptions } from "child_process";
-import { extensions, Uri, window } from "vscode";
+import { extensions, Uri, window, Map } from "vscode";
+import { TaskItem } from "../tasks";
 
 
-export function spawn(
-    command: string,
-    args?: string[],
-    options?: SpawnOptions
-): ChildProcess
+
+export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
+{
+    let found = false;
+    taskMap.forEach(task =>
+    {
+        if (task.id.includes(id)) {
+            found = true;
+            return false; // break forEach
+        }
+    });
+    return found;
+}
+
+
+export function spawn(command: string, args?: string[], options?: SpawnOptions): ChildProcess
 {
     const proc = cp.spawn(command, args, options);
 
@@ -92,10 +104,7 @@ export function overrideNextShowQuickPick(value: any)
 const originalShowQuickPick = window.showQuickPick;
 
 
-window.showQuickPick = (
-    items: any[] | Thenable<any[]>,
-    ...args: any[]
-): Thenable<any | undefined> =>
+window.showQuickPick = (items: any[] | Thenable<any[]>, ...args: any[]): Thenable<any | undefined> =>
 {
     let next = overridesShowQuickPick.shift();
     if (typeof next === "undefined")
