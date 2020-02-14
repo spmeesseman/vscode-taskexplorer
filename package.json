@@ -792,6 +792,11 @@
                     "default": false,
                     "description": "%config.taskExplorer.keepTermOnStop%"
                 },
+                "taskExplorer.groupDashed": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.groupDashed%"
+                },
                 "taskExplorer.pathToAnt": {
                     "type": "string",
                     "description": "%config.taskExplorer.pathToAnt%"

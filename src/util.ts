@@ -1,13 +1,22 @@
 
-import { workspace, RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext, commands, window } from "vscode";
+import { workspace, RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext, commands, window, TreeItem } from "vscode";
 import * as fs from "original-fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./common/configuration";
+import { TaskFolder, TaskFile, TaskItem } from "./tasks";
 
 const logValueWhiteSpace = 40;
 
 let writeToConsole = false;
 let logOutputChannel: OutputChannel | undefined;
+
+
+export async function asyncForEach(array: any, callback: any)
+{
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array);
+    }
+}
 
 
 export function initLog(context: ExtensionContext)
