@@ -24,7 +24,7 @@
 - [Task Explorer - View and Run Tasks from Visual Studio Code](#task-explorer---view-and-run-tasks-from-visual-studio-code)
   - [Description](#description)
   - [Table of Contents](#table-of-contents)
-  - [Screenshots](#screenshots)
+  - [Screenshots by Version](#screenshots-by-version)
   - [Requirements](#requirements)
   - [Features](#features)
   - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
@@ -35,15 +35,15 @@
   - [Thank You](#thank-you)
   - [Other Code Extensions by spmeesseman](#other-code-extensions-by-spmeesseman)
 
-## Screenshots
+## Screenshots by Version
 
 |Original Explorer Tray|Sidebar View (v1.7)|Task Type Groups (v1.13)|
 |-|-|-|
 |![ss0](res/taskview1.png?raw=true)|![ss1](res/taskview2.png?raw=true)|![ss2](res/taskview3.png?raw=true)|
 
-|Grunt/Gulp in Subfolders (v1.14)|Npm Commands (v1.16)||
+|Grunt/Gulp in Subfolders (v1.14)|Npm Commands (v1.16)|Task Dashed Groups (v1.23)|
 |-|-|-|
-|![ss3](res/taskview4.png?raw=true)|![ss3](res/taskview5.png?raw=true)||
+|![ss4](res/taskview4.png?raw=true)|![ss5](res/taskview5.png?raw=true)|![ss6](res/taskview6.png?raw=true)|
 
 ## Requirements
 
@@ -51,7 +51,7 @@
 
 ## Features
 
-* v1.23 - Deeper groupings with dashed task groups (default OFF)
+* v1.23 - Deeper groupings with dashed task groups (Off by default)
 * v1.22 - Major performance enhancements - Task Tree / Task Scanning
 * v1.21 - Add option to keep terminal open after stopping task [closes #51]
 * v1.20 - Add support for restarting task (thank you **antfu**)
