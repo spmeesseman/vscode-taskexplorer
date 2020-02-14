@@ -388,7 +388,7 @@ suite('Task tests', () =>
     });
 
 
-    test('Scan tasks', async function() 
+    test('Perform tree construction', async function() 
     {
         this.timeout(30 * 1000);
 
@@ -413,6 +413,7 @@ suite('Task tests', () =>
         await trees.configuration.update('pathToPerl', 'perl');
         await trees.configuration.update('pathToPython', 'python');
         await trees.configuration.update('pathToPowershell', 'powershell');
+
         await trees.explorerProvider.refresh();
         treeItems = await trees.explorerProvider.getChildren(); // mock explorer open view which would call this function
 
@@ -471,6 +472,11 @@ suite('Task tests', () =>
         taskCount = testUtil.findIdInTaskMap(':grunt:', taskMap);
         if (taskCount < 4) {
             assert.fail('Unexpected Grunt task count (Found ' + taskCount + ' of 4)');
+        }
+
+        taskCount = testUtil.findIdInTaskMap(':typescript:', taskMap);
+        if (taskCount < 2) {
+            assert.fail('Unexpected Grunt task count (Found ' + taskCount + ' of 2)');
         }
 
         taskCount = testUtil.findIdInTaskMap(':Workspace:', taskMap);

@@ -14,7 +14,7 @@ type StringMap = { [s: string]: string; };
 let cachedTasks: Task[];
 
 
-interface GradleTaskDefinition extends TaskDefinition 
+interface GradleTaskDefinition extends TaskDefinition
 {
     script?: string;
     path?: string;
@@ -23,8 +23,9 @@ interface GradleTaskDefinition extends TaskDefinition
     treeItem?: TaskItem;
 }
 
-export class GradleTaskProvider implements TaskProvider 
+export class GradleTaskProvider implements TaskProvider
 {
+    // tslint:disable-next-line: no-empty
     constructor() {}
 
     public provideTasks()
@@ -39,12 +40,12 @@ export class GradleTaskProvider implements TaskProvider
 }
 
 
-export async function invalidateTasksCacheGradle(opt?: Uri): Promise<void> 
+export async function invalidateTasksCacheGradle(opt?: Uri): Promise<void>
 {
     util.log("");
-    util.log("invalidateTasksCacheAnt");
+    util.log("invalidateTasksCacheGradle");
 
-    if (opt && cachedTasks) 
+    if (opt && cachedTasks)
     {
         const rmvTasks: Task[] = [];
 
@@ -79,7 +80,7 @@ export async function invalidateTasksCacheGradle(opt?: Uri): Promise<void>
 }
 
 
-async function detectGradlefiles(): Promise<Task[]> 
+async function detectGradlefiles(): Promise<Task[]>
 {
     util.log("");
     util.log("detectGradlefiles");
@@ -93,11 +94,11 @@ async function detectGradlefiles(): Promise<Task[]>
     {
         return emptyTasks;
     }
-    try 
+    try
     {
         if (!paths)
         {
-            for (const folder of folders) 
+            for (const folder of folders)
             {
                 //
                 // Note - pattern will ignore gradlefiles in root project dir, which would be picked
@@ -105,7 +106,7 @@ async function detectGradlefiles(): Promise<Task[]>
                 //
                 const relativePattern = new RelativePattern(folder, "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]");
                 const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-                for (const fpath of paths) 
+                for (const fpath of paths)
                 {
                     if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath))
                     {
@@ -139,7 +140,7 @@ async function detectGradlefiles(): Promise<Task[]>
 }
 
 
-export async function provideGradlefiles(): Promise<Task[]> 
+export async function provideGradlefiles(): Promise<Task[]>
 {
     if (!cachedTasks)
     {
@@ -149,7 +150,7 @@ export async function provideGradlefiles(): Promise<Task[]>
 }
 
 
-async function readGradlefile(uri: Uri): Promise<Task[]> 
+async function readGradlefile(uri: Uri): Promise<Task[]>
 {
     const emptyTasks: Task[] = [];
 
@@ -181,7 +182,7 @@ async function readGradlefile(uri: Uri): Promise<Task[]>
 }
 
 
-async function findTargets(fsPath: string): Promise<StringMap> 
+async function findTargets(fsPath: string): Promise<StringMap>
 {
     const json: any = "";
     const scripts: StringMap = {};
@@ -195,7 +196,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
     while (eol !== -1)
     {
         const line: string = contents.substring(idx, eol).trim();
-        if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("task ")) 
+        if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("task "))
         {
             let idx1 = line.trimLeft().indexOf(" ");
             if (idx1 !== -1)
@@ -227,9 +228,9 @@ async function findTargets(fsPath: string): Promise<StringMap>
 }
 
 
-function createGradleTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task 
+function createGradleTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
 {
-    function getCommand(folder: WorkspaceFolder, cmd: string): string 
+    function getCommand(folder: WorkspaceFolder, cmd: string): string
     {
         let gradle = "gradle";
 
@@ -246,7 +247,7 @@ function createGradleTask(target: string, cmd: string, folder: WorkspaceFolder, 
         return gradle;
     }
 
-    function getRelativePath(folder: WorkspaceFolder, uri: Uri): string 
+    function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
     {
         if (folder)
         {

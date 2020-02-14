@@ -327,7 +327,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const me = this;
         const taskMap: Map<string, TaskItem> = new Map();
 
-        util.log(logPad + "Get task item");
+        util.log(logPad + "Get task tree items, start task tree scan");
+        util.logValue(logPad + "   task id", taskId ? taskId : "all tasks");
+        util.logValue(logPad + "   execute open", executeOpenForTests.toString());
 
         const treeItems = await this.getChildren(undefined, "   ");
         if (!treeItems || treeItems.length === 0)
@@ -400,9 +402,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         {
                             const tpath: string = item3.task.definition.uri ? item3.task.definition.uri.fsPath :
                                                 (item3.task.definition.path ? item3.task.definition.path : "root");
-                            util.log(logPad + "      ✔ Processed " + item3.task.name);
-                            util.log(logPad + "           id " + item3.id);
-                            util.log(logPad + "           type " + item3.taskSource + " @ " + tpath);
+                            util.log(logPad + "   ✔ Processed " + item3.task.name);
+                            util.logValue(logPad + "        id", item3.id);
+                            util.logValue(logPad + "        type", item3.taskSource + " @ " + tpath);
                             taskMap.set(item3.id, item3);
                         }
                         else
@@ -474,6 +476,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 assert.fail("Exception error: " + error.toString());
             }
         });
+
+        util.log(logPad + "   finished task tree scan");
+        util.logValue(logPad + "   # of items found", taskMap.keys.length, 2);
 
         if (taskId) {
             return taskMap.get(taskId);

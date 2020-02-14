@@ -86,13 +86,18 @@ async function detectAntScripts(): Promise<Task[]>
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("ant");
 
+    filesCache.forEach((v,k) =>
+    {
+        console.log(k);
+        console.log(v.values.length);
+    });
     const folders = workspace.workspaceFolders;
     if (!folders) {
         return emptyTasks;
     }
     try {
         if (!paths)
-        {
+        {console.log('1');
             for (const folder of folders)
             {
                 let relativePattern = new RelativePattern(folder, "**/[Bb]uild.xml");
@@ -127,9 +132,9 @@ async function detectAntScripts(): Promise<Task[]>
             }
         }
         else
-        {
+        {console.log('A');
             for (const fobj of paths)
-            {
+            {console.log('B: ' + fobj.uri.fsPath);
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
                     visitedFiles.add(fobj.uri.fsPath);
                     const tasks = await readAntfile(fobj.uri);
