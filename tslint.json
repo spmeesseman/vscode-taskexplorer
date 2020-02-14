@@ -54,6 +54,7 @@
 		"no-unused-expression": true,
 		"no-duplicate-variable": true,
         "no-switch-case-fall-through": true,
+        "no-this-assignment": false,
         "no-trailing-whitespace": [true, "ignore-template-strings"],
         "no-type-assertion-whitespace": true,
         "no-unnecessary-qualifier": true,
