@@ -377,6 +377,8 @@ async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boole
 {
     registerFileWatcher(context, "ant", "**/[Bb]uild.xml", false, enabled);
 
+    console.log("registerFileWatcherAnt!!!!!!!!!!");
+
     //
     // For extra file globs configured in settings, we need to first go through and disable
     // all current watchers since there is no way of knowing which glob patterns were
@@ -394,7 +396,7 @@ async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boole
     }
 
     const includeAnt: string[] = configuration.get("includeAnt");
-    console.log(includeAnt.toString());
+    console.log("here: " + includeAnt.toString());
     if (includeAnt && includeAnt.length > 0) {
         for (let i = 0; i < includeAnt.length; i++) {
             await registerFileWatcher(context, "ant-" + includeAnt[i], includeAnt[i], false, enabled);
@@ -406,7 +408,7 @@ async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boole
 async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, isScriptType?: boolean, enabled?: boolean)
 {
     let watcher: FileSystemWatcher = watchers.get(taskType);
-
+    console.log("registerFileWatcher!!!!!!!!!!");
     await buildCache(isScriptType && taskType !== "app-publisher" ? "script" : taskType, taskType, fileBlob);
 
     if (enabled !== false) {
