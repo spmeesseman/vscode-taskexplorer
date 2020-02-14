@@ -1,13 +1,16 @@
 
-import { workspace, RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext, commands, window, TreeItem } from "vscode";
+import {
+    workspace, RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext, 
+    commands, window
+} from "vscode";
 import * as fs from "original-fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./common/configuration";
-import { TaskFolder, TaskFile, TaskItem } from "./tasks";
+
 
 const logValueWhiteSpace = 40;
-
 let writeToConsole = false;
+let writeToConsoleLevel = 2;
 let logOutputChannel: OutputChannel | undefined;
 
 
@@ -61,56 +64,13 @@ export function properCase(name: string)
 }
 
 
-//export function getTaskType(uri: Uri)
-//{
-//    let ext = path.extname(uri.fsPath);
-//    let fileName = path.basename(uri.fsPath).toLowerCase();
-//
-//    if (fileName === "package.json") {
-//        return "npm";
-//    }
-//    else if (fileName === "tasks.json") {
-//        return "Workspace";
-//    }
-//    else if (fileName === "gruntfile.js") {
-//        return "grunt";
-//    }
-//    else if (fileName === "gulpfile.js") {
-//        return "gulp";
-//    }
-//    else if (fileName === "makefile") {
-//        return "make";
-//    }
-//    else if (ext === ".gradle") {
-//        return "gradle";
-//    }
-//    else if (ext === ".py") {
-//        return "python";
-//    }
-//    else if (ext === ".rb") {
-//        return "ruby";
-//    }
-//    else if (ext === ".ps1") {
-//        return "powershell";
-//    }
-//    else if (ext === ".nsi") {
-//        return "nsis";
-//    }
-//    else if (ext === ".xml") {
-//        return "ant";
-//    }
-//
-//    return null;
-//}
-
-
 export function getExcludesGlob(folder: string | WorkspaceFolder) : RelativePattern
 {
     let relativePattern = new RelativePattern(folder, "**/node_modules/**");
     const excludes: string[] = configuration.get("exclude");
 
     if (excludes && excludes.length > 0) {
-        let multiFilePattern: string = "{**/node_modules/**";
+        let multiFilePattern = "{**/node_modules/**";
         if (Array.isArray(excludes))
         {
             for (const i in excludes) {
@@ -240,35 +200,32 @@ export function existsInArray(arr: any[], item: any)
 }
 
 
-export function setWriteToConsole(set: boolean)
+export function setWriteToConsole(set: boolean, level = 2)
 {
     writeToConsole = set;
+    writeToConsoleLevel = level;
 }
 
 
-export async function log(msg: string, level?: number)
+export function log(msg: string, level?: number)
 {
-    if (level && level > configuration.get<number>("debugLevel")) {
-        return;
-    }
-
     if (workspace.getConfiguration("taskExplorer").get("debug") === true)
     {
-        logOutputChannel.appendLine(msg);
+        if (!level || level <= configuration.get<number>("debugLevel")) {
+            logOutputChannel.appendLine(msg);
+        }
         if (writeToConsole === true) {
-            console.log(msg);
+            if (!level || level <= writeToConsoleLevel) {
+                console.log(msg);
+            }
         }
     }
 }
 
 
-export async function logValue(msg: string, value: any, level?: number)
+export function logValue(msg: string, value: any, level?: number)
 {
     let logMsg = msg;
-
-    if (level && level > configuration.get<number>("debugLevel")) {
-        return;
-    }
 
     for (let i = msg.length; i < logValueWhiteSpace; i++) {
         logMsg += " ";
@@ -286,6 +243,13 @@ export async function logValue(msg: string, value: any, level?: number)
     }
 
     if (workspace.getConfiguration("taskExplorer").get("debug") === true) {
-        logOutputChannel.appendLine(logMsg);
+        if (!level || level <= configuration.get<number>("debugLevel")) {
+            logOutputChannel.appendLine(logMsg);
+        }
+        if (writeToConsole === true) {
+            if (!level || level <= writeToConsoleLevel) {
+                console.log(logMsg);
+            }
+        }
     }
 }
