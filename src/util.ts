@@ -90,7 +90,7 @@ export function getExcludesGlob(folder: string | WorkspaceFolder) : RelativePatt
 }
 
 
-export function isExcluded(uriPath: string)
+export function isExcluded(uriPath: string, logPad = "")
 {
     function testForExclusionPattern(path: string, pattern: string): boolean
     {
@@ -100,31 +100,31 @@ export function isExcluded(uriPath: string)
     const exclude = configuration.get<string | string[]>("exclude");
 
     this.log("", 2);
-    this.log("Check exclusion", 2);
-    this.logValue("   path", uriPath, 2);
+    this.log(logPad + "Check exclusion", 2);
+    this.logValue(logPad + "   path", uriPath, 2);
 
     if (exclude)
     {
         if (Array.isArray(exclude))
         {
             for (const pattern of exclude) {
-                this.logValue("   checking pattern", pattern, 3);
+                this.logValue(logPad + "   checking pattern", pattern, 3);
                 if (testForExclusionPattern(uriPath, pattern)) {
-                    this.log("   Excluded!", 2);
+                    this.log(logPad + "   Excluded!", 2);
                     return true;
                 }
             }
         }
         else {
-            this.logValue("   checking pattern", exclude, 3);
+            this.logValue(logPad + "   checking pattern", exclude, 3);
             if (testForExclusionPattern(uriPath, exclude)) {
-              this.log("   Excluded!", 2);
+              this.log(logPad + "   Excluded!", 2);
               return true;
             }
         }
     }
 
-    this.log("   Not excluded", 2);
+    this.log(logPad + "   Not excluded", 2);
     return false;
 }
 
@@ -209,6 +209,10 @@ export function setWriteToConsole(set: boolean, level = 2)
 
 export function log(msg: string, level?: number)
 {
+    if (msg === null || msg === undefined) {
+        return;
+    }
+
     if (workspace.getConfiguration("taskExplorer").get("debug") === true)
     {
         if (!level || level <= configuration.get<number>("debugLevel")) {
@@ -227,7 +231,7 @@ export function logValue(msg: string, value: any, level?: number)
 {
     let logMsg = msg;
 
-    for (let i = msg.length; i < logValueWhiteSpace; i++) {
+    for (let i = msg && msg.length ? msg.length : (value === undefined ? 9 : 4); i < logValueWhiteSpace; i++) {
         logMsg += " ";
     }
 

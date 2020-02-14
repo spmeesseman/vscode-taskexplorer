@@ -187,6 +187,8 @@ async function detectScriptFiles(): Promise<Task[]>
                     if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
                         visitedFiles.add(fpath.fsPath);
                         allTasks.push(createScriptTask(scriptTable[path.extname(fpath.fsPath).substring(1).toLowerCase()], folder!, fpath));
+                        util.log("   found script target");
+                        util.logValue("      script file", fpath.fsPath);
                     }
                 }
             }
@@ -198,11 +200,14 @@ async function detectScriptFiles(): Promise<Task[]>
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
                     visitedFiles.add(fobj.uri.fsPath);
                     allTasks.push(createScriptTask(scriptTable[path.extname(fobj.uri.fsPath).substring(1).toLowerCase()], fobj.folder!, fobj.uri));
+                    util.log("   found script target");
+                    util.logValue("      script file", fobj.uri.fsPath);
                 }
             }
         }
         return allTasks;
-    } catch (error) {
+    } 
+    catch (error) {
         return Promise.reject(error);
     }
 }
