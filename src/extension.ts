@@ -408,8 +408,12 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
     log("Register file watcher for task type '" + taskType + "'");
 
     let watcher: FileSystemWatcher = watchers.get(taskType);
+    let taskAlias = taskType;
+    if (taskType && taskType.indexOf("ant-") !== -1) {
+        taskAlias = "ant";
+    }
 
-    await buildCache(isScriptType && taskType !== "app-publisher" ? "script" : taskType, taskType, fileBlob);
+    await buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, taskType, fileBlob);
 
     if (enabled !== false) {
         if (!watcher) {
