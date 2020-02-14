@@ -27,10 +27,54 @@ suite("Extension Tests", () =>
         assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
     });
 
-   
-    test("Enable required testing options", async function()
+
+        
+    // test("Enable required testing options", async function()
+    // {
+    //     //
+    //     // Enable views
+    //     //
+    //     await configuration.update('enableExplorerView', true);
+    //     await configuration.update('enableSideBar', true);
+    //     //
+    //     // Set misc settings
+    //     //
+    //     await configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
+    //     await configuration.update('debug', true);
+    //     await configuration.update('debugLevel', 3);
+    //     //
+    //     // Enabled all options
+    //     //
+    //     await configuration.update('enableAnt', true);
+    //     await configuration.update('enableAppPublisher', true);
+    //     await configuration.update('enableBash', true);
+    //     await configuration.update('enableBatch', true);
+    //     await configuration.update('enableGradle', true);
+    //     await configuration.update('enableGrunt', true);
+    //     await configuration.update('enableGulp', true);
+    //     await configuration.update('enableMake', true);
+    //     await configuration.update('enableNpm', true);
+    //     await configuration.update('enableNsis', true);
+    //     await configuration.update('enablePowershell', true);
+    //     await configuration.update('enablePerl', true);
+    //     await configuration.update('enablePython', true);
+    //     await configuration.update('enableRuby', true);
+    //     await configuration.update('enableWorkspace', true);
+    // });
+
+
+    test("Activate extension", async function() 
     {
-        assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
+
+        this.timeout(30 * 1000);
+
+        const extension = vscode.extensions.getExtension(
+            "spmeesseman.vscode-taskexplorer"
+        ) as vscode.Extension<any>;
+
+        if (!extension) {
+            assert.fail("Extension not found");
+        }
 
         //
         // Enable views
@@ -44,7 +88,7 @@ suite("Extension Tests", () =>
         await configuration.update('debug', true);
         await configuration.update('debugLevel', 3);
         //
-        // Enabled all options
+        // Enable all task types
         //
         await configuration.update('enableAnt', true);
         await configuration.update('enableAppPublisher', true);
@@ -61,21 +105,6 @@ suite("Extension Tests", () =>
         await configuration.update('enablePython', true);
         await configuration.update('enableRuby', true);
         await configuration.update('enableWorkspace', true);
-    });
-
-
-    test("Activate extension", async function() 
-    {
-
-        this.timeout(30 * 1000);
-
-        const extension = vscode.extensions.getExtension(
-            "spmeesseman.vscode-taskexplorer"
-        ) as vscode.Extension<any>;
-
-        if (!extension) {
-            assert.fail("Extension not found");
-        }
 
         if (!extension.isActive) 
         {
@@ -92,7 +121,6 @@ suite("Extension Tests", () =>
             assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
         }
     });
-    
 
     test("Check tree providers", function(done) 
     {
