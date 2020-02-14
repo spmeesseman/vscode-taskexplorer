@@ -1,3 +1,10 @@
+## [1.23.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.0...v1.23.1) (2020-02-14)
+
+
+### Bug Fixes
+
+* invalidation was broken in previous release - cache is rebuilt over and over ([be61019](https://github.com/spmeesseman/vscode-taskexplorer/commit/be61019))
+
 # [1.23.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.22.3...v1.23.0) (2020-02-14)
 
 
