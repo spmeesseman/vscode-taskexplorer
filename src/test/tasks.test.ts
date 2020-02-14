@@ -370,16 +370,35 @@ suite('Task tests', () =>
         );
     });
 
+    test('Create app-publisher config file', async function() 
+    {
+        const file = path.join(workspace.rootPath ? workspace.rootPath  : "", '.publishrc.json');
+        tempFiles.push(file);
+    
+        fs.writeFileSync(
+            file,
+            '{\n' +
+            '    "version": "1.0.0"\n' +
+            '    "branch": "trunk",\n' +
+            '    "buildCommand": [],\n' +
+            '    "mantisbtRelease": "Y",\n' +
+            '    "mantisbtChglogEdit": "N",\n' +
+            '    "mantisbtProject": "",\n' +
+            '    "repoType": "svn""\n' +
+            '}\n'
+        );
+    });
+
 
     test('Scan tasks', async function() 
     {
-        //addFolderToCache(dirName);
+        this.timeout(30 * 1000);
 
         if (!trees.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
-        await timeout(3500); // wait for filesystem change events
+        await timeout(5000); // wait for filesystem change events
 
         //
         // Refresh for better coverage
@@ -478,6 +497,6 @@ suite('Task tests', () =>
 
 async function scanTasks()
 {
-    taskMap = await trees.explorerProvider.getTaskItems();
+    taskMap = await trees.explorerProvider.getTaskItems(undefined, "   ", true);
     console.log('    ✔ Scanning complete');
 }

@@ -133,7 +133,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async run(taskItem: TaskItem)
     {
-        var me = this;
+        const me = this;
         //
         // If this is a script, check to see if args are required
         //
@@ -182,7 +182,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 {
                     term.sendText("N", true);
                     taskItem.paused = false;
-                    //taskItem.contextValue = "runningScript";
+                    // taskItem.contextValue = "runningScript";
                 }
             });
         }
@@ -210,17 +210,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     {
                         taskItem.paused = false;
                         term.sendText("N");
-                        //taskItem.contextValue = "runningScript";
+                        // taskItem.contextValue = "runningScript";
                     }
                     else
                     {
-                        //taskItem.paused = true;
+                        // taskItem.paused = true;
                         term.sendText("\u0003");
                         function yes() {
                             term.sendText("Y", true);
                         }
                         setTimeout(yes, 100);
-                        //taskItem.contextValue = "pausedScript";
+                        // taskItem.contextValue = "pausedScript";
                     }
                 }
             });
@@ -232,22 +232,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         if (taskItem.execution)
         {
-            //if (taskItem.paused)
-            //{
-            //    window.terminals.forEach(async (term, idx) =>
-            //    {
-            //        const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
-            //        if (term.name.toLowerCase() === termTaskName.toLowerCase())
-            //        {
-            //            term.sendText("Y", true);
-            //            taskItem.paused = false;
-            //            //taskItem.contextValue = "script";
-            //        }
-            //    });
-            //}
-            //else {
-            //    taskItem.execution.terminate();
-            //}
+            // if (taskItem.paused)
+            // {
+            //     window.terminals.forEach(async (term, idx) =>
+            //     {
+            //         const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+            //         if (term.name.toLowerCase() === termTaskName.toLowerCase())
+            //         {
+            //             term.sendText("Y", true);
+            //             taskItem.paused = false;
+            //             //taskItem.contextValue = "script";
+            //         }
+            //     });
+            // }
+            // else {
+            //     taskItem.execution.terminate();
+            // }
 
             if (configuration.get<boolean>("keepTermOnStop") === true)
             {
@@ -260,17 +260,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         {
                             taskItem.paused = false;
                             term.sendText("N");
-                            //taskItem.contextValue = "runningScript";
+                            // taskItem.contextValue = "runningScript";
                         }
                         else
                         {
-                            //taskItem.paused = true;
+                            // taskItem.paused = true;
                             term.sendText("\u0003");
                             function yes() {
                                 term.sendText("Y", true);
                             }
                             setTimeout(yes, 300);
-                            //taskItem.contextValue = "pausedScript";
+                            // taskItem.contextValue = "pausedScript";
                         }
                     }
                 });
@@ -948,6 +948,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (!this.taskTree)
         {
             util.log(logPad + "   Build task tree");
+            this.isBusy = true;
             //
             // TODO - search enable* settings and apply enabled types to filter
             //
@@ -964,6 +965,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     this.taskTree = [new NoScripts()];
                 }
             }
+            this.isBusy = false;
         }
 
         if (element instanceof TaskFolder)
