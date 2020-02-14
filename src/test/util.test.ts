@@ -30,22 +30,22 @@ suite("Util tests", () =>
 
     test("Log to output window", () =>
     {
-        assert.ok(util.log("spmeesseman.vscode-taskexplorer"));
+        assert.ok(util.log("        spmeesseman.vscode-taskexplorer"));
     });
 
     test("Log value to output window", () =>
     {
-        assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", "true"));
+        assert.ok(util.logValue("        spmeesseman.vscode-taskexplorer", "true"));
     });
 
     test("Log a null value to output window", () =>
     {
-        assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", null));
+        assert.ok(util.logValue("        spmeesseman.vscode-taskexplorer", null));
     });
 
     test("Log undefined value to output window", () =>
     {
-        assert.ok(util.logValue("spmeesseman.vscode-taskexplorer", undefined));
+        assert.ok(util.logValue("        spmeesseman.vscode-taskexplorer", undefined));
     });
 
     test("Camel case a value", () =>

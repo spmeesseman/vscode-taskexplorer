@@ -394,6 +394,7 @@ async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boole
     }
 
     const includeAnt: string[] = configuration.get("includeAnt");
+    console.log(includeAnt.toString());
     if (includeAnt && includeAnt.length > 0) {
         for (let i = 0; i < includeAnt.length; i++) {
             await registerFileWatcher(context, "ant-" + includeAnt[i], includeAnt[i], false, enabled);

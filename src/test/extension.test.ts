@@ -30,7 +30,6 @@ suite("Extension Tests", () =>
 
     test("Activate extension", function(done) 
     {
-
         this.timeout(60 * 1000);
 
         const extension = vscode.extensions.getExtension(
