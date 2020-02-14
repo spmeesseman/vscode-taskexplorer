@@ -614,7 +614,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // If invalidate is true and opt is false, then the refresh button was clicked
         //
-        // If invalidate and opt are both undefined, then extension.refreshTree() called in tests
+        // If invalidate is true and opt undefined, then extension.refreshTree() called in tests
         //
         // If task is truthy, then a task has started/stopped, opt will be the task deifnition's
         // 'uri' property, note that task types not internally provided will not contain this property.
@@ -625,7 +625,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (invalidate !== false)
         {
-            if ((invalidate === true || invalidate === undefined) && !opt) {
+            if (invalidate === true && !opt) {
                 await rebuildCache();
             }
             await this.invalidateTasksCache(invalidate, opt);
