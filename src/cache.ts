@@ -41,6 +41,13 @@ export async function rebuildCache()
 
 export async function buildCache(taskAlias: string, taskType: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined, setCacheBuilding = true)
 {
+    log("Start cache building");
+    logValue("   task alias", taskAlias, 2);
+    logValue("   task type", taskAlias, 2);
+    logValue("   blob", fileBlob, 2);
+    logValue("   folder", !wsfolder ? "entire workspace" : wsfolder.name);
+    logValue("   setCacheBuilding", setCacheBuilding.toString(), 2);
+
     //
     // If buildCache is already running in another scope, then cancel and wait
     //
@@ -136,6 +143,8 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
     }
 
     window.setStatusBarMessage("");
+    log("Cache building complete");
+
     cancel = false;
     if (setCacheBuilding) {
         cacheBuilding = false;
@@ -181,8 +190,8 @@ export async function removeFileFromCache(taskAlias: string, uri: Uri)
 export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
 {
     cacheBuilding = true;
-    log("Start cache building");
-    logValue("   Cache entire workspace", folder ? "true" : "false");
+    log("Add folder to cache");
+    logValue("   folder", !folder ? "entire workspace" : folder.name);
 
     if (configuration.get<boolean>("enableAnt")) {
         await buildCache("ant", "ant", "**/[Bb]uild.xml", folder, false);
@@ -256,6 +265,6 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
     }
 
     cacheBuilding = false;
-    log("Cache building complete");
+    log("Add folder to cache complete");
 }
 

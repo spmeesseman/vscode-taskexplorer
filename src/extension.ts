@@ -22,6 +22,7 @@ import {
     filesCache, addFolderToCache, buildCache, addFileToCache, removeFileFromCache
 } from "./cache";
 import { initLog, log, logValue } from "./util";
+import { utils } from "mocha";
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
@@ -404,6 +405,8 @@ async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boole
 
 async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, isScriptType?: boolean, enabled?: boolean)
 {
+    log("Register file watcher for task type '" + taskType + "'");
+
     let watcher: FileSystemWatcher = watchers.get(taskType);
     await buildCache(isScriptType && taskType !== "app-publisher" ? "script" : taskType, taskType, fileBlob);
 
