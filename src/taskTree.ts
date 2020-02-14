@@ -748,13 +748,93 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private findScriptPosition(document: TextDocument, script?: TaskItem): number
+    private findPosWithJsonVisitor(documentText: string, script?: TaskItem)
     {
         const me = this;
-        let scriptOffset = 0;
         let inScripts = false;
         let inTasks = false;
         let inTaskLabel: any;
+        let scriptOffset = 0;
+
+        const visitor: JSONVisitor = {
+            onError()
+            {
+                return scriptOffset;
+            },
+            onObjectEnd()
+            {
+                if (inScripts)
+                {
+                    inScripts = false;
+                }
+            },
+            onLiteralValue(value: any, offset: number, _length: number)
+            {
+                if (inTaskLabel)
+                {
+                    if (typeof value === "string")
+                    {
+                        if (inTaskLabel === "label")
+                        {
+                            if (script.task.name === value)
+                            {
+                                scriptOffset = offset;
+                            }
+                        }
+                    }
+                    inTaskLabel = undefined;
+                }
+            },
+            onObjectProperty(property: string, offset: number, _length: number)
+            {
+                if (property === "scripts")
+                {
+                    inScripts = true;
+                    if (!script)
+                    { // select the script section
+                        scriptOffset = offset;
+                    }
+                }
+                else if (inScripts && script)
+                {
+                    const label = me.getTaskName(property, script.task.definition.path, true);
+                    if (script.task.name === label)
+                    {
+                        scriptOffset = offset;
+                    }
+                }
+                else if (property === "tasks")
+                {
+                    inTasks = true;
+                    if (!inTaskLabel)
+                    { // select the script section
+                        scriptOffset = offset;
+                    }
+                }
+                else if (property === "label" && inTasks && !inTaskLabel)
+                {
+                    inTaskLabel = "label";
+                    if (!inTaskLabel)
+                    { // select the script section
+                        scriptOffset = offset;
+                    }
+                }
+                else
+                { // nested object which is invalid, ignore the script
+                    inTaskLabel = undefined;
+                }
+            }
+        };
+
+        visit(documentText, visitor);
+
+        return scriptOffset;
+    }
+
+
+    private findScriptPosition(document: TextDocument, script?: TaskItem): number
+    {
+        let scriptOffset = 0;
         const documentText = document.getText();
 
         util.log("findScriptPosition");
@@ -843,77 +923,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
         else if (script.taskSource === "npm" || script.taskSource === "Workspace")
         {
-            const visitor: JSONVisitor = {
-                onError()
-                {
-                    return scriptOffset;
-                },
-                onObjectEnd()
-                {
-                    if (inScripts)
-                    {
-                        inScripts = false;
-                    }
-                },
-                onLiteralValue(value: any, offset: number, _length: number)
-                {
-                    if (inTaskLabel)
-                    {
-                        if (typeof value === "string")
-                        {
-                            if (inTaskLabel === "label")
-                            {
-                                if (script.task.name === value)
-                                {
-                                    scriptOffset = offset;
-                                }
-                            }
-                        }
-                        inTaskLabel = undefined;
-                    }
-                },
-                onObjectProperty(property: string, offset: number, _length: number)
-                {
-                    if (property === "scripts")
-                    {
-                        inScripts = true;
-                        if (!script)
-                        { // select the script section
-                            scriptOffset = offset;
-                        }
-                    }
-                    else if (inScripts && script)
-                    {
-                        const label = me.getTaskName(property, script.task.definition.path, true);
-                        if (script.task.name === label)
-                        {
-                            scriptOffset = offset;
-                        }
-                    }
-                    else if (property === "tasks")
-                    {
-                        inTasks = true;
-                        if (!inTaskLabel)
-                        { // select the script section
-                            scriptOffset = offset;
-                        }
-                    }
-                    else if (property === "label" && inTasks && !inTaskLabel)
-                    {
-                        inTaskLabel = "label";
-                        if (!inTaskLabel)
-                        { // select the script section
-                            scriptOffset = offset;
-                        }
-                    }
-                    else
-                    { // nested object which is invalid, ignore the script
-                        inTaskLabel = undefined;
-                    }
-                }
-            };
-
-            visit(documentText, visitor);
+            this.findPosWithJsonVisitor(documentText, script);
         }
 
         util.logValue("   Offset", scriptOffset);
@@ -1023,6 +1033,49 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    private logTaskDefinition(definition: TaskDefinition)
+    {
+        util.logValue("   type", definition.type, 2);
+        if (definition.scriptType)
+        {
+            util.logValue("      script type", definition.scriptType, 2);	// if 'script' is defined, this is type npm
+        }
+        if (definition.script)
+        {
+            util.logValue("   script", definition.script, 2);	// if 'script' is defined, this is type npm
+        }
+        if (definition.path)
+        {
+            util.logValue("   path", definition.path, 2);
+        }
+        //
+        // Internal task providers will set a fileName property
+        //
+        if (definition.fileName)
+        {
+            util.logValue("   file name", definition.fileName, 2);
+        }
+        //
+        // Internal task providers will set a uri property
+        //
+        if (definition.uri)
+        {
+            util.logValue("   file path", definition.uri.fsPath, 2);
+        }
+        //
+        // Script task providers will set a fileName property
+        //
+        if (definition.requiresArgs)
+        {
+            util.logValue("   script requires args", "true", 2);
+        }
+        if (definition.cmdLine)
+        {
+            util.logValue("   script cmd line", definition.cmdLine, 2);
+        }
+    }
+
+
     private buildTaskTree(tasks: Task[]): TaskFolder[] | NoScripts[]
     {
         let taskCt = 0;
@@ -1102,44 +1155,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 util.logValue("   scope.uri.path", each.scope.uri.path, 2);
                 util.logValue("   scope.uri.fsPath", each.scope.uri.fsPath, 2);
                 util.logValue("   relative Path", relativePath, 2);
-                util.logValue("   type", definition.type, 2);
-                if (definition.scriptType)
-                {
-                    util.logValue("      script type", definition.scriptType, 2);	// if 'script' is defined, this is type npm
-                }
-                if (definition.script)
-                {
-                    util.logValue("   script", definition.script, 2);	// if 'script' is defined, this is type npm
-                }
-                if (definition.path)
-                {
-                    util.logValue("   path", definition.path, 2);
-                }
-                //
-                // Internal task providers will set a fileName property
-                //
-                if (definition.fileName)
-                {
-                    util.logValue("   file name", definition.fileName, 2);
-                }
-                //
-                // Internal task providers will set a uri property
-                //
-                if (definition.uri)
-                {
-                    util.logValue("   file path", definition.uri.fsPath, 2);
-                }
-                //
-                // Script task providers will set a fileName property
-                //
-                if (definition.requiresArgs)
-                {
-                    util.logValue("   script requires args", "true", 2);
-                }
-                if (definition.cmdLine)
-                {
-                    util.logValue("   script cmd line", definition.cmdLine, 2);
-                }
+                this.logTaskDefinition(definition);
 
                 taskFile = files.get(id);
                 //
