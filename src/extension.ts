@@ -375,7 +375,7 @@ function registerTaskProviders(context: ExtensionContext)
 
 async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boolean)
 {
-    registerFileWatcher(context, "ant", "**/[Bb]uild.xml", false, enabled);
+    await registerFileWatcher(context, "ant", "**/[Bb]uild.xml", false, enabled);
     console.log('registerFileWatcherAnt!!!!!!  ');
 
     //
