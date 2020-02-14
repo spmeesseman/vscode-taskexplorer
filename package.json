@@ -95,7 +95,7 @@
         "prettier": "^1.19.1",
         "prettylint": "^1.0.0",
         "semantic-release": "^15.14.0",
-        "semantic-release-vsce": "^2.2.8",
+        "semantic-release-vsce": "^3.0.0",
         "tslint": "^5.20.1",
         "typescript": "^3.7.5",
         "vsce": "^1.72.0",
