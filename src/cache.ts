@@ -1,6 +1,6 @@
 
 import { workspace, window, RelativePattern, WorkspaceFolder, Uri } from "vscode";
-import { log, getExcludesGlob, isExcluded, properCase } from "./util";
+import { log, logValue, getExcludesGlob, isExcluded, properCase } from "./util";
 import { configuration } from "./common/configuration";
 
 export let filesCache: Map<string, Set<any>> = new Map();
@@ -49,9 +49,10 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
     if (dispTaskType.indexOf("Ant") !== -1) {
         dispTaskType = "Ant";
     }
+
     if (!wsfolder)
     {
-        log("Scan all projects");
+        log("Build cache - Scan all projects for taskType '" + dispTaskType + "'");
         window.setStatusBarMessage("$(loading) Task Explorer - Scanning projects...");
 
         if (workspace.workspaceFolders)
@@ -83,6 +84,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                                 uri: fpath,
                                 folder
                             });
+                            logValue("   Added to cache", fpath.fsPath, 2);
                         }
                     }
                 }
@@ -111,6 +113,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                     uri: fpath,
                     folder: wsfolder
                 });
+                logValue("   Added to cache", fpath.fsPath, 2);
             }
         }
     }
