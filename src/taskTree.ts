@@ -293,7 +293,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async runLastTask()
     {
         let lastTaskId: string;
-        const lastTasks = storage.get<Array<string>>("lastTasks", []);
+        const lastTasks = storage.get<string[]>("lastTasks", []);
         if (lastTasks && lastTasks.length > 0)
         {
             lastTaskId = lastTasks[lastTasks.length - 1];
@@ -489,7 +489,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private saveRunTask(taskItem: TaskItem)
     {
-        const lastTasks = storage.get<Array<string>>("lastTasks", []);
+        const lastTasks = storage.get<string[]>("lastTasks", []);
         if (util.existsInArray(lastTasks, taskItem.id))
         {
             util.removeFromArray(lastTasks, taskItem.id);
@@ -506,13 +506,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async pickLastTask()
     {
         // let taskItem: TaskItem;
- 
+
         // let lastTasks = storage.get<Array<string>>("lastTasks", []);
         // lastTasks.forEach(each =>
         // {
- 
+
         // });
- 
+
         // this.run(taskItem);
     }
 
@@ -700,7 +700,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             if (str !== undefined)
             {
-                const excludes = configuration.get<Array<string>>("exclude");
+                const excludes = configuration.get<string[]>("exclude");
                 const strs = str.split(",");
                 for (const s in strs) {
                     if (!util.existsInArray(excludes, strs[s])) {

@@ -231,8 +231,8 @@ export async function log(msg: string, level?: number)
 export async function logValue(msg: string, value: any, level?: number)
 {
     let logMsg = msg;
-
-    for (let i = msg && msg.length ? msg.length : (value === undefined ? 9 : 4); i < logValueWhiteSpace; i++) {
+    const spaces = msg && msg.length ? msg.length : (value === undefined ? 9 : 4);
+    for (let i = spaces; i < logValueWhiteSpace; i++) {
         logMsg += " ";
     }
 
