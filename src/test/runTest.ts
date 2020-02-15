@@ -9,9 +9,12 @@ async function main()
     try {
         await runTests({
             version: process.env.CODE_VERSION,
-            extensionDevelopmentPath,
-            extensionTestsPath,
-            launchArgs: [extensionTestsPath]
+            // extensionDevelopmentPath,   // <- vscode-test
+            // extensionTestsPath,         // <- vscode-test
+            extensionPath: extensionDevelopmentPath,   // <- vscode
+            testRunnerPath: extensionTestsPath,        // <- vscode
+            testWorkspace: extensionDevelopmentPath,   // <- vscode
+            launchArgs: [extensionTestsPath]           // <- vscode
         });
     } catch (err) {
         console.error(`Failed to run tests: ${err}\n${err.stack}`);
