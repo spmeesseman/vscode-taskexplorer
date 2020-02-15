@@ -44,9 +44,7 @@
         "bash"
     ],
     "main": "./out/extension",
-    "activationEvents": [
-        "*"
-    ],
+    "activationEvents": [],
     "files": [
         "res",
         "src/*.js",
@@ -63,20 +61,27 @@
         "semantic-release-no-ci": "semantic-release --no-ci",
         "semantic-release-dry": "semantic-release --dry-run",
         "watch": "tsc -watch -p ./",
-        "test": "node ./out/test/runTest.js",
+        "test1": "node ./out/test/runTest.js",
         "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
         "coverage3": "nyc npm run test",
         "coverage2": "nyc --reporter=lcov mocha 'src/test/**/*.ts' --recursive",
         "open:coverage": "open coverage/lcov-report/index.html",
-        "pretest3": "BABEL_ENV=coverage && npm run build",
+        "pretest3": "npm run compile",
         "test2": "rimraf .nyc_output && node ./out/test/runTest.js && nyc report && nyc report --reporter=lcov",
-        "codecov": "nyc report --reporter=text-lcov > coverage.lcov; codecov"
+        "codecov": "nyc report --reporter=text-lcov > coverage.lcov; codecov",
+        "test": "node ./node_modules/vscode/bin/test",
+        "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "dependencies": {
+        "@types/istanbul": "^0.4.30",
         "is-utf8": "^0.2.1",
         "jsonc-parser": "^2.2.0",
         "minimatch": "^3.0.4",
+        "mocha-junit-reporter": "^1.23.3",
+        "mocha-multi-reporters": "^1.1.7",
+        "original-fs": "^1.1.0",
         "semver": "^6.3.0",
+        "vscode": "^1.1.36",
         "vscode-nls": "^4.1.1",
         "xml2js": "^0.4.23"
     },
@@ -104,11 +109,13 @@
         "glob": "^7.1.6",
         "grunt": "^1.0.4",
         "gulp": "^4.0.2",
+        "istanbul": "^0.4.5",
         "madge": "^3.7.0",
         "mocha": "^6.2.2",
         "nyc": "^15.0.0",
         "prettier": "^1.19.1",
         "prettylint": "^1.0.0",
+        "remap-istanbul": "^0.13.0",
         "rimraf": "^3.0.2",
         "semantic-release": "^15.14.0",
         "semantic-release-vsce": "^2.2.8",
@@ -128,15 +135,7 @@
             ".vscode-test",
             "test-files",
             "src/**/*.test.ts"
-        ],
-        "include": [
-            "src/**/*.ts"
-        ],
-        "require": [
-            "ts-node/register"
-        ],
-        "sourceMap": false,
-        "instrument": false
+        ]
     },
     "contributes": {
         "viewsContainers": {

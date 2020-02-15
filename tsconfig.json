@@ -3,7 +3,7 @@
         "module": "commonjs",
         "target": "es6",
         "outDir": "out",
-        "typeRoots": ["./node_modules/@types"],
+        "typeRoots": ["./node_modules/@types","./src/typings"],
         "lib": [
             "dom",
             "es6"
@@ -17,6 +17,7 @@
         // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
         // "noUnusedParameters": true,  /* Report errors on unused parameters. */
     },
+    "allowSyntheticDefaultImports": true,
     "include": ["src/**/*"],
     "exclude": [
         "node_modules",

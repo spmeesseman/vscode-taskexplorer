@@ -9,7 +9,8 @@ import * as path from 'path';
 import { workspace, Uri, tasks } from 'vscode';
 import * as testUtil from './testUtil';
 import { timeout } from '../util';
-import { trees } from './extension.test';
+import { treeDataProvider, treeDataProvider2 } from '../extension';
+import { teApi } from './extension.test';
 import { TaskItem } from '../tasks';
 import { waitForCache } from '../cache';
 
@@ -44,7 +45,7 @@ suite('Task tests', () =>
         dirNameCode = path.join(workspace.rootPath ? workspace.rootPath  : "", '.vscode');
         //console.log(dirName);
 
-        await trees.configuration.update('exclude', ['**/coveronly/**']);
+        await teApi.configuration.update('exclude', ['**/coveronly/**']);
 
         if (!fs.existsSync(dirName)) {
             fs.mkdirSync(dirName, { mode: 0o770 });
@@ -392,7 +393,7 @@ suite('Task tests', () =>
     {
         this.timeout(30 * 1000);
 
-        if (!trees.explorerProvider) {
+        if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
@@ -402,20 +403,20 @@ suite('Task tests', () =>
         //
         // Refresh for better coverage
         //
-        treeItems = await trees.explorerProvider.getChildren(); // mock explorer open view which would call this function
+        treeItems = await teApi.explorerProvider.getChildren(); // mock explorer open view which would call this function
         await timeout(300);
-        await trees.configuration.update('exclude', '**/coveronly/**');
-        await trees.configuration.update('pathToAnt', 'ant.bat');
-        await trees.configuration.update('pathToGradle', 'gradle.bat');
-        //await trees.configuration.update('pathToGrunt', 'grunt.bat');
-        //await trees.configuration.update('pathToGulp', 'gulp.bat');
-        await trees.configuration.update('pathToMake', 'nmake');
-        await trees.configuration.update('pathToPerl', 'perl');
-        await trees.configuration.update('pathToPython', 'python');
-        await trees.configuration.update('pathToPowershell', 'powershell');
+        await teApi.configuration.update('exclude', '**/coveronly/**');
+        await teApi.configuration.update('pathToAnt', 'ant.bat');
+        await teApi.configuration.update('pathToGradle', 'gradle.bat');
+        //await teApi.configuration.update('pathToGrunt', 'grunt.bat');
+        //await teApi.configuration.update('pathToGulp', 'gulp.bat');
+        await teApi.configuration.update('pathToMake', 'nmake');
+        await teApi.configuration.update('pathToPerl', 'perl');
+        await teApi.configuration.update('pathToPython', 'python');
+        await teApi.configuration.update('pathToPowershell', 'powershell');
 
-        await trees.explorerProvider.refresh("tests");
-        treeItems = await trees.explorerProvider.getChildren(); // mock explorer open view which would call this function
+        await teApi.explorerProvider.refresh("tests");
+        treeItems = await teApi.explorerProvider.getChildren(); // mock explorer open view which would call this function
 
         let taskItems = await tasks.fetchTasks({ type: 'npm' });
         assert(taskItems.length > 0, 'No npm tasks registered');
@@ -433,7 +434,7 @@ suite('Task tests', () =>
 
     test('Verify tree validity and open tasks', async function() 
     {
-        if (!trees.explorerProvider) {
+        if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
 
@@ -487,39 +488,39 @@ suite('Task tests', () =>
 
     test('Invalidation tests', async function() 
     {
-        if (!trees.explorerProvider) {
+        if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
 
-        await trees.configuration.update('enableAnt', false);
-        await trees.configuration.update('enableAppPublisher', false);
-        await trees.configuration.update('enableBash', false);
-        await trees.configuration.update('enableBatch', false);
-        await trees.configuration.update('enableGradle', false);
-        await trees.configuration.update('enableGrunt', false);
-        await trees.configuration.update('enableGulp', false);
-        await trees.configuration.update('enableMake', false);
-        await trees.configuration.update('enableNpm', false);
-        await trees.configuration.update('enableNsis', false);
-        await trees.configuration.update('enablePowershell', false);
-        await trees.configuration.update('enablePerl', false);
-        await trees.configuration.update('enablePython', false);
-        await trees.configuration.update('enableRuby', false);
-        await trees.configuration.update('enableWorkspace', false);
+        await teApi.configuration.update('enableAnt', false);
+        await teApi.configuration.update('enableAppPublisher', false);
+        await teApi.configuration.update('enableBash', false);
+        await teApi.configuration.update('enableBatch', false);
+        await teApi.configuration.update('enableGradle', false);
+        await teApi.configuration.update('enableGrunt', false);
+        await teApi.configuration.update('enableGulp', false);
+        await teApi.configuration.update('enableMake', false);
+        await teApi.configuration.update('enableNpm', false);
+        await teApi.configuration.update('enableNsis', false);
+        await teApi.configuration.update('enablePowershell', false);
+        await teApi.configuration.update('enablePerl', false);
+        await teApi.configuration.update('enablePython', false);
+        await teApi.configuration.update('enableRuby', false);
+        await teApi.configuration.update('enableWorkspace', false);
 
         taskMap.forEach(async(value: TaskItem) =>  {
             if (value) {
-                await trees.explorerProvider.invalidateTasksCache(value.taskSource, value.task.definition.uri);
+                await teApi.explorerProvider.invalidateTasksCache(value.taskSource, value.task.definition.uri);
             }
         });
 
-        await trees.explorerProvider.invalidateTasksCache(undefined, undefined);
+        await teApi.explorerProvider.invalidateTasksCache(undefined, undefined);
     });
 });
 
 
 async function scanTasks()
 {
-    taskMap = await trees.explorerProvider.getTaskItems(undefined, "   ", true);
+    taskMap = await teApi.explorerProvider.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
     console.log('    ✔ Scanning complete');
 }
