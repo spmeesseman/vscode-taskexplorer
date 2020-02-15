@@ -44,7 +44,9 @@
         "bash"
     ],
     "main": "./out/extension",
-    "activationEvents": [],
+    "activationEvents": [
+        "*"
+    ],
     "files": [
         "res",
         "src/*.js",

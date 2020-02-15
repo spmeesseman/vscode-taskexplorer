@@ -29,6 +29,46 @@ suite("Extension Tests", () =>
     });
 
 
+    test("Enable required testing options", async function()
+    {
+        this.timeout(10 * 1000);
+
+        assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
+
+        //
+        // Enable views
+        //
+        await configuration.update('enableExplorerView', true);
+        await configuration.update('enableSideBar', true);
+        //
+        // Set misc settings
+        //
+        await configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
+        await configuration.update('debug', true);
+        await configuration.update('debugLevel', 3);
+        //
+        // Enabled all options
+        //
+        await configuration.update('enableAnt', true);
+        await configuration.update('enableAppPublisher', true);
+        await configuration.update('enableBash', true);
+        await configuration.update('enableBatch', true);
+        await configuration.update('enableGradle', true);
+        await configuration.update('enableGrunt', true);
+        await configuration.update('enableGulp', true);
+        await configuration.update('enableMake', true);
+        await configuration.update('enableNpm', true);
+        await configuration.update('enableNsis', true);
+        await configuration.update('enablePowershell', true);
+        await configuration.update('enablePerl', true);
+        await configuration.update('enablePython', true);
+        await configuration.update('enableRuby', true);
+        await configuration.update('enableWorkspace', true);
+
+        setWriteToConsole(true); // write debug logging from exiension to console
+    });
+
+
     test("Get active extension", async function()
     {
         let wait = 0;
@@ -74,47 +114,6 @@ suite("Extension Tests", () =>
         assert(teApi, "Exported API is empty");
         assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
     });
-
-
-    test("Enable required testing options", async function()
-    {
-        this.timeout(5 * 1000);
-
-        assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
-
-        //
-        // Enable views
-        //
-        await configuration.update('enableExplorerView', true);
-        await configuration.update('enableSideBar', true);
-        //
-        // Set misc settings
-        //
-        await configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
-        await configuration.update('debug', true);
-        await configuration.update('debugLevel', 3);
-        //
-        // Enabled all options
-        //
-        await configuration.update('enableAnt', true);
-        await configuration.update('enableAppPublisher', true);
-        await configuration.update('enableBash', true);
-        await configuration.update('enableBatch', true);
-        await configuration.update('enableGradle', true);
-        await configuration.update('enableGrunt', true);
-        await configuration.update('enableGulp', true);
-        await configuration.update('enableMake', true);
-        await configuration.update('enableNpm', true);
-        await configuration.update('enableNsis', true);
-        await configuration.update('enablePowershell', true);
-        await configuration.update('enablePerl', true);
-        await configuration.update('enablePython', true);
-        await configuration.update('enableRuby', true);
-        await configuration.update('enableWorkspace', true);
-
-        setWriteToConsole(true); // write debug logging from exiension to console
-    });
-
 
     test("Check tree providers", function(done) 
     {
