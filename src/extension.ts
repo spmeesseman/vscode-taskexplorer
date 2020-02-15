@@ -22,7 +22,6 @@ import {
     filesCache, addFolderToCache, buildCache, addFileToCache, removeFileFromCache
 } from "./cache";
 import { initLog, log, logValue } from "./util";
-import { utils } from "mocha";
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;

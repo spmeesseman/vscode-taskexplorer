@@ -2,7 +2,7 @@
 
 import * as cp from "child_process";
 import { ChildProcess, SpawnOptions } from "child_process";
-import { extensions, Uri, window } from "vscode";
+import { extensions, Uri, window, Extension } from "vscode";
 import { TaskItem } from "../tasks";
 
 
@@ -46,6 +46,20 @@ export function spawn(command: string, args?: string[], options?: SpawnOptions):
     return proc;
 }
 
+/*
+export async function waitForActiveExtension(extension: Extension<any>)
+{
+    return new Promise((resolve,reject) => setTimeout(() =>
+    {
+        if (!extension || !extension.isActive) {
+            return waitForActiveExtension();
+        }
+        else {
+            resolve();
+        }
+    }, 500));
+}
+*/
 
 export function activeExtension()
 {
