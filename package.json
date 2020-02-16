@@ -71,7 +71,7 @@
         "coverage2": "nyc --reporter=lcov mocha 'src/test/**/*.ts' --recursive",
         "open:coverage": "open coverage/lcov-report/index.html",
         "pretest2": "rimraf coverage && npm run compile",
-        "pretest": "set BABEL_ENV=coverage && npm run babel",
+        "pretest3": "set BABEL_ENV=coverage && npm run babel",
         "nycreport": "nyc report && nyc report --reporter=lcov",
         "test2": "rimraf .nyc_output && node ./out/test/runTest.js && nyc report && nyc report --reporter=lcov",
         "codecov": "nyc report --reporter=text-lcov > coverage.lcov; codecov",
