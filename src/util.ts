@@ -22,15 +22,15 @@ export async function asyncForEach(array: any, callback: any)
 }
 
 
-export function initLog(context: ExtensionContext)
+export function initLog(context: ExtensionContext, showOutput?: boolean)
 {
     // Set up a log in the Output window
     //
     logOutputChannel = window.createOutputChannel("Task Explorer");
     context.subscriptions.push(logOutputChannel);
     context.subscriptions.push(commands.registerCommand("taskExplorer.showOutput", () => logOutputChannel.show()));
-    const showOutput = configuration.get<boolean>("showOutput");
-    if (showOutput) {
+    const showOutputWin = showOutput || configuration.get<boolean>("showOutput");
+    if (showOutputWin) {
         logOutputChannel.show();
     }
 }
@@ -38,7 +38,7 @@ export function initLog(context: ExtensionContext)
 
 export function camelCase(name: string, indexUpper: number)
 {
-    if (!name) {
+    if (!name || indexUpper <= 0 || indexUpper >= name.length) {
       return name;
     }
 

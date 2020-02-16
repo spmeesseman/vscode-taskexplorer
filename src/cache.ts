@@ -10,18 +10,18 @@ export let cacheBuilding = false;
 let cancel = false;
 
 
-// export async function cancelBuildCache()
-// {
-//     let waitCount = 20;
-//     if (!cacheBuilding) {
-//         return;
-//     }
-//     cancel = true;
-//     while (cacheBuilding && waitCount > 0) {
-//         waitCount--;
-//         await timeout(500);
-//     }
-// }
+export async function cancelBuildCache(wait?: boolean)
+{
+    let waitCount = 20;
+    if (!cacheBuilding) {
+        return;
+    }
+    cancel = true;
+    while (wait && cacheBuilding && waitCount > 0) {
+        waitCount--;
+        await timeout(500);
+    }
+}
 
 
 export async function waitForCache()

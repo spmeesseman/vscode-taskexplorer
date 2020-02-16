@@ -571,7 +571,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 util.log("   Delay refresh, exit");
                 this.needsRefresh.push({ invalidate, opt, task });
-                return false;
+                return;
             }
         }
 
@@ -650,6 +650,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         this._onDidChangeTreeData.fire(treeItem);
 
+        util.log("   Refresh task tree finished");
         return true;
     }
 

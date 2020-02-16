@@ -17,7 +17,7 @@
             "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": ["${workspaceFolder}/out/**/*.js"],
-            "preLaunchTask": "babel2: watch"
+            "preLaunchTask": "npm: watch"
           },
           {
             "name": "Launch Tests",
@@ -25,14 +25,14 @@
             "request": "launch",
             "runtimeExecutable": "${execPath}",
             "args": [
+              "${workspaceFolder}/out/test",
               "--extensionDevelopmentPath=${workspaceFolder}",
               "--extensionTestsPath=${workspaceFolder}/out/test",
               "--disable-extensions"
             ],
             "stopOnEntry": false,
             "sourceMaps": true,
-            "outFiles": ["${workspaceRoot}/out/test/**/*.js"],
-            "preLaunchTask": "npm: compile"
+            "outFiles": ["${workspaceRoot}/out/test/**/*.js"]
         }
     ]
 }

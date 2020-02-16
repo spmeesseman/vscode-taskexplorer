@@ -19,12 +19,13 @@ import { configuration } from "./common/configuration";
 import { initStorage } from "./common/storage";
 import { views } from "./views";
 import {
-    filesCache, addFolderToCache, buildCache, addFileToCache, removeFileFromCache
+    filesCache, addFolderToCache, buildCache, addFileToCache, removeFileFromCache, cancelBuildCache
 } from "./cache";
 import { initLog, log, logValue } from "./util";
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
+
 
 const watchers: Map<string, FileSystemWatcher> = new Map();
 
@@ -40,7 +41,7 @@ export function getTreeDataProvider(name?: string)
 
 export async function activate(context: ExtensionContext, disposables: Disposable[])
 {
-    initLog(context);
+    initLog(context, true);
     initStorage(context);
 
     log("");
@@ -487,4 +488,7 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
 
 
 // tslint:disable-next-line: no-empty
-export function deactivate() {}
+export async function deactivate()
+{
+    //await cancelBuildCache(true);
+}

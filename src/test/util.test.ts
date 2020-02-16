@@ -25,37 +25,41 @@ suite("Util tests", () =>
 
     test("Turn logging on", () =>
     {
-        assert.ok(workspace.getConfiguration('taskExplorer').update('debug', true));
+        assert(workspace.getConfiguration('taskExplorer').update('debug', true));
     });
 
     test("Log to output window", () =>
     {
-        assert.ok(util.log("        spmeesseman.vscode-taskexplorer"));
+        assert(util.log("        spmeesseman.vscode-taskexplorer"));
     });
 
     test("Log value to output window", () =>
     {
-        assert.ok(util.logValue("        spmeesseman.vscode-taskexplorer", "true"));
+        assert(util.logValue("        spmeesseman.vscode-taskexplorer", "true"));
     });
 
     test("Log a null value to output window", () =>
     {
-        assert.ok(util.logValue("        spmeesseman.vscode-taskexplorer", null));
+        assert(util.logValue("        spmeesseman.vscode-taskexplorer", null));
     });
 
     test("Log undefined value to output window", () =>
     {
-        assert.ok(util.logValue("        spmeesseman.vscode-taskexplorer", undefined));
+        assert(util.logValue("        spmeesseman.vscode-taskexplorer", undefined));
     });
 
-    test("Camel case a value", () =>
+    test("Test camelCase()", () =>
     {
-        assert(util.camelCase("taskexplorer", 4) == 'taskExplorer');
+        assert(util.camelCase("taskexplorer", 4) === 'taskExplorer');
+        assert(util.camelCase(undefined, 4) === undefined);
+        assert(util.camelCase("testgreaterindex", 19) === "testgreaterindex");
+        assert(util.camelCase("test", -1) === "test");
     });
 
-    test("Proper case a value", () =>
+    test("Test properCase()", () =>
     {
-        assert(util.properCase("taskexplorer") == 'Taskexplorer');
+        assert(util.properCase("taskexplorer") === 'Taskexplorer');
+        assert(util.properCase(undefined) === undefined);
     });
 
     //test("Turn logging off", () => {
@@ -64,7 +68,7 @@ suite("Util tests", () =>
 
     test("Timeout", () =>
     {
-        assert.ok(util.timeout(500));
+        assert(util.timeout(10));
     });
 
 });

@@ -38,32 +38,32 @@ suite("Extension Tests", () =>
         //
         // Enable views
         //
-        await configuration.update('enableExplorerView', true);
-        await configuration.update('enableSideBar', true);
+        await configuration.updateWs('enableExplorerView', true);
+        await configuration.updateWs('enableSideBar', true);
         //
         // Set misc settings
         //
-        await configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
-        await configuration.update('debug', true);
-        await configuration.update('debugLevel', 3);
+        await configuration.updateWs('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
+        await configuration.updateWs('debug', true);
+        await configuration.updateWs('debugLevel', 3);
         //
         // Enabled all options
         //
-        await configuration.update('enableAnt', true);
-        await configuration.update('enableAppPublisher', true);
-        await configuration.update('enableBash', true);
-        await configuration.update('enableBatch', true);
-        await configuration.update('enableGradle', true);
-        await configuration.update('enableGrunt', true);
-        await configuration.update('enableGulp', true);
-        await configuration.update('enableMake', true);
-        await configuration.update('enableNpm', true);
-        await configuration.update('enableNsis', true);
-        await configuration.update('enablePowershell', true);
-        await configuration.update('enablePerl', true);
-        await configuration.update('enablePython', true);
-        await configuration.update('enableRuby', true);
-        await configuration.update('enableWorkspace', true);
+        await configuration.updateWs('enableAnt', true);
+        await configuration.updateWs('enableAppPublisher', true);
+        await configuration.updateWs('enableBash', true);
+        await configuration.updateWs('enableBatch', true);
+        await configuration.updateWs('enableGradle', true);
+        await configuration.updateWs('enableGrunt', true);
+        await configuration.updateWs('enableGulp', true);
+        await configuration.updateWs('enableMake', true);
+        await configuration.updateWs('enableNpm', true);
+        await configuration.updateWs('enableNsis', true);
+        await configuration.updateWs('enablePowershell', true);
+        await configuration.updateWs('enablePerl', true);
+        await configuration.updateWs('enablePython', true);
+        await configuration.updateWs('enableRuby', true);
+        await configuration.updateWs('enableWorkspace', true);
 
         setWriteToConsole(true); // write debug logging from exiension to console
     });

@@ -2,7 +2,7 @@
 
 import {
     ConfigurationChangeEvent, Event, EventEmitter, workspace,
-    WorkspaceConfiguration, ConfigurationTarget
+    WorkspaceConfiguration, ConfigurationTarget, Uri
 } from "vscode";
 
 const taskExplorer = "taskExplorer";
@@ -10,6 +10,9 @@ const taskExplorer = "taskExplorer";
 class Configuration
 {
     private configuration: WorkspaceConfiguration;
+    //private wsconfiguration: WorkspaceConfiguration;
+    //private wsfconfiguration: WorkspaceConfiguration;
+
     private _onDidChange = new EventEmitter<ConfigurationChangeEvent>();
 
     get onDidChange(): Event<ConfigurationChangeEvent>
@@ -20,6 +23,7 @@ class Configuration
     constructor()
     {
         this.configuration = workspace.getConfiguration(taskExplorer);
+        // this.wsconfiguration = workspace.getConfiguration(taskExplorer, workspace.workspaceFolders[0].uri);
         workspace.onDidChangeConfiguration(this.onConfigurationChanged, this);
     }
 
@@ -43,6 +47,16 @@ class Configuration
     public update(section: string, value: any): Thenable<void>
     {
         return this.configuration.update(section, value, ConfigurationTarget.Global);
+    }
+
+    public updateWs(section: string, value: any, uri?: Uri): Thenable<void>
+    {
+        return workspace.getConfiguration(taskExplorer, uri ? uri : workspace.workspaceFolders[0].uri).update(section, value, ConfigurationTarget.Workspace);
+    }
+
+    public updateWsf(section: string, value: any, uri?: Uri): Thenable<void>
+    {
+        return workspace.getConfiguration(taskExplorer, uri ? uri : workspace.workspaceFolders[0].uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
     }
 
     public inspect(section: string)
