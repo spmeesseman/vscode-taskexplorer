@@ -44,9 +44,7 @@
         "bash"
     ],
     "main": "./out/extension",
-    "activationEvents": [
-        "*"
-    ],
+    "activationEvents": [ "*" ],
     "files": [
         "res",
         "src/*.js",
@@ -54,20 +52,20 @@
         "src/typings/*.js"
     ],
     "scripts": {
-        "babel": "babel src --out-dir out --extensions \".js,.ts\" && tsc --declaration --emitDeclarationOnly -p ./",
-        "babel2:watch": "nodemon -e js,ts,json --watch src --watch .babelrc.js --exec \"(babel src --out-dir out --extensions '.js,.ts'; exit 0)\"",
         "build": "npx tsc -p ./",
+        "build-babel": "babel src --out-dir out --extensions \".js,.ts\" && tsc --declaration --emitDeclarationOnly -p ./",
+        "babel2:watch": "nodemon -e js,ts,json --watch src --watch .babelrc.js --exec \"(babel src --out-dir out --extensions '.js,.ts'; exit 0)\"",
         "clean": "rimraf out",
         "compile": "npx tsc -p ./",
-        "codecov": "nyc report --reporter=text-lcov > coverage.lcov; codecov",
-        "codecov2": "nyc report --reporter=text-lcov > coverage.lcov; codecov",
+        "codecov": "codecov --disable=gcov --disable=detect",
         "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
-        "coverage3": "nyc npm run test",
+        "coverage1": "nyc npm run test",
         "coverage2": "nyc --reporter=lcov mocha 'src/test/**/*.ts' --recursive",
         "coverage-open": "chrome.exe coverage/lcov-report/index.html",
+        "coverage-full": "enable-full-coverage.sh",
+        "coverage-full-off": "enable-full-coverage.sh --off",
         "nycreport": "nyc report && nyc report --reporter=lcov",
         "package": "vsce package",
-        "pretest": "rimraf test-reports && rimraf coverage && npm run compile",
         "pretest2": "rimraf coverage && npm run compile",
         "pretest3": "set BABEL_ENV=coverage && npm run babel",
         "publish": "vsce publish",
@@ -76,7 +74,10 @@
         "semantic-release-no-ci": "semantic-release --no-ci",
         "semantic-release-dry": "semantic-release --dry-run",
         "test": "node ./out/test/runTest.js",
-        "test2": "rimraf .nyc_output && node ./out/test/runTest.js && nyc report && nyc report --reporter=lcov",
+        "test-babel": "npm run test && nyc report && nyc report --reporter=lcov",
+        "test-after": "npm run coverage-full-off",
+        "test-before": "rimraf test-reports && rimraf coverage && rimraf c:\\code\\data\\user-data\\cacheddata && npm run compile && npm run coverage-full",
+        "test-babel-before": "rimraf .nyc_output && rimraf test-reports && rimraf coverage && rimraf c:\\code\\data\\user-data\\cacheddata && npm run build-babel && npm run coverage-full",
         "vscode:prepublish": "npm run build",
         "watch": "tsc -watch -p ./"
     },

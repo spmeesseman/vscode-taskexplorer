@@ -9,23 +9,21 @@ import * as vscode from "vscode";
 //import { waitForActiveExtension } from './testUtil';
 import { configuration } from "../common/configuration";
 import { setWriteToConsole, timeout } from '../util';
-import { treeDataProvider, treeDataProvider2 } from '../extension';
+import { TaskExplorerApi } from '../extension';
 
 
-export let teApi: any;
+export let teApi: TaskExplorerApi;
 
 
 suite("Extension Tests", () => 
 {
     setup(async () => 
-    { 
-        setWriteToConsole(true, 2);
+    {
     });
 
 
     teardown(() =>
     {
-
     });
 
 
@@ -36,18 +34,21 @@ suite("Extension Tests", () =>
         assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
 
         //
-        // Enable views
+        // Enable views, use workspace level so that running this test from Code itself
+        // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
         //
         await configuration.updateWs('enableExplorerView', true);
         await configuration.updateWs('enableSideBar', true);
         //
-        // Set misc settings
+        // Set misc settings, use workspace level so that running this test from Code itself
+        // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
         //
         await configuration.updateWs('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
         await configuration.updateWs('debug', true);
         await configuration.updateWs('debugLevel', 3);
         //
-        // Enabled all options
+        // Enabled all options, use workspace level so that running this test from Code itself
+        // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
         //
         await configuration.updateWs('enableAnt', true);
         await configuration.updateWs('enableAppPublisher', true);

@@ -18,10 +18,8 @@ import { AppPublisherTaskProvider } from "./taskProviderAppPublisher";
 import { configuration } from "./common/configuration";
 import { initStorage } from "./common/storage";
 import { views } from "./views";
-import {
-    filesCache, addFolderToCache, buildCache, addFileToCache, removeFileFromCache, cancelBuildCache
-} from "./cache";
-import { initLog, log, logValue } from "./util";
+import * as util from "./util";
+import * as cache from "./cache";
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
@@ -39,13 +37,22 @@ export function getTreeDataProvider(name?: string)
 }
 
 
-export async function activate(context: ExtensionContext, disposables: Disposable[])
+export interface TaskExplorerApi
 {
-    initLog(context, true);
+    explorerProvider: TaskTreeDataProvider | undefined;
+    sidebarProvider: TaskTreeDataProvider | undefined;
+    utilities: any;
+    fileCache: any;
+}
+
+
+export async function activate(context: ExtensionContext, disposables: Disposable[]): Promise<TaskExplorerApi>
+{
+    util.initLog(context, true);
     initStorage(context);
 
-    log("");
-    log("Init extension");
+    util.log("");
+    util.log("Init extension");
 
     //
     // Register file type watchers
@@ -74,17 +81,17 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     const workspaceWatcher = workspace.onDidChangeWorkspaceFolders(async(_e) =>
     {
         for (const a in _e.added) {
-            log("Workspace folder added: " + _e.added[a].name, 1);
-            await addFolderToCache(_e.added[a]);
+            util.log("Workspace folder added: " + _e.added[a].name, 1);
+            await cache.addFolderToCache(_e.added[a]);
         }
         for (const r in _e.removed)
         {
-            log("Workspace folder removed: " + _e.removed[r].name, 1);
+            util.log("Workspace folder removed: " + _e.removed[r].name, 1);
             // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
-            for (const key in filesCache.keys)
+            for (const key in cache.filesCache.keys)
             {
                 const toRemove = [];
-                const obj = filesCache.get(key);
+                const obj = cache.filesCache.get(key);
                 obj.forEach((item) =>
                 {
                     if (item.folder.uri.fsPath === _e.removed[r].uri.fsPath) {
@@ -111,11 +118,13 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     });
     context.subscriptions.push(d);
 
-    log("   Task Explorer activated");
+    util.log("   Task Explorer activated");
 
     return {
         explorerProvider: treeDataProvider2,
-        sidebarProvider: treeDataProvider
+        sidebarProvider: treeDataProvider,
+        utilities: util,
+        fileCache: cache
     };
 }
 
@@ -404,7 +413,7 @@ async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boole
 
 async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, isScriptType?: boolean, enabled?: boolean)
 {
-    log("Register file watcher for task type '" + taskType + "'");
+    util.log("Register file watcher for task type '" + taskType + "'");
 
     let watcher: FileSystemWatcher = watchers.get(taskType);
     let taskAlias = taskType;
@@ -413,7 +422,7 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
     }
 
     if (workspace.workspaceFolders) {
-        await buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, taskType, fileBlob);
+        await cache.buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, taskType, fileBlob);
     }
 
     if (enabled !== false) {
@@ -430,12 +439,12 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
         }
         watcher.onDidDelete(_e => {
             logFileWatcherEvent(_e, "delete");
-            removeFileFromCache(taskType, _e);
+            cache.removeFileFromCache(taskType, _e);
             refreshTree(taskType, _e);
         });
         watcher.onDidCreate(_e => {
             logFileWatcherEvent(_e, "create");
-            addFileToCache(taskType, _e);
+            cache.addFileToCache(taskType, _e);
             refreshTree(taskType, _e);
         });
     }
@@ -451,15 +460,15 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
 
 function logFileWatcherEvent(uri: Uri, type: string)
 {
-    log("file change event");
-    logValue("   type", type);
-    logValue("   file", uri.fsPath);
+    util.log("file change event");
+    util.logValue("   type", type);
+    util.logValue("   file", uri.fsPath);
 }
 
 
 function registerExplorer(name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined
 {
-    log("Register explorer view / tree provider '" + name + "'");
+    util.log("Register explorer view / tree provider '" + name + "'");
 
     if (enabled !== false)
     {
@@ -469,17 +478,17 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
             const treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
             treeView.onDidChangeVisibility(_e => {
                 if (_e.visible) {
-                    log("view visibility change event");
+                    util.log("view visibility change event");
                     refreshTree("visible-event");
                 }
             });
             views.set(name, treeView);
             context.subscriptions.push(views.get(name));
-            log("   Tree data provider registered'" + name + "'");
+            util.log("   Tree data provider registered'" + name + "'");
             return treeDataProvider;
         }
         else {
-            log("✘ No workspace folders!!!");
+            util.log("✘ No workspace folders!!!");
         }
     }
 
@@ -490,5 +499,5 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
 // tslint:disable-next-line: no-empty
 export async function deactivate()
 {
-    //await cancelBuildCache(true);
+    await cache.cancelBuildCache(true);
 }

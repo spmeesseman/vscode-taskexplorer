@@ -51,6 +51,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private extensionContext: ExtensionContext;
     private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
     readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
+    private busy = false;
+
 
     constructor(name: string, context: ExtensionContext)
     {
@@ -78,6 +80,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     public async invalidateTasksCache(opt1: string, opt2: Uri)
     {
+        this.busy = true;
         //
         // All internal task providers export an invalidate() function...
         //
@@ -128,12 +131,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             await invalidateTasksCacheGulp();
             await invalidateTasksCacheAppPublisher();
         }
+
+        this.busy = false;
     }
 
 
     private async run(taskItem: TaskItem)
     {
         const me = this;
+
+        if (!taskItem || this.busy)
+        {
+            window.showInformationMessage("Busy, please wait...");
+            return;
+        }
+
         //
         // If this is a script, check to see if args are required
         //
@@ -199,6 +211,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async pause(taskItem: TaskItem)
     {
+        if (!taskItem || this.busy)
+        {
+            window.showInformationMessage("Busy, please wait...");
+            return;
+        }
+
         if (taskItem.execution)
         {
             const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
@@ -230,6 +248,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async stop(taskItem: TaskItem)
     {
+        if (!taskItem || this.busy)
+        {
+            window.showInformationMessage("Busy, please wait...");
+            return;
+        }
+
         if (taskItem.execution)
         {
             // if (taskItem.paused)
@@ -292,6 +316,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async runLastTask()
     {
+        if (this.busy)
+        {
+            window.showInformationMessage("Busy, please wait...");
+            return;
+        }
+
         let lastTaskId: string;
         const lastTasks = storage.get<string[]>("lastTasks", []);
         if (lastTasks && lastTasks.length > 0)
@@ -634,7 +664,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             if ((invalidate === true || invalidate === "tests") && !opt) {
                 util.log("   Handling 'rebuild cache' event");
+                this.busy = true;
                 await rebuildCache();
+                this.busy = false;
             }
             util.log("   Handling 'invalidate tasks cache' event");
             await this.invalidateTasksCache(invalidate, opt);
