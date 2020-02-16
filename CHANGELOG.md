@@ -1,3 +1,10 @@
+## [1.23.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.1...v1.23.2) (2020-02-16)
+
+
+### Bug Fixes
+
+* when trying to start a task while the explorer is busy, error notification randomly pops up ([c7e8d1e](https://github.com/spmeesseman/vscode-taskexplorer/commit/c7e8d1e))
+
 ## [1.23.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.0...v1.23.1) (2020-02-14)
 
 

@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "1.23.1",
+    "version": "1.23.2",
     "displayName": "Task Explorer",
     "description": "Manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
@@ -44,7 +44,9 @@
         "bash"
     ],
     "main": "./out/extension",
-    "activationEvents": [ "*" ],
+    "activationEvents": [
+        "*"
+    ],
     "files": [
         "res",
         "src/*.js",
