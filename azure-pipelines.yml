@@ -203,8 +203,8 @@ jobs:
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     #condition: succeeded()
     dependsOn:
-    - Windows
-    - macOS
+    #- Windows
+    #- macOS
     - Linux
     pool:
       name: Hosted Ubuntu 1604
