@@ -17,7 +17,7 @@
             "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": ["${workspaceFolder}/out/**/*.js"],
-            "preLaunchTask": "npm: watch"
+            "preLaunchTask": "babel2: watch"
           },
           {
             "name": "Launch Tests",

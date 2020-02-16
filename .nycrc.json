@@ -1,19 +1,11 @@
-
 {
-    "enabled": true,
-    "relativeSourcePath": "..",
-    "relativeCoverageDir": "../../coverage",
-    "ignorePatterns": ["**/node_modules/**", "test/**"],
-    "includePid": false,
-    "reports": ["json", "lcov", "cobertura"],
-    "verbose": true,
     "extends": "@istanbuljs/nyc-config-typescript",
     "branches": 80,
     "lines": 80,
     "functions": 80,
     "statements": 80,
-    "reportDir": "../../coverage",
-    "tempDir": "../../.nyc_output",
+    "reportDir": "./coverage",
+    "tempDir": "./.nyc_output",
     "excludeNodeModules": true,
     "all": false,
     "sourceMap": false,
@@ -21,20 +13,17 @@
     "require": [
         "@babel/register"
     ],
-    "include": [
-        "../../src/**/*.ts"
-    ],
     "exclude": [
         "node_modules",
         ".vscode-test",
         "coverage",
         "test-files",
-        "../../src/**/*.test.ts",
+        "src/**/*.test.ts",
         "src/**/*.d.ts"
     ],
     "reporter": [
         "json",
         "lcov",
         "cobertura"
-    ]
+    ]  
 }
