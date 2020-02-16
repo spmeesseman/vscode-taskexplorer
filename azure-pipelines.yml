@@ -253,7 +253,6 @@ jobs:
     - Windows_Node10
     - macOS
     - Linux
-    - Linux_Node10
     pool:
       name: Hosted Ubuntu 1604
       demands: npm
