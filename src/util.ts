@@ -1,7 +1,7 @@
 
 import {
     workspace, RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext,
-    commands, window
+    commands, window, Uri
 } from "vscode";
 import * as fs from "fs";
 import * as minimatch from "minimatch";
@@ -28,11 +28,23 @@ export function initLog(context: ExtensionContext, showOutput?: boolean)
     //
     logOutputChannel = window.createOutputChannel("Task Explorer");
     context.subscriptions.push(logOutputChannel);
-    context.subscriptions.push(commands.registerCommand("taskExplorer.showOutput", () => logOutputChannel.show()));
+    context.subscriptions.push(commands.registerCommand("taskExplorer.showOutput", () => {
+        if (logOutputChannel) { logOutputChannel.show();
+    }}));
     const showOutputWin = showOutput || configuration.get<boolean>("showOutput");
-    if (showOutputWin) {
+    if (logOutputChannel && showOutputWin) {
         logOutputChannel.show();
     }
+}
+
+
+export function getCwd(uri: Uri): string
+{
+    let dir = uri.fsPath.substring(0, uri.fsPath.lastIndexOf("\\") + 1);
+    if (process.platform !== "win32") {
+        dir = uri.fsPath.substring(0, uri.fsPath.lastIndexOf("/") + 1);
+    }
+    return dir;
 }
 
 
@@ -99,32 +111,32 @@ export function isExcluded(uriPath: string, logPad = "")
 
     const exclude = configuration.get<string | string[]>("exclude");
 
-    this.log("", 2);
-    this.log(logPad + "Check exclusion", 2);
-    this.logValue(logPad + "   path", uriPath, 2);
+    log("", 2);
+    log(logPad + "Check exclusion", 2);
+    logValue(logPad + "   path", uriPath, 2);
 
     if (exclude)
     {
         if (Array.isArray(exclude))
         {
             for (const pattern of exclude) {
-                this.logValue(logPad + "   checking pattern", pattern, 3);
+                logValue(logPad + "   checking pattern", pattern, 3);
                 if (testForExclusionPattern(uriPath, pattern)) {
-                    this.log(logPad + "   Excluded!", 2);
+                    log(logPad + "   Excluded!", 2);
                     return true;
                 }
             }
         }
         else {
-            this.logValue(logPad + "   checking pattern", exclude, 3);
+            logValue(logPad + "   checking pattern", exclude, 3);
             if (testForExclusionPattern(uriPath, exclude)) {
-              this.log(logPad + "   Excluded!", 2);
+              log(logPad + "   Excluded!", 2);
               return true;
             }
         }
     }
 
-    this.log(logPad + "   Not excluded", 2);
+    log(logPad + "   Not excluded", 2);
     return false;
 }
 
