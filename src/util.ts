@@ -227,7 +227,7 @@ export async function log(msg: string, level?: number)
 
     if (workspace.getConfiguration("taskExplorer").get("debug") === true)
     {
-        if (!level || level <= configuration.get<number>("debugLevel")) {
+        if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
             logOutputChannel.appendLine(msg);
         }
         if (writeToConsole === true) {
@@ -259,7 +259,7 @@ export async function logValue(msg: string, value: any, level?: number)
     }
 
     if (workspace.getConfiguration("taskExplorer").get("debug") === true) {
-        if (!level || level <= configuration.get<number>("debugLevel")) {
+        if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
             logOutputChannel.appendLine(logMsg);
         }
         if (writeToConsole === true) {
