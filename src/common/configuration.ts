@@ -5,7 +5,7 @@ import {
     WorkspaceConfiguration, ConfigurationTarget, Uri
 } from "vscode";
 
-const taskExplorer = "taskExplorer";
+const extensionName = "taskExplorer";
 
 class Configuration
 {
@@ -21,19 +21,19 @@ class Configuration
 
     constructor()
     {
-        this.configuration = workspace.getConfiguration(taskExplorer);
+        this.configuration = workspace.getConfiguration(extensionName);
         workspace.onDidChangeConfiguration(this.onConfigurationChanged, this);
     }
 
 
     private onConfigurationChanged(event: ConfigurationChangeEvent)
     {
-        if (!event.affectsConfiguration(taskExplorer))
+        if (!event.affectsConfiguration(extensionName))
         {
             return;
         }
 
-        this.configuration = workspace.getConfiguration(taskExplorer);
+        this.configuration = workspace.getConfiguration(extensionName);
 
         this._onDidChange.fire(event);
     }
@@ -53,13 +53,13 @@ class Configuration
 
     public updateWs(section: string, value: any): Thenable<void>
     {
-        return workspace.getConfiguration(taskExplorer).update(section, value, ConfigurationTarget.Workspace);
+        return workspace.getConfiguration(extensionName).update(section, value, ConfigurationTarget.Workspace);
     }
 
 
     public updateWsf(section: string, value: any, uri?: Uri): Thenable<void>
     {
-        return workspace.getConfiguration(taskExplorer, uri ? uri : workspace.workspaceFolders[0].uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
+        return workspace.getConfiguration(extensionName, uri ? uri : workspace.workspaceFolders[0].uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
     }
 
 

@@ -11,7 +11,7 @@ async function main()
             version: process.env.CODE_VERSION,
             extensionDevelopmentPath,
             extensionTestsPath,
-            launchArgs: [extensionTestsPath] // ?? WHY DO I NEED THIS ON LOCAL MACHINE ???
+            launchArgs: [extensionTestsPath]
         });
     } catch (err) {
         console.error(`Failed to run tests: ${err}\n${err.stack}`);

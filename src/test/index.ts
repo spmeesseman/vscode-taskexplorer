@@ -21,7 +21,7 @@ const mochaOpts: Mocha.MochaOptions = {
 
 testRunner.configure(mochaOpts,
 {
-    coverConfig: "../../coverconfig.json"
+    coverConfig: "../../.coverconfig.json"
 });
 
 module.exports = testRunner;
