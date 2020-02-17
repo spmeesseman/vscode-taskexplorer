@@ -47,12 +47,6 @@
     "activationEvents": [
         "*"
     ],
-    "files": [
-        "res",
-        "src/*.js",
-        "src/common/*.js",
-        "src/typings/*.js"
-    ],
     "scripts": {
         "build": "npx tsc -p ./",
         "build-babel": "babel src --out-dir out --extensions \".js,.ts\" && tsc --declaration --emitDeclarationOnly -p ./",
@@ -149,6 +143,11 @@
         "vsce": "^1.72.0",
         "vscode-nls-dev": "3.2.7",
         "vscode-test": "^1.3.0"
+    },
+    "greenkeeper": {
+        "ignore": [
+            "@types/node"
+        ]
     },
     "mocha": {},
     "nyc": {},
