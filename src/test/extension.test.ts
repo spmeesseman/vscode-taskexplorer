@@ -62,14 +62,6 @@ suite("Extension Tests", () =>
         await configuration.updateWs('enableTsc', true);
         await configuration.updateWs('enableWorkspace', true);
         await configuration.updateWs('groupDashed', false);
-        await configuration.updateWs('pathToAnt', 'ant.bat');
-        await configuration.updateWs('pathToGradle', 'gradle.bat');
-        //await configuration.updateWs('pathToGrunt', 'grunt.bat');
-        //await configuration.updateWs('pathToGulp', 'gulp.bat');
-        await configuration.updateWs('pathToMake', 'nmake');
-        await configuration.updateWs('pathToPerl', 'perl');
-        await configuration.updateWs('pathToPython', 'python');
-        await configuration.updateWs('pathToPowershell', 'powershell');
 
         await vscode.workspace.getConfiguration().update('terminal.integrated.shell.windows', 
                                                          'C:\\Windows\\System32\\cmd.exe',

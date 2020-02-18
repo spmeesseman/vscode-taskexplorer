@@ -93,9 +93,8 @@ async function detectAntScripts(): Promise<Task[]>
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("ant");
-    const folders = workspace.workspaceFolders;
 
-    if (folders && paths)
+    if (workspace.workspaceFolders && paths)
     {
         for (const fobj of paths)
         {
@@ -203,18 +202,16 @@ function createAntTask(target: string, cmdName: string, folder: WorkspaceFolder,
     function getCommand(folder: WorkspaceFolder): string
     {
         let ant = "ant";
-
         if (process.platform === "win32") {
             ant = "ant.bat";
         }
-
-        if (workspace.getConfiguration("taskExplorer").get("pathToAnt")) {
-            ant = workspace.getConfiguration("taskExplorer").get("pathToAnt");
+        if (configuration.get("pathToAnt"))
+        {
+            ant = configuration.get("pathToAnt");
             if (process.platform === "win32" && ant.endsWith("\\ant")) {
                 ant += ".bat";
             }
         }
-
         return ant;
     }
 
@@ -228,24 +225,18 @@ function createAntTask(target: string, cmdName: string, folder: WorkspaceFolder,
         return "";
     }
 
+    const cwd = path.dirname(uri.fsPath);
     const antFile = path.basename(uri.path);
+    let args = [ target ];
+    let options = null;
 
     const kind: AntTaskDefinition = {
         type: "ant",
         script: target,
-        path: "", // populated below if relativePath is non-empty
+        path: getRelativePath(folder, uri),
         fileName: antFile,
         uri
     };
-
-    const relativePath = getRelativePath(folder, uri);
-    if (relativePath.length) {
-        kind.path = relativePath;
-    }
-    const cwd = path.dirname(uri.fsPath);
-
-    let args = [ target ];
-    let options = null;
 
     if (process.platform === "win32" && configuration.get("enableAnsiconForAnt") === true)
     {
@@ -267,8 +258,7 @@ function createAntTask(target: string, cmdName: string, folder: WorkspaceFolder,
             executable: ansicon
         };
     }
-    else
-    {
+    else {
         options = {
             cwd
         };

@@ -96,9 +96,8 @@ async function detectMakefiles(): Promise<Task[]>
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("make");
-    const folders = workspace.workspaceFolders;
 
-    if (folders && paths)
+    if (workspace.workspaceFolders && paths)
     {
         for (const fobj of paths)
         {
@@ -207,17 +206,12 @@ function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, ur
     function getCommand(folder: WorkspaceFolder, cmd: string): string
     {
         let make = "make";
-
-        if (process.platform === "win32")
-        {
+        if (process.platform === "win32") {
             make = "nmake";
         }
-
-        if (workspace.getConfiguration("taskExplorer").get("pathToMake"))
-        {
-            make = workspace.getConfiguration("taskExplorer").get("pathToMake");
+        if (configuration.get("pathToMake")) {
+            make = configuration.get("pathToMake");
         }
-
         return make;
     }
 
@@ -235,18 +229,12 @@ function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, ur
     const kind: MakeTaskDefinition = {
         type: "make",
         script: target,
-        path: "",
+        path: getRelativePath(folder, uri),
         fileName: path.basename(uri.path),
         uri
     };
 
-    const relativePath = getRelativePath(folder, uri);
-    if (relativePath.length)
-    {
-        kind.path = relativePath;
-    }
     const cwd = path.dirname(uri.fsPath);
-
     const args = [target];
     const options = {
         cwd
@@ -254,18 +242,18 @@ function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, ur
 
     const execution = new ShellExecution(getCommand(folder, cmd), args, options);
 
-    const pm = {
-        owner: "cpp",
-        fileLocation: ["absolute"],
-        pattern: {
-            regexp: "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-            file: 1,
-            line: 2,
-            column: 3,
-            severity: 4,
-            message: 5
-        }
-    };
+    // const pm = {
+    //     owner: "cpp",
+    //     fileLocation: ["absolute"],
+    //     pattern: {
+    //         regexp: "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+    //         file: 1,
+    //         line: 2,
+    //         column: 3,
+    //         severity: 4,
+    //         message: 5
+    //     }
+    // };
 
     return new Task(kind, folder, target, "make", execution, "cpp");
 }

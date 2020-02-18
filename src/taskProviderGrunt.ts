@@ -102,9 +102,8 @@ async function detectGruntfiles(): Promise<Task[]>
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("grunt");
-    const folders = workspace.workspaceFolders;
 
-    if (folders && paths)
+    if (workspace.workspaceFolders && paths)
     {
         for (const fobj of paths)
         {
@@ -216,19 +215,16 @@ async function findTargets(fsPath: string): Promise<StringMap>
 
 function createGruntTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
 {
-    function getCommand(folder: WorkspaceFolder, relativePath: string, cmd: string): string
+    function getCommand(folder: WorkspaceFolder, cmd: string): string
     {
         // let grunt = 'folder.uri.fsPath + "/node_modules/.bin/grunt";
         const grunt = "grunt";
-
         // if (process.platform === 'win32') {
         //     grunt = folder.uri.fsPath + "\\node_modules\\.bin\\grunt.cmd";
         // }
-
         // if (workspace.getConfiguration('taskExplorer').get('pathToGrunt')) {
         //     grunt = workspace.getConfiguration('taskExplorer').get('pathToGrunt');
         // }
-
         return grunt;
     }
 
@@ -245,18 +241,13 @@ function createGruntTask(target: string, cmd: string, folder: WorkspaceFolder, u
     const kind: GruntTaskDefinition = {
         type: "grunt",
         script: target,
-        path: "",
+        path: getRelativePath(folder, uri),
         fileName: path.basename(uri.path),
         uri
     };
 
-    const relativePath = getRelativePath(folder, uri);
-    if (relativePath.length) {
-        kind.path = relativePath;
-    }
     const cwd = path.dirname(uri.fsPath);
-
-    const args = [ getCommand(folder, relativePath, cmd), target ];
+    const args = [ getCommand(folder, cmd), target ];
     const options = {
         cwd
     };

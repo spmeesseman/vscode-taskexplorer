@@ -94,10 +94,9 @@ async function detectGradlefiles(): Promise<Task[]>
 
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
-    const folders = workspace.workspaceFolders;
     const paths = filesCache.get("gradle");
 
-    if (folders && paths)
+    if (workspace.workspaceFolders && paths)
     {
         for (const fobj of paths)
         {
@@ -204,17 +203,12 @@ function createGradleTask(target: string, cmd: string, folder: WorkspaceFolder, 
     function getCommand(folder: WorkspaceFolder, cmd: string): string
     {
         let gradle = "gradle";
-
-        if (process.platform === "win32")
-        {
+        if (process.platform === "win32") {
             gradle = "gradle.bat";
         }
-
-        if (workspace.getConfiguration("taskExplorer").get("pathToGradle"))
-        {
+        if (workspace.getConfiguration("taskExplorer").get("pathToGradle")) {
             gradle = workspace.getConfiguration("taskExplorer").get("pathToGradle");
         }
-
         return gradle;
     }
 
@@ -232,23 +226,16 @@ function createGradleTask(target: string, cmd: string, folder: WorkspaceFolder, 
     const kind: GradleTaskDefinition = {
         type: "gradle",
         script: target,
-        path: "",
+        path: getRelativePath(folder, uri),
         fileName: path.basename(uri.path),
         uri
     };
 
-    const relativePath = getRelativePath(folder, uri);
-    if (relativePath.length)
-    {
-        kind.path = relativePath;
-    }
     const cwd = path.dirname(uri.fsPath);
-
     const args = [target];
     const options = {
         cwd
     };
-
     const execution = new ShellExecution(getCommand(folder, cmd), args, options);
 
     return new Task(kind, folder, target, "gradle", execution, undefined);

@@ -92,11 +92,11 @@ export class ScriptTaskProvider implements TaskProvider
 
 function refreshScriptTable()
 {
-    scriptTable.py.exec = configuration.get("pathToPython") ? configuration.get("pathToPython") : "python";
-    scriptTable.rb.exec = configuration.get("pathToRuby") ? configuration.get("pathToRuby") : "ruby";
-    scriptTable.pl.exec = configuration.get("pathToPerl") ? configuration.get("pathToPerl") : "perl";
-    scriptTable.nsi.exec = configuration.get("pathToNsis") ? configuration.get("pathToNsis") : "makensis";
-    scriptTable.ps1.exec = configuration.get("pathToPowershell") ? configuration.get("pathToPowershell") : "powershell";
+    scriptTable.py.exec = configuration.get("pathToPython");
+    scriptTable.rb.exec = configuration.get("pathToRuby");
+    scriptTable.pl.exec = configuration.get("pathToPerl");
+    scriptTable.nsi.exec = configuration.get("pathToNsis");
+    scriptTable.ps1.exec = configuration.get("pathToPowershell");
 
     scriptTable.py.enabled = configuration.get("enablePython");
     scriptTable.rb.enabled = configuration.get("enableRuby");
@@ -177,8 +177,7 @@ async function detectScriptFiles(): Promise<Task[]>
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("script");
-    const folders = workspace.workspaceFolders;
-    if (folders && paths)
+    if (workspace.workspaceFolders && paths)
     {
         for (const fobj of paths)
         {
@@ -200,12 +199,13 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
 {
     function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
     {
+        let rtn = "";
         if (folder) {
             const rootUri = folder.uri;
             const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
-            return absolutePath.substring(rootUri.path.length + 1);
+            rtn = absolutePath.substring(rootUri.path.length + 1);
         }
-        return "";
+        return rtn;
     }
 
     const cwd = path.dirname(uri.fsPath);
@@ -217,7 +217,7 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
         scriptType: scriptDef.type,
         fileName,
         scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
-        path: "",
+        path: getRelativePath(folder, uri),
         cmdLine: (scriptDef.exec.indexOf(" ") !== -1 ? "\"" + scriptDef.exec + "\"" : scriptDef.exec),
         requiresArgs: false,
         uri
@@ -232,14 +232,6 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
     {
         const contents = util.readFileSync(uri.fsPath);
         kind.requiresArgs = (new RegExp("%[1-9]")).test(contents);
-    }
-
-    //
-    // Get relative dir to workspace folder
-    //
-    const relativePath = getRelativePath(folder, uri);
-    if (relativePath.length) {
-        kind.path = relativePath;
     }
 
     //
@@ -306,7 +298,7 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
     if (scriptDef.type === "python") {
         kind.cmdLine += " bdist_egg";
     }
-    
+
     //
     // Create the shell execution object
     //

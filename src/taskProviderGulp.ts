@@ -102,9 +102,8 @@ async function detectGulpfiles(): Promise<Task[]>
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("gulp");
-    const folders = workspace.workspaceFolders;
 
-    if (folders && paths)
+    if (workspace.workspaceFolders && paths)
     {
         for (const fobj of paths)
         {
@@ -216,7 +215,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
 
 function createGulpTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
 {
-    function getCommand(folder: WorkspaceFolder, relativePath: string, cmd: string): string
+    function getCommand(folder: WorkspaceFolder, cmd: string): string
     {
         const gulp = "gulp";
         // let gulp = folder.uri.fsPath + "/node_modules/.bin/gulp";
@@ -226,11 +225,9 @@ function createGulpTask(target: string, cmd: string, folder: WorkspaceFolder, ur
         // if (relativePath) {
         //     gulp += (' --gulpfile ' + path.join(relativePath, 'gulpfile.js'));
         // }
-
         // if (workspace.getConfiguration('taskExplorer').get('pathToGulp')) {
         //     gulp = workspace.getConfiguration('taskExplorer').get('pathToGulp');
         // }
-
         return gulp;
     }
 
@@ -247,18 +244,13 @@ function createGulpTask(target: string, cmd: string, folder: WorkspaceFolder, ur
     const kind: GulpTaskDefinition = {
         type: "gulp",
         script: target,
-        path: "",
+        path: getRelativePath(folder, uri),
         fileName: path.basename(uri.path),
         uri
     };
 
-    const relativePath = getRelativePath(folder, uri);
-    if (relativePath.length) {
-        kind.path = relativePath;
-    }
     const cwd = path.dirname(uri.fsPath);
-
-    const args = [ getCommand(folder, relativePath, cmd), target ];
+    const args = [ getCommand(folder, cmd), target ];
     const options = {
         cwd
     };
