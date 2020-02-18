@@ -653,6 +653,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // If invalidate and opt are both truthy, then a filesystemwatcher event or a task just triggered
         //
+        // If invalidate and opt are both undefined, then a configuration has changed
+        //
         let treeItem: TreeItem;
 
         if (invalidate !== false)
