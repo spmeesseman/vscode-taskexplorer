@@ -1258,10 +1258,30 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
                 prevTaskFile = each;
 
+                //
+                // Build dashed groupings
+                //
+                // For example, consider the set of task names/labels:
+                //
+                //     build-prod
+                //     build-dev
+                //     build-server
+                //     build-sass
+                //
+                // If the option 'groupDashed' is ON, then group this set of tasks like so:
+                //
+                //     build
+                //         prod
+                //         dev
+                //         server
+                //         sass
+                //
                 if (configuration.get("groupDashed"))
                 {
                     let prevName: string[];
                     let prevTaskItem: TaskItem | TaskFile;
+                    const newNodes: TaskFile[] = [];
+
                     each.scripts.forEach(each2 =>
                     {
                         let id = folder.label + each.taskSource;
@@ -1269,14 +1289,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         const prevNameThis = each2.label.split("-");
                         if (prevName && prevName.length > 1 && prevNameThis.length > 1 && prevName[0] === prevNameThis[0])
                         {
+                            // We found a pair of tasks that need to be grouped.  i.e. the first part of the label
+                            // when split by the '-' character is the same...
+                            //
                             id += prevName[0];
                             subfolder = subfolders.get(id);
                             if (!subfolder)
                             {
-                                subfolder = new TaskFile(this.extensionContext, folder, (each2 as TaskItem).task.definition, each.taskSource, (each2 as TaskItem).taskFile.path, true, prevName[0]);
+                                // Create the new node, add it to the list of nodes to add to the tree.  We must
+                                // add them after we loop since we are looping on the array that they need to be
+                                // added to
+                                //
+                                subfolder = new TaskFile(this.extensionContext, folder, (each2 as TaskItem).task.definition,
+                                                         each.taskSource, (each2 as TaskItem).taskFile.path, true, prevName[0]);
                                 subfolders.set(id, subfolder);
                                 subfolder.addScript(prevTaskItem);
-                                each.addScript(subfolder);
+                                newNodes.push(subfolder);
                             }
                             subfolder.addScript(each2);
                         }
@@ -1284,9 +1312,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         prevName = each2.label.split("-");
                         prevTaskItem = each2;
                     });
+                    //
+                    // If there are new dashed grouped nodes to add to the tree...
+                    //
+                    if (newNodes.length > 0) {
+                        let numGrouped = 0;
+                        newNodes.forEach(n => {
+                            each.insertScript(n, numGrouped++);
+                        });
+                    }
                 }
             });
 
+            //
+            // Perform some removal based on dashed groupings.  The nodes added within the new
+            // group nodes need to be removed from the old parent node still...
+            //
             function removeScripts(each: any)
             {
                 const taskTypesRmv2: TaskItem[] = [];
@@ -1306,7 +1347,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     each.removeScript(each2);
                 });
             }
-
             const taskTypesRmv: TaskFile[] = [];
             folder.taskFiles.forEach(each =>
             {
@@ -1327,14 +1367,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     removeScripts(each);
                 }
             });
-
             taskTypesRmv.forEach(each =>
             {
                 folder.removeTaskFile(each);
             });
 
             //
-            // Grouped task items
+            // For dashed groupings, now go through and rename the labels within each group minus the
+            // first part of the name split by the '-' character (the name of the new dashed-grouped node)
             //
             folder.taskFiles.forEach(each =>
             {

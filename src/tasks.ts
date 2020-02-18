@@ -242,6 +242,11 @@ export class TaskFile extends TreeItem
         this.scripts.push(script);
     }
 
+    insertScript(script: any, index: number)
+    {
+        this.scripts.splice(index, 0, script);
+    }
+
     removeScript(script: any)
     {
         let idx = -1;
