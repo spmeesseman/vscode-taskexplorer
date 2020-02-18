@@ -1,3 +1,15 @@
+## [1.23.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.5...v1.23.6) (2020-02-18)
+
+
+### Bug Fixes
+
+* v1.23.5 is broken, receiving error 'each.removeScript is no a function' ([6ad65eb](https://github.com/spmeesseman/vscode-taskexplorer/commit/6ad65eb))
+
+
+### Documentation
+
+* **readme:** update badges with devops info ([81f1275](https://github.com/spmeesseman/vscode-taskexplorer/commit/81f1275))
+
 ## [1.23.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.4...v1.23.5) (2020-02-18)
 
 
