@@ -157,9 +157,7 @@ export function isExcluded(uriPath: string, logPad = "")
 
 export function timeout(ms: number)
 {
-    if (ms > 0) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
