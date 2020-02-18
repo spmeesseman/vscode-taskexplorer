@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "1.23.2",
+    "version": "1.23.3",
     "displayName": "Task Explorer",
     "description": "Manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
@@ -44,7 +44,9 @@
         "bash"
     ],
     "main": "./out/extension",
-    "activationEvents": [ "*" ],
+    "activationEvents": [
+        "*"
+    ],
     "scripts": {
         "build": "npx tsc -p ./",
         "build-babel": "babel src --out-dir out --extensions \".js,.ts\" && tsc --declaration --emitDeclarationOnly -p ./",

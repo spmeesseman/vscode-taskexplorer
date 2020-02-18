@@ -1,3 +1,18 @@
+## [1.23.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.2...v1.23.3) (2020-02-18)
+
+
+### Bug Fixes
+
+* removing a path from the 'includeAntPath' setting has does not remove the fswatcher until restart ([1a27d3f](https://github.com/spmeesseman/vscode-taskexplorer/commit/1a27d3f))
+* when pasting multiple task files into a workspace folder, sometimes tasks do not get imported ([92b7a7b](https://github.com/spmeesseman/vscode-taskexplorer/commit/92b7a7b))
+
+
+### Code Refactoring
+
+* make addToExcludes fully async ([ff951bc](https://github.com/spmeesseman/vscode-taskexplorer/commit/ff951bc))
+* make all 'enable' settings available in vscode folder settings ([2154498](https://github.com/spmeesseman/vscode-taskexplorer/commit/2154498))
+* make checks on empty util.readfile ([d367895](https://github.com/spmeesseman/vscode-taskexplorer/commit/d367895))
+
 ## [1.23.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.1...v1.23.2) (2020-02-16)
 
 
