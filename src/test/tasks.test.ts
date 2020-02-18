@@ -671,7 +671,10 @@ suite('Task tests', () =>
         let uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        try {
+            fs.unlinkSync(file);
+        }
+        catch {}
         await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
         await(timeout(100));
         createAppPublisherFile();
@@ -686,7 +689,10 @@ suite('Task tests', () =>
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("ant", uri);
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        try {
+            fs.unlinkSync(file);
+        }
+        catch {}
         await teApi.explorerProvider.invalidateTasksCache("ant", uri);
         await(timeout(100));
         createAntFile();
@@ -701,7 +707,10 @@ suite('Task tests', () =>
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        try {
+            fs.unlinkSync(file);
+        }
+        catch {}
         await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
         await(timeout(100));
         createGradleFile();
@@ -716,7 +725,10 @@ suite('Task tests', () =>
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        try {
+            fs.unlinkSync(file);
+        }
+        catch {}
         await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
         await(timeout(100));
         createGruntFile();
@@ -731,7 +743,10 @@ suite('Task tests', () =>
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        try {
+            fs.unlinkSync(file);
+        }
+        catch {}
         await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
         await(timeout(100));
         createGulpFile();
@@ -746,7 +761,10 @@ suite('Task tests', () =>
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("make", uri);
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        try {
+            fs.unlinkSync(file);
+        }
+        catch {}
         await teApi.explorerProvider.invalidateTasksCache("make", uri);
         await(timeout(100));
         createMakeFile();
@@ -761,7 +779,10 @@ suite('Task tests', () =>
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("batch", uri);
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        try {
+            fs.unlinkSync(file);
+        }
+        catch {}
         await teApi.explorerProvider.invalidateTasksCache("batch", uri);
         await(timeout(100));
         createBatchFile();
@@ -882,98 +903,121 @@ suite('Task tests', () =>
 
 function createAntFile()
 {
-    const file1 = path.join(dirName, 'build.xml');
-    tempFiles.push(file1);
-    fs.writeFileSync(
-        file1,
-        '<?xml version="1.0"?>\n' +
-        '<project basedir="." default="test1">\n' +
-        '    <property environment="env" />\n' +
-        '    <property name="test" value="test" />\n' +
-        '    <target name="test1" depends="init"></target>\n' +
-        '    <target name="test2" depends="init"></target>\n' +
-        '</project>\n'
-    );
+    const file = path.join(dirName, 'build.xml');
+    tempFiles.push(file);
+
+    if (!fs.existsSync(file))
+    {
+        fs.writeFileSync(
+            file,
+            '<?xml version="1.0"?>\n' +
+            '<project basedir="." default="test1">\n' +
+            '    <property environment="env" />\n' +
+            '    <property name="test" value="test" />\n' +
+            '    <target name="test1" depends="init"></target>\n' +
+            '    <target name="test2" depends="init"></target>\n' +
+            '</project>\n'
+        );
+    }
 }
 
 
 function createAppPublisherFile()
 {
-    const file1 = path.join(rootPath, '.publishrc.json');
-    tempFiles.push(file1);
-    fs.writeFileSync(
-        file1,
-        '{\n' +
-        '    "version": "1.0.0"\n' +
-        '    "branch": "trunk",\n' +
-        '    "buildCommand": [],\n' +
-        '    "mantisbtRelease": "Y",\n' +
-        '    "mantisbtChglogEdit": "N",\n' +
-        '    "mantisbtProject": "",\n' +
-        '    "repoType": "svn""\n' +
-        '}\n'
-    );
+    const file = path.join(rootPath, '.publishrc.json');
+    tempFiles.push(file);
+
+    if (!fs.existsSync(file))
+    {
+        fs.writeFileSync(
+            file,
+            '{\n' +
+            '    "version": "1.0.0"\n' +
+            '    "branch": "trunk",\n' +
+            '    "buildCommand": [],\n' +
+            '    "mantisbtRelease": "Y",\n' +
+            '    "mantisbtChglogEdit": "N",\n' +
+            '    "mantisbtProject": "",\n' +
+            '    "repoType": "svn""\n' +
+            '}\n'
+        );
+    }
 }
 
 
 function createBatchFile()
 {
-    const file1 = path.join(rootPath, 'test.bat');
-    tempFiles.push(file1);
-    fs.writeFileSync(file1, '@echo testing batch file\r\n');
+    const file = path.join(rootPath, 'test.bat');
+    tempFiles.push(file);
+
+    if (!fs.existsSync(file))
+    {
+        fs.writeFileSync(file, '@echo testing batch file\r\n');
+    }
 }
 
 
 function createGradleFile()
 {
-    const file1 = path.join(dirName, 'build.gradle');
-    tempFiles.push(file1);
+    const file = path.join(dirName, 'build.gradle');
+    tempFiles.push(file);
 
-    fs.writeFileSync(
-        file1,
-        'task fatJar(type: Jar) {\n' +
-        '    manifest {\n' +
-        '        attributes \'Implementation-Title\': \'Gradle Jar File Example\',\n' +  
-        '            \'Implementation-Version\': version,\n' +
-        '            \'Main-Class\': \'com.spmeesseman.test\'\n' +
-        '    }\n' +
-        '    baseName = project.name + \'-all\'\n' +
-        '    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n' +
-        '    with jar\n' +
-        '}\n'
-    );
+    if (!fs.existsSync(file))
+    {
+        fs.writeFileSync(
+            file,
+            'task fatJar(type: Jar) {\n' +
+            '    manifest {\n' +
+            '        attributes \'Implementation-Title\': \'Gradle Jar File Example\',\n' +  
+            '            \'Implementation-Version\': version,\n' +
+            '            \'Main-Class\': \'com.spmeesseman.test\'\n' +
+            '    }\n' +
+            '    baseName = project.name + \'-all\'\n' +
+            '    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n' +
+            '    with jar\n' +
+            '}\n'
+        );
+    }
 }
 
 
 function createGruntFile()
 {
-    const file1 = path.join(rootPath, 'GRUNTFILE.js');
-    tempFiles.push(file1);
-    fs.writeFileSync(
-        file1,
-        'module.exports = function(grunt) {\n' +
-        "    grunt.registerTask(\n'default', ['jshint:myproject']);\n" +
-        '    grunt.registerTask("upload", [\'s3\']);\n' +
-        '};\n'
-    );
+    const file = path.join(rootPath, 'GRUNTFILE.js');
+    tempFiles.push(file);
+
+    if (!fs.existsSync(file))
+    {
+        fs.writeFileSync(
+            file,
+            'module.exports = function(grunt) {\n' +
+            "    grunt.registerTask(\n'default', ['jshint:myproject']);\n" +
+            '    grunt.registerTask("upload", [\'s3\']);\n' +
+            '};\n'
+        );
+    }
 }
 
 
 function createGulpFile()
 {
-    const file1 = path.join(rootPath, 'gulpfile.js');
-    tempFiles.push(file1);
-    fs.writeFileSync(
-        file1,
-        "var gulp = require('gulp');\n" +
-        "gulp.task(\n'hello', (done) => {\n" +
-        "    console.log('Hello!');\n" +
-        '    done();\n' +
-        '});\n' +
-        'gulp.task(\n       "hello2", (done) => {\n' +
-        '    done();\n' +
-        '});\n'
-    );
+    const file = path.join(rootPath, 'gulpfile.js');
+    tempFiles.push(file);
+
+    if (!fs.existsSync(file))
+    {
+        fs.writeFileSync(
+            file,
+            "var gulp = require('gulp');\n" +
+            "gulp.task(\n'hello', (done) => {\n" +
+            "    console.log('Hello!');\n" +
+            '    done();\n' +
+            '});\n' +
+            'gulp.task(\n       "hello2", (done) => {\n' +
+            '    done();\n' +
+            '});\n'
+        );
+    }
 }
 
 
@@ -981,8 +1025,12 @@ function createMakeFile()
 {
     const file = path.join(rootPath, 'Makefile');
     tempFiles.push(file);
-    fs.writeFileSync(
-        file,
-        'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n'
-    );
+
+    if (!fs.existsSync(file))
+    {
+        fs.writeFileSync(
+            file,
+            'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n'
+        );
+    }
 }
