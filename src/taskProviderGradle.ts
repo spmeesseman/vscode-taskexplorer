@@ -99,20 +99,17 @@ async function detectGradlefiles(): Promise<Task[]>
 
     if (folders)
     {
-        try {
-            if (paths)
+        if (paths)
+        {
+            for (const fobj of paths)
             {
-                for (const fobj of paths)
-                {
-                    if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                        visitedFiles.add(fobj.uri.fsPath);
-                        const tasks = await readGradlefile(fobj.uri);
-                        allTasks.push(...tasks);
-                    }
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                    visitedFiles.add(fobj.uri.fsPath);
+                    const tasks = await readGradlefile(fobj.uri);
+                    allTasks.push(...tasks);
                 }
             }
         }
-        catch {}
     }
 
     util.logValue("   # of tasks", allTasks.length, 2);

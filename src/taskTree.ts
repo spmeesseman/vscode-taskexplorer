@@ -200,11 +200,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
         else
         {
-            try {
-                await tasks.executeTask(taskItem.task);
-                me.saveRunTask(taskItem);
-            }
-            catch {}
+            await tasks.executeTask(taskItem.task);
+            me.saveRunTask(taskItem);
         }
     }
 
@@ -468,16 +465,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         await util.asyncForEach(treeItems, async item =>
         {
-            try {
-                if (item instanceof TaskFolder)
-                {
-                    const tmp: any = me.getParent(item);
-                    assert(tmp === null, "Invaid parent type, should be null for TaskFolder");
-                    util.log(logPad + "Task Folder " + item.label + ":  " + item.resourceUri.fsPath);
-                    await processItem(item);
-                }
+            if (item instanceof TaskFolder)
+            {
+                const tmp: any = me.getParent(item);
+                assert(tmp === null, "Invaid parent type, should be null for TaskFolder");
+                util.log(logPad + "Task Folder " + item.label + ":  " + item.resourceUri.fsPath);
+                await processItem(item);
             }
-            catch {}
         });
 
         util.log(logPad + "   finished task tree scan");

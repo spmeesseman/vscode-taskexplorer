@@ -109,19 +109,16 @@ async function detectAppPublisherfiles(): Promise<Task[]>
 
     if (folders)
     {
-        try {
-            if (paths)
+        if (paths)
+        {
+            for (const fobj of paths)
             {
-                for (const fobj of paths)
-                {
-                    if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                        visitedFiles.add(fobj.uri.fsPath);
-                        allTasks.push(...createAppPublisherTask(fobj.folder!, fobj.uri));
-                    }
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                    visitedFiles.add(fobj.uri.fsPath);
+                    allTasks.push(...createAppPublisherTask(fobj.folder!, fobj.uri));
                 }
             }
         }
-        catch {}
     }
 
     util.logValue("   # of tasks", allTasks.length, 2);
