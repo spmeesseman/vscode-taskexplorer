@@ -179,7 +179,7 @@ export async function readFile(file: string): Promise<string>
             if (err) {
                 reject(err);
             }
-            resolve(data.toString());
+            resolve(data ? data.toString() : "");
         });
     });
 }
@@ -187,7 +187,8 @@ export async function readFile(file: string): Promise<string>
 
 export function readFileSync(file: string)
 {
-    return fs.readFileSync(file).toString();
+    const buf = fs.readFileSync(file);
+    return (buf ? buf.toString() : "");
 }
 
 
