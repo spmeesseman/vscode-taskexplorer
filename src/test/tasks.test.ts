@@ -68,6 +68,24 @@ suite('Task tests', () =>
                     console.log(error);
                 }
             }
+
+            if (fs.existsSync(path.join(rootPath, 'package-lock.json'))) {
+                try {
+                    fs.unlinkSync(path.join(rootPath, 'package-lock.json'));
+                } 
+                catch (error) {
+                    console.log(error);
+                }
+            }
+
+            if (fs.existsSync(path.join(dirName, 'package-lock.json'))) {
+                try {
+                    fs.unlinkSync(path.join(dirName, 'package-lock.json'));
+                } 
+                catch (error) {
+                    console.log(error);
+                }
+            }
         }
         
         try {
@@ -77,7 +95,9 @@ suite('Task tests', () =>
             fs.rmdirSync(dirName);
             fs.rmdirSync(dirNameIgn);
         }
-        catch {}
+        catch (error) {
+            console.log(error);
+        }
 
         await timeout(3000); // wait for filesystem change events
     });
@@ -495,8 +515,6 @@ suite('Task tests', () =>
 
         taskMap = await teApi.explorerProvider.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
 
-        console.log("         ✔ Task tree successfully scanned");
-
         //
         // Find all created tasks in the task tree and ensure the counts are correct.
         //
@@ -575,8 +593,6 @@ suite('Task tests', () =>
         if (taskCount != 7) {
             assert.fail('Unexpected VSCode task count (Found ' + taskCount + ' of 7)');
         }
-
-        console.log("         ✔ All tasks found, counts verified");
     });
 
 
@@ -617,6 +633,33 @@ suite('Task tests', () =>
     });
 
 
+    test('Test add to excludes', async function() 
+    {
+        if (!teApi.explorerProvider) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist")
+        }
+        
+        let taskItems = await tasks.fetchTasks({ type: 'grunt' });
+        if (taskItems.length != 4) {
+            assert.fail('Unexpected Grunt task count (Found ' + taskItems.length + ' of 4)');
+        }
+
+        console.log("    Simulate add to exclude");
+        await asyncMapForEach(taskMap, async (value: TaskItem) =>  {
+            if (value && value.taskSource === "grunt") {
+                await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile, false, false);
+                await teApi.explorerProvider.invalidateTasksCache("grunt", value.taskFile.resourceUri);
+                return false;
+            }
+        });
+
+        taskItems = await tasks.fetchTasks({ type: 'grunt' });
+        if (taskItems.length != 2) {
+            assert.fail('Unexpected Grunt task count (Found ' + taskItems.length + ' of 2)');
+        }
+    });
+
+
     test('Invalidation tests', async function() 
     {
         if (!teApi.explorerProvider) {
@@ -628,91 +671,107 @@ suite('Task tests', () =>
         //
         // App-Publisher - Delete and invalidate, re-add and invalidate
         //
-        let file1 = path.join(rootPath, '.publishrc.json');
-        removeFromArray(tempFiles, file1);
-        fs.unlinkSync(file1);
-        await teApi.explorerProvider.invalidateTasksCache("app-publisher", Uri.parse(file1));
+        let file = path.join(rootPath, '.publishrc.json');
+        let uri = Uri.parse(file);
+        await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
+        removeFromArray(tempFiles, file);
+        fs.unlinkSync(file);
+        await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
         await(timeout(100));
         createAppPublisherFile();
-        await teApi.explorerProvider.invalidateTasksCache("app-publisher", Uri.parse(file1));
+        await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
         await(timeout(100));
 
         //
         // Ant type - Delete and invalidate, re-add and invalidate
         //
-        file1 = path.join(dirName, 'build.xml');
-        removeFromArray(tempFiles, file1);
-        fs.unlinkSync(file1);
-        await teApi.explorerProvider.invalidateTasksCache("ant", Uri.parse(file1));
+        file = path.join(dirName, 'build.xml');
+        uri = Uri.parse(file);
+        await teApi.explorerProvider.invalidateTasksCache("ant", uri);
+        removeFromArray(tempFiles, file);
+        fs.unlinkSync(file);
+        await teApi.explorerProvider.invalidateTasksCache("ant", uri);
         await(timeout(100));
         createAntFile();
-        await teApi.explorerProvider.invalidateTasksCache("ant", Uri.parse(file1));
+        await teApi.explorerProvider.invalidateTasksCache("ant", uri);
         await(timeout(100));
 
         //
         // Gradle type - Delete and invalidate, re-add and invalidate
         //
-        file1 = path.join(dirName, 'build.gradle');
-        removeFromArray(tempFiles, file1);
-        fs.unlinkSync(file1);
-        await teApi.explorerProvider.invalidateTasksCache("gradle", Uri.parse(file1));
+        file = path.join(dirName, 'build.gradle');
+        uri = Uri.parse(file);
+        await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
+        removeFromArray(tempFiles, file);
+        fs.unlinkSync(file);
+        await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
         await(timeout(100));
         createGradleFile();
-        await teApi.explorerProvider.invalidateTasksCache("gradle", Uri.parse(file1));
+        await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
         await(timeout(100));
 
         //
         // Grunt type - Delete and invalidate, re-add and invalidate
         //
-        file1 = path.join(rootPath, 'GRUNTFILE.js');
-        removeFromArray(tempFiles, file1);
-        fs.unlinkSync(file1);
-        await teApi.explorerProvider.invalidateTasksCache("grunt", Uri.parse(file1));
+        file = path.join(rootPath, 'GRUNTFILE.js');
+        uri = Uri.parse(file);
+        await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
+        removeFromArray(tempFiles, file);
+        fs.unlinkSync(file);
+        await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
         await(timeout(100));
         createGruntFile();
-        await teApi.explorerProvider.invalidateTasksCache("grunt", Uri.parse(file1));
+        await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
         await(timeout(100));
 
         //
         // Gulp type - Delete and invalidate, re-add and invalidate
         //
-        file1 = path.join(rootPath, 'gulpfile.js');
-        removeFromArray(tempFiles, file1);
-        fs.unlinkSync(file1);
-        await teApi.explorerProvider.invalidateTasksCache("gulp", Uri.parse(file1));
+        file = path.join(rootPath, 'gulpfile.js');
+        uri = Uri.parse(file);
+        await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
+        removeFromArray(tempFiles, file);
+        fs.unlinkSync(file);
+        await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
         await(timeout(100));
         createGulpFile();
-        await teApi.explorerProvider.invalidateTasksCache("gulp", Uri.parse(file1));
+        await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
         await(timeout(100));
 
         //
         // Make type - Delete and invalidate, re-add and invalidate
         //
-        file1 = path.join(rootPath, 'Makefile');
-        removeFromArray(tempFiles, file1);
-        fs.unlinkSync(file1);
-        await teApi.explorerProvider.invalidateTasksCache("make", Uri.parse(file1));
+        file = path.join(rootPath, 'Makefile');
+        uri = Uri.parse(file);
+        await teApi.explorerProvider.invalidateTasksCache("make", uri);
+        removeFromArray(tempFiles, file);
+        fs.unlinkSync(file);
+        await teApi.explorerProvider.invalidateTasksCache("make", uri);
         await(timeout(100));
         createMakeFile();
-        await teApi.explorerProvider.invalidateTasksCache("make", Uri.parse(file1));
+        await teApi.explorerProvider.invalidateTasksCache("make", uri);
         await(timeout(100));
 
         //
         // Script type - Delete and invalidate, re-add and invalidate
         //
-        file1 = path.join(rootPath, 'test.bat');
-        removeFromArray(tempFiles, file1);
-        fs.unlinkSync(file1);
-        await teApi.explorerProvider.invalidateTasksCache("batch", Uri.parse(file1));
+        file = path.join(rootPath, 'test.bat');
+        uri = Uri.parse(file);
+        await teApi.explorerProvider.invalidateTasksCache("batch", uri);
+        removeFromArray(tempFiles, file);
+        fs.unlinkSync(file);
+        await teApi.explorerProvider.invalidateTasksCache("batch", uri);
         await(timeout(100));
         createBatchFile();
-        await teApi.explorerProvider.invalidateTasksCache("batch", Uri.parse(file1));
+        await teApi.explorerProvider.invalidateTasksCache("batch", uri);
         await(timeout(100));
 
         await asyncMapForEach(taskMap, async(value: TaskItem) =>  {
             if (value) {
-                console.log("         Invalidate task type '" + value.taskSource + "'");
-                await teApi.explorerProvider.invalidateTasksCache(value.taskSource, value.task.definition.uri);
+                if (fs.existsSync(value.taskFile.resourceUri.fsPath)) {
+                    console.log("         Invalidate task type '" + value.taskSource + "'");
+                    await teApi.explorerProvider.invalidateTasksCache(value.taskSource, value.task.definition.uri);
+                }
             }
         });
 
