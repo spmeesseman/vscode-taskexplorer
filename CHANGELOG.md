@@ -1,3 +1,10 @@
+## [1.23.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.3...v1.23.4) (2020-02-18)
+
+
+### Code Refactoring
+
+* nodes created using 'dashed groupings' should be shown first under the parent node before any individual tasks are, i.e. the same behavior as that of a file explorer with files/folders ([431b456](https://github.com/spmeesseman/vscode-taskexplorer/commit/431b456))
+
 ## [1.23.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.2...v1.23.3) (2020-02-18)
 
 
