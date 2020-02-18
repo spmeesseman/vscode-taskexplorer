@@ -112,37 +112,43 @@ export async function invalidateTasksCacheScript(opt?: Uri): Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheScript");
+    util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
+    util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
 
     if (opt && cachedTasks)
     {
         const rmvTasks: Task[] = [];
         const folder = workspace.getWorkspaceFolder(opt);
 
-        cachedTasks.forEach(each => {
+        await util.asyncForEach(cachedTasks, (each) => {
             const cstDef: ScriptTaskDefinition = each.definition as ScriptTaskDefinition;
             if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                 rmvTasks.push(each);
             }
         });
 
-        rmvTasks.forEach(each => {
-            util.log("   removing old task " + each.name);
-            util.removeFromArray(cachedTasks, each);
-        });
-
-        if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+        //
+        // Technically this function can be called back into when waiting for a promise
+        // to return on the asncForEach() above, and cachedTask array can be set to undefined,
+        // this is happening with a broken await() somewere that I cannot find
+        if (cachedTasks)
         {
-            const task = createScriptTask(scriptTable[path.extname(opt.fsPath).substring(1)], folder!,  opt);
-            if (task) {
-                cachedTasks.push(task);
-            }
-            else {
-                util.log("   !!! could not create script task from " + opt.fsPath);
-            }
-        }
+            await util.asyncForEach(rmvTasks, (each) => {
+                util.log("   removing old task " + each.name);
+                util.removeFromArray(cachedTasks, each);
+            });
 
-        if (cachedTasks.length > 0) {
-            return;
+            if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+            {
+                const task = createScriptTask(scriptTable[path.extname(opt.fsPath).substring(1)], folder!,  opt);
+                if (task) {
+                    cachedTasks.push(task);
+                }
+            }
+
+            if (cachedTasks.length > 0) {
+                return;
+            }
         }
     }
 
@@ -152,6 +158,9 @@ export async function invalidateTasksCacheScript(opt?: Uri): Promise<void>
 
 async function provideScriptFiles(): Promise<Task[]>
 {
+    util.log("");
+    util.log("provideScriptFiles");
+
     if (!cachedTasks) {
         refreshScriptTable();
         cachedTasks = await detectScriptFiles();
@@ -165,50 +174,34 @@ async function detectScriptFiles(): Promise<Task[]>
     util.log("");
     util.log("detectScriptFiles");
 
-    const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("script");
-
     const folders = workspace.workspaceFolders;
-    if (!folders) {
-        return emptyTasks;
-    }
-    try {
-        if (!paths)
-        {
-            for (const folder of folders)
+
+    if (folders)
+    {
+        try {
+            if (paths)
             {
-                const relativePattern = new RelativePattern(folder, "{**/*.[Ss][Hh],**/*.[Rr][Bb],**/*.[Pp][Ss]1,**/*.[Pp][Ll],**/*.[Bb][Aa][Tt],**/*.[Cc][Mm][Dd],**/*.[Nn][Ss][Ii],**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]}"); // ,SH,PY,RB,PS1,PL,BAT,CMD/NSI");
-                const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-                for (const fpath of paths)
+                for (const fobj of paths)
                 {
-                    if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-                        visitedFiles.add(fpath.fsPath);
-                        allTasks.push(createScriptTask(scriptTable[path.extname(fpath.fsPath).substring(1).toLowerCase()], folder!, fpath));
+                    if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                        visitedFiles.add(fobj.uri.fsPath);
+                        allTasks.push(createScriptTask(scriptTable[path.extname(fobj.uri.fsPath).substring(1).toLowerCase()], fobj.folder!, fobj.uri));
                         util.log("   found script target");
-                        util.logValue("      script file", fpath.fsPath);
+                        util.logValue("      script file", fobj.uri.fsPath);
                     }
                 }
             }
         }
-        else
-        {
-            for (const fobj of paths)
-            {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    allTasks.push(createScriptTask(scriptTable[path.extname(fobj.uri.fsPath).substring(1).toLowerCase()], fobj.folder!, fobj.uri));
-                    util.log("   found script target");
-                    util.logValue("      script file", fobj.uri.fsPath);
-                }
-            }
+        catch (error) {
+            return Promise.reject(error);
         }
-        return allTasks;
     }
-    catch (error) {
-        return Promise.reject(error);
-    }
+
+    util.logValue("   # of tasks", allTasks.length, 2);
+    return allTasks;
 }
 
 
@@ -268,9 +261,11 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
      //
     // If the defualt terminal is bash, set the separator to non-windows-style
     //
+    let isWinShell = true;
     const winShell: string = workspace.getConfiguration().get("terminal.integrated.shell.windows");
     if (winShell && winShell.includes("bash.exe")) {
         sep = "/";
+        isWinShell = false;
     }
     //
     // Handle bash script on windows - set the shell executable as bash.exe.  This can be set by user
@@ -310,8 +305,9 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
     if (scriptDef.type !== "bash") {
         kind.cmdLine += " ";
     }
-    kind.cmdLine += (fileName.indexOf(" ") !== -1 ? "\"" + "." + sep + fileName + "\"" : "." + sep + fileName);
-
+    const pathPre = (isWinShell ? "." + sep : "");
+    kind.cmdLine += (fileName.indexOf(" ") !== -1 ?
+                    "\"" + pathPre + fileName + "\"" : pathPre + fileName);
     //
     // For python setup.py scripts, use the bdist_egg argument - the egg will be built and stored
     // at dist/PackageName-Version.egg
@@ -319,7 +315,7 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
     if (scriptDef.type === "python") {
         kind.cmdLine += " bdist_egg";
     }
-
+    
     //
     // Create the shell execution object
     //

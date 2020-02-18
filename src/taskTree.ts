@@ -65,20 +65,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".restart", this.restart, this));
         subscriptions.push(commands.registerCommand(name + ".pause", this.pause, this));
         subscriptions.push(commands.registerCommand(name + ".open", this.open, this));
-        subscriptions.push(commands.registerCommand(name + ".refresh", function (taskFile: TaskFile) { this.refresh(true, false); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runInstall", function (taskFile: TaskFile) { this.runNpmCommand(taskFile, "install"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runUpdate", function (taskFile: TaskFile) { this.runNpmCommand(taskFile, "update"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runUpdatePackage", function (taskFile: TaskFile) { this.runNpmCommand(taskFile, "update <packagename>"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runAudit", function (taskFile: TaskFile) { this.runNpmCommand(taskFile, "audit"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runAuditFix", function (taskFile: TaskFile) { this.runNpmCommand(taskFile, "audit fix"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addToExcludes", this.addToExcludes, this));
+        subscriptions.push(commands.registerCommand(name + ".refresh", () => { this.refresh(true, false); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runInstall", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "install"); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runUpdate", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "update"); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runUpdatePackage", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "update <packagename>"); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runAudit", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "audit"); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runAuditFix", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "audit fix"); }, this));
+        subscriptions.push(commands.registerCommand(name + ".addToExcludes", (taskFile: TaskFile | string, global: boolean) => { this.addToExcludes(taskFile, global); }, this));
 
         tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
         tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
     }
 
 
-    public async invalidateTasksCache(opt1: string, opt2: Uri)
+    public async invalidateTasksCache(opt1: string, opt2: Uri | boolean)
     {
         this.busy = true;
         //
@@ -90,7 +90,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // 'opt2' should contain the Uri of the file that was edited, or the Task if this was
         // a task event
         //
-        if (opt1 && opt1 !== "tests")
+        if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
         {
             if (opt1 === "ant")
             {
@@ -550,43 +550,38 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async open(selection: TaskFile | TaskItem)
     {
         let uri: Uri | undefined;
-        if (selection instanceof TaskFile)
-        {
+        if (selection instanceof TaskFile) {
             uri = selection.resourceUri!;
-        } else if (selection instanceof TaskItem)
+        }
+        else if (selection instanceof TaskItem)
         {
             uri = selection.taskFile.resourceUri;
         }
-        if (!uri)
-        {
-            return;
-        }
 
-        util.log("Open script at position");
-        util.logValue("   command", selection.command.command);
-        util.logValue("   source", selection.taskSource);
-        util.logValue("   uri path", uri.path);
-        util.logValue("   file path", uri.fsPath);
+        if (uri)
+        {
+            util.log("Open script at position");
+            util.logValue("   command", selection.command.command);
+            util.logValue("   source", selection.taskSource);
+            util.logValue("   uri path", uri.path);
+            util.logValue("   file path", uri.fsPath);
 
-        if (util.pathExists(uri.fsPath))
-        {
-            const document: TextDocument = await workspace.openTextDocument(uri);
-            const offset = this.findScriptPosition(document, selection instanceof TaskItem ? selection : undefined);
-            const position = document.positionAt(offset);
-            await window.showTextDocument(document, { selection: new Selection(position, position) });
-        }
-        else
-        {
-            util.log("Invalid path for file, cannot open");
+            if (util.pathExists(uri.fsPath))
+            {
+                const document: TextDocument = await workspace.openTextDocument(uri);
+                const offset = this.findScriptPosition(document, selection instanceof TaskItem ? selection : undefined);
+                const position = document.positionAt(offset);
+                await window.showTextDocument(document, { selection: new Selection(position, position) });
+            }
         }
     }
 
 
-    public async refresh(invalidate?: any, opt?: Uri, task?: Task)
+    public async refresh(invalidate?: any, opt?: Uri | boolean, task?: Task)
     {
         util.log("Refresh task tree");
         util.logValue("   invalidate", invalidate, 2);
-        util.logValue("   opt fsPath", opt ? opt.fsPath : "n/a", 2);
+        util.logValue("   opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a", 2);
         util.logValue("   task name", task ? task.name : "n/a", 2);
 
         //
@@ -651,7 +646,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // If invalidate is true and opt is false, then the refresh button was clicked
         //
-        // If invalidate is true and opt undefined, then extension.refreshTree() called in tests
+        // If invalidate is "tests" and opt undefined, then extension.refreshTree() called in tests
         //
         // If task is truthy, then a task has started/stopped, opt will be the task deifnition's
         // 'uri' property, note that task types not internally provided will not contain this property.
@@ -687,63 +682,93 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async addToExcludes(selection: TaskFile)
+    private async addToExcludes(selection: TaskFile | string, global?: boolean)
     {
         const me = this;
         let uri: Uri | undefined;
+        let pathValue = "";
 
         if (selection instanceof TaskFile)
         {
             uri = selection.resourceUri!;
-        }
-        if (!uri && !selection.isGroup)
-        {
-            return;
+            if (!uri && !selection.isGroup)
+            {
+                return;
+            }
         }
 
         util.log("Add to excludes");
-        let pathValue = "";
+        util.logValue("   global", global === false ? "false" : "true", 2);
 
-        if (selection.isGroup)
+        if (selection instanceof TaskFile)
         {
-            util.log("  File group");
-            pathValue = "";
-            selection.scripts.forEach(each =>
+            if (selection.isGroup)
             {
-                pathValue += each.resourceUri.path;
-                pathValue += ",";
-            });
-            if (pathValue) {
-                pathValue = pathValue.substring(0, pathValue.length - 1);
+                util.log("  File group");
+                pathValue = "";
+                selection.scripts.forEach(each =>
+                {
+                    pathValue += each.resourceUri.path;
+                    pathValue += ",";
+                });
+                if (pathValue) {
+                    pathValue = pathValue.substring(0, pathValue.length - 1);
+                }
+            }
+            else
+            {
+                util.logValue("  File glob", uri.path);
+                pathValue = uri.path;
             }
         }
-        else
-        {
-            util.logValue("  File glob", uri.path);
-            pathValue = uri.path;
+        else {
+            pathValue = selection;
         }
 
-        if (!pathValue)
-        {
+        if (!pathValue) {
             return;
         }
+        util.logValue("   path value", pathValue, 2);
 
-        const opts: InputBoxOptions = { prompt: "Add the following file to excluded tasks list?", value: pathValue };
-        window.showInputBox(opts).then(str =>
+        function saveExclude(str: string)
         {
-            if (str !== undefined)
+            if (str)
             {
-                const excludes = configuration.get<string[]>("exclude");
+                let excludes: string[] = [];
+                const excludes2 = configuration.get<string[]>("exclude");
+                if (excludes2 && excludes2 instanceof Array) {
+                    excludes = excludes2;
+                }
+                else if (excludes2 instanceof String) {
+                    excludes.push(excludes2.toString());
+                }
                 const strs = str.split(",");
                 for (const s in strs) {
                     if (!util.existsInArray(excludes, strs[s])) {
                         excludes.push(strs[s]);
                     }
                 }
-                configuration.update("exclude", excludes);
-                me.refresh(selection.taskSource, uri);
+                if (global !== false) {
+                    configuration.update("exclude", excludes);
+                }
+                else {
+                    configuration.updateWs("exclude", excludes);
+                }
+                me.refresh(selection instanceof TaskFile ? selection.taskSource : false, uri);
             }
-        });
+        }
+
+        if (selection instanceof TaskFile)
+        {
+            const opts: InputBoxOptions = { prompt: "Add the following file to excluded tasks list?", value: pathValue };
+            window.showInputBox(opts).then(str =>
+            {
+                saveExclude(str);
+            });
+        }
+        else {
+            saveExclude(pathValue);
+        }
     }
 
 
@@ -763,18 +788,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             const execution = new ShellExecution("npm " + command, options);
             const task = new Task(kind, taskFile.folder.workspaceFolder, command, "npm", execution, undefined);
-            tasks.executeTask(task).then(execution => { }, reason => { });
+            await tasks.executeTask(task);
         }
         else
         {
             const opts: InputBoxOptions = { prompt: "Enter package name to " + command };
-            window.showInputBox(opts).then(str =>
+            await window.showInputBox(opts).then(async (str) =>
             {
                 if (str !== undefined)
                 {
                     const execution = new ShellExecution("npm " + command.replace("<packagename>", "").trim() + " " + str.trim(), options);
                     const task = new Task(kind, taskFile.folder.workspaceFolder, command.replace("<packagename>", "").trim() + str.trim(), "npm", execution, undefined);
-                    tasks.executeTask(task).then(execution => { }, reason => { });
+                    await tasks.executeTask(task);
                 }
             });
         }
@@ -1006,8 +1031,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             // TODO - search enable* settings and apply enabled types to filter
             //
             // let taskItems = await tasks.fetchTasks({ type: 'npm' });
-            if (!this.tasks)
-            {
+            if (!this.tasks) {
                 this.tasks = await tasks.fetchTasks();
             }
             if (this.tasks)

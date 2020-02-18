@@ -41,38 +41,47 @@ export async function invalidateTasksCacheAppPublisher(opt?: Uri): Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheAppPublisher");
+    util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
+    util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
 
     if (opt && cachedTasks)
     {
         const rmvTasks: Task[] = [];
         const folder = workspace.getWorkspaceFolder(opt);
 
-        cachedTasks.forEach(each => {
+        await util.asyncForEach(cachedTasks, each => {
             const cstDef: AppPublisherTaskDefinition = each.definition as AppPublisherTaskDefinition;
             if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                 rmvTasks.push(each);
             }
         });
 
-        rmvTasks.forEach(each => {
-            util.log("   removing old task " + each.name);
-            util.removeFromArray(cachedTasks, each);
-        });
-
-        if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+        //
+        // Technically this function can be called back into when waiting for a promise
+        // to return on the asncForEach() above, and cachedTask array can be set to undefined,
+        // this is happening with a broken await() somewere that I cannot find
+        if (cachedTasks)
         {
-            const tasks = createAppPublisherTask(folder!, opt);
-            if (tasks) {
-                cachedTasks.push(...tasks);
-                // cachedTasks.push(task2);
-            }
-            else {
-                util.log("   !!! could not create app-publisher task from " + opt.fsPath);
-            }
-        }
+            await util.asyncForEach(rmvTasks, each => {
+                util.log("   removing old task " + each.name);
+                util.removeFromArray(cachedTasks, each);
+            });
 
-        if (cachedTasks.length > 0) {
-            return;
+            if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+            {
+                const tasks = createAppPublisherTask(folder!, opt);
+                if (tasks) {
+                    cachedTasks.push(...tasks);
+                    // cachedTasks.push(task2);
+                }
+                else {
+                    util.log("   !!! could not create app-publisher task from " + opt.fsPath);
+                }
+            }
+
+            if (cachedTasks.length > 0) {
+                return;
+            }
         }
     }
 
@@ -82,6 +91,9 @@ export async function invalidateTasksCacheAppPublisher(opt?: Uri): Promise<void>
 
 async function provideAppPublisherfiles(): Promise<Task[]>
 {
+    util.log("");
+    util.log("provideAppPublisherfiles");
+
     if (!cachedTasks) {
         cachedTasks = await detectAppPublisherfiles();
     }
@@ -94,54 +106,32 @@ async function detectAppPublisherfiles(): Promise<Task[]>
     util.log("");
     util.log("detectAppPublisherfiles");
 
-    const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("app-publisher");
+    const folders = workspace.workspaceFolders;
 
-    try
+    if (folders)
     {
-        if (!paths)
-        {
-            const folders = workspace.workspaceFolders;
-            if (!folders) {
-                return emptyTasks;
-            }
-
-            for (const folder of folders)
+        try {
+            if (paths)
             {
-                //
-                // Note - pattern will ignore gruntfiles in root project dir, which would be picked
-                // up by VSCoces internal Grunt task provider
-                //
-                const relativePattern = new RelativePattern(folder, "**/.publishrc.json");
-                const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-                for (const fpath of paths)
+                for (const fobj of paths)
                 {
-                    if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-                        visitedFiles.add(fpath.fsPath);
-                        allTasks.push(...createAppPublisherTask(folder!, fpath));
+                    if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                        visitedFiles.add(fobj.uri.fsPath);
+                        allTasks.push(...createAppPublisherTask(fobj.folder!, fobj.uri));
                     }
                 }
             }
         }
-        else
-        {
-            for (const fobj of paths)
-            {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    allTasks.push(...createAppPublisherTask(fobj.folder!, fobj.uri));
-                }
-            }
+        catch (error) {
+            return Promise.reject(error);
         }
+    }
 
-        return allTasks;
-    }
-    catch (error)
-    {
-        return Promise.reject(error);
-    }
+    util.logValue("   # of tasks", allTasks.length, 2);
+    return allTasks;
 }
 
 

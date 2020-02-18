@@ -41,31 +41,40 @@ export async function invalidateTasksCacheGulp(opt?: Uri): Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheGulp");
+    util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
+    util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
 
     if (opt && cachedTasks)
     {
         const rmvTasks: Task[] = [];
 
-        cachedTasks.forEach(each => {
+        await util.asyncForEach(cachedTasks, each => {
             const cstDef: GulpTaskDefinition = each.definition;
             if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                 rmvTasks.push(each);
             }
         });
-
-        rmvTasks.forEach(each => {
-            util.log("   removing old task " + each.name);
-            util.removeFromArray(cachedTasks, each);
-        });
-
-        if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+        
+        //
+        // Technically this function can be called back into when waiting for a promise
+        // to return on the asncForEach() above, and cachedTask array can be set to undefined,
+        // this is happening with a broken await() somewere that I cannot find
+        if (cachedTasks)
         {
-            const tasks = await readGulpfile(opt);
-            cachedTasks.push(...tasks);
-        }
+            await util.asyncForEach(rmvTasks, each => {
+                util.log("   removing old task " + each.name);
+                util.removeFromArray(cachedTasks, each);
+            });
 
-        if (cachedTasks.length > 0) {
-            return;
+            if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+            {
+                const tasks = await readGulpfile(opt);
+                cachedTasks.push(...tasks);
+            }
+
+            if (cachedTasks.length > 0) {
+                return;
+            }
         }
     }
 
@@ -75,6 +84,9 @@ export async function invalidateTasksCacheGulp(opt?: Uri): Promise<void>
 
 async function provideGulpfiles(): Promise<Task[]>
 {
+    util.log("");
+    util.log("provideGulpfiles");
+
     if (!cachedTasks) {
         cachedTasks = await detectGulpfiles();
     }
@@ -87,77 +99,55 @@ async function detectGulpfiles(): Promise<Task[]>
     util.log("");
     util.log("detectGulpfiles");
 
-    const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("gulp");
-
     const folders = workspace.workspaceFolders;
-    if (!folders) {
-        return emptyTasks;
-    }
-    try {
-        if (!paths)
-        {
-            for (const folder of folders)
+
+    if (folders)
+    {
+        try {
+            if (paths)
             {
-                //
-                // Note - pattern will ignore gulpfiles in root project dir, which would be picked
-                // up by VSCoces internal Gulp task provider
-                //
-                const relativePattern = new RelativePattern(folder, "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]");
-                const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-                for (const fpath of paths)
+                for (const fobj of paths)
                 {
-                    if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-                        const tasks = await readGulpfile(fpath);
-                        visitedFiles.add(fpath.fsPath);
+                    if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                        visitedFiles.add(fobj.uri.fsPath);
+                        const tasks = await readGulpfile(fobj.uri);
                         allTasks.push(...tasks);
                     }
                 }
             }
         }
-        else
-        {
-            for (const fobj of paths)
-            {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await readGulpfile(fobj.uri);
-                    allTasks.push(...tasks);
-                }
-            }
+        catch (error) {
+            return Promise.reject(error);
         }
-        return allTasks;
-    } catch (error) {
-        return Promise.reject(error);
     }
+
+    util.logValue("   # of tasks", allTasks.length, 2);
+    return allTasks;
 }
 
 
 async function readGulpfile(uri: Uri): Promise<Task[]>
 {
-    const emptyTasks: Task[] = [];
-
-    const folder = workspace.getWorkspaceFolder(uri);
-    if (!folder) {
-        return emptyTasks;
-    }
-
-    const scripts = await findTargets(uri.fsPath);
-    if (!scripts) {
-        return emptyTasks;
-    }
-
     const result: Task[] = [];
+    const folder = workspace.getWorkspaceFolder(uri);
 
-    Object.keys(scripts).forEach(each => {
-        const task = createGulpTask(each, `${each}`, folder!, uri);
-        if (task) {
-            task.group = TaskGroup.Build;
-            result.push(task);
+    if (folder)
+    {
+        const scripts = await findTargets(uri.fsPath);
+        if (scripts)
+        {
+            Object.keys(scripts).forEach(each => {
+                const task = createGulpTask(each, `${each}`, folder!, uri);
+                if (task) {
+                    task.group = TaskGroup.Build;
+                    result.push(task);
+                }
+            });
         }
-    });
+    }
 
     return result;
 }

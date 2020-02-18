@@ -41,34 +41,43 @@ export async function invalidateTasksCacheAnt(opt?: Uri): Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheAnt");
+    util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
+    util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
 
     if (opt && cachedTasks)
     {
         const rmvTasks: Task[] = [];
 
-        cachedTasks.forEach(each => {
+        await util.asyncForEach(cachedTasks, each => {
             const cstDef: AntTaskDefinition = each.definition;
             if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                 rmvTasks.push(each);
             }
         });
 
-        rmvTasks.forEach(each => {
-            util.log("   removing old task " + each.name);
-            util.removeFromArray(cachedTasks, each);
-        });
-
         //
-        // If this isn't a 'delete file' event then read the file for tasks
-        //
-        if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+        // Technically this function can be called back into when waiting for a promise
+        // to return on the asncForEach() above, and cachedTask array can be set to undefined,
+        // this is happening with a broken await() somewere that I cannot find
+        if (cachedTasks)
         {
-            const tasks = await readAntfile(opt);
-            cachedTasks.push(...tasks);
-        }
+            await util.asyncForEach(rmvTasks, each => {
+                util.log("   removing old task " + each.name);
+                util.removeFromArray(cachedTasks, each);
+            });
 
-        if (cachedTasks.length > 0) {
-            return;
+            //
+            // If this isn't a 'delete file' event then read the file for tasks
+            //
+            if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+            {
+                const tasks = await readAntfile(opt);
+                cachedTasks.push(...tasks);
+            }
+
+            if (cachedTasks.length > 0) {
+                return;
+            }
         }
     }
 
@@ -81,67 +90,32 @@ async function detectAntScripts(): Promise<Task[]>
     util.log("");
     util.log("detectAntScripts");
 
-    const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("ant");
-
     const folders = workspace.workspaceFolders;
-    if (!folders) {
-        return emptyTasks;
-    }
-    try {
-        if (!paths)
-        {
-            for (const folder of folders)
+    if (folders)
+    {
+        try {
+            if (paths)
             {
-                let relativePattern = new RelativePattern(folder, "**/[Bb]uild.xml");
-
-                const xtraIncludes: string[] = configuration.get("includeAnt");
-                if (xtraIncludes && xtraIncludes.length > 0) {
-                    let multiFilePattern = "{**/[Bb]uild.xml";
-                    if (Array.isArray(xtraIncludes))
-                    {
-                        for (const i in xtraIncludes) {
-                            multiFilePattern += ",";
-                            multiFilePattern += xtraIncludes[i];
-                        }
-                    }
-                    else {
-                        multiFilePattern += ",";
-                        multiFilePattern += xtraIncludes;
-                    }
-                    multiFilePattern += "}";
-                    relativePattern = new RelativePattern(folder, multiFilePattern);
-                }
-
-                const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-                for (const fpath of paths)
+                for (const fobj of paths)
                 {
-                    if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath)) {
-                        const tasks = await readAntfile(fpath);
-                        visitedFiles.add(fpath.fsPath);
+                    if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                        visitedFiles.add(fobj.uri.fsPath);
+                        const tasks = await readAntfile(fobj.uri);
                         allTasks.push(...tasks);
                     }
                 }
             }
         }
-        else
-        {
-            for (const fobj of paths)
-            {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await readAntfile(fobj.uri);
-                    allTasks.push(...tasks);
-                }
-            }
+        catch (error) {
+            return Promise.reject(error);
         }
-
-        return allTasks;
-    } catch (error) {
-        return Promise.reject(error);
     }
+
+    util.logValue("   # of tasks", allTasks.length, 2);
+    return allTasks;
 }
 
 
@@ -156,29 +130,22 @@ export async function provideAntScripts(): Promise<Task[]>
 
 async function readAntfile(uri: Uri): Promise<Task[]>
 {
-    const emptyTasks: Task[] = [];
-
-    const folder = workspace.getWorkspaceFolder(uri);
-    if (!folder) {
-        return emptyTasks;
-    }
-
-    const contents = await util.readFile(uri.fsPath);
-
-    const scripts = await findAllAntScripts(contents);
-    if (!scripts) {
-        return emptyTasks;
-    }
-
     const result: Task[] = [];
 
-    Object.keys(scripts).forEach(each => {
-        const task = createAntTask(scripts[`${each}`] ? scripts[`${each}`] : `${each}`, each, folder!, uri);
-        if (task) {
-            task.group = TaskGroup.Build;
-            result.push(task);
+    const folder = workspace.getWorkspaceFolder(uri);
+    if (folder) {
+        const contents = await util.readFile(uri.fsPath);
+        const scripts = await findAllAntScripts(contents);
+        if (scripts) {
+            Object.keys(scripts).forEach(each => {
+                const task = createAntTask(scripts[`${each}`] ? scripts[`${each}`] : `${each}`, each, folder!, uri);
+                if (task) {
+                    task.group = TaskGroup.Build;
+                    result.push(task);
+                }
+            });
         }
-    });
+    }
 
     return result;
 }
@@ -231,9 +198,6 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
         if (targets[tgt].$ && targets[tgt].$.name) {
             util.logValue("   Found target", targets[tgt].$.name);
             scripts[defaultTask === targets[tgt].$.name ? targets[tgt].$.name + " - Default" : targets[tgt].$.name] = targets[tgt].$.name;
-        }
-        else {
-            util.log("   Invalid target found");
         }
     }
 

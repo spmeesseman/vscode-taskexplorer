@@ -45,13 +45,14 @@ export async function invalidateTasksCacheMake(opt?: Uri): Promise<void>
 {
     util.log("");
     util.log("invalidateTasksCacheMake");
+    util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
+    util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
 
     if (opt && cachedTasks)
     {
         const rmvTasks: Task[] = [];
 
-        cachedTasks.forEach(each =>
-        {
+        await util.asyncForEach(cachedTasks, (each) => {
             const cstDef: MakeTaskDefinition = each.definition;
             if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath))
             {
@@ -59,21 +60,27 @@ export async function invalidateTasksCacheMake(opt?: Uri): Promise<void>
             }
         });
 
-        rmvTasks.forEach(each =>
+        //
+        // Technically this function can be called back into when waiting for a promise
+        // to return on the asncForEach() above, and cachedTask array can be set to undefined,
+        // this is happening with a broken await() somewere that I cannot find
+        if (cachedTasks)
         {
-            util.log("   removing old task " + each.name);
-            util.removeFromArray(cachedTasks, each);
-        });
+            await util.asyncForEach(rmvTasks, (each) => {
+                util.log("   removing old task " + each.name);
+                util.removeFromArray(cachedTasks, each);
+            });
 
-        if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
-        {
-            const tasks = await readMakefile(opt);
-            cachedTasks.push(...tasks);
-        }
+            if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+            {
+                const tasks = await readMakefile(opt);
+                cachedTasks.push(...tasks);
+            }
 
-        if (cachedTasks.length > 0)
-        {
-            return;
+            if (cachedTasks.length > 0)
+            {
+                return;
+            }
         }
     }
 
@@ -86,56 +93,41 @@ async function detectMakefiles(): Promise<Task[]>
     util.log("");
     util.log("detectMakefiles");
 
-    const emptyTasks: Task[] = [];
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("make");
-
     const folders = workspace.workspaceFolders;
-    if (!folders)
+
+    if (folders)
     {
-        return emptyTasks;
-    }
-    try
-    {
-        if (!paths)
-        {
-            for (const folder of folders)
+        try {
+            if (paths)
             {
-                const relativePattern = new RelativePattern(folder, "**/[Mm]akefile");
-                const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-                for (const fpath of paths)
+                for (const fobj of paths)
                 {
-                    if (!util.isExcluded(fpath.path) && !visitedFiles.has(fpath.fsPath))
-                    {
-                        const tasks = await readMakefile(fpath);
-                        visitedFiles.add(fpath.fsPath);
+                    if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                        visitedFiles.add(fobj.uri.fsPath);
+                        const tasks = await readMakefile(fobj.uri);
                         allTasks.push(...tasks);
                     }
                 }
             }
-        }
-        else
+        } catch (error)
         {
-            for (const fobj of paths)
-            {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await readMakefile(fobj.uri);
-                    allTasks.push(...tasks);
-                }
-            }
+            return Promise.reject(error);
         }
-        return allTasks;
-    } catch (error)
-    {
-        return Promise.reject(error);
     }
+
+    util.logValue("   # of tasks", allTasks.length, 2);
+    return allTasks;
 }
 
 
 async function provideMakefiles(): Promise<Task[]>
 {
+    util.log("");
+    util.log("provideMakefiles");
+
     if (!cachedTasks)
     {
         cachedTasks = await detectMakefiles();
@@ -146,31 +138,25 @@ async function provideMakefiles(): Promise<Task[]>
 
 async function readMakefile(uri: Uri): Promise<Task[]>
 {
-    const emptyTasks: Task[] = [];
-
-    const folder = workspace.getWorkspaceFolder(uri);
-    if (!folder)
-    {
-        return emptyTasks;
-    }
-
-    const scripts = await findTargets(uri.fsPath);
-    if (!scripts)
-    {
-        return emptyTasks;
-    }
-
     const result: Task[] = [];
+    const folder = workspace.getWorkspaceFolder(uri);
 
-    Object.keys(scripts).forEach(each =>
+    if (folder)
     {
-        const task = createMakeTask(each, `${each}`, folder!, uri);
-        if (task)
+        const scripts = await findTargets(uri.fsPath);
+        if (scripts)
         {
-            task.group = TaskGroup.Build;
-            result.push(task);
+            Object.keys(scripts).forEach(each =>
+            {
+                const task = createMakeTask(each, `${each}`, folder!, uri);
+                if (task)
+                {
+                    task.group = TaskGroup.Build;
+                    result.push(task);
+                }
+            });
         }
-    });
+    }
 
     return result;
 }
