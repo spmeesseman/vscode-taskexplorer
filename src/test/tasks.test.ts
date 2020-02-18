@@ -486,15 +486,13 @@ suite('Task tests', () =>
         await teApi.explorerProvider.refresh("tests");
         await waitForCache();
 
+        //
+        // Check VSCode provided task types for the hell of it
+        //
         let taskItems = await tasks.fetchTasks({ type: 'npm' });
         assert(taskItems.length > 0, 'No npm tasks registered');
-
-        taskItems = await tasks.fetchTasks({ type: 'ant' });
-        assert(taskItems.length > 0, 'No ant tasks registered');
-
         taskItems = await tasks.fetchTasks({ type: 'grunt' });
         assert(taskItems.length > 0, 'No grunt tasks registered');
-
         taskItems = await tasks.fetchTasks({ type: 'gulp' });
         assert(taskItems.length > 0, 'No gulp tasks registered');
 
@@ -640,9 +638,7 @@ suite('Task tests', () =>
         }
         
         let taskItems = await tasks.fetchTasks({ type: 'grunt' });
-        if (taskItems.length != 4) {
-            assert.fail('Unexpected Grunt task count (Found ' + taskItems.length + ' of 4)');
-        }
+        const gruntCt = taskItems.length;
 
         console.log("    Simulate add to exclude");
         await asyncMapForEach(taskMap, async (value: TaskItem) =>  {
@@ -654,8 +650,9 @@ suite('Task tests', () =>
         });
 
         taskItems = await tasks.fetchTasks({ type: 'grunt' });
-        if (taskItems.length != 2) {
-            assert.fail('Unexpected Grunt task count (Found ' + taskItems.length + ' of 2)');
+        if (taskItems.length != gruntCt - 2) {
+            assert.fail('Unexpected Grunt task count (Found ' + taskItems.length + ' of ' + 
+                        (gruntCt - 2).toString() + ')');
         }
     });
 
