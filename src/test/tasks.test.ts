@@ -811,7 +811,6 @@ suite('Task tests', () =>
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
-        await configuration.updateWs('enableAnt', false); // get some more coverage
         await configuration.updateWs('enableExplorerView', false);
         await configuration.updateWs('enableSideBar', false);
         await configuration.updateWs('enableExplorerView', true);
