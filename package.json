@@ -739,82 +739,98 @@
                 "taskExplorer.enableNpm": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableNpm%"
+                    "description": "%config.taskExplorer.enableNpm%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableTsc": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableTsc%"
+                    "description": "%config.taskExplorer.enableTsc%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableGradle": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableGradle%"
+                    "description": "%config.taskExplorer.enableGradle%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableGrunt": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableGrunt%"
+                    "description": "%config.taskExplorer.enableGrunt%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableGulp": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableGulp%"
+                    "description": "%config.taskExplorer.enableGulp%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableAnt": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableAnt%"
+                    "description": "%config.taskExplorer.enableAnt%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableAppPublisher": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableAppPublisher%"
+                    "description": "%config.taskExplorer.enableAppPublisher%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableBatch": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableBatch%"
+                    "description": "%config.taskExplorer.enableBatch%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enablePerl": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enablePerl%"
+                    "description": "%config.taskExplorer.enablePerl%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableRuby": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableRuby%"
+                    "description": "%config.taskExplorer.enableRuby%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enablePython": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enablePython%"
+                    "description": "%config.taskExplorer.enablePython%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enablePowershell": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enablePowershell%"
+                    "description": "%config.taskExplorer.enablePowershell%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableBash": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableBash%"
+                    "description": "%config.taskExplorer.enableBash%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableNsis": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableNsis%"
+                    "description": "%config.taskExplorer.enableNsis%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableMake": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableMake%"
+                    "description": "%config.taskExplorer.enableMake%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableWorkspace": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.enableWorkspace%"
+                    "description": "%config.taskExplorer.enableWorkspace%",
+                    "scope": "resource"
                 },
                 "taskExplorer.enableAnsiconForAnt": {
                     "type": "boolean",
