@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {
-    Disposable, ExtensionContext, Uri,
+    Disposable, ExtensionContext, Uri, tasks,
     workspace, window, FileSystemWatcher, ConfigurationChangeEvent
 } from "vscode";
 import { TaskTreeDataProvider } from "./taskTree";
@@ -60,7 +60,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     await registerFileWatchers(context);
 
     //
-    // Register internal task providers.  Npm, Tas, Gulp, and Grunt type tasks are provided
+    // Register internal task providers.  Npm, VScode type tasks are provided
     // by VSCode, not internally.
     //
     registerTaskProviders(context);
@@ -251,6 +251,13 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
         e.affectsConfiguration("taskExplorer.pathToBash") || e.affectsConfiguration("taskExplorer.pathToAppPublisher") ||
         e.affectsConfiguration("taskExplorer.pathToPowershell")) {
         refresh = true;
+    }
+
+    if (e.affectsConfiguration("terminal.integrated.shell.windows")) {
+        //
+        // TODO!! bash task defs will change with terminal change
+        //
+        // tasks.fetchTasks({ type: "bash" });
     }
 
     if (refresh) {
