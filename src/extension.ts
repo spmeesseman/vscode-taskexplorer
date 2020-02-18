@@ -495,7 +495,6 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
 }
 
 
-// tslint:disable-next-line: no-empty
 export async function deactivate()
 {
     await cache.cancelBuildCache(true);

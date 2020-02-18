@@ -72,10 +72,6 @@ export async function invalidateTasksCacheAppPublisher(opt?: Uri): Promise<void>
                 const tasks = createAppPublisherTask(folder!, opt);
                 if (tasks) {
                     cachedTasks.push(...tasks);
-                    // cachedTasks.push(task2);
-                }
-                else {
-                    util.log("   !!! could not create app-publisher task from " + opt.fsPath);
                 }
             }
 
