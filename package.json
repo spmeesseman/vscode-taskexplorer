@@ -1052,7 +1052,9 @@
             },
             {
                 "type": "app-publisher",
-                "required": [],
+                "required": [
+                    "cmdLine"
+                ],
                 "properties": {
                     "script": {
                         "type": "string",
@@ -1110,17 +1112,12 @@
                 "type": "script",
                 "required": [
                     "scriptType",
-                    "cmdLine",
                     "fileName"
                 ],
                 "properties": {
                     "scriptType": {
                         "type": "string",
                         "description": "%taskdef.script.scriptType%"
-                    },
-                    "cmdLine": {
-                        "type": "string",
-                        "description": "%taskdef.script.cmdLine%"
                     },
                     "path": {
                         "type": "string",

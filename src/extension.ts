@@ -246,11 +246,18 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
         refresh = true;
     }
 
-    if (e.affectsConfiguration("terminal.integrated.shell.windows")) {
+    if (e.affectsConfiguration("terminal.integrated.shell.windows") ||
+        e.affectsConfiguration("terminal.integrated.shell.linux") ||
+        e.affectsConfiguration("terminal.integrated.shell.macos")) {
         //
-        // TODO!! bash task defs will change with terminal change
+        // Script type task defs will change with terminal change
         //
-        // tasks.fetchTasks({ type: "bash" });
+        if (configuration.get<boolean>("enableBash") || configuration.get<boolean>("enableBatch") ||
+            configuration.get<boolean>("enablePerl") || configuration.get<boolean>("enablePowershell") ||
+            configuration.get<boolean>("enablePython") || configuration.get<boolean>("enableRuby") ||
+            configuration.get<boolean>("enableNsis")) {
+            refresh = true;
+        }
     }
 
     if (refresh) {

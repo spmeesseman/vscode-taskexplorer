@@ -20,43 +20,43 @@ const scriptTable = {
         enabled: configuration.get("enableBash")
     },
     py: {
-        exec: configuration.get("pathToPython") ? configuration.get("pathToPython") : "python",
+        exec: configuration.get("pathToPython"),
         type: "python",
         args: [],
         enabled: configuration.get("enablePython")
     },
     rb: {
-        exec: configuration.get("pathToRuby") ? configuration.get("pathToRuby") : "ruby",
+        exec: configuration.get("pathToRuby"),
         type: "ruby",
         args: [],
         enabled: configuration.get("enableRuby")
     },
     ps1: {
-        exec: configuration.get("pathToPowershell") ? configuration.get("pathToPowershell") : "powershell",
+        exec: configuration.get("pathToPowershell"),
         type: "powershell",
         args: [],
         enabled: configuration.get("enablePowershell")
     },
     pl: {
-        exec: configuration.get("pathToPerl") ? configuration.get("pathToPerl") : "perl",
+        exec: configuration.get("pathToPerl"),
         type: "perl",
         args: [],
         enabled: configuration.get("enablePerl")
     },
     bat: {
-        exec: "cmd.exe",
+        exec: "cmd",
         type: "batch",
         args: ["/c"],
         enabled: configuration.get("enableBatch")
     },
     cmd: {
-        exec: "cmd.exe",
+        exec: "cmd",
         type: "batch",
         args: ["/c"],
         enabled: configuration.get("enableBatch")
     },
     nsi: {
-        exec: configuration.get("pathToNsis") ? configuration.get("pathToNsis") : "makensis",
+        exec: configuration.get("pathToNsis"),
         type: "nsis",
         args: [],
         enabled: configuration.get("enableNsis")
@@ -66,7 +66,6 @@ const scriptTable = {
 interface ScriptTaskDefinition extends TaskDefinition
 {
     scriptType: string;
-    cmdLine: string;
     fileName: string;
     scriptFile: boolean;
     path?: string;
@@ -218,7 +217,7 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
         fileName,
         scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
         path: getRelativePath(folder, uri),
-        cmdLine: (scriptDef.exec.indexOf(" ") !== -1 ? "\"" + scriptDef.exec + "\"" : scriptDef.exec),
+        //cmdLine: "\"" + scriptDef.exec + "\"",
         requiresArgs: false,
         uri
     };
@@ -242,67 +241,87 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
     };
 
      //
-    // If the defualt terminal is bash, set the separator to non-windows-style
+    // If the defualt terminal cmd/powershell?  On linux and darwin, no, on windows, maybe...
     //
-    let isWinShell = true;
-    const winShell: string = workspace.getConfiguration().get("terminal.integrated.shell.windows");
-    if (winShell && winShell.includes("bash.exe")) {
-        sep = "/";
-        isWinShell = false;
-    }
-    //
-    // Handle bash script on windows - set the shell executable as bash.exe.  This can be set by user
-    // in settings, otherwise Git Bash will be tried in the default install location ("C:\Program Files\Git\bin).
-    // Otherwise, use "bash.exe" and assume the command and other shell commands are in PATH
-    //
-    else if (process.platform === "win32" && scriptDef.type === "bash")
+    let isWinShell = false;
+    if (process.platform === "win32")
     {
-        let bash = configuration.get<string>("pathToBash");
-        if (!bash) {
-            bash = "C:\\Program Files\\Git\\bin\\bash.exe";
-        }
-        if (!bash || !util.pathExists(bash)) {
-            bash = "bash.exe";
-            // return null;
-        }
-        options.executable = bash;
-        sep = "/"; // convert path separator to unix-style
-    }
-
-    //
-    // Add any defined arguments to the command line for the script type
-    //
-    if (scriptDef.args)
-    {
-        for (let i = 0; i < scriptDef.args.length; i++) {
-            kind.cmdLine += " ";
-            kind.cmdLine += scriptDef.args[i];
+        isWinShell = true;
+        const winShell: string = workspace.getConfiguration().get("terminal.integrated.shell.windows");
+        if (winShell && winShell.includes("bash.exe")) {
+            sep = "/";
+            isWinShell = false;
         }
     }
 
     //
-    // Add the file name to the command line following the exec.  Quote if ecessary.  Prepend "./" as
-    // powershell script requires this.  If this is for a shell/bash/sh task, then skip the space
-    // character as the script itself is considered "executable"
+    // Handle bash script on windows - set the shell executable as bash.exe if it isnt the default.
+    // This can be set by usernin settings, otherwise Git Bash will be tried in the default install
+    // location ("C:\Program Files\Git\bin). Otherwise, use "bash.exe" and assume the command and
+    // other shell commands are in PATH
     //
-    if (scriptDef.type !== "bash") {
-        kind.cmdLine += " ";
+    if (isWinShell)
+    {
+        if (scriptDef.type === "bash")
+        {
+            let bash = configuration.get<string>("pathToBash");
+            if (!bash) {
+                bash = "C:\\Program Files\\Git\\bin\\bash.exe";
+            }
+            if (!util.pathExists(bash)) {
+                bash = "bash.exe";
+            }
+            options.executable = bash;
+            sep = "/"; // convert path separator to unix-style
+        }
     }
-    const pathPre = (isWinShell ? "." + sep : "");
-    kind.cmdLine += (fileName.indexOf(" ") !== -1 ?
-                    "\"" + pathPre + fileName + "\"" : pathPre + fileName);
+
+    const pathPre = "." + sep; // ; (scriptDef.type === "powershell" ? "." + sep : "")
+    const fileNamePathPre = pathPre + fileName;
+    //
+    // Build arguments list
+    //
+    const args: string[] = [];
+    //
+    // Identify the 'executable'
+    //
+    let exec: string = scriptDef.exec;
+    if (scriptDef.type === "bash")
+    {
+        exec = fileNamePathPre;
+    }
+    else { // All scripts except for 'bash'
+        //
+        // Add any defined arguments to the command line exec
+        //
+        if (scriptDef.args) {
+            args.push(...scriptDef.args);
+        }
+        //
+        // Add the filename as an argument to the script exe (i.e. 'powershell', 'cmd', etc)
+        //
+        args.push(scriptDef.type !== "powershell" ? fileName : fileNamePathPre);
+    }
     //
     // For python setup.py scripts, use the bdist_egg argument - the egg will be built and stored
     // at dist/PackageName-Version.egg
     //
     if (scriptDef.type === "python") {
-        kind.cmdLine += " bdist_egg";
+        args.push("bdist_egg");
     }
 
     //
-    // Create the shell execution object
+    // Make sure there are no windows style slashes in any configured path to an executable
+    // if this isnt running in a windows shell
     //
-    const execution = new ShellExecution(kind.cmdLine, options);
+    if (!isWinShell)
+    {
+        exec = exec.replace(/\\/g, "/");
+    }
 
+    //
+    // Create the shell execution object and task
+    //
+    const execution = new ShellExecution(exec, args, options);
     return new Task(kind, folder, scriptDef.type !== "python" ? fileName : "build egg", scriptDef.type, execution, undefined);
 }
