@@ -663,11 +663,11 @@ suite('Task tests', () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
 
-        console.log("    Running all invalidation tests");
-
+        
         //
         // App-Publisher - Delete and invalidate, re-add and invalidate
         //
+        console.log("    Running app-publisher invalidation");
         let file = path.join(rootPath, '.publishrc.json');
         let uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
@@ -682,6 +682,7 @@ suite('Task tests', () =>
         //
         // Ant type - Delete and invalidate, re-add and invalidate
         //
+        console.log("    Running ant invalidation");
         file = path.join(dirName, 'build.xml');
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("ant", uri);
@@ -696,6 +697,7 @@ suite('Task tests', () =>
         //
         // Gradle type - Delete and invalidate, re-add and invalidate
         //
+        console.log("    Running gradle invalidation");
         file = path.join(dirName, 'build.gradle');
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
@@ -710,6 +712,7 @@ suite('Task tests', () =>
         //
         // Grunt type - Delete and invalidate, re-add and invalidate
         //
+        console.log("    Running grunt invalidation");
         file = path.join(rootPath, 'GRUNTFILE.js');
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
@@ -724,6 +727,7 @@ suite('Task tests', () =>
         //
         // Gulp type - Delete and invalidate, re-add and invalidate
         //
+        console.log("    Running gulp invalidation");
         file = path.join(rootPath, 'gulpfile.js');
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
@@ -738,6 +742,7 @@ suite('Task tests', () =>
         //
         // Make type - Delete and invalidate, re-add and invalidate
         //
+        console.log("    Running makefile invalidation");
         file = path.join(rootPath, 'Makefile');
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("make", uri);
@@ -752,6 +757,7 @@ suite('Task tests', () =>
         //
         // Script type - Delete and invalidate, re-add and invalidate
         //
+        console.log("    Running script file invalidation");
         file = path.join(rootPath, 'test.bat');
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("batch", uri);
@@ -763,6 +769,7 @@ suite('Task tests', () =>
         await teApi.explorerProvider.invalidateTasksCache("batch", uri);
         await(timeout(100));
 
+        console.log("    Running all other invalidations");
         await asyncMapForEach(taskMap, async(value: TaskItem) =>  {
             if (value) {
                 if (fs.existsSync(value.taskFile.resourceUri.fsPath)) {
@@ -772,6 +779,7 @@ suite('Task tests', () =>
             }
         });
 
+        console.log("     Disable all task providers");
         await configuration.updateWs('enableAnt', false);
         await configuration.updateWs('enableAppPublisher', false);
         await configuration.updateWs('enableBash', false);
@@ -789,8 +797,7 @@ suite('Task tests', () =>
         await configuration.updateWs('enableTsc', false);
         await configuration.updateWs('enableWorkspace', false);
 
-        console.log("         ✔ Task type invalidation after disable finished");
-
+        console.log("     Re-enable all task providers");
         await configuration.updateWs('enableAnt', true);
         await configuration.updateWs('enableAppPublisher', true);
         await configuration.updateWs('enableBash', true);
@@ -808,13 +815,10 @@ suite('Task tests', () =>
         await configuration.updateWs('enableTsc', true);
         await configuration.updateWs('enableWorkspace', true);
 
-        console.log("         ✔ Task type invalidation after enable finished");
-
+        console.log("    Running global invalidation");
         await teApi.explorerProvider.invalidateTasksCache(undefined, undefined);
 
         await timeout(1000); // wait for filesystem change events
-
-        console.log("         ✔ Complete invalidation finished");
     });
 
 
