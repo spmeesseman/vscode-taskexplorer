@@ -831,6 +831,7 @@
                 },
                 "taskExplorer.pathToAnt": {
                     "type": "string",
+                    "default": "ant.bat",
                     "description": "%config.taskExplorer.pathToAnt%"
                 },
                 "taskExplorer.pathToAppPublisher": {
@@ -843,34 +844,42 @@
                 },
                 "taskExplorer.pathToBash": {
                     "type": "string",
+                    "default": "bash",
                     "description": "%config.taskExplorer.pathToBash%"
                 },
                 "taskExplorer.pathToGradle": {
                     "type": "string",
+                    "default": "gradle.bat",
                     "description": "%config.taskExplorer.pathToGradle%"
                 },
                 "taskExplorer.pathToMake": {
                     "type": "string",
+                    "default": "nmake",
                     "description": "%config.taskExplorer.pathToMake%"
                 },
                 "taskExplorer.pathToNsis": {
                     "type": "string",
+                    "default": "makensis",
                     "description": "%config.taskExplorer.pathToNsis%"
                 },
                 "taskExplorer.pathToPerl": {
                     "type": "string",
+                    "default": "perl",
                     "description": "%config.taskExplorer.pathToPerl%"
                 },
                 "taskExplorer.pathToPython": {
                     "type": "string",
+                    "default": "python",
                     "description": "%config.taskExplorer.pathToPython%"
                 },
                 "taskExplorer.pathToPowershell": {
                     "type": "string",
+                    "default": "powershell",
                     "description": "%config.taskExplorer.pathToPowershell%"
                 },
                 "taskExplorer.pathToRuby": {
                     "type": "string",
+                    "default": "ruby",
                     "description": "%config.taskExplorer.pathToRuby%"
                 },
                 "taskExplorer.debug": {
