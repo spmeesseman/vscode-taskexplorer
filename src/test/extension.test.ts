@@ -1,12 +1,7 @@
 /* tslint:disable */
 
-//
-// Documentation on https://mochajs.org/ for help.
-//
-
 import * as assert from 'assert';
 import * as vscode from "vscode";
-//import { waitForActiveExtension } from './testUtil';
 import { configuration } from "../common/configuration";
 import { setWriteToConsole, timeout } from '../util';
 import { TaskExplorerApi } from '../extension';
@@ -131,6 +126,7 @@ suite("Extension Tests", () =>
         assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
     });
 
+    
     test("Check tree providers", function(done) 
     {
         if (!teApi.explorerProvider) {
