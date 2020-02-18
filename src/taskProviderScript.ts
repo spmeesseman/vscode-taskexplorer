@@ -178,20 +178,24 @@ async function detectScriptFiles(): Promise<Task[]>
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("script");
 
-    if (paths)
+    const folders = workspace.workspaceFolders;
+    if (folders)
     {
-        for (const fobj of paths)
-        {
-            if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                visitedFiles.add(fobj.uri.fsPath);
-                allTasks.push(createScriptTask(scriptTable[path.extname(fobj.uri.fsPath).substring(1).toLowerCase()], fobj.folder!, fobj.uri));
-                util.log("   found script target");
-                util.logValue("      script file", fobj.uri.fsPath);
+        try {
+            if (paths)
+            {
+                for (const fobj of paths)
+                {
+                    if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                        visitedFiles.add(fobj.uri.fsPath);
+                        allTasks.push(createScriptTask(scriptTable[path.extname(fobj.uri.fsPath).substring(1).toLowerCase()], fobj.folder!, fobj.uri));
+                        util.log("   found script target");
+                        util.logValue("      script file", fobj.uri.fsPath);
+                    }
+                }
             }
         }
-    }
-    else {
-        console.log("what?");
+        catch {}
     }
 
     util.logValue("   # of tasks", allTasks.length, 2);
