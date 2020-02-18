@@ -75,4 +75,44 @@ suite("Util tests", () =>
         assert(util.timeout(10));
     });
 
+    test("Asynchronous forEach", async () =>
+    {
+        let arr: number[] = [ 1, 2, 3, 4, 5 ];
+        let curNum = 1;
+
+        async function asyncFn(num: number)
+        {
+            setTimeout(() => {
+                assert(num === curNum++);
+            }, 100);
+        }
+
+        await util.asyncForEach(arr, async (n: number) =>
+        {
+            await asyncFn(n);
+        });
+    });
+
+    test("Asynchronous mapForEach", async () =>
+    {
+        let arr: Map<number, number> = new Map();
+        let curNum = 1;
+        
+        for (let i = 1; i <= 5; i++) {
+            arr.set(i, i);
+        }
+        async function asyncFn(num: number)
+        {
+            setTimeout(() => {
+                assert(num === curNum++);
+            }, 100);
+        }
+
+        await util.asyncMapForEach(arr, async (n: number, n2: number) =>
+        {
+            assert(n === n2);
+            await asyncFn(n);
+        });
+    });
+
 });
