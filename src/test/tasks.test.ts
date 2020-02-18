@@ -806,6 +806,19 @@ suite('Task tests', () =>
         await teApi.fileCache.cancelBuildCache(true);
     });
 
+    test('Test enable and disable views', async function() 
+    {
+        if (!teApi.explorerProvider) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist")
+        }
+        await configuration.updateWs('enableAnt', false); // get some more coverage
+        await configuration.updateWs('enableExplorerView', false);
+        await configuration.updateWs('enableSideBar', false);
+        await configuration.updateWs('enableExplorerView', true);
+        await configuration.updateWs('enableSideBar', true);
+        await timeout(5000); // wait for refresh
+    });
+
 });
 
 
