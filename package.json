@@ -57,7 +57,7 @@
         "nyc-coverage1": "nyc npm run test",
         "nyc-coverage2": "nyc --reporter=lcov mocha 'src/test/**/*.ts' --recursive",
         "nyc-test-babel": "npm run test && nyc report && nyc report --reporter=lcov",
-        "nyc-test-babel-before": "set BABEL_ENV=coverage && rimraf .nyc_output && rimraf test-reports && rimraf coverage && rimraf c:\\code\\data\\user-data\\cacheddata && npm run build-babel && npm run coverage-full",
+        "nyc-test-babel-before": "set BABEL_ENV=coverage && rimraf .nyc_output && rimraf test-reports && rimraf coverage && rimraf c:\\code\\data\\user-data\\cacheddata && npm run build-babel && npm run coverage-full-on",
         "nyc-report": "nyc report && nyc report --reporter=lcov",
         "coverage-open-report": "chrome.exe coverage/lcov-report/index.html",
         "coverage-full-on": "enable-full-coverage.sh",
@@ -71,7 +71,7 @@
         "semantic_release-release-dry": "semantic-release --dry-run",
         "test": "node ./out/test/runTest.js",
         "testafter": "npm run coverage-full-off",
-        "testbefore": "rimraf test-reports && rimraf coverage && rimraf c:\\code\\data\\user-data\\cacheddata && npm run compile && npm run coverage-full",
+        "testbefore": "rimraf test-reports && rimraf coverage && rimraf c:\\code\\data\\user-data\\cacheddata && npm run compile && npm run coverage-full-on",
         "vscode:prepublish": "npm run build",
         "watch": "tsc -watch -p ./"
     },
