@@ -64,9 +64,23 @@ suite("Extension Tests", () =>
         await configuration.updateWs('enablePerl', true);
         await configuration.updateWs('enablePython', true);
         await configuration.updateWs('enableRuby', true);
+        await configuration.updateWs('enableTsc', true);
         await configuration.updateWs('enableWorkspace', true);
+        await configuration.updateWs('groupDashed', false);
+        await configuration.updateWs('pathToAnt', 'ant.bat');
+        await configuration.updateWs('pathToGradle', 'gradle.bat');
+        //await configuration.updateWs('pathToGrunt', 'grunt.bat');
+        //await configuration.updateWs('pathToGulp', 'gulp.bat');
+        await configuration.updateWs('pathToMake', 'nmake');
+        await configuration.updateWs('pathToPerl', 'perl');
+        await configuration.updateWs('pathToPython', 'python');
+        await configuration.updateWs('pathToPowershell', 'powershell');
 
-        setWriteToConsole(true); // write debug logging from exiension to console
+        await vscode.workspace.getConfiguration().update('terminal.integrated.shell.windows', 
+                                                         'C:\\Windows\\System32\\cmd.exe',
+                                                         vscode.ConfigurationTarget.Workspace);
+
+        setWriteToConsole(false); // FOR DEBUGGING - write debug logging from exiension to console
     });
 
 
@@ -86,7 +100,7 @@ suite("Extension Tests", () =>
         //
         if (!ext.isActive) 
         {
-            console.log('        Manually activating extension');
+            console.log('        Manually activating extension for full coverage');
             try {
                 teApi = await ext.activate();
                 assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
@@ -94,6 +108,7 @@ suite("Extension Tests", () =>
             catch(e) {
                 assert.fail("Failed to activate extension");
             }
+            console.log("         ✔ Extension activated");
         } 
         else {
             //

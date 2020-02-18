@@ -2,9 +2,11 @@
 
 import * as cp from "child_process";
 import { ChildProcess, SpawnOptions } from "child_process";
-import { extensions, Uri, window, Extension } from "vscode";
+import { extensions, Uri, window, workspace } from "vscode";
 import { TaskItem } from "../tasks";
-
+import { removeFromArray } from "../util";
+import * as fs from "fs";
+import { join } from "path";
 
 
 export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)

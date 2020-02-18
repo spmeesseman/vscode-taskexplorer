@@ -17,7 +17,21 @@ let logOutputChannel: OutputChannel | undefined;
 export async function asyncForEach(array: any, callback: any)
 {
     for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array);
+        const result = await callback(array[index], index, array);
+        if (result === false) {
+            break;
+        }
+    }
+}
+
+
+export async function asyncMapForEach(map: any, callback: any)
+{
+    for (const entry of map.entries()) {
+        const result = await callback(entry[1], entry[0], map);
+        if (result === false) {
+            break;
+        }
     }
 }
 

@@ -1,12 +1,7 @@
 /* tslint:disable */
 
-//
-// Documentation on https://mochajs.org/ for help.
-//
-
 import * as assert from "assert";
 import { workspace } from "vscode";
-import * as testUtil from "./testUtil";
 import * as util from "../util";
 
 
@@ -14,8 +9,7 @@ suite("Util tests", () =>
 {
     suiteSetup(async () =>
     {
-        await testUtil.activeExtension();
-        //workspace.getConfiguration('taskExplorer').update('debug', true, ConfigurationTarget.Global);
+
     });
 
     suiteTeardown(() =>
@@ -48,7 +42,7 @@ suite("Util tests", () =>
         assert(util.logValue("        spmeesseman.vscode-taskexplorer", undefined));
     });
 
-    test("Test camelCase()", () =>
+    test("Test camel casing", () =>
     {
         assert(util.camelCase("taskexplorer", 4) === 'taskExplorer');
         assert(util.camelCase(undefined, 4) === undefined);
@@ -56,15 +50,25 @@ suite("Util tests", () =>
         assert(util.camelCase("test", -1) === "test");
     });
 
-    test("Test properCase()", () =>
+    test("Test proper casing", () =>
     {
         assert(util.properCase("taskexplorer") === 'Taskexplorer');
         assert(util.properCase(undefined) === undefined);
     });
 
-    //test("Turn logging off", () => {
-    //  assert.ok(workspace.getConfiguration('taskExplorer').update('debug', false));
-    //});
+    test("Test array functions", () =>
+    {
+        let arr: number[] = [ 1, 2, 3, 4, 5 ];
+        util.removeFromArray(arr, 3);
+        assert(arr.length === 4);
+        assert(util.existsInArray(arr, 5));
+        assert(!util.existsInArray(arr, 3));
+    });
+
+    test("Test get cwd", () =>
+    {
+        assert(util.getCwd(workspace.workspaceFolders[0].uri) !== undefined);
+    });
 
     test("Timeout", () =>
     {
