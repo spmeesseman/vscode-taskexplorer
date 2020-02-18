@@ -54,7 +54,7 @@ export async function invalidateTasksCacheGulp(opt?: Uri): Promise<void>
                 rmvTasks.push(each);
             }
         });
-        
+
         //
         // Technically this function can be called back into when waiting for a promise
         // to return on the asncForEach() above, and cachedTask array can be set to undefined,
@@ -132,10 +132,8 @@ async function readGulpfile(uri: Uri): Promise<Task[]>
         {
             Object.keys(scripts).forEach(each => {
                 const task = createGulpTask(each, `${each}`, folder!, uri);
-                if (task) {
-                    task.group = TaskGroup.Build;
-                    result.push(task);
-                }
+                task.group = TaskGroup.Build;
+                result.push(task);
             });
         }
     }

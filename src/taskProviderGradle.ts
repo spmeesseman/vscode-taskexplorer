@@ -139,11 +139,8 @@ async function readGradlefile(uri: Uri): Promise<Task[]>
             Object.keys(scripts).forEach(each =>
             {
                 const task = createGradleTask(each, `${each}`, folder!, uri);
-                if (task)
-                {
-                    task.group = TaskGroup.Build;
-                    result.push(task);
-                }
+                task.group = TaskGroup.Build;
+                result.push(task);
             });
         }
     }

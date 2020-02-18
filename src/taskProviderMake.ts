@@ -140,11 +140,8 @@ async function readMakefile(uri: Uri): Promise<Task[]>
             Object.keys(scripts).forEach(each =>
             {
                 const task = createMakeTask(each, `${each}`, folder!, uri);
-                if (task)
-                {
-                    task.group = TaskGroup.Build;
-                    result.push(task);
-                }
+                task.group = TaskGroup.Build;
+                result.push(task);
             });
         }
     }

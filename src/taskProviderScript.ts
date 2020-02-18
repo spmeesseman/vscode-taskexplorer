@@ -140,9 +140,7 @@ export async function invalidateTasksCacheScript(opt?: Uri): Promise<void>
             if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
             {
                 const task = createScriptTask(scriptTable[path.extname(opt.fsPath).substring(1)], folder!,  opt);
-                if (task) {
-                    cachedTasks.push(task);
-                }
+                cachedTasks.push(task);
             }
 
             if (cachedTasks.length > 0) {

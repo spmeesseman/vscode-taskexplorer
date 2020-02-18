@@ -70,9 +70,7 @@ export async function invalidateTasksCacheAppPublisher(opt?: Uri): Promise<void>
             if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
             {
                 const tasks = createAppPublisherTask(folder!, opt);
-                if (tasks) {
-                    cachedTasks.push(...tasks);
-                }
+                cachedTasks.push(...tasks);
             }
 
             if (cachedTasks.length > 0) {

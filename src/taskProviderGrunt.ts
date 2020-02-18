@@ -132,10 +132,8 @@ async function readGruntfile(uri: Uri): Promise<Task[]>
         {
             Object.keys(scripts).forEach(each => {
                 const task = createGruntTask(each, `${each}`, folder!, uri);
-                if (task) {
-                    task.group = TaskGroup.Build;
-                    result.push(task);
-                }
+                task.group = TaskGroup.Build;
+                result.push(task);
             });
         }
     }
