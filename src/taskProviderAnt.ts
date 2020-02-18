@@ -94,23 +94,16 @@ async function detectAntScripts(): Promise<Task[]>
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("ant");
     const folders = workspace.workspaceFolders;
-    if (folders)
+
+    if (folders && paths)
     {
-        try {
-            if (paths)
-            {
-                for (const fobj of paths)
-                {
-                    if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                        visitedFiles.add(fobj.uri.fsPath);
-                        const tasks = await readAntfile(fobj.uri);
-                        allTasks.push(...tasks);
-                    }
-                }
+        for (const fobj of paths)
+        {
+            if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                visitedFiles.add(fobj.uri.fsPath);
+                const tasks = await readAntfile(fobj.uri);
+                allTasks.push(...tasks);
             }
-        }
-        catch (error) {
-            return Promise.reject(error);
         }
     }
 

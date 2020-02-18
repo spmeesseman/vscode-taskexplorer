@@ -107,16 +107,13 @@ async function detectAppPublisherfiles(): Promise<Task[]>
     const paths = filesCache.get("app-publisher");
     const folders = workspace.workspaceFolders;
 
-    if (folders)
+    if (folders && paths)
     {
-        if (paths)
+        for (const fobj of paths)
         {
-            for (const fobj of paths)
-            {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    allTasks.push(...createAppPublisherTask(fobj.folder!, fobj.uri));
-                }
+            if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                visitedFiles.add(fobj.uri.fsPath);
+                allTasks.push(...createAppPublisherTask(fobj.folder!, fobj.uri));
             }
         }
     }

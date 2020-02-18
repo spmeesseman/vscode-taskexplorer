@@ -170,7 +170,7 @@ suite('Task tests', () =>
             '        },\r\n' +
             '        "problemMatcher": [\r\n' +
             '            "$tsc-watch"\r\n' +
-            '        ]\r\n' +
+            '        ],\r\n' +
             '        "group": {\r\n' +
             '            "kind": "build",\r\n' +
             '            "isDefault": true\r\n' +

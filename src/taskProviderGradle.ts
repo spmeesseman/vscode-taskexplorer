@@ -97,17 +97,14 @@ async function detectGradlefiles(): Promise<Task[]>
     const folders = workspace.workspaceFolders;
     const paths = filesCache.get("gradle");
 
-    if (folders)
+    if (folders && paths)
     {
-        if (paths)
+        for (const fobj of paths)
         {
-            for (const fobj of paths)
-            {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await readGradlefile(fobj.uri);
-                    allTasks.push(...tasks);
-                }
+            if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                visitedFiles.add(fobj.uri.fsPath);
+                const tasks = await readGradlefile(fobj.uri);
+                allTasks.push(...tasks);
             }
         }
     }
