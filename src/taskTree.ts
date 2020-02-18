@@ -71,7 +71,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".runUpdatePackage", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "update <packagename>"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAudit", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "audit"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAuditFix", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "audit fix"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addToExcludes", (taskFile: TaskFile | string, global: boolean) => { this.addToExcludes(taskFile, global); }, this));
+        subscriptions.push(commands.registerCommand(name + ".addToExcludes", (taskFile: TaskFile | string, global: boolean, prompt: boolean) => { this.addToExcludes(taskFile, global, prompt); }, this));
 
         tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
         tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
@@ -400,13 +400,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         util.log("        Task File (grouped): " + item2.path + item2.fileName);
                         await processItem2(item2);
                     }
-                    else {
-                        assert.fail("Invalid taskfile node found");
-                    }
                 });
-            }
-            else {
-                assert.fail("No task files found");
             }
         }
 
@@ -420,7 +414,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     if (item3 instanceof TaskItem)
                     {
                         if (executeOpenForTests) {
-                            await commands.executeCommand("taskExplorer.open", item3);
+                            await me.open(item3);
                         }
 
                         const tmp = me.getParent(item3);
@@ -437,22 +431,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                             util.logValue(logPad + "        type", item3.taskSource + " @ " + tpath);
                             taskMap.set(item3.id, item3);
                         }
-                        else
-                        {
-                            util.log(logPad + "      ✘ " + item3.label + "does not contain a task or task definition");
-                        }
                     }
                     else if (item3 instanceof TaskFile && item3.isGroup)
                     {
                         await processItem2(item3);
                     }
-                    else {
-                        assert.fail("Invalid taskitem node found");
-                    }
                 });
-            }
-            else {
-                assert.fail("No tasks found in treefile");
             }
         }
 
@@ -478,13 +462,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     {
                         await processItem2g(item2);
                     }
-                    else {
-                        assert.fail("Invalid taskfile node found");
-                    }
                 });
-            }
-            else {
-                assert.fail("No task files found");
             }
         }
 
@@ -497,9 +475,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     assert(tmp === null, "Invaid parent type, should be null for TaskFolder");
                     util.log(logPad + "Task Folder " + item.label + ":  " + item.resourceUri.fsPath);
                     await processItem(item);
-                }
-                else {
-                    assert.fail("Invalid root folder");
                 }
             }
             catch (error) {
@@ -684,7 +659,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async addToExcludes(selection: TaskFile | string, global?: boolean)
+    private async addToExcludes(selection: TaskFile | string, global?: boolean, prompt?: boolean)
     {
         const me = this;
         let uri: Uri | undefined;
@@ -732,7 +707,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
         util.logValue("   path value", pathValue, 2);
 
-        function saveExclude(str: string)
+        async function saveExclude(str: string)
         {
             if (str)
             {
@@ -756,20 +731,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 else {
                     configuration.updateWs("exclude", excludes);
                 }
-                me.refresh(selection instanceof TaskFile ? selection.taskSource : false, uri);
+                await me.refresh(selection instanceof TaskFile ? selection.taskSource : false, uri);
             }
         }
 
-        if (selection instanceof TaskFile)
+        if (selection instanceof TaskFile && prompt !== false)
         {
             const opts: InputBoxOptions = { prompt: "Add the following file to excluded tasks list?", value: pathValue };
-            window.showInputBox(opts).then(str =>
+            window.showInputBox(opts).then(async str =>
             {
-                saveExclude(str);
+                await saveExclude(str);
             });
         }
         else {
-            saveExclude(pathValue);
+            await saveExclude(pathValue);
         }
     }
 
