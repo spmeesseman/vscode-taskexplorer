@@ -220,7 +220,8 @@ suite('Task tests', () =>
             '            "$eslint-stylish"\r\n' +
             '        ]\r\n' +
             '    }]\r\n' +
-            '}\r\n'
+            '}\r\n',
+            { mode: 0o770 }
         );
     });
 
@@ -246,7 +247,8 @@ suite('Task tests', () =>
             '    <property name="test2" value="test2" />\n' +
             "    <target name='test3'></target>\n" +
             '    <target name="test4"></target>\n' +
-            '</project>\n'
+            '</project>\n',
+            { mode: 0o770 }
         );
 
         fs.writeFileSync(
@@ -255,10 +257,11 @@ suite('Task tests', () =>
             '<project basedir="." default="test1">\n' +
             '    <property environment="env" />\n' +
             '    <property name="test" value="test" />\n' +
-            '</project>\n'
+            '</project>\n',
+            { mode: 0o770 }
         );
 
-        fs.writeFileSync(file4, '<?xml version="1.0"?>\n');
+        fs.writeFileSync(file4, '<?xml version="1.0"?>\n', { mode: 0o770 });
 
         fs.writeFileSync(
             file5,
@@ -266,7 +269,8 @@ suite('Task tests', () =>
             '<project basedir="." default="test2">\n' +
             '    <property name="testv" value="testv" />\n' +
             "    <target name='test5'></target>\n" +
-            '</project>\n'
+            '</project>\n',
+            { mode: 0o770 }
         );
     });
 
@@ -292,7 +296,8 @@ suite('Task tests', () =>
             '    baseName = project.name + \'-all\'\n' +
             '    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n' +
             '    with jar\n' +
-            '}\n'
+            '}\n',
+            { mode: 0o770 }
         );
 
         fs.writeFileSync(
@@ -306,7 +311,8 @@ suite('Task tests', () =>
             '    baseName = project.name + \'-all\'\n' +
             '    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n' +
             '    with jar\n' +
-            '}\n'
+            '}\n',
+            { mode: 0o770 }
         );
 
     });
@@ -334,7 +340,8 @@ suite('Task tests', () =>
             '  },\n' +
             '  "include": ["**/*"],\n' +
             '  "exclude": ["node_modules"]\n' +
-            '}\n'
+            '}\n',
+            { mode: 0o770 }
         );
     });
 
@@ -359,7 +366,8 @@ suite('Task tests', () =>
             'gulp.task(\n"hello4", (done) => {\n' +
             "    console.log('Hello4!');\n" +
             '    done();\n' +
-            '});\n'
+            '});\n',
+            { mode: 0o770 }
         );
 
         fs.writeFileSync(
@@ -372,7 +380,8 @@ suite('Task tests', () =>
             'gulp.task(\n"hello6", (done) => {\n' +
             "    console.log('Hello6!');\n" +
             '    done();\n' +
-            '});\n'
+            '});\n',
+            { mode: 0o770 }
         );
     });
 
@@ -390,12 +399,14 @@ suite('Task tests', () =>
         fs.writeFileSync(
             file2,
             '# all tasks comment\n' +
-            'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n'
+            'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n',
+            { mode: 0o770 }
         );
 
         fs.writeFileSync(
             file3,
-            'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n'
+            'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n',
+            { mode: 0o770 }
         );
     });
 
@@ -410,8 +421,8 @@ suite('Task tests', () =>
         const file3 = path.join(dirNameIgn, 'test3.bat');
         tempFiles.push(file3);
 
-        fs.writeFileSync(file2, '@echo testing batch file 2\r\n');
-        fs.writeFileSync(file3, '@echo testing batch file 3\r\n');
+        fs.writeFileSync(file2, '@echo testing batch file 2\r\n', { mode: 0o770 });
+        fs.writeFileSync(file3, '@echo testing batch file 3\r\n', { mode: 0o770 });
     });
 
 
@@ -426,9 +437,9 @@ suite('Task tests', () =>
         const file3 = path.join(dirNameIgn, 'test3.sh');
         tempFiles.push(file3);
 
-        fs.writeFileSync(file, 'echo testing bash file\r\n');
-        fs.writeFileSync(file2, 'echo testing bash file 2\r\n');
-        fs.writeFileSync(file3, 'echo testing bash file 3\r\n');
+        fs.writeFileSync(file, 'echo testing bash file\r\n', { mode: 0o770 });
+        fs.writeFileSync(file2, 'echo testing bash file 2\r\n', { mode: 0o770 });
+        fs.writeFileSync(file3, 'echo testing bash file 3\r\n', { mode: 0o770 });
     });
 
 
@@ -447,7 +458,8 @@ suite('Task tests', () =>
             'module.exports = function(grunt) {\n' +
             '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
             '    grunt.registerTask("upload2", ["s3"]);\n' +
-            '};\n'
+            '};\n',
+            { mode: 0o770 }
         );
 
         fs.writeFileSync(
@@ -455,7 +467,8 @@ suite('Task tests', () =>
             'module.exports = function(grunt) {\n' +
             '    grunt.registerTask(\n"default3", ["jshint:myproject"]);\n' +
             '    grunt.registerTask("upload3", ["s3"]);\n' +
-            '};\n'
+            '};\n',
+            { mode: 0o770 }
         );
     });
 
@@ -673,7 +686,7 @@ suite('Task tests', () =>
         removeFromArray(tempFiles, file);
         fs.unlinkSync(file);
         await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
-        await(timeout(100));
+        await(timeout(250));
         createAppPublisherFile();
         await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
         await(timeout(100));
@@ -688,7 +701,7 @@ suite('Task tests', () =>
         removeFromArray(tempFiles, file);
         fs.unlinkSync(file);
         await teApi.explorerProvider.invalidateTasksCache("ant", uri);
-        await(timeout(100));
+        await(timeout(250));
         createAntFile();
         await teApi.explorerProvider.invalidateTasksCache("ant", uri);
         await(timeout(100));
@@ -703,7 +716,7 @@ suite('Task tests', () =>
         removeFromArray(tempFiles, file);
         fs.unlinkSync(file);
         await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
-        await(timeout(100));
+        await(timeout(250));
         createGradleFile();
         await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
         await(timeout(100));
@@ -718,7 +731,7 @@ suite('Task tests', () =>
         removeFromArray(tempFiles, file);
         fs.unlinkSync(file);
         await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
-        await(timeout(100));
+        await(timeout(250));
         createGruntFile();
         await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
         await(timeout(100));
@@ -733,7 +746,7 @@ suite('Task tests', () =>
         removeFromArray(tempFiles, file);
         fs.unlinkSync(file);
         await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
-        await(timeout(100));
+        await(timeout(250));
         createGulpFile();
         await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
         await(timeout(100));
@@ -748,7 +761,7 @@ suite('Task tests', () =>
         removeFromArray(tempFiles, file);
         fs.unlinkSync(file);
         await teApi.explorerProvider.invalidateTasksCache("make", uri);
-        await(timeout(100));
+        await(timeout(250));
         createMakeFile();
         await teApi.explorerProvider.invalidateTasksCache("make", uri);
         await(timeout(100));
@@ -763,7 +776,7 @@ suite('Task tests', () =>
         removeFromArray(tempFiles, file);
         fs.unlinkSync(file);
         await teApi.explorerProvider.invalidateTasksCache("batch", uri);
-        await(timeout(100));
+        await(timeout(250));
         createBatchFile();
         await teApi.explorerProvider.invalidateTasksCache("batch", uri);
         await(timeout(100));
@@ -892,7 +905,8 @@ function createAntFile()
         '    <property name="test" value="test" />\n' +
         '    <target name="test1" depends="init"></target>\n' +
         '    <target name="test2" depends="init"></target>\n' +
-        '</project>\n'
+        '</project>\n',
+        { mode: 0o770 }
     );
 }
 
@@ -911,7 +925,8 @@ function createAppPublisherFile()
         '    "mantisbtChglogEdit": "N",\n' +
         '    "mantisbtProject": "",\n' +
         '    "repoType": "svn""\n' +
-        '}\n'
+        '}\n',
+        { mode: 0o770 }
     );
 }
 
@@ -920,7 +935,7 @@ function createBatchFile()
 {
     const file1 = path.join(rootPath, 'test.bat');
     tempFiles.push(file1);
-    fs.writeFileSync(file1, '@echo testing batch file\r\n');
+    fs.writeFileSync(file1, '@echo testing batch file\r\n', { mode: 0o770 });
 }
 
 
@@ -940,7 +955,8 @@ function createGradleFile()
         '    baseName = project.name + \'-all\'\n' +
         '    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n' +
         '    with jar\n' +
-        '}\n'
+        '}\n',
+        { mode: 0o770 }
     );
 }
 
@@ -954,7 +970,8 @@ function createGruntFile()
         'module.exports = function(grunt) {\n' +
         "    grunt.registerTask(\n'default', ['jshint:myproject']);\n" +
         '    grunt.registerTask("upload", [\'s3\']);\n' +
-        '};\n'
+        '};\n',
+        { mode: 0o770 }
     );
 }
 
@@ -972,7 +989,8 @@ function createGulpFile()
         '});\n' +
         'gulp.task(\n       "hello2", (done) => {\n' +
         '    done();\n' +
-        '});\n'
+        '});\n',
+        { mode: 0o770 }
     );
 }
 
@@ -983,6 +1001,7 @@ function createMakeFile()
     tempFiles.push(file);
     fs.writeFileSync(
         file,
-        'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n'
+        'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n',
+        { mode: 0o770 }
     );
 }
