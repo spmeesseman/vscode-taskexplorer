@@ -438,20 +438,20 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
             context.subscriptions.push(watcher);
         }
         if (!isScriptType) {
-            watcher.onDidChange(_e => {
+            watcher.onDidChange(async _e => {
                 logFileWatcherEvent(_e, "change");
-                refreshTree(taskType, _e);
+                await refreshTree(taskType, _e);
             });
         }
-        watcher.onDidDelete(_e => {
+        watcher.onDidDelete(async _e => {
             logFileWatcherEvent(_e, "delete");
-            cache.removeFileFromCache(taskType, _e);
-            refreshTree(taskType, _e);
+            await cache.removeFileFromCache(taskType, _e);
+            await refreshTree(taskType, _e);
         });
-        watcher.onDidCreate(_e => {
+        watcher.onDidCreate(async _e => {
             logFileWatcherEvent(_e, "create");
-            cache.addFileToCache(taskType, _e);
-            refreshTree(taskType, _e);
+            await cache.addFileToCache(taskType, _e);
+            await refreshTree(taskType, _e);
         });
     }
     else if (watcher) {
