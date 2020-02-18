@@ -247,25 +247,25 @@ export class TaskFile extends TreeItem
         this.scripts.splice(index, 0, script);
     }
 
-    removeScript(script: any)
-    {
-        let idx = -1;
-        let idx2 = -1;
-
-        this.scripts.forEach(each =>
-        {
-            idx++;
-            if (script === each)
-            {
-                idx2 = idx;
-            }
-        });
-
-        if (idx2 !== -1 && idx2 < this.scripts.length)
-        {
-            this.scripts.splice(idx2, 1);
-        }
-    }
+    // removeScript(script: any)
+    // {
+    //     let idx = -1;
+    //     let idx2 = -1;
+    //
+    //     this.scripts.forEach(each =>
+    //     {
+    //         idx++;
+    //         if (script === each)
+    //         {
+    //             idx2 = idx;
+    //         }
+    //     });
+    //
+    //     if (idx2 !== -1 && idx2 < this.scripts.length)
+    //     {
+    //         this.scripts.splice(idx2, 1);
+    //     }
+    // }
 }
 
 export class TaskFolder extends TreeItem
