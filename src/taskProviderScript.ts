@@ -190,6 +190,9 @@ async function detectScriptFiles(): Promise<Task[]>
             }
         }
     }
+    else {
+        console.log("what?");
+    }
 
     util.logValue("   # of tasks", allTasks.length, 2);
     return allTasks;

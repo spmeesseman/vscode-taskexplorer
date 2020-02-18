@@ -62,7 +62,7 @@
         "coverage-open-report": "chrome.exe coverage/lcov-report/index.html",
         "coverage-full-on": "enable-full-coverage.sh",
         "coverage-full-off": "enable-full-coverage.sh --off",
-        "coverage-run-codecov": "codecov --disable=gcov --disable=detect",
+        "coverage-run-codecov": "codecov --disable=gcov --disable=detect --token=${codecovToken} --build 100",
         "package": "vsce package",
         "publish": "vsce publish",
         "rebuild": "npm run clean && npm run build",
