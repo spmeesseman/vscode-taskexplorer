@@ -28,15 +28,6 @@ export let treeDataProvider2: TaskTreeDataProvider | undefined;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 
 
-export function getTreeDataProvider(name?: string)
-{
-    if (name === "taskExplorerSideBar") {
-        return treeDataProvider;
-    }
-    return treeDataProvider2;
-}
-
-
 export interface TaskExplorerApi
 {
     explorerProvider: TaskTreeDataProvider | undefined;
@@ -225,6 +216,7 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     if (e.affectsConfiguration("taskExplorer.enableSideBar")) {
         if (configuration.get<boolean>("enableSideBar")) {
             if (treeDataProvider) {
+                // TODO - remove/add view on enable/disable view
                 refresh = true;
             }
             else {
@@ -236,6 +228,7 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     if (e.affectsConfiguration("taskExplorer.enableExplorerView")) {
         if (configuration.get<boolean>("enableExplorerView")) {
             if (treeDataProvider2) {
+                // TODO - remove/add view on enable/disable view
                 refresh = true;
             }
             else {
@@ -398,8 +391,7 @@ async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boole
     // all current watchers since there is no way of knowing which glob patterns were
     // removed (if any).
     //
-    for (const key in watchers.keys)
-    {
+    watchers.forEach((watcher, key) => {
         if (key.startsWith("ant") && key !== "ant")
         {
             const watcher = watchers.get(key);
@@ -407,7 +399,7 @@ async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boole
             watcher.onDidDelete(_e => undefined);
             watcher.onDidCreate(_e => undefined);
         }
-    }
+    });
 
     const includeAnt: string[] = configuration.get("includeAnt");
     if (includeAnt && includeAnt.length > 0) {
