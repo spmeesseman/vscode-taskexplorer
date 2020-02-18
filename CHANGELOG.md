@@ -1,3 +1,11 @@
+## [1.23.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.4...v1.23.5) (2020-02-18)
+
+
+### Bug Fixes
+
+* app-publisher tasks 'mantis release' and 'send notification email' are mapped incorrectly and running the 're-publish' task. ([21831a4](https://github.com/spmeesseman/vscode-taskexplorer/commit/21831a4))
+* when changing the default shell, some scripts will no longer run until a refresh or reload is done ([7854324](https://github.com/spmeesseman/vscode-taskexplorer/commit/7854324))
+
 ## [1.23.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.3...v1.23.4) (2020-02-18)
 
 
