@@ -477,9 +477,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     await processItem(item);
                 }
             }
-            catch (error) {
-                assert.fail("Exception error: " + error.toString());
-            }
+            catch {}
         });
 
         util.log(logPad + "   finished task tree scan");

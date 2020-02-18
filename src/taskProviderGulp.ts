@@ -119,9 +119,7 @@ async function detectGulpfiles(): Promise<Task[]>
                 }
             }
         }
-        catch (error) {
-            return Promise.reject(error);
-        }
+        catch {}
     }
 
     util.logValue("   # of tasks", allTasks.length, 2);
