@@ -105,9 +105,8 @@ async function detectAppPublisherfiles(): Promise<Task[]>
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("app-publisher");
-    const folders = workspace.workspaceFolders;
 
-    if (folders && paths)
+    if (workspace.workspaceFolders && paths)
     {
         for (const fobj of paths)
         {
@@ -137,12 +136,12 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
 
     const cwd = path.dirname(uri.fsPath);
     const fileName = path.basename(uri.fsPath);
-
+    const relativePath = getRelativePath(folder, uri);
 
     const kind1: AppPublisherTaskDefinition = {
         type: "app-publisher",
         fileName,
-        path: "",
+        path: relativePath,
         cmdLine: "npx app-publisher -p ps --no-ci --republish",
         requiresArgs: false,
         uri
@@ -151,7 +150,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
     const kind2: AppPublisherTaskDefinition = {
         type: "app-publisher",
         fileName,
-        path: "",
+        path: relativePath,
         cmdLine: "npx app-publisher -p ps --no-ci --email-only",
         uri
     };
@@ -159,7 +158,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
     const kind3: AppPublisherTaskDefinition = {
         type: "app-publisher",
         fileName,
-        path: "",
+        path: relativePath,
         cmdLine: "npx app-publisher -p ps --no-ci",
         uri
     };
@@ -167,7 +166,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
     const kind4: AppPublisherTaskDefinition = {
         type: "app-publisher",
         fileName,
-        path: "",
+        path: relativePath,
         cmdLine: "npx app-publisher -p ps --no-ci --dry-run",
         uri
     };
@@ -175,7 +174,7 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
     const kind5: AppPublisherTaskDefinition = {
         type: "app-publisher",
         fileName,
-        path: "",
+        path: relativePath,
         cmdLine: "npx app-publisher -p ps --no-ci --mantis-only",
         uri
     };
@@ -183,23 +182,10 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
     const kind6: AppPublisherTaskDefinition = {
         type: "app-publisher",
         fileName,
-        path: "",
+        path: relativePath,
         cmdLine: "npx app-publisher -p ps --no-ci --prompt-version",
         uri
     };
-
-    //
-    // Get relative dir to workspace folder
-    //
-    const relativePath = getRelativePath(folder, uri);
-    if (relativePath.length) {
-        kind1.path = relativePath;
-        kind2.path = relativePath;
-        kind3.path = relativePath;
-        kind4.path = relativePath;
-        kind5.path = relativePath;
-        kind6.path = relativePath;
-    }
 
     //
     // Set current working dircetory in oprions to relative script dir
@@ -216,12 +202,12 @@ function createAppPublisherTask(folder: WorkspaceFolder, uri: Uri): Task[]
     const execution3 = new ShellExecution(kind3.cmdLine, options);
     const execution4 = new ShellExecution(kind4.cmdLine, options);
     const execution5 = new ShellExecution(kind5.cmdLine, options);
-    const execution6 = new ShellExecution(kind5.cmdLine, options);
+    const execution6 = new ShellExecution(kind6.cmdLine, options);
 
     return [ new Task(kind4, folder, "Dry Run", "app-publisher", execution4, undefined),
              new Task(kind3, folder, "Publish", "app-publisher", execution3, undefined),
              new Task(kind1, folder, "Re-publish", "app-publisher", execution1, undefined),
-             new Task(kind1, folder, "Publish Mantis Release", "app-publisher", execution1, undefined),
-             new Task(kind5, folder, "Send Release Email", "app-publisher", execution5, undefined),
+             new Task(kind1, folder, "Publish Mantis Release", "app-publisher", execution5, undefined),
+             new Task(kind5, folder, "Send Release Email", "app-publisher", execution2, undefined),
              new Task(kind6, folder, "Publish (Prompt Version)", "app-publisher", execution6, undefined) ];
 }
