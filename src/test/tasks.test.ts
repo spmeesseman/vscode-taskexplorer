@@ -551,7 +551,7 @@ suite('Task tests', () =>
         console.log("            NPM          : " + taskCount.toString());
         if (taskCount != 6) {
             if (taskCount === 0) {
-                console.log("            ℹ VSCode could not provide the NPM tasks fast enough");
+                console.log("            ℹ NPM tasks are not found when running tests locally");
             }
             else {
                 assert.fail('Unexpected NPM task count (Found ' + taskCount + ' of 6)');
@@ -601,12 +601,19 @@ suite('Task tests', () =>
 
         console.log("    Run npm install");
 
+        let npmRan = false;
         await asyncMapForEach(taskMap, async (value: TaskItem) =>  {
             if (value && value.taskSource === "npm") {
                 await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
+                npmRan = true;
                 return false; // break foreach
             }
         });
+        if (!npmRan) {
+            console.log("        ℹ Running npm install in local testing env");
+            // TODO - how to run with local test ran in vscode dev host?
+            //await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
+        }
     });
 
 
