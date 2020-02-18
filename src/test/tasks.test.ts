@@ -663,7 +663,6 @@ suite('Task tests', () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
 
-        
         //
         // App-Publisher - Delete and invalidate, re-add and invalidate
         //
