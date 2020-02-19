@@ -123,18 +123,18 @@ export async function provideAntScripts(): Promise<Task[]>
 async function readAntfile(uri: Uri): Promise<Task[]>
 {
     const result: Task[] = [];
-
     const folder = workspace.getWorkspaceFolder(uri);
-    if (folder) {
+
+    if (folder)
+    {
         const contents = await util.readFile(uri.fsPath);
         const scripts = await findAllAntScripts(contents);
-        if (scripts) {
+        if (scripts)
+        {
             Object.keys(scripts).forEach(each => {
                 const task = createAntTask(scripts[`${each}`] ? scripts[`${each}`] : `${each}`, each, folder!, uri);
-                if (task) {
-                    task.group = TaskGroup.Build;
-                    result.push(task);
-                }
+                task.group = TaskGroup.Build;
+                result.push(task);
             });
         }
     }
@@ -151,45 +151,20 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
     util.log("");
     util.log("FindAllAntScripts");
 
-    try {
-        parseString(buffer, (err, result) => {
-            if (err) {
-                util.log("   Script file cannot be parsed");
-                return scripts;
+    parseString(buffer, (err, result) => {
+        json = result;
+    });
+
+    if (json && json.project && json.project.target)
+    {
+        const defaultTask = json.project.$.default;
+        const targets = json.project.target;
+        for (const tgt in targets)
+        {
+            if (targets[tgt].$ && targets[tgt].$.name) {
+                util.logValue("   Found target", targets[tgt].$.name);
+                scripts[defaultTask === targets[tgt].$.name ? targets[tgt].$.name + " - Default" : targets[tgt].$.name] = targets[tgt].$.name;
             }
-            json = result;
-        });
-    }
-    catch (e) {
-        util.log("   Script file cannot be parsed");
-                return scripts;
-    }
-
-    if (!json || !json.project)
-    {
-        util.log("   Script file does not contain a <project> root");
-        return scripts;
-    }
-
-    if (!json.project.target)
-    {
-        util.log("   Script file does not contain any targets");
-        return scripts;
-    }
-
-    const defaultTask = json.project.$.default;
-
-    // if (json.project.$.default) {
-    // util.logValue('   Found default target', json.project.$.default);
-    //     scripts["Default (" + json.project.$.default + ")"] = json.project.$.default;
-    // }
-
-    const targets = json.project.target;
-    for (const tgt in targets)
-    {
-        if (targets[tgt].$ && targets[tgt].$.name) {
-            util.logValue("   Found target", targets[tgt].$.name);
-            scripts[defaultTask === targets[tgt].$.name ? targets[tgt].$.name + " - Default" : targets[tgt].$.name] = targets[tgt].$.name;
         }
     }
 
@@ -228,7 +203,10 @@ function createAntTask(target: string, cmdName: string, folder: WorkspaceFolder,
     const cwd = path.dirname(uri.fsPath);
     const antFile = path.basename(uri.path);
     let args = [ target ];
-    let options = null;
+
+    let options: any = {
+        cwd
+    };
 
     const kind: AntTaskDefinition = {
         type: "ant",
@@ -238,6 +216,9 @@ function createAntTask(target: string, cmdName: string, folder: WorkspaceFolder,
         uri
     };
 
+    //
+    // Ansicon for Windows
+    //
     if (process.platform === "win32" && configuration.get("enableAnsiconForAnt") === true)
     {
         let ansicon = "ansicon.exe";
@@ -256,11 +237,6 @@ function createAntTask(target: string, cmdName: string, folder: WorkspaceFolder,
         options = {
             cwd,
             executable: ansicon
-        };
-    }
-    else {
-        options = {
-            cwd
         };
     }
 
