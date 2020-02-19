@@ -1,3 +1,10 @@
+## [1.23.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.6...v1.23.7) (2020-02-19)
+
+
+### Bug Fixes
+
+* when copying and pasting multiple task files into the same folder, tasks randomly are no imported ([89534ea](https://github.com/spmeesseman/vscode-taskexplorer/commit/89534ea))
+
 ## [1.23.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.5...v1.23.6) (2020-02-18)
 
 
