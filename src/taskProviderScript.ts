@@ -174,6 +174,7 @@ async function detectScriptFiles(): Promise<Task[]>
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("script");
+    
     if (workspace.workspaceFolders && paths)
     {
         for (const fobj of paths)
