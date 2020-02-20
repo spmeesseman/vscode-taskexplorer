@@ -1,7 +1,8 @@
 
 import { workspace, window, RelativePattern, WorkspaceFolder, Uri } from "vscode";
-import { log, getExcludesGlob, isExcluded, properCase, timeout } from "./util";
+import { log, logValue, timeout, getExcludesGlob, isExcluded, properCase } from "./util";
 import { configuration } from "./common/configuration";
+import { utils } from "mocha";
 
 export let filesCache: Map<string, Set<any>> = new Map();
 export let cacheBuilding = false;
@@ -9,18 +10,26 @@ export let cacheBuilding = false;
 let cancel = false;
 
 
-// export async function cancelBuildCache()
-// {
-//     let waitCount = 20;
-//     if (!cacheBuilding) {
-//         return;
-//     }
-//     cancel = true;
-//     while (cacheBuilding && waitCount > 0) {
-//         waitCount--;
-//         await timeout(500);
-//     }
-// }
+export async function cancelBuildCache(wait?: boolean)
+{
+    let waitCount = 20;
+    if (!cacheBuilding) {
+        return;
+    }
+    cancel = true;
+    while (wait && cacheBuilding && waitCount > 0) {
+        waitCount--;
+        await timeout(500);
+    }
+}
+
+
+export async function waitForCache()
+{
+    while (cacheBuilding) {
+        await timeout(100);
+    }
+}
 
 
 export async function rebuildCache()
@@ -30,8 +39,15 @@ export async function rebuildCache()
 }
 
 
-export async function buildCache(taskAlias: string, taskType: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined)
+export async function buildCache(taskAlias: string, taskType: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined, setCacheBuilding = true)
 {
+    log("Start cache building");
+    logValue("   task alias", taskAlias, 2);
+    logValue("   task type", taskType, 2);
+    logValue("   blob", fileBlob, 2);
+    logValue("   folder", !wsfolder ? "entire workspace" : wsfolder.name);
+    logValue("   setCacheBuilding", setCacheBuilding.toString(), 2);
+
     //
     // If buildCache is already running in another scope, then cancel and wait
     //
@@ -39,7 +55,9 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
     //     await cancelBuildCache();
     // }
 
-    cacheBuilding = true;
+    if (setCacheBuilding) {
+        cacheBuilding = true;
+    }
 
     if (!filesCache.get(taskAlias)) {
         filesCache.set(taskAlias, new Set());
@@ -49,9 +67,10 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
     if (dispTaskType.indexOf("Ant") !== -1) {
         dispTaskType = "Ant";
     }
+
     if (!wsfolder)
     {
-        log("Scan all projects");
+        log("Build cache - Scan all projects for taskType '" + taskType + "'");
         window.setStatusBarMessage("$(loading) Task Explorer - Scanning projects...");
 
         if (workspace.workspaceFolders)
@@ -61,7 +80,9 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                 {
                     if (cancel) {
                         cancel = false;
-                        cacheBuilding = false;
+                        if (setCacheBuilding) {
+                            cacheBuilding = false;
+                        }
                         window.setStatusBarMessage("");
                         return;
                     }
@@ -74,7 +95,9 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                     {
                         if (cancel) {
                             cancel = false;
-                            cacheBuilding = false;
+                            if (setCacheBuilding) {
+                                cacheBuilding = false;
+                            }
                             window.setStatusBarMessage("");
                             return;
                         }
@@ -83,6 +106,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                                 uri: fpath,
                                 folder
                             });
+                            logValue("   Added to cache", fpath.fsPath, 2);
                         }
                     }
                 }
@@ -92,7 +116,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
     }
     else
     {
-        log("Scan project: " + wsfolder.name);
+        log("Build cache - Scan project '" + wsfolder.name + "' for taskType '" + taskType + "'");
         window.setStatusBarMessage("$(loading~spin) Scanning for tasks in project " + wsfolder.name + "...");
 
         const relativePattern = new RelativePattern(wsfolder, fileBlob);
@@ -101,7 +125,9 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
         {
             if (cancel) {
                 cancel = false;
-                cacheBuilding = false;
+                if (setCacheBuilding) {
+                    cacheBuilding = false;
+                }
                 window.setStatusBarMessage("");
                 return;
             }
@@ -111,13 +137,18 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                     uri: fpath,
                     folder: wsfolder
                 });
+                logValue("   Added to cache", fpath.fsPath, 2);
             }
         }
     }
 
     window.setStatusBarMessage("");
+    log("Cache building complete");
+
     cancel = false;
-    cacheBuilding = false;
+    if (setCacheBuilding) {
+        cacheBuilding = false;
+    }
 }
 
 
@@ -158,69 +189,82 @@ export async function removeFileFromCache(taskAlias: string, uri: Uri)
 
 export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
 {
+    cacheBuilding = true;
+    log("Add folder to cache");
+    logValue("   folder", !folder ? "entire workspace" : folder.name);
+
     if (configuration.get<boolean>("enableAnt")) {
-        await buildCache("ant", "ant", "**/[Bb]uild.xml", folder);
+        await buildCache("ant", "ant", "**/[Bb]uild.xml", folder, false);
+        const includeAnt: string[] = configuration.get("includeAnt");
+        if (includeAnt && includeAnt.length > 0) {
+            for (let i = 0; i < includeAnt.length; i++) {
+                await buildCache("ant", "ant-" + includeAnt[i], includeAnt[i], folder, false);
+            }
+        }
     }
 
     if (configuration.get<boolean>("enableAppPublisher")) {
-        await buildCache("app-publisher", "app-publisher", "**/.publishrc*", folder);
+        await buildCache("app-publisher", "app-publisher", "**/.publishrc*", folder, false);
     }
 
     if (configuration.get<boolean>("enableBash")) {
-        await buildCache("script", "bash", "**/*.[Ss][Hh]", folder);
+        await buildCache("script", "bash", "**/*.[Ss][Hh]", folder, false);
     }
 
     if (configuration.get<boolean>("enableBatch")) {
-        await buildCache("script", "batch", "**/*.[Bb][Aa][Tt]", folder);
-        await buildCache("script", "batch", "**/*.[Cc][Mm][Dd]", folder);
+        await buildCache("script", "batch", "**/*.[Bb][Aa][Tt]", folder, false);
+        await buildCache("script", "batch", "**/*.[Cc][Mm][Dd]", folder, false);
     }
 
     if (configuration.get<boolean>("enableGradle")) {
-        await buildCache("gradle", "gradle", "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]", folder);
+        await buildCache("gradle", "gradle", "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]", folder, false);
     }
 
     if (configuration.get<boolean>("enableGrunt")) {
-        await buildCache("grunt", "grunt", "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]", folder);
+        await buildCache("grunt", "grunt", "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]", folder, false);
     }
 
     if (configuration.get<boolean>("enableGulp")) {
-        await buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]", folder);
+        await buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]", folder, false);
     }
 
     if (configuration.get<boolean>("enableMake")) {
-        await buildCache("make", "make", "**/[Mm]akefile", folder);
+        await buildCache("make", "make", "**/[Mm]akefile", folder, false);
     }
 
     if (configuration.get<boolean>("enableNpm")) {
-        await buildCache("npm", "npm", "**/package.json", folder);
+        await buildCache("npm", "npm", "**/package.json", folder, false);
     }
 
     if (configuration.get<boolean>("enableNsis")) {
-        await buildCache("script", "nsis", "**/*.[Nn][Ss][Ii]", folder);
+        await buildCache("script", "nsis", "**/*.[Nn][Ss][Ii]", folder, false);
     }
 
     if (configuration.get<boolean>("enablePerl")) {
-        await buildCache("script", "perl", "**/*.[Pp][Ll]", folder);
+        await buildCache("script", "perl", "**/*.[Pp][Ll]", folder, false);
     }
 
     if (configuration.get<boolean>("enablePowershell")) {
-        await buildCache("script", "powershell", "**/*.[Pp][Ss]1", folder);
+        await buildCache("script", "powershell", "**/*.[Pp][Ss]1", folder, false);
     }
 
     if (configuration.get<boolean>("enablePython")) {
-        await buildCache("script", "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", folder);
+        await buildCache("script", "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", folder, false);
     }
 
     if (configuration.get<boolean>("enableRuby")) {
-        await buildCache("script", "ruby", "**/*.[Rr][Bb]", folder);
+        await buildCache("script", "ruby", "**/*.[Rr][Bb]", folder, false);
     }
 
     if (configuration.get<boolean>("enableTsc")) {
-        await buildCache("tsc", "tsc", "**/tsconfig.json", folder);
+        await buildCache("tsc", "tsc", "**/tsconfig.json", folder, false);
     }
 
     if (configuration.get<boolean>("enableWorkspace")) {
-        await buildCache("workspace", "workspace", "**/.vscode/tasks.json", folder);
+        await buildCache("workspace", "workspace", "**/.vscode/tasks.json", folder, false);
     }
+
+    cacheBuilding = false;
+    log("Add folder to cache complete");
 }
 

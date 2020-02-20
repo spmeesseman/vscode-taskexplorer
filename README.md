@@ -6,11 +6,17 @@
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating-short/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer)
 [![authors](https://img.shields.io/badge/authors-scott%20meesseman-6F02B5.svg?logo=visual%20studio%20code)](https://www.littlesm.com)
 
-[![Build Status](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_apis/build/status/spmeesseman.vscode-taskexplorer?branchName=master)](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_build/latest?definitionId=10&branchName=master)
-[![codecov](https://codecov.io/gh/spmeesseman/vscode-taskexplorer/branch/master/graph/badge.svg)](https://codecov.io/gh/spmeesseman/vscode-taskexplorer)
 [![Greenkeeper badge](https://badges.greenkeeper.io/spmeesseman/vscode-taskexplorer.svg)](https://greenkeeper.io/)
+[![Build Status](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_apis/build/status/spmeesseman.vscode-taskexplorer?branchName=master)](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_build/latest?definitionId=10&branchName=master)
+[![azuretests](https://img.shields.io/azure-devops/tests/spmeesseman/vscode-taskexplorer/10?compact_message)](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_build/latest?definitionId=10&branchName=master)
+[![azurecoverage](https://img.shields.io/azure-devops/coverage/spmeesseman/vscode-taskexplorer/10)](https://dev.azure.com/spmeesseman/vscode-taskexplorer/_build/latest?definitionId=10&branchName=master)
+[![codecov](https://codecov.io/gh/spmeesseman/vscode-taskexplorer/branch/master/graph/badge.svg)](https://codecov.io/gh/spmeesseman/vscode-taskexplorer)
+[![CodeFactor](https://www.codefactor.io/repository/github/spmeesseman/vscode-taskexplorer/badge)](https://www.codefactor.io/repository/github/spmeesseman/vscode-taskexplorer)
+
 [![GitHub issues open](https://img.shields.io/github/issues-raw/spmeesseman/vscode%2dtaskexplorer.svg?maxAge=2592000&logo=github)](https://github.com/spmeesseman/vscode-taskexplorer/issues)
 [![GitHub issues closed](https://img.shields.io/github/issues-closed-raw/spmeesseman/vscode%2dtaskexplorer.svg?maxAge=2592000&logo=github)](https://github.com/spmeesseman/vscode-taskexplorer/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/spmeesseman/vscode%2dtaskexplorer.svg?maxAge=2592000&logo=github)](https://github.com/spmeesseman/vscode-taskexplorer/pulls)
+[![GitHub last commit](https://img.shields.io/github/last-commit/spmeesseman/vscode%2dtaskexplorer.svg?maxAge=2592000&logo=github)](https://github.com/spmeesseman/vscode-taskexplorer)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 ![src0](res/sources/npm.png?raw=true) ![src1](res/sources/ant.png?raw=true) ![src2](res/sources/grunt.png?raw=true) ![src3](res/sources/gulp.png?raw=true) ![src13](res/sources/gradle.png?raw=true) ![src4](res/sources/workspace.png?raw=true) ![src5](res/sources/make.png?raw=true) ![src6](res/sources/ts.png?raw=true) ![src7](res/sources/bat.png?raw=true) ![src8](res/sources/ruby.png?raw=true) ![src9](res/sources/powershell.png?raw=true) ![src10](res/sources/bash.png?raw=true) ![src11](res/sources/python.png?raw=true) ![src12](res/sources/nsis.png?raw=true)
@@ -24,25 +30,26 @@
 - [Task Explorer - View and Run Tasks from Visual Studio Code](#task-explorer---view-and-run-tasks-from-visual-studio-code)
   - [Description](#description)
   - [Table of Contents](#table-of-contents)
-  - [Screenshots](#screenshots)
+  - [Screenshots by Version](#screenshots-by-version)
   - [Requirements](#requirements)
   - [Features](#features)
-  - [Configuring Global Excludes and Apache Ant Includes with Glob Patterns](#configuring-global-excludes-and-apache-ant-includes-with-glob-patterns)
+  - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
+  - [Using Dashed Groups](#using-dashed-groups)
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
   - [Feedback & Contributing](#feedback--contributing)
   - [Thank You](#thank-you)
   - [Other Code Extensions by spmeesseman](#other-code-extensions-by-spmeesseman)
 
-## Screenshots
+## Screenshots by Version
 
 |Original Explorer Tray|Sidebar View (v1.7)|Task Type Groups (v1.13)|
 |-|-|-|
 |![ss0](res/taskview1.png?raw=true)|![ss1](res/taskview2.png?raw=true)|![ss2](res/taskview3.png?raw=true)|
 
-|Grunt/Gulp in Subfolders (v1.14)|Npm Commands (v1.16)||
+|Grunt/Gulp in Subfolders (v1.14)|Npm Commands (v1.16)|Task Dashed Groups (v1.23)|
 |-|-|-|
-|![ss3](res/taskview4.png?raw=true)|![ss3](res/taskview5.png?raw=true)||
+|![ss4](res/taskview4.png?raw=true)|![ss5](res/taskview5.png?raw=true)|![ss6](res/taskview6.png?raw=true)|
 
 ## Requirements
 
@@ -50,6 +57,7 @@
 
 ## Features
 
+* v1.23 - Deeper groupings with dashed task groups (Off by default)
 * v1.22 - Major performance enhancements - Task Tree / Task Scanning
 * v1.21 - Add option to keep terminal open after stopping task [closes #51]
 * v1.20 - Add support for restarting task (thank you **antfu**)
@@ -75,19 +83,55 @@
 * v1.1 - Supports multi-root or single-root workspaces
 * v1.0 - Open and launch NPM scripts as tasks
 
-## Configuring Global Excludes and Apache Ant Includes with Glob Patterns
+## Configuring Global Excludes and Apache Ant Includes
 
-The setting *exclude* defines a string or an array of strings of file patterns to ignore.  The setting applies to all script types.  The string(s) must be glob pattern(s), for example:
+The setting *exclude* defines a file/directory pattern or an array of file/directory patterns to ignore using *Glob Patterns* or a valid *File URI*.  The setting applies to all script types.  For example:
 
-* `taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**" ]`
+* `taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**", "/c:/projects/project1/src/theme/test/package.json" ]`
 
 Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.  Using the *exclude* configuration can greatly improve performance in large workspaces if configured correctly.
 
-**Apache Ant** uses an .xml file extension, the setting *includeAnt* can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting is a string or an array of strings and must be glob pattern(s) including the .xml extension, for example:
+Task files that are found by Task Expolorer can also be added to the *excludes* list via the tree node context menu, by right clicking the task file or task group node, and selecting *Add to Excludes*.
 
-* `taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml" ]`
+**Apache Ant** uses an .xml file extension, the setting *includeAnt* can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting defines a file pattern or an array of file patterns to include using *Glob Patterns* or a valid *File URI*, for example:
+
+* `taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml", "/c:/projects/project1/scripts/test/antetests.xml" ]`
 
 Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **Ant** includes list in all cases.
+
+## Using Dashed Groups
+
+*Dashed Groups* are simply an extra level of task groupings that can be made based on a dash (-) character in the script name.  This option can be turned on/off with the *Group Dashed* option in Settings, the default is OFF.
+
+For example, consider 10 npm tasks, 5 of which all start with the string *dev-*, 5 of which start with the string *prod-*.  Prior to Version 1.23, this would create 10 individual task nodes within the main npm task node in the task tree:
+
+    npm
+        dev-build
+        dev-build-server
+        dev-build-themes
+        dev-cp-from-bin
+        dev-clean
+        prod-build
+        prod-build-server
+        prod-build-themes
+        prod-cp-from-bin
+        prod-clean
+
+By enabling the *Group Dashed* option in Settings, two new grouped nodes would be created underneath the main npm node, one called *dev* and the other called *prod*.  Each of these two sub-nodes of course would contain the respective *dev-* and *prod-* scrtips/tasks, minus the prepended group name:
+
+    npm
+        dev
+            build
+            build-server
+            build-themes
+            cp-from-bin
+            clean
+        prod
+            build
+            build-server
+            build-themes
+            cp-from-bin
+            clean
 
 ## Internally Provided Tasks vs. VSCode Provided Tasks
 

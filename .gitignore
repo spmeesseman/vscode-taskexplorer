@@ -4,3 +4,4 @@ out
 *.vscode-test
 test-reports
 coverage
+.nyc_output

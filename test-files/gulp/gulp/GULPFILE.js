@@ -1,4 +1,4 @@
-//构建目录
+
 process.chdir(__dirname);
 
 var pkg = require("../../package.json");
@@ -33,30 +33,24 @@ function randomString(len) {
     return text;
 }
 
-/**
- * 递归创建多级目录
- * @param dirname 
- */
+
 function mkdirsSync(dirname) {
     if (fs.existsSync(dirname)) {
         return true;
-    } else {
-        if (mkdirsSync(path.dirname(dirname))) {
-            fs.mkdirSync(dirname);
-            return true;
-        }
+    }
+    if (mkdirsSync(path.dirname(dirname))) {
+        fs.mkdirSync(dirname);
+        return true;
     }
 }
 
-//获取参数
+
 var  note = [
         "/** <%= pkg.name %>-v<%= pkg.version %> <%= pkg.license %> License By <%= pkg.homepage %> */\n <%= js %>",
         { pkg: pkg, js: ";" }
     ],
-    destDir = "./dist", //构建的目标目录
-    //任务
+    destDir = "./dist",
     task = {
-        //压缩 HTML
         minHtml: function() {
             var src = ["./src/views/**/*.html"];
             
@@ -64,7 +58,6 @@ var  note = [
                 .src(src)
                 .pipe(plumber({errorHandler:errorHandler}))
                 .pipe(
-                    //提取 HTML 中的JS代码写入文件来加载
                     cheerio(function($) {
                         var filePath =  "./temp/js/";
                         var fileName = randomString(8) + '.js';
@@ -85,15 +78,14 @@ var  note = [
                     })
                 )
                 .pipe(htmlmin({
-                        removeComments: true, //清除HTML注释
-                        collapseWhitespace: true, //压缩HTML
-                        minfyJS: true, //压缩JS
-                        minfyCss: true //压缩CSS
+                        removeComments: true,
+                        collapseWhitespace: true,
+                        minfyJS: true,
+                        minfyCss: true
                     }))
                 .pipe(gulp.dest(destDir + "/views" ));
         },
 
-        //压缩 CSS
         minCss: function() {
             var src = ["./src/**/*.css"],
                 noteNew = JSON.parse(JSON.stringify(note));
@@ -104,12 +96,11 @@ var  note = [
                 .src(src)
                 .pipe(plumber({errorHandler:errorHandler}))
                 .pipe(cssmin({
-                    advanced: false,        //类型：Boolean 默认：true [是否开启高级优化（合并选择器等）]
-                    compatibility: 'ie7',   //保留ie7及以下兼容写法 类型：String 默认：''or'*' [启用兼容模式； 'ie7'：IE7兼容模式，'ie8'：IE8兼容模式，'*'：IE9+兼容模式]
-                    keepBreaks: false,      //类型：Boolean 默认：false [是否保留换行]
-                    keepSpecialComments: '*' //保留所有特殊前缀 当你用autoprefixer生成的浏览器前缀，如果不加这个参数，有可能将会删除你的部分前缀
-                }))    
-                //.pipe(header.apply(null, noteNew))
+                    advanced: false,
+                    compatibility: 'ie7',
+                    keepBreaks: false,
+                    keepSpecialComments: '*'
+                }))
                 .pipe(gulp.dest(destDir));
         },
 
@@ -131,15 +122,13 @@ var  note = [
                     stringArrayEncoding: "rc4",
                 }))
                 .pipe(uglify({
-                    mangle: { except: ['require', 'exports', 'module', '$'] },//类型：Boolean 默认：true 是否修改变量名
-                    compress: true,             //类型：Boolean 默认：true 是否完全压缩
-                    preserveComments: 'false'   //保留所有注释
+                    mangle: { except: ['require', 'exports', 'module', '$'] },
+                    compress: true,
+                    preserveComments: 'false'
                 }))
-                //.pipe(header.apply(null, note))
                 .pipe(gulp.dest(destDir));
         },
 
-        //复制文件夹
         mv: function() {
             return gulp.src("./src/style/res/**/*").pipe(
                 gulp.dest(destDir + "/style/res")
@@ -147,7 +136,6 @@ var  note = [
         }
     };
 
-//清理
 gulp.task("clear", function(cb) {
     return del(["./dist/*", "./temp/*"], cb);
 });
@@ -161,7 +149,6 @@ gulp.task("minJs", task.minJs);
 gulp.task("minCss", task.minCss);
 gulp.task("mv", task.mv);
 
-//构建核心源文件
 gulp.task(
     "default",
     //[],
@@ -169,9 +156,6 @@ gulp.task(
         console.log('why is this task always ran?');
         done();
     }
-    //gulpSequence("clear", "minHtml", "minJs", "minCss", "mv", function() {
-    //    gulp.start("done");
-    //}) 
 );
 
 gulp.task('test', (done) => {

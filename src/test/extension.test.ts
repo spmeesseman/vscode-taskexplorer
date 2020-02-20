@@ -1,137 +1,130 @@
 /* tslint:disable */
 
-//
-// Documentation on https://mochajs.org/ for help.
-//
-
 import * as assert from 'assert';
 import * as vscode from "vscode";
 import { configuration } from "../common/configuration";
+import { setWriteToConsole, timeout } from '../util';
+import { TaskExplorerApi } from '../extension';
 
-export let trees: any;
+
+export let teApi: TaskExplorerApi;
 
 
 suite("Extension Tests", () => 
 {
-    setup(async () => { });
+    setup(async () => 
+    {
+    });
 
 
     teardown(() =>
     {
-
     });
 
 
-    test("Get extension", () =>
+    test("Enable required testing options", async function()
     {
+        this.timeout(10 * 1000);
+
         assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
+
+        //
+        // Enable views, use workspace level so that running this test from Code itself
+        // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
+        //
+        await configuration.updateWs('enableExplorerView', true);
+        await configuration.updateWs('enableSideBar', true);
+        //
+        // Set misc settings, use workspace level so that running this test from Code itself
+        // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
+        //
+        await configuration.updateWs('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
+        await configuration.updateWs('debug', true);
+        await configuration.updateWs('debugLevel', 3);
+        //
+        // Enabled all options, use workspace level so that running this test from Code itself
+        // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
+        //
+        await configuration.updateWs('enableAnt', true);
+        await configuration.updateWs('enableAppPublisher', true);
+        await configuration.updateWs('enableBash', true);
+        await configuration.updateWs('enableBatch', true);
+        await configuration.updateWs('enableGradle', true);
+        await configuration.updateWs('enableGrunt', true);
+        await configuration.updateWs('enableGulp', true);
+        await configuration.updateWs('enableMake', true);
+        await configuration.updateWs('enableNpm', true);
+        await configuration.updateWs('enableNsis', true);
+        await configuration.updateWs('enablePowershell', true);
+        await configuration.updateWs('enablePerl', true);
+        await configuration.updateWs('enablePython', true);
+        await configuration.updateWs('enableRuby', true);
+        await configuration.updateWs('enableTsc', true);
+        await configuration.updateWs('enableWorkspace', true);
+        await configuration.updateWs('groupDashed', false);
+
+        await vscode.workspace.getConfiguration().update('terminal.integrated.shell.windows', 
+                                                         'C:\\Windows\\System32\\cmd.exe',
+                                                         vscode.ConfigurationTarget.Workspace);
+
+        setWriteToConsole(false); // FOR DEBUGGING - write debug logging from exiension to console
     });
 
 
-    test("Activate extension", function(done) 
+    test("Get active extension", async function()
     {
+        let wait = 0;
+        const maxWait = 15;  // seconds
 
-        this.timeout(60 * 1000);
+        this.timeout(20 * 1000);
 
-        const extension = vscode.extensions.getExtension(
-            "spmeesseman.vscode-taskexplorer"
-        ) as vscode.Extension<any>;
-
-        if (!extension) {
-            assert.fail("Extension not found");
-        }
+        let ext = vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer");
+        assert(ext, "Could not find extension");
 
         //
-        // Enable views
+        // For coverage, we remove activationEvents "*" in package.json, we should
+        // not be active at this point
         //
-        assert(configuration.update('enableExplorerView', true));
-        assert(configuration.update('enableSideBar', true));
-        //
-        // Set misc settings
-        //
-        assert(configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]));
-        assert(configuration.update('debug', true));
-        assert(configuration.update('debugLevel', 3));
-        //
-        // Enable all task types
-        //
-        assert(configuration.update('enableAnt', true));
-        assert(configuration.update('enableAppPublisher', true));
-        assert(configuration.update('enableBash', true));
-        assert(configuration.update('enableBatch', true));
-        assert(configuration.update('enableGradle', true));
-        assert(configuration.update('enableGrunt', true));
-        assert(configuration.update('enableGulp', true));
-        assert(configuration.update('enableMake', true));
-        assert(configuration.update('enableNpm', true));
-        assert(configuration.update('enableNsis', true));
-        assert(configuration.update('enablePowershell', true));
-        assert(configuration.update('enablePerl', true));
-        assert(configuration.update('enablePython', true));
-        assert(configuration.update('enableRuby', true));
-        assert(configuration.update('enableWorkspace', true));
-
-        if (!extension.isActive) 
+        if (!ext.isActive) 
         {
-            console.log('        Manually activating extension');
-            extension.activate().then(
-                api => {
-                    trees = api;
-                    assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
-                    done();
-                },
-                () => {
-                    assert.fail("Failed to activate extension");
-                }
-            );
+            console.log('        Manually activating extension for full coverage');
+            try {
+                teApi = await ext.activate();
+                assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
+            }
+            catch(e) {
+                assert.fail("Failed to activate extension");
+            }
+            console.log("         ✔ Extension activated");
         } 
         else {
+            //
+            // Wait for extension to activate
+            //
+            while (!ext.isActive && wait < maxWait * 10) {
+                wait += 1;
+                await timeout(100);
+            }
+            assert(!ext.isActive || wait < maxWait * 10, "Extension did not finish activation within " + maxWait + " seconds");
+            //
+            // Set extension api exports
+            //
+            teApi = ext.exports;
             assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
-            done();
         }
+
+        //assert(treeDataProvider2);
+        assert(teApi, "Exported API is empty");
+        assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
     });
 
     
-    // test("Enable required testing options", async function()
-    // {
-    //     //
-    //     // Enable views
-    //     //
-    //     await trees.configuration.update('enableExplorerView', true);
-    //     await trees.configuration.update('enableSideBar', true);
-    //     //
-    //     // Set misc settings
-    //     //
-    //     await trees.configuration.update('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
-    //     await trees.configuration.update('debug', true);
-    //     await trees.configuration.update('debugLevel', 3);
-    //     //
-    //     // Enabled all options
-    //     //
-    //     await trees.configuration.update('enableAnt', true);
-    //     await trees.configuration.update('enableAppPublisher', true);
-    //     await trees.configuration.update('enableBash', true);
-    //     await trees.configuration.update('enableBatch', true);
-    //     await trees.configuration.update('enableGradle', true);
-    //     await trees.configuration.update('enableGrunt', true);
-    //     await trees.configuration.update('enableGulp', true);
-    //     await trees.configuration.update('enableMake', true);
-    //     await trees.configuration.update('enableNpm', true);
-    //     await trees.configuration.update('enableNsis', true);
-    //     await trees.configuration.update('enablePowershell', true);
-    //     await trees.configuration.update('enablePerl', true);
-    //     await trees.configuration.update('enablePython', true);
-    //     await trees.configuration.update('enableRuby', true);
-    //     await trees.configuration.update('enableWorkspace', true);
-    // });
-
-
     test("Check tree providers", function(done) 
     {
-        if (!trees.explorerProvider) {
+        if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        if (!trees.sidebarProvider) {
+        if (!teApi.sidebarProvider) {
             assert.fail("        ✘ Task Explorer sidebar tree instance does not exist");
         }
         done();

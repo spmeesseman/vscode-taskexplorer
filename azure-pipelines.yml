@@ -9,21 +9,21 @@ trigger:
      - master
      - greenkeeper/*
 
-# 
+#
 # pool:
 #   vmImage: 'Ubuntu-16.04'
-# 
+#
 # steps:
 # - task: NodeTool@0
 #   inputs:
 #     versionSpec: '10.x'
 #   displayName: 'Install Node.js'
-# 
+#
 # - script: |
 #     npm install
 #     npm run build
 #   displayName: 'npm install and build'
-# 
+#
 
 jobs:
   - job: Windows
@@ -31,6 +31,8 @@ jobs:
       matrix:
         Code30:
           CODE_VERSION: '1.30.0'
+        Code40:
+          CODE_VERSION: '1.40.0'
         CodeCurrent:
           CODE_VERSION:
         CodeInssiders:
@@ -78,13 +80,115 @@ jobs:
         displayName: 'Publish Code Coverage to Codecov'
         env:
           CODECOV_TOKEN: $(codecovToken)
+  - job: Windows_Node10
+    strategy:
+      matrix:
+        CodeCurrent:
+          CODE_VERSION:
+        #CodeInssiders:
+        #  CODE_VERSION: 'insiders'  # 2/20/2019 - this test is causing cobertura coverage to fail 
+    pool:
+      name: Hosted VS2017
+      demands: npm
+    steps:
+      - task: NodeTool@0
+        displayName: 'Use Node 10.x'
+        inputs:
+          versionSpec: 10.x
+      - task: Npm@1
+        displayName: 'Install dependencies'
+        inputs:
+          verbose: false
+      - task: Npm@1
+        displayName: 'Compile sources'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run build'
+      - bash: sed -i.bak 's/"\*"//g' package.json
+        displayName: 'Enable full coverage'
+      - task: Npm@1
+        displayName: 'Run tests'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run test --silent'
+      - task: PublishTestResults@2
+        displayName: 'Publish Test Results'
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: 'test-reports/*.xml'
+          mergeTestResults: true
+          testRunTitle: '$(Agent.OS) $(Agent.JobName)'
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Publish Code Coverage to Azure'
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
+      - script: node_modules\.bin\codecov --disable=gcov
+        displayName: 'Publish Code Coverage to Codecov'
+        env:
+          CODECOV_TOKEN: $(codecovToken)
+  - job: Windows_Node13
+    strategy:
+      matrix:
+        CodeCurrent:
+          CODE_VERSION:
+        CodeInssiders:
+          CODE_VERSION: 'insiders'  # 2/20/2019 - this test is causing cobertura coverage to fail 
+    pool:
+      name: Hosted VS2017
+      demands: npm
+    steps:
+      - task: NodeTool@0
+        displayName: 'Use Node 13.x'
+        inputs:
+          versionSpec: 13.x
+      - task: Npm@1
+        displayName: 'Install dependencies'
+        inputs:
+          verbose: false
+      - task: Npm@1
+        displayName: 'Compile sources'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run build'
+      - bash: sed -i.bak 's/"\*"//g' package.json
+        displayName: 'Enable full coverage'
+      - task: Npm@1
+        displayName: 'Run tests'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run test --silent'
+      - task: PublishTestResults@2
+        displayName: 'Publish Test Results'
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: 'test-reports/*.xml'
+          mergeTestResults: true
+          testRunTitle: '$(Agent.OS) $(Agent.JobName)'
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Publish Code Coverage to Azure'
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
+      - script: node_modules\.bin\codecov --disable=gcov
+        displayName: 'Publish Code Coverage to Codecov'
+        env:
+          CODECOV_TOKEN: $(codecovToken)
   - job: macOS
     strategy:
       matrix:
         Code30:
           CODE_VERSION: '1.30.0'
+        Code40:
+          CODE_VERSION: '1.40.0'
         CodeCurrent:
-          CODE_VERSION: 
+          CODE_VERSION:
         CodeInssiders:
           CODE_VERSION: 'insiders'
     pool:
@@ -135,6 +239,8 @@ jobs:
       matrix:
         Code30:
           CODE_VERSION: '1.30.0'
+        Code40:
+          CODE_VERSION: '1.40.0'
         CodeCurrent:
           CODE_VERSION:
         CodeInssiders:
@@ -194,6 +300,7 @@ jobs:
     #condition: succeeded()
     dependsOn:
     - Windows
+    - Windows_Node10
     - macOS
     - Linux
     pool:
@@ -224,7 +331,7 @@ jobs:
         inputs:
           command: custom
           verbose: false
-          customCommand: 'run semantic-release --allow-same-version'
+          customCommand: 'run semantic_release-release --allow-same-version'
         env:
           VSCE_TOKEN: $(vsceToken)
           GH_TOKEN: $(githubToken)

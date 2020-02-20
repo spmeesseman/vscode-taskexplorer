@@ -6,29 +6,31 @@ import {
 import * as path from "path";
 import * as util from "./util";
 
-export class TaskItem extends TreeItem 
+export class TaskItem extends TreeItem
 {
     public static readonly defaultSource = "Workspace";
 
     public readonly task: Task | undefined;
     public readonly taskSource: string;
+    public readonly taskGroup: string;
     public readonly execution: TaskExecution | undefined;
     public paused: boolean;
 
     taskFile: TaskFile;
 
-    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task) 
+    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task, taskGroup?: string)
     {
         let taskName = task.name;
         if (taskName.indexOf(" - ") !== -1 && (taskName.indexOf("/") !== -1 || taskName.indexOf("\\") !== -1 ||
             taskName.indexOf(" - tsconfig.json") !== -1))
         {
-            taskName = task.name.substring(0, task.name.indexOf(" - "));
+            taskGroup ? taskName.replace(taskGroup + "-", "") : taskName = task.name.substring(0, task.name.indexOf(" - "));
         }
 
         super(taskName, TreeItemCollapsibleState.None);
 
-        this.id = taskFile.resourceUri.fsPath + ":" + task.name + Math.floor(Math.random() * 1000000);
+        this.taskGroup = taskGroup;
+        this.id = taskFile.resourceUri.fsPath + ":" + task.source + ":" + task.name; // + Math.floor(Math.random() * 1000000);
         this.paused = false;
         this.contextValue = "script";
         this.taskFile = taskFile;
@@ -72,7 +74,7 @@ export class TaskFile extends TreeItem
 {
     public path: string;
     public folder: TaskFolder;
-    public scripts: TaskItem[] = [];
+    public scripts: (TaskItem|TaskFile)[] = [];
     public fileName: string;
     public readonly taskSource: string;
     public readonly isGroup: boolean;
@@ -190,9 +192,9 @@ export class TaskFile extends TreeItem
     }
 
 
-    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean)
+    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean, label?: string)
     {
-        super(TaskFile.getLabel(taskDef, source, relativePath, group), TreeItemCollapsibleState.Collapsed);
+        super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group), TreeItemCollapsibleState.Collapsed);
 
         this.folder = folder;
         this.path = relativePath;
@@ -239,9 +241,34 @@ export class TaskFile extends TreeItem
     {
         this.scripts.push(script);
     }
+
+    insertScript(script: any, index: number)
+    {
+        this.scripts.splice(index, 0, script);
+    }
+
+    removeScript(script: any)
+    {
+        let idx = -1;
+        let idx2 = -1;
+
+        this.scripts.forEach(each =>
+        {
+            idx++;
+            if (script === each)
+            {
+                idx2 = idx;
+            }
+        });
+
+        if (idx2 !== -1 && idx2 < this.scripts.length)
+        {
+            this.scripts.splice(idx2, 1);
+        }
+    }
 }
 
-export class TaskFolder extends TreeItem 
+export class TaskFolder extends TreeItem
 {
     public taskFiles: TaskFile[] = [];
     public taskFolders: TaskFolder[] = [];
@@ -267,7 +294,7 @@ export class TaskFolder extends TreeItem
         this.taskFolders.push(taskFolder);
     }
 
-    removeTaskFile(taskFile: TaskFile) 
+    removeTaskFile(taskFile: TaskFile)
     {
         let idx = -1;
         let idx2 = -1;
