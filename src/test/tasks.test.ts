@@ -817,6 +817,12 @@ suite('Task tests', () =>
         await configuration.updateWs('enableTsc', false);
         await configuration.updateWs('enableWorkspace', false);
 
+        //
+        // Cover single-if branches in cache module
+        //
+        await teApi.fileCache.addFolderToCache();
+        await teApi.fileCache.addFolderToCache(workspace.workspaceFolders[0]);
+
         console.log("     Re-enable all task providers");
         await configuration.updateWs('enableAnt', true);
         await configuration.updateWs('enableAppPublisher', true);
@@ -881,10 +887,26 @@ suite('Task tests', () =>
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
-        teApi.fileCache.filesCache.clear();
-        teApi.fileCache.addFolderToCache();
+        //
+        // Try a bunch of times to cover all of the hooks in the processing loops
+        //
+        await teApi.fileCache.cancelBuildCache(true);
+        teApi.fileCache.rebuildCache();
+        await teApi.fileCache.cancelBuildCache(true);
+        teApi.fileCache.rebuildCache();
+        await timeout(40);
+        await teApi.fileCache.cancelBuildCache(true);
+        teApi.fileCache.rebuildCache();
+        await timeout(75);
+        await teApi.fileCache.cancelBuildCache(true);
+        teApi.fileCache.rebuildCache();
+        await timeout(100);
+        await teApi.fileCache.cancelBuildCache(true);
+        teApi.fileCache.rebuildCache();
+        await timeout(150);
         await teApi.fileCache.cancelBuildCache(true);
     });
+
 
     test('Test enable and disable views', async function() 
     {
