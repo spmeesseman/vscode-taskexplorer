@@ -1,3 +1,16 @@
+## [1.23.9](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.8...v1.23.9) (2020-02-20)
+
+
+### Bug Fixes
+
+* **gulp:** tasks defined as exports are not picked up - fixes [#41](https://github.com/spmeesseman/vscode-taskexplorer/issues/41) ([49d1ad8](https://github.com/spmeesseman/vscode-taskexplorer/commit/49d1ad8))
+
+
+### Build System
+
+* attempt fix broken vsce release ([c2c3fca](https://github.com/spmeesseman/vscode-taskexplorer/commit/c2c3fca))
+* bump semantic-release-vsce to 3.0.1 - fixes broken vsce release ([5f75591](https://github.com/spmeesseman/vscode-taskexplorer/commit/5f75591))
+
 ## [1.23.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.7...v1.23.8) (2020-02-20)
 
 
