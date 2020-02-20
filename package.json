@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "1.23.1",
+    "version": "1.23.8",
     "displayName": "Task Explorer",
     "description": "Manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
@@ -47,42 +47,73 @@
     "activationEvents": [
         "*"
     ],
-    "files": [
-        "res",
-        "src/*.js",
-        "src/common/*.js",
-        "types"
-    ],
     "scripts": {
+        "build": "npx tsc -p ./",
+        "build-babel": "babel src --out-dir out --extensions \".js,.ts\" && tsc --declaration --emitDeclarationOnly -p ./",
+        "babel:watch": "nodemon -e js,ts,json --watch src --watch .babelrc.js --exec \"(babel src --out-dir out --extensions '.js,.ts'; exit 0)\"",
+        "clean": "rimraf out",
+        "compile": "npx tsc -p ./",
+        "nyc-coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
+        "nyc-coverage1": "nyc npm run test",
+        "nyc-coverage2": "nyc --reporter=lcov mocha 'src/test/**/*.ts' --recursive",
+        "nyc-test-babel": "npm run test && nyc report && nyc report --reporter=lcov",
+        "nyc-test-babel-before": "set BABEL_ENV=coverage && rimraf .nyc_output && rimraf test-reports && rimraf coverage && rimraf c:\\code\\data\\user-data\\cacheddata && npm run build-babel && npm run coverage-full-on",
+        "nyc-report": "nyc report && nyc report --reporter=lcov",
+        "coverage-open-report": "chrome.exe coverage/lcov-report/index.html",
+        "coverage-full-on": "enable-full-coverage.sh",
+        "coverage-full-off": "enable-full-coverage.sh --off",
+        "coverage-run-codecov": "codecov --disable=gcov --disable=detect --token=${codecovToken} --build 100",
         "package": "vsce package",
         "publish": "vsce publish",
+        "rebuild": "npm run clean && npm run build",
+        "semantic_release-release": "semantic-release",
+        "semantic_release-release-no-ci": "semantic-release --no-ci",
+        "semantic_release-release-dry": "semantic-release --dry-run",
+        "test": "node ./out/test/runTest.js",
+        "testafter": "npm run coverage-full-off",
+        "testbefore": "rimraf test-reports && rimraf coverage && rimraf c:\\code\\data\\user-data\\cacheddata && npm run compile && npm run coverage-full-on",
         "vscode:prepublish": "npm run build",
-        "build": "npx tsc -p ./",
-        "compile": "npx tsc -p ./",
-        "semantic-release": "semantic-release",
-        "semantic-release-no-ci": "semantic-release --no-ci",
-        "semantic-release-dry": "semantic-release --dry-run",
-        "watch": "tsc -watch -p ./",
-        "test": "node ./out/test/runTest.js"
+        "watch": "tsc -watch -p ./"
     },
     "dependencies": {
+        "@babel/runtime": "^7.8.4",
         "is-utf8": "^0.2.1",
         "jsonc-parser": "^2.2.0",
         "minimatch": "^3.0.4",
-        "semver": "^6.3.0",
         "vscode-nls": "^4.1.1",
         "xml2js": "^0.4.23"
     },
     "devDependencies": {
+        "@babel/cli": "^7.8.4",
+        "@babel/core": "^7.8.4",
+        "@babel/plugin-proposal-class-properties": "^7.8.3",
+        "@babel/plugin-proposal-export-default-from": "^7.8.3",
+        "@babel/plugin-proposal-export-namespace-from": "^7.8.3",
+        "@babel/plugin-proposal-nullish-coalescing-operator": "^7.8.3",
+        "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
+        "@babel/plugin-proposal-optional-chaining": "^7.8.3",
+        "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+        "@babel/plugin-transform-modules-commonjs": "^7.8.3",
+        "@babel/plugin-transform-runtime": "^7.8.3",
+        "@babel/plugin-transform-typescript": "^7.8.3",
+        "@babel/preset-env": "^7.8.4",
+        "@babel/preset-typescript": "^7.8.3",
+        "@babel/register": "^7.8.3",
+        "@istanbuljs/nyc-config-hook-run-in-this-context": "^1.0.0",
+        "@istanbuljs/nyc-config-typescript": "^1.0.1",
         "@semantic-release/changelog": "^3.0.6",
         "@semantic-release/git": "^7.0.18",
         "@types/glob": "^7.1.1",
+        "@types/istanbul": "^0.4.30",
         "@types/minimatch": "^3.0.3",
         "@types/mocha": "^5.2.7",
-        "@types/node": "^12.12.26",
+        "@types/node": "^13.7.1",
         "@types/semver": "^6.2.1",
         "@types/vscode": "^1.30.0",
         "@types/xml2js": "^0.4.5",
+        "babel-plugin-add-module-exports": "^1.0.2",
+        "babel-plugin-istanbul": "^6.0.0",
+        "codecov": "^3.6.5",
         "conventional-changelog-spm": "^1.2.3",
         "cz-conventional-changelog": "^3.1.0",
         "decache": "^4.5.1",
@@ -90,18 +121,34 @@
         "glob": "^7.1.6",
         "grunt": "^1.0.4",
         "gulp": "^4.0.2",
-        "madge": "^3.7.0",
+        "istanbul": "^0.4.5",
         "mocha": "^6.2.2",
+        "mocha-junit-reporter": "^1.23.3",
+        "mocha-multi-reporters": "^1.1.7",
+        "nodemon": "^2.0.2",
+        "nyc": "^15.0.0",
         "prettier": "^1.19.1",
         "prettylint": "^1.0.0",
-        "semantic-release": "^15.14.0",
+        "remap-istanbul": "^0.13.0",
+        "rimraf": "^3.0.2",
+        "semantic-release": "^17.0.3",
         "semantic-release-vsce": "^3.0.0",
+        "semver": "^7.1.3",
+        "source-map-support": "^0.5.16",
+        "ts-node": "^8.6.2",
         "tslint": "^5.20.1",
         "typescript": "^3.7.5",
         "vsce": "^1.72.0",
         "vscode-nls-dev": "3.2.7",
         "vscode-test": "^1.3.0"
     },
+    "greenkeeper": {
+        "ignore": [
+            "@types/node"
+        ]
+    },
+    "mocha": {},
+    "nyc": {},
     "contributes": {
         "viewsContainers": {
             "activitybar": [
@@ -784,6 +831,7 @@
                 },
                 "taskExplorer.pathToAnt": {
                     "type": "string",
+                    "default": "ant.bat",
                     "description": "%config.taskExplorer.pathToAnt%"
                 },
                 "taskExplorer.pathToAppPublisher": {
@@ -796,34 +844,42 @@
                 },
                 "taskExplorer.pathToBash": {
                     "type": "string",
+                    "default": "bash",
                     "description": "%config.taskExplorer.pathToBash%"
                 },
                 "taskExplorer.pathToGradle": {
                     "type": "string",
+                    "default": "gradle.bat",
                     "description": "%config.taskExplorer.pathToGradle%"
                 },
                 "taskExplorer.pathToMake": {
                     "type": "string",
+                    "default": "nmake",
                     "description": "%config.taskExplorer.pathToMake%"
                 },
                 "taskExplorer.pathToNsis": {
                     "type": "string",
+                    "default": "makensis",
                     "description": "%config.taskExplorer.pathToNsis%"
                 },
                 "taskExplorer.pathToPerl": {
                     "type": "string",
+                    "default": "perl",
                     "description": "%config.taskExplorer.pathToPerl%"
                 },
                 "taskExplorer.pathToPython": {
                     "type": "string",
+                    "default": "python",
                     "description": "%config.taskExplorer.pathToPython%"
                 },
                 "taskExplorer.pathToPowershell": {
                     "type": "string",
+                    "default": "powershell",
                     "description": "%config.taskExplorer.pathToPowershell%"
                 },
                 "taskExplorer.pathToRuby": {
                     "type": "string",
+                    "default": "ruby",
                     "description": "%config.taskExplorer.pathToRuby%"
                 },
                 "taskExplorer.debug": {
@@ -996,7 +1052,9 @@
             },
             {
                 "type": "app-publisher",
-                "required": [],
+                "required": [
+                    "cmdLine"
+                ],
                 "properties": {
                     "script": {
                         "type": "string",
@@ -1054,17 +1112,12 @@
                 "type": "script",
                 "required": [
                     "scriptType",
-                    "cmdLine",
                     "fileName"
                 ],
                 "properties": {
                     "scriptType": {
                         "type": "string",
                         "description": "%taskdef.script.scriptType%"
-                    },
-                    "cmdLine": {
-                        "type": "string",
-                        "description": "%taskdef.script.cmdLine%"
                     },
                     "path": {
                         "type": "string",

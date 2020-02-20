@@ -1,3 +1,66 @@
+## [1.23.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.7...v1.23.8) (2020-02-20)
+
+
+### Documentation
+
+* **readme:** update badges ([5927563](https://github.com/spmeesseman/vscode-taskexplorer/commit/5927563))
+
+## [1.23.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.6...v1.23.7) (2020-02-19)
+
+
+### Bug Fixes
+
+* when copying and pasting multiple task files into the same folder, tasks randomly are no imported ([89534ea](https://github.com/spmeesseman/vscode-taskexplorer/commit/89534ea))
+
+## [1.23.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.5...v1.23.6) (2020-02-18)
+
+
+### Bug Fixes
+
+* v1.23.5 is broken, receiving error 'each.removeScript is no a function' ([6ad65eb](https://github.com/spmeesseman/vscode-taskexplorer/commit/6ad65eb))
+
+
+### Documentation
+
+* **readme:** update badges with devops info ([81f1275](https://github.com/spmeesseman/vscode-taskexplorer/commit/81f1275))
+
+## [1.23.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.4...v1.23.5) (2020-02-18)
+
+
+### Bug Fixes
+
+* app-publisher tasks 'mantis release' and 'send notification email' are mapped incorrectly and running the 're-publish' task. ([21831a4](https://github.com/spmeesseman/vscode-taskexplorer/commit/21831a4))
+* when changing the default shell, some scripts will no longer run until a refresh or reload is done ([7854324](https://github.com/spmeesseman/vscode-taskexplorer/commit/7854324))
+
+## [1.23.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.3...v1.23.4) (2020-02-18)
+
+
+### Code Refactoring
+
+* nodes created using 'dashed groupings' should be shown first under the parent node before any individual tasks are, i.e. the same behavior as that of a file explorer with files/folders ([431b456](https://github.com/spmeesseman/vscode-taskexplorer/commit/431b456))
+
+## [1.23.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.2...v1.23.3) (2020-02-18)
+
+
+### Bug Fixes
+
+* removing a path from the 'includeAntPath' setting has does not remove the fswatcher until restart ([1a27d3f](https://github.com/spmeesseman/vscode-taskexplorer/commit/1a27d3f))
+* when pasting multiple task files into a workspace folder, sometimes tasks do not get imported ([92b7a7b](https://github.com/spmeesseman/vscode-taskexplorer/commit/92b7a7b))
+
+
+### Code Refactoring
+
+* make addToExcludes fully async ([ff951bc](https://github.com/spmeesseman/vscode-taskexplorer/commit/ff951bc))
+* make all 'enable' settings available in vscode folder settings ([2154498](https://github.com/spmeesseman/vscode-taskexplorer/commit/2154498))
+* make checks on empty util.readfile ([d367895](https://github.com/spmeesseman/vscode-taskexplorer/commit/d367895))
+
+## [1.23.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.1...v1.23.2) (2020-02-16)
+
+
+### Bug Fixes
+
+* when trying to start a task while the explorer is busy, error notification randomly pops up ([c7e8d1e](https://github.com/spmeesseman/vscode-taskexplorer/commit/c7e8d1e))
+
 ## [1.23.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.0...v1.23.1) (2020-02-14)
 
 

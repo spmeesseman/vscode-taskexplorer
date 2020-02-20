@@ -1,7 +1,7 @@
 
 import {
-    workspace, RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext,
-    commands, window
+    RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext,
+    commands, window, Uri
 } from "vscode";
 import * as fs from "fs";
 import * as minimatch from "minimatch";
@@ -17,28 +17,54 @@ let logOutputChannel: OutputChannel | undefined;
 export async function asyncForEach(array: any, callback: any)
 {
     for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array);
+        const result = await callback(array[index], index, array);
+        if (result === false) {
+            break;
+        }
     }
 }
 
 
-export function initLog(context: ExtensionContext)
+export async function asyncMapForEach(map: any, callback: any)
+{
+    for (const entry of map.entries()) {
+        const result = await callback(entry[1], entry[0], map);
+        if (result === false) {
+            break;
+        }
+    }
+}
+
+
+export function initLog(context: ExtensionContext, showOutput?: boolean)
 {
     // Set up a log in the Output window
     //
     logOutputChannel = window.createOutputChannel("Task Explorer");
     context.subscriptions.push(logOutputChannel);
-    context.subscriptions.push(commands.registerCommand("taskExplorer.showOutput", () => logOutputChannel.show()));
-    const showOutput = configuration.get<boolean>("showOutput");
-    if (showOutput) {
+    context.subscriptions.push(commands.registerCommand("taskExplorer.showOutput", () => {
+        if (logOutputChannel) { logOutputChannel.show();
+    }}));
+    const showOutputWin = showOutput || configuration.get<boolean>("showOutput");
+    if (logOutputChannel && showOutputWin) {
         logOutputChannel.show();
     }
 }
 
 
+export function getCwd(uri: Uri): string
+{
+    let dir = uri.fsPath.substring(0, uri.fsPath.lastIndexOf("\\") + 1);
+    if (process.platform !== "win32") {
+        dir = uri.fsPath.substring(0, uri.fsPath.lastIndexOf("/") + 1);
+    }
+    return dir;
+}
+
+
 export function camelCase(name: string, indexUpper: number)
 {
-    if (!name) {
+    if (!name || indexUpper <= 0 || indexUpper >= name.length) {
       return name;
     }
 
@@ -99,32 +125,32 @@ export function isExcluded(uriPath: string, logPad = "")
 
     const exclude = configuration.get<string | string[]>("exclude");
 
-    this.log("", 2);
-    this.log(logPad + "Check exclusion", 2);
-    this.logValue(logPad + "   path", uriPath, 2);
+    log("", 2);
+    log(logPad + "Check exclusion", 2);
+    logValue(logPad + "   path", uriPath, 2);
 
     if (exclude)
     {
         if (Array.isArray(exclude))
         {
             for (const pattern of exclude) {
-                this.logValue(logPad + "   checking pattern", pattern, 3);
+                logValue(logPad + "   checking pattern", pattern, 3);
                 if (testForExclusionPattern(uriPath, pattern)) {
-                    this.log(logPad + "   Excluded!", 2);
+                    log(logPad + "   Excluded!", 2);
                     return true;
                 }
             }
         }
         else {
-            this.logValue(logPad + "   checking pattern", exclude, 3);
+            logValue(logPad + "   checking pattern", exclude, 3);
             if (testForExclusionPattern(uriPath, exclude)) {
-              this.log(logPad + "   Excluded!", 2);
+              log(logPad + "   Excluded!", 2);
               return true;
             }
         }
     }
 
-    this.log(logPad + "   Not excluded", 2);
+    log(logPad + "   Not excluded", 2);
     return false;
 }
 
@@ -153,7 +179,7 @@ export async function readFile(file: string): Promise<string>
             if (err) {
                 reject(err);
             }
-            resolve(data.toString());
+            resolve(data ? data.toString() : "");
         });
     });
 }
@@ -161,7 +187,8 @@ export async function readFile(file: string): Promise<string>
 
 export function readFileSync(file: string)
 {
-    return fs.readFileSync(file).toString();
+    const buf = fs.readFileSync(file);
+    return (buf ? buf.toString() : "");
 }
 
 
@@ -213,9 +240,9 @@ export async function log(msg: string, level?: number)
         return;
     }
 
-    if (workspace.getConfiguration("taskExplorer").get("debug") === true)
+    if (configuration.get("debug") === true)
     {
-        if (!level || level <= configuration.get<number>("debugLevel")) {
+        if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
             logOutputChannel.appendLine(msg);
         }
         if (writeToConsole === true) {
@@ -246,8 +273,8 @@ export async function logValue(msg: string, value: any, level?: number)
         logMsg += ": null";
     }
 
-    if (workspace.getConfiguration("taskExplorer").get("debug") === true) {
-        if (!level || level <= configuration.get<number>("debugLevel")) {
+    if (configuration.get("debug") === true) {
+        if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
             logOutputChannel.appendLine(logMsg);
         }
         if (writeToConsole === true) {
