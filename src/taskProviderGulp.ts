@@ -157,45 +157,66 @@ async function findTargets(fsPath: string): Promise<StringMap>
     while (eol !== -1)
     {
         let line: string = contents.substring(idx, eol).trim();
-        if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("gulp.task"))
+        console.log(line);
+        if (line.length > 0)
         {
-            let idx1 = line.indexOf("'");
-            if (idx1 === -1) {
-                idx1 = line.indexOf('"');
-            }
-
-            if (idx1 === -1) // check next line for task name
+            let idx1: number;
+            if (line.toLowerCase().trimLeft().startsWith("exports."))
             {
-                let eol2 = eol + 1;
-                eol2 = contents.indexOf("\n", eol2);
-                line = contents.substring(eol + 1, eol2).trim();
-                if (line.startsWith("'") || line.startsWith('"'))
-                {
-                    idx1 = line.indexOf("'");
-                    if (idx1 === -1) {
-                        idx1 = line.indexOf('"');
-                    }
-                    if (idx1 !== -1) {
-                        eol = eol2;
-                    }
-                }
-            }
-
-            if (idx1 !== -1)
-            {
-                idx1++;
-                let idx2 = line.indexOf("'", idx1);
+                idx1 = line.indexOf(".") + 1;
+                let idx2 = line.indexOf(" ", idx1);
                 if (idx2 === -1) {
-                    idx2 = line.indexOf('"', idx1);
-                }
-                if (idx2 !== -1)
+                    idx2 = line.indexOf("=", idx1);
+                }console.log(idx1);console.log(idx2);
+                if (idx1 !== -1)
                 {
                     const tgtName = line.substring(idx1, idx2).trim();
-
                     if (tgtName) {
                         scripts[tgtName] = "";
                         util.log("   found target");
                         util.logValue("      name", tgtName);
+                    }
+                }
+            }
+            else if (line.toLowerCase().trimLeft().startsWith("gulp.task"))
+            {
+                idx1 = line.indexOf("'");
+                if (idx1 === -1) {
+                    idx1 = line.indexOf('"');
+                }
+
+                if (idx1 === -1) // check next line for task name
+                {
+                    let eol2 = eol + 1;
+                    eol2 = contents.indexOf("\n", eol2);
+                    line = contents.substring(eol + 1, eol2).trim();
+                    if (line.startsWith("'") || line.startsWith('"'))
+                    {
+                        idx1 = line.indexOf("'");
+                        if (idx1 === -1) {
+                            idx1 = line.indexOf('"');
+                        }
+                        if (idx1 !== -1) {
+                            eol = eol2;
+                        }
+                    }
+                }
+
+                if (idx1 !== -1)
+                {
+                    idx1++;
+                    let idx2 = line.indexOf("'", idx1);
+                    if (idx2 === -1) {
+                        idx2 = line.indexOf('"', idx1);
+                    }
+                    if (idx2 !== -1)
+                    {
+                        const tgtName = line.substring(idx1, idx2).trim();
+                        if (tgtName) {
+                            scripts[tgtName] = "";
+                            util.log("   found target");
+                            util.logValue("      name", tgtName);
+                        }
                     }
                 }
             }
