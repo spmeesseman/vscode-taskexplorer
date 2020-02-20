@@ -418,9 +418,9 @@ jobs:
       demands: npm
     steps:
       - task: NodeTool@0
-        displayName: 'Use Node 10.x'
+        displayName: 'Use Node 12.x'
         inputs:
-          versionSpec: 10.x
+          versionSpec: 12.x
       - task: Npm@1
         displayName: 'Install dependencies'
         inputs:
