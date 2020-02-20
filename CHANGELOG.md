@@ -1,3 +1,10 @@
+## [1.23.8](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.7...v1.23.8) (2020-02-20)
+
+
+### Documentation
+
+* **readme:** update badges ([5927563](https://github.com/spmeesseman/vscode-taskexplorer/commit/5927563))
+
 ## [1.23.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.6...v1.23.7) (2020-02-19)
 
 
