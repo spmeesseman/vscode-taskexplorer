@@ -85,8 +85,8 @@ jobs:
       matrix:
         CodeCurrent:
           CODE_VERSION:
-        CodeInssiders:
-          CODE_VERSION: 'insiders'
+        #CodeInssiders:
+        #  CODE_VERSION: 'insiders'
     pool:
       name: Hosted VS2017
       demands: npm
