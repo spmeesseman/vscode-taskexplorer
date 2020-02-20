@@ -887,6 +887,7 @@ suite('Task tests', () =>
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
+        this.timeout(60 * 1000);
         //
         // Try a bunch of times to cover all of the hooks in the processing loops
         //
