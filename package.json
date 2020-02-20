@@ -107,7 +107,7 @@
         "@types/istanbul": "^0.4.30",
         "@types/minimatch": "^3.0.3",
         "@types/mocha": "^5.2.7",
-        "@types/node": "^12.12.26",
+        "@types/node": "^13.7.1",
         "@types/semver": "^6.2.1",
         "@types/vscode": "^1.30.0",
         "@types/xml2js": "^0.4.5",
