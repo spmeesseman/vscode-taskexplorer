@@ -130,7 +130,7 @@ jobs:
         displayName: 'Publish Code Coverage to Codecov'
         env:
           CODECOV_TOKEN: $(codecovToken)
-  - job: Windows_Node13
+  - job: Windows_Node12
     strategy:
       matrix:
         CodeCurrent:
@@ -142,9 +142,9 @@ jobs:
       demands: npm
     steps:
       - task: NodeTool@0
-        displayName: 'Use Node 13.x'
+        displayName: 'Use Node 12.x'
         inputs:
-          versionSpec: 13.x
+          versionSpec: 12.x
       - task: Npm@1
         displayName: 'Install dependencies'
         inputs:
@@ -180,6 +180,56 @@ jobs:
         displayName: 'Publish Code Coverage to Codecov'
         env:
           CODECOV_TOKEN: $(codecovToken)
+  - job: Windows_Node13
+    strategy:
+      matrix:
+        CodeCurrent:
+          CODE_VERSION:
+        #CodeInssiders:
+        #  CODE_VERSION: 'insiders'  # 2/20/2019 - this test is causing cobertura coverage to fail 
+    pool:
+      name: Hosted VS2017
+      demands: npm
+    steps:
+      - task: NodeTool@0
+        displayName: 'Use Node 13.x'
+        inputs:
+          versionSpec: 13.x
+      - task: Npm@1
+        displayName: 'Install dependencies'
+        inputs:
+          verbose: false
+      - task: Npm@1
+        displayName: 'Compile sources'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run build'
+      - bash: sed -i.bak 's/"\*"//g' package.json
+        displayName: 'Enable full coverage'
+      - task: Npm@1
+        displayName: 'Run tests'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run test --silent'
+      #- task: PublishTestResults@2
+      #  displayName: 'Publish Test Results'
+      #  inputs:
+      #    testResultsFormat: 'JUnit'
+      #    testResultsFiles: 'test-reports/*.xml'
+      #    mergeTestResults: true
+      #    testRunTitle: '$(Agent.OS) $(Agent.JobName)'
+      #- task: PublishCodeCoverageResults@1
+      #  displayName: 'Publish Code Coverage to Azure'
+      #  inputs:
+      #    codeCoverageTool: Cobertura
+      #    summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+      #    reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
+      #- script: node_modules\.bin\codecov --disable=gcov
+      #  displayName: 'Publish Code Coverage to Codecov'
+      #  env:
+      #    CODECOV_TOKEN: $(codecovToken)
   - job: macOS
     strategy:
       matrix:
@@ -295,15 +345,74 @@ jobs:
         displayName: 'Publish Code Coverage to Codecov'
         env:
           CODECOV_TOKEN: $(codecovToken)
+  - job: Linux_Node12
+    strategy:
+      matrix:
+        CodeCurrent:
+          CODE_VERSION:
+        #CodeInssiders:
+        #  CODE_VERSION: 'insiders'
+    pool:
+      name: Hosted Ubuntu 1604
+      demands: npm
+    steps:
+      - task: NodeTool@0
+        displayName: 'Use Node 12.x'
+        inputs:
+          versionSpec: 12.x
+      - task: Npm@1
+        displayName: 'Install dependencies'
+        inputs:
+          verbose: false
+      - task: Npm@1
+        displayName: 'Compile sources'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run build'
+      - script: |
+          set -e
+          /usr/bin/Xvfb :10 -ac >> /tmp/Xvfb.out 2>&1 &
+          disown -ar
+        displayName: 'Start xvfb'
+      - bash: sed -i.bak 's/"\*"//g' package.json
+        displayName: 'Enable full coverage'
+      - task: Npm@1
+        displayName: 'Run tests'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run test --silent'
+        env:
+          DISPLAY: :10
+      - task: PublishTestResults@2
+        displayName: 'Publish Test Results'
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: 'test-reports/*.xml'
+          mergeTestResults: true
+          testRunTitle: '$(Agent.OS) $(Agent.JobName)'
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Publish Code Coverage to Azure'
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/coverage/lcov-report'
+      - script: node_modules/.bin/codecov --disable=gcov
+        displayName: 'Publish Code Coverage to Codecov'
+        env:
+          CODECOV_TOKEN: $(codecovToken)
   - job: Release
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     #condition: succeeded()
     dependsOn:
     - Windows
     - Windows_Node10
+    - Windows_Node12
     - Windows_Node13
     - macOS
     - Linux
+    - Linux_Node12
     pool:
       name: Hosted Ubuntu 1604
       demands: npm
