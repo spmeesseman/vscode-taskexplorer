@@ -55,7 +55,7 @@
 	"command.addToExcludes": "Add to excludes list",
 	"command.stop": "Stop",
 	"command.pause": "Pause",
-	"command.debug": "Debug",
+	"command.debug": "Debugging ",
 	"command.open": "Open",
 	"command.openTerminal": "Open Terminal",
 	"command.runInstall": "Run npm install",
