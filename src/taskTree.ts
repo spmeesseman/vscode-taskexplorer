@@ -59,12 +59,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const subscriptions = context.subscriptions;
         this.extensionContext = context;
         this.name = name;
-        subscriptions.push(commands.registerCommand(name + ".run", this.run, this));
+        subscriptions.push(commands.registerCommand(name + ".run", this.run, this));                     // (TaskItem) =>
         subscriptions.push(commands.registerCommand(name + ".runLastTask", this.runLastTask, this));
-        subscriptions.push(commands.registerCommand(name + ".stop", this.stop, this));
-        subscriptions.push(commands.registerCommand(name + ".restart", this.restart, this));
-        subscriptions.push(commands.registerCommand(name + ".pause", this.pause, this));
-        subscriptions.push(commands.registerCommand(name + ".open", this.open, this));
+        subscriptions.push(commands.registerCommand(name + ".stop", this.stop, this));                   // (TaskItem) =>
+        subscriptions.push(commands.registerCommand(name + ".restart", this.restart, this));             // (TaskItem) =>
+        subscriptions.push(commands.registerCommand(name + ".pause", this.pause, this));                 // (TaskItem) =>
+        subscriptions.push(commands.registerCommand(name + ".open", this.open, this));                   // (TaskItem) =>
+        subscriptions.push(commands.registerCommand(name + ".openTerminal", this.openTerminal, this));   // (TaskItem) =>
         subscriptions.push(commands.registerCommand(name + ".refresh", () => { this.refresh(true, false); }, this));
         subscriptions.push(commands.registerCommand(name + ".runInstall", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "install"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runUpdate", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "update"); }, this));
@@ -190,7 +191,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             window.terminals.forEach(async (term, idx) =>
             {
                 const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
-                if (term.name.toLowerCase() === termTaskName.toLowerCase())
+                if (termTaskName.toLowerCase().replace("task - ", "").indexOf(term.name.toLowerCase().replace("task - ", "")) !== -1)
                 {
                     term.sendText("N", true);
                     taskItem.paused = false;
@@ -511,6 +512,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // });
 
         // this.run(taskItem);
+    }
+
+
+    private async openTerminal(taskItem: TaskItem)
+    {
+        window.terminals.forEach(async (term, idx) =>
+        {
+            window.terminals.forEach(async (term, idx) =>
+            {
+                const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+                if (termTaskName.toLowerCase().replace("task - ", "").indexOf(term.name.toLowerCase().replace("task - ", "")) !== -1)
+                {
+                    term.show();
+                }
+            });
+        });
     }
 
 

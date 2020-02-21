@@ -57,6 +57,7 @@
 	"command.pause": "Pause",
 	"command.debug": "Debug",
 	"command.open": "Open",
+	"command.openTerminal": "Open Terminal",
 	"command.runInstall": "Run npm install",
 	"command.runAudit": "Run npm audit",
 	"command.runAuditFix": "Run npm audit fix",

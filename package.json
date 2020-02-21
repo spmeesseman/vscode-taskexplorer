@@ -227,6 +227,15 @@
                 }
             },
             {
+                "command": "taskExplorerSideBar.openTerminal",
+                "title": "%command.openTerminal%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "dark": "res/dark/terminal.svg",
+                    "light": "res/light/terminal.svg"
+                }
+            },
+            {
                 "command": "taskExplorerSideBar.open",
                 "title": "%command.open%",
                 "when": "config.taskExplorer.enableSideBar"
@@ -304,6 +313,15 @@
                 "icon": {
                     "dark": "res/dark/restart.svg",
                     "light": "res/light/restart.svg"
+                }
+            },
+            {
+                "command": "taskExplorer.openTerminal",
+                "title": "%command.openTerminal%",
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "dark": "res/dark/terminal.svg",
+                    "light": "res/light/terminal.svg"
                 }
             },
             {
@@ -545,6 +563,11 @@
                     "group": "inline"
                 },
                 {
+                    "command": "taskExplorer.openTerminal",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == runningScript",
+                    "group": "inline"
+                },
+                {
                     "command": "taskExplorer.restart",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == runningScript",
                     "group": "inline"
@@ -676,7 +699,7 @@
                 },
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorerSideBar && viewItem == taskGroupGrunt"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupGrunt"
                 },
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
@@ -705,6 +728,11 @@
                 {
                     "command": "taskExplorerSideBar.run",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskExplorerSideBar.openTerminal",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == runningScript",
                     "group": "inline"
                 },
                 {
