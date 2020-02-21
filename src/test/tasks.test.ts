@@ -364,15 +364,17 @@ suite('Task tests', () =>
 
         fs.writeFileSync(
             file3,
-            "var gulp = require('gulp');\n" +
-            "gulp.task('hello5', (done) => {\n" +
-            "    console.log('Hello5!');\n" +
-            '    done();\n' +
-            '});\n' +
-            'gulp.task(\n"hello6", (done) => {\n' +
-            "    console.log('Hello6!');\n" +
-            '    done();\n' +
-            '});\n'
+            "const { series } = require('gulp');\n" +
+            "function clean(cb) {\n" +
+            "    console.log('clean!!!');\n" +
+            '    cb();\n' +
+            '};\n' +
+            'function build(cb) {' +
+            "    console.log('build!!!');\n" +
+            '    cb();\n' +
+            '};\n' +
+            'exports.build = build;\n' +
+            'exports.default = series(clean, build);\n'
         );
     });
 
