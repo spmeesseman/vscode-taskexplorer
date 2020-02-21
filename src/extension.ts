@@ -39,7 +39,7 @@ export interface TaskExplorerApi
 
 export async function activate(context: ExtensionContext, disposables: Disposable[]): Promise<TaskExplorerApi>
 {
-    util.initLog(context, true);
+    util.initLog("taskExplorer", "Task Explorer", context);
     initStorage(context);
 
     util.log("");

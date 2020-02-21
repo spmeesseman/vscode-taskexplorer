@@ -36,19 +36,26 @@ export async function asyncMapForEach(map: any, callback: any)
 }
 
 
-export function initLog(context: ExtensionContext, showOutput?: boolean)
+export function initLog(settingGrpName: string, dispName: string, context?: ExtensionContext, showLog?: boolean)
 {
+    function showLogOutput(show: boolean)
+    {
+        if (logOutputChannel && show) {
+            logOutputChannel.show();
+        }
+    }
+    //
     // Set up a log in the Output window
     //
-    logOutputChannel = window.createOutputChannel("Task Explorer");
-    context.subscriptions.push(logOutputChannel);
-    context.subscriptions.push(commands.registerCommand("taskExplorer.showOutput", () => {
-        if (logOutputChannel) { logOutputChannel.show();
-    }}));
-    const showOutputWin = showOutput || configuration.get<boolean>("showOutput");
-    if (logOutputChannel && showOutputWin) {
-        logOutputChannel.show();
+    logOutputChannel = window.createOutputChannel(dispName);
+    if (context)
+    {
+        context.subscriptions.push(logOutputChannel);
+        context.subscriptions.push(
+            commands.registerCommand(settingGrpName + ".showOutput", (show: boolean) => showLogOutput)
+        );
     }
+    showLogOutput(showLog);
 }
 
 

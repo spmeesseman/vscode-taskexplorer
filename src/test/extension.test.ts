@@ -90,7 +90,7 @@ suite("Extension Tests", () =>
             console.log('        Manually activating extension for full coverage');
             try {
                 teApi = await ext.activate();
-                assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
+                assert(vscode.commands.executeCommand("taskExplorer.showOutput", true));
             }
             catch(e) {
                 assert.fail("Failed to activate extension");
@@ -110,12 +110,12 @@ suite("Extension Tests", () =>
             // Set extension api exports
             //
             teApi = ext.exports;
-            assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
+            assert(vscode.commands.executeCommand("taskExplorer.showOutput", true));
         }
 
         //assert(treeDataProvider2);
         assert(teApi, "Exported API is empty");
-        assert(vscode.commands.executeCommand("taskExplorer.showOutput"));
+        assert(vscode.commands.executeCommand("taskExplorer.showOutput", true));
     });
 
     
