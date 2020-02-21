@@ -1,3 +1,15 @@
+# [1.24.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.9...v1.24.0) (2020-02-21)
+
+
+### Bug Fixes
+
+* if logging is turned on, the output window is displayed when extension activates ([a7ace49](https://github.com/spmeesseman/vscode-taskexplorer/commit/a7ace49))
+
+
+### Features
+
+* add 'open temrinal' button for running tasks - closes [#39](https://github.com/spmeesseman/vscode-taskexplorer/issues/39) ([3b4be06](https://github.com/spmeesseman/vscode-taskexplorer/commit/3b4be06))
+
 ## [1.23.9](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.8...v1.23.9) (2020-02-20)
 
 
