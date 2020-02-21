@@ -351,19 +351,6 @@ suite('Task tests', () =>
 
         fs.writeFileSync(
             file2,
-            "var gulp = require('gulp');\n" +
-            "gulp.task('hello3', (done) => {\n" +
-            "    console.log('Hello3!');\n" +
-            '    done();\n' +
-            '});\n' +
-            'gulp.task(\n"hello4", (done) => {\n' +
-            "    console.log('Hello4!');\n" +
-            '    done();\n' +
-            '});\n'
-        );
-
-        fs.writeFileSync(
-            file3,
             "const { series } = require('gulp');\n" +
             "function clean(cb) {\n" +
             "    console.log('clean!!!');\n" +
@@ -375,6 +362,19 @@ suite('Task tests', () =>
             '};\n' +
             'exports.build = build;\n' +
             'exports.default = series(clean, build);\n'
+        );
+
+        fs.writeFileSync(
+            file3,
+            "var gulp = require('gulp');\n" +
+            "gulp.task('hello3', (done) => {\n" +
+            "    console.log('Hello3!');\n" +
+            '    done();\n' +
+            '});\n' +
+            'gulp.task(\n"hello4", (done) => {\n' +
+            "    console.log('Hello4!');\n" +
+            '    done();\n' +
+            '});\n'
         );
     });
 
