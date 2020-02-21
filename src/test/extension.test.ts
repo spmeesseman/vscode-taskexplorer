@@ -25,9 +25,96 @@ suite("Extension Tests", () =>
     test("Enable required testing options", async function()
     {
         this.timeout(10 * 1000);
-
         assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
+        await initSettings();
+        await vscode.workspace.getConfiguration().update('terminal.integrated.shell.windows', 
+                                                         'C:\\Windows\\System32\\cmd.exe',
+                                                         vscode.ConfigurationTarget.Workspace);
+        setWriteToConsole(false); // FOR DEBUGGING - write debug logging from exiension to console
+    });
 
+
+    test("Get active extension", async function()
+    {
+        let wait = 0;
+        const maxWait = 15;  // seconds
+
+        this.timeout(20 * 1000);
+
+        let ext = vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer");
+        assert(ext, "Could not find extension");
+
+        //
+        // For coverage, we remove activationEvents "*" in package.json, we should
+        // not be active at this point
+        //
+        if (!ext.isActive) 
+        {
+            console.log('        Manually activating extension for full coverage');
+            try {
+                teApi = await ext.activate();
+            }
+            catch(e) {
+                assert.fail("Failed to activate extension");
+            }
+            console.log("         ✔ Extension activated");
+        } 
+        else {
+            console.log('         ℹ Extension is already activated, coverage will not occur');
+            //
+            // Wait for extension to activate
+            //
+            while (!ext.isActive && wait < maxWait * 10) {
+                wait += 1;
+                await timeout(100);
+            }
+            assert(!ext.isActive || wait < maxWait * 10, "Extension did not finish activation within " + maxWait + " seconds");
+            //
+            // If we could somehow deactivate and reactivate the extension here possibly coverage would work?
+            //
+            // ext.deactivate();
+            //
+            // Set extension api exports
+            //
+            teApi = ext.exports;
+        }
+
+        assert(teApi, "Exported API is empty");
+
+        vscode.commands.executeCommand("taskExplorer.showOutput", false);
+        vscode.commands.executeCommand("taskExplorer.showOutput", true);
+    });
+
+    
+    test("Check tree providers", function(done) 
+    {
+        if (!teApi.explorerProvider) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
+        }
+        if (!teApi.sidebarProvider) {
+            assert.fail("        ✘ Task Explorer sidebar tree instance does not exist");
+        }
+        done();
+    });
+
+    test("Check settings", function(done) 
+    {
+        //
+        // On Insiders tests, for whareve reason all settings are OFF, and the run produces
+        // near 0% coverage, check to see if there are some enabled* options turned ON, since
+        // they should ALL be on
+        //
+        if (configuration.get<boolean>("enableAnt") === false)
+        {
+
+        }
+
+        done();
+    });
+
+
+    async function initSettings()
+    {
         //
         // Enable views, use workspace level so that running this test from Code itself
         // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
@@ -62,72 +149,6 @@ suite("Extension Tests", () =>
         await configuration.updateWs('enableTsc', true);
         await configuration.updateWs('enableWorkspace', true);
         await configuration.updateWs('groupDashed', false);
-
-        await vscode.workspace.getConfiguration().update('terminal.integrated.shell.windows', 
-                                                         'C:\\Windows\\System32\\cmd.exe',
-                                                         vscode.ConfigurationTarget.Workspace);
-
-        setWriteToConsole(false); // FOR DEBUGGING - write debug logging from exiension to console
-    });
-
-
-    test("Get active extension", async function()
-    {
-        let wait = 0;
-        const maxWait = 15;  // seconds
-
-        this.timeout(20 * 1000);
-
-        let ext = vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer");
-        assert(ext, "Could not find extension");
-
-        //
-        // For coverage, we remove activationEvents "*" in package.json, we should
-        // not be active at this point
-        //
-        if (!ext.isActive) 
-        {
-            console.log('        Manually activating extension for full coverage');
-            try {
-                teApi = await ext.activate();
-                assert(vscode.commands.executeCommand("taskExplorer.showOutput", true));
-            }
-            catch(e) {
-                assert.fail("Failed to activate extension");
-            }
-            console.log("         ✔ Extension activated");
-        } 
-        else {
-            //
-            // Wait for extension to activate
-            //
-            while (!ext.isActive && wait < maxWait * 10) {
-                wait += 1;
-                await timeout(100);
-            }
-            assert(!ext.isActive || wait < maxWait * 10, "Extension did not finish activation within " + maxWait + " seconds");
-            //
-            // Set extension api exports
-            //
-            teApi = ext.exports;
-            assert(vscode.commands.executeCommand("taskExplorer.showOutput", true));
-        }
-
-        //assert(treeDataProvider2);
-        assert(teApi, "Exported API is empty");
-        assert(vscode.commands.executeCommand("taskExplorer.showOutput", true));
-    });
-
-    
-    test("Check tree providers", function(done) 
-    {
-        if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-        if (!teApi.sidebarProvider) {
-            assert.fail("        ✘ Task Explorer sidebar tree instance does not exist");
-        }
-        done();
-    });
+    }
 
 });
