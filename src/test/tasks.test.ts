@@ -594,17 +594,22 @@ suite('Task tests', () =>
     });
 
 
-    test('Run, pause, and stop a task', async function() 
+    test('Run, pause, open, and stop a task', async function() 
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
         
+        //
+        // Just find and run a batch script...
+        //  
         console.log("    Run a batch task");
-        await asyncMapForEach(taskMap, async (value: TaskItem) =>  {
+        await asyncMapForEach(taskMap, async (value: TaskItem) =>  
+        {
             if (value && value.taskSource === "batch") {
                 await commands.executeCommand("taskExplorer.run", value);
                 await commands.executeCommand("taskExplorer.pause", value);
+                await commands.executeCommand("taskExplorer.openTerminal", value);
                 await commands.executeCommand("taskExplorer.pause", value);
                 await commands.executeCommand("taskExplorer.stop", value);
                 await commands.executeCommand("taskExplorer.runLastTask", value);
@@ -612,9 +617,10 @@ suite('Task tests', () =>
                 return false; // break foreach
             }
         });
-
+        //
+        // Find an npm file and run an "npm install"
+        //  
         console.log("    Run npm install");
-
         let npmRan = false;
         await asyncMapForEach(taskMap, async (value: TaskItem) =>  {
             if (value && value.taskSource === "npm") {
