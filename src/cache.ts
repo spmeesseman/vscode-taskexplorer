@@ -1,5 +1,5 @@
 
-import { workspace, window, RelativePattern, WorkspaceFolder, Uri } from "vscode";
+import { workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment } from "vscode";
 import { log, logValue, timeout, getExcludesGlob, isExcluded, properCase } from "./util";
 import { configuration } from "./common/configuration";
 import { utils } from "mocha";
@@ -68,10 +68,35 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
         dispTaskType = "Ant";
     }
 
+    function statusString(msg: string, statusLength = 0)
+    {
+        if (msg)
+        {
+            if (statusLength > 0)
+            {
+                if (msg.length < statusLength)
+                {
+                    for (let i = msg.length; i < statusLength; i++) {
+                        msg += " ";
+                    }
+                }
+                else {
+                    msg = msg.substring(0, statusLength - 3) + "...";
+                }
+            }
+            return "$(loading~spin) " + msg;
+        }
+
+        return "";
+    }
+
+    const statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
+    statusBarSpace.tooltip = "Task Explorer is building the task cache";
+    statusBarSpace.show();
+
     if (!wsfolder)
     {
-        log("Build cache - Scan all projects for taskType '" + taskType + "'");
-        window.setStatusBarMessage("$(loading) Task Explorer - Scanning projects...");
+        log("Build cache - Scan all projects for taskType '" + taskType + "' (" + dispTaskType + ")");
 
         if (workspace.workspaceFolders)
         {
@@ -83,12 +108,12 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                         if (setCacheBuilding) {
                             cacheBuilding = false;
                         }
-                        window.setStatusBarMessage("");
+                        statusBarSpace.dispose();
                         return;
                     }
 
                     log("   Scan project " + folder.name + " for " + dispTaskType + " tasks");
-                    window.setStatusBarMessage("$(loading~spin) Scanning for " + dispTaskType + " tasks in project " + folder.name + "...");
+                    statusBarSpace.text = statusString("Scanning for " + dispTaskType + " tasks in project " + folder.name, 50);
                     const relativePattern = new RelativePattern(folder, fileBlob);
                     const paths = await workspace.findFiles(relativePattern, getExcludesGlob(folder));
                     for (const fpath of paths)
@@ -98,7 +123,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                             if (setCacheBuilding) {
                                 cacheBuilding = false;
                             }
-                            window.setStatusBarMessage("");
+                            statusBarSpace.dispose();
                             return;
                         }
                         if (!isExcluded(fpath.path)) {
@@ -117,7 +142,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
     else
     {
         log("Build cache - Scan project '" + wsfolder.name + "' for taskType '" + taskType + "'");
-        window.setStatusBarMessage("$(loading~spin) Scanning for tasks in project " + wsfolder.name + "...");
+        statusBarSpace.text = statusString("Scanning for tasks in project " + wsfolder.name);
 
         const relativePattern = new RelativePattern(wsfolder, fileBlob);
         const paths = await workspace.findFiles(relativePattern, getExcludesGlob(wsfolder));
@@ -128,7 +153,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                 if (setCacheBuilding) {
                     cacheBuilding = false;
                 }
-                window.setStatusBarMessage("");
+                statusBarSpace.dispose();
                 return;
             }
             if (!isExcluded(fpath.path)) {
@@ -142,7 +167,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
         }
     }
 
-    window.setStatusBarMessage("");
+    statusBarSpace.dispose();
     log("Cache building complete");
 
     cancel = false;
