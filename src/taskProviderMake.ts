@@ -164,7 +164,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
 
     while (eol !== -1)
     {
-        const line: string = contents.substring(idx, eol).trim();
+        const line: string = contents.substring(idx, eol);
         //
         // Target names always start at position 0 of the line.
         //
@@ -179,7 +179,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
             //
             // Don't incude object targets
             //
-            if (tgtName.indexOf("/") === -1 && tgtName.indexOf("\\") === -1)
+            if (tgtName.indexOf("/") === -1 && tgtName.indexOf("=") === -1 && tgtName.indexOf("\\") === -1)
             {
                 scripts[tgtName] = "";
                 util.log("   found target");
