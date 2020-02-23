@@ -1,3 +1,15 @@
+## [1.24.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.24.0...v1.24.1) (2020-02-23)
+
+
+### Code Refactoring
+
+* when building the cache, the status messages cause any traling status messages to jump around too much ([ad717e7](https://github.com/spmeesseman/vscode-taskexplorer/commit/ad717e7))
+
+
+### Documentation
+
+* **readme:** update features section, remove maxage query param from github badges ([9eedc03](https://github.com/spmeesseman/vscode-taskexplorer/commit/9eedc03))
+
 # [1.24.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.23.9...v1.24.0) (2020-02-21)
 
 
