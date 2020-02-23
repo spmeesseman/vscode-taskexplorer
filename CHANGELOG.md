@@ -1,3 +1,15 @@
+## [1.24.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.24.1...v1.24.2) (2020-02-23)
+
+
+### Bug Fixes
+
+* makefile target detection is malfunctioning - fixes [#82](https://github.com/spmeesseman/vscode-taskexplorer/issues/82) ([a3211da](https://github.com/spmeesseman/vscode-taskexplorer/commit/a3211da))
+
+
+### Code Refactoring
+
+* increase max width for status bar message ([a590f99](https://github.com/spmeesseman/vscode-taskexplorer/commit/a590f99))
+
 ## [1.24.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.24.0...v1.24.1) (2020-02-23)
 
 
