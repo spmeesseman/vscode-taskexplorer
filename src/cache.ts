@@ -113,7 +113,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                     }
 
                     log("   Scan project " + folder.name + " for " + dispTaskType + " tasks");
-                    statusBarSpace.text = statusString("Scanning for " + dispTaskType + " tasks in project " + folder.name, 50);
+                    statusBarSpace.text = statusString("Scanning for " + dispTaskType + " tasks in project " + folder.name, 65);
                     const relativePattern = new RelativePattern(folder, fileBlob);
                     const paths = await workspace.findFiles(relativePattern, getExcludesGlob(folder));
                     for (const fpath of paths)
