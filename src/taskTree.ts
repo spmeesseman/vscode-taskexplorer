@@ -1396,7 +1396,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         const rmvLbl = each2.label;
                         each2.scripts.forEach(each3 =>
                         {
-                            each3.label = each3.label.replace(rmvLbl + "-", "");
+                            const rgx = new RegExp(rmvLbl + "-", "i");
+                            each3.label = each3.label.replace(rgx, "");
                         });
                     }
                 });
