@@ -1,3 +1,10 @@
+## [1.24.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.24.3...v1.24.4) (2020-02-25)
+
+
+### Bug Fixes
+
+* when using the 'dashed groups' option, parenthesis or brackets in a task name breaks extension in previous release ([0d62ddc](https://github.com/spmeesseman/vscode-taskexplorer/commit/0d62ddc))
+
 ## [1.24.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.24.2...v1.24.3) (2020-02-25)
 
 
