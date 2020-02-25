@@ -1,3 +1,10 @@
+## [1.24.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.24.2...v1.24.3) (2020-02-25)
+
+
+### Bug Fixes
+
+* when using the 'dashed groups' feature, tsk names are not renamed if not all lowercase ([13ac7eb](https://github.com/spmeesseman/vscode-taskexplorer/commit/13ac7eb))
+
 ## [1.24.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.24.1...v1.24.2) (2020-02-23)
 
 
