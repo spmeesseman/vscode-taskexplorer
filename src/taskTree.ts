@@ -1393,7 +1393,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 {
                     if (each2 instanceof TaskFile && each2.isGroup)
                     {
-                        const rmvLbl = each2.label;
+                        let rmvLbl = each2.label;
+                        rmvLbl = rmvLbl.replace(/\(/gi, "\\(");
+                        rmvLbl = rmvLbl.replace(/\[/gi, "\\[");
                         each2.scripts.forEach(each3 =>
                         {
                             const rgx = new RegExp(rmvLbl + "-", "i");
