@@ -579,8 +579,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             else if (taskItem)
             {
+                let taskItem2: TaskItem;
                 const ltfolder = tree[0] as TaskFolder;
-                let taskItem2 = await this.getTaskItems(this.lastTasksText + ":" + taskItem.id) as TaskItem;
+                let taskId = taskItem.id.replace(this.lastTasksText + ":", "");
+                taskId = this.lastTasksText + ":" + taskItem.id;
+
+                ltfolder.taskFiles.forEach((t: TaskItem) =>
+                {
+                    if (t.id === taskId) {
+                        taskItem2 = t;
+                        return false;
+                    }
+                });
+
                 if (taskItem2)
                 {
                     ltfolder.removeTaskFile(taskItem2);
@@ -589,12 +600,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 {
                     ltfolder.removeTaskFile(ltfolder.taskFiles[ltfolder.taskFiles.length - 1]);
                 }
+
                 if (!taskItem2)
                 {
                     taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
-                    taskItem2.id = this.lastTasksText + ":" + taskItem2.id;
+                    taskItem2.id = taskId;
                     taskItem2.label = this.getLastTaskName(taskItem2);
                 }
+
                 util.logValue(logPad + "   add item", taskItem2.id, 2);
                 ltfolder.insertTaskFile(taskItem2, 0);
                 changed = true;
