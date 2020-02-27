@@ -1,3 +1,10 @@
+## [1.25.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.25.0...v1.25.1) (2020-02-27)
+
+
+### Bug Fixes
+
+* seemingly harmless 'element already exists' error is thrown when running a task in the 'last tasks' list ([81ffec0](https://github.com/spmeesseman/vscode-taskexplorer/commit/81ffec0))
+
 # [1.25.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.24.4...v1.25.0) (2020-02-27)
 
 
