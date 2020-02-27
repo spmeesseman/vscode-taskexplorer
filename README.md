@@ -57,15 +57,16 @@
 
 ## Features
 
-* v1.24 - Added 'Open Terminal' button to running tasks (closes [#23](https://github.com/spmeesseman/vscode-taskexplorer/issues/23))
+* v1.25 - Add 'Last Tasks' pesudo-folder (closes [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
+* v1.24 - Add 'Open Terminal' button to running tasks (closes [#23](https://github.com/spmeesseman/vscode-taskexplorer/issues/23))
 * v1.23 - Deeper groupings with dashed task groups (Off by default)
 * v1.22 - Major performance enhancements - Task Tree / Task Scanning
 * v1.21 - Add option to keep terminal open after stopping task (closes [#51](https://github.com/spmeesseman/vscode-taskexplorer/issues/51))
 * v1.20 - Add support for restarting task (thank you **antfu**)
 * v1.19 - App-Publisher task support for BETA testing
-* v1.18 - Added 'Add to excludes' action in task file node context menu
-* v1.17 - Added 'Run last task' button to titlebar
-* v1.16 - Added npm management tasks to npm file node context menus
+* v1.18 - Add 'Add to excludes' action in task file node context menu
+* v1.17 - Add 'Run last task' button to titlebar
+* v1.16 - Add npm management tasks to npm file node context menus
 * v1.15 - Support for gradle tasks (includes provider) (closes [#15](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
 * v1.14 - Support for grunt and gulp task files not located in the project root (closes [#12](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
 * v1.13 - Multiple task files of the same type placed within a group node for less clutter in folder level nodes
