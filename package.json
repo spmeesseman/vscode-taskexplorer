@@ -59,7 +59,7 @@
         "nyc-test-babel": "npm run test && nyc report && nyc report --reporter=lcov",
         "nyc-test-babel-before": "set BABEL_ENV=coverage && rimraf .nyc_output && rimraf test-reports && rimraf coverage && rimraf c:\\code\\data\\user-data\\cacheddata && npm run build-babel && npm run coverage-full-on",
         "nyc-report": "nyc report && nyc report --reporter=lcov",
-        "coverage-open-report": "chrome.exe coverage/lcov-report/index.html",
+        "coverage-open-report": "cmd /c \"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\" coverage/lcov-report/index.html",
         "coverage-full-on": "enable-full-coverage.sh",
         "coverage-full-off": "enable-full-coverage.sh --off",
         "coverage-run-codecov": "codecov --disable=gcov --disable=detect --token=${codecovToken} --build 100",
@@ -910,6 +910,19 @@
                     "default": "ruby",
                     "description": "%config.taskExplorer.pathToRuby%"
                 },
+                "taskExplorer.showLastTasks": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%config.taskExplorer.showLastTasks%"
+                },
+                "taskExplorer.numLastTasks": {
+                    "type": "number",
+                    "enum": [
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+                    ],
+                    "default": 5,
+                    "description": "%config.taskExplorer.numLastTasks%"
+                },
                 "taskExplorer.debug": {
                     "type": "boolean",
                     "default": false,
@@ -918,11 +931,7 @@
                 "taskExplorer.debugLevel": {
                     "type": "number",
                     "enum": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5
+                        1, 2, 3, 4, 5
                     ],
                     "default": 1,
                     "description": "%config.taskExplorer.debugLevel%"

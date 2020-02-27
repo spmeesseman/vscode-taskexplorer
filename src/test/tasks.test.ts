@@ -428,9 +428,9 @@ suite('Task tests', () =>
         const file3 = path.join(dirNameIgn, 'test3.sh');
         tempFiles.push(file3);
 
-        fs.writeFileSync(file, 'echo testing bash file\r\n');
-        fs.writeFileSync(file2, 'echo testing bash file 2\r\n');
-        fs.writeFileSync(file3, 'echo testing bash file 3\r\n');
+        fs.writeFileSync(file, 'echo testing bash file\n');
+        fs.writeFileSync(file2, 'echo testing bash file 2\n');
+        fs.writeFileSync(file3, 'echo testing bash file 3\n');
     });
 
 
@@ -469,7 +469,7 @@ suite('Task tests', () =>
 
     test('Perform tree construction', async function() 
     {
-        this.timeout(30 * 1000);
+        this.timeout(45 * 1000);
 
         console.log("    Constructing task tree");
 
@@ -477,7 +477,7 @@ suite('Task tests', () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
-        await timeout(6000); // wait for filesystem change events
+        await timeout(7500); // wait for filesystem change events
         await waitForCache();
 
         console.log("         ✔ Cache done building");
@@ -486,6 +486,7 @@ suite('Task tests', () =>
         // Refresh for better coverage
         //
         await teApi.explorerProvider.refresh("tests");
+        await timeout(4000);
         await waitForCache();
 
         //
@@ -598,6 +599,9 @@ suite('Task tests', () =>
 
     test('Run, pause, open, and stop a task', async function() 
     {
+        let ranBash = false;
+        let ranBatch = false;
+
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
@@ -605,10 +609,11 @@ suite('Task tests', () =>
         //
         // Just find and run a batch script...
         //  
-        console.log("    Run a batch task");
+        console.log("    Run a batch and a bash task");
         await asyncMapForEach(taskMap, async (value: TaskItem) =>  
         {
-            if (value && value.taskSource === "batch") {
+            if (value && value.taskSource === "batch")
+            {
                 await commands.executeCommand("taskExplorer.run", value);
                 await commands.executeCommand("taskExplorer.pause", value);
                 await commands.executeCommand("taskExplorer.openTerminal", value);
@@ -616,7 +621,20 @@ suite('Task tests', () =>
                 await commands.executeCommand("taskExplorer.stop", value);
                 await commands.executeCommand("taskExplorer.runLastTask", value);
                 await commands.executeCommand("taskExplorer.restart", value);
-                return false; // break foreach
+                ranBatch = true;
+                return !(ranBash && ranBatch); // break foreach
+            }
+            else if (value && value.taskSource === "bash")
+            {
+                await commands.executeCommand("taskExplorer.run", value);
+                await(1500);
+                await workspace.getConfiguration().update('terminal.integrated.shell.windows', 
+                                                          'bash.exe', ConfigurationTarget.Workspace);
+                await commands.executeCommand("taskExplorer.run", value);
+                await workspace.getConfiguration().update('terminal.integrated.shell.windows', 
+                                                          'C:\\Windows\\System32\\cmd.exe', ConfigurationTarget.Workspace);
+                ranBash = true;
+                return !(ranBash && ranBatch); // break foreach
             }
         });
         //
@@ -639,6 +657,20 @@ suite('Task tests', () =>
     });
 
 
+    test('Test show/hide last tasks', async function() 
+    {
+        if (!teApi.explorerProvider) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist")
+        }
+        console.log("    Show/hide last tasks");
+        await teApi.explorerProvider.showLastTasks(true);
+        await teApi.explorerProvider.showLastTasks(false);
+        await configuration.updateWs("showLastTasks", true);
+        await teApi.explorerProvider.showLastTasks(true);
+        await teApi.explorerProvider.showLastTasks(false);
+    });
+
+    
     test('Test add to excludes', async function() 
     {
         if (!teApi.explorerProvider) {
@@ -684,7 +716,7 @@ suite('Task tests', () =>
         }
         catch {}
         await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
-        await(timeout(100));
+        await(timeout(1000));
         createAppPublisherFile();
         await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
         await(timeout(100));
@@ -702,7 +734,7 @@ suite('Task tests', () =>
         }
         catch {}
         await teApi.explorerProvider.invalidateTasksCache("ant", uri);
-        await(timeout(100));
+        await(timeout(1000));
         createAntFile();
         await teApi.explorerProvider.invalidateTasksCache("ant", uri);
         await(timeout(100));
@@ -720,7 +752,7 @@ suite('Task tests', () =>
         }
         catch {}
         await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
-        await(timeout(100));
+        await(timeout(1000));
         createGradleFile();
         await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
         await(timeout(100));
@@ -738,7 +770,7 @@ suite('Task tests', () =>
         }
         catch {}
         await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
-        await(timeout(100));
+        await(timeout(1000));
         createGruntFile();
         await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
         await(timeout(100));
@@ -756,7 +788,7 @@ suite('Task tests', () =>
         }
         catch {}
         await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
-        await(timeout(100));
+        await(timeout(1000));
         createGulpFile();
         await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
         await(timeout(100));
@@ -774,7 +806,7 @@ suite('Task tests', () =>
         }
         catch {}
         await teApi.explorerProvider.invalidateTasksCache("make", uri);
-        await(timeout(100));
+        await(timeout(1000));
         createMakeFile();
         await teApi.explorerProvider.invalidateTasksCache("make", uri);
         await(timeout(100));
@@ -792,7 +824,7 @@ suite('Task tests', () =>
         }
         catch {}
         await teApi.explorerProvider.invalidateTasksCache("batch", uri);
-        await(timeout(100));
+        await(timeout(1000));
         createBatchFile();
         await teApi.explorerProvider.invalidateTasksCache("batch", uri);
         await(timeout(100));

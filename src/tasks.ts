@@ -270,47 +270,63 @@ export class TaskFile extends TreeItem
 
 export class TaskFolder extends TreeItem
 {
-    public taskFiles: TaskFile[] = [];
+    public taskFiles: (TaskFile|TaskItem)[] = [];
     public taskFolders: TaskFolder[] = [];
 
     public workspaceFolder: WorkspaceFolder;
 
-    constructor(folder: WorkspaceFolder)
+    constructor(folder: WorkspaceFolder | string)
     {
-        super(folder.name, TreeItemCollapsibleState.Expanded);
+        super(typeof folder === "string" ? folder  : folder.name, TreeItemCollapsibleState.Expanded);
         this.contextValue = "folder";
-        this.resourceUri = folder.uri;
-        this.workspaceFolder = folder;
+        if (!(typeof folder === "string")) {
+            this.workspaceFolder = folder;
+            this.resourceUri = folder.uri;
+        }
         this.iconPath = ThemeIcon.Folder;
     }
 
-    addTaskFile(taskFile: TaskFile)
+    addTaskFile(taskFile: TaskFile|TaskItem)
     {
-        this.taskFiles.push(taskFile);
+        if (taskFile) {
+            this.taskFiles.push(taskFile);
+        }
+    }
+
+    insertTaskFile(taskFile: TaskFile|TaskItem, index: number)
+    {
+        if (taskFile) {
+            this.taskFiles.splice(index, 0, taskFile);
+        }
     }
 
     addTaskFolder(taskFolder: TaskFolder)
     {
-        this.taskFolders.push(taskFolder);
+        if (taskFolder) {
+            this.taskFolders.push(taskFolder);
+        }
     }
 
-    removeTaskFile(taskFile: TaskFile)
+    removeTaskFile(taskFile: TaskFile|TaskItem)
     {
-        let idx = -1;
-        let idx2 = -1;
-
-        this.taskFiles.forEach(each =>
+        if (taskFile)
         {
-            idx++;
-            if (taskFile === each)
+            let idx = -1;
+            let idx2 = -1;
+
+            this.taskFiles.forEach(each =>
             {
-                idx2 = idx;
-            }
-        });
+                idx++;
+                if (taskFile === each)
+                {
+                    idx2 = idx;
+                }
+            });
 
-        if (idx2 !== -1 && idx2 < this.taskFiles.length)
-        {
-            this.taskFiles.splice(idx2, 1);
+            if (idx2 !== -1 && idx2 < this.taskFiles.length)
+            {
+                this.taskFiles.splice(idx2, 1);
+            }
         }
     }
 }

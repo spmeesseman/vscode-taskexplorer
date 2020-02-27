@@ -52,7 +52,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
     readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
     private busy = false;
-
+    private lastTasksText = "Last Tasks";
 
     constructor(name: string, context: ExtensionContext)
     {
@@ -346,6 +346,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             window.showInformationMessage("Task not found!  Check log for details");
             util.removeFromArray(lastTasks, lastTaskId);
             storage.update("lastTasks", lastTasks);
+            this.showLastTasks(true);
         }
     }
 
@@ -354,6 +355,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         const me = this;
         const taskMap: Map<string, TaskItem> = new Map();
+        let done = false;
 
         util.log(logPad + "Get task tree items, start task tree scan");
         util.logValue(logPad + "   task id", taskId ? taskId : "all tasks");
@@ -379,6 +381,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 await util.asyncForEach(treeFiles, async(item2) =>
                 {
+                    if (done) {
+                        return false;
+                    }
+
                     if (item2 instanceof TaskItem)
                     {
                         const tmp = me.getParent(item2);
@@ -409,12 +415,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 await util.asyncForEach(treeTasks, async item3 =>
                 {
+                    if (done) {
+                        return false;
+                    }
+
                     if (item3 instanceof TaskItem)
                     {
                         if (executeOpenForTests) {
                             await me.open(item3);
                         }
-
                         const tmp = me.getParent(item3);
                         assert(
                             tmp instanceof TaskFile,
@@ -428,6 +437,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                             util.logValue(logPad + "        id", item3.id);
                             util.logValue(logPad + "        type", item3.taskSource + " @ " + tpath);
                             taskMap.set(item3.id, item3);
+                            if (taskId && taskId === item3.id) {
+                                done = true;
+                            }
                         }
                     }
                     else if (item3 instanceof TaskFile && item3.isGroup)
@@ -446,6 +458,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 await util.asyncForEach(treeFiles, async item2 =>
                 {
+                    if (done) {
+                        return false;
+                    }
+
                     if (item2 instanceof TaskFile && !item2.isGroup)
                     {
                         util.log(logPad + "   Task File: " + item2.path + item2.fileName);
@@ -460,6 +476,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     {
                         await processItem2g(item2);
                     }
+                    else if (item2 instanceof TaskItem)
+                    {
+                        await processItem2(item2);
+                    }
                 });
             }
         }
@@ -470,7 +490,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 const tmp: any = me.getParent(item);
                 assert(tmp === null, "Invaid parent type, should be null for TaskFolder");
-                util.log(logPad + "Task Folder " + item.label + ":  " + item.resourceUri.fsPath);
+                util.log(logPad + "Task Folder " + item.label + ":  " + (item.resourceUri ?
+                         item.resourceUri.fsPath : me.lastTasksText));
                 await processItem(item);
             }
         });
@@ -485,19 +506,109 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private saveRunTask(taskItem: TaskItem)
+    private saveRunTask(taskItem: TaskItem, logPad = "")
     {
+        util.log(logPad + "save run task");
+
         const lastTasks = storage.get<string[]>("lastTasks", []);
-        if (util.existsInArray(lastTasks, taskItem.id))
+        util.logValue(logPad + "   current saved task ids", lastTasks.toString(), 2);
+
+        const taskId = taskItem.id.replace(this.lastTasksText + ":", "");
+
+        if (util.existsInArray(lastTasks, taskId))
         {
-            util.removeFromArray(lastTasks, taskItem.id);
+            util.removeFromArray(lastTasks, taskId);
         }
-        if (lastTasks.length > 4)
-        { // store max 5 tasks
+        if (lastTasks.length >= configuration.get<number>("numLastTasks"))
+        {
             lastTasks.shift();
         }
-        lastTasks.push(taskItem.id);
+
+        lastTasks.push(taskId);
+        util.logValue(logPad + "   pushed taskitem id", taskItem.id, 2);
+
         storage.update("lastTasks", lastTasks);
+        util.logValue(logPad + "   new saved task ids", lastTasks.toString(), 2);
+
+        if (configuration.get<boolean>("showLastTasks") === true)
+        {
+            util.log(logPad + "   call showLastTasks()");
+            this.showLastTasks(true, taskItem);
+        }
+    }
+
+
+    public async showLastTasks(show: boolean, taskItem?: TaskItem, logPad = "")
+    {
+        let changed = true;
+        const tree = this.taskTree;
+
+        util.log(logPad + "show last tasks");
+        util.logValue(logPad + "   show", show);
+
+        if (!this.taskTree || this.taskTree.length === 0 ||
+            (this.taskTree.length === 1 && this.taskTree[0].contextValue === "noscripts")) {
+            return;
+        }
+
+        if (show)
+        {
+            if (!taskItem) // refresh
+            {
+                tree.splice(0, 1);
+                changed = true;
+            }
+
+            if (tree[0].label !== this.lastTasksText)
+            {
+                util.log(logPad + "   create last tasks folder", 2);
+                const lastTasks = storage.get<string[]>("lastTasks", []);
+                const ltfolder = new TaskFolder(this.lastTasksText);
+                tree.splice(0, 0, ltfolder);
+                await util.asyncForEach(lastTasks, async (tId: string) =>
+                {
+                    const taskItem2 = await this.getTaskItems(tId);
+                    if (taskItem2 && taskItem2 instanceof TaskItem) {
+                        const taskItem3 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
+                        taskItem3.id = this.lastTasksText + ":" + taskItem3.id;
+                        ltfolder.insertTaskFile(taskItem3, 0);
+                    }
+                });
+                changed = true;
+            }
+            else if (taskItem)
+            {
+                const ltfolder = tree[0] as TaskFolder;
+                let taskItem2 = await this.getTaskItems(this.lastTasksText + ":" + taskItem.id) as TaskItem;
+                if (taskItem2)
+                {
+                    ltfolder.removeTaskFile(taskItem2);
+                }
+                else if (ltfolder.taskFiles.length >= configuration.get<number>("numLastTasks"))
+                {
+                    ltfolder.removeTaskFile(ltfolder.taskFiles[ltfolder.taskFiles.length - 1]);
+                }
+                if (!taskItem2)
+                {
+                    taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
+                    taskItem2.id = this.lastTasksText + ":" + taskItem2.id;
+                }
+                util.logValue(logPad + "   add item", taskItem2.id, 2);
+                ltfolder.insertTaskFile(taskItem2, 0);
+                changed = true;
+            }
+        }
+        else {
+            if (tree[0].label === this.lastTasksText)
+            {
+                tree.splice(0, 1);
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            this._onDidChangeTreeData.fire();
+        }
     }
 
 
@@ -649,8 +760,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 await rebuildCache();
                 this.busy = false;
             }
-            util.log("   Handling 'invalidate tasks cache' event");
-            await this.invalidateTasksCache(invalidate, opt);
+            if (invalidate !== "tests") {
+                util.log("   Handling 'invalidate tasks cache' event");
+                await this.invalidateTasksCache(invalidate, opt);
+            }
         }
 
         if (task)
@@ -1124,8 +1237,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
         const files: Map<string, TaskFile> = new Map();
-        let folder = null;
+        let folder = null,
+            ltfolder = null;
         let taskFile = null;
+
+        //
+        // The 'Last Tasks' folder will be 1st in the tree
+        //
+        const lastTasks = storage.get<string[]>("lastTasks", []);
+        if (configuration.get<boolean>("showLastTasks") === true)
+        {
+            if (lastTasks && lastTasks.length > 0)
+            {
+                ltfolder = new TaskFolder(this.lastTasksText);
+                folders.set(this.lastTasksText, ltfolder);
+            }
+        }
 
         //
         // Loop through each task provided by the engine and build a task tree
@@ -1201,6 +1328,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 this.logTaskDefinition(definition);
 
                 taskFile = files.get(id);
+
                 //
                 // Create taskfile node if needed
                 //
@@ -1211,12 +1339,23 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     files.set(id, taskFile);
                     util.logValue("   Added source file container", each.source);
                 }
+
                 //
                 // Create and add task item to task file node
                 //
                 const taskItem = new TaskItem(this.extensionContext, taskFile, each);
                 taskItem.task.definition.taskItem = taskItem;
                 taskFile.addScript(taskItem);
+
+                //
+                // Addd this task to the 'Last Tasks' folder if we need to
+                //
+                if (ltfolder && lastTasks.includes(taskItem.id))
+                {
+                    const taskItem2 = new TaskItem(this.extensionContext, taskFile, each);
+                    taskItem2.id = this.lastTasksText + ":" + taskItem2.id;
+                    ltfolder.insertTaskFile(taskItem2, 0);
+                }
             }
             else
             {
@@ -1235,12 +1374,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         folders.forEach((folder, key) =>
         {
+            if (key === this.lastTasksText) {
+                return; // continue forEach()
+            }
+
             folder.taskFiles.forEach(each =>
             {
-                each.scripts.sort((a, b) =>
+                if (each instanceof TaskFile)
                 {
-                    return a.label.localeCompare(b.label);
-                });
+                    each.scripts.sort((a, b) =>
+                    {
+                        return a.label.localeCompare(b.label);
+                    });
+                }
             });
 
             folder.taskFiles.sort((a, b) =>
@@ -1254,6 +1400,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             let prevTaskFile: TaskItem | TaskFile;
             folder.taskFiles.forEach(each =>
             {
+                if (!(each instanceof TaskFile)) {
+                    return; // continue forEach()
+                }
+
                 if (prevTaskFile && prevTaskFile.taskSource === each.taskSource)
                 {
                     const id = folder.label + each.taskSource;
@@ -1361,6 +1511,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             const taskTypesRmv: TaskFile[] = [];
             folder.taskFiles.forEach(each =>
             {
+                if (!(each instanceof TaskFile)) {
+                    return; // continue forEach()
+                }
+
                 const id = folder.label + each.taskSource;
                 if (!each.isGroup && subfolders.get(id))
                 {
@@ -1389,6 +1543,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             folder.taskFiles.forEach(each =>
             {
+                if (!(each instanceof TaskFile)) {
+                    return; // continue forEach()
+                }
                 each.scripts.forEach(each2 =>
                 {
                     if (each2 instanceof TaskFile && each2.isGroup)
@@ -1414,6 +1571,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             });
             folder.taskFiles.forEach(each =>
             {
+                if (!(each instanceof TaskFile)) {
+                    return; // continue forEach()
+                }
                 if (each.isGroup)
                 {
                     each.scripts.sort((a, b) =>
@@ -1424,9 +1584,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             });
         });
 
-        // if (folders.size === 1) { // return just fi
-        // 	return [...packages.values()];
-        // }
+        //
+        // Sort the 'Last Tasks' folder by last time run
+        //
+        if (ltfolder)
+        {
+            ltfolder.taskFiles.sort((a, b) =>
+            {
+                const aIdx = lastTasks.indexOf(a.id.replace(this.lastTasksText + ":", ""));
+                const bIdx = lastTasks.indexOf(b.id.replace(this.lastTasksText + ":", ""));
+                return (aIdx < bIdx ? 1 : (bIdx < aIdx ? -1 : 0));
+            });
+        }
+
         return [...folders.values()];
     }
 }

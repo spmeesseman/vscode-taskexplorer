@@ -61,6 +61,7 @@ suite("Extension Tests", () =>
         } 
         else {
             console.log('         ℹ Extension is already activated, coverage will not occur');
+            console.log('         ℹ Remove the activation event from package.json before running tests');
             //
             // Wait for extension to activate
             //
@@ -97,6 +98,16 @@ suite("Extension Tests", () =>
         done();
     });
 
+
+    test("Cover pre-init cases", async function() 
+    {
+        await initSettings(false);
+        teApi.explorerProvider.showLastTasks(true);
+        await teApi.explorerProvider.refresh("tests");
+        await initSettings();
+    });
+
+
     test("Check settings", function(done) 
     {
         //
@@ -106,14 +117,14 @@ suite("Extension Tests", () =>
         //
         if (configuration.get<boolean>("enableAnt") === false)
         {
-
+            console.log("THE SETTINGS DID NOT TAKE!!!")
         }
 
         done();
     });
 
 
-    async function initSettings()
+    async function initSettings(enable = true)
     {
         //
         // Enable views, use workspace level so that running this test from Code itself
@@ -132,23 +143,24 @@ suite("Extension Tests", () =>
         // Enabled all options, use workspace level so that running this test from Code itself
         // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
         //
-        await configuration.updateWs('enableAnt', true);
-        await configuration.updateWs('enableAppPublisher', true);
-        await configuration.updateWs('enableBash', true);
-        await configuration.updateWs('enableBatch', true);
-        await configuration.updateWs('enableGradle', true);
-        await configuration.updateWs('enableGrunt', true);
-        await configuration.updateWs('enableGulp', true);
-        await configuration.updateWs('enableMake', true);
-        await configuration.updateWs('enableNpm', true);
-        await configuration.updateWs('enableNsis', true);
-        await configuration.updateWs('enablePowershell', true);
-        await configuration.updateWs('enablePerl', true);
-        await configuration.updateWs('enablePython', true);
-        await configuration.updateWs('enableRuby', true);
-        await configuration.updateWs('enableTsc', true);
-        await configuration.updateWs('enableWorkspace', true);
+        await configuration.updateWs('enableAnt', enable);
+        await configuration.updateWs('enableAppPublisher', enable);
+        await configuration.updateWs('enableBash', enable);
+        await configuration.updateWs('enableBatch', enable);
+        await configuration.updateWs('enableGradle', enable);
+        await configuration.updateWs('enableGrunt', enable);
+        await configuration.updateWs('enableGulp', enable);
+        await configuration.updateWs('enableMake', enable);
+        await configuration.updateWs('enableNpm', enable);
+        await configuration.updateWs('enableNsis', enable);
+        await configuration.updateWs('enablePowershell', enable);
+        await configuration.updateWs('enablePerl', enable);
+        await configuration.updateWs('enablePython', enable);
+        await configuration.updateWs('enableRuby', enable);
+        await configuration.updateWs('enableTsc', enable);
+        await configuration.updateWs('enableWorkspace', enable);
         await configuration.updateWs('groupDashed', false);
+        await configuration.updateWs('showLastTasks', false);
     }
 
 });

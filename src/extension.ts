@@ -132,6 +132,18 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
         refresh = true;
     }
 
+    if (e.affectsConfiguration("taskExplorer.showLastTasks"))
+    {
+        if (configuration.get<boolean>("enableSideBar") && treeDataProvider)
+        {
+            treeDataProvider2.showLastTasks(configuration.get<boolean>("showLastTasks"));
+        }
+        if (configuration.get<boolean>("enableExplorerView") && treeDataProvider2)
+        {
+            treeDataProvider2.showLastTasks(configuration.get<boolean>("showLastTasks"));
+        }
+    }
+
     if (e.affectsConfiguration("taskExplorer.enableAnt") || e.affectsConfiguration("taskExplorer.includeAnt")) {
         registerFileWatcherAnt(context, configuration.get<boolean>("enableAnt"));
         refresh = true;
