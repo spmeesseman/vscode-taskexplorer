@@ -113,6 +113,9 @@ async function detectAntScripts(): Promise<Task[]>
 
 export async function provideAntScripts(): Promise<Task[]>
 {
+    util.log("");
+    util.log("provideAntScripts");
+
     if (!cachedTasks) {
         cachedTasks = await detectAntScripts();
     }
