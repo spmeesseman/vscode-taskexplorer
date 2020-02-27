@@ -571,6 +571,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     if (taskItem2 && taskItem2 instanceof TaskItem) {
                         const taskItem3 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
                         taskItem3.id = this.lastTasksText + ":" + taskItem3.id;
+                        taskItem3.label = this.getLastTaskName(taskItem3);
                         ltfolder.insertTaskFile(taskItem3, 0);
                     }
                 });
@@ -592,6 +593,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 {
                     taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
                     taskItem2.id = this.lastTasksText + ":" + taskItem2.id;
+                    taskItem2.label = this.getLastTaskName(taskItem2);
                 }
                 util.logValue(logPad + "   add item", taskItem2.id, 2);
                 ltfolder.insertTaskFile(taskItem2, 0);
@@ -1173,6 +1175,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    private getLastTaskName(taskItem: TaskItem)
+    {
+        return taskItem.label = taskItem.label + " (" + taskItem.taskFile.folder.label + " - " + taskItem.taskSource + ")";
+    }
+
+
     private getTaskName(script: string, relativePath: string | undefined, forcePathInName?: boolean)
     {
         if (relativePath && relativePath.length && forcePathInName === true)
@@ -1354,6 +1362,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 {
                     const taskItem2 = new TaskItem(this.extensionContext, taskFile, each);
                     taskItem2.id = this.lastTasksText + ":" + taskItem2.id;
+                    taskItem2.label = this.getLastTaskName(taskItem2);
                     ltfolder.insertTaskFile(taskItem2, 0);
                 }
             }
