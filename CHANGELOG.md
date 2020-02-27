@@ -1,3 +1,20 @@
+# [1.25.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.24.4...v1.25.0) (2020-02-27)
+
+
+### Bug Fixes
+
+* new/removed cmd files are not picked up, must manually refresh ([dab6906](https://github.com/spmeesseman/vscode-taskexplorer/commit/dab6906))
+
+
+### Documentation
+
+* **reame:** update to 1.25 info ([88b55bb](https://github.com/spmeesseman/vscode-taskexplorer/commit/88b55bb))
+
+
+### Features
+
+* add support for a 'last tasks' pseudo-folder [closes [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47)] ([10ba7f1](https://github.com/spmeesseman/vscode-taskexplorer/commit/10ba7f1))
+
 ## [1.24.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.24.3...v1.24.4) (2020-02-25)
 
 
