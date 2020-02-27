@@ -294,7 +294,7 @@ async function registerFileWatchers(context: ExtensionContext)
 
     if (configuration.get<boolean>("enableBatch")) {
         await registerFileWatcher(context, "batch", "**/*.[Bb][Aa][Tt]", true);
-        await registerFileWatcher(context, "batch", "**/*.[Cc][Mm][Dd]", true);
+        await registerFileWatcher(context, "batch2", "**/*.[Cc][Mm][Dd]", true);
     }
 
     if (configuration.get<boolean>("enableGradle")) {
@@ -435,35 +435,41 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
 
     let watcher: FileSystemWatcher = watchers.get(taskType);
     let taskAlias = taskType;
+    let taskTypeR = taskType !== "batch2" ? taskType : "batch";
+
     if (taskType && taskType.indexOf("ant-") !== -1) {
         taskAlias = "ant";
+        taskTypeR = "ant";
+    }
+    if (taskType && taskType.indexOf("batch2") !== -1) {
+        taskAlias = "batch";
     }
 
     if (workspace.workspaceFolders) {
-        await cache.buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, taskType, fileBlob);
+        await cache.buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, taskTypeR, fileBlob);
     }
 
     if (enabled !== false) {
         if (!watcher) {
             watcher = workspace.createFileSystemWatcher(fileBlob);
-            watchers.set(taskType, watcher);
+            watchers.set(taskTypeR, watcher);
             context.subscriptions.push(watcher);
         }
         if (!isScriptType) {
             watcher.onDidChange(async _e => {
                 logFileWatcherEvent(_e, "change");
-                await refreshTree(taskType, _e);
+                await refreshTree(taskTypeR, _e);
             });
         }
         watcher.onDidDelete(async _e => {
             logFileWatcherEvent(_e, "delete");
-            await cache.removeFileFromCache(taskType, _e);
-            await refreshTree(taskType, _e);
+            await cache.removeFileFromCache(taskTypeR, _e);
+            await refreshTree(taskTypeR, _e);
         });
         watcher.onDidCreate(async _e => {
             logFileWatcherEvent(_e, "create");
-            await cache.addFileToCache(taskType, _e);
-            await refreshTree(taskType, _e);
+            await cache.addFileToCache(taskTypeR, _e);
+            await refreshTree(taskTypeR, _e);
         });
     }
     else if (watcher) {
