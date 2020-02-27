@@ -157,7 +157,6 @@ async function findTargets(fsPath: string): Promise<StringMap>
     while (eol !== -1)
     {
         let line: string = contents.substring(idx, eol).trim();
-        console.log(line);
         if (line.length > 0)
         {
             let idx1: number;
@@ -167,7 +166,7 @@ async function findTargets(fsPath: string): Promise<StringMap>
                 let idx2 = line.indexOf(" ", idx1);
                 if (idx2 === -1) {
                     idx2 = line.indexOf("=", idx1);
-                }console.log(idx1);console.log(idx2);
+                }
                 if (idx1 !== -1)
                 {
                     const tgtName = line.substring(idx1, idx2).trim();
