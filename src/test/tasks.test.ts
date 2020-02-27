@@ -656,20 +656,6 @@ suite('Task tests', () =>
         }
     });
 
-
-    test('Test show/hide last tasks', async function() 
-    {
-        if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
-        }
-        console.log("    Show/hide last tasks");
-        await teApi.explorerProvider.showLastTasks(true);
-        await teApi.explorerProvider.showLastTasks(false);
-        await configuration.updateWs("showLastTasks", true);
-        await teApi.explorerProvider.showLastTasks(true);
-        await teApi.explorerProvider.showLastTasks(false);
-    });
-
     
     test('Test add to excludes', async function() 
     {
@@ -888,18 +874,6 @@ suite('Task tests', () =>
     });
 
 
-    test('Test dashed groups', async function() 
-    {
-        if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
-        }
-        console.log("    Enable dashed groups and rebuild cache");
-        await configuration.updateWs('groupDashed', true);
-        await timeout(2000); // wait for filesystem change events
-        await waitForCache();
-    });
-
-
     test('Test invalidate bash tasks with new bash shell setting', async function() 
     {
         if (!teApi.explorerProvider) {
@@ -919,6 +893,32 @@ suite('Task tests', () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
         await teApi.fileCache.buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]", workspace.workspaceFolders[0], true);
+    });
+
+
+    test('Test show/hide last tasks', async function() 
+    {
+        if (!teApi.explorerProvider) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist")
+        }
+        console.log("    Show/hide last tasks");
+        await teApi.explorerProvider.showLastTasks(true);
+        await teApi.explorerProvider.showLastTasks(false);
+        await configuration.updateWs("showLastTasks", true);
+        await teApi.explorerProvider.showLastTasks(true);
+        await teApi.explorerProvider.showLastTasks(false);
+    });
+
+
+    test('Test dashed groups', async function() 
+    {
+        if (!teApi.explorerProvider) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist")
+        }
+        console.log("    Enable dashed groups and rebuild cache");
+        await configuration.updateWs('groupDashed', true);
+        await timeout(2000); // wait for filesystem change events
+        await waitForCache();
     });
 
 

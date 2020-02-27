@@ -136,7 +136,7 @@ suite("Extension Tests", () =>
         // Set misc settings, use workspace level so that running this test from Code itself
         // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
         //
-        await configuration.updateWs('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml"]);
+        await configuration.updateWs('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml", "**/hello.xml"]);
         await configuration.updateWs('debug', true);
         await configuration.updateWs('debugLevel', 3);
         //
