@@ -174,7 +174,7 @@ async function detectScriptFiles(): Promise<Task[]>
     const allTasks: Task[] = [];
     const visitedFiles: Set<string> = new Set();
     const paths = filesCache.get("script");
-    
+
     if (workspace.workspaceFolders && paths)
     {
         for (const fobj of paths)
@@ -216,7 +216,6 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
         fileName,
         scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
         path: getRelativePath(folder, uri),
-        //cmdLine: "\"" + scriptDef.exec + "\"",
         requiresArgs: false,
         uri
     };
