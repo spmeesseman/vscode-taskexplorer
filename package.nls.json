@@ -39,6 +39,7 @@
 	"config.taskExplorer.pathToRuby": "The path to the ruby program, if not registered in system path.",
 	"config.taskExplorer.pathToPowershell": "The path to the powershell program, if not registered in system path.",
 	"config.taskExplorer.showLastTasks": "Show the 'last tasks' as a node in the task tree.",
+	"config.taskExplorer.showRunningTask": "Show the last ran running task in the status bar.",
 	"taskExplorer.parseError": "Task Explorer task detection: failed to parse the file {0}",
 	"taskdef.task.fileName": "The ant file that target was found in. Can be omitted.",
 	"taskdef.task.script": "The target/script name.",

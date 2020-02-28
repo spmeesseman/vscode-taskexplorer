@@ -10,7 +10,7 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
     TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, Terminal
+    ShellExecution, Terminal, StatusBarItem, StatusBarAlignment
 } from "vscode";
 import { visit, JSONVisitor } from "jsonc-parser";
 import * as nls from "vscode-nls";
@@ -53,6 +53,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
     private busy = false;
     private lastTasksText = "Last Tasks";
+    private static statusBarSpace: StatusBarItem;
+
 
     constructor(name: string, context: ExtensionContext)
     {
@@ -188,16 +190,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (taskItem.paused)
         {
-            window.terminals.forEach(async (term, idx) =>
-            {
-                const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
-                if (termTaskName.toLowerCase().replace("task - ", "").indexOf(term.name.toLowerCase().replace("task - ", "")) !== -1)
-                {
-                    term.sendText("N", true);
-                    taskItem.paused = false;
-                    // taskItem.contextValue = "runningScript";
-                }
-            });
+            const term = this.getTerminal(taskItem);
+            if (term) {
+                term.sendText("N", true);
+                taskItem.paused = false;
+            }
         }
         else
         {
@@ -274,6 +271,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async restart(taskItem: TaskItem)
     {
+        if (!taskItem || this.busy)
+        {
+            window.showInformationMessage("Busy, please wait...");
+            return;
+        }
+
         this.stop(taskItem);
         this.run(taskItem);
     }
@@ -741,6 +744,27 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         util.logValue("   invalidate", invalidate, 2);
         util.logValue("   opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a", 2);
         util.logValue("   task name", task ? task.name : "n/a", 2);
+
+        if (task && configuration.get<boolean>("showRunningTask") === true) {
+            const exec = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
+                         e.task.scope === task.scope && e.task.definition.path === task.definition.path);
+            if (exec) {
+                if (!TaskTreeDataProvider.statusBarSpace) {
+                    TaskTreeDataProvider.statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
+                    TaskTreeDataProvider.statusBarSpace.tooltip = "Task Explorer running task";
+                }
+                let statusMsg = task.name;
+                if ((task.scope as WorkspaceFolder).name) {
+                    statusMsg += " (" + (task.scope as WorkspaceFolder).name + ")";
+                }
+                TaskTreeDataProvider.statusBarSpace.text = "$(loading~spin) " + statusMsg;
+                TaskTreeDataProvider.statusBarSpace.show();
+            }
+            else if (TaskTreeDataProvider.statusBarSpace) {
+                TaskTreeDataProvider.statusBarSpace.dispose();
+                TaskTreeDataProvider.statusBarSpace = undefined;
+            }
+        }
 
         //
         // If a view was turned off in settings, the disposable view still remains

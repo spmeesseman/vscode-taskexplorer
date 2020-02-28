@@ -912,8 +912,13 @@
                 },
                 "taskExplorer.showLastTasks": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "%config.taskExplorer.showLastTasks%"
+                },
+                "taskExplorer.showRunningTask": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.showRunningTask%"
                 },
                 "taskExplorer.numLastTasks": {
                     "type": "number",
