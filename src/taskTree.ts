@@ -745,6 +745,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         util.logValue("   opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a", 2);
         util.logValue("   task name", task ? task.name : "n/a", 2);
 
+        //
+        // Show status bar message (if ON in settings)
+        //
         if (task && configuration.get<boolean>("showRunningTask") === true) {
             const exec = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
                          e.task.scope === task.scope && e.task.definition.path === task.definition.path);

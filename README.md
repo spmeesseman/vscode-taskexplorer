@@ -23,7 +23,7 @@
 
 ## Description
 
-> Provides a view in either (or both) the SideBar and/or Explorer that displays all supported tasks organized into a treeview, with parent task file nodes, grouped nodes, and project folders (convenient for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped.  NPM file nodes support special npm command(s) (i.e. 'install') via context menu.
+Provides a view in either (or both) the SideBar and/or Explorer that displays all supported tasks organized into a treeview, with parent task file nodes, grouped nodes, and project folders (convenient for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped, among other things for specific task types, for example NPM file nodes support common npm command(s) (i.e. 'install') via context menu.
 
 ## Table of Contents
 
@@ -32,7 +32,7 @@
   - [Table of Contents](#table-of-contents)
   - [Screenshots by Version](#screenshots-by-version)
   - [Requirements](#requirements)
-  - [Features](#features)
+  - [Features by Version](#features-by-version)
   - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
   - [Using Dashed Groups](#using-dashed-groups)
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
@@ -56,8 +56,9 @@
 
 * Visual Studio Code v1.30+
 
-## Features
+## Features by Version
 
+* v1.26 - Add 'Running Task' status bar message (refs [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
 * v1.25 - Add 'Last Tasks' pseudo-folder (closes [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
 * v1.24 - Add 'Open Terminal' button to running tasks (closes [#23](https://github.com/spmeesseman/vscode-taskexplorer/issues/23))
 * v1.23 - Deeper groupings with dashed task groups (Off by default)
@@ -104,6 +105,7 @@ Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **An
 
 ## Using Dashed Groups
 
+**EXPERIMENTAL**
 *Dashed Groups* are simply an extra level of task groupings that can be made based on a dash (-) character in the script name.  This option can be turned on/off with the *Group Dashed* option in Settings, the default is OFF.
 
 For example, consider 10 npm tasks, 5 of which all start with the string *dev-*, 5 of which start with the string *prod-*.  Prior to Version 1.23, this would create 10 individual task nodes within the main npm task node in the task tree:
