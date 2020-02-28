@@ -10,7 +10,7 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
     TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution
+    ShellExecution, Terminal
 } from "vscode";
 import { visit, JSONVisitor } from "jsonc-parser";
 import * as nls from "vscode-nls";
@@ -217,29 +217,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (taskItem.execution)
         {
-            const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
-            window.terminals.forEach(async (term, idx) =>
+            const terminal = this.getTerminal(taskItem);
+            if (terminal)
             {
-                if (termTaskName.toLowerCase().replace("task - ", "").indexOf(term.name.toLowerCase().replace("task - ", "")) !== -1)
+                if (taskItem.paused)
                 {
-                    if (taskItem.paused)
-                    {
-                        taskItem.paused = false;
-                        term.sendText("N");
-                        // taskItem.contextValue = "runningScript";
-                    }
-                    else
-                    {
-                        // taskItem.paused = true;
-                        term.sendText("\u0003");
-                        function yes() {
-                            term.sendText("Y", true);
-                        }
-                        setTimeout(yes, 100);
-                        // taskItem.contextValue = "pausedScript";
-                    }
+                    taskItem.paused = false;
+                    terminal.sendText("N");
                 }
-            });
+                else
+                {
+                    taskItem.paused = true;
+                    terminal.sendText("\u0003");
+                }
+            }
         }
     }
 
@@ -254,51 +245,27 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (taskItem.execution)
         {
-            // if (taskItem.paused)
-            // {
-            //     window.terminals.forEach(async (term, idx) =>
-            //     {
-            //         const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
-            //         if (term.name.toLowerCase() === termTaskName.toLowerCase())
-            //         {
-            //             term.sendText("Y", true);
-            //             taskItem.paused = false;
-            //             //taskItem.contextValue = "script";
-            //         }
-            //     });
-            // }
-            // else {
-            //     taskItem.execution.terminate();
-            // }
-
             if (configuration.get<boolean>("keepTermOnStop") === true)
             {
-                const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
-                window.terminals.forEach(async (term, idx) =>
+                const terminal = this.getTerminal(taskItem);
+                if (terminal)
                 {
-                    if (termTaskName.toLowerCase().replace("task - ", "").indexOf(term.name.toLowerCase().replace("task - ", "")) !== -1)
+                    if (taskItem.paused)
                     {
-                        if (taskItem.paused)
-                        {
-                            taskItem.paused = false;
-                            term.sendText("N");
-                            // taskItem.contextValue = "runningScript";
-                        }
-                        else
-                        {
-                            // taskItem.paused = true;
-                            term.sendText("\u0003");
-                            function yes() {
-                                term.sendText("Y", true);
-                            }
-                            setTimeout(yes, 300);
-                            // taskItem.contextValue = "pausedScript";
-                        }
+                        terminal.sendText("Y");
                     }
-                });
+                    else
+                    {
+                        terminal.sendText("\u0003");
+                        function yes() {
+                            terminal.sendText("Y", true);
+                        }
+                        setTimeout(yes, 300);
+                    }
+                    taskItem.paused = false;
+                }
             }
-            else
-            {
+            else {
                 taskItem.execution.terminate();
             }
         }
@@ -347,6 +314,103 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             util.removeFromArray(lastTasks, lastTaskId);
             storage.update("lastTasks", lastTasks);
             this.showLastTasks(true);
+        }
+    }
+
+
+    private getTerminal(taskItem: TaskItem): Terminal | null
+    {
+        const me = this;
+        let checkNum = 0;
+        let term: Terminal = null;
+
+        util.log("Get terminal", 1);
+
+        if (!window.terminals || window.terminals.length === 0)
+        {
+            util.log("   zero terminals alive", 2);
+            return term;
+        }
+
+        if (window.terminals.length === 1)
+        {
+            util.log("   return only terminal alive", 2);
+            return window.terminals[0];
+        }
+
+        function check(taskName: string)
+        {
+            let term: Terminal = null;
+            util.logValue("   Checking possible task terminal name #" + (++checkNum).toString(), taskName, 2);
+
+            window.terminals.forEach(async (t, i) =>
+            {
+                util.logValue("      == terminal " + i + " name", t.name, 2);
+                if (taskName.toLowerCase().replace("task - ", "").indexOf(t.name.toLowerCase().replace("task - ", "")) !== -1)
+                {
+                    term = t;
+                    util.log("   found!", 2);
+                    return false; // break forEach()
+                }
+            });
+
+            return term;
+        }
+
+        let relPath = taskItem.task.definition.path ? taskItem.task.definition.path : "";
+        if (relPath[relPath.length - 1] === "/") {
+            relPath = relPath.substring(0, relPath.length - 1);
+        }
+        else if (relPath[relPath.length - 1] === "\\") {
+            relPath = relPath.substring(0, relPath.length - 1);
+        }
+
+        let taskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label +
+                           " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+        term = check(taskName);
+
+        if (!term && taskItem.label.indexOf("(") !== -1)
+        {
+            taskName = "Task - " + taskItem.taskSource + ": " + taskItem.label.substring(0, taskItem.label.indexOf("(")).trim() +
+                       " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+            term = check(taskName);
+        }
+
+        if (!term)
+        {
+            taskName = "Task - " + taskItem.taskSource + ": " + taskItem.label +
+                       " - " + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+            term = check(taskName);
+        }
+
+        if (!term && taskItem.label.indexOf("(") !== -1)
+        {
+            taskName = "Task - " + taskItem.taskSource + ": " + taskItem.label.substring(0, taskItem.label.indexOf("(")).trim() +
+                       " - " + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+            term = check(taskName);
+        }
+
+        if (!term)
+        {
+            taskName = taskItem.getFolder().name + " (" + relPath + ")";
+            term = check(taskName);
+        }
+
+        if (!term)
+        {
+            taskName = taskItem.getFolder().name + " (" + path.basename(relPath) + ")";
+            term = check(taskName);
+        }
+
+        return term;
+    }
+
+
+    private async openTerminal(taskItem: TaskItem)
+    {
+        const term = this.getTerminal(taskItem);
+        if (term) {
+            term.show();
         }
     }
 
@@ -638,22 +702,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // });
 
         // this.run(taskItem);
-    }
-
-
-    private async openTerminal(taskItem: TaskItem)
-    {
-        window.terminals.forEach(async (term, idx) =>
-        {
-            window.terminals.forEach(async (term, idx) =>
-            {
-                const termTaskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
-                if (termTaskName.toLowerCase().replace("task - ", "").indexOf(term.name.toLowerCase().replace("task - ", "")) !== -1)
-                {
-                    term.show();
-                }
-            });
-        });
     }
 
 
