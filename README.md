@@ -58,12 +58,12 @@
 
 ## Features
 
-* v1.25 - Add 'Last Tasks' pesudo-folder (closes [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
+* v1.25 - Add 'Last Tasks' pseudo-folder (closes [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
 * v1.24 - Add 'Open Terminal' button to running tasks (closes [#23](https://github.com/spmeesseman/vscode-taskexplorer/issues/23))
 * v1.23 - Deeper groupings with dashed task groups (Off by default)
 * v1.22 - Major performance enhancements - Task Tree / Task Scanning
 * v1.21 - Add option to keep terminal open after stopping task (closes [#51](https://github.com/spmeesseman/vscode-taskexplorer/issues/51))
-* v1.20 - Add support for restarting task (thank you **antfu**)
+* v1.20 - Add support for restarting task (thanks **antfu**)
 * v1.19 - App-Publisher task support for BETA testing
 * v1.18 - Add 'Add to excludes' action in task file node context menu
 * v1.17 - Add 'Run last task' button to titlebar
