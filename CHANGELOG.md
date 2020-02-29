@@ -1,3 +1,21 @@
+# [1.26.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.25.1...v1.26.0) (2020-02-29)
+
+
+### Bug Fixes
+
+* the 'open terminal' button doesn't work for all tasks ([253f885](https://github.com/spmeesseman/vscode-taskexplorer/commit/253f885))
+
+
+### Documentation
+
+* **readme:** add 1.26 info, grammar fixes ([c5d05f8](https://github.com/spmeesseman/vscode-taskexplorer/commit/c5d05f8))
+* **readme:** adjust ratings url in badge, add feedback link ([4687ccd](https://github.com/spmeesseman/vscode-taskexplorer/commit/4687ccd))
+
+
+### Features
+
+* add last ran running task in status bar (configurable) ([bd2de58](https://github.com/spmeesseman/vscode-taskexplorer/commit/bd2de58))
+
 ## [1.25.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.25.0...v1.25.1) (2020-02-27)
 
 
