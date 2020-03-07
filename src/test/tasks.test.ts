@@ -6,17 +6,19 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
-import { workspace, tasks, commands, Uri, ConfigurationTarget } from 'vscode';
+import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder } from 'vscode';
 import * as testUtil from './testUtil';
 import { timeout, removeFromArray, asyncMapForEach } from '../util';
 import { teApi } from './extension.test';
 import { TaskItem } from '../tasks';
 import { waitForCache } from '../cache';
+import { addWsFolder, removeWsFolder } from '../extension';
 import { configuration } from "../common/configuration";
 
 
 const rootPath = workspace.workspaceFolders[0].uri.fsPath;
 const dirName = path.join(rootPath, 'tasks_test_');
+const ws2DirName = path.join(rootPath, 'ws2');
 const dirNameIgn = path.join(rootPath, 'tasks_test_ignore_');
 const dirNameCode = path.join(rootPath, '.vscode');
 let tempFiles: Array<string> = [];
@@ -43,6 +45,9 @@ suite('Task tests', () =>
         //
         if (!fs.existsSync(dirName)) {
             fs.mkdirSync(dirName, { mode: 0o777 });
+        }
+        if (!fs.existsSync(ws2DirName)) {
+            fs.mkdirSync(ws2DirName, { mode: 0o777 });
         }
         if (!fs.existsSync(dirNameIgn)) {
             fs.mkdirSync(dirNameIgn, { mode: 0o777 });
@@ -92,6 +97,7 @@ suite('Task tests', () =>
             if (!didCodeDirExist) {
                 fs.rmdirSync(dirNameCode);
             }
+            fs.rmdirSync(ws2DirName);
             fs.rmdirSync(dirName);
             fs.rmdirSync(dirNameIgn);
         }
@@ -361,6 +367,7 @@ suite('Task tests', () =>
             '    cb();\n' +
             '};\n' +
             'exports.build = build;\n' +
+            'exports["clean"] = clean;\n' +
             'exports.default = series(clean, build);\n'
         );
 
@@ -557,8 +564,8 @@ suite('Task tests', () =>
 
         taskCount = testUtil.findIdInTaskMap(':gulp:', taskMap);
         console.log("            Gulp         : " + taskCount.toString());
-        if (taskCount != 4) {
-            assert.fail('Unexpected Gulp task count (Found ' + taskCount + ' of 4)');
+        if (taskCount != 5) {
+            assert.fail('Unexpected Gulp task count (Found ' + taskCount + ' of 5)');
         }
 
         //
@@ -610,10 +617,17 @@ suite('Task tests', () =>
         // Just find and run a batch script...
         //  
         console.log("    Run a batch and a bash task");
+        let lastTask: any;
         await asyncMapForEach(taskMap, async (value: TaskItem) =>  
         {
             if (value && value.taskSource === "batch")
             {
+                if (lastTask) {
+                    await configuration.updateWs('keepTermOnStop', true);
+                    await commands.executeCommand("taskExplorer.run", lastTask);
+                }
+                await commands.executeCommand("taskExplorer.run", value);
+                await commands.executeCommand("taskExplorer.stop", value);
                 await commands.executeCommand("taskExplorer.run", value);
                 await commands.executeCommand("taskExplorer.pause", value);
                 await commands.executeCommand("taskExplorer.openTerminal", value);
@@ -621,19 +635,25 @@ suite('Task tests', () =>
                 await commands.executeCommand("taskExplorer.stop", value);
                 await commands.executeCommand("taskExplorer.runLastTask", value);
                 await commands.executeCommand("taskExplorer.restart", value);
+                await commands.executeCommand("taskExplorer.stop", value);
+                if (lastTask) {
+                    await commands.executeCommand("taskExplorer.openTerminal", lastTask);
+                }
                 ranBatch = true;
+                lastTask = value;
                 return !(ranBash && ranBatch); // break foreach
             }
             else if (value && value.taskSource === "bash")
             {
                 await commands.executeCommand("taskExplorer.run", value);
-                await(1500);
+                await timeout(1500);
                 await workspace.getConfiguration().update('terminal.integrated.shell.windows', 
                                                           'bash.exe', ConfigurationTarget.Workspace);
                 await commands.executeCommand("taskExplorer.run", value);
                 await workspace.getConfiguration().update('terminal.integrated.shell.windows', 
                                                           'C:\\Windows\\System32\\cmd.exe', ConfigurationTarget.Workspace);
                 ranBash = true;
+                await commands.executeCommand("taskExplorer.openTerminal", value);
                 return !(ranBash && ranBatch); // break foreach
             }
         });
@@ -904,7 +924,7 @@ suite('Task tests', () =>
         console.log("    Show/hide last tasks");
         await teApi.explorerProvider.showLastTasks(true);
         await teApi.explorerProvider.showLastTasks(false);
-        await configuration.updateWs("showLastTasks", true);
+        await configuration.updateWs("showLastTasks", false);
         await teApi.explorerProvider.showLastTasks(true);
         await teApi.explorerProvider.showLastTasks(false);
     });
@@ -941,11 +961,8 @@ suite('Task tests', () =>
         await timeout(75);
         await teApi.fileCache.cancelBuildCache(true);
         teApi.fileCache.rebuildCache();
-        await timeout(100);
         await teApi.fileCache.cancelBuildCache(true);
-        teApi.fileCache.rebuildCache();
-        await timeout(150);
-        await teApi.fileCache.cancelBuildCache(true);
+        await teApi.fileCache.rebuildCache();
     });
 
 
@@ -959,6 +976,16 @@ suite('Task tests', () =>
         await configuration.updateWs('enableExplorerView', true);
         await configuration.updateWs('enableSideBar', true);
         await timeout(5000); // wait for refresh
+    });
+
+
+    test("Add and remove a workspace folder", async function()
+    {
+        // Simulate add/remove folder (cannot use workspace.updateWOrkspaceFolders() in tests)
+        //
+        let wsf: WorkspaceFolder = workspace.workspaceFolders[0];
+        addWsFolder(workspace.workspaceFolders);
+        removeWsFolder(workspace.workspaceFolders);
     });
 
 });

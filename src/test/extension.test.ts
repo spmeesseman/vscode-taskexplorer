@@ -81,12 +81,9 @@ suite("Extension Tests", () =>
         }
 
         assert(teApi, "Exported API is empty");
-
-        vscode.commands.executeCommand("taskExplorer.showOutput", false);
-        vscode.commands.executeCommand("taskExplorer.showOutput", true);
     });
 
-    
+
     test("Check tree providers", function(done) 
     {
         if (!teApi.explorerProvider) {
@@ -96,6 +93,13 @@ suite("Extension Tests", () =>
             assert.fail("        ✘ Task Explorer sidebar tree instance does not exist");
         }
         done();
+    });
+
+    
+    test("Show log", async function() 
+    {
+        await vscode.commands.executeCommand("taskExplorer.showOutput", false);
+        await vscode.commands.executeCommand("taskExplorer.showOutput", true);
     });
 
 
@@ -122,7 +126,7 @@ suite("Extension Tests", () =>
 
         done();
     });
-
+    
 
     async function initSettings(enable = true)
     {
@@ -159,8 +163,9 @@ suite("Extension Tests", () =>
         await configuration.updateWs('enableRuby', enable);
         await configuration.updateWs('enableTsc', enable);
         await configuration.updateWs('enableWorkspace', enable);
-        await configuration.updateWs('groupDashed', false);
-        await configuration.updateWs('showLastTasks', false);
+        await configuration.updateWs('groupDashed', enable);
+        await configuration.updateWs('showLastTasks', enable);
+        await configuration.updateWs('keepTermOnStop', false);
     }
 
 });
