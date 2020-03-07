@@ -61,20 +61,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const subscriptions = context.subscriptions;
         this.extensionContext = context;
         this.name = name;
-        subscriptions.push(commands.registerCommand(name + ".run", this.run, this));                     // (TaskItem) =>
-        subscriptions.push(commands.registerCommand(name + ".runLastTask", this.runLastTask, this));
-        subscriptions.push(commands.registerCommand(name + ".stop", this.stop, this));                   // (TaskItem) =>
-        subscriptions.push(commands.registerCommand(name + ".restart", this.restart, this));             // (TaskItem) =>
-        subscriptions.push(commands.registerCommand(name + ".pause", this.pause, this));                 // (TaskItem) =>
-        subscriptions.push(commands.registerCommand(name + ".open", this.open, this));                   // (TaskItem) =>
-        subscriptions.push(commands.registerCommand(name + ".openTerminal", this.openTerminal, this));   // (TaskItem) =>
-        subscriptions.push(commands.registerCommand(name + ".refresh", () => { this.refresh(true, false); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runInstall", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "install"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runUpdate", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "update"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runUpdatePackage", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "update <packagename>"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runAudit", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "audit"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runAuditFix", (taskFile: TaskFile) => { this.runNpmCommand(taskFile, "audit fix"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addToExcludes", (taskFile: TaskFile | string, global: boolean, prompt: boolean) => { this.addToExcludes(taskFile, global, prompt); }, this));
+        subscriptions.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => { await this.run(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runLastTask",  async () => { await this.runLastTask(); }, this));
+        subscriptions.push(commands.registerCommand(name + ".stop",  async (item: TaskItem) => { await this.stop(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".pause",  async (item: TaskItem) => { await this.pause(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".open", async (item: TaskFile | TaskItem) => { await this.open(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".openTerminal", async (item: TaskItem) => { await this.openTerminal(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "install"); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update"); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update <packagename>"); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit"); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
+        subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | string, global: boolean, prompt: boolean) => { await this.addToExcludes(taskFile, global, prompt); }, this));
 
         tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
         tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
@@ -636,7 +636,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 {
                     const taskItem2 = await this.getTaskItems(tId);
                     if (taskItem2 && taskItem2 instanceof TaskItem) {
-                        const taskItem3 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
+                        const taskItem3 = new TaskItem(this.extensionContext, taskItem2.taskFile, taskItem2.task);
                         taskItem3.id = this.lastTasksText + ":" + taskItem3.id;
                         taskItem3.label = this.getLastTaskName(taskItem3);
                         ltfolder.insertTaskFile(taskItem3, 0);
