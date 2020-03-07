@@ -177,6 +177,20 @@ async function findTargets(fsPath: string): Promise<StringMap>
                     }
                 }
             }
+            else if (line.toLowerCase().trimLeft().startsWith("exports["))
+            {
+                idx1 = line.indexOf("[") + 2; // skip past [ and '/"
+                const idx2 = line.indexOf("]", idx1) - 1;  // move up to "/'
+                if (idx1 !== -1)
+                {
+                    const tgtName = line.substring(idx1, idx2).trim();
+                    if (tgtName) {
+                        scripts[tgtName] = "";
+                        util.log("   found target");
+                        util.logValue("      name", tgtName);
+                    }
+                }
+            }
             else if (line.toLowerCase().trimLeft().startsWith("gulp.task"))
             {
                 idx1 = line.indexOf("'");

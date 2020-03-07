@@ -5,3 +5,11 @@ gulp.task('hello', (done) => {
     done();
 });
 
+function test(cb)
+{
+    console.log('Test!');
+    cb();
+}
+
+exports['build:test'] = test;
+
