@@ -5,7 +5,7 @@
 
 import {
     Disposable, ExtensionContext, Uri, tasks,
-    workspace, window, FileSystemWatcher, ConfigurationChangeEvent
+    workspace, window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder
 } from "vscode";
 import { TaskTreeDataProvider } from "./taskTree";
 import { AntTaskProvider } from "./taskProviderAnt";
@@ -71,41 +71,17 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     //
     const workspaceWatcher = workspace.onDidChangeWorkspaceFolders(async(_e) =>
     {
-        for (const a in _e.added) {
-            util.log("Workspace folder added: " + _e.added[a].name, 1);
-            await cache.addFolderToCache(_e.added[a]);
-        }
-        for (const r in _e.removed)
-        {
-            util.log("Workspace folder removed: " + _e.removed[r].name, 1);
-            // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
-            for (const key in cache.filesCache.keys)
-            {
-                const toRemove = [];
-                const obj = cache.filesCache.get(key);
-                obj.forEach((item) =>
-                {
-                    if (item.folder.uri.fsPath === _e.removed[r].uri.fsPath) {
-                        toRemove.push(item);
-                    }
-                });
-                if (toRemove.length > 0) {
-                    for (const tr in toRemove) {
-                        obj.delete(toRemove[tr]);
-                    }
-                }
-            }
-            // window.setStatusBarMessage("");
-        }
-        refreshTree();
+        await addWsFolder(_e.added);
+        removeWsFolder(_e.removed);
+        await refreshTree();
     });
     context.subscriptions.push(workspaceWatcher);
 
     //
     // Register configurations/settings change watcher
     //
-    const d = workspace.onDidChangeConfiguration(e => {
-        processConfigChanges(context, e);
+    const d = workspace.onDidChangeConfiguration(async e => {
+        await processConfigChanges(context, e);
     });
     context.subscriptions.push(d);
 
@@ -120,7 +96,42 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 }
 
 
-function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
+export async function addWsFolder(wsf: WorkspaceFolder[])
+{
+    for (const f in wsf) {
+        util.log("Workspace folder added: " + wsf[f].name, 1);
+        await cache.addFolderToCache(wsf[f]);
+    }
+}
+
+
+export function removeWsFolder(wsf: WorkspaceFolder[])
+{
+    for (const f in wsf)
+    {
+        util.log("Workspace folder removed: " + wsf[f].name, 1);
+        // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
+        for (const key in cache.filesCache.keys)
+        {
+            const toRemove = [];
+            const obj = cache.filesCache.get(key);
+            obj.forEach((item) =>
+            {
+                if (item.folder.uri.fsPath === wsf[f].uri.fsPath) {
+                    toRemove.push(item);
+                }
+            });
+            if (toRemove.length > 0) {
+                for (const tr in toRemove) {
+                    obj.delete(toRemove[tr]);
+                }
+            }
+        }
+    }
+}
+
+
+async function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
 {
     let refresh: boolean;
 
@@ -136,92 +147,92 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     {
         if (configuration.get<boolean>("enableSideBar") && treeDataProvider)
         {
-            treeDataProvider2.showLastTasks(configuration.get<boolean>("showLastTasks"));
+            await treeDataProvider2.showLastTasks(configuration.get<boolean>("showLastTasks"));
         }
         if (configuration.get<boolean>("enableExplorerView") && treeDataProvider2)
         {
-            treeDataProvider2.showLastTasks(configuration.get<boolean>("showLastTasks"));
+            await treeDataProvider2.showLastTasks(configuration.get<boolean>("showLastTasks"));
         }
     }
 
     if (e.affectsConfiguration("taskExplorer.enableAnt") || e.affectsConfiguration("taskExplorer.includeAnt")) {
-        registerFileWatcherAnt(context, configuration.get<boolean>("enableAnt"));
+        await registerFileWatcherAnt(context, configuration.get<boolean>("enableAnt"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableAppPublisher")) {
-        registerFileWatcher(context, "app-publisher", "**/.publishrc*", false, configuration.get<boolean>("enableAppPublisher"));
+        await registerFileWatcher(context, "app-publisher", "**/.publishrc*", false, configuration.get<boolean>("enableAppPublisher"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableBash")) {
-        registerFileWatcher(context, "bash", "**/*.[Ss][Hh]", true, configuration.get<boolean>("enableBash"));
+        await registerFileWatcher(context, "bash", "**/*.[Ss][Hh]", true, configuration.get<boolean>("enableBash"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableBatch")) {
-        registerFileWatcher(context, "batch", "**/*.[Bb][Aa][Tt]", true, configuration.get<boolean>("enableBatch"));
-        registerFileWatcher(context, "batch", "**/*.[Cc][Mm][Dd]", true, configuration.get<boolean>("enableBatch"));
+        await registerFileWatcher(context, "batch", "**/*.[Bb][Aa][Tt]", true, configuration.get<boolean>("enableBatch"));
+        await registerFileWatcher(context, "batch", "**/*.[Cc][Mm][Dd]", true, configuration.get<boolean>("enableBatch"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableGradle")) {
-        registerFileWatcher(context, "grunt", "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]", false, configuration.get<boolean>("enableGradle"));
+        await registerFileWatcher(context, "grunt", "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]", false, configuration.get<boolean>("enableGradle"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableGrunt")) {
-        registerFileWatcher(context, "grunt", "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]", false, configuration.get<boolean>("enableGrunt"));
+        await registerFileWatcher(context, "grunt", "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]", false, configuration.get<boolean>("enableGrunt"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableGulp")) {
-        registerFileWatcher(context, "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]", false, configuration.get<boolean>("enableGulp"));
+        await registerFileWatcher(context, "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]", false, configuration.get<boolean>("enableGulp"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableMake")) {
-        registerFileWatcher(context, "make", "**/[Mm]akefile", false, configuration.get<boolean>("enableMake"));
+        await registerFileWatcher(context, "make", "**/[Mm]akefile", false, configuration.get<boolean>("enableMake"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableNpm")) {
-        registerFileWatcher(context, "npm", "**/package.json", false, configuration.get<boolean>("enableNpm"));
+        await registerFileWatcher(context, "npm", "**/package.json", false, configuration.get<boolean>("enableNpm"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableNsis")) {
-        registerFileWatcher(context, "nsis", "**/*.[Nn][Ss][Ii]", true, configuration.get<boolean>("enableNsis"));
+        await registerFileWatcher(context, "nsis", "**/*.[Nn][Ss][Ii]", true, configuration.get<boolean>("enableNsis"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enablePerl")) {
-        registerFileWatcher(context, "perl", "**/*.[Pp][Ll]", true, configuration.get<boolean>("enablePerl"));
+        await registerFileWatcher(context, "perl", "**/*.[Pp][Ll]", true, configuration.get<boolean>("enablePerl"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enablePowershell")) {
-        registerFileWatcher(context, "powershell", "**/*.[Pp][Ss]1", true, configuration.get<boolean>("enablePowershell"));
+        await registerFileWatcher(context, "powershell", "**/*.[Pp][Ss]1", true, configuration.get<boolean>("enablePowershell"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enablePython")) {
-        registerFileWatcher(context, "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", true, configuration.get<boolean>("enablePython"));
+        await registerFileWatcher(context, "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", true, configuration.get<boolean>("enablePython"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableRuby")) {
-        registerFileWatcher(context, "ruby", "**/*.rb", true, configuration.get<boolean>("enableRuby"));
+        await registerFileWatcher(context, "ruby", "**/*.rb", true, configuration.get<boolean>("enableRuby"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableTsc")) {
-        registerFileWatcher(context, "tsc", "**/tsconfig.json", false, configuration.get<boolean>("enableTsc"));
+        await registerFileWatcher(context, "tsc", "**/tsconfig.json", false, configuration.get<boolean>("enableTsc"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableWorkspace")) {
-        registerFileWatcher(context, "workspace", "**/.vscode/tasks.json", false, configuration.get<boolean>("enableWorkspace"));
+        await registerFileWatcher(context, "workspace", "**/.vscode/tasks.json", false, configuration.get<boolean>("enableWorkspace"));
         refresh = true;
     }
 
@@ -273,7 +284,7 @@ function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeE
     }
 
     if (refresh) {
-        refreshTree();
+        await refreshTree();
     }
 }
 
