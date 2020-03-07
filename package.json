@@ -371,6 +371,11 @@
                     "light": "res/light/refresh.svg",
                     "dark": "res/dark/refresh.svg"
                 }
+            },
+            {
+                "command": "taskExplorer.showOutput",
+                "title": "%command.showOutput%",
+                "when": "config.taskExplorer.enableExplorerView"
             }
         ],
         "keybindings": [

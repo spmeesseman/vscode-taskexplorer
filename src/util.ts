@@ -52,7 +52,7 @@ export function initLog(settingGrpName: string, dispName: string, context?: Exte
     {
         context.subscriptions.push(logOutputChannel);
         context.subscriptions.push(
-            commands.registerCommand(settingGrpName + ".showOutput", (show: boolean) => showLogOutput)
+            commands.registerCommand(settingGrpName + ".showOutput", showLogOutput)
         );
     }
     showLogOutput(showLog);

@@ -66,5 +66,6 @@
 	"command.runAuditFix": "Run npm audit fix",
 	"command.runUpdate": "Run npm update",
 	"command.runUpdatePackage": "Run npm update [package]",
-	"command.runSelectedScript": "Run Script"
+	"command.runSelectedScript": "Run Script",
+	"command.showOutput": "Show the log output window"
 }
