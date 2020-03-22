@@ -1,3 +1,13 @@
+## [1.26.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.26.0...v1.26.1) (2020-03-22)
+
+
+### Bug Fixes
+
+* gulp4 tasks in bracket notation are not picked up ([5fb9039](https://github.com/spmeesseman/vscode-taskexplorer/commit/5fb9039))
+* re-enabling the 'show last tasks' option after disabling it causes an error ([f842b70](https://github.com/spmeesseman/vscode-taskexplorer/commit/f842b70))
+* the 'taskExplorer.showOutput' command does not work ([ad14b14](https://github.com/spmeesseman/vscode-taskexplorer/commit/ad14b14))
+* when enabling multiple task providers at the same time by editing settings.json, random task types are not initially imported ([c69de7a](https://github.com/spmeesseman/vscode-taskexplorer/commit/c69de7a))
+
 # [1.26.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.25.1...v1.26.0) (2020-02-29)
 
 
