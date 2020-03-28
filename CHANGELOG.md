@@ -1,3 +1,10 @@
+## [1.26.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.26.1...v1.26.2) (2020-03-28)
+
+
+### Documentation
+
+* **readme:** add donation info and dev notes [skip-ci] ([347ae7d](https://github.com/spmeesseman/vscode-taskexplorer/commit/347ae7d))
+
 ## [1.26.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.26.0...v1.26.1) (2020-03-28)
 
 
