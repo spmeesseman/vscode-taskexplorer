@@ -1,3 +1,10 @@
+## [1.26.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.26.2...v1.26.3) (2020-03-28)
+
+
+### Bug Fixes
+
+* if tasks exist that start with a '-' character, and the 'group dashed' option is on, the tree explorer breaks ([723a86a](https://github.com/spmeesseman/vscode-taskexplorer/commit/723a86a))
+
 ## [1.26.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.26.1...v1.26.2) (2020-03-28)
 
 
