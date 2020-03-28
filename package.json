@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "1.26.1",
+    "version": "1.26.0",
     "displayName": "Task Explorer",
     "description": "Manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
@@ -76,7 +76,6 @@
         "watch": "tsc -watch -p ./"
     },
     "dependencies": {
-        "@babel/runtime": "^7.8.4",
         "is-utf8": "^0.2.1",
         "jsonc-parser": "^2.2.0",
         "minimatch": "^3.0.4",

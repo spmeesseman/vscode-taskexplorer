@@ -41,6 +41,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
     - [Rate It - Leave Some Stars](#rate-it---leave-some-stars)
   - [Thank You](#thank-you)
   - [Other Code Extensions by spmeesseman](#other-code-extensions-by-spmeesseman)
+  - [Development Notes](#development-notes)
 
 ## Screenshots by Version
 
@@ -176,3 +177,22 @@ Please rate your experience with stars... [like five of them ;)](https://marketp
 |-|-|-|
 |svn-scm-ext|[GitHub](https://github.com/spmeesseman/svn-scm-ext)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.svn-scm-ext)|
 |vscode-vslauncher|[GitHub](https://github.com/spmeesseman/vscode-vslauncher)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-vslauncher)|
+
+## Development Notes
+
+3/25/20 - CI has to be THE most overrated tech on the planet.  CI should be named PA standing for "pain in the ass".  These are personal notes for correcting CI issues that happen seemingly every other release.
+
+When semantic release kindly creates the git version tag, then something bombs, run the following git commands to remove the git tag, remote and local:
+
+    git push origin :v1.26.1
+    git tag --delete v1.26.1
+
+Babel runtime:
+
+Errors in reelase when incuding babel runtime:
+
+This extension consists of 379 files, out of which 230 are JavaScript files. For performance reasons, you should bundle your extension. You should also exclude unnecessary files by adding them to your .vscodeignore.
+
+WHen messing with babel, and finishing, install/uninstall the runtime:
+
+    npm install @bebel/runtime
