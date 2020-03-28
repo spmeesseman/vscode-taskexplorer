@@ -1545,7 +1545,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         let id = folder.label + each.taskSource;
                         let subfolder: TaskFile;
                         const prevNameThis = each2.label.split("-");
-                        if (prevName && prevName.length > 1 && prevNameThis.length > 1 && prevName[0] === prevNameThis[0])
+                        if (prevName && prevName.length > 1 && prevName[0] && prevNameThis.length > 1 && prevName[0] === prevNameThis[0])
                         {
                             // We found a pair of tasks that need to be grouped.  i.e. the first part of the label
                             // when split by the '-' character is the same...
@@ -1591,7 +1591,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 const taskTypesRmv2: TaskItem[] = [];
                 each.scripts.forEach(each2 =>
                 {
-                    if (each2.label.split("-").length > 1)
+                    if (each2.label.split("-").length > 1 && each2.label.split("-")[0])
                     {
                         const id = folder.label + each.taskSource + each2.label.split("-")[0];
                         if (subfolders.get(id))
