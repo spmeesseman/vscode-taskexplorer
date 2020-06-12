@@ -35,7 +35,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Requirements](#requirements)
   - [Features by Version](#features-by-version)
   - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
-  - [Using Dashed Groups](#using-dashed-groups)
+  - [Using Groups With A Separator](#using-groups-with-a-separator)
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
   - [Feedback & Contributing](#feedback--contributing)
