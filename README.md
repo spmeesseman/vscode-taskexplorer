@@ -35,7 +35,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Requirements](#requirements)
   - [Features by Version](#features-by-version)
   - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
-  - [Using Dashed Groups](#using-dashed-groups)
+  - [Using Groups With A Separator](#using-groups-with-a-separator)
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
   - [Feedback & Contributing](#feedback--contributing)
@@ -106,10 +106,10 @@ Task files that are found by Task Expolorer can also be added to the *excludes* 
 
 Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **Ant** includes list in all cases.
 
-## Using Dashed Groups
+## Using Groups With A Separator
 
 **EXPERIMENTAL**
-*Dashed Groups* are simply an extra level of task groupings that can be made based on a dash (-) character in the script name.  This option can be turned on/off with the *Group Dashed* option in Settings, the default is OFF.
+The *Groups With Separator* option is simply an extra level of task groupings that can be made based on a configured separation character in the script name.  This option can be turned on/off with the *Group With Sepator* option in Settings, the default is OFF. The default separator is a dash ("-").
 
 For example, consider 10 npm tasks, 5 of which all start with the string *dev-*, 5 of which start with the string *prod-*.  Prior to Version 1.23, this would create 10 individual task nodes within the main npm task node in the task tree:
 
@@ -125,7 +125,7 @@ For example, consider 10 npm tasks, 5 of which all start with the string *dev-*,
         prod-cp-from-bin
         prod-clean
 
-By enabling the *Group Dashed* option in Settings, two new grouped nodes would be created underneath the main npm node, one called *dev* and the other called *prod*.  Each of these two sub-nodes of course would contain the respective *dev-* and *prod-* scrtips/tasks, minus the prepended group name:
+By enabling the *Group With Sepator* option in Settings and setting the *Group Sepator* to a dash ("-") two new grouped nodes would be created underneath the main npm node, one called *dev* and the other called *prod*.  Each of these two sub-nodes of course would contain the respective *dev-* and *prod-* scrtips/tasks, minus the prepended group name:
 
     npm
         dev

@@ -930,13 +930,14 @@ suite('Task tests', () =>
     });
 
 
-    test('Test dashed groups', async function() 
+    test('Test groups with separator', async function() 
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
-        console.log("    Enable dashed groups and rebuild cache");
-        await configuration.updateWs('groupDashed', true);
+        console.log("    Enable groups with separator and rebuild cache");
+        await configuration.updateWs('groupWithSeparator', true);
+        await configuration.updateWs('groupSeparator', "-");
         await timeout(2000); // wait for filesystem change events
         await waitForCache();
     });

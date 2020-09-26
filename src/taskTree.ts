@@ -1336,6 +1336,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let folder = null,
             ltfolder = null;
         let taskFile = null;
+        const groupSeparator = configuration.get<string>("groupSeparator") || "-";
 
         //
         // The 'Last Tasks' folder will be 1st in the tree
@@ -1517,7 +1518,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 prevTaskFile = each;
 
                 //
-                // Build dashed groupings
+                // Build groupings by separator
                 //
                 // For example, consider the set of task names/labels:
                 //
@@ -1526,7 +1527,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 //     build-server
                 //     build-sass
                 //
-                // If the option 'groupDashed' is ON, then group this set of tasks like so:
+                // If the option 'groupWithSeparator' is ON and 'groupSeparator' is set to '-', then group this set of tasks like so:
                 //
                 //     build
                 //         prod
@@ -1534,7 +1535,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 //         server
                 //         sass
                 //
-                if (configuration.get("groupDashed"))
+                if (configuration.get("groupWithSeparator"))
                 {
                     let prevName: string[];
                     let prevTaskItem: TaskItem | TaskFile;
@@ -1544,11 +1545,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     {
                         let id = folder.label + each.taskSource;
                         let subfolder: TaskFile;
-                        const prevNameThis = each2.label.split("-");
+                        const prevNameThis = each2.label.split(groupSeparator);
                         if (prevName && prevName.length > 1 && prevName[0] && prevNameThis.length > 1 && prevName[0] === prevNameThis[0])
                         {
                             // We found a pair of tasks that need to be grouped.  i.e. the first part of the label
-                            // when split by the '-' character is the same...
+                            // when split by the separator character is the same...
                             //
                             id += prevName[0];
                             subfolder = subfolders.get(id);
@@ -1567,11 +1568,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                             subfolder.addScript(each2);
                         }
 
-                        prevName = each2.label.split("-");
+                        prevName = each2.label.split(groupSeparator);
                         prevTaskItem = each2;
                     });
                     //
-                    // If there are new dashed grouped nodes to add to the tree...
+                    // If there are new grouped by separator nodes to add to the tree...
                     //
                     if (newNodes.length > 0) {
                         let numGrouped = 0;
@@ -1583,7 +1584,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             });
 
             //
-            // Perform some removal based on dashed groupings.  The nodes added within the new
+            // Perform some removal based on groupings with separator.  The nodes added within the new
             // group nodes need to be removed from the old parent node still...
             //
             function removeScripts(each: any)
@@ -1591,9 +1592,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 const taskTypesRmv2: TaskItem[] = [];
                 each.scripts.forEach(each2 =>
                 {
-                    if (each2.label.split("-").length > 1 && each2.label.split("-")[0])
+                    if (each2.label.split(groupSeparator).length > 1 && each2.label.split(groupSeparator)[0])
                     {
-                        const id = folder.label + each.taskSource + each2.label.split("-")[0];
+                        const id = folder.label + each.taskSource + each2.label.split(groupSeparator)[0];
                         if (subfolders.get(id))
                         {
                             taskTypesRmv2.push(each2);
@@ -1635,8 +1636,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             });
 
             //
-            // For dashed groupings, now go through and rename the labels within each group minus the
-            // first part of the name split by the '-' character (the name of the new dashed-grouped node)
+            // For groupings with separator, now go through and rename the labels within each group minus the
+            // first part of the name split by the separator character (the name of the new grouped-with-separator node)
             //
             folder.taskFiles.forEach(each =>
             {
@@ -1652,7 +1653,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         rmvLbl = rmvLbl.replace(/\[/gi, "\\[");
                         each2.scripts.forEach(each3 =>
                         {
-                            const rgx = new RegExp(rmvLbl + "-", "i");
+                            const rgx = new RegExp(rmvLbl + groupSeparator, "i");
                             each3.label = each3.label.replace(rgx, "");
                         });
                     }

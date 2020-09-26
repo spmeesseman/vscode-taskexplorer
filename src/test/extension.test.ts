@@ -163,7 +163,8 @@ suite("Extension Tests", () =>
         await configuration.updateWs('enableRuby', enable);
         await configuration.updateWs('enableTsc', enable);
         await configuration.updateWs('enableWorkspace', enable);
-        await configuration.updateWs('groupDashed', enable);
+        await configuration.updateWs('groupWithSeparator', enable);
+        await configuration.updateWs('groupSeparator', "-");
         await configuration.updateWs('showLastTasks', enable);
         await configuration.updateWs('keepTermOnStop', false);
     }
