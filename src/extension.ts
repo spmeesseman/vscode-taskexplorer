@@ -181,7 +181,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     }
 
     if (e.affectsConfiguration("taskExplorer.enableGradle")) {
-        await registerFileWatcher(context, "grunt", "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]", false, configuration.get<boolean>("enableGradle"));
+        await registerFileWatcher(context, "gradle", "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]", false, configuration.get<boolean>("enableGradle"));
         refresh = true;
     }
 
