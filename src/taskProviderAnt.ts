@@ -168,36 +168,37 @@ async function findAllAntScripts(path: string): Promise<StringMap>
     //     Other targets:
     //
     //      Clean
-    //      GEMS32ProductionSQLServer
-    //      GEMS32SQLServer
-    //      GEMS64
-    //      GEMS64AspNetCore
-    //      GEMS64Production
-    //      GEMS64ProductionSQLServer
-    //      GEMS64SQLServer
+    //      G32ProductionSQLServer
+    //      G32SQLServer
+    //      G64
+    //      G64AspNetCore
+    //      G64Production
+    //      G64ProductionSQLServer
+    //      G64SQLServer
     //      init
     //
-    //     Default target: GEMS64
+    //     Default target: G64
     //
-    const stdout = execSync(getCommand() + " -f " + path + " -p");
+    let stdout: Buffer;
+    try {
+        stdout = execSync(getCommand() + " -f " + path + " -p");
+    }
+    catch {}
     if (stdout)
     {
         text = stdout.toString();
         //
         // First get the default, use 2nd capturing group (returned arr-idx 2):
         //
-        let defaultTask = text.match(/(Default target: )([\W\w]+)/i);
+        let defaultTask = text.match(/(Default target: )([\w\-]+)/i);
         if (defaultTask && defaultTask.length > 2) {
             defaultTask = defaultTask[2];
             defaultTask = defaultTask.trim();
         }
         //
-        // Break into array of lines...
+        // Loop through all the lines and extract the task names, if it's a task
         //
         text = text.split("\n");
-        //
-        // Loop through all the tasks found
-        //
         for (const i in text)
         {
             const line: string = text[i].trim();
