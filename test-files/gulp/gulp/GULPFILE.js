@@ -1,7 +1,7 @@
 
 process.chdir(__dirname);
 
-var pkg = require("../../package.json");
+var pkg = require("../../../package.json");
 
 var gulp = require("gulp");
 // var uglify = require("gulp-uglify");
