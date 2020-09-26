@@ -689,7 +689,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
 
         if (changed) {
-            this._onDidChangeTreeData.fire();
+            this._onDidChangeTreeData.fire(taskItem);
         }
     }
 

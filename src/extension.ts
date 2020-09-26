@@ -96,7 +96,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 }
 
 
-export async function addWsFolder(wsf: WorkspaceFolder[])
+export async function addWsFolder(wsf: readonly WorkspaceFolder[])
 {
     for (const f in wsf) {
         util.log("Workspace folder added: " + wsf[f].name, 1);
@@ -105,7 +105,7 @@ export async function addWsFolder(wsf: WorkspaceFolder[])
 }
 
 
-export function removeWsFolder(wsf: WorkspaceFolder[])
+export function removeWsFolder( wsf: readonly WorkspaceFolder[])
 {
     for (const f in wsf)
     {
