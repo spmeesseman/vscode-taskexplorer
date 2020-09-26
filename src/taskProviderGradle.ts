@@ -199,9 +199,9 @@ function createGradleTask(target: string, cmd: string, folder: WorkspaceFolder, 
 {
     function getCommand(folder: WorkspaceFolder, cmd: string): string
     {
-        let gradle = "gradle";
+        let gradle = "gradlew";
         if (process.platform === "win32") {
-            gradle = "gradle.bat";
+            gradle = "gradlew.bat";
         }
         if (workspace.getConfiguration("taskExplorer").get("pathToGradle")) {
             gradle = workspace.getConfiguration("taskExplorer").get("pathToGradle");
