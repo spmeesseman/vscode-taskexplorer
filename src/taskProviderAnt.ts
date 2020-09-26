@@ -9,6 +9,8 @@ import { parseString } from "xml2js";
 import { configuration } from "./common/configuration";
 import { TaskItem } from "./tasks";
 import { filesCache } from "./cache";
+import { execSync } from "child_process";
+
 
 interface StringMap { [s: string]: string; }
 let cachedTasks: Task[];
@@ -67,7 +69,7 @@ export async function invalidateTasksCacheAnt(opt?: Uri): Promise<void>
             });
 
             //
-            // If this isn't a 'delete file' event then read the file for tasks
+            // If this isn"t a "delete file" event then read the file for tasks
             //
             if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
             {
@@ -130,8 +132,7 @@ async function readAntfile(uri: Uri): Promise<Task[]>
 
     if (folder)
     {
-        const contents = await util.readFile(uri.fsPath);
-        const scripts = await findAllAntScripts(contents);
+        const scripts = await findAllAntScripts(uri.fsPath);
         if (scripts)
         {
             Object.keys(scripts).forEach(each => {
@@ -146,27 +147,83 @@ async function readAntfile(uri: Uri): Promise<Task[]>
 }
 
 
-async function findAllAntScripts(buffer: string): Promise<StringMap>
+async function findAllAntScripts(path: string): Promise<StringMap>
 {
-    let json: any = "";
+    let text: any = "";
     const scripts: StringMap = {};
+    const buffer = await util.readFile(path);
 
     util.log("");
     util.log("FindAllAntScripts");
 
-    parseString(buffer, (err, result) => {
-        json = result;
-    });
-
-    if (json && json.project && json.project.target)
+    //
+    // Try running 'ant' itself to get the targets.  If fail, just custom parse
+    //
+    // Sample Output of ant -p :
+    //
+    //     Buildfile: C:\Projects\.....\build.xml
+    //
+    //     Main targets:
+    //
+    //     Other targets:
+    //
+    //      Clean
+    //      GEMS32ProductionSQLServer
+    //      GEMS32SQLServer
+    //      GEMS64
+    //      GEMS64AspNetCore
+    //      GEMS64Production
+    //      GEMS64ProductionSQLServer
+    //      GEMS64SQLServer
+    //      init
+    //
+    //     Default target: GEMS64
+    //
+    const stdout = execSync(getCommand() + " -f " + path + " -p");
+    if (stdout)
     {
-        const defaultTask = json.project.$.default;
-        const targets = json.project.target;
-        for (const tgt in targets)
+        text = stdout.toString();
+        //
+        // First get the default, use 2nd capturing group (returned arr-idx 2):
+        //
+        let defaultTask = text.match(/(Default target: )([\W\w]+)/i);
+        if (defaultTask && defaultTask.length > 2) {
+            defaultTask = defaultTask[2];
+            defaultTask = defaultTask.trim();
+        }
+        //
+        // Break into array of lines...
+        //
+        text = text.split("\n");
+        //
+        // Loop through all the tasks found
+        //
+        for (const i in text)
         {
-            if (targets[tgt].$ && targets[tgt].$.name) {
-                util.logValue("   Found target", targets[tgt].$.name);
-                scripts[defaultTask === targets[tgt].$.name ? targets[tgt].$.name + " - Default" : targets[tgt].$.name] = targets[tgt].$.name;
+            const line: string = text[i].trim();
+            if (!line || line.match(/(target[s]{0,1}:|Buildfile:)/i)) {
+                continue;
+            }
+            util.logValue("   Found target (ant -p)", line);
+            scripts[defaultTask === line ? line + " - Default" : line] = line;
+        }
+    }
+    else
+    {
+        parseString(buffer, (err, result) => {
+            text = result;
+        });
+
+        if (text && text.project && text.project.target)
+        {
+            const defaultTask = text.project.$.default;
+            const targets = text.project.target;
+            for (const tgt in targets)
+            {
+                if (targets[tgt].$ && targets[tgt].$.name) {
+                    util.logValue("   Found target (cst.)", targets[tgt].$.name);
+                    scripts[defaultTask === targets[tgt].$.name ? targets[tgt].$.name + " - Default" : targets[tgt].$.name] = targets[tgt].$.name;
+                }
             }
         }
     }
@@ -175,24 +232,25 @@ async function findAllAntScripts(buffer: string): Promise<StringMap>
 }
 
 
+function getCommand(): string
+{
+    let ant = "ant";
+    if (process.platform === "win32") {
+        ant = "ant.bat";
+    }
+    if (configuration.get("pathToAnt"))
+    {
+        ant = configuration.get("pathToAnt");
+        if (process.platform === "win32" && ant.endsWith("\\ant")) {
+            ant += ".bat";
+        }
+    }
+    return ant;
+}
+
+
 function createAntTask(target: string, cmdName: string, folder: WorkspaceFolder, uri: Uri): Task
 {
-    function getCommand(folder: WorkspaceFolder): string
-    {
-        let ant = "ant";
-        if (process.platform === "win32") {
-            ant = "ant.bat";
-        }
-        if (configuration.get("pathToAnt"))
-        {
-            ant = configuration.get("pathToAnt");
-            if (process.platform === "win32" && ant.endsWith("\\ant")) {
-                ant += ".bat";
-            }
-        }
-        return ant;
-    }
-
     function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
     {
         if (folder) {
@@ -249,7 +307,7 @@ function createAntTask(target: string, cmdName: string, folder: WorkspaceFolder,
         args.push(antFile);
     }
 
-    const execution = new ShellExecution(getCommand(folder), args, options);
+    const execution = new ShellExecution(getCommand(), args, options);
 
     return new Task(kind, folder, cmdName ? cmdName : target, "ant", execution, undefined);
 }
