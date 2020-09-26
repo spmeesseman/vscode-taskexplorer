@@ -613,6 +613,8 @@ suite('Task tests', () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist")
         }
         
+        this.timeout(60 * 1000);
+        
         //
         // Just find and run a batch script...
         //  
