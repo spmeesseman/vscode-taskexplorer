@@ -406,13 +406,16 @@ function registerTaskProviders(context: ExtensionContext)
     // These tak types are provided internally by the extension.  Some task types (npm, grunt,
     //  gulp) are provided by VSCode itself
     //
-    context.subscriptions.push(workspace.registerTaskProvider("ant", new AntTaskProvider()));
-    context.subscriptions.push(workspace.registerTaskProvider("make", new MakeTaskProvider()));
-    context.subscriptions.push(workspace.registerTaskProvider("script", new ScriptTaskProvider()));
-    context.subscriptions.push(workspace.registerTaskProvider("grunt", new GruntTaskProvider()));
-    context.subscriptions.push(workspace.registerTaskProvider("gulp", new GulpTaskProvider()));
-    context.subscriptions.push(workspace.registerTaskProvider("gradle", new GradleTaskProvider()));
-    context.subscriptions.push(workspace.registerTaskProvider("app-publisher", new AppPublisherTaskProvider()));
+    // TODO: VSCODE API now implements "resolveTask" in addition to "provideTask".  Need to implement
+    //     https://code.visualstudio.com/api/extension-guides/task-provider
+    //
+    context.subscriptions.push(tasks.registerTaskProvider("ant", new AntTaskProvider()));
+    context.subscriptions.push(tasks.registerTaskProvider("make", new MakeTaskProvider()));
+    context.subscriptions.push(tasks.registerTaskProvider("script", new ScriptTaskProvider()));
+    context.subscriptions.push(tasks.registerTaskProvider("grunt", new GruntTaskProvider()));
+    context.subscriptions.push(tasks.registerTaskProvider("gulp", new GulpTaskProvider()));
+    context.subscriptions.push(tasks.registerTaskProvider("gradle", new GradleTaskProvider()));
+    context.subscriptions.push(tasks.registerTaskProvider("app-publisher", new AppPublisherTaskProvider()));
 }
 
 
