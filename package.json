@@ -163,14 +163,16 @@
                 {
                     "id": "taskExplorer",
                     "name": "%view.name%",
-                    "when": "config.taskExplorer.enableExplorerView"
+                    "when": "config.taskExplorer.enableExplorerView",
+                    "icon": "res/gears-r.svg"
                 }
             ],
             "taskActivity": [
                 {
                     "id": "taskExplorerSideBar",
                     "name": "",
-                    "when": "config.taskExplorer.enableSideBar"
+                    "when": "config.taskExplorer.enableSideBar",
+                    "icon": "res/gears-r.svg"
                 }
             ]
         },
