@@ -149,10 +149,50 @@ async function readMakefile(uri: Uri): Promise<Task[]>
     return result;
 }
 
+// See: https://www.gnu.org/software/make/manual/html_node/Special-Targets.html
+const specialTargets = new Set([
+    ".PHONY",
+    ".SUFFIXES",
+    ".DEFAULT",
+    ".PRECIOUS",
+    ".INTERMEDIATE",
+    ".SECONDARY",
+    ".SECONDEXPANSION",
+    ".DELETE_ON_ERROR",
+    ".IGNORE",
+    ".LOW_RESOLUTION_TIME",
+    ".SILENT",
+    ".EXPORT_ALL_VARIABLES",
+    ".NOTPARALLEL",
+    ".ONESHELL",
+    ".POSIX",
+    ".MAKE",
+]);
+
+const suffixRuleTargets = /^(\.\w+|\.\w+\.\w+)$/;
+const patternRuleTargets = /^(%\.\w+|%)$/;
+
+function isNormalTarget(target: string): boolean
+{
+    if (specialTargets.has(target))
+    {
+        return false;
+    }
+    if (suffixRuleTargets.test(target))
+    {
+        return false;
+    }
+    if (patternRuleTargets.test(target))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 
 async function findTargets(fsPath: string): Promise<StringMap>
 {
-    const json: any = "";
     const scripts: StringMap = {};
 
     util.log("");
@@ -177,9 +217,10 @@ async function findTargets(fsPath: string): Promise<StringMap>
             const tgtName = line.substring(0, line.indexOf(":")).trim();
             const dependsName = line.substring(line.indexOf(":") + 1).trim();
             //
-            // Don't incude object targets
+            // Don't include object targets
             //
-            if (tgtName.indexOf("/") === -1 && tgtName.indexOf("=") === -1 && tgtName.indexOf("\\") === -1)
+            if (tgtName.indexOf("/") === -1 && tgtName.indexOf("=") === -1 && tgtName.indexOf("\\") === -1 &&
+                isNormalTarget(tgtName))
             {
                 scripts[tgtName] = "";
                 util.log("   found target");
