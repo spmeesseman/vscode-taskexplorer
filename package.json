@@ -860,7 +860,7 @@
                 },
                 "taskExplorer.groupWithSeparator": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "%config.taskExplorer.groupWithSeparator%"
                 },
                 "taskExplorer.groupSeparator": {
