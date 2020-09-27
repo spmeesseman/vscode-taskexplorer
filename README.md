@@ -35,6 +35,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Requirements](#requirements)
   - [Features by Version](#features-by-version)
   - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
+  - [Ant and Gulp Self Provided Tasks](#ant-and-gulp-self-provided-tasks)
   - [Using Groups With A Separator](#using-groups-with-a-separator)
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
@@ -106,6 +107,10 @@ Task files that are found by Task Expolorer can also be added to the *excludes* 
 * `taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml", "/c:/projects/project1/scripts/test/antetests.xml" ]`
 
 Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **Ant** includes list in all cases.  If you don't include the asterisked glob pattern `**/` first in the string, files in sub-folders will not be found.
+
+## Ant and Gulp Self Provided Tasks
+
+By default, a custom parser is used to locate Ant and Gulp tasks in respective files.  This may be fine in most cases, but in cases where the script and/or build files become complex, or there is something in the file that was not coded into the parser, you can use the *ant* and *gulp* programs themseleves to find their own tasks.  Note however that turning this on has a negative performance impact when refreshing and providing tasks to the VSCode Task Host.
 
 ## Using Groups With A Separator
 
