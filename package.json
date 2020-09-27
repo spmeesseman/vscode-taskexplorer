@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "1.26.3",
+    "version": "1.27.0",
     "displayName": "Task Explorer",
     "description": "Manage tasks for npm, vscode, ant, gradle, grunt, gulp, batch, bash, make, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
@@ -962,8 +962,26 @@
                 "taskExplorer.numLastTasks": {
                     "type": "number",
                     "enum": [
-                        1, 2, 3, 4, 5, 6, 7,  8, 9,
-                        10, 11, 12, 13, 14, 15, 26, 17, 18, 19, 20
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        26,
+                        17,
+                        18,
+                        19,
+                        20
                     ],
                     "default": 10,
                     "title": "%config.taskExplorer.numLastTasks%",

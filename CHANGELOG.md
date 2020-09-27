@@ -1,3 +1,32 @@
+# [1.27.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.26.3...v1.27.0) (2020-09-27)
+
+
+### Bug Fixes
+
+* alternate name gulp files not picked up [Fixes [#73](https://github.com/spmeesseman/vscode-taskexplorer/issues/73)] ([753aae4](https://github.com/spmeesseman/vscode-taskexplorer/commit/753aae4))
+* Gradle tasks not picked up from other task providers [Fixes [#113](https://github.com/spmeesseman/vscode-taskexplorer/issues/113)] ([3190242](https://github.com/spmeesseman/vscode-taskexplorer/commit/3190242))
+
+
+### Code Refactoring
+
+* default the 'group with separator' setting to true ([ab2b4c0](https://github.com/spmeesseman/vscode-taskexplorer/commit/ab2b4c0))
+* modify deprecated registerTaskProvider call to use tasks namespace ([5cd0ad5](https://github.com/spmeesseman/vscode-taskexplorer/commit/5cd0ad5))
+* update to latest vscode api calls ([4e69d2b](https://github.com/spmeesseman/vscode-taskexplorer/commit/4e69d2b))
+* use ant itself to read tasks.  fall back to custom parser if cmd not present on system ([b3db802](https://github.com/spmeesseman/vscode-taskexplorer/commit/b3db802))
+* use ant to read gulp tasks if ant is available. [References [#109](https://github.com/spmeesseman/vscode-taskexplorer/issues/109)] ([b6cd13c](https://github.com/spmeesseman/vscode-taskexplorer/commit/b6cd13c))
+* use gulp to read gulp tasks if gulp is available [References [#73](https://github.com/spmeesseman/vscode-taskexplorer/issues/73)] ([434ee4e](https://github.com/spmeesseman/vscode-taskexplorer/commit/434ee4e))
+
+
+### Documentation
+
+* **readme:** add section 'Ant and Gulp Self Provided Tasks' [skip ci] ([8d9ea78](https://github.com/spmeesseman/vscode-taskexplorer/commit/8d9ea78))
+* **readme:** update 1.27 feature ([ab20af5](https://github.com/spmeesseman/vscode-taskexplorer/commit/ab20af5))
+
+
+### Features
+
+* turn gulp/ant on/off to find tasks (uses cst parser when off) ([224973b](https://github.com/spmeesseman/vscode-taskexplorer/commit/224973b))
+
 ## [1.26.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.26.2...v1.26.3) (2020-03-28)
 
 
