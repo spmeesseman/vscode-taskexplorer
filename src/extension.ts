@@ -147,6 +147,10 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         refresh = true;
     }
 
+    if (e.affectsConfiguration("taskExplorer.useAnt") || e.affectsConfiguration("taskExplorer.useGulp")) {
+        refresh = true;
+    }
+
     if (e.affectsConfiguration("taskExplorer.showLastTasks"))
     {
         if (configuration.get<boolean>("enableSideBar") && treeDataProvider)

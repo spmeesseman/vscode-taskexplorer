@@ -203,13 +203,18 @@ async function findTargets(fsPath: string): Promise<StringMap>
     //     [12:28:59]         ├── buildStatic
     //     [12:28:59]         └── buildJS
     //
+
     let stdout: Buffer;
-    try {
-        stdout = execSync("npx " + getCommand() + " --tasks", {
-            cwd: path.dirname(fsPath)
-        });
+    if (configuration.get("useGulp") === true)
+    {
+        try {
+            stdout = execSync("npx " + getCommand() + " --tasks", {
+                cwd: path.dirname(fsPath)
+            });
+        }
+        catch (e) { util.log(e); }
     }
-    catch (e) { util.log(e); }
+
     if (stdout)
     {   //
         // Loop through all the lines and extract the task names

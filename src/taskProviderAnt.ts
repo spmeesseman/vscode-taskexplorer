@@ -179,11 +179,16 @@ async function findAllAntScripts(path: string): Promise<StringMap>
     //
     //     Default target: G64
     //
+
     let stdout: Buffer;
-    try {
-        stdout = execSync(getCommand() + " -f " + path + " -p");
+    if (configuration.get("useAnt") === true)
+    {
+        try {
+            stdout = execSync(getCommand() + " -f " + path + " -p");
+        }
+        catch {}
     }
-    catch {}
+
     if (stdout)
     {
         text = stdout.toString();

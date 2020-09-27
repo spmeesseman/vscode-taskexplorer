@@ -1,57 +1,120 @@
 {
-	"description": "Extension to add support for vscode and npm tasks.",
-	"displayName": "Task support for VS Code Explorer",
+	"description": "Extension to add support for tasks in VSCode.",
+	"displayName": "Task support for VSCode",
+
 	"config.taskExplorer.debug": "Turn on logging.",
 	"config.taskExplorer.debugLevel": "Set debug verbosity (1 - Low / 5 - High).",
+
 	"config.taskExplorer.keepTermOnStop": "Keep terminal open when stopping a task.",
+
 	"config.taskExplorer.groupWithSeparator": "If script names contain the configured separator, break them into grouped nodes according to similar fist parts.",
 	"config.taskExplorer.groupSeparator": "The separator to use when grouping tasks.",
-	"config.taskExplorer.exclude": "Configure global glob patterns for folders and files that should be excluded from script detection.",
-	"config.taskExplorer.includeAnt": "Configure global glob patterns for locating Apache Ant files not named b(B)uild.xml.",
-	"config.taskExplorer.enableNpm": "Enable/show npm scripts as tasks.",
-	"config.taskExplorer.enableWorkspace": "Enable/show vscode tasks.",
-	"config.taskExplorer.enableGradle": "Enable/show gradle tasks.",
-	"config.taskExplorer.enableGrunt": "Enable/show grunt tasks.",
-	"config.taskExplorer.enableGulp": "Enable/show gulp tasks.",
-	"config.taskExplorer.enableAnt": "Enable/show ant targets as tasks.",
-	"config.taskExplorer.enableAppPublisher": "Enable/show app-publsiher tasks.",
-	"config.taskExplorer.enableBatch": "Enable/show batch scripts as tasks.",
-	"config.taskExplorer.enablePerl": "Enable/show perl scripts as tasks.",
-	"config.taskExplorer.enablePython": "Enable/show python scripts as tasks.",
-	"config.taskExplorer.enableRuby": "Enable/show ruby scripts as tasks.",
-	"config.taskExplorer.enableBash": "Enable/show bash/sh scripts as tasks.",
-	"config.taskExplorer.enableNsis": "Enable/show nullsoft installer scripts as tasks.",
-	"config.taskExplorer.enablePowershell": "Enable/show powershell scripts as tasks.",
-	"config.taskExplorer.enableMake": "Enable/show makefiles as tasks.",
-	"config.taskExplorer.enableTsc": "Enable/show tsc node with npm tasks.",
-	"config.taskExplorer.enableAnsiconForAnt": "Enable ansicon output colorization for ant tasks.",
+
+	"config.taskExplorer.exclude": "Configure glob patterns for folders and files that should be excluded from script detection.",
+
+	"config.taskExplorer.enableNpm": "NPM - Enable",
+	"config.taskExplorer.enableNpmDsc": "Enable/show npm scripts as tasks.",
+
+	"config.taskExplorer.enableWorkspace": "VSCode - Enable",
+	"config.taskExplorer.enableWorkspaceDsc": "Enable/show vscode tasks.",
+
+	"config.taskExplorer.enableGradle": "Gradle - Enable",
+	"config.taskExplorer.enableGradleDsc": "Enable/show gradle tasks.",
+	"config.taskExplorer.pathToGradle": "Gradle - Path",
+	"config.taskExplorer.pathToGradleDsc": "The path to the gradle program, if not registered in system path.",
+
+	"config.taskExplorer.enableGrunt": "Grunt - Enable",
+	"config.taskExplorer.enableGruntDsc": "Enable/show grunt tasks.",
+
+	"config.taskExplorer.enableGulp": "Gulp - Enable",
+	"config.taskExplorer.enableGulpDsc": "Enable/show gulp tasks.",
+	"config.taskExplorer.useGulp": "Gulp - Use Ant",
+	"config.taskExplorer.useGulpDsc": "Use the gulp program itself to find its tasks.",
+
+	"config.taskExplorer.enableAnt": "Ant - Enable",
+	"config.taskExplorer.enableAntDsc": "Enable/show ant targets as tasks.",
+	"config.taskExplorer.enableAnsiconForAnt": "Ant - Use Ansicon",
+	"config.taskExplorer.enableAnsiconForAntDsc": "Enable/use ansicon output colorization for ant tasks.",
+	"config.taskExplorer.pathToAnsicon": "Ant - Ansicon Path",
+	"config.taskExplorer.pathToAnsiconDsc": "The path to the ansicon program, if not registered in system path",
+	"config.taskExplorer.pathToAnt": "Ant - Path",
+	"config.taskExplorer.pathToAntDsc": "The path to the ant program, if not registered in system path",
+	"config.taskExplorer.useAnt": "Ant - Use Ant",
+	"config.taskExplorer.useAntDsc": "Use the ant program itself to find its tasks",
+	"config.taskExplorer.includeAnt": "Ant - Extra Files",
+	"config.taskExplorer.includeAntDsc": "Configure glob patterns for locating Apache Ant files not named b(B)uild.xml.",
+
+	"config.taskExplorer.enableAppPublisher": "App Publisher - Enable",
+	"config.taskExplorer.enableAppPublisherDsc": "Enable/show app-publsiher tasks.",
+	"config.taskExplorer.pathToAppPublisher": "App Publisher - Path",
+	"config.taskExplorer.pathToAppPublisherDsc": "The path to the app-publisher program, if not registered in system path",
+
+	"config.taskExplorer.enableBatch": "Batch - Enable",
+	"config.taskExplorer.enableBatchDsc": "Enable/show batch scripts as tasks.",
+
+	"config.taskExplorer.enablePerl": "Perl - Enable",
+	"config.taskExplorer.enablePerlDsc": "Enable/show perl scripts as tasks.",
+	"config.taskExplorer.pathToPerl": "Perl - Path",
+	"config.taskExplorer.pathToPerlDsc": "The path to the perl program, if not registered in system path.",
+
+	"config.taskExplorer.enablePython": "Python - Enable",
+	"config.taskExplorer.enablePythonDsc": "Enable/show python scripts as tasks.",
+	"config.taskExplorer.pathToPython": "Python - Path",
+	"config.taskExplorer.pathToPythonDsc": "The path to the python program, if not registered in system path.",
+
+	"config.taskExplorer.enableRuby": "Ruby - Enable",
+	"config.taskExplorer.enableRubyDsc": "Enable/show ruby scripts as tasks.",
+	"config.taskExplorer.pathToRuby": "Ruby - Path",
+	"config.taskExplorer.pathToRubyDsc": "The path to the ruby program, if not registered in system path.",
+
+	"config.taskExplorer.enableBash": "Bash/sh - Enable",
+	"config.taskExplorer.enableBashDsc": "Enable/show bash/sh scripts as tasks.",
+	"config.taskExplorer.pathToBash": "Bash/sh - Path",
+	"config.taskExplorer.pathToBashDsc": "The path to the bash/sh program (on Windows, if not registered in system path)",
+
+	"config.taskExplorer.enableNsis": "Nullsoft Installer - Enable",
+	"config.taskExplorer.enableNsisDsc": "Enable/show Nullsoft Installer scripts as tasks.",
+	"config.taskExplorer.pathToNsis": "Nullsoft Installer - Path",
+	"config.taskExplorer.pathToNsisDsc": "The path to the nsis program, if not registered in system path.",
+
+	"config.taskExplorer.enablePowershell": "Powershell - Enable",
+	"config.taskExplorer.enablePowershellDsc": "Enable/show powershell scripts as tasks.",
+	"config.taskExplorer.pathToPowershell": "Powershell - Path",
+	"config.taskExplorer.pathToPowershellDsc": "The path to the powershell program, if not registered in system path.",
+
+	"config.taskExplorer.enableMake": "Make - Enable",
+	"config.taskExplorer.enableMakeDsc": "Enable/show makefiles as tasks.",
+	"config.taskExplorer.pathToMake": "Make - Path",
+	"config.taskExplorer.pathToMakeDsc": "The path to the make program, if not registered in system path.",
+
+	"config.taskExplorer.enableTsc": "Typescript - Enable",
+	"config.taskExplorer.enableTscDsc": "Enable/show tsc node with npm tasks.",
+
 	"config.taskExplorer.enableSideBar": "Add a task explorer to the the sidebar.",
-	"config.taskExplorer.numLastTasks": "Number of tasks to store in the 'last tasks' pseudo-folder.",
+
+	"config.taskExplorer.numLastTasks": "# of Tasks to Remember",
+	"config.taskExplorer.numLastTasksDsc": "The number of tasks to store in the 'Last Tasks' tree pseudo-folder.",
+
 	"config.taskExplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
-	"config.taskExplorer.pathToAnsicon": "The path to the ansicon program, if not registered in system path",
-	"config.taskExplorer.pathToAnt": "The path to the ant program, if not registered in system path",
-	"config.taskExplorer.pathToAppPublisher": "The path to the app-publisher program, if not registered in system path",
-	"config.taskExplorer.pathToBash": "The path to the bash/sh program (on Windows, if not registered in system path)",
-	"config.taskExplorer.pathToGradle": "The path to the gradle program, if not registered in system path.",
-	"config.taskExplorer.pathToMake": "The path to the make program, if not registered in system path.",
-	"config.taskExplorer.pathToNsis": "The path to the nsis program, if not registered in system path.",
-	"config.taskExplorer.pathToPerl": "The path to the perl program, if not registered in system path.",
-	"config.taskExplorer.pathToPython": "The path to the python program, if not registered in system path.",
-	"config.taskExplorer.pathToRuby": "The path to the ruby program, if not registered in system path.",
-	"config.taskExplorer.pathToPowershell": "The path to the powershell program, if not registered in system path.",
+	
 	"config.taskExplorer.showLastTasks": "Show the 'last tasks' as a node in the task tree.",
 	"config.taskExplorer.showRunningTask": "Show the last ran running task in the status bar.",
+
 	"taskExplorer.parseError": "Task Explorer task detection: failed to parse the file {0}",
+
 	"taskdef.task.fileName": "The ant file that target was found in. Can be omitted.",
 	"taskdef.task.script": "The target/script name.",
 	"taskdef.task.path": "The relative path to the folder that contains the task file. Can be omitted.",
 	"taskdef.task.uri": "The uri of the task file. Can be omitted.",
 	"taskdef.task.treeItem": "The tree item that the task is associated with. Can be omitted.",
+
 	"taskdef.script.scriptType": "The type of script (bash, batch, pythin, etc...).",
 	"taskdef.script.cmdLine": "The command line used to execute the script in a shell.",
 	"taskdef.script.scriptFile": "Boolean to display filename as the script target. Set to true.",
 	"taskdef.script.requiresArgs": "Boolean to indicate if the script requires command line args.",
+
 	"view.name": "Task Explorer",
+
 	"command.refresh": "Refresh",
 	"command.run": "Run",
 	"command.restart": "Restart",
