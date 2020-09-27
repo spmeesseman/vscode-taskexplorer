@@ -61,6 +61,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Features by Version
 
+* v1.27 - Use gulp and ant to find their respective tasks (configurable on/off) (closes [#105](https://github.com/spmeesseman/vscode-taskexplorer/issues/105))
 * v1.26 - Add 'Running Task' status bar message (refs [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
 * v1.25 - Add 'Last Tasks' pseudo-folder (closes [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
 * v1.24 - Add 'Open Terminal' button to running tasks (closes [#23](https://github.com/spmeesseman/vscode-taskexplorer/issues/23))
@@ -104,7 +105,7 @@ Task files that are found by Task Expolorer can also be added to the *excludes* 
 
 * `taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml", "/c:/projects/project1/scripts/test/antetests.xml" ]`
 
-Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **Ant** includes list in all cases.
+Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **Ant** includes list in all cases.  If you don't include the asterisked glob pattern `**/` first in the string, files in sub-folders will not be found.
 
 ## Using Groups With A Separator
 
