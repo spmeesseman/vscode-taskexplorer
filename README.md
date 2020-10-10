@@ -1,4 +1,4 @@
-# Task Explorer - View and Run Tasks from Visual Studio Code
+# Task Explorer - View and Run Tasks from Visual Studio Code <!-- omit in toc -->
 
 [![Version](https://vsmarketplacebadge.apphb.com/version-short/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer)
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer)
@@ -22,39 +22,36 @@
 
 ![src0](res/sources/npm.png?raw=true) ![src1](res/sources/ant.png?raw=true) ![src2](res/sources/grunt.png?raw=true) ![src3](res/sources/gulp.png?raw=true) ![src13](res/sources/gradle.png?raw=true) ![src4](res/sources/workspace.png?raw=true) ![src5](res/sources/make.png?raw=true) ![src6](res/sources/ts.png?raw=true) ![src7](res/sources/bat.png?raw=true) ![src8](res/sources/ruby.png?raw=true) ![src9](res/sources/powershell.png?raw=true) ![src10](res/sources/bash.png?raw=true) ![src11](res/sources/python.png?raw=true) ![src12](res/sources/nsis.png?raw=true)
 
-## Description
+## Description <!-- omit in toc -->
 
 Provides a view in either (or both) the SideBar and/or Explorer that displays all supported tasks organized into a treeview, with parent task file nodes, grouped nodes, and project folders (convenient for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped, among other things for specific task types, for example NPM file nodes support common npm command(s) (i.e. 'install') via context menu.
 
-## Table of Contents
+## Table of Contents <!-- omit in toc -->
 
-- [Task Explorer - View and Run Tasks from Visual Studio Code](#task-explorer---view-and-run-tasks-from-visual-studio-code)
-  - [Description](#description)
-  - [Table of Contents](#table-of-contents)
-  - [Screenshots by Version](#screenshots-by-version)
-  - [Requirements](#requirements)
-  - [Features by Version](#features-by-version)
-  - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
-  - [Ant and Gulp Self Provided Tasks](#ant-and-gulp-self-provided-tasks)
-  - [Using Groups With A Separator](#using-groups-with-a-separator)
-  - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
-  - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
-  - [Feedback & Contributing](#feedback--contributing)
-    - [Rate It - Leave Some Stars](#rate-it---leave-some-stars)
-  - [Thank You](#thank-you)
-  - [Other Code Extensions by spmeesseman](#other-code-extensions-by-spmeesseman)
-  - [Donations](#donations)
-  - [Development Notes](#development-notes)
+- [Screenshots by Version](#screenshots-by-version)
+- [Requirements](#requirements)
+- [Features by Version](#features-by-version)
+- [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
+- [Ant and Gulp Self Provided Tasks](#ant-and-gulp-self-provided-tasks)
+- [Using Groups With A Separator](#using-groups-with-a-separator)
+- [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
+- [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
+- [Feedback & Contributing](#feedback--contributing)
+  - [Rate It - Leave Some Stars](#rate-it---leave-some-stars)
+- [Thank You](#thank-you)
+- [Other Code Extensions by spmeesseman](#other-code-extensions-by-spmeesseman)
+- [Donations](#donations)
+- [Development Notes](#development-notes)
 
 ## Screenshots by Version
 
-|Original Explorer Tray|Sidebar View (v1.7)|Task Type Groups (v1.13)|
-|-|-|-|
-|![ss0](res/taskview1.png?raw=true)|![ss1](res/taskview2.png?raw=true)|![ss2](res/taskview3.png?raw=true)|
+| Original Explorer Tray             | Sidebar View (v1.7)                | Task Type Groups (v1.13)           |
+| ---------------------------------- | ---------------------------------- | ---------------------------------- |
+| ![ss0](res/taskview1.png?raw=true) | ![ss1](res/taskview2.png?raw=true) | ![ss2](res/taskview3.png?raw=true) |
 
-|Grunt/Gulp in Subfolders (v1.14)|Npm Commands (v1.16)|Task Dashed Groups (v1.23)|
-|-|-|-|
-|![ss4](res/taskview4.png?raw=true)|![ss5](res/taskview5.png?raw=true)|![ss6](res/taskview6.png?raw=true)|
+| Grunt/Gulp in Subfolders (v1.14)   | Npm Commands (v1.16)               | Task Dashed Groups (v1.23)         |
+| ---------------------------------- | ---------------------------------- | ---------------------------------- |
+| ![ss4](res/taskview4.png?raw=true) | ![ss5](res/taskview5.png?raw=true) | ![ss6](res/taskview6.png?raw=true) |
 
 ## Requirements
 
@@ -181,10 +178,10 @@ Please rate your experience with stars... [like five of them ;)](https://marketp
 
 ## Other Code Extensions by spmeesseman
 
-|Package|Repository|Marketplace|
-|-|-|-|
-|svn-scm-ext|[GitHub](https://github.com/spmeesseman/svn-scm-ext)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.svn-scm-ext)|
-|vscode-vslauncher|[GitHub](https://github.com/spmeesseman/vscode-vslauncher)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-vslauncher)|
+| Package           | Repository                                                 | Marketplace                                                                                                          |
+| ----------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| svn-scm-ext       | [GitHub](https://github.com/spmeesseman/svn-scm-ext)       | [Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.svn-scm-ext)       |
+| vscode-vslauncher | [GitHub](https://github.com/spmeesseman/vscode-vslauncher) | [Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-vslauncher) |
 
 ## Donations
 
