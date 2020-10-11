@@ -192,8 +192,8 @@ function isNormalTarget(target: string): boolean
 
 function parseTargetLine(line: string)
 {
-  const tgtAliases = line.split(":")[0].trim().split(" ");
-  const tgtName = tgtAliases[tgtAliases.length - 1];
+  const tgtNames = line.split(":")[0].trim();
+  const tgtName = tgtNames.split(" ").slice(-1);
 
   const dependsName = line.substring(line.indexOf(":") + 1).trim();
 
