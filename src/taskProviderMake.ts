@@ -190,6 +190,15 @@ function isNormalTarget(target: string): boolean
     return true;
 }
 
+function parseTargetLine(line: string)
+{
+  const tgtAliases = line.split(":")[0].trim().split(" ");
+  const tgtName = tgtAliases[tgtAliases.length - 1];
+
+  const dependsName = line.substring(line.indexOf(":") + 1).trim();
+
+  return { tgtName, dependsName };
+}
 
 async function findTargets(fsPath: string): Promise<StringMap>
 {
@@ -214,8 +223,8 @@ async function findTargets(fsPath: string): Promise<StringMap>
         if (line.length > 0 && !line.startsWith("\t") && !line.startsWith(" ") &&
             !line.startsWith("#") && !line.startsWith("$") && line.indexOf(":") > 0)
         {
-            const tgtName = line.substring(0, line.indexOf(":")).trim();
-            const dependsName = line.substring(line.indexOf(":") + 1).trim();
+            const { tgtName, dependsName } = parseTargetLine(line);
+
             //
             // Don't include object targets
             //
