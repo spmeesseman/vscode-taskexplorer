@@ -45,13 +45,13 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Screenshots by Version
 
-| Original Explorer Tray             | Sidebar View (v1.7)                | Task Type Groups (v1.13)           |
-| ---------------------------------- | ---------------------------------- | ---------------------------------- |
-| ![ss0](res/taskview1.png?raw=true) | ![ss1](res/taskview2.png?raw=true) | ![ss2](res/taskview3.png?raw=true) |
+|Original Explorer Tray|Sidebar View (v1.7)|Task Type Groups (v1.13)|
+|-|-|-|
+|![ss0](res/taskview1.png?raw=true)|![ss1](res/taskview2.png?raw=true)|![ss2](res/taskview3.png?raw=true)|
 
-| Grunt/Gulp in Subfolders (v1.14)   | Npm Commands (v1.16)               | Task Dashed Groups (v1.23)         |
-| ---------------------------------- | ---------------------------------- | ---------------------------------- |
-| ![ss4](res/taskview4.png?raw=true) | ![ss5](res/taskview5.png?raw=true) | ![ss6](res/taskview6.png?raw=true) |
+|Grunt/Gulp in Subfolders (v1.14)|Npm Commands (v1.16)|Task Dashed Groups (v1.23)|
+|-|-|-|
+|![ss4](res/taskview4.png?raw=true)|![ss5](res/taskview5.png?raw=true)|![ss6](res/taskview6.png?raw=true)|
 
 ## Requirements
 
@@ -178,10 +178,10 @@ Please rate your experience with stars... [like five of them ;)](https://marketp
 
 ## Other Code Extensions by spmeesseman
 
-| Package           | Repository                                                 | Marketplace                                                                                                          |
-| ----------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| svn-scm-ext       | [GitHub](https://github.com/spmeesseman/svn-scm-ext)       | [Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.svn-scm-ext)       |
-| vscode-vslauncher | [GitHub](https://github.com/spmeesseman/vscode-vslauncher) | [Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-vslauncher) |
+|Package|Repository|Marketplace|
+|-|-|-|
+|svn-scm-ext|[GitHub](https://github.com/spmeesseman/svn-scm-ext)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.svn-scm-ext)|
+|vscode-vslauncher|[GitHub](https://github.com/spmeesseman/vscode-vslauncher)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-vslauncher)|
 
 ## Donations
 
