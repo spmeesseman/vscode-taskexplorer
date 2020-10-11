@@ -190,14 +190,14 @@ function isNormalTarget(target: string): boolean
     return true;
 }
 
-function parseTargetLine(line: string)
+function parseTargetLine(line)
 {
-  const tgtNames = line.split(":")[0].trim();
-  const tgtName = tgtNames.split(" ").slice(-1);
+    const tgtNames = line.split(":")[0].trim();
+    const tgtName = tgtNames.split(" ").slice(-1)[0];
 
-  const dependsName = line.substring(line.indexOf(":") + 1).trim();
+    const dependsName = line.substring(line.indexOf(":") + 1).trim();
 
-  return { tgtName, dependsName };
+    return { tgtName, dependsName };
 }
 
 async function findTargets(fsPath: string): Promise<StringMap>
