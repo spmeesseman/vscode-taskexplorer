@@ -1644,20 +1644,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 if (!(each instanceof TaskFile)) {
                     return; // continue forEach()
                 }
-                each.scripts.forEach(each2 =>
-                {
-                    if (each2 instanceof TaskFile && each2.isGroup)
-                    {
-                        let rmvLbl = each2.label;
-                        rmvLbl = rmvLbl.replace(/\(/gi, "\\(");
-                        rmvLbl = rmvLbl.replace(/\[/gi, "\\[");
-                        each2.scripts.forEach(each3 =>
-                        {
-                            const rgx = new RegExp(rmvLbl + groupSeparator, "i");
-                            each3.label = each3.label.replace(rgx, "");
-                        });
-                    }
-                });
+                this.renameGroupedTasks(each, groupSeparator);
             });
 
             //
@@ -1696,5 +1683,33 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
 
         return [...folders.values()];
+    }
+
+    private renameGroupedTasks(taskFile: TaskFile, groupSeparator: string)
+    {
+        taskFile.scripts.forEach(each =>
+        {
+            if (each instanceof TaskFile)
+            {
+                if (each.isGroup)
+                {
+                    let rmvLbl = each.label;
+                    // rmvLbl = rmvLbl.replace(/ \([\w-_]+\)/gi, "").replace(/\[/gi, "\\[");
+                    rmvLbl = rmvLbl.replace(/\(/gi, "\\(").replace(/\[/gi, "\\[");
+                    rmvLbl = rmvLbl.replace(/\)/gi, "\\)").replace(/\]/gi, "\\]");
+                    each.scripts.forEach(each2 =>
+                    {
+                        console.log(each2.label);
+                        console.log('    ' + rmvLbl + groupSeparator);
+                        const rgx = new RegExp(rmvLbl + groupSeparator, "i");
+                        each2.label = each2.label.replace(rgx, "");
+                    });
+                }
+                else
+                {
+                    this.renameGroupedTasks(each, groupSeparator);
+                }
+            }
+        });
     }
 }
