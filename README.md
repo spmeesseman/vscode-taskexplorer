@@ -205,6 +205,6 @@ Errors in reelase when incuding babel runtime:
 
 This extension consists of 379 files, out of which 230 are JavaScript files. For performance reasons, you should bundle your extension. You should also exclude unnecessary files by adding them to your .vscodeignore.
 
-WHen messing with babel, and finishing, install/uninstall the runtime:
+When messing with babel, and finishing, install/uninstall the runtime:
 
-    npm install @bebel/runtime
+    npm install @babel/runtime
