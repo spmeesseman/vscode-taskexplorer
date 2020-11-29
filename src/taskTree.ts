@@ -586,7 +586,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             util.removeFromArray(lastTasks, taskId);
         }
-        if (lastTasks.length >= configuration.get<number>("numLastTasks"))
+        while (lastTasks.length >= configuration.get<number>("numLastTasks"))
         {
             lastTasks.shift();
         }
