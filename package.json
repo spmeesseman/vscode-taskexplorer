@@ -1004,6 +1004,18 @@
                     "default": 1,
                     "description": "%config.taskExplorer.debugLevel%"
                 },
+                "taskExplorer.groupMaxLevel": {
+                    "type": "number",
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                    ],
+                    "default": 1,
+                    "description": "%config.taskExplorer.groupMaxLevel%"
+                },
                 "taskExplorer.exclude": {
                     "type": [
                         "string",

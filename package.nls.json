@@ -9,6 +9,7 @@
 
 	"config.taskExplorer.groupWithSeparator": "If script names contain the configured separator, break them into grouped nodes according to similar fist parts.",
 	"config.taskExplorer.groupSeparator": "The separator to use when grouping tasks.",
+	"config.taskExplorer.groupMaxLevel": "Maximum grouping level for separator groupings",
 
 	"config.taskExplorer.exclude": "Configure glob patterns for folders and files that should be excluded from script detection.",
 

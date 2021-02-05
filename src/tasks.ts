@@ -15,6 +15,7 @@ export class TaskItem extends TreeItem
     public readonly taskGroup: string;
     public readonly execution: TaskExecution | undefined;
     public paused: boolean;
+    public nodePath: string;
 
     taskFile: TaskFile;
 
@@ -59,7 +60,7 @@ export class TaskItem extends TreeItem
                 dark: context.asAbsolutePath(path.join("res", "dark", "script.svg"))
             };
         }
-
+        this.nodePath = task.definition.path;
         this.tooltip = "Open " + task.name;
     }
 
@@ -78,6 +79,7 @@ export class TaskFile extends TreeItem
     public fileName: string;
     public readonly taskSource: string;
     public readonly isGroup: boolean;
+    public nodePath: string;
 
     static getLabel(taskDef: TaskDefinition, source: string, relativePath: string, group: boolean): string
     {
@@ -198,8 +200,22 @@ export class TaskFile extends TreeItem
 
         this.folder = folder;
         this.path = relativePath;
+        this.nodePath = relativePath;
         this.taskSource = source;
         this.isGroup = (group === true);
+
+        const labelI = TaskFile.getLabel(taskDef, label ? label : source, relativePath, group);
+        if (group && labelI) {
+            this.nodePath = path.join(this.nodePath, labelI);
+        }
+
+        if (!this.nodePath && labelI === "vscode") {
+            this.nodePath = path.join(".vscode", labelI);
+        }
+
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        console.log(labelI, this.nodePath, relativePath);
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
 
         if (!group)
         {
