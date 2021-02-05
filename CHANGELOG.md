@@ -1,3 +1,27 @@
+# [1.28.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.27.0...v1.28.0) (2021-02-05)
+
+
+### Bug Fixes
+
+* Get string instead of array ([a96f6bb](https://github.com/spmeesseman/vscode-taskexplorer/commit/a96f6bb))
+* grouped tasks momre than two tree nodes deep are not appropriately renamed (by removing the grouped text from the task name). ([5e4622a](https://github.com/spmeesseman/vscode-taskexplorer/commit/5e4622a))
+* if more than one package.json exists within a workspace directory, the task names do not have the 'separator paths' stripped out of the task name in the tree. [skip ci] ([99b10d7](https://github.com/spmeesseman/vscode-taskexplorer/commit/99b10d7))
+
+
+### Code Refactoring
+
+* Update to use .slice ([83121c5](https://github.com/spmeesseman/vscode-taskexplorer/commit/83121c5))
+
+
+### Documentation
+
+* Fix typos in README.md ([0e28fab](https://github.com/spmeesseman/vscode-taskexplorer/commit/0e28fab))
+
+
+### Features
+
+* Create parseTargetLine with support for Makefile aliases ([aeadb4e](https://github.com/spmeesseman/vscode-taskexplorer/commit/aeadb4e))
+
 # [1.27.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.26.3...v1.27.0) (2020-09-27)
 
 
