@@ -48,13 +48,13 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Screenshots by Version
 
-|Original Explorer Tray|Sidebar View (v1.7)|Task Type Groups (v1.13)|
-|-|-|-|
-|![ss0](res/taskview1.png?raw=true)|![ss1](res/taskview2.png?raw=true)|![ss2](res/taskview3.png?raw=true)|
+| Original Explorer Tray             | Sidebar View (v1.7)                | Task Type Groups (v1.13)           |
+| ---------------------------------- | ---------------------------------- | ---------------------------------- |
+| ![ss0](res/taskview1.png?raw=true) | ![ss1](res/taskview2.png?raw=true) | ![ss2](res/taskview3.png?raw=true) |
 
-|Grunt/Gulp in Subfolders (v1.14)|Npm Commands (v1.16)|Task Dashed Groups (v1.23)|
-|-|-|-|
-|![ss4](res/taskview4.png?raw=true)|![ss5](res/taskview5.png?raw=true)|![ss6](res/taskview6.png?raw=true)|
+| Grunt/Gulp in Subfolders (v1.14)   | Npm Commands (v1.16)               | Task Dashed Groups (v1.23)         |
+| ---------------------------------- | ---------------------------------- | ---------------------------------- |
+| ![ss4](res/taskview4.png?raw=true) | ![ss5](res/taskview5.png?raw=true) | ![ss6](res/taskview6.png?raw=true) |
 
 ## Requirements
 
@@ -100,7 +100,7 @@ The setting *exclude* defines a file/directory pattern or an array of file/direc
 
 Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.  Using the *exclude* configuration can greatly improve performance in large workspaces if configured correctly.
 
-Task files that are found by Task Expolorer can also be added to the *excludes* list via the tree node context menu, by right clicking the task file or task group node, and selecting *Add to Excludes*.
+Task files that are found by Task Explorer can also be added to the *excludes* list via the tree node context menu, by right clicking the task file or task group node, and selecting *Add to Excludes*.
 
 **Apache Ant** uses an .xml file extension, the setting *includeAnt* can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting defines a file pattern or an array of file patterns to include using *Glob Patterns* or a valid *File URI*, for example:
 
@@ -108,9 +108,9 @@ Task files that are found by Task Expolorer can also be added to the *excludes* 
 
 Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **Ant** includes list in all cases.  If you don't include the asterisked glob pattern `**/` first in the string, files in sub-folders will not be found.
 
-## Ant and Gulp Self Provided Tasks
+## Ant and Gulp Self-Provided Tasks
 
-By default, a custom parser is used to locate Ant and Gulp tasks in respective files.  This may be fine in most cases, but in cases where the script and/or build files become complex, or there is something in the file that was not coded into the parser, you can use the *ant* and *gulp* programs themseleves to find their own tasks.  Note however that turning this on has a negative performance impact when refreshing and providing tasks to the VSCode Task Host.
+By default, a custom parser is used to locate Ant and Gulp tasks in respective files.  This may be fine in most cases, but in cases where the script and/or build files become complex, or there is something in the file that was not coded into the parser, you can use the *ant* and *gulp* programs themselves to find their own tasks.  Note however that turning this on has a negative performance impact when refreshing and providing tasks to the VSCode Task Host.
 
 ## Using Groups With A Separator
 
@@ -131,7 +131,7 @@ For example, consider 10 npm tasks, 5 of which all start with the string *dev-*,
         prod-cp-from-bin
         prod-clean
 
-By enabling the *Group With Sepator* option in Settings and setting the *Group Sepator* to a dash ("-") two new grouped nodes would be created underneath the main npm node, one called *dev* and the other called *prod*.  Each of these two sub-nodes of course would contain the respective *dev-* and *prod-* scrtips/tasks, minus the prepended group name:
+By enabling the *Group With Separator* option in Settings and setting the *Group Separator* to a dash ("-") two new grouped nodes would be created underneath the main npm node, one called *dev* and the other called *prod*.  Each of these two sub-nodes of course would contain the respective *dev-* and *prod-* scripts/tasks, minus the prepended group name:
 
     npm
         dev
@@ -154,7 +154,7 @@ The following tasks are provided by VSCode:
 * Workspace (.vscode/tasks.json)
 * NPM (**/package.json)
 
-All other tasks are internaly provided.  Workspace tasks are detected by VSCode in all cases.  However, NPM tasks are detected only if the setting `'Npm -> Auto Detect'` is turned on in VSCode Settings.  By default this is turned on, but if NPM tasks are not displaying, please check this setting, also check the setting that turns npm package management off in favor of Yarn `'Npm -> Package manager'`.  A future release will contain internally provided NPM and Yarn tasks.  Note these tasks are still displayed in the Task Tree, just not "provided" by this extension.
+All other tasks are internally provided.  Workspace tasks are detected by VSCode in all cases.  However, NPM tasks are detected only if the setting `'Npm -> Auto Detect'` is turned on in VSCode Settings.  By default this is turned on, but if NPM tasks are not displaying, please check this setting, also check the setting that turns npm package management off in favor of Yarn `'Npm -> Package manager'`.  A future release will contain internally provided NPM and Yarn tasks.  Note these tasks are still displayed in the Task Tree, just not "provided" by this extension.
 
 Detection of all internally provided task types can be turned on/off in Settings - `'Task Explorer -> Enable [Tasktype]'`.
 
@@ -181,10 +181,10 @@ Please rate your experience with stars... [like five of them ;)](https://marketp
 
 ## Other Code Extensions by spmeesseman
 
-|Package|Repository|Marketplace|
-|-|-|-|
-|svn-scm-ext|[GitHub](https://github.com/spmeesseman/svn-scm-ext)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.svn-scm-ext)|
-|vscode-vslauncher|[GitHub](https://github.com/spmeesseman/vscode-vslauncher)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-vslauncher)|
+| Package           | Repository                                                 | Marketplace                                                                                                          |
+| ----------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| svn-scm-ext       | [GitHub](https://github.com/spmeesseman/svn-scm-ext)       | [Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.svn-scm-ext)       |
+| vscode-vslauncher | [GitHub](https://github.com/spmeesseman/vscode-vslauncher) | [Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-vslauncher) |
 
 ## Donations
 
@@ -201,9 +201,9 @@ When semantic release kindly creates the git version tag, then something bombs, 
 
 Babel runtime:
 
-Errors in reelase when incuding babel runtime:
+Errors in release when including babel runtime:
 
-This extension consists of 379 files, out of which 230 are JavaScript files. For performance reasons, you should bundle your extension. You should also exclude unnecessary files by adding them to your .vscodeignore.
+This extension consists of 379 files, out of which 230 are JavaScript files. For performance reasons, you should bundle your extension. You should also exclude unnecessary files by adding them to your `.vscodeignore`.
 
 When messing with babel, and finishing, install/uninstall the runtime:
 
