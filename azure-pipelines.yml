@@ -283,8 +283,8 @@ jobs:
   - job: Linux
     strategy:
       matrix:
-        Code50:
-          CODE_VERSION: '1.50.0'
+        #Code50:
+        #  CODE_VERSION: '1.50.0' # building vscode in azure pipelines is a piece of s***
         CodeCurrent:
           CODE_VERSION:
         CodeInssiders:
