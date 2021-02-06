@@ -245,6 +245,10 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         refresh = true;
     }
 
+    if (e.affectsConfiguration("npm.packageManager")) {
+        refresh = true;
+    }
+
     if (e.affectsConfiguration("taskExplorer.enableSideBar")) {
         if (configuration.get<boolean>("enableSideBar")) {
             if (treeDataProvider) {
