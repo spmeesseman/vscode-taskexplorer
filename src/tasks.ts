@@ -31,7 +31,7 @@ export class TaskItem extends TreeItem
         super(taskName, TreeItemCollapsibleState.None);
 
         this.taskGroup = taskGroup;
-        this.id = taskFile.resourceUri.fsPath + ":" + task.source + ":" + task.name; // + Math.floor(Math.random() * 1000000);
+        this.id = taskFile.resourceUri.fsPath + ":" + task.source + ":" + task.name + ":" + (taskGroup || "");
         this.paused = false;
         this.contextValue = "script";
         this.taskFile = taskFile;
@@ -79,6 +79,7 @@ export class TaskFile extends TreeItem
     public fileName: string;
     public readonly taskSource: string;
     public readonly isGroup: boolean;
+    public readonly groupLevel: number;
     public nodePath: string;
 
     static getLabel(taskDef: TaskDefinition, source: string, relativePath: string, group: boolean): string
@@ -194,7 +195,7 @@ export class TaskFile extends TreeItem
     }
 
 
-    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean, label?: string)
+    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean, label?: string, groupLevel?: number)
     {
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group), TreeItemCollapsibleState.Collapsed);
 
@@ -212,10 +213,6 @@ export class TaskFile extends TreeItem
         if (!this.nodePath && labelI === "vscode") {
             this.nodePath = path.join(".vscode", labelI);
         }
-
-        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-        console.log(labelI, this.nodePath, relativePath);
-        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
 
         if (!group)
         {
@@ -238,6 +235,7 @@ export class TaskFile extends TreeItem
             // Use a custom toolip (default is to display resource uri)
             this.tooltip = util.properCase(source) + " Task Files";
             this.contextValue = "taskGroup" + util.properCase(this.taskSource);
+            this.groupLevel = groupLevel;
         }
 
         if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", this.taskSource + ".svg"))))
