@@ -204,7 +204,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 me.saveRunTask(taskItem);
             }
             catch (e) {
-                let err = e.toString();
+                const err = e.toString();
                 if (err.indexOf("No workspace folder") !== -1)
                 {
                     window.showErrorMessage("Task executon failed:  No workspace folder.  NOTE: You must " +
@@ -1246,7 +1246,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             // let taskItems = await tasks.fetchTasks({ type: 'npm' });
             //
-            // The main junk here.  tasks.fetchTasks() retrieves all tasks from all providers 
+            // The main junk here.  tasks.fetchTasks() retrieves all tasks from all providers
             // (including this extension).  Get the tasks, and build the task tree...
             //
             if (!this.tasks) {
@@ -1832,7 +1832,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private removeGroupedTasks(folder: TaskFolder, subfolders: Map<string, TaskFile>)
     {
         const taskTypesRmv: TaskFile[] = [];
-        
+
         folder.taskFiles.forEach(each =>
         {
             if (!(each instanceof TaskFile)) {
@@ -1875,7 +1875,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         });
     }
 
-    
+
     //
     // Perform some removal based on groupings with separator.  The nodes added within the new
     // group nodes need to be removed from the old parent node still...

@@ -46,7 +46,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 
     util.log("");
     util.log("Init extension");
-    
+
     //
     // Register file type watchers
     //
