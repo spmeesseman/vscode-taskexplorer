@@ -63,13 +63,13 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 "Should" work with VSCode versions 1.30 and above, but am no longer running tests against VSCode versions below 1.50 as of 2/5/2021 (v1.28.0).
 ## Features by Version
 
-* v1.29 - Multi-level task groupings (closes [#129](https://github.com/spmeesseman/vscode-taskexplorer/issues/129))
-* v1.28 - support Makefile aliases (thanks **MichaelCurrin**)
-* v1.27 - Use gulp and ant to find their respective tasks (configurable on/off) (closes [#105](https://github.com/spmeesseman/vscode-taskexplorer/issues/105))
+* v1.29 - Support multi-level task groupings (closes [#129](https://github.com/spmeesseman/vscode-taskexplorer/issues/129)), Support user tasks (closes [#127](https://github.com/spmeesseman/vscode-taskexplorer/issues/127))
+* v1.28 - Support Makefile aliases (thanks **MichaelCurrin**)
+* v1.27 - Use gulp and ant to find their respective tasks (configurable on/off) (closes [#105](https://github.com/spmeesseman/vscode-taskexplorer/issues/105)), Make grouping separator configurable (thanks **richarddavenport**)
 * v1.26 - Add 'Running Task' status bar message (refs [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
-* v1.25 - Add 'Last Tasks' pseudo-folder (closes [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
+* v1.25 - Add 'Last Tasks' pseudo-folder
 * v1.24 - Add 'Open Terminal' button to running tasks (closes [#23](https://github.com/spmeesseman/vscode-taskexplorer/issues/23))
-* v1.23 - Deeper groupings with dashed task groups (Off by default)
+* v1.23 - Task groupings with dashed task groups (Off by default)
 * v1.22 - Major performance enhancements - Task Tree / Task Scanning
 * v1.21 - Add option to keep terminal open after stopping task (closes [#51](https://github.com/spmeesseman/vscode-taskexplorer/issues/51))
 * v1.20 - Add support for restarting task (thanks **antfu**)
@@ -94,7 +94,6 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 * v1.2 - Convenient layout - groups all tasks by project folder, by task file, by task
 * v1.1 - Supports multi-root or single-root workspaces
 * v1.0 - Open and launch NPM scripts as tasks
-
 ## Configuring Global Excludes and Apache Ant Includes
 
 The setting *exclude* defines a file/directory pattern or an array of file/directory patterns to ignore using *Glob Patterns* or a valid *File URI*.  The setting applies to all script types.  For example:
@@ -180,8 +179,15 @@ Please rate your experience with stars... [like five of them ;)](https://marketp
 ## Thank You
 
 * The [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme) for some of the task type icons.
-* The author of the [NSIS Extension](https://marketplace.visualstudio.com/items?itemName=idleberg.nsis) idleberg for NSIS graphics.
+* The author of the [NSIS Extension](https://marketplace.visualstudio.com/items?itemName=idleberg.nsis) **idleberg** for NSIS graphics.
 
+Other contributors:
+* antfu
+* eamodio (fixed [#114](https://github.com/spmeesseman/vscode-taskexplorer/issues/114))
+* MichaelCurrin
+* tiansin
+* JacobParis
+* Spitfire1900
 ## Other Code Extensions by spmeesseman
 
 | Package           | Repository                                                 | Marketplace                                                                                                          |

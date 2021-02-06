@@ -26,6 +26,7 @@ import { invalidateTasksCacheGradle } from "./taskProviderGradle";
 import { invalidateTasksCacheGrunt } from "./taskProviderGrunt";
 import { invalidateTasksCacheGulp } from "./taskProviderGulp";
 import { invalidateTasksCacheAppPublisher } from "./taskProviderAppPublisher";
+import { utils } from "istanbul";
 
 
 const localize = nls.loadMessageBundle();
@@ -186,7 +187,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 		}
 		else
 		{*/
-        // Execute task
+        // Execute or pause task
         //
         if (taskItem.paused)
         {
@@ -198,8 +199,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
         else
         {
-            await tasks.executeTask(taskItem.task);
-            me.saveRunTask(taskItem);
+            try {
+                await tasks.executeTask(taskItem.task);
+                me.saveRunTask(taskItem);
+            }
+            catch (e) {
+                let err = e.toString();
+                if (err.indexOf("No workspace folder") !== -1)
+                {
+                    window.showErrorMessage("Task executon failed:  No workspace folder.  NOTE: You must " +
+                                            "save your workspace first before running 'User' tasks");
+                }
+                else {
+                    window.showErrorMessage("Task executon failed: " + err);
+                }
+                util.log("Task execution failed: " + err);
+            }
         }
     }
 
@@ -498,8 +513,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         );
                         if (item3.task && item3.task.definition)
                         {
-                            const tpath: string = item3.task.definition.uri ? item3.task.definition.uri.fsPath :
+                            let tpath: string;
+                            
+                            if (this.isWorkspaceFolder(item3)) {
+                                tpath = item3.task.definition.uri ? item3.task.definition.uri.fsPath :
                                                 (item3.task.definition.path ? item3.task.definition.path : "root");
+                            }
+                            else {
+                                tpath = "root";
+                            }
+
                             util.log(logPad + "   ✔ Processed " + item3.task.name);
                             util.logValue(logPad + "        id", item3.id);
                             util.logValue(logPad + "        type", item3.taskSource + " @ " + tpath);
@@ -1222,6 +1245,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             // TODO - search enable* settings and apply enabled types to filter
             //
             // let taskItems = await tasks.fetchTasks({ type: 'npm' });
+            //
+            // The main junk here.  tasks.fetchTasks() retrieves all tasks from all providers 
+            // (including this extension).  Get the tasks, and build the task tree...
+            //
             if (!this.tasks) {
                 this.tasks = await tasks.fetchTasks();
             }
@@ -1330,7 +1357,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private buildTaskTree(tasks: Task[]): TaskFolder[] | NoScripts[]
+    private buildTaskTree(tasksList: Task[]): TaskFolder[] | NoScripts[]
     {
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
@@ -1355,27 +1382,47 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Loop through each task provided by the engine and build a task tree
         //
-        tasks.forEach(each =>
+        tasksList.forEach(async each =>
         {
+            let scopeName: string;
+            let settingName: string = "enable" + util.properCase(each.source);
+
             taskCt++;
             util.log("");
-            util.log("Processing task " + taskCt.toString() + " of " + tasks.length.toString());
+            util.log("Processing task " + taskCt.toString() + " of " + tasksList.length.toString());
             util.logValue("   name", each.name, 2);
             util.logValue("   source", each.source, 2);
-
-            let settingName: string = "enable" + util.properCase(each.source);
+            
+            //
+            // Remove the '-' from app-publisher task
+            //
             if (settingName === "enableApp-publisher") {
                 settingName = "enableAppPublisher";
             }
 
-            if (configuration.get(settingName) && this.isWorkspaceFolder(each.scope) && !this.isInstallTask(each))
+            if ((configuration.get(settingName) || !this.isWorkspaceFolder(each.scope)) && !this.isInstallTask(each))
             {
-                folder = folders.get(each.scope.name);
-                if (!folder)
+                if (this.isWorkspaceFolder(each.scope))
                 {
-                    folder = new TaskFolder(each.scope);
-                    folders.set(each.scope.name, folder);
+                    scopeName = each.scope.name;
+                    folder = folders.get(scopeName);
+                    if (!folder)
+                    {
+                        folder = new TaskFolder(each.scope);
+                        folders.set(scopeName, folder);
+                    }
                 }
+                else // User Task (not related to a ws or project)
+                {
+                    scopeName = "User";
+                    folder = folders.get(scopeName);
+                    if (!folder)
+                    {
+                        folder = new TaskFolder(scopeName);
+                        folders.set(scopeName, folder);
+                    }
+                }
+
                 const definition: TaskDefinition = each.definition;
                 let relativePath = definition.path ? definition.path : "";
 
@@ -1395,7 +1442,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 //     watch - tsconfig.json
                 //     watch - .vscode-test\vscode-1.32.3\resources\app\tsconfig.schema.json
                 //
-                if (each.source === "tsc")
+                if (each.source === "tsc" && this.isWorkspaceFolder(each.scope))
                 {
                     if (each.name.indexOf(" - ") !== -1 && each.name.indexOf(" - tsconfig.json") === -1)
                     {
@@ -1410,7 +1457,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 //
                 // Create an id to group tasks together with
                 //
-                let id = each.source + ":" + path.join(each.scope.name, relativePath);
+                let id = each.source + ":" + path.join(scopeName, relativePath);
                 if (definition.fileName && !definition.scriptFile)
                 {
                     id = path.join(id, definition.fileName);
@@ -1419,9 +1466,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 //
                 // Logging
                 //
-                util.logValue("   scope.name", each.scope.name, 2);
-                util.logValue("   scope.uri.path", each.scope.uri.path, 2);
-                util.logValue("   scope.uri.fsPath", each.scope.uri.fsPath, 2);
+                util.logValue("   scope.name", scopeName, 2);
+                if (this.isWorkspaceFolder(each.scope))
+                {
+                    util.logValue("   scope.uri.path", each.scope.uri.path, 2);
+                    util.logValue("   scope.uri.fsPath", each.scope.uri.fsPath, 2);
+                }
+                else // User tasks
+                {
+                    util.logValue("   scope.uri.path", "N/A (User)", 2);
+                }
                 util.logValue("   relative Path", relativePath, 2);
                 this.logTaskDefinition(definition);
 
@@ -1463,7 +1517,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 util.logValue("   is install task", this.isInstallTask(each));
             }
         });
-console.log(1);
+
         //
         // Sort nodes.  By default the project folders are sorted in the same order as that
         // of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
@@ -1547,7 +1601,7 @@ console.log(1);
                     subfolders.set(id, subfolder);
                     folder.addTaskFile(subfolder);
                     subfolder.addScript(prevTaskFile);
-                    util.logValue("   Added source file sub-container", each.path);console.log(3);
+                    util.logValue("   Added source file sub-container", each.path);
                 }
                 subfolder.addScript(each);
             }

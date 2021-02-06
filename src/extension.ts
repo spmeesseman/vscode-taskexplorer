@@ -20,9 +20,11 @@ import { initStorage } from "./common/storage";
 import { views } from "./views";
 import * as util from "./util";
 import * as cache from "./cache";
+import * as path from "path";
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
+export let appDataPath: string;
 
 
 const watchers: Map<string, FileSystemWatcher> = new Map();
@@ -44,7 +46,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 
     util.log("");
     util.log("Init extension");
-
+    
     //
     // Register file type watchers
     //

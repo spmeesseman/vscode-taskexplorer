@@ -1,10 +1,13 @@
 
 import {
-    Task, TaskExecution, ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder,
-    TaskDefinition, ExtensionContext, tasks, Uri, workspace
+    Task, TaskExecution, ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, env,
+    TaskDefinition, ExtensionContext, tasks, Uri, workspace, ProcessExecution, ShellExecution
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
+import * as os from 'os';
+import * as fs from "fs";
+
 
 export class TaskItem extends TreeItem
 {
@@ -22,6 +25,7 @@ export class TaskItem extends TreeItem
     constructor(context: ExtensionContext, taskFile: TaskFile, task: Task, taskGroup?: string)
     {
         let taskName = task.name;
+        let fsPath = taskFile.resourceUri ? taskFile.resourceUri.fsPath : "root";
         if (taskName.indexOf(" - ") !== -1 && (taskName.indexOf("/") !== -1 || taskName.indexOf("\\") !== -1 ||
             taskName.indexOf(" - tsconfig.json") !== -1))
         {
@@ -31,7 +35,7 @@ export class TaskItem extends TreeItem
         super(taskName, TreeItemCollapsibleState.None);
 
         this.taskGroup = taskGroup;
-        this.id = taskFile.resourceUri.fsPath + ":" + task.source + ":" + task.name + ":" + (taskGroup || "");
+        this.id = fsPath + ":" + task.source + ":" + task.name + ":" + (taskGroup || "");
         this.paused = false;
         this.contextValue = "script";
         this.taskFile = taskFile;
@@ -41,6 +45,7 @@ export class TaskItem extends TreeItem
             command: "taskExplorer.open",
             arguments: [this]
         };
+        
         this.taskSource = task.source;
         this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
             e.task.scope === task.scope && e.task.definition.path === task.definition.path);
@@ -111,8 +116,7 @@ export class TaskFile extends TreeItem
                 {
                     return label + " (" + relativePath.substring(0, relativePath.length - 1).toLowerCase() + ")";
                 }
-                else
-                {
+                else {
                     return label + " (" + relativePath.toLowerCase() + ")";
                 }
             }
@@ -144,7 +148,12 @@ export class TaskFile extends TreeItem
         {
             if (incRelPathForCode === true)
             {
-                fileName = ".vscode/tasks.json";
+                if (folder!.resourceUri) { // project folder task
+                    fileName = ".vscode/tasks.json";
+                }
+                else { // user task (has no resourceUri)
+                    fileName = "tasks.json";
+                }
             }
             else
             {
@@ -162,14 +171,19 @@ export class TaskFile extends TreeItem
         // want it covered in local tests
         //
 
-        let dirPath: string;
-        if (relativePath)
-        {
-            dirPath = path.join(folder!.resourceUri!.fsPath, relativePath);
-        } else
-        {
-            dirPath = folder!.resourceUri!.fsPath;
-        }
+        //let dirPath: string;
+        //if (folder!.resourceUri) {
+        //    if (relativePath)
+        //    {
+        //        dirPath = path.join(folder!.resourceUri!.fsPath, relativePath);
+        //    } else
+        //    {
+        //        dirPath = folder!.resourceUri!.fsPath;
+        //    }
+        //}
+        //else {
+        //    dirPath = "user"
+        //}
 
         // let filePath = path.join(dirPath, fileName);
         // if (!util.pathExists(filePath)) {
@@ -192,6 +206,63 @@ export class TaskFile extends TreeItem
         // }
 
         return fileName;
+    }
+
+    getUserDataPath()
+    {
+        function getDefaultUserDataPath()
+        {   //
+            // Support global VSCODE_APPDATA environment variable
+            //
+            let appDataPath = process.env['VSCODE_APPDATA'];
+            //
+            // Otherwise check per platform
+            //
+            if (!appDataPath) {
+                switch (process.platform) {
+                    case 'win32':
+                        appDataPath = process.env['APPDATA'];
+                        if (!appDataPath) {
+                            const userProfile = process.env['USERPROFILE'];
+                            if (typeof userProfile !== 'string') {
+                                throw new Error('Windows: Unexpected undefined %USERPROFILE% environment variable');
+                            }
+                            appDataPath = path.join(userProfile, 'AppData', 'Roaming');
+                        }
+                        break;
+                    case 'darwin':
+                        appDataPath = path.join(os.homedir(), 'Library', 'Application Support');
+                        break;
+                    case 'linux':
+                        appDataPath = process.env['XDG_CONFIG_HOME'] || path.join(os.homedir(), '.config');
+                        break;
+                    default:
+                        throw new Error('Platform not supported');
+                }
+            }
+        
+            return path.join(appDataPath, "vscode");
+        }
+
+        const vscodePortable = process.env['VSCODE_PORTABLE'];
+        if (vscodePortable)
+        {
+            let uri = Uri.parse(vscodePortable);
+            if (fs.existsSync(uri.fsPath)) {
+                try {
+                    return path.join(uri.fsPath, 'user-data', 'User');
+                }
+                catch (e) {
+                    util.log(e.toString());
+                    throw(e);
+                }
+            }
+        }
+        
+        //
+        // TODO - if a user set the data directory 'user-data-dir' via cmd line, this doesnt work
+        //
+        return path.resolve(getDefaultUserDataPath()); //(cliArgs['user-data-dir'] || getDefaultUserDataPath());
     }
 
     constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean, label?: string, groupLevel?: number)
@@ -220,12 +291,18 @@ export class TaskFile extends TreeItem
         {
             this.contextValue = "taskFile" + util.properCase(this.taskSource);
             this.fileName = TaskFile.getFileNameFromSource(source, folder, taskDef, relativePath, true);
-            if (relativePath)
+            if (folder!.resourceUri)
             {
-                this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, this.fileName));
-            } else
-            {
-                this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, this.fileName));
+                if (relativePath)
+                {
+                    this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, this.fileName));
+                } else
+                {
+                    this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, this.fileName));
+                }
+            }
+            else {
+                this.resourceUri = Uri.file(path.join(this.getUserDataPath(), this.fileName));
             }
         }
         else

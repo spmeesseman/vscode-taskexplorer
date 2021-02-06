@@ -231,9 +231,6 @@ async function findTargets(fsPath: string): Promise<StringMap>
             if (tgtName.indexOf("/") === -1 && tgtName.indexOf("=") === -1 && tgtName.indexOf("\\") === -1 &&
                 tgtName.indexOf("(") === -1 && tgtName.indexOf("$") === -1 && isNormalTarget(tgtName))
             {
-                console.log(tgtName);
-                console.log("   " + dependsName);
-
                 scripts[tgtName] = "";
                 util.log("   found target");
                 util.logValue("      name", tgtName);
