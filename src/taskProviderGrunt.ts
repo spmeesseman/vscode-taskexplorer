@@ -252,5 +252,5 @@ function createGruntTask(target: string, cmd: string, folder: WorkspaceFolder, u
 
     const execution = new ShellExecution("npx", args, options);
 
-    return new Task(kind, folder, target, "grunt", execution, undefined);
+    return new Task(kind, folder, target, "grunt", execution, "$msCompile");
 }

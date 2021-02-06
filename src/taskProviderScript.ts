@@ -321,5 +321,5 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
     // Create the shell execution object and task
     //
     const execution = new ShellExecution(exec, args, options);
-    return new Task(kind, folder, scriptDef.type !== "python" ? fileName : "build egg", scriptDef.type, execution, undefined);
+    return new Task(kind, folder, scriptDef.type !== "python" ? fileName : "build egg", scriptDef.type, execution, "$msCompile");
 }

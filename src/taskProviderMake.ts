@@ -1,7 +1,7 @@
 
 import {
     Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition
+    workspace, TaskProvider, TaskDefinition, ShellExecutionOptions, extensions
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
@@ -229,8 +229,11 @@ async function findTargets(fsPath: string): Promise<StringMap>
             // Don't include object targets
             //
             if (tgtName.indexOf("/") === -1 && tgtName.indexOf("=") === -1 && tgtName.indexOf("\\") === -1 &&
-                isNormalTarget(tgtName))
+                tgtName.indexOf("(") === -1 && tgtName.indexOf("$") === -1 && isNormalTarget(tgtName))
             {
+                console.log(tgtName);
+                console.log("   " + dependsName);
+
                 scripts[tgtName] = "";
                 util.log("   found target");
                 util.logValue("      name", tgtName);
@@ -278,29 +281,23 @@ function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, ur
         script: target,
         path: getRelativePath(folder, uri),
         fileName: path.basename(uri.path),
+        problemMatcher: "",
         uri
     };
 
     const cwd = path.dirname(uri.fsPath);
     const args = [target];
-    const options = {
+    const options: ShellExecutionOptions = {
         cwd
     };
 
     const execution = new ShellExecution(getCommand(folder, cmd), args, options);
+    let problemMatcher = "$gccte";
+    let cPlusPlusExtension = extensions.getExtension("spmeesseman.vscode-taskexplorer");
+    if (cPlusPlusExtension)
+    {
+        problemMatcher = "$gcc";
+    }
 
-    // const pm = {
-    //     owner: "cpp",
-    //     fileLocation: ["absolute"],
-    //     pattern: {
-    //         regexp: "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-    //         file: 1,
-    //         line: 2,
-    //         column: 3,
-    //         severity: 4,
-    //         message: 5
-    //     }
-    // };
-
-    return new Task(kind, folder, target, "make", execution, "cpp");
+    return new Task(kind, folder, target, "make", execution, problemMatcher);
 }

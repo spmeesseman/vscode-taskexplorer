@@ -372,5 +372,5 @@ function createGulpTask(target: string, cmd: string, folder: WorkspaceFolder, ur
 
     const execution = new ShellExecution("npx", args, options);
 
-    return new Task(kind, folder, target, "gulp", execution, undefined);
+    return new Task(kind, folder, target, "gulp", execution, "$msCompile");
 }
