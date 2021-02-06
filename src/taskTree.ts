@@ -1168,6 +1168,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {   
             let scriptName = script.task.name.replace(" - Default", "");
             scriptOffset = this._findScriptPosition("name=", scriptName, documentText, 6);
+            
+            if (scriptOffset > 0)
+            {   //
+                // Check to make sure this isnt the 'default task' position,i.e.:
+                //
+                //     <project basedir="." default="test-build">
+                //
+                const scriptOffset2 = this._findScriptPosition("name=", scriptName, documentText, 6, scriptOffset + 1);
+                if (scriptOffset2 > 0) {
+                    scriptOffset = scriptOffset2;
+                }
+            }
         }
         else if (script.taskSource === "gulp")
         {
