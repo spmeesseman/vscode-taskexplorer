@@ -126,11 +126,11 @@
 	"command.debug": "Debugging ",
 	"command.open": "Open",
 	"command.openTerminal": "Open Terminal",
-	"command.runInstall": "Run npm install",
-	"command.runAudit": "Run npm audit",
-	"command.runAuditFix": "Run npm audit fix",
-	"command.runUpdate": "Run npm update",
-	"command.runUpdatePackage": "Run npm update [package]",
+	"command.runInstall": "Run pkg mgr install",
+	"command.runAudit": "Run pkg mgr audit",
+	"command.runAuditFix": "Run pkg mgr audit fix",
+	"command.runUpdate": "Run pkg mgr update",
+	"command.runUpdatePackage": "Run pkg mgr update [package]",
 	"command.runSelectedScript": "Run Script",
 	"command.showOutput": "Show the log output window"
 }

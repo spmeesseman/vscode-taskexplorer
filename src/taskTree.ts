@@ -963,6 +963,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async runNpmCommand(taskFile: TaskFile, command: string)
     {
+        let  pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager") || "npm";
+
         const options = {
             cwd: path.dirname(taskFile.resourceUri.fsPath)
         };
@@ -975,7 +977,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (command.indexOf("<packagename>") === -1)
         {
-            const execution = new ShellExecution("npm " + command, options);
+            const execution = new ShellExecution(pkgMgr + " " + command, options);
             const task = new Task(kind, taskFile.folder.workspaceFolder, command, "npm", execution, undefined);
             await tasks.executeTask(task);
         }
@@ -986,7 +988,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 if (str !== undefined)
                 {
-                    const execution = new ShellExecution("npm " + command.replace("<packagename>", "").trim() + " " + str.trim(), options);
+                    const execution = new ShellExecution(pkgMgr + " " + command.replace("<packagename>", "").trim() + " " + str.trim(), options);
                     const task = new Task(kind, taskFile.folder.workspaceFolder, command.replace("<packagename>", "").trim() + str.trim(), "npm", execution, undefined);
                     await tasks.executeTask(task);
                 }
