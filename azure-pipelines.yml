@@ -401,8 +401,6 @@ jobs:
     #condition: succeeded()
     dependsOn:
     - Windows
-    - Windows_Node10
-    - Windows_Node12
     - Windows_Node13
     - macOS
     - Linux
