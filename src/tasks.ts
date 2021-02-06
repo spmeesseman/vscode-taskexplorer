@@ -246,7 +246,7 @@ export class TaskFile extends TreeItem
             //
             if (src === "npm")
             {
-                var pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager");
+                let pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager");
                 src = pkgMgr || this.taskSource;
             }
             this.iconPath = {
