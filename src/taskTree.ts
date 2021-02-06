@@ -515,7 +515,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         {
                             let tpath: string;
                             
-                            if (this.isWorkspaceFolder(item3)) {
+                            if (me.isWorkspaceFolder(item3)) {
                                 tpath = item3.task.definition.uri ? item3.task.definition.uri.fsPath :
                                                 (item3.task.definition.path ? item3.task.definition.path : "root");
                             }
