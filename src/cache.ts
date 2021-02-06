@@ -269,7 +269,9 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
     }
 
     if (!cancel && configuration.get<boolean>("enableGulp")) {
-        await buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]", folder, false);
+        await buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[JjTt][Ss]", folder, false);
+        await buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Mm][Jj][Ss]", folder, false);
+        await buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Bb][Aa][Bb][Ee][Ll].[JjTt][Ss]", folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableMake")) {

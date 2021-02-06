@@ -2,17 +2,17 @@ const { series } = require('gulp');
 
 // The `clean` function is not exported so it can be considered a private task.
 // It can still be used within the `series()` composition.
-function clean3(cb) {
-  console.log('clean3!!!');
+function clean(cb) {
+  console.log('clean!!!');
   cb();
 }
 
 // The `build` function is exported so it is public and can be run with the `gulp` command.
 // It can also be used within the `series()` composition.
-function build3(cb) {
-  console.log('build3!!!');
+function build(cb) {
+  console.log('build!!!');
   cb();
 }
 
-exports.build3 = build;
-exports.default3 = series(clean, build);
+exports.build = build;
+exports.default = series(clean, build);

@@ -202,6 +202,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
 
     if (e.affectsConfiguration("taskExplorer.enableGulp")) {
         await registerFileWatcher(context, "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[JjTt][Ss]", false, configuration.get<boolean>("enableGulp"));
+        await registerFileWatcher(context, "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Mm][Jj][Ss]", false, configuration.get<boolean>("enableGulp"));
         await registerFileWatcher(context, "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Bb][Aa][Bb][Ee][Ll].[JjTt][Ss]", false, configuration.get<boolean>("enableGulp"));
         refresh = true;
     }
@@ -336,7 +337,9 @@ async function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>("enableGulp")) {
-        await registerFileWatcher(context, "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]");
+        await registerFileWatcher(context, "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[JjTt][Ss]");
+        await registerFileWatcher(context, "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Mm][Jj][Ss]");
+        await registerFileWatcher(context, "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Bb][Aa][Bb][Ee][Ll].[JjTt][Ss]");
     }
 
     if (configuration.get<boolean>("enableMake")) {
