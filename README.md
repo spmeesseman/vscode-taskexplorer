@@ -35,7 +35,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Requirements](#requirements)
   - [Features by Version](#features-by-version)
   - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
-  - [Ant and Gulp Self Provided Tasks](#ant-and-gulp-self-provided-tasks)
+  - [Ant and Gulp Self-Provided Tasks](#ant-and-gulp-self-provided-tasks)
   - [Using Groups With A Separator](#using-groups-with-a-separator)
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
@@ -58,10 +58,13 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Requirements
 
-* Visual Studio Code v1.30+
+* Visual Studio Code v1.50+
 
+"Should" work with VSCode versions 1.30 and above, but am no longer running tests against VSCode versions below 1.50 as of 2/5/2021 (v1.28.0).
 ## Features by Version
 
+* v1.29 - Multi-level task groupings (closes [#129](https://github.com/spmeesseman/vscode-taskexplorer/issues/129))
+* v1.28 - support Makefile aliases (thanks **MichaelCurrin**)
 * v1.27 - Use gulp and ant to find their respective tasks (configurable on/off) (closes [#105](https://github.com/spmeesseman/vscode-taskexplorer/issues/105))
 * v1.26 - Add 'Running Task' status bar message (refs [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
 * v1.25 - Add 'Last Tasks' pseudo-folder (closes [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
