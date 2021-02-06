@@ -135,6 +135,10 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
 {
     let refresh: boolean;
 
+    if (configuration.get<boolean>("autoRefresh") === false) {
+        return;
+    }
+
     if (e.affectsConfiguration("taskExplorer.exclude")) {
         refresh = true;
     }

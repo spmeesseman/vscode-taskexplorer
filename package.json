@@ -988,6 +988,11 @@
                     "title": "%config.taskExplorer.numLastTasks%",
                     "description": "%config.taskExplorer.numLastTasksDsc%"
                 },
+                "taskExplorer.autoRefresh": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.autoRefresh%"
+                },
                 "taskExplorer.debug": {
                     "type": "boolean",
                     "default": false,
