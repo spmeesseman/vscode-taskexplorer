@@ -1,7 +1,7 @@
 
 import {
     Task, TaskExecution, ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder,
-    TaskDefinition, ExtensionContext, tasks, Uri
+    TaskDefinition, ExtensionContext, tasks, Uri, workspace
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
@@ -239,10 +239,19 @@ export class TaskFile extends TreeItem
         }
 
         if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", this.taskSource + ".svg"))))
-        {
+        {   
+            let src = this.taskSource;
+            //
+            // If npm, check package manager set in vscode settings
+            //
+            if (src === "npm")
+            {
+                var pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager");
+                src = pkgMgr || this.taskSource;
+            }
             this.iconPath = {
-                light: context.asAbsolutePath(path.join("res", "sources", this.taskSource + ".svg")),
-                dark: context.asAbsolutePath(path.join("res", "sources", this.taskSource + ".svg"))
+                light: context.asAbsolutePath(path.join("res", "sources", src + ".svg")),
+                dark: context.asAbsolutePath(path.join("res", "sources", src + ".svg"))
             };
         }
         else
