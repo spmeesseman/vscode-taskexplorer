@@ -1,3 +1,25 @@
+# [1.29.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.28.0...v1.29.0) (2021-02-06)
+
+
+### Bug Fixes
+
+* if 'yarn is package manager set in VSCode, package.json tasks still show npm icon. [fix [#125](https://github.com/spmeesseman/vscode-taskexplorer/issues/125)] ([52acdc1](https://github.com/spmeesseman/vscode-taskexplorer/commit/52acdc1))
+* problem matcher used in makefile tasks is undefined. [fixes [#123](https://github.com/spmeesseman/vscode-taskexplorer/issues/123)] ([cae79ea](https://github.com/spmeesseman/vscode-taskexplorer/commit/cae79ea))
+* the context menu tasks for npm folder nodes does not run the package manager set in VSCode settings, will always use npm. [fix [#62](https://github.com/spmeesseman/vscode-taskexplorer/issues/62)] ([79695f0](https://github.com/spmeesseman/vscode-taskexplorer/commit/79695f0))
+* vscode tasks - compound tasks with no 'command' property do not launch. [fixes [#130](https://github.com/spmeesseman/vscode-taskexplorer/issues/130)] ([f5a92fc](https://github.com/spmeesseman/vscode-taskexplorer/commit/f5a92fc))
+
+
+### Documentation
+
+* **readme:** update by-version features list ([97233be](https://github.com/spmeesseman/vscode-taskexplorer/commit/97233be))
+
+
+### Features
+
+* ADD option to disable auto-refresh. [closes [#124](https://github.com/spmeesseman/vscode-taskexplorer/issues/124)] ([82aa4bd](https://github.com/spmeesseman/vscode-taskexplorer/commit/82aa4bd))
+* add support for 'User' tasks. [closes [#127](https://github.com/spmeesseman/vscode-taskexplorer/issues/127)] ([43f7399](https://github.com/spmeesseman/vscode-taskexplorer/commit/43f7399))
+* add support for multi-level groupings (configurable level). [fix [#129](https://github.com/spmeesseman/vscode-taskexplorer/issues/129)] ([35da55e](https://github.com/spmeesseman/vscode-taskexplorer/commit/35da55e))
+
 # [1.28.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.27.0...v1.28.0) (2021-02-05)
 
 
