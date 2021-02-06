@@ -194,7 +194,6 @@ export class TaskFile extends TreeItem
         return fileName;
     }
 
-
     constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean, label?: string, groupLevel?: number)
     {
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group), TreeItemCollapsibleState.Collapsed);
@@ -204,14 +203,17 @@ export class TaskFile extends TreeItem
         this.nodePath = relativePath;
         this.taskSource = source;
         this.isGroup = (group === true);
-
         const labelI = TaskFile.getLabel(taskDef, label ? label : source, relativePath, group);
+
         if (group && labelI) {
             this.nodePath = path.join(this.nodePath, labelI);
         }
 
         if (!this.nodePath && labelI === "vscode") {
             this.nodePath = path.join(".vscode", labelI);
+        }
+        if (!this.nodePath) {
+            this.nodePath = "";
         }
 
         if (!group)
@@ -242,12 +244,15 @@ export class TaskFile extends TreeItem
         {   
             let src = this.taskSource;
             //
-            // If npm, check package manager set in vscode settings
+            // If npm, check package manager set in vscode settings, (npm, pnpm, or yarn)
             //
             if (src === "npm")
             {
                 let pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager");
                 src = pkgMgr || this.taskSource;
+                if (src.indexOf("npm") != -1) { // pnpm?
+                    src = "npm";
+                }
             }
             this.iconPath = {
                 light: context.asAbsolutePath(path.join("res", "sources", src + ".svg")),

@@ -20,5 +20,55 @@
         "problemMatcher": [
             "$tsc"
         ]
+    },
+    {
+        "label": "cmd1",
+        "type": "shell",
+        "command": "cmd",
+        "args": [
+            "/c",
+            "echo",
+            "hello1"
+        ],
+        "group": "build",
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared"
+        }
+    },
+    {
+        "label": "cmd2",
+        "type": "shell",
+        "command": "cmd",
+        "args": [
+            "/c",
+            "echo",
+            "hello111112222"
+        ],
+        "group": "build",
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared"
+        }
+    },
+    {
+        "label": "tetcmpx",
+        "detail": "",
+        "type": "shell",
+        "dependsOn": ["cmd1", "cmd2"],
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared",
+            "showReuseMessage": true,
+            "clear": true
+        },
+        "promptOnClose": true,
+        
     }]
 }

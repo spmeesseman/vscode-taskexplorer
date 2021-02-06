@@ -1463,7 +1463,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 util.logValue("   is install task", this.isInstallTask(each));
             }
         });
-
+console.log(1);
         //
         // Sort nodes.  By default the project folders are sorted in the same order as that
         // of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
@@ -1547,7 +1547,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     subfolders.set(id, subfolder);
                     folder.addTaskFile(subfolder);
                     subfolder.addScript(prevTaskFile);
-                    util.logValue("   Added source file sub-container", each.path);
+                    util.logValue("   Added source file sub-container", each.path);console.log(3);
                 }
                 subfolder.addScript(each);
             }
@@ -1558,13 +1558,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             this.createTaskGroupingsBySep(folder, each, subfolders);
         });
 
-        //folder.taskFiles.forEach(each =>
-        //{
-        //    if (!(each instanceof TaskFile)) {
-        //        return; // continue forEach()
-        //    }
-            this.removeGroupedTasks(folder, subfolders);
-        //});
+        //
+        // For groupings with separator, when building the task tree, when tasks are grouped new task definitions 
+        // are created but the old task remains in the parent folder.  Remove all tasks that have been moved down
+        // into the tree hierarchy due to groupings
+        //
+        this.removeGroupedTasks(folder, subfolders);
 
         //
         // For groupings with separator, now go through and rename the labels within each group minus the
@@ -1622,16 +1621,30 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *
      *      build-prod
      *      build-dev
-     *      build-server
+     *      build-server-dev
+     *      build-server-prod
      *      build-sass
      *
-     *  If the option 'groupWithSeparator' is ON and 'groupSeparator' is set to '-', then group this set of tasks like so:
+     * If the option 'groupWithSeparator' is ON and 'groupSeparator' is set, then group this set of tasks.
+     * By default the hierarchy would look like:
      *
      *      build
      *          prod
      *          dev
-     *          server
+     *          server-dev
+     *          server-prod
      *          sass
+     * 
+     * If 'groupMaxLevel' is > 1 (default), then the hierarchy continunes to be broken down until the max
+     * nesting level is reached.  The example above, with 'groupMaxLevel' set > 1, would look like:
+     * 
+      *      build
+     *          prod
+     *          dev
+     *          server
+     *             dev
+     *             prod
+     *          sass 
      *
      * @param folder The base task folder
      * @param each  Task file to process
@@ -1642,10 +1655,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private createTaskGroupingsBySep(folder: TaskFolder, taskFile: TaskFile, subfolders: Map<string, TaskFile>, treeLevel = 0)
     {
         let prevName: string[];
-        let prevTaskItem: TaskItem | TaskFile;
+        let prevTaskItem: TaskItem;
         const newNodes: TaskFile[] = [];
         const groupSeparator = configuration.get<string>("groupSeparator") || "-";
         const atMaxLevel: Boolean = configuration.get<number>("groupMaxLevel") <= treeLevel + 1;
+
+        function _setNodePath(t: TaskItem, cPath: string)
+        {
+            if (!atMaxLevel) {
+                if (!t.nodePath && taskFile.taskSource === "Workspace") {
+                    t.nodePath = path.join(".vscode", prevName[treeLevel]);
+                }
+                else if (!t.nodePath) {
+                    t.nodePath = prevName[treeLevel];
+                }
+                else {
+                    t.nodePath = path.join(cPath, prevName[treeLevel]);
+                }
+            }
+        }
 
         taskFile.scripts.forEach(each =>
         {
@@ -1708,26 +1736,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                                              each.taskFile.path, true, prevName[treeLevel], treeLevel);
                     subfolders.set(id, subfolder);
 
-                    if (!atMaxLevel) {
-                        if (!each.nodePath && taskFile.taskSource === "Workspace") {
-                            prevTaskItem.nodePath = path.join(".vscode", prevName[treeLevel]);
-                        }
-                        else {
-                            prevTaskItem.nodePath = path.join(each.nodePath, prevName[treeLevel]);
-                        }
-                    }
+                    _setNodePath(prevTaskItem, each.nodePath);
+
                     subfolder.addScript(prevTaskItem);
                     newNodes.push(subfolder);
                 }
 
-                if (!atMaxLevel) {
-                    if (!each.nodePath && taskFile.taskSource === "Workspace") {
-                        each.nodePath = path.join(".vscode", prevName[treeLevel]);
-                    }
-                    else {
-                        each.nodePath = path.join(each.nodePath, prevName[treeLevel]);
-                    }
-                }
+                _setNodePath(each, each.nodePath);
                 subfolder.addScript(each);
             }
 
