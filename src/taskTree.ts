@@ -83,64 +83,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    public async invalidateTasksCache(opt1: string, opt2: Uri | boolean)
-    {
-        this.busy = true;
-        //
-        // All internal task providers export an invalidate() function...
-        //
-        // If 'opt1' is a string then a filesystemwatcher or taskevent was triggered for the
-        // task type defined in the 'opt1' parameter.
-        //
-        // 'opt2' should contain the Uri of the file that was edited, or the Task if this was
-        // a task event
-        //
-        if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
-        {
-            if (opt1 === "ant")
-            {
-                await invalidateTasksCacheAnt(opt2);
-            }
-            else if (opt1 === "gradle")
-            {
-                await invalidateTasksCacheGradle(opt2);
-            }
-            else if (opt1 === "grunt")
-            {
-                await invalidateTasksCacheGrunt(opt2);
-            }
-            else if (opt1 === "gulp")
-            {
-                await invalidateTasksCacheGulp(opt2);
-            }
-            else if (opt1 === "make")
-            {
-                await invalidateTasksCacheMake(opt2);
-            }
-            else if (opt1 === "app-publisher")
-            {
-                await invalidateTasksCacheAppPublisher(opt2);
-            }
-            else if (opt1 === "bash" || opt1 === "batch" || opt1 === "nsis" || opt1 === "perl" || opt1 === "powershell" || opt1 === "python" || opt1 === "ruby")
-            {
-                await invalidateTasksCacheScript(opt2);
-            }
-        }
-        else
-        {
-            await invalidateTasksCacheAnt();
-            await invalidateTasksCacheMake();
-            await invalidateTasksCacheScript();
-            await invalidateTasksCacheGradle();
-            await invalidateTasksCacheGrunt();
-            await invalidateTasksCacheGulp();
-            await invalidateTasksCacheAppPublisher();
-        }
-
-        this.busy = false;
-    }
-
-
     private async executeTask(task: Task, noTerminal?: boolean): Promise<boolean>
     {
         if (noTerminal === true) {
@@ -822,7 +764,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async _handleInvalidation(invalidate: any, opt: boolean | Uri)
+    private async handleInvalidation(invalidate: any, opt: boolean | Uri)
     {
         if ((invalidate === true || invalidate === "tests") && !opt) {
             util.log("   Handling 'rebuild cache' event");
@@ -837,6 +779,87 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    private async invalidateTasksCacheFileEdit(opt1: string, opt2: Uri)
+    {
+        if (opt1 === "ant")
+            {
+                await invalidateTasksCacheAnt(opt2);
+            }
+            else if (opt1 === "gradle")
+            {
+                await invalidateTasksCacheGradle(opt2);
+            }
+            else if (opt1 === "grunt")
+            {
+                await invalidateTasksCacheGrunt(opt2);
+            }
+            else if (opt1 === "gulp")
+            {
+                await invalidateTasksCacheGulp(opt2);
+            }
+            else if (opt1 === "make")
+            {
+                await invalidateTasksCacheMake(opt2);
+            }
+            else if (opt1 === "app-publisher")
+            {
+                await invalidateTasksCacheAppPublisher(opt2);
+            }
+            else if (opt1 === "bash" || opt1 === "batch" || opt1 === "nsis" || opt1 === "perl" || opt1 === "powershell" || opt1 === "python" || opt1 === "ruby")
+            {
+                await invalidateTasksCacheScript(opt2);
+            }
+    }
+
+
+    private async invalidateTasksCacheEvent()
+    {
+        await invalidateTasksCacheAnt();
+        await invalidateTasksCacheMake();
+        await invalidateTasksCacheScript();
+        await invalidateTasksCacheGradle();
+        await invalidateTasksCacheGrunt();
+        await invalidateTasksCacheGulp();
+        await invalidateTasksCacheAppPublisher();
+    }
+
+
+    public async invalidateTasksCache(opt1: string, opt2: Uri | boolean)
+    {
+        this.busy = true;
+        //
+        // All internal task providers export an invalidate() function...
+        //
+        // If 'opt1' is a string then a filesystemwatcher or taskevent was triggered for the
+        // task type defined in the 'opt1' parameter.
+        //
+        // 'opt2' should contain the Uri of the file that was edited, or the Task if this was
+        // a task event
+        //
+        if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
+        {
+            await this.invalidateTasksCacheFileEdit(opt1, opt2);
+        }
+        else {
+            await this.invalidateTasksCacheEvent();
+        }
+
+        this.busy = false;
+    }
+
+
+    /**
+     * Responsible for refreshing the tree content and tasks cache
+     * This function is called each time and event occurs, whether its a modified or new
+     * file (via FileSystemWatcher event), or when the view first becomes active/visible, etc.
+     *
+     * @param invalidate The invalidation event.
+     * Can be one of:
+     *     tests
+     *     visible-event
+     * @param opt Uri of the invalidated resource
+     * @param task The task
+     */
     public async refresh(invalidate?: any, opt?: Uri | boolean, task?: Task): Promise<boolean>
     {
         util.log("Refresh task tree");
@@ -906,7 +929,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (invalidate !== false)
         {
-            await this._handleInvalidation(invalidate, opt);
+            await this.handleInvalidation(invalidate, opt);
         }
 
         if (task)

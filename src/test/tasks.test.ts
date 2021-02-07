@@ -3,32 +3,32 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as path from 'path';
-import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder } from 'vscode';
-import * as testUtil from './testUtil';
-import { timeout, removeFromArray, asyncMapForEach } from '../util';
-import { teApi } from './extension.test';
-import { TaskItem } from '../tasks';
-import { waitForCache } from '../cache';
-import { addWsFolder, removeWsFolder } from '../extension';
+import * as assert from "assert";
+import * as fs from "fs";
+import * as path from "path";
+import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder } from "vscode";
+import * as testUtil from "./testUtil";
+import { timeout, removeFromArray, asyncMapForEach } from "../util";
+import { teApi } from "./extension.test";
+import { TaskItem } from "../tasks";
+import { waitForCache } from "../cache";
+import { addWsFolder, removeWsFolder } from "../extension";
 import { configuration } from "../common/configuration";
 
 
 const rootPath = workspace.workspaceFolders[0].uri.fsPath;
-const dirName = path.join(rootPath, 'tasks_test_');
-const ws2DirName = path.join(rootPath, 'ws2');
-const dirNameIgn = path.join(rootPath, 'tasks_test_ignore_');
-const dirNameCode = path.join(rootPath, '.vscode');
+const dirName = path.join(rootPath, "tasks_test_");
+const ws2DirName = path.join(rootPath, "ws2");
+const dirNameIgn = path.join(rootPath, "tasks_test_ignore_");
+const dirNameCode = path.join(rootPath, ".vscode");
 let tempFiles: Array<string> = [];
 let didCodeDirExist: boolean = false;
 let taskMap: Map<string, TaskItem> = new Map();
 
 
-suite('Task tests', () => 
+suite("Task tests", () =>
 {
-    suiteSetup(async () => 
+    suiteSetup(async () =>
     {
         await testUtil.activeExtension();
 
@@ -37,7 +37,7 @@ suite('Task tests', () =>
         // for full coverage.  The 'addExclude' command will add the setting globally though,
         // so add it to the workspace setting as well
         //
-        await configuration.updateWs('exclude', ['**/coveronly/**']);
+        await configuration.updateWs("exclude", ["**/coveronly/**"]);
         await commands.executeCommand("taskExplorer.addToExcludes", "**/tasks_test_ignore_/**", false);
 
         //
@@ -54,45 +54,45 @@ suite('Task tests', () =>
         }
         if (!fs.existsSync(dirNameCode)) {
             fs.mkdirSync(dirNameCode, { mode: 0o777 });
-        } 
+        }
         else {
             didCodeDirExist = true;
         }
     });
 
-    suiteTeardown(async () => 
+    suiteTeardown(async () =>
     {
         if (tempFiles.length) {
             let file: string;
-            while ((file = tempFiles.shift())) 
+            while ((file = tempFiles.shift()))
             {
                 try {
                     fs.unlinkSync(file);
-                } 
+                }
                 catch (error) {
                     console.log(error);
                 }
             }
 
-            if (fs.existsSync(path.join(rootPath, 'package-lock.json'))) {
+            if (fs.existsSync(path.join(rootPath, "package-lock.json"))) {
                 try {
-                    fs.unlinkSync(path.join(rootPath, 'package-lock.json'));
-                } 
+                    fs.unlinkSync(path.join(rootPath, "package-lock.json"));
+                }
                 catch (error) {
                     console.log(error);
                 }
             }
 
-            if (fs.existsSync(path.join(dirName, 'package-lock.json'))) {
+            if (fs.existsSync(path.join(dirName, "package-lock.json"))) {
                 try {
-                    fs.unlinkSync(path.join(dirName, 'package-lock.json'));
-                } 
+                    fs.unlinkSync(path.join(dirName, "package-lock.json"));
+                }
                 catch (error) {
                     console.log(error);
                 }
             }
         }
-        
+
         try {
             if (!didCodeDirExist) {
                 fs.rmdirSync(dirNameCode);
@@ -109,17 +109,17 @@ suite('Task tests', () =>
     });
 
 
-    test('Create npm package files', async function() 
+    test("Create npm package files", async () =>
     {
-        const file = path.join(rootPath, 'package.json');
+        const file = path.join(rootPath, "package.json");
         tempFiles.push(file);
 
-        const file2 = path.join(dirName, 'package.json');
+        const file2 = path.join(dirName, "package.json");
         tempFiles.push(file2);
 
         fs.writeFileSync(
             file,
-            '{\r\n' +
+            "{\r\n" +
             '    "name": "vscode-taskexplorer",\r\n' +
             '    "version": "0.0.1",\r\n' +
             '    "scripts":{\r\n' +
@@ -128,117 +128,117 @@ suite('Task tests', () =>
             '        "install": "npm install",\r\n' +
             '        "watch": "tsc -watch -p ./",\r\n' +
             '        "build": "npx tsc -p ./"\r\n' +
-            '    }\r\n' +
-            '}\r\n'
+            "    }\r\n" +
+            "}\r\n"
         );
 
         fs.writeFileSync(
             file2,
-            '{\r\n' +
+            "{\r\n" +
             '    "name": "vscode-taskexplorer2",\r\n' +
             '    "version": "0.0.2",\r\n' +
             '    "scripts":{\r\n' +
             '        "test2": "node ./node_modules/vscode/bin/test",\r\n' +
             '        "compile2": "npx tsc -p ../",\r\n' +
             '        "install2": "npm install"\r\n' +
-            '    }\r\n' +
-            '}\r\n'
+            "    }\r\n" +
+            "}\r\n"
         );
     });
 
 
-    test('Create vscode task files', async function() 
+    test("Create vscode task files", async () =>
     {
-        const file = path.join(dirNameCode, 'tasks.json');
+        const file = path.join(dirNameCode, "tasks.json");
         tempFiles.push(file);
 
         fs.writeFileSync(
             file,
-            '{\r\n' +
+            "{\r\n" +
             '    "version": "2.0.0",\r\n' +
             '    "tasks": [\r\n' +
-            '    {\r\n' +
+            "    {\r\n" +
             '        "label": "test1",\r\n' +
             '        "type": "shell",\r\n' +
             '        "command": "ant.bat",\r\n' +
             '        "group": "build",\r\n' +
             '        "problemMatcher": [\r\n' +
             '            "$eslint-stylish"\r\n' +
-            '        ]\r\n' +
-            '    },\r\n' +
-            '    {\r\n' +
+            "        ]\r\n" +
+            "    },\r\n" +
+            "    {\r\n" +
             '        "type": "npm",\r\n' +
             '        "script": "watch",\r\n' +
             '        "problemMatcher": "$tsc-watch",\r\n' +
             '        "isBackground": true,\r\n' +
             '        "presentation": {\r\n' +
             '            "reveal": "never"\r\n' +
-            '        },\r\n' +
+            "        },\r\n" +
             '        "problemMatcher": [\r\n' +
             '            "$tsc-watch"\r\n' +
-            '        ],\r\n' +
+            "        ],\r\n" +
             '        "group": {\r\n' +
             '            "kind": "build",\r\n' +
             '            "isDefault": true\r\n' +
-            '        }\r\n' +
-            '    },\r\n' +
-            '    {\r\n' +
+            "        }\r\n" +
+            "    },\r\n" +
+            "    {\r\n" +
             '        "type": "npm",\r\n' +
             '        "script": "build",\r\n' +
             '        "group": "build",\r\n' +
             '        "problemMatcher": [\r\n' +
             '            "$tsc"\r\n' +
-            '        ]\r\n' +
-            '    },\r\n' +
-            '    {\r\n' +
+            "        ]\r\n" +
+            "    },\r\n" +
+            "    {\r\n" +
             '        "type": "shell",\r\n' +
             '        "label": "build-dev",\r\n' +
             '        "command": "..\\test.bat",\r\n' +
             '        "group": "build",\r\n' +
             '        "problemMatcher": [\r\n' +
             '            "$eslint-stylish"\r\n' +
-            '        ]\r\n' +
-            '    },\r\n' +
-            '    {\r\n' +
+            "        ]\r\n" +
+            "    },\r\n" +
+            "    {\r\n" +
             '        "type": "shell",\r\n' +
             '        "label": "build-prod",\r\n' +
             '        "command": "..\\test.bat",\r\n' +
             '        "group": "build",\r\n' +
             '        "problemMatcher": [\r\n' +
             '            "$eslint-stylish"\r\n' +
-            '        ]\r\n' +
-            '    },\r\n' +
-            '    {\r\n' +
+            "        ]\r\n" +
+            "    },\r\n" +
+            "    {\r\n" +
             '        "type": "shell",\r\n' +
             '        "label": "..\\test.bat",\r\n' +
             '        "command": "..\\test.bat",\r\n' +
             '        "group": "build",\r\n' +
             '        "problemMatcher": [\r\n' +
             '            $eslint-stylish"\r\n' +
-            '        ]\r\n' +
-            '    },\r\n' +
-            '    {\r\n' +
+            "        ]\r\n" +
+            "    },\r\n" +
+            "    {\r\n" +
             '        "type": "shell",\r\n' +
             '        "label": "build-server",\r\n' +
             '        "command": "..\\test.bat",\r\n' +
             '        "group": "build",\r\n' +
             '        "problemMatcher": [\r\n' +
             '            "$eslint-stylish"\r\n' +
-            '        ]\r\n' +
-            '    }]\r\n' +
-            '}\r\n'
+            "        ]\r\n" +
+            "    }]\r\n" +
+            "}\r\n"
         );
     });
 
 
-    test('Create ant target files', async function() 
+    test("Create ant target files", async () =>
     {
         createAntFile();
 
-        const file2 = path.join(dirName, 'test.xml');
-        const file3 = path.join(dirName, 'emptytarget.xml');
-        const file4 = path.join(dirName, 'emtyproject.xml');
-        const file5 = path.join(dirNameIgn, 'build.xml');
+        const file2 = path.join(dirName, "test.xml");
+        const file3 = path.join(dirName, "emptytarget.xml");
+        const file4 = path.join(dirName, "emtyproject.xml");
+        const file5 = path.join(dirNameIgn, "build.xml");
 
         tempFiles.push(file2);
         tempFiles.push(file3);
@@ -252,7 +252,7 @@ suite('Task tests', () =>
             '    <property name="test2" value="test2" />\n' +
             "    <target name='test3'></target>\n" +
             '    <target name="test4"></target>\n' +
-            '</project>\n'
+            "</project>\n"
         );
 
         fs.writeFileSync(
@@ -261,7 +261,7 @@ suite('Task tests', () =>
             '<project basedir="." default="test1">\n' +
             '    <property environment="env" />\n' +
             '    <property name="test" value="test" />\n' +
-            '</project>\n'
+            "</project>\n"
         );
 
         fs.writeFileSync(file4, '<?xml version="1.0"?>\n');
@@ -272,62 +272,62 @@ suite('Task tests', () =>
             '<project basedir="." default="test2">\n' +
             '    <property name="testv" value="testv" />\n' +
             "    <target name='test5'></target>\n" +
-            '</project>\n'
+            "</project>\n"
         );
     });
 
 
-    test('Create gradle target files', async function() 
+    test("Create gradle target files", async () =>
     {
         createGradleFile();
 
-        const file2 = path.join(dirName, 'TEST.GRADLE');
-        const file3 = path.join(dirNameIgn, 'build.gradle');
+        const file2 = path.join(dirName, "TEST.GRADLE");
+        const file3 = path.join(dirNameIgn, "build.gradle");
 
         tempFiles.push(file2);
         tempFiles.push(file3);
 
         fs.writeFileSync(
             file2,
-            'task fatJar2(type: Jar) {\n' +
-            '    manifest {\n' +
-            '        attributes \'Implementation-Title\': \'Gradle Jar File Example\',\n' +  
-            '            \'Implementation-Version\': version,\n' +
-            '            \'Main-Class\': \'com.spmeesseman.test\'\n' +
-            '    }\n' +
-            '    baseName = project.name + \'-all\'\n' +
-            '    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n' +
-            '    with jar\n' +
-            '}\n'
+            "task fatJar2(type: Jar) {\n" +
+            "    manifest {\n" +
+            "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
+            "            'Implementation-Version': version,\n" +
+            "            'Main-Class': 'com.spmeesseman.test'\n" +
+            "    }\n" +
+            "    baseName = project.name + '-all'\n" +
+            "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
+            "    with jar\n" +
+            "}\n"
         );
 
         fs.writeFileSync(
             file3,
-            'task fatJar3(type: Jar) {\n' +
-            '    manifest {\n' +
-            '        attributes \'Implementation-Title\': \'Gradle Jar File Example\',\n' +  
-            '            \'Implementation-Version\': version,\n' +
-            '            \'Main-Class\': \'com.spmeesseman.test\'\n' +
-            '    }\n' +
-            '    baseName = project.name + \'-all\'\n' +
-            '    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n' +
-            '    with jar\n' +
-            '}\n'
+            "task fatJar3(type: Jar) {\n" +
+            "    manifest {\n" +
+            "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
+            "            'Implementation-Version': version,\n" +
+            "            'Main-Class': 'com.spmeesseman.test'\n" +
+            "    }\n" +
+            "    baseName = project.name + '-all'\n" +
+            "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
+            "    with jar\n" +
+            "}\n"
         );
 
     });
 
 
-    test('Create tsc config files', async function() 
+    test("Create tsc config files", async () =>
     {
-        const file = path.join(rootPath, 'tsconfig.json');
+        const file = path.join(rootPath, "tsconfig.json");
         tempFiles.push(file);
-    
+
         fs.writeFileSync(
             file,
-            '{\n' +
+            "{\n" +
             '    "compilerOptions":\n' +
-            '  {\n' +
+            "  {\n" +
             '    "target": "es6",\n' +
             '    "lib": ["es2016"],\n' +
             '    "module": "commonjs",\n' +
@@ -337,22 +337,22 @@ suite('Task tests', () =>
             '    "experimentalDecorators": true,\n' +
             '    "sourceMap": true,\n' +
             '    "noImplicitThis": false\n' +
-            '  },\n' +
+            "  },\n" +
             '  "include": ["**/*"],\n' +
             '  "exclude": ["node_modules"]\n' +
-            '}\n'
+            "}\n"
         );
     });
 
 
-    test('Create gulp task files', async function() 
+    test("Create gulp task files", async () =>
     {
         createGulpFile();
 
-        const file2 = path.join(dirName, 'Gulpfile.js');
+        const file2 = path.join(dirName, "Gulpfile.js");
         tempFiles.push(file2);
 
-        const file3 = path.join(dirNameIgn, 'gulpfile.js');
+        const file3 = path.join(dirNameIgn, "gulpfile.js");
         tempFiles.push(file3);
 
         fs.writeFileSync(
@@ -360,15 +360,15 @@ suite('Task tests', () =>
             "const { series } = require('gulp');\n" +
             "function clean(cb) {\n" +
             "    console.log('clean!!!');\n" +
-            '    cb();\n' +
-            '};\n' +
-            'function build(cb) {' +
+            "    cb();\n" +
+            "};\n" +
+            "function build(cb) {" +
             "    console.log('build!!!');\n" +
-            '    cb();\n' +
-            '};\n' +
-            'exports.build = build;\n' +
+            "    cb();\n" +
+            "};\n" +
+            "exports.build = build;\n" +
             'exports["clean"] = clean;\n' +
-            'exports.default = series(clean, build);\n'
+            "exports.default = series(clean, build);\n"
         );
 
         fs.writeFileSync(
@@ -376,105 +376,105 @@ suite('Task tests', () =>
             "var gulp = require('gulp');\n" +
             "gulp.task('hello3', (done) => {\n" +
             "    console.log('Hello3!');\n" +
-            '    done();\n' +
-            '});\n' +
+            "    done();\n" +
+            "});\n" +
             'gulp.task(\n"hello4", (done) => {\n' +
             "    console.log('Hello4!');\n" +
-            '    done();\n' +
-            '});\n'
+            "    done();\n" +
+            "});\n"
         );
     });
 
 
-    test('Create makefiles', async function() 
+    test("Create makefiles", async () =>
     {
         createMakeFile();
 
-        const file2 = path.join(dirName, 'Makefile');
+        const file2 = path.join(dirName, "Makefile");
         tempFiles.push(file2);
 
-        const file3 = path.join(dirNameIgn, 'Makefile');
+        const file3 = path.join(dirNameIgn, "Makefile");
         tempFiles.push(file3);
 
         fs.writeFileSync(
             file2,
-            '# all tasks comment\n' +
-            'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n'
+            "# all tasks comment\n" +
+            "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
         );
 
         fs.writeFileSync(
             file3,
-            'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n'
+            "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
         );
     });
 
 
-    test('Create batch files', async function() 
+    test("Create batch files", async () =>
     {
         createBatchFile();
 
-        const file2 = path.join(dirName, 'test2.BAT');
+        const file2 = path.join(dirName, "test2.BAT");
         tempFiles.push(file2);
 
-        const file3 = path.join(dirNameIgn, 'test3.bat');
+        const file3 = path.join(dirNameIgn, "test3.bat");
         tempFiles.push(file3);
 
-        fs.writeFileSync(file2, '@echo testing batch file 2\r\n');
-        fs.writeFileSync(file3, '@echo testing batch file 3\r\n');
+        fs.writeFileSync(file2, "@echo testing batch file 2\r\n");
+        fs.writeFileSync(file3, "@echo testing batch file 3\r\n");
     });
 
 
-    test('Create bash files', async function() 
+    test("Create bash files", async () =>
     {
-        const file = path.join(rootPath, 'test.sh');
+        const file = path.join(rootPath, "test.sh");
         tempFiles.push(file);
 
-        const file2 = path.join(dirName, 'test2.SH');
+        const file2 = path.join(dirName, "test2.SH");
         tempFiles.push(file2);
 
-        const file3 = path.join(dirNameIgn, 'test3.sh');
+        const file3 = path.join(dirNameIgn, "test3.sh");
         tempFiles.push(file3);
 
-        fs.writeFileSync(file, 'echo testing bash file\n');
-        fs.writeFileSync(file2, 'echo testing bash file 2\n');
-        fs.writeFileSync(file3, 'echo testing bash file 3\n');
+        fs.writeFileSync(file, "echo testing bash file\n");
+        fs.writeFileSync(file2, "echo testing bash file 2\n");
+        fs.writeFileSync(file3, "echo testing bash file 3\n");
     });
 
 
-    test('Create grunt task files', async function() 
+    test("Create grunt task files", async () =>
     {
         createGruntFile();
 
-        const file2 = path.join(dirName, 'Gruntfile.js');
+        const file2 = path.join(dirName, "Gruntfile.js");
         tempFiles.push(file2);
 
-        const file3 = path.join(dirNameIgn, 'Gruntfile.js');
+        const file3 = path.join(dirNameIgn, "Gruntfile.js");
         tempFiles.push(file3);
 
         fs.writeFileSync(
             file2,
-            'module.exports = function(grunt) {\n' +
+            "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
             '    grunt.registerTask("upload2", ["s3"]);\n' +
-            '};\n'
+            "};\n"
         );
 
         fs.writeFileSync(
             file3,
-            'module.exports = function(grunt) {\n' +
+            "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"default3", ["jshint:myproject"]);\n' +
             '    grunt.registerTask("upload3", ["s3"]);\n' +
-            '};\n'
+            "};\n"
         );
     });
 
-    test('Create app-publisher config file', async function() 
+    test("Create app-publisher config file", async () =>
     {
         createAppPublisherFile();
     });
 
 
-    test('Perform tree construction', async function() 
+    test("Perform tree construction", async function()
     {
         this.timeout(45 * 1000);
 
@@ -499,21 +499,21 @@ suite('Task tests', () =>
         //
         // Check VSCode provided task types for the hell of it
         //
-        let taskItems = await tasks.fetchTasks({ type: 'npm' });
-        assert(taskItems.length > 0, 'No npm tasks registered');
-        taskItems = await tasks.fetchTasks({ type: 'grunt' });
-        assert(taskItems.length > 0, 'No grunt tasks registered');
-        taskItems = await tasks.fetchTasks({ type: 'gulp' });
-        assert(taskItems.length > 0, 'No gulp tasks registered');
+        let taskItems = await tasks.fetchTasks({ type: "npm" });
+        assert(taskItems.length > 0, "No npm tasks registered");
+        taskItems = await tasks.fetchTasks({ type: "grunt" });
+        assert(taskItems.length > 0, "No grunt tasks registered");
+        taskItems = await tasks.fetchTasks({ type: "gulp" });
+        assert(taskItems.length > 0, "No gulp tasks registered");
 
         await teApi.explorerProvider.getChildren(undefined, "        "); // mock explorer open view which would call this function
     });
 
 
-    test('Verify tree validity and open tasks for edit', async function() 
+    test("Verify tree validity and open tasks for edit", async () =>
     {
         if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
         //
@@ -532,100 +532,100 @@ suite('Task tests', () =>
 
         console.log("         Finding and counting tasks");
 
-        let taskCount = testUtil.findIdInTaskMap(':ant', taskMap);
+        let taskCount = testUtil.findIdInTaskMap(":ant", taskMap);
         console.log("            Ant          : " + taskCount.toString());
-        if (taskCount != 4) {
-            assert.fail('Unexpected Ant task count (Found ' + taskCount + ' of 4)');
+        if (taskCount !== 4) {
+            assert.fail("Unexpected Ant task count (Found " + taskCount + " of 4)");
         }
-        
-        taskCount = testUtil.findIdInTaskMap(':app-publisher:', taskMap);
+
+        taskCount = testUtil.findIdInTaskMap(":app-publisher:", taskMap);
         console.log("            App-Publisher: " + taskCount.toString());
         if (taskCount < 6) {
-            assert.fail('Unexpected App-Publisher task count (Found ' + taskCount + ' of 6)');
+            assert.fail("Unexpected App-Publisher task count (Found " + taskCount + " of 6)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(':bash:', taskMap);
+        taskCount = testUtil.findIdInTaskMap(":bash:", taskMap);
         console.log("            Bash         : " + taskCount.toString());
-        if (taskCount != 2) {
-            assert.fail('Unexpected Bash task count (Found ' + taskCount + ' of 2)');
+        if (taskCount !== 2) {
+            assert.fail("Unexpected Bash task count (Found " + taskCount + " of 2)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(':batch:', taskMap);
+        taskCount = testUtil.findIdInTaskMap(":batch:", taskMap);
         console.log("            Batch        : " + taskCount.toString());
-        if (taskCount != 2) {
-            assert.fail('Unexpected Batch task count (Found ' + taskCount + ' of 2)');
+        if (taskCount !== 2) {
+            assert.fail("Unexpected Batch task count (Found " + taskCount + " of 2)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(':gradle:', taskMap);
+        taskCount = testUtil.findIdInTaskMap(":gradle:", taskMap);
         console.log("            Gradle       : " + taskCount.toString());
-        if (taskCount != 2) {
-            assert.fail('Unexpected Gradle task count (Found ' + taskCount + ' of 2)');
+        if (taskCount !== 2) {
+            assert.fail("Unexpected Gradle task count (Found " + taskCount + " of 2)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(':gulp:', taskMap);
+        taskCount = testUtil.findIdInTaskMap(":gulp:", taskMap);
         console.log("            Gulp         : " + taskCount.toString());
-        if (taskCount != 5) {
-            assert.fail('Unexpected Gulp task count (Found ' + taskCount + ' of 5)');
+        if (taskCount !== 5) {
+            assert.fail("Unexpected Gulp task count (Found " + taskCount + " of 5)");
         }
 
         //
         // We just wont check NPM files.  If the vascode engine isnt fast enough to
-        // provide the tasks once the package.json files are created, then its not 
+        // provide the tasks once the package.json files are created, then its not
         // out fault
         //
-        taskCount = testUtil.findIdInTaskMap(':npm:', taskMap);
+        taskCount = testUtil.findIdInTaskMap(":npm:", taskMap);
         console.log("            NPM          : " + taskCount.toString());
-        if (taskCount != 6) {
+        if (taskCount !== 6) {
             if (taskCount === 0) {
                 console.log("            ℹ NPM tasks are not found when running tests locally");
             }
             else {
-                assert.fail('Unexpected NPM task count (Found ' + taskCount + ' of 6)');
+                assert.fail("Unexpected NPM task count (Found " + taskCount + " of 6)");
             }
         }
 
-        taskCount = testUtil.findIdInTaskMap(':grunt:', taskMap);
+        taskCount = testUtil.findIdInTaskMap(":grunt:", taskMap);
         console.log("            Grunt        : " + taskCount.toString());
-        if (taskCount != 4) {
-            assert.fail('Unexpected Grunt task count (Found ' + taskCount + ' of 4)');
+        if (taskCount !== 4) {
+            assert.fail("Unexpected Grunt task count (Found " + taskCount + " of 4)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(':tsc:', taskMap);
+        taskCount = testUtil.findIdInTaskMap(":tsc:", taskMap);
         console.log("            TSC          : " + taskCount.toString());
-        if (taskCount != 2) {
-            assert.fail('Unexpected Typescript task count (Found ' + taskCount + ' of 2)');
+        if (taskCount !== 2) {
+            assert.fail("Unexpected Typescript task count (Found " + taskCount + " of 2)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(':Workspace:', taskMap);
+        taskCount = testUtil.findIdInTaskMap(":Workspace:", taskMap);
         console.log("            VSCode       : " + taskCount.toString());
-        if (taskCount != 7) {
-            assert.fail('Unexpected VSCode task count (Found ' + taskCount + ' of 7)');
+        if (taskCount !== 7) {
+            assert.fail("Unexpected VSCode task count (Found " + taskCount + " of 7)");
         }
     });
 
 
-    test('Run, pause, open, and stop a task', async function() 
+    test("Run, pause, open, and stop a task", async function()
     {
         let ranBash = false;
         let ranBatch = false;
 
         if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        
+
         this.timeout(60 * 1000);
-        
+
         //
         // Just find and run a batch script...
-        //  
+        //
         console.log("    Run a batch and a bash task");
         let lastTask: any;
-        await asyncMapForEach(taskMap, async (value: TaskItem) =>  
+        await asyncMapForEach(taskMap, async (value: TaskItem) =>
         {
             if (value && value.taskSource === "batch")
             {
                 if (lastTask) {
-                    await configuration.updateWs('keepTermOnStop', true);
+                    await configuration.updateWs("keepTermOnStop", true);
                     await commands.executeCommand("taskExplorer.run", lastTask);
                 }
                 await commands.executeCommand("taskExplorer.run", value);
@@ -649,11 +649,11 @@ suite('Task tests', () =>
             {
                 await commands.executeCommand("taskExplorer.run", value);
                 await timeout(1500);
-                await workspace.getConfiguration().update('terminal.integrated.shell.windows', 
-                                                          'bash.exe', ConfigurationTarget.Workspace);
+                await workspace.getConfiguration().update("terminal.integrated.shell.windows",
+                                                          "bash.exe", ConfigurationTarget.Workspace);
                 await commands.executeCommand("taskExplorer.run", value);
-                await workspace.getConfiguration().update('terminal.integrated.shell.windows', 
-                                                          'C:\\Windows\\System32\\cmd.exe', ConfigurationTarget.Workspace);
+                await workspace.getConfiguration().update("terminal.integrated.shell.windows",
+                                                          "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
                 ranBash = true;
                 await commands.executeCommand("taskExplorer.openTerminal", value);
                 return !(ranBash && ranBatch); // break foreach
@@ -661,7 +661,7 @@ suite('Task tests', () =>
         });
         //
         // Find an npm file and run an "npm install"
-        //  
+        //
         console.log("    Run npm install");
         let npmRan = false;
         await asyncMapForEach(taskMap, async (value: TaskItem) =>  {
@@ -674,18 +674,18 @@ suite('Task tests', () =>
         if (!npmRan) {
             console.log("        ℹ Running npm install in local testing env");
             // TODO - how to run with local test ran in vscode dev host?
-            //await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
+            // await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
         }
     });
 
-    
-    test('Test add to excludes', async function() 
+
+    test("Test add to excludes", async () =>
     {
         if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        
-        let taskItems = await tasks.fetchTasks({ type: 'grunt' });
+
+        let taskItems = await tasks.fetchTasks({ type: "grunt" });
         const gruntCt = taskItems.length;
 
         console.log("    Simulate add to exclude");
@@ -697,25 +697,25 @@ suite('Task tests', () =>
             }
         });
 
-        taskItems = await tasks.fetchTasks({ type: 'grunt' });
-        if (taskItems.length != gruntCt - 2) {
-            assert.fail('Unexpected Grunt task count (Found ' + taskItems.length + ' of ' + 
-                        (gruntCt - 2).toString() + ')');
+        taskItems = await tasks.fetchTasks({ type: "grunt" });
+        if (taskItems.length !== gruntCt - 2) {
+            assert.fail("Unexpected Grunt task count (Found " + taskItems.length + " of " +
+                        (gruntCt - 2).toString() + ")");
         }
     });
 
 
-    test('Invalidation tests', async function() 
+    test("Invalidation tests", async () =>
     {
         if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
         //
         // App-Publisher - Delete and invalidate, re-add and invalidate
         //
         console.log("    Running app-publisher invalidation");
-        let file = path.join(rootPath, '.publishrc.json');
+        let file = path.join(rootPath, ".publishrc.json");
         let uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
         removeFromArray(tempFiles, file);
@@ -733,7 +733,7 @@ suite('Task tests', () =>
         // Ant type - Delete and invalidate, re-add and invalidate
         //
         console.log("    Running ant invalidation");
-        file = path.join(dirName, 'build.xml');
+        file = path.join(dirName, "build.xml");
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("ant", uri);
         removeFromArray(tempFiles, file);
@@ -751,7 +751,7 @@ suite('Task tests', () =>
         // Gradle type - Delete and invalidate, re-add and invalidate
         //
         console.log("    Running gradle invalidation");
-        file = path.join(dirName, 'build.gradle');
+        file = path.join(dirName, "build.gradle");
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
         removeFromArray(tempFiles, file);
@@ -769,7 +769,7 @@ suite('Task tests', () =>
         // Grunt type - Delete and invalidate, re-add and invalidate
         //
         console.log("    Running grunt invalidation");
-        file = path.join(rootPath, 'GRUNTFILE.js');
+        file = path.join(rootPath, "GRUNTFILE.js");
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
         removeFromArray(tempFiles, file);
@@ -787,7 +787,7 @@ suite('Task tests', () =>
         // Gulp type - Delete and invalidate, re-add and invalidate
         //
         console.log("    Running gulp invalidation");
-        file = path.join(rootPath, 'gulpfile.js');
+        file = path.join(rootPath, "gulpfile.js");
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
         removeFromArray(tempFiles, file);
@@ -805,7 +805,7 @@ suite('Task tests', () =>
         // Make type - Delete and invalidate, re-add and invalidate
         //
         console.log("    Running makefile invalidation");
-        file = path.join(rootPath, 'Makefile');
+        file = path.join(rootPath, "Makefile");
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("make", uri);
         removeFromArray(tempFiles, file);
@@ -823,7 +823,7 @@ suite('Task tests', () =>
         // Script type - Delete and invalidate, re-add and invalidate
         //
         console.log("    Running script file invalidation");
-        file = path.join(rootPath, 'test.bat');
+        file = path.join(rootPath, "test.bat");
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("batch", uri);
         removeFromArray(tempFiles, file);
@@ -848,22 +848,22 @@ suite('Task tests', () =>
         });
 
         console.log("     Disable all task providers");
-        await configuration.updateWs('enableAnt', false);
-        await configuration.updateWs('enableAppPublisher', false);
-        await configuration.updateWs('enableBash', false);
-        await configuration.updateWs('enableBatch', false);
-        await configuration.updateWs('enableGradle', false);
-        await configuration.updateWs('enableGrunt', false);
-        await configuration.updateWs('enableGulp', false);
-        await configuration.updateWs('enableMake', false);
-        await configuration.updateWs('enableNpm', false);
-        await configuration.updateWs('enableNsis', false);
-        await configuration.updateWs('enablePowershell', false);
-        await configuration.updateWs('enablePerl', false);
-        await configuration.updateWs('enablePython', false);
-        await configuration.updateWs('enableRuby', false);
-        await configuration.updateWs('enableTsc', false);
-        await configuration.updateWs('enableWorkspace', false);
+        await configuration.updateWs("enableAnt", false);
+        await configuration.updateWs("enableAppPublisher", false);
+        await configuration.updateWs("enableBash", false);
+        await configuration.updateWs("enableBatch", false);
+        await configuration.updateWs("enableGradle", false);
+        await configuration.updateWs("enableGrunt", false);
+        await configuration.updateWs("enableGulp", false);
+        await configuration.updateWs("enableMake", false);
+        await configuration.updateWs("enableNpm", false);
+        await configuration.updateWs("enableNsis", false);
+        await configuration.updateWs("enablePowershell", false);
+        await configuration.updateWs("enablePerl", false);
+        await configuration.updateWs("enablePython", false);
+        await configuration.updateWs("enableRuby", false);
+        await configuration.updateWs("enableTsc", false);
+        await configuration.updateWs("enableWorkspace", false);
 
         //
         // Cover single-if branches in cache module
@@ -872,22 +872,22 @@ suite('Task tests', () =>
         await teApi.fileCache.addFolderToCache(workspace.workspaceFolders[0]);
 
         console.log("     Re-enable all task providers");
-        await configuration.updateWs('enableAnt', true);
-        await configuration.updateWs('enableAppPublisher', true);
-        await configuration.updateWs('enableBash', true);
-        await configuration.updateWs('enableBatch', true);
-        await configuration.updateWs('enableGradle', true);
-        await configuration.updateWs('enableGrunt', true);
-        await configuration.updateWs('enableGulp', true);
-        await configuration.updateWs('enableMake', true);
-        await configuration.updateWs('enableNpm', true);
-        await configuration.updateWs('enableNsis', true);
-        await configuration.updateWs('enablePowershell', true);
-        await configuration.updateWs('enablePerl', true);
-        await configuration.updateWs('enablePython', true);
-        await configuration.updateWs('enableRuby', true);
-        await configuration.updateWs('enableTsc', true);
-        await configuration.updateWs('enableWorkspace', true);
+        await configuration.updateWs("enableAnt", true);
+        await configuration.updateWs("enableAppPublisher", true);
+        await configuration.updateWs("enableBash", true);
+        await configuration.updateWs("enableBatch", true);
+        await configuration.updateWs("enableGradle", true);
+        await configuration.updateWs("enableGrunt", true);
+        await configuration.updateWs("enableGulp", true);
+        await configuration.updateWs("enableMake", true);
+        await configuration.updateWs("enableNpm", true);
+        await configuration.updateWs("enableNsis", true);
+        await configuration.updateWs("enablePowershell", true);
+        await configuration.updateWs("enablePerl", true);
+        await configuration.updateWs("enablePython", true);
+        await configuration.updateWs("enableRuby", true);
+        await configuration.updateWs("enableTsc", true);
+        await configuration.updateWs("enableWorkspace", true);
 
         console.log("    Running global invalidation");
         await teApi.explorerProvider.invalidateTasksCache(undefined, undefined);
@@ -896,32 +896,32 @@ suite('Task tests', () =>
     });
 
 
-    test('Test invalidate bash tasks with new bash shell setting', async function() 
+    test("Test invalidate bash tasks with new bash shell setting", async () =>
     {
         if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
-        await workspace.getConfiguration().update('terminal.integrated.shell.windows', 
-                                                  'C:\\Program Files\\Git\\bin\\bash.exe', ConfigurationTarget.Workspace);
+        await workspace.getConfiguration().update("terminal.integrated.shell.windows",
+                                                  "C:\\Program Files\\Git\\bin\\bash.exe", ConfigurationTarget.Workspace);
         await timeout(1000);
         await teApi.fileCache.buildCache("bash", "bash", "**/*.[Ss][Hh]", workspace.workspaceFolders[0], true);
     });
 
 
-    test('Test rebuild cache on workspace folder', async function() 
+    test("Test rebuild cache on workspace folder", async () =>
     {
         if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         await teApi.fileCache.buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]", workspace.workspaceFolders[0], true);
     });
 
 
-    test('Test show/hide last tasks', async function() 
+    test("Test show/hide last tasks", async () =>
     {
         if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         console.log("    Show/hide last tasks");
         await teApi.explorerProvider.showLastTasks(true);
@@ -932,23 +932,23 @@ suite('Task tests', () =>
     });
 
 
-    test('Test groups with separator', async function() 
+    test("Test groups with separator", async () =>
     {
         if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         console.log("    Enable groups with separator and rebuild cache");
-        await configuration.updateWs('groupWithSeparator', true);
-        await configuration.updateWs('groupSeparator', "-");
+        await configuration.updateWs("groupWithSeparator", true);
+        await configuration.updateWs("groupSeparator", "-");
         await timeout(2000); // wait for filesystem change events
         await waitForCache();
     });
 
 
-    test('Test cancel rebuild cache', async function() 
+    test("Test cancel rebuild cache", async () =>
     {
         if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         this.timeout(60 * 1000);
         //
@@ -969,24 +969,23 @@ suite('Task tests', () =>
     });
 
 
-    test('Test enable and disable views', async function() 
+    test("Test enable and disable views", async () =>
     {
         if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist")
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        await configuration.updateWs('enableExplorerView', false);
-        await configuration.updateWs('enableSideBar', false);
-        await configuration.updateWs('enableExplorerView', true);
-        await configuration.updateWs('enableSideBar', true);
+        await configuration.updateWs("enableExplorerView", false);
+        await configuration.updateWs("enableSideBar", false);
+        await configuration.updateWs("enableExplorerView", true);
+        await configuration.updateWs("enableSideBar", true);
         await timeout(5000); // wait for refresh
     });
 
 
-    test("Add and remove a workspace folder", async function()
-    {
+    test("Add and remove a workspace folder", async () =>
+    {   //
         // Simulate add/remove folder (cannot use workspace.updateWOrkspaceFolders() in tests)
         //
-        let wsf: WorkspaceFolder = workspace.workspaceFolders[0];
         addWsFolder(workspace.workspaceFolders);
         removeWsFolder(workspace.workspaceFolders);
     });
@@ -994,9 +993,9 @@ suite('Task tests', () =>
 });
 
 
-function createAntFile()
+const createAntFile = () =>
 {
-    const file = path.join(dirName, 'build.xml');
+    const file = path.join(dirName, "build.xml");
     tempFiles.push(file);
 
     if (!fs.existsSync(file))
@@ -1009,22 +1008,22 @@ function createAntFile()
             '    <property name="test" value="test" />\n' +
             '    <target name="test1" depends="init"></target>\n' +
             '    <target name="test2" depends="init"></target>\n' +
-            '</project>\n'
+            "</project>\n"
         );
     }
-}
+};
 
 
-function createAppPublisherFile()
+const createAppPublisherFile = () =>
 {
-    const file = path.join(rootPath, '.publishrc.json');
+    const file = path.join(rootPath, ".publishrc.json");
     tempFiles.push(file);
 
     if (!fs.existsSync(file))
     {
         fs.writeFileSync(
             file,
-            '{\n' +
+            "{\n" +
             '    "version": "1.0.0"\n' +
             '    "branch": "trunk",\n' +
             '    "buildCommand": [],\n' +
@@ -1032,69 +1031,69 @@ function createAppPublisherFile()
             '    "mantisbtChglogEdit": "N",\n' +
             '    "mantisbtProject": "",\n' +
             '    "repoType": "svn""\n' +
-            '}\n'
+            "}\n"
         );
     }
-}
+};
 
 
-function createBatchFile()
+const createBatchFile = () =>
 {
-    const file = path.join(rootPath, 'test.bat');
+    const file = path.join(rootPath, "test.bat");
     tempFiles.push(file);
 
     if (!fs.existsSync(file))
     {
-        fs.writeFileSync(file, '@echo testing batch file\r\n');
+        fs.writeFileSync(file, "@echo testing batch file\r\n");
     }
-}
+};
 
 
-function createGradleFile()
+const createGradleFile = () =>
 {
-    const file = path.join(dirName, 'build.gradle');
+    const file = path.join(dirName, "build.gradle");
     tempFiles.push(file);
 
     if (!fs.existsSync(file))
     {
         fs.writeFileSync(
             file,
-            'task fatJar(type: Jar) {\n' +
-            '    manifest {\n' +
-            '        attributes \'Implementation-Title\': \'Gradle Jar File Example\',\n' +  
-            '            \'Implementation-Version\': version,\n' +
-            '            \'Main-Class\': \'com.spmeesseman.test\'\n' +
-            '    }\n' +
-            '    baseName = project.name + \'-all\'\n' +
-            '    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n' +
-            '    with jar\n' +
-            '}\n'
+            "task fatJar(type: Jar) {\n" +
+            "    manifest {\n" +
+            "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
+            "            'Implementation-Version': version,\n" +
+            "            'Main-Class': 'com.spmeesseman.test'\n" +
+            "    }\n" +
+            "    baseName = project.name + '-all'\n" +
+            "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
+            "    with jar\n" +
+            "}\n"
         );
     }
-}
+};
 
 
-function createGruntFile()
+const createGruntFile = () =>
 {
-    const file = path.join(rootPath, 'GRUNTFILE.js');
+    const file = path.join(rootPath, "GRUNTFILE.js");
     tempFiles.push(file);
 
     if (!fs.existsSync(file))
     {
         fs.writeFileSync(
             file,
-            'module.exports = function(grunt) {\n' +
+            "module.exports = function(grunt) {\n" +
             "    grunt.registerTask(\n'default', ['jshint:myproject']);\n" +
             '    grunt.registerTask("upload", [\'s3\']);\n' +
-            '};\n'
+            "};\n"
         );
     }
-}
+};
 
 
-function createGulpFile()
+const createGulpFile = () =>
 {
-    const file = path.join(rootPath, 'gulpfile.js');
+    const file = path.join(rootPath, "gulpfile.js");
     tempFiles.push(file);
 
     if (!fs.existsSync(file))
@@ -1104,26 +1103,26 @@ function createGulpFile()
             "var gulp = require('gulp');\n" +
             "gulp.task(\n'hello', (done) => {\n" +
             "    console.log('Hello!');\n" +
-            '    done();\n' +
-            '});\n' +
+            "    done();\n" +
+            "});\n" +
             'gulp.task(\n       "hello2", (done) => {\n' +
-            '    done();\n' +
-            '});\n'
+            "    done();\n" +
+            "});\n"
         );
     }
-}
+};
 
 
-function createMakeFile()
+const createMakeFile = () =>
 {
-    const file = path.join(rootPath, 'Makefile');
+    const file = path.join(rootPath, "Makefile");
     tempFiles.push(file);
 
     if (!fs.existsSync(file))
     {
         fs.writeFileSync(
             file,
-            'all   : temp.exe\r\n' + '    @echo Building app\r\n' + 'clean: t1\r\n' + '    rmdir /q /s ../build\r\n'
+            "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
         );
     }
-}
+};
