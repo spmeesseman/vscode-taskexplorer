@@ -383,27 +383,28 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             relPath = relPath.substring(0, relPath.length - 1);
         }
 
+        const lblString = taskItem.label.toString();
         let taskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label +
                            " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
         term = check(taskName);
 
-        if (!term && taskItem.label.indexOf("(") !== -1)
+        if (!term && lblString.indexOf("(") !== -1)
         {
-            taskName = "Task - " + taskItem.taskSource + ": " + taskItem.label.substring(0, taskItem.label.indexOf("(")).trim() +
+            taskName = "Task - " + taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                        " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
             term = check(taskName);
         }
 
         if (!term)
         {
-            taskName = "Task - " + taskItem.taskSource + ": " + taskItem.label +
+            taskName = "Task - " + taskItem.taskSource + ": " + lblString +
                        " - " + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
             term = check(taskName);
         }
 
-        if (!term && taskItem.label.indexOf("(") !== -1)
+        if (!term && lblString.indexOf("(") !== -1)
         {
-            taskName = "Task - " + taskItem.taskSource + ": " + taskItem.label.substring(0, taskItem.label.indexOf("(")).trim() +
+            taskName = "Task - " + taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                        " - " + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
             term = check(taskName);
         }
@@ -1562,7 +1563,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 {
                     each.scripts.sort((a, b) =>
                     {
-                        return a.label.localeCompare(b.label);
+                        return a.label.toString().localeCompare(b.label.toString());
                     });
                 }
             });
@@ -1673,7 +1674,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 each.scripts.sort((a, b) =>
                 {
-                    return a.label.localeCompare(b.label);
+                    return a.label.toString().localeCompare(b.label.toString());
                 });
             }
         });
@@ -1761,8 +1762,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (!(each instanceof TaskItem)) {
                 return; // continue forEach()
             }
+            const label = each.label.toString();
             let subfolder: TaskFile;
-            const prevNameThis = each.label.split(groupSeparator);
+            const prevNameThis = label.split(groupSeparator);
 
             //
             // Check if we're in a state to create a new group.
@@ -1804,7 +1806,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 // We found a pair of tasks that need to be grouped.  i.e. the first part of the label
                 // when split by the separator character is the same...
                 //
-                const id = this.getGroupedId(folder, taskFile, each.label, treeLevel);
+                const id = this.getGroupedId(folder, taskFile, label, treeLevel);
                 subfolder = subfolders.get(id);
 
                 if (!subfolder)
@@ -1827,7 +1829,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 subfolder.addScript(each);
             }
 
-            prevName = each.label.split(groupSeparator);
+            prevName = label.split(groupSeparator);
             prevTaskItem = each;
         });
 
@@ -1866,7 +1868,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 return; // continue forEach()
             }
             const id = folder.label + each.taskSource;
-            const id2 = this.getGroupedId(folder, each, each.label, each.groupLevel);
+            const id2 = this.getGroupedId(folder, each, each.label.toString(), each.groupLevel);
 
             if (!each.isGroup && subfolders.get(id))
             {
@@ -1915,12 +1917,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         taskFile.scripts.forEach(each =>
         {
-            const labelPart = each.label.split(groupSeparator)[level];
-            const id = this.getGroupedId(folder, taskFile, each.label, level);
+            const label = each.label.toString();
+            const labelPart = label.split(groupSeparator)[level];
+            const id = this.getGroupedId(folder, taskFile, label, level);
 
             if (each instanceof TaskItem)
             {
-                if (each.label.split(groupSeparator).length > 1 && labelPart)
+                if (label.split(groupSeparator).length > 1 && labelPart)
                 {
                     if (subfolders.get(id))
                     {
@@ -1966,13 +1969,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 if (each.isGroup)
                 {
-                    let rmvLbl = each.label;
+                    let rmvLbl = each.label.toString();
                     rmvLbl = rmvLbl.replace(/\(/gi, "\\(").replace(/\[/gi, "\\[");
                     rmvLbl = rmvLbl.replace(/\)/gi, "\\)").replace(/\]/gi, "\\]");
                     each.scripts.forEach(each2 =>
                     {
                         const rgx = new RegExp(rmvLbl + groupSeparator, "i");
-                        each2.label = each2.label.replace(rgx, "");
+                        each2.label = each2.label.toString().replace(rgx, "");
                     });
                 }
                 else
