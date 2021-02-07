@@ -386,6 +386,14 @@ async function refreshTree(taskType?: string, uri?: Uri)
     // window.setStatusBarMessage("$(loading) Task Explorer - Refreshing tasks...");
 
     //
+    // If this request is from a filesystem event for a file that exists in an ignored path,
+    // then get out of here
+    //
+    if (uri && util.isExcluded(uri.path)) {
+        return;
+    }
+
+    //
     // If the task type received from a filewatcher event is "ant-*" then it is a custom
     // defined ant file in the includeAnt setting, named accordingly so that the watchers
     // can be tracked.  change the taskType to "ant" here
