@@ -104,6 +104,9 @@
 	"config.taskExplorer.showLastTasks": "Show the 'last tasks' as a node in the task tree.",
 	"config.taskExplorer.showRunningTask": "Show the last ran running task in the status bar.",
 
+	"config.taskExplorer.showExecuteWithNoTerminalButton": "Show the 'Execute with No Terminal' button inline with the 'Execute' button",
+	"config.taskExplorer.showExecuteWithArgumentsButton": "Show the 'Execute with Arguments' button inline with the 'Execute' button",
+
 	"taskExplorer.parseError": "Task Explorer task detection: failed to parse the file {0}",
 
 	"taskdef.task.fileName": "The ant file that target was found in. Can be omitted.",
@@ -122,6 +125,8 @@
 	"command.refresh": "Refresh",
 	"command.run": "Run",
 	"command.restart": "Restart",
+	"command.runNoTerm": "Run with no terminal",
+	"command.runWithArgs": "Run with arguments",
 	"command.runLastTask": "Run last task",
 	"command.addToExcludes": "Add to excludes list",
 	"command.stop": "Stop",

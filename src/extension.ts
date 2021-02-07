@@ -28,6 +28,7 @@ export let appDataPath: string;
 
 
 const watchers: Map<string, FileSystemWatcher> = new Map();
+const watcherDisposables: Map<string, Disposable> = new Map();
 
 
 export interface TaskExplorerApi
@@ -252,7 +253,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         refresh = true;
     }
 
-    if (e.affectsConfiguration("npm.packageManager")) {
+    if (e.affectsConfiguration("npm.packageManager", null)) {
         refresh = true;
     }
 
@@ -316,16 +317,16 @@ async function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>("enableAppPublisher")) {
-        await registerFileWatcher(context, "app-publisher", "**/.publishrc*", true);
+        await registerFileWatcher(context, "app-publisher", "**/.publishrc*");
     }
 
     if (configuration.get<boolean>("enableBash")) {
-        await registerFileWatcher(context, "bash", "**/*.[Ss][Hh]", true);
+        await registerFileWatcher(context, "bash", "**/*.[Ss][Hh]");
     }
 
     if (configuration.get<boolean>("enableBatch")) {
-        await registerFileWatcher(context, "batch", "**/*.[Bb][Aa][Tt]", true);
-        await registerFileWatcher(context, "batch2", "**/*.[Cc][Mm][Dd]", true);
+        await registerFileWatcher(context, "batch", "**/*.[Bb][Aa][Tt]");
+        await registerFileWatcher(context, "batch2", "**/*.[Cc][Mm][Dd]");
     }
 
     if (configuration.get<boolean>("enableGradle")) {
@@ -351,23 +352,23 @@ async function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>("enableNsis")) {
-        await registerFileWatcher(context, "nsis", "**/*.[Nn][Ss][Ii]", true);
+        await registerFileWatcher(context, "nsis", "**/*.[Nn][Ss][Ii]");
     }
 
     if (configuration.get<boolean>("enablePerl")) {
-        await registerFileWatcher(context, "perl", "**/*.[Pp][Ll]", true);
+        await registerFileWatcher(context, "perl", "**/*.[Pp][Ll]");
     }
 
     if (configuration.get<boolean>("enablePowershell")) {
-        await registerFileWatcher(context, "powershell", "**/*.[Pp][Ss]1", true);
+        await registerFileWatcher(context, "powershell", "**/*.[Pp][Ss]1");
     }
 
     if (configuration.get<boolean>("enablePython")) {
-        await registerFileWatcher(context, "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", true);
+        await registerFileWatcher(context, "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]");
     }
 
     if (configuration.get<boolean>("enableRuby")) {
-        await registerFileWatcher(context, "ruby", "**/*.[Rr][Bb]", true);
+        await registerFileWatcher(context, "ruby", "**/*.[Rr][Bb]");
     }
 
     if (configuration.get<boolean>("enableTsc")) {
@@ -477,9 +478,9 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
 {
     util.log("Register file watcher for task type '" + taskType + "'");
 
-    let watcher: FileSystemWatcher = watchers.get(taskType);
     let taskAlias = taskType;
     let taskTypeR = taskType !== "batch2" ? taskType : "batch";
+    let watcher: FileSystemWatcher = watchers.get(taskTypeR);
 
     if (taskType && taskType.indexOf("ant-") !== -1) {
         taskAlias = "ant";
@@ -492,37 +493,41 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
     if (workspace.workspaceFolders) {
         await cache.buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, taskTypeR, fileBlob);
     }
+    
+    if (watcher)
+    {
+        let watcherDisposable = watcherDisposables.get(taskTypeR);
+        if (watcherDisposable)
+        {
+            watcherDisposable.dispose();
+            watcherDisposables.delete(taskTypeR);
+        }
+    }
 
-    if (enabled !== false) {
+    if (enabled !== false)
+    {
         if (!watcher) {
             watcher = workspace.createFileSystemWatcher(fileBlob);
             watchers.set(taskTypeR, watcher);
             context.subscriptions.push(watcher);
         }
         if (!isScriptType) {
-            watcher.onDidChange(async _e => {
+            watcherDisposables.set(taskTypeR, watcher.onDidChange(async _e => {
                 logFileWatcherEvent(_e, "change");
                 await refreshTree(taskTypeR, _e);
-            });
+            }));
         }
-        watcher.onDidDelete(async _e => {
+        watcherDisposables.set(taskTypeR, watcher.onDidDelete(async _e => {
             logFileWatcherEvent(_e, "delete");
             await cache.removeFileFromCache(taskTypeR, _e);
             await refreshTree(taskTypeR, _e);
-        });
-        watcher.onDidCreate(async _e => {
+        }));
+        watcherDisposables.set(taskTypeR, watcher.onDidCreate(async _e => {
             logFileWatcherEvent(_e, "create");
             await cache.addFileToCache(taskTypeR, _e);
             await refreshTree(taskTypeR, _e);
-        });
-    }
-    else if (watcher) {
-        if (!isScriptType) {
-            watcher.onDidChange(_e => undefined);
-        }
-        watcher.onDidDelete(_e => undefined);
-        watcher.onDidCreate(_e => undefined);
-    }
+        }));
+    } 
 }
 
 
@@ -566,5 +571,13 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
 
 export async function deactivate()
 {
+    watcherDisposables.forEach((d) => {
+        d.dispose();
+    });
+    
+    watchers.forEach((w) => {
+        w.dispose();
+    });
+
     await cache.cancelBuildCache(true);
 }

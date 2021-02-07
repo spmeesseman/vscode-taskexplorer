@@ -197,6 +197,24 @@
                 }
             },
             {
+                "command": "taskExplorerSideBar.runNoTerm",
+                "title": "%command.runNoTerm%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "light": "res/light/continue.svg",
+                    "dark": "res/dark/continue.svg"
+                }
+            },
+            {
+                "command": "taskExplorerSideBar.runWithArgs",
+                "title": "%command.runWithArgs%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "light": "res/light/continue.svg",
+                    "dark": "res/dark/continue.svg"
+                }
+            },
+            {
                 "command": "taskExplorerSideBar.runLastTask",
                 "title": "%command.runLastTask%",
                 "when": "config.taskExplorer.enableSideBar",
@@ -297,6 +315,24 @@
             {
                 "command": "taskExplorer.run",
                 "title": "%command.run%",
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "light": "res/light/continue.svg",
+                    "dark": "res/dark/continue.svg"
+                }
+            },
+            {
+                "command": "taskExplorerSideBar.runNoTerm",
+                "title": "%command.runNoTerm%",
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "light": "res/light/continue.svg",
+                    "dark": "res/dark/continue.svg"
+                }
+            },
+            {
+                "command": "taskExplorerSideBar.runWithArgs",
+                "title": "%command.runWithArgs%",
                 "when": "config.taskExplorer.enableExplorerView",
                 "icon": {
                     "light": "res/light/continue.svg",
@@ -467,6 +503,14 @@
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
                 },
                 {
+                    "command": "taskExplorer.runWithArgs",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                },
+                {
+                    "command": "taskExplorer.runNoTerm",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                },
+                {
                     "command": "taskExplorer.addToExcludes",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileApp-publiser"
                 },
@@ -587,6 +631,16 @@
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupNsis"
                 },
                 {
+                    "command": "taskExplorer.runNoTerm",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == script",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskExplorer.runWithArgs",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == script",
+                    "group": "inline"
+                },
+                {
                     "command": "taskExplorer.run",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script",
                     "group": "inline"
@@ -642,6 +696,14 @@
                 },
                 {
                     "command": "taskExplorerSideBar.run",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                },
+                {
+                    "command": "taskExplorer.runWithArgs",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                },
+                {
+                    "command": "taskExplorer.runNoTerm",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
                 },
                 {
@@ -763,6 +825,16 @@
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupNsis"
+                },
+                {
+                    "command": "taskExplorer.runNoTerm",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == script",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskExplorer.runWithArgs",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showExecuteWithArgumentsButton && view == taskExplorerSideBar && viewItem == script",
+                    "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.run",
@@ -981,6 +1053,16 @@
                     "default": "ruby",
                     "title": "%config.taskExplorer.pathToRuby%",
                     "description": "%config.taskExplorer.pathToRubyDsc%"
+                },
+                "taskExplorer.showExecuteWithArgumentsButton": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.showExecuteWithArgumentsButton%"
+                },
+                "taskExplorer.showExecuteWithNoTerminalButton": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.showExecuteWithNoTerminalButton%"
                 },
                 "taskExplorer.showLastTasks": {
                     "type": "boolean",

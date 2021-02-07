@@ -7,10 +7,10 @@ import * as path from "path";
 import * as util from "./util";
 import * as assert from "assert";
 import {
-    Event, EventEmitter, ExtensionContext, Task, TaskDefinition,
+    Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind,
     TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, Terminal, StatusBarItem, StatusBarAlignment
+    ShellExecution, Terminal, StatusBarItem, StatusBarAlignment, CustomExecution, ProcessExecution
 } from "vscode";
 import { visit, JSONVisitor } from "jsonc-parser";
 import * as nls from "vscode-nls";
@@ -63,6 +63,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         this.extensionContext = context;
         this.name = name;
         subscriptions.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => { await this.run(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => { await this.run(item, true, false); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem) => { await this.run(item, false, true); }, this));
         subscriptions.push(commands.registerCommand(name + ".runLastTask",  async () => { await this.runLastTask(); }, this));
         subscriptions.push(commands.registerCommand(name + ".stop",  async (item: TaskItem) => { await this.stop(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
@@ -140,7 +142,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async run(taskItem: TaskItem)
+    private async run(taskItem: TaskItem, noTerminal = false, withArgs = false)
     {
         const me = this;
 
@@ -158,43 +160,53 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // batch script contains %1, %2, etc, the task definition's requiresArgs parameter
         // will be set.
         //
-        /*
-		if (taskItem.task.definition.requiresArgs === true)
+		if (withArgs === true)
 		{
-			let opts: InputBoxOptions = { prompt: 'Enter command line arguments separated by spaces'};
-			window.showInputBox(opts).then(function(str)
-			{
-				if (str !== undefined)
-				{
-					//let origArgs = taskItem.task.execution.args ? taskItem.task.execution.args.slice(0) : []; // clone
-					if (str) {
-						//origArgs.push(...str.split(' '));
-						taskItem.task.execution  = new ShellExecution(taskItem.task.definition.cmdLine + ' ' + str, taskItem.task.execution.options);
-					}
-					else {
-						taskItem.task.execution  = new ShellExecution(taskItem.task.definition.cmdLine, taskItem.task.execution.options);
-					}
-					tasks.executeTask(taskItem.task)
-					.then(function(execution) {
-						//taskItem.task.execution.args = origArgs.slice(0); // clone
-						me.saveRunTask(taskItem);
-					},
-					function(reason) {
-						//taskItem.task.execution.args = origArgs.slice(0); // clone
-					});
-				}
-			});
+            if (!(taskItem.task.execution instanceof CustomExecution))
+            {
+                const exec = taskItem.task.execution as (ShellExecution | ProcessExecution);
+
+                let opts: InputBoxOptions = { prompt: 'Enter command line arguments separated by spaces'};
+                window.showInputBox(opts).then(async (str) =>
+                {
+                    if (str !== undefined)
+                    {
+                        //let origArgs = taskItem.task.execution.args ? taskItem.task.execution.args.slice(0) : []; // clone
+                        if (str) {
+                            //origArgs.push(...str.split(' '));
+                            taskItem.task.execution  = new ShellExecution(taskItem.task.definition.cmdLine + ' ' + str, exec.options);
+                        }
+                        else {
+                            taskItem.task.execution  = new ShellExecution(taskItem.task.definition.cmdLine, exec.options);
+                        }
+                        await tasks.executeTask(taskItem.task);
+                        me.saveRunTask(taskItem);
+                    }
+                });
+            }
+            else {
+                window.showInformationMessage("Custom execution tasks cannot have the cmd line altered")
+            }
+            return;
 		}
-		else
-		{*/
-        // Execute or pause task
-        //
+
+        if (noTerminal === true)
+        {
+            taskItem.task.presentationOptions.reveal = TaskRevealKind.Silent;
+        }
+        else {
+            taskItem.task.presentationOptions.reveal = TaskRevealKind.Always;
+        }
+
         if (taskItem.paused)
         {
             const term = this.getTerminal(taskItem);
             if (term) {
                 term.sendText("N", true);
                 taskItem.paused = false;
+            }
+            else {
+                window.showInformationMessage("Terminal not found")
             }
         }
         else
