@@ -317,16 +317,16 @@ async function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>("enableAppPublisher")) {
-        await registerFileWatcher(context, "app-publisher", "**/.publishrc*");
+        await registerFileWatcher(context, "app-publisher", "**/.publishrc*", true);
     }
 
     if (configuration.get<boolean>("enableBash")) {
-        await registerFileWatcher(context, "bash", "**/*.[Ss][Hh]");
+        await registerFileWatcher(context, "bash", "**/*.[Ss][Hh]", true);
     }
 
     if (configuration.get<boolean>("enableBatch")) {
-        await registerFileWatcher(context, "batch", "**/*.[Bb][Aa][Tt]");
-        await registerFileWatcher(context, "batch2", "**/*.[Cc][Mm][Dd]");
+        await registerFileWatcher(context, "batch", "**/*.[Bb][Aa][Tt]", true);
+        await registerFileWatcher(context, "batch2", "**/*.[Cc][Mm][Dd]", true);
     }
 
     if (configuration.get<boolean>("enableGradle")) {
@@ -352,23 +352,23 @@ async function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>("enableNsis")) {
-        await registerFileWatcher(context, "nsis", "**/*.[Nn][Ss][Ii]");
+        await registerFileWatcher(context, "nsis", "**/*.[Nn][Ss][Ii]", true);
     }
 
     if (configuration.get<boolean>("enablePerl")) {
-        await registerFileWatcher(context, "perl", "**/*.[Pp][Ll]");
+        await registerFileWatcher(context, "perl", "**/*.[Pp][Ll]", true);
     }
 
     if (configuration.get<boolean>("enablePowershell")) {
-        await registerFileWatcher(context, "powershell", "**/*.[Pp][Ss]1");
+        await registerFileWatcher(context, "powershell", "**/*.[Pp][Ss]1", true);
     }
 
     if (configuration.get<boolean>("enablePython")) {
-        await registerFileWatcher(context, "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]");
+        await registerFileWatcher(context, "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", true);
     }
 
     if (configuration.get<boolean>("enableRuby")) {
-        await registerFileWatcher(context, "ruby", "**/*.[Rr][Bb]");
+        await registerFileWatcher(context, "ruby", "**/*.[Rr][Bb]", true);
     }
 
     if (configuration.get<boolean>("enableTsc")) {
