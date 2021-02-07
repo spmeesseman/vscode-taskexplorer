@@ -1051,7 +1051,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 {
                     if (typeof value === "string")
                     {
-                        if (inTaskLabel === "label")
+                        if (inTaskLabel === "label" || inTaskLabel === "script")
                         {
                             if (script.task.name === value)
                             {
@@ -1088,7 +1088,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         scriptOffset = offset;
                     }
                 }
-                else if (property === "label" && inTasks && !inTaskLabel)
+                else if ((property === "label" || property === "script") && inTasks && !inTaskLabel)
                 {
                     inTaskLabel = "label";
                     if (!inTaskLabel)
