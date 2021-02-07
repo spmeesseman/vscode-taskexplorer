@@ -1,7 +1,7 @@
 
 import {
     Task, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition, ShellExecutionOptions
+    workspace, TaskProvider, TaskDefinition, ShellExecutionOptions, ShellQuotedString
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
@@ -12,7 +12,7 @@ import { filesCache } from "./cache";
 
 let cachedTasks: Task[];
 
-const scriptTable = {
+export const scriptTable = {
     sh: {
         exec: "",
         type: "bash",
@@ -193,7 +193,7 @@ async function detectScriptFiles(): Promise<Task[]>
 }
 
 
-function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Task
+export function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task
 {
     function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
     {
@@ -306,6 +306,13 @@ function createScriptTask(scriptDef: any, folder: WorkspaceFolder, uri: Uri): Ta
     //
     if (scriptDef.type === "python") {
         args.push("bdist_egg");
+    }
+
+    //
+    // Add extra argumants is specified
+    //
+    if (xArgs) {
+        args.push(...xArgs);
     }
 
     //

@@ -9,8 +9,8 @@ import * as assert from "assert";
 import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind,
     TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
-    commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, Terminal, StatusBarItem, StatusBarAlignment, CustomExecution, ProcessExecution
+    commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions, TaskExecution,
+    ShellExecution, Terminal, StatusBarItem, StatusBarAlignment, CustomExecution, ProcessExecution, ShellQuotedString
 } from "vscode";
 import { visit, JSONVisitor } from "jsonc-parser";
 import * as nls from "vscode-nls";
@@ -21,12 +21,11 @@ import { rebuildCache } from "./cache";
 import { configuration } from "./common/configuration";
 import { invalidateTasksCacheAnt } from "./taskProviderAnt";
 import { invalidateTasksCacheMake } from "./taskProviderMake";
-import { invalidateTasksCacheScript } from "./taskProviderScript";
+import { invalidateTasksCacheScript, createScriptTask, scriptTable } from "./taskProviderScript";
 import { invalidateTasksCacheGradle } from "./taskProviderGradle";
 import { invalidateTasksCacheGrunt } from "./taskProviderGrunt";
 import { invalidateTasksCacheGulp } from "./taskProviderGulp";
 import { invalidateTasksCacheAppPublisher } from "./taskProviderAppPublisher";
-import { utils } from "istanbul";
 
 
 const localize = nls.loadMessageBundle();
@@ -142,6 +141,66 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    private async executeTask(task: Task, noTerminal?: boolean): Promise<boolean>
+    {
+        if (noTerminal === true) {
+            task.presentationOptions.reveal = TaskRevealKind.Never;
+        }
+        else {
+            task.presentationOptions.reveal = TaskRevealKind.Always;
+        }
+
+        try {
+            await tasks.executeTask(task);
+        }
+        catch (e) {
+            const err = e.toString();
+            if (err.indexOf("No workspace folder") !== -1)
+            {
+                window.showErrorMessage("Task executon failed:  No workspace folder.  NOTE: You must " +
+                                        "save your workspace first before running 'User' tasks");
+            }
+            else {
+                window.showErrorMessage("Task executon failed: " + err);
+            }
+            util.log("Task execution failed: " + err);
+            return false;
+        }
+        return true;
+    }
+
+
+    private async _runWithArgs(taskItem: TaskItem, noTerminal?: boolean)
+    {
+        if (!(taskItem.task.execution instanceof CustomExecution))
+        {
+            const me = this;
+            let opts: InputBoxOptions = { prompt: 'Enter command line arguments separated by spaces'};
+            window.showInputBox(opts).then(async (str) =>
+            {
+                if (str !== undefined)
+                {
+                    const exec = taskItem.task.execution as (ShellExecution | ProcessExecution);
+                    let newExec: (ShellExecution | ProcessExecution);
+                    let newTask: Task = taskItem.task;
+
+                    if (str) {
+                        const def = taskItem.task.definition;
+                        newTask = createScriptTask(scriptTable[path.extname(def.uri.fsPath).substring(1)], 
+                                                   taskItem.getFolder(),  def.uri, str.trim().split(' '));
+                    }
+                    if (await this.executeTask(newTask, noTerminal)) {
+                        me.saveRunTask(taskItem);
+                    }
+                }
+            });
+        }
+        else {
+            window.showInformationMessage("Custom execution tasks cannot have the cmd line altered")
+        }
+    }
+
+
     private async run(taskItem: TaskItem, noTerminal = false, withArgs = false)
     {
         const me = this;
@@ -152,81 +211,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
-        //
-        // If this is a script, check to see if args are required
-        //
-        // A script task will set the 'requiresArgs' parameter to true if command line arg
-        // parameters are detected in the scripts contents when inported.  For example, if a
-        // batch script contains %1, %2, etc, the task definition's requiresArgs parameter
-        // will be set.
-        //
-		if (withArgs === true)
+        if (withArgs === true)
 		{
-            if (!(taskItem.task.execution instanceof CustomExecution))
-            {
-                const exec = taskItem.task.execution as (ShellExecution | ProcessExecution);
-
-                let opts: InputBoxOptions = { prompt: 'Enter command line arguments separated by spaces'};
-                window.showInputBox(opts).then(async (str) =>
-                {
-                    if (str !== undefined)
-                    {
-                        //let origArgs = taskItem.task.execution.args ? taskItem.task.execution.args.slice(0) : []; // clone
-                        if (str) {
-                            //origArgs.push(...str.split(' '));
-                            taskItem.task.execution  = new ShellExecution(taskItem.task.definition.cmdLine + ' ' + str, exec.options);
-                        }
-                        else {
-                            taskItem.task.execution  = new ShellExecution(taskItem.task.definition.cmdLine, exec.options);
-                        }
-                        await tasks.executeTask(taskItem.task);
-                        me.saveRunTask(taskItem);
-                    }
-                });
-            }
-            else {
-                window.showInformationMessage("Custom execution tasks cannot have the cmd line altered")
-            }
+            await this._runWithArgs(taskItem);
             return;
 		}
 
-        if (noTerminal === true)
-        {
-            taskItem.task.presentationOptions.reveal = TaskRevealKind.Silent;
-        }
-        else {
-            taskItem.task.presentationOptions.reveal = TaskRevealKind.Always;
-        }
-
         if (taskItem.paused)
         {
-            const term = this.getTerminal(taskItem);
-            if (term) {
-                term.sendText("N", true);
-                taskItem.paused = false;
-            }
-            else {
-                window.showInformationMessage("Terminal not found")
-            }
+            await this.resumeTask(taskItem);
         }
-        else
+        else if (await this.executeTask(taskItem.task, noTerminal))
         {
-            try {
-                await tasks.executeTask(taskItem.task);
-                me.saveRunTask(taskItem);
-            }
-            catch (e) {
-                const err = e.toString();
-                if (err.indexOf("No workspace folder") !== -1)
-                {
-                    window.showErrorMessage("Task executon failed:  No workspace folder.  NOTE: You must " +
-                                            "save your workspace first before running 'User' tasks");
-                }
-                else {
-                    window.showErrorMessage("Task executon failed: " + err);
-                }
-                util.log("Task execution failed: " + err);
-            }
+            me.saveRunTask(taskItem);
         }
     }
 
@@ -306,6 +303,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         this.stop(taskItem);
         this.run(taskItem);
+    }
+
+
+    private async resumeTask(taskItem: TaskItem)
+    {
+        const term = this.getTerminal(taskItem);
+        if (term) {
+            term.sendText("N", true);
+            taskItem.paused = false;
+        }
+        else {
+            await window.showInformationMessage("Terminal not found")
+        }
     }
 
 
@@ -730,20 +740,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async pickLastTask()
-    {
-        // let taskItem: TaskItem;
-
-        // let lastTasks = storage.get<Array<string>>("lastTasks", []);
-        // lastTasks.forEach(each =>
-        // {
-
-        // });
-
-        // this.run(taskItem);
-    }
-
-
     private async open(selection: TaskItem)
     {
         let uri: Uri | undefined;
@@ -789,10 +785,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Show status bar message (if ON in settings)
         //
-        if (task && configuration.get<boolean>("showRunningTask") === true) {
+        if (task && configuration.get<boolean>("showRunningTask") === true)
+        {
             const exec = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
                          e.task.scope === task.scope && e.task.definition.path === task.definition.path);
-            if (exec) {
+            if (exec)
+            {
                 if (!TaskTreeDataProvider.statusBarSpace) {
                     TaskTreeDataProvider.statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
                     TaskTreeDataProvider.statusBarSpace.tooltip = "Task Explorer running task";
@@ -804,9 +802,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 TaskTreeDataProvider.statusBarSpace.text = "$(loading~spin) " + statusMsg;
                 TaskTreeDataProvider.statusBarSpace.show();
             }
-            else if (TaskTreeDataProvider.statusBarSpace) {
-                TaskTreeDataProvider.statusBarSpace.dispose();
-                TaskTreeDataProvider.statusBarSpace = undefined;
+            else {
+                util.log("Could not find task execution!!");
+                if (TaskTreeDataProvider.statusBarSpace) {
+                    TaskTreeDataProvider.statusBarSpace.dispose();
+                    TaskTreeDataProvider.statusBarSpace = undefined;
+                }
             }
         }
 

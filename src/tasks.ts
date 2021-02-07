@@ -50,7 +50,12 @@ export class TaskItem extends TreeItem
         this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
             e.task.scope === task.scope && e.task.definition.path === task.definition.path);
 
-        this.contextValue = this.execution && task.definition.type !== "$composite" ? "runningScript" : "script";
+        if (this.task.definition.scriptFile) {
+            this.contextValue = "scriptFile";
+        }
+        else {
+            this.contextValue = this.execution && task.definition.type !== "$composite" ? "runningScript" : "script";
+        }
 
         if (this.execution && task.definition.type !== "$composite")
         {
