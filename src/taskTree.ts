@@ -1126,6 +1126,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    private _findScriptPositionAnt(scriptName: string, documentText: string): number
+    {
+        scriptName = scriptName.replace(" - Default", "");
+        let idx = this._findScriptPosition("name=", scriptName, documentText, 6);
+        if (idx > 0)
+        {   //
+            // Check to make sure this isnt the 'default task' position,i.e.:
+            //
+            //     <project basedir="." default="test-build">
+            //
+            const scriptOffset2 = this._findScriptPosition("name=", scriptName, documentText, 6, idx + 1);
+            if (scriptOffset2 > 0) {
+                idx = scriptOffset2;
+            }
+        }
+        return idx;
+    }
+
+
     private _findScriptPositionMake(scriptName: string, documentText: string): number
     {
         let idx = documentText.indexOf(scriptName + ":");
@@ -1152,6 +1171,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
     
+    private _findScriptPositionGulp(scriptName: string, documentText: string): number
+    {
+        let idx = this._findScriptPosition("gulp.task(", scriptName, documentText);
+        if (idx === -1) {
+            idx = this._findScriptPosition("exports[", scriptName, documentText);
+        }
+        if (idx === -1) {
+            idx = this._findScriptPosition("exports.", scriptName, documentText, 0, 0, true);
+        }
+        return idx;
+    }
+
+
     private findScriptPosition(document: TextDocument, script?: TaskItem): number
     {
         let scriptOffset = 0;
@@ -1161,44 +1193,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         util.logValue("   task source", script.taskSource);
         util.logValue("   task name", script.task.name);
 
-        if (script.taskSource === "tsc")
-        {
-            scriptOffset = 0;
-        }
-        if (script.taskSource === "make")
-        {
-            scriptOffset = this._findScriptPositionMake(script.task.name, documentText);
-        }
-        else if (script.taskSource === "ant")
+        if (script.taskSource === "ant")
         {   
-            let scriptName = script.task.name.replace(" - Default", "");
-            scriptOffset = this._findScriptPosition("name=", scriptName, documentText, 6);
-            
-            if (scriptOffset > 0)
-            {   //
-                // Check to make sure this isnt the 'default task' position,i.e.:
-                //
-                //     <project basedir="." default="test-build">
-                //
-                const scriptOffset2 = this._findScriptPosition("name=", scriptName, documentText, 6, scriptOffset + 1);
-                if (scriptOffset2 > 0) {
-                    scriptOffset = scriptOffset2;
-                }
-            }
+            scriptOffset = this._findScriptPositionAnt(script.task.name, documentText);
         }
         else if (script.taskSource === "gulp")
         {
-            scriptOffset = this._findScriptPosition("gulp.task(", script.task.name, documentText);
-            if (scriptOffset === -1) {
-                scriptOffset = this._findScriptPosition("exports[", script.task.name, documentText);
-            }
-            if (scriptOffset === -1) {
-                scriptOffset = this._findScriptPosition("exports.", script.task.name, documentText, 0, 0, true);
-            }
+            scriptOffset = this._findScriptPositionGulp(script.task.name, documentText);
         }
         else if (script.taskSource === "grunt")
         {
             scriptOffset = this._findScriptPosition("grunt.registerTask(", script.task.name, documentText);
+        }
+        else if (script.taskSource === "make")
+        {
+            scriptOffset = this._findScriptPositionMake(script.task.name, documentText);
         }
         else if (script.taskSource === "npm" || script.taskSource === "Workspace")
         {
