@@ -172,7 +172,7 @@ module.exports = {
         "import/no-internal-modules": "off",
         "import/order": "off",
         "jsdoc/check-alignment": "warn",
-        "jsdoc/check-indentation": "warn",
+        "jsdoc/check-indentation": "off",
         "jsdoc/newline-after-description": "warn",
         "linebreak-style": "off",
         "max-classes-per-file": "off",
