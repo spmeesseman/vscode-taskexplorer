@@ -34,7 +34,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Features by Version](#features-by-version)
   - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
   - [Ant and Gulp Self-Provided Tasks](#ant-and-gulp-self-provided-tasks)
-  - [Using Groups With A Separator](#using-groups-with-a-separator)
+  - [Using Groups with a Separator](#using-groups-with-a-separator)
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
   - [Feedback & Contributing](#feedback--contributing)
@@ -50,7 +50,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 | ---------------------------------- | ---------------------------------- | ---------------------------------- |
 | ![ss0](res/taskview1.png?raw=true) | ![ss1](res/taskview2.png?raw=true) | ![ss2](res/taskview3.png?raw=true) |
 
-| Grunt/Gulp in Subfolders (v1.14)   | Npm Commands (v1.16)               | Task Dashed Groups (v1.23)         |
+| Grunt/Gulp in Subfolders (v1.14)   | Npm Commands (v1.16)               | Task Groupings (v1.23)             |
 | ---------------------------------- | ---------------------------------- | ---------------------------------- |
 | ![ss4](res/taskview4.png?raw=true) | ![ss5](res/taskview5.png?raw=true) | ![ss6](res/taskview6.png?raw=true) |
 
@@ -115,7 +115,7 @@ Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **An
 
 By default, a custom parser is used to locate Ant and Gulp tasks in respective files.  This may be fine in most cases, but in cases where the script and/or build files become complex, or there is something in the file that was not coded into the parser, you can use the *ant* and *gulp* programs themselves to find their own tasks.  Note however that turning this on has a negative performance impact when refreshing and providing tasks to the VSCode Task Host.
 
-## Using Groups With A Separator
+## Using Groups with a Separator
 
 **EXPERIMENTAL**
 The *Groups With Separator* option is simply an extra level of task groupings that can be made based on a configured separation character in the script name.  This option can be turned on/off with the *Group With Sepator* option in Settings, the default is OFF. The default separator is a dash ("-").

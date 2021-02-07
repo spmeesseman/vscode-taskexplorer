@@ -775,16 +775,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    public async refresh(invalidate?: any, opt?: Uri | boolean, task?: Task)
+    private _showStatusMessage(task: Task)
     {
-        util.log("Refresh task tree");
-        util.logValue("   invalidate", invalidate, 2);
-        util.logValue("   opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a", 2);
-        util.logValue("   task name", task ? task.name : "n/a", 2);
-
-        //
-        // Show status bar message (if ON in settings)
-        //
         if (task && configuration.get<boolean>("showRunningTask") === true)
         {
             const exec = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
@@ -810,6 +802,56 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
             }
         }
+    }
+
+
+    private _handleVisibleEvent()
+    {
+        util.log("   Handling 'visible' event");
+        if (this.needsRefresh && this.needsRefresh.length > 0)
+        {
+            // If theres more than one pending refresh request, just refresh the tree
+            //
+            if (this.needsRefresh.length > 1 || this.needsRefresh[0].invalidate === undefined)
+            {
+                this.refresh();
+            }
+            else
+            {
+                this.refresh(this.needsRefresh[0].invalidate, this.needsRefresh[0].uri, this.needsRefresh[0].task);
+            }
+
+            this.needsRefresh = [];
+        }
+    }
+
+
+    private async _handleInvalidation(invalidate: any, opt: boolean | Uri)
+    {
+        if ((invalidate === true || invalidate === "tests") && !opt) {
+            util.log("   Handling 'rebuild cache' event");
+            this.busy = true;
+            await rebuildCache();
+            this.busy = false;
+        }
+        if (invalidate !== "tests") {
+            util.log("   Handling 'invalidate tasks cache' event");
+            await this.invalidateTasksCache(invalidate, opt);
+        }
+    }
+
+
+    public async refresh(invalidate?: any, opt?: Uri | boolean, task?: Task): Promise<boolean>
+    {
+        util.log("Refresh task tree");
+        util.logValue("   invalidate", invalidate, 2);
+        util.logValue("   opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a", 2);
+        util.logValue("   task name", task ? task.name : "n/a", 2);
+
+        //
+        // Show status bar message (if ON in settings)
+        //
+        this._showStatusMessage(task);
 
         //
         // If a view was turned off in settings, the disposable view still remains
@@ -823,7 +865,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 util.log("   Delay refresh, exit");
                 this.needsRefresh.push({ invalidate, opt, task });
-                return;
+                return false;
             }
         }
 
@@ -835,30 +877,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // parameters in an object (above block of code).  When the view becomes visible again, we refresh if we
         // need to, if not then just exit on this refresh request
         //
-        if (this.taskTree && invalidate === "visible-event")
-        {
-            util.log("   Handling 'visible' event");
-            if (this.needsRefresh && this.needsRefresh.length > 0)
-            {
-                // If theres more than one pending refresh request, just refresh the tree
-                //
-                if (this.needsRefresh.length > 1 || this.needsRefresh[0].invalidate === undefined)
-                {
-                    this.refresh();
-                }
-                else
-                {
-                    this.refresh(this.needsRefresh[0].invalidate, this.needsRefresh[0].uri, this.needsRefresh[0].task);
-                }
-
-                this.needsRefresh = [];
-            }
-
-            return;
-        }
-
         if (invalidate === "visible-event")
         {
+            if (this.taskTree) {
+                this._handleVisibleEvent();
+                return;
+            }
             invalidate = undefined;
         }
 
@@ -886,16 +910,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (invalidate !== false)
         {
-            if ((invalidate === true || invalidate === "tests") && !opt) {
-                util.log("   Handling 'rebuild cache' event");
-                this.busy = true;
-                await rebuildCache();
-                this.busy = false;
-            }
-            if (invalidate !== "tests") {
-                util.log("   Handling 'invalidate tasks cache' event");
-                await this.invalidateTasksCache(invalidate, opt);
-            }
+            await this._handleInvalidation(invalidate, opt);
         }
 
         if (task)
