@@ -61,8 +61,10 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 * Visual Studio Code v1.50+
 
 "Should" work with VSCode versions 1.30 and above, but am no longer running tests against VSCode versions below 1.50 as of 2/5/2021 (v1.28.0).
+
 ## Features by Version
 
+* v1.30 - Configurable default click action (closes [#97](https://github.com/spmeesseman/vscode-taskexplorer/issues/97))
 * v1.29 - Support multi-level task groupings (closes [#129](https://github.com/spmeesseman/vscode-taskexplorer/issues/129)), Support user tasks (closes [#127](https://github.com/spmeesseman/vscode-taskexplorer/issues/127))
 * v1.28 - Support Makefile aliases (thanks **MichaelCurrin**)
 * v1.27 - Use gulp and ant to find their respective tasks (configurable on/off) (closes [#105](https://github.com/spmeesseman/vscode-taskexplorer/issues/105)), Make grouping separator configurable (thanks **richarddavenport**)
@@ -94,6 +96,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 * v1.2 - Convenient layout - groups all tasks by project folder, by task file, by task
 * v1.1 - Supports multi-root or single-root workspaces
 * v1.0 - Open and launch NPM scripts as tasks
+
 ## Configuring Global Excludes and Apache Ant Includes
 
 The setting *exclude* defines a file/directory pattern or an array of file/directory patterns to ignore using *Glob Patterns* or a valid *File URI*.  The setting applies to all script types.  For example:
@@ -188,6 +191,7 @@ Other contributors:
 * tiansin
 * JacobParis
 * Spitfire1900
+
 ## Other Code Extensions by spmeesseman
 
 | Package           | Repository                                                 | Marketplace                                                                                                          |

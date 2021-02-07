@@ -238,6 +238,15 @@
                 }
             },
             {
+                "command": "taskExplorerSideBar.open",
+                "title": "%command.open%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "dark": "res/dark/file.svg",
+                    "light": "res/light/file.svg"
+                }
+            },
+            {
                 "command": "taskExplorerSideBar.openTerminal",
                 "title": "%command.openTerminal%",
                 "when": "config.taskExplorer.enableSideBar",
@@ -259,22 +268,22 @@
             {
                 "command": "taskExplorerSideBar.runUpdate",
                 "title": "%command.runUpdate%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableSideBar"
             },
             {
                 "command": "taskExplorerSideBar.runUpdatePackage",
                 "title": "%command.runUpdatePackage%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableSideBar"
             },
             {
                 "command": "taskExplorerSideBar.runAudit",
                 "title": "%command.runAudit%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableSideBar"
             },
             {
                 "command": "taskExplorerSideBar.runAuditFix",
                 "title": "%command.runAuditFix%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableSideBar"
             },
             {
                 "command": "taskExplorerSideBar.refresh",
@@ -347,7 +356,11 @@
             {
                 "command": "taskExplorer.open",
                 "title": "%command.open%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "dark": "res/dark/file.svg",
+                    "light": "res/light/file.svg"
+                }
             },
             {
                 "command": "taskExplorer.runInstall",

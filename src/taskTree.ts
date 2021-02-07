@@ -67,7 +67,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".stop",  async (item: TaskItem) => { await this.stop(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".pause",  async (item: TaskItem) => { await this.pause(item); }, this));
-        subscriptions.push(commands.registerCommand(name + ".open", async (item: TaskFile | TaskItem) => { await this.open(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".open", async (item: TaskItem) => { await this.open(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".openTerminal", async (item: TaskItem) => { await this.openTerminal(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
         subscriptions.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "install"); }, this));
@@ -731,16 +731,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async open(selection: TaskFile | TaskItem)
+    private async open(selection: TaskItem)
     {
         let uri: Uri | undefined;
-        if (selection instanceof TaskFile) {
-            uri = selection.resourceUri!;
+        const clickAction = configuration.get<string>("clickAction") || "Open";
+
+        //
+        // As of v1.30.0, added option to change the entry item click to execute.  In order to avoid having
+        // to re-register the handler when the setting changes, we just re-route the request here
+        //
+        if (clickAction === "Execute") {
+            this.run(selection);
+            return;
         }
-        else if (selection instanceof TaskItem)
-        {
-            uri = selection.taskFile.resourceUri;
-        }
+
+        uri = selection.taskFile.resourceUri;
 
         if (uri)
         {
@@ -748,7 +753,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             util.logValue("   command", selection.command.command);
             util.logValue("   source", selection.taskSource);
             util.logValue("   uri path", uri.path);
-            util.logValue("   file path", uri.fsPath);
+            util.logValue('', uri.fsPath);
 
             if (util.pathExists(uri.fsPath))
             {

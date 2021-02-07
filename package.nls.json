@@ -14,6 +14,7 @@
 	"config.taskExplorer.exclude": "Configure glob patterns for folders and files that should be excluded from script detection.",
 
 	"config.taskExplorer.autoRefresh": "Auto refresh the task trees when a task file is modified.",
+	"config.taskExplorer.clickAction": "Action to perform when clicking on the main body of a task tree entry",
 
 	"config.taskExplorer.enableNpm": "NPM - Enable",
 	"config.taskExplorer.enableNpmDsc": "Enable/show npm scripts as tasks.",
