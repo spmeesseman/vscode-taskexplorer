@@ -50,7 +50,7 @@ export class TaskItem extends TreeItem
         this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
             e.task.scope === task.scope && e.task.definition.path === task.definition.path);
 
-        if (this.task.definition.scriptFile) {
+        if (this.task.definition.scriptFile || this.taskSource === "gradle") {
             this.contextValue = "scriptFile";
         }
         else {
