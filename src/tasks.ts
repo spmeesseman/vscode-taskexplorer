@@ -71,7 +71,7 @@ export class TaskItem extends TreeItem
             };
         }
         this.nodePath = task.definition.path;
-        this.tooltip = "Open " + task.name;
+        this.tooltip = "Open " + task.name + (task.detail ? ` | ${task.detail}` : "");
     }
 
     getFolder(): WorkspaceFolder
