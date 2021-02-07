@@ -107,7 +107,7 @@ export async function addWsFolder(wsf: readonly WorkspaceFolder[])
 }
 
 
-export function removeWsFolder( wsf: readonly WorkspaceFolder[])
+export function removeWsFolder(wsf: readonly WorkspaceFolder[])
 {
     for (const f in wsf)
     {

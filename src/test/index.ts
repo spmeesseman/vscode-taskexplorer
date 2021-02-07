@@ -74,8 +74,8 @@ module.exports = testRunner;
 //     //    ui: "tdd"
 //     //});
 //     //mocha.useColors(true);
-// 
-//     
+//
+//
 //     const mocha = new Mocha({
 //             ui: "tdd",
 //             timeout: 30000, // default timeout: 10 seconds
@@ -90,8 +90,8 @@ module.exports = testRunner;
 //             }
 //         });
 //         mocha.useColors(true);
-//     
-// 
+//
+//
 //     const files: string[] = await new Promise((resolve, reject) =>
 //         glob(
 //         "**/**.test.js",
@@ -104,15 +104,15 @@ module.exports = testRunner;
 //         }
 //         )
 //     )
-// 
+//
 //     // Add files to the test suite
 //     files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
 // 
 //     const failures: number = await new Promise(resolve => mocha.run(resolve));
 //     await nyc.writeCoverageFile();
-// 
+//
 //     cb(null, failures);
-// 
+//
 //     if (failures > 0) {
 //         throw new Error(`${failures} tests failed.`)
 //     }

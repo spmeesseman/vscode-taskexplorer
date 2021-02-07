@@ -290,9 +290,8 @@ function createMakeTask(target: string, cmd: string, folder: WorkspaceFolder, ur
 
     const execution = new ShellExecution(getCommand(folder, cmd), args, options);
     let problemMatcher = "$gccte";
-    let cPlusPlusExtension = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-    if (cPlusPlusExtension)
-    {
+    const cPlusPlusExtension = extensions.getExtension("spmeesseman.vscode-taskexplorer");
+    if (cPlusPlusExtension) {
         problemMatcher = "$gcc";
     }
 

@@ -22,7 +22,7 @@ declare var global: {
 const tty = require("tty");
 if (!tty.getWindowSize)
 {
-    tty.getWindowSize = function (): number[]
+    tty.getWindowSize = (): number[] =>
     {
         return [80, 75];
     };
@@ -84,7 +84,7 @@ export function run(testsRoot: string, clb: Function): any
     }
 
     // Glob test files
-    glob("**/**.test.js", { cwd: testsRoot }, function (error, files): any
+    glob("**/**.test.js", { cwd: testsRoot }, (error, files): any =>
     {
         if (error)
         {
@@ -102,11 +102,11 @@ export function run(testsRoot: string, clb: Function): any
 
             mocha
                 .run()
-                .on("fail", function (test, err): void
+                .on("fail", (test, err): void =>
                 {
                     failureCount++;
                 })
-                .on("end", function (): void
+                .on("end", (): void =>
                 {
                     clb(undefined, failureCount);
                 });
@@ -183,7 +183,7 @@ class CoverageRunner
             decache(fullPath);
         });
 
-        self.matchFn = function (file: string): boolean
+        self.matchFn = (file: string): boolean =>
         {
             return fileMap[file];
         };

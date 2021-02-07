@@ -25,7 +25,7 @@ export class TaskItem extends TreeItem
     constructor(context: ExtensionContext, taskFile: TaskFile, task: Task, taskGroup?: string)
     {
         let taskName = task.name;
-        let fsPath = taskFile.resourceUri ? taskFile.resourceUri.fsPath : "root";
+        const fsPath = taskFile.resourceUri ? taskFile.resourceUri.fsPath : "root";
         if (taskName.indexOf(" - ") !== -1 && (taskName.indexOf("/") !== -1 || taskName.indexOf("\\") !== -1 ||
             taskName.indexOf(" - tsconfig.json") !== -1))
         {
@@ -214,16 +214,16 @@ export class TaskFile extends TreeItem
         {   //
             // Support global VSCODE_APPDATA environment variable
             //
-            let appDataPath = process.env["VSCODE_APPDATA"];
+            let appDataPath = process.env.VSCODE_APPDATA;
             //
             // Otherwise check per platform
             //
             if (!appDataPath) {
                 switch (process.platform) {
                     case "win32":
-                        appDataPath = process.env["APPDATA"];
+                        appDataPath = process.env.APPDATA;
                         if (!appDataPath) {
-                            const userProfile = process.env["USERPROFILE"];
+                            const userProfile = process.env.USERPROFILE;
                             if (typeof userProfile !== "string") {
                                 throw new Error("Windows: Unexpected undefined %USERPROFILE% environment variable");
                             }
@@ -234,7 +234,7 @@ export class TaskFile extends TreeItem
                         appDataPath = path.join(os.homedir(), "Library", "Application Support");
                         break;
                     case "linux":
-                        appDataPath = process.env["XDG_CONFIG_HOME"] || path.join(os.homedir(), ".config");
+                        appDataPath = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config");
                         break;
                     default:
                         throw new Error("Platform not supported");
@@ -244,7 +244,7 @@ export class TaskFile extends TreeItem
             return path.join(appDataPath, "vscode");
         }
 
-        const vscodePortable = process.env["VSCODE_PORTABLE"];
+        const vscodePortable = process.env.VSCODE_PORTABLE;
         if (vscodePortable)
         {
             const uri = Uri.parse(vscodePortable);
@@ -262,7 +262,7 @@ export class TaskFile extends TreeItem
         //
         // TODO - if a user set the data directory "user-data-dir" via cmd line, this doesnt work
         //
-        return path.resolve(getDefaultUserDataPath()); //(cliArgs["user-data-dir"] || getDefaultUserDataPath());
+        return path.resolve(getDefaultUserDataPath()); // (cliArgs["user-data-dir"] || getDefaultUserDataPath());
     }
 
     constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean, label?: string, groupLevel?: number)
@@ -318,16 +318,16 @@ export class TaskFile extends TreeItem
         }
 
         if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", this.taskSource + ".svg"))))
-        {   
+        {
             let src = this.taskSource;
             //
             // If npm, check package manager set in vscode settings, (npm, pnpm, or yarn)
             //
             if (src === "npm")
             {
-                let pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager");
+                const pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager");
                 src = pkgMgr || this.taskSource;
-                if (src.indexOf("npm") != -1) { // pnpm?
+                if (src.indexOf("npm") !== -1) { // pnpm?
                     src = "npm";
                 }
             }

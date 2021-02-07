@@ -514,7 +514,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         if (item3.task && item3.task.definition)
                         {
                             let tpath: string;
-                            
+
                             if (me.isWorkspaceFolder(item3)) {
                                 tpath = item3.task.definition.uri ? item3.task.definition.uri.fsPath :
                                                 (item3.task.definition.path ? item3.task.definition.path : "root");
@@ -991,7 +991,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async runNpmCommand(taskFile: TaskFile, command: string)
     {
-        let  pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager") || "npm";
+        const pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager") || "npm";
 
         const options = {
             cwd: path.dirname(taskFile.resourceUri.fsPath)
@@ -1408,7 +1408,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             util.log("Processing task " + taskCt.toString() + " of " + tasksList.length.toString());
             util.logValue("   name", each.name, 2);
             util.logValue("   source", each.source, 2);
-            
+
             //
             // Remove the '-' from app-publisher task
             //
@@ -1588,6 +1588,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         return [...folders.values()];
     }
 
+
     /**
      * @param folder The TaskFolder to process
      * @param subfolders Tree taskfile map
@@ -1629,7 +1630,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         });
 
         //
-        // For groupings with separator, when building the task tree, when tasks are grouped new task definitions 
+        // For groupings with separator, when building the task tree, when tasks are grouped new task definitions
         // are created but the old task remains in the parent folder.  Remove all tasks that have been moved down
         // into the tree hierarchy due to groupings
         //
@@ -1681,7 +1682,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
         return folder.label + file.taskSource + id + (treeLevel || treeLevel === 0 ? treeLevel.toString() : "");
     }
-    
+
+
     /**
      * @private
      *
@@ -1704,17 +1706,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *          server-dev
      *          server-prod
      *          sass
-     * 
+     *
      * If 'groupMaxLevel' is > 1 (default), then the hierarchy continunes to be broken down until the max
      * nesting level is reached.  The example above, with 'groupMaxLevel' set > 1, would look like:
-     * 
-      *      build
+     *
+     *      build
      *          prod
      *          dev
      *          server
      *             dev
      *             prod
-     *          sass 
+     *          sass
      *
      * @param folder The base task folder
      * @param each  Task file to process
@@ -1728,7 +1730,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let prevTaskItem: TaskItem;
         const newNodes: TaskFile[] = [];
         const groupSeparator = configuration.get<string>("groupSeparator") || "-";
-        const atMaxLevel: Boolean = configuration.get<number>("groupMaxLevel") <= treeLevel + 1;
+        const atMaxLevel: boolean = configuration.get<number>("groupMaxLevel") <= treeLevel + 1;
 
         function _setNodePath(t: TaskItem, cPath: string)
         {
@@ -1778,7 +1780,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 for (let i = 0; i <= treeLevel; i++)
                 {
-                    if (prevName[i] == prevNameThis[i]) {
+                    if (prevName[i] === prevNameThis[i]) {
                         foundGroup = true;
                     }
                     else {
@@ -1793,7 +1795,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 // We found a pair of tasks that need to be grouped.  i.e. the first part of the label
                 // when split by the separator character is the same...
                 //
-                let id = this.getGroupedId(folder, taskFile, each.label, treeLevel);
+                const id = this.getGroupedId(folder, taskFile, each.label, treeLevel);
                 subfolder = subfolders.get(id);
 
                 if (!subfolder)
@@ -1802,7 +1804,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     // add them after we loop since we are looping on the array that they need to be
                     // added to
                     //
-                    subfolder = new TaskFile(this.extensionContext, folder, each.task.definition, taskFile.taskSource, 
+                    subfolder = new TaskFile(this.extensionContext, folder, each.task.definition, taskFile.taskSource,
                                              each.taskFile.path, true, prevName[treeLevel], treeLevel);
                     subfolders.set(id, subfolder);
 
@@ -1835,7 +1837,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     // but in this extension we user /.vcsode as the path, cant go deeper then one level, for
                     // now until I can find time to look at more
                     //
-                    if (n.taskSource == "Workspace") {
+                    if (n.taskSource === "Workspace") {
                         return;
                     }
                     this.createTaskGroupingsBySep(folder, n, subfolders, treeLevel + 1);
@@ -1896,7 +1898,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     // Perform some removal based on groupings with separator.  The nodes added within the new
     // group nodes need to be removed from the old parent node still...
     //
-    private removeScripts(taskFile: TaskFile, folder: TaskFolder, subfolders: Map<string, TaskFile>, level: number = 0)
+    private removeScripts(taskFile: TaskFile, folder: TaskFolder, subfolders: Map<string, TaskFile>, level = 0)
     {
         const me = this;
         const taskTypesRmv: (TaskItem|TaskFile)[] = [];
@@ -1904,11 +1906,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         taskFile.scripts.forEach(each =>
         {
-            let labelPart = each.label.split(groupSeparator)[level];
+            const labelPart = each.label.split(groupSeparator)[level];
             const id = this.getGroupedId(folder, taskFile, each.label, level);
 
             if (each instanceof TaskItem)
-            { 
+            {
                 if (each.label.split(groupSeparator).length > 1 && labelPart)
                 {
                     if (subfolders.get(id))
@@ -1920,7 +1922,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             else
             {
                 let allTasks = false;
-                for (let each2 of each.scripts)
+                for (const each2 of each.scripts)
                 {
                     if (each2 instanceof TaskItem)
                     {
@@ -1930,7 +1932,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         allTasks = false;
                         break; // break each
                     }
-                };
+                }
 
                 if (!allTasks) {
                     me.removeScripts(each, folder, subfolders, level + 1);
