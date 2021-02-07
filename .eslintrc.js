@@ -69,7 +69,7 @@ module.exports = {
                 "accessibility": "explicit"
             }
         ],
-        "@typescript-eslint/indent": "warn",
+        "@typescript-eslint/indent": "off",
         "@typescript-eslint/member-delimiter-style": [
             "warn",
             {
@@ -202,7 +202,7 @@ module.exports = {
         "no-throw-literal": "warn",
         "no-trailing-spaces": "warn",
         "no-undef-init": "warn",
-        "no-underscore-dangle": "warn",
+        "no-underscore-dangle": "off",
         "no-unsafe-finally": "warn",
         "no-unused-labels": "warn",
         "no-var": "warn",

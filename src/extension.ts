@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------------------------
+/* ---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -40,7 +40,7 @@ export interface TaskExplorerApi
 }
 
 
-export async function activate(context: ExtensionContext, disposables: Disposable[]): Promise<TaskExplorerApi>
+export const activate = async (context: ExtensionContext, disposables: Disposable[]): Promise<TaskExplorerApi> =>
 {
     util.initLog("taskExplorer", "Task Explorer", context);
     initStorage(context);
@@ -96,19 +96,19 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         utilities: util,
         fileCache: cache
     };
-}
+};
 
 
-export async function addWsFolder(wsf: readonly WorkspaceFolder[])
+export const addWsFolder = async (wsf: readonly WorkspaceFolder[]) =>
 {
     for (const f in wsf) {
         util.log("Workspace folder added: " + wsf[f].name, 1);
         await cache.addFolderToCache(wsf[f]);
     }
-}
+};
 
 
-export function removeWsFolder(wsf: readonly WorkspaceFolder[])
+export const removeWsFolder = (wsf: readonly WorkspaceFolder[]) =>
 {
     for (const f in wsf)
     {
@@ -131,10 +131,10 @@ export function removeWsFolder(wsf: readonly WorkspaceFolder[])
             }
         }
     }
-}
+};
 
 
-async function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
+const processConfigChanges = async (context: ExtensionContext, e: ConfigurationChangeEvent) =>
 {
     let refresh: boolean;
 
@@ -307,10 +307,10 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     if (refresh) {
         await refreshTree();
     }
-}
+};
 
 
-async function registerFileWatchers(context: ExtensionContext)
+const registerFileWatchers = async (context: ExtensionContext) =>
 {
     if (configuration.get<boolean>("enableAnt")) {
         await registerFileWatcherAnt(context);
@@ -378,10 +378,10 @@ async function registerFileWatchers(context: ExtensionContext)
     if (configuration.get<boolean>("enableWorkspace")) {
         await registerFileWatcher(context, "workspace", "**/.vscode/tasks.json");
     }
-}
+};
 
 
-async function refreshTree(taskType?: string, uri?: Uri)
+const refreshTree = async (taskType?: string, uri?: Uri) =>
 {
     let refreshedTasks = false;
     // window.setStatusBarMessage("$(loading) Task Explorer - Refreshing tasks...");
@@ -422,10 +422,10 @@ async function refreshTree(taskType?: string, uri?: Uri)
     }
 
     // window.setStatusBarMessage("");
-}
+};
 
 
-function registerTaskProviders(context: ExtensionContext)
+const registerTaskProviders = (context: ExtensionContext) =>
 {
     //
     // Internal Task Providers
@@ -443,10 +443,10 @@ function registerTaskProviders(context: ExtensionContext)
     context.subscriptions.push(tasks.registerTaskProvider("gulp", new GulpTaskProvider()));
     context.subscriptions.push(tasks.registerTaskProvider("gradle", new GradleTaskProvider()));
     context.subscriptions.push(tasks.registerTaskProvider("app-publisher", new AppPublisherTaskProvider()));
-}
+};
 
 
-async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boolean)
+const registerFileWatcherAnt = async (context: ExtensionContext, enabled?: boolean) =>
 {
     await registerFileWatcher(context, "ant", "**/[Bb]uild.xml", false, enabled);
 
@@ -471,10 +471,10 @@ async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boole
             await registerFileWatcher(context, "ant-" + includeAnt[i], includeAnt[i], false, enabled);
         }
     }
-}
+};
 
 
-async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, isScriptType?: boolean, enabled?: boolean)
+const registerFileWatcher = async (context: ExtensionContext, taskType: string, fileBlob: string, isScriptType?: boolean, enabled?: boolean) =>
 {
     util.log("Register file watcher for task type '" + taskType + "'");
 
@@ -493,10 +493,10 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
     if (workspace.workspaceFolders) {
         await cache.buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, taskTypeR, fileBlob);
     }
-    
+
     if (watcher)
     {
-        let watcherDisposable = watcherDisposables.get(taskTypeR);
+        const watcherDisposable = watcherDisposables.get(taskTypeR);
         if (watcherDisposable)
         {
             watcherDisposable.dispose();
@@ -527,19 +527,19 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
             await cache.addFileToCache(taskTypeR, _e);
             await refreshTree(taskTypeR, _e);
         }));
-    } 
-}
+    }
+};
 
 
-function logFileWatcherEvent(uri: Uri, type: string)
+const logFileWatcherEvent = (uri: Uri, type: string) =>
 {
     util.log("file change event");
     util.logValue("   type", type);
     util.logValue("   file", uri.fsPath);
-}
+};
 
 
-function registerExplorer(name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined
+const registerExplorer = (name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined =>
 {
     util.log("Register explorer view / tree provider '" + name + "'");
 
@@ -566,18 +566,18 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
     }
 
     return undefined;
-}
+};
 
 
-export async function deactivate()
+export const deactivate = async () =>
 {
     watcherDisposables.forEach((d) => {
         d.dispose();
     });
-    
+
     watchers.forEach((w) => {
         w.dispose();
     });
 
     await cache.cancelBuildCache(true);
-}
+};
