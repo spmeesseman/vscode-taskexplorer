@@ -9,6 +9,19 @@ import * as os from "os";
 import * as fs from "fs";
 
 
+/*
+export abstract class TaskEx extends Task
+{
+    constructor(taskDefinition: TaskDefinition, scope: WorkspaceFolder | TaskScope, name: string, source: string,
+                execution?: ProcessExecution | ShellExecution | CustomExecution, problemMatchers?: string | string[])
+    {
+        super(taskDefinition, scope, name, source, execution, problemMatchers);
+    }
+
+    abstract invalidateTasksCache(opt?: Uri): Promise<void>;
+}
+*/
+
 export class TaskItem extends TreeItem
 {
     public static readonly defaultSource = "Workspace";
