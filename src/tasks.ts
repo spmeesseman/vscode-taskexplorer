@@ -1,26 +1,14 @@
 
 import {
     Task, TaskExecution, ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, env,
-    TaskDefinition, ExtensionContext, tasks, Uri, workspace, ProcessExecution, ShellExecution
+    TaskDefinition, ExtensionContext, tasks, Uri, workspace, ProcessExecution, ShellExecution,
+    TaskScope, CustomExecution
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
 import * as os from "os";
 import * as fs from "fs";
 
-
-/*
-export abstract class TaskEx extends Task
-{
-    constructor(taskDefinition: TaskDefinition, scope: WorkspaceFolder | TaskScope, name: string, source: string,
-                execution?: ProcessExecution | ShellExecution | CustomExecution, problemMatchers?: string | string[])
-    {
-        super(taskDefinition, scope, name, source, execution, problemMatchers);
-    }
-
-    abstract invalidateTasksCache(opt?: Uri): Promise<void>;
-}
-*/
 
 export class TaskItem extends TreeItem
 {

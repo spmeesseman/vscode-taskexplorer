@@ -10,7 +10,7 @@ import { configuration } from "./common/configuration";
 import { TaskItem } from "./tasks";
 import { filesCache } from "./cache";
 import { execSync } from "child_process";
-// import { TaskExplorerProvider } from "./taskProvider";
+import { TaskExplorerProvider } from "./taskProvider";
 
 
 interface StringMap { [s: string]: string }
@@ -24,21 +24,30 @@ interface AntTaskDefinition extends TaskDefinition
     fileName?: string;
     uri?: Uri;
     treeItem?: TaskItem;
+    isDefault?: boolean;
 }
 
-export class AntTaskProvider implements TaskProvider
-{
-    constructor() {}
 
-    public provideTasks(){
-        return provideAntScripts();
+export class AntTaskProvider implements TaskExplorerProvider
+{
+
+    public async provideTasks()
+    {
+        util.log("");
+        util.log("provideAntScripts");
+
+        if (!cachedTasks) {
+            cachedTasks = await this.detectAntScripts();
+        }
+        return cachedTasks;
     }
+
 
     public resolveTask(_task: Task): Task | undefined {
         return undefined;
     }
-}
-/*
+
+
     public async invalidateTasksCache(opt?: Uri): Promise<void>
     {
         util.log("");
@@ -86,6 +95,30 @@ export class AntTaskProvider implements TaskProvider
         cachedTasks = undefined;
     }
 
+
+
+    public async readAntfile(uri: Uri): Promise<Task[]>
+    {
+        const result: Task[] = [];
+        const folder = workspace.getWorkspaceFolder(uri);
+
+        if (folder)
+        {
+            const scripts = await this.findAllAntScripts(uri.fsPath);
+            if (scripts)
+            {
+                Object.keys(scripts).forEach(each => {
+                    const task = this.createTask(scripts[each] ? scripts[each] : each, each, folder, uri);
+                    task.group = TaskGroup.Build;
+                    result.push(task);
+                });
+            }
+        }
+
+        return result;
+    }
+
+
     private async detectAntScripts(): Promise<Task[]>
     {
         util.log("");
@@ -109,40 +142,6 @@ export class AntTaskProvider implements TaskProvider
 
         util.logValue("   # of tasks", allTasks.length, 2);
         return allTasks;
-    }
-
-
-    public async provideAntScripts(): Promise<Task[]>
-    {
-        util.log("");
-        util.log("provideAntScripts");
-
-        if (!cachedTasks) {
-            cachedTasks = await this.detectAntScripts();
-        }
-        return cachedTasks;
-    }
-
-
-    private async readAntfile(uri: Uri): Promise<Task[]>
-    {
-        const result: Task[] = [];
-        const folder = workspace.getWorkspaceFolder(uri);
-
-        if (folder)
-        {
-            const scripts = await this.findAllAntScripts(uri.fsPath);
-            if (scripts)
-            {
-                Object.keys(scripts).forEach(each => {
-                    const task = this.createAntTask(scripts[`${each}`] ? scripts[`${each}`] : `${each}`, each, folder!, uri);
-                    task.group = TaskGroup.Build;
-                    result.push(task);
-                });
-            }
-        }
-
-        return result;
     }
 
 
@@ -254,7 +253,7 @@ export class AntTaskProvider implements TaskProvider
     }
 
 
-    private createAntTask(target: string, cmdName: string, folder: WorkspaceFolder, uri: Uri): Task
+    public createTask(target: string, cmdName: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task
     {
         const getRelativePath = (folder: WorkspaceFolder, uri: Uri): string =>
         {
@@ -314,73 +313,13 @@ export class AntTaskProvider implements TaskProvider
 
         const execution = new ShellExecution(this.getCommand(), args, options);
 
-        return new AntTask(kind, folder, cmdName ? cmdName : target, "ant", execution, undefined);
+        return new Task(kind, folder, cmdName ? cmdName : target, "ant", execution, undefined);
     }
+
 }
 
-export class AntTask implements TaskEx
-{
-    definition: TaskDefinition;
-    scope?: TaskScope | WorkspaceFolder;
-    name: string;
-    detail?: string;
-    execution?: ProcessExecution | ShellExecution | CustomExecution;
-    isBackground: boolean;
-    source: string;
-    group?: TaskGroup;
-    presentationOptions: TaskPresentationOptions;
-    problemMatchers: string[];
-    runOptions: RunOptions;
 
-    public async invalidateTasksCache(opt?: Uri): Promise<void>
-    {
-        util.log("");
-        util.log("invalidateTasksCacheAnt");
-        util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
-        util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
-
-        if (opt && cachedTasks)
-        {
-            const rmvTasks: Task[] = [];
-
-            await util.asyncForEach(cachedTasks, each => {
-                const cstDef: AntTaskDefinition = each.definition;
-                if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
-                    rmvTasks.push(each);
-                }
-            });
-
-            //
-            // Technically this function can be called back into when waiting for a promise
-            // to return on the asncForEach() above, and cachedTask array can be set to undefined,
-            // this is happening with a broken await() somewere that I cannot find
-            if (cachedTasks)
-            {
-                await util.asyncForEach(rmvTasks, each => {
-                    util.log("   removing old task " + each.name);
-                    util.removeFromArray(cachedTasks, each);
-                });
-
-                //
-                // If this isn"t a "delete file" event then read the file for tasks
-                //
-                if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
-                {
-                    const tasks = await readAntfile(opt);
-                    cachedTasks.push(...tasks);
-                }
-
-                if (cachedTasks.length > 0) {
-                    return;
-                }
-            }
-        }
-
-        cachedTasks = undefined;
-    }
-}
-
-*/
+/*
 
 export const invalidateTasksCacheAnt = async (opt?: Uri): Promise<void> =>
 {
@@ -660,3 +599,4 @@ const createAntTask = (target: string, cmdName: string, folder: WorkspaceFolder,
 
     return new Task(kind, folder, cmdName ? cmdName : target, "ant", execution, undefined);
 };
+*/

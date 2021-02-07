@@ -19,13 +19,8 @@ import { storage } from "./common/storage";
 import { views } from "./views";
 import { rebuildCache } from "./cache";
 import { configuration } from "./common/configuration";
-import { invalidateTasksCacheAnt } from "./taskProviderAnt";
-import { invalidateTasksCacheMake } from "./taskProviderMake";
-import { invalidateTasksCacheScript, createScriptTask, scriptTable } from "./taskProviderScript";
-import { invalidateTasksCacheGradle } from "./taskProviderGradle";
-import { invalidateTasksCacheGrunt } from "./taskProviderGrunt";
-import { invalidateTasksCacheGulp } from "./taskProviderGulp";
-import { invalidateTasksCacheAppPublisher } from "./taskProviderAppPublisher";
+import { providers } from "./extension";
+import { TaskExplorerProvider } from "./taskProvider";
 
 
 const localize = nls.loadMessageBundle();
@@ -47,7 +42,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private taskTree: TaskFolder[] | TaskFile[] | NoScripts[] | null = null;
     private tasks: Task[] = null;
     private needsRefresh: any[] = [];
-    // private processIds: any[] = [];
     private extensionContext: ExtensionContext;
     private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
     readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
@@ -128,8 +122,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
                     if (str) {
                         const def = taskItem.task.definition;
-                        newTask = createScriptTask(scriptTable[path.extname(def.uri.fsPath).substring(1)],
-                                                   taskItem.getFolder(),  def.uri, str.trim().split(" "));
+                        newTask = providers.get("script").createTask(path.extname(def.uri.fsPath).substring(1), null,
+                                                                     taskItem.getFolder(),  def.uri, str.trim().split(" "));
                     }
                     if (await this.executeTask(newTask, noTerminal)) {
                         me.saveRunTask(taskItem);
@@ -781,46 +775,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async invalidateTasksCacheFileEdit(opt1: string, opt2: Uri)
     {
-        if (opt1 === "ant")
-            {
-                await invalidateTasksCacheAnt(opt2);
-            }
-            else if (opt1 === "gradle")
-            {
-                await invalidateTasksCacheGradle(opt2);
-            }
-            else if (opt1 === "grunt")
-            {
-                await invalidateTasksCacheGrunt(opt2);
-            }
-            else if (opt1 === "gulp")
-            {
-                await invalidateTasksCacheGulp(opt2);
-            }
-            else if (opt1 === "make")
-            {
-                await invalidateTasksCacheMake(opt2);
-            }
-            else if (opt1 === "app-publisher")
-            {
-                await invalidateTasksCacheAppPublisher(opt2);
-            }
-            else if (opt1 === "bash" || opt1 === "batch" || opt1 === "nsis" || opt1 === "perl" || opt1 === "powershell" || opt1 === "python" || opt1 === "ruby")
-            {
-                await invalidateTasksCacheScript(opt2);
-            }
-    }
-
-
-    private async invalidateTasksCacheEvent()
-    {
-        await invalidateTasksCacheAnt();
-        await invalidateTasksCacheMake();
-        await invalidateTasksCacheScript();
-        await invalidateTasksCacheGradle();
-        await invalidateTasksCacheGrunt();
-        await invalidateTasksCacheGulp();
-        await invalidateTasksCacheAppPublisher();
+        if (opt1 === "bash" || opt1 === "batch" || opt1 === "nsis" || opt1 === "perl" || opt1 === "powershell" || opt1 === "python" || opt1 === "ruby")
+        {
+            await providers.get("script").invalidateTasksCache(opt2);
+        }
+        else {
+            await providers.get(opt1).invalidateTasksCache(opt2);
+        }
     }
 
 
@@ -841,7 +802,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             await this.invalidateTasksCacheFileEdit(opt1, opt2);
         }
         else {
-            await this.invalidateTasksCacheEvent();
+            await util.asyncForEach(providers, (p: TaskExplorerProvider) => {
+                p.invalidateTasksCache();
+            });
         }
 
         this.busy = false;

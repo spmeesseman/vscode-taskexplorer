@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
 //
@@ -109,7 +110,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Create npm package files", async () =>
+    test("Create npm package files", async function()
     {
         const file = path.join(rootPath, "package.json");
         tempFiles.push(file);
@@ -147,7 +148,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Create vscode task files", async () =>
+    test("Create vscode task files", async function()
     {
         const file = path.join(dirNameCode, "tasks.json");
         tempFiles.push(file);
@@ -231,7 +232,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Create ant target files", async () =>
+    test("Create ant target files", async function()
     {
         createAntFile();
 
@@ -277,7 +278,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Create gradle target files", async () =>
+    test("Create gradle target files", async function()
     {
         createGradleFile();
 
@@ -318,7 +319,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Create tsc config files", async () =>
+    test("Create tsc config files", async function()
     {
         const file = path.join(rootPath, "tsconfig.json");
         tempFiles.push(file);
@@ -345,7 +346,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Create gulp task files", async () =>
+    test("Create gulp task files", async function()
     {
         createGulpFile();
 
@@ -386,7 +387,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Create makefiles", async () =>
+    test("Create makefiles", async function()
     {
         createMakeFile();
 
@@ -409,7 +410,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Create batch files", async () =>
+    test("Create batch files", async function()
     {
         createBatchFile();
 
@@ -424,7 +425,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Create bash files", async () =>
+    test("Create bash files", async function()
     {
         const file = path.join(rootPath, "test.sh");
         tempFiles.push(file);
@@ -441,7 +442,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Create grunt task files", async () =>
+    test("Create grunt task files", async function()
     {
         createGruntFile();
 
@@ -468,7 +469,7 @@ suite("Task tests", () =>
         );
     });
 
-    test("Create app-publisher config file", async () =>
+    test("Create app-publisher config file", async function()
     {
         createAppPublisherFile();
     });
@@ -510,7 +511,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Verify tree validity and open tasks for edit", async () =>
+    test("Verify tree validity and open tasks for edit", async function()
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -679,7 +680,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Test add to excludes", async () =>
+    test("Test add to excludes", async function()
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -705,7 +706,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Invalidation tests", async () =>
+    test("Invalidation tests", async function()
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -896,7 +897,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Test invalidate bash tasks with new bash shell setting", async () =>
+    test("Test invalidate bash tasks with new bash shell setting", async function()
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -909,7 +910,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Test rebuild cache on workspace folder", async () =>
+    test("Test rebuild cache on workspace folder", async function()
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -918,7 +919,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Test show/hide last tasks", async () =>
+    test("Test show/hide last tasks", async function()
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -932,7 +933,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Test groups with separator", async () =>
+    test("Test groups with separator", async function()
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -945,7 +946,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Test cancel rebuild cache", async () =>
+    test("Test cancel rebuild cache", async function()
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -969,7 +970,7 @@ suite("Task tests", () =>
     });
 
 
-    test("Test enable and disable views", async () =>
+    test("Test enable and disable views", async function()
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -982,8 +983,8 @@ suite("Task tests", () =>
     });
 
 
-    test("Add and remove a workspace folder", async () =>
-    {   //
+    test("Add and remove a workspace folder", async function()
+    {
         // Simulate add/remove folder (cannot use workspace.updateWOrkspaceFolders() in tests)
         //
         addWsFolder(workspace.workspaceFolders);
@@ -993,7 +994,7 @@ suite("Task tests", () =>
 });
 
 
-const createAntFile = () =>
+function createAntFile()
 {
     const file = path.join(dirName, "build.xml");
     tempFiles.push(file);
@@ -1011,10 +1012,10 @@ const createAntFile = () =>
             "</project>\n"
         );
     }
-};
+}
 
 
-const createAppPublisherFile = () =>
+function createAppPublisherFile()
 {
     const file = path.join(rootPath, ".publishrc.json");
     tempFiles.push(file);
@@ -1034,10 +1035,10 @@ const createAppPublisherFile = () =>
             "}\n"
         );
     }
-};
+}
 
 
-const createBatchFile = () =>
+function createBatchFile()
 {
     const file = path.join(rootPath, "test.bat");
     tempFiles.push(file);
@@ -1046,10 +1047,10 @@ const createBatchFile = () =>
     {
         fs.writeFileSync(file, "@echo testing batch file\r\n");
     }
-};
+}
 
 
-const createGradleFile = () =>
+function createGradleFile()
 {
     const file = path.join(dirName, "build.gradle");
     tempFiles.push(file);
@@ -1070,10 +1071,10 @@ const createGradleFile = () =>
             "}\n"
         );
     }
-};
+}
 
 
-const createGruntFile = () =>
+function createGruntFile()
 {
     const file = path.join(rootPath, "GRUNTFILE.js");
     tempFiles.push(file);
@@ -1088,10 +1089,10 @@ const createGruntFile = () =>
             "};\n"
         );
     }
-};
+}
 
 
-const createGulpFile = () =>
+function createGulpFile()
 {
     const file = path.join(rootPath, "gulpfile.js");
     tempFiles.push(file);
@@ -1110,10 +1111,10 @@ const createGulpFile = () =>
             "});\n"
         );
     }
-};
+}
 
 
-const createMakeFile = () =>
+function createMakeFile()
 {
     const file = path.join(rootPath, "Makefile");
     tempFiles.push(file);
@@ -1125,4 +1126,4 @@ const createMakeFile = () =>
             "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
         );
     }
-};
+}

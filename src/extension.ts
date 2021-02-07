@@ -4,8 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {
-    Disposable, ExtensionContext, Uri, tasks,
-    workspace, window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder
+    Disposable, ExtensionContext, Uri, tasks, TaskProvider,
+    workspace, window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder, Task
 } from "vscode";
 import { TaskTreeDataProvider } from "./taskTree";
 import { AntTaskProvider } from "./taskProviderAnt";
@@ -18,6 +18,7 @@ import { AppPublisherTaskProvider } from "./taskProviderAppPublisher";
 import { configuration } from "./common/configuration";
 import { initStorage } from "./common/storage";
 import { views } from "./views";
+import { TaskExplorerProvider } from "./taskProvider";
 import * as util from "./util";
 import * as cache from "./cache";
 import * as path from "path";
@@ -29,8 +30,7 @@ export let appDataPath: string;
 
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
-
-
+export const providers: Map<string, TaskExplorerProvider> = new Map();
 export interface TaskExplorerApi
 {
     explorerProvider: TaskTreeDataProvider | undefined;
@@ -425,9 +425,21 @@ const refreshTree = async (taskType?: string, uri?: Uri) =>
 };
 
 
-const registerTaskProviders = (context: ExtensionContext) =>
+// export const getProvider = (provider: string): string =>
+// {
+//     return tasks.
+// };
+
+
+const registerTaskProvider = (providerName: string, provider: TaskExplorerProvider, context: ExtensionContext) =>
 {
-    //
+    context.subscriptions.push(tasks.registerTaskProvider(providerName, provider));
+    providers.set(providerName, provider);
+};
+
+
+const registerTaskProviders = (context: ExtensionContext) =>
+{   //
     // Internal Task Providers
     //
     // These tak types are provided internally by the extension.  Some task types (npm, grunt,
@@ -436,13 +448,13 @@ const registerTaskProviders = (context: ExtensionContext) =>
     // TODO: VSCODE API now implements "resolveTask" in addition to "provideTask".  Need to implement
     //     https://code.visualstudio.com/api/extension-guides/task-provider
     //
-    context.subscriptions.push(tasks.registerTaskProvider("ant", new AntTaskProvider()));
-    context.subscriptions.push(tasks.registerTaskProvider("make", new MakeTaskProvider()));
-    context.subscriptions.push(tasks.registerTaskProvider("script", new ScriptTaskProvider()));
-    context.subscriptions.push(tasks.registerTaskProvider("grunt", new GruntTaskProvider()));
-    context.subscriptions.push(tasks.registerTaskProvider("gulp", new GulpTaskProvider()));
-    context.subscriptions.push(tasks.registerTaskProvider("gradle", new GradleTaskProvider()));
-    context.subscriptions.push(tasks.registerTaskProvider("app-publisher", new AppPublisherTaskProvider()));
+    registerTaskProvider("ant", new AntTaskProvider(), context);
+    registerTaskProvider("app-publisher", new AppPublisherTaskProvider(), context);
+    registerTaskProvider("gradle", new GradleTaskProvider(), context);
+    registerTaskProvider("grunt", new GruntTaskProvider(), context);
+    registerTaskProvider("gulp", new GulpTaskProvider(), context);
+    registerTaskProvider("make", new MakeTaskProvider(), context);
+    registerTaskProvider("script", new ScriptTaskProvider(), context);
 };
 
 
