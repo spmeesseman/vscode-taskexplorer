@@ -156,7 +156,7 @@ export class TaskFile extends TreeItem
         {
             if (incRelPathForCode === true)
             {
-                if (folder!.resourceUri) { // project folder task
+                if (folder.resourceUri) { // project folder task
                     fileName = ".vscode/tasks.json";
                 }
                 else { // user task (has no resourceUri)
@@ -218,7 +218,7 @@ export class TaskFile extends TreeItem
 
     getUserDataPath()
     {
-        function getDefaultUserDataPath()
+        const getDefaultUserDataPath = () =>
         {   //
             // Support global VSCODE_APPDATA environment variable
             //
@@ -250,7 +250,7 @@ export class TaskFile extends TreeItem
             }
 
             return path.join(appDataPath, "vscode");
-        }
+        };
 
         const vscodePortable = process.env.VSCODE_PORTABLE;
         if (vscodePortable)
@@ -299,14 +299,14 @@ export class TaskFile extends TreeItem
         {
             this.contextValue = "taskFile" + util.properCase(this.taskSource);
             this.fileName = TaskFile.getFileNameFromSource(source, folder, taskDef, relativePath, true);
-            if (folder!.resourceUri)
+            if (folder.resourceUri)
             {
                 if (relativePath)
                 {
-                    this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, relativePath, this.fileName));
+                    this.resourceUri = Uri.file(path.join(folder.resourceUri.fsPath, relativePath, this.fileName));
                 } else
                 {
-                    this.resourceUri = Uri.file(path.join(folder!.resourceUri!.fsPath, this.fileName));
+                    this.resourceUri = Uri.file(path.join(folder.resourceUri.fsPath, this.fileName));
                 }
             }
             else {
