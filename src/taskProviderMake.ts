@@ -10,10 +10,6 @@ import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
 
-
-interface StringMap { [s: string]: string }
-let cachedTasks: Task[];
-
 // See: https://www.gnu.org/software/make/manual/html_node/Special-Targets.html
 const specialTargets = new Set([
     ".PHONY",
@@ -36,6 +32,10 @@ const specialTargets = new Set([
 
 const suffixRuleTargets = /^(\.\w+|\.\w+\.\w+)$/;
 const patternRuleTargets = /^(%\.\w+|%)$/;
+
+
+let cachedTasks: Task[];
+
 
 interface MakeTaskDefinition extends TaskDefinition
 {
@@ -256,9 +256,9 @@ export class MakeTaskProvider implements TaskExplorerProvider
     }
 
 
-    private async findTargets(fsPath: string): Promise<StringMap>
+    private async findTargets(fsPath: string): Promise<string[]>
     {
-        const scripts: StringMap = {};
+        const scripts: string[] = [];
 
         util.log("");
         util.log("Find makefile targets");
@@ -287,7 +287,7 @@ export class MakeTaskProvider implements TaskExplorerProvider
                 if (tgtName.indexOf("/") === -1 && tgtName.indexOf("=") === -1 && tgtName.indexOf("\\") === -1 &&
                     tgtName.indexOf("(") === -1 && tgtName.indexOf("$") === -1 && this.isNormalTarget(tgtName))
                 {
-                    scripts[tgtName] = "";
+                    scripts.push(tgtName);
                     util.log("   found target");
                     util.logValue("      name", tgtName);
                     util.logValue("      depends target", dependsName);

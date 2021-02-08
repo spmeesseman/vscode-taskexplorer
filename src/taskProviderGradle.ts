@@ -11,7 +11,6 @@ import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
 
 
-interface StringMap { [s: string]: string; }
 let cachedTasks: Task[];
 
 
@@ -182,7 +181,7 @@ export class GradleTaskProvider implements TaskExplorerProvider
             const scripts = await this.findTargets(uri.fsPath);
             if (scripts)
             {
-                Object.keys(scripts).forEach(each =>
+                scripts.forEach(each =>
                 {
                     const task = this.createTask(each, each, folder, uri);
                     task.group = TaskGroup.Build;
@@ -195,10 +194,10 @@ export class GradleTaskProvider implements TaskExplorerProvider
     }
 
 
-    private async findTargets(fsPath: string): Promise<StringMap>
+    private async findTargets(fsPath: string): Promise<string[]>
     {
         const json: any = "";
-        const scripts: StringMap = {};
+        const scripts: string[] = [];
 
         util.log("   Find gradlefile targets");
 
@@ -225,7 +224,7 @@ export class GradleTaskProvider implements TaskExplorerProvider
 
                         if (tgtName)
                         {
-                            scripts[tgtName] = "";
+                            scripts.push(tgtName);
                             util.log("      found target");
                             util.logValue("         name", tgtName);
                         }

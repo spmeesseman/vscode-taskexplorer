@@ -1,7 +1,7 @@
 
 import {
-    Task, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition, ShellExecutionOptions, ShellQuotedString
+    Task, WorkspaceFolder, ShellExecution, Uri,
+    workspace, TaskDefinition, ShellExecutionOptions, ShellQuotedString
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";

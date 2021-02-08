@@ -11,7 +11,6 @@ import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
 
 
-interface StringMap { [s: string]: string }
 let cachedTasks: Task[];
 
 
@@ -180,7 +179,7 @@ export class GruntTaskProvider implements TaskExplorerProvider
             const scripts = await this.findTargets(uri.fsPath);
             if (scripts)
             {
-                Object.keys(scripts).forEach(each => {
+                scripts.forEach(each => {
                     const task = this.createTask(each, each, folder, uri);
                     task.group = TaskGroup.Build;
                     result.push(task);
@@ -192,10 +191,9 @@ export class GruntTaskProvider implements TaskExplorerProvider
     }
 
 
-    private async findTargets(fsPath: string): Promise<StringMap>
+    private async findTargets(fsPath: string): Promise<string[]>
     {
-        const json: any = "";
-        const scripts: StringMap = {};
+        const scripts: string[] = [];
 
         util.log("");
         util.log("Find gruntfile targets");
@@ -241,9 +239,8 @@ export class GruntTaskProvider implements TaskExplorerProvider
                     if (idx2 !== -1)
                     {
                         const tgtName = line.substring(idx1, idx2).trim();
-
                         if (tgtName) {
-                            scripts[tgtName] = "";
+                            scripts.push(tgtName);
                             util.log("   found target");
                             util.logValue("      name", tgtName);
                         }
