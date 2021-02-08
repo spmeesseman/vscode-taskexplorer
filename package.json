@@ -1062,6 +1062,11 @@
                     "default": "-",
                     "description": "%config.taskExplorer.groupSeparator%"
                 },
+                "taskExplorer.groupStripLabel": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.groupStripLabel%"
+                },
                 "taskExplorer.pathToAnt": {
                     "type": "string",
                     "default": "ant.bat",

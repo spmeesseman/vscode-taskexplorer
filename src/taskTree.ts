@@ -1649,6 +1649,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async renameGroupedTasks(taskFile: TaskFile)
     {
+        if (!configuration.get<boolean>("groupStripLabel", true)) {
+            return;
+        }
+
         const groupSeparator = util.getGroupSeparator();
         let rmvLbl = taskFile.label.toString();
         rmvLbl = rmvLbl.replace(/\(/gi, "\\(").replace(/\[/gi, "\\[");
