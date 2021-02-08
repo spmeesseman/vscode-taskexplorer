@@ -1,3 +1,16 @@
+## [1.30.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.30.1...v1.30.2) (2021-02-08)
+
+
+### Bug Fixes
+
+* editing a gulp files are causies its respective tree node to break. ([f4c6479](https://github.com/spmeesseman/vscode-taskexplorer/commit/f4c6479))
+* grouped task labels in tree still contain the grouping parts, only the last part should display ([6117ac8](https://github.com/spmeesseman/vscode-taskexplorer/commit/6117ac8))
+
+
+### Code Refactoring
+
+* add setting to turn task label renaming on/off ([7be7488](https://github.com/spmeesseman/vscode-taskexplorer/commit/7be7488))
+
 ## [1.30.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.30.0...v1.30.1) (2021-02-08)
 
 
