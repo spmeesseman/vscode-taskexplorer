@@ -630,35 +630,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async executeTask(task: Task, noTerminal?: boolean): Promise<boolean>
-    {
-        if (noTerminal === true) {
-            task.presentationOptions.reveal = TaskRevealKind.Never;
-        }
-        else {
-            task.presentationOptions.reveal = TaskRevealKind.Always;
-        }
-
-        try {
-            await tasks.executeTask(task);
-        }
-        catch (e) {
-            const err = e.toString();
-            if (err.indexOf("No workspace folder") !== -1)
-            {
-                window.showErrorMessage("Task executon failed:  No workspace folder.  NOTE: You must " +
-                                        "save your workspace first before running 'User' tasks");
-            }
-            else {
-                window.showErrorMessage("Task executon failed: " + err);
-            }
-            util.log("Task execution failed: " + err);
-            return false;
-        }
-        return true;
-    }
-
-
     private async handleFileWatcherEvent(invalidate: any, opt: boolean | Uri)
     {
         util.log("   Handling 'FileWatcher/test' event");
@@ -1721,10 +1692,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    /**
+     * Run/execute a command.
+     * The refresh() function will eventually be called by the VSCode task engine when
+     * the task is launched
+     *
+     * @param taskItem TaskItem instance
+     * @param noTerminal Whether or not to show the terminal
+     * Note that the terminal will be shown if there is an error
+     * @param withArgs Whether or not to prompt for argumants
+     * Note that only script type tasks use arguments (and Gradle, ref ticket #88)
+     */
     private async run(taskItem: TaskItem, noTerminal = false, withArgs = false)
     {
-        const me = this;
-
         if (!taskItem || this.busy)
         {
             window.showInformationMessage("Busy, please wait...");
@@ -1734,16 +1714,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (withArgs === true)
 		{
             await this.runWithArgs(taskItem);
-            return;
 		}
-
-        if (taskItem.paused)
+        else if (taskItem.paused)
         {
             await this.resumeTask(taskItem);
         }
-        else if (await this.executeTask(taskItem.task, noTerminal))
+        else if (await this.runTask(taskItem.task, noTerminal))
         {
-            me.saveRunTask(taskItem);
+            this.saveRunTask(taskItem);
         }
     }
 
@@ -1823,6 +1801,42 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    private async runTask(task: Task, noTerminal?: boolean): Promise<boolean>
+    {
+        if (noTerminal === true) {
+            task.presentationOptions.reveal = TaskRevealKind.Never;
+        }
+        else {
+            task.presentationOptions.reveal = TaskRevealKind.Always;
+        }
+
+        try {
+            await tasks.executeTask(task);
+        }
+        catch (e) {
+            const err = e.toString();
+            if (err.indexOf("No workspace folder") !== -1)
+            {
+                window.showErrorMessage("Task executon failed:  No workspace folder.  NOTE: You must " +
+                                        "save your workspace first before running 'User' tasks");
+            }
+            else {
+                window.showErrorMessage("Task executon failed: " + err);
+            }
+            util.log("Task execution failed: " + err);
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
+     * Run/execute a command, with arguments (prompt for args)
+     *
+     * @param taskItem TaskItem instance
+     * @param noTerminal Whether or not to show the terminal
+     * Note that the terminal will be shown if there is an error
+     */
     private async runWithArgs(taskItem: TaskItem, noTerminal?: boolean)
     {
         if (!(taskItem.task.execution instanceof CustomExecution))
@@ -1842,7 +1856,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         newTask = providers.get("script").createTask(path.extname(def.uri.fsPath).substring(1), null,
                                                                      taskItem.getFolder(),  def.uri, str.trim().split(" "));
                     }
-                    if (await this.executeTask(newTask, noTerminal)) {
+                    if (await this.runTask(newTask, noTerminal)) {
                         me.saveRunTask(taskItem);
                     }
                 }
