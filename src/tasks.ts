@@ -29,7 +29,9 @@ export class TaskItem extends TreeItem
         const fsPath = taskFile.resourceUri ? taskFile.resourceUri.fsPath : "root";
         if (taskName.indexOf(" - ") !== -1 && (taskName.indexOf("/") !== -1 || taskName.indexOf("\\") !== -1 ||
             taskName.indexOf(" - tsconfig.json") !== -1))
-        {
+        {   //
+            // TODO - Just noticed this, whats it intended to do?  Itdoesnt do anything
+            //
             taskGroup ? taskName.replace(taskGroup + "-", "") : taskName = task.name.substring(0, task.name.indexOf(" - "));
         }
 

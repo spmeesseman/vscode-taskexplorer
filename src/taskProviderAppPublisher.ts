@@ -30,12 +30,14 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
     constructor() {}
 
 
-    public provideTasks() {
+    public provideTasks()
+    {
         return this.provideAppPublisherfiles();
     }
 
 
-    public resolveTask(_task: Task): Task | undefined {
+    public resolveTask(_task: Task): Task | undefined
+    {
         return undefined;
     }
 

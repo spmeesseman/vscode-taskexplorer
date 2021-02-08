@@ -30,12 +30,14 @@ export class GruntTaskProvider implements TaskExplorerProvider
     constructor() {}
 
 
-    public provideTasks() {
+    public provideTasks()
+    {
         return this.provideGruntfiles();
     }
 
 
-    public resolveTask(_task: Task): Task | undefined {
+    public resolveTask(_task: Task): Task | undefined
+    {
         return undefined;
     }
 
