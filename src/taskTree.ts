@@ -1649,7 +1649,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async renameGroupedTasks(taskFile: TaskFile)
     {
-        if (!configuration.get<boolean>("groupStripLabel", true)) {
+        if (!configuration.get<boolean>("groupStripTaskLabel", true)) {
             return;
         }
 

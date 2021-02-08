@@ -1062,10 +1062,10 @@
                     "default": "-",
                     "description": "%config.taskExplorer.groupSeparator%"
                 },
-                "taskExplorer.groupStripLabel": {
+                "taskExplorer.groupStripTaskLabel": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.groupStripLabel%"
+                    "description": "%config.taskExplorer.groupStripTaskLabel%"
                 },
                 "taskExplorer.pathToAnt": {
                     "type": "string",
