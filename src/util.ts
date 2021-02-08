@@ -7,6 +7,7 @@ import {
 import * as fs from "fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./common/configuration";
+import * as constants from "./common/constants";
 
 
 const logValueWhiteSpace = 40;
@@ -67,6 +68,12 @@ export function getCwd(uri: Uri): string
         dir = uri.fsPath.substring(0, uri.fsPath.lastIndexOf("/") + 1);
     }
     return dir;
+}
+
+
+export function getGroupSeparator()
+{
+    return configuration.get<string>("groupSeparator") || constants.DEFAULT_SEPARATOR;
 }
 
 

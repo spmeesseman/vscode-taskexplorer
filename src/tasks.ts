@@ -20,32 +20,38 @@ export class TaskItem extends TreeItem
     public readonly execution: TaskExecution | undefined;
     public paused: boolean;
     public nodePath: string;
+    public groupLevel: number;
 
     taskFile: TaskFile;
 
-    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task, taskGroup?: string)
+    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task, taskGroup = "", groupLevel = 0)
     {
-        let taskName = task.name;
-        const fsPath = taskFile.resourceUri ? taskFile.resourceUri.fsPath : "root";
-        if (taskName.indexOf(" - ") !== -1 && (taskName.indexOf("/") !== -1 || taskName.indexOf("\\") !== -1 ||
-            taskName.indexOf(" - tsconfig.json") !== -1))
+        const getDisplayName = (taskName: string, taskGroup: string): string =>
         {
-            if (taskGroup) {
-                // taskName = taskName.replace(taskGroup + "-", "");
+            let displayName = taskName;
+            if (displayName.indexOf(" - ") !== -1 && (displayName.indexOf("/") !== -1 || displayName.indexOf("\\") !== -1 ||
+            displayName.indexOf(" - tsconfig.json") !== -1))
+            {
+                if (taskGroup) {
+                    displayName = taskName.replace(taskGroup + "-", "");
+                }
+                else {
+                    displayName = task.name.substring(0, taskName.indexOf(" - "));
+                }
             }
-            else {
-                taskName = task.name.substring(0, task.name.indexOf(" - "));
-            }
-        }
+            return displayName;
+        };
 
-        super(taskName, TreeItemCollapsibleState.None);
+        super(getDisplayName(task.name, taskGroup), TreeItemCollapsibleState.None);
 
+        const fsPath = taskFile.resourceUri ? taskFile.resourceUri.fsPath : "root";
         this.taskGroup = taskGroup;
         this.id = fsPath + ":" + task.source + ":" + task.name + ":" + (taskGroup || "");
         this.paused = false;
         this.contextValue = "script";
         this.taskFile = taskFile;
-        this.task = task;                        //
+        this.task = task;
+        this.groupLevel = groupLevel;                      //
         this.command = {                         // Default click action is Open file since it's easy to click on accident
             title: "Open definition",            // Default click action can be set to 'Execute/Run' in Settings
             command: "taskExplorer.open",        // If the def. action is 'Run', then it is redirected in the 'Open' cmd
@@ -95,7 +101,7 @@ export class TaskFile extends TreeItem
     public fileName: string;
     public readonly taskSource: string;
     public readonly isGroup: boolean;
-    public readonly groupLevel: number;
+    public groupLevel: number;
     public nodePath: string;
 
     static getLabel(taskDef: TaskDefinition, source: string, relativePath: string, group: boolean): string
@@ -353,17 +359,18 @@ export class TaskFile extends TreeItem
         }
     }
 
-    addScript(script: any)
+    addScript(script: (TaskFile | TaskItem))
     {
+        script.groupLevel = this.groupLevel;
         this.scripts.push(script);
     }
 
-    insertScript(script: any, index: number)
+    insertScript(script: (TaskFile | TaskItem), index: number)
     {
         this.scripts.splice(index, 0, script);
     }
 
-    removeScript(script: any)
+    removeScript(script: (TaskFile | TaskItem))
     {
         let idx = -1;
         let idx2 = -1;

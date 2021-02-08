@@ -385,15 +385,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 
     /**
+     * Creates main task groupings, i.e. 'npm', 'vscode', 'batch', etc, for a given {@link TaskFolder}
+     *
      * @param folder The TaskFolder to process
-     * @param subfolders Tree taskfile map
      */
-    private createTaskGroupings(folder: TaskFolder)
+    private async createTaskGroupings(folder: TaskFolder)
     {
         let prevTaskFile: TaskItem | TaskFile;
         const subfolders: Map<string, TaskFile> = new Map();
 
-        folder.taskFiles.forEach(each =>
+        await util.asyncForEach(folder.taskFiles, async (each: TaskFile | TaskItem) =>
         {   //
             // Only processitems of type 'TaskFile'
             //
@@ -409,19 +410,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 let subfolder: TaskFile = subfolders.get(id);
                 if (!subfolder)
                 {
+                    util.logValue("   Added source file sub-container", each.path);
                     subfolder = new TaskFile(this.extensionContext, folder, (each.scripts[0] as TaskItem).task.definition, each.taskSource, each.path, true);
                     subfolders.set(id, subfolder);
                     folder.addTaskFile(subfolder);
-                    subfolder.addScript(prevTaskFile);
-                    util.logValue("   Added source file sub-container", each.path);
+                    //
+                    // Since we add the grouping when we find two or more equal group names, we are iterating
+                    // over the 2nd one at this point, and need to add the previous iteration's TaskItem to the
+                    // new group just created
+                    //
+                    subfolder.addScript(prevTaskFile); // addScript will set the group level on the TaskItem
                 }
-                subfolder.addScript(each);
+                subfolder.addScript(each); // addScript will set the group level on the TaskItem
             }
             prevTaskFile = each;
             //
             // Create the grouping
             //
-            this.createTaskGroupingsBySep(folder, each, subfolders);
+            await this.createTaskGroupingsBySep(folder, each, subfolders);
         });
 
         //
@@ -429,18 +435,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // are created but the old task remains in the parent folder.  Remove all tasks that have been moved down
         // into the tree hierarchy due to groupings
         //
-        this.removeGroupedTasks(folder, subfolders);
+        await this.removeGroupedTasks(folder, subfolders);
 
         //
         // For groupings with separator, now go through and rename the labels within each group minus the
         // first part of the name split by the separator character (the name of the new grouped-with-separator node)
         //
-        folder.taskFiles.forEach(each =>
+        await util.asyncForEach(folder.taskFiles, async (each: TaskFile | TaskItem) =>
         {
             if (!(each instanceof TaskFile)) {
                 return; // continue forEach()
             }
-            this.renameGroupedTasks(each);
+            await this.renameGroupedTasks(each);
         });
 
         //
@@ -450,7 +456,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             return a.taskSource.localeCompare(b.taskSource);
         });
-        folder.taskFiles.forEach(each =>
+        await util.asyncForEach(folder.taskFiles, (each: TaskFile | TaskItem) =>
         {
             if (!(each instanceof TaskFile)) {
                 return; // continue forEach()
@@ -467,8 +473,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 
     /**
-     * @private
-     *
      *  Build groupings by separator
      *
      *  For example, consider the set of task names/labels:
@@ -506,12 +510,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      * @param subfolders Tree taskfile map
      * @param groupSeparator The group separator
      */
-    private createTaskGroupingsBySep(folder: TaskFolder, taskFile: TaskFile, subfolders: Map<string, TaskFile>, treeLevel = 0)
+    private async createTaskGroupingsBySep(folder: TaskFolder, taskFile: TaskFile, subfolders: Map<string, TaskFile>, treeLevel = 0)
     {
         let prevName: string[];
         let prevTaskItem: TaskItem;
         const newNodes: TaskFile[] = [];
-        const groupSeparator = configuration.get<string>("groupSeparator") || "-";
+        const groupSeparator = util.getGroupSeparator();
         const atMaxLevel: boolean = configuration.get<number>("groupMaxLevel") <= treeLevel + 1;
 
         const _setNodePath = (t: TaskItem, cPath: string) =>
@@ -529,7 +533,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         };
 
-        taskFile.scripts.forEach(each =>
+        await util.asyncForEach(taskFile.scripts, (each: TaskFile | TaskItem) =>
         {
             if (!(each instanceof TaskItem)) {
                 return; // continue forEach()
@@ -590,15 +594,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     subfolder = new TaskFile(this.extensionContext, folder, each.task.definition, taskFile.taskSource,
                                              each.taskFile.path, true, prevName[treeLevel], treeLevel);
                     subfolders.set(id, subfolder);
-
                     _setNodePath(prevTaskItem, each.nodePath);
-
-                    subfolder.addScript(prevTaskItem);
+                    //
+                    // Since we add the grouping when we find two or more equal group names, we are iterating
+                    // over the 2nd one at this point, and need to add the previous iteration's TaskItem to the
+                    // new group just created
+                    //
+                    subfolder.addScript(prevTaskItem); // addScript will set the group level on the TaskItem
                     newNodes.push(subfolder);
                 }
 
                 _setNodePath(each, each.nodePath);
-                subfolder.addScript(each);
+                subfolder.addScript(each); // addScript will set the group level on the TaskItem
             }
 
             prevName = label.split(groupSeparator);
@@ -985,7 +992,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private getGroupedId(folder: TaskFolder, file: TaskFile, label: string, treeLevel: number)
     {
-        const groupSeparator = configuration.get<string>("groupSeparator") || "-";
+        const groupSeparator = util.getGroupSeparator();
         const labelSplit = label?.split(groupSeparator);
         let id = "";
         for (let i = 0; i <= treeLevel; i++)
@@ -1535,11 +1542,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private removeGroupedTasks(folder: TaskFolder, subfolders: Map<string, TaskFile>)
+    private async removeGroupedTasks(folder: TaskFolder, subfolders: Map<string, TaskFile>)
     {
         const taskTypesRmv: TaskFile[] = [];
 
-        folder.taskFiles.forEach(each =>
+        await util.asyncForEach(folder.taskFiles, (each: TaskFile | TaskItem) =>
         {
             if (!(each instanceof TaskFile)) {
                 return; // continue forEach()
@@ -1557,15 +1564,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             else if (each.isGroup)
             {
-                each.scripts.forEach(each2 =>
+                each.scripts.forEach(async each2 =>
                 {
                     this.removeScripts(each2 as TaskFile, folder, subfolders);
                     if (each2 instanceof TaskFile && each2.isGroup && each2.groupLevel > 0)
                     {
-                       // me.removeGroupedTasks(folder, each2, subfolders);
-                        each2.scripts.forEach(each3 =>
+                        await util.asyncForEach(each2.scripts, (each3: TaskFile) =>
                         {
-                            this.removeScripts(each3 as TaskFile, folder, subfolders);
+                            this.removeScripts(each3, folder, subfolders);
                         });
                     }
                 });
@@ -1575,7 +1581,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         });
 
-        taskTypesRmv.forEach(each =>
+        util.asyncMapForEach(taskTypesRmv, (each: TaskFile) =>
         {
             folder.removeTaskFile(each);
         });
@@ -1595,7 +1601,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         const me = this;
         const taskTypesRmv: (TaskItem|TaskFile)[] = [];
-        const groupSeparator = configuration.get<string>("groupSeparator") || "-";
+        const groupSeparator = util.getGroupSeparator();
 
         taskFile.scripts.forEach(each =>
         {
@@ -1641,29 +1647,36 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private renameGroupedTasks(taskFile: TaskFile)
+    private async renameGroupedTasks(taskFile: TaskFile)
     {
-        const groupSeparator = configuration.get<string>("groupSeparator") || "-";
+        const groupSeparator = util.getGroupSeparator();
+        let rmvLbl = taskFile.label.toString();
+        rmvLbl = rmvLbl.replace(/\(/gi, "\\(").replace(/\[/gi, "\\[");
+        rmvLbl = rmvLbl.replace(/\)/gi, "\\)").replace(/\]/gi, "\\]");
 
-        taskFile.scripts.forEach(each =>
+        await util.asyncForEach(taskFile.scripts, async (each2: TaskFile | TaskItem) =>
         {
-            if (each instanceof TaskFile)
+            if (each2 instanceof TaskItem)
             {
-                if (each.isGroup)
+                const rgx = new RegExp(rmvLbl + groupSeparator, "i");
+                each2.label = each2.label.toString().replace(rgx, "");
+
+                if (each2.groupLevel > 0)
                 {
-                    let rmvLbl = each.label.toString();
-                    rmvLbl = rmvLbl.replace(/\(/gi, "\\(").replace(/\[/gi, "\\[");
-                    rmvLbl = rmvLbl.replace(/\)/gi, "\\)").replace(/\]/gi, "\\]");
-                    each.scripts.forEach(each2 =>
+                    let label = "";
+                    const labelParts = each2.label?.split(groupSeparator);
+                    if (labelParts)
                     {
-                        const rgx = new RegExp(rmvLbl + groupSeparator, "i");
-                        each2.label = each2.label.toString().replace(rgx, "");
-                    });
+                        for (let i = each2.groupLevel; i < labelParts.length; i++)
+                        {
+                            label += (label ? groupSeparator : "") + labelParts[i];
+                        }
+                        each2.label = label || each2.label;
+                    }
                 }
-                else
-                {
-                    this.renameGroupedTasks(each);
-                }
+            }
+            else {
+                await this.renameGroupedTasks(each2);
             }
         });
     }
@@ -1677,8 +1690,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
-        this.stop(taskItem);
-        this.run(taskItem);
+        await this.stop(taskItem);
+        await this.run(taskItem);
     }
 
 
