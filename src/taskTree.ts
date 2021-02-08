@@ -694,7 +694,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *     "ruby"
      *     "tests"
      *     "Workspace"
-     * @param opt2 The uri of the file that contains the task
+     * @param opt2 The uri of the file that contains/owns the task
      */
     public async invalidateTasksCache(opt1: string, opt2: Uri | boolean)
     {
