@@ -1,3 +1,40 @@
+# [1.30.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.29.0...v1.30.0) (2021-02-08)
+
+
+### Bug Fixes
+
+* adding/modifying/deleting task files in excluded paths causes tree to refresh. [fixes [#92](https://github.com/spmeesseman/vscode-taskexplorer/issues/92)] ([1a980ce](https://github.com/spmeesseman/vscode-taskexplorer/commit/1a980ce))
+* after disabling a task type in settings, modification or additions to files of that type still refresh the tree view. ([0fb783d](https://github.com/spmeesseman/vscode-taskexplorer/commit/0fb783d))
+* not recognizing gulpfile.mjs. [fixes [#120](https://github.com/spmeesseman/vscode-taskexplorer/issues/120)] ([8bc2cbb](https://github.com/spmeesseman/vscode-taskexplorer/commit/8bc2cbb))
+* opening ant task does not find correct position if it is the default task ([62fe08c](https://github.com/spmeesseman/vscode-taskexplorer/commit/62fe08c))
+* opening gulp tasks does not find correct position if not defined as gulp.task. ([fa351e1](https://github.com/spmeesseman/vscode-taskexplorer/commit/fa351e1))
+* when opening a vscode/workspace task, task position is not located properly if no label property exists. ([4870016](https://github.com/spmeesseman/vscode-taskexplorer/commit/4870016))
+
+
+### Build System
+
+* resolve 10 dependency security vulnerabilities ([10e0283](https://github.com/spmeesseman/vscode-taskexplorer/commit/10e0283))
+* update all dependecies, vsce 1.85 ([e019b30](https://github.com/spmeesseman/vscode-taskexplorer/commit/e019b30))
+
+
+### Code Refactoring
+
+* allow gradle tasks to use 'run with arguments' command. [closes [#88](https://github.com/spmeesseman/vscode-taskexplorer/issues/88)] ([8784e00](https://github.com/spmeesseman/vscode-taskexplorer/commit/8784e00))
+* if 'detail' is defined on a task definition, then display it in it's representative tree item tooltip ([e0f45f6](https://github.com/spmeesseman/vscode-taskexplorer/commit/e0f45f6))
+
+
+### Documentation
+
+* **redame:** add feature images for 1.29 and 1.30 ([e773624](https://github.com/spmeesseman/vscode-taskexplorer/commit/e773624))
+* **readme:** add yarn image ([54dec21](https://github.com/spmeesseman/vscode-taskexplorer/commit/54dec21))
+
+
+### Features
+
+* add 'run with arguments' and 'run with no terminal' commands to script file tasks ([c75d9aa](https://github.com/spmeesseman/vscode-taskexplorer/commit/c75d9aa))
+* Add inline open task button ([1bad6d9](https://github.com/spmeesseman/vscode-taskexplorer/commit/1bad6d9))
+* add new setting for default item click action. [closes [#97](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)] ([c4e2ad0](https://github.com/spmeesseman/vscode-taskexplorer/commit/c4e2ad0))
+
 # [1.29.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.28.0...v1.29.0) (2021-02-06)
 
 
