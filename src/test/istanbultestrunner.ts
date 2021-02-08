@@ -1,4 +1,6 @@
-/*---------------------------------------------------------
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* ---------------------------------------------------------
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
@@ -12,6 +14,7 @@ import * as paths from "path";
 // tslint:disable-next-line:no-var-requires
 const remapIstanbul = require("remap-istanbul");
 
+// eslint-disable-next-line no-var
 declare var global: {
     [key: string]: any; // missing index defintion
 };
@@ -22,7 +25,7 @@ declare var global: {
 const tty = require("tty");
 if (!tty.getWindowSize)
 {
-    tty.getWindowSize = (): number[] =>
+    tty.getWindowSize = function (): number[]
     {
         return [80, 75];
     };
@@ -70,6 +73,7 @@ function _readCoverOptions(testsRoot: string): ITestRunnerOptions | undefined
 export function run(testsRoot: string, clb: Function): any
 {
     // Enable source map support
+    // eslint-disable-next-line import/no-extraneous-dependencies
     require("source-map-support").install();
 
     // Read configuration for the coverage file
@@ -84,7 +88,7 @@ export function run(testsRoot: string, clb: Function): any
     }
 
     // Glob test files
-    glob("**/**.test.js", { cwd: testsRoot }, (error, files): any =>
+    glob("**/**.test.js", { cwd: testsRoot }, function (error, files): any
     {
         if (error)
         {
@@ -102,11 +106,11 @@ export function run(testsRoot: string, clb: Function): any
 
             mocha
                 .run()
-                .on("fail", (test, err): void =>
+                .on("fail", function (test, err): void
                 {
                     failureCount++;
                 })
-                .on("end", (): void =>
+                .on("end", function (): void
                 {
                     clb(undefined, failureCount);
                 });
@@ -167,6 +171,7 @@ class CoverageRunner
         });
 
         // Create a match function - taken from the run-with-cover.js in istanbul.
+        // eslint-disable-next-line import/no-extraneous-dependencies
         const decache = require("decache");
         const fileMap: { [key: string]: any } = {};
         srcFiles.forEach(file =>
@@ -183,7 +188,7 @@ class CoverageRunner
             decache(fullPath);
         });
 
-        self.matchFn = (file: string): boolean =>
+        self.matchFn = function (file: string): boolean
         {
             return fileMap[file];
         };
