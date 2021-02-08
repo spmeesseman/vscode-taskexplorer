@@ -710,7 +710,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
         {
-            await providers.get(!util.isScriptType(opt1) ? opt1 : "script").invalidateTasksCache(opt2);
+            const provider = providers.get(!util.isScriptType(opt1) ? opt1 : "script");
+            if (provider) { // NPM and Workspace tasks don't implament the TaskExplorerProvider interface
+                await provider.invalidateTasksCache(opt2);
+            }
         }
         else {
             await util.asyncForEach(providers, (p: TaskExplorerProvider) => {
