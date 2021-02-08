@@ -915,7 +915,7 @@ suite("Task tests", () =>
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        await teApi.fileCache.buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].[Jj][Ss]", workspace.workspaceFolders[0], true);
+        await teApi.fileCache.buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].*[JjTt][Ss]", workspace.workspaceFolders[0], true);
     });
 
 

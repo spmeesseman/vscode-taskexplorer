@@ -29,10 +29,13 @@ export class TaskItem extends TreeItem
         const fsPath = taskFile.resourceUri ? taskFile.resourceUri.fsPath : "root";
         if (taskName.indexOf(" - ") !== -1 && (taskName.indexOf("/") !== -1 || taskName.indexOf("\\") !== -1 ||
             taskName.indexOf(" - tsconfig.json") !== -1))
-        {   //
-            // TODO - Just noticed this, whats it intended to do?  Itdoesnt do anything
-            //
-            taskGroup ? taskName.replace(taskGroup + "-", "") : taskName = task.name.substring(0, task.name.indexOf(" - "));
+        {
+            if (taskGroup) {
+                // taskName = taskName.replace(taskGroup + "-", "");
+            }
+            else {
+                taskName = task.name.substring(0, task.name.indexOf(" - "));
+            }
         }
 
         super(taskName, TreeItemCollapsibleState.None);
@@ -42,11 +45,11 @@ export class TaskItem extends TreeItem
         this.paused = false;
         this.contextValue = "script";
         this.taskFile = taskFile;
-        this.task = task;
-        this.command = {
-            title: "Open definition",
-            command: "taskExplorer.open",
-            arguments: [this]
+        this.task = task;                        //
+        this.command = {                         // Default click action is Open file since it's easy to click on accident
+            title: "Open definition",            // Default click action can be set to 'Execute/Run' in Settings
+            command: "taskExplorer.open",        // If the def. action is 'Run', then it is redirected in the 'Open' cmd
+            arguments: [this]                    //
         };
 
         this.taskSource = task.source;
