@@ -29,9 +29,15 @@ export class GradleTaskProvider implements TaskExplorerProvider
     constructor() {}
 
 
-    public provideTasks()
+    public async provideTasks()
     {
-        return this.provideGradlefiles();
+        util.log("");
+        util.log("provide gradle tasks");
+        if (!cachedTasks)
+        {
+            cachedTasks = await this.detectGradlefiles();
+        }
+        return cachedTasks;
     }
 
 
@@ -155,19 +161,6 @@ export class GradleTaskProvider implements TaskExplorerProvider
 
         util.logValue("   # of tasks", allTasks.length, 2);
         return allTasks;
-    }
-
-
-    private async provideGradlefiles(): Promise<Task[]>
-    {
-        util.log("");
-        util.log("provideGradlefiles");
-
-        if (!cachedTasks)
-        {
-            cachedTasks = await this.detectGradlefiles();
-        }
-        return cachedTasks;
     }
 
 

@@ -29,9 +29,14 @@ export class GruntTaskProvider implements TaskExplorerProvider
     constructor() {}
 
 
-    public provideTasks()
+    public async provideTasks()
     {
-        return this.provideGruntfiles();
+        util.log("");
+        util.log("provide grunt tasks");
+        if (!cachedTasks) {
+            cachedTasks = await this.detectGruntfiles();
+        }
+        return cachedTasks;
     }
 
 
@@ -128,18 +133,6 @@ export class GruntTaskProvider implements TaskExplorerProvider
         const execution = new ShellExecution("npx", args, options);
 
         return new Task(kind, folder, target, "grunt", execution, "$msCompile");
-    }
-
-
-    private async provideGruntfiles(): Promise<Task[]>
-    {
-        util.log("");
-        util.log("provideGruntfiles");
-
-        if (!cachedTasks) {
-            cachedTasks = await this.detectGruntfiles();
-        }
-        return cachedTasks;
     }
 
 

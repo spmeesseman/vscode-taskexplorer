@@ -54,9 +54,15 @@ export class MakeTaskProvider implements TaskExplorerProvider
     }
 
 
-    public provideTasks()
+    public async provideTasks()
     {
-        return this.provideMakefiles();
+        util.log("");
+        util.log("provide mke tasks");
+        if (!cachedTasks)
+        {
+            cachedTasks = await this.detectMakefiles();
+        }
+        return cachedTasks;
     }
 
 
@@ -187,19 +193,6 @@ export class MakeTaskProvider implements TaskExplorerProvider
 
         util.logValue("   # of tasks", allTasks.length, 2);
         return allTasks;
-    }
-
-
-    private async provideMakefiles(): Promise<Task[]>
-    {
-        util.log("");
-        util.log("provideMakefiles");
-
-        if (!cachedTasks)
-        {
-            cachedTasks = await this.detectMakefiles();
-        }
-        return cachedTasks;
     }
 
 

@@ -30,9 +30,14 @@ export class GulpTaskProvider implements TaskProvider
     constructor() {}
 
 
-    public provideTasks()
+    public async provideTasks()
     {
-        return this.provideGulpfiles();
+        util.log("");
+        util.log("provide gulp tasks");
+        if (!cachedTasks) {
+            cachedTasks = await this.detectGulpfiles();
+        }
+        return cachedTasks;
     }
 
 
@@ -116,18 +121,6 @@ export class GulpTaskProvider implements TaskProvider
         const execution = new ShellExecution("npx", args, options);
 
         return new Task(kind, folder, target, "gulp", execution, "$msCompile");
-    }
-
-
-    private async provideGulpfiles(): Promise<Task[]>
-    {
-        util.log("");
-        util.log("provideGulpfiles");
-
-        if (!cachedTasks) {
-            cachedTasks = await this.detectGulpfiles();
-        }
-        return cachedTasks;
     }
 
 

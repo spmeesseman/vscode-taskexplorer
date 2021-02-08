@@ -30,9 +30,14 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
     constructor() {}
 
 
-    public provideTasks()
+    public async provideTasks()
     {
-        return this.provideAppPublisherfiles();
+        util.log("");
+        util.log("provide app-publisher tasks");
+        if (!cachedTasks) {
+            cachedTasks = await this.detectAppPublisherfiles();
+        }
+        return cachedTasks;
     }
 
 
@@ -85,18 +90,6 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
         }
 
         cachedTasks = undefined;
-    }
-
-
-    private async provideAppPublisherfiles(): Promise<Task[]>
-    {
-        util.log("");
-        util.log("provideAppPublisherfiles");
-
-        if (!cachedTasks) {
-            cachedTasks = await this.detectAppPublisherfiles();
-        }
-        return cachedTasks;
     }
 
 

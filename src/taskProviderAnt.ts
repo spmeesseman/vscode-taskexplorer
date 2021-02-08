@@ -34,7 +34,7 @@ export class AntTaskProvider implements TaskExplorerProvider
     public async provideTasks()
     {
         util.log("");
-        util.log("provideAntScripts");
+        util.log("provide ant tasks");
 
         if (!cachedTasks) {
             cachedTasks = await this.detectAntScripts();

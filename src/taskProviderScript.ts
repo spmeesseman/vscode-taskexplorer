@@ -82,23 +82,17 @@ export class ScriptTaskProvider implements TaskExplorerProvider
 
     public async provideTasks()
     {
-        return this.provideScriptsTasks();
-    }
-
-    public resolveTask(_task: Task): Task | undefined {
-        return undefined;
-    }
-
-
-    public async provideScriptsTasks(): Promise<Task[]>
-    {
         util.log("");
-        util.log("provideScriptsTasks");
-
+        util.log("provide scripts tasks");
         if (!cachedTasks) {
             cachedTasks = await this.detectScriptFiles();
         }
         return cachedTasks;
+    }
+
+
+    public resolveTask(_task: Task): Task | undefined {
+        return undefined;
     }
 
 
