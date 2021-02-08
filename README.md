@@ -54,6 +54,10 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 | ---------------------------------- | ---------------------------------- | ---------------------------------- |
 | ![ss4](res/taskview4.png?raw=true) | ![ss5](res/taskview5.png?raw=true) | ![ss6](res/taskview6.png?raw=true) |
 
+| Multi-Level Task Groupings (v1.29) | Run with Args, No Terminal (1.30)  |                                    |
+| ---------------------------------- | ---------------------------------- | ---------------------------------- |
+| ![ss7](res/taskview7.png?raw=true) | ![ss8](res/taskview8.png?raw=true) |                                    |
+
 ## Requirements
 
 * Visual Studio Code v1.50+
