@@ -707,7 +707,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private _showStatusMessage(task: Task)
+    private showStatusMessage(task: Task)
     {
         if (task && configuration.get<boolean>("showRunningTask") === true)
         {
@@ -785,6 +785,28 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    /**
+     * This function should only be called by the unit tests
+     *
+     * @param opt1 Task provider type.  Can be one of:
+     *     "ant"
+     *     "app-publisher"
+     *     "bash"
+     *     "batch"
+     *     "gradle"
+     *     "grunt"
+     *     "gulp"
+     *     "make"
+     *     "npm"
+     *     "nsis"
+     *     "perl"
+     *     "powershell"
+     *     "python"
+     *     "ruby"
+     *     "tests"
+     *     "Workspace"
+     * @param opt2 The uri of the file that contains the task
+     */
     public async invalidateTasksCache(opt1: string, opt2: Uri | boolean)
     {
         this.busy = true;
@@ -817,11 +839,30 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      * file (via FileSystemWatcher event), or when the view first becomes active/visible, etc.
      *
      * @param invalidate The invalidation event.
-     * Can be one of:
-     *     tests
-     *     visible-event
+     * Can be one of the custom values:
+     *     "tests"            (from unit tests)
+     *     "visible-event"
+     *     false|null|undefined
+     * Can also be one of the task types (FileSystemWatcher event):
+     *     "ant"
+     *     "app-publisher"
+     *     "bash"
+     *     "batch"
+     *     "gradle"
+     *     "grunt"
+     *     "gulp"
+     *     "make"
+     *     "npm"
+     *     "nsis"
+     *     "perl"
+     *     "powershell"
+     *     "python"
+     *     "ruby"
+     *     "tests"
+     *     "Workspace"
      * @param opt Uri of the invalidated resource
-     * @param task The task
+     * @param task If defined, a task that has just started or finished. Used to re-paint
+     * the loading icons.  If defined, 'invalidate' should be `false`.
      */
     public async refresh(invalidate?: any, opt?: Uri | boolean, task?: Task): Promise<boolean>
     {
@@ -833,7 +874,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Show status bar message (if ON in settings)
         //
-        this._showStatusMessage(task);
+        this.showStatusMessage(task);
 
         //
         // If a view was turned off in settings, the disposable view still remains
@@ -1036,7 +1077,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private _findScriptPositionJson(documentText: string, script?: TaskItem)
+    private findScriptPositionJson(documentText: string, script?: TaskItem)
     {
         const me = this;
         let inScripts = false;
@@ -1121,7 +1162,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private _findScriptPosition(lineName: string, scriptName: string, documentText: string, advance = 0, start = 0, skipQuotes = false): number
+    private findScriptPositionLine(lineName: string, scriptName: string, documentText: string, advance = 0, start = 0, skipQuotes = false): number
     {   //
         // TODO - This is crap, use regex to detect spaces between quotes
         //
@@ -1138,17 +1179,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private _findScriptPositionAnt(scriptName: string, documentText: string): number
+    private findScriptPositionAnt(scriptName: string, documentText: string): number
     {
         scriptName = scriptName.replace(" - Default", "");
-        let idx = this._findScriptPosition("name=", scriptName, documentText, 6);
+        let idx = this.findScriptPositionLine("name=", scriptName, documentText, 6);
         if (idx > 0)
         {   //
             // Check to make sure this isnt the 'default task' position,i.e.:
             //
             //     <project basedir="." default="test-build">
             //
-            const scriptOffset2 = this._findScriptPosition("name=", scriptName, documentText, 6, idx + 1);
+            const scriptOffset2 = this.findScriptPositionLine("name=", scriptName, documentText, 6, idx + 1);
             if (scriptOffset2 > 0) {
                 idx = scriptOffset2;
             }
@@ -1157,7 +1198,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private _findScriptPositionMake(scriptName: string, documentText: string): number
+    private findScriptPositionMake(scriptName: string, documentText: string): number
     {
         let idx = documentText.indexOf(scriptName + ":");
         if (idx === -1)
@@ -1183,14 +1224,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private _findScriptPositionGulp(scriptName: string, documentText: string): number
+    private findScriptPositionGulp(scriptName: string, documentText: string): number
     {
-        let idx = this._findScriptPosition("gulp.task(", scriptName, documentText);
+        let idx = this.findScriptPositionLine("gulp.task(", scriptName, documentText);
         if (idx === -1) {
-            idx = this._findScriptPosition("exports[", scriptName, documentText);
+            idx = this.findScriptPositionLine("exports[", scriptName, documentText);
         }
         if (idx === -1) {
-            idx = this._findScriptPosition("exports.", scriptName, documentText, 0, 0, true);
+            idx = this.findScriptPositionLine("exports.", scriptName, documentText, 0, 0, true);
         }
         return idx;
     }
@@ -1207,23 +1248,23 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (script.taskSource === "ant")
         {
-            scriptOffset = this._findScriptPositionAnt(script.task.name, documentText);
+            scriptOffset = this.findScriptPositionAnt(script.task.name, documentText);
         }
         else if (script.taskSource === "gulp")
         {
-            scriptOffset = this._findScriptPositionGulp(script.task.name, documentText);
+            scriptOffset = this.findScriptPositionGulp(script.task.name, documentText);
         }
         else if (script.taskSource === "grunt")
         {
-            scriptOffset = this._findScriptPosition("grunt.registerTask(", script.task.name, documentText);
+            scriptOffset = this.findScriptPositionLine("grunt.registerTask(", script.task.name, documentText);
         }
         else if (script.taskSource === "make")
         {
-            scriptOffset = this._findScriptPositionMake(script.task.name, documentText);
+            scriptOffset = this.findScriptPositionMake(script.task.name, documentText);
         }
         else if (script.taskSource === "npm" || script.taskSource === "Workspace")
         {
-            scriptOffset = this._findScriptPositionJson(documentText, script);
+            scriptOffset = this.findScriptPositionJson(documentText, script);
         }
         else
         {
