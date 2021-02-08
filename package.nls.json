@@ -130,6 +130,8 @@
 	"command.runWithArgs": "Run with arguments",
 	"command.runLastTask": "Run last task",
 	"command.addToExcludes": "Add to excludes list",
+	"command.addToFavorites": "Add to favorites list",
+	"command.removeFromFavorites": "Remove from favorites list",
 	"command.stop": "Stop",
 	"command.pause": "Pause",
 	"command.debug": "Debugging ",

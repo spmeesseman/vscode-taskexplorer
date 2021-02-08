@@ -1,18 +1,16 @@
-"use strict";
-
 import {
     Memento, ExtensionContext
 } from "vscode";
 
 export let storage: Memento | undefined;
 
-export function initStorage(context: ExtensionContext)
+export const initStorage = (context: ExtensionContext) =>
 {
     //
     // Set up extension custom storage
     //
     storage = new Storage(context.globalState);
-}
+};
 
 class Storage
 {
@@ -25,11 +23,11 @@ class Storage
 
     public get<T>(key: string, defaultValue?: T): T
     {
-        return this.storage.get<T>(key, defaultValue!);
+        return this.storage.get<T>(key, defaultValue);
     }
 
-    public update(key: string, value: any): Thenable<void>
+    public async update(key: string, value: any)
     {
-        return this.storage.update(key, value);
+        await this.storage.update(key, value);
     }
 }

@@ -229,6 +229,16 @@
                 "when": "config.taskExplorer.enableSideBar"
             },
             {
+                "command": "taskExplorerSideBar.addToFavorites",
+                "title": "%command.addToFavorites%",
+                "when": "config.taskExplorer.enableSideBar"
+            },
+            {
+                "command": "taskExplorerSideBar.removeFromFavorites",
+                "title": "%command.removeFromFavorites%",
+                "when": "config.taskExplorer.enableSideBar"
+            },
+            {
                 "command": "taskExplorerSideBar.pause",
                 "title": "%command.pause%",
                 "when": "config.taskExplorer.enableSideBar",
@@ -351,6 +361,16 @@
             {
                 "command": "taskExplorer.addToExcludes",
                 "title": "%command.addToExcludes%",
+                "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
+                "command": "taskExplorer.addToFavorites",
+                "title": "%command.addToFavorites%",
+                "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
+                "command": "taskExplorer.removeFromFavorites",
+                "title": "%command.removeFromFavorites%",
                 "when": "config.taskExplorer.enableExplorerView"
             },
             {
@@ -647,6 +667,30 @@
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupNsis"
                 },
                 {
+                    "command": "taskExplorer.addToFavorites",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                },
+                {
+                    "command": "taskExplorer.addToFavorites",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                },
+                {
+                    "command": "taskExplorer.addToFavorites",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == runningScript"
+                },
+                {
+                    "command": "taskExplorer.removeFromFavorites",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                },
+                {
+                    "command": "taskExplorer.removeFromFavorites",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                },
+                {
+                    "command": "taskExplorer.removeFromFavorites",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == runningScript"
+                },
+                {
                     "command": "taskExplorer.runNoTerm",
                     "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == script",
                     "group": "inline"
@@ -872,6 +916,30 @@
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupNsis"
+                },
+                {
+                    "command": "taskExplorerSideBar.addToFavorites",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                },
+                {
+                    "command": "taskExplorerSideBar.addToFavorites",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                },
+                {
+                    "command": "taskExplorerSideBar.addToFavorites",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == runningScript"
+                },
+                {
+                    "command": "taskExplorerSideBar.removeFromFavorites",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                },
+                {
+                    "command": "taskExplorerSideBar.removeFromFavorites",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                },
+                {
+                    "command": "taskExplorerSideBar.removeFromFavorites",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == runningScript"
                 },
                 {
                     "command": "taskExplorerSideBar.run",

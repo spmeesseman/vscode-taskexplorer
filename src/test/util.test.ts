@@ -58,7 +58,7 @@ suite("Util tests", () =>
 
     test("Test array functions", () =>
     {
-        let arr: number[] = [ 1, 2, 3, 4, 5 ];
+        const arr = [ 1, 2, 3, 4, 5 ];
         util.removeFromArray(arr, 3);
         assert(arr.length === 4);
         assert(util.existsInArray(arr, 5));

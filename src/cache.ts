@@ -43,12 +43,12 @@ export async function rebuildCache()
 
 export async function buildCache(taskAlias: string, taskType: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined, setCacheBuilding = true)
 {
-    log("Start cache building");
-    logValue("   task alias", taskAlias, 2);
-    logValue("   task type", taskType, 2);
-    logValue("   blob", fileBlob, 2);
-    logValue("   folder", !wsfolder ? "entire workspace" : wsfolder.name);
-    logValue("   setCacheBuilding", setCacheBuilding.toString(), 2);
+    log("Start cache building", 2);
+    logValue("   folder", !wsfolder ? "entire workspace" : wsfolder.name, 2);
+    logValue("   task alias", taskAlias, 3);
+    logValue("   task type", taskType, 3);
+    logValue("   blob", fileBlob, 3);
+    logValue("   setCacheBuilding", setCacheBuilding.toString(), 3);
 
     if (setCacheBuilding) {
         //
@@ -95,7 +95,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
 
     if (!wsfolder)
     {
-        log("Build cache - Scan all projects for taskType '" + taskType + "' (" + dispTaskType + ")");
+        log("Build cache - Scan all projects for taskType '" + taskType + "' (" + dispTaskType + ")", 1);
 
         if (workspace.workspaceFolders)
         {
@@ -109,11 +109,11 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                         }
                         statusBarSpace.hide();
                         statusBarSpace.dispose();
-                        log("Cache building cancelled");
+                        log("Cache building cancelled", 1);
                         return;
                     }
 
-                    log("   Scan project " + folder.name + " for " + dispTaskType + " tasks");
+                    log("   Scan project " + folder.name + " for " + dispTaskType + " tasks", 1);
                     statusBarSpace.text = statusString("Scanning for " + dispTaskType + " tasks in project " + folder.name, 65);
                     const relativePattern = new RelativePattern(folder, fileBlob);
                     const paths = await workspace.findFiles(relativePattern, getExcludesGlob(folder));
@@ -126,7 +126,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                             }
                             statusBarSpace.hide();
                             statusBarSpace.dispose();
-                            log("Cache building cancelled");
+                            log("Cache building cancelled", 1);
                             return;
                         }
                         if (!isExcluded(fpath.path)) {
@@ -134,7 +134,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                                 uri: fpath,
                                 folder
                             });
-                            logValue("   Added to cache", fpath.fsPath, 2);
+                            logValue("   Added to cache", fpath.fsPath, 3);
                         }
                     }
                 }
@@ -144,7 +144,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
     }
     else
     {
-        log("Build cache - Scan project '" + wsfolder.name + "' for taskType '" + taskType + "'");
+        log("Build cache - Scan project '" + wsfolder.name + "' for taskType '" + taskType + "'", 1);
         statusBarSpace.text = statusString("Scanning for tasks in project " + wsfolder.name);
 
         const relativePattern = new RelativePattern(wsfolder, fileBlob);
@@ -158,7 +158,7 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                 }
                 statusBarSpace.hide();
                 statusBarSpace.dispose();
-                log("Cache building cancelled");
+                log("Cache building cancelled", 1);
                 return;
             }
             if (!isExcluded(fpath.path)) {
@@ -167,14 +167,14 @@ export async function buildCache(taskAlias: string, taskType: string, fileBlob: 
                     uri: fpath,
                     folder: wsfolder
                 });
-                logValue("   Added to cache", fpath.fsPath, 2);
+                logValue("   Added to cache", fpath.fsPath, 3);
             }
         }
     }
 
     statusBarSpace.hide();
     statusBarSpace.dispose();
-    log("Cache building complete");
+    log("Cache building complete", 1);
 
     if (setCacheBuilding) {
         cancel = false;
@@ -228,8 +228,8 @@ async function waitForFolderCaching()
 
 export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
 {
-    log("Add folder to cache");
-    logValue("   folder", !folder ? "entire workspace" : folder.name);
+    log("Add folder to cache", 3);
+    logValue("   folder", !folder ? "entire workspace" : folder.name, 3);
 
     await waitForCache();
     await waitForFolderCaching();
@@ -311,10 +311,10 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
     cacheBuilding = false;
     folderCaching = false;
     if (cancel) {
-        log("Add folder to cache cancelled");
+        log("Add folder to cache cancelled", 3);
     }
     else {
-        log("Add folder to cache complete");
+        log("Add folder to cache complete", 3);
     }
     cancel = false;
 }

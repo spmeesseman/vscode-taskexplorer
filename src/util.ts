@@ -233,6 +233,25 @@ export function removeFromArray(arr: any[], item: any)
 }
 
 
+export async function removeFromArrayAsync(arr: any[], item: any)
+{
+    let idx = -1;
+    let idx2 = -1;
+
+    await asyncForEach(arr, (each: any) => {
+        idx++;
+        if (item === each) {
+            idx2 = idx;
+            return false;
+        }
+    });
+
+    if (idx2 !== -1 && idx2 < arr.length) {
+        arr.splice(idx2, 1);
+    }
+}
+
+
 export function existsInArray(arr: any[], item: any)
 {
     let exists = false;

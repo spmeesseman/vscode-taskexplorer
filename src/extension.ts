@@ -22,7 +22,8 @@ import { views } from "./views";
 import { TaskExplorerProvider } from "./taskProvider";
 import * as util from "./util";
 import * as cache from "./cache";
-import * as path from "path";
+import * as constants from "./common/constants";
+
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
 export let treeDataProvider2: TaskTreeDataProvider | undefined;
@@ -163,11 +164,11 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
     {
         if (configuration.get<boolean>("enableSideBar") && treeDataProvider)
         {
-            await treeDataProvider2.showLastTasks(configuration.get<boolean>("showLastTasks"));
+            await treeDataProvider2.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
         }
         if (configuration.get<boolean>("enableExplorerView") && treeDataProvider2)
         {
-            await treeDataProvider2.showLastTasks(configuration.get<boolean>("showLastTasks"));
+            await treeDataProvider2.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
         }
     }
 

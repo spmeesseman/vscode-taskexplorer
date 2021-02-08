@@ -5,6 +5,8 @@ import * as vscode from "vscode";
 import { configuration } from "../common/configuration";
 import { setWriteToConsole, timeout } from '../util';
 import { TaskExplorerApi } from '../extension';
+import * as constants from "../common/constants";
+
 
 
 export let teApi: TaskExplorerApi;
@@ -106,7 +108,8 @@ suite("Extension Tests", () =>
     test("Cover pre-init cases", async function() 
     {
         await initSettings(false);
-        teApi.explorerProvider.showLastTasks(true);
+        teApi.explorerProvider.showSpecialTasks(true);
+        teApi.explorerProvider.showSpecialTasks(true, true);
         await teApi.explorerProvider.refresh("tests");
         await initSettings();
     });

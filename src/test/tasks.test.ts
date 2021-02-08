@@ -15,6 +15,8 @@ import { TaskItem } from "../tasks";
 import { waitForCache } from "../cache";
 import { addWsFolder, removeWsFolder } from "../extension";
 import { configuration } from "../common/configuration";
+import * as constants from "../common/constants";
+
 
 
 const rootPath = workspace.workspaceFolders[0].uri.fsPath;
@@ -925,11 +927,22 @@ suite("Task tests", () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         console.log("    Show/hide last tasks");
-        await teApi.explorerProvider.showLastTasks(true);
-        await teApi.explorerProvider.showLastTasks(false);
+        await teApi.explorerProvider.showSpecialTasks(true);
+        await teApi.explorerProvider.showSpecialTasks(false);
         await configuration.updateWs("showLastTasks", false);
-        await teApi.explorerProvider.showLastTasks(true);
-        await teApi.explorerProvider.showLastTasks(false);
+        await teApi.explorerProvider.showSpecialTasks(true);
+        await teApi.explorerProvider.showSpecialTasks(false);
+    });
+
+
+    test("Test show/hide favorite tasks", async function()
+    {
+        if (!teApi.explorerProvider) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
+        }
+        console.log("    Show/hide favorite tasks");
+        await teApi.explorerProvider.showSpecialTasks(true, true);
+        await teApi.explorerProvider.showSpecialTasks(false, true);
     });
 
 
