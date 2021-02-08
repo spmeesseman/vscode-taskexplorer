@@ -1,3 +1,15 @@
+## [1.30.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.30.0...v1.30.1) (2021-02-08)
+
+
+### Bug Fixes
+
+* editing a package.json or tasks.json file no longer refresh the treeview with changes ([2a168a4](https://github.com/spmeesseman/vscode-taskexplorer/commit/2a168a4))
+
+
+### Code Refactoring
+
+* test semantic-release ([bd8c1f2](https://github.com/spmeesseman/vscode-taskexplorer/commit/bd8c1f2))
+
 # [1.30.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.29.0...v1.30.0) (2021-02-08)
 
 
