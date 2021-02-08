@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import {
     RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext,
@@ -159,6 +160,13 @@ export function isExcluded(uriPath: string, logPad = "")
 
     log(logPad + "   Not excluded", 2);
     return false;
+}
+
+
+export function isScriptType(source: string)
+{
+    return source === "bash" || source === "batch" || source === "nsis" || source === "perl" ||
+           source === "powershell" || source === "python" || source === "ruby";
 }
 
 

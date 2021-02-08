@@ -106,7 +106,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async _runWithArgs(taskItem: TaskItem, noTerminal?: boolean)
+    private async runWithArgs(taskItem: TaskItem, noTerminal?: boolean)
     {
         if (!(taskItem.task.execution instanceof CustomExecution))
         {
@@ -149,7 +149,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (withArgs === true)
 		{
-            await this._runWithArgs(taskItem);
+            await this.runWithArgs(taskItem);
             return;
 		}
 
@@ -737,7 +737,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private _handleVisibleEvent()
+    private handleVisibleEvent()
     {
         util.log("   Handling 'visible' event");
         if (this.needsRefresh && this.needsRefresh.length > 0)
@@ -758,29 +758,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async handleInvalidation(invalidate: any, opt: boolean | Uri)
+    private async handleFileWatcherEvent(invalidate: any, opt: boolean | Uri)
     {
+        util.log("   Handling 'FileWatcher/test' event");
+        //
+        // invalidate=true means the refresh button was clicked (opt will be false)
+        // invalidate="tests" means this is being called from unit tests (opt will be undefined)
+        //
         if ((invalidate === true || invalidate === "tests") && !opt) {
             util.log("   Handling 'rebuild cache' event");
             this.busy = true;
             await rebuildCache();
             this.busy = false;
         }
+        //
+        // If this is not from unit testing, then invalidate the appropriate task cache/file
+        //
         if (invalidate !== "tests") {
             util.log("   Handling 'invalidate tasks cache' event");
             await this.invalidateTasksCache(invalidate, opt);
-        }
-    }
-
-
-    private async invalidateTasksCacheFileEdit(opt1: string, opt2: Uri)
-    {
-        if (opt1 === "bash" || opt1 === "batch" || opt1 === "nsis" || opt1 === "perl" || opt1 === "powershell" || opt1 === "python" || opt1 === "ruby")
-        {
-            await providers.get("script").invalidateTasksCache(opt2);
-        }
-        else {
-            await providers.get(opt1).invalidateTasksCache(opt2);
         }
     }
 
@@ -821,7 +817,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
         {
-            await this.invalidateTasksCacheFileEdit(opt1, opt2);
+            await providers.get(!util.isScriptType(opt1) ? opt1 : "script").invalidateTasksCache(opt2);
         }
         else {
             await util.asyncForEach(providers, (p: TaskExplorerProvider) => {
@@ -903,7 +899,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (invalidate === "visible-event")
         {
             if (this.taskTree) {
-                this._handleVisibleEvent();
+                this.handleVisibleEvent();
                 return;
             }
             invalidate = undefined;
@@ -933,7 +929,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (invalidate !== false)
         {
-            await this.handleInvalidation(invalidate, opt);
+            await this.handleFileWatcherEvent(invalidate, opt);
         }
 
         if (task)
