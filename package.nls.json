@@ -132,6 +132,7 @@
 	"command.runLastTask": "Run last task",
 	"command.addToExcludes": "Add to excludes list",
 	"command.addRemoveFromFavorites": "Add/Remove from favorites list",
+	"command.clearSpecialFolder": "Clear all tasks from this folder",
 	"command.stop": "Stop",
 	"command.pause": "Pause",
 	"command.debug": "Debugging ",

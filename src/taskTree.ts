@@ -72,7 +72,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
         subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | string, global: boolean, prompt: boolean) => { await this.addToExcludes(taskFile, global, prompt); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", (taskItem: TaskItem) => { this.addRemoveFavorite(taskItem); }, this));
+        subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => { await this.addRemoveFavorite(taskItem); }, this));
+        subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
 
         tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
         tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
@@ -82,13 +83,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async addRemoveFavorite(taskItem: TaskItem)
     {
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        const favId = taskItem.id.replace(constants.FAV_TASKS_LABEL + ":", "");
+        const favId = taskItem.id.replace(constants.FAV_TASKS_LABEL + ":", "")
+            .replace(constants.LAST_TASKS_LABEL + ":", "")
+            .replace(constants.USER_TASKS_LABEL + ":", "");
 
         util.log("");
         util.log("remove favorite", 1);
 
         if (!taskItem) {
-             return;
+            return;
         }
 
         util.logValue("   id", taskItem.id, 2);
@@ -415,6 +418,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         this.sortTasks(favfolder?.taskFiles);
 
         return [...folders.values()];
+    }
+
+
+    private async clearSpecialFolder(folder: TaskFolder)
+    {
+        if (folder.label === constants.FAV_TASKS_LABEL) {
+            await storage.update(constants.FAV_TASKS_STORE, "");
+            this.showSpecialTasks(false, true);
+        }
+        else if (folder.label === constants.LAST_TASKS_LABEL) {
+            await storage.update(constants.LAST_TASKS_STORE, "");
+            this.showSpecialTasks(false);
+        }
     }
 
 
@@ -2065,15 +2081,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async saveTask(taskItem: TaskItem, maxTasks: number, isFavorite = false, logPad = "")
     {
-        util.log(logPad + "save task", 1);
-
         const storeName: string = !isFavorite ? constants.LAST_TASKS_STORE : constants.FAV_TASKS_STORE;
         const label: string = !isFavorite ? constants.LAST_TASKS_LABEL : constants.FAV_TASKS_LABEL;
-
         const cstTasks = storage.get<string[]>(storeName, []);
-        util.logValue(logPad + "   current saved task ids", cstTasks.toString(), 2);
+        const taskId = taskItem?.id?.replace(label + ":", "");
 
-        const taskId = taskItem.id.replace(label + ":", "");
+        util.log(logPad + "save task", 1);
+        util.logValue(logPad + "   treenode label", label, 2);
+        util.logValue(logPad + "   max tasks", maxTasks, 2);
+        util.logValue(logPad + "   is favorite", isFavorite, 2);
+        util.logValue(logPad + "   current saved task ids", cstTasks.toString(), 2);
+        if (!taskId) {
+            util.log(logPad + "   invalid task id, exit", 1);
+            return;
+        }
 
         if (util.existsInArray(cstTasks, taskId)) {
             await util.removeFromArrayAsync(cstTasks, taskId);

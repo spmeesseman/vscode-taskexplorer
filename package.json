@@ -238,6 +238,15 @@
                 }
             },
             {
+                "command": "taskExplorerSideBar.clearSpecialFolder",
+                "title": "%command.clearSpecialFolder%",
+                "when": "config.taskExplorer.enableSideBar",
+                "icon": {
+                    "dark": "res/dark/restart.svg",
+                    "light": "res/light/restart.svg"
+                }
+            },
+            {
                 "command": "taskExplorerSideBar.pause",
                 "title": "%command.pause%",
                 "when": "config.taskExplorer.enableSideBar",
@@ -369,6 +378,15 @@
                 "icon": {
                     "dark": "res/dark/favorite.svg",
                     "light": "res/light/favorite.svg"
+                }
+            },
+            {
+                "command": "taskExplorer.clearSpecialFolder",
+                "title": "%command.clearSpecialFolder%",
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "dark": "res/dark/restart.svg",
+                    "light": "res/light/restart.svg"
                 }
             },
             {
@@ -677,6 +695,14 @@
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning"
                 },
                 {
+                    "command": "taskExplorer.clearSpecialFolder",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == favorites"
+                },
+                {
+                    "command": "taskExplorer.clearSpecialFolder",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == lasttasks"
+                },
+                {
                     "command": "taskExplorer.runNoTerm",
                     "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == script",
                     "group": "inline"
@@ -727,6 +753,11 @@
                     "group": "inline"
                 },
                 {
+                    "command": "taskExplorerSideBar.pause",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
+                    "group": "inline"
+                },
+                {
                     "command": "taskExplorer.stop",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
                     "group": "inline"
@@ -744,6 +775,16 @@
                 {
                     "command": "taskExplorer.addRemoveFromFavorites",
                     "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavoritesButton && view == taskExplorer && viewItem == scriptRunning",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskExplorer.clearSpecialFolder",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == favorites",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskExplorer.clearSpecialFolder",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == lasttasks",
                     "group": "inline"
                 },
                 {
@@ -931,6 +972,14 @@
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning"
                 },
                 {
+                    "command": "taskExplorer.clearSpecialFolder",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == favorites"
+                },
+                {
+                    "command": "taskExplorer.clearSpecialFolder",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == lasttasks"
+                },
+                {
                     "command": "taskExplorerSideBar.run",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
                     "group": "inline"
@@ -981,6 +1030,11 @@
                     "group": "inline"
                 },
                 {
+                    "command": "taskExplorerSideBar.pause",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "group": "inline"
+                },
+                {
                     "command": "taskExplorerSideBar.stop",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
                     "group": "inline"
@@ -998,6 +1052,16 @@
                 {
                     "command": "taskExplorerSideBar.addRemoveFromFavorites",
                     "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskExplorerSideBar.clearSpecialFolder",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == favorites",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskExplorerSideBar.clearSpecialFolder",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == lasttasks",
                     "group": "inline"
                 }
             ]

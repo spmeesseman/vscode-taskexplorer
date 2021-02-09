@@ -8,6 +8,7 @@ import * as path from "path";
 import * as util from "./util";
 import * as os from "os";
 import * as fs from "fs";
+import * as constants from "./common/constants";
 
 
 export class TaskItem extends TreeItem
@@ -429,19 +430,28 @@ export class TaskFolder extends TreeItem
 {
     public taskFiles: (TaskFile|TaskItem)[] = [];
     public taskFolders: TaskFolder[] = [];
-
     public workspaceFolder: WorkspaceFolder;
+
 
     constructor(folder: WorkspaceFolder | string)
     {
         super(typeof folder === "string" ? folder  : folder.name, TreeItemCollapsibleState.Expanded);
-        this.contextValue = "folder";
+
+        if (this.label === constants.FAV_TASKS_LABEL || this.label === constants.LAST_TASKS_LABEL) {
+            this.contextValue = this.label.toLowerCase().replace(/[\W \_\-]/g, "");
+        }
+        else {
+            this.contextValue = "folder";
+        }
+
         if (!(typeof folder === "string")) {
             this.workspaceFolder = folder;
             this.resourceUri = folder.uri;
         }
+
         this.iconPath = ThemeIcon.Folder;
     }
+
 
     addTaskFile(taskFile: TaskFile|TaskItem)
     {
@@ -450,6 +460,7 @@ export class TaskFolder extends TreeItem
         }
     }
 
+
     insertTaskFile(taskFile: TaskFile|TaskItem, index: number)
     {
         if (taskFile) {
@@ -457,12 +468,14 @@ export class TaskFolder extends TreeItem
         }
     }
 
+
     addTaskFolder(taskFolder: TaskFolder)
     {
         if (taskFolder) {
             this.taskFolders.push(taskFolder);
         }
     }
+
 
     removeTaskFile(taskFile: TaskFile|TaskItem)
     {
