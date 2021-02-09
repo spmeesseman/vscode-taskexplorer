@@ -8,6 +8,7 @@ import * as constants from "./common/constants";
 let cacheBuilding = false;
 let folderCaching = false;
 let cancel = false;
+let taskGlobs: any = {};
 
 export const filesCache: Map<string, Set<any>> = new Map();
 
@@ -138,11 +139,11 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
 }
 
 
-export async function buildCache(taskType: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined, setCacheBuilding = true)
+export async function buildCache(taskType: string, fileGlob: string, wsfolder?: WorkspaceFolder | undefined, setCacheBuilding = true)
 {
     const taskAlias = !util.isScriptType(taskType) ? taskType : "script";
 
-    logBuildCache(taskType, taskAlias, fileBlob, wsfolder, setCacheBuilding);
+    logBuildCache(taskType, taskAlias, fileGlob, wsfolder, setCacheBuilding);
 
     if (setCacheBuilding) {
         //
@@ -166,6 +167,22 @@ export async function buildCache(taskType: string, fileBlob: string, wsfolder?: 
     statusBarSpace.show();
 
     //
+    // Handle glob changes
+    // For 'script' alias, to support this, we'd need to keep separate cache maps for each
+    // script type (batch, powershell, python, etc)
+    //
+    if (taskGlobs[taskType] && taskAlias !== "script")
+    {   //
+        // As of v1.31, Ant globs will be the only task types whose blobs may change
+        //
+        if (taskGlobs[taskType] !== fileGlob)
+        {
+            fCache.clear();
+        }
+    }
+    taskGlobs[taskType] = fileGlob;
+
+    //
     // If 'wsfolder' if falsey, build the entire cache.  If truthy, build the cache for the
     // specified folder only
     //
@@ -173,10 +190,10 @@ export async function buildCache(taskType: string, fileBlob: string, wsfolder?: 
     {
         util.logBlank(1);
         util.log("   Build cache - Scan all projects for taskType '" + taskType + "' (" + dispTaskType + ")", 1);
-        await buildFolderCaches(fCache, dispTaskType, fileBlob, statusBarSpace, setCacheBuilding);
+        await buildFolderCaches(fCache, dispTaskType, fileGlob, statusBarSpace, setCacheBuilding);
     }
     else {
-        await buildFolderCache(fCache, wsfolder, dispTaskType, fileBlob, statusBarSpace, setCacheBuilding);
+        await buildFolderCache(fCache, wsfolder, dispTaskType, fileGlob, statusBarSpace, setCacheBuilding);
     }
 
     //
@@ -192,7 +209,7 @@ export async function buildCache(taskType: string, fileBlob: string, wsfolder?: 
 }
 
 
-async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskType: string, fileBlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean)
+async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskType: string, fileGlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean)
 {
     if (cancel) {
         cancelInternal(setCacheBuilding, statusBarSpace);
@@ -204,7 +221,7 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
     statusBarSpace.text = getStatusString("Scanning for " + taskType + " tasks in project " + folder.name, 65);
 
     try {
-        const relativePattern = new RelativePattern(folder, fileBlob);
+        const relativePattern = new RelativePattern(folder, fileGlob);
         const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
         for (const fpath of paths)
         {
@@ -227,13 +244,13 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
 }
 
 
-async function buildFolderCaches(fCache: Set<any>, taskType: string, fileBlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean)
+async function buildFolderCaches(fCache: Set<any>, taskType: string, fileGlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean)
 {
     if (workspace.workspaceFolders) // ensure workspace folders exist
     {
         for (const folder of workspace.workspaceFolders)
         {
-            await buildFolderCache(fCache, folder, taskType, fileBlob, statusBarSpace, setCacheBuilding);
+            await buildFolderCache(fCache, folder, taskType, fileGlob, statusBarSpace, setCacheBuilding);
         }
     }
 }
@@ -306,14 +323,14 @@ function getStatusString(msg: string, statusLength = 0)
 }
 
 
-function logBuildCache(taskType: string, taskAlias: string, fileBlob: string, wsfolder: WorkspaceFolder | undefined, setCacheBuilding: boolean)
+function logBuildCache(taskType: string, taskAlias: string, fileGlob: string, wsfolder: WorkspaceFolder | undefined, setCacheBuilding: boolean)
 {
     util.logBlank(2);
     util.log("Start cache building", 2);
     util.logValue("   folder", !wsfolder ? "entire workspace" : wsfolder.name, 2);
     util.logValue("   task type", taskType, 2);
     util.logValue("   task alias", taskAlias, 2);
-    util.logValue("   blob", fileBlob, 2);
+    util.logValue("   blob", fileGlob, 2);
     util.logValue("   setCacheBuilding", setCacheBuilding.toString(), 2);
 }
 
@@ -341,7 +358,7 @@ export async function removeFileFromCache(taskAlias: string, uri: Uri)
     const taskCache = filesCache.get(taskAlias);
     const toRemove = [];
 
-    taskCache.forEach((item) =>
+    taskCache?.forEach((item) =>
     {
         if (item.uri.fsPath === uri.fsPath) {
             toRemove.push(item);
@@ -356,7 +373,6 @@ export async function removeFileFromCache(taskAlias: string, uri: Uri)
         }
     }
 }
-
 
 
 export async function waitForCache()
