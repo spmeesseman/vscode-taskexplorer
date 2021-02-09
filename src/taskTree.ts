@@ -170,6 +170,57 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    private addToSpecialFolder(taskItem: TaskItem, folder: any, tasks: string[], label: string)
+    {
+        if (taskItem && folder && tasks && label && tasks.includes(taskItem.id))
+        {
+            const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
+            taskItem2.id = label + ":" + taskItem2.id;
+            taskItem2.label = this.getSpecialTaskName(taskItem2);
+            folder.insertTaskFile(taskItem2, 0);
+        }
+    }
+
+
+    private buildGroupings(folders: Map<string, TaskFolder>)
+    {
+        //
+        // Sort nodes.  By default the project folders are sorted in the same order as that
+        // of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
+        // its entirley random as to when the individual providers report tasks to the engine
+        //
+        // After the initial sort, create any task groupings based on the task group separator
+        //
+        // TODO - As of v1.29 with muti-level groupings, this needs ti be recursve, it's not
+        // going to hit task items levels 2 or more
+        //
+        folders.forEach((folder, key) =>
+        {
+            if (key === constants.LAST_TASKS_LABEL || key === constants.FAV_TASKS_LABEL) {
+                return; // continue forEach()
+            }
+
+            folder.taskFiles.forEach(each =>
+            {
+                if (each instanceof TaskFile)
+                {
+                    this.sortTasks(each.scripts);
+                }
+            });
+
+            this.sortTasks(folder.taskFiles);
+
+            //
+            // Create groupings by task type
+            //
+            if (configuration.get("groupWithSeparator")) // && key !== constants.USER_TASKS_LABEL)
+            {
+                this.createTaskGroupings(folder);
+            }
+        });
+    }
+
+
     private buildTaskTree(tasksList: Task[]): TaskFolder[] | NoScripts[]
     {
         let taskCt = 0;
@@ -213,20 +264,38 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             let settingName: string = "enable" + util.properCase(each.source);
 
             taskCt++;
-            util.log("");
-            util.log("Processing task " + taskCt.toString() + " of " + tasksList.length.toString());
-            util.logValue("   name", each.name, 2);
-            util.logValue("   source", each.source, 2);
 
             //
-            // Remove the '-' from app-publisher task
+            // Remove the '-' from app-publisher task.  VSCode doesn't like dashes in the settings names, so...
             //
             if (settingName === "enableApp-publisher") {
                 settingName = "enableAppPublisher";
             }
 
-            if ((configuration.get(settingName) || !this.isWorkspaceFolder(each.scope)) && !this.isInstallTask(each))
+            //
+            // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
+            // By default, also ignore npm 'install' tasks, since its available in the context menu
+            //
+            if ((configuration.get(settingName) || !this.isWorkspaceFolder(each.scope)) && !this.isNpmInstallTask(each))
             {
+                const definition: TaskDefinition = each.definition;
+                let relativePath = definition.path ? definition.path : "";
+
+                //
+                // Make sure this task shouldnt be ignored based on various criteria...
+                //
+                const include: any = this.isTaskIncluded(each, relativePath);
+                if (!include) {
+                    return;
+                }
+                else if (include instanceof String) { // TSC tasks may have had their rel. pathchanged
+                    relativePath = include;
+                }
+
+                //
+                // Set scope name and create the TaskFolder, a "user" task will have a TaskScope scope, not
+                // a WosrkspaceFolder scope.
+                //
                 if (this.isWorkspaceFolder(each.scope))
                 {
                     scopeName = each.scope.name;
@@ -236,9 +305,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         folder = new TaskFolder(each.scope);
                         folders.set(scopeName, folder);
                     }
-                }
+                }     //
                 else // User Task (not related to a ws or project)
-                {
+                {   //
                     scopeName = constants.USER_TASKS_LABEL;
                     folder = folders.get(scopeName);
                     if (!folder)
@@ -248,74 +317,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     }
                 }
 
-                const definition: TaskDefinition = each.definition;
-                let relativePath = definition.path ? definition.path : "";
-
-                //
-                // Ignore VSCode provided gulp and grunt tasks, which are always and only from a gulp/gruntfile
-                // in a workspace folder root directory.  All internaly provided tasks will have the 'uri' property
-                // set in its task definition
-                //
-                if (!definition.uri && (each.source === "gulp" || each.source === "grunt"))
-                {
-                    return; // continue forEach() loop
-                }
-
-                //
-                // TSC tasks are returned with no path value, the relative path is in the task name:
-                //
-                //     watch - tsconfig.json
-                //     watch - .vscode-test\vscode-1.32.3\resources\app\tsconfig.schema.json
-                //
-                if (each.source === "tsc" && this.isWorkspaceFolder(each.scope))
-                {
-                    if (each.name.indexOf(" - ") !== -1 && each.name.indexOf(" - tsconfig.json") === -1)
-                    {
-                        relativePath = path.dirname(each.name.substring(each.name.indexOf(" - ") + 3));
-                        if (util.isExcluded(path.join(each.scope.uri.path, relativePath)))
-                        {
-                            return; // continue forEach loop
-                        }
-                    }
-                }
-
-                //
-                // Create an id to group tasks together with
-                //
-                let id = each.source + ":" + path.join(scopeName, relativePath);
-                if (definition.fileName && !definition.scriptFile)
-                {
-                    id = path.join(id, definition.fileName);
-                }
-
                 //
                 // Logging
                 //
-                util.logValue("   scope.name", scopeName, 2);
-                if (this.isWorkspaceFolder(each.scope))
-                {
-                    util.logValue("   scope.uri.path", each.scope.uri.path, 2);
-                    util.logValue("   scope.uri.fsPath", each.scope.uri.fsPath, 2);
-                }
-                else // User tasks
-                {
-                    util.logValue("   scope.uri.path", "N/A (User)", 2);
-                }
-                util.logValue("   relative Path", relativePath, 2);
-                this.logTaskDefinition(definition);
-
-                taskFile = files.get(id);
+                util.log("");
+                util.log("Processing task " + taskCt.toString() + " of " + tasksList.length.toString());
+                this.logTask(each, scopeName);
 
                 //
-                // Create taskfile node if needed
+                // Get task file node
                 //
-                if (!taskFile)
-                {
-                    taskFile = new TaskFile(this.extensionContext, folder, definition, each.source, relativePath);
-                    folder.addTaskFile(taskFile);
-                    files.set(id, taskFile);
-                    util.logValue("   Added source file container", each.source);
-                }
+                taskFile = this.getTaskFileNode(each, folder, files, relativePath, scopeName);
 
                 //
                 // Create and add task item to task file node
@@ -327,67 +339,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 //
                 // Add this task to the 'Last Tasks' folder if we need to
                 //
-                if (ltfolder && lastTasks.includes(taskItem.id))
-                {
-                    const taskItem2 = new TaskItem(this.extensionContext, taskFile, each);
-                    taskItem2.id = constants.LAST_TASKS_LABEL + ":" + taskItem2.id;
-                    taskItem2.label = this.getSpecialTaskName(taskItem2);
-                    ltfolder.insertTaskFile(taskItem2, 0);
-                }
-
+                this.addToSpecialFolder(taskItem, ltfolder, lastTasks, constants.LAST_TASKS_LABEL);
                 //
                 // Add this task to the 'Favorites' folder if we need to
                 //
-                if (favfolder && favTasks.includes(taskItem.id))
-                {
-                    const taskItem2 = new TaskItem(this.extensionContext, taskFile, each);
-                    taskItem2.id = constants.FAV_TASKS_LABEL + ":" + taskItem2.id;
-                    taskItem2.label = this.getSpecialTaskName(taskItem2);
-                    favfolder.insertTaskFile(taskItem2, 0);
-                }
+                this.addToSpecialFolder(taskItem, favfolder, favTasks, constants.FAV_TASKS_LABEL);
             }
             else
             {
                 util.log("   Skipping");
                 util.logValue("   enabled", configuration.get(settingName));
-                util.logValue("   is install task", this.isInstallTask(each));
+                util.logValue("   is npm install task", this.isNpmInstallTask(each));
             }
         });
 
         //
-        // Sort nodes.  By default the project folders are sorted in the same order as that
-        // of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
-        // its entirley random as to when the individual providers report tasks to the engine
+        // Sort and build groupings
         //
-        // After the initial sort, create any task groupings based on the task group separator
-        //
-        // TODO - As of v1.29 with muti-level groupings, this needs ti be recursve, it's not
-        // going to hit task items levels 2 or more
-        //
-        folders.forEach((folder, key) =>
-        {
-            if (key === constants.LAST_TASKS_LABEL || key === constants.FAV_TASKS_LABEL) {
-                return; // continue forEach()
-            }
-
-            folder.taskFiles.forEach(each =>
-            {
-                if (each instanceof TaskFile)
-                {
-                    this.sortTasks(each.scripts);
-                }
-            });
-
-            this.sortTasks(folder.taskFiles);
-
-            //
-            // Create groupings by task type
-            //
-            if (configuration.get("groupWithSeparator")) // && key !== constants.USER_TASKS_LABEL)
-            {
-                this.createTaskGroupings(folder);
-            }
-        });
+        this.buildGroupings(folders);
 
         //
         // Sort the 'Last Tasks' folder by last time run
@@ -405,10 +374,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Sort the 'Favorites' folder
         //
-        if (favfolder)
-        {
-            this.sortTasks(favfolder.taskFiles);
-        }
+        this.sortTasks(favfolder?.taskFiles);
 
         return [...folders.values()];
     }
@@ -689,101 +655,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
             });
         }
-    }
-
-
-    private async handleFileWatcherEvent(invalidate: any, opt: boolean | Uri)
-    {
-        util.log("   Handling 'FileWatcher/test' event");
-        //
-        // invalidate=true means the refresh button was clicked (opt will be false)
-        // invalidate="tests" means this is being called from unit tests (opt will be undefined)
-        //
-        if ((invalidate === true || invalidate === "tests") && !opt) {
-            util.log("   Handling 'rebuild cache' event");
-            this.busy = true;
-            await rebuildCache();
-            this.busy = false;
-        }
-        //
-        // If this is not from unit testing, then invalidate the appropriate task cache/file
-        //
-        if (invalidate !== "tests") {
-            util.log("   Handling 'invalidate tasks cache' event");
-            await this.invalidateTasksCache(invalidate, opt);
-        }
-    }
-
-
-    private handleVisibleEvent()
-    {
-        util.log("   Handling 'visible' event");
-        if (this.needsRefresh && this.needsRefresh.length > 0)
-        {
-            // If theres more than one pending refresh request, just refresh the tree
-            //
-            if (this.needsRefresh.length > 1 || this.needsRefresh[0].invalidate === undefined)
-            {
-                this.refresh();
-            }
-            else
-            {
-                this.refresh(this.needsRefresh[0].invalidate, this.needsRefresh[0].uri, this.needsRefresh[0].task);
-            }
-
-            this.needsRefresh = [];
-        }
-    }
-
-
-    /**
-     * This function should only be called by the unit tests
-     *
-     * @param opt1 Task provider type.  Can be one of:
-     *     "ant"
-     *     "app-publisher"
-     *     "bash"
-     *     "batch"
-     *     "gradle"
-     *     "grunt"
-     *     "gulp"
-     *     "make"
-     *     "npm"
-     *     "nsis"
-     *     "perl"
-     *     "powershell"
-     *     "python"
-     *     "ruby"
-     *     "tests"
-     *     "Workspace"
-     * @param opt2 The uri of the file that contains/owns the task
-     */
-    public async invalidateTasksCache(opt1: string, opt2: Uri | boolean)
-    {
-        this.busy = true;
-        //
-        // All internal task providers export an invalidate() function...
-        //
-        // If 'opt1' is a string then a filesystemwatcher or taskevent was triggered for the
-        // task type defined in the 'opt1' parameter.
-        //
-        // 'opt2' should contain the Uri of the file that was edited, or the Task if this was
-        // a task event
-        //
-        if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
-        {
-            const provider = providers.get(!util.isScriptType(opt1) ? opt1 : "script");
-            if (provider) { // NPM and Workspace tasks don't implament the TaskExplorerProvider interface
-                await provider.invalidateTasksCache(opt2);
-            }
-        }
-        else {
-            await util.asyncForEach(providers, (p: TaskExplorerProvider) => {
-                p.invalidateTasksCache();
-            });
-        }
-
-        this.busy = false;
     }
 
 
@@ -1264,6 +1135,33 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    private getTaskFileNode(task: Task, folder: any, files: any, relativePath: string, scopeName: string): TaskFile
+    {
+        let taskFile: TaskFile;
+
+        let id = task.source + ":" + path.join(scopeName, relativePath);
+        if (task.definition.fileName && !task.definition.scriptFile)
+        {
+            id = path.join(id, task.definition.fileName);
+        }
+
+        taskFile = files.get(id);
+
+        //
+        // Create taskfile node if needed
+        //
+        if (!taskFile)
+        {
+            taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath);
+            folder.addTaskFile(taskFile);
+            files.set(id, taskFile);
+            util.logValue("   Added source file container", task.source);
+        }
+
+        return taskFile;
+    }
+
+
     private getTerminal(taskItem: TaskItem): Terminal | null
     {
         const me = this;
@@ -1357,10 +1255,140 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private isInstallTask(task: Task): boolean
+    private async handleFileWatcherEvent(invalidate: any, opt: boolean | Uri)
     {
-        const fullName = this.getTaskName("install", task.definition.path);
-        return fullName === task.name;
+        util.log("   Handling 'FileWatcher/test' event");
+        //
+        // invalidate=true means the refresh button was clicked (opt will be false)
+        // invalidate="tests" means this is being called from unit tests (opt will be undefined)
+        //
+        if ((invalidate === true || invalidate === "tests") && !opt) {
+            util.log("   Handling 'rebuild cache' event");
+            this.busy = true;
+            await rebuildCache();
+            this.busy = false;
+        }
+        //
+        // If this is not from unit testing, then invalidate the appropriate task cache/file
+        //
+        if (invalidate !== "tests") {
+            util.log("   Handling 'invalidate tasks cache' event");
+            await this.invalidateTasksCache(invalidate, opt);
+        }
+    }
+
+
+    private handleVisibleEvent()
+    {
+        util.log("   Handling 'visible' event");
+        if (this.needsRefresh && this.needsRefresh.length > 0)
+        {
+            // If theres more than one pending refresh request, just refresh the tree
+            //
+            if (this.needsRefresh.length > 1 || this.needsRefresh[0].invalidate === undefined)
+            {
+                this.refresh();
+            }
+            else
+            {
+                this.refresh(this.needsRefresh[0].invalidate, this.needsRefresh[0].uri, this.needsRefresh[0].task);
+            }
+
+            this.needsRefresh = [];
+        }
+    }
+
+
+    /**
+     * This function should only be called by the unit tests
+     *
+     * @param opt1 Task provider type.  Can be one of:
+     *     "ant"
+     *     "app-publisher"
+     *     "bash"
+     *     "batch"
+     *     "gradle"
+     *     "grunt"
+     *     "gulp"
+     *     "make"
+     *     "npm"
+     *     "nsis"
+     *     "perl"
+     *     "powershell"
+     *     "python"
+     *     "ruby"
+     *     "tests"
+     *     "Workspace"
+     * @param opt2 The uri of the file that contains/owns the task
+     */
+    public async invalidateTasksCache(opt1: string, opt2: Uri | boolean)
+    {
+        this.busy = true;
+        //
+        // All internal task providers export an invalidate() function...
+        //
+        // If 'opt1' is a string then a filesystemwatcher or taskevent was triggered for the
+        // task type defined in the 'opt1' parameter.
+        //
+        // 'opt2' should contain the Uri of the file that was edited, or the Task if this was
+        // a task event
+        //
+        if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
+        {
+            const provider = providers.get(!util.isScriptType(opt1) ? opt1 : "script");
+            if (provider) { // NPM and Workspace tasks don't implament the TaskExplorerProvider interface
+                await provider.invalidateTasksCache(opt2);
+            }
+        }
+        else {
+            await util.asyncForEach(providers, (p: TaskExplorerProvider) => {
+                p.invalidateTasksCache();
+            });
+        }
+
+        this.busy = false;
+    }
+
+
+    private isNpmInstallTask(task: Task): boolean
+    {
+        return task.source === "npm" && task.name === this.getTaskName("install", task.definition.path);
+    }
+
+
+    private isTaskIncluded(task: Task, relativePath: string): boolean | string
+    {
+        //
+        // We have our own provider for Gulp and Grunt tasks...
+        // Ignore VSCode provided gulp and grunt tasks, which are always and only from a gulp/gruntfile
+        // in a workspace folder root directory.  All internaly provided tasks will have the 'uri' property
+        // set in its task definition,VSCode provided Grunt/Gulp tasks will not
+        //
+        if (!task.definition.uri && (task.source === "gulp" || task.source === "grunt"))
+        {
+            return false;
+        }
+
+        //
+        // TSC tasks are returned with no path value, the relative path is in the task name:
+        //
+        //     watch - tsconfig.json
+        //     watch - .vscode-test\vscode-1.32.3\resources\app\tsconfig.schema.json
+        //
+        if (task.source === "tsc" && this.isWorkspaceFolder(task.scope))
+        {
+            if (task.name.indexOf(" - ") !== -1 && task.name.indexOf(" - tsconfig.json") === -1)
+            {
+                relativePath = path.dirname(task.name.substring(task.name.indexOf(" - ") + 3));
+                if (util.isExcluded(path.join(task.scope.uri.path, relativePath)))
+                {
+                    return false;
+                }
+                return relativePath;
+            }
+        }
+
+        return true;
     }
 
 
@@ -1370,8 +1398,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private logTaskDefinition(definition: TaskDefinition)
+    private logTask(task: Task, scopeName: string)
     {
+        const definition = task.definition;
+
+        util.logValue("   name", task.name, 2);
+        util.logValue("   source", task.source, 2);
+        util.logValue("   scopeName", scopeName, 2);
+        util.logValue("   scope.name", scopeName, 2);
+        if (this.isWorkspaceFolder(task.scope))
+        {
+            util.logValue("   scope.uri.path", task.scope.uri.path, 2);
+            util.logValue("   scope.uri.fsPath", task.scope.uri.fsPath, 2);
+        }
+        else // User tasks
+        {
+            util.logValue("   scope.uri.path", "N/A (User)", 2);
+        }
+        util.logValue("   relative Path", definition.path ? definition.path : "", 2);
         util.logValue("   type", definition.type, 2);
         if (definition.scriptType)
         {
@@ -2157,9 +2201,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private sortTasks(items: (TaskFile | TaskItem)[])
     {
-        items.sort((a: TaskFile| TaskItem, b: TaskFile| TaskItem) =>
+        items?.sort((a: TaskFile| TaskItem, b: TaskFile| TaskItem) =>
         {
-            return a.label.toString().localeCompare(b.label.toString());
+            return a.label?.toString()?.localeCompare(b.label?.toString());
         });
     }
 
