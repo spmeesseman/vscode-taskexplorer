@@ -182,78 +182,77 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
     }
 
     if (e.affectsConfiguration("taskExplorer.enableAppPublisher")) {
-        await registerFileWatcher(context, "app-publisher", "**/.publishrc*", false, configuration.get<boolean>("enableAppPublisher"));
+        await registerFileWatcher(context, "app-publisher", constants.GLOB_APPPUBLISHER, false, configuration.get<boolean>("enableAppPublisher"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableBash")) {
-        await registerFileWatcher(context, "bash", "**/*.[Ss][Hh]", true, configuration.get<boolean>("enableBash"));
+        await registerFileWatcher(context, "bash", constants.GLOB_BASH, true, configuration.get<boolean>("enableBash"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableBatch")) {
-        await registerFileWatcher(context, "batch", "**/*.[Bb][Aa][Tt]", true, configuration.get<boolean>("enableBatch"));
-        await registerFileWatcher(context, "batch", "**/*.[Cc][Mm][Dd]", true, configuration.get<boolean>("enableBatch"));
+        await registerFileWatcher(context, "batch", constants.GLOB_BATCH, true, configuration.get<boolean>("enableBatch"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableGradle")) {
-        await registerFileWatcher(context, "gradle", "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]", false, configuration.get<boolean>("enableGradle"));
+        await registerFileWatcher(context, "gradle", constants.GLOB_GRADLE, false, configuration.get<boolean>("enableGradle"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableGrunt")) {
-        await registerFileWatcher(context, "grunt", "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]", false, configuration.get<boolean>("enableGrunt"));
+        await registerFileWatcher(context, "grunt", constants.GLOB_GRUNT, false, configuration.get<boolean>("enableGrunt"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableGulp")) {
-        await registerFileWatcher(context, "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].*[JjTt][Ss]", false, configuration.get<boolean>("enableGulp"));
+        await registerFileWatcher(context, "gulp", constants.GLOB_GULP, false, configuration.get<boolean>("enableGulp"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableMake")) {
-        await registerFileWatcher(context, "make", "**/[Mm]akefile", false, configuration.get<boolean>("enableMake"));
+        await registerFileWatcher(context, "make", constants.GLOB_MAKEFILE, false, configuration.get<boolean>("enableMake"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableNpm")) {
-        await registerFileWatcher(context, "npm", "**/package.json", false, configuration.get<boolean>("enableNpm"));
+        await registerFileWatcher(context, "npm", constants.GLOB_NPM, false, configuration.get<boolean>("enableNpm"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableNsis")) {
-        await registerFileWatcher(context, "nsis", "**/*.[Nn][Ss][Ii]", true, configuration.get<boolean>("enableNsis"));
+        await registerFileWatcher(context, "nsis", constants.GLOB_NSIS, true, configuration.get<boolean>("enableNsis"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enablePerl")) {
-        await registerFileWatcher(context, "perl", "**/*.[Pp][Ll]", true, configuration.get<boolean>("enablePerl"));
+        await registerFileWatcher(context, "perl", constants.GLOB_PERL, true, configuration.get<boolean>("enablePerl"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enablePowershell")) {
-        await registerFileWatcher(context, "powershell", "**/*.[Pp][Ss]1", true, configuration.get<boolean>("enablePowershell"));
+        await registerFileWatcher(context, "powershell", constants.GLOB_POWERSHELL, true, configuration.get<boolean>("enablePowershell"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enablePython")) {
-        await registerFileWatcher(context, "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", true, configuration.get<boolean>("enablePython"));
+        await registerFileWatcher(context, "python", constants.GLOB_PYTHON, true, configuration.get<boolean>("enablePython"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableRuby")) {
-        await registerFileWatcher(context, "ruby", "**/*.rb", true, configuration.get<boolean>("enableRuby"));
+        await registerFileWatcher(context, "ruby", constants.GLOB_RUBY, true, configuration.get<boolean>("enableRuby"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableTsc")) {
-        await registerFileWatcher(context, "tsc", "**/tsconfig.json", false, configuration.get<boolean>("enableTsc"));
+        await registerFileWatcher(context, "tsc", constants.GLOB_TYPESCRIPT, false, configuration.get<boolean>("enableTsc"));
         refresh = true;
     }
 
     if (e.affectsConfiguration("taskExplorer.enableWorkspace")) {
-        await registerFileWatcher(context, "workspace", "**/.vscode/tasks.json", false, configuration.get<boolean>("enableWorkspace"));
+        await registerFileWatcher(context, "workspace", constants.GLOB_VSCODE, false, configuration.get<boolean>("enableWorkspace"));
         refresh = true;
     }
 
@@ -321,64 +320,63 @@ async function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>("enableAppPublisher")) {
-        await registerFileWatcher(context, "app-publisher", "**/.publishrc*", true);
+        await registerFileWatcher(context, "app-publisher", constants.GLOB_APPPUBLISHER, true);
     }
 
     if (configuration.get<boolean>("enableBash")) {
-        await registerFileWatcher(context, "bash", "**/*.[Ss][Hh]", true);
+        await registerFileWatcher(context, "bash", constants.GLOB_BASH, true);
     }
 
     if (configuration.get<boolean>("enableBatch")) {
-        await registerFileWatcher(context, "batch", "**/*.[Bb][Aa][Tt]", true);
-        await registerFileWatcher(context, "batch2", "**/*.[Cc][Mm][Dd]", true);
+        await registerFileWatcher(context, "batch", constants.GLOB_BATCH, true);
     }
 
     if (configuration.get<boolean>("enableGradle")) {
-        await registerFileWatcher(context, "gradle", "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]");
+        await registerFileWatcher(context, "gradle", constants.GLOB_GRADLE,);
     }
 
     if (configuration.get<boolean>("enableGrunt")) {
-        await registerFileWatcher(context, "grunt", "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]");
+        await registerFileWatcher(context, "grunt", constants.GLOB_GRUNT);
     }
 
     if (configuration.get<boolean>("enableGulp")) {
-        await registerFileWatcher(context, "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].*[JjTt][Ss]");
+        await registerFileWatcher(context, "gulp", constants.GLOB_GULP);
     }
 
     if (configuration.get<boolean>("enableMake")) {
-        await registerFileWatcher(context, "make", "**/[Mm]akefile");
+        await registerFileWatcher(context, "make", constants.GLOB_MAKEFILE);
     }
 
     if (configuration.get<boolean>("enableNpm")) {
-        await registerFileWatcher(context, "npm", "**/package.json");
+        await registerFileWatcher(context, "npm", constants.GLOB_NPM);
     }
 
     if (configuration.get<boolean>("enableNsis")) {
-        await registerFileWatcher(context, "nsis", "**/*.[Nn][Ss][Ii]", true);
+        await registerFileWatcher(context, "nsis", constants.GLOB_NSIS, true);
     }
 
     if (configuration.get<boolean>("enablePerl")) {
-        await registerFileWatcher(context, "perl", "**/*.[Pp][Ll]", true);
+        await registerFileWatcher(context, "perl", constants.GLOB_PERL, true);
     }
 
     if (configuration.get<boolean>("enablePowershell")) {
-        await registerFileWatcher(context, "powershell", "**/*.[Pp][Ss]1", true);
+        await registerFileWatcher(context, "powershell", constants.GLOB_POWERSHELL, true);
     }
 
     if (configuration.get<boolean>("enablePython")) {
-        await registerFileWatcher(context, "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", true);
+        await registerFileWatcher(context, "python", constants.GLOB_PYTHON, true);
     }
 
     if (configuration.get<boolean>("enableRuby")) {
-        await registerFileWatcher(context, "ruby", "**/*.[Rr][Bb]", true);
+        await registerFileWatcher(context, "ruby", constants.GLOB_RUBY, true);
     }
 
     if (configuration.get<boolean>("enableTsc")) {
-        await registerFileWatcher(context, "tsc", "**/tsconfig.json");
+        await registerFileWatcher(context, "tsc", constants.GLOB_TYPESCRIPT);
     }
 
     if (configuration.get<boolean>("enableWorkspace")) {
-        await registerFileWatcher(context, "workspace", "**/.vscode/tasks.json");
+        await registerFileWatcher(context, "workspace", constants.GLOB_VSCODE);
     }
 }
 
@@ -485,19 +483,16 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
     util.log("Register file watcher for task type '" + taskType + "'");
 
     let taskAlias = taskType;
-    let taskTypeR = taskType !== "batch2" ? taskType : "batch";
+    let taskTypeR = taskType;
     let watcher: FileSystemWatcher = watchers.get(taskTypeR);
 
     if (taskType && taskType.indexOf("ant-") !== -1) {
         taskAlias = "ant";
         taskTypeR = "ant";
     }
-    if (taskType && taskType.indexOf("batch2") !== -1) {
-        taskAlias = "batch";
-    }
 
     if (workspace.workspaceFolders) {
-        await cache.buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, taskTypeR, fileBlob);
+        await cache.buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, fileBlob);
     }
 
     if (watcher)

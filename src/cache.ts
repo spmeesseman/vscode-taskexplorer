@@ -1,8 +1,9 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment } from "vscode";
-import { log, logValue, timeout, getExcludesGlob, isExcluded, properCase } from "./util";
+import { log, logValue, timeout, getExcludesGlob, isExcluded, properCase, isScriptType } from "./util";
 import { configuration } from "./common/configuration";
+import * as constants from "./common/constants";
 
 
 export const filesCache: Map<string, Set<any>> = new Map();
@@ -40,12 +41,14 @@ export async function rebuildCache()
 }
 
 
-export async function buildCache(taskAlias: string, taskType: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined, setCacheBuilding = true)
+export async function buildCache(taskType: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined, setCacheBuilding = true, aliasOverride: string = null)
 {
+    const taskAlias = !aliasOverride ? (!isScriptType(taskType) ? taskType : "script") : aliasOverride;
+
     log("Start cache building", 2);
     logValue("   folder", !wsfolder ? "entire workspace" : wsfolder.name, 2);
-    logValue("   task alias", taskAlias, 3);
     logValue("   task type", taskType, 3);
+    logValue("   task alias", taskAlias, 3);
     logValue("   blob", fileBlob, 3);
     logValue("   setCacheBuilding", setCacheBuilding.toString(), 3);
 
@@ -239,74 +242,73 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
     cacheBuilding = true;
 
     if (!cancel && configuration.get<boolean>("enableAnt")) {
-        await buildCache("ant", "ant", "**/[Bb]uild.xml", folder, false);
+        await buildCache("ant", "**/[Bb]uild.xml", folder, false);
         const includeAnt: string[] = configuration.get("includeAnt");
         if (includeAnt && includeAnt.length > 0) {
             for (let i = 0; i < includeAnt.length; i++) {
-                await buildCache("ant", "ant-" + includeAnt[i], includeAnt[i], folder, false);
+                await buildCache("ant", includeAnt[i], folder, false, "ant-" + includeAnt[i]);
             }
         }
     }
 
     if (!cancel && configuration.get<boolean>("enableAppPublisher")) {
-        await buildCache("app-publisher", "app-publisher", "**/.publishrc*", folder, false);
+        await buildCache("app-publisher", constants.GLOB_APPPUBLISHER, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableBash")) {
-        await buildCache("script", "bash", "**/*.[Ss][Hh]", folder, false);
+        await buildCache("bash", constants.GLOB_BASH, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableBatch")) {
-        await buildCache("script", "batch", "**/*.[Bb][Aa][Tt]", folder, false);
-        await buildCache("script", "batch", "**/*.[Cc][Mm][Dd]", folder, false);
+        await buildCache("batch", constants.GLOB_BATCH, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableGradle")) {
-        await buildCache("gradle", "gradle", "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]", folder, false);
+        await buildCache("gradle", constants.GLOB_GRADLE, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableGrunt")) {
-        await buildCache("grunt", "grunt", "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]", folder, false);
+        await buildCache("grunt", constants.GLOB_GRUNT, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableGulp")) {
-        await buildCache("gulp", "gulp", "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].*[JjTt][Ss]", folder, false);
+        await buildCache("gulp", constants.GLOB_GULP, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableMake")) {
-        await buildCache("make", "make", "**/[Mm]akefile", folder, false);
+        await buildCache("make", constants.GLOB_MAKEFILE, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableNpm")) {
-        await buildCache("npm", "npm", "**/package.json", folder, false);
+        await buildCache("npm", constants.GLOB_NPM, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableNsis")) {
-        await buildCache("script", "nsis", "**/*.[Nn][Ss][Ii]", folder, false);
+        await buildCache("nsis", constants.GLOB_NSIS, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enablePerl")) {
-        await buildCache("script", "perl", "**/*.[Pp][Ll]", folder, false);
+        await buildCache("perl", "**/*.[Pp][Ll]", folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enablePowershell")) {
-        await buildCache("script", "powershell", "**/*.[Pp][Ss]1", folder, false);
+        await buildCache("powershell", "**/*.[Pp][Ss]1", folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enablePython")) {
-        await buildCache("script", "python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", folder, false);
+        await buildCache("python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableRuby")) {
-        await buildCache("script", "ruby", "**/*.[Rr][Bb]", folder, false);
+        await buildCache("ruby", "**/*.[Rr][Bb]", folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableTsc")) {
-        await buildCache("tsc", "tsc", "**/tsconfig.json", folder, false);
+        await buildCache("tsc", "**/tsconfig.json", folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableWorkspace")) {
-        await buildCache("workspace", "workspace", "**/.vscode/tasks.json", folder, false);
+        await buildCache("workspace", "**/.vscode/tasks.json", folder, false);
     }
 
     cacheBuilding = false;
