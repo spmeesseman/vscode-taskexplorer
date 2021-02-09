@@ -239,12 +239,8 @@
             },
             {
                 "command": "taskExplorerSideBar.clearSpecialFolder",
-                "title": "%command.clearSpecialFolder%",
-                "when": "config.taskExplorer.enableSideBar",
-                "icon": {
-                    "dark": "res/dark/restart.svg",
-                    "light": "res/light/restart.svg"
-                }
+                "title": "CLR",
+                "when": "config.taskExplorer.enableSideBar"
             },
             {
                 "command": "taskExplorerSideBar.pause",
@@ -382,12 +378,8 @@
             },
             {
                 "command": "taskExplorer.clearSpecialFolder",
-                "title": "%command.clearSpecialFolder%",
-                "when": "config.taskExplorer.enableExplorerView",
-                "icon": {
-                    "dark": "res/dark/restart.svg",
-                    "light": "res/light/restart.svg"
-                }
+                "title": "CLR",
+                "when": "config.taskExplorer.enableExplorerView"
             },
             {
                 "command": "taskExplorer.pause",
