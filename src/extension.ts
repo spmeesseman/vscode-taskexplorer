@@ -132,9 +132,9 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
                 });
                 if (toRemove.length > 0) {
                     for (const tr in toRemove) {
-                        if (toRemove.hasOwnProperty(tr)) // skip over properties inherited by prototype
+                        if (toRemove.hasOwnProperty(tr)) { // skip over properties inherited by prototype
                             obj.delete(toRemove[tr]);
-                    }
+                        }
                     }
                 }
             }
@@ -155,11 +155,8 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
         refresh = true;
     }
 
-    if (e.affectsConfiguration("taskExplorer.groupWithSeparator")) {
-        refresh = true;
-    }
-
-    if (e.affectsConfiguration("taskExplorer.groupSeparator")) {
+    if (e.affectsConfiguration("taskExplorer.groupWithSeparator") || e.affectsConfiguration("taskExplorer.groupSeparator") ||
+        e.affectsConfiguration("taskExplorer.groupMaxLevel") || e.affectsConfiguration("taskExplorer.groupStripTaskLabel")) {
         refresh = true;
     }
 

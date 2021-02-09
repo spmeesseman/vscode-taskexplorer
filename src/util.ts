@@ -110,7 +110,8 @@ export function getExcludesGlob(folder: string | WorkspaceFolder): RelativePatte
     let relativePattern = new RelativePattern(folder, "**/node_modules/**");
     const excludes: string[] = configuration.get("exclude");
 
-    if (excludes && excludes.length > 0) {
+    if (excludes && excludes.length > 0)
+    {
         let multiFilePattern = "{**/node_modules/**";
         if (Array.isArray(excludes))
         {
@@ -275,7 +276,7 @@ export function setWriteToConsole(set: boolean, level = 2)
 }
 
 
-export async function log(msg: string, level?: number)
+export function log(msg: string, level?: number)
 {
     if (msg === null || msg === undefined) {
         return;
@@ -295,7 +296,31 @@ export async function log(msg: string, level?: number)
 }
 
 
-export async function logValue(msg: string, value: any, level?: number)
+export function logBlank(level?: number)
+{
+    log("", level);
+}
+
+
+export async function logError(msg: string | string[])
+{
+    if (!msg === null || msg === undefined) {
+        return;
+    }
+    log("***");
+    if (msg instanceof String) {
+        log("*** " + msg);
+    }
+    else {
+        await asyncForEach(msg, (m: string) => {
+            log("*** " + m);
+        });
+    }
+    log("***");
+}
+
+
+export function logValue(msg: string, value: any, level?: number)
 {
     let logMsg = msg;
     const spaces = msg && msg.length ? msg.length : (value === undefined ? 9 : 4);

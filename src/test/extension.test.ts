@@ -1,10 +1,11 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import * as assert from 'assert';
+import * as assert from "assert";
 import * as vscode from "vscode";
 import { configuration } from "../common/configuration";
-import { setWriteToConsole, timeout } from '../util';
-import { TaskExplorerApi } from '../extension';
+import { setWriteToConsole, timeout } from "../util";
+import { TaskExplorerApi } from "../extension";
 import * as constants from "../common/constants";
 
 
@@ -12,9 +13,9 @@ import * as constants from "../common/constants";
 export let teApi: TaskExplorerApi;
 
 
-suite("Extension Tests", () => 
+suite("Extension Tests", () =>
 {
-    setup(async () => 
+    setup(async () =>
     {
     });
 
@@ -29,8 +30,8 @@ suite("Extension Tests", () =>
         this.timeout(10 * 1000);
         assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
         await initSettings();
-        await vscode.workspace.getConfiguration().update('terminal.integrated.shell.windows', 
-                                                         'C:\\Windows\\System32\\cmd.exe',
+        await vscode.workspace.getConfiguration().update("terminal.integrated.shell.windows",
+                                                         "C:\\Windows\\System32\\cmd.exe",
                                                          vscode.ConfigurationTarget.Workspace);
         setWriteToConsole(false); // FOR DEBUGGING - write debug logging from exiension to console
     });
@@ -43,16 +44,16 @@ suite("Extension Tests", () =>
 
         this.timeout(20 * 1000);
 
-        let ext = vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer");
+        const ext = vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer");
         assert(ext, "Could not find extension");
 
         //
         // For coverage, we remove activationEvents "*" in package.json, we should
         // not be active at this point
         //
-        if (!ext.isActive) 
+        if (!ext.isActive)
         {
-            console.log('        Manually activating extension for full coverage');
+            console.log("        Manually activating extension for full coverage");
             try {
                 teApi = await ext.activate();
             }
@@ -60,10 +61,10 @@ suite("Extension Tests", () =>
                 assert.fail("Failed to activate extension");
             }
             console.log("         ✔ Extension activated");
-        } 
+        }
         else {
-            console.log('         ℹ Extension is already activated, coverage will not occur');
-            console.log('         ℹ Remove the activation event from package.json before running tests');
+            console.log("         ℹ Extension is already activated, coverage will not occur");
+            console.log("         ℹ Remove the activation event from package.json before running tests");
             //
             // Wait for extension to activate
             //
@@ -86,7 +87,7 @@ suite("Extension Tests", () =>
     });
 
 
-    test("Check tree providers", function(done) 
+    test("Check tree providers", function(done)
     {
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -97,15 +98,15 @@ suite("Extension Tests", () =>
         done();
     });
 
-    
-    test("Show log", async function() 
+
+    test("Show log", async function()
     {
         await vscode.commands.executeCommand("taskExplorer.showOutput", false);
         await vscode.commands.executeCommand("taskExplorer.showOutput", true);
     });
 
 
-    test("Cover pre-init cases", async function() 
+    test("Cover pre-init cases", async function()
     {
         await initSettings(false);
         teApi.explorerProvider.showSpecialTasks(true);
@@ -115,7 +116,7 @@ suite("Extension Tests", () =>
     });
 
 
-    test("Check settings", function(done) 
+    test("Check settings", function(done)
     {
         //
         // On Insiders tests, for whareve reason all settings are OFF, and the run produces
@@ -124,12 +125,12 @@ suite("Extension Tests", () =>
         //
         if (configuration.get<boolean>("enableAnt") === false)
         {
-            console.log("THE SETTINGS DID NOT TAKE!!!")
+            console.log("THE SETTINGS DID NOT TAKE!!!");
         }
 
         done();
     });
-    
+
 
     async function initSettings(enable = true)
     {
@@ -137,39 +138,39 @@ suite("Extension Tests", () =>
         // Enable views, use workspace level so that running this test from Code itself
         // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
         //
-        await configuration.updateWs('enableExplorerView', true);
-        await configuration.updateWs('enableSideBar', true);
+        await configuration.updateWs("enableExplorerView", true);
+        await configuration.updateWs("enableSideBar", true);
         //
         // Set misc settings, use workspace level so that running this test from Code itself
         // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
         //
-        await configuration.updateWs('includeAnt', ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml", "**/hello.xml"]);
-        await configuration.updateWs('debug', true);
-        await configuration.updateWs('debugLevel', 3);
+        await configuration.updateWs("includeAnt", ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml", "**/hello.xml"]);
+        await configuration.updateWs("debug", true);
+        await configuration.updateWs("debugLevel", 3);
         //
         // Enabled all options, use workspace level so that running this test from Code itself
         // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
         //
-        await configuration.updateWs('enableAnt', enable);
-        await configuration.updateWs('enableAppPublisher', enable);
-        await configuration.updateWs('enableBash', enable);
-        await configuration.updateWs('enableBatch', enable);
-        await configuration.updateWs('enableGradle', enable);
-        await configuration.updateWs('enableGrunt', enable);
-        await configuration.updateWs('enableGulp', enable);
-        await configuration.updateWs('enableMake', enable);
-        await configuration.updateWs('enableNpm', enable);
-        await configuration.updateWs('enableNsis', enable);
-        await configuration.updateWs('enablePowershell', enable);
-        await configuration.updateWs('enablePerl', enable);
-        await configuration.updateWs('enablePython', enable);
-        await configuration.updateWs('enableRuby', enable);
-        await configuration.updateWs('enableTsc', enable);
-        await configuration.updateWs('enableWorkspace', enable);
-        await configuration.updateWs('groupWithSeparator', enable);
-        await configuration.updateWs('groupSeparator', "-");
-        await configuration.updateWs('showLastTasks', enable);
-        await configuration.updateWs('keepTermOnStop', false);
+        await configuration.updateWs("enableAnt", enable);
+        await configuration.updateWs("enableAppPublisher", enable);
+        await configuration.updateWs("enableBash", enable);
+        await configuration.updateWs("enableBatch", enable);
+        await configuration.updateWs("enableGradle", enable);
+        await configuration.updateWs("enableGrunt", enable);
+        await configuration.updateWs("enableGulp", enable);
+        await configuration.updateWs("enableMake", enable);
+        await configuration.updateWs("enableNpm", enable);
+        await configuration.updateWs("enableNsis", enable);
+        await configuration.updateWs("enablePowershell", enable);
+        await configuration.updateWs("enablePerl", enable);
+        await configuration.updateWs("enablePython", enable);
+        await configuration.updateWs("enableRuby", enable);
+        await configuration.updateWs("enableTsc", enable);
+        await configuration.updateWs("enableWorkspace", enable);
+        await configuration.updateWs("groupWithSeparator", enable);
+        await configuration.updateWs("groupSeparator", "-");
+        await configuration.updateWs("showLastTasks", enable);
+        await configuration.updateWs("keepTermOnStop", false);
     }
 
 });

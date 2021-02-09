@@ -739,7 +739,7 @@ suite("Task tests", () =>
         file = path.join(dirName, "build.xml");
         uri = Uri.parse(file);
         await teApi.explorerProvider.invalidateTasksCache("ant", uri);
-        removeFromArray(tempFiles, file);
+        await removeFromArray(tempFiles, file);
         try {
             fs.unlinkSync(file);
         }

@@ -3,13 +3,11 @@
 import { workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment } from "vscode";
 import { log, logValue, timeout, getExcludesGlob, isExcluded, properCase } from "./util";
 import { configuration } from "./common/configuration";
-import { utils } from "mocha";
 
-export let filesCache: Map<string, Set<any>> = new Map();
+
+export const filesCache: Map<string, Set<any>> = new Map();
 export let cacheBuilding = false;
 let folderCaching = false;
-
-
 let cancel = false;
 
 
