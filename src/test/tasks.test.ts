@@ -9,7 +9,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder } from "vscode";
 import * as testUtil from "./testUtil";
-import { timeout, removeFromArray, asyncMapForEach } from "../util";
+import { timeout, removeFromArray, forEachMapAsync } from "../util";
 import { teApi } from "./extension.test";
 import { TaskItem } from "../tasks";
 import { waitForCache } from "../cache";
@@ -623,7 +623,7 @@ suite("Task tests", () =>
         //
         console.log("    Run a batch and a bash task");
         let lastTask: any;
-        await asyncMapForEach(taskMap, async (value: TaskItem) =>
+        await forEachMapAsync(taskMap, async (value: TaskItem) =>
         {
             if (value && value.taskSource === "batch")
             {
@@ -667,7 +667,7 @@ suite("Task tests", () =>
         //
         console.log("    Run npm install");
         let npmRan = false;
-        await asyncMapForEach(taskMap, async (value: TaskItem) =>  {
+        await forEachMapAsync(taskMap, async (value: TaskItem) =>  {
             if (value && value.taskSource === "npm") {
                 await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
                 npmRan = true;
@@ -692,7 +692,7 @@ suite("Task tests", () =>
         const gruntCt = taskItems.length;
 
         console.log("    Simulate add to exclude");
-        await asyncMapForEach(taskMap, async (value: TaskItem) =>  {
+        await forEachMapAsync(taskMap, async (value: TaskItem) =>  {
             if (value && value.taskSource === "grunt") {
                 await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile, false, false);
                 await teApi.explorerProvider.invalidateTasksCache("grunt", value.taskFile.resourceUri);
@@ -841,7 +841,7 @@ suite("Task tests", () =>
         await(timeout(100));
 
         console.log("    Running all other invalidations");
-        await asyncMapForEach(taskMap, async(value: TaskItem) =>  {
+        await forEachMapAsync(taskMap, async(value: TaskItem) =>  {
             if (value) {
                 if (fs.existsSync(value.taskFile.resourceUri.fsPath)) {
                     console.log("         Invalidate task type '" + value.taskSource + "'");

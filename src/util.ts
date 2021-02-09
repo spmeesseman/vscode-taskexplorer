@@ -16,25 +16,33 @@ let writeToConsoleLevel = 2;
 let logOutputChannel: OutputChannel | undefined;
 
 
-export async function asyncForEach(array: any, callback: any)
+export function camelCase(name: string, indexUpper: number)
 {
-    for (let index = 0; index < array.length; index++) {
-        const result = await callback(array[index], index, array);
-        if (result === false) {
-            break;
-        }
+    if (!name || indexUpper <= 0 || indexUpper >= name.length) {
+      return name;
     }
+
+    return name
+        .replace(/(?:^\w|[A-Za-z]|\b\w)/g, (letter, index) => {
+            return index !== indexUpper ? letter.toLowerCase() : letter.toUpperCase();
+        })
+        .replace(/[\s\-]+/g, "");
 }
 
 
-export async function asyncMapForEach(map: any, callback: any)
+export function existsInArray(arr: any[], item: any)
 {
-    for (const entry of map.entries()) {
-        const result = await callback(entry[1], entry[0], map);
-        if (result === false) {
-            break;
-        }
+    let exists = false;
+    if (arr) {
+        arr.forEach(each => {
+            if (item === each) {
+                exists = true;
+                return false;
+            }
+        });
     }
+
+    return exists;
 }
 
 
@@ -61,6 +69,28 @@ export function initLog(settingGrpName: string, dispName: string, context?: Exte
 }
 
 
+export async function forEachAsync(array: any, callback: any)
+{
+    for (let index = 0; index < array.length; index++) {
+        const result = await callback(array[index], index, array);
+        if (result === false) {
+            break;
+        }
+    }
+}
+
+
+export async function forEachMapAsync(map: any, callback: any)
+{
+    for (const entry of map.entries()) {
+        const result = await callback(entry[1], entry[0], map);
+        if (result === false) {
+            break;
+        }
+    }
+}
+
+
 export function getCwd(uri: Uri): string
 {
     let dir = uri.fsPath.substring(0, uri.fsPath.lastIndexOf("\\") + 1);
@@ -74,34 +104,6 @@ export function getCwd(uri: Uri): string
 export function getGroupSeparator()
 {
     return configuration.get<string>("groupSeparator") || constants.DEFAULT_SEPARATOR;
-}
-
-
-export function camelCase(name: string, indexUpper: number)
-{
-    if (!name || indexUpper <= 0 || indexUpper >= name.length) {
-      return name;
-    }
-
-    return name
-        .replace(/(?:^\w|[A-Za-z]|\b\w)/g, (letter, index) => {
-            return index !== indexUpper ? letter.toLowerCase() : letter.toUpperCase();
-        })
-        .replace(/[\s\-]+/g, "");
-}
-
-
-export function properCase(name: string)
-{
-    if (!name) {
-      return name;
-    }
-
-    return name
-        .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
-            return index !== 0 ? letter.toLowerCase() : letter.toUpperCase();
-        })
-        .replace(/[\s]+/g, "");
 }
 
 
@@ -202,9 +204,79 @@ export function isScriptType(source: string)
 }
 
 
-export function timeout(ms: number)
+export function log(msg: string, level?: number)
 {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    if (msg === null || msg === undefined) {
+        return;
+    }
+
+    if (configuration.get("debug") === true)
+    {
+        if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
+            logOutputChannel.appendLine(msg);
+        }
+        if (writeToConsole === true) {
+            if (!level || level <= writeToConsoleLevel) {
+                console.log(msg);
+            }
+        }
+    }
+}
+
+
+export function logBlank(level?: number)
+{
+    log("", level);
+}
+
+
+export async function logError(msg: string | string[])
+{
+    if (!msg === null || msg === undefined) {
+        return;
+    }
+    log("***");
+    if (msg instanceof String) {
+        log("*** " + msg);
+    }
+    else {
+        await forEachAsync(msg, (m: string) => {
+            log("*** " + m);
+        });
+    }
+    log("***");
+}
+
+
+export function logValue(msg: string, value: any, level?: number)
+{
+    let logMsg = msg;
+    const spaces = msg && msg.length ? msg.length : (value === undefined ? 9 : 4);
+    for (let i = spaces; i < logValueWhiteSpace; i++) {
+        logMsg += " ";
+    }
+
+    if (value || value === 0 || value === "") {
+        logMsg += ": ";
+        logMsg += value.toString();
+    }
+    else if (value === undefined) {
+        logMsg += ": undefined";
+    }
+    else if (value === null) {
+        logMsg += ": null";
+    }
+
+    if (configuration.get("debug") === true) {
+        if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
+            logOutputChannel.appendLine(logMsg);
+        }
+        if (writeToConsole === true) {
+            if (!level || level <= writeToConsoleLevel) {
+                console.log(logMsg);
+            }
+        }
+    }
 }
 
 
@@ -216,6 +288,20 @@ export function pathExists(path: string)
         return false;
     }
     return true;
+}
+
+
+export function properCase(name: string)
+{
+    if (!name) {
+      return name;
+    }
+
+    return name
+        .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
+            return index !== 0 ? letter.toLowerCase() : letter.toUpperCase();
+        })
+        .replace(/[\s]+/g, "");
 }
 
 
@@ -263,7 +349,7 @@ export async function removeFromArrayAsync(arr: any[], item: any)
     let idx = -1;
     let idx2 = -1;
 
-    await asyncForEach(arr, (each: any) => {
+    await forEachAsync(arr, (each: any) => {
         idx++;
         if (item === each) {
             idx2 = idx;
@@ -277,22 +363,6 @@ export async function removeFromArrayAsync(arr: any[], item: any)
 }
 
 
-export function existsInArray(arr: any[], item: any)
-{
-    let exists = false;
-    if (arr) {
-        arr.forEach(each => {
-            if (item === each) {
-                exists = true;
-                return false;
-            }
-        });
-    }
-
-    return exists;
-}
-
-
 export function setWriteToConsole(set: boolean, level = 2)
 {
     writeToConsole = set;
@@ -300,77 +370,7 @@ export function setWriteToConsole(set: boolean, level = 2)
 }
 
 
-export function log(msg: string, level?: number)
+export function timeout(ms: number)
 {
-    if (msg === null || msg === undefined) {
-        return;
-    }
-
-    if (configuration.get("debug") === true)
-    {
-        if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
-            logOutputChannel.appendLine(msg);
-        }
-        if (writeToConsole === true) {
-            if (!level || level <= writeToConsoleLevel) {
-                console.log(msg);
-            }
-        }
-    }
-}
-
-
-export function logBlank(level?: number)
-{
-    log("", level);
-}
-
-
-export async function logError(msg: string | string[])
-{
-    if (!msg === null || msg === undefined) {
-        return;
-    }
-    log("***");
-    if (msg instanceof String) {
-        log("*** " + msg);
-    }
-    else {
-        await asyncForEach(msg, (m: string) => {
-            log("*** " + m);
-        });
-    }
-    log("***");
-}
-
-
-export function logValue(msg: string, value: any, level?: number)
-{
-    let logMsg = msg;
-    const spaces = msg && msg.length ? msg.length : (value === undefined ? 9 : 4);
-    for (let i = spaces; i < logValueWhiteSpace; i++) {
-        logMsg += " ";
-    }
-
-    if (value || value === 0 || value === "") {
-        logMsg += ": ";
-        logMsg += value.toString();
-    }
-    else if (value === undefined) {
-        logMsg += ": undefined";
-    }
-    else if (value === null) {
-        logMsg += ": null";
-    }
-
-    if (configuration.get("debug") === true) {
-        if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
-            logOutputChannel.appendLine(logMsg);
-        }
-        if (writeToConsole === true) {
-            if (!level || level <= writeToConsoleLevel) {
-                console.log(logMsg);
-            }
-        }
-    }
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

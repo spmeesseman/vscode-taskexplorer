@@ -441,12 +441,15 @@ function registerTaskProviders(context: ExtensionContext)
     // TODO: VSCODE API now implements "resolveTask" in addition to "provideTask".  Need to implement
     //     https://code.visualstudio.com/api/extension-guides/task-provider
     //
-    registerTaskProvider("ant", new AntTaskProvider(), context);
-    registerTaskProvider("app-publisher", new AppPublisherTaskProvider(), context);
-    registerTaskProvider("gradle", new GradleTaskProvider(), context);
-    registerTaskProvider("grunt", new GruntTaskProvider(), context);
-    registerTaskProvider("gulp", new GulpTaskProvider(), context);
-    registerTaskProvider("make", new MakeTaskProvider(), context);
+    registerTaskProvider("ant", new AntTaskProvider(), context);                      // Apache Ant Build Automation Tool
+    registerTaskProvider("app-publisher", new AppPublisherTaskProvider(), context);   // App Publisher (work related)
+    registerTaskProvider("gradle", new GradleTaskProvider(), context);                // Gradle Mulit-Language Automation Tool
+    registerTaskProvider("grunt", new GruntTaskProvider(), context);                  // Gulp JavaScript Toolkit
+    registerTaskProvider("gulp", new GulpTaskProvider(), context);                    // Grunt JavaScript Task Runner
+    registerTaskProvider("make", new MakeTaskProvider(), context);                    // C/C++ Makefile
+    //
+    // The 'script' provider handles all file based 'scripts', e.g. batch files, bash, powershell, etc
+    //
     registerTaskProvider("script", new ScriptTaskProvider(), context);
 }
 

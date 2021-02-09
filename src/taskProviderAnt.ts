@@ -58,7 +58,7 @@ export class AntTaskProvider implements TaskExplorerProvider
         {
             const rmvTasks: Task[] = [];
 
-            await util.asyncForEach(this.cachedTasks, each => {
+            await util.forEachAsync(this.cachedTasks, each => {
                 const cstDef: AntTaskDefinition = each.definition;
                 if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                     rmvTasks.push(each);
@@ -71,7 +71,7 @@ export class AntTaskProvider implements TaskExplorerProvider
             // this is happening with a broken await() somewere that I cannot find
             if (this.cachedTasks)
             {
-                await util.asyncForEach(rmvTasks, each => {
+                await util.forEachAsync(rmvTasks, each => {
                     util.log("   removing old task " + each.name);
                     util.removeFromArray(this.cachedTasks, each);
                 });

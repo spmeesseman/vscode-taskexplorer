@@ -449,7 +449,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         this.taskTree.splice(treeIndex, 0, folder);
 
-        await util.asyncForEach(lTasks, async (tId: string) =>
+        await util.forEachAsync(lTasks, async (tId: string) =>
         {
             const taskItem2 = await this.getTaskItems(tId);
             if (taskItem2 && taskItem2 instanceof TaskItem)
@@ -473,7 +473,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let prevTaskFile: TaskItem | TaskFile;
         const subfolders: Map<string, TaskFile> = new Map();
 
-        await util.asyncForEach(folder.taskFiles, async (each: TaskFile | TaskItem) =>
+        await util.forEachAsync(folder.taskFiles, async (each: TaskFile | TaskItem) =>
         {   //
             // Only processitems of type 'TaskFile'
             //
@@ -520,7 +520,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // For groupings with separator, now go through and rename the labels within each group minus the
         // first part of the name split by the separator character (the name of the new grouped-with-separator node)
         //
-        await util.asyncForEach(folder.taskFiles, async (each: TaskFile | TaskItem) =>
+        await util.forEachAsync(folder.taskFiles, async (each: TaskFile | TaskItem) =>
         {
             if (!(each instanceof TaskFile)) {
                 return; // continue forEach()
@@ -535,7 +535,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             return a.taskSource.localeCompare(b.taskSource);
         });
-        await util.asyncForEach(folder.taskFiles, (each: TaskFile | TaskItem) =>
+        await util.forEachAsync(folder.taskFiles, (each: TaskFile | TaskItem) =>
         {
             if (!(each instanceof TaskFile)) {
                 return; // continue forEach()
@@ -612,7 +612,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         };
 
-        await util.asyncForEach(taskFile.scripts, (each: TaskFile | TaskItem) =>
+        await util.forEachAsync(taskFile.scripts, (each: TaskFile | TaskItem) =>
         {
             if (!(each instanceof TaskItem)) {
                 return; // continue forEach()
@@ -1044,7 +1044,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             const treeFiles: any[] = await me.getChildren(pitem2, "   ");
             if (treeFiles.length > 0)
             {
-                await util.asyncForEach(treeFiles, async(item2) =>
+                await util.forEachAsync(treeFiles, async(item2) =>
                 {
                     if (done) {
                         return false;
@@ -1078,7 +1078,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             const treeTasks: any[] = await me.getChildren(pitem2, "   ");
             if (treeTasks.length > 0)
             {
-                await util.asyncForEach(treeTasks, async item3 =>
+                await util.forEachAsync(treeTasks, async item3 =>
                 {
                     if (done) {
                         return false;
@@ -1129,7 +1129,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             const treeFiles: any[] = await me.getChildren(pitem, "   ");
             if (treeFiles.length > 0)
             {
-                await util.asyncForEach(treeFiles, async item2 =>
+                await util.forEachAsync(treeFiles, async item2 =>
                 {
                     if (done) {
                         return false;
@@ -1157,7 +1157,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         };
 
-        await util.asyncForEach(treeItems, async (item: TaskFolder | TaskFile | TaskItem) =>
+        await util.forEachAsync(treeItems, async (item: TaskFolder | TaskFile | TaskItem) =>
         {
             if (item instanceof TaskFolder)
             {
@@ -1399,7 +1399,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         }
         else {
-            await util.asyncForEach(providers, (p: TaskExplorerProvider) => {
+            await util.forEachAsync(providers, (p: TaskExplorerProvider) => {
                 p.invalidateTasksCache();
             });
         }
@@ -1744,7 +1744,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         const taskTypesRmv: TaskFile[] = [];
 
-        await util.asyncForEach(folder.taskFiles, (each: TaskFile | TaskItem) =>
+        await util.forEachAsync(folder.taskFiles, (each: TaskFile | TaskItem) =>
         {
             if (!(each instanceof TaskFile)) {
                 return; // continue forEach()
@@ -1767,7 +1767,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     this.removeScripts(each2 as TaskFile, folder, subfolders);
                     if (each2 instanceof TaskFile && each2.isGroup && each2.groupLevel > 0)
                     {
-                        await util.asyncForEach(each2.scripts, (each3: TaskFile) =>
+                        await util.forEachAsync(each2.scripts, (each3: TaskFile) =>
                         {
                             this.removeScripts(each3, folder, subfolders);
                         });
@@ -1779,7 +1779,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         });
 
-        util.asyncMapForEach(taskTypesRmv, (each: TaskFile) =>
+        util.forEachMapAsync(taskTypesRmv, (each: TaskFile) =>
         {
             folder.removeTaskFile(each);
         });
@@ -1856,7 +1856,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         rmvLbl = rmvLbl.replace(/\(/gi, "\\(").replace(/\[/gi, "\\[");
         rmvLbl = rmvLbl.replace(/\)/gi, "\\)").replace(/\]/gi, "\\]");
 
-        await util.asyncForEach(taskFile.scripts, async (each2: TaskFile | TaskItem) =>
+        await util.forEachAsync(taskFile.scripts, async (each2: TaskFile | TaskItem) =>
         {
             if (each2 instanceof TaskItem)
             {

@@ -113,7 +113,7 @@ suite("Util tests", () =>
             }, 100);
         };
 
-        await util.asyncForEach(arr, async (n: number) =>
+        await util.forEachAsync(arr, async (n: number) =>
         {
             await asyncFn(n);
         });
@@ -135,7 +135,7 @@ suite("Util tests", () =>
             }, 100);
         };
 
-        await util.asyncMapForEach(arr, async (n: number, n2: number) =>
+        await util.forEachMapAsync(arr, async (n: number, n2: number) =>
         {
             assert(n === n2);
             await asyncFn(n);
