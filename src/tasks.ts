@@ -44,31 +44,65 @@ export class TaskItem extends TreeItem
 
         super(getDisplayName(task.name, taskGroup), TreeItemCollapsibleState.None);
 
-        const fsPath = taskFile.resourceUri ? taskFile.resourceUri.fsPath : "root";
+        //
+        // Task group indicates the TaskFile group name (???)
+        //
         this.taskGroup = taskGroup;
+        //
+        // Since we save tasks (last tasks and favorites), we need a knownst unique key to
+        // save them with.  We can just use the existing id parameter...
+        //
+        const fsPath = taskFile.resourceUri ? taskFile.resourceUri.fsPath : "root";
         this.id = fsPath + ":" + task.source + ":" + task.name + ":" + (taskGroup || "");
-        this.paused = false;
-        this.contextValue = "script";
-        this.taskFile = taskFile;
-        this.task = task;
-        this.groupLevel = groupLevel;                      //
-        this.command = {                         // Default click action is Open file since it's easy to click on accident
-            title: "Open definition",            // Default click action can be set to 'Execute/Run' in Settings
-            command: "taskExplorer.open",        // If the def. action is 'Run', then it is redirected in the 'Open' cmd
-            arguments: [this]                    //
+        this.paused = false;                // paused flag used by start/stop/pause task functionality
+        this.taskFile = taskFile;           // Save a reference to the TaskFile that this TaskItem belongs to
+        this.task = task;                   // Save a reference to the Task that this TaskItem represents
+        this.groupLevel = groupLevel;       // Grouping level - indicates how many levels deep the TaskItem node is
+        this.command = {                    // Note that 'groupLevel' will be set by TaskFile.addScript()
+            title: "Open definition",       // Default click action is Open file since it's easy to click on accident
+            command: "taskExplorer.open",   // Default click action can be set to 'Execute/Run' in Settings
+            arguments: [this]               // If the def. action is 'Run', then it is redirected in the 'Open' cmd
         };
 
+        //
+        // The task source, i.e. "npm", "workspace", or any of the TaskExplorer provided tasl mnemonics,
+        // i.e. "ant", "gulp", "batch", etc...
+        //
         this.taskSource = task.source;
+
+        //
+        // Find an execustion for this task if it exists, this tells if it's currently running or not
+        //
         this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
             e.task.scope === task.scope && e.task.definition.path === task.definition.path);
 
+        //
+        // Context view controls the view parameters to the ui, see package.json /views/context node.
+        //
+        //     script        - Standard task item, e.g. "npm", "Workspace", "gulp", etc
+        //     scriptFile    - A file that is ran as a task, ie. "batch" or "bash", i.e. script type "script".
+        //     runningScript - Obviously, a task/script that is running.
+        //
+        // Note that TaskItems of type 'scriptFile' can be ran with arguments and this will have an additional
+        // entry added to it's context menu - "Run with arguments"
+        //
         if (this.task.definition.scriptFile || this.taskSource === "gradle") {
             this.contextValue = "scriptFile";
-        }
-        else {
+        }       //
+        else { // Note 2/8/2021
+              // I think "$composite" was the old definition type for composite tasks, because as of Code v1.53,
+             // the task definition type for a comosite task is "$empty".
+            //
             this.contextValue = this.execution && task.definition.type !== "$composite" ? "runningScript" : "script";
         }
 
+        //
+        // Set icon
+        //
+        // Note 2/8/2021
+        // I think "$composite" was the old definition type for composite tasks, because as of Code v1.53,
+        // the task definition type for a comosite task is "$empty".
+        //
         if (this.execution && task.definition.type !== "$composite")
         {
             this.iconPath = {
