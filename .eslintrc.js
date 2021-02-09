@@ -243,13 +243,6 @@ module.exports = {
                         true,
                         "setInterval"
                     ],
-                    "boolean-trivia": true,
-                    "debug-assert": true,
-                    "next-line": [
-                        true,
-                        "check-catch",
-                        "check-else"
-                    ],
                     "whitespace": [
                         true,
                         "check-branch",
