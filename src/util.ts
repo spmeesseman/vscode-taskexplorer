@@ -295,6 +295,9 @@ export function logValue(msg: string, value: any, level?: number)
     else if (value === null) {
         logMsg += ": null";
     }
+    else if (value === false) {
+        logMsg += ": false";
+    }
 
     if (configuration.get("debug") === true) {
         if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
