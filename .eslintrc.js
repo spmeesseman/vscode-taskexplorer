@@ -250,13 +250,6 @@ module.exports = {
                         "check-catch",
                         "check-else"
                     ],
-                    "no-bom": true,
-                    "no-double-space": true,
-                    "no-in-operator": true,
-                    "no-increment-decrement": true,
-                    "no-type-assertion-whitespace": true,
-                    "object-literal-surrounding-space": true,
-                    "type-operator-spacing": true,
                     "whitespace": [
                         true,
                         "check-branch",

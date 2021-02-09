@@ -1,23 +1,23 @@
 
 
 
-declare module 'nyc' 
+declare module "nyc"
 {
-    export class NYC 
+    export class NYC
     {
       constructor(options?: any);
       createTempDirectory(): Promise<void>;
       writeCoverageFile(): Promise<void>;
       instrumenter(): any
     }
-    
+
     export const libHook: any;
 
     export default NYC;
 }
 
 /*
-declare namespace nyc2 
+declare namespace nyc2
 {
     interface NYC {
         new (options?: any): NYC;

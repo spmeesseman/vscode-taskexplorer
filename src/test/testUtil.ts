@@ -1,12 +1,7 @@
-/* tslint:disable */
-
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import * as cp from "child_process";
-import { ChildProcess, SpawnOptions } from "child_process";
-import { extensions, Uri, window, workspace } from "vscode";
+import { extensions, window } from "vscode";
 import { TaskItem } from "../tasks";
-import { removeFromArray } from "../util";
-import * as fs from "fs";
-import { join } from "path";
 
 
 export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
@@ -22,7 +17,7 @@ export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
 }
 
 
-export function spawn(command: string, args?: string[], options?: SpawnOptions): ChildProcess
+export function spawn(command: string, args?: string[], options?: cp.SpawnOptions): cp.ChildProcess
 {
     const proc = cp.spawn(command, args, options);
 
@@ -85,7 +80,7 @@ export function activeExtension()
 const overridesShowInputBox: any[] = [];
 
 
-export function overrideNextShowInputBox(value: any) 
+export function overrideNextShowInputBox(value: any)
 {
     overridesShowInputBox.push(value);
 }
@@ -94,7 +89,7 @@ export function overrideNextShowInputBox(value: any)
 const originalShowInputBox = window.showInputBox;
 
 
-window.showInputBox = (...args: any[]) => 
+window.showInputBox = (...args: any[]) =>
 {
     const next = overridesShowInputBox.shift();
     if (typeof next === "undefined")
@@ -111,7 +106,7 @@ window.showInputBox = (...args: any[]) =>
 const overridesShowQuickPick: any[] = [];
 
 
-export function overrideNextShowQuickPick(value: any) 
+export function overrideNextShowQuickPick(value: any)
 {
     overridesShowQuickPick.push(value);
 }

@@ -4,14 +4,12 @@ import { workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlig
 import * as util from "./util";
 import { configuration } from "./common/configuration";
 import * as constants from "./common/constants";
-import { utils } from "istanbul";
 
-
-export const filesCache: Map<string, Set<any>> = new Map();
-export let cacheBuilding = false;
+let cacheBuilding = false;
 let folderCaching = false;
 let cancel = false;
 
+export const filesCache: Map<string, Set<any>> = new Map();
 
 
 export async function addFolderToCache(folder?: WorkspaceFolder | undefined)

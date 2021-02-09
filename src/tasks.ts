@@ -154,7 +154,7 @@ export class TaskFile extends TreeItem
             {   //
                 // For ant files not named build.xml, display the file name too
                 //
-                if (taskDef?.fileName?.match(/build.xml/i))
+                if (!taskDef?.fileName?.match(/build.xml/i))
                 {
                     if (relativePath.length > 0 && relativePath !== ".vscode")
                     {

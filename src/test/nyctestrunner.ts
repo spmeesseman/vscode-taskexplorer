@@ -1,8 +1,7 @@
-"use strict";
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-declare var global: any;
-
-/* tslint:disable no-require-imports */
+declare let global: any;
 
 import * as fs from "fs";
 import * as glob from "glob";
@@ -122,7 +121,7 @@ class CoverageRunner
     {
         // Set up Code Coverage, hooking require so that instrumented code is returned
         const self = this;
-        //self.instrumenter = new this.nyc.instrumenter({ coverageVariable: self.coverageVar });
+        // self.instrumenter = new this.nyc.instrumenter({ coverageVariable: self.coverageVar });
         self.instrumenter = this.nyc.instrumenter();
         const sourceRoot = paths.join(self.testsRoot, self.options.relativeSourcePath);
 
@@ -179,15 +178,12 @@ class CoverageRunner
 
     public async reportCoverage() {
         const self = this;
-        
-        
+
         //
         // TODO!!!
         //
         // self.nyc.hook.unhookRequire();
 
-
-        
         let cov: any;
         if (typeof global[self.coverageVar] === "undefined" || Object.keys(global[self.coverageVar]).length === 0) {
             console.error("No coverage information was collected, exit without writing coverage information");

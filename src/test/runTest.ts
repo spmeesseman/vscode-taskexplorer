@@ -1,6 +1,8 @@
 import * as path from "path";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { runTests } from "vscode-test";
 
+// eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 async function main()
 {
     const extensionDevelopmentPath = path.resolve(__dirname, "../../");

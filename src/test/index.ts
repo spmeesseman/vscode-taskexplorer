@@ -27,11 +27,11 @@ testRunner.configure(mochaOpts,
 module.exports = testRunner;
 
 
-//import * as path from "path";
-//import * as Mocha from "mocha";
-//import * as glob from "glob";
-//import NYC from "nyc";
-//const NYC = require("../../node_modules/nyc/index.js")
+// import * as path from "path";
+// import * as Mocha from "mocha";
+// import * as glob from "glob";
+// import NYC from "nyc";
+// const NYC = require("../../node_modules/nyc/index.js")
 
 // export async function run(testsRoot: string, cb: (error: any, failures?: number) => void): Promise<void>
 // {
@@ -107,7 +107,7 @@ module.exports = testRunner;
 //
 //     // Add files to the test suite
 //     files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
-// 
+//
 //     const failures: number = await new Promise(resolve => mocha.run(resolve));
 //     await nyc.writeCoverageFile();
 //

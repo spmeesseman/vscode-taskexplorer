@@ -70,6 +70,7 @@ function _readCoverOptions(testsRoot: string): ITestRunnerOptions | undefined
     return coverConfig;
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function run(testsRoot: string, clb: Function): any
 {
     // Enable source map support
@@ -141,6 +142,7 @@ class CoverageRunner
     constructor(
         private options: ITestRunnerOptions,
         private testsRoot: string,
+        // eslint-disable-next-line @typescript-eslint/ban-types
         private endRunCallback: Function
     )
     {

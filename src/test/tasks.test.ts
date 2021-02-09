@@ -18,14 +18,13 @@ import { configuration } from "../common/configuration";
 import * as constants from "../common/constants";
 
 
-
 const rootPath = workspace.workspaceFolders[0].uri.fsPath;
 const dirName = path.join(rootPath, "tasks_test_");
 const ws2DirName = path.join(rootPath, "ws2");
 const dirNameIgn = path.join(rootPath, "tasks_test_ignore_");
 const dirNameCode = path.join(rootPath, ".vscode");
-let tempFiles: Array<string> = [];
-let didCodeDirExist: boolean = false;
+const tempFiles: string[] = [];
+let didCodeDirExist = false;
 let taskMap: Map<string, TaskItem> = new Map();
 
 

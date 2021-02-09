@@ -1,4 +1,5 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 /* ---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -177,7 +178,7 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
     }
 
     if (e.affectsConfiguration("taskExplorer.enableAnt") || e.affectsConfiguration("taskExplorer.includeAnt")) {
-        await registerFileWatcherAnt(context, configuration.get<boolean>("enableAnt"));
+        await registerFileWatcher(context, "ant", util.getAntGlobPattern(), configuration.get<boolean>("enableAnt"));
         refresh = true;
     }
 
@@ -333,7 +334,7 @@ async function registerFileWatchers(context: ExtensionContext)
     }
 
     if (configuration.get<boolean>("enableGradle")) {
-        await registerFileWatcher(context, "gradle", constants.GLOB_GRADLE,);
+        await registerFileWatcher(context, "gradle", constants.GLOB_GRADLE);
     }
 
     if (configuration.get<boolean>("enableGrunt")) {

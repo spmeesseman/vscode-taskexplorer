@@ -41,7 +41,7 @@ class Configuration
 
     public get<T>(section: string, defaultValue?: T): T
     {
-        return this.configuration.get<T>(section, defaultValue!);
+        return this.configuration.get<T>(section, defaultValue);
     }
 
 
