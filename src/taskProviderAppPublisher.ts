@@ -11,9 +11,6 @@ import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
 
 
-let cachedTasks: Task[];
-
-
 interface AppPublisherTaskDefinition extends TaskDefinition
 {
     script?: string;
@@ -26,6 +23,8 @@ interface AppPublisherTaskDefinition extends TaskDefinition
 
 export class AppPublisherTaskProvider implements TaskExplorerProvider
 {
+    private cachedTasks: Task[];
+
 
     constructor() {}
 
@@ -34,10 +33,10 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
     {
         util.log("");
         util.log("provide app-publisher tasks");
-        if (!cachedTasks) {
-            cachedTasks = await this.detectAppPublisherfiles();
+        if (!this.cachedTasks) {
+            this.cachedTasks = await this.detectAppPublisherfiles();
         }
-        return cachedTasks;
+        return this.cachedTasks;
     }
 
 
@@ -52,14 +51,14 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
         util.log("");
         util.log("invalidateTasksCacheAppPublisher");
         util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
-        util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
+        util.logValue("   has cached tasks", this.cachedTasks ? "true" : "false", 2);
 
-        if (opt && cachedTasks)
+        if (opt && this.cachedTasks)
         {
             const rmvTasks: Task[] = [];
             const folder = workspace.getWorkspaceFolder(opt);
 
-            await util.asyncForEach(cachedTasks, each => {
+            await util.asyncForEach(this.cachedTasks, each => {
                 const cstDef: AppPublisherTaskDefinition = each.definition as AppPublisherTaskDefinition;
                 if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                     rmvTasks.push(each);
@@ -70,26 +69,26 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
             // Technically this function can be called back into when waiting for a promise
             // to return on the asncForEach() above, and cachedTask array can be set to undefined,
             // this is happening with a broken await() somewere that I cannot find
-            if (cachedTasks)
+            if (this.cachedTasks)
             {
                 await util.asyncForEach(rmvTasks, each => {
                     util.log("   removing old task " + each.name);
-                    util.removeFromArray(cachedTasks, each);
+                    util.removeFromArray(this.cachedTasks, each);
                 });
 
                 if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
                 {
                     const tasks = this.createTasks(folder, opt);
-                    cachedTasks.push(...tasks);
+                    this.cachedTasks.push(...tasks);
                 }
 
-                if (cachedTasks.length > 0) {
+                if (this.cachedTasks.length > 0) {
                     return;
                 }
             }
         }
 
-        cachedTasks = undefined;
+        this.cachedTasks = undefined;
     }
 
 

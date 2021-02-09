@@ -10,32 +10,6 @@ import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
 
-// See: https://www.gnu.org/software/make/manual/html_node/Special-Targets.html
-const specialTargets = new Set([
-    ".PHONY",
-    ".SUFFIXES",
-    ".DEFAULT",
-    ".PRECIOUS",
-    ".INTERMEDIATE",
-    ".SECONDARY",
-    ".SECONDEXPANSION",
-    ".DELETE_ON_ERROR",
-    ".IGNORE",
-    ".LOW_RESOLUTION_TIME",
-    ".SILENT",
-    ".EXPORT_ALL_VARIABLES",
-    ".NOTPARALLEL",
-    ".ONESHELL",
-    ".POSIX",
-    ".MAKE",
-]);
-
-const suffixRuleTargets = /^(\.\w+|\.\w+\.\w+)$/;
-const patternRuleTargets = /^(%\.\w+|%)$/;
-
-
-let cachedTasks: Task[];
-
 
 interface MakeTaskDefinition extends TaskDefinition
 {
@@ -49,6 +23,31 @@ interface MakeTaskDefinition extends TaskDefinition
 export class MakeTaskProvider implements TaskExplorerProvider
 {
 
+    private suffixRuleTargets = /^(\.\w+|\.\w+\.\w+)$/;
+    private patternRuleTargets = /^(%\.\w+|%)$/;
+    private cachedTasks: Task[];
+
+    // See: https://www.gnu.org/software/make/manual/html_node/Special-Targets.html
+    private specialTargets = new Set([
+        ".PHONY",
+        ".SUFFIXES",
+        ".DEFAULT",
+        ".PRECIOUS",
+        ".INTERMEDIATE",
+        ".SECONDARY",
+        ".SECONDEXPANSION",
+        ".DELETE_ON_ERROR",
+        ".IGNORE",
+        ".LOW_RESOLUTION_TIME",
+        ".SILENT",
+        ".EXPORT_ALL_VARIABLES",
+        ".NOTPARALLEL",
+        ".ONESHELL",
+        ".POSIX",
+        ".MAKE",
+    ]);
+
+
     constructor()
     {
     }
@@ -58,11 +57,11 @@ export class MakeTaskProvider implements TaskExplorerProvider
     {
         util.log("");
         util.log("provide mke tasks");
-        if (!cachedTasks)
+        if (!this.cachedTasks)
         {
-            cachedTasks = await this.detectMakefiles();
+            this.cachedTasks = await this.detectMakefiles();
         }
-        return cachedTasks;
+        return this.cachedTasks;
     }
 
 
@@ -128,13 +127,13 @@ export class MakeTaskProvider implements TaskExplorerProvider
         util.log("");
         util.log("invalidateTasksCacheMake");
         util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
-        util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
+        util.logValue("   has cached tasks", this.cachedTasks ? "true" : "false", 2);
 
-        if (opt && cachedTasks)
+        if (opt && this.cachedTasks)
         {
             const rmvTasks: Task[] = [];
 
-            await util.asyncForEach(cachedTasks, (each) => {
+            await util.asyncForEach(this.cachedTasks, (each) => {
                 const cstDef: MakeTaskDefinition = each.definition;
                 if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath))
                 {
@@ -146,27 +145,27 @@ export class MakeTaskProvider implements TaskExplorerProvider
             // Technically this function can be called back into when waiting for a promise
             // to return on the asncForEach() above, and cachedTask array can be set to undefined,
             // this is happening with a broken await() somewere that I cannot find
-            if (cachedTasks)
+            if (this.cachedTasks)
             {
                 await util.asyncForEach(rmvTasks, (each) => {
                     util.log("   removing old task " + each.name);
-                    util.removeFromArray(cachedTasks, each);
+                    util.removeFromArray(this.cachedTasks, each);
                 });
 
                 if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
                 {
                     const tasks = await this.readMakefile(opt);
-                    cachedTasks.push(...tasks);
+                    this.cachedTasks.push(...tasks);
                 }
 
-                if (cachedTasks.length > 0)
+                if (this.cachedTasks.length > 0)
                 {
                     return;
                 }
             }
         }
 
-        cachedTasks = undefined;
+        this.cachedTasks = undefined;
     }
 
 
@@ -221,15 +220,15 @@ export class MakeTaskProvider implements TaskExplorerProvider
 
     private isNormalTarget(target: string): boolean
     {
-        if (specialTargets.has(target))
+        if (this.specialTargets.has(target))
         {
             return false;
         }
-        if (suffixRuleTargets.test(target))
+        if (this.suffixRuleTargets.test(target))
         {
             return false;
         }
-        if (patternRuleTargets.test(target))
+        if (this.patternRuleTargets.test(target))
         {
             return false;
         }

@@ -13,7 +13,6 @@ import { TaskExplorerProvider } from "./taskProvider";
 
 
 interface StringMap { [s: string]: string }
-let cachedTasks: Task[];
 
 
 interface AntTaskDefinition extends TaskDefinition
@@ -29,16 +28,17 @@ interface AntTaskDefinition extends TaskDefinition
 
 export class AntTaskProvider implements TaskExplorerProvider
 {
+    private cachedTasks: Task[];
 
     public async provideTasks()
     {
         util.logBlank();
         util.log("provide ant tasks");
 
-        if (!cachedTasks) {
-            cachedTasks = await this.detectAntScripts();
+        if (!this.cachedTasks) {
+            this.cachedTasks = await this.detectAntScripts();
         }
-        return cachedTasks;
+        return this.cachedTasks;
     }
 
 
@@ -52,13 +52,13 @@ export class AntTaskProvider implements TaskExplorerProvider
         util.logBlank();
         util.log("invalidateTasksCacheAnt");
         util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
-        util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
+        util.logValue("   has cached tasks", this.cachedTasks ? "true" : "false", 2);
 
-        if (opt && cachedTasks)
+        if (opt && this.cachedTasks)
         {
             const rmvTasks: Task[] = [];
 
-            await util.asyncForEach(cachedTasks, each => {
+            await util.asyncForEach(this.cachedTasks, each => {
                 const cstDef: AntTaskDefinition = each.definition;
                 if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                     rmvTasks.push(each);
@@ -69,11 +69,11 @@ export class AntTaskProvider implements TaskExplorerProvider
             // Technically this function can be called back into when waiting for a promise
             // to return on the asncForEach() above, and cachedTask array can be set to undefined,
             // this is happening with a broken await() somewere that I cannot find
-            if (cachedTasks)
+            if (this.cachedTasks)
             {
                 await util.asyncForEach(rmvTasks, each => {
                     util.log("   removing old task " + each.name);
-                    util.removeFromArray(cachedTasks, each);
+                    util.removeFromArray(this.cachedTasks, each);
                 });
 
                 //
@@ -82,16 +82,16 @@ export class AntTaskProvider implements TaskExplorerProvider
                 if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
                 {
                     const tasks = await this.readAntfile(opt);
-                    cachedTasks.push(...tasks);
+                    this.cachedTasks.push(...tasks);
                 }
 
-                if (cachedTasks.length > 0) {
+                if (this.cachedTasks.length > 0) {
                     return;
                 }
             }
         }
 
-        cachedTasks = undefined;
+        this.cachedTasks = undefined;
     }
 
 

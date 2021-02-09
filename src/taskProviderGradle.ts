@@ -11,9 +11,6 @@ import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
 
 
-let cachedTasks: Task[];
-
-
 interface GradleTaskDefinition extends TaskDefinition
 {
     script?: string;
@@ -25,6 +22,8 @@ interface GradleTaskDefinition extends TaskDefinition
 
 export class GradleTaskProvider implements TaskExplorerProvider
 {
+    private cachedTasks: Task[];
+
 
     constructor() {}
 
@@ -33,11 +32,11 @@ export class GradleTaskProvider implements TaskExplorerProvider
     {
         util.log("");
         util.log("provide gradle tasks");
-        if (!cachedTasks)
+        if (!this.cachedTasks)
         {
-            cachedTasks = await this.detectGradlefiles();
+            this.cachedTasks = await this.detectGradlefiles();
         }
-        return cachedTasks;
+        return this.cachedTasks;
     }
 
 
@@ -96,13 +95,13 @@ export class GradleTaskProvider implements TaskExplorerProvider
         util.log("");
         util.log("invalidateTasksCacheGradle");
         util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
-        util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
+        util.logValue("   has cached tasks", this.cachedTasks ? "true" : "false", 2);
 
-        if (opt && cachedTasks)
+        if (opt && this.cachedTasks)
         {
             const rmvTasks: Task[] = [];
 
-            await util.asyncForEach(cachedTasks, (each) => {
+            await util.asyncForEach(this.cachedTasks, (each) => {
                 const cstDef: GradleTaskDefinition = each.definition;
                 if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath))
                 {
@@ -114,27 +113,27 @@ export class GradleTaskProvider implements TaskExplorerProvider
             // Technically this function can be called back into when waiting for a promise
             // to return on the asncForEach() above, and cachedTask array can be set to undefined,
             // this is happening with a broken await() somewere that I cannot find
-            if (cachedTasks)
+            if (this.cachedTasks)
             {
                 await util.asyncForEach(rmvTasks, each => {
                     util.log("   removing old task " + each.name);
-                    util.removeFromArray(cachedTasks, each);
+                    util.removeFromArray(this.cachedTasks, each);
                 });
 
                 if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
                 {
                     const tasks = await this.readGradlefile(opt);
-                    cachedTasks.push(...tasks);
+                    this.cachedTasks.push(...tasks);
                 }
 
-                if (cachedTasks.length > 0)
+                if (this.cachedTasks.length > 0)
                 {
                     return;
                 }
             }
         }
 
-        cachedTasks = undefined;
+        this.cachedTasks = undefined;
     }
 
 

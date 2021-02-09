@@ -11,59 +11,6 @@ import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
 
 
-let cachedTasks: Task[];
-
-const scriptTable = {
-    sh: {
-        exec: "",
-        type: "bash",
-        args: [],
-        enabled: configuration.get("enableBash")
-    },
-    py: {
-        exec: configuration.get("pathToPython"),
-        type: "python",
-        args: [],
-        enabled: configuration.get("enablePython")
-    },
-    rb: {
-        exec: configuration.get("pathToRuby"),
-        type: "ruby",
-        args: [],
-        enabled: configuration.get("enableRuby")
-    },
-    ps1: {
-        exec: configuration.get("pathToPowershell"),
-        type: "powershell",
-        args: [],
-        enabled: configuration.get("enablePowershell")
-    },
-    pl: {
-        exec: configuration.get("pathToPerl"),
-        type: "perl",
-        args: [],
-        enabled: configuration.get("enablePerl")
-    },
-    bat: {
-        exec: "cmd",
-        type: "batch",
-        args: ["/c"],
-        enabled: configuration.get("enableBatch")
-    },
-    cmd: {
-        exec: "cmd",
-        type: "batch",
-        args: ["/c"],
-        enabled: configuration.get("enableBatch")
-    },
-    nsi: {
-        exec: configuration.get("pathToNsis"),
-        type: "nsis",
-        args: [],
-        enabled: configuration.get("enableNsis")
-    }
-};
-
 interface ScriptTaskDefinition extends TaskDefinition
 {
     scriptType: string;
@@ -77,17 +24,72 @@ interface ScriptTaskDefinition extends TaskDefinition
 
 export class ScriptTaskProvider implements TaskExplorerProvider
 {
+    private cachedTasks: Task[];
+
+    private scriptTable: any = {
+        sh: {
+            exec: "",
+            type: "bash",
+            args: [],
+            enabled: configuration.get("enableBash")
+        },
+        py: {
+            exec: configuration.get("pathToPython"),
+            type: "python",
+            args: [],
+            enabled: configuration.get("enablePython")
+        },
+        rb: {
+            exec: configuration.get("pathToRuby"),
+            type: "ruby",
+            args: [],
+            enabled: configuration.get("enableRuby")
+        },
+        ps1: {
+            exec: configuration.get("pathToPowershell"),
+            type: "powershell",
+            args: [],
+            enabled: configuration.get("enablePowershell")
+        },
+        pl: {
+            exec: configuration.get("pathToPerl"),
+            type: "perl",
+            args: [],
+            enabled: configuration.get("enablePerl")
+        },
+        bat: {
+            exec: "cmd",
+            type: "batch",
+            args: ["/c"],
+            enabled: configuration.get("enableBatch")
+        },
+        cmd: {
+            exec: "cmd",
+            type: "batch",
+            args: ["/c"],
+            enabled: configuration.get("enableBatch")
+        },
+        nsi: {
+            exec: configuration.get("pathToNsis"),
+            type: "nsis",
+            args: [],
+            enabled: configuration.get("enableNsis")
+        }
+    };
+
+
     constructor() {
     }
+
 
     public async provideTasks()
     {
         util.log("");
         util.log("provide scripts tasks");
-        if (!cachedTasks) {
-            cachedTasks = await this.detectScriptFiles();
+        if (!this.cachedTasks) {
+            this.cachedTasks = await this.detectScriptFiles();
         }
-        return cachedTasks;
+        return this.cachedTasks;
     }
 
 
@@ -101,14 +103,14 @@ export class ScriptTaskProvider implements TaskExplorerProvider
         util.log("");
         util.log("invalidateTasksCacheScript");
         util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
-        util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
+        util.logValue("   has cached tasks", this.cachedTasks ? "true" : "false", 2);
 
-        if (opt && cachedTasks)
+        if (opt && this.cachedTasks)
         {
             const rmvTasks: Task[] = [];
             const folder = workspace.getWorkspaceFolder(opt);
 
-            await util.asyncForEach(cachedTasks, (each) => {
+            await util.asyncForEach(this.cachedTasks, (each) => {
                 const cstDef: ScriptTaskDefinition = each.definition as ScriptTaskDefinition;
                 if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                     rmvTasks.push(each);
@@ -119,26 +121,26 @@ export class ScriptTaskProvider implements TaskExplorerProvider
             // Technically this function can be called back into when waiting for a promise
             // to return on the asncForEach() above, and cachedTask array can be set to undefined,
             // this is happening with a broken await() somewere that I cannot find
-            if (cachedTasks)
+            if (this.cachedTasks)
             {
                 await util.asyncForEach(rmvTasks, (each) => {
                     util.log("   removing old task " + each.name);
-                    util.removeFromArray(cachedTasks, each);
+                    util.removeFromArray(this.cachedTasks, each);
                 });
 
                 if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
                 {
                     const task = this.createTask(path.extname(opt.fsPath).substring(1), null, folder, opt);
-                    cachedTasks.push(task);
+                    this.cachedTasks.push(task);
                 }
 
-                if (cachedTasks.length > 0) {
+                if (this.cachedTasks.length > 0) {
                     return;
                 }
             }
         }
 
-        cachedTasks = undefined;
+        this.cachedTasks = undefined;
     }
 
 
@@ -171,7 +173,7 @@ export class ScriptTaskProvider implements TaskExplorerProvider
 
     createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task
     {
-        const scriptDef = scriptTable[target?.toLowerCase()];
+        const scriptDef = this.scriptTable[target?.toLowerCase()];
 
         const getRelativePath = (folder: WorkspaceFolder, uri: Uri): string =>
         {
