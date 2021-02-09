@@ -4,7 +4,7 @@ import {
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
-import { parseString } from "xml2js";
+import { parseStringPromise } from "xml2js";
 import { configuration } from "./common/configuration";
 import { TaskItem } from "./tasks";
 import { filesCache } from "./cache";
@@ -50,8 +50,8 @@ export class AntTaskProvider implements TaskExplorerProvider
     public async invalidateTasksCache(opt?: Uri): Promise<void>
     {
         util.logBlank();
-        util.log("invalidateTasksCacheAnt");
-        util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
+        util.log("invalidate ant tasks cache");
+        util.logValue("   uri", opt?.path, 2);
         util.logValue("   has cached tasks", this.cachedTasks ? "true" : "false", 2);
 
         if (opt && this.cachedTasks)
@@ -111,8 +111,8 @@ export class AntTaskProvider implements TaskExplorerProvider
             const scripts = await this.findAllAntScripts(uri.fsPath);
             if (scripts)
             {
-                Object.keys(scripts).forEach(each => {
-                    const task = this.createTask(scripts[each] ? scripts[each] : each, each, folder, uri);
+                await util.forEachAsync(Object.keys(scripts), (k: string) => {
+                    const task = this.createTask(scripts[k] ? scripts[k] : k, k, folder, uri);
                     task.group = TaskGroup.Build;
                     result.push(task);
                 });
@@ -247,15 +247,11 @@ export class AntTaskProvider implements TaskExplorerProvider
 
     private async findTasksWithXml2Js(path: string, scripts: StringMap)
     {
-        let text: any = "";
         const buffer = await util.readFile(path);
-
         //
         // Convert to JSON with Xml2Js parseString()
         //
-        parseString(buffer, (err, result) => {
-            text = result;
-        });
+        const text = await parseStringPromise(buffer);
         //
         // We should have a main 'project' object and a 'project.target' array
         //
