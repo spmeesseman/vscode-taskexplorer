@@ -107,6 +107,7 @@
 
 	"config.taskExplorer.showExecuteWithNoTerminalButton": "Show the 'Execute with No Terminal' button inline with the 'Execute' button",
 	"config.taskExplorer.showExecuteWithArgumentsButton": "Show the 'Execute with Arguments' button inline with the 'Execute' button",
+	"config.taskExplorer.showFavoritesButton": "Show the 'Favorites' button inline with the 'Execute' button",
 
 	"taskExplorer.parseError": "Task Explorer task detection: failed to parse the file {0}",
 
@@ -130,8 +131,7 @@
 	"command.runWithArgs": "Run with arguments",
 	"command.runLastTask": "Run last task",
 	"command.addToExcludes": "Add to excludes list",
-	"command.addToFavorites": "Add to favorites list",
-	"command.removeFromFavorites": "Remove from favorites list",
+	"command.addRemoveFromFavorites": "Add/Remove from favorites list",
 	"command.stop": "Stop",
 	"command.pause": "Pause",
 	"command.debug": "Debugging ",

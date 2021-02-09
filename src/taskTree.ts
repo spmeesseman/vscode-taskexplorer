@@ -72,11 +72,49 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
         subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | string, global: boolean, prompt: boolean) => { await this.addToExcludes(taskFile, global, prompt); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addToFavorites", async (taskItem: TaskItem) => { await this.saveTask(taskItem, -1, true); }, this));
-        subscriptions.push(commands.registerCommand(name + ".removeFromFavorites", (taskItem: TaskItem) => { this.removeFavorite(taskItem); }, this));
+        subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", (taskItem: TaskItem) => { this.addRemoveFavorite(taskItem); }, this));
 
         tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
         tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
+    }
+
+
+    private async addRemoveFavorite(taskItem: TaskItem)
+    {
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
+        const favId = taskItem.id.replace(constants.FAV_TASKS_LABEL + ":", "");
+
+        util.log("");
+        util.log("remove favorite", 1);
+
+        if (!taskItem) {
+             return;
+        }
+
+        util.logValue("   id", taskItem.id, 2);
+        util.logValue("   current fav count", favTasks.length, 2);
+
+        //
+        // If this task doesn't exist as a favorite, inform the user and exit
+        //
+        if (!util.existsInArray(favTasks, favId))
+        {
+            await this.saveTask(taskItem, -1, true);
+        }
+        else //
+        {   // Remove
+            //
+            await util.removeFromArrayAsync(favTasks, favId);
+            util.logValue("   new fav count", favTasks.length, 2);
+            //
+            // Update local storage for persistence
+            //
+            await storage.update(constants.FAV_TASKS_STORE, favTasks);
+            //
+            // Update
+            //
+            this.showSpecialTasks(true, true);
+        }
     }
 
 
@@ -1682,40 +1720,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async removeFavorite(taskItem: TaskItem)
-    {
-        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        const favId = taskItem.id.replace(constants.FAV_TASKS_LABEL + ":", "");
-        util.log("");
-        util.log("remove favorite", 1);
-        if (!taskItem) {
-             return;
-        }
-        util.logValue("   id", taskItem.id, 2);
-        util.logValue("   current fav count", favTasks.length, 2);
-        //
-        // If this task doesnt exist as a favorite, inform the user and exit
-        //
-        if (!util.existsInArray(favTasks, favId))
-        {
-            window.showInformationMessage(`Task '${taskItem.label}' is not in the favorites list`);
-        }
-        //
-        // Remove
-        //
-        await util.removeFromArrayAsync(favTasks, favId);
-        util.logValue("   new fav count", favTasks.length, 2);
-        //
-        // Update local storage for persistence
-        //
-        await storage.update(constants.FAV_TASKS_STORE, favTasks);
-        //
-        // Update
-        //
-        this.showSpecialTasks(true, true);
-    }
-
-
     private async removeGroupedTasks(folder: TaskFolder, subfolders: Map<string, TaskFile>)
     {
         const taskTypesRmv: TaskFile[] = [];
@@ -2071,13 +2075,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         const taskId = taskItem.id.replace(label + ":", "");
 
-        if (util.existsInArray(cstTasks, taskId))
-        {
-            if (isFavorite)
-            {
-                window.showInformationMessage(`Task '${taskItem.label}' has already been added as a favorite`);
-                return;
-            }
+        if (util.existsInArray(cstTasks, taskId)) {
             await util.removeFromArrayAsync(cstTasks, taskId);
         }
 

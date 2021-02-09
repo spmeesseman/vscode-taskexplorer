@@ -81,7 +81,7 @@ export class TaskItem extends TreeItem
         //
         //     script        - Standard task item, e.g. "npm", "Workspace", "gulp", etc
         //     scriptFile    - A file that is ran as a task, ie. "batch" or "bash", i.e. script type "script".
-        //     runningScript - Obviously, a task/script that is running.
+        //     scriptRunning - Obviously, a task/script that is running.
         //
         // Note that TaskItems of type 'scriptFile' can be ran with arguments and this will have an additional
         // entry added to it's context menu - "Run with arguments"
@@ -93,7 +93,7 @@ export class TaskItem extends TreeItem
               // I think "$composite" was the old definition type for composite tasks, because as of Code v1.53,
              // the task definition type for a comosite task is "$empty".
             //
-            this.contextValue = this.execution && task.definition.type !== "$composite" ? "runningScript" : "script";
+            this.contextValue = this.execution && task.definition.type !== "$composite" ? "scriptRunning" : "script";
         }
 
         //
