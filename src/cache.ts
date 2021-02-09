@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment } from "vscode";
 import { log, logValue, timeout, getExcludesGlob, isExcluded, properCase } from "./util";
@@ -211,7 +212,9 @@ export async function removeFileFromCache(taskAlias: string, uri: Uri)
     });
     if (toRemove.length > 0) {
         for (const tr in toRemove) {
-            taskCache.delete(toRemove[tr]);
+            if (toRemove.hasOwnProperty(tr)) { // skip over properties inherited by prototype
+                taskCache.delete(toRemove[tr]);
+            }
         }
     }
 

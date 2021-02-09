@@ -204,12 +204,14 @@ export class AntTaskProvider implements TaskExplorerProvider
             text = text.split("\n");
             for (const i in text)
             {
-                const line: string = text[i].trim();
-                if (!line || line.match(/(target[s]{0,1}:|Buildfile:)/i)) {
-                    continue;
+                if (text.hasOwnProperty(i)) { // skip over properties inherited by prototype
+                    const line: string = text[i].trim();
+                    if (!line || line.match(/(target[s]{0,1}:|Buildfile:)/i)) {
+                        continue;
+                    }
+                    util.logValue("   Found target (ant -p)", line);
+                    scripts[defaultTask === line ? line + " - Default" : line] = line;
                 }
-                util.logValue("   Found target (ant -p)", line);
-                scripts[defaultTask === line ? line + " - Default" : line] = line;
             }
         }
         else

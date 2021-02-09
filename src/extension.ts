@@ -104,8 +104,10 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 export async function addWsFolder(wsf: readonly WorkspaceFolder[])
 {
     for (const f in wsf) {
-        util.log("Workspace folder added: " + wsf[f].name, 1);
-        await cache.addFolderToCache(wsf[f]);
+        if (wsf.hasOwnProperty(f)) { // skip over properties inherited by prototype
+            util.log("Workspace folder added: " + wsf[f].name, 1);
+            await cache.addFolderToCache(wsf[f]);
+        }
     }
 }
 
@@ -114,21 +116,26 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
 {
     for (const f in wsf)
     {
-        util.log("Workspace folder removed: " + wsf[f].name, 1);
-        // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
-        for (const key in cache.filesCache.keys)
+        if (wsf.hasOwnProperty(f)) // skip over properties inherited by prototype
         {
-            const toRemove = [];
-            const obj = cache.filesCache.get(key);
-            obj.forEach((item) =>
+            util.log("Workspace folder removed: " + wsf[f].name, 1);
+            // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
+            for (const key in cache.filesCache.keys)
             {
-                if (item.folder.uri.fsPath === wsf[f].uri.fsPath) {
-                    toRemove.push(item);
-                }
-            });
-            if (toRemove.length > 0) {
-                for (const tr in toRemove) {
-                    obj.delete(toRemove[tr]);
+                const toRemove = [];
+                const obj = cache.filesCache.get(key);
+                obj.forEach((item) =>
+                {
+                    if (item.folder.uri.fsPath === wsf[f].uri.fsPath) {
+                        toRemove.push(item);
+                    }
+                });
+                if (toRemove.length > 0) {
+                    for (const tr in toRemove) {
+                        if (toRemove.hasOwnProperty(tr)) // skip over properties inherited by prototype
+                            obj.delete(toRemove[tr]);
+                    }
+                    }
                 }
             }
         }
