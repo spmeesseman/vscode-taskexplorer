@@ -82,7 +82,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async addRemoveFavorite(taskItem: TaskItem)
     {
-        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []) || [];
         const favId = taskItem.id.replace(constants.FAV_TASKS_LABEL + ":", "")
             .replace(constants.LAST_TASKS_LABEL + ":", "")
             .replace(constants.USER_TASKS_LABEL + ":", "");
@@ -275,7 +275,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // The 'Last Tasks' folder will be 1st in the tree
         //
-        const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
+        const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []) || [];
         if (configuration.get<boolean>("showLastTasks") === true)
         {
             if (lastTasks && lastTasks.length > 0)
@@ -289,7 +289,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // The 'Favorites' folder will be 2nd in the tree (or 1st if configured to hide
         // the 'Last Tasks' folder)
         //
-        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []) || [];
         if (favTasks && favTasks.length > 0)
         {
             favfolder = new TaskFolder(constants.FAV_TASKS_LABEL);
@@ -423,20 +423,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async clearSpecialFolder(folder: TaskFolder)
     {
-        if (folder.label === constants.FAV_TASKS_LABEL) {
-            await storage.update(constants.FAV_TASKS_STORE, "");
-            this.showSpecialTasks(false, true);
-        }
-        else if (folder.label === constants.LAST_TASKS_LABEL) {
-            await storage.update(constants.LAST_TASKS_STORE, "");
-            this.showSpecialTasks(false);
+        const choice = await window.showInformationMessage("Clear all tasks from this folder?", "Yes", "No");
+        if (choice === "Yes")
+        {
+            if (folder.label === constants.FAV_TASKS_LABEL) {
+                await storage.update(constants.FAV_TASKS_STORE, "");
+                this.showSpecialTasks(false, true);
+            }
+            else if (folder.label === constants.LAST_TASKS_LABEL) {
+                await storage.update(constants.LAST_TASKS_STORE, "");
+                this.showSpecialTasks(false);
+            }
         }
     }
 
 
     private async createSpecialFolder(storeName: string, label: string, treeIndex: number, logPad = "")
     {
-        const lTasks = storage.get<string[]>(storeName, []);
+        const lTasks = storage.get<string[]>(storeName, []) || [];
         const folder = new TaskFolder(label);
 
         util.log(logPad + "create special tasks folder", 1);
@@ -2083,7 +2087,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         const storeName: string = !isFavorite ? constants.LAST_TASKS_STORE : constants.FAV_TASKS_STORE;
         const label: string = !isFavorite ? constants.LAST_TASKS_LABEL : constants.FAV_TASKS_LABEL;
-        const cstTasks = storage.get<string[]>(storeName, []);
+        const cstTasks = storage.get<string[]>(storeName, []) || [];
         const taskId = taskItem?.id?.replace(label + ":", "");
 
         util.log(logPad + "save task", 1);
@@ -2149,23 +2153,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (!taskItem || isFavorite) // refresh
             {
                 taskItem = null;
-                tree.splice(treeIdx, 1);
+                if (tree[treeIdx].label === label) {
+                    tree.splice(treeIdx, 1);
+                }
                 changed = true;
             }
 
             if (!isFavorite && tree[0].label !== label)
             {
-                this.createSpecialFolder(storeName, label, 0, "   ");
+                await this.createSpecialFolder(storeName, label, 0, "   ");
                 changed = true;
             }
             else if (isFavorite && tree[favIdx].label !== label)
             {
-                this.createSpecialFolder(storeName, label, favIdx, "   ");
+                await this.createSpecialFolder(storeName, label, favIdx, "   ");
                 changed = true;
             }
             else if (taskItem) // only 'last tasks' case here.  'favs' are added
             {
-                this.pushToTopOfSpecialFolder(taskItem, label, treeIdx);
+                await this.pushToTopOfSpecialFolder(taskItem, label, treeIdx);
                 changed = true;
             }
         }
