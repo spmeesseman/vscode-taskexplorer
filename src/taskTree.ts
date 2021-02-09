@@ -1391,31 +1391,41 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // All internal task providers export an invalidate() function...
         //
-        // If 'opt1' is a string then a filesystemwatcher or taskevent was triggered for the
-        // task type defined in the 'opt1' parameter.
+        // If 'opt1' is a string then a filesystemwatcher, settings change, or taskevent was
+        // triggered for the task type defined in the 'opt1' parameter.
         //
-        // 'opt2' should contain the Uri of the file that was edited, or the Task if this was
-        // a task event
+        // The 'opt1' parameter may also have a value of 'tests', which indicates this is
+        // being called from the unit tests, so some special handling is required.
+        //
+        // In the case of a settings change, 'opt2' will be undefined.  Depending on how many task
+        // types configs' were aaltered in settings, this function may run through more than once
+        // right now for each task type affected.  Some settings require a global refresh, for example
+        // the 'groupDashed' settings, or 'enableSideBar',etc.  If a global refresh is to be performed,
+        // then both 'opt1' and 'opt2' will be undefined.
+        //
+        // In the casse of a task event, 'opt2' is undefined.
+        //
+        // If a FileSystemWatcher event, then 'opt2' should contain the Uri of the file that was
+        // modified, created, or deleted.
         //
         if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
         {
             util.log("   invalidate " + opt1 + " provider file ", 1);
             util.logValue("      file", opt2, 1);
             const provider = providers.get(!util.isScriptType(opt1) ? opt1 : "script");
-            if (provider) { // NPM and Workspace tasks don't implament the TaskExplorerProvider interface
-                await provider.invalidateTasksCache(opt2);
-            }
+            provider?.invalidateTasksCache(opt2); // NPM/Workspace tasks don't implement TaskExplorerProvider
         }
-        else {
+        else { // If opt1 is undefined, refresh all providers
             if (!opt1) {
                 util.log("   invalidate all providers", 1);
-                await util.forEachAsync(providers, (p: TaskExplorerProvider) => {
+                await util.forEachMapAsync(providers, (p: TaskExplorerProvider, key: string) => {
+                    util.log("   invalidate " + key + " provider", 1);
                     p.invalidateTasksCache();
                 });
             }
             else {
-                util.log("   invalidate " + opt1 + " providers", 1);
-                providers.get(opt1)?.invalidateTasksCache();
+                util.log("   invalidate " + opt1 + " provider", 1);
+                providers.get(opt1)?.invalidateTasksCache();  // NPM/Workspace tasks don't implement TaskExplorerProvider
             }
         }
 

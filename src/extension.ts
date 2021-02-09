@@ -338,7 +338,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     // Do a global refrsh since we don't provide the npm tasks, VSCode itself does
     //
     if (e.affectsConfiguration("npm.packageManager", null)) {
-        refresh = true;
+        registerChange("npm");
     }
 
     //
