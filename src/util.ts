@@ -16,6 +16,12 @@ let writeToConsoleLevel = 2;
 let logOutputChannel: OutputChannel | undefined;
 
 
+/**
+ * Camel case a string
+ *
+ * @param name The string to manipulate
+ * @param indexUpper The index of the string to upper case
+ */
 export function camelCase(name: string, indexUpper: number)
 {
     if (!name || indexUpper <= 0 || indexUpper >= name.length) {
@@ -30,6 +36,13 @@ export function camelCase(name: string, indexUpper: number)
 }
 
 
+/**
+ * Checks if a value exists in the given array
+ *
+ * @param arr The array to check
+ * @param item The value to check in the given array for
+ * @returns `true` if the value exists in the arrray, `false` otherwise
+ */
 export function existsInArray(arr: any[], item: any)
 {
     let exists = false;
