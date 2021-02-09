@@ -15,6 +15,10 @@
             "release": "patch"
           },
           {
+            "type": "visual",
+            "release": "patch"
+          },
+          {
               "type": "featmin",
               "release": "patch"
           }
