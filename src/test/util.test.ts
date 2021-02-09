@@ -84,11 +84,11 @@ suite("Util tests", () =>
         util.removeFromArray(arr, 3);
         await util.removeFromArrayAsync(arr, 1);
         assert(arr.length === 3);
-        assert(util.existsInArray(arr, 5));
-        assert(util.existsInArray(arr, 2));
-        assert(util.existsInArray(arr, 4));
-        assert(!util.existsInArray(arr, 3));
-        assert(!util.existsInArray(arr, 1));
+        assert(util.existsInArray(arr, 5) !== false);
+        assert(util.existsInArray(arr, 2) !== false);
+        assert(util.existsInArray(arr, 4) !== false);
+        assert(!util.existsInArray(arr, 3) === false);
+        assert(!util.existsInArray(arr, 1) === false);
     });
 
     test("Test get cwd", () =>

@@ -43,19 +43,18 @@ export function camelCase(name: string, indexUpper: number)
  * @param item The value to check in the given array for
  * @returns `true` if the value exists in the arrray, `false` otherwise
  */
-export function existsInArray(arr: any[], item: any)
+export function existsInArray(arr: any[], item: any): boolean | number
 {
-    let exists = false;
     if (arr) {
+        let index = -1;
         arr.forEach(each => {
+            index++;
             if (item === each) {
-                exists = true;
-                return false;
+                return index;
             }
         });
     }
-
-    return exists;
+    return false;
 }
 
 
@@ -171,6 +170,23 @@ export function getExcludesGlob(folder: string | WorkspaceFolder): RelativePatte
 }
 
 
+export function getScriptTaskTypes(): string[]
+{
+    return [
+        "bash", "batch", "nsis", "perl", "powershell", "python", "ruby"
+    ];
+}
+
+
+export function getTaskTypes(): string[]
+{
+    return [
+        "ant", "app-publisher", "bash", "batch", "gradle", "grunt", "gulp", "make", "npm",
+        "nsis", "perl", "powershell", "python", "ruby", "workspace"
+    ];
+}
+
+
 export function isExcluded(uriPath: string, logPad = "")
 {
     function testForExclusionPattern(path: string, pattern: string): boolean
@@ -249,7 +265,7 @@ export async function logError(msg: string | string[])
         return;
     }
     log("***");
-    if (msg instanceof String) {
+    if (typeof msg === "string") {
         log("*** " + msg);
     }
     else {

@@ -120,7 +120,7 @@ export class GradleTaskProvider implements TaskExplorerProvider
                     util.removeFromArray(this.cachedTasks, each);
                 });
 
-                if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+                if (util.pathExists(opt.fsPath) && util.existsInArray(configuration.get("exclude"), opt.path) === false)
                 {
                     const tasks = await this.readGradlefile(opt);
                     this.cachedTasks.push(...tasks);

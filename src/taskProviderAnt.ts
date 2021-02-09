@@ -79,7 +79,7 @@ export class AntTaskProvider implements TaskExplorerProvider
                 //
                 // If this isn"t a "delete file" event then read the file for tasks
                 //
-                if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+                if (util.pathExists(opt.fsPath) && util.existsInArray(configuration.get("exclude"), opt.path) === false)
                 {
                     const tasks = await this.readAntfile(opt);
                     this.cachedTasks.push(...tasks);
@@ -101,6 +101,11 @@ export class AntTaskProvider implements TaskExplorerProvider
         const result: Task[] = [];
         const folder = workspace.getWorkspaceFolder(uri);
 
+        util.logBlank(1);
+        util.log("read ant file", 1);
+        util.logValue("   file", uri.fsPath, 2);
+        util.logValue("   project folder", folder.name, 2);
+
         if (folder)
         {
             const scripts = await this.findAllAntScripts(uri.fsPath);
@@ -120,8 +125,8 @@ export class AntTaskProvider implements TaskExplorerProvider
 
     private async detectAntScripts(): Promise<Task[]>
     {
-        util.logBlank();
-        util.log("detectAntScripts");
+        util.logBlank(1);
+        util.log("detect ant scripts", 1);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -149,8 +154,8 @@ export class AntTaskProvider implements TaskExplorerProvider
         const scripts: StringMap = {};
         const useAnt = configuration.get<boolean>("useAnt");
 
-        util.logBlank();
-        util.log("find all ant targets");
+        util.logBlank(1);
+        util.log("find all ant targets", 1);
         util.logValue("   use ant", useAnt, 2);
 
         //

@@ -100,7 +100,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // If this task doesn't exist as a favorite, inform the user and exit
         //
-        if (!util.existsInArray(favTasks, favId))
+        if (util.existsInArray(favTasks, favId) === false)
         {
             await this.saveTask(taskItem, -1, true);
         }
@@ -178,12 +178,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 if (excludes2 && excludes2 instanceof Array) {
                     excludes = excludes2;
                 }
-                else if (excludes2 instanceof String) {
-                    excludes.push(excludes2.toString());
+                else if (typeof excludes2 === "string") {
+                    excludes.push(excludes2);
                 }
                 const strs = str.split(",");
                 for (const s in strs) {
-                    if (!util.existsInArray(excludes, strs[s])) {
+                    if (util.existsInArray(excludes, strs[s]) === false) {
                         excludes.push(strs[s]);
                     }
                 }
@@ -329,7 +329,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 if (!include) {
                     return;
                 }
-                else if (include instanceof String) { // TSC tasks may have had their rel. pathchanged
+                else if (typeof include === "string") { // TSC tasks may have had their rel. pathchanged
                     relativePath = include;
                 }
 
@@ -1313,9 +1313,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async handleFileWatcherEvent(invalidate: any, opt: boolean | Uri)
+    private async handleFileWatcherEvent(invalidate: any, opt?: boolean | Uri)
     {
-        util.log("   Handling 'FileWatcher/test' event");
+        util.log("   handling FileWatcher / settings change / test event");
         //
         // invalidate=true means the refresh button was clicked (opt will be false)
         // invalidate="tests" means this is being called from unit tests (opt will be undefined)
@@ -1330,7 +1330,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // If this is not from unit testing, then invalidate the appropriate task cache/file
         //
         if (invalidate !== "tests") {
-            util.log("   Handling 'invalidate tasks cache' event");
+            util.log("   handling 'invalidate tasks cache' event");
             await this.invalidateTasksCache(invalidate, opt);
         }
     }
@@ -1338,7 +1338,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private handleVisibleEvent()
     {
-        util.log("   Handling 'visible' event");
+        util.log("   handling 'visible' event");
         if (this.needsRefresh && this.needsRefresh.length > 0)
         {
             // If theres more than one pending refresh request, just refresh the tree
@@ -1379,9 +1379,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *     "Workspace"
      * @param opt2 The uri of the file that contains/owns the task
      */
-    public async invalidateTasksCache(opt1: string, opt2: Uri | boolean)
+    public async invalidateTasksCache(opt1: string, opt2?: Uri | boolean)
     {
+        util.logBlank(1);
+        util.log("Invalidate tasks cache", 1);
+        util.logValue("   opt1", opt1, 2);
+        util.logValue("   opt2", opt2 && opt2 instanceof Uri ? opt2.fsPath : opt2, 2);
+
         this.busy = true;
+
         //
         // All internal task providers export an invalidate() function...
         //
@@ -1393,15 +1399,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
         {
+            util.log("   invalidate " + opt1 + " provider file ", 1);
+            util.logValue("      file", opt2, 1);
             const provider = providers.get(!util.isScriptType(opt1) ? opt1 : "script");
             if (provider) { // NPM and Workspace tasks don't implament the TaskExplorerProvider interface
                 await provider.invalidateTasksCache(opt2);
             }
         }
         else {
-            await util.forEachAsync(providers, (p: TaskExplorerProvider) => {
-                p.invalidateTasksCache();
-            });
+            if (!opt1) {
+                util.log("   invalidate all providers", 1);
+                await util.forEachAsync(providers, (p: TaskExplorerProvider) => {
+                    p.invalidateTasksCache();
+                });
+            }
+            else {
+                util.log("   invalidate " + opt1 + " providers", 1);
+                providers.get(opt1)?.invalidateTasksCache();
+            }
         }
 
         this.busy = false;
@@ -1655,7 +1670,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      */
     public async refresh(invalidate?: any, opt?: Uri | boolean, task?: Task): Promise<boolean>
     {
-        util.log("Refresh task tree");
+        util.logBlank(1);
+        util.log("Refresh task tree", 1);
         util.logValue("   invalidate", invalidate, 2);
         util.logValue("   opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a", 2);
         util.logValue("   task name", task ? task.name : "n/a", 2);
@@ -1735,7 +1751,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         this._onDidChangeTreeData.fire(treeItem);
 
-        util.log("   Refresh task tree finished");
+        util.log("Refresh task tree finished");
         return true;
     }
 
@@ -2100,7 +2116,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
-        if (util.existsInArray(cstTasks, taskId)) {
+        if (util.existsInArray(cstTasks, taskId) !== false) {
             await util.removeFromArrayAsync(cstTasks, taskId);
         }
 

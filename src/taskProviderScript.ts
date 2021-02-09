@@ -128,7 +128,7 @@ export class ScriptTaskProvider implements TaskExplorerProvider
                     util.removeFromArray(this.cachedTasks, each);
                 });
 
-                if (util.pathExists(opt.fsPath) && !util.existsInArray(configuration.get("exclude"), opt.path))
+                if (util.pathExists(opt.fsPath) && util.existsInArray(configuration.get("exclude"), opt.path) === false)
                 {
                     const task = this.createTask(path.extname(opt.fsPath).substring(1), null, folder, opt);
                     this.cachedTasks.push(task);

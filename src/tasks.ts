@@ -139,6 +139,132 @@ export class TaskFile extends TreeItem
     public groupLevel: number;
     public nodePath: string;
 
+
+    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean, label?: string, groupLevel?: number)
+    {
+        super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group), TreeItemCollapsibleState.Collapsed);
+
+        this.folder = folder;
+        this.path = relativePath;
+        this.nodePath = relativePath;
+        this.taskSource = source;
+        this.isGroup = (group === true);
+
+        if (group && this.label) {
+            this.nodePath = path.join(this.nodePath, this.label);
+        }
+
+        if (!this.nodePath && this.label === "vscode") {
+            this.nodePath = path.join(".vscode", this.label);
+        }
+
+        if (!this.nodePath) { // force null or undefined to empty string
+            this.nodePath = "";
+        }
+
+        if (!group)
+        {
+            this.contextValue = "taskFile" + util.properCase(this.taskSource);
+            this.fileName = this.getFileNameFromSource(source, folder, taskDef, relativePath, true);
+            if (folder.resourceUri)
+            {
+                if (relativePath)
+                {
+                    this.resourceUri = Uri.file(path.join(folder.resourceUri.fsPath, relativePath, this.fileName));
+                } else
+                {
+                    this.resourceUri = Uri.file(path.join(folder.resourceUri.fsPath, this.fileName));
+                }
+            } //
+             // No resource uri means this file is 'user tasks', and not associated to a workspace folder
+            //
+            else {
+                this.resourceUri = Uri.file(path.join(this.getUserDataPath(), this.fileName));
+            }
+        }
+        else //
+        {   // When a grouped node is created, the definition for the first task is passed to this
+            // function.  Remove the filename part of tha path for this resource
+            //
+            this.fileName = "group";      // change to name of directory
+            // Use a custom toolip (default is to display resource uri)
+            this.tooltip = util.properCase(source) + " Task Files";
+            this.contextValue = "taskGroup" + util.properCase(this.taskSource);
+            this.groupLevel = groupLevel;
+        }
+
+        //
+        // Set context icon
+        //
+        if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", this.taskSource + ".svg"))))
+        {
+            let src = this.taskSource;
+            //
+            // If npm TaskFile, check package manager set in vscode settings, (npm, pnpm, or yarn) to determine
+            // which icon to display
+            //
+            if (src === "npm")
+            {
+                const pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager");
+                src = pkgMgr || this.taskSource;
+                if (src.indexOf("npm") !== -1) { // pnpm?
+                    src = "npm";
+                }
+            }
+            this.iconPath = {
+                light: context.asAbsolutePath(path.join("res", "sources", src + ".svg")),
+                dark: context.asAbsolutePath(path.join("res", "sources", src + ".svg"))
+            };
+        }
+        else
+        {
+            this.iconPath = ThemeIcon.File;
+        }
+    }
+
+
+    addScript(script: (TaskFile | TaskItem))
+    {
+        script.groupLevel = this.groupLevel;
+        this.scripts.push(script);
+    }
+
+
+    getDefaultUserDataPath()
+    {   //
+        // Support global VSCODE_APPDATA environment variable
+        //
+        let appDataPath = process.env.VSCODE_APPDATA;
+        //
+        // Otherwise check per platform
+        //
+        if (!appDataPath) {
+            switch (process.platform) {
+                case "win32":
+                    appDataPath = process.env.APPDATA;
+                    if (!appDataPath) {
+                        const userProfile = process.env.USERPROFILE;
+                        if (typeof userProfile !== "string") {
+                            throw new Error("Windows: Unexpected undefined %USERPROFILE% environment variable");
+                        }
+                        appDataPath = path.join(userProfile, "AppData", "Roaming");
+                    }
+                    break;
+                case "darwin":
+                    appDataPath = path.join(os.homedir(), "Library", "Application Support");
+                    break;
+                case "linux":
+                    appDataPath = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config");
+                    break;
+                default:
+                    throw new Error("Platform not supported");
+            }
+        }
+
+        return path.join(appDataPath, "vscode");
+    }
+
+
     static getLabel(taskDef: TaskDefinition, source: string, relativePath: string, group: boolean): string
     {
         let label = source;
@@ -179,7 +305,8 @@ export class TaskFile extends TreeItem
         return label.toLowerCase();
     }
 
-    static getFileNameFromSource(source: string, folder: TaskFolder, taskDef: TaskDefinition, relativePath: string, incRelPathForCode?: boolean): string | null
+
+    getFileNameFromSource(source: string, folder: TaskFolder, taskDef: TaskDefinition, relativePath: string, incRelPathForCode?: boolean): string | null
     {
         //
         // Ant tasks or any tasks provided by this extension will have a "fileName" definition
@@ -262,150 +389,71 @@ export class TaskFile extends TreeItem
         return fileName;
     }
 
+
+    getPortableDataPath()
+    {
+        const uri = Uri.parse(process.env.VSCODE_PORTABLE);
+            if (fs.existsSync(uri.fsPath))
+            {
+                try {
+                const fullPath = path.join(uri.fsPath, "user-data", "User");
+                util.logValue("   found portable user data path", fullPath, 1);
+                return fullPath;
+            }
+            catch (e) {
+                util.log(e.toString());
+                throw(e);
+            }
+        }
+    }
+
+
     getUserDataPath()
     {
-        const getDefaultUserDataPath = () =>
-        {   //
-            // Support global VSCODE_APPDATA environment variable
-            //
-            let appDataPath = process.env.VSCODE_APPDATA;
-            //
-            // Otherwise check per platform
-            //
-            if (!appDataPath) {
-                switch (process.platform) {
-                    case "win32":
-                        appDataPath = process.env.APPDATA;
-                        if (!appDataPath) {
-                            const userProfile = process.env.USERPROFILE;
-                            if (typeof userProfile !== "string") {
-                                throw new Error("Windows: Unexpected undefined %USERPROFILE% environment variable");
-                            }
-                            appDataPath = path.join(userProfile, "AppData", "Roaming");
-                        }
-                        break;
-                    case "darwin":
-                        appDataPath = path.join(os.homedir(), "Library", "Application Support");
-                        break;
-                    case "linux":
-                        appDataPath = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config");
-                        break;
-                    default:
-                        throw new Error("Platform not supported");
-                }
-            }
-
-            return path.join(appDataPath, "vscode");
-        };
-
-        const vscodePortable = process.env.VSCODE_PORTABLE;
-        if (vscodePortable)
-        {
-            const uri = Uri.parse(vscodePortable);
-            if (fs.existsSync(uri.fsPath)) {
-                try {
-                    return path.join(uri.fsPath, "user-data", "User");
-                }
-                catch (e) {
-                    util.log(e.toString());
-                    throw(e);
-                }
-            }
-        }
-
+        this.logProcessEnv();
         //
-        // TODO - if a user set the data directory "user-data-dir" via cmd line, this doesnt work
+        // If this is a portable install (zip install), then VSCODE_PORTABLE will be defined in the 
+        // environment this process is running in
         //
-        return path.resolve(getDefaultUserDataPath()); // (cliArgs["user-data-dir"] || getDefaultUserDataPath());
+        if (process.env.VSCODE_PORTABLE) {
+            return this.getPortableDataPath();
+        }
+        //
+        // Check if data path was passed on the command line
+        //
+        if (process.argv)
+        {
+            let argvIdx = util.existsInArray(process.argv, "--user-data-dir");
+            if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
+                return process.argv[++argvIdx];
+            }
+        }
+        //
+        // Use system user data path
+        //
+        return path.resolve(this.getDefaultUserDataPath()); // (cliArgs["user-data-dir"] || getDefaultUserDataPath());
     }
 
-    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean, label?: string, groupLevel?: number)
+
+    logProcessEnv()
     {
-        super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group), TreeItemCollapsibleState.Collapsed);
-
-        this.folder = folder;
-        this.path = relativePath;
-        this.nodePath = relativePath;
-        this.taskSource = source;
-        this.isGroup = (group === true);
-        const labelI = TaskFile.getLabel(taskDef, label ? label : source, relativePath, group);
-
-        if (group && labelI) {
-            this.nodePath = path.join(this.nodePath, labelI);
-        }
-
-        if (!this.nodePath && labelI === "vscode") {
-            this.nodePath = path.join(".vscode", labelI);
-        }
-        if (!this.nodePath) {
-            this.nodePath = "";
-        }
-
-        if (!group)
-        {
-            this.contextValue = "taskFile" + util.properCase(this.taskSource);
-            this.fileName = TaskFile.getFileNameFromSource(source, folder, taskDef, relativePath, true);
-            if (folder.resourceUri)
-            {
-                if (relativePath)
-                {
-                    this.resourceUri = Uri.file(path.join(folder.resourceUri.fsPath, relativePath, this.fileName));
-                } else
-                {
-                    this.resourceUri = Uri.file(path.join(folder.resourceUri.fsPath, this.fileName));
-                }
-            }
-            else {
-                this.resourceUri = Uri.file(path.join(this.getUserDataPath(), this.fileName));
-            }
-        }
-        else
-        {
-            // When a grouped node is created, the definition for the first task is passed to this
-            // function.  Remove the filename part of tha path for this resource
-            //
-            this.fileName = "group";      // change to name of directory
-            // Use a custom toolip (default is to display resource uri)
-            this.tooltip = util.properCase(source) + " Task Files";
-            this.contextValue = "taskGroup" + util.properCase(this.taskSource);
-            this.groupLevel = groupLevel;
-        }
-
-        if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", this.taskSource + ".svg"))))
-        {
-            let src = this.taskSource;
-            //
-            // If npm, check package manager set in vscode settings, (npm, pnpm, or yarn)
-            //
-            if (src === "npm")
-            {
-                const pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager");
-                src = pkgMgr || this.taskSource;
-                if (src.indexOf("npm") !== -1) { // pnpm?
-                    src = "npm";
-                }
-            }
-            this.iconPath = {
-                light: context.asAbsolutePath(path.join("res", "sources", src + ".svg")),
-                dark: context.asAbsolutePath(path.join("res", "sources", src + ".svg"))
-            };
-        }
-        else
-        {
-            this.iconPath = ThemeIcon.File;
+        util.log("get user data path", 1);
+        util.logValue("   os", process.platform, 1);
+        util.logValue("   portable", process.env.VSCODE_PORTABLE, 1);
+        util.logValue("   env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
+        util.logValue("   env:VSCODE_APPDATA", process.env.APPDATA, 1);
+        util.logValue("   env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
+        if (process.platform === "linux") {
+            util.logValue("   env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
         }
     }
 
-    addScript(script: (TaskFile | TaskItem))
-    {
-        script.groupLevel = this.groupLevel;
-        this.scripts.push(script);
-    }
 
     insertScript(script: (TaskFile | TaskItem), index: number)
     {
         this.scripts.splice(index, 0, script);
     }
+
 
     removeScript(script: (TaskFile | TaskItem))
     {
@@ -426,7 +474,9 @@ export class TaskFile extends TreeItem
             this.scripts.splice(idx2, 1);
         }
     }
+
 }
+
 
 export class TaskFolder extends TreeItem
 {

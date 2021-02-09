@@ -24,6 +24,7 @@ import { TaskExplorerProvider } from "./taskProvider";
 import * as util from "./util";
 import * as cache from "./cache";
 import * as constants from "./common/constants";
+import { utils } from "istanbul";
 
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
@@ -113,6 +114,20 @@ export async function addWsFolder(wsf: readonly WorkspaceFolder[])
 }
 
 
+export async function deactivate()
+{
+    watcherDisposables.forEach((d) => {
+        d.dispose();
+    });
+
+    watchers.forEach((w) => {
+        w.dispose();
+    });
+
+    await cache.cancelBuildCache(true);
+}
+
+
 export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
 {
     for (const f in wsf)
@@ -144,32 +159,51 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
 }
 
 
- async function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
+async function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
 {
     let refresh: boolean;
+    let taskTypes: string[] = [];
 
+    const registerChange = (taskType: string) => {
+        if (!util.existsInArray(taskTypes, taskType)) {
+            taskTypes.push(taskType);
+        }
+    };
+
+    //
+    // Check configs that may require a tree refresh...
+    //
+
+    //
+    // if the 'autoRefresh' settings if truned off, then there's nothing to do
+    //
     if (configuration.get<boolean>("autoRefresh") === false) {
         return;
     }
 
+    //
+    // Main excludes list cahnges requires global refresh
+    //
     if (e.affectsConfiguration("taskExplorer.exclude")) {
         refresh = true;
     }
 
+    //
+    // Groupings changes require global refresh
+    //
     if (e.affectsConfiguration("taskExplorer.groupWithSeparator") || e.affectsConfiguration("taskExplorer.groupSeparator") ||
         e.affectsConfiguration("taskExplorer.groupMaxLevel") || e.affectsConfiguration("taskExplorer.groupStripTaskLabel")) {
         refresh = true;
     }
 
-    if (e.affectsConfiguration("taskExplorer.useAnt") || e.affectsConfiguration("taskExplorer.useGulp")) {
-        refresh = true;
-    }
-
+    //
+    // Show/hide last tasks
+    //
     if (e.affectsConfiguration("taskExplorer.showLastTasks"))
     {
         if (configuration.get<boolean>("enableSideBar") && treeDataProvider)
         {
-            await treeDataProvider2.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
+            await treeDataProvider.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
         }
         if (configuration.get<boolean>("enableExplorerView") && treeDataProvider2)
         {
@@ -177,91 +211,141 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
         }
     }
 
+    //
+    // Enable/disable task types
+    //
     if (e.affectsConfiguration("taskExplorer.enableAnt") || e.affectsConfiguration("taskExplorer.includeAnt")) {
         await registerFileWatcher(context, "ant", util.getAntGlobPattern(), configuration.get<boolean>("enableAnt"));
-        refresh = true;
+        registerChange("ant");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableAppPublisher")) {
         await registerFileWatcher(context, "app-publisher", constants.GLOB_APPPUBLISHER, false, configuration.get<boolean>("enableAppPublisher"));
-        refresh = true;
+        registerChange("app-publisher");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableBash")) {
         await registerFileWatcher(context, "bash", constants.GLOB_BASH, true, configuration.get<boolean>("enableBash"));
-        refresh = true;
+        registerChange("bash");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableBatch")) {
         await registerFileWatcher(context, "batch", constants.GLOB_BATCH, true, configuration.get<boolean>("enableBatch"));
-        refresh = true;
+        registerChange("batch");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableGradle")) {
         await registerFileWatcher(context, "gradle", constants.GLOB_GRADLE, false, configuration.get<boolean>("enableGradle"));
-        refresh = true;
+        registerChange("gradle");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableGrunt")) {
         await registerFileWatcher(context, "grunt", constants.GLOB_GRUNT, false, configuration.get<boolean>("enableGrunt"));
-        refresh = true;
+        registerChange("grunt");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableGulp")) {
         await registerFileWatcher(context, "gulp", constants.GLOB_GULP, false, configuration.get<boolean>("enableGulp"));
-        refresh = true;
+        registerChange("gulp");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableMake")) {
         await registerFileWatcher(context, "make", constants.GLOB_MAKEFILE, false, configuration.get<boolean>("enableMake"));
-        refresh = true;
+        registerChange("make");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableNpm")) {
         await registerFileWatcher(context, "npm", constants.GLOB_NPM, false, configuration.get<boolean>("enableNpm"));
-        refresh = true;
+        registerChange("npm");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableNsis")) {
         await registerFileWatcher(context, "nsis", constants.GLOB_NSIS, true, configuration.get<boolean>("enableNsis"));
-        refresh = true;
+        registerChange("nsis");
     }
 
     if (e.affectsConfiguration("taskExplorer.enablePerl")) {
         await registerFileWatcher(context, "perl", constants.GLOB_PERL, true, configuration.get<boolean>("enablePerl"));
-        refresh = true;
+         registerChange("perl");
     }
 
     if (e.affectsConfiguration("taskExplorer.enablePowershell")) {
         await registerFileWatcher(context, "powershell", constants.GLOB_POWERSHELL, true, configuration.get<boolean>("enablePowershell"));
-        refresh = true;
+        registerChange("powershell");
     }
 
     if (e.affectsConfiguration("taskExplorer.enablePython")) {
         await registerFileWatcher(context, "python", constants.GLOB_PYTHON, true, configuration.get<boolean>("enablePython"));
-        refresh = true;
+        registerChange("python");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableRuby")) {
         await registerFileWatcher(context, "ruby", constants.GLOB_RUBY, true, configuration.get<boolean>("enableRuby"));
-        refresh = true;
+        registerChange("ruby");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableTsc")) {
         await registerFileWatcher(context, "tsc", constants.GLOB_TYPESCRIPT, false, configuration.get<boolean>("enableTsc"));
-        refresh = true;
+        registerChange("tsc");
     }
 
     if (e.affectsConfiguration("taskExplorer.enableWorkspace")) {
         await registerFileWatcher(context, "workspace", constants.GLOB_VSCODE, false, configuration.get<boolean>("enableWorkspace"));
-        refresh = true;
+        registerChange("workspace");
     }
 
+    //
+    // Path changes to task programs require task executions to be re-set up
+    //
+    await util.forEachAsync(util.getTaskTypes(), (type: string) =>
+    {
+        if (type === "app-publisher") {
+            if (e.affectsConfiguration("taskExplorer.pathToAppPublisher")) {
+                taskTypes.push("app-publisher");
+            }
+        }
+        else if (e.affectsConfiguration("taskExplorer.pathTo" + util.properCase(type))) {
+            taskTypes.push(type);
+        }
+    });
+
+    //
+    // Extra Apache Ant 'include' paths
+    //
+    if (e.affectsConfiguration("taskExplorer.includeAnt")) {
+        if (!util.existsInArray(taskTypes, "ant")){
+            await registerFileWatcher(context, "ant", util.getAntGlobPattern(), configuration.get<boolean>("enableAnt"));
+            registerChange("ant");
+        }
+    }
+
+    //
+    // Whether or not to use the 'ant' program to detect ant tasks (default is xml2js parser)
+    //
+    if (e.affectsConfiguration("taskExplorer.useAnt")) {
+        registerChange("ant");
+    }
+
+    //
+    // Whether or not to use the 'gulp' program to detect gulp tasks (default is custom parser)
+    //
+    if (e.affectsConfiguration("taskExplorer.useGulp")) {
+        registerChange("gulp");
+    }
+
+    //
+    // NPM Package Manager change (NPM / Yarn)
+    // Do a global refrsh since we don't provide the npm tasks, VSCode itself does
+    //
     if (e.affectsConfiguration("npm.packageManager", null)) {
         refresh = true;
     }
 
-    if (e.affectsConfiguration("taskExplorer.enableSideBar")) {
+    //
+    // Enabled/disable sidebar view
+    //
+    if (e.affectsConfiguration("taskExplorer.enableSideBar"))
+    {
         if (configuration.get<boolean>("enableSideBar")) {
             if (treeDataProvider) {
                 // TODO - remove/add view on enable/disable view
@@ -273,7 +357,11 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
         }
     }
 
-    if (e.affectsConfiguration("taskExplorer.enableExplorerView")) {
+    //
+    // Enabled/disable explorer view
+    //
+    if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
+    {
         if (configuration.get<boolean>("enableExplorerView")) {
             if (treeDataProvider2) {
                 // TODO - remove/add view on enable/disable view
@@ -285,15 +373,9 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
         }
     }
 
-    if (e.affectsConfiguration("taskExplorer.pathToAnsicon") || e.affectsConfiguration("taskExplorer.pathToAnt") ||
-        e.affectsConfiguration("taskExplorer.pathToGradle") || e.affectsConfiguration("taskExplorer.pathToMake") ||
-        e.affectsConfiguration("taskExplorer.pathToNsis") || e.affectsConfiguration("taskExplorer.pathToPerl") ||
-        e.affectsConfiguration("taskExplorer.pathToPython") || e.affectsConfiguration("taskExplorer.pathToRuby")  ||
-        e.affectsConfiguration("taskExplorer.pathToBash") || e.affectsConfiguration("taskExplorer.pathToAppPublisher") ||
-        e.affectsConfiguration("taskExplorer.pathToPowershell")) {
-        refresh = true;
-    }
-
+    //
+    // Integrated shell
+    //
     if (e.affectsConfiguration("terminal.integrated.shell.windows") ||
         e.affectsConfiguration("terminal.integrated.shell.linux") ||
         e.affectsConfiguration("terminal.integrated.shell.macos")) {
@@ -310,6 +392,11 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
 
     if (refresh) {
         await refreshTree();
+    }
+    else if (taskTypes?.length > 0) {
+        util.forEachAsync(taskTypes, async (t: string) => {
+            await refreshTree(t);
+        });
     }
 }
 
@@ -394,15 +481,6 @@ export async function refreshTree(taskType?: string, uri?: Uri)
     //
     if (uri && util.isExcluded(uri.path)) {
         return;
-    }
-
-    //
-    // If the task type received from a filewatcher event is "ant-*" then it is a custom
-    // defined ant file in the includeAnt setting, named accordingly so that the watchers
-    // can be tracked.  change the taskType to "ant" here
-    //
-    if (taskType && taskType.indexOf("ant-") !== -1) {
-        taskType = "ant";
     }
 
     //
@@ -537,18 +615,4 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
     }
 
     return undefined;
-}
-
-
-export async function deactivate()
-{
-    watcherDisposables.forEach((d) => {
-        d.dispose();
-    });
-
-    watchers.forEach((w) => {
-        w.dispose();
-    });
-
-    await cache.cancelBuildCache(true);
 }

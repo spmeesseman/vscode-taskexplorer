@@ -171,7 +171,8 @@ export async function buildCache(taskType: string, fileBlob: string, wsfolder?: 
     //
     if (!wsfolder)
     {
-        util.log("Build cache - Scan all projects for taskType '" + taskType + "' (" + dispTaskType + ")", 1);
+        util.logBlank(1);
+        util.log("   Build cache - Scan all projects for taskType '" + taskType + "' (" + dispTaskType + ")", 1);
         await buildFolderCaches(fCache, dispTaskType, fileBlob, statusBarSpace, setCacheBuilding);
     }
     else {
@@ -198,6 +199,7 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
         return;
     }
 
+    util.logBlank(1);
     util.log("   Scan project " + folder.name + " for " + taskType + " tasks", 1);
     statusBarSpace.text = getStatusString("Scanning for " + taskType + " tasks in project " + folder.name, 65);
 
@@ -210,11 +212,12 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
                 cancelInternal(setCacheBuilding, statusBarSpace);
                 return;
             }
-            if (!util.isExcluded(fpath.path)) {
+            if (!util.isExcluded(fpath.path, "   ")) {
                 fCache.add({
                     uri: fpath,
                     folder
                 });
+                util.logBlank(1);
                 util.logValue("   Added to cache", fpath.fsPath, 3);
             }
         }
@@ -256,7 +259,7 @@ function cancelInternal(setCacheBuilding: boolean, statusBarSpace: StatusBarItem
         cancel = false;
     }
     disposeStatusBarSpace(statusBarSpace);
-    util.log("Cache building cancelled", 1);
+    util.log("   Cache building cancelled", 1);
 }
 
 
@@ -305,6 +308,7 @@ function getStatusString(msg: string, statusLength = 0)
 
 function logBuildCache(taskType: string, taskAlias: string, fileBlob: string, wsfolder: WorkspaceFolder | undefined, setCacheBuilding: boolean)
 {
+    util.logBlank(2);
     util.log("Start cache building", 2);
     util.logValue("   folder", !wsfolder ? "entire workspace" : wsfolder.name, 2);
     util.logValue("   task type", taskType, 2);
@@ -316,6 +320,8 @@ function logBuildCache(taskType: string, taskAlias: string, fileBlob: string, ws
 
 export async function rebuildCache()
 {
+    util.logBlank(1);
+    util.log("rebuild cache", 1);
     filesCache.clear();
     await addFolderToCache();
 }
@@ -323,17 +329,25 @@ export async function rebuildCache()
 
 export async function removeFileFromCache(taskAlias: string, uri: Uri)
 {
+    util.logBlank(1);
+    util.log("remove file from cache", 1);
+    util.logValue("   task type", taskAlias, 2);
+    util.logValue("   file", uri.fsPath, 2);
+
     if (!filesCache.get(taskAlias)) {
         return;
     }
+
     const taskCache = filesCache.get(taskAlias);
     const toRemove = [];
+
     taskCache.forEach((item) =>
     {
         if (item.uri.fsPath === uri.fsPath) {
             toRemove.push(item);
         }
     });
+
     if (toRemove.length > 0) {
         for (const tr in toRemove) {
             if (toRemove.hasOwnProperty(tr)) { // skip over properties inherited by prototype
@@ -341,7 +355,6 @@ export async function removeFileFromCache(taskAlias: string, uri: Uri)
             }
         }
     }
-
 }
 
 
