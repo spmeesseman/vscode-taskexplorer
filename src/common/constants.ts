@@ -9,6 +9,7 @@ export const FAV_TASKS_LABEL = "Favorites";
 
 export const USER_TASKS_LABEL = "User Tasks";
 
+export const GLOB_ANT = "**/[Bb][Uu][Ii][Ll][Dd].[Xx][Mm][Ll]";
 export const GLOB_APPPUBLISHER = "**/.publishrc*";
 export const GLOB_BASH = "**/*.[Ss][Hh]";
 export const GLOB_BATCH = "**/*.{[Bb][Aa][Tt],[Cc][Mm][Dd]}";

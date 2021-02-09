@@ -105,6 +105,30 @@ export function properCase(name: string)
 }
 
 
+export function getAntGlobPattern(): string
+{
+    let multiFilePattern = "";
+    const includes: string[] = configuration.get("includeAnt");
+    if (includes && includes.length > 0)
+    {
+        multiFilePattern = "{" + constants.GLOB_ANT;
+        if (Array.isArray(includes))
+        {
+            for (const i in includes) {
+                multiFilePattern += ",";
+                multiFilePattern += includes[i];
+            }
+        }
+        else {
+            multiFilePattern += ",";
+            multiFilePattern += includes;
+        }
+        multiFilePattern += "}";
+    }
+    return multiFilePattern;
+}
+
+
 export function getExcludesGlob(folder: string | WorkspaceFolder): RelativePattern
 {
     let relativePattern = new RelativePattern(folder, "**/node_modules/**");

@@ -315,8 +315,9 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
 
 async function registerFileWatchers(context: ExtensionContext)
 {
-    if (configuration.get<boolean>("enableAnt")) {
-        await registerFileWatcherAnt(context);
+    if (configuration.get<boolean>("enableAnt"))
+    {
+        await registerFileWatcher(context, "ant", util.getAntGlobPattern());
     }
 
     if (configuration.get<boolean>("enableAppPublisher")) {
@@ -450,58 +451,23 @@ function registerTaskProviders(context: ExtensionContext)
 }
 
 
-async function registerFileWatcherAnt(context: ExtensionContext, enabled?: boolean)
-{
-    await registerFileWatcher(context, "ant", "**/[Bb]uild.xml", false, enabled);
-
-    //
-    // For extra file globs configured in settings, we need to first go through and disable
-    // all current watchers since there is no way of knowing which glob patterns were
-    // removed (if any).
-    //
-    watchers.forEach((watcher, key) => {
-        if (key.startsWith("ant") && key !== "ant")
-        {
-            const watcher = watchers.get(key);
-            watcher.onDidChange(_e => undefined);
-            watcher.onDidDelete(_e => undefined);
-            watcher.onDidCreate(_e => undefined);
-        }
-    });
-
-    const includeAnt: string[] = configuration.get("includeAnt");
-    if (includeAnt && includeAnt.length > 0) {
-        for (let i = 0; i < includeAnt.length; i++) {
-            await registerFileWatcher(context, "ant-" + includeAnt[i], includeAnt[i], false, enabled);
-        }
-    }
-}
-
-
 async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, isScriptType?: boolean, enabled?: boolean)
 {
     util.log("Register file watcher for task type '" + taskType + "'");
 
-    let taskAlias = taskType;
-    let taskTypeR = taskType;
-    let watcher: FileSystemWatcher = watchers.get(taskTypeR);
-
-    if (taskType && taskType.indexOf("ant-") !== -1) {
-        taskAlias = "ant";
-        taskTypeR = "ant";
-    }
+    let watcher: FileSystemWatcher = watchers.get(taskType);
 
     if (workspace.workspaceFolders) {
-        await cache.buildCache(isScriptType && taskAlias !== "app-publisher" ? "script" : taskAlias, fileBlob);
+        await cache.buildCache(isScriptType && taskType !== "app-publisher" ? "script" : taskType, fileBlob);
     }
 
     if (watcher)
     {
-        const watcherDisposable = watcherDisposables.get(taskTypeR);
+        const watcherDisposable = watcherDisposables.get(taskType);
         if (watcherDisposable)
         {
             watcherDisposable.dispose();
-            watcherDisposables.delete(taskTypeR);
+            watcherDisposables.delete(taskType);
         }
     }
 
@@ -509,24 +475,24 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
     {
         if (!watcher) {
             watcher = workspace.createFileSystemWatcher(fileBlob);
-            watchers.set(taskTypeR, watcher);
+            watchers.set(taskType, watcher);
             context.subscriptions.push(watcher);
         }
         if (!isScriptType) {
-            watcherDisposables.set(taskTypeR, watcher.onDidChange(async _e => {
+            watcherDisposables.set(taskType, watcher.onDidChange(async _e => {
                 logFileWatcherEvent(_e, "change");
-                await refreshTree(taskTypeR, _e);
+                await refreshTree(taskType, _e);
             }));
         }
-        watcherDisposables.set(taskTypeR, watcher.onDidDelete(async _e => {
+        watcherDisposables.set(taskType, watcher.onDidDelete(async _e => {
             logFileWatcherEvent(_e, "delete");
-            await cache.removeFileFromCache(taskTypeR, _e);
-            await refreshTree(taskTypeR, _e);
+            await cache.removeFileFromCache(taskType, _e);
+            await refreshTree(taskType, _e);
         }));
-        watcherDisposables.set(taskTypeR, watcher.onDidCreate(async _e => {
+        watcherDisposables.set(taskType, watcher.onDidCreate(async _e => {
             logFileWatcherEvent(_e, "create");
-            await cache.addFileToCache(taskTypeR, _e);
-            await refreshTree(taskTypeR, _e);
+            await cache.addFileToCache(taskType, _e);
+            await refreshTree(taskType, _e);
         }));
     }
 }

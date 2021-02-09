@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment } from "vscode";
-import { log, logValue, timeout, getExcludesGlob, isExcluded, properCase, isScriptType } from "./util";
+import { log, logValue, timeout, getExcludesGlob, isExcluded, properCase, isScriptType, getAntGlobPattern } from "./util";
 import { configuration } from "./common/configuration";
 import * as constants from "./common/constants";
 
@@ -41,16 +41,16 @@ export async function rebuildCache()
 }
 
 
-export async function buildCache(taskType: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined, setCacheBuilding = true, aliasOverride: string = null)
+export async function buildCache(taskType: string, fileBlob: string, wsfolder?: WorkspaceFolder | undefined, setCacheBuilding = true)
 {
-    const taskAlias = !aliasOverride ? (!isScriptType(taskType) ? taskType : "script") : aliasOverride;
+    const taskAlias = !isScriptType(taskType) ? taskType : "script";
 
     log("Start cache building", 2);
     logValue("   folder", !wsfolder ? "entire workspace" : wsfolder.name, 2);
-    logValue("   task type", taskType, 3);
-    logValue("   task alias", taskAlias, 3);
-    logValue("   blob", fileBlob, 3);
-    logValue("   setCacheBuilding", setCacheBuilding.toString(), 3);
+    logValue("   task type", taskType, 2);
+    logValue("   task alias", taskAlias, 2);
+    logValue("   blob", fileBlob, 2);
+    logValue("   setCacheBuilding", setCacheBuilding.toString(), 2);
 
     if (setCacheBuilding) {
         //
@@ -64,10 +64,7 @@ export async function buildCache(taskType: string, fileBlob: string, wsfolder?: 
         filesCache.set(taskAlias, new Set());
     }
     const fCache = filesCache.get(taskAlias);
-    let dispTaskType = properCase(taskType);
-    if (dispTaskType.indexOf("Ant") !== -1) {
-        dispTaskType = "Ant";
-    }
+    const dispTaskType = properCase(taskType);
 
     function statusString(msg: string, statusLength = 0)
     {
@@ -242,13 +239,7 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
     cacheBuilding = true;
 
     if (!cancel && configuration.get<boolean>("enableAnt")) {
-        await buildCache("ant", "**/[Bb]uild.xml", folder, false);
-        const includeAnt: string[] = configuration.get("includeAnt");
-        if (includeAnt && includeAnt.length > 0) {
-            for (let i = 0; i < includeAnt.length; i++) {
-                await buildCache("ant", includeAnt[i], folder, false, "ant-" + includeAnt[i]);
-            }
-        }
+        await buildCache("ant", getAntGlobPattern(), folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableAppPublisher")) {
@@ -288,27 +279,27 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
     }
 
     if (!cancel && configuration.get<boolean>("enablePerl")) {
-        await buildCache("perl", "**/*.[Pp][Ll]", folder, false);
+        await buildCache("perl", constants.GLOB_PERL, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enablePowershell")) {
-        await buildCache("powershell", "**/*.[Pp][Ss]1", folder, false);
+        await buildCache("powershell", constants.GLOB_POWERSHELL, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enablePython")) {
-        await buildCache("python", "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]", folder, false);
+        await buildCache("python", constants.GLOB_PYTHON, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableRuby")) {
-        await buildCache("ruby", "**/*.[Rr][Bb]", folder, false);
+        await buildCache("ruby", constants.GLOB_RUBY, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableTsc")) {
-        await buildCache("tsc", "**/tsconfig.json", folder, false);
+        await buildCache("tsc", constants.GLOB_TYPESCRIPT, folder, false);
     }
 
     if (!cancel && configuration.get<boolean>("enableWorkspace")) {
-        await buildCache("workspace", "**/.vscode/tasks.json", folder, false);
+        await buildCache("workspace", constants.GLOB_VSCODE, folder, false);
     }
 
     cacheBuilding = false;
