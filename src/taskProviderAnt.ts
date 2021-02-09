@@ -1,7 +1,6 @@
 
 import {
-    Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition, CustomExecution, ProcessExecution, RunOptions, TaskPresentationOptions, TaskScope
+    Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace, TaskDefinition
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
@@ -33,7 +32,7 @@ export class AntTaskProvider implements TaskExplorerProvider
 
     public async provideTasks()
     {
-        util.log("");
+        util.logBlank();
         util.log("provide ant tasks");
 
         if (!cachedTasks) {
@@ -50,7 +49,7 @@ export class AntTaskProvider implements TaskExplorerProvider
 
     public async invalidateTasksCache(opt?: Uri): Promise<void>
     {
-        util.log("");
+        util.logBlank();
         util.log("invalidateTasksCacheAnt");
         util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
         util.logValue("   has cached tasks", cachedTasks ? "true" : "false", 2);
@@ -121,7 +120,7 @@ export class AntTaskProvider implements TaskExplorerProvider
 
     private async detectAntScripts(): Promise<Task[]>
     {
-        util.log("");
+        util.logBlank();
         util.log("detectAntScripts");
 
         const allTasks: Task[] = [];
@@ -147,15 +146,34 @@ export class AntTaskProvider implements TaskExplorerProvider
 
     private async findAllAntScripts(path: string): Promise<StringMap>
     {
-        let text: any = "";
         const scripts: StringMap = {};
-        const buffer = await util.readFile(path);
+        const useAnt = configuration.get<boolean>("useAnt");
 
-        util.log("");
-        util.log("FindAllAntScripts");
+        util.logBlank();
+        util.log("find all ant targets");
+        util.logValue("   use ant", useAnt, 2);
 
         //
         // Try running 'ant' itself to get the targets.  If fail, just custom parse
+        //
+        if (useAnt === true)
+        {
+            this.findTasksWithAnt(scripts);
+        }
+        else {
+            await this.findTasksWithXml2Js(path, scripts);
+        }
+
+        return scripts;
+    }
+
+
+    private findTasksWithAnt(scripts: StringMap)
+    {
+        let stdout: Buffer;
+
+        //
+        // Execute 'ant'/'ant.bat' to find defined tasks (ant targets)
         //
         // Sample Output of ant -p :
         //
@@ -177,19 +195,17 @@ export class AntTaskProvider implements TaskExplorerProvider
         //
         //     Default target: G64
         //
-
-        let stdout: Buffer;
-        if (configuration.get("useAnt") === true)
-        {
-            try {
-                stdout = execSync(this.getCommand() + " -f " + path + " -p");
-            }
-            catch {}
+        try {
+            stdout = execSync(this.getCommand() + " -f " + path + " -p");
+        }
+        catch (ex) {
+            this.logException(ex);
+            return;
         }
 
         if (stdout)
         {
-            text = stdout.toString();
+            let text: any = stdout.toString();
             //
             // First get the default, use 2nd capturing group (returned arr-idx 2):
             //
@@ -214,27 +230,42 @@ export class AntTaskProvider implements TaskExplorerProvider
                 }
             }
         }
-        else
-        {
-            parseString(buffer, (err, result) => {
-                text = result;
-            });
+    }
 
-            if (text && text.project && text.project.target)
+
+    private logException(ex: any)
+    {
+        util.logError([ "*** Error running/executing ant!!", "Check to ensure the path to ant/ant.bat is correct", ex?.toString() ]);
+        window.showInformationMessage("Error running/executing ant!!  Check to ensure the path to ant/ant.bat is correct");
+    }
+
+
+    private async findTasksWithXml2Js(path: string, scripts: StringMap)
+    {
+        let text: any = "";
+        const buffer = await util.readFile(path);
+
+        //
+        // Convert to JSON with Xml2Js parseString()
+        //
+        parseString(buffer, (err, result) => {
+            text = result;
+        });
+        //
+        // We should have a main 'project' object and a 'project.target' array
+        //
+        if (text && text.project && text.project.target)
+        {
+            const defaultTask = text.project.$.default; // Is default task?  It's always defined on the main project node
+            const targets = text.project.target;
+            for (const tgt in targets)                  // Check .$ and .$.name (xml2js output format)
             {
-                const defaultTask = text.project.$.default;
-                const targets = text.project.target;
-                for (const tgt in targets)
-                {
-                    if (targets[tgt].$ && targets[tgt].$.name) {
-                        util.logValue("   Found target (cst.)", targets[tgt].$.name);
-                        scripts[defaultTask === targets[tgt].$.name ? targets[tgt].$.name + " - Default" : targets[tgt].$.name] = targets[tgt].$.name;
-                    }
+                if (targets[tgt].$ && targets[tgt].$.name) {
+                    util.logValue("   Found target (cst.)", targets[tgt].$.name);
+                    scripts[defaultTask === targets[tgt].$.name ? targets[tgt].$.name + " - Default" : targets[tgt].$.name] = targets[tgt].$.name;
                 }
             }
         }
-
-        return scripts;
     }
 
 
