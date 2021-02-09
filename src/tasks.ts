@@ -151,8 +151,10 @@ export class TaskFile extends TreeItem
         if (group !== true)
         {
             if (source === "ant")
-            {
-                if (taskDef.fileName && taskDef.fileName !== "build.xml" && taskDef.fileName !== "Build.xml")
+            {   //
+                // For ant files not named build.xml, display the file name too
+                //
+                if (taskDef?.fileName?.match(/build.xml/i))
                 {
                     if (relativePath.length > 0 && relativePath !== ".vscode")
                     {
@@ -164,7 +166,7 @@ export class TaskFile extends TreeItem
 
             if (relativePath.length > 0 && relativePath !== ".vscode")
             {
-                if (relativePath.endsWith("\\") || relativePath.endsWith("/"))
+                if (relativePath.endsWith("\\") || relativePath.endsWith("/")) // trim slash chars
                 {
                     return label + " (" + relativePath.substring(0, relativePath.length - 1).toLowerCase() + ")";
                 }
