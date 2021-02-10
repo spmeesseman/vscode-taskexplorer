@@ -1324,6 +1324,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    private getTaskItemId(taskItem: TaskItem)
+    {
+        return taskItem?.id?.replace(constants.LAST_TASKS_LABEL + ":", "").replace(constants.FAV_TASKS_LABEL + ":", "");
+    }
+
+
     private getTerminal(taskItem: TaskItem): Terminal | null
     {
         const me = this;
@@ -1730,8 +1736,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         let taskItem2: TaskItem;
         const ltfolder = this.taskTree[treeIndex] as TaskFolder;
-        let taskId = taskItem.id.replace(label + ":", "");
-        taskId = label + ":" + taskItem.id;
+        const taskId = label + ":" + this.getTaskItemId(taskItem);
 
         ltfolder.taskFiles.forEach((t: TaskItem) =>
         {
@@ -2220,7 +2225,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const storeName: string = !isFavorite ? constants.LAST_TASKS_STORE : constants.FAV_TASKS_STORE;
         const label: string = !isFavorite ? constants.LAST_TASKS_LABEL : constants.FAV_TASKS_LABEL;
         const cstTasks = storage.get<string[]>(storeName, []) || [];
-        const taskId = taskItem?.id?.replace(constants.LAST_TASKS_LABEL + ":", "").replace(constants.FAV_TASKS_LABEL + ":", "");
+        const taskId =  this.getTaskItemId(taskItem);
 
         util.log(logPad + "save task", 1);
         util.logValue(logPad + "   treenode label", label, 2);
