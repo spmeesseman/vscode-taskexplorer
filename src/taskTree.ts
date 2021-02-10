@@ -223,10 +223,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async buildGroupings(folders: Map<string, TaskFolder>)
+    private async buildGroupings(folders: Map<string, TaskFolder>, padding = "")
     {
         util.logBlank(1);
-        util.log("Build tree node groupings", 1);
+        util.log(padding + "Build tree node groupings", 1);
         //
         // Sort nodes.  By default the project folders are sorted in the same order as that
         // of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
@@ -258,16 +258,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             if (configuration.get("groupWithSeparator")) // && key !== constants.USER_TASKS_LABEL)
             {
-                await this.createTaskGroupings(folder, "   ");
+                await this.createTaskGroupings(folder, padding + "   ");
             }
         });
 
         util.logBlank(1);
-        util.log("completed tree node groupings", 1);
+        util.log(padding + "completed build tree node groupings", 1);
     }
 
 
-    private buildTaskTree(tasksList: Task[]): TaskFolder[] | NoScripts[]
+    private async buildTaskTree(tasksList: Task[]): Promise<TaskFolder[] | NoScripts[]>
     {
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
@@ -276,6 +276,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             ltfolder = null,
             favfolder = null;
         let taskFile = null;
+
+        util.logBlank(1);
+        util.log("build task tree", 1);
 
         //
         // The 'Last Tasks' folder will be 1st in the tree
@@ -402,7 +405,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Sort and build groupings
         //
-        this.buildGroupings(folders);
+        await this.buildGroupings(folders, "   ");
 
         //
         // Sort the 'Last Tasks' folder by last time run
@@ -421,6 +424,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // Sort the 'Favorites' folder
         //
         this.sortTasks(favfolder?.taskFiles);
+
+        util.logBlank(1);
+        util.log("completed build task tree", 1);
 
         return [...folders.values()];
     }
@@ -613,9 +619,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const atMaxLevel: boolean = configuration.get<number>("groupMaxLevel") <= treeLevel + 1;
 
         util.log(padding + "create task groupings by defined separator", 2);
+        util.logValue(padding + "   node name", taskFile.label, 2);
         util.logValue(padding + "   grouping level", treeLevel, 3);
-        util.logValue(padding + "   node name", taskFile.label, 3);
-        util.logValue(padding + "   file name", taskFile.path.fileName, 3);
+        util.logValue(padding + "   is group", taskFile.isGroup, 3);
+        util.logValue(padding + "   file name", taskFile.path, 3);
         util.logValue(padding + "   folder", folder.label, 3);
         util.logValue(padding + "   path", taskFile.path, 3);
 
@@ -965,7 +972,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             if (this.tasks)
             {
-                this.taskTree = this.buildTaskTree(this.tasks);
+                this.taskTree = await this.buildTaskTree(this.tasks);
                 if (this.taskTree.length === 0)
                 {
                     this.taskTree = [new NoScripts()];
