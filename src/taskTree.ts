@@ -8,7 +8,7 @@ import * as util from "./util";
 import * as assert from "assert";
 import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind,
-    TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri,
+    TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions, TaskExecution,
     ShellExecution, Terminal, StatusBarItem, StatusBarAlignment, CustomExecution, ProcessExecution, ShellQuotedString
 } from "vscode";
@@ -76,8 +76,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => { await this.addRemoveFavorite(taskItem); }, this));
         subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
 
-        tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
-        tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
+        tasks.onDidStartTask(async(_e) => this.taskStartEvent(_e));
+        tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e));
+        //tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
+        //tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
     }
 
 
@@ -384,7 +386,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 // Create and add task item to task file node
                 //
                 const taskItem = new TaskItem(this.extensionContext, taskFile, each);
-                taskItem.task.definition.taskItem = taskItem;
                 taskFile.addScript(taskItem);
 
                 //
@@ -953,6 +954,48 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    private fireTaskChangeEvents(taskFile: TaskFile)
+    {
+        const tree = this.taskTree;
+
+        //
+        // Fire change event for parent folder
+        //
+        this._onDidChangeTreeData.fire(taskFile);
+
+        //
+        // The 'Last Tasks' folder
+        //
+        if (configuration.get<boolean>("showLastTasks") === true)
+        {
+            const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []) || [];
+            if (lastTasks && lastTasks.length > 0)
+            {
+                if (tree[0].label === constants.LAST_TASKS_LABEL)
+                {
+                    this._onDidChangeTreeData.fire(tree[0]);
+                }
+            }
+        }
+
+        //
+        // The 'Favorites' folder
+        //
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []) || [];
+        if (favTasks && favTasks.length > 0)
+        {
+            if (tree[0].label === constants.FAV_TASKS_LABEL)
+            {
+                this._onDidChangeTreeData.fire(tree[0]);
+            }
+            else if (tree[1].label === constants.FAV_TASKS_LABEL)
+            {
+                this._onDidChangeTreeData.fire(tree[1]);
+            }
+        }
+    }
+
+
     async getChildren(element?: TreeItem, logPad = ""): Promise<TreeItem[]>
     {
         let waited = 0;
@@ -960,6 +1003,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         util.logBlank(1);
         util.log(logPad + "get tree children", 1);
+        util.logValue(logPad + "   task folder", element?.label, 1);
         util.logValue(logPad + "   tasks need to be retrieved", !this.tasks, 2);
         util.logValue(logPad + "   task tree needs to be built", !this.taskTree, 2);
 
@@ -980,11 +1024,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Build task tree if not built already.
         // Note that a task start or stop will set taskTree to null when the onDidStartTask() and
-        // onDidStopTask() events trigger refresh().  THis could be redone, see TODO in refresh().
+        // onDidStopTask() events trigger refresh().  This might be able to be redone to perform
+        // with much less processing , see TODO in refresh().
         //
         if (!this.taskTree)
         {   //
-            // TODO - search enable* settings and apply enabled types to filter
+            // TODO - Performance Enhancement - search enable* settings and apply enabled types to
+            // the filter parameter of fetchTasks() (or have to call multiple times?).  THis would
+            // eliminate all callbacks into disabled task providers to read task files.
             //
             // let taskItems = await tasks.fetchTasks({ type: 'npm' });
             //
@@ -995,7 +1042,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 this.tasks = await tasks.fetchTasks();
             }
             if (this.tasks)
-            {
+            {   //
+                // Build the task tree, see the TODO above
+                //
                 this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ");
                 util.logBlank(1);
                 if (this.taskTree.length === 0)
@@ -1364,8 +1413,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    public getTreeItem(element: TreeItem): TreeItem
+    public getTreeItem(element: TaskItem | TaskFile | TaskFolder): TreeItem
     {
+        util.logBlank(1);
+        util.log("get tree item", 1);
+        util.logValue("   label", element?.label, 1);
+        if (element instanceof TaskItem) {
+            util.log("   refresh task item state", 1);
+            element.refreshState();
+        }
         return element;
     }
 
@@ -1789,7 +1845,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // TODO - performance enhancement
         // Can only invalidate a section of the tree depending on tasktype/uri?
         //
-        this.taskTree = null;
+        // if (invalidate !== false) {
+            this.taskTree = null;
+        // }
 
         //
         // If invalidate is false, then this is a task start/stop
@@ -2358,6 +2416,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 taskItem.execution.terminate();
             }
         }
+    }
+
+
+    private async taskStartEvent(e: TaskStartEvent)
+    {
+        util.log("task started", 1);
+        this.fireTaskChangeEvents(e.execution.task.definition.taskItem.taskFile);
+    }
+
+
+    private async taskFinishedEvent(e: TaskEndEvent)
+    {
+        util.log("task finished", 1);
+        this.fireTaskChangeEvents(e.execution.task.definition.taskItem.taskFile);
     }
 
 }

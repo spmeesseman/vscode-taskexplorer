@@ -11,12 +11,12 @@ import * as constants from "./common/constants";
 
 export class TaskItem extends TreeItem
 {
+    private readonly context: ExtensionContext;
     public static readonly defaultSource = "Workspace";
-
-    public readonly task: Task | undefined;
     public readonly taskSource: string;
     public readonly taskGroup: string;
-    public readonly execution: TaskExecution | undefined;
+    public task: Task | undefined;
+    public execution: TaskExecution | undefined;
     public paused: boolean;
     public nodePath: string;
     public groupLevel: number;
@@ -40,11 +40,16 @@ export class TaskItem extends TreeItem
             }
             return displayName;
         };
-
-        super(getDisplayName(task.name, taskGroup), TreeItemCollapsibleState.None);
-
         //
-        // Task group indicates the TaskFile group name (???)
+        // Construction
+        //
+        super(getDisplayName(task.name, taskGroup), TreeItemCollapsibleState.None);
+        //
+        // Save extension context, we need it in a few of the classes functions
+        //
+        this.context = context;
+        //
+        // Task group indicates the TaskFile group name (double check this???)
         //
         this.taskGroup = taskGroup;
         //
@@ -62,20 +67,55 @@ export class TaskItem extends TreeItem
             command: "taskExplorer.open",   // Default click action can be set to 'Execute/Run' in Settings
             arguments: [this]               // If the def. action is 'Run', then it is redirected in the 'Open' cmd
         };
-
         //
         // The task source, i.e. "npm", "workspace", or any of the TaskExplorer provided tasl mnemonics,
         // i.e. "ant", "gulp", "batch", etc...
         //
         this.taskSource = task.source;
+        //
+        // Set taskItem on the task deinfition object for use in the task start/stop events
+        //
+        this.task.definition.taskItem = this;
+        //
+        // Node path
+        //
+        this.nodePath = task.definition.path;
+        //
+        // Tooltip
+        //
+        this.tooltip = "Open " + task.name + (task.detail ? ` | ${task.detail}` : "");
+        //
+        // Refresh state - sets context value, icon path from execution state
+        //
+        this.refreshState();
+    }
 
-        //
-        // Find an execustion for this task if it exists, this tells if it's currently running or not
-        //
-        this.execution = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
-            e.task.scope === task.scope && e.task.definition.path === task.definition.path);
 
-        //
+    getFolder(): WorkspaceFolder
+    {
+        return this.taskFile.folder.workspaceFolder;
+    }
+
+
+    isExecuting(task?: Task | undefined)
+    {
+        this.task = task ?? this.task;
+        this.execution = tasks.taskExecutions.find(e => e.task.name === this.task.name && e.task.source === this.task.source &&
+            e.task.scope === this.task.scope && e.task.definition.path === this.task.definition.path);
+        return !!this.execution;
+    }
+
+
+    refreshState(task?: Task | undefined)
+    {
+        const isExecuting = this.isExecuting(task);
+        this.setContextValue(this.task, isExecuting);
+        this.setIconPath(this.task, this.context, isExecuting);
+    }
+
+
+    setContextValue(task: Task, running: boolean)
+    {   //
         // Context view controls the view parameters to the ui, see package.json /views/context node.
         //
         //     script        - Standard task item, e.g. "npm", "Workspace", "gulp", etc
@@ -85,24 +125,25 @@ export class TaskItem extends TreeItem
         // Note that TaskItems of type 'scriptFile' can be ran with arguments and this will have an additional
         // entry added to it's context menu - "Run with arguments"
         //
-        if (this.task.definition.scriptFile || this.taskSource === "gradle") {
-            this.contextValue = "scriptFile";
+        if (task.definition.scriptFile || this.taskSource === "gradle") {
+            this.contextValue = running ? "scriptRunning" : "scriptFile";
         }       //
         else { // Note 2/8/2021
               // I think "$composite" was the old definition type for composite tasks, because as of Code v1.53,
              // the task definition type for a comosite task is "$empty".
             //
-            this.contextValue = this.execution && task.definition.type !== "$composite" ? "scriptRunning" : "script";
+            this.contextValue = running ? "scriptRunning" : "script";
         }
+    }
 
-        //
-        // Set icon
-        //
+
+    setIconPath(task: Task, context: ExtensionContext, running: boolean)
+    {   //
         // Note 2/8/2021
         // I think "$composite" was the old definition type for composite tasks, because as of Code v1.53,
         // the task definition type for a comosite task is "$empty".
         //
-        if (this.execution && task.definition.type !== "$composite")
+        if (running && task.definition.type !== "$composite")
         {
             this.iconPath = {
                 light: context.asAbsolutePath(path.join("res", "light", "loading.svg")),
@@ -115,14 +156,8 @@ export class TaskItem extends TreeItem
                 dark: context.asAbsolutePath(path.join("res", "dark", "script.svg"))
             };
         }
-        this.nodePath = task.definition.path;
-        this.tooltip = "Open " + task.name + (task.detail ? ` | ${task.detail}` : "");
     }
 
-    getFolder(): WorkspaceFolder
-    {
-        return this.taskFile.folder.workspaceFolder;
-    }
 }
 
 

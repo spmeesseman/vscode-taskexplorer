@@ -5,20 +5,10 @@ import {
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
-import { TaskItem } from "./tasks";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 import { execSync } from "child_process";
-
-
-interface GulpTaskDefinition extends TaskDefinition
-{
-    script?: string;
-    path?: string;
-    fileName?: string;
-    uri?: Uri;
-    treeItem?: TaskItem;
-}
+import { TaskExplorerDefinition } from "./taskDefinition";
 
 
 export class GulpTaskProvider implements TaskProvider
@@ -58,7 +48,7 @@ export class GulpTaskProvider implements TaskProvider
             const rmvTasks: Task[] = [];
 
             await util.forEachAsync(this.cachedTasks, each => {
-                const cstDef: GulpTaskDefinition = each.definition;
+                const cstDef: TaskExplorerDefinition = each.definition;
                 if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                     rmvTasks.push(each);
                 }
@@ -70,7 +60,7 @@ export class GulpTaskProvider implements TaskProvider
             // this is happening with a broken await() somewere that I cannot find
             if (this.cachedTasks)
             {
-                await util.forEachAsync(rmvTasks, each => {
+                await util.forEachAsync(rmvTasks, (each: Task) => {
                     util.log("   removing old task " + each.name);
                     util.removeFromArray(this.cachedTasks, each);
                 });
@@ -103,7 +93,7 @@ export class GulpTaskProvider implements TaskProvider
             return "";
         };
 
-        const kind: GulpTaskDefinition = {
+        const kind: TaskExplorerDefinition = {
             type: "gulp",
             script: target,
             path: getRelativePath(folder, uri),

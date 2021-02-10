@@ -5,21 +5,11 @@ import {
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
-import { TaskItem } from "./tasks";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
+import { TaskExplorerDefinition } from "./taskDefinition";
 
-
-interface AppPublisherTaskDefinition extends TaskDefinition
-{
-    script?: string;
-    path?: string;
-    fileName?: string;
-    uri?: Uri;
-    treeItem?: TaskItem;
-    cmdLine?: string;
-}
 
 export class AppPublisherTaskProvider implements TaskExplorerProvider
 {
@@ -58,8 +48,8 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
             const rmvTasks: Task[] = [];
             const folder = workspace.getWorkspaceFolder(opt);
 
-            await util.forEachAsync(this.cachedTasks, each => {
-                const cstDef: AppPublisherTaskDefinition = each.definition as AppPublisherTaskDefinition;
+            await util.forEachAsync(this.cachedTasks, (each: Task) => {
+                const cstDef: TaskExplorerDefinition = each.definition;
                 if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                     rmvTasks.push(each);
                 }
@@ -139,7 +129,7 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
         const fileName = path.basename(uri.fsPath);
         const relativePath = getRelativePath(folder, uri);
 
-        const kind1: AppPublisherTaskDefinition = {
+        const kind1: TaskExplorerDefinition = {
             type: "app-publisher",
             fileName,
             path: relativePath,
@@ -148,7 +138,7 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
             uri
         };
 
-        const kind2: AppPublisherTaskDefinition = {
+        const kind2: TaskExplorerDefinition = {
             type: "app-publisher",
             fileName,
             path: relativePath,
@@ -156,7 +146,7 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
             uri
         };
 
-        const kind3: AppPublisherTaskDefinition = {
+        const kind3: TaskExplorerDefinition = {
             type: "app-publisher",
             fileName,
             path: relativePath,
@@ -164,7 +154,7 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
             uri
         };
 
-        const kind4: AppPublisherTaskDefinition = {
+        const kind4: TaskExplorerDefinition = {
             type: "app-publisher",
             fileName,
             path: relativePath,
@@ -172,7 +162,7 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
             uri
         };
 
-        const kind5: AppPublisherTaskDefinition = {
+        const kind5: TaskExplorerDefinition = {
             type: "app-publisher",
             fileName,
             path: relativePath,
@@ -180,7 +170,7 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
             uri
         };
 
-        const kind6: AppPublisherTaskDefinition = {
+        const kind6: TaskExplorerDefinition = {
             type: "app-publisher",
             fileName,
             path: relativePath,

@@ -6,24 +6,13 @@ import * as path from "path";
 import * as util from "./util";
 import { parseStringPromise } from "xml2js";
 import { configuration } from "./common/configuration";
-import { TaskItem } from "./tasks";
 import { filesCache } from "./cache";
 import { execSync } from "child_process";
 import { TaskExplorerProvider } from "./taskProvider";
+import { TaskExplorerDefinition } from "./taskDefinition";
 
 
 interface StringMap { [s: string]: string }
-
-
-interface AntTaskDefinition extends TaskDefinition
-{
-    script?: string;
-    path?: string;
-    fileName?: string;
-    uri?: Uri;
-    treeItem?: TaskItem;
-    isDefault?: boolean;
-}
 
 
 export class AntTaskProvider implements TaskExplorerProvider
@@ -58,8 +47,8 @@ export class AntTaskProvider implements TaskExplorerProvider
         {
             const rmvTasks: Task[] = [];
 
-            await util.forEachAsync(this.cachedTasks, each => {
-                const cstDef: AntTaskDefinition = each.definition;
+            await util.forEachAsync(this.cachedTasks, (each: Task) => {
+                const cstDef: TaskExplorerDefinition = each.definition;
                 if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                     rmvTasks.push(each);
                 }
@@ -307,7 +296,7 @@ export class AntTaskProvider implements TaskExplorerProvider
             cwd
         };
 
-        const kind: AntTaskDefinition = {
+        const kind: TaskExplorerDefinition = {
             type: "ant",
             script: target,
             path: getRelativePath(folder, uri),

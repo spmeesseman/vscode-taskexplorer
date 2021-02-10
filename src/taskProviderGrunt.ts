@@ -5,20 +5,11 @@ import {
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
-import { TaskItem } from "./tasks";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
+import { TaskExplorerDefinition } from "./taskDefinition";
 
-
-interface GruntTaskDefinition extends TaskDefinition
-{
-    script?: string;
-    path?: string;
-    fileName?: string;
-    uri?: Uri;
-    treeItem?: TaskItem;
-}
 
 export class GruntTaskProvider implements TaskExplorerProvider
 {
@@ -56,8 +47,8 @@ export class GruntTaskProvider implements TaskExplorerProvider
         {
             const rmvTasks: Task[] = [];
 
-            await util.forEachAsync(this.cachedTasks, (each) => {
-                const cstDef: GruntTaskDefinition = each.definition;
+            await util.forEachAsync(this.cachedTasks, (each: Task) => {
+                const cstDef: TaskExplorerDefinition = each.definition;
                 if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                     rmvTasks.push(each);
                 }
@@ -115,7 +106,7 @@ export class GruntTaskProvider implements TaskExplorerProvider
             return "";
         };
 
-        const kind: GruntTaskDefinition = {
+        const kind: TaskExplorerDefinition = {
             type: "grunt",
             script: target,
             path: getRelativePath(folder, uri),

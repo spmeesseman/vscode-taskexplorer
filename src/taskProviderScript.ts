@@ -6,21 +6,10 @@ import {
 import * as path from "path";
 import * as util from "./util";
 import { configuration } from "./common/configuration";
-import { TaskItem } from "./tasks";
 import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
+import { TaskExplorerDefinition } from "./taskDefinition";
 
-
-interface ScriptTaskDefinition extends TaskDefinition
-{
-    scriptType: string;
-    fileName: string;
-    scriptFile: boolean;
-    path?: string;
-    requiresArgs?: boolean;
-    uri?: Uri;
-    treeItem?: TaskItem;
-}
 
 export class ScriptTaskProvider implements TaskExplorerProvider
 {
@@ -111,7 +100,7 @@ export class ScriptTaskProvider implements TaskExplorerProvider
             const folder = workspace.getWorkspaceFolder(opt);
 
             await util.forEachAsync(this.cachedTasks, (each) => {
-                const cstDef: ScriptTaskDefinition = each.definition as ScriptTaskDefinition;
+                const cstDef: TaskExplorerDefinition = each.definition as TaskExplorerDefinition;
                 if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
                     rmvTasks.push(each);
                 }
@@ -190,7 +179,7 @@ export class ScriptTaskProvider implements TaskExplorerProvider
         const fileName = path.basename(uri.fsPath);
         let sep: string = (process.platform === "win32" ? "\\" : "/");
 
-        const kind: ScriptTaskDefinition = {
+        const kind: TaskExplorerDefinition = {
             type: "script",
             scriptType: scriptDef?.type || "unknown",
             fileName,
