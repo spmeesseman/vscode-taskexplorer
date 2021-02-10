@@ -1180,6 +1180,11 @@
                     "default": false,
                     "description": "%config.taskExplorer.keepTermOnStop%"
                 },
+                "taskExplorer.readUserTasks": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.readUserTasks%"
+                },
                 "taskExplorer.groupWithSeparator": {
                     "type": "boolean",
                     "default": true,

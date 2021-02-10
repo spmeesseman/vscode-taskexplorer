@@ -7,6 +7,7 @@ import {
 import * as path from "path";
 import * as util from "./util";
 import * as constants from "./common/constants";
+import { configuration } from "./common/configuration";
 
 
 export class TaskItem extends TreeItem
@@ -211,7 +212,7 @@ export class TaskFile extends TreeItem
             } //
              // No resource uri means this file is 'user tasks', and not associated to a workspace folder
             //
-            else {
+            else if (configuration.get<boolean>("readUserTasks")) {
                 this.resourceUri = Uri.file(path.join(util.getUserDataPath(padding), this.fileName));
             }
         }

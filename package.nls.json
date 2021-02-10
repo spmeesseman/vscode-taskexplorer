@@ -4,9 +4,10 @@
 
 	"config.taskExplorer.debug": "Turn on logging.",
 	"config.taskExplorer.debugLevel": "Set debug verbosity (1 - Low / 5 - High).",
-
 	"config.taskExplorer.keepTermOnStop": "Keep terminal open when stopping a task.",
 
+	"config.taskExplorer.readUserTasks": "Attempt to read user tasks from data directory (experimental).",
+	
 	"config.taskExplorer.groupWithSeparator": "If script names contain the configured separator, break them into grouped nodes according to similar fist parts.",
 	"config.taskExplorer.groupSeparator": "The separator to use when grouping tasks.",
 	"config.taskExplorer.groupMaxLevel": "Maximum grouping level (tree node depth) of grouped tasks",
