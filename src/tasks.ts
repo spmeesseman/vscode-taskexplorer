@@ -179,7 +179,7 @@ export class TaskFile extends TreeItem
              // No resource uri means this file is 'user tasks', and not associated to a workspace folder
             //
             else {
-                this.resourceUri = Uri.file(path.join(this.getUserDataPath(), this.fileName));
+                this.resourceUri = Uri.file(path.join(util.getUserDataPath(), this.fileName));
             }
         }
         else //
@@ -387,51 +387,6 @@ export class TaskFile extends TreeItem
         // }
 
         return fileName;
-    }
-
-
-    getPortableDataPath()
-    {
-        const uri = Uri.parse(process.env.VSCODE_PORTABLE);
-            if (fs.existsSync(uri.fsPath))
-            {
-                try {
-                const fullPath = path.join(uri.fsPath, "user-data", "User");
-                util.logValue("   found portable user data path", fullPath, 1);
-                return fullPath;
-            }
-            catch (e) {
-                util.log(e.toString());
-                throw(e);
-            }
-        }
-    }
-
-
-    getUserDataPath()
-    {
-        this.logProcessEnv();
-        //
-        // If this is a portable install (zip install), then VSCODE_PORTABLE will be defined in the 
-        // environment this process is running in
-        //
-        if (process.env.VSCODE_PORTABLE) {
-            return this.getPortableDataPath();
-        }
-        //
-        // Check if data path was passed on the command line
-        //
-        if (process.argv)
-        {
-            let argvIdx = util.existsInArray(process.argv, "--user-data-dir");
-            if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
-                return process.argv[++argvIdx];
-            }
-        }
-        //
-        // Use system user data path
-        //
-        return path.resolve(this.getDefaultUserDataPath()); // (cliArgs["user-data-dir"] || getDefaultUserDataPath());
     }
 
 

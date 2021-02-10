@@ -8,6 +8,7 @@ import * as fs from "fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./common/configuration";
 import * as constants from "./common/constants";
+import * as path from "path";
 
 
 const logValueWhiteSpace = 40;
@@ -184,6 +185,51 @@ export function getTaskTypes(): string[]
         "ant", "app-publisher", "bash", "batch", "gradle", "grunt", "gulp", "make", "npm",
         "nsis", "perl", "powershell", "python", "ruby", "workspace"
     ];
+}
+
+
+export function getPortableDataPath()
+{
+    const uri = Uri.parse(process.env.VSCODE_PORTABLE);
+    if (fs.existsSync(uri.fsPath))
+    {
+        try {
+            const fullPath = path.join(uri.fsPath, "user-data", "User");
+            logValue("   found portable user data path", fullPath, 1);
+            return fullPath;
+        }
+        catch (e) {
+            log(e.toString());
+            throw(e);
+        }
+    }
+}
+
+
+export function getUserDataPath()
+{
+    this.logProcessEnv();
+    //
+    // If this is a portable install (zip install), then VSCODE_PORTABLE will be defined in the
+    // environment this process is running in
+    //
+    if (process.env.VSCODE_PORTABLE) {
+        return getPortableDataPath();
+    }
+    //
+    // Check if data path was passed on the command line
+    //
+    if (process.argv)
+    {
+        let argvIdx = existsInArray(process.argv, "--user-data-dir");
+        if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
+            return process.argv[++argvIdx];
+        }
+    }
+    //
+    // Use system user data path
+    //
+    return path.resolve(this.getDefaultUserDataPath()); // (cliArgs["user-data-dir"] || getDefaultUserDataPath());
 }
 
 

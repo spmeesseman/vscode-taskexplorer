@@ -6,8 +6,6 @@ import * as vscode from "vscode";
 import { configuration } from "../common/configuration";
 import { setWriteToConsole, timeout } from "../util";
 import { TaskExplorerApi } from "../extension";
-import * as constants from "../common/constants";
-
 
 
 export let teApi: TaskExplorerApi;
@@ -172,5 +170,4 @@ suite("Extension Tests", () =>
         await configuration.updateWs("showLastTasks", enable);
         await configuration.updateWs("keepTermOnStop", false);
     }
-
 });

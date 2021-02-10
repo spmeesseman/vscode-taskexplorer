@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
 import * as assert from "assert";
@@ -78,7 +79,7 @@ suite("Util tests", () =>
         assert(util.isScriptType("batch"));
     });
 
-    test("Test array functions", async () =>
+    test("Test array functions", async function()
     {
         const arr = [ 1, 2, 3, 4, 5 ];
         util.removeFromArray(arr, 3);
@@ -91,35 +92,35 @@ suite("Util tests", () =>
         assert(!util.existsInArray(arr, 1) === false);
     });
 
-    test("Test get cwd", () =>
+    test("Test get cwd", function()
     {
         assert(util.getCwd(workspace.workspaceFolders[0].uri) !== undefined);
     });
 
-    test("Timeout", () =>
+    test("Timeout", function()
     {
         assert(util.timeout(10));
     });
 
-    test("Asynchronous forEach", async () =>
+    test("Asynchronous forEach", async function()
     {
         const arr = [ 1, 2, 3, 4, 5 ];
         let curNum = 1;
 
-        const asyncFn = async (num: number) =>
+        const asyncFn = async function(num: number)
         {
             setTimeout(() => {
                 assert(num === curNum++);
             }, 100);
         };
 
-        await util.forEachAsync(arr, async (n: number) =>
+        await util.forEachAsync(arr, async function(n: number)
         {
             await asyncFn(n);
         });
     });
 
-    test("Asynchronous mapForEach", async () =>
+    test("Asynchronous mapForEach", async function()
     {
         const arr: Map<number, number> = new Map();
         let curNum = 1;
@@ -128,18 +129,35 @@ suite("Util tests", () =>
             arr.set(i, i);
         }
 
-        const asyncFn = async (num: number) =>
+        const asyncFn = async function(num: number)
         {
             setTimeout(() => {
                 assert(num === curNum++);
             }, 100);
         };
 
-        await util.forEachMapAsync(arr, async (n: number, n2: number) =>
+        await util.forEachMapAsync(arr, async function(n: number, n2: number)
         {
             assert(n === n2);
             await asyncFn(n);
         });
+    });
+
+
+    test("Get user data paths", function()
+    {
+        const dataPath = util.getUserDataPath();
+        const portablePath = util.getPortableDataPath();
+        if (portablePath) {
+            console.log("         ℹ Portable data path = " + portablePath);
+        }
+        if (dataPath) {
+            console.log("         ℹ Data path = " + dataPath);
+            console.log("         ✔ Successfully located user data directory");
+        }
+        else {
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
+        }
     });
 
 });
