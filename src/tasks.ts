@@ -390,20 +390,6 @@ export class TaskFile extends TreeItem
     }
 
 
-    logProcessEnv()
-    {
-        util.log("get user data path", 1);
-        util.logValue("   os", process.platform, 1);
-        util.logValue("   portable", process.env.VSCODE_PORTABLE, 1);
-        util.logValue("   env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
-        util.logValue("   env:VSCODE_APPDATA", process.env.APPDATA, 1);
-        util.logValue("   env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
-        if (process.platform === "linux") {
-            util.logValue("   env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
-        }
-    }
-
-
     insertScript(script: (TaskFile | TaskItem), index: number)
     {
         this.scripts.splice(index, 0, script);
