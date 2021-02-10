@@ -267,7 +267,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async buildTaskTree(tasksList: Task[], padding = ""): Promise<TaskFolder[] | NoScripts[]>
+    private buildTaskTree(tasksList: Task[], padding = ""): TaskFolder[] | NoScripts[]
     {
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
@@ -405,7 +405,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Sort and build groupings
         //
-        await this.buildGroupings(folders, padding + "   ");
+        // TODO - await
+        // Await here causes issue refreshing tree???
+        //
+        this.buildGroupings(folders);
 
         //
         // Sort the 'Last Tasks' folder by last time run
@@ -701,7 +704,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     // added to
                     //
                     subfolder = new TaskFile(this.extensionContext, folder, each.task.definition, taskFile.taskSource,
-                                             each.taskFile.path, treeLevel, true, prevName[treeLevel], "   ");
+                                             each.taskFile.path, treeLevel, true, prevName[treeLevel], padding);
                     subfolders.set(id, subfolder);
                     _setNodePath(prevTaskItem, each.nodePath);
                     //
@@ -970,8 +973,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 this.tasks = await tasks.fetchTasks();
             }
             if (this.tasks)
-            {
-                this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ");
+            {   //
+                // TODO - await
+                // Await here causes issue refreshing tree???
+                //
+                this.taskTree = this.buildTaskTree(this.tasks, logPad + "   ");
                 util.logBlank(1);
                 if (this.taskTree.length === 0)
                 {
@@ -1243,7 +1249,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (!taskFile)
         {
             util.logValue(padding + "   Add source file container", task.source);
-            taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath, 0);
+            taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath, 0, false, null, padding);
             folder.addTaskFile(taskFile);
             files.set(id, taskFile);
         }
