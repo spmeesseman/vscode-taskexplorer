@@ -88,7 +88,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             .replace(constants.USER_TASKS_LABEL + ":", "");
 
         util.log("");
-        util.log("remove favorite", 1);
+        util.log("add/remove favorite", 1);
 
         if (!taskItem) {
             return;
@@ -116,7 +116,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             // Update
             //
-            this.showSpecialTasks(true, true);
+            this.showSpecialTasks(true, true, null, "   ");
         }
     }
 
@@ -1992,7 +1992,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             window.showInformationMessage("Busy, please wait...");
             return;
         }
-
+        util.log("run task", 1);
+        util.logValue("   task name", taskItem.label, 2);
         if (withArgs === true)
 		{
             await this.runWithArgs(taskItem);
@@ -2003,7 +2004,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
         else if (await this.runTask(taskItem.task, noTerminal))
         {
-            await this.saveTask(taskItem, configuration.get<number>("numLastTasks"));
+            await this.saveTask(taskItem, configuration.get<number>("numLastTasks"), false, "   ");
         }
     }
 
@@ -2086,7 +2087,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async runTask(task: Task, noTerminal?: boolean): Promise<boolean>
     {
         if (noTerminal === true) {
-            task.presentationOptions.reveal = TaskRevealKind.Never;
+            task.presentationOptions.reveal = TaskRevealKind.Silent;
         }
         else {
             task.presentationOptions.reveal = TaskRevealKind.Always;
@@ -2152,12 +2153,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const storeName: string = !isFavorite ? constants.LAST_TASKS_STORE : constants.FAV_TASKS_STORE;
         const label: string = !isFavorite ? constants.LAST_TASKS_LABEL : constants.FAV_TASKS_LABEL;
         const cstTasks = storage.get<string[]>(storeName, []) || [];
-        const taskId = taskItem?.id?.replace(label + ":", "");
+        const taskId = taskItem?.id?.replace(constants.LAST_TASKS_LABEL + ":", "").replace(constants.FAV_TASKS_LABEL + ":", "");
 
         util.log(logPad + "save task", 1);
         util.logValue(logPad + "   treenode label", label, 2);
         util.logValue(logPad + "   max tasks", maxTasks, 2);
         util.logValue(logPad + "   is favorite", isFavorite, 2);
+        util.logValue(logPad + "   task id", taskId, 2);
         util.logValue(logPad + "   current saved task ids", cstTasks.toString(), 2);
         if (!taskId) {
             util.log(logPad + "   invalid task id, exit", 1);
@@ -2176,7 +2178,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
 
         cstTasks.push(taskId);
-        util.logValue(logPad + "   pushed taskitem id", taskItem.id, 2);
 
         await storage.update(storeName, cstTasks);
         util.logValue(logPad + "   new saved task ids", cstTasks.toString(), 3);
@@ -2196,6 +2197,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const treeIdx = !isFavorite ? 0 : favIdx;
 
         util.log(logPad + "show special tasks", 1);
+        util.logValue(logPad + "   is favorite", isFavorite, 2);
         util.logValue(logPad + "   fav index", favIdx, 2);
         util.logValue(logPad + "   tree index", treeIdx, 2);
         util.logValue(logPad + "   show", show, 2);
