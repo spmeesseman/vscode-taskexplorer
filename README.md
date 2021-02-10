@@ -54,7 +54,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 | ---------------------------------- | ---------------------------------- | ---------------------------------- |
 | ![ss4](res/taskview4.png?raw=true) | ![ss5](res/taskview5.png?raw=true) | ![ss6](res/taskview6.png?raw=true) |
 
-| Multi-Level Task Groupings (v1.29) | Run with Args, No Terminal (1.30)  | Last Tasks (1.25) Favorites (1.31) |
+| Multi-Level Task Groupings (v1.29) | Run with Args, No Terminal (1.30)  | Last Tasks (1.25) Favorites (2.0)  |
 | ---------------------------------- | ---------------------------------- | ---------------------------------- |
 | ![ss7](res/taskview7.png?raw=true) | ![ss8](res/taskview8.png?raw=true) | ![ss9](res/taskview9.png?raw=true) |
 
@@ -66,7 +66,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Features by Version
 
-* v1.31 - Favorites / Bookmarked Tasks (closes [#101](https://github.com/spmeesseman/vscode-taskexplorer/issues/97))
+* v2.0  - All async-await processing, Favorites (closes [#101](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)), Clear special task lists
 * v1.30 - Configurable default click action (closes [#97](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)), Add 'Run with Arguments' command (closes [#88](https://github.com/spmeesseman/vscode-taskexplorer/issues/88)), Add 'Run with NoTerminal' command (closes [#39](https://github.com/spmeesseman/vscode-taskexplorer/issues/39)) (note that as of VSCode 1.53, there seems to be a bug that prevents running tasks without showing the terminal).
 * v1.29 - Support multi-level task groupings (closes [#129](https://github.com/spmeesseman/vscode-taskexplorer/issues/129)), Support user tasks (closes [#127](https://github.com/spmeesseman/vscode-taskexplorer/issues/127))
 * v1.28 - Support Makefile aliases (thanks **MichaelCurrin**)
