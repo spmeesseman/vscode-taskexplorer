@@ -206,9 +206,24 @@ export function getPortableDataPath()
 }
 
 
+function logProcessEnv()
+{
+    logBlank(1);
+    log("get user data path", 1);
+    logValue("   os", process.platform, 1);
+    logValue("   portable", process.env.VSCODE_PORTABLE, 1);
+    logValue("   env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
+    logValue("   env:VSCODE_APPDATA", process.env.APPDATA, 1);
+    logValue("   env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
+    if (process.platform === "linux") {
+        logValue("   env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
+    }
+}
+
+
 export function getUserDataPath()
 {
-    this.logProcessEnv();
+    logProcessEnv();
     //
     // If this is a portable install (zip install), then VSCODE_PORTABLE will be defined in the
     // environment this process is running in
