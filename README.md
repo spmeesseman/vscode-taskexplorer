@@ -32,6 +32,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Screenshots by Version](#screenshots-by-version)
   - [Requirements](#requirements)
   - [Features by Version](#features-by-version)
+  - [Version 2](#version-2)
   - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
   - [Ant and Gulp Self-Provided Tasks](#ant-and-gulp-self-provided-tasks)
   - [Using Groups with a Separator](#using-groups-with-a-separator)
@@ -99,6 +100,17 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 * v1.2 - Convenient layout - groups all tasks by project folder, by task file, by task
 * v1.1 - Supports multi-root or single-root workspaces
 * v1.0 - Open and launch NPM scripts as tasks
+
+## Version 2
+
+Version 2 highlights 2 major performance enhancements along with several features and bug fixes, notably:
+
+1. An async/await approach for all processing has improved task load time performance 10-20%.
+2. Launching tasks is 1.5-2x more responsive in the Tree UI, as well as when tasks finish.
+3. Favorites List.
+4. Clear buttons for Favorites and last Tasks lists.
+5. Much improved logging for debugging user issues.
+6. Completely refactored classes, interfaces, and commenting for easier community contributions.
 
 ## Configuring Global Excludes and Apache Ant Includes
 
