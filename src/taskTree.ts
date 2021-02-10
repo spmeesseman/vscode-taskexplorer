@@ -223,8 +223,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private buildGroupings(folders: Map<string, TaskFolder>)
+    private async buildGroupings(folders: Map<string, TaskFolder>)
     {
+        util.logBlank(1);
+        util.log("Build tree node groupings", 1);
         //
         // Sort nodes.  By default the project folders are sorted in the same order as that
         // of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
@@ -235,13 +237,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // TODO - As of v1.29 with muti-level groupings, this needs ti be recursve, it's not
         // going to hit task items levels 2 or more
         //
-        folders.forEach((folder, key) =>
+        await util.forEachMapAsync(folders, async (folder: TaskFolder, key: string) =>
         {
             if (key === constants.LAST_TASKS_LABEL || key === constants.FAV_TASKS_LABEL) {
                 return; // continue forEach()
             }
 
-            folder.taskFiles.forEach(each =>
+            await util.forEachAsync(folder.taskFiles, (each: TaskFile | TaskItem) =>
             {
                 if (each instanceof TaskFile)
                 {
@@ -256,9 +258,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             if (configuration.get("groupWithSeparator")) // && key !== constants.USER_TASKS_LABEL)
             {
-                this.createTaskGroupings(folder);
+                await this.createTaskGroupings(folder, "   ");
             }
         });
+
+        util.logBlank(1);
+        util.log("completed tree node groupings", 1);
     }
 
 
@@ -468,10 +473,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *
      * @param folder The TaskFolder to process
      */
-    private async createTaskGroupings(folder: TaskFolder)
+    private async createTaskGroupings(folder: TaskFolder, padding = "")
     {
         let prevTaskFile: TaskItem | TaskFile;
         const subfolders: Map<string, TaskFile> = new Map();
+
+        util.logBlank(1);
+        util.log(padding + "create tree node folder grouping", 1);
+        util.logValue(padding + "   project folder", folder.label, 2);
 
         await util.forEachAsync(folder.taskFiles, async (each: TaskFile | TaskItem) =>
         {   //
@@ -489,7 +498,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 let subfolder: TaskFile = subfolders.get(id);
                 if (!subfolder)
                 {
-                    util.logValue("   Added source file sub-container", each.path);
+                    util.logValue(padding + "   Added source file sub-container", each.path, 3);
                     subfolder = new TaskFile(this.extensionContext, folder, (each.scripts[0] as TaskItem).task.definition, each.taskSource, each.path, true);
                     subfolders.set(id, subfolder);
                     folder.addTaskFile(subfolder);
@@ -506,7 +515,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             // Create the grouping
             //
-            await this.createTaskGroupingsBySep(folder, each, subfolders);
+            util.logValue(padding + "   folder", folder.label, 3);
+            await this.createTaskGroupingsBySep(folder, each, subfolders, 0, padding + "   ");
         });
 
         //
@@ -514,12 +524,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // are created but the old task remains in the parent folder.  Remove all tasks that have been moved down
         // into the tree hierarchy due to groupings
         //
-        await this.removeGroupedTasks(folder, subfolders);
+        await this.removeGroupedTasks(folder, subfolders, padding + "   ");
 
         //
         // For groupings with separator, now go through and rename the labels within each group minus the
         // first part of the name split by the separator character (the name of the new grouped-with-separator node)
         //
+        util.log(padding + "   rename grouped tasks", 1);
         await util.forEachAsync(folder.taskFiles, async (each: TaskFile | TaskItem) =>
         {
             if (!(each instanceof TaskFile)) {
@@ -531,6 +542,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Resort after making adds/removes
         //
+        util.log(padding + "   resort after add/removes", 1);
         folder.taskFiles.sort((a, b) =>
         {
             return a.taskSource.localeCompare(b.taskSource);
@@ -548,6 +560,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 });
             }
         });
+
+        util.logBlank(1);
+        util.log(padding + "completed tree node folder grouping", 1);
     }
 
 
@@ -589,13 +604,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      * @param subfolders Tree taskfile map
      * @param groupSeparator The group separator
      */
-    private async createTaskGroupingsBySep(folder: TaskFolder, taskFile: TaskFile, subfolders: Map<string, TaskFile>, treeLevel = 0)
+    private async createTaskGroupingsBySep(folder: TaskFolder, taskFile: TaskFile, subfolders: Map<string, TaskFile>, treeLevel = 0, padding = "")
     {
         let prevName: string[];
         let prevTaskItem: TaskItem;
         const newNodes: TaskFile[] = [];
         const groupSeparator = util.getGroupSeparator();
         const atMaxLevel: boolean = configuration.get<number>("groupMaxLevel") <= treeLevel + 1;
+
+        util.log(padding + "create task groupings by defined separator", 2);
+        util.logValue(padding + "   grouping level", treeLevel, 3);
+        util.logValue(padding + "   node name", taskFile.label, 3);
+        util.logValue(padding + "   file name", taskFile.path.fileName, 3);
+        util.logValue(padding + "   folder", folder.label, 3);
+        util.logValue(padding + "   path", taskFile.path, 3);
 
         const _setNodePath = (t: TaskItem, cPath: string) =>
         {
@@ -709,7 +731,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     if (n.taskSource === "Workspace") {
                         return;
                     }
-                    this.createTaskGroupingsBySep(folder, n, subfolders, treeLevel + 1);
+                    this.createTaskGroupingsBySep(folder, n, subfolders, treeLevel + 1, padding + "   ");
                 }
             });
         }
@@ -1766,9 +1788,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async removeGroupedTasks(folder: TaskFolder, subfolders: Map<string, TaskFile>)
+    private async removeGroupedTasks(folder: TaskFolder, subfolders: Map<string, TaskFile>, padding = "")
     {
         const taskTypesRmv: TaskFile[] = [];
+
+        util.log(padding + "remove grouped tasks", 1);
 
         await util.forEachAsync(folder.taskFiles, (each: TaskFile | TaskItem) =>
         {
