@@ -6,8 +6,6 @@ import {
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
-import * as os from "os";
-import * as fs from "fs";
 import * as constants from "./common/constants";
 
 

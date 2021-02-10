@@ -9,6 +9,7 @@ import * as minimatch from "minimatch";
 import { configuration } from "./common/configuration";
 import * as constants from "./common/constants";
 import * as path from "path";
+import * as os from "os";
 
 
 const logValueWhiteSpace = 40;
@@ -292,6 +293,15 @@ function getDefaultUserDataPath()
         }
     }
     return path.join(appDataPath, "vscode");
+}
+
+
+export function getScriptProviderType(source: string): string
+{
+    if (isScriptType(source)) {
+        return "script";
+    }
+    return source;
 }
 
 

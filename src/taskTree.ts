@@ -1444,7 +1444,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             util.log("   invalidate " + opt1 + " provider file ", 1);
             util.logValue("      file", opt2, 1);
-            const provider = providers.get(!util.isScriptType(opt1) ? opt1 : "script");
+            const provider = providers.get(util.getScriptProviderType(opt1));
             provider?.invalidateTasksCache(opt2); // NPM/Workspace tasks don't implement TaskExplorerProvider
         }
         else { // If opt1 is undefined, refresh all providers
