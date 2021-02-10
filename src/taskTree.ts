@@ -78,8 +78,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         tasks.onDidStartTask(async(_e) => this.taskStartEvent(_e));
         tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e));
-        //tasks.onDidStartTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
-        //tasks.onDidEndTask((_e) => this.refresh(false, _e.execution.task.definition.uri, _e.execution.task));
     }
 
 
@@ -1462,7 +1460,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             else
             {
-                this.refresh(this.needsRefresh[0].invalidate, this.needsRefresh[0].uri, this.needsRefresh[0].task);
+                this.refresh(this.needsRefresh[0].invalidate, this.needsRefresh[0].uri);
             }
 
             this.needsRefresh = [];
@@ -1774,7 +1772,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *     "tests"            (from unit tests)
      *     "visible-event"
      *     false|null|undefined
+     *
      * Can also be one of the task types (FileSystemWatcher event):
+     *
      *     "ant"
      *     "app-publisher"
      *     "bash"
@@ -1791,22 +1791,34 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *     "ruby"
      *     "tests"
      *     "Workspace"
+     *
+     * If invalidate is false, then this is both an event as a result from adding to excludes list
+     * and the item being added is a file, not a group / set of files.  If theitem being added to
+     * the expludes list is a group/folder, then invalidate will be set to the task source, i.e.
+     * npm, ant, workspace, etc.
+     *
+     * If invalidate is true and opt is false, then the refresh button was clicked
+     *
+     * If invalidate is "tests" and opt undefined, then extension.refreshTree() called in tests
+     *
+     * If task is truthy, then a task has started/stopped, opt will be the task deifnition's
+     * 'uri' property, note that task types not internally provided will not contain this property.
+     *
+     * If invalidate and opt are both truthy, then a filesystemwatcher event or a task just triggered
+     *
+     * If invalidate and opt are both undefined, then a configuration has changed
+     *
+     * 2/10/2021 - Task start/finish events no longer call this function.  This means invalidate will
+     * only be false if it is set from the addToExcludes() function.
+     *
      * @param opt Uri of the invalidated resource
-     * @param task If defined, a task that has just started or finished. Used to re-paint
-     * the loading icons.  If defined, 'invalidate' should be `false`.
      */
-    public async refresh(invalidate?: any, opt?: Uri | boolean, task?: Task): Promise<boolean>
+    public async refresh(invalidate?: any, opt?: Uri | boolean): Promise<boolean>
     {
         util.logBlank(1);
         util.log("Refresh task tree", 1);
         util.logValue("   invalidate", invalidate, 2);
         util.logValue("   opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a", 2);
-        util.logValue("   task name", task ? task.name : "n/a", 2);
-
-        //
-        // Show status bar message (if ON in settings)
-        //
-        this.showStatusMessage(task);
 
         //
         // If a view was turned off in settings, the disposable view still remains
@@ -1819,7 +1831,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (!views.get(this.name).visible)
             {
                 util.log("   Delay refresh, exit");
-                this.needsRefresh.push({ invalidate, opt, task });
+                this.needsRefresh.push({ invalidate, opt });
                 return false;
             }
         }
@@ -1841,44 +1853,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             invalidate = undefined;
         }
 
-        //
-        // TODO - performance enhancement
-        // Can only invalidate a section of the tree depending on tasktype/uri?
-        //
-        // if (invalidate !== false) {
-            this.taskTree = null;
-        // }
-
-        //
-        // If invalidate is false, then this is a task start/stop
-        //
-        // If invalidate is true and opt is false, then the refresh button was clicked
-        //
-        // If invalidate is "tests" and opt undefined, then extension.refreshTree() called in tests
-        //
-        // If task is truthy, then a task has started/stopped, opt will be the task deifnition's
-        // 'uri' property, note that task types not internally provided will not contain this property.
-        //
-        // If invalidate and opt are both truthy, then a filesystemwatcher event or a task just triggered
-        //
-        // If invalidate and opt are both undefined, then a configuration has changed
-        //
-        let treeItem: TreeItem;
-
-        if (invalidate !== false)
+        if (invalidate !== false) // if anything but 'add to excludes'
         {
             await this.handleFileWatcherEvent(invalidate, opt);
         }
 
-        if (task)
-        {
-            treeItem = task.definition.treeItem;
-        }
-        else {
-            this.tasks = null;
-        }
-
-        this._onDidChangeTreeData.fire(treeItem);
+        //
+        // Rebuild tree
+        //
+        this.taskTree = null;
+        this._onDidChangeTreeData.fire(undefined);
 
         util.log("Refresh task tree finished");
         return true;
@@ -2422,6 +2406,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async taskStartEvent(e: TaskStartEvent)
     {
         util.log("task started", 1);
+        //
+        // Show status bar message (if ON in settings)
+        //
+        this.showStatusMessage(e.execution.task);
         this.fireTaskChangeEvents(e.execution.task.definition.taskItem.taskFile);
     }
 
@@ -2429,6 +2417,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async taskFinishedEvent(e: TaskEndEvent)
     {
         util.log("task finished", 1);
+        //
+        // Hide status bar message (if ON in settings)
+        //
+        this.showStatusMessage(e.execution.task);
         this.fireTaskChangeEvents(e.execution.task.definition.taskItem.taskFile);
     }
 
