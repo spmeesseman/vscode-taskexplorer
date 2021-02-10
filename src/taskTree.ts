@@ -41,6 +41,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 {
     private static statusBarSpace: StatusBarItem;
 
+    private treeBuilding = false;
     private busy = false;
     private extensionContext: ExtensionContext;
     private name: string;
@@ -267,7 +268,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private buildTaskTree(tasksList: Task[], padding = ""): TaskFolder[] | NoScripts[]
+    private async buildTaskTree(tasksList: Task[], padding = ""): Promise<TaskFolder[] | NoScripts[]>
     {
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
@@ -279,6 +280,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         util.logBlank(1);
         util.log(padding + "build task tree", 1);
+        this.treeBuilding = true;
 
         //
         // The 'Last Tasks' folder will be 1st in the tree
@@ -405,10 +407,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Sort and build groupings
         //
-        // TODO - await
-        // Await here causes issue refreshing tree???
-        //
-        this.buildGroupings(folders);
+        await this.buildGroupings(folders);
 
         //
         // Sort the 'Last Tasks' folder by last time run
@@ -430,6 +429,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         util.logBlank(1);
         util.log(padding + "completed build task tree", 1);
+        this.treeBuilding = false;
 
         return [...folders.values()];
     }
@@ -955,10 +955,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     async getChildren(element?: TreeItem, logPad = ""): Promise<TreeItem[]>
     {
+        let waited = 0;
         let items: any = [];
 
         util.logBlank(1);
         util.log(logPad + "get tree children", 1);
+        util.logValue(logPad + "   tasks need to be retrieved", !this.tasks, 2);
+        util.logValue(logPad + "   task tree needs to be built", !this.taskTree, 2);
+
+        while (this.treeBuilding) {
+            util.log(logPad + "   waiting...", 1);
+            await util.timeout(100);
+            waited += 100;
+        }
+        if (waited) {
+            util.log(logPad + "   waited " + waited + " ms", 1);
+        }
 
         if (!this.taskTree)
         {   //
@@ -977,7 +989,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 // TODO - await
                 // Await here causes issue refreshing tree???
                 //
-                this.taskTree = this.buildTaskTree(this.tasks, logPad + "   ");
+                this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ");
                 util.logBlank(1);
                 if (this.taskTree.length === 0)
                 {
