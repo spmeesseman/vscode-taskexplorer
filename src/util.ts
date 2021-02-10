@@ -188,21 +188,28 @@ export function getTaskTypes(): string[]
 }
 
 
-export function getPortableDataPath()
+export function getPortableDataPath(padding = "")
 {
-    const uri = Uri.parse(process.env.VSCODE_PORTABLE);
-    if (fs.existsSync(uri.fsPath))
+    if (process.env.VSCODE_PORTABLE)
     {
-        try {
-            const fullPath = path.join(uri.fsPath, "user-data", "User");
-            logValue("   found portable user data path", fullPath, 1);
-            return fullPath;
-        }
-        catch (e) {
-            log(e.toString());
-            throw(e);
+        const uri = Uri.parse(process.env.VSCODE_PORTABLE);
+        if (uri)
+        {
+            if (fs.existsSync(uri.fsPath))
+            {
+                try {
+                    const fullPath = path.join(uri.fsPath, "user-data", "User");
+                    logValue(padding + "found portable user data path", fullPath, 1);
+                    return fullPath;
+                }
+                catch (e) {
+                    log(e.toString());
+                    return null;
+                }
+            }
         }
     }
+    return null;
 }
 
 
@@ -223,16 +230,8 @@ export function getUserDataPath(padding = "")
 {
     let userPath = "";
 
-    logBlank(1);
     log(padding + "get user data path", 1);
     logUserDataEnv(padding + "   ");
-    //
-    // If this is a portable install (zip install), then VSCODE_PORTABLE will be defined in the
-    // environment this process is running in
-    //
-    if (process.env.VSCODE_PORTABLE) {
-        return getPortableDataPath();
-    }
     //
     // Check if data path was passed on the command line
     //
@@ -246,11 +245,53 @@ export function getUserDataPath(padding = "")
         }
     }
     //
-    // Use system user data path
+    // If this is a portable install (zip install), then VSCODE_PORTABLE will be defined in the
+    // environment this process is running in
     //
-    userPath = path.resolve(this.getDefaultUserDataPath());
+    userPath = getPortableDataPath(padding + "   ");
+    if (!userPath)
+    {   //
+        // Use system user data path
+        //
+        userPath = getDefaultUserDataPath();
+    }
+    userPath = path.resolve(userPath);
     logValue(padding + "user path is", userPath, 1);
     return userPath;
+}
+
+
+function getDefaultUserDataPath()
+{   //
+    // Support global VSCODE_APPDATA environment variable
+    //
+    let appDataPath = process.env.VSCODE_APPDATA;
+    //
+    // Otherwise check per platform
+    //
+    if (!appDataPath) {
+        switch (process.platform) {
+            case "win32":
+                appDataPath = process.env.APPDATA;
+                if (!appDataPath) {
+                    const userProfile = process.env.USERPROFILE;
+                    if (typeof userProfile !== "string") {
+                        throw new Error("Windows: Unexpected undefined %USERPROFILE% environment variable");
+                    }
+                    appDataPath = path.join(userProfile, "AppData", "Roaming");
+                }
+                break;
+            case "darwin":
+                appDataPath = path.join(os.homedir(), "Library", "Application Support");
+                break;
+            case "linux":
+                appDataPath = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config");
+                break;
+            default:
+                throw new Error("Platform not supported");
+        }
+    }
+    return path.join(appDataPath, "vscode");
 }
 
 
@@ -290,6 +331,12 @@ export function isExcluded(uriPath: string, logPad = "")
 
     log(logPad + "   Not excluded", 2);
     return false;
+}
+
+
+export function isLoggingEnabled()
+{
+    return configuration.get("debug") === true;
 }
 
 

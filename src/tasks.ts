@@ -140,7 +140,7 @@ export class TaskFile extends TreeItem
     public nodePath: string;
 
 
-    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, group?: boolean, label?: string, groupLevel?: number)
+    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, groupLevel: number, group?: boolean, label?: string, padding = "")
     {
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group), TreeItemCollapsibleState.Collapsed);
 
@@ -179,7 +179,7 @@ export class TaskFile extends TreeItem
              // No resource uri means this file is 'user tasks', and not associated to a workspace folder
             //
             else {
-                this.resourceUri = Uri.file(path.join(util.getUserDataPath(), this.fileName));
+                this.resourceUri = Uri.file(path.join(util.getUserDataPath(padding), this.fileName));
             }
         }
         else //
@@ -227,41 +227,6 @@ export class TaskFile extends TreeItem
     {
         script.groupLevel = this.groupLevel;
         this.scripts.push(script);
-    }
-
-
-    getDefaultUserDataPath()
-    {   //
-        // Support global VSCODE_APPDATA environment variable
-        //
-        let appDataPath = process.env.VSCODE_APPDATA;
-        //
-        // Otherwise check per platform
-        //
-        if (!appDataPath) {
-            switch (process.platform) {
-                case "win32":
-                    appDataPath = process.env.APPDATA;
-                    if (!appDataPath) {
-                        const userProfile = process.env.USERPROFILE;
-                        if (typeof userProfile !== "string") {
-                            throw new Error("Windows: Unexpected undefined %USERPROFILE% environment variable");
-                        }
-                        appDataPath = path.join(userProfile, "AppData", "Roaming");
-                    }
-                    break;
-                case "darwin":
-                    appDataPath = path.join(os.homedir(), "Library", "Application Support");
-                    break;
-                case "linux":
-                    appDataPath = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config");
-                    break;
-                default:
-                    throw new Error("Platform not supported");
-            }
-        }
-
-        return path.join(appDataPath, "vscode");
     }
 
 

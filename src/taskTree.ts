@@ -247,11 +247,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 if (each instanceof TaskFile)
                 {
-                    this.sortTasks(each.scripts);
+                    this.sortTasks(each.scripts, padding + "   ");
                 }
             });
 
-            this.sortTasks(folder.taskFiles);
+            this.sortTasks(folder.taskFiles, padding + "   ");
 
             //
             // Create groupings by task type
@@ -267,7 +267,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async buildTaskTree(tasksList: Task[]): Promise<TaskFolder[] | NoScripts[]>
+    private async buildTaskTree(tasksList: Task[], padding = ""): Promise<TaskFolder[] | NoScripts[]>
     {
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
@@ -278,7 +278,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let taskFile = null;
 
         util.logBlank(1);
-        util.log("build task tree", 1);
+        util.log(padding + "build task tree", 1);
 
         //
         // The 'Last Tasks' folder will be 1st in the tree
@@ -369,14 +369,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 //
                 // Logging
                 //
-                util.log("");
-                util.log("Processing task " + taskCt.toString() + " of " + tasksList.length.toString());
-                this.logTask(each, scopeName);
+                util.logBlank(1);
+                util.log(padding + "   Processing task " + taskCt.toString() + " of " + tasksList.length.toString(), 1);
+                this.logTask(each, scopeName, padding + "      ");
 
                 //
                 // Get task file node
                 //
-                taskFile = this.getTaskFileNode(each, folder, files, relativePath, scopeName);
+                taskFile = this.getTaskFileNode(each, folder, files, relativePath, scopeName, padding);
 
                 //
                 // Create and add task item to task file node
@@ -396,16 +396,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             else
             {
-                util.log("   Skipping");
-                util.logValue("   enabled", configuration.get(settingName));
-                util.logValue("   is npm install task", this.isNpmInstallTask(each));
+                util.log(padding + "      Skipping", 1);
+                util.logValue(padding + "      enabled", configuration.get(settingName), 1);
+                util.logValue(padding + "      is npm install task", this.isNpmInstallTask(each), 1);
             }
         });
 
         //
         // Sort and build groupings
         //
-        await this.buildGroupings(folders, "   ");
+        await this.buildGroupings(folders, padding + "   ");
 
         //
         // Sort the 'Last Tasks' folder by last time run
@@ -423,10 +423,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Sort the 'Favorites' folder
         //
-        this.sortTasks(favfolder?.taskFiles);
+        this.sortTasks(favfolder?.taskFiles, padding + "   ");
 
         util.logBlank(1);
-        util.log("completed build task tree", 1);
+        util.log(padding + "completed build task tree", 1);
 
         return [...folders.values()];
     }
@@ -504,8 +504,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 let subfolder: TaskFile = subfolders.get(id);
                 if (!subfolder)
                 {
-                    util.logValue(padding + "   Added source file sub-container", each.path, 3);
-                    subfolder = new TaskFile(this.extensionContext, folder, (each.scripts[0] as TaskItem).task.definition, each.taskSource, each.path, true);
+                    util.logValue(padding + "   Add source file sub-container", each.path, 3);
+                    subfolder = new TaskFile(this.extensionContext, folder, (each.scripts[0] as TaskItem).task.definition,
+                                             each.taskSource, each.path, 0, true, undefined, "   ");
                     subfolders.set(id, subfolder);
                     folder.addTaskFile(subfolder);
                     //
@@ -700,7 +701,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     // added to
                     //
                     subfolder = new TaskFile(this.extensionContext, folder, each.task.definition, taskFile.taskSource,
-                                             each.taskFile.path, true, prevName[treeLevel], treeLevel);
+                                             each.taskFile.path, treeLevel, true, prevName[treeLevel], "   ");
                     subfolders.set(id, subfolder);
                     _setNodePath(prevTaskItem, each.nodePath);
                     //
@@ -953,13 +954,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         let items: any = [];
 
-        util.log("");
-        util.log(logPad + "Tree get children", 1);
+        util.logBlank(1);
+        util.log(logPad + "get tree children", 1);
 
         if (!this.taskTree)
-        {
-            util.log(logPad + "   Build task tree", 1);
-            //
+        {   //
             // TODO - search enable* settings and apply enabled types to filter
             //
             // let taskItems = await tasks.fetchTasks({ type: 'npm' });
@@ -972,7 +971,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             if (this.tasks)
             {
-                this.taskTree = await this.buildTaskTree(this.tasks);
+                this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ");
+                util.logBlank(1);
                 if (this.taskTree.length === 0)
                 {
                     this.taskTree = [new NoScripts()];
@@ -998,6 +998,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 items = this.taskTree;
             }
         }
+
+        util.logBlank(1);
+        util.log(logPad + "completed get tree children", 1);
 
         return items;
     }
@@ -1222,7 +1225,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private getTaskFileNode(task: Task, folder: any, files: any, relativePath: string, scopeName: string): TaskFile
+    private getTaskFileNode(task: Task, folder: any, files: any, relativePath: string, scopeName: string, padding = ""): TaskFile
     {
         let taskFile: TaskFile;
 
@@ -1239,10 +1242,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (!taskFile)
         {
-            taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath);
+            util.logValue(padding + "   Add source file container", task.source);
+            taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath, 0);
             folder.addTaskFile(taskFile);
             files.set(id, taskFile);
-            util.logValue("   Added source file container", task.source);
         }
 
         return taskFile;
@@ -1510,61 +1513,65 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private logTask(task: Task, scopeName: string)
+    private logTask(task: Task, scopeName: string, padding = "")
     {
         const definition = task.definition;
 
-        util.logValue("   name", task.name, 2);
-        util.logValue("   source", task.source, 2);
-        util.logValue("   scopeName", scopeName, 2);
-        util.logValue("   scope.name", scopeName, 2);
+        if (!util.isLoggingEnabled()) {
+            return;
+        }
+
+        util.logValue(padding + "name", task.name, 2);
+        util.logValue(padding + "source", task.source, 2);
+        util.logValue(padding + "scopeName", scopeName, 3);
+        util.logValue(padding + "scope.name", scopeName, 3);
         if (this.isWorkspaceFolder(task.scope))
         {
-            util.logValue("   scope.uri.path", task.scope.uri.path, 2);
-            util.logValue("   scope.uri.fsPath", task.scope.uri.fsPath, 2);
+            util.logValue(padding + "scope.uri.path", task.scope.uri.path, 3);
+            util.logValue(padding + "scope.uri.fsPath", task.scope.uri.fsPath, 3);
         }
         else // User tasks
         {
-            util.logValue("   scope.uri.path", "N/A (User)", 2);
+            util.logValue(padding + "scope.uri.path", "N/A (User)", 3);
         }
-        util.logValue("   relative Path", definition.path ? definition.path : "", 2);
-        util.logValue("   type", definition.type, 2);
+        util.logValue(padding + "relative Path", definition.path ? definition.path : "", 3);
+        util.logValue(padding + "type", definition.type, 3);
         if (definition.scriptType)
         {
-            util.logValue("      script type", definition.scriptType, 2);	// if 'script' is defined, this is type npm
+            util.logValue(padding + "   script type", definition.scriptType, 3);	// if 'script' is defined, this is type npm
         }
         if (definition.script)
         {
-            util.logValue("   script", definition.script, 2);	// if 'script' is defined, this is type npm
+            util.logValue(padding + "script", definition.script, 3);	// if 'script' is defined, this is type npm
         }
         if (definition.path)
         {
-            util.logValue("   path", definition.path, 2);
+            util.logValue(padding + "path", definition.path, 3);
         }
         //
         // Internal task providers will set a fileName property
         //
         if (definition.fileName)
         {
-            util.logValue("   file name", definition.fileName, 2);
+            util.logValue(padding + "file name", definition.fileName, 3);
         }
         //
         // Internal task providers will set a uri property
         //
         if (definition.uri)
         {
-            util.logValue("   file path", definition.uri.fsPath, 2);
+            util.logValue(padding + "file path", definition.uri.fsPath, 3);
         }
         //
         // Script task providers will set a fileName property
         //
         if (definition.requiresArgs)
         {
-            util.logValue("   script requires args", "true", 2);
+            util.logValue(padding + "script requires args", "true", 3);
         }
         if (definition.cmdLine)
         {
-            util.logValue("   script cmd line", definition.cmdLine, 2);
+            util.logValue(padding + "script cmd line", definition.cmdLine, 3);
         }
     }
 
@@ -2281,8 +2288,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private sortTasks(items: (TaskFile | TaskItem)[])
+    private sortTasks(items: (TaskFile | TaskItem)[], padding = "")
     {
+        util.log(padding + "sort tasks", 1);
         items?.sort((a: TaskFile| TaskItem, b: TaskFile| TaskItem) =>
         {
             return a.label?.toString()?.localeCompare(b.label?.toString());
