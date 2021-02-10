@@ -21,6 +21,10 @@
           {
               "type": "featmin",
               "release": "patch"
+          },
+          {
+              "type": "featmaj",
+              "release": "major"
           }
         ]
       }
