@@ -963,6 +963,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         util.logValue(logPad + "   tasks need to be retrieved", !this.tasks, 2);
         util.logValue(logPad + "   task tree needs to be built", !this.taskTree, 2);
 
+        //
+        // The vscode task engine processing will call back in multiple time while we are awaiting
+        // the call to buildTaskTree().  This occurs on the await of buildGroupings() in buildTaskTree.
+        // To prevent bad. things. happening. sleep the call here until the tree has finished building.
+        //
         while (this.treeBuilding) {
             util.log(logPad + "   waiting...", 1);
             await util.timeout(100);
@@ -972,6 +977,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             util.log(logPad + "   waited " + waited + " ms", 1);
         }
 
+        //
+        // Build task tree if not built already.
+        // Note that a task start or stop will set taskTree to null when the onDidStartTask() and
+        // onDidStopTask() events trigger refresh().  THis could be redone, see TODO in refresh().
+        //
         if (!this.taskTree)
         {   //
             // TODO - search enable* settings and apply enabled types to filter
@@ -985,10 +995,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 this.tasks = await tasks.fetchTasks();
             }
             if (this.tasks)
-            {   //
-                // TODO - await
-                // Await here causes issue refreshing tree???
-                //
+            {
                 this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ");
                 util.logBlank(1);
                 if (this.taskTree.length === 0)
