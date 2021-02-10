@@ -206,24 +206,26 @@ export function getPortableDataPath()
 }
 
 
-function logProcessEnv()
+function logUserDataEnv(padding = "")
 {
-    logBlank(1);
-    log("get user data path", 1);
-    logValue("   os", process.platform, 1);
-    logValue("   portable", process.env.VSCODE_PORTABLE, 1);
-    logValue("   env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
-    logValue("   env:VSCODE_APPDATA", process.env.APPDATA, 1);
-    logValue("   env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
+    logValue(padding + "os", process.platform, 1);
+    logValue(padding + "portable", process.env.VSCODE_PORTABLE, 1);
+    logValue(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
+    logValue(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 1);
+    logValue(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
     if (process.platform === "linux") {
-        logValue("   env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
+        logValue("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
     }
 }
 
 
-export function getUserDataPath()
+export function getUserDataPath(padding = "")
 {
-    logProcessEnv();
+    let userPath = "";
+
+    logBlank(1);
+    log(padding + "get user data path", 1);
+    logUserDataEnv(padding + "   ");
     //
     // If this is a portable install (zip install), then VSCODE_PORTABLE will be defined in the
     // environment this process is running in
@@ -238,13 +240,17 @@ export function getUserDataPath()
     {
         let argvIdx = existsInArray(process.argv, "--user-data-dir");
         if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
-            return process.argv[++argvIdx];
+            userPath = path.resolve(process.argv[++argvIdx]);
+            logValue(padding + "user path is", userPath, 1);
+            return userPath;
         }
     }
     //
     // Use system user data path
     //
-    return path.resolve(this.getDefaultUserDataPath()); // (cliArgs["user-data-dir"] || getDefaultUserDataPath());
+    userPath = path.resolve(this.getDefaultUserDataPath());
+    logValue(padding + "user path is", userPath, 1);
+    return userPath;
 }
 
 
