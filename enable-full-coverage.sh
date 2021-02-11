@@ -10,8 +10,8 @@ if [ ! -z $1 ] ; then
 fi
 
 if [ $ENABLE = 1 ]; then
-  sed -i ':begin;$!N;s/"activationEvents": \[[ \r\n\t]*"\*"/"activationEvents": []/;tbegin' package.json
-  sed -i ':begin;$!N;s/]\n[ ]*],/],/;tbegin' package.json
+  sed -i ':a;N;$!ba;s/"activationEvents": \[[ \r\n\t]*"\*"/"activationEvents": []/g' package.json
+  sed -i ':a;N;$!ba;s/]\n[ ]*],/],/g' package.json
 fi
 
 if [ $ENABLE = 0 ]; then
