@@ -16,6 +16,7 @@ export class TaskItem extends TreeItem
     public static readonly defaultSource = "Workspace";
     public readonly taskSource: string;
     public readonly taskGroup: string;
+    public readonly isUser: boolean;
     public task: Task | undefined;
     public execution: TaskExecution | undefined;
     public paused: boolean;
@@ -53,6 +54,7 @@ export class TaskItem extends TreeItem
         // Task group indicates the TaskFile group name (double check this???)
         //
         this.taskGroup = taskGroup;
+        this.isUser = taskFile.isUser;
         //
         // Since we save tasks (last tasks and favorites), we need a knownst unique key to
         // save them with.  We can just use the existing id parameter...
@@ -168,10 +170,11 @@ export class TaskFile extends TreeItem
     public folder: TaskFolder;
     public scripts: (TaskItem|TaskFile)[] = [];
     public fileName: string;
-    public readonly taskSource: string;
-    public readonly isGroup: boolean;
     public groupLevel: number;
     public nodePath: string;
+    public readonly taskSource: string;
+    public readonly isGroup: boolean;
+    public readonly isUser: boolean;
 
 
     constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, groupLevel: number, group?: boolean, label?: string, padding = "")
@@ -214,6 +217,7 @@ export class TaskFile extends TreeItem
             //
             else if (configuration.get<boolean>("readUserTasks")) {
                 this.resourceUri = Uri.file(path.join(util.getUserDataPath(padding), this.fileName));
+                this.isUser = true;
             }
         }
         else //

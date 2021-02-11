@@ -9,7 +9,7 @@ export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
     let found = 0;
     taskMap.forEach(task =>
     {
-        if (task.id.includes(id)) {
+        if (task.id.includes(id) && !task.isUser) {
             found++;
         }
     });

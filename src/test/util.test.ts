@@ -25,39 +25,39 @@ suite("Util tests", () =>
 
     test("Log a blank to output window", () =>
     {
-        assert(util.logBlank());
+        util.logBlank();
     });
 
     test("Log to output window", () =>
     {
-        assert(util.log("        spmeesseman.vscode-taskexplorer"));
+        util.log("        spmeesseman.vscode-taskexplorer");
     });
 
     test("Log value to output window", () =>
     {
-        assert(util.logValue("        spmeesseman.vscode-taskexplorer", "true"));
+        util.logValue("        spmeesseman.vscode-taskexplorer", "true");
     });
 
     test("Log a null value to output window", () =>
     {
-        assert(util.logValue("        spmeesseman.vscode-taskexplorer", null));
+        util.logValue("        spmeesseman.vscode-taskexplorer", null);
     });
 
     test("Log undefined value to output window", () =>
     {
-        assert(util.logValue("        spmeesseman.vscode-taskexplorer", undefined));
+        util.logValue("        spmeesseman.vscode-taskexplorer", undefined);
     });
 
     test("Log error value to output window", () =>
     {
-        assert(util.logError("        spmeesseman.vscode-taskexplorer"));
+        util.logError("        spmeesseman.vscode-taskexplorer");
     });
 
     test("Log error array to output window", () =>
     {
-        assert(util.logError([ "        spmeesseman.vscode-taskexplorer",
-                               "        spmeesseman.vscode-taskexplorer",
-                               "        spmeesseman.vscode-taskexplorer" ]));
+        util.logError([ "        spmeesseman.vscode-taskexplorer",
+                        "        spmeesseman.vscode-taskexplorer",
+                        "        spmeesseman.vscode-taskexplorer" ]);
     });
 
     test("Test camel casing", () =>
@@ -88,8 +88,8 @@ suite("Util tests", () =>
         assert(util.existsInArray(arr, 5) !== false);
         assert(util.existsInArray(arr, 2) !== false);
         assert(util.existsInArray(arr, 4) !== false);
-        assert(!util.existsInArray(arr, 3) === false);
-        assert(!util.existsInArray(arr, 1) === false);
+        assert(util.existsInArray(arr, 3) === false);
+        assert(util.existsInArray(arr, 1) === false);
     });
 
     test("Test get cwd", function()
