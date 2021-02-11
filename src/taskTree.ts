@@ -248,17 +248,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (key === constants.LAST_TASKS_LABEL || key === constants.FAV_TASKS_LABEL) {
                 return; // continue forEach()
             }
-
-            await util.forEachAsync(folder.taskFiles, (each: TaskFile | TaskItem) =>
-            {
-                if (each instanceof TaskFile)
-                {
-                    this.sortTasks(each.scripts, logPad + "   ");
-                }
-            });
-
-            this.sortTasks(folder.taskFiles, logPad + "   ");
-
+            this.sortFolder(folder, logPad + "   ");
             //
             // Create groupings by task type
             //
@@ -560,24 +550,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Resort after making adds/removes
         //
-        util.log(logPad + "   resort after add/removes", 1);
-        folder.taskFiles.sort((a, b) =>
-        {
-            return a.taskSource.localeCompare(b.taskSource);
-        });
-        await util.forEachAsync(folder.taskFiles, (each: TaskFile | TaskItem) =>
-        {
-            if (!(each instanceof TaskFile)) {
-                return; // continue forEach()
-            }
-            if (each.isGroup)
-            {
-                each.scripts.sort((a, b) =>
-                {
-                    return a.label.toString().localeCompare(b.label.toString());
-                });
-            }
-        });
+        this.sortFolder(folder, logPad + "   ");
 
         util.logBlank(1);
         util.log(logPad + "completed tree node folder grouping", 1);
@@ -2379,6 +2352,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
             }
         }
+    }
+
+
+    private async sortFolder(folder: TaskFolder, logPad = "")
+    {
+        this.sortTasks(folder.taskFiles, logPad);
+        await util.forEachAsync(folder.taskFiles, (each: TaskFile | TaskItem) =>
+        {
+            if ((each instanceof TaskFile)) { // && each.isGroup) {
+                this.sortTasks(each.scripts, logPad);
+            }
+        });
     }
 
 
