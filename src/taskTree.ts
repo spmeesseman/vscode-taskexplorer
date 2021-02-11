@@ -248,7 +248,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (key === constants.LAST_TASKS_LABEL || key === constants.FAV_TASKS_LABEL) {
                 return; // continue forEach()
             }
-            this.sortFolder(folder, logPad + "   ");
+            await this.sortFolder(folder, logPad + "   ");
             //
             // Create groupings by task type
             //
@@ -421,11 +421,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         this.sortTasks(favfolder?.taskFiles, logPad + "   ");
 
+        //
+        // Get sorted root project folders (only project folders are sorted, special folders 'Favorites',
+        // 'User Tasks' and 'Last Tasks' are kept at the top of the list.
+        //
+        const sortedFolders = this.getSortedRoot(folders);
+
+        //
+        // Done!
+        //
         util.logBlank(1);
         util.log(logPad + "completed build task tree", 1);
         this.treeBuilding = false;
 
-        return [...folders.values()];
+        return sortedFolders;
     }
 
 
@@ -550,7 +559,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Resort after making adds/removes
         //
-        this.sortFolder(folder, logPad + "   ");
+        await this.sortFolder(folder, logPad + "   ");
 
         util.logBlank(1);
         util.log(logPad + "completed tree node folder grouping", 1);
@@ -1098,6 +1107,46 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return null;
         }
         return null;
+    }
+
+
+    private getSortedRoot(folders: Map<string, TaskFolder>): TaskFolder[]
+    {
+        return [...folders.values()]?.sort((a: TaskFolder, b: TaskFolder) =>
+        {
+            const sFolders = [ constants.FAV_TASKS_LABEL, constants.LAST_TASKS_LABEL, constants.USER_TASKS_LABEL];
+            if (a.label === constants.LAST_TASKS_LABEL) {
+                return -1;
+            }
+            else if (b.label === constants.LAST_TASKS_LABEL) {
+                return 1;
+            }
+            else if (a.label === constants.FAV_TASKS_LABEL) {
+                if (b.label !== constants.LAST_TASKS_LABEL) {
+                    return -1;
+                }
+                return 1;
+            }
+            else if (b.label === constants.FAV_TASKS_LABEL) {
+                if (a.label !== constants.LAST_TASKS_LABEL) {
+                    return 1;
+                }
+                return -1;
+            }
+            else if (a.label === constants.USER_TASKS_LABEL) {
+                if (b.label !== constants.LAST_TASKS_LABEL && b.label !== constants.FAV_TASKS_LABEL) {
+                    return -1;
+                }
+                return 1;
+            }
+            else if (b.label === constants.USER_TASKS_LABEL) {
+                if (a.label !== constants.LAST_TASKS_LABEL && a.label !== constants.FAV_TASKS_LABEL) {
+                    return 1;
+                }
+                return -1;
+            }
+            return a.label?.localeCompare(b.label?.toString());
+        });
     }
 
 

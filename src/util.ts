@@ -524,6 +524,15 @@ export function setWriteToConsole(set: boolean, level = 2)
 }
 
 
+export function sortMapByKey(map: Map<string, any>)
+{
+    map = new Map([...map].sort((a: [ string, any], b: [ string, any]) =>
+    {
+        return a[0]?.localeCompare(b[0].toString());
+    }));
+}
+
+
 export function timeout(ms: number)
 {
     return new Promise(resolve => setTimeout(resolve, ms));
