@@ -48,13 +48,11 @@ export function camelCase(name: string, indexUpper: number)
 export function existsInArray(arr: any[], item: any): boolean | number
 {
     if (arr) {
-        let index = -1;
-        arr.forEach(each => {
-            index++;
-            if (item === each) {
-                return index;
+        for (let i = 0; i < arr.length; i++) {
+            if (item === arr[i]) {
+                return i;
             }
-        });
+        }
     }
     return false;
 }

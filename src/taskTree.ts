@@ -52,8 +52,61 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
 
 
-    constructor(name: string, context: ExtensionContext)
+    //
+    // Temporary, remove after a few releases post v2 release, I believe there was a bug where
+    // multiple task id's can make their way into the storage array.  Iterate the array, and make
+    // sure all entries are unique.  If not, remove all duplicated entries except for one.
+    // Also remove the call below in the constructor when this is removed.
+    //
+    _tmpV2Cleanup()
     {
+        let prevItem: string;
+        let modified = false;
+
+        const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []) || [];
+        if (lastTasks) {
+            for (let i = 0; i < lastTasks.length; i++) {
+                if (prevItem === lastTasks[i]) {
+                    lastTasks.splice(i--, 1);
+                    modified = true;
+                }
+                prevItem = lastTasks[i];
+            }
+        }
+        if (modified) {
+            storage.update(constants.LAST_TASKS_STORE, lastTasks);
+        }
+
+        modified = false;
+        prevItem = null;
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []) || [];
+        if (favTasks) {
+            for (let i = 0; i < favTasks.length; i++) {
+                if (prevItem === favTasks[i]) {
+                    favTasks.splice(i--, 1);
+                    modified = true;
+                }
+                prevItem = favTasks[i];
+            }
+            if (modified) {
+                storage.update(constants.FAV_TASKS_STORE, favTasks);
+            }
+        }
+    }
+
+
+    constructor(name: string, context: ExtensionContext)
+    {   //
+        // Temporary, remove after a few releases post v2 release, I believe there was a bug where
+        // multiple task id's can make their way into the storage array.  Iterate the array, and make
+        // sure all entries are unique.  If not, remove all duplicated entries except for one.
+        // Also remove the function implementation above when this gets removed.
+        //
+        if (name === "taskExplorer")
+        {
+            this._tmpV2Cleanup();
+        }
+
         const subscriptions = context.subscriptions;
         this.extensionContext = context;
         this.name = name;
@@ -81,12 +134,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    /**
+     * Adds/removes tasks from the Favorites List.  Basically a toggle, if the task exists as a
+     * favorite already when this function is called, it gets removed, if it doesnt exist, it gets added.
+     *
+     * @param taskItem The representative TaskItem of the task to add/remove
+     */
     private async addRemoveFavorite(taskItem: TaskItem)
     {
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []) || [];
-        const favId = taskItem.id.replace(constants.FAV_TASKS_LABEL + ":", "")
-            .replace(constants.LAST_TASKS_LABEL + ":", "")
-            .replace(constants.USER_TASKS_LABEL + ":", "");
+        const favId = this.getTaskItemId(taskItem);
 
         util.log("");
         util.log("add/remove favorite", 1);
@@ -99,7 +156,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         util.logValue("   current fav count", favTasks.length, 2);
 
         //
-        // If this task doesn't exist as a favorite, inform the user and exit
+        // If this task exists in the favorites, remove it, if it doesnt, then add it
         //
         if (util.existsInArray(favTasks, favId) === false)
         {
@@ -952,43 +1009,49 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private fireTaskChangeEvents(taskFile: TaskFile)
+    private fireTaskChangeEvents(taskItem: TaskItem)
     {
-        const tree = this.taskTree;
+        if (!this.taskTree) {
+            return;
+        }
 
         //
-        // Fire change event for parent folder
+        // Fire change event for parent folder.  FIring the change eventfor the task item itself
+        // does not cause the getTreeItem() callback to be called from VSCode Tree API.  Firing it
+        // on the parent folder (type TreeFile) works good though.  Pre v2, we refreshed the entire
+        // tree, so this is still good.  TODO possibly this gets fixed in the future to be able to
+        // invalidate just the TaskItem, so check back on this sometime.
         //
-        this._onDidChangeTreeData.fire(taskFile);
+        this._onDidChangeTreeData.fire(taskItem.taskFile);
 
         //
-        // The 'Last Tasks' folder
+        // Fire change event for the 'Last Tasks' folder if the task exists there
         //
         if (configuration.get<boolean>("showLastTasks") === true)
         {
             const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []) || [];
-            if (lastTasks && lastTasks.length > 0)
+            if (util.existsInArray(lastTasks, this.getTaskItemId(taskItem)))
             {
-                if (tree[0].label === constants.LAST_TASKS_LABEL)
+                if (this.taskTree[0].label === constants.LAST_TASKS_LABEL)
                 {
-                    this._onDidChangeTreeData.fire(tree[0]);
+                    this._onDidChangeTreeData.fire(this.taskTree[0]);
                 }
             }
         }
 
         //
-        // The 'Favorites' folder
+        // Fire change event for the 'Favorites' folder if the task exists there
         //
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []) || [];
-        if (favTasks && favTasks.length > 0)
+        if (util.existsInArray(favTasks, this.getTaskItemId(taskItem)))
         {
-            if (tree[0].label === constants.FAV_TASKS_LABEL)
+            if (this.taskTree[0].label === constants.FAV_TASKS_LABEL)
             {
-                this._onDidChangeTreeData.fire(tree[0]);
+                this._onDidChangeTreeData.fire(this.taskTree[0]);
             }
-            else if (tree[1].label === constants.FAV_TASKS_LABEL)
+            else if (this.taskTree[1].label === constants.FAV_TASKS_LABEL)
             {
-                this._onDidChangeTreeData.fire(tree[1]);
+                this._onDidChangeTreeData.fire(this.taskTree[1]);
             }
         }
     }
@@ -1091,12 +1154,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private getSpecialTaskName(taskItem: TaskItem)
-    {
-        return taskItem.label + " (" + taskItem.taskFile.folder.label + " - " + taskItem.taskSource + ")";
-    }
-
-
     public getParent(element: TreeItem): TreeItem | null
     {
         if (element instanceof TaskFolder)
@@ -1116,6 +1173,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return null;
         }
         return null;
+    }
+
+
+    private getSpecialTaskName(taskItem: TaskItem)
+    {
+        return taskItem.label + " (" + taskItem.taskFile.folder.label + " - " + taskItem.taskSource + ")";
     }
 
 
@@ -1326,7 +1389,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private getTaskItemId(taskItem: TaskItem)
     {
-        return taskItem?.id?.replace(constants.LAST_TASKS_LABEL + ":", "").replace(constants.FAV_TASKS_LABEL + ":", "");
+        return taskItem?.id?.replace(constants.LAST_TASKS_LABEL + ":", "")
+                            .replace(constants.FAV_TASKS_LABEL + ":", "")
+                            .replace(constants.USER_TASKS_LABEL + ":", "");
     }
 
 
@@ -2238,6 +2303,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
+        //
+        // Moving it to the top of the list it if it already exists
+        //
         if (util.existsInArray(cstTasks, taskId) !== false) {
             await util.removeFromArrayAsync(cstTasks, taskId);
         }
@@ -2415,7 +2483,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // Show status bar message (if ON in settings)
         //
         this.showStatusMessage(e.execution.task);
-        this.fireTaskChangeEvents(e.execution.task.definition.taskItem.taskFile);
+        this.fireTaskChangeEvents(e.execution.task.definition.taskItem);
     }
 
 
@@ -2426,7 +2494,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // Hide status bar message (if ON in settings)
         //
         this.showStatusMessage(e.execution.task);
-        this.fireTaskChangeEvents(e.execution.task.definition.taskItem.taskFile);
+        this.fireTaskChangeEvents(e.execution.task.definition.taskItem);
     }
 
 }
