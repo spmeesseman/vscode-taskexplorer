@@ -406,15 +406,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Sort the 'Last Tasks' folder by last time run
         //
-        if (ltfolder)
-        {
-            ltfolder.taskFiles.sort((a: TaskItem, b: TaskItem) =>
-            {
-                const aIdx = lastTasks.indexOf(a.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
-                const bIdx = lastTasks.indexOf(b.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
-                return (aIdx < bIdx ? 1 : (bIdx < aIdx ? -1 : 0));
-            });
-        }
+        this.sortLastTasks(ltfolder?.taskFiles, lastTasks, logPad + "   ");
 
         //
         // Sort the 'Favorites' folder
@@ -2412,6 +2404,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if ((each instanceof TaskFile)) { // && each.isGroup) {
                 this.sortTasks(each.scripts, logPad);
             }
+        });
+    }
+
+
+    private sortLastTasks(items: (TaskFile | TaskItem)[], lastTasks: string[], logPad = "")
+    {
+        util.log(logPad + "sort last tasks", 1);
+        items?.sort((a: TaskItem, b: TaskItem) =>
+        {
+            const aIdx = lastTasks.indexOf(a.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
+            const bIdx = lastTasks.indexOf(b.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
+            return (aIdx < bIdx ? 1 : (bIdx < aIdx ? -1 : 0));
         });
     }
 
