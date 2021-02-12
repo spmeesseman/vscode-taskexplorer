@@ -288,11 +288,6 @@
                 }
             },
             {
-                "command": "taskExplorerSideBar.open",
-                "title": "%command.open%",
-                "when": "config.taskExplorer.enableSideBar"
-            },
-            {
                 "command": "taskExplorerSideBar.runInstall",
                 "title": "%command.runInstall%",
                 "when": "config.taskExplorer.enableSideBar"
@@ -400,6 +395,15 @@
                 }
             },
             {
+                "command": "taskExplorer.open",
+                "title": "%command.open%",
+                "when": "config.taskExplorer.enableExplorerView",
+                "icon": {
+                    "dark": "res/dark/file.svg",
+                    "light": "res/light/file.svg"
+                }
+            },
+            {
                 "command": "taskExplorer.openTerminal",
                 "title": "%command.openTerminal%",
                 "when": "config.taskExplorer.enableExplorerView",
@@ -415,15 +419,6 @@
                 "icon": {
                     "dark": "res/dark/stop.svg",
                     "light": "res/light/stop.svg"
-                }
-            },
-            {
-                "command": "taskExplorer.open",
-                "title": "%command.open%",
-                "when": "config.taskExplorer.enableExplorerView",
-                "icon": {
-                    "dark": "res/dark/file.svg",
-                    "light": "res/light/file.svg"
                 }
             },
             {
