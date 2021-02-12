@@ -24,7 +24,6 @@ import { TaskExplorerProvider } from "./taskProvider";
 import * as util from "./util";
 import * as cache from "./cache";
 import * as constants from "./common/constants";
-import { utils } from "istanbul";
 
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;

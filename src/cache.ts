@@ -8,7 +8,7 @@ import * as constants from "./common/constants";
 let cacheBuilding = false;
 let folderCaching = false;
 let cancel = false;
-let taskGlobs: any = {};
+const taskGlobs: any = {};
 
 export const filesCache: Map<string, Set<any>> = new Map();
 
