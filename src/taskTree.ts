@@ -1026,13 +1026,23 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             // of type specified by it's value.  The 'currentInvalidation' parameter is set by the
             // refresh() function when a file modify/create/delete event has occurred, it will be
             // set to the task type of the file that was modified.created/deleted, and at this point
-            // the provider's tasks cache will have been invalidated and rebuilt
+            // the provider's tasks cache will have been invalidated and rebuilt.
             //
-            if (!this.tasks || this.currentInvalidation  === "workspace") {
+            // Note that if 'currentInvalidation' is 'workspace', indicating tasks from a tasks.json
+            // file, there in actuality is no task type called 'workspace'.  Tasks found in these
+            // files can be of any type that is available to VSCode's task provider interface
+            // (including providers implemented in this extension).  In this case, we have to ask
+            // for all tasks.
+            //
+            if (!this.tasks || this.currentInvalidation === "workspace") {
                 this.tasks = await tasks.fetchTasks();
             }
             else if (this.currentInvalidation)
-            {
+            {   //
+                // Get all tasks of the type defined in 'currentInvalidation' from VSCode, remove
+                // all tasks of the type defined in 'currentInvalidation' from the tasks list cache,
+                // and add the new tasks from VSCode into the tasks list.
+                //
                 const toRemove: Task[] = [];
                 const taskItems = await tasks.fetchTasks({ type: this.currentInvalidation });
                 this.tasks.forEach((t: Task) => {
@@ -1047,7 +1057,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             if (this.tasks)
             {   //
-                // Build the task tree, see the TODO above
+                // Build the entire task tree
                 //
                 this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ");
                 util.logBlank(1);
