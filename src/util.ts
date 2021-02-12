@@ -41,9 +41,13 @@ export function camelCase(name: string, indexUpper: number)
 /**
  * Checks if a value exists in the given array
  *
+ * * **IMPORTANT**  This function will return 0 on success if the item is the 1st in the array,
+ * always check for a return value of false, and not just using a !existsInArray to determine if
+ * the item exists
+ *
  * @param arr The array to check
  * @param item The value to check in the given array for
- * @returns `true` if the value exists in the arrray, `false` otherwise
+ * @returns The index of the item in the array if the value exists in the arrray, `false` otherwise
  */
 export function existsInArray(arr: any[], item: any): boolean | number
 {

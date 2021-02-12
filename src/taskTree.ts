@@ -957,7 +957,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (configuration.get<boolean>("showLastTasks") === true)
         {
             const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []) || [];
-            if (util.existsInArray(lastTasks, this.getTaskItemId(taskItem)))
+            if (util.existsInArray(lastTasks, this.getTaskItemId(taskItem)) !== false)
             {
                 if (this.taskTree[0].label === constants.LAST_TASKS_LABEL)
                 {
@@ -970,7 +970,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // Fire change event for the 'Favorites' folder if the task exists there
         //
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []) || [];
-        if (util.existsInArray(favTasks, this.getTaskItemId(taskItem)))
+        if (util.existsInArray(favTasks, this.getTaskItemId(taskItem)) !== false)
         {
             if (this.taskTree[0].label === constants.FAV_TASKS_LABEL)
             {

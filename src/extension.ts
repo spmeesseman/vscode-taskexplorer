@@ -165,7 +165,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     const taskTypes: string[] = [];
 
     const registerChange = (taskType: string) => {
-        if (!util.existsInArray(taskTypes, taskType)) {
+        if (util.existsInArray(taskTypes, taskType) === false) {
             taskTypes.push(taskType);
         }
     };
@@ -313,7 +313,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     // Extra Apache Ant 'include' paths
     //
     if (e.affectsConfiguration("taskExplorer.includeAnt")) {
-        if (!util.existsInArray(taskTypes, "ant")){
+        if (util.existsInArray(taskTypes, "ant") === false){
             await registerFileWatcher(context, "ant", util.getAntGlobPattern(), configuration.get<boolean>("enableAnt"));
             registerChange("ant");
         }
