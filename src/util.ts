@@ -438,6 +438,14 @@ export function pathExists(path: string)
 }
 
 
+export function pushIfNotExists(arr: any[], item: any)
+{
+    if (existsInArray(arr, item) === false) {
+        arr.push(item);
+    }
+}
+
+
 export function properCase(name: string)
 {
     if (!name) {

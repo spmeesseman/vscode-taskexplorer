@@ -40,8 +40,7 @@ class NoScripts extends TreeItem
 export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 {
     private static statusBarSpace: StatusBarItem;
-    private static tasks: Task[] = null;
-
+    private tasks: Task[] = null;
     private treeBuilding = false;
     private busy = false;
     private extensionContext: ExtensionContext;
@@ -190,9 +189,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
                 const strs = str.split(",");
                 for (const s in strs) {
-                    if (util.existsInArray(excludes, strs[s]) === false) {
-                        excludes.push(strs[s]);
-                    }
+                    util.pushIfNotExists(excludes, strs[s]);
                 }
                 if (global !== false) {
                     configuration.update("exclude", excludes);
@@ -992,7 +989,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         util.logBlank(1);
         util.log(logPad + "get tree children", 1);
         util.logValue(logPad + "   task folder", element?.label, 1);
-        util.logValue(logPad + "   all tasks need to be retrieved", !TaskTreeDataProvider.tasks, 2);
+        util.logValue(logPad + "   all tasks need to be retrieved", !this.tasks, 2);
         util.logValue(logPad + "   specific tasks need to be retrieved", !!this.currentInvalidation, 2);
         if (this.currentInvalidation) {
             util.logValue(logPad + "      current invalidation", this.currentInvalidation, 2);
@@ -1031,28 +1028,28 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             // set to the task type of the file that was modified.created/deleted, and at this point
             // the provider's tasks cache will have been invalidated and rebuilt
             //
-            if (!TaskTreeDataProvider.tasks) {
-                TaskTreeDataProvider.tasks = await tasks.fetchTasks();
+            if (!this.tasks) {
+                this.tasks = await tasks.fetchTasks();
             }
             else if (this.currentInvalidation)
             {
                 const toRemove: Task[] = [];
                 const taskItems = await tasks.fetchTasks({ type: this.currentInvalidation });
-                TaskTreeDataProvider.tasks.forEach((t: Task) => {
+                this.tasks.forEach((t: Task) => {
                     if (t.source === this.currentInvalidation) {
                         toRemove.push(t);
                     }
                 });
                 toRemove.forEach((t: Task) => {
-                    util.removeFromArray(TaskTreeDataProvider.tasks, t);
+                    util.removeFromArray(this.tasks, t);
                 });
-                TaskTreeDataProvider.tasks = [ ...TaskTreeDataProvider.tasks, ...taskItems ];
+                this.tasks = [ ...this.tasks, ...taskItems ];
             }
-            if (TaskTreeDataProvider.tasks)
+            if (this.tasks)
             {   //
                 // Build the task tree, see the TODO above
                 //
-                this.taskTree = await this.buildTaskTree(TaskTreeDataProvider.tasks, logPad + "   ");
+                this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ");
                 util.logBlank(1);
                 if (this.taskTree.length === 0)
                 {
@@ -1490,9 +1487,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // invalidate="tests" means this is being called from unit tests (opt will be undefined)
         //
         if ((invalidate === true || invalidate === "tests") && !opt) {
-            util.log("   Handling 'rebuild cache' event");
+            util.log("   Handling 'rebuild cache' event", 1);
             this.busy = true;
             await rebuildCache();
+            util.log("   Handling 'rebuild cache' eventcomplete", 1);
             this.busy = false;
         }
         //
@@ -1509,7 +1507,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         util.log("   handling 'visible' event");
         if (this.needsRefresh && this.needsRefresh.length > 0)
-        {
+        {   //
             // If theres more than one pending refresh request, just refresh the tree
             //
             if (this.needsRefresh.length > 1 || this.needsRefresh[0].invalidate === undefined)
@@ -1598,6 +1596,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         }
 
+        util.log("Invalidate tasks cache complete", 1);
         this.busy = false;
     }
 
@@ -1870,7 +1869,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *
      * @param opt Uri of the invalidated resource
      */
-    public async refresh(invalidate?: any, opt?: Uri | boolean, skipAskTasks?: boolean): Promise<boolean>
+    public async refresh(invalidate?: any, opt?: Uri | boolean): Promise<boolean>// , skipAskTasks?: boolean): Promise<boolean>
     {
         util.logBlank(1);
         util.log("Refresh task tree", 1);
@@ -1879,17 +1878,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         util.logValue("   opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a", 2);
 
         //
-        // If a view was turned off in settings, the disposable view still remains
-        // ans will still receive events.  Check visibility property, and of this view
-        // is hidden/disabled, then exit.  Unless opt is defined, in which case this is just a
-        // task ending, so we can proceed just invalidating that task set
+        // If a view was turned off in settings, the disposable view still remains and will still
+        // receive events.  If this view is hidden/disabled, then nothing to do right now, save the
+        // event paramters to process later.
         //
         if (this.taskTree && views.get(this.name) && invalidate !== "tests")
         {
-            if (!views.get(this.name).visible)
+            if (!views.get(this.name).visible ||
+                !configuration.get<boolean>(this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar"))
             {
                 util.log("   Delay refresh, exit");
-                this.needsRefresh.push({ invalidate, opt });
+                util.pushIfNotExists(this.needsRefresh, { invalidate, opt });
                 return false;
             }
         }
@@ -1906,8 +1905,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             if (this.taskTree)
             {   //
-                // If we await on the same function within that function, bad. things. happen.  So timeout the
-                // the handling of the visible event, which calls back into this function.
+                // If we await on the same function within that awaited function, bad. things. happen. So
+                // timeout the the handling of the visible event, which calls back into this function.
                 //
                 setTimeout(async () => {
                     await this.handleVisibleEvent();
@@ -1937,7 +1936,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         else //
         {   // Re-ask for all tasks from all providers and rebuild tree
             //
-            TaskTreeDataProvider.tasks = !skipAskTasks ? null : TaskTreeDataProvider.tasks;
+            this.tasks = null; // !skipAskTasks ? null : this.tasks;
             this.taskTree = null;
             this._onDidChangeTreeData.fire(undefined);
         }
