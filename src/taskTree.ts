@@ -2467,7 +2467,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         util.log(logPad + "sort tasks", 1);
         items?.sort((a: TaskFile| TaskItem, b: TaskFile| TaskItem) =>
         {
-            return a.label?.toString()?.localeCompare(b.label?.toString());
+            if ((a instanceof TaskFile && b instanceof TaskFile || a instanceof TaskItem && b instanceof TaskItem)) {
+                return a.label?.toString()?.localeCompare(b.label?.toString());
+            }
+            //
+            // TaskFiles we keep at the  top, like a folder in Windows Explorer
+            //
+            else if (a instanceof TaskFile && b instanceof TaskItem)
+            {
+                return -1;
+            }
+            else {
+                return 1;
+            }
         });
     }
 
