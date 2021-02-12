@@ -363,12 +363,13 @@ export function log(msg: string, level?: number)
 
     if (configuration.get("debug") === true)
     {
+        const tsMsg = new Date().toISOString().replace(/[TZ]/g, " ") + msg;
         if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
-            logOutputChannel.appendLine(msg);
+            logOutputChannel.appendLine(tsMsg);
         }
         if (writeToConsole === true) {
             if (!level || level <= writeToConsoleLevel) {
-                console.log(msg);
+                console.log(tsMsg);
             }
         }
     }
@@ -407,7 +408,7 @@ export function logValue(msg: string, value: any, level?: number)
         logMsg += " ";
     }
 
-    if (value || value === 0 || value === "") {
+    if (value || value === 0 || value === "" || value === false) {
         logMsg += ": ";
         logMsg += value.toString();
     }
@@ -417,20 +418,8 @@ export function logValue(msg: string, value: any, level?: number)
     else if (value === null) {
         logMsg += ": null";
     }
-    else if (value === false) {
-        logMsg += ": false";
-    }
 
-    if (configuration.get("debug") === true) {
-        if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
-            logOutputChannel.appendLine(logMsg);
-        }
-        if (writeToConsole === true) {
-            if (!level || level <= writeToConsoleLevel) {
-                console.log(logMsg);
-            }
-        }
-    }
+    log(logMsg, level);
 }
 
 
