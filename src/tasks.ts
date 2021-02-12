@@ -8,6 +8,7 @@ import * as path from "path";
 import * as util from "./util";
 import * as constants from "./common/constants";
 import { configuration } from "./common/configuration";
+import { match } from "minimatch";
 
 
 export class TaskItem extends TreeItem
@@ -20,6 +21,9 @@ export class TaskItem extends TreeItem
     public task: Task | undefined;
     public execution: TaskExecution | undefined;
     public paused: boolean;
+    /**
+     * Equivalent to task.definition.path
+     */
     public nodePath: string;
     public groupLevel: number;
 
@@ -245,7 +249,7 @@ export class TaskFile extends TreeItem
             {
                 const pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager");
                 src = pkgMgr || this.taskSource;
-                if (src.indexOf("npm") !== -1) { // pnpm?
+                if (src.match(/(npm|auto)/)) { // pnpm/auto?  only other option is yarn
                     src = "npm";
                 }
             }
