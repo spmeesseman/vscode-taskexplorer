@@ -1028,7 +1028,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             // set to the task type of the file that was modified.created/deleted, and at this point
             // the provider's tasks cache will have been invalidated and rebuilt
             //
-            if (!this.tasks) {
+            if (!this.tasks || this.currentInvalidation  === "workspace") {
                 this.tasks = await tasks.fetchTasks();
             }
             else if (this.currentInvalidation)
@@ -1043,7 +1043,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 toRemove.forEach((t: Task) => {
                     util.removeFromArray(this.tasks, t);
                 });
-                this.tasks = [ ...this.tasks, ...taskItems ];
+                this.tasks.push(...taskItems);
             }
             if (this.tasks)
             {   //
