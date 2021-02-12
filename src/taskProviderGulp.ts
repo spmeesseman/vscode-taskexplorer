@@ -39,9 +39,9 @@ export class GulpTaskProvider implements TaskProvider
     public async invalidateTasksCache(opt?: Uri): Promise<void>
     {
         util.log("");
-        util.log("invalidateTasksCacheGulp");
-        util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
-        util.logValue("   has cached tasks", this.cachedTasks ? "true" : "false", 2);
+        util.log("invalidate gulp tasks cache");
+        util.logValue("   uri", opt?.path, 2);
+        util.logValue("   has cached tasks", !!this.cachedTasks, 2);
 
         if (opt && this.cachedTasks)
         {
@@ -67,7 +67,7 @@ export class GulpTaskProvider implements TaskProvider
 
                 if (util.pathExists(opt.fsPath) && util.existsInArray(configuration.get("exclude"), opt.path) === false)
                 {
-                    const tasks = await this.readGulpfile(opt);
+                    const tasks = await this.readGulpfile(opt, "   ");
                     this.cachedTasks.push(...tasks);
                 }
 
@@ -115,8 +115,8 @@ export class GulpTaskProvider implements TaskProvider
 
     private async detectGulpfiles(): Promise<Task[]>
     {
-        util.log("");
-        util.log("detectGulpfiles");
+        util.logBlank(1);
+        util.log("detect gulp files", 1);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -139,10 +139,14 @@ export class GulpTaskProvider implements TaskProvider
     }
 
 
-    private async readGulpfile(uri: Uri): Promise<Task[]>
+    private async readGulpfile(uri: Uri, logPad = ""): Promise<Task[]>
     {
         const result: Task[] = [];
         const folder = workspace.getWorkspaceFolder(uri);
+
+        util.logBlank(1);
+        util.log(logPad + "read gulp file", 1);
+        util.logValue(logPad + "   path", uri?.fsPath, 1);
 
         if (folder)
         {

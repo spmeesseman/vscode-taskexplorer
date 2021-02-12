@@ -90,9 +90,9 @@ export class ScriptTaskProvider implements TaskExplorerProvider
     public async invalidateTasksCache(opt?: Uri): Promise<void>
     {
         util.log("");
-        util.log("invalidateTasksCacheScript");
-        util.logValue("   uri", opt ? opt.path : (opt === null ? "null" : "undefined"), 2);
-        util.logValue("   has cached tasks", this.cachedTasks ? "true" : "false", 2);
+        util.log("invalidate script tasks cache");
+        util.logValue("   uri", opt?.path, 2);
+        util.logValue("   has cached tasks", !!this.cachedTasks, 2);
 
         if (opt && this.cachedTasks)
         {

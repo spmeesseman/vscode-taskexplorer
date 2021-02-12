@@ -493,12 +493,12 @@ export async function refreshTree(taskType?: string, uri?: Uri)
         refreshedTasks = await treeDataProvider.refresh(taskType, uri);
     }
     if (configuration.get<boolean>("enableExplorerView") && treeDataProvider2) {
-        if (!refreshedTasks) {
+        // if (!refreshedTasks) {
             await treeDataProvider2.refresh(taskType, uri);
-        }
-        else {
-            await treeDataProvider2.refresh(taskType !== "visible-event" ? false : taskType, uri);
-        }
+        // }
+        // else {
+        //     await treeDataProvider2.refresh(taskType !== "visible-event" ? false : taskType, uri);
+        // }
     }
 }
 

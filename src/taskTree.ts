@@ -48,6 +48,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private needsRefresh: any[] = [];
     private taskTree: TaskFolder[] | TaskFile[] | NoScripts[] | null = null;
     private tasks: Task[] = null;
+    private currentInvalidation: string;
     private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
     readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
 
@@ -991,13 +992,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         util.logBlank(1);
         util.log(logPad + "get tree children", 1);
         util.logValue(logPad + "   task folder", element?.label, 1);
-        util.logValue(logPad + "   tasks need to be retrieved", !this.tasks, 2);
+        util.logValue(logPad + "   all tasks need to be retrieved", !this.tasks, 2);
+        util.logValue(logPad + "   specific tasks need to be retrieved", !!this.currentInvalidation, 2);
+        if (this.currentInvalidation) {
+            util.logValue(logPad + "      current invalidation", this.currentInvalidation, 2);
+        }
         util.logValue(logPad + "   task tree needs to be built", !this.taskTree, 2);
 
         //
         // The vscode task engine processing will call back in multiple time while we are awaiting
         // the call to buildTaskTree().  This occurs on the await of buildGroupings() in buildTaskTree.
         // To prevent bad. things. happening. sleep the call here until the tree has finished building.
+        // This "could"" be prevented by re-implementing the tree the "right way", where we dont build the
+        // whole tree if it doesnt exist and build it node by node as theyare expanded, but, because we
+        // have 'LastTasks' and 'Favorites', we need to load everything.  Oh well.
         //
         while (this.treeBuilding) {
             util.log(logPad + "   waiting...", 1);
@@ -1016,17 +1024,29 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (!this.taskTree)
         {   //
-            // TODO - Performance Enhancement - search enable* settings and apply enabled types to
-            // the filter parameter of fetchTasks() (or have to call multiple times?).  THis would
-            // eliminate all callbacks into disabled task providers to read task files.
-            //
-            // let taskItems = await tasks.fetchTasks({ type: 'npm' });
-            //
-            // The main junk here.  tasks.fetchTasks() retrieves all tasks from all providers
-            // (including this extension).  Get the tasks, and build the task tree...
+            // If 'tasks' is empty, then ask for all tasks.
+            // If 'tasks' is non-empty, and 'currentInvalidation' is set, then only ask for tasks
+            // of type specified by it's value.  The 'currentInvalidation' parameter is set by the
+            // refresh() function when a file modify/create/delete event has occurred, it will be
+            // set to the task type of the file that was modified.created/deleted, and at this point
+            // the provider's tasks cache will have been invalidated and rebuilt
             //
             if (!this.tasks) {
                 this.tasks = await tasks.fetchTasks();
+            }
+            else if (this.currentInvalidation)
+            {
+                const toRemove: Task[] = [];
+                const taskItems = await tasks.fetchTasks({ type: this.currentInvalidation });
+                this.tasks.forEach((t: Task) => {
+                    if (t.source === this.currentInvalidation) {
+                        toRemove.push(t);
+                    }
+                });
+                toRemove.forEach((t: Task) => {
+                    util.removeFromArray(this.tasks, t);
+                });
+                this.tasks = [ ...this.tasks, ...taskItems ];
             }
             if (this.tasks)
             {   //
@@ -1063,6 +1083,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         util.logBlank(1);
         util.log(logPad + "completed get tree children", 1);
 
+        this.currentInvalidation = null; // reset file modification task type flag
         return items;
     }
 
@@ -1450,11 +1471,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     public getTreeItem(element: TaskItem | TaskFile | TaskFolder): TreeItem
     {
-        util.logBlank(1);
-        util.log("get tree item", 1);
-        util.logValue("   label", element?.label, 1);
+        util.logBlank(3);
+        util.log("get tree item", 3);
+        util.logValue("   label", element?.label, 3);
         if (element instanceof TaskItem) {
-            util.log("   refresh task item state", 1);
+            util.log("   refresh task item state", 3);
             element.refreshState();
         }
         return element;
@@ -1561,19 +1582,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             util.log("   invalidate " + opt1 + " provider file ", 1);
             util.logValue("      file", opt2, 1);
             const provider = providers.get(util.getScriptProviderType(opt1));
-            provider?.invalidateTasksCache(opt2); // NPM/Workspace tasks don't implement TaskExplorerProvider
+            await provider?.invalidateTasksCache(opt2); // NPM/Workspace tasks don't implement TaskExplorerProvider
         }
         else { // If opt1 is undefined, refresh all providers
             if (!opt1) {
                 util.log("   invalidate all providers", 1);
-                await util.forEachMapAsync(providers, (p: TaskExplorerProvider, key: string) => {
+                await util.forEachMapAsync(providers, async (p: TaskExplorerProvider, key: string) => {
                     util.log("   invalidate " + key + " provider", 1);
-                    p.invalidateTasksCache();
+                    await p.invalidateTasksCache();
                 });
             }
             else {
                 util.log("   invalidate " + opt1 + " provider", 1);
-                providers.get(opt1)?.invalidateTasksCache();  // NPM/Workspace tasks don't implement TaskExplorerProvider
+                await providers.get(opt1)?.invalidateTasksCache();  // NPM/Workspace tasks don't implement TaskExplorerProvider
             }
         }
 
@@ -1853,12 +1874,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         util.logBlank(1);
         util.log("Refresh task tree", 1);
+        util.logValue("   from view", this.name, 2);
         util.logValue("   invalidate", invalidate, 2);
         util.logValue("   opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a", 2);
 
         //
         // If a view was turned off in settings, the disposable view still remains
-        // ans will still receive events.  CHeck visibility property, and of this view
+        // ans will still receive events.  Check visibility property, and of this view
         // is hidden/disabled, then exit.  Unless opt is defined, in which case this is just a
         // task ending, so we can proceed just invalidating that task set
         //
@@ -1894,11 +1916,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             await this.handleFileWatcherEvent(invalidate, opt);
         }
 
-        //
-        // Rebuild tree
-        //
-        this.taskTree = null;
-        this._onDidChangeTreeData.fire(undefined);
+        if (opt instanceof Uri) // && task.definition.treeItem)
+        {   //
+            // TODO - Performance Enhanceement
+            // Get the invalidated treeitem.treefile and invalidate that instead of rebuilding
+            // the entire tree. We set currentInvalidation here, this will cause the resulting
+            // call to getChildren() from the VSCode task engine to only re-provide the invalidated
+            // task type, instead of all task types
+            //
+            this.currentInvalidation = invalidate;
+            this.taskTree = null;                      // see todo above
+            this._onDidChangeTreeData.fire(undefined); // see todo above
+        }
+        else //
+        {   // Re-ask for all tasks from all providers and rebuild tree
+            //
+            this.tasks = null;
+            this.taskTree = null;
+            this._onDidChangeTreeData.fire(undefined);
+        }
 
         util.log("Refresh task tree finished");
         return true;
