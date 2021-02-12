@@ -162,7 +162,7 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
 async function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
 {
     let refresh: boolean;
-    let taskTypes: string[] = [];
+    const taskTypes: string[] = [];
 
     const registerChange = (taskType: string) => {
         if (!util.existsInArray(taskTypes, taskType)) {
@@ -484,17 +484,17 @@ export async function refreshTree(taskType?: string, uri?: Uri)
     }
 
     //
-    // Refresh tree
+    // Refresh tree(s)
     //
-    // Note the task cache only needs to be refreshed once if both the explorer view and
-    // the sidebar view are being used and/or enabled
+    // Note the static task cache only needs to be refreshed once if both the explorer view
+    // and the sidebar view are being used and/or enabled
     //
     if (configuration.get<boolean>("enableSideBar") && treeDataProvider) {
         refreshedTasks = await treeDataProvider.refresh(taskType, uri);
     }
     if (configuration.get<boolean>("enableExplorerView") && treeDataProvider2) {
         // if (!refreshedTasks) {
-            await treeDataProvider2.refresh(taskType, uri);
+            await treeDataProvider2.refresh(taskType, uri, refreshedTasks);
         // }
         // else {
         //     await treeDataProvider2.refresh(taskType !== "visible-event" ? false : taskType, uri);
@@ -598,10 +598,10 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
         {
             const treeDataProvider = new TaskTreeDataProvider(name, context);
             const treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
-            treeView.onDidChangeVisibility(_e => {
+            treeView.onDidChangeVisibility(async _e => {
                 if (_e.visible) {
                     util.log("view visibility change event");
-                    refreshTree("visible-event");
+                    await refreshTree("visible-event");
                 }
             });
             views.set(name, treeView);
