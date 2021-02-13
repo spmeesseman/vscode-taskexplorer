@@ -12,4 +12,5 @@ export interface TaskExplorerDefinition extends TaskDefinition
     taskItem?: TaskItem;
     isDefault?: boolean;
     requiresArgs?: boolean;
+    taskId?: string;
 }

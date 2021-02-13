@@ -7,10 +7,10 @@ import * as path from "path";
 import * as util from "./util";
 import * as assert from "assert";
 import {
-    Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind,
-    TextDocument, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
-    commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions, TaskExecution,
-    ShellExecution, Terminal, StatusBarItem, StatusBarAlignment, CustomExecution, ProcessExecution, ShellQuotedString
+    Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
+    TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
+    commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
+    ShellExecution, Terminal, StatusBarItem, StatusBarAlignment, CustomExecution
 } from "vscode";
 import { visit, JSONVisitor } from "jsonc-parser";
 import * as nls from "vscode-nls";
@@ -21,6 +21,7 @@ import { rebuildCache } from "./cache";
 import { configuration } from "./common/configuration";
 import { providers } from "./extension";
 import { TaskExplorerProvider } from "./taskProvider";
+import { TaskExplorerDefinition } from "./taskDefinition";
 import * as constants from "./common/constants";
 
 
@@ -2156,9 +2157,32 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             await this.resumeTask(taskItem);
         }
-        else if (await this.runTask(taskItem.task, noTerminal))
-        {
-            await this.saveTask(taskItem, configuration.get<number>("numLastTasks"), false, "   ");
+        else //
+        {   // Create a new instance of 'task' if this is to be ran with no termainl (see notes below)
+            //
+            let newTask = taskItem.task;
+            if (noTerminal)
+            {
+                const def = taskItem.task.definition;
+                const p = providers.get(util.getScriptProviderType(def.type));
+                const ext = path.extname(def.uri.fsPath).substring(1);
+                newTask = p.createTask(ext, null, taskItem.getFolder(), def.uri);
+                //
+                // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
+                // an instance of this task.
+                // For some damn reason, setting task.presentationOptions.reveal = TaskRevealKind.Silent or
+                // task.presentationOptions.reveal = TaskRevealKind.Never does not work if we do it on the task
+                // that was instantiated when the providers were asked for tasks.  If we create a new instance
+                // here, same exact task, then it works.  Same kind of thing with running with args, but in that
+                // case I can understand it because a new execution class has to be instantiated with the command
+                // line arguments.  In this case, its simply a property task.presentationOption on an instantiated
+                // task.  No idea.  But this works fine for now.
+                //
+                newTask.definition.taskId = this.getTaskItemId(taskItem);
+            }
+            if (await this.runTask(newTask, noTerminal)) {
+                await this.saveTask(taskItem, configuration.get<number>("numLastTasks"), false, "   ");
+            }
         }
     }
 
@@ -2288,7 +2312,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     if (str) {
                         const def = taskItem.task.definition;
                         newTask = providers.get("script").createTask(path.extname(def.uri.fsPath).substring(1), null,
-                                                                     taskItem.getFolder(),  def.uri, str.trim().split(" "));
+                                                                     taskItem.getFolder(), def.uri, str.trim().split(" "));
+                        //
+                        // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
+                        // an instance of this task.
+                        //
+                        newTask.definition.taskId = this.getTaskItemId(taskItem);
                     }
                     if (await this.runTask(newTask, noTerminal)) {
                         await me.saveTask(taskItem, configuration.get<number>("numLastTasks"));
@@ -2536,7 +2565,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // Show status bar message (if ON in settings)
         //
         this.showStatusMessage(e.execution.task);
-        this.fireTaskChangeEvents(e.execution.task.definition.taskItem);
+        //
+        // Fire change event which will update tree loading icons, etc
+        //
+        this.fireTaskChangeEvents(e.execution.task.definition.taskItem ||
+                                  await this.getTaskItems(e.execution.task.definition.taskId));
     }
 
 
@@ -2547,7 +2580,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // Hide status bar message (if ON in settings)
         //
         this.showStatusMessage(e.execution.task);
-        this.fireTaskChangeEvents(e.execution.task.definition.taskItem);
+        //
+        // Fire change event which will update tree loading icons, etc
+        //
+        this.fireTaskChangeEvents(e.execution.task.definition.taskItem ||
+                                  await this.getTaskItems(e.execution.task.definition.taskId));
     }
 
 }
