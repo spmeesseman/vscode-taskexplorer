@@ -2,7 +2,7 @@
 
 import {
     RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext,
-    commands, window, Uri
+    commands, window, Uri, workspace
 } from "vscode";
 import * as fs from "fs";
 import * as minimatch from "minimatch";
@@ -171,6 +171,16 @@ export function getExcludesGlob(folder: string | WorkspaceFolder): RelativePatte
     }
 
     return relativePattern;
+}
+
+
+export function getPackageManager(): string
+{
+    let pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager") || "npm";
+    if (pkgMgr.match(/(npm|auto)/)) { // pnpm/auto?  only other option is yarn
+        pkgMgr = "npm";
+    }
+    return pkgMgr;
 }
 
 

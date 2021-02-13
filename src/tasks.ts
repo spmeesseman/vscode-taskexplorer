@@ -247,11 +247,7 @@ export class TaskFile extends TreeItem
             //
             if (src === "npm")
             {
-                const pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager");
-                src = pkgMgr || this.taskSource;
-                if (src.match(/(npm|auto)/)) { // pnpm/auto?  only other option is yarn
-                    src = "npm";
-                }
+                src = util.getPackageManager();
             }
             this.iconPath = {
                 light: context.asAbsolutePath(path.join("res", "sources", src + ".svg")),

@@ -2204,7 +2204,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async runNpmCommand(taskFile: TaskFile, command: string)
     {
-        const pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager") || "npm";
+        const pkgMgr = util.getPackageManager();
 
         const options = {
             cwd: path.dirname(taskFile.resourceUri.fsPath)
