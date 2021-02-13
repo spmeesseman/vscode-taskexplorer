@@ -211,6 +211,7 @@ Other contributors:
 
 | Package           | Repository                                                 | Marketplace                                                                                                          |
 | ----------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| vscode-extjs | [GitHub](https://github.com/spmeesseman/vscode-extjs)           | [Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-extjs)      |
 | svn-scm-ext       | [GitHub](https://github.com/spmeesseman/svn-scm-ext)       | [Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.svn-scm-ext)       |
 | vscode-vslauncher | [GitHub](https://github.com/spmeesseman/vscode-vslauncher) | [Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-vslauncher) |
 
