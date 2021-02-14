@@ -12,7 +12,8 @@
             "runtimeExecutable": "${execPath}",
             "args": [
               "--disable-extensions",
-              "--extensionDevelopmentPath=${workspaceFolder}"
+              "--extensionDevelopmentPath=${workspaceFolder}",
+              "${workspaceRoot}"
             ],
             "stopOnEntry": false,
             "sourceMaps": true,
