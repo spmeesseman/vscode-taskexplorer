@@ -74,7 +74,7 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
     // C/C++ Makefile
     //
     if (!cancel && configuration.get<boolean>("enableMake")) {
-        await buildCache("make", constants.GLOB_MAKEFILE, folder, false);
+        await buildCache("make", constants.GLOB_MAKE, folder, false);
     }
     //
     // NPM
@@ -117,14 +117,14 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
     // Typescript
     //
     if (!cancel && configuration.get<boolean>("enableTsc")) {
-        await buildCache("tsc", constants.GLOB_TYPESCRIPT, folder, false);
+        await buildCache("tsc", constants.GLOB_TSC, folder, false);
     }
     //
     // VSCode / Workspace
     // Note that VSCode tasks are provided by VSCode, not this extension
     //
     if (!cancel && configuration.get<boolean>("enableWorkspace")) {
-        await buildCache("workspace", constants.GLOB_VSCODE, folder, false);
+        await buildCache("workspace", constants.GLOB_WORKSPACE, folder, false);
     }
 
     cacheBuilding = false;   // un-set flag

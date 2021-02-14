@@ -226,19 +226,6 @@ export function getPortableDataPath(padding = "")
 }
 
 
-function logUserDataEnv(padding = "")
-{
-    logValue(padding + "os", process.platform, 1);
-    logValue(padding + "portable", process.env.VSCODE_PORTABLE, 1);
-    logValue(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
-    logValue(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 1);
-    logValue(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
-    if (process.platform === "linux") {
-        logValue("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
-    }
-}
-
-
 export function getUserDataPath(padding = "")
 {
     let userPath = "";
@@ -305,6 +292,20 @@ function getDefaultUserDataPath()
         }
     }
     return path.join(appDataPath, "vscode");
+}
+
+
+export function getGlobPattern(taskType: string)
+{
+    if (taskType) {
+        taskType = taskType.replace(/\W*/, "");
+        if (taskType === "ant") {
+            return getAntGlobPattern();
+        }
+        else {
+            return constants["GLOB_" + taskType.toUpperCase()];
+        }
+    }
 }
 
 
@@ -411,6 +412,19 @@ export function logError(msg: string | string[])
         });
     }
     log("***");
+}
+
+
+function logUserDataEnv(padding = "")
+{
+    logValue(padding + "os", process.platform, 1);
+    logValue(padding + "portable", process.env.VSCODE_PORTABLE, 1);
+    logValue(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
+    logValue(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 1);
+    logValue(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
+    if (process.platform === "linux") {
+        logValue("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
+    }
 }
 
 

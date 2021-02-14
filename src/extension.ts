@@ -104,10 +104,12 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 
 export async function addWsFolder(wsf: readonly WorkspaceFolder[])
 {
-    for (const f in wsf) {
-        if (wsf.hasOwnProperty(f)) { // skip over properties inherited by prototype
-            util.log("Workspace folder added: " + wsf[f].name, 1);
-            await cache.addFolderToCache(wsf[f]);
+    if (wsf) {
+        for (const f in wsf) {
+            if (wsf.hasOwnProperty(f)) { // skip over properties inherited by prototype
+                util.log("Workspace folder added: " + wsf[f].name, 1);
+                await cache.addFolderToCache(wsf[f]);
+            }
         }
     }
 }
@@ -161,11 +163,12 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
 async function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
 {
     let refresh: boolean;
-    const taskTypes: string[] = [];
+    const refreshTaskTypes: string[] = [],
+          taskTypes = util.getTaskTypes();
 
     const registerChange = (taskType: string) => {
-        if (util.existsInArray(taskTypes, taskType) === false) {
-            taskTypes.push(taskType);
+        if (util.existsInArray(refreshTaskTypes, taskType) === false) {
+            refreshTaskTypes.push(taskType);
         }
     };
 
@@ -213,84 +216,24 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     // Enable/disable task types
     //
-    if (e.affectsConfiguration("taskExplorer.enableAnt") || e.affectsConfiguration("taskExplorer.includeAnt")) {
-        await registerFileWatcher(context, "ant", util.getAntGlobPattern(), configuration.get<boolean>("enableAnt"));
-        registerChange("ant");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableAppPublisher")) {
-        await registerFileWatcher(context, "app-publisher", constants.GLOB_APPPUBLISHER, false, configuration.get<boolean>("enableAppPublisher"));
-        registerChange("app-publisher");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableBash")) {
-        await registerFileWatcher(context, "bash", constants.GLOB_BASH, true, configuration.get<boolean>("enableBash"));
-        registerChange("bash");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableBatch")) {
-        await registerFileWatcher(context, "batch", constants.GLOB_BATCH, true, configuration.get<boolean>("enableBatch"));
-        registerChange("batch");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableGradle")) {
-        await registerFileWatcher(context, "gradle", constants.GLOB_GRADLE, false, configuration.get<boolean>("enableGradle"));
-        registerChange("gradle");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableGrunt")) {
-        await registerFileWatcher(context, "grunt", constants.GLOB_GRUNT, false, configuration.get<boolean>("enableGrunt"));
-        registerChange("grunt");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableGulp")) {
-        await registerFileWatcher(context, "gulp", constants.GLOB_GULP, false, configuration.get<boolean>("enableGulp"));
-        registerChange("gulp");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableMake")) {
-        await registerFileWatcher(context, "make", constants.GLOB_MAKEFILE, false, configuration.get<boolean>("enableMake"));
-        registerChange("make");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableNpm")) {
-        await registerFileWatcher(context, "npm", constants.GLOB_NPM, false, configuration.get<boolean>("enableNpm"));
-        registerChange("npm");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableNsis")) {
-        await registerFileWatcher(context, "nsis", constants.GLOB_NSIS, true, configuration.get<boolean>("enableNsis"));
-        registerChange("nsis");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enablePerl")) {
-        await registerFileWatcher(context, "perl", constants.GLOB_PERL, true, configuration.get<boolean>("enablePerl"));
-         registerChange("perl");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enablePowershell")) {
-        await registerFileWatcher(context, "powershell", constants.GLOB_POWERSHELL, true, configuration.get<boolean>("enablePowershell"));
-        registerChange("powershell");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enablePython")) {
-        await registerFileWatcher(context, "python", constants.GLOB_PYTHON, true, configuration.get<boolean>("enablePython"));
-        registerChange("python");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableRuby")) {
-        await registerFileWatcher(context, "ruby", constants.GLOB_RUBY, true, configuration.get<boolean>("enableRuby"));
-        registerChange("ruby");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableTsc")) {
-        await registerFileWatcher(context, "tsc", constants.GLOB_TYPESCRIPT, false, configuration.get<boolean>("enableTsc"));
-        registerChange("tsc");
-    }
-
-    if (e.affectsConfiguration("taskExplorer.enableWorkspace")) {
-        await registerFileWatcher(context, "workspace", constants.GLOB_VSCODE, false, configuration.get<boolean>("enableWorkspace"));
-        registerChange("workspace");
+    if (taskTypes)
+    {
+        for (const i in taskTypes)
+        {
+            const taskType = taskTypes[i],
+                  taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher",
+                  enabledSetting = "enable" + taskTypeP;
+            let configAffected = e.affectsConfiguration("taskExplorer." + enabledSetting);
+            if (taskType === "ant") {
+                configAffected = configAffected || e.affectsConfiguration("taskExplorer.includeAnt");
+            }
+            if (configuration.get<boolean>("enable" + taskTypeP))
+            {
+                const watchModify = util.isScriptType(taskType) || taskType === "app-publisher";
+                await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), watchModify, configuration.get<boolean>(enabledSetting));
+                registerChange(taskType);
+            }
+        }
     }
 
     //
@@ -300,11 +243,11 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     {
         if (type === "app-publisher") {
             if (e.affectsConfiguration("taskExplorer.pathToAppPublisher")) {
-                taskTypes.push("app-publisher");
+                refreshTaskTypes.push("app-publisher");
             }
         }
         else if (e.affectsConfiguration("taskExplorer.pathTo" + util.properCase(type))) {
-            taskTypes.push(type);
+            refreshTaskTypes.push(type);
         }
     });
 
@@ -312,7 +255,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     // Extra Apache Ant 'include' paths
     //
     if (e.affectsConfiguration("taskExplorer.includeAnt")) {
-        if (util.existsInArray(taskTypes, "ant") === false){
+        if (util.existsInArray(refreshTaskTypes, "ant") === false){
             await registerFileWatcher(context, "ant", util.getAntGlobPattern(), configuration.get<boolean>("enableAnt"));
             registerChange("ant");
         }
@@ -392,8 +335,8 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     if (refresh) {
         await refreshTree();
     }
-    else if (taskTypes?.length > 0) {
-        util.forEachAsync(taskTypes, async (t: string) => {
+    else if (refreshTaskTypes?.length > 0) {
+        await util.forEachAsync(refreshTaskTypes, async (t: string) => {
             await refreshTree(t);
         });
     }
@@ -402,69 +345,19 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
 
 async function registerFileWatchers(context: ExtensionContext)
 {
-    if (configuration.get<boolean>("enableAnt"))
+    const taskTypes = util.getTaskTypes();
+    if (taskTypes)
     {
-        await registerFileWatcher(context, "ant", util.getAntGlobPattern());
-    }
-
-    if (configuration.get<boolean>("enableAppPublisher")) {
-        await registerFileWatcher(context, "app-publisher", constants.GLOB_APPPUBLISHER, true);
-    }
-
-    if (configuration.get<boolean>("enableBash")) {
-        await registerFileWatcher(context, "bash", constants.GLOB_BASH, true);
-    }
-
-    if (configuration.get<boolean>("enableBatch")) {
-        await registerFileWatcher(context, "batch", constants.GLOB_BATCH, true);
-    }
-
-    if (configuration.get<boolean>("enableGradle")) {
-        await registerFileWatcher(context, "gradle", constants.GLOB_GRADLE);
-    }
-
-    if (configuration.get<boolean>("enableGrunt")) {
-        await registerFileWatcher(context, "grunt", constants.GLOB_GRUNT);
-    }
-
-    if (configuration.get<boolean>("enableGulp")) {
-        await registerFileWatcher(context, "gulp", constants.GLOB_GULP);
-    }
-
-    if (configuration.get<boolean>("enableMake")) {
-        await registerFileWatcher(context, "make", constants.GLOB_MAKEFILE);
-    }
-
-    if (configuration.get<boolean>("enableNpm")) {
-        await registerFileWatcher(context, "npm", constants.GLOB_NPM);
-    }
-
-    if (configuration.get<boolean>("enableNsis")) {
-        await registerFileWatcher(context, "nsis", constants.GLOB_NSIS, true);
-    }
-
-    if (configuration.get<boolean>("enablePerl")) {
-        await registerFileWatcher(context, "perl", constants.GLOB_PERL, true);
-    }
-
-    if (configuration.get<boolean>("enablePowershell")) {
-        await registerFileWatcher(context, "powershell", constants.GLOB_POWERSHELL, true);
-    }
-
-    if (configuration.get<boolean>("enablePython")) {
-        await registerFileWatcher(context, "python", constants.GLOB_PYTHON, true);
-    }
-
-    if (configuration.get<boolean>("enableRuby")) {
-        await registerFileWatcher(context, "ruby", constants.GLOB_RUBY, true);
-    }
-
-    if (configuration.get<boolean>("enableTsc")) {
-        await registerFileWatcher(context, "tsc", constants.GLOB_TYPESCRIPT);
-    }
-
-    if (configuration.get<boolean>("enableWorkspace")) {
-        await registerFileWatcher(context, "workspace", constants.GLOB_VSCODE);
+        for (const i in taskTypes)
+        {
+            const taskType = taskTypes[i],
+                  taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher";
+            if (configuration.get<boolean>("enable" + taskTypeP))
+            {
+                const watchModify = util.isScriptType(taskType) || taskType === "app-publisher";
+                await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), watchModify);
+            }
+        }
     }
 }
 
@@ -532,7 +425,7 @@ function registerTaskProviders(context: ExtensionContext)
 }
 
 
-async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, isScriptType?: boolean, enabled?: boolean)
+async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, ignorehModify?: boolean, enabled?: boolean)
 {
     util.log("Register file watcher for task type '" + taskType + "'");
 
@@ -559,7 +452,7 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
             watchers.set(taskType, watcher);
             context.subscriptions.push(watcher);
         }
-        if (!isScriptType) {
+        if (!ignorehModify) {
             watcherDisposables.set(taskType, watcher.onDidChange(async _e => {
                 logFileWatcherEvent(_e, "change");
                 await refreshTree(taskType, _e);
