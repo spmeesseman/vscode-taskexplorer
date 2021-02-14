@@ -375,7 +375,7 @@ export function log(msg: string, level?: number)
         return;
     }
 
-    if (configuration.get("debug") === true)
+    if (isLoggingEnabled())
     {
         const tsMsg = new Date().toISOString().replace(/[TZ]/g, " ") + msg;
         if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
