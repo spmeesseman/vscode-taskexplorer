@@ -230,8 +230,8 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
             }
             if (configuration.get<boolean>("enable" + taskTypeP))
             {
-                const watchModify = util.isScriptType(taskType) || taskType === "app-publisher";
-                await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), watchModify, configuration.get<boolean>(enabledSetting));
+                const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher";
+                await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), ignoreModify, configuration.get<boolean>(enabledSetting));
                 registerChange(taskType);
             }
         }

@@ -298,7 +298,7 @@ function getDefaultUserDataPath()
 export function getGlobPattern(taskType: string)
 {
     if (taskType) {
-        taskType = taskType.replace(/\W*/, "");
+        taskType = taskType.replace(/\W*\-/, "");
         if (taskType === "ant") {
             return getAntGlobPattern();
         }
