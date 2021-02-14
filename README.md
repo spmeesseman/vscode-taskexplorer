@@ -61,45 +61,45 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Requirements
 
-* Visual Studio Code v1.50+
+- Visual Studio Code v1.50+
 
 "Should" work with VSCode versions 1.30 and above, but am no longer running tests against VSCode versions below 1.50 as of 2/5/2021 (v1.28.0).
 
 ## Features by Version
 
-* v2.0  - All async-await processing, Favorites (closes [#101](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)), Clear special task lists
-* v1.30 - Configurable default click action (closes [#97](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)), Add 'Run with Arguments' command (closes [#88](https://github.com/spmeesseman/vscode-taskexplorer/issues/88)), Add 'Run with NoTerminal' command (closes [#39](https://github.com/spmeesseman/vscode-taskexplorer/issues/39)) (note that as of VSCode 1.53, there seems to be a bug that prevents running tasks without showing the terminal).
-* v1.29 - Support multi-level task groupings (closes [#129](https://github.com/spmeesseman/vscode-taskexplorer/issues/129)), Support user tasks (closes [#127](https://github.com/spmeesseman/vscode-taskexplorer/issues/127))
-* v1.28 - Support Makefile aliases (thanks **MichaelCurrin**)
-* v1.27 - Use gulp and ant to find their respective tasks (configurable on/off) (closes [#105](https://github.com/spmeesseman/vscode-taskexplorer/issues/105)), Make grouping separator configurable (thanks **richarddavenport**)
-* v1.26 - Add 'Running Task' status bar message (refs [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
-* v1.25 - Add 'Last Tasks' pseudo-folder
-* v1.24 - Add 'Open Terminal' button to running tasks (closes [#23](https://github.com/spmeesseman/vscode-taskexplorer/issues/23))
-* v1.23 - Task groupings with dashed task groups (Off by default)
-* v1.22 - Major performance enhancements - Task Tree / Task Scanning
-* v1.21 - Add option to keep terminal open after stopping task (closes [#51](https://github.com/spmeesseman/vscode-taskexplorer/issues/51))
-* v1.20 - Add support for restarting task (thanks **antfu**)
-* v1.19 - App-Publisher task support for BETA testing
-* v1.18 - Add 'Add to excludes' action in task file node context menu
-* v1.17 - Add 'Run last task' button to titlebar
-* v1.16 - Add npm management tasks to npm file node context menus
-* v1.15 - Support for gradle tasks (includes provider) (closes [#15](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
-* v1.14 - Support for grunt and gulp task files not located in the project root (closes [#12](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
-* v1.13 - Multiple task files of the same type placed within a group node for less clutter in folder level nodes
-* v1.12 - Support for bash, batch, perl, powershell, python, ruby, and nsis scripts (includes provider)
-* v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
-* v1.10 - Support for Makefiles (includes provider)
-* v1.9 - Support for gulp and grunt tasks (includes provider)
-* v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
-* v1.7 - Two view types - Use one or both of either SideBar View and/or Explorer Tray
-* v1.6 - Progress icons for running tasks
-* v1.6 - Stop execution button for running tasks
-* v1.5 - Support for Apache Ant tasks (includes provider)
-* v1.4 - Support for TSC tasks
-* v1.3 - Support for Visual Studio Code tasks
-* v1.2 - Convenient layout - groups all tasks by project folder, by task file, by task
-* v1.1 - Supports multi-root or single-root workspaces
-* v1.0 - Open and launch NPM scripts as tasks
+- v2.0  - All async-await processing, Favorites (closes [#101](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)), Clear special task lists
+- v1.30 - Configurable default click action (closes [#97](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)), Add 'Run with Arguments' command (closes [#88](https://github.com/spmeesseman/vscode-taskexplorer/issues/88)), Add 'Run with NoTerminal' command (closes [#39](https://github.com/spmeesseman/vscode-taskexplorer/issues/39)) (note that as of VSCode 1.53, there seems to be a bug that prevents running tasks without showing the terminal).
+- v1.29 - Support multi-level task groupings (closes [#129](https://github.com/spmeesseman/vscode-taskexplorer/issues/129)), Support user tasks (closes [#127](https://github.com/spmeesseman/vscode-taskexplorer/issues/127))
+- v1.28 - Support Makefile aliases (thanks **MichaelCurrin**)
+- v1.27 - Use gulp and ant to find their respective tasks (configurable on/off) (closes [#105](https://github.com/spmeesseman/vscode-taskexplorer/issues/105)), Make grouping separator configurable (thanks **richarddavenport**)
+- v1.26 - Add 'Running Task' status bar message (refs [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
+- v1.25 - Add 'Last Tasks' pseudo-folder
+- v1.24 - Add 'Open Terminal' button to running tasks (closes [#23](https://github.com/spmeesseman/vscode-taskexplorer/issues/23))
+- v1.23 - Task groupings with dashed task groups (Off by default)
+- v1.22 - Major performance enhancements - Task Tree / Task Scanning
+- v1.21 - Add option to keep terminal open after stopping task (closes [#51](https://github.com/spmeesseman/vscode-taskexplorer/issues/51))
+- v1.20 - Add support for restarting task (thanks **antfu**)
+- v1.19 - App-Publisher task support for BETA testing
+- v1.18 - Add 'Add to excludes' action in task file node context menu
+- v1.17 - Add 'Run last task' button to titlebar
+- v1.16 - Add npm management tasks to npm file node context menus
+- v1.15 - Support for gradle tasks (includes provider) (closes [#15](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
+- v1.14 - Support for grunt and gulp task files not located in the project root (closes [#12](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
+- v1.13 - Multiple task files of the same type placed within a group node for less clutter in folder level nodes
+- v1.12 - Support for bash, batch, perl, powershell, python, ruby, and nsis scripts (includes provider)
+- v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
+- v1.10 - Support for Makefiles (includes provider)
+- v1.9 - Support for gulp and grunt tasks (includes provider)
+- v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
+- v1.7 - Two view types - Use one or both of either SideBar View and/or Explorer Tray
+- v1.6 - Progress icons for running tasks
+- v1.6 - Stop execution button for running tasks
+- v1.5 - Support for Apache Ant tasks (includes provider)
+- v1.4 - Support for TSC tasks
+- v1.3 - Support for Visual Studio Code tasks
+- v1.2 - Convenient layout - groups all tasks by project folder, by task file, by task
+- v1.1 - Supports multi-root or single-root workspaces
+- v1.0 - Open and launch NPM scripts as tasks
 
 ## Version 2
 
@@ -116,7 +116,7 @@ Version 2 highlights 2 major performance enhancements along with several feature
 
 The setting *exclude* defines a file/directory pattern or an array of file/directory patterns to ignore using *Glob Patterns* or a valid *File URI*.  The setting applies to all script types.  For example:
 
-* `taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**", "/c:/projects/project1/src/theme/test/package.json" ]`
+- `taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**", "/c:/projects/project1/src/theme/test/package.json" ]`
 
 Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.  Using the *exclude* configuration can greatly improve performance in large workspaces if configured correctly.
 
@@ -124,7 +124,7 @@ Task files that are found by Task Explorer can also be added to the *excludes* l
 
 **Apache Ant** uses an .xml file extension, the setting *includeAnt* can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting defines a file pattern or an array of file patterns to include using *Glob Patterns* or a valid *File URI*, for example:
 
-* `taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml", "/c:/projects/project1/scripts/test/antetests.xml" ]`
+- `taskExplorer.includeAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml", "/c:/projects/project1/scripts/test/antetests.xml" ]`
 
 Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **Ant** includes list in all cases.  If you don't include the asterisked glob pattern `**/` first in the string, files in sub-folders will not be found.
 
@@ -171,8 +171,8 @@ By enabling the *Group With Separator* option in Settings and setting the *Group
 
 The following tasks are provided by VSCode:
 
-* Workspace (.vscode/tasks.json)
-* NPM (**/package.json)
+- Workspace (.vscode/tasks.json)
+- NPM (**/package.json)
 
 All other tasks are internally provided.  Workspace tasks are detected by VSCode in all cases.  However, NPM tasks are detected only if the setting `'Npm -> Auto Detect'` is turned on in VSCode Settings.  By default this is turned on, but if NPM tasks are not displaying, please check this setting, also check the setting that turns npm package management off in favor of Yarn `'Npm -> Package manager'`.  A future release will contain internally provided NPM and Yarn tasks.  Note these tasks are still displayed in the Task Tree, just not "provided" by this extension.
 
@@ -184,11 +184,11 @@ Bash/sh scripts in Windows will have the shell executable automatically set to a
 
 ## Feedback & Contributing
 
-* Please report any bugs, suggestions or documentation requests via the
+- Please report any bugs, suggestions or documentation requests via the
   [Issues](https://github.com/spmeesseman/vscode-taskexplorer/issues)
-* Feel free to submit
+- Feel free to submit
   [Pull Requests](https://github.com/spmeesseman/vscode-taskexplorer/pulls)
-* [Contributors](https://github.com/spmeesseman/vscode-taskexplorer/graphs/contributors)
+- [Contributors](https://github.com/spmeesseman/vscode-taskexplorer/graphs/contributors)
 
 ### Rate It - Leave Some Stars
 
@@ -196,16 +196,17 @@ Please rate your experience with stars... [like five of them ;)](https://marketp
 
 ## Thank You
 
-* The [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme) for some of the task type icons.
-* The author of the [NSIS Extension](https://marketplace.visualstudio.com/items?itemName=idleberg.nsis) **idleberg** for NSIS graphics.
+- **PKief** from GiHub and his [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme) for some of the task type icons.  The project can be found [here](https://github.com/PKief/vscode-material-icon-theme).
+- The author of the [NSIS Extension](https://marketplace.visualstudio.com/items?itemName=idleberg.nsis) **idleberg** for NSIS graphics.
 
 Other contributors:
-* antfu
-* eamodio (fixed [#114](https://github.com/spmeesseman/vscode-taskexplorer/issues/114))
-* MichaelCurrin
-* tiansin
-* JacobParis
-* Spitfire1900
+
+- antfu
+- eamodio (fixed [#114](https://github.com/spmeesseman/vscode-taskexplorer/issues/114))
+- MichaelCurrin
+- tiansin
+- JacobParis
+- Spitfire1900
 
 ## Other Code Extensions by spmeesseman
 

@@ -120,11 +120,10 @@
 	"taskdef.task.uri": "The uri of the task file.",
 	"taskdef.task.taskItemId": "The tree item id that the task is associated with.",
 	"taskdef.task.isDefault": "For Ant tasks, indicates the 'default' task.",
-
-	"taskdef.script.scriptType": "The type of script (bash, batch, pythin, etc...).",
-	"taskdef.script.cmdLine": "The command line used to execute the script in a shell.",
-	"taskdef.script.scriptFile": "Boolean to display filename as the script target. Set to true.",
-	"taskdef.script.takesArgs": "Boolean to indicate if the script accepts command line args.",
+	"taskdef.task.scriptType": "The type of script (bash, batch, pythin, etc...).",
+	"taskdef.task.cmdLine": "The command line used to execute the script in a shell.",
+	"taskdef.task.scriptFile": "Boolean to display filename as the script target. Set to true.",
+	"taskdef.task.takesArgs": "Boolean to indicate if the script accepts command line args.",
 
 	"view.name": "Task Explorer",
 
