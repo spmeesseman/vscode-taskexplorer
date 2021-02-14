@@ -84,31 +84,46 @@ export class AntTaskProvider implements TaskExplorerProvider
     }
 
 
-
-    public async readAntfile(uri: Uri): Promise<Task[]>
+    public createTask(target: string, cmdName: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task
     {
-        const result: Task[] = [];
-        const folder = workspace.getWorkspaceFolder(uri);
+        const cwd = path.dirname(uri.fsPath),
+              def = this.getDefaultDefinition(target, folder, uri);
+        let args = [ target ],
+            options: any = {  cwd };
 
-        util.logBlank(1);
-        util.log("read ant file", 1);
-        util.logValue("   file", uri.fsPath, 2);
-        util.logValue("   project folder", folder.name, 2);
-
-        if (folder)
+        //
+        // Ansicon for Windows
+        //
+        if (process.platform === "win32" && configuration.get("enableAnsiconForAnt") === true)
         {
-            const scripts = await this.findAllAntScripts(uri.fsPath);
-            if (scripts)
-            {
-                await util.forEachAsync(Object.keys(scripts), (k: string) => {
-                    const task = this.createTask(scripts[k] ? scripts[k] : k, k, folder, uri);
-                    task.group = TaskGroup.Build;
-                    result.push(task);
-                });
+            let ansicon = "ansicon.exe";
+            const ansiPath: string = configuration.get("pathToAnsicon");
+            if (ansiPath && util.pathExists(ansiPath)) {
+                ansicon = ansiPath;
+                if (!ansicon.endsWith("ansicon.exe") && !ansicon.endsWith("\\")) {
+                    ansicon = path.join(ansicon, "ansicon.exe");
+                }
+                else if (!ansicon.endsWith("ansicon.exe")) {
+                    ansicon += "ansicon.exe";
+                }
             }
+
+            args = [ "-logger", "org.apache.tools.ant.listener.AnsiColorLogger", target ];
+            options = {
+                cwd,
+                executable: ansicon
+            };
         }
 
-        return result;
+        if (def.fileName?.toLowerCase() !== "build.xml")
+        {
+            args.push("-f");
+            args.push(def.fileName);
+        }
+
+        const execution = new ShellExecution(this.getCommand(), args, options);
+
+        return new Task(def, folder, cmdName ? cmdName : target, "ant", execution, undefined);
     }
 
 
@@ -276,67 +291,44 @@ export class AntTaskProvider implements TaskExplorerProvider
     }
 
 
-    public createTask(target: string, cmdName: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task
+    public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
-        const getRelativePath = (folder: WorkspaceFolder, uri: Uri): string =>
-        {
-            if (folder) {
-                const rootUri = folder.uri;
-                const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
-                return absolutePath.substring(rootUri.path.length + 1);
-            }
-            return "";
-        };
-
-        const cwd = path.dirname(uri.fsPath);
-        const antFile = path.basename(uri.path);
-        let args = [ target ];
-
-        let options: any = {
-            cwd
-        };
-
-        const kind: TaskExplorerDefinition = {
+        const def: TaskExplorerDefinition = {
             type: "ant",
             script: target,
-            path: getRelativePath(folder, uri),
-            fileName: antFile,
+            target,
+            path: util.getRelativePath(folder, uri),
+            fileName: path.basename(uri.path),
             uri
         };
+        return def;
+    }
 
-        //
-        // Ansicon for Windows
-        //
-        if (process.platform === "win32" && configuration.get("enableAnsiconForAnt") === true)
+
+    public async readAntfile(uri: Uri): Promise<Task[]>
+    {
+        const result: Task[] = [];
+        const folder = workspace.getWorkspaceFolder(uri);
+
+        util.logBlank(1);
+        util.log("read ant file", 1);
+        util.logValue("   file", uri.fsPath, 2);
+        util.logValue("   project folder", folder.name, 2);
+
+        if (folder)
         {
-            let ansicon = "ansicon.exe";
-            const ansiPath: string = configuration.get("pathToAnsicon");
-            if (ansiPath && util.pathExists(ansiPath)) {
-                ansicon = ansiPath;
-                if (!ansicon.endsWith("ansicon.exe") && !ansicon.endsWith("\\")) {
-                    ansicon = path.join(ansicon, "ansicon.exe");
-                }
-                else if (!ansicon.endsWith("ansicon.exe")) {
-                    ansicon += "ansicon.exe";
-                }
+            const scripts = await this.findAllAntScripts(uri.fsPath);
+            if (scripts)
+            {
+                await util.forEachAsync(Object.keys(scripts), (k: string) => {
+                    const task = this.createTask(scripts[k] ? scripts[k] : k, k, folder, uri);
+                    task.group = TaskGroup.Build;
+                    result.push(task);
+                });
             }
-
-            args = [ "-logger", "org.apache.tools.ant.listener.AnsiColorLogger", target ];
-            options = {
-                cwd,
-                executable: ansicon
-            };
         }
 
-        if (antFile.toLowerCase() !== "build.xml")
-        {
-            args.push("-f");
-            args.push(antFile);
-        }
-
-        const execution = new ShellExecution(this.getCommand(), args, options);
-
-        return new Task(kind, folder, cmdName ? cmdName : target, "ant", execution, undefined);
+        return result;
     }
 
 }

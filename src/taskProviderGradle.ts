@@ -51,33 +51,85 @@ export class GradleTaskProvider implements TaskExplorerProvider
             return gradle;
         };
 
-        const getRelativePath = (folder: WorkspaceFolder, uri: Uri): string =>
-        {
-            if (folder)
-            {
-                const rootUri = folder.uri;
-                const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
-                return absolutePath.substring(rootUri.path.length + 1);
-            }
-            return "";
-        };
-
-        const kind: TaskExplorerDefinition = {
-            type: "gradle",
-            script: target,
-            path: getRelativePath(folder, uri),
-            fileName: path.basename(uri.path),
-            uri
-        };
-
+        const def = this.getDefaultDefinition(target, folder, uri);
         const cwd = path.dirname(uri.fsPath);
         const args = [target];
-        const options = {
-            cwd
-        };
+        const options = { cwd };
         const execution = new ShellExecution(getCommand(folder, cmd), args, options);
 
-        return new Task(kind, folder, target, "gradle", execution, undefined);
+        return new Task(def, folder, target, "gradle", execution, undefined);
+    }
+
+
+    private async detectGradlefiles(): Promise<Task[]>
+    {
+        util.log("");
+        util.log("detectGradlefiles");
+
+        const allTasks: Task[] = [];
+        const visitedFiles: Set<string> = new Set();
+        const paths = filesCache.get("gradle");
+
+        if (workspace.workspaceFolders && paths)
+        {
+            for (const fobj of paths)
+            {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                    visitedFiles.add(fobj.uri.fsPath);
+                    const tasks = await this.readGradlefile(fobj.uri);
+                    allTasks.push(...tasks);
+                }
+            }
+        }
+
+        util.logValue("   # of tasks", allTasks.length, 2);
+        return allTasks;
+    }
+
+
+    private async findTargets(fsPath: string): Promise<string[]>
+    {
+        const json: any = "";
+        const scripts: string[] = [];
+
+        util.log("   Find gradlefile targets");
+
+        const contents = await util.readFile(fsPath);
+        let idx = 0;
+        let eol = contents.indexOf("\n", 0);
+
+        while (eol !== -1)
+        {
+            const line: string = contents.substring(idx, eol).trim();
+            if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("task "))
+            {
+                let idx1 = line.trimLeft().indexOf(" ");
+                if (idx1 !== -1)
+                {
+                    idx1++;
+                    let idx2 = line.indexOf("(", idx1);
+                    if (idx2 === -1) {
+                        idx2 = line.indexOf("{", idx1);
+                    }
+                    if (idx2 !== -1)
+                    {
+                        const tgtName = line.substring(idx1, idx2).trim();
+
+                        if (tgtName)
+                        {
+                            scripts.push(tgtName);
+                            util.log("      found target");
+                            util.logValue("         name", tgtName);
+                        }
+                    }
+                }
+            }
+
+            idx = eol + 1;
+            eol = contents.indexOf("\n", idx);
+        }
+
+        return scripts;
     }
 
 
@@ -128,29 +180,17 @@ export class GradleTaskProvider implements TaskExplorerProvider
     }
 
 
-    private async detectGradlefiles(): Promise<Task[]>
+    public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
-        util.log("");
-        util.log("detectGradlefiles");
-
-        const allTasks: Task[] = [];
-        const visitedFiles: Set<string> = new Set();
-        const paths = filesCache.get("gradle");
-
-        if (workspace.workspaceFolders && paths)
-        {
-            for (const fobj of paths)
-            {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readGradlefile(fobj.uri);
-                    allTasks.push(...tasks);
-                }
-            }
-        }
-
-        util.logValue("   # of tasks", allTasks.length, 2);
-        return allTasks;
+        const def: TaskExplorerDefinition = {
+            type: "gradle",
+            script: target,
+            target,
+            path: util.getRelativePath(folder, uri),
+            fileName: path.basename(uri.path),
+            uri
+        };
+        return def;
     }
 
 
@@ -174,52 +214,6 @@ export class GradleTaskProvider implements TaskExplorerProvider
         }
 
         return result;
-    }
-
-
-    private async findTargets(fsPath: string): Promise<string[]>
-    {
-        const json: any = "";
-        const scripts: string[] = [];
-
-        util.log("   Find gradlefile targets");
-
-        const contents = await util.readFile(fsPath);
-        let idx = 0;
-        let eol = contents.indexOf("\n", 0);
-
-        while (eol !== -1)
-        {
-            const line: string = contents.substring(idx, eol).trim();
-            if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("task "))
-            {
-                let idx1 = line.trimLeft().indexOf(" ");
-                if (idx1 !== -1)
-                {
-                    idx1++;
-                    let idx2 = line.indexOf("(", idx1);
-                    if (idx2 === -1) {
-                        idx2 = line.indexOf("{", idx1);
-                    }
-                    if (idx2 !== -1)
-                    {
-                        const tgtName = line.substring(idx1, idx2).trim();
-
-                        if (tgtName)
-                        {
-                            scripts.push(tgtName);
-                            util.log("      found target");
-                            util.logValue("         name", tgtName);
-                        }
-                    }
-                }
-            }
-
-            idx = eol + 1;
-            eol = contents.indexOf("\n", idx);
-        }
-
-        return scripts;
     }
 
 }

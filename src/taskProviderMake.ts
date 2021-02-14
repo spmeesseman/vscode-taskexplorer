@@ -76,25 +76,7 @@ export class MakeTaskProvider implements TaskExplorerProvider
             return make;
         };
 
-        const getRelativePath = (folder: WorkspaceFolder, uri: Uri): string =>
-        {
-            if (folder)
-            {
-                const rootUri = folder.uri;
-                const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
-                return absolutePath.substring(rootUri.path.length + 1);
-            }
-            return "";
-        };
-
-        const kind: TaskExplorerDefinition = {
-            type: "make",
-            script: target,
-            path: getRelativePath(folder, uri),
-            fileName: path.basename(uri.path),
-            problemMatcher: "",
-            uri
-        };
+        const kind = this.getDefaultDefinition(target, folder, uri);
 
         const cwd = path.dirname(uri.fsPath);
         const args = [target];
@@ -110,6 +92,21 @@ export class MakeTaskProvider implements TaskExplorerProvider
         }
 
         return new Task(kind, folder, target, "make", execution, problemMatcher);
+    }
+
+
+    public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    {
+        const def: TaskExplorerDefinition = {
+            type: "make",
+            script: target,
+            target,
+            path: util.getRelativePath(folder, uri),
+            fileName: path.basename(uri.path),
+            problemMatcher: "",
+            uri
+        };
+        return def;
     }
 
 

@@ -112,16 +112,19 @@
 
 	"taskExplorer.parseError": "Task Explorer task detection: failed to parse the file {0}",
 
-	"taskdef.task.fileName": "The ant file that target was found in. Can be omitted.",
-	"taskdef.task.script": "The target/script name.",
-	"taskdef.task.path": "The relative path to the folder that contains the task file. Can be omitted.",
-	"taskdef.task.uri": "The uri of the task file. Can be omitted.",
-	"taskdef.task.treeItem": "The tree item that the task is associated with. Can be omitted.",
+	"taskdef.task.fileName": "The file that the target was found in.",
+	"taskdef.task.fileUri": "The uri object of file that the target was found in.",
+	"taskdef.task.script": "The script/target name.",
+	"taskdef.task.target": "The target name.",
+	"taskdef.task.path": "The relative path to the folder that contains the task file.",
+	"taskdef.task.uri": "The uri of the task file.",
+	"taskdef.task.taskItemId": "The tree item id that the task is associated with.",
+	"taskdef.task.isDefault": "For Ant tasks, indicates the 'default' task.",
 
 	"taskdef.script.scriptType": "The type of script (bash, batch, pythin, etc...).",
 	"taskdef.script.cmdLine": "The command line used to execute the script in a shell.",
 	"taskdef.script.scriptFile": "Boolean to display filename as the script target. Set to true.",
-	"taskdef.script.requiresArgs": "Boolean to indicate if the script requires command line args.",
+	"taskdef.script.takesArgs": "Boolean to indicate if the script accepts command line args.",
 
 	"view.name": "Task Explorer",
 

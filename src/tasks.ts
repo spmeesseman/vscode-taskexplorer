@@ -80,9 +80,9 @@ export class TaskItem extends TreeItem
         //
         this.taskSource = task.source;
         //
-        // Set taskItem on the task deinfition object for use in the task start/stop events
+        // Set taskItemId on the task deinfition object for use in the task start/stop events
         //
-        this.task.definition.taskItem = this;
+        this.task.definition.taskItemId = this.id;
         //
         // Node path
         //
@@ -134,11 +134,8 @@ export class TaskItem extends TreeItem
         //
         if (task.definition.scriptFile || this.taskSource === "gradle") {
             this.contextValue = running ? "scriptRunning" : "scriptFile";
-        }       //
-        else { // Note 2/8/2021
-              // I think "$composite" was the old definition type for composite tasks, because as of Code v1.53,
-             // the task definition type for a comosite task is "$empty".
-            //
+        }
+        else {
             this.contextValue = running ? "scriptRunning" : "script";
         }
     }
@@ -146,11 +143,9 @@ export class TaskItem extends TreeItem
 
     setIconPath(task: Task, context: ExtensionContext, running: boolean)
     {   //
-        // Note 2/8/2021
-        // I think "$composite" was the old definition type for composite tasks, because as of Code v1.53,
-        // the task definition type for a comosite task is "$empty".
+        // Type "$empty" is a composite tasks
         //
-        if (running && task.definition.type !== "$composite")
+        if (running) // && task.definition.type !== "$empty")
         {
             this.iconPath = {
                 light: context.asAbsolutePath(path.join("res", "light", "loading.svg")),

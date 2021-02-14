@@ -115,74 +115,43 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
 
     public createTasks(folder: WorkspaceFolder, uri: Uri): Task[]
     {
-        const getRelativePath = (folder: WorkspaceFolder, uri: Uri): string =>
-        {
-            if (folder) {
-                const rootUri = folder.uri;
-                const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
-                return absolutePath.substring(rootUri.path.length + 1);
-            }
-            return "";
-        };
-
-        const cwd = path.dirname(uri.fsPath);
-        const fileName = path.basename(uri.fsPath);
-        const relativePath = getRelativePath(folder, uri);
+        const cwd = path.dirname(uri.fsPath),
+              defaultDef = this.getDefaultDefinition(null, folder, uri),
+              options: ShellExecutionOptions = { cwd };
 
         const kind1: TaskExplorerDefinition = {
-            type: "app-publisher",
-            fileName,
-            path: relativePath,
-            cmdLine: "npx app-publisher -p ps --no-ci --republish",
-            requiresArgs: false,
-            uri
+            ...defaultDef,
+            ...{
+                cmdLine: "npx app-publisher -p ps --no-ci --republish"
+            }
         };
 
         const kind2: TaskExplorerDefinition = {
-            type: "app-publisher",
-            fileName,
-            path: relativePath,
-            cmdLine: "npx app-publisher -p ps --no-ci --email-only",
-            uri
-        };
-
-        const kind3: TaskExplorerDefinition = {
-            type: "app-publisher",
-            fileName,
-            path: relativePath,
-            cmdLine: "npx app-publisher -p ps --no-ci",
-            uri
+            ...defaultDef,
+            ...{
+                cmdLine: "npx app-publisher -p ps --no-ci --email-only",
+            }
         };
 
         const kind4: TaskExplorerDefinition = {
-            type: "app-publisher",
-            fileName,
-            path: relativePath,
-            cmdLine: "npx app-publisher -p ps --no-ci --dry-run",
-            uri
+            ...defaultDef,
+            ...{
+                cmdLine: "npx app-publisher -p ps --no-ci --dry-run",
+            }
         };
 
         const kind5: TaskExplorerDefinition = {
-            type: "app-publisher",
-            fileName,
-            path: relativePath,
-            cmdLine: "npx app-publisher -p ps --no-ci --mantis-only",
-            uri
+            ...defaultDef,
+            ...{
+                cmdLine: "npx app-publisher -p ps --no-ci --mantis-only",
+            }
         };
 
         const kind6: TaskExplorerDefinition = {
-            type: "app-publisher",
-            fileName,
-            path: relativePath,
-            cmdLine: "npx app-publisher -p ps --no-ci --prompt-version",
-            uri
-        };
-
-        //
-        // Set current working dircetory in oprions to relative script dir
-        //
-        const options: ShellExecutionOptions = {
-            cwd
+            ...defaultDef,
+            ...{
+                cmdLine: "npx app-publisher -p ps --no-ci --prompt-version",
+            }
         };
 
         //
@@ -190,16 +159,33 @@ export class AppPublisherTaskProvider implements TaskExplorerProvider
         //
         const execution1 = new ShellExecution(kind1.cmdLine, options);
         const execution2 = new ShellExecution(kind2.cmdLine, options);
-        const execution3 = new ShellExecution(kind3.cmdLine, options);
+        const execution3 = new ShellExecution(defaultDef.cmdLine, options);
         const execution4 = new ShellExecution(kind4.cmdLine, options);
         const execution5 = new ShellExecution(kind5.cmdLine, options);
         const execution6 = new ShellExecution(kind6.cmdLine, options);
 
         return [ new Task(kind4, folder, "Dry Run", "app-publisher", execution4, undefined),
-                new Task(kind3, folder, "Publish", "app-publisher", execution3, undefined),
+                new Task(defaultDef, folder, "Publish", "app-publisher", execution3, undefined),
                 new Task(kind1, folder, "Re-publish", "app-publisher", execution1, undefined),
                 new Task(kind1, folder, "Publish Mantis Release", "app-publisher", execution5, undefined),
                 new Task(kind5, folder, "Send Release Email", "app-publisher", execution2, undefined),
                 new Task(kind6, folder, "Publish (Prompt Version)", "app-publisher", execution6, undefined) ];
     }
+
+
+    public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    {
+        const def: TaskExplorerDefinition = {
+            type: "app-publisher",
+            script: target,
+            target,
+            fileName: path.basename(uri.fsPath),
+            path: util.getRelativePath(folder, uri),
+            cmdLine: "npx app-publisher -p ps --no-ci",
+            takesArgs: false,
+            uri
+        };
+        return def;
+    }
+
 }

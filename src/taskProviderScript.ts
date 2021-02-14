@@ -1,7 +1,6 @@
 
 import {
-    Task, WorkspaceFolder, ShellExecution, Uri,
-    workspace, TaskDefinition, ShellExecutionOptions, ShellQuotedString
+    Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
@@ -160,57 +159,25 @@ export class ScriptTaskProvider implements TaskExplorerProvider
     }
 
 
-    createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task
+    public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task
     {
-        const scriptDef = this.scriptTable[target?.toLowerCase()];
-
-        const getRelativePath = (folder: WorkspaceFolder, uri: Uri): string =>
-        {
-            let rtn = "";
-            if (folder) {
-                const rootUri = folder.uri;
-                const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
-                rtn = absolutePath.substring(rootUri.path.length + 1);
-            }
-            return rtn;
-        };
-
-        const cwd = path.dirname(uri.fsPath);
-        const fileName = path.basename(uri.fsPath);
         let sep: string = (process.platform === "win32" ? "\\" : "/");
+        const scriptDef = this.scriptTable[target?.toLowerCase()],
+              cwd = path.dirname(uri.fsPath),
+              fileName = path.basename(uri.fsPath),
+              def = this.getDefaultDefinition(target, folder, uri),
+              options: ShellExecutionOptions = { cwd },
+              args: string[] = [];
+        let isWinShell = false,
+            exec: string = scriptDef.exec;
 
-        const kind: TaskExplorerDefinition = {
-            type: "script",
-            scriptType: scriptDef?.type || "unknown",
-            fileName,
-            scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
-            path: getRelativePath(folder, uri),
-            requiresArgs: false,
-            uri
-        };
-
-        //
-        // Check if this script might need command line arguments
-        //
-        // TODO:  Other script types
-        //
-        if (scriptDef.type === "batch")
-        {
-            const contents = util.readFileSync(uri.fsPath);
-            kind.requiresArgs = (new RegExp("%[1-9]")).test(contents);
+        if (!scriptDef) {
+            return null;
         }
-
-        //
-        // Set current working dircetory in oprions to relative script dir
-        //
-        const options: ShellExecutionOptions = {
-            cwd
-        };
 
         //
         // If the defualt terminal cmd/powershell?  On linux and darwin, no, on windows, maybe...
         //
-        let isWinShell = false;
         if (process.platform === "win32")
         {
             isWinShell = true;
@@ -243,16 +210,10 @@ export class ScriptTaskProvider implements TaskExplorerProvider
             }
         }
 
-        const pathPre = "." + sep; // ; (scriptDef.type === "powershell" ? "." + sep : "")
-        const fileNamePathPre = pathPre + fileName;
-        //
-        // Build arguments list
-        //
-        const args: string[] = [];
         //
         // Identify the 'executable'
         //
-        let exec: string = scriptDef.exec;
+        const fileNamePathPre = "." + sep + fileName;
         if (scriptDef.type === "bash")
         {
             exec = fileNamePathPre;
@@ -297,7 +258,40 @@ export class ScriptTaskProvider implements TaskExplorerProvider
         // Create the shell execution object and task
         //
         const execution = new ShellExecution(exec, args, options);
-        return new Task(kind, folder, scriptDef.type !== "python" ? fileName : "build egg", scriptDef.type, execution, "$msCompile");
+        return new Task(def, folder, scriptDef.type !== "python" ? fileName : "build egg", scriptDef.type, execution, "$msCompile");
+    }
+
+
+    public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    {
+        const tgt = target?.toLowerCase(),
+              scriptDef = this.scriptTable[tgt],
+              fileName = path.basename(uri.fsPath);
+
+        const def: TaskExplorerDefinition = {
+            type: "script",
+            script: target?.toLowerCase(),
+            target: tgt,
+            scriptType: scriptDef?.type || "unknown",
+            fileName,
+            scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
+            path: util.getRelativePath(folder, uri),
+            takesArgs: false,
+            uri
+        };
+
+        //
+        // Check if this script might need command line arguments
+        //
+        // TODO:  Other script types
+        //
+        if (scriptDef.type === "batch")
+        {
+            const contents = util.readFileSync(uri.fsPath);
+            def.takesArgs = (new RegExp("%[1-9]")).test(contents);
+        }
+
+        return def;
     }
 
 }

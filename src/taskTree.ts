@@ -21,7 +21,6 @@ import { rebuildCache } from "./cache";
 import { configuration } from "./common/configuration";
 import { providers } from "./extension";
 import { TaskExplorerProvider } from "./taskProvider";
-import { TaskExplorerDefinition } from "./taskDefinition";
 import * as constants from "./common/constants";
 
 
@@ -190,7 +189,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
                 const strs = str.split(",");
                 for (const s in strs) {
-                    util.pushIfNotExists(excludes, strs[s]);
+                    if (strs.hasOwnProperty(s)) { // skip properties inherited from prototype
+                        util.pushIfNotExists(excludes, strs[s]);
+                    }
                 }
                 if (global !== false) {
                     configuration.update("exclude", excludes);
@@ -1688,6 +1689,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             util.logValue(logPad + "   script type", definition.scriptType, 3);	// if 'script' is defined, this is type npm
         }
+        if (definition.scriptFile)
+        {
+            util.logValue(logPad + "   script file", definition.scriptFile, 3);	// if 'script' is defined, this is type npm
+        }
         if (definition.script)
         {
             util.logValue(logPad + "script", definition.script, 3);	// if 'script' is defined, this is type npm
@@ -1713,7 +1718,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Script task providers will set a fileName property
         //
-        if (definition.requiresArgs)
+        if (definition.takesArgs)
         {
             util.logValue(logPad + "script requires args", "true", 3);
         }
@@ -2163,14 +2168,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             let newTask = taskItem.task;
             if (noTerminal)
-            {
-                const def = taskItem.task.definition;
-                const p = providers.get(util.getScriptProviderType(def.type));
-                const ext = path.extname(def.uri.fsPath).substring(1);
-                newTask = p.createTask(ext, null, taskItem.getFolder(), def.uri);
-                //
-                // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
-                // an instance of this task.
+            {   //
                 // For some damn reason, setting task.presentationOptions.reveal = TaskRevealKind.Silent or
                 // task.presentationOptions.reveal = TaskRevealKind.Never does not work if we do it on the task
                 // that was instantiated when the providers were asked for tasks.  If we create a new instance
@@ -2179,7 +2177,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 // line arguments.  In this case, its simply a property task.presentationOption on an instantiated
                 // task.  No idea.  But this works fine for now.
                 //
-                newTask.definition.taskId = this.getTaskItemId(taskItem);
+                const def = taskItem.task.definition;
+                const p = providers.get(util.getScriptProviderType(def.type));
+                newTask = p.createTask(def.target, null, taskItem.getFolder(), def.uri);
+                //
+                // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
+                // an instance of this task.
+                //
+                newTask.definition.taskItemId = def.taskItemId;
             }
             if (await this.runTask(newTask, noTerminal)) {
                 await this.saveTask(taskItem, configuration.get<number>("numLastTasks"), false, "   ");
@@ -2312,13 +2317,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     let newTask: Task = taskItem.task;
                     if (str) {
                         const def = taskItem.task.definition;
-                        newTask = providers.get("script").createTask(path.extname(def.uri.fsPath).substring(1), null,
+                        newTask = providers.get("script").createTask(def.script, null,
                                                                      taskItem.getFolder(), def.uri, str.trim().split(" "));
                         //
                         // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
                         // an instance of this task.
                         //
-                        newTask.definition.taskId = this.getTaskItemId(taskItem);
+                        newTask.definition.taskItemId = def.taskItemId;
                     }
                     if (await this.runTask(newTask, noTerminal)) {
                         await me.saveTask(taskItem, configuration.get<number>("numLastTasks"));
@@ -2569,8 +2574,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Fire change event which will update tree loading icons, etc
         //
-        this.fireTaskChangeEvents(e.execution.task.definition.taskItem ||
-                                  await this.getTaskItems(e.execution.task.definition.taskId));
+        this.fireTaskChangeEvents(await this.getTaskItems(e.execution.task.definition.taskItemId) as TaskItem);
     }
 
 
@@ -2584,8 +2588,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Fire change event which will update tree loading icons, etc
         //
-        this.fireTaskChangeEvents(e.execution.task.definition.taskItem ||
-                                  await this.getTaskItems(e.execution.task.definition.taskId));
+        this.fireTaskChangeEvents(await this.getTaskItems(e.execution.task.definition.taskItemId) as TaskItem);
     }
 
 }
