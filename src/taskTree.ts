@@ -936,12 +936,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private fireTaskChangeEvents(taskItem: TaskItem)
     {
-        if (!this.taskTree) {
+        if (!this.taskTree || !taskItem) {
+            util.logError("task change event fire, invalid argument");
             return;
         }
 
         //
-        // Fire change event for parent folder.  FIring the change eventfor the task item itself
+        // Fire change event for parent folder.  Firing the change event for the task item itself
         // does not cause the getTreeItem() callback to be called from VSCode Tree API.  Firing it
         // on the parent folder (type TreeFile) works good though.  Pre v2, we refreshed the entire
         // tree, so this is still good.  TODO possibly this gets fixed in the future to be able to

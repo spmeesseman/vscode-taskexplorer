@@ -396,7 +396,7 @@ export function logBlank(level?: number)
 }
 
 
-export async function logError(msg: string | string[])
+export function logError(msg: string | string[])
 {
     if (!msg === null || msg === undefined) {
         return;
@@ -406,7 +406,7 @@ export async function logError(msg: string | string[])
         log("*** " + msg);
     }
     else {
-        await forEachAsync(msg, (m: string) => {
+        msg.forEach((m: string) => {
             log("*** " + m);
         });
     }
