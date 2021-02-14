@@ -106,9 +106,9 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 Version 2 highlights 2 major performance enhancements along with several features and bug fixes, notably:
 
 1. An async/await approach for all processing has improved task load time performance 10-20%.
-2. Launching tasks is 1.5-2x more responsive in the Tree UI, as well as when tasks finish.
+2. Launching tasks is more than 2x more responsive in the Tree UI, as well as when tasks finish.
 3. Favorites List.
-4. Clear buttons for Favorites and last Tasks lists.
+4. Clear buttons for Favorites and last Tasks lists (**need icon!!!**).
 5. Much improved logging for debugging user issues.
 6. Completely refactored classes, interfaces, and commenting for easier community contributions.
 
