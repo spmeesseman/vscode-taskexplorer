@@ -1,3 +1,61 @@
+# [2.0.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.30.2...v2.0.0) (2021-02-14)
+
+
+### Bug Fixes
+
+* altering the 'includeAnt' globs has no effect when removing globs until after a restart ([71c97f9](https://github.com/spmeesseman/vscode-taskexplorer/commit/71c97f9))
+* ant files with an uppercase letter other than the first letter do not display with the path prepandature ([3b0d639](https://github.com/spmeesseman/vscode-taskexplorer/commit/3b0d639))
+* ant task discovery is breaking async /await process ([658da17](https://github.com/spmeesseman/vscode-taskexplorer/commit/658da17))
+* bild node groupings breaks async/await processing ([d784c75](https://github.com/spmeesseman/vscode-taskexplorer/commit/d784c75))
+* gulfile.babel.js and gulpfile.mjs are no longer found ([a5aa7fd](https://github.com/spmeesseman/vscode-taskexplorer/commit/a5aa7fd))
+* if npm.packageManager setting is 'auto', the npm icon is missing in all npm tree nodes ([a3504a0](https://github.com/spmeesseman/vscode-taskexplorer/commit/a3504a0))
+* logValue does not log a false boolean value ([bf99324](https://github.com/spmeesseman/vscode-taskexplorer/commit/bf99324))
+* run with no terminal still opens the terminal ([ea2fd8f](https://github.com/spmeesseman/vscode-taskexplorer/commit/ea2fd8f))
+* switching between explorer and sidebar views can cause a crash in certain cases. ([f2e85cf](https://github.com/spmeesseman/vscode-taskexplorer/commit/f2e85cf))
+* the 'open' button icon is missing in the sidebar view ([2a63421](https://github.com/spmeesseman/vscode-taskexplorer/commit/2a63421))
+* the context menu npm commands fail if the package manager setting in Code is set to 'auto' ([0e42fd4](https://github.com/spmeesseman/vscode-taskexplorer/commit/0e42fd4))
+* when modifying an ant file, the tree randomly breaks and must be refreshed manually ([9e5d0e0](https://github.com/spmeesseman/vscode-taskexplorer/commit/9e5d0e0))
+
+
+### Build System
+
+* finalize update to eslint from tslint ([52a2d93](https://github.com/spmeesseman/vscode-taskexplorer/commit/52a2d93))
+* set visual tag as patch ([e169b0f](https://github.com/spmeesseman/vscode-taskexplorer/commit/e169b0f))
+
+
+### Code Refactoring
+
+* add temp handler for v2 to clean up tasks caches ([e3f030d](https://github.com/spmeesseman/vscode-taskexplorer/commit/e3f030d))
+* add timestamps to logging ([8d9cf9d](https://github.com/spmeesseman/vscode-taskexplorer/commit/8d9cf9d))
+* improve log readability ([291280f](https://github.com/spmeesseman/vscode-taskexplorer/commit/291280f))
+* sort project folders ([e424b5b](https://github.com/spmeesseman/vscode-taskexplorer/commit/e424b5b))
+
+
+### Documentation
+
+* **readme:** add new section for v2 ([f68591c](https://github.com/spmeesseman/vscode-taskexplorer/commit/f68591c))
+* **readme:** add ref to new vscode-extjs language server extension ([b0f45eb](https://github.com/spmeesseman/vscode-taskexplorer/commit/b0f45eb))
+* **readme:** update 2.0 info ([5877652](https://github.com/spmeesseman/vscode-taskexplorer/commit/5877652))
+
+
+### Features
+
+* add 'clear list' action  to last tasks tree node ([06afff0](https://github.com/spmeesseman/vscode-taskexplorer/commit/06afff0))
+* add favorites list ([decf2cd](https://github.com/spmeesseman/vscode-taskexplorer/commit/decf2cd))
+* do all processing with async/await ([48098b4](https://github.com/spmeesseman/vscode-taskexplorer/commit/48098b4))
+
+
+### Performance Improvements
+
+* config changes for some settings refresh performance increased by 2-5x ([b146814](https://github.com/spmeesseman/vscode-taskexplorer/commit/b146814))
+* major performance improvement in tree refresh when tasks start and when they complete. ([a2b271e](https://github.com/spmeesseman/vscode-taskexplorer/commit/a2b271e))
+* when a watched file is modified, created, or deleted, re-ask the VSCode task engine for tasks of only the task type that the file is associated with. ([a74bfac](https://github.com/spmeesseman/vscode-taskexplorer/commit/a74bfac))
+
+
+### Visual Enhancements
+
+* new task icon ([fec8e9f](https://github.com/spmeesseman/vscode-taskexplorer/commit/fec8e9f))
+
 ## [1.30.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.30.1...v1.30.2) (2021-02-08)
 
 
