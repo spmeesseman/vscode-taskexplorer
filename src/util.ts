@@ -309,6 +309,18 @@ export function getGlobPattern(taskType: string)
 }
 
 
+export function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
+{
+    let rtn = "";
+    if (folder) {
+        const rootUri = folder.uri;
+        const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
+        rtn = absolutePath.substring(rootUri.path.length + 1);
+    }
+    return rtn;
+}
+
+
 export function getScriptProviderType(source: string): string
 {
     if (isScriptType(source)) {

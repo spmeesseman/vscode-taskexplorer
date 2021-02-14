@@ -104,12 +104,10 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 
 export async function addWsFolder(wsf: readonly WorkspaceFolder[])
 {
-    if (wsf) {
-        for (const f in wsf) {
-            if (wsf.hasOwnProperty(f)) { // skip over properties inherited by prototype
-                util.log("Workspace folder added: " + wsf[f].name, 1);
-                await cache.addFolderToCache(wsf[f]);
-            }
+    for (const f in wsf) {
+        if (wsf.hasOwnProperty(f)) { // skip over properties inherited by prototype
+            util.log("Workspace folder added: " + wsf[f].name, 1);
+            await cache.addFolderToCache(wsf[f]);
         }
     }
 }
@@ -139,18 +137,21 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
             // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
             for (const key in cache.filesCache.keys)
             {
-                const toRemove = [];
-                const obj = cache.filesCache.get(key);
-                obj.forEach((item) =>
+                if (cache.filesCache.keys.hasOwnProperty(key))
                 {
-                    if (item.folder.uri.fsPath === wsf[f].uri.fsPath) {
-                        toRemove.push(item);
-                    }
-                });
-                if (toRemove.length > 0) {
-                    for (const tr in toRemove) {
-                        if (toRemove.hasOwnProperty(tr)) { // skip over properties inherited by prototype
-                            obj.delete(toRemove[tr]);
+                    const toRemove = [];
+                    const obj = cache.filesCache.get(key);
+                    obj.forEach((item) =>
+                    {
+                        if (item.folder.uri.fsPath === wsf[f].uri.fsPath) {
+                            toRemove.push(item);
+                        }
+                    });
+                    if (toRemove.length > 0) {
+                        for (const tr in toRemove) {
+                            if (toRemove.hasOwnProperty(tr)) { // skip over properties inherited by prototype
+                                obj.delete(toRemove[tr]);
+                            }
                         }
                     }
                 }
@@ -216,13 +217,13 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     // Enable/disable task types
     //
-    if (taskTypes)
+    for (const i in taskTypes)
     {
-        for (const i in taskTypes)
+        if (taskTypes.hasOwnProperty(i))
         {
             const taskType = taskTypes[i],
-                  taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher",
-                  enabledSetting = "enable" + taskTypeP;
+                taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher",
+                enabledSetting = "enable" + taskTypeP;
             let configAffected = e.affectsConfiguration("taskExplorer." + enabledSetting);
             if (taskType === "ant") {
                 configAffected = configAffected || e.affectsConfiguration("taskExplorer.includeAnt");
@@ -346,12 +347,12 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
 async function registerFileWatchers(context: ExtensionContext)
 {
     const taskTypes = util.getTaskTypes();
-    if (taskTypes)
+    for (const i in taskTypes)
     {
-        for (const i in taskTypes)
+        if (taskTypes.hasOwnProperty(i))
         {
             const taskType = taskTypes[i],
-                  taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher";
+                taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher";
             if (configuration.get<boolean>("enable" + taskTypeP))
             {
                 const watchModify = util.isScriptType(taskType) || taskType === "app-publisher";
