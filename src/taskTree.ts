@@ -62,11 +62,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => { await this.run(item, true, false); }, this));
         subscriptions.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem) => { await this.run(item, false, true); }, this));
         subscriptions.push(commands.registerCommand(name + ".runLastTask",  async () => { await this.runLastTask(); }, this));
-        subscriptions.push(commands.registerCommand(name + ".stop",  async (item: TaskItem) => { await this.stop(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".stop",  (item: TaskItem) => { this.stop(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
-        subscriptions.push(commands.registerCommand(name + ".pause",  async (item: TaskItem) => { await this.pause(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => { this.pause(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".open", async (item: TaskItem) => { await this.open(item); }, this));
-        subscriptions.push(commands.registerCommand(name + ".openTerminal", async (item: TaskItem) => { await this.openTerminal(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => { this.openTerminal(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
         subscriptions.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "install"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update"); }, this));
@@ -268,10 +268,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
         const files: Map<string, TaskFile> = new Map();
-        let folder = null,
-            ltfolder = null,
-            favfolder = null;
-        let taskFile = null;
+        let folder: TaskFolder = null,
+            ltfolder: TaskFolder = null,
+            favfolder: TaskFolder = null;
+        let taskFile: TaskFile = null;
 
         util.logBlank(1);
         util.log(logPad + "build task tree", 1);
@@ -437,11 +437,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             if (folder.label === constants.FAV_TASKS_LABEL) {
                 await storage.update(constants.FAV_TASKS_STORE, "");
-                this.showSpecialTasks(false, true);
+                await this.showSpecialTasks(false, true);
             }
             else if (folder.label === constants.LAST_TASKS_LABEL) {
                 await storage.update(constants.LAST_TASKS_STORE, "");
-                this.showSpecialTasks(false);
+                await this.showSpecialTasks(false);
             }
         }
     }
@@ -712,7 +712,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (newNodes.length > 0)
         {
             let numGrouped = 0;
-            newNodes.forEach(n =>
+            await util.forEachAsync(newNodes, async (n: TaskFile) =>
             {
                 taskFile.insertScript(n, numGrouped++);
                 if (!atMaxLevel) {
@@ -724,7 +724,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     if (n.taskSource === "Workspace") {
                         return;
                     }
-                    this.createTaskGroupingsBySep(folder, n, subfolders, treeLevel + 1, logPad + "   ");
+                    await this.createTaskGroupingsBySep(folder, n, subfolders, treeLevel + 1, logPad + "   ");
                 }
             });
         }
@@ -1247,7 +1247,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             const treeTasks: any[] = await me.getChildren(pitem2, "   ");
             if (treeTasks.length > 0)
             {
-                await util.forEachAsync(treeTasks, async item3 =>
+                await util.forEachAsync(treeTasks, async (item3: TaskFolder | TaskFile | TaskItem) =>
                 {
                     if (done) {
                         return false;
@@ -1362,7 +1362,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private getTaskFileNode(task: Task, folder: any, files: any, relativePath: string, scopeName: string, logPad = ""): TaskFile
+    private getTaskFileNode(task: Task, folder: TaskFolder, files: any, relativePath: string, scopeName: string, logPad = ""): TaskFile
     {
         let taskFile: TaskFile;
 
@@ -1768,7 +1768,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async openTerminal(taskItem: TaskItem)
+    private openTerminal(taskItem: TaskItem)
     {
         const term = this.getTerminal(taskItem);
         if (term) {
@@ -1777,7 +1777,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async pause(taskItem: TaskItem)
+    private pause(taskItem: TaskItem)
     {
         if (!taskItem || this.busy)
         {
@@ -1805,7 +1805,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async pushToTopOfSpecialFolder(taskItem: TaskItem, label: string, treeIndex: number, logPad = "")
+    private pushToTopOfSpecialFolder(taskItem: TaskItem, label: string, treeIndex: number, logPad = "")
     {
         let taskItem2: TaskItem;
         const ltfolder = this.taskTree[treeIndex] as TaskFolder;
@@ -2009,7 +2009,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         });
 
-        util.forEachMapAsync(taskTypesRmv, (each: TaskFile) =>
+        await util.forEachMapAsync(taskTypesRmv, (each: TaskFile) =>
         {
             folder.removeTaskFile(each);
         });
@@ -2122,7 +2122,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
-        await this.stop(taskItem);
+        this.stop(taskItem);
         await this.run(taskItem);
     }
 
@@ -2135,7 +2135,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             taskItem.paused = false;
         }
         else {
-            await window.showInformationMessage("Terminal not found");
+            window.showInformationMessage("Terminal not found");
         }
     }
 
@@ -2225,14 +2225,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (taskItem && taskItem instanceof TaskItem)
         {
-            this.run(taskItem);
+            await this.run(taskItem);
         }
         else
         {
             window.showInformationMessage("Task not found!  Check log for details");
             await util.removeFromArrayAsync(lastTasks, lastTaskId);
             await storage.update(constants.LAST_TASKS_STORE, lastTasks);
-            this.showSpecialTasks(true);
+            await this.showSpecialTasks(true);
         }
     }
 
@@ -2434,7 +2434,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             else if (taskItem) // only 'last tasks' case here.  'favs' are added
             {
-                await this.pushToTopOfSpecialFolder(taskItem, label, treeIdx);
+                this.pushToTopOfSpecialFolder(taskItem, label, treeIdx);
                 changed = true;
             }
         }
@@ -2533,7 +2533,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async stop(taskItem: TaskItem)
+    private stop(taskItem: TaskItem)
     {
         if (!taskItem || this.busy)
         {
