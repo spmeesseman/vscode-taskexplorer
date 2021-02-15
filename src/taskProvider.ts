@@ -26,7 +26,7 @@ export abstract class TaskExplorerProvider implements TaskExplorerProvider
     public async provideTasks()
     {
         util.logBlank();
-        util.log("provide ant tasks");
+        util.log(`provide ${this.providerName} tasks`);
 
         if (!this.cachedTasks) {
             this.cachedTasks = await this.readTasks();

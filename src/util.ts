@@ -125,7 +125,7 @@ export function getGroupSeparator()
 
 export function getAntGlobPattern(): string
 {
-    let multiFilePattern = "";
+    let multiFilePattern = constants.GLOB_ANT;
     const includes: string[] = configuration.get("includeAnt");
     if (includes && includes.length > 0)
     {
