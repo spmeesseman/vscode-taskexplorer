@@ -1,3 +1,21 @@
+## [2.0.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.0...v2.0.1) (2021-02-15)
+
+
+### Bug Fixes
+
+* after modifying and saving an ant file, changes are no longer noticed. ([de7dfdd](https://github.com/spmeesseman/vscode-taskexplorer/commit/de7dfdd))
+* modifying a package.json that has defined tasks in a tasks.json file causes the vscode tasks tree node to break ([7b0c4f7](https://github.com/spmeesseman/vscode-taskexplorer/commit/7b0c4f7))
+
+
+### Code Refactoring
+
+* task definitions are not properly exposed to vscode api ([bc1f0b4](https://github.com/spmeesseman/vscode-taskexplorer/commit/bc1f0b4))
+
+
+### Documentation
+
+* **readme:** touch info ([a5e8bad](https://github.com/spmeesseman/vscode-taskexplorer/commit/a5e8bad))
+
 # [2.0.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v1.30.2...v2.0.0) (2021-02-14)
 
 
