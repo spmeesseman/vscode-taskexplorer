@@ -17,9 +17,12 @@ export abstract class TaskExplorerProvider implements TaskExplorerProvider
     public invalidating = false;
     public providerName = "***";
 
+    private queue: Uri[];
+
 
     constructor(name: string) {
         this.providerName = name;
+        this.queue = [];
     }
 
 
@@ -41,24 +44,27 @@ export abstract class TaskExplorerProvider implements TaskExplorerProvider
     }
 
 
-    public async invalidateTasksCache(opt?: Uri): Promise<void>
+    public async invalidateTasksCache(uri?: Uri): Promise<void>
     {
         util.log("");
         util.log(`invalidate ${this.providerName} tasks cache`);
-        util.logValue("   uri", opt?.path, 2);
+        util.logValue("   uri", uri?.path, 2);
         util.logValue("   has cached tasks", !!this.cachedTasks, 2);
 
-        await this.wait();
+        if (this.invalidating) {
+            this.queue.push(uri);
+            return;
+        }
         this.invalidating = true;
 
-        if (opt && this.cachedTasks)
+        if (uri && this.cachedTasks)
         {
             const rmvTasks: Task[] = [];
-            const folder = workspace.getWorkspaceFolder(opt);
+            const folder = workspace.getWorkspaceFolder(uri);
 
-            await util.forEachAsync(this.cachedTasks, (each: Task) => {
+            this.cachedTasks.forEach((each: Task) => {
                 const cstDef: TaskExplorerDefinition = each.definition;
-                if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath))
+                if (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath))
                 {
                     rmvTasks.push(each);
                 }
@@ -72,35 +78,35 @@ export abstract class TaskExplorerProvider implements TaskExplorerProvider
             //
             if (this.cachedTasks)
             {
-                await util.forEachAsync(rmvTasks, each => {
+                rmvTasks.forEach(each => {
                     util.log("   removing old task " + each.name);
                     util.removeFromArray(this.cachedTasks, each);
                 });
 
-                if (util.pathExists(opt.fsPath) && util.existsInArray(configuration.get("exclude"), opt.path) === false)
+                if (util.pathExists(uri.fsPath) && util.existsInArray(configuration.get("exclude"), uri.path) === false)
                 {
-                    const tasks = await this.readUriTasks(opt, folder, "   ");
+                    const tasks = await this.readUriTasks(uri, folder, "   ");
                     this.cachedTasks?.push(...tasks);
                 }
 
                 if (this.cachedTasks?.length > 0)
                 {
-                    this.invalidating = false;
+                    await this.processQueue();
                     return;
                 }
             }
         }
 
-        this.invalidating = false;
         this.cachedTasks = undefined;
+        await this.processQueue();
     }
 
 
-    public async wait()
+    private async processQueue()
     {
-        while (this.invalidating === true) {
-            util.log(`   waiting for ${this.providerName} invalidation to finish...`);
-            await util.timeout(100);
+        this.invalidating = false;
+        if (this.queue.length > 0) {
+            await this.invalidateTasksCache(this.queue.shift());
         }
     }
 
