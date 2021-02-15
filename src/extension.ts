@@ -137,21 +137,18 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
             // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
             for (const key in cache.filesCache.keys)
             {
-                if (cache.filesCache.keys.hasOwnProperty(key))
+                const toRemove = [];
+                const obj = cache.filesCache.get(key);
+                obj.forEach((item) =>
                 {
-                    const toRemove = [];
-                    const obj = cache.filesCache.get(key);
-                    obj.forEach((item) =>
-                    {
-                        if (item.folder.uri.fsPath === wsf[f].uri.fsPath) {
-                            toRemove.push(item);
-                        }
-                    });
-                    if (toRemove.length > 0) {
-                        for (const tr in toRemove) {
-                            if (toRemove.hasOwnProperty(tr)) { // skip over properties inherited by prototype
-                                obj.delete(toRemove[tr]);
-                            }
+                    if (item.folder.uri.fsPath === wsf[f].uri.fsPath) {
+                        toRemove.push(item);
+                    }
+                });
+                if (toRemove.length > 0) {
+                    for (const tr in toRemove) {
+                        if (toRemove.hasOwnProperty(tr)) { // skip over properties inherited by prototype
+                            obj.delete(toRemove[tr]);
                         }
                     }
                 }
@@ -224,11 +221,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
             const taskType = taskTypes[i],
                 taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher",
                 enabledSetting = "enable" + taskTypeP;
-            let configAffected = e.affectsConfiguration("taskExplorer." + enabledSetting);
-            if (taskType === "ant") {
-                configAffected = configAffected || e.affectsConfiguration("taskExplorer.includeAnt");
-            }
-            if (configuration.get<boolean>("enable" + taskTypeP))
+            if (e.affectsConfiguration("taskExplorer." + enabledSetting))
             {
                 const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher";
                 await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), ignoreModify, configuration.get<boolean>(enabledSetting));
@@ -257,7 +250,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     if (e.affectsConfiguration("taskExplorer.includeAnt")) {
         if (util.existsInArray(refreshTaskTypes, "ant") === false){
-            await registerFileWatcher(context, "ant", util.getAntGlobPattern(), configuration.get<boolean>("enableAnt"));
+            await registerFileWatcher(context, "ant", util.getAntGlobPattern(), false, configuration.get<boolean>("enableAnt"));
             registerChange("ant");
         }
     }
