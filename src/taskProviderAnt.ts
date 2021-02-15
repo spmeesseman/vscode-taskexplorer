@@ -18,6 +18,8 @@ interface StringMap { [s: string]: string }
 export class AntTaskProvider implements TaskExplorerProvider
 {
     private cachedTasks: Task[];
+    private invalidating = false;
+
 
     public async provideTasks()
     {
@@ -43,6 +45,9 @@ export class AntTaskProvider implements TaskExplorerProvider
         util.logValue("   uri", opt?.path, 2);
         util.logValue("   has cached tasks", this.cachedTasks ? "true" : "false", 2);
 
+        await this.wait();
+        this.invalidating = true;
+
         if (opt && this.cachedTasks)
         {
             const rmvTasks: Task[] = [];
@@ -55,9 +60,11 @@ export class AntTaskProvider implements TaskExplorerProvider
             });
 
             //
+            // TODO - Bug
             // Technically this function can be called back into when waiting for a promise
             // to return on the asncForEach() above, and cachedTask array can be set to undefined,
             // this is happening with a broken await() somewere that I cannot find
+            //
             if (this.cachedTasks)
             {
                 await util.forEachAsync(rmvTasks, each => {
@@ -71,15 +78,17 @@ export class AntTaskProvider implements TaskExplorerProvider
                 if (util.pathExists(opt.fsPath) && util.existsInArray(configuration.get("exclude"), opt.path) === false)
                 {
                     const tasks = await this.readAntfile(opt);
-                    this.cachedTasks.push(...tasks);
+                    this.cachedTasks?.push(...tasks);
                 }
 
-                if (this.cachedTasks.length > 0) {
+                if (this.cachedTasks?.length > 0) {
+                    this.invalidating = false;
                     return;
                 }
             }
         }
 
+        this.invalidating = false;
         this.cachedTasks = undefined;
     }
 
@@ -329,6 +338,15 @@ export class AntTaskProvider implements TaskExplorerProvider
         }
 
         return result;
+    }
+
+
+    private async wait()
+    {
+        while (this.invalidating === true) {
+            util.log("   waiting for current invalidation to finish...");
+            await util.timeout(100);
+        }
     }
 
 }

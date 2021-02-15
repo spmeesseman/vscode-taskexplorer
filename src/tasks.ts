@@ -80,8 +80,9 @@ export class TaskItem extends TreeItem
         //
         this.taskSource = task.source;
         //
-        // Set taskItemId on the task deinfition object for use in the task start/stop events
+        // Set taskItem on the task deinfition object for use in the task start/stop events
         //
+        this.task.definition.taskItem = this;
         this.task.definition.taskItemId = this.id;
         //
         // Node path

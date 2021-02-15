@@ -13,6 +13,7 @@ import { TaskExplorerDefinition } from "./taskDefinition";
 export class ScriptTaskProvider implements TaskExplorerProvider
 {
     private cachedTasks: Task[];
+    private invalidating = false;
 
     private scriptTable: any = {
         sh: {
@@ -93,6 +94,9 @@ export class ScriptTaskProvider implements TaskExplorerProvider
         util.logValue("   uri", opt?.path, 2);
         util.logValue("   has cached tasks", !!this.cachedTasks, 2);
 
+        await this.wait();
+        this.invalidating = true;
+
         if (opt && this.cachedTasks)
         {
             const rmvTasks: Task[] = [];
@@ -106,9 +110,11 @@ export class ScriptTaskProvider implements TaskExplorerProvider
             });
 
             //
+            // TODO - Bug
             // Technically this function can be called back into when waiting for a promise
             // to return on the asncForEach() above, and cachedTask array can be set to undefined,
             // this is happening with a broken await() somewere that I cannot find
+            //
             if (this.cachedTasks)
             {
                 await util.forEachAsync(rmvTasks, (each) => {
@@ -119,15 +125,17 @@ export class ScriptTaskProvider implements TaskExplorerProvider
                 if (util.pathExists(opt.fsPath) && util.existsInArray(configuration.get("exclude"), opt.path) === false)
                 {
                     const task = this.createTask(path.extname(opt.fsPath).substring(1), null, folder, opt);
-                    this.cachedTasks.push(task);
+                    this.cachedTasks?.push(task);
                 }
 
-                if (this.cachedTasks.length > 0) {
+                if (this.cachedTasks?.length > 0) {
+                    this.invalidating = false;
                     return;
                 }
             }
         }
 
+        this.invalidating = false;
         this.cachedTasks = undefined;
     }
 
@@ -292,6 +300,15 @@ export class ScriptTaskProvider implements TaskExplorerProvider
         }
 
         return def;
+    }
+
+
+    private async wait()
+    {
+        while (this.invalidating === true) {
+            util.log("   waiting for current invalidation to finish...");
+            await util.timeout(100);
+        }
     }
 
 }

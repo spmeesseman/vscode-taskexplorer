@@ -1208,12 +1208,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             const treeFiles: any[] = await me.getChildren(pitem2, "   ");
             if (treeFiles.length > 0)
             {
-                await util.forEachAsync(treeFiles, async(item2) =>
+                await util.forEachAsync(treeFiles, async(item2: TaskFolder | TaskFile | TaskItem) =>
                 {
                     if (done) {
                         return false;
                     }
-
                     if (item2 instanceof TaskItem)
                     {
                         const tmp = me.getParent(item2);
@@ -1293,7 +1292,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             const treeFiles: any[] = await me.getChildren(pitem, "   ");
             if (treeFiles.length > 0)
             {
-                await util.forEachAsync(treeFiles, async item2 =>
+                await util.forEachAsync(treeFiles, async (item2: TaskFolder | TaskFile | TaskItem) =>
                 {
                     if (done) {
                         return false;
@@ -1738,7 +1737,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // to re-register the handler when the setting changes, we just re-route the request here
         //
         if (clickAction === "Execute") {
-            this.run(selection);
+            await this.run(selection);
             return;
         }
 
@@ -2574,7 +2573,23 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Fire change event which will update tree loading icons, etc
         //
-        this.fireTaskChangeEvents(await this.getTaskItems(e.execution.task.definition.taskItemId) as TaskItem);
+        // TODO - Bug
+        // Something to do with what's going on in each of the providers invalidate() functions,
+        // see the TODO comment in each one.  If we await the call to getTaskItems her when running
+        // the invalidation unit tests (tasks.test.ts lines ~ 720-...), things get screwy.  Before the
+        // the wait() calss were put into the providers invalidates() functions,cachedTasks would get
+        // set to null while it was seemingly looping still from another call to it.  How is this eben
+        // possible in a single threaded execution?  Doesnt seem to affect program operation, but the
+        // unit tests fail, on Windows (something to do with the URI's getting messed up and losing the
+        // /c:/ in the path, as if it were a Unix URI or something, which is weird because we run a bash
+        // task and change the shell before the invalidation tests, this should have nothing to to with
+        // the app-publisher/ant invalidations though, where it crashes!!)  Don't want to attach
+        // taskItem to the task in the TaskItem constructor (its creating a circular ref), but if it's
+        // not referenced on the task then we have to do an async call here to get the tree ID.  WIll
+        // come back to this later, it's killing me already.
+        //
+        this.fireTaskChangeEvents(e.execution.task.definition.taskItem ||
+                                  await this.getTaskItems(e.execution.task.definition.taskId));
     }
 
 
@@ -2588,7 +2603,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Fire change event which will update tree loading icons, etc
         //
-        this.fireTaskChangeEvents(await this.getTaskItems(e.execution.task.definition.taskItemId) as TaskItem);
+        // TODO - Bug
+        // Something to do with what's going on in each of the providers invalidate() functions,
+        // see the TODO comment in each one.  If we await the call to getTaskItems her when running
+        // the invalidation unit tests (tasks.test.ts lines ~ 720-...), things get screwy.  Before the
+        // the wait() calss were put into the providers invalidates() functions,cachedTasks would get
+        // set to null while it was seemingly looping still from another call to it.  How is this eben
+        // possible in a single threaded execution?  Doesnt seem to affect program operation, but the
+        // unit tests fail, on Windows (something to do with the URI's getting messed up and losing the
+        // /c:/ in the path, as if it were a Unix URI or something, which is weird because we run a bash
+        // task and change the shell before the invalidation tests, this should have nothing to to with
+        // the app-publisher/ant invalidations though, where it crashes!!).  Don't want to attach
+        // taskItem to the task in the TaskItem constructor (its creating a circular ref), but if it's
+        // not referenced on the task then we have to do an async call here to get the tree ID.  WIll
+        // come back to this later, it's killing me already.
+        //
+        // this.fireTaskChangeEvents(await this.getTaskItems(e.execution.task.definition.taskId) as TaskItem);
+        this.fireTaskChangeEvents(e.execution.task.definition.taskItem ||
+                                  await this.getTaskItems(e.execution.task.definition.taskId));
     }
 
 }

@@ -650,10 +650,11 @@ suite("Task tests", () =>
             else if (value && value.taskSource === "bash")
             {
                 await commands.executeCommand("taskExplorer.run", value);
-                await timeout(1500);
+                await timeout(2000);
                 await workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                           "bash.exe", ConfigurationTarget.Workspace);
                 await commands.executeCommand("taskExplorer.run", value);
+                await timeout(2000);
                 await workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                           "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
                 ranBash = true;
