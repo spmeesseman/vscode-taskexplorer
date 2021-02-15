@@ -1,3 +1,16 @@
+## [2.0.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.1...v2.0.2) (2021-02-15)
+
+
+### Bug Fixes
+
+* if no ant includes are specified in sttings.json, the xtension does not start if all task types are enabled ([0a4ede6](https://github.com/spmeesseman/vscode-taskexplorer/commit/0a4ede6))
+* insiders 1.53.1 build hangs randomly ([70e34c8](https://github.com/spmeesseman/vscode-taskexplorer/commit/70e34c8))
+
+
+### Code Refactoring
+
+* extract more funcitonality into base task interface for easier debugging ([a2ff41a](https://github.com/spmeesseman/vscode-taskexplorer/commit/a2ff41a))
+
 ## [2.0.1](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.0...v2.0.1) (2021-02-15)
 
 
