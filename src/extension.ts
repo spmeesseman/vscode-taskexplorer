@@ -330,7 +330,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         await refreshTree();
     }
     else if (refreshTaskTypes?.length > 0) {
-        await util.forEachAsync(refreshTaskTypes, async (t: string) => {
+        util.forEachAsync(refreshTaskTypes, async (t: string) => {
             await refreshTree(t);
         });
     }

@@ -533,7 +533,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // are created but the old task remains in the parent folder.  Remove all tasks that have been moved down
         // into the tree hierarchy due to groupings
         //
-        await this.removeGroupedTasks(folder, subfolders, logPad + "   ");
+        this.removeGroupedTasks(folder, subfolders, logPad + "   ");
 
         //
         // For groupings with separator, now go through and rename the labels within each group minus the
@@ -1968,13 +1968,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async removeGroupedTasks(folder: TaskFolder, subfolders: Map<string, TaskFile>, logPad = "")
+    private removeGroupedTasks(folder: TaskFolder, subfolders: Map<string, TaskFile>, logPad = "")
     {
         const taskTypesRmv: TaskFile[] = [];
 
         util.log(logPad + "remove grouped tasks", 1);
 
-        await util.forEachAsync(folder.taskFiles, (each: TaskFile | TaskItem) =>
+        folder.taskFiles.forEach((each) =>
         {
             if (!(each instanceof TaskFile)) {
                 return; // continue forEach()
@@ -1992,12 +1992,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             else if (each.isGroup)
             {
-                each.scripts.forEach(async each2 =>
+                each.scripts.forEach(each2 =>
                 {
                     this.removeScripts(each2 as TaskFile, folder, subfolders);
                     if (each2 instanceof TaskFile && each2.isGroup && each2.groupLevel > 0)
                     {
-                        await util.forEachAsync(each2.scripts, (each3: TaskFile) =>
+                        each2.scripts.forEach((each3: TaskFile) =>
                         {
                             this.removeScripts(each3, folder, subfolders);
                         });
@@ -2009,7 +2009,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         });
 
-        await util.forEachMapAsync(taskTypesRmv, (each: TaskFile) =>
+        taskTypesRmv.forEach((each: TaskFile) =>
         {
             folder.removeTaskFile(each);
         });
