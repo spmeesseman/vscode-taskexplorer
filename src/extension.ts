@@ -137,18 +137,21 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
             // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
             for (const key in cache.filesCache.keys)
             {
-                const toRemove = [];
-                const obj = cache.filesCache.get(key);
-                obj.forEach((item) =>
+                if (cache.filesCache.keys.hasOwnProperty(key)) // skip over props inherited by prototype
                 {
-                    if (item.folder.uri.fsPath === wsf[f].uri.fsPath) {
-                        toRemove.push(item);
-                    }
-                });
-                if (toRemove.length > 0) {
-                    for (const tr in toRemove) {
-                        if (toRemove.hasOwnProperty(tr)) { // skip over properties inherited by prototype
-                            obj.delete(toRemove[tr]);
+                    const toRemove = [];
+                    const obj = cache.filesCache.get(key);
+                    obj.forEach((item) =>
+                    {
+                        if (item.folder.uri.fsPath === wsf[f].uri.fsPath) {
+                            toRemove.push(item);
+                        }
+                    });
+                    if (toRemove.length > 0) {
+                        for (const tr in toRemove) {
+                            if (toRemove.hasOwnProperty(tr)) { // skip over propes inherited by prototype
+                                obj.delete(toRemove[tr]);
+                            }
                         }
                     }
                 }

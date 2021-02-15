@@ -11,14 +11,11 @@ import { TaskExplorerProvider } from "./taskProvider";
 import { TaskExplorerDefinition } from "./taskDefinition";
 
 
-export class MakeTaskProvider implements TaskExplorerProvider
+export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
     private suffixRuleTargets = /^(\.\w+|\.\w+\.\w+)$/;
     private patternRuleTargets = /^(%\.\w+|%)$/;
-    private cachedTasks: Task[];
-    private invalidating = false;
-
     // See: https://www.gnu.org/software/make/manual/html_node/Special-Targets.html
     private specialTargets = new Set([
         ".PHONY",
@@ -40,27 +37,7 @@ export class MakeTaskProvider implements TaskExplorerProvider
     ]);
 
 
-    constructor()
-    {
-    }
-
-
-    public async provideTasks()
-    {
-        util.log("");
-        util.log("provide mke tasks");
-        if (!this.cachedTasks)
-        {
-            this.cachedTasks = await this.detectMakefiles();
-        }
-        return this.cachedTasks;
-    }
-
-
-    public resolveTask(_task: Task): Task | undefined
-    {
-        return undefined;
-    }
+    constructor() { super("make"); }
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
@@ -93,154 +70,6 @@ export class MakeTaskProvider implements TaskExplorerProvider
         }
 
         return new Task(kind, folder, target, "make", execution, problemMatcher);
-    }
-
-
-    public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
-    {
-        const def: TaskExplorerDefinition = {
-            type: "make",
-            script: target,
-            target,
-            path: util.getRelativePath(folder, uri),
-            fileName: path.basename(uri.path),
-            problemMatcher: "",
-            uri
-        };
-        return def;
-    }
-
-
-    public async invalidateTasksCache(opt?: Uri): Promise<void>
-    {
-        util.log("");
-        util.log("invalidate make tasks cache");
-        util.logValue("   uri", opt?.path, 2);
-        util.logValue("   has cached tasks", !!this.cachedTasks, 2);
-
-        await this.wait();
-        this.invalidating = true;
-
-        if (opt && this.cachedTasks)
-        {
-            const rmvTasks: Task[] = [];
-
-            await util.forEachAsync(this.cachedTasks, (each: Task) => {
-                const cstDef: TaskExplorerDefinition = each.definition;
-                if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath))
-                {
-                    rmvTasks.push(each);
-                }
-            });
-
-            //
-            // TODO - Bug
-            // Technically this function can be called back into when waiting for a promise
-            // to return on the asncForEach() above, and cachedTask array can be set to undefined,
-            // this is happening with a broken await() somewere that I cannot find
-            //
-            if (this.cachedTasks)
-            {
-                await util.forEachAsync(rmvTasks, (each) => {
-                    util.log("   removing old task " + each.name);
-                    util.removeFromArray(this.cachedTasks, each);
-                });
-
-                if (util.pathExists(opt.fsPath) && util.existsInArray(configuration.get("exclude"), opt.path) === false)
-                {
-                    const tasks = await this.readMakefile(opt);
-                    this.cachedTasks?.push(...tasks);
-                }
-
-                if (this.cachedTasks?.length > 0)
-                {
-                    this.invalidating = false;
-                    return;
-                }
-            }
-        }
-
-        this.invalidating = false;
-        this.cachedTasks = undefined;
-    }
-
-
-    private async detectMakefiles(): Promise<Task[]>
-    {
-        util.log("");
-        util.log("detectMakefiles");
-
-        const allTasks: Task[] = [];
-        const visitedFiles: Set<string> = new Set();
-        const paths = filesCache.get("make");
-
-        if (workspace.workspaceFolders && paths)
-        {
-            for (const fobj of paths)
-            {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readMakefile(fobj.uri);
-                    allTasks.push(...tasks);
-                }
-            }
-        }
-
-        util.logValue("   # of tasks", allTasks.length, 2);
-        return allTasks;
-    }
-
-
-    private async readMakefile(uri: Uri): Promise<Task[]>
-    {
-        const result: Task[] = [];
-        const folder = workspace.getWorkspaceFolder(uri);
-
-        if (folder)
-        {
-            const scripts = await this.findTargets(uri.fsPath);
-            if (scripts)
-            {
-                Object.keys(scripts).forEach(each =>
-                {
-                    const task = this.createTask(each, each, folder, uri);
-                    task.group = TaskGroup.Build;
-                    result.push(task);
-                });
-            }
-        }
-
-        return result;
-    }
-
-
-    private isNormalTarget(target: string): boolean
-    {
-        if (this.specialTargets.has(target))
-        {
-            return false;
-        }
-        if (this.suffixRuleTargets.test(target))
-        {
-            return false;
-        }
-        if (this.patternRuleTargets.test(target))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-
-    private parseTargetLine(line)
-    {
-        const tgtNames = line.split(":")[0].trim();
-        const tgtName = tgtNames.split(" ").slice(-1)[0];
-
-        const dependsName = line.substring(line.indexOf(":") + 1).trim();
-
-        return { tgtName, dependsName };
     }
 
 
@@ -292,12 +121,97 @@ export class MakeTaskProvider implements TaskExplorerProvider
     }
 
 
-    private async wait()
+    public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
-        while (this.invalidating === true) {
-            util.log("   waiting for current invalidation to finish...");
-            await util.timeout(100);
+        const def: TaskExplorerDefinition = {
+            type: "make",
+            script: target,
+            target,
+            path: util.getRelativePath(folder, uri),
+            fileName: path.basename(uri.path),
+            problemMatcher: "",
+            uri
+        };
+        return def;
+    }
+
+
+    private isNormalTarget(target: string): boolean
+    {
+        if (this.specialTargets.has(target))
+        {
+            return false;
         }
+        if (this.suffixRuleTargets.test(target))
+        {
+            return false;
+        }
+        if (this.patternRuleTargets.test(target))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    private parseTargetLine(line)
+    {
+        const tgtNames = line.split(":")[0].trim();
+        const tgtName = tgtNames.split(" ").slice(-1)[0];
+
+        const dependsName = line.substring(line.indexOf(":") + 1).trim();
+
+        return { tgtName, dependsName };
+    }
+
+
+    public async readTasks(): Promise<Task[]>
+    {
+        util.log("");
+        util.log("detectMakefiles");
+
+        const allTasks: Task[] = [];
+        const visitedFiles: Set<string> = new Set();
+        const paths = filesCache.get("make");
+
+        if (workspace.workspaceFolders && paths)
+        {
+            for (const fobj of paths)
+            {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                    visitedFiles.add(fobj.uri.fsPath);
+                    const tasks = await this.readUriTasks(fobj.uri);
+                    allTasks.push(...tasks);
+                }
+            }
+        }
+
+        util.logValue("   # of tasks", allTasks.length, 2);
+        return allTasks;
+    }
+
+
+    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder): Promise<Task[]>
+    {
+        const result: Task[] = [];
+        const folder = wsFolder || workspace.getWorkspaceFolder(uri);
+
+        if (folder)
+        {
+            const scripts = await this.findTargets(uri.fsPath);
+            if (scripts)
+            {
+                Object.keys(scripts).forEach(each =>
+                {
+                    const task = this.createTask(each, each, folder, uri);
+                    task.group = TaskGroup.Build;
+                    result.push(task);
+                });
+            }
+        }
+
+        return result;
     }
 
 }

@@ -10,10 +10,11 @@ import { TaskExplorerProvider } from "./taskProvider";
 import { TaskExplorerDefinition } from "./taskDefinition";
 
 
-export class ScriptTaskProvider implements TaskExplorerProvider
+export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
-    private cachedTasks: Task[];
-    private invalidating = false;
+
+    constructor() { super("script"); }
+
 
     private scriptTable: any = {
         sh: {
@@ -65,106 +66,6 @@ export class ScriptTaskProvider implements TaskExplorerProvider
             enabled: configuration.get("enableNsis")
         }
     };
-
-
-    constructor() {
-    }
-
-
-    public async provideTasks()
-    {
-        util.log("");
-        util.log("provide scripts tasks");
-        if (!this.cachedTasks) {
-            this.cachedTasks = await this.detectScriptFiles();
-        }
-        return this.cachedTasks;
-    }
-
-
-    public resolveTask(_task: Task): Task | undefined {
-        return undefined;
-    }
-
-
-    public async invalidateTasksCache(opt?: Uri): Promise<void>
-    {
-        util.log("");
-        util.log("invalidate script tasks cache");
-        util.logValue("   uri", opt?.path, 2);
-        util.logValue("   has cached tasks", !!this.cachedTasks, 2);
-
-        await this.wait();
-        this.invalidating = true;
-
-        if (opt && this.cachedTasks)
-        {
-            const rmvTasks: Task[] = [];
-            const folder = workspace.getWorkspaceFolder(opt);
-
-            await util.forEachAsync(this.cachedTasks, (each) => {
-                const cstDef: TaskExplorerDefinition = each.definition as TaskExplorerDefinition;
-                if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath)) {
-                    rmvTasks.push(each);
-                }
-            });
-
-            //
-            // TODO - Bug
-            // Technically this function can be called back into when waiting for a promise
-            // to return on the asncForEach() above, and cachedTask array can be set to undefined,
-            // this is happening with a broken await() somewere that I cannot find
-            //
-            if (this.cachedTasks)
-            {
-                await util.forEachAsync(rmvTasks, (each) => {
-                    util.log("   removing old task " + each.name);
-                    util.removeFromArray(this.cachedTasks, each);
-                });
-
-                if (util.pathExists(opt.fsPath) && util.existsInArray(configuration.get("exclude"), opt.path) === false)
-                {
-                    const task = this.createTask(path.extname(opt.fsPath).substring(1), null, folder, opt);
-                    this.cachedTasks?.push(task);
-                }
-
-                if (this.cachedTasks?.length > 0) {
-                    this.invalidating = false;
-                    return;
-                }
-            }
-        }
-
-        this.invalidating = false;
-        this.cachedTasks = undefined;
-    }
-
-
-    private async detectScriptFiles(): Promise<Task[]>
-    {
-        util.log("");
-        util.log("detectScriptFiles");
-
-        const allTasks: Task[] = [];
-        const visitedFiles: Set<string> = new Set();
-        const paths = filesCache.get("script");
-
-        if (workspace.workspaceFolders && paths)
-        {
-            for (const fobj of paths)
-            {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    allTasks.push(this.createTask(path.extname(fobj.uri.fsPath).substring(1), null, fobj.folder, fobj.uri));
-                    util.log("   found script target");
-                    util.logValue("      script file", fobj.uri.fsPath);
-                }
-            }
-        }
-
-        util.logValue("   # of tasks", allTasks.length, 2);
-        return allTasks;
-    }
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task
@@ -303,12 +204,37 @@ export class ScriptTaskProvider implements TaskExplorerProvider
     }
 
 
-    private async wait()
+    public async readTasks(): Promise<Task[]>
     {
-        while (this.invalidating === true) {
-            util.log("   waiting for current invalidation to finish...");
-            await util.timeout(100);
+        util.log("");
+        util.log("detectScriptFiles");
+
+        const allTasks: Task[] = [];
+        const visitedFiles: Set<string> = new Set();
+        const paths = filesCache.get("script");
+
+        if (workspace.workspaceFolders && paths)
+        {
+            for (const fobj of paths)
+            {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                    visitedFiles.add(fobj.uri.fsPath);
+                    allTasks.push(this.createTask(path.extname(fobj.uri.fsPath).substring(1), null, fobj.folder, fobj.uri));
+                    util.log("   found script target");
+                    util.logValue("      script file", fobj.uri.fsPath);
+                }
+            }
         }
+
+        util.logValue("   # of tasks", allTasks.length, 2);
+        return allTasks;
+    }
+
+
+    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder): Promise<Task[]>
+    {
+        const folder = wsFolder || workspace.getWorkspaceFolder(uri);
+        return [ this.createTask(path.extname(uri.fsPath).substring(1), null, folder, uri) ];
     }
 
 }

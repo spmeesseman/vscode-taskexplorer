@@ -5,37 +5,15 @@ import {
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
-import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
 import { TaskExplorerDefinition } from "./taskDefinition";
 
 
-export class GradleTaskProvider implements TaskExplorerProvider
+export class GradleTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
-    private cachedTasks: Task[];
-    private invalidating = false;
 
-
-    constructor() {}
-
-
-    public async provideTasks()
-    {
-        util.log("");
-        util.log("provide gradle tasks");
-        if (!this.cachedTasks)
-        {
-            this.cachedTasks = await this.detectGradlefiles();
-        }
-        return this.cachedTasks;
-    }
-
-
-    public resolveTask(_task: Task): Task | undefined
-    {
-        return undefined;
-    }
+    constructor() { super("gradle"); }
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
@@ -62,7 +40,7 @@ export class GradleTaskProvider implements TaskExplorerProvider
     }
 
 
-    private async detectGradlefiles(): Promise<Task[]>
+    public async readTasks(): Promise<Task[]>
     {
         util.log("");
         util.log("detectGradlefiles");
@@ -77,7 +55,7 @@ export class GradleTaskProvider implements TaskExplorerProvider
             {
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
                     visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readGradlefile(fobj.uri);
+                    const tasks = await this.readUriTasks(fobj.uri);
                     allTasks.push(...tasks);
                 }
             }
@@ -134,60 +112,6 @@ export class GradleTaskProvider implements TaskExplorerProvider
     }
 
 
-    public async invalidateTasksCache(opt?: Uri): Promise<void>
-    {
-        util.log("");
-        util.log("invalidate gradle tasks cache");
-        util.logValue("   uri", opt?.path, 2);
-        util.logValue("   has cached tasks", !!this.cachedTasks, 2);
-
-        await this.wait();
-        this.invalidating = true;
-
-        if (opt && this.cachedTasks)
-        {
-            const rmvTasks: Task[] = [];
-
-            await util.forEachAsync(this.cachedTasks, (each: Task) => {
-                const cstDef: TaskExplorerDefinition = each.definition;
-                if (cstDef.uri.fsPath === opt.fsPath || !util.pathExists(cstDef.uri.fsPath))
-                {
-                    rmvTasks.push(each);
-                }
-            });
-
-            //
-            // TODO - Bug
-            // Technically this function can be called back into when waiting for a promise
-            // to return on the asncForEach() above, and cachedTask array can be set to undefined,
-            // this is happening with a broken await() somewere that I cannot find
-            //
-            if (this.cachedTasks)
-            {
-                await util.forEachAsync(rmvTasks, each => {
-                    util.log("   removing old task " + each.name);
-                    util.removeFromArray(this.cachedTasks, each);
-                });
-
-                if (util.pathExists(opt.fsPath) && util.existsInArray(configuration.get("exclude"), opt.path) === false)
-                {
-                    const tasks = await this.readGradlefile(opt);
-                    this.cachedTasks?.push(...tasks);
-                }
-
-                if (this.cachedTasks?.length > 0)
-                {
-                    this.invalidating = false;
-                    return;
-                }
-            }
-        }
-
-        this.invalidating = false;
-        this.cachedTasks = undefined;
-    }
-
-
     public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
         const def: TaskExplorerDefinition = {
@@ -202,10 +126,10 @@ export class GradleTaskProvider implements TaskExplorerProvider
     }
 
 
-    private async readGradlefile(uri: Uri): Promise<Task[]>
+    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder): Promise<Task[]>
     {
         const result: Task[] = [];
-        const folder = workspace.getWorkspaceFolder(uri);
+        const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
         if (folder)
         {
@@ -222,15 +146,6 @@ export class GradleTaskProvider implements TaskExplorerProvider
         }
 
         return result;
-    }
-
-
-    private async wait()
-    {
-        while (this.invalidating === true) {
-            util.log("   waiting for current invalidation to finish...");
-            await util.timeout(100);
-        }
     }
 
 }

@@ -1018,9 +1018,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         //
         // Build task tree if not built already.
-        // Note that a task start or stop will set taskTree to null when the onDidStartTask() and
-        // onDidStopTask() events trigger refresh().  This might be able to be redone to perform
-        // with much less processing , see TODO in refresh().
         //
         if (!this.taskTree)
         {   //
