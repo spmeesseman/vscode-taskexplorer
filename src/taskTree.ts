@@ -77,8 +77,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => { await this.addRemoveFavorite(taskItem); }, this));
         subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
 
-        tasks.onDidStartTask((_e) => this.taskStartEvent(_e));
-        tasks.onDidEndTask((_e) => this.taskFinishedEvent(_e));
+        tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e));
+        tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e));
     }
 
 
