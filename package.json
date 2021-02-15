@@ -55,7 +55,7 @@
         "clean": "rimraf out",
         "compile": "npx tsc -p ./",
         "lint": "eslint -c .eslintrc.js --ext .ts .",
-        "nyc-coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
+        "nyc-coverage3": "nyc --reporter=lcov --reporter=text-summary npm run test",
         "nyc-coverage1": "nyc npm run test",
         "nyc-coverage2": "nyc --reporter=lcov mocha 'src/test/**/*.ts' --recursive",
         "nyc-test-babel": "npm run test && nyc report && nyc report --reporter=lcov",

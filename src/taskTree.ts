@@ -1049,7 +1049,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 const toRemove: Task[] = [];
                 const taskItems = await tasks.fetchTasks({ type: this.currentInvalidation });
                 this.tasks.forEach((t: Task) => {
-                    if (t.source === this.currentInvalidation) {
+                    //
+                    // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
+                    // if the script type set for the task in tasks.json is of type 'currentInvalidation'.
+                    // Remove any Workspace type tasks returned as well, in this case the source type is
+                    // != 'currentInvalidation'
+                    //
+                    if (t.source === this.currentInvalidation || t.source === "Workspace") {
                         toRemove.push(t);
                     }
                 });
