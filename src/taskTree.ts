@@ -77,8 +77,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => { await this.addRemoveFavorite(taskItem); }, this));
         subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
 
-        tasks.onDidStartTask(async(_e) => this.taskStartEvent(_e));
-        tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e));
+        tasks.onDidStartTask((_e) => this.taskStartEvent(_e));
+        tasks.onDidEndTask((_e) => this.taskFinishedEvent(_e));
     }
 
 
@@ -2560,10 +2560,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         }, 300);
                     }
                     taskItem.paused = false;
-                }
-            }
-            else {
-                taskItem.execution.terminate();
+                }  //
+            }     // After vscode 1.50, sometimes terminate() caused a lock up, try
+            else // a timeout to see if that makes it any better...
+            {   //
+                setTimeout(() => {
+                    taskItem.execution.terminate();
+                }, 1);
             }
         }
     }
@@ -2594,8 +2597,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // not referenced on the task then we have to do an async call here to get the tree ID.  WIll
         // come back to this later, it's killing me already.
         //
+        // this.fireTaskChangeEvents(await this.getTaskItems(e.execution.task.definition.taskItemId) as TaskItem);
         this.fireTaskChangeEvents(e.execution.task.definition.taskItem ||
-                                  await this.getTaskItems(e.execution.task.definition.taskId));
+                                  await this.getTaskItems(e.execution.task.definition.taskItemId));
     }
 
 
@@ -2624,9 +2628,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // not referenced on the task then we have to do an async call here to get the tree ID.  WIll
         // come back to this later, it's killing me already.
         //
-        // this.fireTaskChangeEvents(await this.getTaskItems(e.execution.task.definition.taskId) as TaskItem);
+        // this.fireTaskChangeEvents(await this.getTaskItems(e.execution.task.definition.taskItemId) as TaskItem);
         this.fireTaskChangeEvents(e.execution.task.definition.taskItem ||
-                                  await this.getTaskItems(e.execution.task.definition.taskId));
+                                  await this.getTaskItems(e.execution.task.definition.taskItemId));
     }
 
 }
