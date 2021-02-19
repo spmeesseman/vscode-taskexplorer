@@ -1,3 +1,11 @@
+## [2.0.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.2...v2.0.3) (2021-02-19)
+
+
+### Bug Fixes
+
+* makefile targets are not parsed correctly in v2. [fixes [#136](https://github.com/spmeesseman/vscode-taskexplorer/issues/136)] ([2ac9c6c](https://github.com/spmeesseman/vscode-taskexplorer/commit/2ac9c6c))
+* modifying a task file other than an npm package.json causes workspace tasks to disappear nd requires manual refresh to get back ([44385f9](https://github.com/spmeesseman/vscode-taskexplorer/commit/44385f9))
+
 ## [2.0.2](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.1...v2.0.2) (2021-02-15)
 
 
