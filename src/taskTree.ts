@@ -268,10 +268,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
         const files: Map<string, TaskFile> = new Map();
-        let folder: TaskFolder = null,
-            ltfolder: TaskFolder = null,
+        let ltfolder: TaskFolder = null,
             favfolder: TaskFolder = null;
-        let taskFile: TaskFile = null;
 
         util.logBlank(1);
         util.log(logPad + "build task tree", 1);
@@ -306,96 +304,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         for (const each of tasksList)
         {
-            let scopeName: string;
-            let settingName: string = "enable" + util.properCase(each.source);
-
             taskCt++;
-
-            //
-            // Remove the '-' from app-publisher task.  VSCode doesn't like dashes in the settings names, so...
-            //
-            if (settingName === "enableApp-publisher") {
-                settingName = "enableAppPublisher";
-            }
-
-            //
-            // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
-            // By default, also ignore npm 'install' tasks, since its available in the context menu
-            //
-            if ((configuration.get(settingName) || !this.isWorkspaceFolder(each.scope)) && !this.isNpmInstallTask(each))
-            {
-                const definition: TaskDefinition = each.definition;
-                let relativePath = definition.path ? definition.path : "";
-
-                //
-                // Make sure this task shouldnt be ignored based on various criteria...
-                //
-                const include: any = this.isTaskIncluded(each, relativePath);
-                if (!include) {
-                    continue;
-                }
-                else if (typeof include === "string") { // TSC tasks may have had their rel. pathchanged
-                    relativePath = include;
-                }
-
-                //
-                // Set scope name and create the TaskFolder, a "user" task will have a TaskScope scope, not
-                // a WosrkspaceFolder scope.
-                //
-                if (this.isWorkspaceFolder(each.scope))
-                {
-                    scopeName = each.scope.name;
-                    folder = folders.get(scopeName);
-                    if (!folder)
-                    {
-                        folder = new TaskFolder(each.scope);
-                        folders.set(scopeName, folder);
-                    }
-                }     //
-                else // User Task (not related to a ws or project)
-                {   //
-                    scopeName = constants.USER_TASKS_LABEL;
-                    folder = folders.get(scopeName);
-                    if (!folder)
-                    {
-                        folder = new TaskFolder(scopeName);
-                        folders.set(scopeName, folder);
-                    }
-                }
-
-                //
-                // Logging
-                //
-                util.logBlank(1);
-                util.log(logPad + "   Processing task " + taskCt.toString() + " of " + tasksList.length.toString(), 1);
-                this.logTask(each, scopeName, logPad + "      ");
-
-                //
-                // Get task file node
-                //
-                taskFile = this.getTaskFileNode(each, folder, files, relativePath, scopeName, logPad);
-
-                //
-                // Create and add task item to task file node
-                //
-                const taskItem = new TaskItem(this.extensionContext, taskFile, each);
-                taskFile.addScript(taskItem);
-
-                //
-                // Add this task to the 'Last Tasks' folder if we need to
-                //
-                this.addToSpecialFolder(taskItem, ltfolder, lastTasks, constants.LAST_TASKS_LABEL);
-                //
-                // Add this task to the 'Favorites' folder if we need to
-                //
-                this.addToSpecialFolder(taskItem, favfolder, favTasks, constants.FAV_TASKS_LABEL);
-            }
-            else
-            {
-                util.log(logPad + "      Skipping", 1);
-                util.logValue(logPad + "      enabled", configuration.get(settingName), 1);
-                util.logValue(logPad + "      is npm install task", this.isNpmInstallTask(each), 1);
-            }
+            util.logBlank(1);
+            util.log(logPad + "   Processing task " + (++taskCt).toString() + " of " + tasksList.length.toString(), 1);
+            this.buildTaskTreeList(each, folders, files, ltfolder, favfolder, lastTasks, favTasks, logPad + "   ");
         }
 
         //
@@ -427,6 +339,100 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         this.treeBuilding = false;
 
         return sortedFolders;
+    }
+
+
+    private buildTaskTreeList(each: Task, folders: Map<string, TaskFolder>, files: Map<string, TaskFile>, ltfolder: TaskFolder, favfolder: TaskFolder, lastTasks: string[], favTasks: string[], logPad = "")
+    {
+        let folder: TaskFolder,
+            taskFile: TaskFile = null,
+            settingName: string = "enable" + util.properCase(each.source),
+            scopeName: string;
+
+        util.logBlank(1);
+        util.log(logPad + "build task tree list", 1);
+
+        //
+        // Remove the '-' from app-publisher task.  VSCode doesn't like dashes in the settings names, so...
+        //
+        if (settingName === "enableApp-publisher") {
+            settingName = "enableAppPublisher";
+        }
+
+        //
+        // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
+        // By default, also ignore npm 'install' tasks, since its available in the context menu
+        //
+        if ((configuration.get(settingName) || !this.isWorkspaceFolder(each.scope)) && !this.isNpmInstallTask(each))
+        {
+            const definition: TaskDefinition = each.definition;
+            let relativePath = definition.path ? definition.path : "";
+
+            //
+            // Make sure this task shouldnt be ignored based on various criteria...
+            //
+            const include: any = this.isTaskIncluded(each, relativePath);
+            if (!include) {
+                return;
+            }
+            else if (typeof include === "string") { // TSC tasks may have had their rel. pathchanged
+                relativePath = include;
+            }
+
+            //
+            // Set scope name and create the TaskFolder, a "user" task will have a TaskScope scope, not
+            // a WosrkspaceFolder scope.
+            //
+            if (this.isWorkspaceFolder(each.scope))
+            {
+                scopeName = each.scope.name;
+                folder = folders.get(scopeName);
+                if (!folder)
+                {
+                    folder = new TaskFolder(each.scope);
+                    folders.set(scopeName, folder);
+                }
+            }     //
+            else // User Task (not related to a ws or project)
+            {   //
+                scopeName = constants.USER_TASKS_LABEL;
+                folder = folders.get(scopeName);
+                if (!folder)
+                {
+                    folder = new TaskFolder(scopeName);
+                    folders.set(scopeName, folder);
+                }
+            }
+
+            //
+            // Get task file node
+            //
+            taskFile = this.getTaskFileNode(each, folder, files, relativePath, scopeName, logPad);
+
+            //
+            // Create and add task item to task file node
+            //
+            const taskItem = new TaskItem(this.extensionContext, taskFile, each);
+            taskFile.addScript(taskItem);
+
+            //
+            // Add this task to the 'Last Tasks' folder if we need to
+            //
+            this.addToSpecialFolder(taskItem, ltfolder, lastTasks, constants.LAST_TASKS_LABEL);
+            //
+            // Add this task to the 'Favorites' folder if we need to
+            //
+            this.addToSpecialFolder(taskItem, favfolder, favTasks, constants.FAV_TASKS_LABEL);
+        }
+        else
+        {
+            util.log(logPad + "   Skipping", 1);
+            util.logValue(logPad + "   enabled", configuration.get(settingName), 1);
+            util.logValue(logPad + "   is npm install task", this.isNpmInstallTask(each), 1);
+        }
+
+        util.logBlank(1);
+        util.log(logPad + "build task tree list complete", 1);
     }
 
 
