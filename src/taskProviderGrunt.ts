@@ -45,7 +45,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     public async readTasks(): Promise<Task[]>
     {
         util.log("");
-        util.log("detectGruntfiles");
+        util.log("detect grunt files");
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -55,9 +55,13 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
         {
             for (const fobj of paths)
             {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
+                {
                     visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri);
+                    const tasks = await this.readUriTasks(fobj.uri, null, "   ");
+                    util.log("   processed grunt file", 3);
+                    util.logValue("      file", fobj.uri.fsPath, 3);
+                    util.logValue("      targets in file", tasks.length, 3);
                     allTasks.push(...tasks);
                 }
             }
@@ -68,14 +72,14 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     }
 
 
-    private async findTargets(fsPath: string): Promise<string[]>
+    private findTargets(fsPath: string, logPad = ""): string[]
     {
         const scripts: string[] = [];
 
-        util.log("");
-        util.log("Find gruntfile targets");
+        util.logBlank(1);
+        util.log(logPad + "find grunt targets", 1);
 
-        const contents = await util.readFile(fsPath);
+        const contents = util.readFileSync(fsPath);
         let idx = 0;
         let eol = contents.indexOf("\n", 0);
 
@@ -118,8 +122,8 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
                         const tgtName = line.substring(idx1, idx2).trim();
                         if (tgtName) {
                             scripts.push(tgtName);
-                            util.log("   found target");
-                            util.logValue("      name", tgtName);
+                            util.log(logPad + "   found grunt target");
+                            util.logValue(logPad + "      name", tgtName);
                         }
                     }
                 }
@@ -129,7 +133,8 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
             eol = contents.indexOf("\n", idx);
         }
 
-        util.log("   done");
+        util.logBlank(1);
+        util.log(logPad + "find grunt targets complete", 1);
 
         return scripts;
     }
@@ -149,24 +154,30 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     }
 
 
-    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder): Promise<Task[]>
+    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
+        util.logBlank(1);
+        util.log(logPad + "read grunt file uri tasks", 1);
+        util.logValue(logPad + "   path", uri?.fsPath, 1);
+
         if (folder)
         {
-            const scripts = await this.findTargets(uri.fsPath);
+            const scripts = this.findTargets(uri.fsPath, "   ");
             if (scripts)
             {
-                scripts.forEach(each => {
-                    const task = this.createTask(each, each, folder, uri);
+                for (const s of scripts)
+                {
+                    const task = this.createTask(s, s, folder, uri);
                     task.group = TaskGroup.Build;
                     result.push(task);
-                });
+                }
             }
         }
 
+        util.log(logPad + "read grunt file uri tasks complete", 1);
         return result;
     }
 

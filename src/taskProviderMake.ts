@@ -73,14 +73,14 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    private async findTargets(fsPath: string): Promise<string[]>
+    private findTargets(fsPath: string, logPad = ""): string[]
     {
         const scripts: string[] = [];
 
-        util.log("");
-        util.log("Find makefile targets");
+        util.logBlank(1);
+        util.log(logPad + "find makefile targets");
 
-        const contents = await util.readFile(fsPath);
+        const contents = util.readFileSync(fsPath);
         let idx = 0;
         let eol = contents.indexOf("\n", 0);
 
@@ -105,9 +105,9 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
                     tgtName.indexOf("(") === -1 && tgtName.indexOf("$") === -1 && this.isNormalTarget(tgtName))
                 {
                     scripts.push(tgtName);
-                    util.log("   found target");
-                    util.logValue("      name", tgtName);
-                    util.logValue("      depends target", dependsName);
+                    util.log(logPad + "   found makefile target");
+                    util.logValue(logPad + "      name", tgtName);
+                    util.logValue(logPad + "      depends target", dependsName);
                 }
             }
 
@@ -115,7 +115,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             eol = contents.indexOf("\n", idx);
         }
 
-        util.log("   done");
+        util.log(logPad + "find makefile targets complete", 1);
 
         return scripts;
     }
@@ -168,8 +168,8 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     public async readTasks(): Promise<Task[]>
     {
-        util.log("");
-        util.log("detectMakefiles");
+        util.logBlank();
+        util.log("detect make files");
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -179,38 +179,50 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         {
             for (const fobj of paths)
             {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
+                {
                     visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri);
+                    const tasks = await this.readUriTasks(fobj.uri, null, "   ");
+                    util.log("   processed make file", 3);
+                    util.logValue("      file", fobj.uri.fsPath, 3);
+                    util.logValue("      targets in file", tasks.length, 3);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        util.logValue("   # of tasks", allTasks.length, 2);
+        util.logBlank();
+        util.logValue("   # of make tasks", allTasks.length, 2);
+        util.log("detect make files complete", 1);
+
         return allTasks;
     }
 
 
-    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder): Promise<Task[]>
+    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
+        util.logBlank(1);
+        util.log(logPad + "read make file uri tasks", 1);
+        util.logValue(logPad + "   path", uri?.fsPath, 1);
+
         if (folder)
         {
-            const scripts = await this.findTargets(uri.fsPath);
+            const scripts = this.findTargets(uri.fsPath, "   ");
             if (scripts)
             {
-                Object.keys(scripts).forEach(each =>
+                for (const s of scripts)
                 {
-                    const task = this.createTask(each, each, folder, uri);
+                    const task = this.createTask(s, s, folder, uri);
                     task.group = TaskGroup.Build;
                     result.push(task);
-                });
+                }
             }
         }
 
+        util.log(logPad + "read make file uri tasks complete", 1);
         return result;
     }
 

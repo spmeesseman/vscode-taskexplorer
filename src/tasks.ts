@@ -475,14 +475,14 @@ export class TaskFolder extends TreeItem
             let idx = -1;
             let idx2 = -1;
 
-            this.taskFiles.forEach(each =>
+            for (const each of this.taskFiles)
             {
                 idx++;
                 if (taskFile === each)
                 {
                     idx2 = idx;
                 }
-            });
+            }
 
             if (idx2 !== -1 && idx2 < this.taskFiles.length)
             {

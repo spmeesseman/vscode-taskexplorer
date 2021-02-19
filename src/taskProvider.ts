@@ -62,13 +62,14 @@ export abstract class TaskExplorerProvider implements TaskExplorerProvider
             const rmvTasks: Task[] = [];
             const folder = workspace.getWorkspaceFolder(uri);
 
-            this.cachedTasks.forEach((each: Task) => {
+            for (const each of this.cachedTasks)
+            {
                 const cstDef: TaskExplorerDefinition = each.definition;
                 if (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath))
                 {
                     rmvTasks.push(each);
                 }
-            });
+            }
 
             //
             // TODO - Bug
@@ -78,10 +79,10 @@ export abstract class TaskExplorerProvider implements TaskExplorerProvider
             //
             if (this.cachedTasks)
             {
-                rmvTasks.forEach(each => {
+                for (const each of rmvTasks) {
                     util.log("   removing old task " + each.name);
                     util.removeFromArray(this.cachedTasks, each);
-                });
+                }
 
                 if (util.pathExists(uri.fsPath) && util.existsInArray(configuration.get("exclude"), uri.path) === false)
                 {

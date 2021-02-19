@@ -132,9 +132,9 @@ export function getAntGlobPattern(): string
         multiFilePattern = "{" + constants.GLOB_ANT;
         if (Array.isArray(includes))
         {
-            for (const i in includes) {
+            for (const i of includes) {
                 multiFilePattern += ",";
-                multiFilePattern += includes[i];
+                multiFilePattern += i;
             }
         }
         else {
@@ -157,9 +157,9 @@ export function getExcludesGlob(folder: string | WorkspaceFolder): RelativePatte
         let multiFilePattern = "{**/node_modules/**";
         if (Array.isArray(excludes))
         {
-            for (const i in excludes) {
+            for (const e of excludes) {
                 multiFilePattern += ",";
-                multiFilePattern += excludes[i];
+                multiFilePattern += e;
             }
         }
         else {
@@ -339,32 +339,32 @@ export function isExcluded(uriPath: string, logPad = "")
 
     const exclude = configuration.get<string | string[]>("exclude");
 
-    log("", 2);
-    log(logPad + "Check exclusion", 2);
-    logValue(logPad + "   path", uriPath, 2);
+    logBlank(4);
+    log(logPad + "Check exclusion", 4);
+    logValue(logPad + "   path", uriPath, 4);
 
     if (exclude)
     {
         if (Array.isArray(exclude))
         {
             for (const pattern of exclude) {
-                logValue(logPad + "   checking pattern", pattern, 3);
+                logValue(logPad + "   checking pattern", pattern, 5);
                 if (testForExclusionPattern(uriPath, pattern)) {
-                    log(logPad + "   Excluded!", 2);
+                    log(logPad + "   Excluded!", 4);
                     return true;
                 }
             }
         }
         else {
-            logValue(logPad + "   checking pattern", exclude, 3);
+            logValue(logPad + "   checking pattern", exclude, 5);
             if (testForExclusionPattern(uriPath, exclude)) {
-              log(logPad + "   Excluded!", 2);
+              log(logPad + "   Excluded!", 4);
               return true;
             }
         }
     }
 
-    log(logPad + "   Not excluded", 2);
+    log(logPad + "   Not excluded", 4);
     return false;
 }
 
@@ -419,9 +419,9 @@ export function logError(msg: string | string[])
         log("*** " + msg);
     }
     else {
-        msg.forEach((m: string) => {
+        for (const m of msg) {
             log("*** " + m);
-        });
+        }
     }
     log("***");
 }
@@ -521,13 +521,14 @@ export function removeFromArray(arr: any[], item: any)
     let idx = -1;
     let idx2 = -1;
 
-    arr.forEach(each => {
+    for (const each of arr)
+    {
         idx++;
         if (item === each) {
             idx2 = idx;
-            return false;
+            break;
         }
-    });
+    }
 
     if (idx2 !== -1 && idx2 < arr.length) {
         arr.splice(idx2, 1);

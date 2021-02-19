@@ -114,10 +114,10 @@ suite("Util tests", () =>
             }, 100);
         };
 
-        await util.forEachAsync(arr, async function(n: number)
+        for (const n of arr)
         {
             await asyncFn(n);
-        });
+        }
     });
 
     test("Asynchronous mapForEach", async function()

@@ -7,12 +7,12 @@ import { TaskItem } from "../tasks";
 export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
 {
     let found = 0;
-    taskMap.forEach(task =>
+    for (const [ k, task ] of taskMap)
     {
         if (task.id.includes(id) && !task.isUser) {
             found++;
         }
-    });
+    }
     return found;
 }
 

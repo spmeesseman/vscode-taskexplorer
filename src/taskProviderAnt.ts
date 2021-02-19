@@ -67,7 +67,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     public async readTasks(): Promise<Task[]>
     {
         util.logBlank(1);
-        util.log("detect ant scripts", 1);
+        util.log("detect ant files", 1);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -79,25 +79,30 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             {
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
                     visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri);
+                    const tasks = await this.readUriTasks(fobj.uri, null, "   ");
+                    util.log("   processed ant file", 3);
+                    util.logValue("      file", fobj.uri.fsPath, 3);
+                    util.logValue("      targets in file", tasks.length, 3);
                     allTasks.push(...tasks);
                 }
             }
         }
 
+        util.logBlank(1);
         util.logValue("   # of tasks", allTasks.length, 2);
+        util.log("detect ant files complete", 1);
         return allTasks;
     }
 
 
-    private async findAllAntScripts(path: string): Promise<StringMap>
+    private async findAllAntScripts(path: string, logPad = ""): Promise<StringMap>
     {
         const scripts: StringMap = {};
         const useAnt = configuration.get<boolean>("useAnt");
 
         util.logBlank(1);
-        util.log("find all ant targets", 1);
-        util.logValue("   use ant", useAnt, 2);
+        util.log(logPad + "find ant targets", 1);
+        util.logValue(logPad + "   use ant", useAnt, 2);
 
         //
         // Try running 'ant' itself to get the targets.  If fail, just custom parse
@@ -110,6 +115,8 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             await this.findTasksWithXml2Js(path, scripts);
         }
 
+        util.logBlank(1);
+        util.log(logPad + "find ant targets complete", 1);
         return scripts;
     }
 
@@ -188,7 +195,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
     private async findTasksWithXml2Js(path: string, scripts: StringMap)
     {
-        const buffer = await util.readFile(path);
+        const buffer = util.readFileSync(path);
         //
         // Convert to JSON with Xml2Js parseString()
         //
@@ -200,11 +207,11 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         {
             const defaultTask = text.project.$.default; // Is default task?  It's always defined on the main project node
             const targets = text.project.target;
-            for (const tgt in targets)                  // Check .$ and .$.name (xml2js output format)
+            for (const tgt of targets)                  // Check .$ and .$.name (xml2js output format)
             {
-                if (targets[tgt].$ && targets[tgt].$.name) {
-                    util.logValue("   Found target (cst.)", targets[tgt].$.name);
-                    scripts[defaultTask === targets[tgt].$.name ? targets[tgt].$.name + " - Default" : targets[tgt].$.name] = targets[tgt].$.name;
+                if (tgt.$ && tgt.$.name) {
+                    util.logValue("   Found target (cst.)", tgt.$.name);
+                    scripts[defaultTask === tgt.$.name ? tgt.$.name + " - Default" : tgt.$.name] = tgt.$.name;
                 }
             }
         }
@@ -242,29 +249,31 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
-    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder): Promise<Task[]>
+    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
         util.logBlank(1);
-        util.log("read ant file", 1);
-        util.logValue("   file", uri.fsPath, 2);
-        util.logValue("   project folder", folder.name, 2);
+        util.log(logPad + "read ant file", 1);
+        util.logValue(logPad + "   file", uri.fsPath, 2);
+        util.logValue(logPad + "   project folder", folder.name, 2);
 
         if (folder)
         {
-            const scripts = await this.findAllAntScripts(uri.fsPath);
+            const scripts = await this.findAllAntScripts(uri.fsPath, "   ");
             if (scripts)
             {
-                await util.forEachAsync(Object.keys(scripts), (k: string) => {
-                    const task = this.createTask(scripts[k] ? scripts[k] : k, k, folder, uri);
+                for (const s of Object.keys(scripts))
+                {
+                    const task = this.createTask(scripts[s] ? scripts[s] : s, s, folder, uri);
                     task.group = TaskGroup.Build;
                     result.push(task);
-                });
+                }
             }
         }
 
+        util.log(logPad + "read ant file complete", 1);
         return result;
     }
 

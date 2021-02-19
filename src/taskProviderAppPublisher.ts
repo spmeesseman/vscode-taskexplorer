@@ -19,7 +19,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task
     {
-        return this.readUriTasks(uri)[0];
+        return this.readUriTasks(uri, null, "   ")[0];
     }
 
 
@@ -39,10 +39,10 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
     }
 
 
-    public async readTasks(): Promise<Task[]>
+    public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.log("");
-        util.log("detectAppPublisherfiles");
+        util.logBlank(1);
+        util.log(logPad + "detect app-publisher files", 1);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -52,24 +52,32 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         {
             for (const fobj of paths)
             {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
+                {
                     visitedFiles.add(fobj.uri.fsPath);
                     allTasks.push(...await this.readUriTasks(fobj.uri));
                 }
             }
         }
 
-        util.logValue("   # of tasks", allTasks.length, 2);
+        util.logBlank(1);
+        util.logValue(logPad + "   # of tasks", allTasks.length, 2);
+        util.log(logPad + "detect app-publisher files complete", 1);
+
         return allTasks;
     }
 
 
-    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder): Promise<Task[]>
+    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const cwd = path.dirname(uri.fsPath),
         folder = wsFolder || workspace.getWorkspaceFolder(uri),
               defaultDef = this.getDefaultDefinition(null, folder, uri),
               options: ShellExecutionOptions = { cwd };
+
+        util.logBlank(1);
+        util.log(logPad + "read app-publisher file uri tasks", 1);
+        util.logValue(logPad + "   path", uri?.fsPath, 1);
 
         const kind1: TaskExplorerDefinition = {
             ...defaultDef,
@@ -116,6 +124,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         const execution5 = new ShellExecution(kind5.cmdLine, options);
         const execution6 = new ShellExecution(kind6.cmdLine, options);
 
+        util.log(logPad + "read app-ublisher file uri tasks complete", 1);
         return [ new Task(kind4, folder, "Dry Run", "app-publisher", execution4, undefined),
                 new Task(defaultDef, folder, "Publish", "app-publisher", execution3, undefined),
                 new Task(kind1, folder, "Re-publish", "app-publisher", execution1, undefined),

@@ -115,13 +115,13 @@ export async function addWsFolder(wsf: readonly WorkspaceFolder[])
 
 export async function deactivate()
 {
-    watcherDisposables.forEach((d) => {
+    for (const [ k, d ] of watcherDisposables) {
         d.dispose();
-    });
+    }
 
-    watchers.forEach((w) => {
+    for (const [ k, w ] of watchers) {
         w.dispose();
-    });
+    }
 
     await cache.cancelBuildCache(true);
 }
@@ -140,18 +140,16 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
                 if (cache.filesCache.keys.hasOwnProperty(key)) // skip over props inherited by prototype
                 {
                     const toRemove = [];
-                    const obj = cache.filesCache.get(key);
-                    obj.forEach((item) =>
+                    const obj = cache.filesCache.get(cache.filesCache.keys[key]);
+                    for (const item of obj)
                     {
                         if (item.folder.uri.fsPath === wsf[f].uri.fsPath) {
                             toRemove.push(item);
                         }
-                    });
+                    }
                     if (toRemove.length > 0) {
-                        for (const tr in toRemove) {
-                            if (toRemove.hasOwnProperty(tr)) { // skip over propes inherited by prototype
-                                obj.delete(toRemove[tr]);
-                            }
+                        for (const tr of toRemove) {
+                            obj.delete(tr);
                         }
                     }
                 }
@@ -236,7 +234,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     // Path changes to task programs require task executions to be re-set up
     //
-    await util.forEachAsync(util.getTaskTypes(), (type: string) =>
+    for (const type of util.getTaskTypes())
     {
         if (type === "app-publisher") {
             if (e.affectsConfiguration("taskExplorer.pathToAppPublisher")) {
@@ -246,7 +244,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         else if (e.affectsConfiguration("taskExplorer.pathTo" + util.properCase(type))) {
             refreshTaskTypes.push(type);
         }
-    });
+    }
 
     //
     // Extra Apache Ant 'include' paths
@@ -333,9 +331,9 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         await refreshTree();
     }
     else if (refreshTaskTypes?.length > 0) {
-        util.forEachAsync(refreshTaskTypes, async (t: string) => {
+        for (const t of refreshTaskTypes) {
             await refreshTree(t);
-        });
+        }
     }
 }
 
@@ -343,17 +341,14 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
 async function registerFileWatchers(context: ExtensionContext)
 {
     const taskTypes = util.getTaskTypes();
-    for (const i in taskTypes)
+    for (const t of taskTypes)
     {
-        if (taskTypes.hasOwnProperty(i))
+        const taskType = t,
+            taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher";
+        if (configuration.get<boolean>("enable" + taskTypeP))
         {
-            const taskType = taskTypes[i],
-                taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher";
-            if (configuration.get<boolean>("enable" + taskTypeP))
-            {
-                const watchModify = util.isScriptType(taskType) || taskType === "app-publisher";
-                await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), watchModify);
-            }
+            const watchModify = util.isScriptType(taskType) || taskType === "app-publisher";
+            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), watchModify);
         }
     }
 }

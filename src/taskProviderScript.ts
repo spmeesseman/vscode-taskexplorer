@@ -206,8 +206,8 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public async readTasks(): Promise<Task[]>
     {
-        util.log("");
-        util.log("detectScriptFiles");
+        util.logBlank(1);
+        util.log("detect script files", 1);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -217,24 +217,32 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         {
             for (const fobj of paths)
             {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
+                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
+                {
                     visitedFiles.add(fobj.uri.fsPath);
                     allTasks.push(this.createTask(path.extname(fobj.uri.fsPath).substring(1), null, fobj.folder, fobj.uri));
-                    util.log("   found script target");
+                    util.log("   found script target/file");
                     util.logValue("      script file", fobj.uri.fsPath);
                 }
             }
         }
 
+        util.logBlank(1);
         util.logValue("   # of tasks", allTasks.length, 2);
+        util.log("detect script files complete", 1);
         return allTasks;
     }
 
 
-    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder): Promise<Task[]>
+    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
-        return [ this.createTask(path.extname(uri.fsPath).substring(1), null, folder, uri) ];
+        util.logBlank(1);
+        util.log(logPad + "read script file uri task", 1);
+        util.logValue(logPad + "   path", uri?.fsPath, 1);
+        const task = this.createTask(path.extname(uri.fsPath).substring(1), null, folder, uri);
+        util.log(logPad + "read script file uri task complete", 1);
+        return [ task ];
     }
 
 }

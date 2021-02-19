@@ -30,12 +30,12 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    private async findTargets(fsPath: string): Promise<string[]>
+    private findTargets(fsPath: string, logPad = ""): string[]
     {
         let scripts: string[];
 
-        util.log("");
-        util.log("Find gulpfile targets");
+        util.logBlank(1);
+        util.log(logPad + "Find gulp targets", 1);
 
         //
         // Try running 'gulp' itself to get the targets.  If fail, just custom parse
@@ -101,22 +101,22 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             // Loop through all the lines and extract the task names
             //
             const contents = stdout?.toString().split("\n");
-            for (const i in contents)
+            for (const c of contents)
             {
-                if (contents.hasOwnProperty(i)) {
-                    const line = contents[i].match(/(\[[\w\W][^\]]+\][ ](├─┬|├──|└──|└─┬) )([\w\-]+)/i);
-                    if (line && line.length > 3) {
-                        util.logValue("   Found target (gulp --tasks)", line[3]);
-                        scripts[line[3]] = line[3];
-                    }
+                const line = c.match(/(\[[\w\W][^\]]+\][ ](├─┬|├──|└──|└─┬) )([\w\-]+)/i);
+                if (line && line.length > 3)
+                {
+                    util.logValue(logPad + "   Found target (gulp --tasks)", line[3]);
+                    scripts[line[3]] = line[3];
                 }
             }
         }
         else {
-            scripts = await this.parseGulpTasks(fsPath);
+            scripts = this.parseGulpTasks(fsPath);
         }
 
-        util.log("   done");
+        util.logBlank(1);
+        util.log(logPad + "find gulp targets complete", 1);
 
         return scripts;
     }
@@ -153,10 +153,10 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    private async parseGulpTasks(fsPath: string): Promise<string[]>
+    private parseGulpTasks(fsPath: string): string[]
     {
         const scripts: string[] = [];
-        const contents = await util.readFile(fsPath);
+        const contents = util.readFileSync(fsPath);
         let idx = 0;
         let eol = contents.indexOf("\n", 0);
 
@@ -177,7 +177,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                 }
                 if (tgtName) {
                     scripts.push(tgtName);
-                    util.log("   found target");
+                    util.log("   found gulp target");
                     util.logValue("      name", tgtName);
                 }
             }
@@ -280,13 +280,17 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             {
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
                     visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri);
+                    const tasks = await this.readUriTasks(fobj.uri, null, "   ");
+                    util.log("   processed gulp file", 3);
+                    util.logValue("      file", fobj.uri.fsPath, 3);
+                    util.logValue("      targets in file", tasks.length, 3);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        util.logValue("   # of tasks", allTasks.length, 2);
+        util.logValue("   # of gulp tasks", allTasks.length, 2);
+        util.log("detect gulp files complete", 1);
         return allTasks;
     }
 
@@ -297,22 +301,24 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
         util.logBlank(1);
-        util.log(logPad + "read gulp file", 1);
+        util.log(logPad + "read gulp file uri tasks", 1);
         util.logValue(logPad + "   path", uri?.fsPath, 1);
 
         if (folder)
         {
-            const scripts = await this.findTargets(uri.fsPath);
+            const scripts = this.findTargets(uri.fsPath, "   ");
             if (scripts)
             {
-                scripts.forEach(each => {
-                    const task = this.createTask(each, each, folder, uri);
+                for (const s of scripts)
+                {
+                    const task = this.createTask(s, s, folder, uri);
                     task.group = TaskGroup.Build;
                     result.push(task);
-                });
+                }
             }
         }
 
+        util.log(logPad + "read gulp file uri tasks complete", 1);
         return result;
     }
 

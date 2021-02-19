@@ -369,17 +369,18 @@ export async function removeFileFromCache(taskAlias: string, uri: Uri)
     const taskCache = filesCache.get(taskAlias);
     const toRemove = [];
 
-    taskCache?.forEach((item) =>
+    if (taskCache)
     {
-        if (item.uri.fsPath === uri.fsPath) {
-            toRemove.push(item);
+        for (const item of taskCache)
+        {
+            if (item.uri.fsPath === uri.fsPath) {
+                toRemove.push(item);
+            }
         }
-    });
 
-    if (toRemove.length > 0) {
-        for (const tr in toRemove) {
-            if (toRemove.hasOwnProperty(tr)) { // skip over properties inherited by prototype
-                taskCache.delete(toRemove[tr]);
+        if (toRemove.length > 0) {
+            for (const tr of toRemove) {
+                taskCache.delete(tr);
             }
         }
     }

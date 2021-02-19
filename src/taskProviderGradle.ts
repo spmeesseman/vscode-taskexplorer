@@ -42,8 +42,8 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public async readTasks(): Promise<Task[]>
     {
-        util.log("");
-        util.log("detectGradlefiles");
+        util.logBlank(1);
+        util.log("detect gradle files", 1);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -55,25 +55,31 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             {
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
                     visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri);
+                    const tasks = await this.readUriTasks(fobj.uri, null, "   ");
+                    util.log("   processed gradle file", 3);
+                    util.logValue("      file", fobj.uri.fsPath, 3);
+                    util.logValue("      targets in file", tasks.length, 3);
                     allTasks.push(...tasks);
                 }
             }
         }
 
+        util.logBlank(1);
         util.logValue("   # of tasks", allTasks.length, 2);
+        util.log("detect gradle files complete", 1);
         return allTasks;
     }
 
 
-    private async findTargets(fsPath: string): Promise<string[]>
+    private findTargets(fsPath: string, logPad = ""): string[]
     {
         const json: any = "";
         const scripts: string[] = [];
 
-        util.log("   Find gradlefile targets");
+        util.logBlank(1);
+        util.log(logPad + "find gradle targets", 1);
 
-        const contents = await util.readFile(fsPath);
+        const contents = util.readFileSync(fsPath);
         let idx = 0;
         let eol = contents.indexOf("\n", 0);
 
@@ -97,8 +103,8 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
                         if (tgtName)
                         {
                             scripts.push(tgtName);
-                            util.log("      found target");
-                            util.logValue("         name", tgtName);
+                            util.log(logPad + "      found gradle target", 1);
+                            util.logValue(logPad + "         name", tgtName, 1);
                         }
                     }
                 }
@@ -108,6 +114,9 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             eol = contents.indexOf("\n", idx);
         }
 
+
+        util.logBlank(1);
+        util.log(logPad + "Find gradle targets complete", 1);
         return scripts;
     }
 
@@ -126,25 +135,30 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder): Promise<Task[]>
+    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
+        util.logBlank(1);
+        util.log(logPad + "read gulp file uri tasks", 1);
+        util.logValue(logPad + "   path", uri?.fsPath, 1);
+
         if (folder)
         {
-            const scripts = await this.findTargets(uri.fsPath);
+            const scripts = this.findTargets(uri.fsPath, "   ");
             if (scripts)
             {
-                scripts.forEach(each =>
+                for (const s of scripts)
                 {
-                    const task = this.createTask(each, each, folder, uri);
+                    const task = this.createTask(s, s, folder, uri);
                     task.group = TaskGroup.Build;
                     result.push(task);
-                });
+                }
             }
         }
 
+        util.log(logPad + "read grunt file uri tasks complete", 1);
         return result;
     }
 
