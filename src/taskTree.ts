@@ -1052,7 +1052,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
                     // if the script type set for the task in tasks.json is of type 'currentInvalidation'.
                     // Remove any Workspace type tasks returned as well, in this case the source type is
-                    // != 'currentInvalidation'
+                    // != currentInvalidation, but the definition type == currentInvalidation
                     //
                     if (t.source === this.currentInvalidation || t.source === "Workspace") {
                         if (t.source !== "Workspace" || t.definition.type === this.currentInvalidation) {
