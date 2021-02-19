@@ -1055,7 +1055,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     // != 'currentInvalidation'
                     //
                     if (t.source === this.currentInvalidation || t.source === "Workspace") {
-                        toRemove.push(t);
+                        if (t.source !== "Workspace" || t.definition.type === this.currentInvalidation) {
+                            toRemove.push(t);
+                        }
                     }
                 }
                 for (const t of toRemove) {
