@@ -1381,8 +1381,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private getTaskFileNode(task: Task, folder: TaskFolder, files: any, relativePath: string, scopeName: string, logPad = ""): TaskFile
     {
         let taskFile: TaskFile;
+        //
+        // Reference ticket #133, vscode folder should not use a path appendature in it's folder label
+        // in the task tree, there is only one path for vscode/workspace tasks, /.vscode.  The fact that
+        // you can set the path variable inside a vscode task changes the relativePath for the task,
+        // causing an endless loop when putting the tasks into groups (see taskTree.createTaskGroupings).
+        // All othr task types will have a relative path of it's location on the filesystem (with
+        // eception of TSC, which is handled elsewhere).
+        //
+        const relPathAdj = task.source !== "Workspace" ? relativePath : ".vscode";
 
-        let id = task.source + ":" + path.join(scopeName, relativePath);
+        let id = task.source + ":" + path.join(scopeName, relPathAdj);
         if (task.definition.fileName && !task.definition.scriptFile)
         {
             id = path.join(id, task.definition.fileName);

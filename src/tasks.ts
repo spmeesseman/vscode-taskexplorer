@@ -84,7 +84,7 @@ export class TaskItem extends TreeItem
         //
         // Node path
         //
-        this.nodePath = task.definition.path;
+        this.nodePath = taskFile.nodePath; // task.definition.path;
         //
         // Tooltip
         //
@@ -179,10 +179,19 @@ export class TaskFile extends TreeItem
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group), TreeItemCollapsibleState.Collapsed);
 
         this.folder = folder;
-        this.path = relativePath;
-        this.nodePath = relativePath;
+        this.path = this.label !== "vscode" ? relativePath : ".vscode";
+        this.nodePath = this.label !== "vscode" ? relativePath : "vscode";
         this.taskSource = source;
         this.isGroup = (group === true);
+        //
+        // Reference ticket #133, vscode folder should not use a path appendature in it's folder label
+        // in the task tree, there is only one path for vscode/workspace tasks, /.vscode.  The fact that
+        // you can set the path variable inside a vscode task changes the relativePath for the task,
+        // causing an endless loop when putting the tasks into groups (see taskTree.createTaskGroupings).
+        // All othr task types will have a relative path of it's location on the filesystem (with
+        // eception of TSC, which is handled elsewhere).
+        //
+        this.path = this.label !== "vscode" ? relativePath : ".vscode";
 
         if (group && this.label) {
             this.nodePath = path.join(this.nodePath, this.label);
@@ -286,7 +295,15 @@ export class TaskFile extends TreeItem
                 }
             }
 
-            if (relativePath.length > 0 && relativePath !== ".vscode")
+            //
+            // Reference ticket #133, vscode folder should not use a path appendature in it's folder label
+            // in the task tree, there is only one path for vscode/workspace tasks, /.vscode.  The fact that
+            // you can set the path variable inside a vscode task changes the relativePath for the task,
+            // causing an endless loop when putting the tasks into groups (see taskTree.createTaskGroupings).
+            // All othr task types will have a relative path of it's location on the filesystem (with
+            // eception of TSC, which is handled elsewhere).
+            //
+            if (relativePath.length > 0 && relativePath !== ".vscode" && source !== "Workspace")
             {
                 if (relativePath.endsWith("\\") || relativePath.endsWith("/")) // trim slash chars
                 {
