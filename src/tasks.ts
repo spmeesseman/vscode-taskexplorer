@@ -83,6 +83,13 @@ export class TaskItem extends TreeItem
         this.task.definition.taskItemId = this.id;
         //
         // Node path
+        // 2-19-21 - This was being set to task.definitieon.path, which for workspace tasks doesnt
+        // necessarily mean that the file path is the same (workspace task filepath is ./.vscode).
+        // The 'nodePath' variable should be the same as the taskFile owner in any case, and this
+        // should not have had anything to do with the issue found in ticket #133, which the same
+        // situation with workspace tasks with paths set caused a never-ending loop when building
+        // the task groups.  Leaving commented, as a reminder, in case of any side effect.  It gets
+        // reset in _setNodePath of taskTree.createTaskGroupingsBySep while creating grouping levels.
         //
         this.nodePath = taskFile.nodePath; // task.definition.path;
         //
