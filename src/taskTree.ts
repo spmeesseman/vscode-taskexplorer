@@ -398,6 +398,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
 
         //
+        // Log the task details
+        //
+        this.logTask(each, scopeName, logPad);
+
+        //
         // Get task file node
         //
         taskFile = this.getTaskFileNode(each, folder, files, relativePath, scopeName, logPad);
@@ -602,7 +607,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         util.logMethodStart("create task groupings by defined separator", 2, logPad, [
             [ "label (node name)", taskFile.label ], [ "grouping level", treeLevel ], [ "is group", taskFile.isGroup ],
-            [ "file name", taskFile.path ], [ "folder", folder.label ], [ "path", taskFile.path ], ["tree level", prevName[treeLevel]]
+            [ "file name", taskFile.path ], [ "folder", folder.label ], [ "path", taskFile.path ], ["tree level", treeLevel]
         ]);
 
         const _setNodePath = (t: TaskItem, cPath: string) =>
@@ -631,7 +636,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             const prevNameOk = prevName && prevName.length > treeLevel && prevName[treeLevel];
 
             util.log("   process task item", 3, logPad);
-            util.logValues(3, logPad + "      ", [
+            util.logValues(4, logPad + "      ", [
                 ["id", each.id], ["label", label], ["node path", each.nodePath], ["command", each.command],
                 ["previous name [tree level]", prevNameOk ? prevName[treeLevel] : "undefined"],
                 ["this previous name", prevNameThis]
@@ -663,6 +668,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 for (let i = 0; i <= treeLevel; i++)
                 {
                     if (prevName[i] === prevNameThis[i]) {
+                        util.log("   found group", 4, logPad);
                         foundGroup = true;
                     }
                     else {
@@ -721,7 +727,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     // TODO !!!
                     // Ref ticket #133
                     // VSCode Tasks - Bug, something to do with "relativepath" of the acutal task being empty,
-                    // but in this extension we user /.vcsode as the path, cant go deeper then one level, for
+                    // but in this extension we use /.vcsode as the path, cant go deeper then one level, for
                     // now until I can find time to look at more
                     //
                     if (n.taskSource === "Workspace") {
@@ -1698,61 +1704,61 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
-        util.logValue(logPad + "name", task.name, 2);
-        util.logValue(logPad + "source", task.source, 2);
-        util.logValue(logPad + "scopeName", scopeName, 3);
-        util.logValue(logPad + "scope.name", scopeName, 3);
+        util.logValue(logPad + "name", task.name, 3);
+        util.logValue(logPad + "source", task.source, 3);
+        util.logValue(logPad + "scope name", scopeName, 4);
         if (this.isWorkspaceFolder(task.scope))
         {
-            util.logValue(logPad + "scope.uri.path", task.scope.uri.path, 3);
-            util.logValue(logPad + "scope.uri.fsPath", task.scope.uri.fsPath, 3);
+            util.logValue(logPad + "scope.name", task.scope.name, 4);
+            util.logValue(logPad + "scope.uri.path", task.scope.uri.path, 4);
+            util.logValue(logPad + "scope.uri.fsPath", task.scope.uri.fsPath, 4);
         }
         else // User tasks
         {
-            util.logValue(logPad + "scope.uri.path", "N/A (User)", 3);
+            util.logValue(logPad + "scope.uri.path", "N/A (User)", 4);
         }
-        util.logValue(logPad + "relative Path", definition.path ? definition.path : "", 3);
-        util.logValue(logPad + "type", definition.type, 3);
+        util.logValue(logPad + "relative Path", definition.path ? definition.path : "", 4);
+        util.logValue(logPad + "type", definition.type, 4);
         if (definition.scriptType)
         {
-            util.logValue(logPad + "   script type", definition.scriptType, 3);	// if 'script' is defined, this is type npm
+            util.logValue(logPad + "   script type", definition.scriptType, 4);	// if 'script' is defined, this is type npm
         }
         if (definition.scriptFile)
         {
-            util.logValue(logPad + "   script file", definition.scriptFile, 3);	// if 'script' is defined, this is type npm
+            util.logValue(logPad + "   script file", definition.scriptFile, 4);	// if 'script' is defined, this is type npm
         }
         if (definition.script)
         {
-            util.logValue(logPad + "script", definition.script, 3);	// if 'script' is defined, this is type npm
+            util.logValue(logPad + "script", definition.script, 4);	// if 'script' is defined, this is type npm
         }
         if (definition.path)
         {
-            util.logValue(logPad + "path", definition.path, 3);
+            util.logValue(logPad + "path", definition.path, 4);
         }
         //
         // Internal task providers will set a fileName property
         //
         if (definition.fileName)
         {
-            util.logValue(logPad + "file name", definition.fileName, 3);
+            util.logValue(logPad + "file name", definition.fileName, 4);
         }
         //
         // Internal task providers will set a uri property
         //
         if (definition.uri)
         {
-            util.logValue(logPad + "file path", definition.uri.fsPath, 3);
+            util.logValue(logPad + "file path", definition.uri.fsPath, 4);
         }
         //
         // Script task providers will set a fileName property
         //
         if (definition.takesArgs)
         {
-            util.logValue(logPad + "script requires args", "true", 3);
+            util.logValue(logPad + "script requires args", "true", 4);
         }
         if (definition.cmdLine)
         {
-            util.logValue(logPad + "script cmd line", definition.cmdLine, 3);
+            util.logValue(logPad + "script cmd line", definition.cmdLine, 4);
         }
     }
 
