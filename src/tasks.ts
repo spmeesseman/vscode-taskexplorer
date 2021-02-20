@@ -211,7 +211,7 @@ export class TaskFile extends TreeItem
             this.fileName = this.getFileNameFromSource(source, folder, taskDef, relativePath, true);
             if (folder.resourceUri)
             {
-                if (relativePath)
+                if (relativePath && source !== "Workspace")
                 {
                     this.resourceUri = Uri.file(path.join(folder.resourceUri.fsPath, relativePath, this.fileName));
                 } else
