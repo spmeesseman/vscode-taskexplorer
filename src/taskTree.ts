@@ -523,7 +523,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             // Create the grouping
             //
-            util.logValue(logPad + "   folder", folder.label, 3);
             await this.createTaskGroupingsBySep(folder, each, subfolders, 0, logPad + "   ");
         }
 
@@ -606,8 +605,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const atMaxLevel: boolean = configuration.get<number>("groupMaxLevel") <= treeLevel + 1;
 
         util.logMethodStart("create task groupings by defined separator", 2, logPad, [
-            [ "label (node name)", taskFile.label ], [ "grouping level", treeLevel ], [ "is group", taskFile.isGroup ],
-            [ "file name", taskFile.path ], [ "folder", folder.label ], [ "path", taskFile.path ], ["tree level", treeLevel]
+            [ "folder", folder.label ], [ "label (node name)", taskFile.label ], [ "grouping level", treeLevel ], [ "is group", taskFile.isGroup ],
+            [ "file name", taskFile.fileName ], [ "folder", folder.label ], [ "path", taskFile.path ], ["tree level", treeLevel]
         ]);
 
         const _setNodePath = (t: TaskItem, cPath: string) =>
