@@ -602,7 +602,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         util.logMethodStart("create task groupings by defined separator", 2, logPad, [
             [ "label (node name)", taskFile.label ], [ "grouping level", treeLevel ], [ "is group", taskFile.isGroup ],
-            [ "file name", taskFile.path ], [ "folder", folder.label ], [ "path", taskFile.path ]
+            [ "file name", taskFile.path ], [ "folder", folder.label ], [ "path", taskFile.path ], ["tree level", prevName[treeLevel]]
         ]);
 
         const _setNodePath = (t: TaskItem, cPath: string) =>
@@ -628,6 +628,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             const label = each.label.toString();
             let subfolder: TaskFile;
             const prevNameThis = label.split(groupSeparator);
+            const prevNameOk = prevName && prevName.length > treeLevel && prevName[treeLevel];
+
+            util.log("   process task item", 3, logPad);
+            util.logValues(3, logPad + "      ", [
+                ["id", each.id], ["label", label], ["node path", each.nodePath], ["command", each.command],
+                ["previous name [tree level]", prevNameOk ? prevName[treeLevel] : "undefined"],
+                ["this previous name", prevNameThis]
+            ]);
 
             //
             // Check if we're in a state to create a new group.
@@ -650,7 +658,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //     wp-build-svr-production
             //
             let foundGroup = false;
-            if (prevName && prevName.length > treeLevel && prevName[treeLevel] && prevNameThis.length > treeLevel)
+            if (prevNameOk && prevNameThis.length > treeLevel)
             {
                 for (let i = 0; i <= treeLevel; i++)
                 {

@@ -429,7 +429,7 @@ export function logMethodDone(msg: string, level?: number, logPad = "")
 }
 
 
-export function log(msg: string, level?: number, color?: LogColor)
+export function log(msg: string, level?: number, logPad = "", color?: LogColor)
 {
     if (msg === null || msg === undefined) {
         return;
@@ -440,7 +440,7 @@ export function log(msg: string, level?: number, color?: LogColor)
         // if (color) {
         //     msg = color + msg + LogColor.white;
         // }
-        const tsMsg = new Date().toISOString().replace(/[TZ]/g, " ") + msg;
+        const tsMsg = new Date().toISOString().replace(/[TZ]/g, " ") + logPad + msg;
         if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
             logOutputChannel.appendLine(tsMsg);
         }
@@ -497,7 +497,7 @@ function logUserDataEnv(padding = "")
 }
 
 
-export function logValue(msg: string, value: any, level?: number)
+export function logValue(msg: string, value: any, level?: number, logPad = "")
 {
     if (isLoggingEnabled())
     {
@@ -518,7 +518,22 @@ export function logValue(msg: string, value: any, level?: number)
             logMsg += ": null";
         }
 
-        log(logMsg, level);
+        log(logMsg, level, logPad);
+    }
+}
+
+
+export function logValues(level: number, logPad: string, params: any | [string, any][])
+{
+    if (params === null || params === undefined || params.length === 0) {
+        return;
+    }
+
+    if (isLoggingEnabled())
+    {
+        for (const [ n, v] of params) {
+            logValue(n, v, level, logPad);
+        }
     }
 }
 
