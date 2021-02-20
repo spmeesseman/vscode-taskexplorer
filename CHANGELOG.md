@@ -1,3 +1,11 @@
+## [2.0.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.3...v2.0.4) (2021-02-20)
+
+
+### Bug Fixes
+
+* open command does not work for vscode/workspace tasks if a path property is defined. ([8535d69](https://github.com/spmeesseman/vscode-taskexplorer/commit/8535d69))
+* tree build loops indefinitely when vscode/worskspace tasks with path properties exist. [fixes [#133](https://github.com/spmeesseman/vscode-taskexplorer/issues/133)] ([d8fb390](https://github.com/spmeesseman/vscode-taskexplorer/commit/d8fb390))
+
 ## [2.0.3](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.2...v2.0.3) (2021-02-19)
 
 
