@@ -1,14 +1,12 @@
 
 import {
     Task, TaskExecution, ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, env,
-    TaskDefinition, ExtensionContext, tasks, Uri, workspace, ProcessExecution, ShellExecution,
-    TaskScope, CustomExecution
+    TaskDefinition, ExtensionContext, tasks, Uri
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
 import * as constants from "./common/constants";
 import { configuration } from "./common/configuration";
-import { match } from "minimatch";
 
 
 export class TaskItem extends TreeItem
@@ -280,7 +278,7 @@ export class TaskFile extends TreeItem
                 //
                 if (!taskDef?.fileName?.match(/build.xml/i))
                 {
-                    if (relativePath.length > 0 && relativePath !== ".vscode")
+                    if (relativePath.length > 0 && relativePath !== ".vscode" && taskDef.type)
                     {
                         return label + " (" + relativePath.substring(0, relativePath.length - 1).toLowerCase() + "/" + taskDef.fileName.toLowerCase() + ")";
                     }
@@ -344,45 +342,6 @@ export class TaskFile extends TreeItem
             fileName = "tsconfig.json";
             tmpIdx = 2;
         }
-
-        //
-        // Check for casing, technically this isnt needed for windows but still
-        // want it covered in local tests
-        //
-
-        // let dirPath: string;
-        // if (folder!.resourceUri) {
-        //     if (relativePath)
-        //     {
-        //         dirPath = path.join(folder!.resourceUri!.fsPath, relativePath);
-        //     } else
-        //     {
-        //         dirPath = folder!.resourceUri!.fsPath;
-        //     }
-        // }
-        // else {
-        //     dirPath = "user"
-        // }
-
-        // let filePath = path.join(dirPath, fileName);
-        // if (!util.pathExists(filePath)) {
-        // 	//
-        // 	// try camelcasing
-        // 	//
-        // 	fileName = util.camelCase(fileName, tmpIdx);
-        // 	if (!util.pathExists(filePath)) {
-        // 		//
-        // 		// upper casing first leter
-        // 		//
-        // 		fileName = util.properCase(fileName);
-        // 		if (!util.pathExists(filePath)) {
-        // 			//
-        // 			// upper case
-        // 			//
-        // 			fileName = fileName.toUpperCase();
-        // 		}
-        // 	}
-        // }
 
         return fileName;
     }

@@ -6,7 +6,7 @@
 	"version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Extension",
+            "name": "Launch Extension w Root",
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
@@ -14,6 +14,20 @@
               "--disable-extensions",
               "--extensionDevelopmentPath=${workspaceFolder}",
               "${workspaceRoot}"
+            ],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            "preLaunchTask": "npm: watch"
+          },
+          {
+            "name": "Launch Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+              "--disable-extensions",
+              "--extensionDevelopmentPath=${workspaceFolder}"
             ],
             "stopOnEntry": false,
             "sourceMaps": true,

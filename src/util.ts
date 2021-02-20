@@ -18,6 +18,19 @@ let writeToConsoleLevel = 2;
 let logOutputChannel: OutputChannel | undefined;
 
 
+export enum LogColor
+{
+    black = "\\u001b[30m",
+    red = "\\u001b[31",
+    green = "\\u001b[32m",
+    yellow = "\\u001b[33m",
+    blue = "\\u001b[34m", // "<span style=\"color:blue\">"  "</style>"
+    magenta = "\\u001b[35",
+    cyan = "\\u001b[36m",
+    white = "\\u001b[37m"
+}
+
+
 /**
  * Camel case a string
  *
@@ -382,7 +395,7 @@ export function isScriptType(source: string)
 }
 
 
-export function log(msg: string, level?: number)
+export function logMethodStart(msg: string, level?: number, logPad = "", params?: [string, any][], color?: LogColor)
 {
     if (msg === null || msg === undefined) {
         return;
@@ -390,6 +403,43 @@ export function log(msg: string, level?: number)
 
     if (isLoggingEnabled())
     {
+        const lLevel = level || 1;
+        logBlank(lLevel);
+        log(logPad + "*start* " + msg, lLevel, color);
+        if (params) {
+            for (const [ n, v] of params) {
+                logValue(logPad + "   " + n, v, lLevel + 1);
+            }
+        }
+    }
+}
+
+
+export function logMethodDone(msg: string, level?: number, logPad = "")
+{
+    if (msg === null || msg === undefined) {
+        return;
+    }
+
+    if (isLoggingEnabled())
+    {
+        logBlank(level || 1);
+        log(logPad + "*done* " + msg, level || 1, LogColor.cyan);
+    }
+}
+
+
+export function log(msg: string, level?: number, color?: LogColor)
+{
+    if (msg === null || msg === undefined) {
+        return;
+    }
+
+    if (isLoggingEnabled())
+    {
+        // if (color) {
+        //     msg = color + msg + LogColor.white;
+        // }
         const tsMsg = new Date().toISOString().replace(/[TZ]/g, " ") + msg;
         if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
             logOutputChannel.appendLine(tsMsg);
@@ -414,52 +464,62 @@ export function logError(msg: string | string[])
     if (!msg === null || msg === undefined) {
         return;
     }
-    log("***");
-    if (typeof msg === "string") {
-        log("*** " + msg);
-    }
-    else {
-        for (const m of msg) {
-            log("*** " + m);
+
+    if (isLoggingEnabled())
+    {
+        log("***");
+        if (typeof msg === "string") {
+            log("*** " + msg);
         }
+        else {
+            for (const m of msg) {
+                log("*** " + m);
+            }
+        }
+        log("***");
     }
-    log("***");
 }
 
 
 function logUserDataEnv(padding = "")
 {
-    logValue(padding + "os", process.platform, 1);
-    logValue(padding + "portable", process.env.VSCODE_PORTABLE, 1);
-    logValue(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
-    logValue(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 1);
-    logValue(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
-    if (process.platform === "linux") {
-        logValue("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
+    if (isLoggingEnabled())
+    {
+        logValue(padding + "os", process.platform, 1);
+        logValue(padding + "portable", process.env.VSCODE_PORTABLE, 1);
+        logValue(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
+        logValue(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 1);
+        logValue(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
+        if (process.platform === "linux") {
+            logValue("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
+        }
     }
 }
 
 
 export function logValue(msg: string, value: any, level?: number)
 {
-    let logMsg = msg;
-    const spaces = msg && msg.length ? msg.length : (value === undefined ? 9 : 4);
-    for (let i = spaces; i < logValueWhiteSpace; i++) {
-        logMsg += " ";
-    }
+    if (isLoggingEnabled())
+    {
+        let logMsg = msg;
+        const spaces = msg && msg.length ? msg.length : (value === undefined ? 9 : 4);
+        for (let i = spaces; i < logValueWhiteSpace; i++) {
+            logMsg += " ";
+        }
 
-    if (value || value === 0 || value === "" || value === false) {
-        logMsg += ": ";
-        logMsg += value.toString();
-    }
-    else if (value === undefined) {
-        logMsg += ": undefined";
-    }
-    else if (value === null) {
-        logMsg += ": null";
-    }
+        if (value || value === 0 || value === "" || value === false) {
+            logMsg += ": ";
+            logMsg += value.toString();
+        }
+        else if (value === undefined) {
+            logMsg += ": undefined";
+        }
+        else if (value === null) {
+            logMsg += ": null";
+        }
 
-    log(logMsg, level);
+        log(logMsg, level);
+    }
 }
 
 

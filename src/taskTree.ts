@@ -83,6 +83,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
 
     /**
+     * @method addRemoveFavorite
+     * @since 2.0.0
+     *
      * Adds/removes tasks from the Favorites List.  Basically a toggle, if the task exists as a
      * favorite already when this function is called, it gets removed, if it doesnt exist, it gets added.
      *
@@ -93,8 +96,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []) || [];
         const favId = this.getTaskItemId(taskItem);
 
-        util.log("");
-        util.log("add/remove favorite", 1);
+        util.logMethodStart("add/remove favorite", 1);
 
         if (!taskItem) {
             return;
@@ -124,6 +126,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             this.showSpecialTasks(true, true, null, "   ");
         }
+
+        util.logMethodDone("add/remove favorite", 1);
     }
 
 
@@ -142,14 +146,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         }
 
-        util.log("Add to excludes");
-        util.logValue("   global", global === false ? "false" : "true", 2);
+        util.logMethodStart("add to excludes", 1, "", [[ "global", global ]]);
 
         if (selection instanceof TaskFile)
         {
             if (selection.isGroup)
             {
-                util.log("  File group");
+                util.log("  file group");
                 pathValue = "";
                 for (const each of selection.scripts)
                 {
@@ -162,7 +165,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             else
             {
-                util.logValue("  File glob", uri.path);
+                util.logValue("  file glob", uri.path);
                 pathValue = uri.path;
             }
         }
@@ -214,6 +217,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         else {
             await saveExclude(pathValue);
         }
+
+        util.logMethodDone("add to excludes", 1);
     }
 
 
@@ -231,17 +236,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async buildGroupings(folders: Map<string, TaskFolder>, logPad = "")
     {
-        util.logBlank(1);
-        util.log(logPad + "Build tree node groupings", 1);
+        util.logMethodStart("build tree node groupings", 1, logPad);
+
         //
         // Sort nodes.  By default the project folders are sorted in the same order as that
         // of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
         // its entirley random as to when the individual providers report tasks to the engine
         //
-        // After the initial sort, create any task groupings based on the task group separator
-        //
-        // TODO - As of v1.29 with muti-level groupings, this needs ti be recursve, it's not
-        // going to hit task items levels 2 or more
+        // After the initial sort, create any task groupings based on the task group separator.
+        // 'folders' are the project/workspace folders.
         //
         for (const [ key, folder ] of folders)
         {
@@ -258,8 +261,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         }
 
-        util.logBlank(1);
-        util.log(logPad + "completed build tree node groupings", 1);
+        util.logMethodDone("build tree node groupings", 1, logPad);
     }
 
 
@@ -271,8 +273,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let ltfolder: TaskFolder = null,
             favfolder: TaskFolder = null;
 
-        util.logBlank(1);
-        util.log(logPad + "build task tree", 1);
+        util.logMethodStart("build task tree", 1, logPad, null, util.LogColor.cyan);
         this.treeBuilding = true;
 
         //
@@ -306,7 +307,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             taskCt++;
             util.logBlank(1);
-            util.log(logPad + "   Processing task " + (++taskCt).toString() + " of " + tasksList.length.toString(), 1);
+            util.log(logPad + "   Processing task " + (++taskCt).toString() + " of " + tasksList.length.toString(), 1, util.LogColor.cyan);
             this.buildTaskTreeList(each, folders, files, ltfolder, favfolder, lastTasks, favTasks, logPad + "   ");
         }
 
@@ -334,8 +335,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Done!
         //
-        util.logBlank(1);
-        util.log(logPad + "completed build task tree", 1);
+        util.logMethodDone("build task tree", 1, logPad);
         this.treeBuilding = false;
 
         return sortedFolders;
@@ -346,93 +346,78 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         let folder: TaskFolder,
             taskFile: TaskFile = null,
-            settingName: string = "enable" + util.properCase(each.source),
             scopeName: string;
 
-        util.logBlank(1);
-        util.log(logPad + "build task tree list", 1);
+        util.logMethodStart("build task tree list", 2, logPad, [
+            [ "name", each.name ], [ "source", each.source ], [ "scope", each.scope ], [ "scope", each.scope ],
+            [ "definition type", each.definition.type ], [ "definition path", each.definition.path ]
+        ]);
+
+        const definition: TaskDefinition = each.definition;
+        let relativePath = definition.path ? definition.path : "";
 
         //
-        // Remove the '-' from app-publisher task.  VSCode doesn't like dashes in the settings names, so...
-        //
-        if (settingName === "enableApp-publisher") {
-            settingName = "enableAppPublisher";
-        }
-
-        //
+        // Make sure this task shouldnt be ignored based on various criteria...
         // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
         // By default, also ignore npm 'install' tasks, since its available in the context menu
         //
-        if ((configuration.get(settingName) || !this.isWorkspaceFolder(each.scope)) && !this.isNpmInstallTask(each))
+        const include: any = this.isTaskIncluded(each, relativePath, logPad);
+        if (!include) {
+            util.logMethodDone("build task tree list", 2, logPad);
+            return;
+        }
+
+        if (typeof include === "string") { // TSC tasks may have had their rel. pathchanged
+            relativePath = include;
+            util.logValue(logPad + "   set relative path", relativePath, 2);
+        }
+
+        //
+        // Set scope name and create the TaskFolder, a "user" task will have a TaskScope scope, not
+        // a WosrkspaceFolder scope.
+        //
+        if (this.isWorkspaceFolder(each.scope))
         {
-            const definition: TaskDefinition = each.definition;
-            let relativePath = definition.path ? definition.path : "";
-
-            //
-            // Make sure this task shouldnt be ignored based on various criteria...
-            //
-            const include: any = this.isTaskIncluded(each, relativePath);
-            if (!include) {
-                return;
-            }
-            else if (typeof include === "string") { // TSC tasks may have had their rel. pathchanged
-                relativePath = include;
-            }
-
-            //
-            // Set scope name and create the TaskFolder, a "user" task will have a TaskScope scope, not
-            // a WosrkspaceFolder scope.
-            //
-            if (this.isWorkspaceFolder(each.scope))
+            scopeName = each.scope.name;
+            folder = folders.get(scopeName);
+            if (!folder)
             {
-                scopeName = each.scope.name;
-                folder = folders.get(scopeName);
-                if (!folder)
-                {
-                    folder = new TaskFolder(each.scope);
-                    folders.set(scopeName, folder);
-                }
-            }     //
-            else // User Task (not related to a ws or project)
-            {   //
-                scopeName = constants.USER_TASKS_LABEL;
-                folder = folders.get(scopeName);
-                if (!folder)
-                {
-                    folder = new TaskFolder(scopeName);
-                    folders.set(scopeName, folder);
-                }
+                folder = new TaskFolder(each.scope);
+                folders.set(scopeName, folder);
             }
-
-            //
-            // Get task file node
-            //
-            taskFile = this.getTaskFileNode(each, folder, files, relativePath, scopeName, logPad);
-
-            //
-            // Create and add task item to task file node
-            //
-            const taskItem = new TaskItem(this.extensionContext, taskFile, each);
-            taskFile.addScript(taskItem);
-
-            //
-            // Add this task to the 'Last Tasks' folder if we need to
-            //
-            this.addToSpecialFolder(taskItem, ltfolder, lastTasks, constants.LAST_TASKS_LABEL);
-            //
-            // Add this task to the 'Favorites' folder if we need to
-            //
-            this.addToSpecialFolder(taskItem, favfolder, favTasks, constants.FAV_TASKS_LABEL);
-        }
-        else
-        {
-            util.log(logPad + "   Skipping", 1);
-            util.logValue(logPad + "   enabled", configuration.get(settingName), 1);
-            util.logValue(logPad + "   is npm install task", this.isNpmInstallTask(each), 1);
+        }     //
+        else // User Task (not related to a ws or project)
+        {   //
+            scopeName = constants.USER_TASKS_LABEL;
+            folder = folders.get(scopeName);
+            if (!folder)
+            {
+                folder = new TaskFolder(scopeName);
+                folders.set(scopeName, folder);
+            }
         }
 
-        util.logBlank(1);
-        util.log(logPad + "build task tree list complete", 1);
+        //
+        // Get task file node
+        //
+        taskFile = this.getTaskFileNode(each, folder, files, relativePath, scopeName, logPad);
+
+        //
+        // Create and add task item to task file node
+        //
+        const taskItem = new TaskItem(this.extensionContext, taskFile, each);
+        taskFile.addScript(taskItem);
+
+        //
+        // Add this task to the 'Last Tasks' folder if we need to
+        //
+        this.addToSpecialFolder(taskItem, ltfolder, lastTasks, constants.LAST_TASKS_LABEL);
+        //
+        // Add this task to the 'Favorites' folder if we need to
+        //
+        this.addToSpecialFolder(taskItem, favfolder, favTasks, constants.FAV_TASKS_LABEL);
+
+        util.logMethodDone("build task tree list", 2, logPad);
     }
 
 
@@ -458,9 +443,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const lTasks = storage.get<string[]>(storeName, []) || [];
         const folder = new TaskFolder(label);
 
-        util.log(logPad + "create special tasks folder", 1);
-        util.logValue(logPad + "   store",  storeName, 2);
-        util.logValue(logPad + "   name",  label, 2);
+        util.logMethodStart("create special tasks folder", 1, logPad, [
+            [ "store",  storeName ], [ "name",  label ]
+        ]);
 
         this.taskTree.splice(treeIndex, 0, folder);
 
@@ -479,10 +464,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (sort) {
             this.sortTasks(folder.taskFiles, logPad + "   ");
         }
+
+        util.logMethodDone("create special tasks folder", 1, logPad);
     }
 
 
     /**
+     * @method createTaskGroupings
+     * @since 1.28.0
+     *
      * Creates main task groupings, i.e. 'npm', 'vscode', 'batch', etc, for a given {@link TaskFolder}
      *
      * @param folder The TaskFolder to process
@@ -492,9 +482,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let prevTaskFile: TaskItem | TaskFile;
         const subfolders: Map<string, TaskFile> = new Map();
 
-        util.logBlank(1);
-        util.log(logPad + "create tree node folder grouping", 1);
-        util.logValue(logPad + "   project folder", folder.label, 2);
+        util.logMethodStart("create tree node folder grouping", 1, logPad, [[ "project folder", folder.label ]]);
 
         for (const each of folder.taskFiles)
         {   //
@@ -559,12 +547,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         await this.sortFolder(folder, logPad + "   ");
 
-        util.logBlank(1);
-        util.log(logPad + "completed tree node folder grouping", 1);
+        util.logMethodDone("create tree node folder grouping", 1, logPad);
     }
 
 
     /**
+     * @method createTaskGroupingsBySep
+     * @since 1.29.0
+     *
      *  Build groupings by separator
      *
      *  For example, consider the set of task names/labels:
@@ -610,13 +600,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const groupSeparator = util.getGroupSeparator();
         const atMaxLevel: boolean = configuration.get<number>("groupMaxLevel") <= treeLevel + 1;
 
-        util.log(logPad + "create task groupings by defined separator", 2);
-        util.logValue(logPad + "   node name", taskFile.label, 2);
-        util.logValue(logPad + "   grouping level", treeLevel, 3);
-        util.logValue(logPad + "   is group", taskFile.isGroup, 3);
-        util.logValue(logPad + "   file name", taskFile.path, 3);
-        util.logValue(logPad + "   folder", folder.label, 3);
-        util.logValue(logPad + "   path", taskFile.path, 3);
+        util.logMethodStart("create task groupings by defined separator", 2, logPad, [
+            [ "label (node name)", taskFile.label ], [ "grouping level", treeLevel ], [ "is group", taskFile.isGroup ],
+            [ "file name", taskFile.path ], [ "folder", folder.label ], [ "path", taskFile.path ]
+        ]);
 
         const _setNodePath = (t: TaskItem, cPath: string) =>
         {
@@ -736,6 +723,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
             }
         }
+
+        util.logMethodDone("create task groupings by defined separator", 2, logPad);
     }
 
 
@@ -1634,7 +1623,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private isTaskIncluded(task: Task, relativePath: string): boolean | string
+    private isTaskIncluded(task: Task, relativePath: string, logPad = ""): boolean | string
     {
         //
         // We have our own provider for Gulp and Grunt tasks...
@@ -1666,7 +1655,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         }
 
-        return true;
+        //
+        // Remove the '-' from app-publisher task.  VSCode doesn't like dashes in the settings names, so...
+        //
+        let settingName: string = "enable" + util.properCase(task.source);
+        if (settingName === "enableApp-publisher") {
+            settingName = "enableAppPublisher";
+        }
+
+        if ((configuration.get(settingName) || !this.isWorkspaceFolder(task.scope)) && !this.isNpmInstallTask(task))
+        {
+            return true;
+        }
+
+        util.log(logPad + "   Skipping", 1);
+        util.logValue(logPad + "   enabled", configuration.get(settingName), 1);
+        util.logValue(logPad + "   is npm install task", this.isNpmInstallTask(task), 1);
+
+        return false;
     }
 
 
