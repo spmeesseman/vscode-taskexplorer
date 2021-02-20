@@ -607,14 +607,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const groupSeparator = util.getGroupSeparator();
         const atMaxLevel: boolean = configuration.get<number>("groupMaxLevel") <= treeLevel + 1;
 
-        util.logMethodStart("create task groupings by defined separator", 2, logPad, true, [
+        util.logMethodStart("create task groupings by separator", 2, logPad, true, [
             [ "folder", folder.label ], [ "label (node name)", taskFile.label ], [ "grouping level", treeLevel ], [ "is group", taskFile.isGroup ],
             [ "file name", taskFile.fileName ], [ "folder", folder.label ], [ "path", taskFile.path ], ["tree level", treeLevel]
         ]);
 
         const _setNodePath = (t: TaskItem, cPath: string) =>
         {
-            if (!atMaxLevel) {
+            if (!atMaxLevel)
+            {
+                util.log("   setting node path", 4, logPad);
+                util.logValue("      current", t.nodePath, 4, logPad);
                 if (!t.nodePath && taskFile.taskSource === "Workspace") {
                     t.nodePath = path.join(".vscode", prevName[treeLevel]);
                 }
@@ -624,6 +627,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 else {
                     t.nodePath = path.join(cPath, prevName[treeLevel]);
                 }
+                util.logValue("      new", t.nodePath, 4, logPad);
             }
         };
 
@@ -740,7 +744,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         }
 
-        util.logMethodDone("create task groupings by defined separator", 2, logPad);
+        util.logMethodDone("create task groupings by separator", 2, logPad);
     }
 
 
