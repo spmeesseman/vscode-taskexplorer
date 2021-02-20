@@ -395,7 +395,7 @@ export function isScriptType(source: string)
 }
 
 
-export function logMethodStart(msg: string, level?: number, logPad = "", params?: [string, any][], color?: LogColor)
+export function logMethodStart(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: [string, any][], color?: LogColor)
 {
     if (msg === null || msg === undefined) {
         return;
@@ -404,7 +404,9 @@ export function logMethodStart(msg: string, level?: number, logPad = "", params?
     if (isLoggingEnabled())
     {
         const lLevel = level || 1;
-        logBlank(lLevel);
+        if (doLogBlank === true) {
+            logBlank(lLevel);
+        }
         log(logPad + "*start* " + msg, lLevel, color);
         if (params) {
             for (const [ n, v] of params) {
@@ -415,7 +417,7 @@ export function logMethodStart(msg: string, level?: number, logPad = "", params?
 }
 
 
-export function logMethodDone(msg: string, level?: number, logPad = "")
+export function logMethodDone(msg: string, level?: number, logPad = "", doLogBlank?: boolean)
 {
     if (msg === null || msg === undefined) {
         return;
@@ -423,7 +425,9 @@ export function logMethodDone(msg: string, level?: number, logPad = "")
 
     if (isLoggingEnabled())
     {
-        logBlank(level || 1);
+        if (doLogBlank === true) {
+            logBlank(level || 1);
+        }
         log("*done* " + msg, level || 1, logPad, LogColor.cyan);
     }
 }
@@ -523,7 +527,7 @@ export function logValue(msg: string, value: any, level?: number, logPad = "")
 }
 
 
-export function logValues(level: number, logPad: string, params: any | [string, any][])
+export function logValues(level: number, logPad: string, params: any | [string, any][], doLogBlank?: boolean)
 {
     if (params === null || params === undefined || params.length === 0) {
         return;
@@ -531,6 +535,9 @@ export function logValues(level: number, logPad: string, params: any | [string, 
 
     if (isLoggingEnabled())
     {
+        if (doLogBlank === true) {
+            logBlank(level);
+        }
         for (const [ n, v] of params) {
             logValue(n, v, level, logPad);
         }

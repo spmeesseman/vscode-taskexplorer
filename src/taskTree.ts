@@ -146,7 +146,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         }
 
-        util.logMethodStart("add to excludes", 1, "", [[ "global", global ]]);
+        util.logMethodStart("add to excludes", 1, "", true, [[ "global", global ]]);
 
         if (selection instanceof TaskFile)
         {
@@ -348,7 +348,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             taskFile: TaskFile = null,
             scopeName: string;
 
-        util.logMethodStart("build task tree list", 2, logPad, [
+        util.logMethodStart("build task tree list", 2, logPad, true, [
             [ "name", each.name ], [ "source", each.source ], [ "scope", each.scope ], [ "scope", each.scope ],
             [ "definition type", each.definition.type ], [ "definition path", each.definition.path ]
         ]);
@@ -448,7 +448,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const lTasks = storage.get<string[]>(storeName, []) || [];
         const folder = new TaskFolder(label);
 
-        util.logMethodStart("create special tasks folder", 1, logPad, [
+        util.logMethodStart("create special tasks folder", 1, logPad, true, [
             [ "store",  storeName ], [ "name",  label ]
         ]);
 
@@ -487,7 +487,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let prevTaskFile: TaskItem | TaskFile;
         const subfolders: Map<string, TaskFile> = new Map();
 
-        util.logMethodStart("create tree node folder grouping", 1, logPad, [[ "project folder", folder.label ]]);
+        util.logMethodStart("create tree node folder grouping", 1, logPad, true, [[ "project folder", folder.label ]]);
 
         for (const each of folder.taskFiles)
         {   //
@@ -505,7 +505,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 let subfolder: TaskFile = subfolders.get(id);
                 if (!subfolder)
                 {
-                    util.logValue(logPad + "   Add source file sub-container", each.path, 3);
+                    util.logValues(3, logPad, [
+                        ["   Add source file sub-container", each.path],
+                        ["      id", id]
+                    ], true);
                     subfolder = new TaskFile(this.extensionContext, folder, (each.scripts[0] as TaskItem).task.definition,
                                              each.taskSource, each.path, 0, true, undefined, "   ");
                     subfolders.set(id, subfolder);
@@ -604,7 +607,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const groupSeparator = util.getGroupSeparator();
         const atMaxLevel: boolean = configuration.get<number>("groupMaxLevel") <= treeLevel + 1;
 
-        util.logMethodStart("create task groupings by defined separator", 2, logPad, [
+        util.logMethodStart("create task groupings by defined separator", 2, logPad, true, [
             [ "folder", folder.label ], [ "label (node name)", taskFile.label ], [ "grouping level", treeLevel ], [ "is group", taskFile.isGroup ],
             [ "file name", taskFile.fileName ], [ "folder", folder.label ], [ "path", taskFile.path ], ["tree level", treeLevel]
         ]);
@@ -636,7 +639,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
             util.log("   process task item", 3, logPad);
             util.logValues(4, logPad + "      ", [
-                ["id", each.id], ["label", label], ["node path", each.nodePath], ["command", each.command],
+                ["id", each.id], ["label", label], ["node path", each.nodePath], ["command", each.command.command],
                 ["previous name [tree level]", prevNameOk ? prevName[treeLevel] : "undefined"],
                 ["this previous name", prevNameThis]
             ]);
@@ -2000,7 +2003,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         const taskTypesRmv: TaskFile[] = [];
 
-        util.log(logPad + "remove grouped tasks", 1);
+        util.logMethodStart("remove grouped tasks", 2, logPad);
 
         for (const each of folder.taskFiles)
         {
@@ -2022,21 +2025,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 for (const each2 of each.scripts)
                 {
-                    this.removeScripts(each2 as TaskFile, folder, subfolders);
+                    this.removeScripts(each2 as TaskFile, folder, subfolders, 0, logPad);
                     if (each2 instanceof TaskFile && each2.isGroup && each2.groupLevel > 0)
                     {
                         for (const each3 of each2.scripts)
                         {
                             if (each3 instanceof TaskFile)
                             {
-                                this.removeScripts(each3, folder, subfolders);
+                                this.removeScripts(each3, folder, subfolders, 0, logPad);
                             }
                         }
                     }
                 }
             }
             else {
-                this.removeScripts(each, folder, subfolders);
+                this.removeScripts(each, folder, subfolders, 0, logPad);
             }
         }
 
@@ -2044,6 +2047,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             folder.removeTaskFile(each);
         }
+
+        util.logMethodDone("remove grouped tasks", 2, logPad);
     }
 
 
@@ -2056,11 +2061,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      * @param subfolders Current tree subfolders map
      * @param level Current grouping level
      */
-    private removeScripts(taskFile: TaskFile, folder: TaskFolder, subfolders: Map<string, TaskFile>, level = 0)
+    private removeScripts(taskFile: TaskFile, folder: TaskFolder, subfolders: Map<string, TaskFile>, level = 0, logPad = "")
     {
         const me = this;
         const taskTypesRmv: (TaskItem|TaskFile)[] = [];
         const groupSeparator = util.getGroupSeparator();
+
+        util.logMethodStart("remove scripts", 3, logPad, false);
 
         for (const each of taskFile.scripts)
         {
@@ -2094,7 +2101,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
 
                 if (!allTasks) {
-                    me.removeScripts(each, folder, subfolders, level + 1);
+                    me.removeScripts(each, folder, subfolders, level + 1, logPad);
                 }
             }
         }
@@ -2103,6 +2110,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             taskFile.removeScript(each2);
         }
+
+        util.logMethodStart("remove scripts", 3, logPad);
     }
 
 
