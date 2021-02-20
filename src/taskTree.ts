@@ -273,7 +273,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let ltfolder: TaskFolder = null,
             favfolder: TaskFolder = null;
 
-        util.logMethodStart("build task tree", 1, logPad, null, util.LogColor.cyan);
+        util.logMethodStart("build task tree", 1, logPad);
         this.treeBuilding = true;
 
         //
@@ -307,7 +307,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             taskCt++;
             util.logBlank(1);
-            util.log(logPad + "   Processing task " + (++taskCt).toString() + " of " + tasksList.length.toString(), 1, util.LogColor.cyan);
+            util.log("   Processing task " + (++taskCt).toString() + " of " + tasksList.length.toString(), 1, logPad);
             this.buildTaskTreeList(each, folders, files, ltfolder, favfolder, lastTasks, favTasks, logPad + "   ");
         }
 

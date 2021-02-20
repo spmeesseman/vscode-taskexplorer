@@ -424,7 +424,7 @@ export function logMethodDone(msg: string, level?: number, logPad = "")
     if (isLoggingEnabled())
     {
         logBlank(level || 1);
-        log(logPad + "*done* " + msg, level || 1, LogColor.cyan);
+        log("*done* " + msg, level || 1, logPad, LogColor.cyan);
     }
 }
 
