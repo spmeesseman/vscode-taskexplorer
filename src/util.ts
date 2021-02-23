@@ -527,7 +527,7 @@ export function logValue(msg: string, value: any, level?: number, logPad = "")
 }
 
 
-export function logValues(level: number, logPad: string, params: any | [string, any][], doLogBlank?: boolean)
+export function logValues(level: number, logPad: string, params: any | (string|any)[][], doLogBlank?: boolean)
 {
     if (params === null || params === undefined || params.length === 0) {
         return;
