@@ -3,7 +3,7 @@
 'use strict';
 
 const path = require('path');
-// const TerserPlugin = require('terser-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 /**
  * @type {import('webpack').Configuration}
@@ -47,11 +47,29 @@ const config =
 			use: [{
 				loader: 'ts-loader'
 			}]
-		}]// ,
-		// optimization: {
+		}]
+	},
+	optimization: {
+		// minimizer: [
 		// 	// @ts-ignore
-		// 	minimizer: [new TerserPlugin({ extractComments: false })],
-		// }
+		// 	new UglifyJsPlugin({
+		// 		test: /\.js(\?.*)?$/i,
+		// 		extractComments: false,
+		// 		include: /\.\/dist/,
+		// 		// sourceMap: true,
+		// 		uglifyOptions: {
+		// 			warnings: false,
+		// 			parse: {},
+		// 			compress: {},
+		// 			mangle: true, // Note `mangle.properties` is `false` by default.
+		// 			output: null,
+		// 			toplevel: false,
+		// 			nameCache: null,
+		// 			ie8: false,
+		// 			keep_fnames: false
+		// 		}
+		// 	})
+		// ]
 	}
 };
 module.exports = config;

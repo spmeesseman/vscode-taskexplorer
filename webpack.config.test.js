@@ -4,6 +4,7 @@
 
 const path = require('path');
 const nodeExternals = require("webpack-node-externals")
+//const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 /**
  * @type {import('webpack').Configuration}
@@ -17,24 +18,27 @@ const config =
 	// the entry point of this extension, -> https://webpack.js.org/configuration/entry-context/
 	//
 	entry: {
-        index: './src/test/index.ts',
-        istanbultestrunner: './src/test/istanbultestrunner.ts',
         runTest: './src/test/runTest.ts',
+        index: './src/test/index.ts',
         "tasks.test": './src/test/tasks.test.ts',
-        testUtil: './src/test/testUtil.ts',
         "extension.test": './src/test/extension.test.ts',
         "util.test": './src/test/util.test.ts'
     },
+	//entry: './src/test/runTest.ts',
+	// entry: {
+    //     runTest: './src/test/runTest.ts',
+    //     index: './src/test/index.ts'
+    // },
 	output:
 	{   //
 		// the bundle is stored in the 'dist' folder (check package.json), -> https://webpack.js.org/configuration/output/
 		//
 		path: path.resolve(__dirname, 'dist'),
-		//  filename: 'test.js',
 		libraryTarget: 'commonjs2',
 		devtoolModuleFilenameTemplate: '../[resource-path]',
-		filename: 'test/[name].js',
-        sourceMapFilename: 'test/[name].js.map'
+		filename: 'test/[name].js'
+		// filename: 'test/[name].js',
+        // sourceMapFilename: 'test/[name].js.map'
 	},
 	devtool: 'source-map',
 	externals: [
@@ -60,6 +64,12 @@ const config =
 				loader: 'ts-loader'
 			}]
 		}]
-	}
+	}//,
+	// optimization: {
+	// 	minimizer: [
+	// 		// @ts-ignore
+	// 		new UglifyJsPlugin({ test: /\.js(\?.*)?$/i })
+	// 	]
+	// }
 };
 module.exports = config;
