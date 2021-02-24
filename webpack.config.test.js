@@ -3,7 +3,7 @@
 'use strict';
 
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
+const nodeExternals = require("webpack-node-externals")
 
 /**
  * @type {import('webpack').Configuration}
@@ -16,24 +16,35 @@ const config =
 	//
 	// the entry point of this extension, -> https://webpack.js.org/configuration/entry-context/
 	//
-	entry: './src/extension.ts',
+	entry: {
+        index: './src/test/index.ts',
+        istanbultestrunner: './src/test/istanbultestrunner.ts',
+        runTest: './src/test/runTest.ts',
+        testUtil: './src/test/testUtil.ts',
+        extension: './src/test/extension.test.ts',
+        util: './src/test/util.test.ts'
+    },
 	output:
 	{   //
 		// the bundle is stored in the 'dist' folder (check package.json), -> https://webpack.js.org/configuration/output/
 		//
 		path: path.resolve(__dirname, 'dist'),
-		filename: 'extension.js',
+		//  filename: 'test.js',
 		libraryTarget: 'commonjs2',
-		devtoolModuleFilenameTemplate: '../[resource-path]'
+		devtoolModuleFilenameTemplate: '../[resource-path]',
+		filename: 'test/[name].js',
+        sourceMapFilename: 'test/[name].js.map'
 	},
 	devtool: 'source-map',
-	externals:
-	{   //
-		// the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot
-		// be webpack'ed, -> https://webpack.js.org/configuration/externals/
-		//
-		vscode: 'commonjs vscode'
-	},
+	externals: [
+		nodeExternals(),
+		{   //
+			// the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot
+			// be webpack'ed, -> https://webpack.js.org/configuration/externals/
+			//
+			vscode: 'commonjs vscode'
+		}
+	],
 	resolve:
 	{   //
 		// support reading TypeScript and JavaScript files, -> https://github.com/TypeStrong/ts-loader
@@ -48,10 +59,6 @@ const config =
 				loader: 'ts-loader'
 			}]
 		}]
-	},
-	optimization: {
-		// @ts-ignore
-		minimizer: [new TerserPlugin({ extractComments: false })],
 	}
 };
 module.exports = config;

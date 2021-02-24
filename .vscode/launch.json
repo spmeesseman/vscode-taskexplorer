@@ -8,13 +8,13 @@
         {
 			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch Extension (WebPack Build)",
+			"name": "Launch (WebPack Build)",
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceRoot}"
 			],
-			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
+			"outFiles": ["${workspaceFolder}/dist/extension.js"],
 			"stopOnEntry": false,
             "sourceMaps": true,
 			"preLaunchTask": "npm: webpack-watch"
@@ -22,20 +22,20 @@
         {
 			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch Extension w Root (WebPack Build)",
+			"name": "Launch w Root (WebPack Build)",
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceRoot}",
 				"${workspaceRoot}"
 			],
-			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
+			"outFiles": ["${workspaceFolder}/dist/extension.js"],
 			"stopOnEntry": false,
             "sourceMaps": true,
 			"preLaunchTask": "npm: webpack-watch"
 		},
         {
-            "name": "Launch Extension w Root",
+            "name": "Launch w Root",
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
@@ -52,7 +52,7 @@
             "preLaunchTask": "npm: watch"
         },
         {
-            "name": "Launch Extension",
+            "name": "Launch",
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
@@ -82,6 +82,25 @@
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceFolder}/out/test/**/*.js"
+            ],
+            "preLaunchTask": "npm: testbefore",
+            "postDebugTask": "npm: testafter"
+        },
+        {
+            "name": "Launch Tests (WebPack Build)",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "${workspaceFolder}/dist/test",
+                "--extensionDevelopmentPath=${workspaceFolder}",
+                "--extensionTestsPath=${workspaceFolder}/dist/test",
+                "--disable-extensions"
+            ],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/dist/test/**/*.js"
             ],
             "preLaunchTask": "npm: testbefore",
             "postDebugTask": "npm: testafter"

@@ -6,6 +6,8 @@
 **/*.ts
 out/test/**
 out/**/*.map
+dist/test/**
+dist/**/*.map
 package-lock.json
 src/**
 test/**
