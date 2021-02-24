@@ -6,7 +6,7 @@ import * as log from "../common/log";
 import { configuration } from "../common/configuration";
 import { filesCache } from "../cache";
 import { execSync } from "child_process";
-import { TaskExplorerProvider } from "./taskProvider";
+import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../taskDefinition";
 
 
