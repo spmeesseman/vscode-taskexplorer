@@ -77,6 +77,7 @@
         "vscode:prepublish": "npm run build",
         "watch": "tsc -watch -p ./",
         "webpack-test": "node ./dist/test/runTest.js",
+        "webpack-testbefore": "rimraf test-reports && rimraf coverage && rimraf c:\\code\\data\\user-data\\cacheddata && npm run webpack-build && npm run coverage-full-on",
         "webpack-watch": "webpack -w --info-verbosity verbose --mode development --config ./webpack.config.js",
         "webpack-build": "webpack --mode production --config ./webpack.config.js",
         "webpack-build:test": "webpack --mode production --config ./webpack.config.test.js"
