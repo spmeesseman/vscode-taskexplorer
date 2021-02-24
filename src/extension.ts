@@ -23,7 +23,6 @@ import { views } from "./views";
 import { TaskExplorerProvider } from "./taskProvider";
 import * as util from "./util";
 import * as cache from "./cache";
-import * as constants from "./common/constants";
 
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
@@ -78,7 +77,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     const workspaceWatcher = workspace.onDidChangeWorkspaceFolders(async(_e) =>
     {
         await addWsFolder(_e.added);
-        removeWsFolder(_e.removed);
+        await removeWsFolder(_e.removed);
         await refreshTree();
     });
     context.subscriptions.push(workspaceWatcher);
@@ -127,35 +126,43 @@ export async function deactivate()
 }
 
 
-export async function removeWsFolder(wsf: readonly WorkspaceFolder[])
+export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "")
 {
-    for (const f in wsf)
+    util.logMethodStart("process remove workspace folder", 1, logPad, true);
+
+    for (const f of wsf)
     {
-        if (wsf.hasOwnProperty(f)) // skip over properties inherited by prototype
+        util.logValue("      folder", f.name, 1, logPad);
+        // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
+        await util.forEachMapAsync(cache.filesCache, (files: Set<cache.ICacheItem>, provider: string) =>
         {
-            util.log("Workspace folder removed: " + wsf[f].name, 1);
-            // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
-            for (const key in cache.filesCache.keys)
+            const toRemove: cache.ICacheItem[] = [];
+
+            util.logValue("      start remove task files from cache", provider, 2, logPad);
+
+            for (const file of files)
             {
-                if (cache.filesCache.keys.hasOwnProperty(key)) // skip over props inherited by prototype
-                {
-                    const toRemove = [];
-                    const obj = cache.filesCache.get(cache.filesCache.keys[key]);
-                    for (const item of obj)
-                    {
-                        if (item.folder.uri.fsPath === wsf[f].uri.fsPath) {
-                            toRemove.push(item);
-                        }
-                    }
-                    if (toRemove.length > 0) {
-                        for (const tr of toRemove) {
-                            obj.delete(tr);
-                        }
-                    }
+                util.logValue("         checking cache file", file.uri.fsPath, 4, logPad);
+                if (file.folder.uri.fsPath === f.uri.fsPath) {
+                    util.log("            added for removal",  4, logPad);
+                    toRemove.push(file);
                 }
             }
-        }
+
+            if (toRemove.length > 0)
+            {
+                for (const tr of toRemove) {
+                    util.logValue("         remove file", tr.uri.fsPath, 2, logPad);
+                    files.delete(tr);
+                }
+            }
+
+            util.logValue("      completed remove files from cache", provider, 2, logPad);
+        });
+        util.log("   folder removed", 1, logPad);
     }
+
+    util.logMethodDone("process remove workspace folder", 1, logPad, true);
 }
 
 

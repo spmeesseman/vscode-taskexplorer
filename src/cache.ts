@@ -10,8 +10,14 @@ let folderCaching = false;
 let cancel = false;
 const taskGlobs: any = {};
 
-export const filesCache: Map<string, Set<any>> = new Map();
 
+export interface ICacheItem
+{
+    uri: Uri;
+    folder: WorkspaceFolder;
+}
+
+export const filesCache: Map<string, Set<ICacheItem>> = new Map();
 
 export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
 {
