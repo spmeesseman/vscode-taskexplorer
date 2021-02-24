@@ -1,9 +1,9 @@
 
 import { Uri, Task, WorkspaceFolder, workspace, TaskProvider } from "vscode";
-import { TaskExplorerDefinition } from "./taskDefinition";
-import { configuration } from "./common/configuration";
-import * as util from "./common/utils";
-import * as log from "./common/log";
+import { TaskExplorerDefinition } from "../taskDefinition";
+import { configuration } from "../common/configuration";
+import * as util from "../common/utils";
+import * as log from "../common/log";
 
 export abstract class TaskExplorerProvider implements TaskProvider
 {

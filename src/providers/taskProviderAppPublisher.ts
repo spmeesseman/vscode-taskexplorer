@@ -1,11 +1,11 @@
 
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 import * as path from "path";
-import * as util from "./common/utils";
-import * as log from "./common/log";
-import { filesCache } from "./cache";
+import * as util from "../common/utils";
+import * as log from "../common/log";
+import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./taskProvider";
-import { TaskExplorerDefinition } from "./taskDefinition";
+import { TaskExplorerDefinition } from "../taskDefinition";
 
 
 export class AppPublisherTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
