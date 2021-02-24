@@ -77,7 +77,7 @@
         "vscode:prepublish": "npm run build",
         "watch": "tsc -watch -p ./",
         "webpack-test": "node ./dist/test/runTest.js",
-        "webpack-watch": "webpack -w --mode development --config ./webpack.config.js",
+        "webpack-watch": "webpack -w --info-verbosity verbose --mode development --config ./webpack.config.js",
         "webpack-build": "webpack --mode production --config ./webpack.config.js",
         "webpack-build:test": "webpack --mode production --config ./webpack.config.test.js"
     },
@@ -156,8 +156,8 @@
         "vsce": "^1.85.0",
         "vscode-nls-dev": "3.2.7",
         "vscode-test": "^1.5.0",
-        "webpack": "^5.24.1",
-        "webpack-cli": "^4.5.0",
+        "webpack": "^4.46.0",
+        "webpack-cli": "^3.3.12",
         "webpack-node-externals": "^2.5.2"
     },
     "greenkeeper": {
