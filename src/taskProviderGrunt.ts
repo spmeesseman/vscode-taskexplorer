@@ -1,11 +1,8 @@
 
-import {
-    Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition
-} from "vscode";
+import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 import * as path from "path";
 import * as util from "./util";
-import { configuration } from "./common/configuration";
+import * as log from "./common/log";
 import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
 import { TaskExplorerDefinition } from "./taskDefinition";
@@ -44,7 +41,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
 
     public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.logMethodStart("detect grunt files", 1, logPad, true);
+        log.methodStart("detect grunt files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -58,16 +55,16 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
                 {
                     visitedFiles.add(fobj.uri.fsPath);
                     const tasks = await this.readUriTasks(fobj.uri, null, logPad + "   ");
-                    util.log("   processed grunt file", 3, logPad);
-                    util.logValue("      file", fobj.uri.fsPath, 3, logPad);
-                    util.logValue("      targets in file", tasks.length, 3, logPad);
+                    log.write("   processed grunt file", 3, logPad);
+                    log.value("      file", fobj.uri.fsPath, 3, logPad);
+                    log.value("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        util.logValue("   # of tasks", allTasks.length, 2, logPad);
-        util.logMethodDone("detect grunt files", 1, logPad, true);
+        log.value("   # of tasks", allTasks.length, 2, logPad);
+        log.methodDone("detect grunt files", 1, logPad, true);
         return allTasks;
     }
 
@@ -76,7 +73,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     {
         const scripts: string[] = [];
 
-        util.logMethodStart("find grunt targets", 1, logPad, true);
+        log.methodStart("find grunt targets", 1, logPad, true);
 
         const contents = util.readFileSync(fsPath);
         let idx = 0;
@@ -121,8 +118,8 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
                         const tgtName = line.substring(idx1, idx2).trim();
                         if (tgtName) {
                             scripts.push(tgtName);
-                            util.log("   found grunt target", 3, logPad);
-                            util.logValue("      name", tgtName, 3, logPad);
+                            log.write("   found grunt target", 3, logPad);
+                            log.value("      name", tgtName, 3, logPad);
                         }
                     }
                 }
@@ -132,7 +129,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
             eol = contents.indexOf("\n", idx);
         }
 
-        util.logMethodDone("find grunt targets", 1, logPad, true);
+        log.methodDone("find grunt targets", 1, logPad, true);
 
         return scripts;
     }
@@ -157,7 +154,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        util.logMethodStart("read grunt file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read grunt file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
 
         if (folder)
         {
@@ -173,7 +170,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
             }
         }
 
-        util.logMethodDone("read grunt file uri tasks", 1, logPad, true);
+        log.methodDone("read grunt file uri tasks", 1, logPad, true);
         return result;
     }
 

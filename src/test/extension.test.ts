@@ -4,8 +4,9 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import { configuration } from "../common/configuration";
-import { setWriteToConsole, timeout } from "../util";
+import { timeout } from "../util";
 import { TaskExplorerApi } from "../extension";
+import * as log from "../common/log";
 
 
 export let teApi: TaskExplorerApi;
@@ -31,7 +32,7 @@ suite("Extension Tests", () =>
         await vscode.workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                          "C:\\Windows\\System32\\cmd.exe",
                                                          vscode.ConfigurationTarget.Workspace);
-        setWriteToConsole(false); // FOR DEBUGGING - write debug logging from exiension to console
+        log.setWriteToConsole(false); // FOR DEBUGGING - write debug logging from exiension to console
     });
 
 

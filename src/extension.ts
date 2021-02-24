@@ -23,6 +23,7 @@ import { views } from "./views";
 import { TaskExplorerProvider } from "./taskProvider";
 import * as util from "./util";
 import * as cache from "./cache";
+import * as log from "./common/log";
 
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
@@ -44,11 +45,11 @@ export interface TaskExplorerApi
 
 export async function activate(context: ExtensionContext, disposables: Disposable[]): Promise<TaskExplorerApi>
 {
-    util.initLog("taskExplorer", "Task Explorer", context);
+    log.initLog("taskExplorer", "Task Explorer", context);
     initStorage(context);
 
-    util.log("");
-    util.log("Init extension");
+    log.write("");
+    log.write("Init extension");
 
     //
     // Register file type watchers
@@ -90,7 +91,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     });
     context.subscriptions.push(d);
 
-    util.log("   Task Explorer activated");
+    log.write("   Task Explorer activated");
 
     return {
         explorerProvider: treeDataProvider2,
@@ -105,7 +106,7 @@ export async function addWsFolder(wsf: readonly WorkspaceFolder[])
 {
     for (const f in wsf) {
         if (wsf.hasOwnProperty(f)) { // skip over properties inherited by prototype
-            util.log("Workspace folder added: " + wsf[f].name, 1);
+            log.write("Workspace folder added: " + wsf[f].name, 1);
             await cache.addFolderToCache(wsf[f]);
         }
     }
@@ -128,23 +129,23 @@ export async function deactivate()
 
 export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "")
 {
-    util.logMethodStart("process remove workspace folder", 1, logPad, true);
+    log.methodStart("process remove workspace folder", 1, logPad, true);
 
     for (const f of wsf)
     {
-        util.logValue("      folder", f.name, 1, logPad);
+        log.value("      folder", f.name, 1, logPad);
         // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
         await util.forEachMapAsync(cache.filesCache, (files: Set<cache.ICacheItem>, provider: string) =>
         {
             const toRemove: cache.ICacheItem[] = [];
 
-            util.logValue("      start remove task files from cache", provider, 2, logPad);
+            log.value("      start remove task files from cache", provider, 2, logPad);
 
             for (const file of files)
             {
-                util.logValue("         checking cache file", file.uri.fsPath, 4, logPad);
+                log.value("         checking cache file", file.uri.fsPath, 4, logPad);
                 if (file.folder.uri.fsPath === f.uri.fsPath) {
-                    util.log("            added for removal",  4, logPad);
+                    log.write("            added for removal",  4, logPad);
                     toRemove.push(file);
                 }
             }
@@ -152,17 +153,17 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "
             if (toRemove.length > 0)
             {
                 for (const tr of toRemove) {
-                    util.logValue("         remove file", tr.uri.fsPath, 2, logPad);
+                    log.value("         remove file", tr.uri.fsPath, 2, logPad);
                     files.delete(tr);
                 }
             }
 
-            util.logValue("      completed remove files from cache", provider, 2, logPad);
+            log.value("      completed remove files from cache", provider, 2, logPad);
         });
-        util.log("   folder removed", 1, logPad);
+        log.write("   folder removed", 1, logPad);
     }
 
-    util.logMethodDone("process remove workspace folder", 1, logPad, true);
+    log.methodDone("process remove workspace folder", 1, logPad, true);
 }
 
 
@@ -426,7 +427,7 @@ function registerTaskProviders(context: ExtensionContext)
 
 async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, ignorehModify?: boolean, enabled?: boolean)
 {
-    util.log("Register file watcher for task type '" + taskType + "'");
+    log.write("Register file watcher for task type '" + taskType + "'");
 
     let watcher: FileSystemWatcher = watchers.get(taskType);
 
@@ -473,15 +474,15 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
 
 function logFileWatcherEvent(uri: Uri, type: string)
 {
-    util.log("file change event");
-    util.logValue("   type", type);
-    util.logValue("   file", uri.fsPath);
+    log.write("file change event");
+    log.value("   type", type);
+    log.value("   file", uri.fsPath);
 }
 
 
 function registerExplorer(name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined
 {
-    util.log("Register explorer view / tree provider '" + name + "'");
+    log.write("Register explorer view / tree provider '" + name + "'");
 
     if (enabled !== false)
     {
@@ -491,17 +492,17 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
             const treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
             treeView.onDidChangeVisibility(async _e => {
                 if (_e.visible) {
-                    util.log("view visibility change event");
+                    log.write("view visibility change event");
                     await refreshTree("visible-event");
                 }
             });
             views.set(name, treeView);
             context.subscriptions.push(views.get(name));
-            util.log("   Tree data provider registered'" + name + "'");
+            log.write("   Tree data provider registered'" + name + "'");
             return treeDataProvider;
         }
         else {
-            util.log("✘ No workspace folders!!!");
+            log.write("✘ No workspace folders!!!");
         }
     }
 

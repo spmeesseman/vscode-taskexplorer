@@ -1,34 +1,13 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import {
-    RelativePattern, WorkspaceFolder, OutputChannel, ExtensionContext,
-    commands, window, Uri, workspace
-} from "vscode";
+import { RelativePattern, WorkspaceFolder, Uri, workspace } from "vscode";
 import * as fs from "fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./common/configuration";
 import * as constants from "./common/constants";
 import * as path from "path";
 import * as os from "os";
-
-
-const logValueWhiteSpace = 40;
-let writeToConsole = false;
-let writeToConsoleLevel = 2;
-let logOutputChannel: OutputChannel | undefined;
-
-
-export enum LogColor
-{
-    black = "\\u001b[30m",
-    red = "\\u001b[31",
-    green = "\\u001b[32m",
-    yellow = "\\u001b[33m",
-    blue = "\\u001b[34m", // "<span style=\"color:blue\">"  "</style>"
-    magenta = "\\u001b[35",
-    cyan = "\\u001b[36m",
-    white = "\\u001b[37m"
-}
+import * as log from "./common/log";
 
 
 /**
@@ -72,29 +51,6 @@ export function existsInArray(arr: any[], item: any): boolean | number
         }
     }
     return false;
-}
-
-
-export function initLog(settingGrpName: string, dispName: string, context?: ExtensionContext, showLog?: boolean)
-{
-    function showLogOutput(show: boolean)
-    {
-        if (logOutputChannel && show) {
-            logOutputChannel.show();
-        }
-    }
-    //
-    // Set up a log in the Output window
-    //
-    logOutputChannel = window.createOutputChannel(dispName);
-    if (context)
-    {
-        context.subscriptions.push(logOutputChannel);
-        context.subscriptions.push(
-            commands.registerCommand(settingGrpName + ".showOutput", showLogOutput)
-        );
-    }
-    showLogOutput(showLog);
 }
 
 
@@ -225,11 +181,11 @@ export function getPortableDataPath(padding = "")
             {
                 try {
                     const fullPath = path.join(uri.fsPath, "user-data", "User");
-                    logValue(padding + "found portable user data path", fullPath, 1);
+                    log.value(padding + "found portable user data path", fullPath, 1);
                     return fullPath;
                 }
                 catch (e) {
-                    log(e.toString());
+                    log.write(e.toString());
                     return null;
                 }
             }
@@ -243,7 +199,7 @@ export function getUserDataPath(padding = "")
 {
     let userPath = "";
 
-    log(padding + "get user data path", 1);
+    log.write(padding + "get user data path", 1);
     logUserDataEnv(padding + "   ");
     //
     // Check if data path was passed on the command line
@@ -253,7 +209,7 @@ export function getUserDataPath(padding = "")
         let argvIdx = existsInArray(process.argv, "--user-data-dir");
         if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
             userPath = path.resolve(process.argv[++argvIdx]);
-            logValue(padding + "user path is", userPath, 1);
+            log.value(padding + "user path is", userPath, 1);
             return userPath;
         }
     }
@@ -269,7 +225,7 @@ export function getUserDataPath(padding = "")
         userPath = getDefaultUserDataPath();
     }
     userPath = path.resolve(userPath);
-    logValue(padding + "user path is", userPath, 1);
+    log.value(padding + "user path is", userPath, 1);
     return userPath;
 }
 
@@ -352,39 +308,33 @@ export function isExcluded(uriPath: string, logPad = "")
 
     const exclude = configuration.get<string | string[]>("exclude");
 
-    logBlank(4);
-    log(logPad + "Check exclusion", 4);
-    logValue(logPad + "   path", uriPath, 4);
+    log.blank(4);
+    log.write(logPad + "Check exclusion", 4);
+    log.value(logPad + "   path", uriPath, 4);
 
     if (exclude)
     {
         if (Array.isArray(exclude))
         {
             for (const pattern of exclude) {
-                logValue(logPad + "   checking pattern", pattern, 5);
+                log.value(logPad + "   checking pattern", pattern, 5);
                 if (testForExclusionPattern(uriPath, pattern)) {
-                    log(logPad + "   Excluded!", 4);
+                    log.write(logPad + "   Excluded!", 4);
                     return true;
                 }
             }
         }
         else {
-            logValue(logPad + "   checking pattern", exclude, 5);
+            log.value(logPad + "   checking pattern", exclude, 5);
             if (testForExclusionPattern(uriPath, exclude)) {
-              log(logPad + "   Excluded!", 4);
+              log.write(logPad + "   Excluded!", 4);
               return true;
             }
         }
     }
 
-    log(logPad + "   Not excluded", 4);
+    log.write(logPad + "   Not excluded", 4);
     return false;
-}
-
-
-export function isLoggingEnabled()
-{
-    return configuration.get("debug") === true;
 }
 
 
@@ -395,151 +345,17 @@ export function isScriptType(source: string)
 }
 
 
-export function logMethodStart(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: [string, any][], color?: LogColor)
-{
-    if (msg === null || msg === undefined) {
-        return;
-    }
-
-    if (isLoggingEnabled())
-    {
-        const lLevel = level || 1;
-        if (doLogBlank === true) {
-            logBlank(lLevel);
-        }
-        log(logPad + "*start* " + msg, lLevel, color);
-        if (params) {
-            for (const [ n, v] of params) {
-                logValue(logPad + "   " + n, v, lLevel + 1);
-            }
-        }
-    }
-}
-
-
-export function logMethodDone(msg: string, level?: number, logPad = "", doLogBlank?: boolean)
-{
-    if (msg === null || msg === undefined) {
-        return;
-    }
-
-    if (isLoggingEnabled())
-    {
-        if (doLogBlank === true) {
-            logBlank(level || 1);
-        }
-        log("*done* " + msg, level || 1, logPad, LogColor.cyan);
-    }
-}
-
-
-export function log(msg: string, level?: number, logPad = "", color?: LogColor)
-{
-    if (msg === null || msg === undefined) {
-        return;
-    }
-
-    if (isLoggingEnabled())
-    {
-        // if (color) {
-        //     msg = color + msg + LogColor.white;
-        // }
-        const tsMsg = new Date().toISOString().replace(/[TZ]/g, " ") + logPad + msg;
-        if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
-            logOutputChannel.appendLine(tsMsg);
-        }
-        if (writeToConsole === true) {
-            if (!level || level <= writeToConsoleLevel) {
-                console.log(tsMsg);
-            }
-        }
-    }
-}
-
-
-export function logBlank(level?: number)
-{
-    log("", level);
-}
-
-
-export function logError(msg: string | string[])
-{
-    if (!msg === null || msg === undefined) {
-        return;
-    }
-
-    if (isLoggingEnabled())
-    {
-        log("***");
-        if (typeof msg === "string") {
-            log("*** " + msg);
-        }
-        else {
-            for (const m of msg) {
-                log("*** " + m);
-            }
-        }
-        log("***");
-    }
-}
-
-
 function logUserDataEnv(padding = "")
 {
-    if (isLoggingEnabled())
+    if (log.isLoggingEnabled())
     {
-        logValue(padding + "os", process.platform, 1);
-        logValue(padding + "portable", process.env.VSCODE_PORTABLE, 1);
-        logValue(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
-        logValue(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 1);
-        logValue(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
+        log.value(padding + "os", process.platform, 1);
+        log.value(padding + "portable", process.env.VSCODE_PORTABLE, 1);
+        log.value(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
+        log.value(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 1);
+        log.value(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
         if (process.platform === "linux") {
-            logValue("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
-        }
-    }
-}
-
-
-export function logValue(msg: string, value: any, level?: number, logPad = "")
-{
-    if (isLoggingEnabled())
-    {
-        let logMsg = msg;
-        const spaces = msg && msg.length ? msg.length : (value === undefined ? 9 : 4);
-        for (let i = spaces; i < logValueWhiteSpace; i++) {
-            logMsg += " ";
-        }
-
-        if (value || value === 0 || value === "" || value === false) {
-            logMsg += ": ";
-            logMsg += value.toString();
-        }
-        else if (value === undefined) {
-            logMsg += ": undefined";
-        }
-        else if (value === null) {
-            logMsg += ": null";
-        }
-
-        log(logMsg, level, logPad);
-    }
-}
-
-
-export function logValues(level: number, logPad: string, params: any | (string|any)[][], doLogBlank?: boolean)
-{
-    if (params === null || params === undefined || params.length === 0) {
-        return;
-    }
-
-    if (isLoggingEnabled())
-    {
-        if (doLogBlank === true) {
-            logBlank(level);
-        }
-        for (const [ n, v] of params) {
-            logValue(n, v, level, logPad);
+            log.value("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
         }
     }
 }
@@ -634,13 +450,6 @@ export async function removeFromArrayAsync(arr: any[], item: any)
     if (idx2 !== -1 && idx2 < arr.length) {
         arr.splice(idx2, 1);
     }
-}
-
-
-export function setWriteToConsole(set: boolean, level = 2)
-{
-    writeToConsole = set;
-    writeToConsoleLevel = level;
 }
 
 

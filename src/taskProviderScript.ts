@@ -1,9 +1,8 @@
 
-import {
-    Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions
-} from "vscode";
+import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 import * as path from "path";
 import * as util from "./util";
+import * as log from "./common/log";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
@@ -206,7 +205,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.logMethodStart("detect script files", 1, logPad, true);
+        log.methodStart("detect script files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -220,14 +219,14 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
                 {
                     visitedFiles.add(fobj.uri.fsPath);
                     allTasks.push(this.createTask(path.extname(fobj.uri.fsPath).substring(1), null, fobj.folder, fobj.uri));
-                    util.log("   found script target/file", 3, logPad);
-                    util.logValue("      script file", fobj.uri.fsPath, 3, logPad);
+                    log.write("   found script target/file", 3, logPad);
+                    log.value("      script file", fobj.uri.fsPath, 3, logPad);
                 }
             }
         }
 
-        util.logValue("   # of tasks", allTasks.length, 2, logPad);
-        util.logMethodDone("detect script files", 1, logPad, true);
+        log.value("   # of tasks", allTasks.length, 2, logPad);
+        log.methodDone("detect script files", 1, logPad, true);
         return allTasks;
     }
 
@@ -235,9 +234,9 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
-        util.logMethodStart("read ant file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read ant file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
         const task = this.createTask(path.extname(uri.fsPath).substring(1), null, folder, uri);
-        util.logMethodDone("read script file uri task", 1, logPad, true);
+        log.methodDone("read script file uri task", 1, logPad, true);
         return [ task ];
     }
 

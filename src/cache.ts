@@ -4,6 +4,7 @@ import { workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlig
 import * as util from "./util";
 import { configuration } from "./common/configuration";
 import * as constants from "./common/constants";
+import * as log from "./common/log";
 
 let cacheBuilding = false;
 let folderCaching = false;
@@ -21,8 +22,8 @@ export const filesCache: Map<string, Set<ICacheItem>> = new Map();
 
 export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
 {
-    util.log("Add folder to cache", 3);
-    util.logValue("   folder", !folder ? "entire workspace" : folder.name, 3);
+    log.write("Add folder to cache", 3);
+    log.value("   folder", !folder ? "entire workspace" : folder.name, 3);
 
     //
     // Wait for caches to get done building before proceeding
@@ -136,10 +137,10 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
     cacheBuilding = false;   // un-set flag
     folderCaching = false;   // un-set flag
     if (cancel) {
-        util.log("Add folder to cache cancelled", 3);
+        log.write("Add folder to cache cancelled", 3);
     }
     else {
-        util.log("Add folder to cache complete", 3);
+        log.write("Add folder to cache complete", 3);
     }
     cancel = false;          // un-set flag
 }
@@ -205,8 +206,8 @@ export async function buildCache(taskType: string, fileGlob: string, wsfolder?: 
     //
     if (!wsfolder)
     {
-        util.logBlank(1);
-        util.log("   Build cache - Scan all projects for taskType '" + taskType + "' (" + dispTaskType + ")", 1);
+        log.blank(1);
+        log.write("   Build cache - Scan all projects for taskType '" + taskType + "' (" + dispTaskType + ")", 1);
         await buildFolderCaches(fCache, dispTaskType, fileGlob, statusBarSpace, setCacheBuilding);
     }
     else {
@@ -218,7 +219,7 @@ export async function buildCache(taskType: string, fileGlob: string, wsfolder?: 
     //
     disposeStatusBarSpace(statusBarSpace);
 
-    util.log("Cache building complete", 1);
+    log.write("Cache building complete", 1);
     if (setCacheBuilding) {
         cancel = false;           // reset flag
         cacheBuilding = false;    // reset flag
@@ -233,8 +234,8 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
         return;
     }
 
-    util.logBlank(1);
-    util.log("   Scan project " + folder.name + " for " + taskType + " tasks", 1);
+    log.blank(1);
+    log.write("   Scan project " + folder.name + " for " + taskType + " tasks", 1);
     statusBarSpace.text = getStatusString("Scanning for " + taskType + " tasks in project " + folder.name, 65);
 
     try {
@@ -251,12 +252,12 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
                     uri: fpath,
                     folder
                 });
-                util.logBlank(1);
-                util.logValue("   Added to cache", fpath.fsPath, 3);
+                log.blank(1);
+                log.value("   Added to cache", fpath.fsPath, 3);
             }
         }
     } catch (error) {
-        util.logError(error.toString());
+        log.error(error.toString());
     }
 }
 
@@ -293,7 +294,7 @@ function cancelInternal(setCacheBuilding: boolean, statusBarSpace: StatusBarItem
         cancel = false;
     }
     disposeStatusBarSpace(statusBarSpace);
-    util.log("   Cache building cancelled", 1);
+    log.write("   Cache building cancelled", 1);
 }
 
 
@@ -342,20 +343,20 @@ function getStatusString(msg: string, statusLength = 0)
 
 function logBuildCache(taskType: string, taskAlias: string, fileGlob: string, wsfolder: WorkspaceFolder | undefined, setCacheBuilding: boolean)
 {
-    util.logBlank(2);
-    util.log("Start cache building", 2);
-    util.logValue("   folder", !wsfolder ? "entire workspace" : wsfolder.name, 2);
-    util.logValue("   task type", taskType, 2);
-    util.logValue("   task alias", taskAlias, 2);
-    util.logValue("   blob", fileGlob, 2);
-    util.logValue("   setCacheBuilding", setCacheBuilding.toString(), 2);
+    log.blank(2);
+    log.write("Start cache building", 2);
+    log.value("   folder", !wsfolder ? "entire workspace" : wsfolder.name, 2);
+    log.value("   task type", taskType, 2);
+    log.value("   task alias", taskAlias, 2);
+    log.value("   blob", fileGlob, 2);
+    log.value("   setCacheBuilding", setCacheBuilding.toString(), 2);
 }
 
 
 export async function rebuildCache()
 {
-    util.logBlank(1);
-    util.log("rebuild cache", 1);
+    log.blank(1);
+    log.write("rebuild cache", 1);
     filesCache.clear();
     await addFolderToCache();
 }
@@ -363,10 +364,10 @@ export async function rebuildCache()
 
 export async function removeFileFromCache(taskAlias: string, uri: Uri)
 {
-    util.logBlank(1);
-    util.log("remove file from cache", 1);
-    util.logValue("   task type", taskAlias, 2);
-    util.logValue("   file", uri.fsPath, 2);
+    log.blank(1);
+    log.write("remove file from cache", 1);
+    log.value("   task type", taskAlias, 2);
+    log.value("   file", uri.fsPath, 2);
 
     if (!filesCache.get(taskAlias)) {
         return;

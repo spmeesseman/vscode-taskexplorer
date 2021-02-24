@@ -1,10 +1,8 @@
 
-import {
-    Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition
-} from "vscode";
+import { Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri, workspace } from "vscode";
 import * as path from "path";
 import * as util from "./util";
+import * as log from "./common/log";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 import { execSync } from "child_process";
@@ -34,8 +32,8 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     {
         let scripts: string[];
 
-        util.logBlank(1);
-        util.log(logPad + "Find gulp targets", 1);
+        log.blank(1);
+        log.write(logPad + "Find gulp targets", 1);
 
         //
         // Try running 'gulp' itself to get the targets.  If fail, just custom parse
@@ -96,7 +94,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                     cwd: path.dirname(fsPath)
                 });
             }
-            catch (e) { util.log(e); }
+            catch (e) { log.write(e); }
             //
             // Loop through all the lines and extract the task names
             //
@@ -106,7 +104,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                 const line = c.match(/(\[[\w\W][^\]]+\][ ](├─┬|├──|└──|└─┬) )([\w\-]+)/i);
                 if (line && line.length > 3)
                 {
-                    util.logValue(logPad + "   Found target (gulp --tasks)", line[3]);
+                    log.value(logPad + "   Found target (gulp --tasks)", line[3]);
                     scripts[line[3]] = line[3];
                 }
             }
@@ -115,8 +113,8 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             scripts = this.parseGulpTasks(fsPath);
         }
 
-        util.logBlank(1);
-        util.log(logPad + "find gulp targets complete", 1);
+        log.blank(1);
+        log.write(logPad + "find gulp targets complete", 1);
 
         return scripts;
     }
@@ -177,8 +175,8 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                 }
                 if (tgtName) {
                     scripts.push(tgtName);
-                    util.log("   found gulp target");
-                    util.logValue("      name", tgtName);
+                    log.write("   found gulp target");
+                    log.value("      name", tgtName);
                 }
             }
 
@@ -267,7 +265,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.logMethodStart("detect gulp files", 1, logPad, true);
+        log.methodStart("detect gulp files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -280,16 +278,16 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
                     visitedFiles.add(fobj.uri.fsPath);
                     const tasks = await this.readUriTasks(fobj.uri, null, logPad + "   ");
-                    util.log("   processed gulp file", 3, logPad);
-                    util.logValue("      file", fobj.uri.fsPath, 3, logPad);
-                    util.logValue("      targets in file", tasks.length, 3, logPad);
+                    log.write("   processed gulp file", 3, logPad);
+                    log.value("      file", fobj.uri.fsPath, 3, logPad);
+                    log.value("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        util.logValue("   # of gulp tasks", allTasks.length, 2, logPad);
-        util.logMethodDone("detect gulp files", 1, logPad, true);
+        log.value("   # of gulp tasks", allTasks.length, 2, logPad);
+        log.methodDone("detect gulp files", 1, logPad, true);
         return allTasks;
     }
 
@@ -299,7 +297,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        util.logMethodStart("read gulp file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read gulp file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
 
         if (folder)
         {
@@ -315,7 +313,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             }
         }
 
-        util.logMethodDone("read gulp file uri tasks", 1, logPad, true);
+        log.methodDone("read gulp file uri tasks", 1, logPad, true);
         return result;
     }
 

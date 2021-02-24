@@ -1,9 +1,8 @@
 
-import {
-    Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace, TaskDefinition
-} from "vscode";
+import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace } from "vscode";
 import * as path from "path";
 import * as util from "./util";
+import * as log from "./common/log";
 import { parseStringPromise } from "xml2js";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
@@ -66,7 +65,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
     public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.logMethodStart("detect ant files", 1, logPad, true);
+        log.methodStart("detect ant files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -80,16 +79,16 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
                 {
                     visitedFiles.add(fobj.uri.fsPath);
                     const tasks = await this.readUriTasks(fobj.uri, null, logPad + "   ");
-                    util.log("   processed ant file", 3, logPad);
-                    util.logValue("      file", fobj.uri.fsPath, 3, logPad);
-                    util.logValue("      targets in file", tasks.length, 3, logPad);
+                    log.write("   processed ant file", 3, logPad);
+                    log.value("      file", fobj.uri.fsPath, 3, logPad);
+                    log.value("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        util.logValue("   # of tasks", allTasks.length, 2, logPad);
-        util.logMethodDone("detect ant files", 1, logPad, true);
+        log.value("   # of tasks", allTasks.length, 2, logPad);
+        log.methodDone("detect ant files", 1, logPad, true);
         return allTasks;
     }
 
@@ -99,7 +98,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         const scripts: StringMap = {};
         const useAnt = configuration.get<boolean>("useAnt");
 
-        util.logMethodStart("find ant targets", 1, logPad, true, [["use ant", useAnt]]);
+        log.methodStart("find ant targets", 1, logPad, true, [["use ant", useAnt]]);
 
         //
         // Try running 'ant' itself to get the targets.  If fail, just custom parse
@@ -112,7 +111,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             await this.findTasksWithXml2Js(path, scripts);
         }
 
-        util.logMethodDone("find ant targets complete", 1, logPad, true);
+        log.methodDone("find ant targets complete", 1, logPad, true);
         return scripts;
     }
 
@@ -174,7 +173,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
                     if (!line || line.match(/(target[s]{0,1}:|Buildfile:)/i)) {
                         continue;
                     }
-                    util.logValue("   Found target (ant -p)", line);
+                    log.value("   Found target (ant -p)", line);
                     scripts[defaultTask === line ? line + " - Default" : line] = line;
                 }
             }
@@ -184,7 +183,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
     private logException(ex: any)
     {
-        util.logError([ "*** Error running/executing ant!!", "Check to ensure the path to ant/ant.bat is correct", ex?.toString() ]);
+        log.error([ "*** Error running/executing ant!!", "Check to ensure the path to ant/ant.bat is correct", ex?.toString() ]);
         window.showInformationMessage("Error running/executing ant!!  Check to ensure the path to ant/ant.bat is correct");
     }
 
@@ -206,7 +205,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             for (const tgt of targets)                  // Check .$ and .$.name (xml2js output format)
             {
                 if (tgt.$ && tgt.$.name) {
-                    util.logValue("   Found target (cst.)", tgt.$.name);
+                    log.value("   Found target (cst.)", tgt.$.name);
                     scripts[defaultTask === tgt.$.name ? tgt.$.name + " - Default" : tgt.$.name] = tgt.$.name;
                 }
             }
@@ -250,7 +249,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        util.logMethodStart("read ant file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read ant file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
 
         if (folder)
         {
@@ -266,7 +265,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             }
         }
 
-        util.logMethodDone("read ant file uri task", 1, logPad, true);
+        log.methodDone("read ant file uri task", 1, logPad, true);
         return result;
     }
 

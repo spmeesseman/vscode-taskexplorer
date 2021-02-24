@@ -1,10 +1,10 @@
 
 import {
-    Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition, ShellExecutionOptions, extensions
+    Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions, extensions
 } from "vscode";
 import * as path from "path";
 import * as util from "./util";
+import * as log from "./common/log";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
@@ -77,8 +77,8 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     {
         const scripts: string[] = [];
 
-        util.logBlank(1);
-        util.log(logPad + "find makefile targets");
+        log.blank(1);
+        log.write(logPad + "find makefile targets");
 
         const contents = util.readFileSync(fsPath);
         let idx = 0;
@@ -105,9 +105,9 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
                     tgtName.indexOf("(") === -1 && tgtName.indexOf("$") === -1 && this.isNormalTarget(tgtName))
                 {
                     scripts.push(tgtName);
-                    util.log(logPad + "   found makefile target");
-                    util.logValue(logPad + "      name", tgtName);
-                    util.logValue(logPad + "      depends target", dependsName);
+                    log.write(logPad + "   found makefile target");
+                    log.value(logPad + "      name", tgtName);
+                    log.value(logPad + "      depends target", dependsName);
                 }
             }
 
@@ -115,7 +115,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             eol = contents.indexOf("\n", idx);
         }
 
-        util.log(logPad + "find makefile targets complete", 1);
+        log.write(logPad + "find makefile targets complete", 1);
 
         return scripts;
     }
@@ -168,7 +168,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.logMethodStart("detect make files", 1, logPad, true);
+        log.methodStart("detect make files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -182,17 +182,17 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
                 {
                     visitedFiles.add(fobj.uri.fsPath);
                     const tasks = await this.readUriTasks(fobj.uri, null, logPad + "   ");
-                    util.log("   processed make file", 3, logPad);
-                    util.logValue("      file", fobj.uri.fsPath, 3, logPad);
-                    util.logValue("      targets in file", tasks.length, 3, logPad);
+                    log.write("   processed make file", 3, logPad);
+                    log.value("      file", fobj.uri.fsPath, 3, logPad);
+                    log.value("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        util.logBlank();
-        util.logValue("   # of make tasks", allTasks.length, 2, logPad);
-        util.logMethodDone("detect make files", 1, logPad, true);
+        log.blank();
+        log.value("   # of make tasks", allTasks.length, 2, logPad);
+        log.methodDone("detect make files", 1, logPad, true);
 
         return allTasks;
     }
@@ -203,7 +203,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        util.logMethodStart("read make file uri tasks", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read make file uri tasks", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
 
         if (folder)
         {
@@ -219,7 +219,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             }
         }
 
-        util.logMethodDone("read make file uri tasks", 1, logPad);
+        log.methodDone("read make file uri tasks", 1, logPad);
         return result;
     }
 

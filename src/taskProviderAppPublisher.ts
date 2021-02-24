@@ -1,11 +1,8 @@
 
-import {
-    Task, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition, ShellExecutionOptions
-} from "vscode";
+import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 import * as path from "path";
 import * as util from "./util";
-import { configuration } from "./common/configuration";
+import * as log from "./common/log";
 import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
 import { TaskExplorerDefinition } from "./taskDefinition";
@@ -41,7 +38,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
 
     public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.logMethodStart("detect app-publisher files", 1, logPad, true);
+        log.methodStart("detect app-publisher files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -59,8 +56,8 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
             }
         }
 
-        util.logValue(logPad + "   # of tasks", allTasks.length, 2, logPad);
-        util.logMethodDone("detect app-publisher files", 1, logPad, true);
+        log.value(logPad + "   # of tasks", allTasks.length, 2, logPad);
+        log.methodDone("detect app-publisher files", 1, logPad, true);
 
         return allTasks;
     }
@@ -73,7 +70,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
               defaultDef = this.getDefaultDefinition(null, folder, uri),
               options: ShellExecutionOptions = { cwd };
 
-        util.logMethodStart("read app-publisher file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read app-publisher file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
 
         const kind1: TaskExplorerDefinition = {
             ...defaultDef,
@@ -120,7 +117,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         const execution5 = new ShellExecution(kind5.cmdLine, options);
         const execution6 = new ShellExecution(kind6.cmdLine, options);
 
-        util.logMethodDone("read app-ublisher file uri tasks", 1, logPad, true);
+        log.methodDone("read app-ublisher file uri tasks", 1, logPad, true);
 
         return [ new Task(kind4, folder, "Dry Run", "app-publisher", execution4, undefined),
                 new Task(defaultDef, folder, "Publish", "app-publisher", execution3, undefined),

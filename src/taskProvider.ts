@@ -2,8 +2,8 @@
 import { Uri, Task, WorkspaceFolder, workspace, TaskProvider } from "vscode";
 import { TaskExplorerDefinition } from "./taskDefinition";
 import { configuration } from "./common/configuration";
-import * as path from "path";
 import * as util from "./util";
+import * as log from "./common/log";
 
 export abstract class TaskExplorerProvider implements TaskProvider
 {
@@ -28,7 +28,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
     public async provideTasks()
     {
-        util.logMethodStart(`provide ${this.providerName} tasks`, 1, "", true);
+        log.methodStart(`provide ${this.providerName} tasks`, 1, "", true);
 
         if (!this.cachedTasks) {
             this.cachedTasks = await this.readTasks("   ");
@@ -45,7 +45,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
     public async invalidateTasksCache(uri?: Uri, logPad = ""): Promise<void>
     {
-        util.logMethodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, true,
+        log.methodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, true,
             [["uri", uri?.path], ["has cached tasks", !!this.cachedTasks]]
         );
 
@@ -78,7 +78,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             if (this.cachedTasks)
             {
                 for (const each of rmvTasks) {
-                    util.log("   removing old task " + each.name, 2, logPad);
+                    log.write("   removing old task " + each.name, 2, logPad);
                     util.removeFromArray(this.cachedTasks, each);
                 }
 
@@ -97,7 +97,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
         }
 
         this.cachedTasks = undefined;
-        util.logMethodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad);
+        log.methodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad);
         await this.processQueue();
     }
 

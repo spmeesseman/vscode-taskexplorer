@@ -4,6 +4,7 @@
 import * as assert from "assert";
 import { workspace } from "vscode";
 import * as util from "../util";
+import * as log from "../common/log";
 
 
 suite("Util tests", () =>
@@ -25,37 +26,37 @@ suite("Util tests", () =>
 
     test("Log a blank to output window", () =>
     {
-        util.logBlank();
+        log.blank();
     });
 
     test("Log to output window", () =>
     {
-        util.log("        spmeesseman.vscode-taskexplorer");
+        log.write("        spmeesseman.vscode-taskexplorer");
     });
 
     test("Log value to output window", () =>
     {
-        util.logValue("        spmeesseman.vscode-taskexplorer", "true");
+        log.value("        spmeesseman.vscode-taskexplorer", "true");
     });
 
     test("Log a null value to output window", () =>
     {
-        util.logValue("        spmeesseman.vscode-taskexplorer", null);
+        log.value("        spmeesseman.vscode-taskexplorer", null);
     });
 
     test("Log undefined value to output window", () =>
     {
-        util.logValue("        spmeesseman.vscode-taskexplorer", undefined);
+        log.value("        spmeesseman.vscode-taskexplorer", undefined);
     });
 
     test("Log error value to output window", () =>
     {
-        util.logError("        spmeesseman.vscode-taskexplorer");
+        log.error("        spmeesseman.vscode-taskexplorer");
     });
 
     test("Log error array to output window", () =>
     {
-        util.logError([ "        spmeesseman.vscode-taskexplorer",
+        log.error([ "        spmeesseman.vscode-taskexplorer",
                         "        spmeesseman.vscode-taskexplorer",
                         "        spmeesseman.vscode-taskexplorer" ]);
     });

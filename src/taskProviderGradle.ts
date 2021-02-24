@@ -1,10 +1,8 @@
 
-import {
-    Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri,
-    workspace, TaskProvider, TaskDefinition
-} from "vscode";
+import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 import * as path from "path";
 import * as util from "./util";
+import * as log from "./common/log";
 import { filesCache } from "./cache";
 import { TaskExplorerProvider } from "./taskProvider";
 import { TaskExplorerDefinition } from "./taskDefinition";
@@ -42,7 +40,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.logMethodStart("detect gradle files", 1, logPad, true);
+        log.methodStart("detect gradle files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -55,16 +53,16 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
                     visitedFiles.add(fobj.uri.fsPath);
                     const tasks = await this.readUriTasks(fobj.uri, null, logPad + "   ");
-                    util.log("   processed gradle file", 3, logPad);
-                    util.logValue("      file", fobj.uri.fsPath, 3, logPad);
-                    util.logValue("      targets in file", tasks.length, 3, logPad);
+                    log.write("   processed gradle file", 3, logPad);
+                    log.value("      file", fobj.uri.fsPath, 3, logPad);
+                    log.value("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        util.logValue("   # of tasks", allTasks.length, 2, logPad);
-        util.logMethodDone("detect gradle files", 1, logPad, true);
+        log.value("   # of tasks", allTasks.length, 2, logPad);
+        log.methodDone("detect gradle files", 1, logPad, true);
         return allTasks;
     }
 
@@ -74,7 +72,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         const json: any = "";
         const scripts: string[] = [];
 
-        util.logMethodStart("find gradle targets", 1, logPad, true);
+        log.methodStart("find gradle targets", 1, logPad, true);
 
         const contents = util.readFileSync(fsPath);
         let idx = 0;
@@ -100,8 +98,8 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
                         if (tgtName)
                         {
                             scripts.push(tgtName);
-                            util.log("      found gradle target", 1, logPad);
-                            util.logValue("         name", tgtName, 1, logPad);
+                            log.write("      found gradle target", 1, logPad);
+                            log.value("         name", tgtName, 1, logPad);
                         }
                     }
                 }
@@ -111,7 +109,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             eol = contents.indexOf("\n", idx);
         }
 
-        util.logMethodDone("Find gradle targets", 1, logPad, true);
+        log.methodDone("Find gradle targets", 1, logPad, true);
         return scripts;
     }
 
@@ -135,7 +133,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        util.logMethodStart("read gulp file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read gulp file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
 
         if (folder)
         {
@@ -151,7 +149,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             }
         }
 
-        util.logMethodDone("read gulp file uri task", 1, logPad, true);
+        log.methodDone("read gulp file uri task", 1, logPad, true);
         return result;
     }
 
