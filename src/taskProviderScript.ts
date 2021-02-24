@@ -204,10 +204,9 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public async readTasks(): Promise<Task[]>
+    public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.logBlank(1);
-        util.log("detect script files", 1);
+        util.logMethodStart("detect script files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -221,15 +220,14 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
                 {
                     visitedFiles.add(fobj.uri.fsPath);
                     allTasks.push(this.createTask(path.extname(fobj.uri.fsPath).substring(1), null, fobj.folder, fobj.uri));
-                    util.log("   found script target/file");
-                    util.logValue("      script file", fobj.uri.fsPath);
+                    util.log("   found script target/file", 3, logPad);
+                    util.logValue("      script file", fobj.uri.fsPath, 3, logPad);
                 }
             }
         }
 
-        util.logBlank(1);
-        util.logValue("   # of tasks", allTasks.length, 2);
-        util.log("detect script files complete", 1);
+        util.logValue("   # of tasks", allTasks.length, 2, logPad);
+        util.logMethodDone("detect script files", 1, logPad, true);
         return allTasks;
     }
 
@@ -237,11 +235,9 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
-        util.logBlank(1);
-        util.log(logPad + "read script file uri task", 1);
-        util.logValue(logPad + "   path", uri?.fsPath, 1);
+        util.logMethodStart("read ant file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
         const task = this.createTask(path.extname(uri.fsPath).substring(1), null, folder, uri);
-        util.log(logPad + "read script file uri task complete", 1);
+        util.logMethodDone("read script file uri task", 1, logPad, true);
         return [ task ];
     }
 

@@ -41,8 +41,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
 
     public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.logBlank(1);
-        util.log(logPad + "detect app-publisher files", 1);
+        util.logMethodStart("detect app-publisher files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -60,9 +59,8 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
             }
         }
 
-        util.logBlank(1);
-        util.logValue(logPad + "   # of tasks", allTasks.length, 2);
-        util.log(logPad + "detect app-publisher files complete", 1);
+        util.logValue(logPad + "   # of tasks", allTasks.length, 2, logPad);
+        util.logMethodDone("detect app-publisher files", 1, logPad, true);
 
         return allTasks;
     }
@@ -75,9 +73,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
               defaultDef = this.getDefaultDefinition(null, folder, uri),
               options: ShellExecutionOptions = { cwd };
 
-        util.logBlank(1);
-        util.log(logPad + "read app-publisher file uri tasks", 1);
-        util.logValue(logPad + "   path", uri?.fsPath, 1);
+        util.logMethodStart("read app-publisher file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
 
         const kind1: TaskExplorerDefinition = {
             ...defaultDef,
@@ -124,7 +120,8 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         const execution5 = new ShellExecution(kind5.cmdLine, options);
         const execution6 = new ShellExecution(kind6.cmdLine, options);
 
-        util.log(logPad + "read app-ublisher file uri tasks complete", 1);
+        util.logMethodDone("read app-ublisher file uri tasks", 1, logPad, true);
+
         return [ new Task(kind4, folder, "Dry Run", "app-publisher", execution4, undefined),
                 new Task(defaultDef, folder, "Publish", "app-publisher", execution3, undefined),
                 new Task(kind1, folder, "Re-publish", "app-publisher", execution1, undefined),

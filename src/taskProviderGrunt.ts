@@ -42,10 +42,9 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     }
 
 
-    public async readTasks(): Promise<Task[]>
+    public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.log("");
-        util.log("detect grunt files");
+        util.logMethodStart("detect grunt files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -58,16 +57,17 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
                 {
                     visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri, null, "   ");
-                    util.log("   processed grunt file", 3);
-                    util.logValue("      file", fobj.uri.fsPath, 3);
-                    util.logValue("      targets in file", tasks.length, 3);
+                    const tasks = await this.readUriTasks(fobj.uri, null, logPad + "   ");
+                    util.log("   processed grunt file", 3, logPad);
+                    util.logValue("      file", fobj.uri.fsPath, 3, logPad);
+                    util.logValue("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        util.logValue("   # of tasks", allTasks.length, 2);
+        util.logValue("   # of tasks", allTasks.length, 2, logPad);
+        util.logMethodDone("detect grunt files", 1, logPad, true);
         return allTasks;
     }
 
@@ -76,8 +76,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     {
         const scripts: string[] = [];
 
-        util.logBlank(1);
-        util.log(logPad + "find grunt targets", 1);
+        util.logMethodStart("find grunt targets", 1, logPad, true);
 
         const contents = util.readFileSync(fsPath);
         let idx = 0;
@@ -122,8 +121,8 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
                         const tgtName = line.substring(idx1, idx2).trim();
                         if (tgtName) {
                             scripts.push(tgtName);
-                            util.log(logPad + "   found grunt target");
-                            util.logValue(logPad + "      name", tgtName);
+                            util.log("   found grunt target", 3, logPad);
+                            util.logValue("      name", tgtName, 3, logPad);
                         }
                     }
                 }
@@ -133,8 +132,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
             eol = contents.indexOf("\n", idx);
         }
 
-        util.logBlank(1);
-        util.log(logPad + "find grunt targets complete", 1);
+        util.logMethodDone("find grunt targets", 1, logPad, true);
 
         return scripts;
     }
@@ -159,13 +157,11 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        util.logBlank(1);
-        util.log(logPad + "read grunt file uri tasks", 1);
-        util.logValue(logPad + "   path", uri?.fsPath, 1);
+        util.logMethodStart("read grunt file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
 
         if (folder)
         {
-            const scripts = this.findTargets(uri.fsPath, "   ");
+            const scripts = this.findTargets(uri.fsPath, logPad + "   ");
             if (scripts)
             {
                 for (const s of scripts)
@@ -177,7 +173,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
             }
         }
 
-        util.log(logPad + "read grunt file uri tasks complete", 1);
+        util.logMethodDone("read grunt file uri tasks", 1, logPad, true);
         return result;
     }
 

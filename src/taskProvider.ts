@@ -1,15 +1,15 @@
 
-import { Uri, Task, WorkspaceFolder, workspace } from "vscode";
+import { Uri, Task, WorkspaceFolder, workspace, TaskProvider } from "vscode";
 import { TaskExplorerDefinition } from "./taskDefinition";
 import { configuration } from "./common/configuration";
 import * as path from "path";
 import * as util from "./util";
 
-export abstract class TaskExplorerProvider implements TaskExplorerProvider
+export abstract class TaskExplorerProvider implements TaskProvider
 {
     abstract getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition;
     abstract createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task;
-    abstract readTasks(): Promise<Task[]>;
+    abstract readTasks(logPad?: string): Promise<Task[]>;
     abstract readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad?: string): Promise<Task[]>;
 
 
@@ -28,11 +28,10 @@ export abstract class TaskExplorerProvider implements TaskExplorerProvider
 
     public async provideTasks()
     {
-        util.logBlank();
-        util.log(`provide ${this.providerName} tasks`);
+        util.logMethodStart(`provide ${this.providerName} tasks`, 1, "", true);
 
         if (!this.cachedTasks) {
-            this.cachedTasks = await this.readTasks();
+            this.cachedTasks = await this.readTasks("   ");
         }
         return this.cachedTasks;
     }
@@ -44,12 +43,11 @@ export abstract class TaskExplorerProvider implements TaskExplorerProvider
     }
 
 
-    public async invalidateTasksCache(uri?: Uri): Promise<void>
+    public async invalidateTasksCache(uri?: Uri, logPad = ""): Promise<void>
     {
-        util.log("");
-        util.log(`invalidate ${this.providerName} tasks cache`);
-        util.logValue("   uri", uri?.path, 2);
-        util.logValue("   has cached tasks", !!this.cachedTasks, 2);
+        util.logMethodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, true,
+            [["uri", uri?.path], ["has cached tasks", !!this.cachedTasks]]
+        );
 
         if (this.invalidating) {
             this.queue.push(uri);
@@ -80,13 +78,13 @@ export abstract class TaskExplorerProvider implements TaskExplorerProvider
             if (this.cachedTasks)
             {
                 for (const each of rmvTasks) {
-                    util.log("   removing old task " + each.name);
+                    util.log("   removing old task " + each.name, 2, logPad);
                     util.removeFromArray(this.cachedTasks, each);
                 }
 
                 if (util.pathExists(uri.fsPath) && util.existsInArray(configuration.get("exclude"), uri.path) === false)
                 {
-                    const tasks = await this.readUriTasks(uri, folder, "   ");
+                    const tasks = await this.readUriTasks(uri, folder, logPad + "   ");
                     this.cachedTasks?.push(...tasks);
                 }
 
@@ -99,6 +97,7 @@ export abstract class TaskExplorerProvider implements TaskExplorerProvider
         }
 
         this.cachedTasks = undefined;
+        util.logMethodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad);
         await this.processQueue();
     }
 

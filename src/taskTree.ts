@@ -1624,7 +1624,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             util.log("   invalidate " + opt1 + " provider file ", 1);
             util.logValue("      file", opt2, 1);
             const provider = providers.get(util.getScriptProviderType(opt1));
-            await provider?.invalidateTasksCache(opt2); // NPM/Workspace tasks don't implement TaskExplorerProvider
+            await provider?.invalidateTasksCache(opt2, "   "); // NPM/Workspace tasks don't implement TaskExplorerProvider
         }
         else { // If opt1 is undefined, refresh all providers
             if (!opt1) {
@@ -1632,12 +1632,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 for (const [ key, p ] of providers)
                 {
                     util.log("   invalidate " + key + " provider", 1);
-                    await p.invalidateTasksCache();
+                    await p.invalidateTasksCache(null, "   ");
                 }
             }
             else {
                 util.log("   invalidate " + opt1 + " provider", 1);
-                await providers.get(opt1)?.invalidateTasksCache();  // NPM/Workspace tasks don't implement TaskExplorerProvider
+                await providers.get(opt1)?.invalidateTasksCache(null, "   ");  // NPM/Workspace tasks don't implement TaskExplorerProvider
             }
         }
 

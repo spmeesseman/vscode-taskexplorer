@@ -40,10 +40,9 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public async readTasks(): Promise<Task[]>
+    public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.logBlank(1);
-        util.log("detect gradle files", 1);
+        util.logMethodStart("detect gradle files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -55,18 +54,17 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             {
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
                     visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri, null, "   ");
-                    util.log("   processed gradle file", 3);
-                    util.logValue("      file", fobj.uri.fsPath, 3);
-                    util.logValue("      targets in file", tasks.length, 3);
+                    const tasks = await this.readUriTasks(fobj.uri, null, logPad + "   ");
+                    util.log("   processed gradle file", 3, logPad);
+                    util.logValue("      file", fobj.uri.fsPath, 3, logPad);
+                    util.logValue("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        util.logBlank(1);
-        util.logValue("   # of tasks", allTasks.length, 2);
-        util.log("detect gradle files complete", 1);
+        util.logValue("   # of tasks", allTasks.length, 2, logPad);
+        util.logMethodDone("detect gradle files", 1, logPad, true);
         return allTasks;
     }
 
@@ -76,8 +74,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         const json: any = "";
         const scripts: string[] = [];
 
-        util.logBlank(1);
-        util.log(logPad + "find gradle targets", 1);
+        util.logMethodStart("find gradle targets", 1, logPad, true);
 
         const contents = util.readFileSync(fsPath);
         let idx = 0;
@@ -103,8 +100,8 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
                         if (tgtName)
                         {
                             scripts.push(tgtName);
-                            util.log(logPad + "      found gradle target", 1);
-                            util.logValue(logPad + "         name", tgtName, 1);
+                            util.log("      found gradle target", 1, logPad);
+                            util.logValue("         name", tgtName, 1, logPad);
                         }
                     }
                 }
@@ -114,9 +111,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             eol = contents.indexOf("\n", idx);
         }
 
-
-        util.logBlank(1);
-        util.log(logPad + "Find gradle targets complete", 1);
+        util.logMethodDone("Find gradle targets", 1, logPad, true);
         return scripts;
     }
 
@@ -140,13 +135,11 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        util.logBlank(1);
-        util.log(logPad + "read gulp file uri tasks", 1);
-        util.logValue(logPad + "   path", uri?.fsPath, 1);
+        util.logMethodStart("read gulp file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
 
         if (folder)
         {
-            const scripts = this.findTargets(uri.fsPath, "   ");
+            const scripts = this.findTargets(uri.fsPath, logPad + "   ");
             if (scripts)
             {
                 for (const s of scripts)
@@ -158,7 +151,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             }
         }
 
-        util.log(logPad + "read grunt file uri tasks complete", 1);
+        util.logMethodDone("read gulp file uri task", 1, logPad, true);
         return result;
     }
 

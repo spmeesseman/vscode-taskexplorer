@@ -166,10 +166,9 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    public async readTasks(): Promise<Task[]>
+    public async readTasks(logPad = ""): Promise<Task[]>
     {
-        util.logBlank();
-        util.log("detect make files");
+        util.logMethodStart("detect make files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
@@ -182,18 +181,18 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
                 {
                     visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri, null, "   ");
-                    util.log("   processed make file", 3);
-                    util.logValue("      file", fobj.uri.fsPath, 3);
-                    util.logValue("      targets in file", tasks.length, 3);
+                    const tasks = await this.readUriTasks(fobj.uri, null, logPad + "   ");
+                    util.log("   processed make file", 3, logPad);
+                    util.logValue("      file", fobj.uri.fsPath, 3, logPad);
+                    util.logValue("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
                 }
             }
         }
 
         util.logBlank();
-        util.logValue("   # of make tasks", allTasks.length, 2);
-        util.log("detect make files complete", 1);
+        util.logValue("   # of make tasks", allTasks.length, 2, logPad);
+        util.logMethodDone("detect make files", 1, logPad, true);
 
         return allTasks;
     }
@@ -204,13 +203,11 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        util.logBlank(1);
-        util.log(logPad + "read make file uri tasks", 1);
-        util.logValue(logPad + "   path", uri?.fsPath, 1);
+        util.logMethodStart("read make file uri tasks", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
 
         if (folder)
         {
-            const scripts = this.findTargets(uri.fsPath, "   ");
+            const scripts = this.findTargets(uri.fsPath, logPad + "   ");
             if (scripts)
             {
                 for (const s of scripts)
@@ -222,7 +219,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             }
         }
 
-        util.log(logPad + "read make file uri tasks complete", 1);
+        util.logMethodDone("read make file uri tasks", 1, logPad);
         return result;
     }
 
