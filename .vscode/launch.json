@@ -8,13 +8,13 @@
         {
 			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch (WebPack Build)",
+			"name": "Launch WebPack Build",
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--disable-extensions",
-				"--extensionDevelopmentPath=${workspaceRoot}"
+				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
-			"outFiles": ["${workspaceFolder}/dist/extension.js"],
+			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
 			"stopOnEntry": false,
             "sourceMaps": true,
 			"preLaunchTask": "npm: webpack-watch"
@@ -22,12 +22,12 @@
         {
 			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch w Root (WebPack Build)",
+			"name": "Launch WebPack Build w Root",
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--disable-extensions",
-				"--extensionDevelopmentPath=${workspaceRoot}",
-				"${workspaceRoot}"
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"${workspaceFolder}"
 			],
 			"outFiles": ["${workspaceFolder}/dist/extension.js"],
 			"stopOnEntry": false,
@@ -87,7 +87,7 @@
             "postDebugTask": "npm: testafter"
         },
         {
-            "name": "Launch Tests (WebPack Build)",
+            "name": "Launch Tests WebPack Build",
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",

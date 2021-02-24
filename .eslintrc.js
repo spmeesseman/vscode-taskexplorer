@@ -14,15 +14,20 @@ Happy linting! 💖
 module.exports = {
     "root": true,
     "env": {
-        "browser": true,
         "es6": true,
         "node": true
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "project": "tsconfig.json",
-        "sourceType": "module"
+        "sourceType": "module",
+        "ecmaVersion": 6
     },
+    "overrides": [
+    {
+        "files": ["src/**/*.ts"],
+        "excludedFiles": ["test-files", "lib", "*.js", "*.json"  ]
+    }],
     "plugins": [
         "eslint-plugin-jsdoc",
         "eslint-plugin-no-null",

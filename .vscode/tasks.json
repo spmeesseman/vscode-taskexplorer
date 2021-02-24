@@ -16,6 +16,35 @@
     },
     {
         "type": "npm",
+        "script": "webpack-watch",
+        "problemMatcher": {
+            "owner": "typescript",
+            "pattern": [
+                {
+                    "regexp": "\\[tsl\\] ERROR",
+                    "file": 1,
+                    "location": 2,
+                    "message": 3
+                }
+            ],
+            "background": {
+                "activeOnStart": true,
+                // Webpack 
+                "beginsPattern": "Compilation \\w+ starting…",
+                "endsPattern": "Compilation\\s+finished"
+            }
+        },
+        "isBackground": true,
+        "presentation": {
+            "reveal": "never"
+        },
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        }
+    },
+    {
+        "type": "npm",
         "script": "build",
         "problemMatcher": [
             "$tsc"

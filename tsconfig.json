@@ -3,11 +3,9 @@
         "module": "commonjs",
         "target": "es6",
         "outDir": "out",
+		"rootDir": "src",
+        "allowSyntheticDefaultImports":true,
         "typeRoots": [ "./node_modules/@types", "typings" ],
-        "lib": [
-            "dom",
-            "es6"
-        ],
         "sourceMap": true,
         //"allowSyntheticDefaultImports": true,
         //"esModuleInterop": true,
@@ -19,11 +17,12 @@
         // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
         // "noUnusedParameters": true,  /* Report errors on unused parameters. */
     },
-    "allowSyntheticDefaultImports": true,
     "include": ["src/**/*"],
     "exclude": [
         "node_modules",
         ".vscode-test",
-        "test-files"
+        "test-files",
+        "webpack.*",
+        ".eslintrc.*"
     ]
 }
