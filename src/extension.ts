@@ -21,7 +21,7 @@ import { configuration } from "./common/configuration";
 import { initStorage } from "./common/storage";
 import { views } from "./views";
 import { TaskExplorerProvider } from "./taskProvider";
-import * as util from "./util";
+import * as util from "./common/utils";
 import * as cache from "./cache";
 import * as log from "./common/log";
 

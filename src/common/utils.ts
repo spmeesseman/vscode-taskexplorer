@@ -3,11 +3,11 @@
 import { RelativePattern, WorkspaceFolder, Uri, workspace } from "vscode";
 import * as fs from "fs";
 import * as minimatch from "minimatch";
-import { configuration } from "./common/configuration";
-import * as constants from "./common/constants";
+import { configuration } from "./configuration";
+import * as constants from "./constants";
 import * as path from "path";
 import * as os from "os";
-import * as log from "./common/log";
+import * as log from "./log";
 
 
 /**

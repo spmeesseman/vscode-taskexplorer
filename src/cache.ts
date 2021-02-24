@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem } from "vscode";
-import * as util from "./util";
+import * as util from "./common/utils";
 import { configuration } from "./common/configuration";
 import * as constants from "./common/constants";
 import * as log from "./common/log";

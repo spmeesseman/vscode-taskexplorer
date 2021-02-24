@@ -9,7 +9,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder } from "vscode";
 import * as testUtil from "./testUtil";
-import { timeout, removeFromArray, forEachMapAsync } from "../util";
+import { timeout, removeFromArray, forEachMapAsync } from "../common/utils";
 import { teApi } from "./extension.test";
 import { TaskItem } from "../tasks";
 import { waitForCache } from "../cache";

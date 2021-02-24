@@ -4,7 +4,7 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import { configuration } from "../common/configuration";
-import { timeout } from "../util";
+import { timeout } from "../common/utils";
 import { TaskExplorerApi } from "../extension";
 import * as log from "../common/log";
 

@@ -1,7 +1,7 @@
 
 import { Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri, workspace } from "vscode";
 import * as path from "path";
-import * as util from "./util";
+import * as util from "./common/utils";
 import * as log from "./common/log";
 import { configuration } from "./common/configuration";
 import { filesCache } from "./cache";

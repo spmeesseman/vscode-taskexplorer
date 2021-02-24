@@ -3,7 +3,7 @@
 
 import * as assert from "assert";
 import { workspace } from "vscode";
-import * as util from "../util";
+import * as util from "../common/utils";
 import * as log from "../common/log";
 
 

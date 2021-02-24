@@ -4,7 +4,7 @@ import {
     TaskDefinition, ExtensionContext, tasks, Uri
 } from "vscode";
 import * as path from "path";
-import * as util from "./util";
+import * as util from "./common/utils";
 import * as constants from "./common/constants";
 import { configuration } from "./common/configuration";
 
