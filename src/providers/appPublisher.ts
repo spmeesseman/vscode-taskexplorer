@@ -70,7 +70,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
               defaultDef = this.getDefaultDefinition(null, folder, uri),
               options: ShellExecutionOptions = { cwd };
 
-        log.methodStart("read app-publisher file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read app-publisher file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
 
         const kind1: TaskExplorerDefinition = {
             ...defaultDef,

@@ -249,7 +249,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        log.methodStart("read ant file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read ant file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
 
         if (folder)
         {

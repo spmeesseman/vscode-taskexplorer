@@ -154,7 +154,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        log.methodStart("read grunt file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read grunt file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
 
         if (folder)
         {

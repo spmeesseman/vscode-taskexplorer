@@ -133,7 +133,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        log.methodStart("read gulp file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read gulp file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
 
         if (folder)
         {
