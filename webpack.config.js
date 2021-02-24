@@ -3,7 +3,7 @@
 'use strict';
 
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
+// const TerserPlugin = require('terser-webpack-plugin');
 
 /**
  * @type {import('webpack').Configuration}
@@ -47,11 +47,11 @@ const config =
 			use: [{
 				loader: 'ts-loader'
 			}]
-		}]
-	},
-	optimization: {
-		// @ts-ignore
-		minimizer: [new TerserPlugin({ extractComments: false })],
+		}]// ,
+		// optimization: {
+		// 	// @ts-ignore
+		// 	minimizer: [new TerserPlugin({ extractComments: false })],
+		// }
 	}
 };
 module.exports = config;
