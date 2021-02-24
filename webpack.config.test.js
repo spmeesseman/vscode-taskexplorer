@@ -20,9 +20,10 @@ const config =
         index: './src/test/index.ts',
         istanbultestrunner: './src/test/istanbultestrunner.ts',
         runTest: './src/test/runTest.ts',
+        "tasks.test": './src/test/tasks.test.ts',
         testUtil: './src/test/testUtil.ts',
-        extension: './src/test/extension.test.ts',
-        util: './src/test/util.test.ts'
+        "extension.test": './src/test/extension.test.ts',
+        "util.test": './src/test/util.test.ts'
     },
 	output:
 	{   //

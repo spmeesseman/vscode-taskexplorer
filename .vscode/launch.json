@@ -102,7 +102,7 @@
             "outFiles": [
                 "${workspaceFolder}/dist/test/**/*.js"
             ],
-            "preLaunchTask": "npm: testbefore",
+            "preLaunchTask": "npm: webpack-testbefore",
             "postDebugTask": "npm: testafter"
         }
     ]
