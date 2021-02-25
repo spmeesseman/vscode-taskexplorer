@@ -20,3 +20,4 @@ test-files
 webpack.config.js
 webpack.config.test.js
 coverconfig.json
+test-files
