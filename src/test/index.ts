@@ -71,7 +71,12 @@ export async function run(): Promise<void>
     // console.log('Glob verification', await nyc.exclude.glob(nyc.cwd));
     //
 
-    const mochaOpts: Mocha.MochaOptions = {
+    await nyc.createTempDirectory();
+
+    //
+    // Create the mocha test
+    //
+    const mocha = new Mocha({
         ui: "tdd", // the TDD UI is being used in extension.test.ts (suite, test, etc.)
         useColors: true, // colored output from test results,
         timeout: 30000, // default timeout: 10 seconds
@@ -84,16 +89,8 @@ export async function run(): Promise<void>
                 suiteTitleSeparatedBy: ": "
             }
         }
-    };
-
-    await nyc.createTempDirectory();
-    //
-    // Create the mocha test
-    //
-    const mocha = new Mocha({
-        ui: "tdd",
-        timeout: 10 * 1000,
     });
+
     mocha.useColors(true);
 
     //
@@ -118,6 +115,7 @@ export async function run(): Promise<void>
 
 async function captureStdout(fn)
 {
+    // eslint-disable-next-line prefer-const
     let w = process.stdout.write, buffer = "";
     process.stdout.write = (s) => { buffer = buffer + s; return true; };
     await fn();

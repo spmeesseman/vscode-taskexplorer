@@ -4,7 +4,6 @@
         "target": "es6",
         "outDir": "dist",
 		"rootDir": "src",
-        "typeRoots": [ "./node_modules/@types", "typings" ],
         "lib": [
             // "dom",
             "es6"
