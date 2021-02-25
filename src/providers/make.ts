@@ -40,9 +40,11 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     constructor() { super("make"); }
 
 
-    public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
+    public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad = ""): Task
     {
-        const getCommand = (folder: WorkspaceFolder, cmd: string): string =>
+        log.methodStart("create make task", 4, logPad, true);
+
+        const getCommand = (): string =>
         {
             let make = "make";
             if (process.platform === "win32") {
@@ -50,7 +52,9 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             }
             if (configuration.get("pathToMake")) {
                 make = configuration.get("pathToMake");
+                log.value("   set make program from settings", make, 5, logPad);
             }
+            log.value("   set make program from settings", make, 5, logPad);
             return make;
         };
 
@@ -62,12 +66,14 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             cwd
         };
 
-        const execution = new ShellExecution(getCommand(folder, cmd), args, options);
+        const execution = new ShellExecution(getCommand(), args, options);
         let problemMatcher = "$gccte";
         const cPlusPlusExtension = extensions.getExtension("spmeesseman.vscode-taskexplorer");
         if (cPlusPlusExtension) {
             problemMatcher = "$gcc";
         }
+
+        log.methodDone("create make task", 4, logPad, true);
 
         return new Task(kind, folder, target, "make", execution, problemMatcher);
     }
@@ -212,7 +218,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             {
                 for (const s of scripts)
                 {
-                    const task = this.createTask(s, s, folder, uri);
+                    const task = this.createTask(s, s, folder, uri, undefined, logPad);
                     task.group = TaskGroup.Build;
                     result.push(task);
                 }

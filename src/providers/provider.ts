@@ -8,7 +8,7 @@ import * as log from "../common/log";
 export abstract class TaskExplorerProvider implements TaskProvider
 {
     abstract getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition;
-    abstract createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task;
+    abstract createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task;
     abstract readTasks(logPad?: string): Promise<Task[]>;
     abstract readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad?: string): Promise<Task[]>;
 
