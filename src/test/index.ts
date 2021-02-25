@@ -43,7 +43,7 @@ export async function run(): Promise<void>
     const nyc = new NYC({
         ...baseConfig,
         cwd: path.join(__dirname, "..", ".."),
-        reporter: ["text-summary", "html"],
+        reporter: ["text-summary", "html", "lcov", "cobertura" ],
         all: true,
         silent: false,
         instrument: true,
@@ -85,7 +85,7 @@ export async function run(): Promise<void>
         reporterOptions: {
             reporterEnabled: "spec, mocha-junit-reporter",
             mochaJunitReporterReporterOptions: {
-                mochaFile: __dirname + "/../../test-reports/extension_tests.xml",
+                mochaFile: __dirname + "/../../coverage/junit/extension_tests.xml",
                 suiteTitleSeparatedBy: ": "
             }
         }

@@ -52,7 +52,7 @@
         "build": "npx tsc -p ./",
         "build-babel": "babel src --out-dir dist --extensions \".js,.ts\" && tsc --declaration --emitDeclarationOnly -p ./",
         "babel:watch": "nodemon -e js,ts,json --watch src --watch .babelrc.js --exec \"(babel src --out-dir dist --extensions '.js,.ts'; exit 0)\"",
-        "clean": "rimraf dist && rimraf .nyc_output && rimraf coverage && rimraf test-reports",
+        "clean": "rimraf dist && rimraf .nyc_output && rimraf coverage",
         "lint": "eslint -c .eslintrc.js --ext .ts .",
         "package": "vsce package",
         "publish": "vsce publish",

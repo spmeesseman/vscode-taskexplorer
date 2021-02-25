@@ -65,7 +65,7 @@ jobs:
         displayName: 'Publish Test Results'
         inputs:
           testResultsFormat: 'JUnit'
-          testResultsFiles: 'test-reports/*.xml'
+          testResultsFiles: 'coverage/junit/*.xml'
           mergeTestResults: true
           testRunTitle: '$(Agent.OS) $(Agent.JobName)'
       - task: PublishCodeCoverageResults@1
@@ -115,7 +115,7 @@ jobs:
   #      displayName: 'Publish Test Results'
   #      inputs:
   #        testResultsFormat: 'JUnit'
-  #        testResultsFiles: 'test-reports/*.xml'
+  #        testResultsFiles: 'coverage/junit/*.xml'
   #        mergeTestResults: true
   #        testRunTitle: '$(Agent.OS) $(Agent.JobName)'
   #    - task: PublishCodeCoverageResults@1
@@ -165,7 +165,7 @@ jobs:
   #    #  displayName: 'Publish Test Results'
   #    #  inputs:
   #    #    testResultsFormat: 'JUnit'
-  #    #    testResultsFiles: 'test-reports/*.xml'
+  #    #    testResultsFiles: 'coverage/junit/*.xml'
   #    #    mergeTestResults: true
   #    #    testRunTitle: '$(Agent.OS) $(Agent.JobName)'
   #    #- task: PublishCodeCoverageResults@1
@@ -215,7 +215,7 @@ jobs:
       #  displayName: 'Publish Test Results'
       #  inputs:
       #    testResultsFormat: 'JUnit'
-      #    testResultsFiles: 'test-reports/*.xml'
+      #    testResultsFiles: 'coverage/junit/*.xml'
       #    mergeTestResults: true
       #    testRunTitle: '$(Agent.OS) $(Agent.JobName)'
       #- task: PublishCodeCoverageResults@1
@@ -267,7 +267,7 @@ jobs:
         displayName: 'Publish Test Results'
         inputs:
           testResultsFormat: 'JUnit'
-          testResultsFiles: 'test-reports/*.xml'
+          testResultsFiles: 'coverage/junit/*.xml'
           mergeTestResults: true
           testRunTitle: '$(Agent.OS) $(Agent.JobName)'
       - task: PublishCodeCoverageResults@1
@@ -326,7 +326,7 @@ jobs:
         displayName: 'Publish Test Results'
         inputs:
           testResultsFormat: 'JUnit'
-          testResultsFiles: 'test-reports/*.xml'
+          testResultsFiles: 'coverage/junit/*.xml'
           mergeTestResults: true
           testRunTitle: '$(Agent.OS) $(Agent.JobName)'
       - task: PublishCodeCoverageResults@1
@@ -383,7 +383,7 @@ jobs:
       #  displayName: 'Publish Test Results'
       #  inputs:
       #    testResultsFormat: 'JUnit'
-      #    testResultsFiles: 'test-reports/*.xml'
+      #    testResultsFiles: 'coverage/junit/*.xml'
       #    mergeTestResults: true
       #    testRunTitle: '$(Agent.OS) $(Agent.JobName)'
       #- task: PublishCodeCoverageResults@1
