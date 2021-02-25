@@ -4,7 +4,8 @@
 
 const path = require('path');
 const nodeExternals = require("webpack-node-externals")
-//const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+
 
 /**
  * @type {import('webpack').Configuration}
@@ -20,6 +21,8 @@ const config =
 	entry: {
         runTest: './src/test/runTest.ts',
         index: './src/test/index.ts',
+        istanbultestrunner: './src/test/istanbultestrunner.ts',
+        testUtil: './src/test/testUtil.ts',
         "tasks.test": './src/test/tasks.test.ts',
         "extension.test": './src/test/extension.test.ts',
         "util.test": './src/test/util.test.ts'
@@ -64,12 +67,17 @@ const config =
 				loader: 'ts-loader'
 			}]
 		}]
-	}//,
-	// optimization: {
-	// 	minimizer: [
-	// 		// @ts-ignore
-	// 		new UglifyJsPlugin({ test: /\.js(\?.*)?$/i })
-	// 	]
-	// }
+	},
+	optimization: {
+		minimizer: [
+			new TerserPlugin({ 
+				extractComments: false ,
+				parallel: true,
+				terserOptions: {
+					ecma: 2019
+				}
+			})
+		],
+	}
 };
 module.exports = config;
