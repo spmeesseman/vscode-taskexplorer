@@ -7,5 +7,20 @@
         "out": true // set this to false to include "out" folder in search results
     },
     // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-    "typescript.tsc.autoDetect": "off"
+    "typescript.tsc.autoDetect": "off",
+
+    "mochaExplorer.ui": "tdd",
+    "mochaExplorer.files": "dist/test/**/*.js",
+    "mochaExplorer.require": "ts-node/register",
+    "mochaExplorer.launcherScript": "node_modules/mocha-explorer-launcher-scripts/vscode-test",
+    "mochaExplorer.autoload": true,
+    "mochaExplorer.ipcRole": "server",
+    "mochaExplorer.ipcTimeout": 10000,
+    "testExplorer.codeLens": true,
+    "testExplorer.gutterDecoration": true,
+    "mochaExplorer.mochaPath": "dist/test",
+    "mochaExplorer.env": {
+    "VSCODE_VERSION": "insiders",
+        "ELECTRON_RUN_AS_NODE": null
+    }
 }
