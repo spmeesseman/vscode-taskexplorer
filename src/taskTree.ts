@@ -2237,7 +2237,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 //
                 const def = taskItem.task.definition;
                 const p = providers.get(util.getScriptProviderType(def.type));
-                newTask = p.createTask(def.target, null, taskItem.getFolder(), def.uri);
+                newTask = p.createTask(def.target, null, taskItem.getFolder(), def.uri, undefined, "   ");
                 //
                 // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
                 // an instance of this task.

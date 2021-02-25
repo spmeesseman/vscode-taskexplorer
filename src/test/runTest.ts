@@ -6,7 +6,7 @@ import { runTests } from "vscode-test";
 async function main()
 {
     const extensionDevelopmentPath = path.resolve(__dirname, "../../");
-    const extensionTestsPath = path.resolve(__dirname, "../../out/test");
+    const extensionTestsPath = path.resolve(__dirname, "../../dist/test");
 
     try {
         await runTests({

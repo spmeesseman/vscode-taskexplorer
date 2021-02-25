@@ -5,7 +5,7 @@
     "relativeCoverageDir": "../../coverage",
     "ignorePatterns": ["**/node_modules/**", "test/**"],
     "includePid": false,
-    "reports": ["json", "lcov", "cobertura"],
+    "reports": ["json", "html", "lcov", "cobertura"],
     "verbose": true,
     "extends": "@istanbuljs/nyc-config-typescript",
     "branches": 80,
@@ -33,7 +33,9 @@
         "src/**/*.d.ts"
     ],
     "reporter": [
+        "text",
         "json",
+        "html",
         "lcov",
         "cobertura"
     ]

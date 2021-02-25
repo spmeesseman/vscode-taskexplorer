@@ -714,6 +714,8 @@ suite("Task tests", () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
+        this.timeout(30 * 1000);
+
         //
         // App-Publisher - Delete and invalidate, re-add and invalidate
         //

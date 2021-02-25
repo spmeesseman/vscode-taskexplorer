@@ -15,4 +15,8 @@ tsconfig.json
 tslint.json
 *.yml
 *.vsix
+*.sh
 test-files
+webpack.config.js
+webpack.config.test.js
+coverconfig.json

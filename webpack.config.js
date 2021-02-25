@@ -3,6 +3,7 @@
 'use strict';
 
 const path = require('path');
+const exec = require('child_process').exec;
 const TerserPlugin = require('terser-webpack-plugin');
 
 /**
@@ -43,7 +44,7 @@ const config =
 	module: {
 		rules: [{
 			test: /\.ts$/,
-			exclude: /(node_modules|test)/,
+			exclude: [/node_modules/, /test/],
 			use: [{
 				loader: 'ts-loader'
 			}]
@@ -55,7 +56,20 @@ const config =
 				extractComments: false ,
 				parallel: true,
 				terserOptions: {
-					ecma: 2019
+					ecma: undefined,
+					parse: {},
+					compress: {},
+					mangle: true, // Note `mangle.properties` is `false` by default.
+					module: false,
+					// Deprecated
+					output: null,
+					format: null,
+					toplevel: false,
+					nameCache: null,
+					ie8: false,
+					keep_classnames: undefined,
+					keep_fnames: false,
+					safari10: false,
 				}
 			})
 		],
