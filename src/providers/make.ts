@@ -161,7 +161,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    private parseTargetLine(line)
+    private parseTargetLine(line: string)
     {
         const tgtNames = line.split(":")[0].trim();
         const tgtName = tgtNames.split(" ").slice(-1)[0];

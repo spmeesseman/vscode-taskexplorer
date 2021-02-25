@@ -113,11 +113,11 @@ export async function run(): Promise<void>
     }
 }
 
-async function captureStdout(fn)
+async function captureStdout(fn: any)
 {
     // eslint-disable-next-line prefer-const
     let w = process.stdout.write, buffer = "";
-    process.stdout.write = (s) => { buffer = buffer + s; return true; };
+    process.stdout.write = (s: string) => { buffer = buffer + s; return true; };
     await fn();
     process.stdout.write = w;
     return buffer;

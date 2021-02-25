@@ -429,11 +429,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (choice === "Yes")
         {
             if (folder.label === constants.FAV_TASKS_LABEL) {
-                await storage.update(constants.FAV_TASKS_STORE, "");
+                await storage?.update(constants.FAV_TASKS_STORE, "");
                 await this.showSpecialTasks(false, true);
             }
             else if (folder.label === constants.LAST_TASKS_LABEL) {
-                await storage.update(constants.LAST_TASKS_STORE, "");
+                await storage?.update(constants.LAST_TASKS_STORE, "");
                 await this.showSpecialTasks(false);
             }
         }
@@ -442,7 +442,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async createSpecialFolder(storeName: string, label: string, treeIndex: number, sort: boolean, logPad = "")
     {
-        const lTasks = storage.get<string[]>(storeName, []) || [];
+        const lTasks = storage?.get<string[]>(storeName, []) || [];
         const folder = new TaskFolder(label);
 
         log.methodStart("create special tasks folder", 1, logPad, true, [

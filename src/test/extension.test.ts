@@ -107,6 +107,9 @@ suite("Extension Tests", () =>
 
     test("Cover pre-init cases", async function()
     {
+        if (!teApi || !teApi.explorerProvider) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
+        }
         await initSettings(false);
         teApi.explorerProvider.showSpecialTasks(true);
         teApi.explorerProvider.showSpecialTasks(true, true);

@@ -710,7 +710,7 @@ suite("Task tests", () =>
 
     test("Invalidation tests", async function()
     {
-        if (!teApi.explorerProvider) {
+        if (!teApi || !teApi.explorerProvider || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
@@ -903,7 +903,7 @@ suite("Task tests", () =>
 
     test("Test invalidate bash tasks with new bash shell setting", async function()
     {
-        if (!teApi.explorerProvider) {
+        if (!teApi || !teApi.explorerProvider || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
@@ -916,7 +916,7 @@ suite("Task tests", () =>
 
     test("Test rebuild cache on workspace folder", async function()
     {
-        if (!teApi.explorerProvider) {
+        if (!teApi || !teApi.explorerProvider || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         await teApi.fileCache.buildCache("gulp", "gulp", constants.GLOB_GULP, workspace.workspaceFolders[0], true);

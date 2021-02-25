@@ -13,7 +13,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     abstract readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad?: string): Promise<Task[]>;
 
 
-    public cachedTasks: Task[];
+    public cachedTasks: Task[] | undefined;
     public invalidating = false;
     public providerName = "***";
 

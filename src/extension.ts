@@ -102,12 +102,15 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 }
 
 
-export async function addWsFolder(wsf: readonly WorkspaceFolder[])
+export async function addWsFolder(wsf: readonly WorkspaceFolder[] | undefined)
 {
-    for (const f in wsf) {
-        if (wsf.hasOwnProperty(f)) { // skip over properties inherited by prototype
-            log.write("Workspace folder added: " + wsf[f].name, 1);
-            await cache.addFolderToCache(wsf[f]);
+    if (wsf)
+    {
+        for (const f in wsf) {
+            if (wsf.hasOwnProperty(f)) { // skip over properties inherited by prototype
+                log.write("Workspace folder added: " + wsf[f].name, 1);
+                await cache.addFolderToCache(wsf[f]);
+            }
         }
     }
 }
@@ -127,9 +130,13 @@ export async function deactivate()
 }
 
 
-export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "")
+export async function removeWsFolder(wsf: readonly WorkspaceFolder[] | undefined, logPad = "")
 {
     log.methodStart("process remove workspace folder", 1, logPad, true);
+
+    if (!wsf) {
+        return;
+    }
 
     for (const f of wsf)
     {
@@ -169,7 +176,7 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "
 
 async function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
 {
-    let refresh: boolean;
+    let refresh = false;
     const refreshTaskTypes: string[] = [],
           taskTypes = util.getTaskTypes();
 
@@ -282,7 +289,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     // NPM Package Manager change (NPM / Yarn)
     // Do a global refrsh since we don't provide the npm tasks, VSCode itself does
     //
-    if (e.affectsConfiguration("npm.packageManager", null)) {
+    if (e.affectsConfiguration("npm.packageManager", undefined)) {
         registerChange("npm");
     }
 
@@ -429,7 +436,7 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
 {
     log.write("Register file watcher for task type '" + taskType + "'");
 
-    let watcher: FileSystemWatcher = watchers.get(taskType);
+    let watcher = watchers.get(taskType);
 
     if (workspace.workspaceFolders) {
         await cache.buildCache(taskType, fileBlob);
@@ -497,8 +504,11 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
                 }
             });
             views.set(name, treeView);
-            context.subscriptions.push(views.get(name));
-            log.write("   Tree data provider registered'" + name + "'");
+            const view = views.get(name);
+            if (view) {
+                context.subscriptions.push(view);
+                log.write("   Tree data provider registered'" + name + "'");
+            }
             return treeDataProvider;
         }
         else {
