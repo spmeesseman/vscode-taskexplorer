@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import * as cp from "child_process";
 import { extensions, window } from "vscode";
-import { TaskItem } from "../tasks";
+import TaskItem from "../tree/item";
 
 
 export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)

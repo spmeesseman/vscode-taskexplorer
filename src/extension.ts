@@ -9,7 +9,7 @@ import {
     Disposable, ExtensionContext, Uri, tasks, TaskProvider,
     workspace, window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder, Task
 } from "vscode";
-import { TaskTreeDataProvider } from "./taskTree";
+import { TaskTreeDataProvider } from "./tree/tree";
 import { AntTaskProvider } from "./providers/ant";
 import { MakeTaskProvider } from "./providers/make";
 import { ScriptTaskProvider } from "./providers/script";
@@ -386,7 +386,7 @@ export async function refreshTree(taskType?: string, uri?: Uri)
     }
     if (configuration.get<boolean>("enableExplorerView") && treeDataProvider2) {
         // if (!refreshedTasks) {
-            await treeDataProvider2.refresh(taskType, uri); //, refreshedTasks);
+            await treeDataProvider2.refresh(taskType, uri); // , refreshedTasks);
         // }
         // else {
         //     await treeDataProvider2.refresh(taskType !== "visible-event" ? false : taskType, uri);

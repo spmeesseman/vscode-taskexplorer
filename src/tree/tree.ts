@@ -1,27 +1,24 @@
-/* ---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
-import * as path from "path";
-import * as util from "./common/utils";
-import * as assert from "assert";
 import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
     ShellExecution, Terminal, StatusBarItem, StatusBarAlignment, CustomExecution
 } from "vscode";
-import { visit, JSONVisitor } from "jsonc-parser";
+import * as path from "path";
+import * as util from "../common/utils";
+import * as assert from "assert";
 import * as nls from "vscode-nls";
-import { TaskFolder, TaskFile, TaskItem } from "./tasks";
-import { storage } from "./common/storage";
-import { views } from "./views";
-import { rebuildCache } from "./cache";
-import { configuration } from "./common/configuration";
-import { providers } from "./extension";
-import * as constants from "./common/constants";
-import * as log from "./common/log";
+import * as constants from "../common/constants";
+import * as log from "../common/log";
+import TaskItem from "./item";
+import TaskFile from "./file";
+import TaskFolder from "./folder";
+import { visit, JSONVisitor } from "jsonc-parser";
+import { storage } from "../common/storage";
+import { views } from "../views";
+import { rebuildCache } from "../cache";
+import { configuration } from "../common/configuration";
+import { providers } from "../extension";
 
 
 const localize = nls.loadMessageBundle();

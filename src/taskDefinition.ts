@@ -1,6 +1,5 @@
 
 import { Uri, TaskDefinition } from "vscode";
-import { TaskItem } from "./tasks";
 
 
 export interface TaskExplorerDefinition extends TaskDefinition

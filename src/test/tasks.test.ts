@@ -11,7 +11,7 @@ import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder }
 import * as testUtil from "./testUtil";
 import { timeout, removeFromArray, forEachMapAsync } from "../common/utils";
 import { teApi } from "./extension.test";
-import { TaskItem } from "../tasks";
+import TaskItem from "../tree/item";
 import { waitForCache } from "../cache";
 import { addWsFolder, removeWsFolder } from "../extension";
 import { configuration } from "../common/configuration";
