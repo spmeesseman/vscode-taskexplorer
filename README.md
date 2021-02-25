@@ -43,7 +43,6 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Thank You](#thank-you)
   - [Other Code Extensions by spmeesseman](#other-code-extensions-by-spmeesseman)
   - [Donations](#donations)
-  - [Development Notes](#development-notes)
 
 ## Screenshots by Version
 
@@ -219,22 +218,3 @@ Other contributors:
 ## Donations
 
 If my work and this extension has made your life easier, consider a [donation](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YWZXT3KE2L4BA&item_name=taskexplorer&currency_code=USD).  All donations go straight to the *Single Dad ATM*.
-
-## Development Notes
-
-3/25/20 - CI has to be THE most overrated tech on the planet.  CI should be named PA standing for "pain in the ass".  These are personal notes for correcting CI issues that happen seemingly every other release.
-
-When semantic release kindly creates the git version tag, then something bombs, run the following git commands to remove the git tag, remote and local:
-
-    git push origin :v1.26.1
-    git tag --delete v1.26.1
-
-Babel runtime:
-
-Errors in release when including babel runtime:
-
-This extension consists of 379 files, out of which 230 are JavaScript files. For performance reasons, you should bundle your extension. You should also exclude unnecessary files by adding them to your `.vscodeignore`.
-
-When messing with babel, and finishing, install/uninstall the runtime:
-
-    npm install @babel/runtime

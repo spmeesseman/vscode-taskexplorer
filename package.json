@@ -98,6 +98,7 @@
         "@babel/plugin-transform-typescript": "^7.12.13",
         "@babel/preset-env": "^7.12.13",
         "@babel/preset-typescript": "^7.12.13",
+        "@babel/register": "^7.12.13",
         "@istanbuljs/nyc-config-hook-run-in-this-context": "^1.0.0",
         "@istanbuljs/nyc-config-typescript": "^1.0.1",
         "@semantic-release/changelog": "^5.0.1",
