@@ -17,9 +17,6 @@ import TaskFolder  from "./folder";
  *
  * The last TaskFile in a grouping will contain items of type TaskItem.  If not grouped,
  * the TaskFile node for each task type within each TaskFolder will contain items of type TaskItem.
- *
- * @see [TaskItem](TaskItem)
- * @see [TaskFolder](TaskFolder)
  */
 export default class TaskFile extends TreeItem
 {

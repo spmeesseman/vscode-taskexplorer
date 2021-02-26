@@ -346,6 +346,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    /**
+     * @method buildTaskTreeList
+     *
+     * @param each The Task that the tree item to be created will represent.
+     * @param folders The map of existing TaskFolder items.  TaskFolder items represent workspace folders.
+     * @param files The map of existing TaskFile items.
+     * @param ltfolder The TaskFolder representing "Last Tasks"
+     * @param favfolder The TaskFolder representing "Favorites"
+     * @param lastTasks List of Task ID's currently in the "Last Tasks" TaskFolder.
+     * @param favTasks List of Task ID's currently in the "Favorites" TaskFolder.
+     * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
+     */
     private buildTaskTreeList(each: Task, folders: Map<string, TaskFolder>, files: Map<string, TaskFile>, ltfolder: TaskFolder | undefined, favfolder: TaskFolder | undefined, lastTasks: string[], favTasks: string[], logPad = "")
     {
         let folder: TaskFolder | undefined,
@@ -357,20 +369,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         ]);
 
         const definition: TaskDefinition = each.definition;
-        let relativePath = definition.path ? definition.path : "";
+        let relativePath = definition.path ?? "";
 
         //
         // Make sure this task shouldnt be ignored based on various criteria...
         // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
         // By default, also ignore npm 'install' tasks, since its available in the context menu
         //
-        const include: any = this.isTaskIncluded(each, relativePath, logPad);
+        const include: boolean | string = this.isTaskIncluded(each, relativePath, logPad);
         if (!include) {
             log.methodDone("build task tree list", 2, logPad);
             return;
         }
 
-        if (typeof include === "string") { // TSC tasks may have had their rel. pathchanged
+        const isNpmInstallTask = include === "npm-install";
+        if (typeof include === "string" && !isNpmInstallTask) { // TSC tasks may have had their rel. pathchanged
             relativePath = include;
             log.value(logPad + "   set relative path", relativePath, 2);
         }
@@ -406,29 +419,47 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         this.logTask(each, scopeName, logPad);
 
         //
-        // Get task file node
+        // Get task file node, this will create one of it doesn't exist
         //
         const taskFile = this.getTaskFileNode(each, folder, files, relativePath, scopeName, logPad);
 
         //
         // Create and add task item to task file node
         //
-        const taskItem = new TaskItem(this.extensionContext, taskFile, each);
-        taskFile.addScript(taskItem);
-
+        // If this is an 'NPM Install' task, then we do not add the "tree item".  We do however add
+        // the "tree file" (above), so that the npm management tasks (including install update, audit,
+        // etc) are available via context menu of the "tree file" that represent's the folder that the
+        // package.json file is found in.  Pre-v2.0.5, we exited earlier if an 'npm install' task was
+        // found, but in doing so, if there were no npm "scripts" in the package.json, code execution
+        // would not get far enough to create the "tree file" node for the context menu.
         //
-        // Add this task to the 'Last Tasks' folder if we need to
-        //
-        this.addToSpecialFolder(taskItem, ltfolder, lastTasks, constants.LAST_TASKS_LABEL);
-        //
-        // Add this task to the 'Favorites' folder if we need to
-        //
-        this.addToSpecialFolder(taskItem, favfolder, favTasks, constants.FAV_TASKS_LABEL);
+        if (!isNpmInstallTask)
+        {   //
+            // Create "tree item" node and add it to the owner "tree file" node
+            //
+            const taskItem = new TaskItem(this.extensionContext, taskFile, each);
+            taskFile.addScript(taskItem);
+            //
+            // Add this task to the 'Last Tasks' folder if we need to
+            //
+            this.addToSpecialFolder(taskItem, ltfolder, lastTasks, constants.LAST_TASKS_LABEL);
+            //
+            // Add this task to the 'Favorites' folder if we need to
+            //
+            this.addToSpecialFolder(taskItem, favfolder, favTasks, constants.FAV_TASKS_LABEL);
+        }
 
         log.methodDone("build task tree list", 2, logPad);
     }
 
 
+    /**
+     * @method clearSpecialFolder
+     *
+     * @param folder The TaskFolder representing either the "Last Tasks" or the "Favorites" folders.
+     *
+     * @since v2.0.0
+     */
     private async clearSpecialFolder(folder: TaskFolder)
     {
         const choice = await window.showInformationMessage("Clear all tasks from this folder?", "Yes", "No");
@@ -446,6 +477,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    /**
+     * @method createSpecialFolder
+     *
+     * Create and add a special folder the the tree.  As of v2.0 these are the "Last Tasks" and
+     * "Favorites" folders.
+     *
+     * @param storeName A defined constant representing the special folder ("Last Tasks", or "Favorites")
+     * @see [TaskItem](TaskItem)
+     * @param label The folder label to be displayed in the tree.
+     * @param treeIndex The tree index to insert the created folder at.
+     * @param sort Whether or not to sort any existing items in the folder.
+     * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
+     */
     private async createSpecialFolder(storeName: string, label: string, treeIndex: number, sort: boolean, logPad = "")
     {
         const lTasks = storage?.get<string[]>(storeName, []) || [];
@@ -816,7 +860,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
                 else if (inScripts && taskItem)
                 {
-                    const label = me.getTaskName(property, taskItem.task?.definition.path, true);
+                    const label = me.getTaskName(property, taskItem.task?.definition.path);
                     if (taskItem.task?.name === label)
                     {
                         scriptOffset = offset;
@@ -1299,9 +1343,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private getTaskName(script: string, relativePath: string | undefined, forcePathInName?: boolean)
+    private getTaskName(script: string, relativePath: string | undefined)
     {
-        if (relativePath && relativePath.length && forcePathInName === true)
+        if (relativePath && relativePath.length)
         {
             return `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
         }
@@ -1636,14 +1680,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             settingName = "enableAppPublisher";
         }
 
-        if ((configuration.get(settingName) || !this.isWorkspaceFolder(task.scope)) && !this.isNpmInstallTask(task))
+        const isNpmInstallTask = this.isNpmInstallTask(task);
+        if ((configuration.get(settingName) || !this.isWorkspaceFolder(task.scope)) && !isNpmInstallTask)
         {
             return true;
         }
 
         log.write("   Skipping", 1, logPad);
         log.value("   enabled", configuration.get(settingName), 1, logPad);
-        log.value("   is npm install task", this.isNpmInstallTask(task), 1, logPad);
+        log.value("   is npm install task", isNpmInstallTask, 1, logPad);
+
+        if (isNpmInstallTask) {
+            return "npm-install";
+        }
 
         return false;
     }

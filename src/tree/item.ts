@@ -12,8 +12,6 @@ import TaskFile from "./file";
  *
  * A tree node that represents a task.
  * An item of this type is always a child of type TaskFile in the tree.
- *
- * @see [TaskFile](TaskFile)
  */
 export default class TaskItem extends TreeItem
 {

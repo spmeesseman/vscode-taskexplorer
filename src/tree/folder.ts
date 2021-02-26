@@ -10,9 +10,6 @@ import TaskFile from "./file";
  *
  * A tree node that represents a workspace folder.
  * An item of this type is a "root folder" in the tree, it contains various TaskItem and TaskItem nodes.
- *
- * @see [TaskItem](TaskItem)
- * @see [TaskFile](TaskFile)
  */
 export default class TaskFolder extends TreeItem
 {
