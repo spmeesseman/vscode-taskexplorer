@@ -757,7 +757,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private findJsonDocumentPosition(documentText: string | undefined, script?: TaskItem)
+    private findJsonDocumentPosition(documentText: string | undefined, taskItem?: TaskItem)
     {
         const me = this;
         let inScripts = false;
@@ -765,7 +765,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let inTaskLabel: any;
         let scriptOffset = 0;
 
-        if (!script || !documentText) {
+        if (!taskItem || !documentText) {
             return 0;
         }
 
@@ -790,7 +790,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     {
                         if (inTaskLabel === "label" || inTaskLabel === "script")
                         {
-                            if (script.task?.name === value)
+                            if (taskItem.task?.name === value)
                             {
                                 scriptOffset = offset;
                             }
@@ -804,15 +804,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 if (property === "scripts")
                 {
                     inScripts = true;
-                    if (!script)
+                    if (!taskItem)
                     { // select the script section
                         scriptOffset = offset;
                     }
                 }
-                else if (inScripts && script)
+                else if (inScripts && taskItem)
                 {
-                    const label = me.getTaskName(property, script.task?.definition.path, true);
-                    if (script.task?.name === label)
+                    const label = me.getTaskName(property, taskItem.task?.definition.path, true);
+                    if (taskItem.task?.name === label)
                     {
                         scriptOffset = offset;
                     }
@@ -858,7 +858,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (!taskItem || !taskItem.task) { return 0; }
 
         const def = taskItem.task.definition;
-        if (def.type === "npm" || def.type === "Workspace")
+        if (taskItem.taskSource === "npm" || taskItem.taskSource === "Workspace")
         {
             scriptOffset = this.findJsonDocumentPosition(documentText, taskItem);
         }
