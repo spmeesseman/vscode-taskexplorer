@@ -34,6 +34,11 @@ class NoScripts extends TreeItem
 }
 
 
+/**
+ * @class TaskTreeDataProvider
+ *
+ * Implements the VSCode TreeDataProvider API to build a tree of tasks to display within a view.
+ */
 export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 {
     private static statusBarSpace: StatusBarItem;

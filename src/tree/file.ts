@@ -7,6 +7,20 @@ import TaskItem from "./item";
 import TaskFolder  from "./folder";
 
 
+/**
+ * @class TaskFile
+ *
+ * A tree node that represents a task type/source (e.g. `npm`, `gulp`, etc...).
+ *
+ * A TaskFile can be a direct child of TaskFolder, or, if `grouping` is turned in in
+ * Settings, it can be a child of another TaskFile.
+ *
+ * The last TaskFile in a grouping will contain items of type TaskItem.  If not grouped,
+ * the TaskFile node for each task type within each TaskFolder will contain items of type TaskItem.
+ *
+ * @see [TaskItem](TaskItem)
+ * @see [TaskFolder](TaskFolder)
+ */
 export default class TaskFile extends TreeItem
 {
     public path: string;

@@ -1,12 +1,20 @@
 
 import {
-    Task, TaskExecution, ThemeIcon, TreeItem, TreeItemCollapsibleState,
-    WorkspaceFolder, ExtensionContext, tasks }
+    Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks
+}
 from "vscode";
 import * as path from "path";
 import TaskFile from "./file";
 
 
+/**
+ * @class TaskItem
+ *
+ * A tree node that represents a task.
+ * An item of this type is always a child of type TaskFile in the tree.
+ *
+ * @see [TaskFile](TaskFile)
+ */
 export default class TaskItem extends TreeItem
 {
     private readonly context: ExtensionContext;
