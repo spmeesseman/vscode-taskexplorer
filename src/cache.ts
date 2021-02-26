@@ -2,9 +2,9 @@
 
 import { workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem } from "vscode";
 import * as util from "./common/utils";
-import { configuration } from "./common/configuration";
-import * as constants from "./common/constants";
 import * as log from "./common/log";
+import constants from "./common/constants";
+import { configuration } from "./common/configuration";
 
 let cacheBuilding = false;
 let folderCaching = false;
@@ -152,6 +152,19 @@ export async function buildCache(taskType: string, fileGlob: string, wsfolder?: 
 
     logBuildCache(taskType, taskAlias, fileGlob, wsfolder, setCacheBuilding);
 
+    if (!filesCache.get(taskAlias)) {
+        filesCache.set(taskAlias, new Set());
+    }
+    const fCache = filesCache.get(taskAlias);
+    if (!fCache) {
+        return;
+    }
+
+    const dispTaskType = util.properCase(taskType);
+    if (!dispTaskType) {
+        return;
+    }
+
     if (setCacheBuilding) {
         //
         // If buildCache is already running in another scope, then wait before proceeding
@@ -159,12 +172,6 @@ export async function buildCache(taskType: string, fileGlob: string, wsfolder?: 
         await waitForCache();
         cacheBuilding = true;
     }
-
-    if (!filesCache.get(taskAlias)) {
-        filesCache.set(taskAlias, new Set());
-    }
-    const fCache = filesCache.get(taskAlias);
-    const dispTaskType = util.properCase(taskType);
 
     //
     // Status bar
@@ -208,10 +215,10 @@ export async function buildCache(taskType: string, fileGlob: string, wsfolder?: 
     {
         log.blank(1);
         log.write("   Build cache - Scan all projects for taskType '" + taskType + "' (" + dispTaskType + ")", 1);
-        await buildFolderCaches(fCache, dispTaskType, fileGlob, statusBarSpace, setCacheBuilding);
+        await buildFolderCaches(fCache, dispTaskType, fileGlob, statusBarSpace, setCacheBuilding, "   ");
     }
     else {
-        await buildFolderCache(fCache, wsfolder, dispTaskType, fileGlob, statusBarSpace, setCacheBuilding);
+        await buildFolderCache(fCache, wsfolder, dispTaskType, fileGlob, statusBarSpace, setCacheBuilding, "   ");
     }
 
     //
@@ -227,15 +234,15 @@ export async function buildCache(taskType: string, fileGlob: string, wsfolder?: 
 }
 
 
-async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskType: string, fileGlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean)
+async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskType: string, fileGlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean, logPad = "")
 {
     if (cancel) {
         cancelInternal(setCacheBuilding, statusBarSpace);
         return;
     }
 
-    log.blank(1);
-    log.write("   Scan project " + folder.name + " for " + taskType + " tasks", 1);
+    const logMsg = "Scan project " + folder.name + " for " + taskType + " tasks";
+    log.methodStart(logMsg, 1, logPad, true);
     statusBarSpace.text = getStatusString("Scanning for " + taskType + " tasks in project " + folder.name, 65);
 
     try {
@@ -252,23 +259,24 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
                     uri: fpath,
                     folder
                 });
-                log.blank(1);
-                log.value("   Added to cache", fpath.fsPath, 3);
+                log.value("   Added to cache", fpath.fsPath, 3, logPad);
             }
         }
     } catch (error) {
         log.error(error.toString());
     }
+
+    log.methodDone(logMsg, 1, logPad, true);
 }
 
 
-async function buildFolderCaches(fCache: Set<any>, taskType: string, fileGlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean)
+async function buildFolderCaches(fCache: Set<any>, taskType: string, fileGlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean, logPad = "")
 {
     if (workspace.workspaceFolders) // ensure workspace folders exist
     {
         for (const folder of workspace.workspaceFolders)
         {
-            await buildFolderCache(fCache, folder, taskType, fileGlob, statusBarSpace, setCacheBuilding);
+            await buildFolderCache(fCache, folder, taskType, fileGlob, statusBarSpace, setCacheBuilding, logPad);
         }
     }
 }
@@ -279,11 +287,14 @@ export async function addFileToCache(taskAlias: string, uri: Uri)
     if (!filesCache.get(taskAlias)) {
         filesCache.set(taskAlias, new Set());
     }
-    const taskCache = filesCache.get(taskAlias);
-    taskCache.add({
-        uri,
-        folder: workspace.getWorkspaceFolder(uri)
-    });
+    const taskCache = filesCache.get(taskAlias),
+          wsf = workspace.getWorkspaceFolder(uri);
+    if (taskCache && wsf) {
+        taskCache.add({
+            uri,
+            folder: wsf
+        });
+    }
 }
 
 

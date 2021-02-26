@@ -54,7 +54,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
                 {
                     visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri, null, logPad + "   ");
+                    const tasks = await this.readUriTasks(fobj.uri, undefined, logPad + "   ");
                     log.write("   processed grunt file", 3, logPad);
                     log.value("      file", fobj.uri.fsPath, 3, logPad);
                     log.value("      targets in file", tasks.length, 3, logPad);

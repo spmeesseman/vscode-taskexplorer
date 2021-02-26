@@ -8,7 +8,7 @@ import * as log from "../common/log";
 export abstract class TaskExplorerProvider implements TaskProvider
 {
     abstract getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition;
-    abstract createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task;
+    abstract createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined;
     abstract readTasks(logPad?: string): Promise<Task[]>;
     abstract readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad?: string): Promise<Task[]>;
 
@@ -49,7 +49,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             [["uri", uri?.path], ["has cached tasks", !!this.cachedTasks]]
         );
 
-        if (this.invalidating) {
+        if (uri && this.invalidating) {
             this.queue.push(uri);
             return;
         }
@@ -63,7 +63,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             for (const each of this.cachedTasks)
             {
                 const cstDef: TaskExplorerDefinition = each.definition;
-                if (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath))
+                if (cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath)))
                 {
                     rmvTasks.push(each);
                 }
@@ -82,7 +82,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                     util.removeFromArray(this.cachedTasks, each);
                 }
 
-                if (util.pathExists(uri.fsPath) && util.existsInArray(configuration.get("exclude"), uri.path) === false)
+                if (util.pathExists(uri.fsPath) && util.existsInArray(configuration.get("exclude") || [], uri.path) === false)
                 {
                     const tasks = await this.readUriTasks(uri, folder, logPad + "   ");
                     this.cachedTasks?.push(...tasks);

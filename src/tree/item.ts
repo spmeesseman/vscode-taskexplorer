@@ -101,7 +101,7 @@ export default class TaskItem extends TreeItem
     }
 
 
-    getFolder(): WorkspaceFolder
+    getFolder(): WorkspaceFolder | undefined
     {
         return this.taskFile.folder.workspaceFolder;
     }
@@ -110,17 +110,22 @@ export default class TaskItem extends TreeItem
     isExecuting(task?: Task | undefined)
     {
         this.task = task ?? this.task;
-        this.execution = tasks.taskExecutions.find(e => e.task.name === this.task.name && e.task.source === this.task.source &&
-            e.task.scope === this.task.scope && e.task.definition.path === this.task.definition.path);
-        return !!this.execution;
+        if (this.task) {
+            this.execution = tasks.taskExecutions.find(e => e.task.name === this.task?.name && e.task.source === this.task.source &&
+                e.task.scope === this.task.scope && e.task.definition.path === this.task.definition.path);
+            return !!this.execution;
+        }
+        return false;
     }
 
 
     refreshState(task?: Task | undefined)
     {
         const isExecuting = this.isExecuting(task);
-        this.setContextValue(this.task, isExecuting);
-        this.setIconPath(this.task, this.context, isExecuting);
+        if (this.task) {
+            this.setContextValue(this.task, isExecuting);
+            this.setIconPath(this.task, this.context, isExecuting);
+        }
     }
 
 

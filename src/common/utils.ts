@@ -4,7 +4,7 @@ import { RelativePattern, WorkspaceFolder, Uri, workspace } from "vscode";
 import * as fs from "fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./configuration";
-import * as constants from "./constants";
+import constants from "./constants";
 import * as path from "path";
 import * as os from "os";
 import * as log from "./log";
@@ -16,7 +16,7 @@ import * as log from "./log";
  * @param name The string to manipulate
  * @param indexUpper The index of the string to upper case
  */
-export function camelCase(name: string, indexUpper: number)
+export function camelCase(name: string | undefined, indexUpper: number)
 {
     if (!name || indexUpper <= 0 || indexUpper >= name.length) {
       return name;
@@ -186,18 +186,18 @@ export function getPortableDataPath(padding = "")
                 }
                 catch (e) {
                     log.write(e.toString());
-                    return null;
+                    return;
                 }
             }
         }
     }
-    return null;
+    return;
 }
 
 
 export function getUserDataPath(padding = "")
 {
-    let userPath = "";
+    let userPath: string | undefined = "";
 
     log.write(padding + "get user data path", 1);
     logUserDataEnv(padding + "   ");
@@ -264,7 +264,7 @@ function getDefaultUserDataPath()
 }
 
 
-export function getGlobPattern(taskType: string)
+export function getGlobPattern(taskType: string): string
 {
     if (taskType) {
         taskType = taskType.replace(/\W*\-/, "");
@@ -275,6 +275,7 @@ export function getGlobPattern(taskType: string)
             return constants["GLOB_" + taskType.toUpperCase()];
         }
     }
+    return "*/**";
 }
 
 
@@ -380,7 +381,7 @@ export function pushIfNotExists(arr: any[], item: any)
 }
 
 
-export function properCase(name: string)
+export function properCase(name: string | undefined)
 {
     if (!name) {
       return name;

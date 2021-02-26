@@ -67,7 +67,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     };
 
 
-    public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task
+    public createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task | undefined
     {
         let sep: string = (process.platform === "win32" ? "\\" : "/");
         const scriptDef = this.scriptTable[target?.toLowerCase()],
@@ -80,7 +80,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             exec: string = scriptDef.exec;
 
         if (!scriptDef) {
-            return null;
+            return;
         }
 
         //
@@ -89,8 +89,8 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         if (process.platform === "win32")
         {
             isWinShell = true;
-            const winShell: string = workspace.getConfiguration().get("terminal.integrated.shell.windows");
-            if (winShell && winShell.includes("bash.exe")) {
+            const winShell: string | undefined = workspace.getConfiguration().get("terminal.integrated.shell.windows");
+            if (winShell?.includes("bash.exe")) {
                 sep = "/";
                 isWinShell = false;
             }
@@ -218,9 +218,12 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
                 {
                     visitedFiles.add(fobj.uri.fsPath);
-                    allTasks.push(this.createTask(path.extname(fobj.uri.fsPath).substring(1), null, fobj.folder, fobj.uri));
-                    log.write("   found script target/file", 3, logPad);
-                    log.value("      script file", fobj.uri.fsPath, 3, logPad);
+                    const task = this.createTask(path.extname(fobj.uri.fsPath).substring(1), undefined, fobj.folder, fobj.uri);
+                    if (task) {
+                        allTasks.push(task);
+                        log.write("   found script target/file", 3, logPad);
+                        log.value("      script file", fobj.uri.fsPath, 3, logPad);
+                    }
                 }
             }
         }
@@ -234,10 +237,13 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
-        log.methodStart("read ant file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
-        const task = this.createTask(path.extname(uri.fsPath).substring(1), null, folder, uri);
+        log.methodStart("read script file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
+        let task: Task | undefined;
+        if (folder) {
+            task = this.createTask(path.extname(uri.fsPath).substring(1), undefined, folder, uri);
+        }
         log.methodDone("read script file uri task", 1, logPad, true);
-        return [ task ];
+        return task ? [ task ] : [];
     }
 
 }

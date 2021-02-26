@@ -1,27 +1,32 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 
-export const DEFAULT_SEPARATOR = "-";
+import { IDictionary } from "./interface";
 
-export const LAST_TASKS_STORE = "lastTasks";
-export const LAST_TASKS_LABEL = "Last Tasks";
 
-export const FAV_TASKS_STORE = "favoriteTasks";
-export const FAV_TASKS_LABEL = "Favorites";
+const constants: IDictionary<string> =
+{
+    DEFAULT_SEPARATOR: "-",
+    LAST_TASKS_STORE: "lastTasks",
+    LAST_TASKS_LABEL: "Last Tasks",
+    FAV_TASKS_STORE: "favoriteTasks",
+    FAV_TASKS_LABEL: "Favorites",
+    USER_TASKS_LABEL: "User Tasks",
+    GLOB_ANT: "**/[Bb][Uu][Ii][Ll][Dd].[Xx][Mm][Ll]",
+    GLOB_APPPUBLISHER: "**/.publishrc*",
+    GLOB_BASH: "**/*.[Ss][Hh]",
+    GLOB_BATCH: "**/*.{[Bb][Aa][Tt],[Cc][Mm][Dd]}",
+    GLOB_GULP: "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].{[Jj][Ss],[Tt][Ss],[Mm][Jj][Ss],[Bb][Aa][Bb][Ee][Ll].[Jj][Ss]}",
+    GLOB_GRADLE: "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]",
+    GLOB_GRUNT: "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]",
+    GLOB_MAKE: "**/[Mm]akefile",
+    GLOB_NPM: "**/package.json",
+    GLOB_NSIS: "**/*.[Nn][Ss][Ii]",
+    GLOB_PERL: "**/*.[Pp][Ll]",
+    GLOB_POWERSHELL: "**/*.[Pp][Ss]1",
+    GLOB_PYTHON: "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]",
+    GLOB_RUBY: "**/*.rb",
+    GLOB_TSC: "**/tsconfig.json",
+    GLOB_WORKSPACE: "**/.vscode/tasks.json"
+};
 
-export const USER_TASKS_LABEL = "User Tasks";
-
-export const GLOB_ANT = "**/[Bb][Uu][Ii][Ll][Dd].[Xx][Mm][Ll]";
-export const GLOB_APPPUBLISHER = "**/.publishrc*";
-export const GLOB_BASH = "**/*.[Ss][Hh]";
-export const GLOB_BATCH = "**/*.{[Bb][Aa][Tt],[Cc][Mm][Dd]}";
-export const GLOB_GULP = "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].{[Jj][Ss],[Tt][Ss],[Mm][Jj][Ss],[Bb][Aa][Bb][Ee][Ll].[Jj][Ss]}";
-export const GLOB_GRADLE = "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]";
-export const GLOB_GRUNT = "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]";
-export const GLOB_MAKE = "**/[Mm]akefile";
-export const GLOB_NPM = "**/package.json";
-export const GLOB_NSIS = "**/*.[Nn][Ss][Ii]";
-export const GLOB_PERL = "**/*.[Pp][Ll]";
-export const GLOB_POWERSHELL = "**/*.[Pp][Ss]1";
-export const GLOB_PYTHON = "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]";
-export const GLOB_RUBY = "**/*.rb";
-export const GLOB_TSC = "**/tsconfig.json";
-export const GLOB_WORKSPACE = "**/.vscode/tasks.json";
+export default constants;

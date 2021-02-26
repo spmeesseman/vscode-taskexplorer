@@ -43,7 +43,7 @@ export function initLog(settingGrpName: string, dispName: string, context?: Exte
             commands.registerCommand(settingGrpName + ".showOutput", showLogOutput)
         );
     }
-    showLogOutput(showLog);
+    showLogOutput(showLog || false);
 }
 
 
@@ -103,7 +103,7 @@ export function write(msg: string, level?: number, logPad = "", color?: LogColor
         //     msg = color + msg + LogColor.white;
         // }
         const tsMsg = new Date().toISOString().replace(/[TZ]/g, " ") + logPad + msg;
-        if (logOutputChannel && (!level || level <= configuration.get<number>("debugLevel"))) {
+        if (logOutputChannel && (!level || level <= (configuration.get<number>("debugLevel") || -1))) {
             logOutputChannel.appendLine(tsMsg);
         }
         if (writeToConsole) {

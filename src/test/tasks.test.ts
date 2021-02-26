@@ -15,14 +15,14 @@ import TaskItem from "../tree/item";
 import { waitForCache } from "../cache";
 import { addWsFolder, removeWsFolder } from "../extension";
 import { configuration } from "../common/configuration";
-import * as constants from "../common/constants";
+import constants from "../common/constants";
 
 
-const rootPath = workspace.workspaceFolders[0].uri.fsPath;
-const dirName = path.join(rootPath, "tasks_test_");
-const ws2DirName = path.join(rootPath, "ws2");
-const dirNameIgn = path.join(rootPath, "tasks_test_ignore_");
-const dirNameCode = path.join(rootPath, ".vscode");
+let rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
+let dirName: string | undefined;
+let ws2DirName: string | undefined;
+let dirNameIgn: string | undefined;
+let dirNameCode: string | undefined;
 const tempFiles: string[] = [];
 let didCodeDirExist = false;
 let taskMap: Map<string, TaskItem> = new Map();
@@ -32,6 +32,17 @@ suite("Task tests", () =>
 {
     suiteSetup(async () =>
     {
+        rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
+
+        if (!rootPath) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
+        dirName = path.join(rootPath, "tasks_test_");
+        ws2DirName = path.join(rootPath, "ws2");
+        dirNameIgn = path.join(rootPath, "tasks_test_ignore_");
+        dirNameCode = path.join(rootPath, ".vscode");
+
         await testUtil.activeExtension();
 
         //
@@ -64,8 +75,9 @@ suite("Task tests", () =>
 
     suiteTeardown(async () =>
     {
-        if (tempFiles.length) {
-            let file: string;
+        if (tempFiles.length)
+        {
+            let file: string | undefined;
             while ((file = tempFiles.shift()))
             {
                 try {
@@ -76,35 +88,41 @@ suite("Task tests", () =>
                 }
             }
 
-            if (fs.existsSync(path.join(rootPath, "package-lock.json"))) {
-                try {
-                    fs.unlinkSync(path.join(rootPath, "package-lock.json"));
+            if (rootPath && dirName)
+            {
+                if (fs.existsSync(path.join(rootPath, "package-lock.json"))) {
+                    try {
+                        fs.unlinkSync(path.join(rootPath, "package-lock.json"));
+                    }
+                    catch (error) {
+                        console.log(error);
+                    }
                 }
-                catch (error) {
-                    console.log(error);
-                }
-            }
 
-            if (fs.existsSync(path.join(dirName, "package-lock.json"))) {
-                try {
-                    fs.unlinkSync(path.join(dirName, "package-lock.json"));
-                }
-                catch (error) {
-                    console.log(error);
+                if (fs.existsSync(path.join(dirName, "package-lock.json"))) {
+                    try {
+                        fs.unlinkSync(path.join(dirName, "package-lock.json"));
+                    }
+                    catch (error) {
+                        console.log(error);
+                    }
                 }
             }
         }
 
-        try {
-            if (!didCodeDirExist) {
-                fs.rmdirSync(dirNameCode);
+        if (dirName && ws2DirName && dirNameCode && dirNameIgn)
+        {
+            try {
+                if (!didCodeDirExist) {
+                    fs.rmdirSync(dirNameCode);
+                }
+                fs.rmdirSync(ws2DirName);
+                fs.rmdirSync(dirName);
+                fs.rmdirSync(dirNameIgn);
             }
-            fs.rmdirSync(ws2DirName);
-            fs.rmdirSync(dirName);
-            fs.rmdirSync(dirNameIgn);
-        }
-        catch (error) {
-            console.log(error);
+            catch (error) {
+                console.log(error);
+            }
         }
 
         await timeout(3000); // wait for filesystem change events
@@ -113,6 +131,10 @@ suite("Task tests", () =>
 
     test("Create npm package files", async function()
     {
+        if (!rootPath || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         const file = path.join(rootPath, "package.json");
         tempFiles.push(file);
 
@@ -151,6 +173,10 @@ suite("Task tests", () =>
 
     test("Create vscode task files", async function()
     {
+        if (!rootPath || !dirNameCode) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         const file = path.join(dirNameCode, "tasks.json");
         tempFiles.push(file);
 
@@ -235,6 +261,10 @@ suite("Task tests", () =>
 
     test("Create ant target files", async function()
     {
+        if (!rootPath || !dirNameIgn || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         createAntFile();
 
         const file2 = path.join(dirName, "test.xml");
@@ -281,6 +311,10 @@ suite("Task tests", () =>
 
     test("Create gradle target files", async function()
     {
+        if (!rootPath || !dirNameIgn || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         createGradleFile();
 
         const file2 = path.join(dirName, "TEST.GRADLE");
@@ -322,6 +356,10 @@ suite("Task tests", () =>
 
     test("Create tsc config files", async function()
     {
+        if (!rootPath) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         const file = path.join(rootPath, "tsconfig.json");
         tempFiles.push(file);
 
@@ -349,6 +387,10 @@ suite("Task tests", () =>
 
     test("Create gulp task files", async function()
     {
+        if (!rootPath || !dirNameIgn || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         createGulpFile();
 
         const file2 = path.join(dirName, "Gulpfile.js");
@@ -390,6 +432,10 @@ suite("Task tests", () =>
 
     test("Create makefiles", async function()
     {
+        if (!rootPath || !dirNameIgn || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         createMakeFile();
 
         const file2 = path.join(dirName, "Makefile");
@@ -413,6 +459,10 @@ suite("Task tests", () =>
 
     test("Create batch files", async function()
     {
+        if (!rootPath || !dirNameIgn || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         createBatchFile();
 
         const file2 = path.join(dirName, "test2.BAT");
@@ -428,6 +478,10 @@ suite("Task tests", () =>
 
     test("Create bash files", async function()
     {
+        if (!rootPath || !dirNameIgn || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         const file = path.join(rootPath, "test.sh");
         tempFiles.push(file);
 
@@ -445,6 +499,10 @@ suite("Task tests", () =>
 
     test("Create grunt task files", async function()
     {
+        if (!rootPath || !dirName || !dirNameIgn) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         createGruntFile();
 
         const file2 = path.join(dirName, "Gruntfile.js");
@@ -470,19 +528,27 @@ suite("Task tests", () =>
         );
     });
 
+
     test("Create app-publisher config file", async function()
     {
+        if (!rootPath) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
         createAppPublisherFile();
     });
 
 
     test("Perform tree construction", async function()
     {
+        if (!rootPath || !dirNameIgn || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         this.timeout(45 * 1000);
 
         console.log("    Constructing task tree");
 
-        if (!teApi.explorerProvider) {
+        if (!teApi || !teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
@@ -514,7 +580,11 @@ suite("Task tests", () =>
 
     test("Verify tree validity and open tasks for edit", async function()
     {
-        if (!teApi.explorerProvider) {
+        if (!rootPath || !dirNameIgn || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
+        if (!teApi || !teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
@@ -611,7 +681,11 @@ suite("Task tests", () =>
         let ranBash = false;
         let ranBatch = false;
 
-        if (!teApi.explorerProvider) {
+        if (!rootPath) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
+        if (!teApi || !teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
@@ -684,7 +758,11 @@ suite("Task tests", () =>
 
     test("Test add to excludes", async function()
     {
-        if (!teApi.explorerProvider) {
+        if (!rootPath) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
+        if (!teApi || !teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
@@ -695,8 +773,8 @@ suite("Task tests", () =>
         await forEachMapAsync(taskMap, async (value: TaskItem) =>  {
             if (value && value.taskSource === "grunt") {
                 await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile, false, false);
-                await teApi.explorerProvider.invalidateTasksCache("grunt", value.taskFile.resourceUri);
-                return false;
+                await teApi.explorerProvider?.invalidateTasksCache("grunt", value.taskFile.resourceUri);
+                return false; // continue forEachMapAsync()
             }
         });
 
@@ -710,6 +788,10 @@ suite("Task tests", () =>
 
     test("Invalidation tests", async function()
     {
+        if (!rootPath || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+
         if (!teApi || !teApi.explorerProvider || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
@@ -844,11 +926,14 @@ suite("Task tests", () =>
 
         console.log("    Running all other invalidations");
         await forEachMapAsync(taskMap, async(value: TaskItem) =>  {
-            if (value) {
+            if (value && value.task && teApi && teApi.explorerProvider && value.taskFile.resourceUri) {
                 if (fs.existsSync(value.taskFile.resourceUri.fsPath)) {
                     console.log("         Invalidate task type '" + value.taskSource + "'");
                     await teApi.explorerProvider.invalidateTasksCache(value.taskSource, value.task.definition.uri);
                 }
+            }
+            else {
+                assert.fail("        ✘ TaskItem definition is incomplete");
             }
         });
 
@@ -895,7 +980,7 @@ suite("Task tests", () =>
         await configuration.updateWs("enableWorkspace", true);
 
         console.log("    Running global invalidation");
-        await teApi.explorerProvider.invalidateTasksCache(undefined, undefined);
+        await teApi.explorerProvider.invalidateTasksCache();
 
         await timeout(1000); // wait for filesystem change events
     });
@@ -939,7 +1024,10 @@ suite("Task tests", () =>
 
     test("Test show/hide favorite tasks", async function()
     {
-        if (!teApi.explorerProvider) {
+        if (!rootPath || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+        if (!teApi?.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         console.log("    Show/hide favorite tasks");
@@ -950,7 +1038,10 @@ suite("Task tests", () =>
 
     test("Test groups with separator", async function()
     {
-        if (!teApi.explorerProvider) {
+        if (!rootPath || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+        if (!teApi?.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         console.log("    Enable groups with separator and rebuild cache");
@@ -963,7 +1054,10 @@ suite("Task tests", () =>
 
     test("Test cancel rebuild cache", async function()
     {
-        if (!teApi.explorerProvider) {
+        if (!rootPath || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+        if (!teApi?.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         this.timeout(60 * 1000);
@@ -987,7 +1081,10 @@ suite("Task tests", () =>
 
     test("Test enable and disable views", async function()
     {
-        if (!teApi.explorerProvider) {
+        if (!rootPath || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+        if (!teApi?.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         await configuration.updateWs("enableExplorerView", false);
@@ -1000,6 +1097,12 @@ suite("Task tests", () =>
 
     test("Add and remove a workspace folder", async function()
     {
+        if (!rootPath || !dirName) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+        if (!teApi?.explorerProvider) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
+        }
         // Simulate add/remove folder (cannot use workspace.updateWOrkspaceFolders() in tests)
         //
         addWsFolder(workspace.workspaceFolders);
@@ -1011,134 +1114,154 @@ suite("Task tests", () =>
 
 function createAntFile()
 {
-    const file = path.join(dirName, "build.xml");
-    tempFiles.push(file);
-
-    if (!fs.existsSync(file))
+    if (dirName)
     {
-        fs.writeFileSync(
-            file,
-            '<?xml version="1.0"?>\n' +
-            '<project basedir="." default="test1">\n' +
-            '    <property environment="env" />\n' +
-            '    <property name="test" value="test" />\n' +
-            '    <target name="test1" depends="init"></target>\n' +
-            '    <target name="test2" depends="init"></target>\n' +
-            "</project>\n"
-        );
+        const file = path.join(dirName, "build.xml");
+        tempFiles.push(file);
+
+        if (!fs.existsSync(file))
+        {
+            fs.writeFileSync(
+                file,
+                '<?xml version="1.0"?>\n' +
+                '<project basedir="." default="test1">\n' +
+                '    <property environment="env" />\n' +
+                '    <property name="test" value="test" />\n' +
+                '    <target name="test1" depends="init"></target>\n' +
+                '    <target name="test2" depends="init"></target>\n' +
+                "</project>\n"
+            );
+        }
     }
 }
 
 
 function createAppPublisherFile()
 {
-    const file = path.join(rootPath, ".publishrc.json");
-    tempFiles.push(file);
-
-    if (!fs.existsSync(file))
+    if (rootPath)
     {
-        fs.writeFileSync(
-            file,
-            "{\n" +
-            '    "version": "1.0.0"\n' +
-            '    "branch": "trunk",\n' +
-            '    "buildCommand": [],\n' +
-            '    "mantisbtRelease": "Y",\n' +
-            '    "mantisbtChglogEdit": "N",\n' +
-            '    "mantisbtProject": "",\n' +
-            '    "repoType": "svn""\n' +
-            "}\n"
-        );
+        const file = path.join(rootPath, ".publishrc.json");
+        tempFiles.push(file);
+
+        if (!fs.existsSync(file))
+        {
+            fs.writeFileSync(
+                file,
+                "{\n" +
+                '    "version": "1.0.0"\n' +
+                '    "branch": "trunk",\n' +
+                '    "buildCommand": [],\n' +
+                '    "mantisbtRelease": "Y",\n' +
+                '    "mantisbtChglogEdit": "N",\n' +
+                '    "mantisbtProject": "",\n' +
+                '    "repoType": "svn""\n' +
+                "}\n"
+            );
+        }
     }
 }
 
 
 function createBatchFile()
 {
-    const file = path.join(rootPath, "test.bat");
-    tempFiles.push(file);
-
-    if (!fs.existsSync(file))
+    if (rootPath)
     {
-        fs.writeFileSync(file, "@echo testing batch file\r\n");
+        const file = path.join(rootPath, "test.bat");
+        tempFiles.push(file);
+        if (!fs.existsSync(file))
+        {
+            fs.writeFileSync(file, "@echo testing batch file\r\n");
+        }
     }
 }
 
 
 function createGradleFile()
 {
-    const file = path.join(dirName, "build.gradle");
-    tempFiles.push(file);
-
-    if (!fs.existsSync(file))
+    if (dirName)
     {
-        fs.writeFileSync(
-            file,
-            "task fatJar(type: Jar) {\n" +
-            "    manifest {\n" +
-            "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
-            "            'Implementation-Version': version,\n" +
-            "            'Main-Class': 'com.spmeesseman.test'\n" +
-            "    }\n" +
-            "    baseName = project.name + '-all'\n" +
-            "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
-            "    with jar\n" +
-            "}\n"
-        );
+        const file = path.join(dirName, "build.gradle");
+        tempFiles.push(file);
+
+        if (!fs.existsSync(file))
+        {
+            fs.writeFileSync(
+                file,
+                "task fatJar(type: Jar) {\n" +
+                "    manifest {\n" +
+                "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
+                "            'Implementation-Version': version,\n" +
+                "            'Main-Class': 'com.spmeesseman.test'\n" +
+                "    }\n" +
+                "    baseName = project.name + '-all'\n" +
+                "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
+                "    with jar\n" +
+                "}\n"
+            );
+        }
     }
 }
 
 
 function createGruntFile()
 {
-    const file = path.join(rootPath, "GRUNTFILE.js");
-    tempFiles.push(file);
-
-    if (!fs.existsSync(file))
+    if (rootPath)
     {
-        fs.writeFileSync(
-            file,
-            "module.exports = function(grunt) {\n" +
-            "    grunt.registerTask(\n'default', ['jshint:myproject']);\n" +
-            '    grunt.registerTask("upload", [\'s3\']);\n' +
-            "};\n"
-        );
+        const file = path.join(rootPath, "GRUNTFILE.js");
+        tempFiles.push(file);
+
+        if (!fs.existsSync(file))
+        {
+            fs.writeFileSync(
+                file,
+                "module.exports = function(grunt) {\n" +
+                "    grunt.registerTask(\n'default', ['jshint:myproject']);\n" +
+                '    grunt.registerTask("upload", [\'s3\']);\n' +
+                "};\n"
+            );
+        }
     }
 }
 
 
 function createGulpFile()
 {
-    const file = path.join(rootPath, "gulpfile.js");
-    tempFiles.push(file);
-
-    if (!fs.existsSync(file))
+    if (rootPath)
     {
-        fs.writeFileSync(
-            file,
-            "var gulp = require('gulp');\n" +
-            "gulp.task(\n'hello', (done) => {\n" +
-            "    console.log('Hello!');\n" +
-            "    done();\n" +
-            "});\n" +
-            'gulp.task(\n       "hello2", (done) => {\n' +
-            "    done();\n" +
-            "});\n"
-        );
+        const file = path.join(rootPath, "gulpfile.js");
+        tempFiles.push(file);
+
+        if (!fs.existsSync(file))
+        {
+            fs.writeFileSync(
+                file,
+                "var gulp = require('gulp');\n" +
+                "gulp.task(\n'hello', (done) => {\n" +
+                "    console.log('Hello!');\n" +
+                "    done();\n" +
+                "});\n" +
+                'gulp.task(\n       "hello2", (done) => {\n' +
+                "    done();\n" +
+                "});\n"
+            );
+        }
     }
 }
 
 
 function createMakeFile()
 {
-    const file = path.join(rootPath, "Makefile");
-    tempFiles.push(file);
-
-    if (!fs.existsSync(file))
+    if (rootPath)
     {
-        fs.writeFileSync(
-            file,
-            "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
-        );
+        const file = path.join(rootPath, "Makefile");
+        tempFiles.push(file);
+
+        if (!fs.existsSync(file))
+        {
+            fs.writeFileSync(
+                file,
+                "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
+            );
+        }
     }
 }

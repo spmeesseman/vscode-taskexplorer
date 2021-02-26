@@ -6,11 +6,12 @@ import * as path from "path";
 import * as Mocha from "mocha";
 const NYC = require("nyc");
 import * as glob from "glob";
+
 //
 // Simulates the recommended config option
 // extends: "@istanbuljs/nyc-config-typescript",
-//
-import * as baseConfig from "@istanbuljs/nyc-config-typescript";
+// import * as baseConfig from "@istanbuljs/nyc-config-typescript";
+
 //
 // Recommended modules, loading them here to speed up NYC init
 // and minimize risk of race condition
@@ -41,7 +42,8 @@ export async function run(): Promise<void>
 
     // Setup coverage pre-test, including post-test hook to report
     const nyc = new NYC({
-        ...baseConfig,
+        // ...baseConfig,
+        extends: "@istanbuljs/nyc-config-typescript",
         cwd: path.join(__dirname, "..", ".."),
         reporter: ["text-summary", "html", "lcov", "cobertura" ],
         all: true,

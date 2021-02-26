@@ -22,13 +22,16 @@ export default class TaskFile extends TreeItem
 
     constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, groupLevel: number, group?: boolean, label?: string, padding = "")
     {
-        super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group), TreeItemCollapsibleState.Collapsed);
+        super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group || false), TreeItemCollapsibleState.Collapsed);
 
         this.folder = folder;
         this.path = this.label !== "vscode" ? relativePath : ".vscode";
         this.nodePath = this.label !== "vscode" ? relativePath : "vscode";
         this.taskSource = source;
         this.isGroup = (group === true);
+        this.isUser = false;
+        this.groupLevel = 0;
+
         //
         // Reference ticket #133, vscode folder should not use a path appendature in it's folder label
         // in the task tree, there is only one path for vscode/workspace tasks, /.vscode.  The fact that
@@ -54,7 +57,7 @@ export default class TaskFile extends TreeItem
         if (!group)
         {
             this.contextValue = "taskFile" + util.properCase(this.taskSource);
-            this.fileName = this.getFileNameFromSource(source, folder, taskDef, relativePath, true);
+            this.fileName = this.getFileNameFromSource(source, folder, taskDef, true);
             if (folder.resourceUri)
             {
                 if (relativePath && source !== "Workspace")
@@ -109,10 +112,12 @@ export default class TaskFile extends TreeItem
     }
 
 
-    addScript(script: (TaskFile | TaskItem))
+    addScript(script: (TaskFile | TaskItem | undefined))
     {
-        script.groupLevel = this.groupLevel;
-        this.scripts.push(script);
+        if (script) {
+            script.groupLevel = this.groupLevel;
+            this.scripts.push(script);
+        }
     }
 
 
@@ -131,7 +136,7 @@ export default class TaskFile extends TreeItem
             {   //
                 // For ant files not named build.xml, display the file name too
                 //
-                if (!taskDef?.fileName?.match(/build.xml/i))
+                if (taskDef.fileName && !taskDef.fileName.match(/build.xml/i))
                 {
                     if (relativePath.length > 0 && relativePath !== ".vscode" && taskDef.type)
                     {
@@ -165,7 +170,7 @@ export default class TaskFile extends TreeItem
     }
 
 
-    getFileNameFromSource(source: string, folder: TaskFolder, taskDef: TaskDefinition, relativePath: string, incRelPathForCode?: boolean): string | null
+    getFileNameFromSource(source: string, folder: TaskFolder, taskDef: TaskDefinition, incRelPathForCode?: boolean): string
     {
         //
         // Ant tasks or any tasks provided by this extension will have a "fileName" definition

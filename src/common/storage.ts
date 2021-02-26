@@ -21,9 +21,16 @@ class Storage
         this.storage = storageMemento;
     }
 
-    public get<T>(key: string, defaultValue?: T): T
+    public get<T>(key: string, defaultValue?: T): T | undefined
     {
-        return this.storage.get<T>(key, defaultValue);
+        if (key) {
+            if (defaultValue) {
+                return this.storage.get<T>(key, defaultValue);
+            }
+            else {
+                return this.storage.get(key);
+            }
+        }
     }
 
     public async update(key: string, value: any)

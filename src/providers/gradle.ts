@@ -3,6 +3,7 @@ import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from
 import * as path from "path";
 import * as util from "../common/utils";
 import * as log from "../common/log";
+import { configuration } from "../common/configuration";
 import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../taskDefinition";
@@ -22,8 +23,8 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             if (process.platform === "win32") {
                 gradle = "gradlew.bat";
             }
-            if (workspace.getConfiguration("taskExplorer").get("pathToGradle")) {
-                gradle = workspace.getConfiguration("taskExplorer").get("pathToGradle");
+            if (configuration.get<string>("pathToGradle")) {
+                gradle = configuration.get("pathToGradle");
             }
             return gradle;
         };
@@ -52,7 +53,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             {
                 if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
                     visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri, null, logPad + "   ");
+                    const tasks = await this.readUriTasks(fobj.uri, undefined, logPad + "   ");
                     log.write("   processed gradle file", 3, logPad);
                     log.value("      file", fobj.uri.fsPath, 3, logPad);
                     log.value("      targets in file", tasks.length, 3, logPad);

@@ -9,7 +9,7 @@ export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
     let found = 0;
     for (const [ k, task ] of taskMap)
     {
-        if (task.id.includes(id) && !task.isUser) {
+        if (task.id?.includes(id) && !task.isUser) {
             found++;
         }
     }
@@ -19,7 +19,13 @@ export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
 
 export function spawn(command: string, args?: string[], options?: cp.SpawnOptions): cp.ChildProcess
 {
-    const proc = cp.spawn(command, args, options);
+    let proc: cp.ChildProcess;
+    if (options) {
+        proc = cp.spawn(command, args || [], options);
+    }
+    else {
+        proc = cp.spawn(command, args || []);
+    }
 
     // let fullCommand = "command: " + command;
 

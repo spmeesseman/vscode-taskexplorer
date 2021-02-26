@@ -1,6 +1,6 @@
 
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder } from "vscode";
-import * as constants from "../common/constants";
+import constants from "../common/constants";
 import TaskItem from "./item";
 import TaskFile from "./file";
 
@@ -9,7 +9,7 @@ export default class TaskFolder extends TreeItem
 {
     public taskFiles: (TaskFile|TaskItem)[] = [];
     public taskFolders: TaskFolder[] = [];
-    public workspaceFolder: WorkspaceFolder;
+    public workspaceFolder: WorkspaceFolder | undefined;
 
 
     constructor(folder: WorkspaceFolder | string)

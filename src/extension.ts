@@ -389,15 +389,10 @@ export async function refreshTree(taskType?: string, uri?: Uri)
     // and the sidebar view are being used and/or enabled
     //
     if (configuration.get<boolean>("enableSideBar") && treeDataProvider) {
-        refreshedTasks = await treeDataProvider.refresh(taskType, uri);
+        await treeDataProvider.refresh(taskType, uri);
     }
     if (configuration.get<boolean>("enableExplorerView") && treeDataProvider2) {
-        // if (!refreshedTasks) {
-            await treeDataProvider2.refresh(taskType, uri); // , refreshedTasks);
-        // }
-        // else {
-        //     await treeDataProvider2.refresh(taskType !== "visible-event" ? false : taskType, uri);
-        // }
+        await treeDataProvider2.refresh(taskType, uri);
     }
 }
 

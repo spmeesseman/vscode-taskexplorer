@@ -50,8 +50,6 @@
     ],
     "scripts": {
         "build": "npx tsc -p ./",
-        "build-babel": "babel src --out-dir dist --extensions \".js,.ts\" && tsc --declaration --emitDeclarationOnly -p ./",
-        "babel:watch": "nodemon -e js,ts,json --watch src --watch .babelrc.js --exec \"(babel src --out-dir dist --extensions '.js,.ts'; exit 0)\"",
         "clean": "rimraf dist && rimraf .nyc_output && rimraf coverage",
         "lint": "eslint -c .eslintrc.js --ext .ts .",
         "package": "vsce package",
@@ -68,7 +66,7 @@
         "test:dev": "npm run test:before && node ./dist/test/runTest.js && npm run test:after",
         "test:after": "npm run coverage-full_off",
         "test:before": "npm run clean && rimraf c:\\code\\data\\user-data\\cacheddata && npm run build && npm run coverage-full_on",
-        "test:openreport": "npm run coverage-open-repor",
+        "test:openreport": "npm run coverage-open-report",
         "vscode:prepublish": "npm run build",
         "watch": "tsc -watch -p ./",
         "webpack-watch": "webpack -w --info-verbosity verbose --mode development --config ./webpack.config.js",
@@ -84,7 +82,6 @@
         "xml2js": "^0.4.23"
     },
     "devDependencies": {
-        "@istanbuljs/nyc-config-hook-run-in-this-context": "^1.0.0",
         "@istanbuljs/nyc-config-typescript": "^1.0.1",
         "@semantic-release/changelog": "^5.0.1",
         "@semantic-release/git": "^9.0.0",
@@ -101,7 +98,6 @@
         "codecov": "^3.8.1",
         "conventional-changelog-spm": "^1.2.5",
         "cz-conventional-changelog": "^3.3.0",
-        "decache": "^4.6.0",
         "eslint": "^7.19.0",
         "eslint-plugin-import": "^2.22.1",
         "eslint-plugin-jsdoc": "^31.6.0",

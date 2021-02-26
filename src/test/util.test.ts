@@ -95,7 +95,11 @@ suite("Util tests", () =>
 
     test("Test get cwd", function()
     {
-        assert(util.getCwd(workspace.workspaceFolders[0].uri) !== undefined);
+        const uri = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined;
+        if (!uri) {
+            assert.fail("        ✘ Worksapce folder does not exist");
+        }
+        assert(util.getCwd(uri) !== undefined);
     });
 
     test("Timeout", function()

@@ -41,7 +41,8 @@ class Configuration
 
     public get<T>(section: string, defaultValue?: T): T
     {
-        return this.configuration.get<T>(section, defaultValue);
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        return this.configuration.get<T>(section, defaultValue!);
     }
 
 
@@ -59,7 +60,8 @@ class Configuration
 
     public updateWsf(section: string, value: any, uri?: Uri): Thenable<void>
     {
-        return workspace.getConfiguration(extensionName, uri ? uri : workspace.workspaceFolders[0].uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
+        uri = uri || (workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined);
+        return workspace.getConfiguration(extensionName, uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
     }
 
 
