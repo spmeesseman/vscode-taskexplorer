@@ -79,6 +79,35 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
+    public getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number
+    {
+        if (!taskName || !documentText) {
+            return 0;
+        }
+        let idx = documentText.indexOf(taskName + ":");
+        if (idx === -1)
+        {
+            idx = documentText.indexOf(taskName);
+            let bLine = documentText.lastIndexOf("\n", idx) + 1;
+            let eLine = documentText.indexOf("\n", idx);
+            if (eLine === -1) { eLine = documentText.length; }
+            let line = documentText.substring(bLine, eLine).trim();
+            while (bLine !== -1 && bLine !== idx && idx !== -1 && line.indexOf(":") === -1)
+            {
+                idx = documentText.indexOf(taskName, idx + 1);
+                bLine = documentText.lastIndexOf("\n", idx) + 1;
+                eLine = documentText.indexOf("\n", idx);
+                if (bLine !== -1)
+                {
+                    if (eLine === -1) { eLine = documentText.length; }
+                    line = documentText.substring(bLine, eLine).trim();
+                }
+            }
+        }
+        return idx;
+    }
+
+
     private findTargets(fsPath: string, logPad = ""): string[]
     {
         const scripts: string[] = [];

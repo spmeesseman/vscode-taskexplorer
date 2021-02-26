@@ -28,6 +28,23 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
+    public getDocumentPosition(scriptName: string | undefined, documentText: string | undefined): number
+    {
+        if (!scriptName || !documentText) {
+            return 0;
+        }
+
+        let idx = this.getDocumentPositionLine("gulp.task(", scriptName, documentText);
+        if (idx === -1) {
+            idx = this.getDocumentPositionLine("exports[", scriptName, documentText);
+        }
+        if (idx === -1) {
+            idx = this.getDocumentPositionLine("exports.", scriptName, documentText, 0, 0, true);
+        }
+        return idx;
+    }
+
+
     private findTargets(fsPath: string, logPad = ""): string[]
     {
         let scripts: string[] = [];

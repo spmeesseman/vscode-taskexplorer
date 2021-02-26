@@ -149,6 +149,12 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     }
 
 
+    public getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number
+    {
+        return this.getDocumentPositionLine("grunt.registerTask(", taskName, documentText);
+    }
+
+
     public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const result: Task[] = [];

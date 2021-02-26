@@ -757,74 +757,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private findScriptPosition(document: TextDocument, script?: TaskItem): number
-    {
-        let scriptOffset = 0;
-        const documentText = document.getText();
-
-        log.methodStart("findScriptPosition", 1, "", true, [[ "task label", script?.label], [ "task source", script?.taskSource]]);
-
-        if (!script) { return 0; }
-
-        if (script.taskSource === "ant")
-        {
-            scriptOffset = this.findScriptPositionAnt(script.task?.name, documentText);
-        }
-        else if (script.taskSource === "gulp")
-        {
-            scriptOffset = this.findScriptPositionGulp(script.task?.name, documentText);
-        }
-        else if (script.taskSource === "grunt")
-        {
-            scriptOffset = this.findScriptPositionLine("grunt.registerTask(", script.task?.name, documentText);
-        }
-        else if (script.taskSource === "make")
-        {
-            scriptOffset = this.findScriptPositionMake(script.task?.name, documentText);
-        }
-        else if (script.taskSource === "npm" || script.taskSource === "Workspace")
-        {
-            scriptOffset = this.findScriptPositionJson(documentText, script);
-        }
-        else
-        {
-            log.write("   Does not support task find, file open only");
-        }
-
-        if (scriptOffset === -1)
-        {
-            scriptOffset = 0;
-        }
-
-        log.value("   Offset", scriptOffset);
-        return scriptOffset;
-    }
-
-
-    private findScriptPositionAnt(scriptName: string | undefined, documentText: string | undefined): number
-    {
-        if (!scriptName || !documentText) {
-            return 0;
-        }
-
-        scriptName = scriptName.replace(" - Default", "");
-        let idx = this.findScriptPositionLine("name=", scriptName, documentText, 6);
-        if (idx > 0)
-        {   //
-            // Check to make sure this isnt the 'default task' position,i.e.:
-            //
-            //     <project basedir="." default="test-build">
-            //
-            const scriptOffset2 = this.findScriptPositionLine("name=", scriptName, documentText, 6, idx + 1);
-            if (scriptOffset2 > 0) {
-                idx = scriptOffset2;
-            }
-        }
-        return idx;
-    }
-
-
-    private findScriptPositionJson(documentText: string | undefined, script?: TaskItem)
+    private findJsonDocumentPosition(documentText: string | undefined, script?: TaskItem)
     {
         const me = this;
         let inScripts = false;
@@ -913,70 +846,33 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private findScriptPositionLine(lineName: string, scriptName: string | undefined, documentText: string | undefined, advance = 0, start = 0, skipQuotes = false): number
+    private findDocumentPosition(document: TextDocument, taskItem?: TaskItem): number
     {
-        if (!scriptName || !documentText) {
-            return 0;
-        }
-        //
-        // TODO - This is crap, use regex to detect spaces between quotes
-        //
-        let idx = documentText.indexOf(lineName + (!skipQuotes ? "\"" : "") + scriptName + (!skipQuotes ? "\"" : ""), start);
-        if (idx === -1)
+        let scriptOffset = 0;
+        const documentText = document.getText();
+
+        log.methodStart("find task definition document position", 1, "", true,
+            [ [ "task label", taskItem?.label], [ "task source", taskItem?.taskSource] ]
+        );
+
+        if (!taskItem || !taskItem.task) { return 0; }
+
+        const def = taskItem.task.definition;
+        if (def.type === "npm" || def.type === "Workspace")
         {
-            idx = documentText.indexOf(lineName + (!skipQuotes ? "'" : "") + scriptName + (!skipQuotes ? "'" : ""), start);
+            scriptOffset = this.findJsonDocumentPosition(documentText, taskItem);
         }
-        if (advance !== 0 && idx !== -1)
-        {
-            idx += advance;
-        }
-        return idx;
-    }
-
-
-    private findScriptPositionGulp(scriptName: string | undefined, documentText: string | undefined): number
-    {
-        if (!scriptName || !documentText) {
-            return 0;
+        else {
+            const provider = providers.get(util.getScriptProviderType(def.type));
+            scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || -1;
         }
 
-        let idx = this.findScriptPositionLine("gulp.task(", scriptName, documentText);
-        if (idx === -1) {
-            idx = this.findScriptPositionLine("exports[", scriptName, documentText);
+        if (scriptOffset === -1) {
+            scriptOffset = 0;
         }
-        if (idx === -1) {
-            idx = this.findScriptPositionLine("exports.", scriptName, documentText, 0, 0, true);
-        }
-        return idx;
-    }
 
-
-    private findScriptPositionMake(scriptName: string | undefined, documentText: string | undefined): number
-    {
-        if (!scriptName || !documentText) {
-            return 0;
-        }
-        let idx = documentText.indexOf(scriptName + ":");
-        if (idx === -1)
-        {
-            idx = documentText.indexOf(scriptName);
-            let bLine = documentText.lastIndexOf("\n", idx) + 1;
-            let eLine = documentText.indexOf("\n", idx);
-            if (eLine === -1) { eLine = documentText.length; }
-            let line = documentText.substring(bLine, eLine).trim();
-            while (bLine !== -1 && bLine !== idx && idx !== -1 && line.indexOf(":") === -1)
-            {
-                idx = documentText.indexOf(scriptName, idx + 1);
-                bLine = documentText.lastIndexOf("\n", idx) + 1;
-                eLine = documentText.indexOf("\n", idx);
-                if (bLine !== -1)
-                {
-                    if (eLine === -1) { eLine = documentText.length; }
-                    line = documentText.substring(bLine, eLine).trim();
-                }
-            }
-        }
-        return idx;
+        log.methodDone("find task definition document position", 1, "", true, [ ["offset", scriptOffset ] ]);
+        return scriptOffset;
     }
 
 
@@ -1852,7 +1748,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (util.pathExists(uri.fsPath))
             {
                 const document: TextDocument = await workspace.openTextDocument(uri);
-                const offset = this.findScriptPosition(document, selection instanceof TaskItem ? selection : undefined);
+                const offset = this.findDocumentPosition(document, selection instanceof TaskItem ? selection : undefined);
                 const position = document.positionAt(offset);
                 await window.showTextDocument(document, { selection: new Selection(position, position) });
             }

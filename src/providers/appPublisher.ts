@@ -36,6 +36,12 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
     }
 
 
+    public getDocumentPosition(scriptName: string | undefined, documentText: string | undefined): number
+    {
+        return 0;
+    }
+
+
     public async readTasks(logPad = ""): Promise<Task[]>
     {
         log.methodStart("detect app-publisher files", 1, logPad, true);

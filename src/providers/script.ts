@@ -203,6 +203,12 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
+    public getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number
+    {
+        return 0;
+    }
+
+
     public async readTasks(logPad = ""): Promise<Task[]>
     {
         log.methodStart("detect script files", 1, logPad, true);

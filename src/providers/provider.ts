@@ -4,11 +4,14 @@ import { TaskExplorerDefinition } from "../taskDefinition";
 import { configuration } from "../common/configuration";
 import * as util from "../common/utils";
 import * as log from "../common/log";
+import TaskItem from "../tree/item";
+
 
 export abstract class TaskExplorerProvider implements TaskProvider
 {
     abstract getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition;
     abstract createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined;
+    abstract getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number;
     abstract readTasks(logPad?: string): Promise<Task[]>;
     abstract readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad?: string): Promise<Task[]>;
 
@@ -23,6 +26,27 @@ export abstract class TaskExplorerProvider implements TaskProvider
     constructor(name: string) {
         this.providerName = name;
         this.queue = [];
+    }
+
+
+    getDocumentPositionLine(lineName: string, scriptName: string | undefined, documentText: string | undefined, advance = 0, start = 0, skipQuotes = false): number
+    {
+        if (!scriptName || !documentText) {
+            return 0;
+        }
+        //
+        // TODO - This is crap, use regex to detect spaces between quotes
+        //
+        let idx = documentText.indexOf(lineName + (!skipQuotes ? "\"" : "") + scriptName + (!skipQuotes ? "\"" : ""), start);
+        if (idx === -1)
+        {
+            idx = documentText.indexOf(lineName + (!skipQuotes ? "'" : "") + scriptName + (!skipQuotes ? "'" : ""), start);
+        }
+        if (advance !== 0 && idx !== -1)
+        {
+            idx += advance;
+        }
+        return idx;
     }
 
 

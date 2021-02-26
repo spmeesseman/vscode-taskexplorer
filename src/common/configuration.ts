@@ -41,7 +41,6 @@ class Configuration
 
     public get<T>(section: string, defaultValue?: T): T
     {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         return this.configuration.get<T>(section, defaultValue!);
     }
 

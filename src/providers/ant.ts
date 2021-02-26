@@ -116,6 +116,29 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
+    public getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number
+    {
+        if (!taskName || !documentText) {
+            return 0;
+        }
+
+        taskName = taskName.replace(" - Default", "");
+        let idx = this.getDocumentPositionLine("name=", taskName, documentText, 6);
+        if (idx > 0)
+        {   //
+            // Check to make sure this isnt the 'default task' position,i.e.:
+            //
+            //     <project basedir="." default="test-build">
+            //
+            const scriptOffset2 = this.getDocumentPositionLine("name=", taskName, documentText, 6, idx + 1);
+            if (scriptOffset2 > 0) {
+                idx = scriptOffset2;
+            }
+        }
+        return idx;
+    }
+
+
     private findTasksWithAnt(scripts: StringMap)
     {
         let stdout: Buffer;

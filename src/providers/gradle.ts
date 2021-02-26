@@ -129,6 +129,12 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
+    public getDocumentPosition(scriptName: string | undefined, documentText: string | undefined): number
+    {
+        return 0;
+    }
+
+
     public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const result: Task[] = [];
