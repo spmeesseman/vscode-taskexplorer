@@ -21,17 +21,73 @@ import TaskFolder  from "./folder";
 export default class TaskFile extends TreeItem
 {
     public path: string;
+    /**
+     * @property folder
+     *
+     * The owner TaskFolder representng a workspace or special (Last Tasks / Favorites)
+     * folder.
+     */
     public folder: TaskFolder;
-    public scripts: (TaskItem|TaskFile)[] = [];
+    /**
+     * @property folder
+     *
+     * Child TaskItem or TaskFile nodes in the tree.  A TaskFile can own another TaskFile
+     * if "Grouping" is turned on in settings.
+     */
+    public treeNodes: (TaskItem|TaskFile)[] = [];
+    /**
+     * @property fileName
+     *
+     * The name of the filesystem file that this TaskFile represents, and/or is associated
+     * with if grouped.
+     */
     public fileName: string;
+    /**
+     * @property groupLevel
+     *
+     * Grouping level of this TaskFIle, if grouping is enabled in Settings.  The maximum
+     * group level is configurable in Settings 1-10.
+     */
     public groupLevel: number;
+    /**
+     * @property nodePath ?
+     */
     public nodePath: string;
+    /**
+     * @property taskSource
+     *
+     * The task source that the TaskFile will be associated with, e.g. `npm`, `ant`,
+     * `gulp`, etc.
+     *
+     * @readonly
+     */
     public readonly taskSource: string;
+    /**
+     * @property isGroup Flag indicating if the TaskFile is being added in grouped mode.
+     * @readonly
+     */
     public readonly isGroup: boolean;
+    /**
+     * @property isUser Flag indicating if the TaskFile is associated with "User" tasks.
+     * @readonly
+     */
     public readonly isUser: boolean;
 
 
-    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, groupLevel: number, group?: boolean, label?: string, padding = "")
+    /**
+     * @constructor
+     *
+     * @param context The VSCode extension context.
+     * @param folder The owner TaskFolder, a TaskFolder represents a workspace or special (Last Tasks / Favorites) folder.
+     * @param taskDef The task definition.
+     * @param source The task source that the TaskFile will be associated with, e.g. `npm`, `ant`, `gulp`, etc.
+     * @param relativePath The relative path of the task file, relative to the workspace folder it was found in.
+     * @param groupLevel The grouping level in the tree.
+     * @param group Flag indicating if the TaskFile is being added in grouped mode.
+     * @param label The display label.
+     * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
+     */
+    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, groupLevel: number, group?: boolean, label?: string, logPad = "")
     {
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group || false), TreeItemCollapsibleState.Collapsed);
 
@@ -82,7 +138,7 @@ export default class TaskFile extends TreeItem
              // No resource uri means this file is 'user tasks', and not associated to a workspace folder
             //
             else if (configuration.get<boolean>("readUserTasks")) {
-                this.resourceUri = Uri.file(path.join(util.getUserDataPath(padding), this.fileName));
+                this.resourceUri = Uri.file(path.join(util.getUserDataPath(logPad), this.fileName));
                 this.isUser = true;
             }
         }
@@ -122,17 +178,26 @@ export default class TaskFile extends TreeItem
         }
     }
 
-
-    addScript(script: (TaskFile | TaskItem | undefined))
+    /**
+     * @method addTreeNode
+     *
+     * @param treeNode The node/item to add to this TaskFile node.
+     */
+    public addTreeNode(treeNode: (TaskFile | TaskItem | undefined))
     {
-        if (script) {
-            script.groupLevel = this.groupLevel;
-            this.scripts.push(script);
+        if (treeNode) {
+            treeNode.groupLevel = this.groupLevel;
+            this.treeNodes.push(treeNode);
         }
     }
 
 
-    static getLabel(taskDef: TaskDefinition, source: string, relativePath: string, group: boolean): string
+    /**
+     * @method getLabel
+     *
+     * @param treeNode The node/item to add to this TaskFile node.
+     */
+    private static getLabel(taskDef: TaskDefinition, source: string, relativePath: string, group: boolean): string
     {
         let label = source;
 
@@ -181,7 +246,15 @@ export default class TaskFile extends TreeItem
     }
 
 
-    getFileNameFromSource(source: string, folder: TaskFolder, taskDef: TaskDefinition, incRelPathForCode?: boolean): string
+    /**
+     * @method addTreeNode
+     * @private
+     *
+     * @param treeNode The node/item to add to this TaskFile node.
+     *
+     * @returns File name
+     */
+    private getFileNameFromSource(source: string, folder: TaskFolder, taskDef: TaskDefinition, incRelPathForCode?: boolean): string
     {
         //
         // Ant tasks or any tasks provided by this extension will have a "fileName" definition
@@ -226,29 +299,40 @@ export default class TaskFile extends TreeItem
     }
 
 
-    insertScript(script: (TaskFile | TaskItem), index: number)
+    /**
+     * @method insertTreeNode
+     *
+     * @param treeNode The node/item to add to this TaskFile node.
+     * @param index The index at which to insert into the array
+     */
+    public insertTreeNode(treeItem: (TaskFile | TaskItem), index: number)
     {
-        this.scripts.splice(index, 0, script);
+        this.treeNodes.splice(index, 0, treeItem);
     }
 
 
-    removeScript(script: (TaskFile | TaskItem))
+    /**
+     * @method removeTreeNode
+     *
+     * @param treeNode The node/item to remove from this TaskFile node.
+     */
+    public removeTreeNode(treeItem: (TaskFile | TaskItem))
     {
         let idx = -1;
         let idx2 = -1;
 
-        this.scripts.forEach(each =>
+        this.treeNodes.forEach(each =>
         {
             idx++;
-            if (script === each)
+            if (treeItem === each)
             {
                 idx2 = idx;
             }
         });
 
-        if (idx2 !== -1 && idx2 < this.scripts.length)
+        if (idx2 !== -1 && idx2 < this.treeNodes.length)
         {
-            this.scripts.splice(idx2, 1);
+            this.treeNodes.splice(idx2, 1);
         }
     }
 

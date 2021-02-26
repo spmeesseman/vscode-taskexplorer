@@ -156,7 +156,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 log.write("  file group");
                 pathValue = "";
-                for (const each of selection.scripts)
+                for (const each of selection.treeNodes)
                 {
                     if (each.resourceUri) {
                         pathValue += each.resourceUri.path;
@@ -438,7 +438,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             // Create "tree item" node and add it to the owner "tree file" node
             //
             const taskItem = new TaskItem(this.extensionContext, taskFile, each);
-            taskFile.addScript(taskItem);
+            taskFile.addTreeNode(taskItem);
             //
             // Add this task to the 'Last Tasks' folder if we need to
             //
@@ -560,7 +560,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         ["   Add source file sub-container", each.path],
                         ["      id", id]
                     ], true);
-                    const definition = (each.scripts[0] as TaskItem)?.task?.definition;
+                    const definition = (each.treeNodes[0] as TaskItem)?.task?.definition;
                     if (definition)
                     {
                         subfolder = new TaskFile(this.extensionContext, folder, definition,
@@ -572,13 +572,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         // over the 2nd one at this point, and need to add the previous iteration's TaskItem to the
                         // new group just created
                         //
-                        subfolder.addScript(prevTaskFile); // addScript will set the group level on the TaskItem
+                        subfolder.addTreeNode(prevTaskFile); // addScript will set the group level on the TaskItem
                     }
                     else {
                         log.value("   defintion not found", `(${each.taskSource}) ${each.path}` , 1);
                     }
                 }
-                subfolder?.addScript(each); // addScript will set the group level on the TaskItem
+                subfolder?.addTreeNode(each); // addScript will set the group level on the TaskItem
             }
             prevTaskFile = each;
             //
@@ -689,7 +689,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         };
 
-        for (const each of taskFile.scripts)
+        for (const each of taskFile.treeNodes)
         {
             if (!(each instanceof TaskItem) || !each.task || !each.label) {
                 continue;
@@ -765,12 +765,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     // over the 2nd one at this point, and need to add the previous iteration's TaskItem to the
                     // new group just created
                     //
-                    subfolder.addScript(prevTaskItem); // addScript will set the group level on the TaskItem
+                    subfolder.addTreeNode(prevTaskItem); // addScript will set the group level on the TaskItem
                     newNodes.push(subfolder);
                 }
 
                 _setNodePath(each, each.nodePath);
-                subfolder.addScript(each); // addScript will set the group level on the TaskItem
+                subfolder.addTreeNode(each); // addScript will set the group level on the TaskItem
             }
 
             prevName = label.split(groupSeparator);
@@ -785,7 +785,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             let numGrouped = 0;
             for (const n of newNodes)
             {
-                taskFile.insertScript(n, numGrouped++);
+                taskFile.insertTreeNode(n, numGrouped++);
                 if (!atMaxLevel)
                 {   //
                     // TODO !!!
@@ -1071,7 +1071,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         else if (element instanceof TaskFile)
         {
             log.write(logPad + "   Get file tasks/scripts", 2);
-            items = element.scripts;
+            items = element.treeNodes;
         }
         else if (!element)
         {
@@ -2032,12 +2032,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             else if (each.isGroup)
             {
-                for (const each2 of each.scripts)
+                for (const each2 of each.treeNodes)
                 {
                     this.removeScripts(each2 as TaskFile, folder, subfolders, 0, logPad);
                     if (each2 instanceof TaskFile && each2.isGroup && each2.groupLevel > 0)
                     {
-                        for (const each3 of each2.scripts)
+                        for (const each3 of each2.treeNodes)
                         {
                             if (each3 instanceof TaskFile)
                             {
@@ -2078,7 +2078,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         log.methodStart("remove scripts", 3, logPad, false);
 
-        for (const each of taskFile.scripts)
+        for (const each of taskFile.treeNodes)
         {
             const label = each.label?.toString();
 
@@ -2102,7 +2102,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             else
             {
                 let allTasks = false;
-                for (const each2 of each.scripts)
+                for (const each2 of each.treeNodes)
                 {
                     if (each2 instanceof TaskItem)
                     {
@@ -2122,7 +2122,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         for (const each2 of taskTypesRmv)
         {
-            taskFile.removeScript(each2);
+            taskFile.removeTreeNode(each2);
         }
 
         log.methodStart("remove scripts", 3, logPad);
@@ -2140,7 +2140,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         rmvLbl = rmvLbl?.replace(/\(/gi, "\\(").replace(/\[/gi, "\\[");
         rmvLbl = rmvLbl?.replace(/\)/gi, "\\)").replace(/\]/gi, "\\]");
 
-        for (const each2 of taskFile.scripts)
+        for (const each2 of taskFile.treeNodes)
         {
             if (each2 instanceof TaskItem)
             {
@@ -2567,7 +2567,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         for (const each of folder.taskFiles)
         {
             if ((each instanceof TaskFile)) { // && each.isGroup) {
-                this.sortTasks(each.scripts, logPad);
+                this.sortTasks(each.treeNodes, logPad);
             }
         }
     }
