@@ -127,7 +127,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             // Update
             //
-            this.showSpecialTasks(true, true, undefined, "   ");
+            await this.showSpecialTasks(true, true, undefined, "   ");
         }
 
         log.methodDone("add/remove favorite", 1);
