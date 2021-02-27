@@ -17,7 +17,6 @@ import { waitForCache } from "../cache";
 import { addWsFolder, removeWsFolder } from "../extension";
 import { configuration } from "../common/configuration";
 import constants from "../common/constants";
-import { time } from "console";
 
 
 let rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
@@ -861,12 +860,12 @@ suite("Task tests", () =>
         //
         taskCount = testUtil.findIdInTaskMap(":npm:", taskMap);
         console.log("            NPM          : " + taskCount.toString());
-        if (taskCount !== 6) {
+        if (taskCount !== 5) {
             if (taskCount === 0) {
                 console.log("            ℹ NPM tasks are not found when running tests locally");
             }
             else {
-                assert.fail("Unexpected NPM task count (Found " + taskCount + " of 6)");
+                assert.fail("Unexpected NPM task count (Found " + taskCount + " of 5)");
             }
         }
 
@@ -908,7 +907,7 @@ suite("Task tests", () =>
             if (value && value.taskSource === "batch")
             {
                 console.log("Run batch task: " + value.label);
-                console.log("   Folder: " + value.getFolder());
+                console.log("   Folder: " + value.getFolder()?.name);
                 if (lastTask) {
                     await commands.executeCommand("taskExplorer.open", value);
                     await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
@@ -921,7 +920,7 @@ suite("Task tests", () =>
                     await timeout(1000);
                     await commands.executeCommand("taskExplorer.stop", value);
                     //
-                    // COver code that removes a "Last Task" if it was removed
+                    // Cover code that removes a "Last Task" if it was removed
                     //
                     value.taskFile.removeTreeNode(value);
                     await commands.executeCommand("taskExplorer.runLastTask");
@@ -932,26 +931,26 @@ suite("Task tests", () =>
                 await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
                 await commands.executeCommand("taskExplorer.open", value);
                 await commands.executeCommand("taskExplorer.runWithArgs", value, "--test --test2");
-                await timeout(1000);
+                await timeout(250);
                 await commands.executeCommand("taskExplorer.stop", value);
                 await configuration.updateWs("keepTermOnStop", true);
                 await commands.executeCommand("taskExplorer.run", value);
-                await timeout(1000);
+                await timeout(250);
                 await commands.executeCommand("taskExplorer.pause", value);
                 await commands.executeCommand("taskExplorer.run", value);
-                await timeout(1000);
+                await timeout(250);
                 await commands.executeCommand("taskExplorer.openTerminal", value);
                 await commands.executeCommand("taskExplorer.pause", value);
-                await timeout(1000);
+                await timeout(250);
                 await commands.executeCommand("taskExplorer.stop", value);
                 await commands.executeCommand("taskExplorer.runLastTask", value);
-                await timeout(1000);
+                await timeout(250);
                 await configuration.updateWs("keepTermOnStop", false);
                 await commands.executeCommand("taskExplorer.restart", value);
-                await timeout(1000);
+                await timeout(250);
                 await commands.executeCommand("taskExplorer.stop", value);
                 await commands.executeCommand("taskExplorer.runNoTerm", value);
-                await timeout(1000);
+                await timeout(250);
                 await commands.executeCommand("taskExplorer.stop", value);
                 if (lastTask) {
                     await commands.executeCommand("taskExplorer.openTerminal", lastTask);
@@ -963,7 +962,7 @@ suite("Task tests", () =>
             else if (value && value.taskSource === "bash")
             {
                 console.log("Run bash task: " + value.label);
-                console.log("   Folder: " + value.getFolder());
+                console.log("   Folder: " + value.getFolder()?.name);
                 await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
                 await commands.executeCommand("taskExplorer.run", value);
                 await timeout(2000);
