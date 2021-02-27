@@ -460,16 +460,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *
      * @since v2.0.0
      */
-    private async clearSpecialFolder(folder: TaskFolder)
+    private async clearSpecialFolder(folder: TaskFolder | string)
     {
-        const choice = await window.showInformationMessage("Clear all tasks from this folder?", "Yes", "No");
+        const choice = typeof folder === "string" ?
+                       "Yes" : await window.showInformationMessage("Clear all tasks from this folder?", "Yes", "No"),
+              label = typeof folder === "string" ? folder : folder.label;
         if (choice === "Yes")
         {
-            if (folder.label === constants.FAV_TASKS_LABEL) {
+            if (label === constants.FAV_TASKS_LABEL) {
                 await storage?.update(constants.FAV_TASKS_STORE, "");
                 await this.showSpecialTasks(false, true);
             }
-            else if (folder.label === constants.LAST_TASKS_LABEL) {
+            else if (label === constants.LAST_TASKS_LABEL) {
                 await storage?.update(constants.LAST_TASKS_STORE, "");
                 await this.showSpecialTasks(false);
             }

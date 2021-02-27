@@ -54,14 +54,6 @@ export default class TaskFolder extends TreeItem
     }
 
 
-    addTaskFolder(taskFolder: TaskFolder)
-    {
-        if (taskFolder) {
-            this.taskFolders.push(taskFolder);
-        }
-    }
-
-
     removeTaskFile(taskFile: TaskFile|TaskItem)
     {
         if (taskFile)

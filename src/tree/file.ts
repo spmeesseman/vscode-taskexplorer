@@ -271,28 +271,18 @@ export default class TaskFile extends TreeItem
         //
 
         let fileName = "package.json";
-        let tmpIdx = 0;
 
         if (source === "Workspace")
         {
-            if (incRelPathForCode === true)
+            fileName = "tasks.json"; // // note:  user task has no resourceUri
+            if (incRelPathForCode === true && folder.resourceUri) // project folder task
             {
-                if (folder.resourceUri) { // project folder task
-                    fileName = ".vscode/tasks.json";
-                }
-                else { // user task (has no resourceUri)
-                    fileName = "tasks.json";
-                }
-            }
-            else
-            {
-                fileName = "tasks.json";
+                fileName = ".vscode/tasks.json";
             }
         }
         else if (source === "tsc")
         {
             fileName = "tsconfig.json";
-            tmpIdx = 2;
         }
 
         return fileName;
