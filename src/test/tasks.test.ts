@@ -7,19 +7,22 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder } from "vscode";
+import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder, WorkspaceEdit } from "vscode";
 import * as testUtil from "./testUtil";
 import { timeout, removeFromArray, forEachMapAsync } from "../common/utils";
 import { teApi } from "./extension.test";
 import TaskItem from "../tree/item";
+import TaskFile from "../tree/file";
 import { waitForCache } from "../cache";
 import { addWsFolder, removeWsFolder } from "../extension";
 import { configuration } from "../common/configuration";
 import constants from "../common/constants";
+import { time } from "console";
 
 
 let rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
 let dirName: string | undefined;
+let dirNameL2: string | undefined;
 let ws2DirName: string | undefined;
 let dirNameIgn: string | undefined;
 let dirNameCode: string | undefined;
@@ -30,15 +33,17 @@ let taskMap: Map<string, TaskItem> = new Map();
 
 suite("Task tests", () =>
 {
+
     suiteSetup(async () =>
     {
         rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
 
         if (!rootPath) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         dirName = path.join(rootPath, "tasks_test_");
+        dirNameL2 = path.join(dirName, "subfolder");
         ws2DirName = path.join(rootPath, "ws2");
         dirNameIgn = path.join(rootPath, "tasks_test_ignore_");
         dirNameCode = path.join(rootPath, ".vscode");
@@ -59,6 +64,9 @@ suite("Task tests", () =>
         if (!fs.existsSync(dirName)) {
             fs.mkdirSync(dirName, { mode: 0o777 });
         }
+        if (!fs.existsSync(dirNameL2)) {
+            fs.mkdirSync(dirNameL2, { mode: 0o777 });
+        }
         if (!fs.existsSync(ws2DirName)) {
             fs.mkdirSync(ws2DirName, { mode: 0o777 });
         }
@@ -71,7 +79,57 @@ suite("Task tests", () =>
         else {
             didCodeDirExist = true;
         }
+
+        //
+        // Workspace folders
+        //
+        let wsDirName = path.join(rootPath, "newA");
+        if (!fs.existsSync(wsDirName)) {
+            fs.mkdirSync(wsDirName, { mode: 0o777 });
+        }
+        wsDirName = path.join(rootPath, "newB");
+        if (!fs.existsSync(wsDirName)) {
+            fs.mkdirSync(wsDirName, { mode: 0o777 });
+        }
+        wsDirName = path.join(rootPath, "newC");
+        if (!fs.existsSync(wsDirName)) {
+            fs.mkdirSync(wsDirName, { mode: 0o777 });
+        }
+        wsDirName = path.join(rootPath, "newD");
+        if (!fs.existsSync(wsDirName)) {
+            fs.mkdirSync(wsDirName, { mode: 0o777 });
+        }
+
+        const wsf: WorkspaceFolder[] = [
+        {
+            uri: Uri.parse(ws2DirName),
+            name: "ws2",
+            index: 1
+        },
+        {
+            uri: Uri.parse(path.join(rootPath, "newC")),
+            name: "C Test Workspace",
+            index: 2
+        },
+        {
+            uri: Uri.parse(path.join(rootPath, "newB")),
+            name: "B Test Workspace",
+            index: 3
+        },
+        {
+            uri: Uri.parse(path.join(rootPath, "newA")),
+            name: "A Test Workspace",
+            index: 4
+        },
+        {
+            uri: Uri.parse(path.join(rootPath, "newD")),
+            name: "D Test Workspace",
+            index: 5
+        }];
+
+        workspace.workspaceFolders?.concat(wsf);
     });
+
 
     suiteTeardown(async () =>
     {
@@ -110,19 +168,67 @@ suite("Task tests", () =>
             }
         }
 
-        if (dirName && ws2DirName && dirNameCode && dirNameIgn)
+        if (dirName && ws2DirName && dirNameCode && dirNameIgn && dirNameL2)
         {
             try {
                 if (!didCodeDirExist) {
-                    fs.rmdirSync(dirNameCode);
+                    fs.rmdirSync(dirNameCode, {
+                        recursive: true
+                    });
                 }
-                fs.rmdirSync(ws2DirName);
-                fs.rmdirSync(dirName);
-                fs.rmdirSync(dirNameIgn);
+                fs.rmdirSync(ws2DirName, {
+                    recursive: true
+                });
+                fs.rmdirSync(dirNameL2, {
+                    recursive: true
+                });
+                fs.rmdirSync(dirName, {
+                    recursive: true
+                });
+                fs.rmdirSync(dirNameIgn, {
+                    recursive: true
+                });
             }
             catch (error) {
                 console.log(error);
             }
+        }
+
+        rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
+
+        if (!rootPath) {
+            assert.fail("        ✘ Workspace folder does not exist");
+        }
+
+        //
+        // Workspace folders
+        //
+        try {
+            let wsDirName = path.join(rootPath, "newA");
+            if (fs.existsSync(wsDirName)) {
+                fs.rmdirSync(wsDirName);
+            }
+            wsDirName = path.join(rootPath, "newB");
+            if (fs.existsSync(wsDirName)) {
+                fs.rmdirSync(wsDirName);
+            }
+            wsDirName = path.join(rootPath, "newC");
+            if (fs.existsSync(wsDirName)) {
+                fs.rmdirSync(wsDirName);
+            }
+            wsDirName = path.join(rootPath, "newD");
+            if (fs.existsSync(wsDirName)) {
+                fs.rmdirSync(wsDirName);
+            }
+            wsDirName = path.join(rootPath, ".vscode");
+            if (fs.existsSync(wsDirName)) {
+                fs.rmdirSync(wsDirName, {
+                    recursive: true
+                });
+            }
+        }
+        catch(error) {
+            console.log(error);
         }
 
         await timeout(3000); // wait for filesystem change events
@@ -132,7 +238,7 @@ suite("Task tests", () =>
     test("Create npm package files", async function()
     {
         if (!rootPath || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         const file = path.join(rootPath, "package.json");
@@ -174,7 +280,7 @@ suite("Task tests", () =>
     test("Create vscode task files", async function()
     {
         if (!rootPath || !dirNameCode) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         const file = path.join(dirNameCode, "tasks.json");
@@ -262,7 +368,7 @@ suite("Task tests", () =>
     test("Create ant target files", async function()
     {
         if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         createAntFile();
@@ -312,7 +418,7 @@ suite("Task tests", () =>
     test("Create gradle target files", async function()
     {
         if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         createGradleFile();
@@ -356,15 +462,37 @@ suite("Task tests", () =>
 
     test("Create tsc config files", async function()
     {
-        if (!rootPath) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+        if (!rootPath || !dirName) {
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         const file = path.join(rootPath, "tsconfig.json");
         tempFiles.push(file);
+        const file2 = path.join(dirName, "tsconfig.json");
+        tempFiles.push(file2);
 
         fs.writeFileSync(
             file,
+            "{\n" +
+            '    "compilerOptions":\n' +
+            "  {\n" +
+            '    "target": "es6",\n' +
+            '    "lib": ["es2016"],\n' +
+            '    "module": "commonjs",\n' +
+            '    "outDir": "./out",\n' +
+            '    "typeRoots": ["./node_modules/@types"],\n' +
+            '    "strict": true,\n' +
+            '    "experimentalDecorators": true,\n' +
+            '    "sourceMap": true,\n' +
+            '    "noImplicitThis": false\n' +
+            "  },\n" +
+            '  "include": ["**/*"],\n' +
+            '  "exclude": ["node_modules"]\n' +
+            "}\n"
+        );
+
+        fs.writeFileSync(
+            file2,
             "{\n" +
             '    "compilerOptions":\n' +
             "  {\n" +
@@ -387,8 +515,8 @@ suite("Task tests", () =>
 
     test("Create gulp task files", async function()
     {
-        if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+        if (!rootPath || !dirNameIgn || !dirName || !dirNameL2) {
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         createGulpFile();
@@ -398,6 +526,13 @@ suite("Task tests", () =>
 
         const file3 = path.join(dirNameIgn, "gulpfile.js");
         tempFiles.push(file3);
+
+        const file4 = path.join(dirName, "GULPFILE.MJS");
+        tempFiles.push(file4);
+
+        const file5 = path.join(dirNameL2, "GULPFILE.js");
+        tempFiles.push(file5);
+
 
         fs.writeFileSync(
             file2,
@@ -427,13 +562,63 @@ suite("Task tests", () =>
             "    done();\n" +
             "});\n"
         );
+
+        fs.writeFileSync(
+            file4,
+            "var gulp = require('gulp');\n" +
+            "gulp.task('group-test-build-ui-one', (done) => {\n" +
+            "    console.log('Hello3!');\n" +
+            "    done();\n" +
+            "});\n" +
+            'gulp.task(\n"group-test-build-ui-two", (done) => {\n' +
+            "    console.log('Hello4!');\n" +
+            "    done();\n" +
+            "});\n" +
+            "gulp.task('group-test-build-ui-three', (done) => {\n" +
+            "    console.log('Hello3!');\n" +
+            "    done();\n" +
+            "});\n" +
+            "gulp.task('group-test-build-ui-four', (done) => {\n" +
+            "    console.log('Hello3!');\n" +
+            "    done();\n" +
+            "});\n" +
+            "gulp.task('group-test-build-ui-five', (done) => {\n" +
+            "    console.log('Hello3!');\n" +
+            "    done();\n" +
+            "});\n"
+        );
+
+        fs.writeFileSync(
+            file5,
+            "var gulp = require('gulp');\n" +
+            "gulp.task('group2-test2-build-ui-one', (done) => {\n" +
+            "    console.log('Hello1!');\n" +
+            "    done();\n" +
+            "});\n" +
+            'gulp.task(\n"group2-test2-build-ui-two", (done) => {\n' +
+            "    console.log('Hello2!');\n" +
+            "    done();\n" +
+            "});\n" +
+            "gulp.task('group2-test2-build-ui-three', (done) => {\n" +
+            "    console.log('Hello3!');\n" +
+            "    done();\n" +
+            "});\n" +
+            "gulp.task('group2-test2-build-ui-four', (done) => {\n" +
+            "    console.log('Hello4!');\n" +
+            "    done();\n" +
+            "});\n" +
+            "gulp.task('group2-test2-build-ui-five', (done) => {\n" +
+            "    console.log('Hello5!');\n" +
+            "    done();\n" +
+            "});\n"
+        );
     });
 
 
     test("Create makefiles", async function()
     {
         if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         createMakeFile();
@@ -460,7 +645,7 @@ suite("Task tests", () =>
     test("Create batch files", async function()
     {
         if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         createBatchFile();
@@ -471,7 +656,7 @@ suite("Task tests", () =>
         const file3 = path.join(dirNameIgn, "test3.bat");
         tempFiles.push(file3);
 
-        fs.writeFileSync(file2, "@echo testing batch file 2\r\n");
+        fs.writeFileSync(file2, "@echo testing batch file 2\r\ntimeout /t 5\r\n");
         fs.writeFileSync(file3, "@echo testing batch file 3\r\n");
     });
 
@@ -479,7 +664,7 @@ suite("Task tests", () =>
     test("Create bash files", async function()
     {
         if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         const file = path.join(rootPath, "test.sh");
@@ -499,8 +684,8 @@ suite("Task tests", () =>
 
     test("Create grunt task files", async function()
     {
-        if (!rootPath || !dirName || !dirNameIgn) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+        if (!rootPath || !dirName || !dirNameIgn || !dirNameL2) {
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         createGruntFile();
@@ -510,6 +695,9 @@ suite("Task tests", () =>
 
         const file3 = path.join(dirNameIgn, "Gruntfile.js");
         tempFiles.push(file3);
+
+        const file4 = path.join(dirNameL2, "GRUNTFILE.JS");
+        tempFiles.push(file4);
 
         fs.writeFileSync(
             file2,
@@ -526,13 +714,26 @@ suite("Task tests", () =>
             '    grunt.registerTask("upload3", ["s3"]);\n' +
             "};\n"
         );
+
+        fs.writeFileSync(
+            file4,
+            "module.exports = function(grunt) {\n" +
+            '    grunt.registerTask("grp-test-svr-build1", ["s1"]);\n' +
+            '    grunt.registerTask("grp-test-svr-build2", ["s2"]);\n' +
+            '    grunt.registerTask("grp-test-svr-build3", ["s3"]);\n' +
+            '    grunt.registerTask("grp-test-svr-build4", ["s4"]);\n' +
+            '    grunt.registerTask("grp-test-svr-build5", ["s5"]);\n' +
+            '    grunt.registerTask("grp-test-svr-build6", ["s6"]);\n' +
+            '    grunt.registerTask("grp-test-svr-build7", ["s7"]);\n' +
+            "};\n"
+        );
     });
 
 
     test("Create app-publisher config file", async function()
     {
         if (!rootPath) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
         createAppPublisherFile();
     });
@@ -540,13 +741,16 @@ suite("Task tests", () =>
 
     test("Perform tree construction", async function()
     {
-        if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+        if (!teApi || !teApi.explorerProvider || !rootPath || !dirNameIgn || !dirName) {
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         this.timeout(45 * 1000);
 
         console.log("    Constructing task tree");
+
+        // Cover getitems before tree is built
+        await teApi.explorerProvider.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
 
         if (!teApi || !teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -556,6 +760,10 @@ suite("Task tests", () =>
         await waitForCache();
 
         console.log("         ✔ Cache done building");
+
+        await configuration.updateWs("groupWithSeparator", true);
+        await configuration.updateWs("groupSeparator", "-");
+        await configuration.updateWs("groupMaxLevel", 5);
 
         //
         // Refresh for better coverage
@@ -567,12 +775,12 @@ suite("Task tests", () =>
         //
         // Check VSCode provided task types for the hell of it
         //
-        let taskItems = await tasks.fetchTasks({ type: "npm" });
-        assert(taskItems.length > 0, "No npm tasks registered");
-        taskItems = await tasks.fetchTasks({ type: "grunt" });
-        assert(taskItems.length > 0, "No grunt tasks registered");
-        taskItems = await tasks.fetchTasks({ type: "gulp" });
-        assert(taskItems.length > 0, "No gulp tasks registered");
+        let npmTasks = await tasks.fetchTasks({ type: "npm" });
+        assert(npmTasks.length > 0, "No npm tasks registered");
+        npmTasks = await tasks.fetchTasks({ type: "grunt" });
+        assert(npmTasks.length > 0, "No grunt tasks registered");
+        npmTasks = await tasks.fetchTasks({ type: "gulp" });
+        assert(npmTasks.length > 0, "No gulp tasks registered");
 
         await teApi.explorerProvider.getChildren(undefined, "        "); // mock explorer open view which would call this function
     });
@@ -581,7 +789,7 @@ suite("Task tests", () =>
     test("Verify tree validity and open tasks for edit", async function()
     {
         if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         if (!teApi || !teApi.explorerProvider) {
@@ -634,10 +842,16 @@ suite("Task tests", () =>
             assert.fail("Unexpected Gradle task count (Found " + taskCount + " of 2)");
         }
 
+        taskCount = testUtil.findIdInTaskMap(":grunt:", taskMap);
+        console.log("            Grunt        : " + taskCount.toString());
+        if (taskCount !== 11) {
+            assert.fail("Unexpected Grunt task count (Found " + taskCount + " of 11)");
+        }
+
         taskCount = testUtil.findIdInTaskMap(":gulp:", taskMap);
         console.log("            Gulp         : " + taskCount.toString());
-        if (taskCount !== 5) {
-            assert.fail("Unexpected Gulp task count (Found " + taskCount + " of 5)");
+        if (taskCount !== 15) {
+            assert.fail("Unexpected Gulp task count (Found " + taskCount + " of 15)");
         }
 
         //
@@ -656,16 +870,10 @@ suite("Task tests", () =>
             }
         }
 
-        taskCount = testUtil.findIdInTaskMap(":grunt:", taskMap);
-        console.log("            Grunt        : " + taskCount.toString());
-        if (taskCount !== 4) {
-            assert.fail("Unexpected Grunt task count (Found " + taskCount + " of 4)");
-        }
-
         taskCount = testUtil.findIdInTaskMap(":tsc:", taskMap);
         console.log("            TSC          : " + taskCount.toString());
-        if (taskCount !== 2) {
-            assert.fail("Unexpected Typescript task count (Found " + taskCount + " of 2)");
+        if (taskCount !== 4) {
+            assert.fail("Unexpected Typescript task count (Found " + taskCount + " of 4)");
         }
 
         taskCount = testUtil.findIdInTaskMap(":Workspace:", taskMap);
@@ -682,7 +890,7 @@ suite("Task tests", () =>
         let ranBatch = false;
 
         if (!rootPath) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         if (!teApi || !teApi.explorerProvider) {
@@ -692,37 +900,71 @@ suite("Task tests", () =>
         this.timeout(60 * 1000);
 
         //
-        // Just find and run a batch script...
+        // Just find and task, a batch task, and run all commands on it
         //
-        console.log("    Run a batch and a bash task");
-        let lastTask: any;
+        let lastTask: TaskItem;
         await forEachMapAsync(taskMap, async (value: TaskItem) =>
         {
             if (value && value.taskSource === "batch")
             {
+                console.log("Run batch task: " + value.label);
+                console.log("   Folder: " + value.getFolder());
                 if (lastTask) {
+                    await commands.executeCommand("taskExplorer.open", value);
+                    await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
                     await configuration.updateWs("keepTermOnStop", true);
                     await commands.executeCommand("taskExplorer.run", lastTask);
+                    await timeout(1000);
+                    await commands.executeCommand("taskExplorer.pause", value);
+                    await timeout(1000);
+                    await commands.executeCommand("taskExplorer.run", value);
+                    await timeout(1000);
+                    await commands.executeCommand("taskExplorer.stop", value);
+                    //
+                    // COver code that removes a "Last Task" if it was removed
+                    //
+                    value.taskFile.removeTreeNode(value);
+                    await commands.executeCommand("taskExplorer.runLastTask");
+                    await commands.executeCommand("taskExplorer.stop", value);
+                    value.taskFile.addTreeNode(value);
                 }
-                await commands.executeCommand("taskExplorer.run", value);
+                await configuration.updateWs("keepTermOnStop", false);
+                await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
+                await commands.executeCommand("taskExplorer.open", value);
+                await commands.executeCommand("taskExplorer.runWithArgs", value, "--test --test2");
+                await timeout(1000);
                 await commands.executeCommand("taskExplorer.stop", value);
+                await configuration.updateWs("keepTermOnStop", true);
                 await commands.executeCommand("taskExplorer.run", value);
+                await timeout(1000);
                 await commands.executeCommand("taskExplorer.pause", value);
+                await commands.executeCommand("taskExplorer.run", value);
+                await timeout(1000);
                 await commands.executeCommand("taskExplorer.openTerminal", value);
                 await commands.executeCommand("taskExplorer.pause", value);
+                await timeout(1000);
                 await commands.executeCommand("taskExplorer.stop", value);
                 await commands.executeCommand("taskExplorer.runLastTask", value);
+                await timeout(1000);
+                await configuration.updateWs("keepTermOnStop", false);
                 await commands.executeCommand("taskExplorer.restart", value);
+                await timeout(1000);
+                await commands.executeCommand("taskExplorer.stop", value);
+                await commands.executeCommand("taskExplorer.runNoTerm", value);
+                await timeout(1000);
                 await commands.executeCommand("taskExplorer.stop", value);
                 if (lastTask) {
                     await commands.executeCommand("taskExplorer.openTerminal", lastTask);
                 }
-                ranBatch = true;
+                ranBatch = !!lastTask;
                 lastTask = value;
                 return !(ranBash && ranBatch); // break foreach
             }
             else if (value && value.taskSource === "bash")
             {
+                console.log("Run bash task: " + value.label);
+                console.log("   Folder: " + value.getFolder());
+                await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
                 await commands.executeCommand("taskExplorer.run", value);
                 await timeout(2000);
                 await workspace.getConfiguration().update("terminal.integrated.shell.windows",
@@ -732,10 +974,20 @@ suite("Task tests", () =>
                 await workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                           "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
                 ranBash = true;
+                await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
+                await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
+                await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
                 await commands.executeCommand("taskExplorer.openTerminal", value);
                 return !(ranBash && ranBatch); // break foreach
             }
         });
+
+        //
+        // Clear Last Tasks folder
+        //
+        await commands.executeCommand("taskExplorer.clearSpecialFolder", constants.LAST_TASKS_LABEL);
+        await commands.executeCommand("taskExplorer.clearSpecialFolder", constants.FAV_TASKS_LABEL);
+
         //
         // Find an npm file and run an "npm install"
         //
@@ -759,7 +1011,7 @@ suite("Task tests", () =>
     test("Test add to excludes", async function()
     {
         if (!rootPath) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         if (!teApi || !teApi.explorerProvider) {
@@ -774,7 +1026,7 @@ suite("Task tests", () =>
             if (value && value.taskSource === "grunt") {
                 await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile, false, false);
                 await teApi.explorerProvider?.invalidateTasksCache("grunt", value.taskFile.resourceUri);
-                return false; // continue forEachMapAsync()
+                return false; // break forEachMapAsync()
             }
         });
 
@@ -789,7 +1041,7 @@ suite("Task tests", () =>
     test("Invalidation tests", async function()
     {
         if (!rootPath || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
 
         if (!teApi || !teApi.explorerProvider || !workspace.workspaceFolders) {
@@ -882,7 +1134,7 @@ suite("Task tests", () =>
             fs.unlinkSync(file);
         }
         catch {}
-        await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
+        await teApi.explorerProvider.refresh("gulp", uri);
         await(timeout(1000));
         createGulpFile();
         await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
@@ -903,7 +1155,7 @@ suite("Task tests", () =>
         await teApi.explorerProvider.invalidateTasksCache("make", uri);
         await(timeout(1000));
         createMakeFile();
-        await teApi.explorerProvider.invalidateTasksCache("make", uri);
+        await teApi.explorerProvider.refresh("make", uri);
         await(timeout(100));
 
         //
@@ -921,7 +1173,7 @@ suite("Task tests", () =>
         await teApi.explorerProvider.invalidateTasksCache("batch", uri);
         await(timeout(1000));
         createBatchFile();
-        await teApi.explorerProvider.invalidateTasksCache("batch", uri);
+        await teApi.explorerProvider.refresh("batch", uri);
         await(timeout(100));
 
         console.log("    Running all other invalidations");
@@ -980,6 +1232,7 @@ suite("Task tests", () =>
         await configuration.updateWs("enableWorkspace", true);
 
         console.log("    Running global invalidation");
+        // await commands.executeCommand("taskExplorer.refresh");
         await teApi.explorerProvider.invalidateTasksCache();
 
         await timeout(1000); // wait for filesystem change events
@@ -995,7 +1248,7 @@ suite("Task tests", () =>
         await workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                   "C:\\Program Files\\Git\\bin\\bash.exe", ConfigurationTarget.Workspace);
         await timeout(1000);
-        await teApi.fileCache.buildCache("bash", "bash", "**/*.[Ss][Hh]", workspace.workspaceFolders[0], true);
+        await teApi.fileCache.buildCache("bash", "bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
     });
 
 
@@ -1025,7 +1278,7 @@ suite("Task tests", () =>
     test("Test show/hide favorite tasks", async function()
     {
         if (!rootPath || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
         if (!teApi?.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -1039,7 +1292,7 @@ suite("Task tests", () =>
     test("Test groups with separator", async function()
     {
         if (!rootPath || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
         if (!teApi?.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -1047,15 +1300,59 @@ suite("Task tests", () =>
         console.log("    Enable groups with separator and rebuild cache");
         await configuration.updateWs("groupWithSeparator", true);
         await configuration.updateWs("groupSeparator", "-");
+        await configuration.updateWs("groupMaxLevel", 5);
+
         await timeout(2000); // wait for filesystem change events
         await waitForCache();
     });
 
 
+    test("Test add to excludes after grouping", async function()
+    {
+        if (!rootPath) {
+            assert.fail("        ✘ Workspace folder does not exist");
+        }
+
+        if (!teApi || !teApi.explorerProvider) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
+        }
+
+        console.log("    Add to exclude after grouping"); // exclude the gulp taks file with the 5 tasks that use grouping
+
+        const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
+              gruntCt = taskItemsB4.length;
+
+        await forEachMapAsync(taskMap, async (value: TaskItem) =>
+        {
+            if (value && value.taskSource === "grunt")
+            {
+                let taskFile = value.taskFile;
+                while (taskFile.treeNodes.length === 1 && taskFile.treeNodes[0] instanceof TaskFile && !taskFile.isGroup)
+                {
+                    taskFile = taskFile.treeNodes[0];
+                }
+                if (taskFile && taskFile.isGroup)
+                {
+                    await commands.executeCommand("taskExplorer.addToExcludes", taskFile, false, false);
+                    await teApi.explorerProvider?.invalidateTasksCache("grunt", taskFile.resourceUri);
+                    return false; // break forEachMapAsync()
+                }
+            }
+        });
+
+        timeout(500);
+        const taskItems = await tasks.fetchTasks({ type: "grunt" });
+        timeout(500);
+        if (taskItems.length !== gruntCt - 7) { // grunt file that just got ignored had 7 tasks
+            assert.fail("Unexpected grunt task count (Found " + taskItems.length + " of " +
+                        (gruntCt - 7).toString() + ")");
+        }
+    });
+
     test("Test cancel rebuild cache", async function()
     {
         if (!rootPath || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
         if (!teApi?.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -1082,7 +1379,7 @@ suite("Task tests", () =>
     test("Test enable and disable views", async function()
     {
         if (!rootPath || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
         if (!teApi?.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -1098,7 +1395,7 @@ suite("Task tests", () =>
     test("Add and remove a workspace folder", async function()
     {
         if (!rootPath || !dirName) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("        ✘ Workspace folder does not exist");
         }
         if (!teApi?.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");

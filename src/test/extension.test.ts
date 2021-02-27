@@ -147,8 +147,18 @@ suite("Extension Tests", () =>
         // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
         //
         await configuration.updateWs("includeAnt", ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml", "**/hello.xml"]);
+        // Use update() here for coverage, since these two settings wont trigger any processing
+        await configuration.update("debug", true);
+        await configuration.update("debugLevel", 3);
         await configuration.updateWs("debug", true);
         await configuration.updateWs("debugLevel", 3);
+
+        await configuration.updateWs("useGulp", false);
+        await configuration.updateWs("useAnt", false);
+        await configuration.updateWs("groupSeparator", "-");
+        await configuration.updateWs("numLastTasks", 10);
+        await configuration.updateWs("groupMaxLevel", 1);
+
         //
         // Enabled all options, use workspace level so that running this test from Code itself
         // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
@@ -173,5 +183,8 @@ suite("Extension Tests", () =>
         await configuration.updateWs("groupSeparator", "-");
         await configuration.updateWs("showLastTasks", enable);
         await configuration.updateWs("keepTermOnStop", false);
+        await configuration.updateWs("readUserTasks", enable);
+        await configuration.updateWs("showFavoritesButton", enable);
+        await configuration.updateWs("showRunningTask", enable);
     }
 });

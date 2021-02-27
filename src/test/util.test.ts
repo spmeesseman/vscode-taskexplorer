@@ -5,6 +5,7 @@ import * as assert from "assert";
 import { workspace } from "vscode";
 import * as util from "../common/utils";
 import * as log from "../common/log";
+import { storage } from "../common/storage";
 
 
 suite("Util tests", () =>
@@ -97,7 +98,7 @@ suite("Util tests", () =>
     {
         const uri = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined;
         if (!uri) {
-            assert.fail("        ✘ Worksapce folder does not exist");
+            assert.fail("         ✘ Worksapce folder does not exist");
         }
         assert(util.getCwd(uri) !== undefined);
     });
@@ -161,7 +162,34 @@ suite("Util tests", () =>
             console.log("         ✔ Successfully located user data directory");
         }
         else {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
+            assert.fail("         ✘ Could not find user data path");
+        }
+    });
+
+    test("Get storage", async function()
+    {
+        if (storage)
+        {
+            await storage?.update("TEST_KEY", "This is a test");
+            assert(storage?.get<string>("TEST_KEY") === "This is a test");
+            console.log("         ✔ Successfully updated/read storage");
+            //
+            // tasks.tests will cover storage.update(key, defaultVal) w/ Last Tasks and Favs folders
+        }   //
+        else {
+            console.log("         ℹ Storage not initialized");
+        }
+    });
+
+    test("Get package manager", function()
+    {
+        const pkgMgr = util.getPackageManager();
+        if (pkgMgr) {
+            console.log("         ℹ Portable data path = " + pkgMgr);
+            console.log("         ✔ Successfully read package manager setting");
+        }
+        else {
+            assert.fail("         ✘ Task Explorer tree instance does not exist");
         }
     });
 

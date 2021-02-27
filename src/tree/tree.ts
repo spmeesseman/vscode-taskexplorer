@@ -32,6 +32,7 @@ class NoScripts extends TreeItem
         this.contextValue = "noscripts";
     }
 }
+const noScripts = new NoScripts();
 
 
 /**
@@ -62,7 +63,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         subscriptions.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => { await this.run(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => { await this.run(item, true, false); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem) => { await this.run(item, false, true); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args: string) => { await this.run(item, false, true, args); }, this));
         subscriptions.push(commands.registerCommand(name + ".runLastTask",  async () => { await this.runLastTask(); }, this));
         subscriptions.push(commands.registerCommand(name + ".stop",  (item: TaskItem) => { this.stop(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
@@ -576,9 +577,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         //
                         subfolder.addTreeNode(prevTaskFile); // addScript will set the group level on the TaskItem
                     }
-                    else {
-                        log.value("   defintion not found", `(${each.taskSource}) ${each.path}` , 1);
-                    }
                 }
                 subfolder?.addTreeNode(each); // addScript will set the group level on the TaskItem
             }
@@ -603,10 +601,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         log.write(logPad + "   rename grouped tasks", 1);
         for (const each of folder.taskFiles)
         {
-            if (!(each instanceof TaskFile)) {
-                continue;
+            if (each instanceof TaskFile) {
+                await this.renameGroupedTasks(each);
             }
-            await this.renameGroupedTasks(each);
         }
 
         //
@@ -1060,7 +1057,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 log.blank(1);
                 if (this.taskTree.length === 0)
                 {
-                    this.taskTree = [new NoScripts()];
+                    this.taskTree = [noScripts];
                 }
             }
         }
@@ -1175,6 +1172,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    /**
+     * @method getTaskItems
+     *
+     * Returns a flat mapped list of tree items, or the tre item specified by taskId.
+     *
+     * @param taskId Task ID
+     * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
+     * @param executeOpenForTests For running mocha tests only.
+     */
     public async getTaskItems(taskId: string | undefined, logPad = "", executeOpenForTests = false): Promise<Map<string, TaskItem> | TaskItem | undefined>
     {
         const me = this;
@@ -1823,7 +1829,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
-        if (taskItem.execution)
+        if (taskItem.task?.execution)
         {
             const terminal = this.getTerminal(taskItem);
             if (terminal)
@@ -2175,11 +2181,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (!taskItem || this.busy)
         {
             window.showInformationMessage("Busy, please wait...");
-            return;
         }
-
-        this.stop(taskItem);
-        await this.run(taskItem);
+        else {
+            this.stop(taskItem);
+            await this.run(taskItem);
+        }
     }
 
 
@@ -2207,7 +2213,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      * @param withArgs Whether or not to prompt for argumants
      * Note that only script type tasks use arguments (and Gradle, ref ticket #88)
      */
-    private async run(taskItem: TaskItem, noTerminal = false, withArgs = false)
+    private async run(taskItem: TaskItem, noTerminal = false, withArgs = false, args?: string)
     {
         if (!taskItem || this.busy)
         {
@@ -2218,7 +2224,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         log.value("   task name", taskItem.label, 2);
         if (withArgs === true)
 		{
-            await this.runWithArgs(taskItem);
+            await this.runWithArgs(taskItem, args, noTerminal);
 		}
         else if (taskItem.paused)
         {
@@ -2381,22 +2387,23 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      * @param noTerminal Whether or not to show the terminal
      * Note that the terminal will be shown if there is an error
      */
-    private async runWithArgs(taskItem: TaskItem, noTerminal?: boolean)
+    public async runWithArgs(taskItem: TaskItem, args?: string, noTerminal?: boolean)
     {
         if (taskItem.task && !(taskItem.task.execution instanceof CustomExecution))
         {
             const me = this;
             const opts: InputBoxOptions = { prompt: "Enter command line arguments separated by spaces"};
-            window.showInputBox(opts).then(async (str) =>
+
+            const _run = async (_args: string | undefined) =>
             {
-                if (str)
+                if (_args)
                 {
                     let newTask: Task | undefined = taskItem?.task;
                     if (newTask && taskItem.task) {
                         const def = taskItem.task.definition,
-                              folder = taskItem.getFolder();
+                                folder = taskItem.getFolder();
                         if (folder) {
-                            newTask = providers.get("script")?.createTask(def.script, undefined, folder, def.uri, str.trim().split(" "));
+                            newTask = providers.get("script")?.createTask(def.script, undefined, folder, def.uri, _args.trim().split(" "));
                             //
                             // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
                             // an instance of this task.
@@ -2412,7 +2419,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         }
                     }
                 }
-            });
+            };
+
+            if (!args) {
+                window.showInputBox(opts).then(async (str) => { _run(str); });
+            }
+            else {
+                await _run(args);
+            }
         }
         else {
             window.showInformationMessage("Custom execution tasks cannot have the cmd line altered");
@@ -2622,7 +2636,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
-        if (taskItem.execution)
+        const task = taskItem.task,        // taskItem.execution will not be set if the view hasnt been visible yet
+              exec = taskItem.execution || // this really would only occur in the tests
+                     tasks.taskExecutions.find(e => e.task.name === task?.name && e.task.source === task.source &&
+                     e.task.scope === task.scope && e.task.definition.path === task.definition.path);
+        if (exec)
         {
             if (configuration.get<boolean>("keepTermOnStop") === true)
             {
@@ -2646,7 +2664,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             else // a timeout to see if that makes it any better...
             {   //
                 setTimeout(() => {
-                    taskItem.execution?.terminate();
+                    exec.terminate();
                 }, 1);
             }
         }
