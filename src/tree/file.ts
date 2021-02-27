@@ -121,30 +121,30 @@ export default class TaskFile extends TreeItem
             this.nodePath = "";
         }
 
+        this.fileName = this.getFileNameFromSource(source, folder, taskDef, true);
+        if (folder.resourceUri)
+        {
+            if (relativePath && source !== "Workspace") {
+                this.resourceUri = Uri.file(path.join(folder.resourceUri.fsPath, relativePath, this.fileName));
+            }
+            else {
+                this.resourceUri = Uri.file(path.join(folder.resourceUri.fsPath, this.fileName));
+            }
+        } //
+         // No resource uri means this file is 'user tasks', and not associated to a workspace folder
+        //
+        else if (configuration.get<boolean>("readUserTasks")) {
+            this.resourceUri = Uri.file(path.join(util.getUserDataPath(logPad), this.fileName));
+            this.isUser = true;
+        }
+
         if (!group)
         {
             this.contextValue = "taskFile" + util.properCase(this.taskSource);
-            this.fileName = this.getFileNameFromSource(source, folder, taskDef, true);
-            if (folder.resourceUri)
-            {
-                if (relativePath && source !== "Workspace")
-                {
-                    this.resourceUri = Uri.file(path.join(folder.resourceUri.fsPath, relativePath, this.fileName));
-                } else
-                {
-                    this.resourceUri = Uri.file(path.join(folder.resourceUri.fsPath, this.fileName));
-                }
-            } //
-             // No resource uri means this file is 'user tasks', and not associated to a workspace folder
-            //
-            else if (configuration.get<boolean>("readUserTasks")) {
-                this.resourceUri = Uri.file(path.join(util.getUserDataPath(logPad), this.fileName));
-                this.isUser = true;
-            }
         }
-        else //
-        {   // When a grouped node is created, the definition for the first task is passed to this
-            // function.  Remove the filename part of tha path for this resource
+        else { //
+              // When a grouped node is created, the definition for the first task is passed to this
+             // function.  Remove the filename part of tha path for this resource
             //
             this.fileName = "group";      // change to name of directory
             // Use a custom toolip (default is to display resource uri)
@@ -156,6 +156,7 @@ export default class TaskFile extends TreeItem
         //
         // Set context icon
         //
+        this.iconPath = ThemeIcon.File;
         if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", this.taskSource + ".svg"))))
         {
             let src = this.taskSource;
@@ -171,10 +172,6 @@ export default class TaskFile extends TreeItem
                 light: context.asAbsolutePath(path.join("res", "sources", src + ".svg")),
                 dark: context.asAbsolutePath(path.join("res", "sources", src + ".svg"))
             };
-        }
-        else
-        {
-            this.iconPath = ThemeIcon.File;
         }
     }
 
