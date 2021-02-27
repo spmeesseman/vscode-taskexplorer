@@ -4,7 +4,6 @@
 **/.vscode
 **/.vscode-test
 **/coverage
-**/node_modules
 **/*.map
 **/*.ts
 dist/test/**
