@@ -49,7 +49,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private extensionContext: ExtensionContext;
     private name: string;
     private needsRefresh: any[] = [];
-    private taskTree: TaskFolder[] | TaskFile[] | NoScripts[] | null = null;
+    private taskTree: TaskFolder[] | NoScripts[] | null = null;
     private currentInvalidation: string | undefined;
     private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
     readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
@@ -2507,18 +2507,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (!taskItem || isFavorite) // refresh
             {
                 taskItem = undefined;
-                if (tree[treeIdx].label === label) {
+                if (tree[treeIdx]?.label === label) {
                     tree.splice(treeIdx, 1);
                 }
                 changed = true;
             }
 
-            if (!isFavorite && tree[0].label !== label)
+            if (!isFavorite && tree[0]?.label !== label)
             {
                 await this.createSpecialFolder(storeName, label, 0, false, "   ");
                 changed = true;
             }
-            else if (isFavorite && tree[favIdx].label !== label)
+            else if (isFavorite && tree[favIdx]?.label !== label)
             {
                 await this.createSpecialFolder(storeName, label, favIdx, true, "   ");
                 changed = true;
