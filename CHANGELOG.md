@@ -1,3 +1,10 @@
+## [2.0.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.5...v2.0.6) (2021-02-27)
+
+
+### Bug Fixes
+
+* v2.0.5 does not include required node_modules in package, extension does not load ([d9a9a02](https://github.com/spmeesseman/vscode-taskexplorer/commit/d9a9a02))
+
 ## [2.0.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.4...v2.0.5) (2021-02-27)
 
 
