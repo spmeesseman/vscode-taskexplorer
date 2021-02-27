@@ -2659,13 +2659,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         }, 300);
                     }
                     taskItem.paused = false;
-                }  //
-            }     // After vscode 1.50, sometimes terminate() caused a lock up, try
-            else // a timeout to see if that makes it any better...
-            {   //
-                setTimeout(() => {
-                    exec.terminate();
-                }, 1);
+                }
+            }
+            else {
+                exec.terminate();
             }
         }
     }
