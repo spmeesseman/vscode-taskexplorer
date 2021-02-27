@@ -43,11 +43,9 @@ export function camelCase(name: string | undefined, indexUpper: number)
  */
 export function existsInArray(arr: any[], item: any): boolean | number
 {
-    if (arr) {
-        for (let i = 0; i < arr.length; i++) {
-            if (item === arr[i]) {
-                return i;
-            }
+    for (let i = 0; i < arr.length; i++) {
+        if (item === arr[i]) {
+            return i;
         }
     }
     return false;
@@ -337,8 +335,7 @@ export function isExcluded(uriPath: string, logPad = "")
 
 export function isScriptType(source: string)
 {
-    return source === "bash" || source === "batch" || source === "nsis" || source === "perl" ||
-           source === "powershell" || source === "python" || source === "ruby";
+    return getScriptTaskTypes().includes(source);
 }
 
 

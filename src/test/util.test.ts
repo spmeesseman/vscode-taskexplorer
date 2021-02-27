@@ -20,69 +20,41 @@ suite("Util tests", () =>
 
     });
 
-    test("Turn logging on", () =>
+
+    test("Test utility methids general", async function()
     {
+        const uri = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined;
+        if (!uri) {
+            assert.fail("         ✘ Worksapce folder does not exist");
+        }
+
+        console.log("      Logging");
         assert(workspace.getConfiguration("taskExplorer").update("debug", true));
-    });
-
-    test("Log a blank to output window", () =>
-    {
         log.blank();
-    });
-
-    test("Log to output window", () =>
-    {
         log.write("        spmeesseman.vscode-taskexplorer");
-    });
-
-    test("Log value to output window", () =>
-    {
         log.value("        spmeesseman.vscode-taskexplorer", "true");
-    });
-
-    test("Log a null value to output window", () =>
-    {
         log.value("        spmeesseman.vscode-taskexplorer", null);
-    });
-
-    test("Log undefined value to output window", () =>
-    {
         log.value("        spmeesseman.vscode-taskexplorer", undefined);
-    });
-
-    test("Log error value to output window", () =>
-    {
         log.error("        spmeesseman.vscode-taskexplorer");
-    });
-
-    test("Log error array to output window", () =>
-    {
         log.error([ "        spmeesseman.vscode-taskexplorer",
                         "        spmeesseman.vscode-taskexplorer",
                         "        spmeesseman.vscode-taskexplorer" ]);
-    });
 
-    test("Test camel casing", () =>
-    {
+        console.log("      Camel casing");
         assert(util.camelCase("taskexplorer", 4) === "taskExplorer");
         assert(util.camelCase(undefined, 4) === undefined);
         assert(util.camelCase("testgreaterindex", 19) === "testgreaterindex");
         assert(util.camelCase("test", -1) === "test");
-    });
 
-    test("Test proper casing", () =>
-    {
+        console.log("      Proper casing");
         assert(util.properCase("taskexplorer") === "Taskexplorer");
         assert(util.properCase(undefined) === undefined);
-    });
 
-    test("Test script type", () =>
-    {
+        console.log("      Script type");
         assert(util.isScriptType("batch"));
-    });
+        assert(util.getScriptTaskTypes().length > 0);
 
-    test("Test array functions", async function()
-    {
+        console.log("      Array functions");
         const arr = [ 1, 2, 3, 4, 5 ];
         util.removeFromArray(arr, 3);
         await util.removeFromArrayAsync(arr, 1);
@@ -92,21 +64,17 @@ suite("Util tests", () =>
         assert(util.existsInArray(arr, 4) !== false);
         assert(util.existsInArray(arr, 3) === false);
         assert(util.existsInArray(arr, 1) === false);
-    });
 
-    test("Test get cwd", function()
-    {
-        const uri = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined;
-        if (!uri) {
-            assert.fail("         ✘ Worksapce folder does not exist");
-        }
+        console.log("      Get CWD");
         assert(util.getCwd(uri) !== undefined);
+
+        console.log("      Set a timeout");
+        assert(util.timeout(10));
+
+        console.log("      Get group separator");
+        assert (util.getGroupSeparator() === "-");
     });
 
-    test("Timeout", function()
-    {
-        assert(util.timeout(10));
-    });
 
     test("Asynchronous forEach", async function()
     {

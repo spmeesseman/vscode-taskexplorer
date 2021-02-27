@@ -76,7 +76,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update <packagename>"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | string, global: boolean, prompt: boolean) => { await this.addToExcludes(taskFile, global, prompt); }, this));
+        subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | string) => { await this.addToExcludes(taskFile); }, this));
         subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => { await this.addRemoveFavorite(taskItem); }, this));
         subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
 
@@ -96,17 +96,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      */
     private async addRemoveFavorite(taskItem: TaskItem)
     {
-        const favTasks = storage?.get<string[]>(constants.FAV_TASKS_STORE, []) || [];
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         const favId = this.getTaskItemId(taskItem);
 
-        log.methodStart("add/remove favorite", 1);
-
-        if (!taskItem) {
-            return;
-        }
-
-        log.value("   id", taskItem.id, 2);
-        log.value("   current fav count", favTasks.length, 2);
+        log.methodStart("add/remove favorite", 1, "", false, [
+            ["id", taskItem.id ], [ "current fav count", favTasks.length ]
+        ]);
 
         //
         // If this task exists in the favorites, remove it, if it doesnt, then add it
@@ -123,36 +118,27 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             // Update local storage for persistence
             //
-            await storage?.update(constants.FAV_TASKS_STORE, favTasks);
+            await storage.update(constants.FAV_TASKS_STORE, favTasks);
             //
             // Update
             //
             await this.showSpecialTasks(true, true, undefined, "   ");
         }
-
         log.methodDone("add/remove favorite", 1);
     }
 
 
-    private async addToExcludes(selection: TaskFile | string, global?: boolean, prompt?: boolean)
+    private async addToExcludes(selection: TaskFile | string)
     {
         const me = this;
-        let uri: Uri | undefined;
         let pathValue = "";
-
-        if (selection instanceof TaskFile)
-        {
-            uri = selection.resourceUri;
-            if (!uri && !selection.isGroup)
-            {
-                return;
-            }
-        }
+        let uri: Uri | undefined;
 
         log.methodStart("add to excludes", 1, "", true, [[ "global", global ]]);
 
         if (selection instanceof TaskFile)
         {
+            uri = selection.resourceUri;
             if (selection.isGroup)
             {
                 log.write("  file group");
@@ -183,45 +169,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
         log.value("   path value", pathValue, 2);
 
-        const saveExclude = async (str: string | undefined) =>
-        {
-            if (str)
-            {
-                let excludes: string[] = [];
-                const excludes2 = configuration.get<string[]>("exclude");
-                if (excludes2 && excludes2 instanceof Array) {
-                    excludes = excludes2;
-                }
-                else if (typeof excludes2 === "string") {
-                    excludes.push(excludes2);
-                }
-                const strs = str.split(",");
-                for (const s in strs) {
-                    if (strs.hasOwnProperty(s)) { // skip properties inherited from prototype
-                        util.pushIfNotExists(excludes, strs[s]);
-                    }
-                }
-                if (global !== false) {
-                    configuration.update("exclude", excludes);
-                }
-                else {
-                    configuration.updateWs("exclude", excludes);
-                }
-                await me.refresh(selection instanceof TaskFile ? selection.taskSource : false, uri);
+        let excludes: string[] = [];
+        const excludes2 = configuration.get<string[]>("exclude");
+        if (excludes2 && excludes2 instanceof Array) {
+            excludes = excludes2;
+        }
+        else if (typeof excludes2 === "string") {
+            excludes.push(excludes2);
+        }
+        const strs = pathValue.split(",");
+        for (const s in strs) {
+            if (strs.hasOwnProperty(s)) { // skip properties inherited from prototype
+                util.pushIfNotExists(excludes, strs[s]);
             }
-        };
+        }
 
-        if (selection instanceof TaskFile && prompt !== false)
-        {
-            const opts: InputBoxOptions = { prompt: "Add the following file to excluded tasks list?", value: pathValue };
-            window.showInputBox(opts).then(async str =>
-            {
-                await saveExclude(str);
-            });
-        }
-        else {
-            await saveExclude(pathValue);
-        }
+        configuration.updateWs("exclude", excludes);
+        // configuration.update("exclude", excludes);
+
+        await me.refresh(selection instanceof TaskFile ? selection.taskSource : false, uri);
 
         log.methodDone("add to excludes", 1);
     }
@@ -284,7 +250,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // The 'Last Tasks' folder will be 1st in the tree
         //
-        const lastTasks = storage?.get<string[]>(constants.LAST_TASKS_STORE, []) || [];
+        const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
         if (configuration.get<boolean>("showLastTasks") === true)
         {
             if (lastTasks && lastTasks.length > 0)
@@ -298,7 +264,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // The 'Favorites' folder will be 2nd in the tree (or 1st if configured to hide
         // the 'Last Tasks' folder)
         //
-        const favTasks = storage?.get<string[]>(constants.FAV_TASKS_STORE, []) || [];
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         if (favTasks && favTasks.length > 0)
         {
             favfolder = new TaskFolder(constants.FAV_TASKS_LABEL);
@@ -469,11 +435,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (choice === "Yes")
         {
             if (label === constants.FAV_TASKS_LABEL) {
-                await storage?.update(constants.FAV_TASKS_STORE, "");
+                await storage.update(constants.FAV_TASKS_STORE, []);
                 await this.showSpecialTasks(false, true);
             }
             else if (label === constants.LAST_TASKS_LABEL) {
-                await storage?.update(constants.LAST_TASKS_STORE, "");
+                await storage.update(constants.LAST_TASKS_STORE, []);
                 await this.showSpecialTasks(false);
             }
         }
@@ -495,7 +461,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      */
     private async createSpecialFolder(storeName: string, label: string, treeIndex: number, sort: boolean, logPad = "")
     {
-        const lTasks = storage?.get<string[]>(storeName, []) || [];
+        const lTasks = storage.get<string[]>(storeName, []);
         const folder = new TaskFolder(label);
 
         log.methodStart("create special tasks folder", 1, logPad, true, [
@@ -805,17 +771,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private findJsonDocumentPosition(documentText: string | undefined, taskItem?: TaskItem)
+    private findJsonDocumentPosition(documentText: string, taskItem: TaskItem)
     {
         const me = this;
         let inScripts = false;
         let inTasks = false;
         let inTaskLabel: any;
         let scriptOffset = 0;
-
-        if (!taskItem || !documentText) {
-            return 0;
-        }
 
         const visitor: JSONVisitor =
         {
@@ -945,7 +907,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (configuration.get<boolean>("showLastTasks") === true)
         {
-            const lastTasks = storage?.get<string[]>(constants.LAST_TASKS_STORE, []) || [];
+            const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
             if (util.existsInArray(lastTasks, this.getTaskItemId(taskItem)) !== false)
             {
                 if (this.taskTree[0].label === constants.LAST_TASKS_LABEL)
@@ -958,7 +920,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Fire change event for the 'Favorites' folder if the task exists there
         //
-        const favTasks = storage?.get<string[]>(constants.FAV_TASKS_STORE, []) || [];
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         if (util.existsInArray(favTasks, this.getTaskItemId(taskItem)) !== false)
         {
             if (this.taskTree[0].label === constants.FAV_TASKS_LABEL)
@@ -1195,13 +1157,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (!treeItems || treeItems.length === 0)
         {
             window.showInformationMessage("No tasks found!");
-            await storage?.update(constants.FAV_TASKS_STORE, []);
-            await storage?.update(constants.LAST_TASKS_STORE, []);
-            return;
-        }
-
-        if (!treeItems || treeItems.length === 0)
-        {
+            await storage.update(constants.FAV_TASKS_STORE, []);
+            await storage.update(constants.LAST_TASKS_STORE, []);
             return;
         }
 
@@ -1301,7 +1258,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     if (done) {
                         break;
                     }
-
                     if (item2 instanceof TaskFile && !item2.isGroup)
                     {
                         log.write(logPad + "   Task File: " + item2.path + item2.fileName);
@@ -2274,7 +2230,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
 
         let lastTaskId: string | undefined;
-        const lastTasks = storage?.get<string[]>(constants.LAST_TASKS_STORE, []);
+        const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
         if (lastTasks && lastTasks.length > 0)
         {
             lastTaskId = lastTasks[lastTasks.length - 1];
@@ -2297,8 +2253,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         else
         {
             window.showInformationMessage("Task not found!  Check log for details");
-            await util.removeFromArrayAsync(lastTasks || [], lastTaskId);
-            await storage?.update(constants.LAST_TASKS_STORE, lastTasks);
+            await util.removeFromArrayAsync(lastTasks, lastTaskId);
+            await storage.update(constants.LAST_TASKS_STORE, lastTasks);
             await this.showSpecialTasks(true);
         }
     }
@@ -2438,7 +2394,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         const storeName: string = !isFavorite ? constants.LAST_TASKS_STORE : constants.FAV_TASKS_STORE;
         const label: string = !isFavorite ? constants.LAST_TASKS_LABEL : constants.FAV_TASKS_LABEL;
-        const cstTasks = storage?.get<string[]>(storeName, []) || [];
+        const cstTasks = storage.get<string[]>(storeName, []);
         const taskId =  this.getTaskItemId(taskItem);
 
         log.methodStart("save task", 1, logPad, false, [
@@ -2467,7 +2423,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         cstTasks.push(taskId);
 
-        await storage?.update(storeName, cstTasks);
+        await storage.update(storeName, cstTasks);
 
         log.methodDone("save task", 1, logPad, false, [
             [ "new saved task ids", cstTasks.toString() ]

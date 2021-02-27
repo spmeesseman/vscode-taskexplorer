@@ -40,40 +40,33 @@ export default class TaskFolder extends TreeItem
 
     addTaskFile(taskFile: TaskFile|TaskItem)
     {
-        if (taskFile) {
-            this.taskFiles.push(taskFile);
-        }
+        this.taskFiles.push(taskFile);
     }
 
 
     insertTaskFile(taskFile: TaskFile|TaskItem, index: number)
     {
-        if (taskFile) {
-            this.taskFiles.splice(index, 0, taskFile);
-        }
+        this.taskFiles.splice(index, 0, taskFile);
     }
 
 
     removeTaskFile(taskFile: TaskFile|TaskItem)
     {
-        if (taskFile)
+        let idx = -1;
+        let idx2 = -1;
+
+        for (const each of this.taskFiles)
         {
-            let idx = -1;
-            let idx2 = -1;
-
-            for (const each of this.taskFiles)
+            idx++;
+            if (taskFile === each)
             {
-                idx++;
-                if (taskFile === each)
-                {
-                    idx2 = idx;
-                }
+                idx2 = idx;
             }
+        }
 
-            if (idx2 !== -1 && idx2 < this.taskFiles.length)
-            {
-                this.taskFiles.splice(idx2, 1);
-            }
+        if (idx2 !== -1 && idx2 < this.taskFiles.length)
+        {
+            this.taskFiles.splice(idx2, 1);
         }
     }
 }

@@ -55,7 +55,7 @@ suite("Task tests", () =>
         // so add it to the workspace setting as well
         //
         await configuration.updateWs("exclude", ["**/coveronly/**"]);
-        await commands.executeCommand("taskExplorer.addToExcludes", "**/tasks_test_ignore_/**", false);
+        await commands.executeCommand("taskExplorer.addToExcludes", "**/tasks_test_ignore_/**");
 
         //
         // Create the temporary project dirs
@@ -234,9 +234,19 @@ suite("Task tests", () =>
     });
 
 
+    test("Cover getItems on empty workspace", async function()
+    {
+        if (!teApi?.explorerProvider) {
+            assert.fail("        ✘ Workspace folder does not exist");
+        }
+        // Cover getitems before tree is built
+        await teApi.explorerProvider.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
+    });
+
+
     test("Create npm package files", async function()
     {
-        if (!rootPath || !dirName) {
+        if (!rootPath || !dirName || !dirNameL2 ||!ws2DirName) {
             assert.fail("        ✘ Workspace folder does not exist");
         }
 
@@ -245,6 +255,12 @@ suite("Task tests", () =>
 
         const file2 = path.join(dirName, "package.json");
         tempFiles.push(file2);
+
+        // const file3 = path.join(dirNameL2, "package.json");
+        // tempFiles.push(file3);
+
+        // const file4 = path.join(ws2DirName, "package.json");
+        // tempFiles.push(file4);
 
         fs.writeFileSync(
             file,
@@ -273,6 +289,11 @@ suite("Task tests", () =>
             "    }\r\n" +
             "}\r\n"
         );
+
+        // fs.writeFileSync(file3, "{ \"name\": \"vscode-taskexplorer2\" }\r\n");
+
+        // fs.writeFileSync(file4, "");
+
     });
 
 
@@ -343,7 +364,7 @@ suite("Task tests", () =>
             "    },\r\n" +
             "    {\r\n" +
             '        "type": "shell",\r\n' +
-            '        "label": "..\\test.bat",\r\n' +
+            '        "label": "test.bat",\r\n' +
             '        "command": "..\\test.bat",\r\n' +
             '        "group": "build",\r\n' +
             '        "problemMatcher": [\r\n' +
@@ -748,9 +769,6 @@ suite("Task tests", () =>
 
         console.log("    Constructing task tree");
 
-        // Cover getitems before tree is built
-        await teApi.explorerProvider.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
-
         if (!teApi || !teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
@@ -787,6 +805,17 @@ suite("Task tests", () =>
 
     test("Verify tree validity and open tasks for edit", async function()
     {
+        if (!teApi || !teApi.explorerProvider) {
+            assert.fail("        ✘ Task Explorer tree instance does not exist");
+        }
+        await teApi.explorerProvider.refresh();
+        await timeout(4000);
+        await waitForCache();
+    });
+
+
+    test("Verify tree validity and open tasks for edit", async function()
+    {
         if (!rootPath || !dirNameIgn || !dirName) {
             assert.fail("        ✘ Workspace folder does not exist");
         }
@@ -801,7 +830,7 @@ suite("Task tests", () =>
         console.log("    Scan task tree for tasks");
 
         taskMap = await teApi.explorerProvider.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
-
+console.log(taskMap);
         //
         // Find all created tasks in the task tree and ensure the counts are correct.
         //
@@ -896,7 +925,7 @@ suite("Task tests", () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
-        this.timeout(60 * 1000);
+        this.timeout(75 * 1000);
 
         //
         // Just find and task, a batch task, and run all commands on it
@@ -912,8 +941,10 @@ suite("Task tests", () =>
                     await commands.executeCommand("taskExplorer.open", value);
                     await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
                     await configuration.updateWs("keepTermOnStop", true);
+                    await configuration.updateWs("clickAction", "Execute");
                     await commands.executeCommand("taskExplorer.run", lastTask);
                     await timeout(1000);
+                    await configuration.updateWs("clickAction", "Open");
                     await commands.executeCommand("taskExplorer.pause", value);
                     await timeout(1000);
                     await commands.executeCommand("taskExplorer.run", value);
@@ -925,7 +956,7 @@ suite("Task tests", () =>
                     value.taskFile.removeTreeNode(value);
                     await commands.executeCommand("taskExplorer.runLastTask");
                     await commands.executeCommand("taskExplorer.stop", value);
-                    value.taskFile.addTreeNode(value);
+                    value.taskFile.addTreeNode(value); // remove fav coverage
                 }
                 await configuration.updateWs("keepTermOnStop", false);
                 await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
@@ -937,7 +968,9 @@ suite("Task tests", () =>
                 await commands.executeCommand("taskExplorer.run", value);
                 await timeout(250);
                 await commands.executeCommand("taskExplorer.pause", value);
+                await configuration.updateWs("clickAction", "Execute");
                 await commands.executeCommand("taskExplorer.run", value);
+                await configuration.updateWs("clickAction", "Open");
                 await timeout(250);
                 await commands.executeCommand("taskExplorer.openTerminal", value);
                 await commands.executeCommand("taskExplorer.pause", value);
@@ -952,6 +985,7 @@ suite("Task tests", () =>
                 await commands.executeCommand("taskExplorer.runNoTerm", value);
                 await timeout(250);
                 await commands.executeCommand("taskExplorer.stop", value);
+                await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value); // remove fav coverage
                 if (lastTask) {
                     await commands.executeCommand("taskExplorer.openTerminal", lastTask);
                 }
@@ -965,11 +999,11 @@ suite("Task tests", () =>
                 console.log("   Folder: " + value.getFolder()?.name);
                 await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
                 await commands.executeCommand("taskExplorer.run", value);
-                await timeout(2000);
+                await timeout(1000);
                 await workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                           "bash.exe", ConfigurationTarget.Workspace);
                 await commands.executeCommand("taskExplorer.run", value);
-                await timeout(2000);
+                await timeout(1000);
                 await workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                           "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
                 ranBash = true;
@@ -991,9 +1025,13 @@ suite("Task tests", () =>
         // Find an npm file and run an "npm install"
         //
         console.log("    Run npm install");
+        await configuration.updateWs("clickAction", "Open");
         let npmRan = false;
-        await forEachMapAsync(taskMap, async (value: TaskItem) =>  {
-            if (value && value.taskSource === "npm") {
+        await forEachMapAsync(taskMap, async (value: TaskItem) =>
+        {
+            if (value && value.taskSource === "npm")
+            {
+                // await commands.executeCommand("taskExplorer.open", value);
                 await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
                 npmRan = true;
                 return false; // break foreach
@@ -1003,6 +1041,15 @@ suite("Task tests", () =>
             console.log("        ℹ Running npm install in local testing env");
             // TODO - how to run with local test ran in vscode dev host?
             // await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
+            // const npmTasks = await tasks.fetchTasks({ type: "npm" });
+            // if (npmTasks)
+            // {
+            //     for (const npmTask of npmTasks)
+            //     {
+            //         console.log(npmTask.name);
+            //         await commands.executeCommand("taskExplorer.open", npmTask);
+            //     }
+            // }
         }
     });
 
@@ -1023,7 +1070,7 @@ suite("Task tests", () =>
         console.log("    Simulate add to exclude");
         await forEachMapAsync(taskMap, async (value: TaskItem) =>  {
             if (value && value.taskSource === "grunt") {
-                await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile, false, false);
+                await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile);
                 await teApi.explorerProvider?.invalidateTasksCache("grunt", value.taskFile.resourceUri);
                 return false; // break forEachMapAsync()
             }
@@ -1332,7 +1379,7 @@ suite("Task tests", () =>
                 }
                 if (taskFile && taskFile.isGroup)
                 {
-                    await commands.executeCommand("taskExplorer.addToExcludes", taskFile, false, false);
+                    await commands.executeCommand("taskExplorer.addToExcludes", taskFile);
                     await teApi.explorerProvider?.invalidateTasksCache("grunt", taskFile.resourceUri);
                     return false; // break forEachMapAsync()
                 }

@@ -158,6 +158,7 @@ suite("Extension Tests", () =>
         await configuration.updateWs("groupSeparator", "-");
         await configuration.updateWs("numLastTasks", 10);
         await configuration.updateWs("groupMaxLevel", 1);
+        await configuration.updateWs("clickAction", "Open");
 
         //
         // Enabled all options, use workspace level so that running this test from Code itself
