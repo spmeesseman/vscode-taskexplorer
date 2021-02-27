@@ -13,10 +13,10 @@ class Configuration
     private _onDidChange = new EventEmitter<ConfigurationChangeEvent>();
 
 
-    get onDidChange(): Event<ConfigurationChangeEvent>
-    {
-        return this._onDidChange.event;
-    }
+    // get onDidChange(): Event<ConfigurationChangeEvent>
+    // {
+    //     return this._onDidChange.event;
+    // }
 
 
     constructor()
@@ -28,14 +28,11 @@ class Configuration
 
     private onConfigurationChanged(event: ConfigurationChangeEvent)
     {
-        if (!event.affectsConfiguration(extensionName))
+        if (event.affectsConfiguration(extensionName))
         {
-            return;
+            this.configuration = workspace.getConfiguration(extensionName);
+            this._onDidChange.fire(event);
         }
-
-        this.configuration = workspace.getConfiguration(extensionName);
-
-        this._onDidChange.fire(event);
     }
 
 
@@ -57,17 +54,17 @@ class Configuration
     }
 
 
-    public updateWsf(section: string, value: any, uri?: Uri): Thenable<void>
-    {
-        uri = uri || (workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined);
-        return workspace.getConfiguration(extensionName, uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
-    }
+    // public updateWsf(section: string, value: any, uri?: Uri): Thenable<void>
+    // {
+    //     uri = uri || (workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined);
+    //     return workspace.getConfiguration(extensionName, uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
+    // }
 
 
-    public inspect(section: string)
-    {
-        return this.configuration.inspect(section);
-    }
+    // public inspect(section: string)
+    // {
+    //     return this.configuration.inspect(section);
+    // }
 
 }
 

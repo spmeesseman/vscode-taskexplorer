@@ -23,14 +23,10 @@ class Storage
 
     public get<T>(key: string, defaultValue?: T): T | undefined
     {
-        if (key) {
-            if (defaultValue) {
-                return this.storage.get<T>(key, defaultValue);
-            }
-            else {
-                return this.storage.get(key);
-            }
+        if (defaultValue) {
+            return this.storage.get<T>(key, defaultValue);
         }
+        return this.storage.get<T>(key);
     }
 
     public async update(key: string, value: any)

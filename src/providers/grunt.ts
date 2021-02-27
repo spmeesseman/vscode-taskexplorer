@@ -16,24 +16,11 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
     {
-        const getCommand = (folder: WorkspaceFolder, cmd: string): string =>
-        {
-            // let grunt = 'folder.uri.fsPath + "/node_modules/.bin/grunt";
-            const grunt = "grunt";
-            // if (process.platform === 'win32') {
-            //     grunt = folder.uri.fsPath + "\\node_modules\\.bin\\grunt.cmd";
-            // }
-            // if (workspace.getConfiguration('taskExplorer').get('pathToGrunt')) {
-            //     grunt = workspace.getConfiguration('taskExplorer').get('pathToGrunt');
-            // }
-            return grunt;
-        };
-
-        const def = this.getDefaultDefinition(target, folder, uri);
-        const cwd = path.dirname(uri.fsPath);
-        const args = [ getCommand(folder, cmd), target ];
-        const options = { cwd };
-        const execution = new ShellExecution("npx", args, options);
+        const def = this.getDefaultDefinition(target, folder, uri),
+              cwd = path.dirname(uri.fsPath),
+              args = [ "grunt", target ],
+              options = { cwd },
+              execution = new ShellExecution("npx", args, options);
 
         return new Task(def, folder, target, "grunt", execution, "$msCompile");
     }

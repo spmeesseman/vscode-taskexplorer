@@ -78,11 +78,7 @@ export async function forEachMapAsync(map: any, callback: any)
 
 export function getCwd(uri: Uri): string
 {
-    let dir = uri.fsPath.substring(0, uri.fsPath.lastIndexOf("\\") + 1);
-    if (process.platform !== "win32") {
-        dir = uri.fsPath.substring(0, uri.fsPath.lastIndexOf("/") + 1);
-    }
-    return dir;
+    return uri.fsPath.substring(0, uri.fsPath.lastIndexOf(path.sep) + 1);
 }
 
 

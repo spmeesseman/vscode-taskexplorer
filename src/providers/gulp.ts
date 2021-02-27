@@ -20,7 +20,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     {
         const def = this.getDefaultDefinition(target, folder, uri);
         const cwd = path.dirname(uri.fsPath);
-        const args = [ this.getCommand(), target ];
+        const args = [ "gulp", target ];
         const options = { cwd };
         const execution = new ShellExecution("npx", args, options);
 
@@ -105,7 +105,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         {
             let stdout: Buffer | undefined;
             try {
-                stdout = execSync("npx " + this.getCommand() + " --tasks", {
+                stdout = execSync("npx gulp --tasks", {
                     cwd: path.dirname(fsPath)
                 });
             }
@@ -133,23 +133,6 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         log.methodDone("find gulp targets", 1, logPad, true);
 
         return scripts;
-    }
-
-
-    private getCommand(): string
-    {
-        const gulp = "gulp";
-        // let gulp = folder.uri.fsPath + "/node_modules/.bin/gulp";
-        // if (process.platform === 'win32') {
-        //     gulp = folder.uri.fsPath + "\\node_modules\\.bin\\gulp.cmd";
-        // }
-        // if (relativePath) {
-        //     gulp += (' --gulpfile ' + path.join(relativePath, 'gulpfile.js'));
-        // }
-        // if (workspace.getConfiguration('taskExplorer').get('pathToGulp')) {
-        //     gulp = workspace.getConfiguration('taskExplorer').get('pathToGulp');
-        // }
-        return gulp;
     }
 
 

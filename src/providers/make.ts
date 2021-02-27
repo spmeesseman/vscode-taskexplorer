@@ -52,9 +52,12 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             }
             if (configuration.get("pathToMake")) {
                 make = configuration.get("pathToMake");
+                //
+                // Ref ticket #138 - temp logging
+                //
                 log.value("   set make program from settings", make, 5, logPad);
             }
-            log.value("   set make program from settings", make, 5, logPad);
+            log.value("   make program", make, 5, logPad);
             return make;
         };
 
