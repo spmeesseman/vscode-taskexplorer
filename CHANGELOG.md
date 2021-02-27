@@ -1,3 +1,31 @@
+## [2.0.5](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.4...v2.0.5) (2021-02-27)
+
+
+### Bug Fixes
+
+* add to favorites fails if there is only one workspace folder and no tasks exist in the last tasks folder ([6456148](https://github.com/spmeesseman/vscode-taskexplorer/commit/6456148))
+* adding a grouped node to excludes via context menu isnt working, it has be done at the root node ([ce4ad76](https://github.com/spmeesseman/vscode-taskexplorer/commit/ce4ad76))
+* broken async on add/remove favorite ([c4cf8ab](https://github.com/spmeesseman/vscode-taskexplorer/commit/c4cf8ab))
+* manually stopping a task at the instant it finishes can cause extension to stop responding ([4e84592](https://github.com/spmeesseman/vscode-taskexplorer/commit/4e84592))
+* npm install tasks are showing up for subfolders containg a package.json, npm management tasks should only showin file node context menu ([1712966](https://github.com/spmeesseman/vscode-taskexplorer/commit/1712966))
+* regression - removing a workspace folder causes extension to stop responding ([4703ebb](https://github.com/spmeesseman/vscode-taskexplorer/commit/4703ebb))
+
+
+### Build System
+
+* initial preparation for webpack build ([e7cedef](https://github.com/spmeesseman/vscode-taskexplorer/commit/e7cedef))
+
+
+### Code Refactoring
+
+* additional logging [references [#138](https://github.com/spmeesseman/vscode-taskexplorer/issues/138)] ([359bf37](https://github.com/spmeesseman/vscode-taskexplorer/commit/359bf37))
+* improve logging indentation for better readability ([e35a80e](https://github.com/spmeesseman/vscode-taskexplorer/commit/e35a80e))
+
+
+### Documentation
+
+* jsdoc commenting ([3783548](https://github.com/spmeesseman/vscode-taskexplorer/commit/3783548))
+
 ## [2.0.4](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.3...v2.0.4) (2021-02-20)
 
 
