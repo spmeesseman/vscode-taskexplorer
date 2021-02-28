@@ -53,7 +53,7 @@ export function isLoggingEnabled()
 }
 
 
-export function methodStart(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: [string, any][], color?: LogColor)
+export function methodStart(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][], color?: LogColor)
 {
     if (msg === null || msg === undefined) {
         return;
@@ -76,7 +76,7 @@ export function methodStart(msg: string, level?: number, logPad = "", doLogBlank
 }
 
 
-export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: [string, any][])
+export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][])
 {
     if (msg === null || msg === undefined) {
         return;
