@@ -150,18 +150,18 @@ export async function buildCache(taskType: string, fileGlob: string, wsfolder?: 
 {
     const taskAlias = !util.isScriptType(taskType) ? taskType : "script";
 
-    logBuildCache(taskType, taskAlias, fileGlob, wsfolder, setCacheBuilding);
+    log.methodStart("build file cache", 2, "", true, [
+        [ "folder", !wsfolder ? "entire workspace" : wsfolder.name ], [ "task type", taskType ],
+        [ "task alias", taskAlias ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
+    ]);
 
     if (!filesCache.get(taskAlias)) {
         filesCache.set(taskAlias, new Set());
     }
-    const fCache = filesCache.get(taskAlias);
-    if (!fCache) {
-        return;
-    }
+    const fCache = filesCache.get(taskAlias),
+          dispTaskType = util.properCase(taskType);
 
-    const dispTaskType = util.properCase(taskType);
-    if (!dispTaskType) {
+    if (!fCache || !dispTaskType) {
         return;
     }
 
@@ -226,11 +226,12 @@ export async function buildCache(taskType: string, fileGlob: string, wsfolder?: 
     //
     disposeStatusBarSpace(statusBarSpace);
 
-    log.write("Cache building complete", 1);
     if (setCacheBuilding) {
         cancel = false;           // reset flag
         cacheBuilding = false;    // reset flag
     }
+
+    log.methodDone("build file cache", 2, "", true);
 }
 
 
@@ -349,18 +350,6 @@ function getStatusString(msg: string, statusLength = 0)
         return "$(loading~spin) " + msg;
     }
     return "";
-}
-
-
-function logBuildCache(taskType: string, taskAlias: string, fileGlob: string, wsfolder: WorkspaceFolder | undefined, setCacheBuilding: boolean)
-{
-    log.blank(2);
-    log.write("Start cache building", 2);
-    log.value("   folder", !wsfolder ? "entire workspace" : wsfolder.name, 2);
-    log.value("   task type", taskType, 2);
-    log.value("   task alias", taskAlias, 2);
-    log.value("   blob", fileGlob, 2);
-    log.value("   setCacheBuilding", setCacheBuilding.toString(), 2);
 }
 
 
