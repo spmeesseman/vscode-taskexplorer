@@ -1,3 +1,10 @@
+## [2.0.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.6...v2.0.7) (2021-02-28)
+
+
+### Bug Fixes
+
+* npm file nodes are appearing even if npm tasks are disabled in settings. [fixes [#144](https://github.com/spmeesseman/vscode-taskexplorer/issues/144)] ([d76756b](https://github.com/spmeesseman/vscode-taskexplorer/commit/d76756b))
+
 ## [2.0.6](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.5...v2.0.6) (2021-02-27)
 
 
