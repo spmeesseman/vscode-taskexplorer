@@ -276,9 +276,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         for (const each of tasksList)
         {
-            taskCt++;
             log.blank(1);
-            log.write("   Processing task " + (++taskCt).toString() + " of " + tasksList.length.toString(), 1, logPad);
+            log.write("   Processing task " + (taskCt++).toString() + " of " + tasksList.length.toString(), 1, logPad);
             this.buildTaskTreeList(each, folders, files, ltfolder, favfolder, lastTasks, favTasks, logPad + "   ");
         }
 
@@ -331,7 +330,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             scopeName: string;
 
         log.methodStart("build task tree list", 2, logPad, true, [
-            [ "name", each.name ], [ "source", each.source ], [ "scope", each.scope ], [ "scope", each.scope ],
+            [ "name", each.name ], [ "source", each.source ], [ "scope", each.scope ],
             [ "definition type", each.definition.type ], [ "definition path", each.definition.path ]
         ]);
 
@@ -1614,6 +1613,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (!task.definition.uri && (task.source === "gulp" || task.source === "grunt"))
         {
+            log.write(`   skipping vscode provided ${task.source} task`, 2, logPad);
             return false;
         }
 
@@ -1630,6 +1630,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 relativePath = path.dirname(task.name.substring(task.name.indexOf(" - ") + 3));
                 if (util.isExcluded(path.join(task.scope.uri.path, relativePath)))
                 {
+                    log.write("   skipping this tsc task (remapped subfolder)", 2, logPad);
                     return false;
                 }
                 return relativePath;
@@ -1643,20 +1644,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (settingName === "enableApp-publisher") {
             settingName = "enableAppPublisher";
         }
+        const srcEnabled = configuration.get(settingName);
 
         const isNpmInstallTask = this.isNpmInstallTask(task);
-        if ((configuration.get(settingName) || !this.isWorkspaceFolder(task.scope)) && !isNpmInstallTask)
+        if ((srcEnabled || !this.isWorkspaceFolder(task.scope)) && !isNpmInstallTask)
         {
             return true;
         }
 
-        log.write("   Skipping", 1, logPad);
-        log.value("   enabled", configuration.get(settingName), 1, logPad);
-        log.value("   is npm install task", isNpmInstallTask, 1, logPad);
+        log.value("   enabled in settings", configuration.get(settingName), 2, logPad);
+        log.value("   is npm install task", isNpmInstallTask, 2, logPad);
 
-        if (isNpmInstallTask) {
+        if (isNpmInstallTask && srcEnabled) {
             return "npm-install";
         }
+        log.write("   skipping this task", 2, logPad);
 
         return false;
     }
