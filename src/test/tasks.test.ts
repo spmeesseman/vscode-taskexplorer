@@ -830,7 +830,7 @@ suite("Task tests", () =>
         console.log("    Scan task tree for tasks");
 
         taskMap = await teApi.explorerProvider.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
-console.log(taskMap);
+
         //
         // Find all created tasks in the task tree and ensure the counts are correct.
         //
