@@ -1857,7 +1857,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *     "visible-event"
      *     false|null|undefined
      *
-     * Can also be one of the task types (FileSystemWatcher event):
+     * Can also be one of the task types FileSystemWatcher event):
      *
      *     "ant"
      *     "app-publisher"
