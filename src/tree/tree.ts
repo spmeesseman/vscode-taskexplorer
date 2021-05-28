@@ -991,7 +991,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 // and add the new tasks from VSCode into the tasks list.
                 //
                 const toRemove: Task[] = [];
-                const taskItems = await tasks.fetchTasks({ type: this.currentInvalidation });
+                const taskItems = await tasks.fetchTasks({
+                    type: !util.isScriptType(this.currentInvalidation) ? this.currentInvalidation : "script"
+                });
                 for (const t of this.tasks)
                 {   //
                     // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
