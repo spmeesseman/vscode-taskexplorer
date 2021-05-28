@@ -1,3 +1,16 @@
+# [2.1.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.7...v2.1.0) (2021-05-28)
+
+
+### Bug Fixes
+
+* adding a new script type task file causes explorer to stop responding ([9551467](https://github.com/spmeesseman/vscode-taskexplorer/commit/9551467))
+* script type task files that are located in same folder always 'open' same file ([4716e66](https://github.com/spmeesseman/vscode-taskexplorer/commit/4716e66))
+
+
+### Features
+
+* add app-publisher task 'View Pending Changelog' ([4653c0d](https://github.com/spmeesseman/vscode-taskexplorer/commit/4653c0d))
+
 ## [2.0.7](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.6...v2.0.7) (2021-02-28)
 
 
