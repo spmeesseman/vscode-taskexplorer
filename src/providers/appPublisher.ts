@@ -97,6 +97,13 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
             }
         };
 
+        const kindChangeLog: TaskExplorerDefinition = {
+            ...defaultDef,
+            ...{
+                cmdLine: "npx app-publisher -p ps --no-ci --changelog-only",
+            }
+        };
+
         const kindDry: TaskExplorerDefinition = {
             ...defaultDef,
             ...{
@@ -123,6 +130,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         //
         const executionRepublish = kindRepublish.cmdLine ? new ShellExecution(kindRepublish.cmdLine, options) : undefined;
         const executionEmail = kindEmail.cmdLine ? new ShellExecution(kindEmail.cmdLine, options) : undefined;
+        const executionChangeLog = kindChangeLog.cmdLine ? new ShellExecution(kindChangeLog.cmdLine, options) : undefined;
         const executionPromptVersion = kindPromptVersion.cmdLine ? new ShellExecution(kindPromptVersion.cmdLine, options) : undefined;
         const executionPublish = defaultDef.cmdLine ? new ShellExecution(defaultDef.cmdLine, options) : undefined;
         const executionMantis = kindMantis.cmdLine ? new ShellExecution(kindMantis.cmdLine, options) : undefined;
@@ -131,11 +139,12 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         log.methodDone("read app-ublisher file uri tasks", 1, logPad, true);
 
         return [ new Task(kindDry, folder, "Dry Run", "app-publisher", executionDry, undefined),
-                new Task(defaultDef, folder, "Publish", "app-publisher", executionPublish, undefined),
-                new Task(kindRepublish, folder, "Re-publish", "app-publisher", executionRepublish, undefined),
-                new Task(kindMantis, folder, "Publish Mantis Release", "app-publisher", executionMantis, undefined),
-                new Task(kindEmail, folder, "Send Release Email", "app-publisher", executionEmail, undefined),
-                new Task(kindPromptVersion, folder, "Publish (Prompt Version)", "app-publisher", executionPromptVersion, undefined) ];
+                 new Task(defaultDef, folder, "Publish", "app-publisher", executionPublish, undefined),
+                 new Task(kindRepublish, folder, "Re-publish", "app-publisher", executionRepublish, undefined),
+                 new Task(kindMantis, folder, "Publish Mantis Release", "app-publisher", executionMantis, undefined),
+                 new Task(kindEmail, folder, "Send Release Email", "app-publisher", executionEmail, undefined),
+                 new Task(kindPromptVersion, folder, "Publish (Prompt Version)", "app-publisher", executionPromptVersion, undefined),
+                 new Task(kindEmail, folder, "View Pending Changelog", "app-publisher", executionChangeLog, undefined) ];
     }
 
 }
