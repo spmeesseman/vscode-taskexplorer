@@ -1752,7 +1752,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
-        const uri = selection.taskFile.resourceUri;
+        const uri = !util.isScriptType(selection.taskSource) ?
+                    selection.taskFile.resourceUri : Uri.file(selection.task?.definition.uri.fsPath);
 
         if (uri)
         {
