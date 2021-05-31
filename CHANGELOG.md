@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.1.0...v2.2.0) (2021-05-31)
+
+
+### Features
+
+* add support for maven - closes [#107](https://github.com/spmeesseman/vscode-taskexplorer/issues/107) ([1f90d1b](https://github.com/spmeesseman/vscode-taskexplorer/commit/1f90d1b))
+
 # [2.1.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.0.7...v2.1.0) (2021-05-28)
 
 
