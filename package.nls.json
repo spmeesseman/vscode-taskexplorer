@@ -81,7 +81,7 @@
 	"config.taskExplorer.enableNsis": "Nullsoft Installer - Enable",
 	"config.taskExplorer.enableNsisDsc": "Enable/show Nullsoft Installer scripts as tasks.",
 	"config.taskExplorer.pathToNsis": "Nullsoft Installer - Path",
-	"config.taskExplorer.pathToNsisDsc": "The path to the nsis program, if not registered in system path.",
+	"config.taskExplorer.pathToNsisDsc": "The path to the makensis program, if not registered in system path.",
 
 	"config.taskExplorer.enablePowershell": "Powershell - Enable",
 	"config.taskExplorer.enablePowershellDsc": "Enable/show powershell scripts as tasks.",
@@ -92,6 +92,11 @@
 	"config.taskExplorer.enableMakeDsc": "Enable/show makefiles as tasks.",
 	"config.taskExplorer.pathToMake": "Make - Path",
 	"config.taskExplorer.pathToMakeDsc": "The path to the make program, if not registered in system path.",
+
+	"config.taskExplorer.enableMaven": "Maven - Enable",
+	"config.taskExplorer.enableMavrnDsc": "Enable/show maven lifecycle as tasks.",
+	"config.taskExplorer.pathToMaven": "Maven - Path",
+	"config.taskExplorer.pathToMavenDsc": "The path to the mvn program, if not registered in system path.",
 
 	"config.taskExplorer.enableTsc": "Typescript - Enable",
 	"config.taskExplorer.enableTscDsc": "Enable/show tsc node with npm tasks.",

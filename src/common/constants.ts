@@ -13,6 +13,7 @@ const constants: IDictionary<string> =
     USER_TASKS_LABEL: "User Tasks",
     GLOB_ANT: "**/[Bb][Uu][Ii][Ll][Dd].[Xx][Mm][Ll]",
     GLOB_APPPUBLISHER: "**/.publishrc*",
+    GLOB_MAVEN: "**/pom.xml",
     GLOB_BASH: "**/*.[Ss][Hh]",
     GLOB_BATCH: "**/*.{[Bb][Aa][Tt],[Cc][Mm][Dd]}",
     GLOB_GULP: "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].{[Jj][Ss],[Tt][Ss],[Mm][Jj][Ss],[Bb][Aa][Bb][Ee][Ll].[Jj][Ss]}",

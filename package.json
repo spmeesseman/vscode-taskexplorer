@@ -1138,6 +1138,12 @@
                     "title": "%config.taskExplorer.enableMake%",
                     "description": "%config.taskExplorer.enableMakeDsc%"
                 },
+                "taskExplorer.enableMaven": {
+                    "type": "boolean",
+                    "default": true,
+                    "title": "%config.taskExplorer.enableMaven%",
+                    "description": "%config.taskExplorer.enableMavenDsc%"
+                },
                 "taskExplorer.enableWorkspace": {
                     "type": "boolean",
                     "default": true,
@@ -1208,6 +1214,12 @@
                     "default": "nmake",
                     "title": "%config.taskExplorer.pathToMake%",
                     "description": "%config.taskExplorer.pathToMakeDsc%"
+                },
+                "taskExplorer.pathToMaven": {
+                    "type": "string",
+                    "default": "mvn",
+                    "title": "%config.taskExplorer.pathToMaven%",
+                    "description": "%config.taskExplorer.pathToMavenDsc%"
                 },
                 "taskExplorer.pathToNsis": {
                     "type": "string",
@@ -1362,7 +1374,8 @@
                         "**/target/**",
                         "**/test/**",
                         "**/third_party/**",
-                        "**/vendor/**"
+                        "**/vendor/**",
+                        "**/work/**"
                     ],
                     "description": "%config.taskExplorer.exclude%"
                 },
@@ -1521,6 +1534,46 @@
             },
             {
                 "type": "app-publisher",
+                "required": [
+                    "cmdLine"
+                ],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.task.script%"
+                    },
+                    "target": {
+                        "type": "string",
+                        "description": "%taskdef.task.target%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.task.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.task.fileUri%"
+                    },
+                    "taskItemId": {
+                        "type": "string",
+                        "description": "%taskdef.task.taskItemId%"
+                    },
+                    "takesArgs": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.takesArgs%"
+                    },
+                    "cmdLine": {
+                        "type": "string",
+                        "description": "%taskdef.task.cmdLine%"
+                    }
+                }
+            },
+            {
+                "type": "maven",
                 "required": [
                     "cmdLine"
                 ],

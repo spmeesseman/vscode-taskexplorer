@@ -12,6 +12,7 @@ import {
 import { TaskTreeDataProvider } from "./tree/tree";
 import { AntTaskProvider } from "./providers/ant";
 import { MakeTaskProvider } from "./providers/make";
+import { MavenTaskProvider } from "./providers/maven";
 import { ScriptTaskProvider } from "./providers/script";
 import { GradleTaskProvider } from "./providers/gradle";
 import { GruntTaskProvider } from "./providers/grunt";
@@ -371,7 +372,7 @@ async function registerFileWatchers(context: ExtensionContext)
 
 export async function refreshTree(taskType?: string, uri?: Uri)
 {
-    let refreshedTasks = false;
+    // let refreshedTasks = false;
     // window.setStatusBarMessage("$(loading) Task Explorer - Refreshing tasks...");
 
     //
@@ -420,6 +421,7 @@ function registerTaskProviders(context: ExtensionContext)
     registerTaskProvider("grunt", new GruntTaskProvider(), context);                  // Gulp JavaScript Toolkit
     registerTaskProvider("gulp", new GulpTaskProvider(), context);                    // Grunt JavaScript Task Runner
     registerTaskProvider("make", new MakeTaskProvider(), context);                    // C/C++ Makefile
+    registerTaskProvider("maven", new MavenTaskProvider(), context);                  // Apache Maven Toolset
     //
     // The 'script' provider handles all file based 'scripts', e.g. batch files, bash, powershell, etc
     //

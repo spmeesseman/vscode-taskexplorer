@@ -758,6 +758,14 @@ suite("Task tests", () =>
         createAppPublisherFile();
     });
 
+    test("Create maven pom file", async function()
+    {
+        if (!rootPath) {
+            assert.fail("        ✘ Workspace folder does not exist");
+        }
+        createMavenPomFile();
+    });
+
 
     test("Perform tree construction", async function()
     {
@@ -1205,6 +1213,24 @@ suite("Task tests", () =>
         await(timeout(100));
 
         //
+        // Maven - Delete and invalidate, re-add and invalidate
+        //
+        console.log("    Running maven invalidation");
+        file = path.join(rootPath, "pom.xml");
+        uri = Uri.parse(file);
+        await teApi.explorerProvider.invalidateTasksCache("maven", uri);
+        removeFromArray(tempFiles, file);
+        try {
+            fs.unlinkSync(file);
+        }
+        catch {}
+        await teApi.explorerProvider.invalidateTasksCache("maven", uri);
+        await(timeout(1000));
+        createMavenPomFile();
+        await teApi.explorerProvider.invalidateTasksCache("maven", uri);
+        await(timeout(100));
+
+        //
         // Script type - Delete and invalidate, re-add and invalidate
         //
         console.log("    Running script file invalidation");
@@ -1244,6 +1270,7 @@ suite("Task tests", () =>
         await configuration.updateWs("enableGrunt", false);
         await configuration.updateWs("enableGulp", false);
         await configuration.updateWs("enableMake", false);
+        await configuration.updateWs("enableMaven", false);
         await configuration.updateWs("enableNpm", false);
         await configuration.updateWs("enableNsis", false);
         await configuration.updateWs("enablePowershell", false);
@@ -1268,6 +1295,7 @@ suite("Task tests", () =>
         await configuration.updateWs("enableGrunt", true);
         await configuration.updateWs("enableGulp", true);
         await configuration.updateWs("enableMake", true);
+        await configuration.updateWs("enableMaven", true);
         await configuration.updateWs("enableNpm", true);
         await configuration.updateWs("enableNsis", true);
         await configuration.updateWs("enablePowershell", true);
@@ -1499,6 +1527,26 @@ function createAppPublisherFile()
                 '    "mantisbtProject": "",\n' +
                 '    "repoType": "svn""\n' +
                 "}\n"
+            );
+        }
+    }
+}
+
+
+function createMavenPomFile()
+{
+    if (rootPath)
+    {
+        const file = path.join(rootPath, "pom.xml");
+        tempFiles.push(file);
+
+        if (!fs.existsSync(file))
+        {
+            fs.writeFileSync(
+                file,
+                "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
+                "    <modelVersion>4.0.0</modelVersion>\n" +
+                "</project>\n"
             );
         }
     }

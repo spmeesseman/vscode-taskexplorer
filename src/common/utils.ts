@@ -112,12 +112,11 @@ export function getAntGlobPattern(): string
 
 export function getExcludesGlob(folder: string | WorkspaceFolder): RelativePattern
 {
-    let relativePattern = new RelativePattern(folder, "**/node_modules/**");
+    let multiFilePattern = "{**/node_modules/**,**/work/**";
     const excludes: string[] = configuration.get("exclude");
 
     if (excludes && excludes.length > 0)
     {
-        let multiFilePattern = "{**/node_modules/**";
         if (Array.isArray(excludes))
         {
             for (const e of excludes) {
@@ -129,11 +128,10 @@ export function getExcludesGlob(folder: string | WorkspaceFolder): RelativePatte
             multiFilePattern += ",";
             multiFilePattern += excludes;
         }
-        multiFilePattern += "}";
-        relativePattern = new RelativePattern(folder, multiFilePattern);
     }
+    multiFilePattern += "}";
 
-    return relativePattern;
+    return new RelativePattern(folder, multiFilePattern);
 }
 
 
@@ -158,8 +156,8 @@ export function getScriptTaskTypes(): string[]
 export function getTaskTypes(): string[]
 {
     return [
-        "ant", "app-publisher", "bash", "batch", "gradle", "grunt", "gulp", "make", "npm",
-        "nsis", "perl", "powershell", "python", "ruby", "workspace"
+        "ant", "app-publisher", "bash", "batch", "gradle", "grunt", "gulp", "make",
+        "maven", "npm", "nsis", "perl", "powershell", "python", "ruby", "workspace"
     ];
 }
 

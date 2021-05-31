@@ -157,20 +157,28 @@ export default class TaskFile extends TreeItem
         // Set context icon
         //
         this.iconPath = ThemeIcon.File;
-        if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", this.taskSource + ".svg"))))
+        let src = this.taskSource;
+        //
+        // If npm TaskFile, check package manager set in vscode settings, (npm, pnpm, or yarn) to determine
+        // which icon to display
+        //
+        if (src === "npm") {
+            src = util.getPackageManager();
+        }
+
+        if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", src + ".svg"))))
         {
-            let src = this.taskSource;
-            //
-            // If npm TaskFile, check package manager set in vscode settings, (npm, pnpm, or yarn) to determine
-            // which icon to display
-            //
-            if (src === "npm")
-            {
-                src = util.getPackageManager();
-            }
             this.iconPath = {
                 light: context.asAbsolutePath(path.join("res", "sources", src + ".svg")),
                 dark: context.asAbsolutePath(path.join("res", "sources", src + ".svg"))
+            };
+        }
+        else if (util.pathExists(context.asAbsolutePath(path.join("res", "light", src + ".svg"))) &&
+                 util.pathExists(context.asAbsolutePath(path.join("res", "dark", src + ".svg"))))
+        {
+            this.iconPath = {
+                light: context.asAbsolutePath(path.join("res", "light", src + ".svg")),
+                dark: context.asAbsolutePath(path.join("res", "dark", src + ".svg"))
             };
         }
     }

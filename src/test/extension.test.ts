@@ -172,6 +172,7 @@ suite("Extension Tests", () =>
         await configuration.updateWs("enableGrunt", enable);
         await configuration.updateWs("enableGulp", enable);
         await configuration.updateWs("enableMake", enable);
+        await configuration.updateWs("enableMaven", enable);
         await configuration.updateWs("enableNpm", enable);
         await configuration.updateWs("enableNsis", enable);
         await configuration.updateWs("enablePowershell", enable);

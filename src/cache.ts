@@ -84,6 +84,12 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
         await buildCache("make", constants.GLOB_MAKE, folder, false);
     }
     //
+    // Maven
+    //
+    if (!cancel && configuration.get<boolean>("enableMaven")) {
+        await buildCache("maven", constants.GLOB_MAVEN, folder, false);
+    }
+    //
     // NPM
     // Note that NPM tasks are provided by VSCode, not this extension
     //
