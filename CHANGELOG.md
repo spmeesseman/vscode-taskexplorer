@@ -1,3 +1,24 @@
+# [2.3.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.2.0...v2.3.0) (2021-06-06)
+
+
+### Bug Fixes
+
+* explorer occassionally hangs / stops responding [fixes [#143](https://github.com/spmeesseman/vscode-taskexplorer/issues/143)] ([a68166e](https://github.com/spmeesseman/vscode-taskexplorer/commit/a68166e))
+* if a task label exists that itself is equal to a 1st level task group name of another task (as per the separator char), the tree breaks. [fixes [#149](https://github.com/spmeesseman/vscode-taskexplorer/issues/149)] ([3716ca7](https://github.com/spmeesseman/vscode-taskexplorer/commit/3716ca7))
+* Makefile variables assigned with := are interpreted as rules. [fixes [#146](https://github.com/spmeesseman/vscode-taskexplorer/issues/146)] ([7b878d8](https://github.com/spmeesseman/vscode-taskexplorer/commit/7b878d8))
+* maven settings string is blank ([7e87b01](https://github.com/spmeesseman/vscode-taskexplorer/commit/7e87b01))
+* vscode tasks group separtors fixed by last check-in. [fixes [#147](https://github.com/spmeesseman/vscode-taskexplorer/issues/147)] ([f5d5b32](https://github.com/spmeesseman/vscode-taskexplorer/commit/f5d5b32))
+
+
+### Documentation
+
+* **readme:** update featires by version section ([07d9f5e](https://github.com/spmeesseman/vscode-taskexplorer/commit/07d9f5e))
+
+
+### Features
+
+* add 10+ new app-publisher commands, set up w/ group separator task names ([ce9c8f0](https://github.com/spmeesseman/vscode-taskexplorer/commit/ce9c8f0))
+
 # [2.2.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.1.0...v2.2.0) (2021-05-31)
 
 
