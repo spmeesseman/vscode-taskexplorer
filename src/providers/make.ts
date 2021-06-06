@@ -13,9 +13,9 @@ import { TaskExplorerDefinition } from "../taskDefinition";
 
 export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
-
     private suffixRuleTargets = /^(\.\w+|\.\w+\.\w+)$/;
     private patternRuleTargets = /^(%\.\w+|%)$/;
+    private ruleTargetExp = /^([\w-.\/ ]+)\s*:[^=]/mg;  // note does not disallow leading '.', this must be checked separately.
     // See: https://www.gnu.org/software/make/manual/html_node/Special-Targets.html
     private specialTargets = new Set([
         ".PHONY",
@@ -35,7 +35,6 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         ".POSIX",
         ".MAKE",
     ]);
-
 
     constructor() { super("make"); }
 
@@ -119,38 +118,22 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         log.write(logPad + "find makefile targets");
 
         const contents = util.readFileSync(fsPath);
-        let idx = 0;
-        let eol = contents.indexOf("\n", 0);
-
-        while (eol !== -1)
+        let match;
+        while (match = this.ruleTargetExp.exec(contents))
         {
-            const line: string = contents.substring(idx, eol);
-            //
-            // Target names always start at position 0 of the line.
-            //
-            // TODO = Skip targets that are environment variable names, for now.  Need to
-            // parse value if set in makefile and apply here for $() target names.
-            //
-            if (line.length > 0 && !line.startsWith("\t") && !line.startsWith(" ") &&
-                !line.startsWith("#") && !line.startsWith("$") && line.indexOf(":") > 0)
+            const tgtName = match[1];
+            if (tgtName.startsWith(".")) // skip special targets
             {
-                const { tgtName, dependsName } = this.parseTargetLine(line);
-
-                //
-                // Don't include object targets
-                //
-                if (tgtName.indexOf("/") === -1 && tgtName.indexOf("=") === -1 && tgtName.indexOf("\\") === -1 &&
-                    tgtName.indexOf("(") === -1 && tgtName.indexOf("$") === -1 && this.isNormalTarget(tgtName))
-                {
+                continue;
+            }
+            if (!scripts.includes(tgtName)) // avoid duplicates
+            {
+                if (this.isNormalTarget(tgtName)) {
                     scripts.push(tgtName);
                     log.write(logPad + "   found makefile target");
                     log.value(logPad + "      name", tgtName);
-                    log.value(logPad + "      depends target", dependsName);
                 }
             }
-
-            idx = eol + 1;
-            eol = contents.indexOf("\n", idx);
         }
 
         log.write(logPad + "find makefile targets complete", 1);
@@ -190,17 +173,6 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         }
 
         return true;
-    }
-
-
-    private parseTargetLine(line: string)
-    {
-        const tgtNames = line.split(":")[0].trim();
-        const tgtName = tgtNames.split(" ").slice(-1)[0];
-
-        const dependsName = line.substring(line.indexOf(":") + 1).trim();
-
-        return { tgtName, dependsName };
     }
 
 
