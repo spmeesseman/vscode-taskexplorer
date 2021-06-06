@@ -753,16 +753,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 taskFile.insertTreeNode(n, numGrouped++);
                 if (!atMaxLevel)
-                {   //
-                    // TODO !!!
-                    // Ref ticket #133
-                    // VSCode Tasks - Bug, something to do with "relativepath" of the acutal task being empty,
-                    // but in this extension we use /.vcsode as the path, cant go deeper then one level, for
-                    // now until I can find time to look at more
-                    //
-                    if (n.taskSource === "Workspace") {
-                        continue;
-                    }
+                {
                     await this.createTaskGroupingsBySep(folder, n, subfolders, treeLevel + 1, logPad + "   ");
                 }
             }
