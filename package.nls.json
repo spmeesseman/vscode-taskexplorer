@@ -94,7 +94,7 @@
 	"config.taskExplorer.pathToMakeDsc": "The path to the make program, if not registered in system path.",
 
 	"config.taskExplorer.enableMaven": "Maven - Enable",
-	"config.taskExplorer.enableMavrnDsc": "Enable/show maven lifecycle as tasks.",
+	"config.taskExplorer.enableMavenDsc": "Enable/show maven lifecycle as tasks.",
 	"config.taskExplorer.pathToMaven": "Maven - Path",
 	"config.taskExplorer.pathToMavenDsc": "The path to the mvn program, if not registered in system path.",
 
