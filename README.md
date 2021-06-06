@@ -66,6 +66,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Features by Version
 
+- v2.3 - App-Publisher v2.0 support.  Several fixes including long time issue [#143](https://github.com/spmeesseman/vscode-taskexplorer/issues/143).
 - v2.2 - Support for Maven (closes [#107](https://github.com/spmeesseman/vscode-taskexplorer/issues/107))
 - v2.1 - App Publisher changelog pull tasks
 - v2.0  - All async-await processing, Favorites (closes [#101](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)), Clear special task lists
