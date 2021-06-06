@@ -140,6 +140,11 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         });
 
         taskDefs.push({
+            label: "release" + groupSeparator + "publish (write log)",
+            cmdLine: "npx app-publisher --no-ci --write-log"
+        });
+
+        taskDefs.push({
             label: "release" + groupSeparator + "republish",
             cmdLine: "npx app-publisher --no-ci --republish"
         });
@@ -192,6 +197,16 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         taskDefs.push({
             label: "tasks" + groupSeparator + "version" + groupSeparator + "next",
             cmdLine: "npx app-publisher --no-ci --task-version-next"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "version" + groupSeparator + "touch",
+            cmdLine: "npx app-publisher --no-ci --task-touch-versions"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "version" + groupSeparator + "touch and commit",
+            cmdLine: "npx app-publisher --no-ci --task-touch-versions-commit"
         });
 
         //
