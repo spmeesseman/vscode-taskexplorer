@@ -198,10 +198,14 @@ Please rate your experience with stars... [like five of them ;)](https://marketp
 
 ## Thank You
 
-- **PKief** from GiHub and his [Material Icon Theme](https://marketplace.visualstudio.com/itemdetails?itemName=PKief.material-icon-theme) for some of the task type icons.  The project can be found [here](https://github.com/PKief/vscode-material-icon-theme).
-- The author of the [NSIS Extension](https://marketplace.visualstudio.com/items?itemName=idleberg.nsis) **idleberg** for NSIS graphics.
+Icon Contributors:
 
-Other contributors:
+- pkief - [Material Icon Theme](https://github.com/PKief/vscode-material-icon-theme)
+- idleberg - [NSIS Extension](https://marketplace.visualstudio.com/items?itemName=idleberg.nsis)
+- Microsoft - [VSCode](https://github.com/Microsoft/vscode)
+- Microsoft - [Maven for VSCode](https://github.com/Microsoft/vscode-maven)
+
+Other Contributors:
 
 - antfu
 - eamodio (fixed [#114](https://github.com/spmeesseman/vscode-taskexplorer/issues/114))
