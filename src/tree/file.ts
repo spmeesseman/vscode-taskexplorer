@@ -227,6 +227,18 @@ export default class TaskFile extends TreeItem
                 }
             }
 
+            if (source === "app-publisher")
+            {   //
+                // For ap files in the same dir, nsamed with a tag, e.g.:
+                //    .publishrc.spm.json
+                //
+                const match = taskDef.fileName.match(/\.publishrc\.(.+)\.(?:js(?:on)?|ya?ml)$/i);
+                if (match && match.length > 1 && match[1])
+                {
+                    return (label + " (" + match[1].toLowerCase() + ")");
+                }
+            }
+
             //
             // Reference ticket #133, vscode folder should not use a path appendature in it's folder label
             // in the task tree, there is only one path for vscode/workspace tasks, /.vscode.  The fact that

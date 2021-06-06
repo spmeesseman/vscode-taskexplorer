@@ -222,7 +222,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (key === constants.LAST_TASKS_LABEL || key === constants.FAV_TASKS_LABEL) {
                 continue;
             }
-            await this.sortFolder(folder, logPad + "   ");
+            this.sortFolder(folder, logPad + "   ");
             //
             // Create groupings by task type
             //
@@ -543,7 +543,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         subfolder.addTreeNode(prevTaskFile); // addScript will set the group level on the TaskItem
                     }
                 }
-                subfolder?.addTreeNode(each); // addScript will set the group level on the TaskItem
+                if (subfolder && subfolder.nodePath !== each.nodePath) {
+                    subfolder.addTreeNode(each); // addScript will set the group level on the TaskItem
+                }
             }
             prevTaskFile = each;
             //
@@ -574,7 +576,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Resort after making adds/removes
         //
-        await this.sortFolder(folder, logPad + "   ");
+        this.sortFolder(folder, logPad + "   ");
 
         log.methodDone("create tree node folder grouping", 1, logPad);
     }
@@ -1059,6 +1061,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         for (let i = 0; i <= treeLevel; i++)
         {
             id += labelSplit[i];
+        }
+        if (file.resourceUri) {
+            id += file.resourceUri.fsPath.replace(/\W/gi, "");
+        }
+        else if (file.fileName) {
+            id += file.fileName.replace(/\W/gi, "");
         }
         return folder.label + file.taskSource + id + (treeLevel || treeLevel === 0 ? treeLevel.toString() : "");
     }
@@ -2094,7 +2102,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             taskFile.removeTreeNode(each2);
         }
 
-        log.methodStart("remove scripts", 3, logPad);
+        log.methodDone("remove scripts", 1, logPad);
     }
 
 
@@ -2538,7 +2546,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async sortFolder(folder: TaskFolder, logPad = "")
+    private sortFolder(folder: TaskFolder, logPad = "")
     {
         this.sortTasks(folder.taskFiles, logPad);
         for (const each of folder.taskFiles)
