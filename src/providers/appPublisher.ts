@@ -6,6 +6,7 @@ import * as log from "../common/log";
 import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../taskDefinition";
+import { configuration } from "../common/configuration";
 
 
 export class AppPublisherTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -28,7 +29,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
             target,
             fileName: path.basename(uri.fsPath),
             path: util.getRelativePath(folder, uri),
-            cmdLine: "npx app-publisher -p ps --no-ci",
+            cmdLine: "npx app-publisher --no-ci",
             takesArgs: false,
             uri
         };
@@ -69,82 +70,141 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
     }
 
 
+    private _getKind(cmdLine: string, defaultDef: TaskExplorerDefinition): TaskExplorerDefinition
+    {
+        return { ...defaultDef, ...{ cmdLine } };
+    }
+
+
     public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
     {
         const cwd = path.dirname(uri.fsPath),
-              folder = wsFolder || workspace.getWorkspaceFolder(uri);
+              folder = wsFolder || workspace.getWorkspaceFolder(uri),
+              groupSeparator = configuration.get<string>("groupSeparator");
 
         if (!folder) {
             return [];
         }
 
         const defaultDef = this.getDefaultDefinition(undefined, folder, uri),
-              options: ShellExecutionOptions = { cwd };
+              options: ShellExecutionOptions = { cwd },
+              tasks: Task[] = [],
+              taskDefs: any = [];
+
+        //
+        // For ap files in the same dir, nsamed with a tag, e.g.:
+        //    .publishrc.spm.json
+        //
+        let apLabel = "";
+        const match = uri.fsPath.match(/\.publishrc\.(.+)\.(?:js(?:on)?|ya?ml)$/i);
+        if (match && match.length > 1 && match[1])
+        {
+            apLabel = " (" + match[1].toLowerCase() + ")";
+        }
 
         log.methodStart("read app-publisher file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
 
-        const kindRepublish: TaskExplorerDefinition = {
-            ...defaultDef,
-            ...{
-                cmdLine: "npx app-publisher -p ps --no-ci --republish"
-            }
-        };
+        taskDefs.push({
+            label: "general" + groupSeparator + "config",
+            cmdLine: "npx app-publisher --version"
+        });
 
-        const kindEmail: TaskExplorerDefinition = {
-            ...defaultDef,
-            ...{
-                cmdLine: "npx app-publisher -p ps --no-ci --email-only",
-            }
-        };
+        taskDefs.push({
+            label: "general" + groupSeparator + "help",
+            cmdLine: "npx app-publisher --help"
+        });
 
-        const kindChangeLog: TaskExplorerDefinition = {
-            ...defaultDef,
-            ...{
-                cmdLine: "npx app-publisher -p ps --no-ci --changelog-only",
-            }
-        };
+        taskDefs.push({
+            label: "general" + groupSeparator + "version",
+            cmdLine: "npx app-publisher --version"
+        });
 
-        const kindDry: TaskExplorerDefinition = {
-            ...defaultDef,
-            ...{
-                cmdLine: "npx app-publisher -p ps --no-ci --dry-run",
-            }
-        };
+        taskDefs.push({
+            label: "release" + groupSeparator + "dry" + groupSeparator + "publish",
+            cmdLine: "npx app-publisher --no-ci --dry-run"
+        });
 
-        const kindMantis: TaskExplorerDefinition = {
-            ...defaultDef,
-            ...{
-                cmdLine: "npx app-publisher -p ps --no-ci --mantis-only",
-            }
-        };
+        taskDefs.push({
+            label: "release" + groupSeparator + "dry" + groupSeparator + "publish (prompt version)",
+            cmdLine: "npx app-publisher --no-ci --dry-run --prompt-version"
+        });
 
-        const kindPromptVersion: TaskExplorerDefinition = {
-            ...defaultDef,
-            ...{
-                cmdLine: "npx app-publisher -p ps --no-ci --prompt-version",
-            }
-        };
+        taskDefs.push({
+            label: "release" + groupSeparator + "publish",
+            cmdLine: "npx app-publisher --no-ci"
+        });
+
+        taskDefs.push({
+            label: "release" + groupSeparator + "publish (prompt version)",
+            cmdLine: "npx app-publisher --no-ci --prompt-version"
+        });
+
+        taskDefs.push({
+            label: "release" + groupSeparator + "republish",
+            cmdLine: "npx app-publisher --no-ci --republish"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "changelog " + groupSeparator + "edit pending",
+            cmdLine: "npx app-publisher --no-ci --task-changelog"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "changelog " + groupSeparator + "view pending",
+            cmdLine: "npx app-publisher --no-ci --task-changelog-view"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "changelog " + groupSeparator + "write pending to file",
+            cmdLine: "npx app-publisher --no-ci --task-changelog-file changelog.txt"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "ci" + groupSeparator + "environment info",
+            cmdLine: "npx app-publisher --no-ci --task-ci-env"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "ci" + groupSeparator + "build info",
+            cmdLine: "npx app-publisher --no-ci --task-ci-env-info"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "release" + groupSeparator + "mantis",
+            cmdLine: "npx app-publisher --no-ci --task-mantisbt-release"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "release" + groupSeparator + "email",
+            cmdLine: "npx app-publisher --no-ci --task-email"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "version" + groupSeparator + "current",
+            cmdLine: "npx app-publisher --no-ci --task-version-current"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "version" + groupSeparator + "info",
+            cmdLine: "npx app-publisher --no-ci --task-version-info"
+        });
+
+        taskDefs.push({
+            label: "tasks" + groupSeparator + "version" + groupSeparator + "next",
+            cmdLine: "npx app-publisher --no-ci --task-version-next"
+        });
 
         //
         // Create the shell execution objects
         //
-        const executionRepublish = kindRepublish.cmdLine ? new ShellExecution(kindRepublish.cmdLine, options) : undefined;
-        const executionEmail = kindEmail.cmdLine ? new ShellExecution(kindEmail.cmdLine, options) : undefined;
-        const executionChangeLog = kindChangeLog.cmdLine ? new ShellExecution(kindChangeLog.cmdLine, options) : undefined;
-        const executionPromptVersion = kindPromptVersion.cmdLine ? new ShellExecution(kindPromptVersion.cmdLine, options) : undefined;
-        const executionPublish = defaultDef.cmdLine ? new ShellExecution(defaultDef.cmdLine, options) : undefined;
-        const executionMantis = kindMantis.cmdLine ? new ShellExecution(kindMantis.cmdLine, options) : undefined;
-        const executionDry = kindDry.cmdLine ? new ShellExecution(kindDry.cmdLine, options) : undefined;
+        taskDefs.forEach((def: any) => {
+            const exec = new ShellExecution(def.cmdLine, options);
+            tasks.push(new Task(this._getKind(def.cmdLine, defaultDef), folder, def.label + apLabel, "app-publisher", exec, undefined));
+        });
 
         log.methodDone("read app-ublisher file uri tasks", 1, logPad, true);
 
-        return [ new Task(kindDry, folder, "Dry Run", "app-publisher", executionDry, undefined),
-                 new Task(defaultDef, folder, "Publish", "app-publisher", executionPublish, undefined),
-                 new Task(kindRepublish, folder, "Re-publish", "app-publisher", executionRepublish, undefined),
-                 new Task(kindMantis, folder, "Publish Mantis Release", "app-publisher", executionMantis, undefined),
-                 new Task(kindEmail, folder, "Send Release Email", "app-publisher", executionEmail, undefined),
-                 new Task(kindPromptVersion, folder, "Publish (Prompt Version)", "app-publisher", executionPromptVersion, undefined),
-                 new Task(kindEmail, folder, "View Pending Changelog", "app-publisher", executionChangeLog, undefined) ];
+        return tasks;
     }
 
 }
