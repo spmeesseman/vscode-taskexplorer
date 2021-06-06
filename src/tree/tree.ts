@@ -739,7 +739,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 subfolder.addTreeNode(each); // addScript will set the group level on the TaskItem
             }
 
-            prevName = label.split(groupSeparator);
+            if (label.includes(groupSeparator)) {
+                prevName = label.split(groupSeparator);
+            }
             prevTaskItem = each;
         }
 
