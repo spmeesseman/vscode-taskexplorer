@@ -55,6 +55,7 @@
         "package": "vsce package",
         "publish": "vsce publish",
         "rebuild": "npm run clean && npm run build",
+        "install_extensions.bat": "cmd /c .\\install_extensions.bat",
         "semantic_release-release": "semantic-release",
         "semantic_release-release_no_ci": "semantic-release --no-ci",
         "semantic_release-release_dry": "semantic-release --dry-run",
