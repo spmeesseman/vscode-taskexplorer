@@ -1,0 +1,6 @@
+
+
+
+☐ Use CRTL+C to kill tasks as opposed to killing the terminal @high 
+☐ Saving package.json is throwing the 'tree node already exists' error
+☐ Swutching away from view while task is running, and switching back after task has ended, view still shows it as running, must refresh
