@@ -117,7 +117,7 @@ Version 2 highlights 2 major performance enhancements along with several feature
 
 ## App-Publisher
 
-Integrates with the [app-publisher](https://gtihub.com/spmeesseman/app-publisher) tool.
+Integrates with the [app-publisher](https://github.com/spmeesseman/app-publisher) tool.
 
 App-Publisher is a multi-purpose versioning/release tool that can be used for, but not limited to, the following:
 
