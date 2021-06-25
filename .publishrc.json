@@ -7,10 +7,7 @@
     "deployCommand":      "vsce publish",
     "dryRunVcRevert":     "Y",
     "githubRelease":      "Y",
-    "githubAssets": [
-        "CHANGELOG.md",
-        "install\\dist\\vscode-taskexplorer.tgz"
-    ],
+    "githubAssets":       "CHANGELOG.md",
     "githubUser":         "spmeesseman",
     "npmRelease":         "Y",
     "postBuildCommand":   "npm run test --silent",
