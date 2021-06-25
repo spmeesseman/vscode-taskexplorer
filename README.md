@@ -33,6 +33,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Requirements](#requirements)
   - [Features by Version](#features-by-version)
   - [Version 2](#version-2)
+  - [App-Publisher](#app-publisher)
   - [Configuring Global Excludes and Apache Ant Includes](#configuring-global-excludes-and-apache-ant-includes)
   - [Ant and Gulp Self-Provided Tasks](#ant-and-gulp-self-provided-tasks)
   - [Using Groups with a Separator](#using-groups-with-a-separator)
@@ -113,6 +114,21 @@ Version 2 highlights 2 major performance enhancements along with several feature
 4. Clear buttons for Favorites and last Tasks lists (**need icon!!!**).
 5. Much improved logging for debugging user issues.
 6. Completely refactored classes, interfaces, and commenting for easier community contributions.
+
+## App-Publisher
+
+Integrates with the [app-publisher](https://gtihub.com/spmeesseman/app-publisher) tool.
+
+App-Publisher is a multi-purpose versioning/release tool that can be used for, but not limited to, the following:
+
+- Publish releases in a CI like manner on a local system, with version calculation.
+- Several task-mode tasks such as generating the next vesion from commit message subjects.
+- NPM releases.
+- GitHub releases.
+- MantisBT releases via the [Releases Plugin](https://github.com/mantisbt-plugins/Releases).
+- View/output changelogs for a pending release.
+
+![ap0](res/app-publisher-taskview.png?raw=true)
 
 ## Configuring Global Excludes and Apache Ant Includes
 
