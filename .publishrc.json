@@ -1,0 +1,25 @@
+{
+    "projectName":        "vscode-taskexplorer",
+    "branch":             "master",
+    "bugs":               "https://github.com/spmeesseman/vscode-taskexplorer/issues",
+    "buildCommand":       "npm run build",
+    "changelogFile":      "CHANGELOG.md",
+    "deployCommand":      "vsce publish",
+    "dryRunVcRevert":     "Y",
+    "githubRelease":      "Y",
+    "githubAssets": [
+        "CHANGELOG.md",
+        "install\\dist\\vscode-taskexplorer.tgz"
+    ],
+    "githubUser":         "spmeesseman",
+    "npmRelease":         "Y",
+    "postBuildCommand":   "npm run test --silent",
+    "preCommitCommand":   [],
+    "postCommitCommand":  [],
+    "postReleaseCommand": "npm run coverage-codecov-publish",
+    "repo":               "https://github.com/spmeesseman/vscode-taskexplorer.git",
+    "repoType":           "git",
+    "testEmailRecip":     "spmeesseman@gmail.com",
+    "textEditor":         "notepad",
+    "vcWebPath":          "https://github.com/spmeesseman/vscode-taskexplorer"
+}
