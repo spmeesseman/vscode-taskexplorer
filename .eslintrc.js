@@ -21,7 +21,7 @@ module.exports = {
     "parserOptions": {
         "project": "tsconfig.json",
         "sourceType": "module",
-        "ecmaVersion": 6
+        "ecmaVersion": 2019
     },
     "overrides": [
     {
