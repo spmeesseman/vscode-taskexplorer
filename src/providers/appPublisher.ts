@@ -99,7 +99,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         const match = uri.fsPath.match(/\.publishrc\.(.+)\.(?:js(?:on)?|ya?ml)$/i);
         if (match && match.length > 1 && match[1])
         {
-            apLabel = " (" + match[1].toLowerCase() + ")";
+            apLabel =  match[1];
         }
 
         log.methodStart("read app-publisher file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
@@ -213,8 +213,12 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         // Create the shell execution objects
         //
         taskDefs.forEach((def: any) => {
+            if (apLabel) {
+                def.cmdLine += ` --config-name ${apLabel}`;
+            }
             const exec = new ShellExecution(def.cmdLine, options);
-            tasks.push(new Task(this._getKind(def.cmdLine, defaultDef), folder, def.label + apLabel, "app-publisher", exec, undefined));
+            tasks.push(new Task(this._getKind(def.cmdLine, defaultDef), folder,
+                                `${def.label} (${apLabel.toLowerCase()})`, "app-publisher", exec, undefined));
         });
 
         log.methodDone("read app-ublisher file uri tasks", 1, logPad, true);
