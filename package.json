@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "2.3.0",
+    "version": "2.3.1",
     "displayName": "Task Explorer",
     "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash, make, maven, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
@@ -65,7 +65,6 @@
         "test:after": "npm run coverage-full_off",
         "test:before": "npm run clean && rimraf c:\\code\\data\\user-data\\cacheddata && npm run build && npm run coverage-full_on",
         "test:openreport": "npm run coverage-open-report",
-        "vscode:prepublish": "npm run build",
         "watch": "tsc -watch -p ./",
         "webpack-watch": "webpack -w --info-verbosity verbose --mode development --config ./webpack.config.js",
         "webpack-build": "npm run webpack-build:extension && npm run webpack-build:test",

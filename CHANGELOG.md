@@ -1,3 +1,24 @@
+# VSCODE-TASKEXPLORER CHANGE LOG
+
+## Version 2.3.1 (June 30th, 2021)
+
+### Documentation
+
+- **Readme:** add app-publisher section
+- **Readme:** update contributors section
+
+### Bug Fixes
+
+- **Providers:** app-publisher custom config files are found but tasks always run with default config.
+
+### Build System
+
+- **Publishrc:** run local test task
+
+### Other Notes
+
+- build(package.json): update description [skip ci]
+
 # [2.3.0](https://github.com/spmeesseman/vscode-taskexplorer/compare/v2.2.0...v2.3.0) (2021-06-06)
 
 

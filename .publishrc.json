@@ -9,7 +9,6 @@
     "githubRelease":      "Y",
     "githubAssets":       "CHANGELOG.md",
     "githubUser":         "spmeesseman",
-    "npmRelease":         "Y",
     "postBuildCommand":   "npm run test:dev",
     "preCommitCommand":   [],
     "postCommitCommand":  [],
