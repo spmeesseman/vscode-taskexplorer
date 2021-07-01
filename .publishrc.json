@@ -3,15 +3,24 @@
     "branch":             "master",
     "bugs":               "https://github.com/spmeesseman/vscode-taskexplorer/issues",
     "buildCommand":       "npm run build",
+    "postBuildCommand":   "npm run test:dev",
     "changelogFile":      "CHANGELOG.md",
-    "deployCommand":      "vsce publish",
+    "deployCommand":      [
+        "npx vsce publish"
+    ],
     "dryRunVcRevert":     "Y",
     "githubRelease":      "Y",
-    "githubAssets":       "CHANGELOG.md",
     "githubUser":         "spmeesseman",
-    "postBuildCommand":   "npm run test:dev",
-    "preCommitCommand":   [],
-    "postCommitCommand":  [],
+    "preGithubRelease":   [
+        "npx vsce package"
+    ],
+    "postGithubRelease":   [
+        "npx rimraf *.vsix"
+    ],
+    "githubAssets":       [
+        "CHANGELOG.md",
+        "vscode-taskexplorer-${VERSION}.vsix"
+    ],
     "postReleaseCommand": "npm run coverage-codecov-publish",
     "repo":               "https://github.com/spmeesseman/vscode-taskexplorer.git",
     "repoType":           "git",
