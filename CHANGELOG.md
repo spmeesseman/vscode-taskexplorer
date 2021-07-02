@@ -1,5 +1,11 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.3.2 (July 2nd, 2021)
+
+### Bug Fixes
+
+- **App-Publisher:** tree labels are showing an empty set of parenthesis
+
 ## Version 2.3.1 (June 30th, 2021)
 
 ### Documentation
