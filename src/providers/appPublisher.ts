@@ -213,15 +213,17 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         // Create the shell execution objects
         //
         taskDefs.forEach((def: any) => {
+            let apFmtLabel = "";
             if (apLabel) {
+                apFmtLabel = ` (${apLabel.toLowerCase()})`;
                 def.cmdLine += ` --config-name ${apLabel}`;
             }
             const exec = new ShellExecution(def.cmdLine, options);
             tasks.push(new Task(this._getKind(def.cmdLine, defaultDef), folder,
-                                `${def.label} (${apLabel.toLowerCase()})`, "app-publisher", exec, undefined));
+                                `${def.label}${apFmtLabel}`, "app-publisher", exec, undefined));
         });
 
-        log.methodDone("read app-ublisher file uri tasks", 1, logPad, true);
+        log.methodDone("read app-publisher file uri tasks", 1, logPad, true);
 
         return tasks;
     }
