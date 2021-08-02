@@ -19,7 +19,7 @@
     ],
     "githubAssets":       [
         "CHANGELOG.md",
-        "vscode-taskexplorer-${VERSION}.vsix"
+        "vscode-taskexplorer-$(VERSION).vsix"
     ],
     "postReleaseCommand": "npm run coverage-codecov-publish",
     "repo":               "https://github.com/spmeesseman/vscode-taskexplorer.git",
