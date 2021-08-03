@@ -25,6 +25,7 @@ const constants: IDictionary<string> =
     GLOB_PERL: "**/*.[Pp][Ll]",
     GLOB_POWERSHELL: "**/*.[Pp][Ss]1",
     GLOB_PYTHON: "**/[Ss][Ee][Tt][Uu][Pp].[Pp][Yy]",
+    GLOB_PIPENV: "**/[Pp][Ii][Pp][Ff][Ii][Ll][Ee]",
     GLOB_RUBY: "**/*.rb",
     GLOB_TSC: "**/tsconfig.json",
     GLOB_WORKSPACE: "**/.vscode/tasks.json"

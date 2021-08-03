@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "2.3.2",
+    "version": "2.4.0",
     "displayName": "Task Explorer",
     "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash, make, maven, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
@@ -72,6 +72,7 @@
         "webpack-build:test": "webpack --mode production --config ./webpack.config.test.js"
     },
     "dependencies": {
+        "@sgarciac/bombadil": "^2.3.0",
         "glob": "^7.1.7",
         "is-utf8": "^0.2.1",
         "jsonc-parser": "^2.3.1",
@@ -598,6 +599,10 @@
                 },
                 {
                     "command": "taskExplorer.addToExcludes",
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPipenv"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupAnt"
                 },
                 {
@@ -875,6 +880,10 @@
                 },
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPipenv"
+                },
+                {
+                    "command": "taskExplorerSideBar.addToExcludes",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupAnt"
                 },
                 {
@@ -1105,6 +1114,12 @@
                     "title": "%config.taskExplorer.enablePython%",
                     "description": "%config.taskExplorer.enablePythonDsc%"
                 },
+                "taskExplorer.enablePipenv": {
+                    "type": "boolean",
+                    "default": true,
+                    "title": "%config.taskExplorer.enablePipenv%",
+                    "description": "%config.taskExplorer.enablePipenvDsc%"
+                },
                 "taskExplorer.enablePowershell": {
                     "type": "boolean",
                     "default": true,
@@ -1229,6 +1244,12 @@
                     "default": "python",
                     "title": "%config.taskExplorer.pathToPython%",
                     "description": "%config.taskExplorer.pathToPythonDsc%"
+                },
+                "taskExplorer.pathToPipenv": {
+                    "type": "string",
+                    "default": "pipenv",
+                    "title": "%config.taskExplorer.pathToPipenv%",
+                    "description": "%config.taskExplorer.pathToPipenvDsc%"
                 },
                 "taskExplorer.pathToPowershell": {
                     "type": "string",

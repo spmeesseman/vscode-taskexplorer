@@ -121,6 +121,12 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined)
         await buildCache("python", constants.GLOB_PYTHON, folder, false);
     }
     //
+    // Pipenv (Python)
+    //
+    if (!cancel && configuration.get<boolean>("enablePipenv")) {
+        await buildCache("pipenv", constants.GLOB_PIPENV, folder, false);
+    }
+    //
     // Ruby
     //
     if (!cancel && configuration.get<boolean>("enableRuby")) {

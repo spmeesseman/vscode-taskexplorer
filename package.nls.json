@@ -68,6 +68,11 @@
 	"config.taskExplorer.pathToPython": "Python - Path",
 	"config.taskExplorer.pathToPythonDsc": "The path to the python program, if not registered in system path.",
 
+	"config.taskExplorer.enablePipenv": "Pipenv - Enable",
+	"config.taskExplorer.enablePipenvDsc": "Enable/show pipenv Pipfile python scripts as tasks.",
+	"config.taskExplorer.pathToPipenv": "Pipenv - Path",
+	"config.taskExplorer.pathToPipenvDsc": "The path to the pipenv program, if not registered in system path.",
+
 	"config.taskExplorer.enableRuby": "Ruby - Enable",
 	"config.taskExplorer.enableRubyDsc": "Enable/show ruby scripts as tasks.",
 	"config.taskExplorer.pathToRuby": "Ruby - Path",

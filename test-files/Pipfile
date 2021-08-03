@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pyside6 = "*"
+mypy = "*"
+paramiko = "*"
+pyinstaller = {extras = ["encryption"], version = "*"}
+
+[dev-packages]
+isort = "*"
+flake8 = "*"
+pyinstaller = "*"
+
+[requires]
+python_version = "3.9"
+
+[scripts]
+convert-ui = "pyside6-uic ui_mainwindow.ui > ui_mainwindow.py"
+build-exe = "pyinstaller --name='RobPySide6SSHgui' --windowed --onefile ./main.py"
+run-dev = "python main.py"

@@ -1276,6 +1276,7 @@ suite("Task tests", () =>
         await configuration.updateWs("enablePowershell", false);
         await configuration.updateWs("enablePerl", false);
         await configuration.updateWs("enablePython", false);
+        await configuration.updateWs("enablePipenv", false);
         await configuration.updateWs("enableRuby", false);
         await configuration.updateWs("enableTsc", false);
         await configuration.updateWs("enableWorkspace", false);
@@ -1301,6 +1302,7 @@ suite("Task tests", () =>
         await configuration.updateWs("enablePowershell", true);
         await configuration.updateWs("enablePerl", true);
         await configuration.updateWs("enablePython", true);
+        await configuration.updateWs("enablePipenv", true);
         await configuration.updateWs("enableRuby", true);
         await configuration.updateWs("enableTsc", true);
         await configuration.updateWs("enableWorkspace", true);
