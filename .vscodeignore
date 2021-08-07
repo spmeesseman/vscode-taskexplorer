@@ -8,7 +8,7 @@
 **/*.ts
 dist/test/**
 dist/**/*.map
-**/src
+src
 **/test/**
 coverage
 test-files
