@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "2.4.0",
+    "version": "2.3.2",
     "displayName": "Task Explorer",
     "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash, make, maven, python, perl, powershell, ruby, and nsis",
     "icon": "res/gears-r-colors.png",
@@ -523,7 +523,7 @@
                 },
                 {
                     "command": "taskExplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileApp-publiser"
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileApp-publisher"
                 },
                 {
                     "command": "taskExplorer.addToExcludes",
@@ -583,7 +583,7 @@
                 },
                 {
                     "command": "taskExplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupApp-publiser"
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupApp-publisher"
                 },
                 {
                     "command": "taskExplorer.addToExcludes",
@@ -804,7 +804,7 @@
                 },
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileApp-publiser"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileApp-publisher"
                 },
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
@@ -864,7 +864,7 @@
                 },
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupApp-publiser"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupApp-publisher"
                 },
                 {
                     "command": "taskExplorerSideBar.addToExcludes",

@@ -7,7 +7,7 @@ import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../taskDefinition";
 import { configuration } from "../common/configuration";
-import * as bombadil from "@sgarciac/bombadil";  // Using to parse the TOML of the Pipfile.
+import * as bombadil from "@sgarciac/bombadil";
 
 /**
  * Parses [scripts] from the pipenv Python package manager's Pipfile.
@@ -54,14 +54,14 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
 
         if (workspace.workspaceFolders && paths)
         {
-            for (const fobj of paths)
+            for (const obj of paths)
             {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
+                if (!util.isExcluded(obj.uri.path) && !visitedFiles.has(obj.uri.fsPath))
                 {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri, undefined, logPad + "   ");
+                    visitedFiles.add(obj.uri.fsPath);
+                    const tasks = await this.readUriTasks(obj.uri, undefined, logPad + "   ");
                     log.write("   processed pipenv Pipfile file", 3, logPad);
-                    log.value("      file", fobj.uri.fsPath, 3, logPad);
+                    log.value("      file", obj.uri.fsPath, 3, logPad);
                     log.value("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
                 }

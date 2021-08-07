@@ -64,7 +64,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Features by Version
 
-- v2.4 - Add Pipenv support for Python Pipfile scripts. [#155](https://github.com/spmeesseman/vscode-taskexplorer/issues/155)
+- v2.4 - Add Pipenv support for Python Pipfile scripts. (thanks **rob4226**) [#155](https://github.com/spmeesseman/vscode-taskexplorer/issues/155)
 - v2.3 - App-Publisher v2.0 support.  Several fixes including long time issue [#143](https://github.com/spmeesseman/vscode-taskexplorer/issues/143).
 - v2.2 - Support for Maven (closes [#107](https://github.com/spmeesseman/vscode-taskexplorer/issues/107))
 - v2.1 - App Publisher changelog pull tasks
