@@ -1149,7 +1149,7 @@
                 },
                 "taskExplorer.keepTermOnStop": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "%config.taskExplorer.keepTermOnStop%"
                 },
                 "taskExplorer.readUserTasks": {
