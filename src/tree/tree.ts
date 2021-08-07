@@ -1487,10 +1487,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // invalidate="tests" means this is being called from unit tests (opt will be undefined)
         //
         if ((invalidate === true || invalidate === "tests") && !opt) {
-            log.write("   handling 'rebuild cache' event", 1, logPad);
+            log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
             this.busy = true;
-            await rebuildCache();
-            log.write("   handling 'rebuild cache' eventcomplete", 1, logPad);
+            await rebuildCache(logPad + "   ");
+            log.write("   handling 'rebuild cache' eventcomplete", 1, logPad + "   ");
             this.busy = false;
         }
         //
@@ -1498,7 +1498,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (invalidate !== "tests") {
             log.write("   handling 'invalidate tasks cache' event", 1, logPad);
-            await this.invalidateTasksCache(invalidate, opt);
+            await this.invalidateTasksCache(invalidate, opt, logPad + "   ");
         }
         log.methodDone("   handle filewatcher / settings change / test event", 1, logPad);
     }
@@ -1513,11 +1513,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             if (this.needsRefresh.length > 1 || this.needsRefresh[0].invalidate === undefined)
             {
-                await this.refresh(logPad);
+                await this.refresh(logPad + "   ");
             }
             else
             {
-                await this.refresh(this.needsRefresh[0].invalidate, this.needsRefresh[0].uri, logPad);
+                await this.refresh(this.needsRefresh[0].invalidate, this.needsRefresh[0].uri, logPad + "   ");
             }
 
             this.needsRefresh = [];
