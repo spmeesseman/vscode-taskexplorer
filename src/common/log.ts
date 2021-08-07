@@ -131,7 +131,7 @@ export function blank(level?: number)
 
 export function error(msg: string | string[])
 {
-    if (!msg === null || msg === undefined) {
+    if (msg === null || msg === undefined) {
         return;
     }
 
