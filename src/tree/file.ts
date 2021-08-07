@@ -110,7 +110,7 @@ export default class TaskFile extends TreeItem
         this.path = this.label !== "vscode" ? relativePath : ".vscode";
 
         if (group && this.label) {
-            this.nodePath = path.join(this.nodePath, this.label);
+            this.nodePath = path.join(this.nodePath, this.label.toString());
         }
 
         if (!this.nodePath && this.label === "vscode") {

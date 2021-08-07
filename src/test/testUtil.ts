@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import * as cp from "child_process";
-import { extensions, window } from "vscode";
+import { CancellationToken, extensions, QuickPickOptions, window } from "vscode";
 import TaskItem from "../tree/item";
 
 
@@ -108,33 +108,3 @@ window.showInputBox = (...args: any[]) =>
     });
 };
 
-
-const overridesShowQuickPick: any[] = [];
-
-
-export function overrideNextShowQuickPick(value: any)
-{
-    overridesShowQuickPick.push(value);
-}
-
-const originalShowQuickPick = window.showQuickPick;
-
-
-window.showQuickPick = (items: any[] | Thenable<any[]>, ...args: any[]): Thenable<any | undefined> =>
-{
-    let next = overridesShowQuickPick.shift();
-    if (typeof next === "undefined")
-    {
-        return originalShowQuickPick.call(null, [items, ...args]);
-    }
-
-    if (typeof next === "number" && Array.isArray(items))
-    {
-        next = items[next];
-    }
-
-    return new Promise((resolve, reject) =>
-    {
-        resolve(next);
-    });
-};
