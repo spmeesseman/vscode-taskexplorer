@@ -1,5 +1,11 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.4.2 (August 7th, 2021)
+
+### Bug Fixes
+
+- **General:** v2.4.0/1 does not load - invalid package-lock.json reference to 'chevrotain'
+
 ## Version 2.4.1 (August 7th, 2021)
 
 ### Bug Fixes
