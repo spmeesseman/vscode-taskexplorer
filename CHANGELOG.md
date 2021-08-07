@@ -1,5 +1,24 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.4.0 (August 7th, 2021)
+
+### Bug Fixes
+
+- **Tree:** tree does not populate if not visible when task scan completes.
+
+### Features
+
+- **Providers:** add support for python pipenv pipfile scripts [closes #155]
+
+### Refactoring
+
+- **Settings:** default 'keepTermOnStop' to true
+- **Logging:** further improve readability
+
+### Build System
+
+- the vsix installer is not being published as a github release asset
+
 ## Version 2.3.2 (July 2nd, 2021)
 
 ### Bug Fixes
