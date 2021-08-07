@@ -1481,31 +1481,32 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async handleFileWatcherEvent(invalidate: any, opt?: boolean | Uri, logPad = "")
     {
-        log.write("   handling FileWatcher / settings change / test event");
+        log.methodStart("handle filewatcher / settings change / test event", 1, logPad);
         //
         // invalidate=true means the refresh button was clicked (opt will be false)
         // invalidate="tests" means this is being called from unit tests (opt will be undefined)
         //
         if ((invalidate === true || invalidate === "tests") && !opt) {
-            log.write("Handling 'rebuild cache' event", 1, logPad);
+            log.write("   handling 'rebuild cache' event", 1, logPad);
             this.busy = true;
             await rebuildCache();
-            log.write("Handling 'rebuild cache' eventcomplete", 1, logPad);
+            log.write("   handling 'rebuild cache' eventcomplete", 1, logPad);
             this.busy = false;
         }
         //
         // If this is not from unit testing, then invalidate the appropriate task cache/file
         //
         if (invalidate !== "tests") {
-            log.write("handling 'invalidate tasks cache' event", 1, logPad);
+            log.write("   handling 'invalidate tasks cache' event", 1, logPad);
             await this.invalidateTasksCache(invalidate, opt);
         }
+        log.methodDone("   handle filewatcher / settings change / test event", 1, logPad);
     }
 
 
     private async handleVisibleEvent(logPad = "")
     {
-        log.write("   handling 'visible' event");
+        log.methodStart("handle 'visible' event", 1, logPad);
         if (this.needsRefresh && this.needsRefresh.length > 0)
         {   //
             // If theres more than one pending refresh request, just refresh the tree
@@ -1521,6 +1522,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
             this.needsRefresh = [];
         }
+        log.methodDone("handle 'visible' event", 1, logPad);
     }
 
 
@@ -1546,9 +1548,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *     "Workspace"
      * @param opt2 The uri of the file that contains/owns the task
      */
-    public async invalidateTasksCache(opt1?: string, opt2?: Uri | boolean)
+    public async invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad = "")
     {
-        log.methodStart("invalidate tasks cache", 1, "", true, [
+        log.methodStart("invalidate tasks cache", 1, logPad, true, [
             [ "opt1", opt1 ], [ "opt2", opt2 && opt2 instanceof Uri ? opt2.fsPath : opt2 ]
         ]);
         this.busy = true;
@@ -1575,28 +1577,28 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
         {
-            log.write("   invalidate " + opt1 + " provider file ", 1);
-            log.value("      file", opt2, 1);
+            log.write("   invalidate " + opt1 + " provider file ", 1, logPad);
+            log.value("      file", opt2, 1, logPad);
             const provider = providers.get(util.getScriptProviderType(opt1));
-            await provider?.invalidateTasksCache(opt2, "   "); // NPM/Workspace tasks don't implement TaskExplorerProvider
+            await provider?.invalidateTasksCache(opt2, logPad + "   "); // NPM/Workspace tasks don't implement TaskExplorerProvider
         }
         else { // If opt1 is undefined, refresh all providers
             if (!opt1) {
-                log.write("   invalidate all providers", 1);
+                log.write("   invalidate all providers", 1, logPad);
                 for (const [ key, p ] of providers)
                 {
-                    log.write("   invalidate " + key + " provider", 1);
-                    await p.invalidateTasksCache(undefined, "   ");
+                    log.write("   invalidate " + key + " provider", 1, logPad);
+                    await p.invalidateTasksCache(undefined, logPad + "   ");
                 }
             }
             else {
-                log.write("   invalidate " + opt1 + " provider", 1);
-                await providers.get(opt1)?.invalidateTasksCache(undefined, "   ");  // NPM/Workspace tasks don't implement TaskExplorerProvider
+                log.write("   invalidate " + opt1 + " provider", 1, logPad);
+                await providers.get(opt1)?.invalidateTasksCache(undefined, logPad + "   ");  // NPM/Workspace tasks don't implement TaskExplorerProvider
             }
         }
 
         this.busy = false;
-        log.methodDone("invalidate tasks cache", 1, "", true);
+        log.methodDone("invalidate tasks cache", 1, logPad, true);
     }
 
 
@@ -1905,7 +1907,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         log.methodStart("refresh task tree", 1, logPad, true, [
             [ "from view", this.name ], [ "invalidate", invalidate ],
-            [ "opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a" ]
+            [ "opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a" ],
+            [ "tree is null", !this.taskTree ]
         ]);
 
         //
@@ -1933,23 +1936,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // we need to, if not then just exit on this refresh request
         //
         if (invalidate === "visible-event")
-        {
-            if (this.taskTree)
-            {   //
-                // If we await on the same function within that awaited function, bad. things. happen. So
-                // timeout the the handling of the visible event, which calls back into this function.
-                //
-                setTimeout(async () => {
-                    await this.handleVisibleEvent(logPad);
-                }, 1);
-                return;
-            }
-            invalidate = undefined;
+        {   //
+            // If we await on the same function within that awaited function, bad. things. happen. So
+            // timeout the the handling of the visible event, which calls back into this function.
+            //
+            setTimeout(async () => {
+                if (this.taskTree) {
+                    await this.handleVisibleEvent(logPad + "   ");
+                }
+            }, 1);
+            return;
         }
 
         if (invalidate !== false) // if anything but 'add to excludes'
         {
-            await this.handleFileWatcherEvent(invalidate, opt, logPad);
+            await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
         }
 
         if (opt && opt instanceof Uri)
