@@ -178,6 +178,7 @@ suite("Extension Tests", () =>
         await configuration.updateWs("enablePowershell", enable);
         await configuration.updateWs("enablePerl", enable);
         await configuration.updateWs("enablePython", enable);
+        await configuration.updateWs("enablePipenv", enable);
         await configuration.updateWs("enableRuby", enable);
         await configuration.updateWs("enableTsc", enable);
         await configuration.updateWs("enableWorkspace", enable);
