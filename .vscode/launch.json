@@ -39,6 +39,20 @@
             "preLaunchTask": "npm: watch"
         },
         {
+			"type": "extensionHost",
+			"request": "launch",
+			"name": "Launch (Webpack)",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--disable-extensions",
+				"--extensionDevelopmentPath=${workspaceRoot}"
+			],
+			"outFiles": ["${workspaceRoot}/dist/client/**/*.js"],
+			"stopOnEntry": false,
+            "sourceMaps": true,
+			"preLaunchTask": "npm: webpack-watch"
+		},
+        {
             "name": "Launch Tests",
             "type": "extensionHost",
             "request": "launch",

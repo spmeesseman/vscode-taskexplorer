@@ -21,7 +21,6 @@ const config =
 	entry: {
         runTest: './src/test/runTest.ts',
         index: './src/test/index.ts',
-        istanbultestrunner: './src/test/istanbultestrunner.ts',
         testUtil: './src/test/testUtil.ts',
         "tasks.test": './src/test/tasks.test.ts',
         "extension.test": './src/test/extension.test.ts',
