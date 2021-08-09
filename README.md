@@ -64,6 +64,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Features by Version
 
+- v2.5 - Webpack build - Runs 10-15% faster.
 - v2.4 - Add Pipenv support for Python Pipfile scripts. (thanks **rob4226**) [#155](https://github.com/spmeesseman/vscode-taskexplorer/issues/155)
 - v2.3 - App-Publisher v2.0 support.  Several fixes including long time issue [#143](https://github.com/spmeesseman/vscode-taskexplorer/issues/143).
 - v2.2 - Support for Maven (closes [#107](https://github.com/spmeesseman/vscode-taskexplorer/issues/107))
@@ -120,7 +121,7 @@ Integrates with the [app-publisher](https://github.com/spmeesseman/app-publisher
 App-Publisher is a multi-purpose versioning/release tool that can be used for, but not limited to, the following:
 
 - Publish releases in a CI like manner on a local system, with version calculation.
-- Several task-mode tasks such as generating the next vesion from commit message subjects.
+- Several task-mode tasks such as generating the next version from commit message subjects.
 - NPM releases.
 - GitHub releases.
 - MantisBT releases via the [Releases Plugin](https://github.com/mantisbt-plugins/Releases).
@@ -151,7 +152,7 @@ By default, a custom parser is used to locate Ant and Gulp tasks in respective f
 ## Using Groups with a Separator
 
 **EXPERIMENTAL**
-The *Groups With Separator* option is simply an extra level of task groupings that can be made based on a configured separation character in the script name.  This option can be turned on/off with the *Group With Sepator* option in Settings, the default is OFF. The default separator is a dash ("-").
+The *Groups With Separator* option is simply an extra level of task groupings that can be made based on a configured separation character in the script name.  This option can be turned on/off with the *Group With Seperator* option in Settings, the default is OFF. The default separator is a dash ("-").
 
 For example, consider 10 npm tasks, 5 of which all start with the string *dev-*, 5 of which start with the string *prod-*.  Prior to Version 1.23, this would create 10 individual task nodes within the main npm task node in the task tree:
 
