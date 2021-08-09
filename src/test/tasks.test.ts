@@ -740,11 +740,6 @@ suite("Task tests", () =>
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask("grp-test-svr-build1", ["s1"]);\n' +
             '    grunt.registerTask("grp-test-svr-build2", ["s2"]);\n' +
-            '    grunt.registerTask("grp-test-svr-build3", ["s3"]);\n' +
-            '    grunt.registerTask("grp-test-svr-build4", ["s4"]);\n' +
-            '    grunt.registerTask("grp-test-svr-build5", ["s5"]);\n' +
-            '    grunt.registerTask("grp-test-svr-build6", ["s6"]);\n' +
-            '    grunt.registerTask("grp-test-svr-build7", ["s7"]);\n' +
             "};\n"
         );
     });
@@ -880,8 +875,8 @@ suite("Task tests", () =>
 
         taskCount = testUtil.findIdInTaskMap(":grunt:", taskMap);
         console.log("            Grunt        : " + taskCount.toString());
-        if (taskCount !== 11) {
-            assert.fail("Unexpected Grunt task count (Found " + taskCount + " of 11)");
+        if (taskCount !== 6) {
+            assert.fail("Unexpected Grunt task count (Found " + taskCount + " of 6)");
         }
 
         taskCount = testUtil.findIdInTaskMap(":gulp:", taskMap);
