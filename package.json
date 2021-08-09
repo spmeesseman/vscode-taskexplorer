@@ -63,7 +63,7 @@
         "test": "node ./dist/test/runTest.js",
         "test:dev": "npm run test:before && node ./dist/test/runTest.js && npm run test:after",
         "test:after": "npm run coverage-full_off",
-        "test:before": "npm run clean && rimraf c:\\code\\data\\user-data\\cacheddata && npm run coverage-full_on",
+        "test:before": "rimraf c:\\code\\data\\user-data\\cacheddata && npm run coverage-full_on",
         "test:openreport": "npm run coverage-open-report",
         "vscode:prepublish": " npm run webpack-rebuild",
         "watch": "tsc -watch -p ./",
