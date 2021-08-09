@@ -136,15 +136,16 @@ suite("Extension Tests", () =>
 
     async function initSettings(enable = true)
     {
+        await configuration.updateWs("security.workspace.trust.enabled", false);
         //
         // Enable views, use workspace level so that running this test from Code itself
-        // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
+        // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
         //
         await configuration.updateWs("enableExplorerView", true);
         await configuration.updateWs("enableSideBar", true);
         //
         // Set misc settings, use workspace level so that running this test from Code itself
-        // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
+        // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
         //
         await configuration.updateWs("includeAnt", ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml", "**/hello.xml"]);
         // Use update() here for coverage, since these two settings wont trigger any processing

@@ -1414,9 +1414,9 @@ suite("Task tests", () =>
         timeout(500);
         const taskItems = await tasks.fetchTasks({ type: "grunt" });
         timeout(500);
-        if (taskItems.length !== gruntCt - 7) { // grunt file that just got ignored had 7 tasks
+        if (taskItems.length !== gruntCt - 2) { // grunt file that just got ignored had 7 tasks
             assert.fail("Unexpected grunt task count (Found " + taskItems.length + " of " +
-                        (gruntCt - 7).toString() + ")");
+                        (gruntCt - 2).toString() + ")");
         }
     });
 
