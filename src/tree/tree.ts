@@ -212,7 +212,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Sort nodes.  By default the project folders are sorted in the same order as that
         // of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
-        // its entirley random as to when the individual providers report tasks to the engine
+        // its entirely random as to when the individual providers report tasks to the engine
         //
         // After the initial sort, create any task groupings based on the task group separator.
         // 'folders' are the project/workspace folders.
@@ -394,7 +394,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // If this is an 'NPM Install' task, then we do not add the "tree item".  We do however add
         // the "tree file" (above), so that the npm management tasks (including install update, audit,
-        // etc) are available via context menu of the "tree file" that represent's the folder that the
+        // etc) are available via context menu of the "tree file" that represents the folder that the
         // package.json file is found in.  Pre-v2.0.5, we exited earlier if an 'npm install' task was
         // found, but in doing so, if there were no npm "scripts" in the package.json, code execution
         // would not get far enough to create the "tree file" node for the context menu.
@@ -1397,7 +1397,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             for (const t of window.terminals)
             {
                 log.value("      == terminal " + (++termNum) + " name", t.name, 2, logPad);
-                if (taskName.toLowerCase().replace("task - ", "").indexOf(t.name.toLowerCase().replace("task - ", "")) !== -1)
+                let termName = t.name.toLowerCase().replace("task - ", "");
+                if (termName.endsWith(" Task")) {
+                    termName = termName.substring(0, termName.length - 5);
+                }
+                taskName = taskName.toLowerCase().replace("task - ", "");
+                if (taskName.endsWith(" Task")) {
+                    taskName = taskName.substring(0, taskName.length - 5);
+                }
+                if (taskName.indexOf(termName) !== -1)
                 {
                     term2 = t;
                     log.write("   found!", 2, logPad);
@@ -1417,7 +1425,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (taskItem.taskFile.folder.workspaceFolder)
         {
-            const lblString = taskItem.label.toString();
+            const lblString = taskItem.task.name;
             let taskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label +
                             " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
             term = check(taskName);
@@ -1439,6 +1447,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (!term && taskItem.taskSource === "Workspace")
             {
                 taskName = "Task - npm: " + lblString +
+                           (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+                term = check(taskName);
+            }
+
+            if (!term && lblString.indexOf("(") !== -1)
+            {
+                taskName = "Task - " + taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                            (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
                 term = check(taskName);
             }
