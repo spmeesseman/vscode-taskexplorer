@@ -65,7 +65,6 @@
         "test:after": "npm run coverage-full_off",
         "test:before": "rimraf c:\\code\\data\\user-data\\cacheddata && npm run rebuild && npm run coverage-full_on",
         "test:openreport": "npm run coverage-open-report",
-        "vscode:prepublish": " npm run webpack-rebuild",
         "watch": "tsc -watch -p ./",
         "webpack-watch": "webpack -w --info-verbosity verbose --mode development --config ./webpack.config.js",
         "webpack-build": "npm run webpack-build:extension && npm run webpack-build:test",

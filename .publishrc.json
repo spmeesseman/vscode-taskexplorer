@@ -4,7 +4,10 @@
     "bugs":               "https://github.com/spmeesseman/vscode-taskexplorer/issues",
     "buildCommand":       "npm run webpack-build",
     "changelogFile":      "CHANGELOG.md",
-    "deployCommand":      "npx vsce publish",
+    "deployCommand":      [
+        "npm run webpack-rebuild",
+        "npx vsce publish"
+    ],
     "dryRunVcRevert":     "Y",
     "githubRelease":      "Y",
     "githubUser":         "spmeesseman",
