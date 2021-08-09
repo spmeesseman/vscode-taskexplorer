@@ -1,5 +1,15 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.5.0 (August 9th, 2021)
+
+### Bug Fixes
+
+- **Tasks:** stopping a task with 'keep terminal on stop' works for some tasks but not for all.
+
+### Performance Enhancements
+
+- **Build:** webpack build runs 10-15% faster, package size halved
+
 ## Version 2.4.2 (August 7th, 2021)
 
 ### Bug Fixes
