@@ -5,6 +5,7 @@ import {
 from "vscode";
 import * as path from "path";
 import TaskFile from "./file";
+import * as util from "../common/utils";
 
 
 /**
@@ -37,10 +38,10 @@ export default class TaskItem extends TreeItem
         {
             let displayName = taskName;
             if (displayName.indexOf(" - ") !== -1 && (displayName.indexOf("/") !== -1 || displayName.indexOf("\\") !== -1 ||
-            displayName.indexOf(" - tsconfig.json") !== -1))
+                displayName.indexOf(" - tsconfig.json") !== -1))
             {
                 if (taskGroup) {
-                    displayName = taskName.replace(taskGroup + "-", "");
+                    displayName = taskName.replace(taskGroup + util.getGroupSeparator(), "");
                 }
                 else {
                     displayName = task.name.substring(0, taskName.indexOf(" - "));
@@ -62,7 +63,7 @@ export default class TaskItem extends TreeItem
         this.taskGroup = taskGroup;
         this.isUser = taskFile.isUser;
         //
-        // Since we save tasks (last tasks and favorites), we need a knownst unique key to
+        // Since we save tasks (last tasks and favorites), we need a known unique key to
         // save them with.  We can just use the existing id parameter...
         //
         const fsPath = taskFile.resourceUri ? taskFile.resourceUri.fsPath : "root";
@@ -77,17 +78,17 @@ export default class TaskItem extends TreeItem
             arguments: [this]               // If the def. action is 'Run', then it is redirected in the 'Open' cmd
         };
         //
-        // The task source, i.e. "npm", "workspace", or any of the TaskExplorer provided tasl mnemonics,
+        // The task source, i.e. "npm", "workspace", or any of the TaskExplorer provided task mnemonics,
         // i.e. "ant", "gulp", "batch", etc...
         //
         this.taskSource = task.source;
         //
-        // Set taskItem on the task deinfition object for use in the task start/stop events
+        // Set taskItem on the task definition object for use in the task start/stop events
         //
         this.task.definition.taskItemId = this.id;
         //
         // Node path
-        // 2-19-21 - This was being set to task.definitieon.path, which for workspace tasks doesnt
+        // 2-19-21 - This was being set to task.definition.path, which for workspace tasks doesn't
         // necessarily mean that the file path is the same (workspace task filepath is ./.vscode).
         // The 'nodePath' variable should be the same as the taskFile owner in any case, and this
         // should not have had anything to do with the issue found in ticket #133, which the same
