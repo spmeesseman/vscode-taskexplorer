@@ -22,7 +22,7 @@ import "source-map-support/register";
 
 //
 // Linux: prevent a weird NPE when mocha on Linux requires the window size from the TTY
-// Since we are not running in a tty environment, we just implementt he method statically
+// Since we are not running in a tty environment, we just implement he method statically
 //
 if (process.platform === "linux")
 {
@@ -61,6 +61,10 @@ export async function run(): Promise<void>
     // Check the modules already loaded and warn in case of race condition
     // (ideally, at this point the require cache should only contain one file - this module)
     //
+    // console.log("Check requires cache");
+    // Object.keys(require.cache).forEach((reqKey) => {
+    //     console.log("   " + reqKey);
+    // });
     const myFilesRegex = /vscode-recall\/dist/;
     const filterFn = myFilesRegex.test.bind(myFilesRegex);
     if (Object.keys(require.cache).filter(filterFn).length > 1)

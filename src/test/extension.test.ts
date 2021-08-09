@@ -79,7 +79,10 @@ suite("Extension Tests", () =>
             //
             // Set extension api exports
             //
-            teApi = ext.exports;
+            if (!teApi) {
+                console.log("         ℹ Reset Api");
+                teApi = ext.exports;
+            }
         }
 
         assert(teApi, "Exported API is empty");

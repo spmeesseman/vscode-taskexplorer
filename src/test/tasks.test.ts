@@ -270,7 +270,6 @@ suite("Task tests", () =>
             '    "scripts":{\r\n' +
             '        "test": "node ./node_modules/vscode/bin/test",\r\n' +
             '        "compile": "cmd.exe /c test.bat",\r\n' +
-            '        "install": "npm install",\r\n' +
             '        "watch": "tsc -watch -p ./",\r\n' +
             '        "build": "npx tsc -p ./"\r\n' +
             "    }\r\n" +
@@ -285,7 +284,6 @@ suite("Task tests", () =>
             '    "scripts":{\r\n' +
             '        "test2": "node ./node_modules/vscode/bin/test",\r\n' +
             '        "compile2": "npx tsc -p ../",\r\n' +
-            '        "install2": "npm install"\r\n' +
             "    }\r\n" +
             "}\r\n"
         );
@@ -892,12 +890,12 @@ suite("Task tests", () =>
         //
         taskCount = testUtil.findIdInTaskMap(":npm:", taskMap);
         console.log("            NPM          : " + taskCount.toString());
-        if (taskCount !== 5) {
+        if (taskCount !== 4) {
             if (taskCount === 0) {
                 console.log("            ℹ NPM tasks are not found when running tests locally");
             }
             else {
-                assert.fail("Unexpected NPM task count (Found " + taskCount + " of 5)");
+                assert.fail("Unexpected NPM task count (Found " + taskCount + " of 4)");
             }
         }
 
@@ -1410,19 +1408,12 @@ suite("Task tests", () =>
                 }
                 if (taskFile && taskFile.isGroup)
                 {
-                    console.log("add to excludes");
                     await commands.executeCommand("taskExplorer.addToExcludes", taskFile);
                     await teApi.explorerProvider?.invalidateTasksCache("grunt", taskFile.resourceUri);
                     return false; // break forEachMapAsync()
                 }
             }
         });
-
-        console.log(taskItemsB4.length);
-        for (const t of taskItemsB4)
-        {
-            console.log("   " + t.name);
-        }
 
         timeout(500);
         const taskItems = await tasks.fetchTasks({ type: "grunt" });

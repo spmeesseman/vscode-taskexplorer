@@ -5,18 +5,12 @@
     "buildCommand":       "npm run webpack-build",
     "postBuildCommand":   "npm run test:dev",
     "changelogFile":      "CHANGELOG.md",
-    "deployCommand":      [
-        "npx vsce publish"
-    ],
+    "deployCommand":      "npx vsce publish",
     "dryRunVcRevert":     "Y",
     "githubRelease":      "Y",
     "githubUser":         "spmeesseman",
-    "preGithubRelease":   [
-        "npx vsce package"
-    ],
-    "postGithubRelease":   [
-        "npx rimraf *.vsix"
-    ],
+    "preGithubRelease":   "npx vsce package",
+    "postGithubRelease":   "npx rimraf *.vsix",
     "githubAssets":       [
         "CHANGELOG.md",
         "vscode-taskexplorer-$(VERSION).vsix"
