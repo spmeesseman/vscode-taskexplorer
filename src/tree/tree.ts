@@ -1363,29 +1363,29 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private getTerminal(taskItem: TaskItem): Terminal | undefined
+    private getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefined
     {
         const me = this;
         let checkNum = 0;
         let term: Terminal | undefined;
 
-        log.write("Get terminal", 1);
+        log.write("Get terminal", 1, logPad);
 
         if (!taskItem.task || !taskItem.label)
         {
-            log.write("   no defined task on TaskItem", 2);
+            log.write("   no defined task on TaskItem", 2, logPad);
             return;
         }
 
         if (!window.terminals || window.terminals.length === 0)
         {
-            log.write("   zero terminals alive", 2);
+            log.write("   zero terminals alive", 2, logPad);
             return term;
         }
 
         if (window.terminals.length === 1)
         {
-            log.write("   return only terminal alive", 2);
+            log.write("   return only terminal alive", 2, logPad);
             return window.terminals[0];
         }
 
@@ -1396,11 +1396,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             log.value("   Checking possible task terminal name #" + (++checkNum).toString(), taskName, 2);
             for (const t of window.terminals)
             {
-                log.value("      == terminal " + (++termNum) + " name", t.name, 2);
+                log.value("      == terminal " + (++termNum) + " name", t.name, 2, logPad);
                 if (taskName.toLowerCase().replace("task - ", "").indexOf(t.name.toLowerCase().replace("task - ", "")) !== -1)
                 {
                     term2 = t;
-                    log.write("   found!", 2);
+                    log.write("   found!", 2, logPad);
                     break;
                 }
             }
@@ -1425,39 +1425,45 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (!term && lblString.indexOf("(") !== -1)
             {
                 taskName = "Task - " + taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
-                        " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+                           (relPath ? " - " : "") + taskItem.taskFile.folder.workspaceFolder.name + ")";
                 term = check(taskName);
             }
 
             if (!term)
             {
                 taskName = "Task - " + taskItem.taskSource + ": " + lblString +
-                        " - " + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+                           (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+                term = check(taskName);
+            }
+
+            if (!term && taskItem.taskSource === "Workspace")
+            {
+                taskName = "Task - npm: " + lblString +
+                           (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
                 term = check(taskName);
             }
 
             if (!term && lblString.indexOf("(") !== -1)
             {
                 taskName = "Task - " + taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
-                        " - " + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+                           (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
                 term = check(taskName);
             }
 
-            if (!term)
+            if (!term && relPath)
             {
                 const folder = taskItem.getFolder();
                 if (folder) {
                     taskName = folder.name + " (" + relPath + ")";
                     term = check(taskName);
                 }
-            }
-
-            if (!term)
-            {
-                const folder = taskItem.getFolder();
-                if (folder) {
-                    taskName = folder.name + " (" + path.basename(relPath) + ")";
-                    term = check(taskName);
+                if (!term)
+                {
+                    const folder = taskItem.getFolder();
+                    if (folder) {
+                        taskName = folder.name + " (" + path.basename(relPath) + ")";
+                        term = check(taskName);
+                    }
                 }
             }
         }
@@ -1793,23 +1799,35 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
+        log.methodStart("pause", 1, "", true);
+
         if (taskItem.task?.execution)
         {
-            const terminal = this.getTerminal(taskItem);
+            const terminal = this.getTerminal(taskItem, "   ");
             if (terminal)
             {
                 if (taskItem.paused)
                 {
                     taskItem.paused = false;
+                    log.value("   send to terminal", "Y", 1);
                     terminal.sendText("N");
                 }
                 else
                 {
                     taskItem.paused = true;
+                    log.value("   send to terminal", "\\u0003", 1);
                     terminal.sendText("\u0003");
                 }
             }
+            else {
+                window.showInformationMessage("Terminal not found");
+            }
         }
+        else {
+            window.showInformationMessage("Executing task not found");
+        }
+
+        log.methodDone("pause", 1);
     }
 
 
@@ -2141,6 +2159,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async restart(taskItem: TaskItem)
     {
+        log.methodStart("restart task", 1, "", true);
         if (!taskItem || this.busy)
         {
             window.showInformationMessage("Busy, please wait...");
@@ -2149,19 +2168,23 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             this.stop(taskItem);
             await this.run(taskItem);
         }
+        log.methodDone("restart task", 1);
     }
 
 
     private async resumeTask(taskItem: TaskItem)
     {
-        const term = this.getTerminal(taskItem);
+        log.methodStart("resume task", 1, "", true);
+        const term = this.getTerminal(taskItem, "   ");
         if (term) {
+            log.value("   send to terminal", "N", 1);
             term.sendText("N", true);
             taskItem.paused = false;
         }
         else {
             window.showInformationMessage("Terminal not found");
         }
+        log.methodDone("resume task", 1);
     }
 
 
@@ -2183,8 +2206,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             window.showInformationMessage("Busy, please wait...");
             return;
         }
-        log.write("run task", 1);
-        log.value("   task name", taskItem.label, 2);
+
+        log.methodStart("run task", 1, "", true, [["task name", taskItem.label]]);
+
         if (withArgs === true)
 		{
             await this.runWithArgs(taskItem, args, noTerminal);
@@ -2225,6 +2249,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 await this.saveTask(taskItem, configuration.get<number>("numLastTasks"), false, "   ");
             }
         }
+
+        log.methodDone("run task", 1);
     }
 
 
@@ -2554,7 +2580,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private sortLastTasks(items: (TaskFile | TaskItem)[] | undefined, lastTasks: string[], logPad = "")
     {
-        log.write(logPad + "sort last tasks", 1);
+        log.methodStart("sort last tasks", 1, logPad);
         items?.sort((a: TaskItem | TaskFile, b: TaskItem | TaskFile) =>
         {
             if (a.id && b.id) {
@@ -2569,7 +2595,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private sortTasks(items: (TaskFile | TaskItem)[] | undefined, logPad = "")
     {
-        log.write("sort tasks", 1, logPad);
+        log.methodStart("sort tasks", 1, logPad);
         items?.sort((a: TaskFile| TaskItem, b: TaskFile| TaskItem) =>
         {
             if (a.label && b.label)
@@ -2593,6 +2619,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private stop(taskItem: TaskItem)
     {
+        log.methodStart("stop", 1, "", true);
+
         if (!taskItem || this.busy)
         {
             window.showInformationMessage("Busy, please wait...");
@@ -2607,27 +2635,40 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             if (configuration.get<boolean>("keepTermOnStop") === true)
             {
-                const terminal = this.getTerminal(taskItem);
+                const terminal = this.getTerminal(taskItem, "   ");
+                log.write("   keep terminal open", 1);
                 if (terminal)
                 {
                     if (taskItem.paused)
                     {
+                        log.value("   send to terminal", "Y", 1);
                         terminal.sendText("Y");
                     }
                     else
                     {
+                        log.value("   send to terminal", "\\u0003", 1);
                         terminal.sendText("\u0003");
                         setTimeout(() => {
+                            log.value("   send to terminal", "Y", 1);
                             terminal.sendText("Y", true);
-                        }, 300);
+                        }, 500);
                     }
                     taskItem.paused = false;
                 }
+                else {
+                    window.showInformationMessage("Terminal not found");
+                }
             }
             else {
+                log.write("   kill terminal", 1);
                 exec.terminate();
             }
         }
+        else {
+            window.showInformationMessage("Executing task not found");
+        }
+
+        log.methodDone("stop", 1);
     }
 
 
