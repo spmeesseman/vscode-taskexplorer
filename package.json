@@ -54,7 +54,7 @@
         "lint": "eslint -c .eslintrc.js --ext .ts .",
         "package": "vsce package",
         "publish": "vsce publish",
-        "rebuild": "npm run clean && npm run build",
+        "rebuild": "rimraf dist && npm run build",
         "install_extensions.bat": "cmd /c .\\install_extensions.bat",
         "coverage-open-report": "cmd /c \"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\" coverage/index.html",
         "coverage-full_on": "enable-full-coverage.sh",
@@ -69,7 +69,7 @@
         "watch": "tsc -watch -p ./",
         "webpack-watch": "webpack -w --info-verbosity verbose --mode development --config ./webpack.config.js",
         "webpack-build": "npm run webpack-build:extension && npm run webpack-build:test",
-        "webpack-rebuild": "npm run clean && npm run webpack-build:extension && npm run webpack-build:test",
+        "webpack-rebuild": "rimraf dist && npm run webpack-build:extension && npm run webpack-build:test",
         "webpack-build:extension": "webpack --mode production --config ./webpack.config.js",
         "webpack-build:test": "webpack --mode production --config ./webpack.config.test.js"
     },
