@@ -1070,6 +1070,12 @@ suite("Task tests", () =>
         let taskItems = await tasks.fetchTasks({ type: "grunt" });
         const gruntCt = taskItems.length;
 
+        console.log(taskItems.length);
+        for (const t of taskItems)
+        {
+            console.log("   " + t.name);
+        }
+
         console.log("    Simulate add to exclude");
         await forEachMapAsync(taskMap, async (value: TaskItem) =>  {
             if (value && value.taskSource === "grunt") {
@@ -1388,7 +1394,7 @@ suite("Task tests", () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
-        console.log("    Add to exclude after grouping"); // exclude the gulp taks file with the 5 tasks that use grouping
+        console.log("    Add to exclude after grouping"); // exclude the gulp tasks file with the 5 tasks that use grouping
 
         const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItemsB4.length;
@@ -1404,12 +1410,19 @@ suite("Task tests", () =>
                 }
                 if (taskFile && taskFile.isGroup)
                 {
+                    console.log("add to excludes");
                     await commands.executeCommand("taskExplorer.addToExcludes", taskFile);
                     await teApi.explorerProvider?.invalidateTasksCache("grunt", taskFile.resourceUri);
                     return false; // break forEachMapAsync()
                 }
             }
         });
+
+        console.log(taskItemsB4.length);
+        for (const t of taskItemsB4)
+        {
+            console.log("   " + t.name);
+        }
 
         timeout(500);
         const taskItems = await tasks.fetchTasks({ type: "grunt" });
