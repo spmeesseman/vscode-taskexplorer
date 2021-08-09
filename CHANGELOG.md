@@ -1,5 +1,12 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.5.1 (August 9th, 2021)
+
+### Bug Fixes
+
+- **Tree:** display name for a task is not properly trimmed when grouping is enabled and the group separator character is something other than the default '-'.
+- **Tasks:** stopping a task with 'keep terminal on stop'  option set still fails for some tasks.
+
 ## Version 2.5.0 (August 9th, 2021)
 
 ### Bug Fixes
