@@ -13,7 +13,7 @@ async function main()
             version: process.env.CODE_VERSION,
             extensionDevelopmentPath,
             extensionTestsPath,
-            launchArgs: [extensionTestsPath]
+            launchArgs: [extensionTestsPath, "--disable-workspace-trust"]
         });
     } catch (err) {
         console.error(`Failed to run tests: ${err}\n${err.stack}`);

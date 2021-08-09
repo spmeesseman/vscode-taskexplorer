@@ -12,6 +12,7 @@
             "runtimeExecutable": "${execPath}",
             "args": [
                 "--disable-extensions",
+                "--disable-workspace-trust",
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "${workspaceRoot}"
             ],
@@ -29,6 +30,7 @@
             "runtimeExecutable": "${execPath}",
             "args": [
                 "--disable-extensions",
+                "--disable-workspace-trust",
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
             "stopOnEntry": false,
@@ -45,6 +47,7 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--disable-extensions",
+                "--disable-workspace-trust",
 				"--extensionDevelopmentPath=${workspaceRoot}"
 			],
 			"outFiles": ["${workspaceRoot}/dist/client/**/*.js"],
@@ -61,7 +64,8 @@
                 "${workspaceFolder}/dist/test",
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "--extensionTestsPath=${workspaceFolder}/dist/test",
-                "--disable-extensions"
+                "--disable-extensions",
+                "--disable-workspace-trust"
             ],
             "stopOnEntry": false,
             "sourceMaps": true,
