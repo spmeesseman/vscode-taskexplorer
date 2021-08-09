@@ -2,7 +2,7 @@
     "projectName":        "vscode-taskexplorer",
     "branch":             "master",
     "bugs":               "https://github.com/spmeesseman/vscode-taskexplorer/issues",
-    "buildCommand":       "webpack-build",
+    "buildCommand":       "npm run webpack-build",
     "postBuildCommand":   "npm run test:dev",
     "changelogFile":      "CHANGELOG.md",
     "deployCommand":      [
@@ -24,7 +24,8 @@
     "postReleaseCommand": "npm run coverage-codecov-publish",
     "repo":               "https://github.com/spmeesseman/vscode-taskexplorer.git",
     "repoType":           "git",
+    "skipChangelogEdits": "N",
+    "skipVersionEdits":   "Y",
     "testEmailRecip":     "spmeesseman@gmail.com",
-    "textEditor":         "notepad",
     "vcWebPath":          "https://github.com/spmeesseman/vscode-taskexplorer"
 }
