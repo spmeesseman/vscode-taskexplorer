@@ -136,7 +136,7 @@ suite("Extension Tests", () =>
 
     async function initSettings(enable = true)
     {
-        await configuration.updateWs("security.workspace.trust.enabled", false);
+        await configuration.update("security.workspace.trust.enabled", false);
         //
         // Enable views, use workspace level so that running this test from Code itself
         // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
