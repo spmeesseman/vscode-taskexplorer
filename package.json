@@ -126,6 +126,9 @@
             "@types/node"
         ]
     },
+    "publishConfig": {
+        "access": "public"
+    },
     "mocha": {},
     "nyc": {},
     "contributes": {
