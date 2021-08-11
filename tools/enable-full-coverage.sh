@@ -1,8 +1,7 @@
 #!/bin/bash
 
 cd "$(dirname ${BASH_SOURCE[0]})"
-
-echo ${BASH_SOURCE[0]}
+cd ..
 
 ENABLE=1
 if [ ! -z $1 ] ; then
