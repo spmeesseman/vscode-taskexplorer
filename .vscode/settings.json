@@ -30,6 +30,7 @@
         "cobertura",
         "eamodio",
         "lcov",
+        "nocase",
         "pkief",
         "tiansin",
         "uild",
