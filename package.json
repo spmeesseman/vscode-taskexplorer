@@ -1361,10 +1361,7 @@
                     "description": "%config.taskExplorer.clickAction%"
                 },
                 "taskExplorer.exclude": {
-                    "type": [
-                        "string",
-                        "array"
-                    ],
+                    "type": "array",
                     "items": {
                         "type": "string"
                     },

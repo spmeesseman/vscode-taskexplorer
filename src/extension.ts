@@ -16,7 +16,7 @@ import { MavenTaskProvider } from "./providers/maven";
 import { ScriptTaskProvider } from "./providers/script";
 import { GradleTaskProvider } from "./providers/gradle";
 import { GruntTaskProvider } from "./providers/grunt";
-import { PipenvTaskProvider } from './providers/pipenv';
+import { PipenvTaskProvider } from "./providers/pipenv";
 import { GulpTaskProvider } from "./providers/gulp";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
 import { configuration } from "./common/configuration";
@@ -193,14 +193,14 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
 
     //
-    // if the 'autoRefresh' settings if truned off, then there's nothing to do
+    // if the 'autoRefresh' settings if turned off, then there's nothing to do
     //
     if (configuration.get<boolean>("autoRefresh") === false) {
         return;
     }
 
     //
-    // Main excludes list cahnges requires global refresh
+    // Main excludes list changes requires global refresh
     //
     if (e.affectsConfiguration("taskExplorer.exclude")) {
         refresh = true;
@@ -289,7 +289,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
 
     //
     // NPM Package Manager change (NPM / Yarn)
-    // Do a global refrsh since we don't provide the npm tasks, VSCode itself does
+    // Do a global refresh since we don't provide the npm tasks, VSCode itself does
     //
     if (e.affectsConfiguration("npm.packageManager", undefined)) {
         registerChange("npm");
@@ -418,7 +418,7 @@ function registerTaskProviders(context: ExtensionContext)
     //
     registerTaskProvider("ant", new AntTaskProvider(), context);                      // Apache Ant Build Automation Tool
     registerTaskProvider("app-publisher", new AppPublisherTaskProvider(), context);   // App Publisher (work related)
-    registerTaskProvider("gradle", new GradleTaskProvider(), context);                // Gradle Mulit-Language Automation Tool
+    registerTaskProvider("gradle", new GradleTaskProvider(), context);                // Gradle multi-Language Automation Tool
     registerTaskProvider("grunt", new GruntTaskProvider(), context);                  // Gulp JavaScript Toolkit
     registerTaskProvider("gulp", new GulpTaskProvider(), context);                    // Grunt JavaScript Task Runner
     registerTaskProvider("make", new MakeTaskProvider(), context);                    // C/C++ Makefile
@@ -431,7 +431,7 @@ function registerTaskProviders(context: ExtensionContext)
 }
 
 
-async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, ignorehModify?: boolean, enabled?: boolean)
+async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, ignoreModify?: boolean, enabled?: boolean)
 {
     log.write("Register file watcher for task type '" + taskType + "'");
 
@@ -458,7 +458,7 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
             watchers.set(taskType, watcher);
             context.subscriptions.push(watcher);
         }
-        if (!ignorehModify) {
+        if (!ignoreModify) {
             watcherDisposables.set(taskType, watcher.onDidChange(async _e => {
                 logFileWatcherEvent(_e, "change");
                 await refreshTree(taskType, _e);

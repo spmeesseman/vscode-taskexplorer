@@ -1394,6 +1394,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             let termNum = 0,
                 term2: Terminal | undefined;
             log.value("   Checking possible task terminal name #" + (++checkNum).toString(), taskName, 2);
+            taskName = taskName.toLowerCase();
             for (const t of window.terminals)
             {
                 log.value("      == terminal " + (++termNum) + " name", t.name, 2, logPad);
@@ -1401,11 +1402,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 if (termName.endsWith(" Task")) {
                     termName = termName.substring(0, termName.length - 5);
                 }
-                taskName = taskName.toLowerCase().replace("task - ", "");
-                if (taskName.endsWith(" Task")) {
-                    taskName = taskName.substring(0, taskName.length - 5);
-                }
-                if (taskName.indexOf(termName) !== -1)
+                if (taskName.indexOf(termName) !== -1 || termName.indexOf(taskName) !== -1)
                 {
                     term2 = t;
                     log.write("   found!", 2, logPad);
@@ -1426,41 +1423,54 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (taskItem.taskFile.folder.workspaceFolder)
         {
             const lblString = taskItem.task.name;
-            let taskName = "Task - " + taskItem.taskFile.label + ": " + taskItem.label +
+            let taskName = taskItem.taskFile.label + ": " + taskItem.label +
                             " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
             term = check(taskName);
 
             if (!term && lblString.indexOf("(") !== -1)
             {
-                taskName = "Task - " + taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
+                taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                            (relPath ? " - " : "") + taskItem.taskFile.folder.workspaceFolder.name + ")";
                 term = check(taskName);
             }
 
             if (!term)
             {
-                taskName = "Task - " + taskItem.taskSource + ": " + lblString +
+                taskName = taskItem.taskSource + ": " + lblString +
+                           (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+                term = check(taskName);
+            }
+
+            if (!term)
+            {
+                taskName = taskItem.taskSource + ": " + lblString + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
+                term = check(taskName);
+            }
+
+            if (!term)
+            {
+                taskName = taskItem.taskSource + ": " + lblString +
                            (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
                 term = check(taskName);
             }
 
             if (!term && taskItem.taskSource === "Workspace")
             {
-                taskName = "Task - npm: " + lblString +
+                taskName = "npm: " + lblString +
                            (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
                 term = check(taskName);
             }
 
             if (!term && lblString.indexOf("(") !== -1)
             {
-                taskName = "Task - " + taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
+                taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                            (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
                 term = check(taskName);
             }
 
             if (!term && lblString.indexOf("(") !== -1)
             {
-                taskName = "Task - " + taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
+                taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                            (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
                 term = check(taskName);
             }
@@ -1534,7 +1544,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             if (this.needsRefresh.length > 1 || this.needsRefresh[0].invalidate === undefined)
             {
-                await this.refresh(logPad + "   ");
+                await this.refresh(true, undefined, logPad + "   ");
             }
             else
             {
@@ -1586,12 +1596,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // being called from the unit tests, so some special handling is required.
         //
         // In the case of a settings change, 'opt2' will be undefined.  Depending on how many task
-        // types configs' were aaltered in settings, this function may run through more than once
+        // types configs' were altered in settings, this function may run through more than once
         // right now for each task type affected.  Some settings require a global refresh, for example
         // the 'groupDashed' settings, or 'enableSideBar',etc.  If a global refresh is to be performed,
         // then both 'opt1' and 'opt2' will be undefined.
         //
-        // In the casse of a task event, 'opt2' is undefined.
+        // In the cases of a task event, 'opt2' is undefined.
         //
         // If a FileSystemWatcher event, then 'opt2' should contain the Uri of the file that was
         // modified, created, or deleted.
@@ -1917,14 +1927,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *
      * If invalidate is false, then this is both an event as a result from adding to excludes list
      * and the item being added is a file, not a group / set of files.  If theitem being added to
-     * the expludes list is a group/folder, then invalidate will be set to the task source, i.e.
+     * the excludes list is a group/folder, then invalidate will be set to the task source, i.e.
      * npm, ant, workspace, etc.
      *
      * If invalidate is true and opt is false, then the refresh button was clicked
      *
      * If invalidate is "tests" and opt undefined, then extension.refreshTree() called in tests
      *
-     * If task is truthy, then a task has started/stopped, opt will be the task deifnition's
+     * If task is truthy, then a task has started/stopped, opt will be the task definition's
      * 'uri' property, note that task types not internally provided will not contain this property.
      *
      * If invalidate and opt are both truthy, then a filesystemwatcher event or a task just triggered
@@ -1988,13 +1998,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (opt && opt instanceof Uri)
         {   //
-            // TODO - Performance Enhanceement
+            // TODO - Performance Enhancement
             // Get the invalidated treeitem.treefile and invalidate that instead of rebuilding
             // the entire tree. We set currentInvalidation here, this will cause the resulting
             // call to getChildren() from the VSCode task engine to only re-provide the invalidated
             // task type, instead of all task types
             //
-            this.currentInvalidation = invalidate;
+            this.currentInvalidation = invalidate;     // 'invalidate' will be taskType if 'opt' is uri
             this.taskTree = null;                      // see todo above
             this._onDidChangeTreeData.fire(null);      // see todo above // task.definition.treeItem
         }                                              // not sure if its even possible

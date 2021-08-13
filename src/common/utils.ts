@@ -299,30 +299,18 @@ export function isExcluded(uriPath: string, logPad = "")
         return minimatch(path, pattern, { dot: true, nocase: true });
     }
 
-    const exclude = configuration.get<string | string[]>("exclude");
+    const exclude = configuration.get<string[]>("exclude", []);
 
     log.blank(4);
     log.write(logPad + "Check exclusion", 4);
     log.value(logPad + "   path", uriPath, 4);
 
-    if (exclude)
-    {
-        if (Array.isArray(exclude))
-        {
-            for (const pattern of exclude) {
-                log.value(logPad + "   checking pattern", pattern, 5);
-                if (testForExclusionPattern(uriPath, pattern)) {
-                    log.write(logPad + "   Excluded!", 4);
-                    return true;
-                }
-            }
-        }
-        else {
-            log.value(logPad + "   checking pattern", exclude, 5);
-            if (testForExclusionPattern(uriPath, exclude)) {
-              log.write(logPad + "   Excluded!", 4);
-              return true;
-            }
+
+    for (const pattern of exclude) {
+        log.value(logPad + "   checking pattern", pattern, 5);
+        if (testForExclusionPattern(uriPath, pattern)) {
+            log.write(logPad + "   Excluded!", 4);
+            return true;
         }
     }
 
