@@ -123,6 +123,9 @@
         "webpack-cli": "^3.3.12",
         "webpack-node-externals": "^2.5.2"
     },
+    "resolutions": {
+        "@types/tapable": "1.0.0"
+    },
     "greenkeeper": {
         "ignore": [
             "@types/node"
