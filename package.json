@@ -69,6 +69,7 @@
         "webpack-watch": "webpack -w --info-verbosity verbose --mode development --config ./webpack.config.js",
         "webpack-build": "npm run webpack-build:extension && npm run webpack-build:test",
         "webpack-rebuild": "rimraf dist && npm run webpack-build:extension && npm run webpack-build:test",
+        "webpack-rebuild:extension": "rimraf dist && npm run webpack-build:extension --config ./webpack.config.js",
         "webpack-build:extension": "webpack --mode production --config ./webpack.config.js",
         "webpack-build:test": "webpack --mode production --config ./webpack.config.test.js"
     },
