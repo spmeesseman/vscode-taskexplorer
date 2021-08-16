@@ -1,5 +1,16 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.5.2 (August 15th, 2021)
+
+### Bug Fixes
+
+- **Tasks:** start/stop events processing for non-visible view
+- **Tasks:** stopping a task with 'keep terminal on stop'  option set still x3 fails for some tasks.
+
+### Build System
+
+- **Package.json:** fix -vscode release only contains webpacked files but vsce complains of 850+files in package.
+
 ## Version 2.5.1 (August 9th, 2021)
 
 ### Bug Fixes
