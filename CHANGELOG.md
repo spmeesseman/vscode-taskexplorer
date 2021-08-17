@@ -1,5 +1,16 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.5.3 (August 17th, 2021)
+
+### Refactoring
+
+- handle VSCode v1.56+ randomly emitting 10+ task start/stop events when a task starts and finishes
+
+### Build System
+
+- **Package.json:** fix -vscode release only contains webpacked files but vsce complains of 850+files in package.
+- fix - vsix fails to upload with guthub release
+
 ## Version 2.5.2 (August 15th, 2021)
 
 ### Bug Fixes
