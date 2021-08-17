@@ -1,14 +1,9 @@
 {
     "projectName":              "vscode-taskexplorer",
     "branch":                   "master",
-    "bugs":                     "https://github.com/spmeesseman/vscode-taskexplorer/issues",
-    "buildCommand":             "npm run webpack-build",
+    "buildCommand":             "npm run webpack-rebuild",
     "changelogFile":            "CHANGELOG.md",
-    "deployCommand": [
-        "npm run webpack-rebuild",
-        "npx vsce publish"
-    ],
-    "dryRunVcRevert":           "Y",
+    "deployCommand":            "npx vsce publish",
     "githubAssets": [
         "CHANGELOG.md",
         "vscode-taskexplorer-$(VERSION).vsix"
@@ -17,12 +12,15 @@
     "githubReleasePreCommand":  "npx vsce package",
     "githubReleasePostCommand": "npx rimraf *.vsix",
     "githubUser":               "spmeesseman",
-    "postBuildCommand":         "npm run test:dev",
+    "postBuildCommand": [
+        "npm run test:dev",
+        "npm run webpack-build"
+    ],
     "postReleaseCommand":       "bash.exe tools/codecov.sh -t ${CODECOV_TOKEN}",
+    "promptVersion":            "N",
     "repo":                     "https://github.com/spmeesseman/vscode-taskexplorer.git",
     "repoType":                 "git",
     "skipChangelogEdits":       "N",
     "skipVersionEdits":         "Y",
-    "testEmailRecip":           "spmeesseman@gmail.com",
     "vcWebPath":                "https://github.com/spmeesseman/vscode-taskexplorer"
 }
