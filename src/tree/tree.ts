@@ -1959,13 +1959,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // receive events.  If this view is hidden/disabled, then nothing to do right now, save the
         // event paramters to process later.
         //
-        if (this.taskTree && views.get(this.name) && invalidate !== "tests")
+        if (this.taskTree && views.get(this.name) && invalidate !== "tests" && opt instanceof Uri)
         {
             if (!views.get(this.name)?.visible ||
                 !configuration.get<boolean>(this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar"))
             {
                 log.write("   Delay refresh, exit");
-                util.pushIfNotExists(this.needsRefresh, { invalidate, opt });
+                util.pushIfNotExists(this.needsRefresh, { invalidate, uri: opt });
                 return;
             }
         }
@@ -2708,7 +2708,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // start/end event for a task.  Sick of these damn bugs that keep getting introduced
         // seemingly every other version AT LEAST.
         //
-        const taskId = e.execution.task.definition.taskItemId;
+        const task = e.execution.task,
+              taskId = task.definition.taskItemId;
         let taskTimerId: NodeJS.Timeout | undefined;
         if (this.taskIdStartEvents.has(taskId)) {
             taskTimerId = this.taskIdStartEvents.get(taskId);
@@ -2727,21 +2728,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             // Show status bar message (if ON in settings)
             //
-            this.showStatusMessage(e.execution.task);
-            //
-            // If a view was turned off in settings, the disposable view still remains and will still
-            // receive events.  If this view is hidden/disabled, then nothing to do right now, save the
-            // event paramters to process later.
-            //
-            const enableSettingName = this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar";
-            if (views.get(this.name) && (!views.get(this.name)?.visible || !configuration.get<boolean>(enableSettingName)))
-            {
-                log.write("   view not visible, exit", 1);
-                return;
-            }
-            //
-            // Fire change event which will update tree loading icons, etc
-            //
+            this.showStatusMessage(task);
             const taskItem = await this.getTaskItems(taskId) as TaskItem;
             this.fireTaskChangeEvents(taskItem);
         }, 50);
@@ -2758,7 +2745,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // start/end event for a task.  Sick of these damn bugs that keep getting introduced
         // seemingly every other version AT LEAST.
         //
-        const taskId = e.execution.task.definition.taskItemId;
+        const task = e.execution.task;
+        const taskId = task.definition.taskItemId;
         let taskTimerId: NodeJS.Timeout | undefined;
         if (this.taskIdStopEvents.has(taskId)) {
             taskTimerId = this.taskIdStopEvents.get(taskId);
@@ -2777,21 +2765,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             // Hide status bar message (if ON in settings)
             //
-            this.showStatusMessage(e.execution.task);
-            //
-            // If a view was turned off in settings, the disposable view still remains and will still
-            // receive events.  If this view is hidden/disabled, then nothing to do right now, save the
-            // event paramters to process later.
-            //
-            const enableSettingName = this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar";
-            if (views.get(this.name) && (!views.get(this.name)?.visible || !configuration.get<boolean>(enableSettingName)))
-            {
-                log.write("   view not visible, exit", 1);
-                return;
-            }
-            //
-            // Fire change event which will update tree loading icons, etc
-            //
+            this.showStatusMessage(task);
             const taskItem = await this.getTaskItems(taskId) as TaskItem;
             this.fireTaskChangeEvents(taskItem);
         }, 50);
