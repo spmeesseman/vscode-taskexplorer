@@ -3,7 +3,6 @@
 'use strict';
 
 const path = require('path');
-const exec = require('child_process').exec;
 const TerserPlugin = require('terser-webpack-plugin');
 
 /**
@@ -73,7 +72,7 @@ const config =
 					safari10: false,
 				}
 			})
-		],
+		]
 	}
 };
 module.exports = config;
