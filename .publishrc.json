@@ -13,8 +13,8 @@
     "githubReleasePostCommand": "npx rimraf *.vsix",
     "githubUser":               "spmeesseman",
     "postBuildCommand": [
-        "npm run test:dev",
-        "npm run webpack-build"
+        "npm run test",
+        "npm run webpack-rebuild"
     ],
     "postReleaseCommand":       "bash.exe tools/codecov.sh -t ${CODECOV_TOKEN}",
     "promptVersion":            "N",

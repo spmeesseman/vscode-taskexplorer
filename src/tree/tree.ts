@@ -2697,56 +2697,106 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         log.methodDone("stop", 1);
     }
 
+    private taskIdStartEvents: Map<string, NodeJS.Timeout | undefined> = new Map();
+    private taskIdStopEvents: Map<string, NodeJS.Timeout | undefined> = new Map();
+
 
     private async taskStartEvent(e: TaskStartEvent)
     {
-        log.write("task started", 1);
         //
-        // Show status bar message (if ON in settings)
+        // Clear debounce timeout if still pending.  VScode v1.57+ emits about a dozen task
+        // start/end event for a task.  Sick of these damn bugs that keep getting introduced
+        // seemingly every other version AT LEAST.
         //
-        this.showStatusMessage(e.execution.task);
-        //
-        // If a view was turned off in settings, the disposable view still remains and will still
-        // receive events.  If this view is hidden/disabled, then nothing to do right now, save the
-        // event paramters to process later.
-        //
-        const enableSettingName = this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar";
-        if (views.get(this.name) && (!views.get(this.name)?.visible || !configuration.get<boolean>(enableSettingName)))
-        {
-            log.write("   view not visible, exit", 1);
-            return;
+        const taskId = e.execution.task.definition.taskItemId;
+        let taskTimerId: NodeJS.Timeout | undefined;
+        if (this.taskIdStartEvents.has(taskId)) {
+            taskTimerId = this.taskIdStartEvents.get(taskId);
+            if (taskTimerId) {
+                clearTimeout(taskTimerId);
+                this.taskIdStartEvents.delete(taskId);
+            }
         }
         //
-        // Fire change event which will update tree loading icons, etc
+        // Debounce!!  VScode v1.57+ emits about a dozen task start/end event for a task.  Sick
+        // of these damn bugs that keep getting introduced seemingly every other version AT LEAST.
         //
-        const taskItem = await this.getTaskItems(e.execution.task.definition.taskItemId) as TaskItem;
-        this.fireTaskChangeEvents(taskItem);
+        taskTimerId = setTimeout(async () =>
+        {
+            log.write("task started", 1);
+            //
+            // Show status bar message (if ON in settings)
+            //
+            this.showStatusMessage(e.execution.task);
+            //
+            // If a view was turned off in settings, the disposable view still remains and will still
+            // receive events.  If this view is hidden/disabled, then nothing to do right now, save the
+            // event paramters to process later.
+            //
+            const enableSettingName = this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar";
+            if (views.get(this.name) && (!views.get(this.name)?.visible || !configuration.get<boolean>(enableSettingName)))
+            {
+                log.write("   view not visible, exit", 1);
+                return;
+            }
+            //
+            // Fire change event which will update tree loading icons, etc
+            //
+            const taskItem = await this.getTaskItems(taskId) as TaskItem;
+            this.fireTaskChangeEvents(taskItem);
+        }, 50);
+
+        this.taskIdStartEvents.set(taskId, taskTimerId);
     }
+
 
 
     private async taskFinishedEvent(e: TaskEndEvent)
     {
-        log.write("task finished", 1);
         //
-        // Hide status bar message (if ON in settings)
+        // Clear debounce timeout if still pending.  VScode v1.57+ emits about a dozen task
+        // start/end event for a task.  Sick of these damn bugs that keep getting introduced
+        // seemingly every other version AT LEAST.
         //
-        this.showStatusMessage(e.execution.task);
-        //
-        // If a view was turned off in settings, the disposable view still remains and will still
-        // receive events.  If this view is hidden/disabled, then nothing to do right now, save the
-        // event paramters to process later.
-        //
-        const enableSettingName = this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar";
-        if (views.get(this.name) && (!views.get(this.name)?.visible || !configuration.get<boolean>(enableSettingName)))
-        {
-            log.write("   view not visible, exit", 1);
-            return;
+        const taskId = e.execution.task.definition.taskItemId;
+        let taskTimerId: NodeJS.Timeout | undefined;
+        if (this.taskIdStopEvents.has(taskId)) {
+            taskTimerId = this.taskIdStopEvents.get(taskId);
+            if (taskTimerId) {
+                clearTimeout(taskTimerId);
+                this.taskIdStopEvents.delete(taskId);
+            }
         }
         //
-        // Fire change event which will update tree loading icons, etc
+        // Debounce!!  VScode v1.57+ emits about a dozen task start/end event for a task.  Sick
+        // of these damn bugs that keep getting introduced seemingly every other version AT LEAST.
         //
-        const taskItem = await this.getTaskItems(e.execution.task.definition.taskItemId) as TaskItem;
-        this.fireTaskChangeEvents(taskItem);
+        taskTimerId = setTimeout(async () =>
+        {
+            log.write("task finished", 1);
+            //
+            // Hide status bar message (if ON in settings)
+            //
+            this.showStatusMessage(e.execution.task);
+            //
+            // If a view was turned off in settings, the disposable view still remains and will still
+            // receive events.  If this view is hidden/disabled, then nothing to do right now, save the
+            // event paramters to process later.
+            //
+            const enableSettingName = this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar";
+            if (views.get(this.name) && (!views.get(this.name)?.visible || !configuration.get<boolean>(enableSettingName)))
+            {
+                log.write("   view not visible, exit", 1);
+                return;
+            }
+            //
+            // Fire change event which will update tree loading icons, etc
+            //
+            const taskItem = await this.getTaskItems(taskId) as TaskItem;
+            this.fireTaskChangeEvents(taskItem);
+        }, 50);
+
+        this.taskIdStopEvents.set(taskId, taskTimerId);
     }
 
 }
