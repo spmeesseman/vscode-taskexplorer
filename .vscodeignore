@@ -19,3 +19,5 @@ package-lock.json
 tsconfig.json
 tslint.json
 webpack.config.*
+node_modules
+tools
