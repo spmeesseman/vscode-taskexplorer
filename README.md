@@ -246,13 +246,6 @@ Other Contributors:
 |extjs-pkg-tinymce|ExtJS TinyMCE Wrapper|[GitHub](https://github.com/spmeesseman/extjs-pkg-tinymce)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-pkg-tinymce)|
 |extjs-pkg-websocket|ExtJS WebSocket Wrapper|[GitHub](https://github.com/spmeesseman/extjs-pkg-websocket)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-pkg-websocket)|
 |extjs-pkg-webworker|ExtJS WebWorker Wrapper|[GitHub](https://github.com/spmeesseman/extjs-pkg-webworker)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-pkg-webworker)|
-|extjs-theme-graphite-small|ExtJS Dark Theme|[GitHub](https://github.com/spmeesseman/extjs-theme-graphite-small)|[Npmjs.org Private Registry](https://www.npmjs.com/package/@spmeesseman/@spmeesseman/extjs-theme-graphite-small)|
-|extjs-theme-amethyst|ExtJS Purple Theme|[GitHub](https://github.com/spmeesseman/extjs-theme-amethyst)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-theme-amethyst)|
-|extjs-theme-emerald|ExtJS Green Theme|[GitHub](https://github.com/spmeesseman/extjs-theme-emerald)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-theme-emerald)|
-|extjs-theme-ruby|ExtJS Red Theme|[GitHub](https://github.com/spmeesseman/extjs-theme-ruby)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-theme-ruby)|
-|extjs-theme-ruby-dark|ExtJS Dark Theme|[GitHub](https://github.com/spmeesseman/extjs-theme-ruby-dark)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-theme-ruby-dark)|
-|extjs-theme-turquoise|ExtJS Blue Theme|[GitHub](https://github.com/spmeesseman/extjs-theme-turquoise)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-theme-turquoise)|
-|extjs-theme-turquoise-dark|ExtJS Dark Theme|[GitHub](https://github.com/spmeesseman/extjs-theme-turquoise-dark)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-theme-turquoise-dark)|
 |jenkins-mantisbt-plugin|Jenkins MantisBT Integration|[GitHub](https://github.com/spmeesseman/jenkins-mantisbt-plugin)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/jenkins-mantisbt-plugin)|
 |jenkins-utility-server|Jenkins Desktop Server|[GitHub](https://github.com/spmeesseman/jenkins-utility-server)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/jenkins-utility-server)|
 |mantisbt|MantisBT Custom Site|[GitHub](https://github.com/spmeesseman/mantisbt)|[GitHub Releases](https://github.com/spmeesseman/mantisbt/releases)|
