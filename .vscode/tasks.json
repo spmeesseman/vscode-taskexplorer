@@ -53,7 +53,7 @@
     {
         "label": "Publish to Codecov",
         "type": "shell",
-        "command": "bash.exe",
+        "command": "${env:CODE_HOME}\\git\\bin\\bash.exe",
         "args": [
             "tools/codecov.sh",
             "-t",
