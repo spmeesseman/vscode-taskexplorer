@@ -2,8 +2,13 @@
     "projectName":              "vscode-taskexplorer",
     "branch":                   "master",
     "buildCommand":             "npm run webpack-rebuild",
+    "buildPostCommand": [
+        "npm run test",
+        "npm run webpack-rebuild"
+    ],
     "changelogFile":            "CHANGELOG.md",
     "deployCommand":            "npx vsce publish",
+    "deployPostCommand":        "bash.exe tools/codecov.sh -t ${CODECOV_TOKEN}",
     "githubAssets": [
         "CHANGELOG.md",
         "vscode-taskexplorer-$(VERSION).vsix"
@@ -12,11 +17,6 @@
     "githubReleasePreCommand":  "npx vsce package",
     "githubReleasePostCommand": "npx rimraf *.vsix",
     "githubUser":               "spmeesseman",
-    "postBuildCommand": [
-        "npm run test",
-        "npm run webpack-rebuild"
-    ],
-    "postReleaseCommand":       "bash.exe tools/codecov.sh -t ${CODECOV_TOKEN}",
     "promptVersion":            "N",
     "repo":                     "https://github.com/spmeesseman/vscode-taskexplorer.git",
     "repoType":                 "git",
