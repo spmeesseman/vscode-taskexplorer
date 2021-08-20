@@ -48,7 +48,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private busy = false;
     private extensionContext: ExtensionContext;
     private name: string;
-    private needsRefresh: any[] = [];
+    private needsRefresh: Map<string, any[]> = new Map();
     private taskTree: TaskFolder[] | NoScripts[] | null = null;
     private currentInvalidation: string | undefined;
     private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
@@ -1538,20 +1538,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async handleVisibleEvent(logPad = "")
     {
         log.methodStart("handle 'visible' event", 1, logPad);
-        if (this.needsRefresh && this.needsRefresh.length > 0)
+        if (this.needsRefresh.size > 0)
         {   //
             // If theres more than one pending refresh request, just refresh the tree
             //
-            if (this.needsRefresh.length > 1 || this.needsRefresh[0].invalidate === undefined)
+            const nrMap = this.needsRefresh.get(this.name);
+            if (nrMap)
             {
-                await this.refresh(true, undefined, logPad + "   ");
-            }
-            else
-            {
-                await this.refresh(this.needsRefresh[0].invalidate, this.needsRefresh[0].uri, logPad + "   ");
-            }
+                if (nrMap.length > 1 || nrMap[0].invalidate === undefined)
+                {
+                    await this.refresh(true, undefined, logPad + "   ");
+                }
+                else
+                {
+                    await this.refresh(nrMap[0].invalidate, nrMap[0].uri, logPad + "   ");
+                }
 
-            this.needsRefresh = [];
+                this.needsRefresh.delete(this.name);
+            }
         }
         log.methodDone("handle 'visible' event", 1, logPad);
     }
@@ -1961,11 +1965,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (this.taskTree && views.get(this.name) && invalidate !== "tests" && opt instanceof Uri)
         {
-            if (!views.get(this.name)?.visible ||
-                !configuration.get<boolean>(this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar"))
+            if (!views.get(this.name)?.visible || !configuration.get<boolean>(this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar"))
             {
                 log.write("   Delay refresh, exit");
-                util.pushIfNotExists(this.needsRefresh, { invalidate, uri: opt });
+                const nrMap = this.needsRefresh.get(this.name);
+                if (nrMap)
+                {
+                    const existsMaps = nrMap.find((m) => m.invalidate === invalidate && m.uri === opt);
+                    if (!existsMaps) {
+                        nrMap.push({ invalidate, uri: opt });
+                    }
+                }
+                else {
+                    this.needsRefresh.set(this.name, [{ invalidate, uri: opt }]);
+                }
                 return;
             }
         }

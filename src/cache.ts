@@ -368,7 +368,7 @@ function getStatusString(msg: string, statusLength = 0)
 export async function rebuildCache(logPad = "")
 {
     log.blank(1);
-    log.write("rebuild cache", 1);
+    log.write("rebuild cache", 1, logPad);
     filesCache.clear();
     await addFolderToCache(undefined, logPad);
 }
