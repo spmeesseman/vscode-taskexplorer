@@ -52,10 +52,9 @@
     },
     {
         "label": "Publish to Codecov",
-        "type": "shell",
-        "command": "${env:CODE_HOME}\\git\\bin\\bash.exe",
+        "type": "process",
+        "command": "tools\\codecov.exe",
         "args": [
-            "tools/codecov.sh",
             "-t",
             "${env:CODECOV_TOKEN}"
         ],
