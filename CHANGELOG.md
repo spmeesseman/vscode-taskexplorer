@@ -1,5 +1,20 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.5.5 (August 20th, 2021)
+
+### Bug Fixes
+
+- regression - leaving view while task is running then coming back after it has finished causes re-parse of all tasksif both main and sidebar view are enabled.
+
+### Documentation
+
+- **Readme:** update open source project list
+
+### Build System
+
+- **Ap:** update renamed 3.7  publishrc properties
+- codecov upload fails when using git bash
+
 ## Version 2.5.4 (August 17th, 2021)
 
 ### Bug Fixes
