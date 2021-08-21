@@ -44,17 +44,17 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Screenshots by Version
 
-| Original Explorer Tray             | Sidebar View (v1.7)                | Task Type Groups (v1.13)           |
-| ---------------------------------- | ---------------------------------- | ---------------------------------- |
-| ![ss0](res/taskview1.png?raw=true) | ![ss1](res/taskview2.png?raw=true) | ![ss2](res/taskview3.png?raw=true) |
+| Original Explorer Tray                    | Sidebar View (v1.7)                       | Task Type Groups (v1.13)                  |
+| ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
+| ![ss0](res/readme/taskview1.png?raw=true) | ![ss1](res/readme/taskview2.png?raw=true) | ![ss2](res/readme/taskview3.png?raw=true) |
 
-| Grunt/Gulp in Subfolders (v1.14)   | Npm Commands (v1.16)               | Task Groupings (v1.23)             |
-| ---------------------------------- | ---------------------------------- | ---------------------------------- |
-| ![ss4](res/taskview4.png?raw=true) | ![ss5](res/taskview5.png?raw=true) | ![ss6](res/taskview6.png?raw=true) |
+| Grunt/Gulp in Subfolders (v1.14)          | Npm Commands (v1.16)                      | Task Groupings (v1.23)                    |
+| ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
+| ![ss4](res/readme/taskview4.png?raw=true) | ![ss5](res/readme/taskview5.png?raw=true) | ![ss6](res/readme/taskview6.png?raw=true) |
 
-| Multi-Level Task Groupings (v1.29) | Run with Args, No Terminal (1.30)  | Last Tasks (1.25) Favorites (2.0)  |
-| ---------------------------------- | ---------------------------------- | ---------------------------------- |
-| ![ss7](res/taskview7.png?raw=true) | ![ss8](res/taskview8.png?raw=true) | ![ss9](res/taskview9.png?raw=true) |
+| Multi-Level Task Groupings (v1.29)        | Run with Args, No Terminal (1.30)         | Last Tasks (1.25) Favorites (2.0)         |
+| ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
+| ![ss7](res/readme/taskview7.png?raw=true) | ![ss8](res/readme/taskview8.png?raw=true) | ![ss9](res/readme/taskview9.png?raw=true) |
 
 ## Requirements
 
@@ -115,6 +115,8 @@ Version 2 highlights 2 major performance enhancements along with several feature
 6. Completely refactored classes, interfaces, and commenting for easier community contributions.
 
 ## App-Publisher
+
+![app-publisher-cmdline-banner](https://github.com/spmeesseman/app-publisher/blob/master/res/readme/cmdline-banner.png?raw=true)
 
 Integrates with the [app-publisher](https://github.com/spmeesseman/app-publisher) tool.
 
