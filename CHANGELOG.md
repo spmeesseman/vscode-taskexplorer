@@ -1,5 +1,11 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.5.6 (August 21st, 2021)
+
+### Bug Fixes
+
+- events are processing for bothe sidebar and explorer view even if only one is activated and in use.
+
 ## Version 2.5.5 (August 20th, 2021)
 
 ### Bug Fixes
