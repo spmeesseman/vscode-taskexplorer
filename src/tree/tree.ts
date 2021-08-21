@@ -1950,7 +1950,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *
      * @param opt Uri of the invalidated resource
      */
-    public async refresh(invalidate?: any, opt?: Uri | boolean, logPad = ""): Promise<void>// , skipAskTasks?: boolean): Promise<boolean>
+    public async refresh(invalidate?: any, opt?: Uri | boolean, logPad = ""): Promise<void>
     {
         log.methodStart("refresh task tree", 1, logPad, true, [
             [ "from view", this.name ], [ "invalidate", invalidate ],
@@ -1963,21 +1963,27 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // receive events.  If this view is hidden/disabled, then nothing to do right now, save the
         // event paramters to process later.
         //
-        if (this.taskTree && views.get(this.name) && invalidate !== "tests" && opt instanceof Uri)
+        if (!views.get(this.name)?.visible || !configuration.get<boolean>(this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar"))
         {
-            if (!views.get(this.name)?.visible || !configuration.get<boolean>(this.name === "taskExplorer" ? "enableExplorerView" : "enableSideBar"))
+            if (invalidate !== "tests" && opt && opt instanceof Uri)
             {
-                log.write("   Delay refresh, exit");
-                const nrMap = this.needsRefresh.get(this.name);
-                if (nrMap)
+                log.write("   Delay refresh, exit", 1, logPad);
+                if (this.taskTree)
                 {
-                    const existsMaps = nrMap.find((m) => m.invalidate === invalidate && m.uri === opt);
-                    if (!existsMaps) {
-                        nrMap.push({ invalidate, uri: opt });
+                    const nrMap = this.needsRefresh.get(this.name);
+                    if (nrMap)
+                    {
+                        const existsMaps = nrMap.find((m) => m.invalidate === invalidate && m.uri === opt);
+                        if (!existsMaps) {
+                            nrMap.push({ invalidate, uri: opt });
+                        }
+                    }
+                    else {
+                        this.needsRefresh.set(this.name, [{ invalidate, uri: opt }]);
                     }
                 }
                 else {
-                    this.needsRefresh.set(this.name, [{ invalidate, uri: opt }]);
+                    this.needsRefresh.clear();
                 }
                 return;
             }
@@ -2010,12 +2016,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
 
         if (opt && opt instanceof Uri)
-        {   //
+        {
+            log.write(`   invalidation is for type '${invalidate}'`, 1, logPad);
+            //
             // TODO - Performance Enhancement
             // Get the invalidated treeitem.treefile and invalidate that instead of rebuilding
-            // the entire tree. We set currentInvalidation here, this will cause the resulting
-            // call to getChildren() from the VSCode task engine to only re-provide the invalidated
-            // task type, instead of all task types
+            // the entire tree. We set currentInvalidation here, setting the 'currentInvalidation'
+            // flag will cause the resulting call to getChildren() from the VSCode task engine to
+            // only re-provide the invalidated task type, instead of all task types
             //
             this.currentInvalidation = invalidate;     // 'invalidate' will be taskType if 'opt' is uri
             this.taskTree = null;                      // see todo above
@@ -2024,6 +2032,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         else //
         {   // Re-ask for all tasks from all providers and rebuild tree
             //
+            log.write("   invalidation is for all types", 1, logPad);
             this.tasks = null; // !skipAskTasks ? null : this.tasks;
             this.taskTree = null;
             this._onDidChangeTreeData.fire(null);
@@ -2710,8 +2719,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         log.methodDone("stop", 1);
     }
 
-    private taskIdStartEvents: Map<string, NodeJS.Timeout | undefined> = new Map();
-    private taskIdStopEvents: Map<string, NodeJS.Timeout | undefined> = new Map();
+    private taskIdStartEvents: Map<string, NodeJS.Timeout> = new Map();
+    private taskIdStopEvents: Map<string, NodeJS.Timeout> = new Map();
 
 
     private async taskStartEvent(e: TaskStartEvent)
@@ -2724,12 +2733,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const task = e.execution.task,
               taskId = task.definition.taskItemId;
         let taskTimerId: NodeJS.Timeout | undefined;
-        if (this.taskIdStartEvents.has(taskId)) {
-            taskTimerId = this.taskIdStartEvents.get(taskId);
-            if (taskTimerId) {
-                clearTimeout(taskTimerId);
-                this.taskIdStartEvents.delete(taskId);
-            }
+        if (taskTimerId = this.taskIdStartEvents.get(taskId)) {
+            clearTimeout(taskTimerId);
+            this.taskIdStartEvents.delete(taskId);
         }
         //
         // Debounce!!  VScode v1.57+ emits about a dozen task start/end event for a task.  Sick
@@ -2761,12 +2767,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const task = e.execution.task;
         const taskId = task.definition.taskItemId;
         let taskTimerId: NodeJS.Timeout | undefined;
-        if (this.taskIdStopEvents.has(taskId)) {
-            taskTimerId = this.taskIdStopEvents.get(taskId);
-            if (taskTimerId) {
-                clearTimeout(taskTimerId);
-                this.taskIdStopEvents.delete(taskId);
-            }
+        if (taskTimerId = this.taskIdStopEvents.get(taskId)) {
+            clearTimeout(taskTimerId);
+            this.taskIdStopEvents.delete(taskId);
         }
         //
         // Debounce!!  VScode v1.57+ emits about a dozen task start/end event for a task.  Sick
