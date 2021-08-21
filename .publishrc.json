@@ -8,7 +8,7 @@
     ],
     "changelogFile":            "CHANGELOG.md",
     "deployCommand":            "npx vsce publish",
-    "deployPostCommand":        "bash.exe tools/codecov.sh -t ${CODECOV_TOKEN}",
+    "deployPostCommand":        "tools/codecov.exe -t ${CODECOV_TOKEN}",
     "githubAssets": [
         "CHANGELOG.md",
         "vscode-taskexplorer-$(VERSION).vsix"
