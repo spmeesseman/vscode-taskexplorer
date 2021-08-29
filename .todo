@@ -11,3 +11,7 @@ Features:
     ☐ Option persisted cache
         For tasks to load from fs on startup
         Instant load time, but must refresh for task files edited outside of editor
+    ☐ Auto detect ExtJS project
+        Parse profiels from app.json
+        Detect open tooling vs. command, create webpack and cmd tasks
+        Task for debug output build
