@@ -1,5 +1,11 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.5.7 (August 28th, 2021)
+
+### Bug Fixes
+
+- multiple scans occur if a task is running, the explorer view is not visible, and a package.json script name that is referenced in tasks.json is modified.
+
 ## Version 2.5.6 (August 21st, 2021)
 
 ### Bug Fixes
