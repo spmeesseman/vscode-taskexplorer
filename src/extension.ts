@@ -496,12 +496,6 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
         {
             const treeDataProvider = new TaskTreeDataProvider(name, context);
             const treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
-            treeView.onDidChangeVisibility(async _e => {
-                if (_e.visible) {
-                    log.write("view visibility change event");
-                    await refreshTree("visible-event");
-                }
-            });
             views.set(name, treeView);
             const view = views.get(name);
             if (view) {

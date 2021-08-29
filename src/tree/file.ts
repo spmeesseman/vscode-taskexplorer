@@ -104,8 +104,8 @@ export default class TaskFile extends TreeItem
         // in the task tree, there is only one path for vscode/workspace tasks, /.vscode.  The fact that
         // you can set the path variable inside a vscode task changes the relativePath for the task,
         // causing an endless loop when putting the tasks into groups (see taskTree.createTaskGroupings).
-        // All othr task types will have a relative path of it's location on the filesystem (with
-        // eception of TSC, which is handled elsewhere).
+        // All other task types will have a relative path of it's location on the filesystem (with
+        // exception of TSC, which is handled elsewhere).
         //
         this.path = this.label !== "vscode" ? relativePath : ".vscode";
 
