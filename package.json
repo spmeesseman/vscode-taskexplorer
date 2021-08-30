@@ -721,7 +721,7 @@
                     "group": "inline"
                 },
                 {
-                    "command": "taskExplorerSideBar.pause",
+                    "command": "taskExplorer.pause",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
