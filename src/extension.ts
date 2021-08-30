@@ -508,6 +508,4 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
             log.write("✘ No workspace folders!!!");
         }
     }
-
-    return undefined;
 }
