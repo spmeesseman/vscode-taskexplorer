@@ -65,7 +65,7 @@ export async function run(): Promise<void>
     // Object.keys(require.cache).forEach((reqKey) => {
     //     console.log("   " + reqKey);
     // });
-    const myFilesRegex = /vscode-recall\/dist/;
+    const myFilesRegex = /vscode-taskexplorer\/dist/;
     const filterFn = myFilesRegex.test.bind(myFilesRegex);
     if (Object.keys(require.cache).filter(filterFn).length > 1)
     {
