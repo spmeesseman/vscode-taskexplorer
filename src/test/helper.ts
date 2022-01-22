@@ -2,18 +2,18 @@
 import * as cp from "child_process";
 import * as path from "path";
 import * as assert from "assert";
-import { CancellationToken, extensions, QuickPickOptions, window, workspace } from "vscode";
+import { CancellationToken, commands, ConfigurationTarget, extensions, QuickPickOptions, tasks, TreeItem, window, workspace, WorkspaceFolder } from "vscode";
 import { TaskExplorerApi } from "../extension";
 import TaskItem from "../tree/item";
 import { configuration } from "../common/configuration";
+import { TaskExplorerProvider } from "../providers/provider";
+import { waitForCache } from "../cache";
 
 
+let treeItems: TreeItem[];
 let activated = false;
 let teApi: TaskExplorerApi;
 const serverActivationDelay = 2500;
-const invalidationDelay = 400;
-let docValidationDelay: number | undefined;
-let taskExplorerEnabled: boolean;
 
 
 export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
@@ -89,8 +89,10 @@ export async function activate()
 
     if (!activated)
     {
+        initSettings(true);
         teApi = await ext.activate();
         await sleep(serverActivationDelay); // Wait for server activation
+        await commands.executeCommand("taskExplorer.addToExcludes", "**/tasks_test_ignore_/**", "**/ant/**");
         activated = true;
     }
     return teApi;
@@ -104,22 +106,44 @@ export async function cleanup()
 }
 
 
-export function activeExtension()
+export async function buildTree(instance: any)
 {
-    return new Promise<void>((resolve, reject) =>
-    {
-        const extension = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-        if (!extension) {
-            reject();
-            return;
-        }
-        if (!extension.isActive) {
-            extension.activate().then(() => resolve(), () => reject());
-        } else
-        {
-            resolve();
-        }
-    });
+    if (!teApi || !teApi.explorerProvider) {
+        assert.fail("        ✘ Not initialized");
+    }
+
+    if (treeItems) {
+        return treeItems;
+    }
+
+    console.log("    Constructing task tree");
+    instance.timeout(45 * 1000);
+
+    if (!teApi || !teApi.explorerProvider) {
+        assert.fail("        ✘ Task Explorer tree instance does not exist");
+    }
+
+    await sleep(7500); // wait for filesystem change events
+    await waitForCache();
+
+    console.log("         ✔ Cache done building");
+
+    await configuration.updateWs("groupWithSeparator", true);
+    await configuration.updateWs("groupSeparator", "-");
+    await configuration.updateWs("groupMaxLevel", 5);
+
+    //
+    // Refresh for better coverage
+    //
+    await teApi.explorerProvider.refresh("tests");
+    await sleep(4000);
+    await waitForCache();
+
+    //
+    // Mock explorer open view which would call this function
+    //
+    treeItems = await teApi.explorerProvider.getChildren(undefined, "        ");
+    return treeItems;
 }
 
 
@@ -135,6 +159,91 @@ const overridesShowInputBox: any[] = [];
 export function overrideNextShowInputBox(value: any)
 {
     overridesShowInputBox.push(value);
+}
+
+
+export async function initSettings(enable = true)
+{
+    await workspace.getConfiguration().update("terminal.integrated.shell.windows",
+                                              "C:\\Windows\\System32\\cmd.exe",
+                                              ConfigurationTarget.Workspace);
+    await configuration.updateWs("exclude", ["**/tasks_test_ignore_/**", "**/ant/**"]);
+    //
+    // Enable views, use workspace level so that running this test from Code itself
+    // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
+    //
+    await configuration.updateWs("enableExplorerView", true);
+    await configuration.updateWs("enableSideBar", true);
+    //
+    // Set misc settings, use workspace level so that running this test from Code itself
+    // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
+    //
+    await configuration.updateWs("includeAnt", ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml", "**/hello.xml"]);
+    // Use update() here for coverage, since these two settings wont trigger any processing
+    await configuration.update("debug", true);
+    await configuration.update("debugLevel", 3);
+    await configuration.updateWs("debug", true);
+    await configuration.updateWs("debugLevel", 3);
+
+    await configuration.updateWs("useGulp", false);
+    await configuration.updateWs("useAnt", false);
+    await configuration.updateWs("groupSeparator", "-");
+    await configuration.updateWs("numLastTasks", 10);
+    await configuration.updateWs("groupMaxLevel", 1);
+    await configuration.updateWs("clickAction", "Open");
+
+    //
+    // Enabled all options, use workspace level so that running this test from Code itself
+    // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
+    //
+    await configuration.updateWs("enableAnt", enable);
+    await configuration.updateWs("enableAppPublisher", enable);
+    await configuration.updateWs("enableBash", enable);
+    await configuration.updateWs("enableBatch", enable);
+    await configuration.updateWs("enableGradle", enable);
+    await configuration.updateWs("enableGrunt", enable);
+    await configuration.updateWs("enableGulp", enable);
+    await configuration.updateWs("enableMake", enable);
+    await configuration.updateWs("enableMaven", enable);
+    await configuration.updateWs("enableNpm", enable);
+    await configuration.updateWs("enableNsis", enable);
+    await configuration.updateWs("enablePowershell", enable);
+    await configuration.updateWs("enablePerl", enable);
+    await configuration.updateWs("enablePython", enable);
+    await configuration.updateWs("enablePipenv", enable);
+    await configuration.updateWs("enableRuby", enable);
+    await configuration.updateWs("enableTsc", enable);
+    await configuration.updateWs("enableWorkspace", enable);
+    await configuration.updateWs("groupWithSeparator", enable);
+    await configuration.updateWs("groupSeparator", "-");
+    await configuration.updateWs("showLastTasks", enable);
+    await configuration.updateWs("keepTermOnStop", false);
+    await configuration.updateWs("readUserTasks", enable);
+    await configuration.updateWs("showFavoritesButton", enable);
+    await configuration.updateWs("showRunningTask", enable);
+}
+
+
+export function isReady(taskType?: string)
+{
+    let err: string | undefined;
+    if (!teApi)                                     err = "        ✘ TeApi null";
+    if (!err && !teApi.explorerProvider)            err = "        ✘ TeApi Explorer provider null";
+    if (!err  && !teApi.sidebarProvider)            err = "        ✘ TeApi Sidebar Provider null";
+    if (!err  && !teApi.taskProviders)              err = "        ✘ Providers null";
+    if (!err  && taskType) {
+        if (!teApi.taskProviders.get(taskType))     err = `        ✘ ${taskType} Provider null`;
+    }
+    if (!err && !(workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined)) {
+                                                    err = "        ✘ Workspace folder does not exist";
+    }
+    if (!err && !extensions.getExtension("spmeesseman.vscode-taskexplorer")) {
+                                                    err = "        ✘ Extension not found";
+    }
+    if (err) {
+        console.log(err);
+    }
+    return !err ? true : err;
 }
 
 

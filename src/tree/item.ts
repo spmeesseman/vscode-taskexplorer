@@ -107,10 +107,6 @@ export default class TaskItem extends TreeItem
         //
         this.tooltip = "Open " + task.name + (task.detail ? ` | ${task.detail}` : "");
         //
-        // TaskItemId, for saving
-        //
-        this.taskItemId = util.getTaskItemId(this);
-        //
         // Refresh state - sets context value, icon path from execution state
         //
         this.refreshState();
@@ -146,10 +142,7 @@ export default class TaskItem extends TreeItem
 
 
     setContextValue(task: Task, running: boolean)
-    {
-        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []),
-              lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-        //
+    {   //
         // Context view controls the view parameters to the ui, see package.json /views/context node.
         //
         //     script        - Standard task item, e.g. "npm", "Workspace", "gulp", etc
@@ -163,8 +156,7 @@ export default class TaskItem extends TreeItem
         // Note that TaskItems of type 'scriptFile' can be ran with arguments and this will have an additional
         // entry added to it's context menu - "Run with arguments"
         //
-        if (this.taskItemId && (util.existsInArray(favTasks, this.taskItemId) ||
-                                util.existsInArray(lastTasks, this.taskItemId)))
+        if (util.isSpecialTask(this))
         {
             if (task.definition.scriptFile || this.taskSource === "gradle") {
                 this.contextValue = running ? "scriptRunningS" : "scriptFileS";

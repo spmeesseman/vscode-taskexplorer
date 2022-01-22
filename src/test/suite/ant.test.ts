@@ -22,7 +22,7 @@ let buildXmlFile: string;
 suite("Ant Tests", () =>
 {
 
-    setup(async () =>
+    suiteSetup(async () =>
     {
         teApi = await activate();
         assert(teApi, "        ✘ TeApi null");
@@ -40,6 +40,7 @@ suite("Ant Tests", () =>
         // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
+        provider.getDocumentPosition(undefined, "test");
     });
 
 

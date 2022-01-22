@@ -29,12 +29,7 @@ import * as cache from "./cache";
 import * as log from "./common/log";
 import constants from "./common/constants";
 
-
-export let treeDataProvider: TaskTreeDataProvider | undefined;
-export let treeDataProvider2: TaskTreeDataProvider | undefined;
-export let appDataPath: string;
-
-
+let teApi: TaskExplorerApi;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
 export const providers: Map<string, TaskExplorerProvider> = new Map();
@@ -70,9 +65,11 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     //
     // Register the tree providers
     //
+    let treeDataProvider;
     if (configuration.get<boolean>("enableSideBar")) {
         treeDataProvider = registerExplorer("taskExplorerSideBar", context);
     }
+    let treeDataProvider2;
     if (configuration.get<boolean>("enableExplorerView")) {
         treeDataProvider2 = registerExplorer("taskExplorer", context);
     }
@@ -98,13 +95,16 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 
     log.write("   Task Explorer activated");
 
-    return {
+    teApi = {
         explorerProvider: treeDataProvider2,
         sidebarProvider: treeDataProvider,
         utilities: util,
         fileCache: cache,
-        taskProviders: providers
+        taskProviders: providers // ,
+        // appDataPath: appDataPath
     };
+
+    return teApi;
 }
 
 
@@ -224,13 +224,13 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     if (e.affectsConfiguration("taskExplorer.showLastTasks"))
     {
-        if (configuration.get<boolean>("enableSideBar") && treeDataProvider)
+        if (configuration.get<boolean>("enableSideBar") && teApi.sidebarProvider)
         {
-            await treeDataProvider.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
+            await teApi.sidebarProvider.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
         }
-        if (configuration.get<boolean>("enableExplorerView") && treeDataProvider2)
+        if (configuration.get<boolean>("enableExplorerView") && teApi.explorerProvider)
         {
-            await treeDataProvider2.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
+            await teApi.explorerProvider.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
         }
     }
 
@@ -319,15 +319,19 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     if (e.affectsConfiguration("taskExplorer.enableSideBar"))
     {
-        if (configuration.get<boolean>("enableSideBar")) {
-            if (treeDataProvider) {
+        if (configuration.get<boolean>("enableSideBar"))
+        {
+            if (teApi.sidebarProvider) {
                 // TODO - remove/add view on enable/disable view
                 refresh = true;
             }
             else {
-                treeDataProvider = registerExplorer("taskExplorerSideBar", context);
+                teApi.sidebarProvider = registerExplorer("taskExplorerSideBar", context);
             }
         }
+        // else {
+        //     teApi.sidebarProvider = undefined;
+        // }
     }
 
     //
@@ -335,15 +339,19 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
     {
-        if (configuration.get<boolean>("enableExplorerView")) {
-            if (treeDataProvider2) {
+        if (configuration.get<boolean>("enableExplorerView"))
+        {
+            if (teApi.explorerProvider) {
                 // TODO - remove/add view on enable/disable view
                 refresh = true;
             }
             else {
-                treeDataProvider2 = registerExplorer("taskExplorer", context);
+                teApi.explorerProvider = registerExplorer("taskExplorer", context);
             }
         }
+        // else {
+        //     teApi.explorerProvider = undefined;
+        // }
     }
 
     //
@@ -409,11 +417,11 @@ export async function refreshTree(taskType?: string, uri?: Uri)
     // Note the static task cache only needs to be refreshed once if both the explorer view
     // and the sidebar view are being used and/or enabled
     //
-    if (configuration.get<boolean>("enableSideBar") && treeDataProvider) {
-        await treeDataProvider.refresh(taskType, uri);
+    if (configuration.get<boolean>("enableSideBar") && teApi.sidebarProvider) {
+        await teApi.sidebarProvider.refresh(taskType, uri);
     }
-    if (configuration.get<boolean>("enableExplorerView") && treeDataProvider2) {
-        await treeDataProvider2.refresh(taskType, uri);
+    if (configuration.get<boolean>("enableExplorerView") && teApi.explorerProvider) {
+        await teApi.explorerProvider.refresh(taskType, uri);
     }
 }
 

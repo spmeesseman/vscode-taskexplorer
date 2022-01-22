@@ -22,6 +22,7 @@ import "source-map-support/register";
 const fileToTest = "*";
 // const fileToTest = "_api";
 // const fileToTest = "ant";
+// const fileToTest = "composer";
 // const fileToTest = "provider";
 // const fileToTest = "tasks";
 // const fileToTest = "commands";

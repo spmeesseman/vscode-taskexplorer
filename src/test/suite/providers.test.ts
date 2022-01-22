@@ -15,7 +15,7 @@ import { waitForCache } from "../../cache";
 import { addWsFolder, removeWsFolder, TaskExplorerApi } from "../../extension";
 import { configuration } from "../../common/configuration";
 import constants from "../../common/constants";
-import { activate, findIdInTaskMap } from "../helper";
+import { activate, buildTree, findIdInTaskMap } from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -30,10 +30,10 @@ let didCodeDirExist = false;
 let taskMap: Map<string, TaskItem> = new Map();
 
 
-suite("Task Tests", () =>
+suite("Provider Tests", () =>
 {
 
-    suiteSetup(async () =>
+    suiteSetup(async function()
     {
         teApi = await activate();
 
@@ -127,6 +127,21 @@ suite("Task Tests", () =>
         }];
 
         workspace.workspaceFolders?.concat(wsf);
+
+        setupNpm(); setupVscode(); setupAnt(); setupGradle(); setupTsc(); setupMakefile();
+        setupBash(); setupBatch(); setupGrunt(); setupGulp(); setupAppPublisher(); setupMaven();
+
+        await buildTree(this);
+
+        //
+        // Check VSCode provided task types for the hell of it
+        //
+        let npmTasks = await tasks.fetchTasks({ type: "npm" });
+        assert(npmTasks.length > 0, "No npm tasks registered");
+        npmTasks = await tasks.fetchTasks({ type: "grunt" });
+        assert(npmTasks.length > 0, "No grunt tasks registered");
+        npmTasks = await tasks.fetchTasks({ type: "gulp" });
+        assert(npmTasks.length > 0, "No gulp tasks registered");
     });
 
 
@@ -231,577 +246,6 @@ suite("Task Tests", () =>
         }
 
         await timeout(3000); // wait for filesystem change events
-    });
-
-
-    test("Cover getItems on empty workspace", async function()
-    {
-        if (!teApi?.explorerProvider) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-        // Cover getitems before tree is built
-        await teApi.explorerProvider.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
-    });
-
-
-    test("Create npm package files", async function()
-    {
-        if (!rootPath || !dirName || !dirNameL2 ||!ws2DirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        const file = path.join(rootPath, "package.json");
-        tempFiles.push(file);
-
-        const file2 = path.join(dirName, "package.json");
-        tempFiles.push(file2);
-
-        // const file3 = path.join(dirNameL2, "package.json");
-        // tempFiles.push(file3);
-
-        // const file4 = path.join(ws2DirName, "package.json");
-        // tempFiles.push(file4);
-
-        fs.writeFileSync(
-            file,
-            "{\r\n" +
-            '    "name": "vscode-taskexplorer",\r\n' +
-            '    "version": "0.0.1",\r\n' +
-            '    "scripts":{\r\n' +
-            '        "test": "node ./node_modules/vscode/bin/test",\r\n' +
-            '        "compile": "cmd.exe /c test.bat",\r\n' +
-            '        "watch": "tsc -watch -p ./",\r\n' +
-            '        "build": "npx tsc -p ./"\r\n' +
-            "    }\r\n" +
-            "}\r\n"
-        );
-
-        fs.writeFileSync(
-            file2,
-            "{\r\n" +
-            '    "name": "vscode-taskexplorer2",\r\n' +
-            '    "version": "0.0.2",\r\n' +
-            '    "scripts":{\r\n' +
-            '        "test2": "node ./node_modules/vscode/bin/test",\r\n' +
-            '        "compile2": "npx tsc -p ../",\r\n' +
-            "    }\r\n" +
-            "}\r\n"
-        );
-
-        // fs.writeFileSync(file3, "{ \"name\": \"vscode-taskexplorer2\" }\r\n");
-
-        // fs.writeFileSync(file4, "");
-
-    });
-
-
-    test("Create vscode task files", async function()
-    {
-        if (!rootPath || !dirNameCode) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        const file = path.join(dirNameCode, "tasks.json");
-        tempFiles.push(file);
-
-        fs.writeFileSync(
-            file,
-            "{\r\n" +
-            '    "version": "2.0.0",\r\n' +
-            '    "tasks": [\r\n' +
-            "    {\r\n" +
-            '        "label": "test1",\r\n' +
-            '        "type": "shell",\r\n' +
-            '        "command": "ant.bat",\r\n' +
-            '        "group": "build",\r\n' +
-            '        "problemMatcher": [\r\n' +
-            '            "$eslint-stylish"\r\n' +
-            "        ]\r\n" +
-            "    },\r\n" +
-            "    {\r\n" +
-            '        "type": "npm",\r\n' +
-            '        "script": "watch",\r\n' +
-            '        "problemMatcher": "$tsc-watch",\r\n' +
-            '        "isBackground": true,\r\n' +
-            '        "presentation": {\r\n' +
-            '            "reveal": "never"\r\n' +
-            "        },\r\n" +
-            '        "problemMatcher": [\r\n' +
-            '            "$tsc-watch"\r\n' +
-            "        ],\r\n" +
-            '        "group": {\r\n' +
-            '            "kind": "build",\r\n' +
-            '            "isDefault": true\r\n' +
-            "        }\r\n" +
-            "    },\r\n" +
-            "    {\r\n" +
-            '        "type": "npm",\r\n' +
-            '        "script": "build",\r\n' +
-            '        "group": "build",\r\n' +
-            '        "problemMatcher": [\r\n' +
-            '            "$tsc"\r\n' +
-            "        ]\r\n" +
-            "    },\r\n" +
-            "    {\r\n" +
-            '        "type": "shell",\r\n' +
-            '        "label": "build-dev",\r\n' +
-            '        "command": "..\\test.bat",\r\n' +
-            '        "group": "build",\r\n' +
-            '        "problemMatcher": [\r\n' +
-            '            "$eslint-stylish"\r\n' +
-            "        ]\r\n" +
-            "    },\r\n" +
-            "    {\r\n" +
-            '        "type": "shell",\r\n' +
-            '        "label": "build-prod",\r\n' +
-            '        "command": "..\\test.bat",\r\n' +
-            '        "group": "build",\r\n' +
-            '        "problemMatcher": [\r\n' +
-            '            "$eslint-stylish"\r\n' +
-            "        ]\r\n" +
-            "    },\r\n" +
-            "    {\r\n" +
-            '        "type": "shell",\r\n' +
-            '        "label": "test.bat",\r\n' +
-            '        "command": "..\\test.bat",\r\n' +
-            '        "group": "build",\r\n' +
-            '        "problemMatcher": [\r\n' +
-            '            $eslint-stylish"\r\n' +
-            "        ]\r\n" +
-            "    },\r\n" +
-            "    {\r\n" +
-            '        "type": "shell",\r\n' +
-            '        "label": "build-server",\r\n' +
-            '        "command": "..\\test.bat",\r\n' +
-            '        "group": "build",\r\n' +
-            '        "problemMatcher": [\r\n' +
-            '            "$eslint-stylish"\r\n' +
-            "        ]\r\n" +
-            "    }]\r\n" +
-            "}\r\n"
-        );
-    });
-
-
-    test("Create ant target files", async function()
-    {
-        if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        createAntFile();
-
-        const file2 = path.join(dirName, "test.xml");
-        const file3 = path.join(dirName, "emptytarget.xml");
-        const file4 = path.join(dirName, "emptyproject.xml");
-        const file5 = path.join(dirNameIgn, "build.xml");
-
-        tempFiles.push(file2);
-        tempFiles.push(file3);
-        tempFiles.push(file4);
-        tempFiles.push(file5);
-
-        fs.writeFileSync(
-            file2,
-            '<?xml version="1.0"?>\n' +
-            '<project basedir="." default="test2">\n' +
-            '    <property name="test2" value="test2" />\n' +
-            "    <target name='test3'></target>\n" +
-            '    <target name="test4"></target>\n' +
-            "</project>\n"
-        );
-
-        fs.writeFileSync(
-            file3,
-            '<?xml version="1.0"?>\n' +
-            '<project basedir="." default="test1">\n' +
-            '    <property environment="env" />\n' +
-            '    <property name="test" value="test" />\n' +
-            "</project>\n"
-        );
-
-        fs.writeFileSync(file4, '<?xml version="1.0"?>\n');
-
-        fs.writeFileSync(
-            file5,
-            '<?xml version="1.0"?>\n' +
-            '<project basedir="." default="test2">\n' +
-            '    <property name="testv" value="testv" />\n' +
-            "    <target name='test5'></target>\n" +
-            "</project>\n"
-        );
-    });
-
-
-    test("Create gradle target files", async function()
-    {
-        if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        createGradleFile();
-
-        const file2 = path.join(dirName, "TEST.GRADLE");
-        const file3 = path.join(dirNameIgn, "build.gradle");
-
-        tempFiles.push(file2);
-        tempFiles.push(file3);
-
-        fs.writeFileSync(
-            file2,
-            "task fatJar2(type: Jar) {\n" +
-            "    manifest {\n" +
-            "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
-            "            'Implementation-Version': version,\n" +
-            "            'Main-Class': 'com.spmeesseman.test'\n" +
-            "    }\n" +
-            "    baseName = project.name + '-all'\n" +
-            "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
-            "    with jar\n" +
-            "}\n"
-        );
-
-        fs.writeFileSync(
-            file3,
-            "task fatJar3(type: Jar) {\n" +
-            "    manifest {\n" +
-            "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
-            "            'Implementation-Version': version,\n" +
-            "            'Main-Class': 'com.spmeesseman.test'\n" +
-            "    }\n" +
-            "    baseName = project.name + '-all'\n" +
-            "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
-            "    with jar\n" +
-            "}\n"
-        );
-
-    });
-
-
-    test("Create tsc config files", async function()
-    {
-        if (!rootPath || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        const file = path.join(rootPath, "tsconfig.json");
-        tempFiles.push(file);
-        const file2 = path.join(dirName, "tsconfig.json");
-        tempFiles.push(file2);
-
-        fs.writeFileSync(
-            file,
-            "{\n" +
-            '    "compilerOptions":\n' +
-            "  {\n" +
-            '    "target": "es6",\n' +
-            '    "lib": ["es2016"],\n' +
-            '    "module": "commonjs",\n' +
-            '    "outDir": "./out",\n' +
-            '    "typeRoots": ["./node_modules/@types"],\n' +
-            '    "strict": true,\n' +
-            '    "experimentalDecorators": true,\n' +
-            '    "sourceMap": true,\n' +
-            '    "noImplicitThis": false\n' +
-            "  },\n" +
-            '  "include": ["**/*"],\n' +
-            '  "exclude": ["node_modules"]\n' +
-            "}\n"
-        );
-
-        fs.writeFileSync(
-            file2,
-            "{\n" +
-            '    "compilerOptions":\n' +
-            "  {\n" +
-            '    "target": "es6",\n' +
-            '    "lib": ["es2016"],\n' +
-            '    "module": "commonjs",\n' +
-            '    "outDir": "./out",\n' +
-            '    "typeRoots": ["./node_modules/@types"],\n' +
-            '    "strict": true,\n' +
-            '    "experimentalDecorators": true,\n' +
-            '    "sourceMap": true,\n' +
-            '    "noImplicitThis": false\n' +
-            "  },\n" +
-            '  "include": ["**/*"],\n' +
-            '  "exclude": ["node_modules"]\n' +
-            "}\n"
-        );
-    });
-
-
-    test("Create gulp task files", async function()
-    {
-        if (!rootPath || !dirNameIgn || !dirName || !dirNameL2) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        createGulpFile();
-
-        const file2 = path.join(dirName, "Gulpfile.js");
-        tempFiles.push(file2);
-
-        const file3 = path.join(dirNameIgn, "gulpfile.js");
-        tempFiles.push(file3);
-
-        const file4 = path.join(dirName, "GULPFILE.MJS");
-        tempFiles.push(file4);
-
-        const file5 = path.join(dirNameL2, "GULPFILE.js");
-        tempFiles.push(file5);
-
-
-        fs.writeFileSync(
-            file2,
-            "const { series } = require('gulp');\n" +
-            "function clean(cb) {\n" +
-            "    console.log('clean!!!');\n" +
-            "    cb();\n" +
-            "};\n" +
-            "function build(cb) {" +
-            "    console.log('build!!!');\n" +
-            "    cb();\n" +
-            "};\n" +
-            "exports.build = build;\n" +
-            'exports["clean"] = clean;\n' +
-            "exports.default = series(clean, build);\n"
-        );
-
-        fs.writeFileSync(
-            file3,
-            "var gulp = require('gulp');\n" +
-            "gulp.task('hello3', (done) => {\n" +
-            "    console.log('Hello3!');\n" +
-            "    done();\n" +
-            "});\n" +
-            'gulp.task(\n"hello4", (done) => {\n' +
-            "    console.log('Hello4!');\n" +
-            "    done();\n" +
-            "});\n"
-        );
-
-        fs.writeFileSync(
-            file4,
-            "var gulp = require('gulp');\n" +
-            "gulp.task('group-test-build-ui-one', (done) => {\n" +
-            "    console.log('Hello3!');\n" +
-            "    done();\n" +
-            "});\n" +
-            'gulp.task(\n"group-test-build-ui-two", (done) => {\n' +
-            "    console.log('Hello4!');\n" +
-            "    done();\n" +
-            "});\n" +
-            "gulp.task('group-test-build-ui-three', (done) => {\n" +
-            "    console.log('Hello3!');\n" +
-            "    done();\n" +
-            "});\n" +
-            "gulp.task('group-test-build-ui-four', (done) => {\n" +
-            "    console.log('Hello3!');\n" +
-            "    done();\n" +
-            "});\n" +
-            "gulp.task('group-test-build-ui-five', (done) => {\n" +
-            "    console.log('Hello3!');\n" +
-            "    done();\n" +
-            "});\n"
-        );
-
-        fs.writeFileSync(
-            file5,
-            "var gulp = require('gulp');\n" +
-            "gulp.task('group2-test2-build-ui-one', (done) => {\n" +
-            "    console.log('Hello1!');\n" +
-            "    done();\n" +
-            "});\n" +
-            'gulp.task(\n"group2-test2-build-ui-two", (done) => {\n' +
-            "    console.log('Hello2!');\n" +
-            "    done();\n" +
-            "});\n" +
-            "gulp.task('group2-test2-build-ui-three', (done) => {\n" +
-            "    console.log('Hello3!');\n" +
-            "    done();\n" +
-            "});\n" +
-            "gulp.task('group2-test2-build-ui-four', (done) => {\n" +
-            "    console.log('Hello4!');\n" +
-            "    done();\n" +
-            "});\n" +
-            "gulp.task('group2-test2-build-ui-five', (done) => {\n" +
-            "    console.log('Hello5!');\n" +
-            "    done();\n" +
-            "});\n"
-        );
-    });
-
-
-    test("Create makefiles", async function()
-    {
-        if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        createMakeFile();
-
-        const file2 = path.join(dirName, "Makefile");
-        tempFiles.push(file2);
-
-        const file3 = path.join(dirNameIgn, "Makefile");
-        tempFiles.push(file3);
-
-        fs.writeFileSync(
-            file2,
-            "# all tasks comment\n" +
-            "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
-        );
-
-        fs.writeFileSync(
-            file3,
-            "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
-        );
-    });
-
-
-    test("Create batch files", async function()
-    {
-        if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        createBatchFile();
-
-        const file2 = path.join(dirName, "test2.BAT");
-        tempFiles.push(file2);
-
-        const file3 = path.join(dirNameIgn, "test3.bat");
-        tempFiles.push(file3);
-
-        fs.writeFileSync(file2, "@echo testing batch file 2\r\ntimeout /t 5\r\n");
-        fs.writeFileSync(file3, "@echo testing batch file 3\r\n");
-    });
-
-
-    test("Create bash files", async function()
-    {
-        if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        const file = path.join(rootPath, "test.sh");
-        tempFiles.push(file);
-
-        const file2 = path.join(dirName, "test2.SH");
-        tempFiles.push(file2);
-
-        const file3 = path.join(dirNameIgn, "test3.sh");
-        tempFiles.push(file3);
-
-        fs.writeFileSync(file, "echo testing bash file\n");
-        fs.writeFileSync(file2, "echo testing bash file 2\n");
-        fs.writeFileSync(file3, "echo testing bash file 3\n");
-    });
-
-
-    test("Create grunt task files", async function()
-    {
-        if (!rootPath || !dirName || !dirNameIgn || !dirNameL2) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        createGruntFile();
-
-        const file2 = path.join(dirName, "Gruntfile.js");
-        tempFiles.push(file2);
-
-        const file3 = path.join(dirNameIgn, "Gruntfile.js");
-        tempFiles.push(file3);
-
-        const file4 = path.join(dirNameL2, "GRUNTFILE.JS");
-        tempFiles.push(file4);
-
-        fs.writeFileSync(
-            file2,
-            "module.exports = function(grunt) {\n" +
-            '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
-            '    grunt.registerTask("upload2", ["s3"]);\n' +
-            "};\n"
-        );
-
-        fs.writeFileSync(
-            file3,
-            "module.exports = function(grunt) {\n" +
-            '    grunt.registerTask(\n"default3", ["jshint:myproject"]);\n' +
-            '    grunt.registerTask("upload3", ["s3"]);\n' +
-            "};\n"
-        );
-
-        fs.writeFileSync(
-            file4,
-            "module.exports = function(grunt) {\n" +
-            '    grunt.registerTask("grp-test-svr-build1", ["s1"]);\n' +
-            '    grunt.registerTask("grp-test-svr-build2", ["s2"]);\n' +
-            "};\n"
-        );
-    });
-
-
-    test("Create app-publisher config file", async function()
-    {
-        if (!rootPath) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-        createAppPublisherFile();
-    });
-
-
-    test("Create maven pom file", async function()
-    {
-        if (!rootPath) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-        createMavenPomFile();
-    });
-
-
-    test("Perform tree construction", async function()
-    {
-        if (!teApi || !teApi.explorerProvider || !rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        this.timeout(45 * 1000);
-
-        console.log("    Constructing task tree");
-
-        if (!teApi || !teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-
-        await timeout(7500); // wait for filesystem change events
-        await waitForCache();
-
-        console.log("         ✔ Cache done building");
-
-        await configuration.updateWs("groupWithSeparator", true);
-        await configuration.updateWs("groupSeparator", "-");
-        await configuration.updateWs("groupMaxLevel", 5);
-
-        //
-        // Refresh for better coverage
-        //
-        await teApi.explorerProvider.refresh("tests");
-        await timeout(4000);
-        await waitForCache();
-
-        //
-        // Check VSCode provided task types for the hell of it
-        //
-        let npmTasks = await tasks.fetchTasks({ type: "npm" });
-        assert(npmTasks.length > 0, "No npm tasks registered");
-        npmTasks = await tasks.fetchTasks({ type: "grunt" });
-        assert(npmTasks.length > 0, "No grunt tasks registered");
-        npmTasks = await tasks.fetchTasks({ type: "gulp" });
-        assert(npmTasks.length > 0, "No gulp tasks registered");
-
-        await teApi.explorerProvider.getChildren(undefined, "        "); // mock explorer open view which would call this function
     });
 
 
@@ -1475,6 +919,523 @@ suite("Task Tests", () =>
     });
 
 });
+
+
+function setupNpm()
+{
+    if (!rootPath || !dirName || !dirNameL2 ||!ws2DirName) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+
+    const file = path.join(rootPath, "package.json");
+    tempFiles.push(file);
+
+    const file2 = path.join(dirName, "package.json");
+    tempFiles.push(file2);
+
+    // const file3 = path.join(dirNameL2, "package.json");
+    // tempFiles.push(file3);
+
+    // const file4 = path.join(ws2DirName, "package.json");
+    // tempFiles.push(file4);
+
+    fs.writeFileSync(
+        file,
+        "{\r\n" +
+        '    "name": "vscode-taskexplorer",\r\n' +
+        '    "version": "0.0.1",\r\n' +
+        '    "scripts":{\r\n' +
+        '        "test": "node ./node_modules/vscode/bin/test",\r\n' +
+        '        "compile": "cmd.exe /c test.bat",\r\n' +
+        '        "watch": "tsc -watch -p ./",\r\n' +
+        '        "build": "npx tsc -p ./"\r\n' +
+        "    }\r\n" +
+        "}\r\n"
+    );
+
+    fs.writeFileSync(
+        file2,
+        "{\r\n" +
+        '    "name": "vscode-taskexplorer2",\r\n' +
+        '    "version": "0.0.2",\r\n' +
+        '    "scripts":{\r\n' +
+        '        "test2": "node ./node_modules/vscode/bin/test",\r\n' +
+        '        "compile2": "npx tsc -p ../",\r\n' +
+        "    }\r\n" +
+        "}\r\n"
+    );
+
+    // fs.writeFileSync(file3, "{ \"name\": \"vscode-taskexplorer2\" }\r\n");
+
+    // fs.writeFileSync(file4, "");
+
+}
+
+
+function setupVscode()
+{
+    if (!rootPath || !dirNameCode) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+
+    const file = path.join(dirNameCode, "tasks.json");
+    tempFiles.push(file);
+
+    fs.writeFileSync(
+        file,
+        "{\r\n" +
+        '    "version": "2.0.0",\r\n' +
+        '    "tasks": [\r\n' +
+        "    {\r\n" +
+        '        "label": "test1",\r\n' +
+        '        "type": "shell",\r\n' +
+        '        "command": "ant.bat",\r\n' +
+        '        "group": "build",\r\n' +
+        '        "problemMatcher": [\r\n' +
+        '            "$eslint-stylish"\r\n' +
+        "        ]\r\n" +
+        "    },\r\n" +
+        "    {\r\n" +
+        '        "type": "npm",\r\n' +
+        '        "script": "watch",\r\n' +
+        '        "problemMatcher": "$tsc-watch",\r\n' +
+        '        "isBackground": true,\r\n' +
+        '        "presentation": {\r\n' +
+        '            "reveal": "never"\r\n' +
+        "        },\r\n" +
+        '        "problemMatcher": [\r\n' +
+        '            "$tsc-watch"\r\n' +
+        "        ],\r\n" +
+        '        "group": {\r\n' +
+        '            "kind": "build",\r\n' +
+        '            "isDefault": true\r\n' +
+        "        }\r\n" +
+        "    },\r\n" +
+        "    {\r\n" +
+        '        "type": "npm",\r\n' +
+        '        "script": "build",\r\n' +
+        '        "group": "build",\r\n' +
+        '        "problemMatcher": [\r\n' +
+        '            "$tsc"\r\n' +
+        "        ]\r\n" +
+        "    },\r\n" +
+        "    {\r\n" +
+        '        "type": "shell",\r\n' +
+        '        "label": "build-dev",\r\n' +
+        '        "command": "..\\test.bat",\r\n' +
+        '        "group": "build",\r\n' +
+        '        "problemMatcher": [\r\n' +
+        '            "$eslint-stylish"\r\n' +
+        "        ]\r\n" +
+        "    },\r\n" +
+        "    {\r\n" +
+        '        "type": "shell",\r\n' +
+        '        "label": "build-prod",\r\n' +
+        '        "command": "..\\test.bat",\r\n' +
+        '        "group": "build",\r\n' +
+        '        "problemMatcher": [\r\n' +
+        '            "$eslint-stylish"\r\n' +
+        "        ]\r\n" +
+        "    },\r\n" +
+        "    {\r\n" +
+        '        "type": "shell",\r\n' +
+        '        "label": "test.bat",\r\n' +
+        '        "command": "..\\test.bat",\r\n' +
+        '        "group": "build",\r\n' +
+        '        "problemMatcher": [\r\n' +
+        '            $eslint-stylish"\r\n' +
+        "        ]\r\n" +
+        "    },\r\n" +
+        "    {\r\n" +
+        '        "type": "shell",\r\n' +
+        '        "label": "build-server",\r\n' +
+        '        "command": "..\\test.bat",\r\n' +
+        '        "group": "build",\r\n' +
+        '        "problemMatcher": [\r\n' +
+        '            "$eslint-stylish"\r\n' +
+        "        ]\r\n" +
+        "    }]\r\n" +
+        "}\r\n"
+    );
+}
+
+
+function setupAnt()
+{
+    if (!rootPath || !dirNameIgn || !dirName) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+
+    createAntFile();
+
+    const file2 = path.join(dirName, "test.xml");
+    const file3 = path.join(dirName, "emptytarget.xml");
+    const file4 = path.join(dirName, "emptyproject.xml");
+    const file5 = path.join(dirNameIgn, "build.xml");
+
+    tempFiles.push(file2);
+    tempFiles.push(file3);
+    tempFiles.push(file4);
+    tempFiles.push(file5);
+
+    fs.writeFileSync(
+        file2,
+        '<?xml version="1.0"?>\n' +
+        '<project basedir="." default="test2">\n' +
+        '    <property name="test2" value="test2" />\n' +
+        "    <target name='test3'></target>\n" +
+        '    <target name="test4"></target>\n' +
+        "</project>\n"
+    );
+
+    fs.writeFileSync(
+        file3,
+        '<?xml version="1.0"?>\n' +
+        '<project basedir="." default="test1">\n' +
+        '    <property environment="env" />\n' +
+        '    <property name="test" value="test" />\n' +
+        "</project>\n"
+    );
+
+    fs.writeFileSync(file4, '<?xml version="1.0"?>\n');
+
+    fs.writeFileSync(
+        file5,
+        '<?xml version="1.0"?>\n' +
+        '<project basedir="." default="test2">\n' +
+        '    <property name="testv" value="testv" />\n' +
+        "    <target name='test5'></target>\n" +
+        "</project>\n"
+    );
+}
+
+
+function setupGradle()
+{
+    if (!rootPath || !dirNameIgn || !dirName) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+
+    createGradleFile();
+
+    const file2 = path.join(dirName, "TEST.GRADLE");
+    const file3 = path.join(dirNameIgn, "build.gradle");
+
+    tempFiles.push(file2);
+    tempFiles.push(file3);
+
+    fs.writeFileSync(
+        file2,
+        "task fatJar2(type: Jar) {\n" +
+        "    manifest {\n" +
+        "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
+        "            'Implementation-Version': version,\n" +
+        "            'Main-Class': 'com.spmeesseman.test'\n" +
+        "    }\n" +
+        "    baseName = project.name + '-all'\n" +
+        "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
+        "    with jar\n" +
+        "}\n"
+    );
+
+    fs.writeFileSync(
+        file3,
+        "task fatJar3(type: Jar) {\n" +
+        "    manifest {\n" +
+        "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
+        "            'Implementation-Version': version,\n" +
+        "            'Main-Class': 'com.spmeesseman.test'\n" +
+        "    }\n" +
+        "    baseName = project.name + '-all'\n" +
+        "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
+        "    with jar\n" +
+        "}\n"
+    );
+
+}
+
+
+function setupTsc()
+{
+    if (!rootPath || !dirName) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+
+    const file = path.join(rootPath, "tsconfig.json");
+    tempFiles.push(file);
+    const file2 = path.join(dirName, "tsconfig.json");
+    tempFiles.push(file2);
+
+    fs.writeFileSync(
+        file,
+        "{\n" +
+        '    "compilerOptions":\n' +
+        "  {\n" +
+        '    "target": "es6",\n' +
+        '    "lib": ["es2016"],\n' +
+        '    "module": "commonjs",\n' +
+        '    "outDir": "./out",\n' +
+        '    "typeRoots": ["./node_modules/@types"],\n' +
+        '    "strict": true,\n' +
+        '    "experimentalDecorators": true,\n' +
+        '    "sourceMap": true,\n' +
+        '    "noImplicitThis": false\n' +
+        "  },\n" +
+        '  "include": ["**/*"],\n' +
+        '  "exclude": ["node_modules"]\n' +
+        "}\n"
+    );
+
+    fs.writeFileSync(
+        file2,
+        "{\n" +
+        '    "compilerOptions":\n' +
+        "  {\n" +
+        '    "target": "es6",\n' +
+        '    "lib": ["es2016"],\n' +
+        '    "module": "commonjs",\n' +
+        '    "outDir": "./out",\n' +
+        '    "typeRoots": ["./node_modules/@types"],\n' +
+        '    "strict": true,\n' +
+        '    "experimentalDecorators": true,\n' +
+        '    "sourceMap": true,\n' +
+        '    "noImplicitThis": false\n' +
+        "  },\n" +
+        '  "include": ["**/*"],\n' +
+        '  "exclude": ["node_modules"]\n' +
+        "}\n"
+    );
+}
+
+
+function setupGulp()
+{
+    if (!rootPath || !dirNameIgn || !dirName || !dirNameL2) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+
+    createGulpFile();
+
+    const file2 = path.join(dirName, "Gulpfile.js");
+    tempFiles.push(file2);
+
+    const file3 = path.join(dirNameIgn, "gulpfile.js");
+    tempFiles.push(file3);
+
+    const file4 = path.join(dirName, "GULPFILE.MJS");
+    tempFiles.push(file4);
+
+    const file5 = path.join(dirNameL2, "GULPFILE.js");
+    tempFiles.push(file5);
+
+
+    fs.writeFileSync(
+        file2,
+        "const { series } = require('gulp');\n" +
+        "function clean(cb) {\n" +
+        "    console.log('clean!!!');\n" +
+        "    cb();\n" +
+        "};\n" +
+        "function build(cb) {" +
+        "    console.log('build!!!');\n" +
+        "    cb();\n" +
+        "};\n" +
+        "exports.build = build;\n" +
+        'exports["clean"] = clean;\n' +
+        "exports.default = series(clean, build);\n"
+    );
+
+    fs.writeFileSync(
+        file3,
+        "var gulp = require('gulp');\n" +
+        "gulp.task('hello3', (done) => {\n" +
+        "    console.log('Hello3!');\n" +
+        "    done();\n" +
+        "});\n" +
+        'gulp.task(\n"hello4", (done) => {\n' +
+        "    console.log('Hello4!');\n" +
+        "    done();\n" +
+        "});\n"
+    );
+
+    fs.writeFileSync(
+        file4,
+        "var gulp = require('gulp');\n" +
+        "gulp.task('group-test-build-ui-one', (done) => {\n" +
+        "    console.log('Hello3!');\n" +
+        "    done();\n" +
+        "});\n" +
+        'gulp.task(\n"group-test-build-ui-two", (done) => {\n' +
+        "    console.log('Hello4!');\n" +
+        "    done();\n" +
+        "});\n" +
+        "gulp.task('group-test-build-ui-three', (done) => {\n" +
+        "    console.log('Hello3!');\n" +
+        "    done();\n" +
+        "});\n" +
+        "gulp.task('group-test-build-ui-four', (done) => {\n" +
+        "    console.log('Hello3!');\n" +
+        "    done();\n" +
+        "});\n" +
+        "gulp.task('group-test-build-ui-five', (done) => {\n" +
+        "    console.log('Hello3!');\n" +
+        "    done();\n" +
+        "});\n"
+    );
+
+    fs.writeFileSync(
+        file5,
+        "var gulp = require('gulp');\n" +
+        "gulp.task('group2-test2-build-ui-one', (done) => {\n" +
+        "    console.log('Hello1!');\n" +
+        "    done();\n" +
+        "});\n" +
+        'gulp.task(\n"group2-test2-build-ui-two", (done) => {\n' +
+        "    console.log('Hello2!');\n" +
+        "    done();\n" +
+        "});\n" +
+        "gulp.task('group2-test2-build-ui-three', (done) => {\n" +
+        "    console.log('Hello3!');\n" +
+        "    done();\n" +
+        "});\n" +
+        "gulp.task('group2-test2-build-ui-four', (done) => {\n" +
+        "    console.log('Hello4!');\n" +
+        "    done();\n" +
+        "});\n" +
+        "gulp.task('group2-test2-build-ui-five', (done) => {\n" +
+        "    console.log('Hello5!');\n" +
+        "    done();\n" +
+        "});\n"
+    );
+}
+
+
+function setupMakefile()
+{
+    if (!rootPath || !dirNameIgn || !dirName) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+
+    createMakeFile();
+
+    const file2 = path.join(dirName, "Makefile");
+    tempFiles.push(file2);
+
+    const file3 = path.join(dirNameIgn, "Makefile");
+    tempFiles.push(file3);
+
+    fs.writeFileSync(
+        file2,
+        "# all tasks comment\n" +
+        "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
+    );
+
+    fs.writeFileSync(
+        file3,
+        "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
+    );
+}
+
+
+function setupBatch()
+{
+    if (!rootPath || !dirNameIgn || !dirName) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+
+    createBatchFile();
+
+    const file2 = path.join(dirName, "test2.BAT");
+    tempFiles.push(file2);
+
+    const file3 = path.join(dirNameIgn, "test3.bat");
+    tempFiles.push(file3);
+
+    fs.writeFileSync(file2, "@echo testing batch file 2\r\ntimeout /t 5\r\n");
+    fs.writeFileSync(file3, "@echo testing batch file 3\r\n");
+}
+
+
+function setupBash()
+{
+    if (!rootPath || !dirNameIgn || !dirName) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+
+    const file = path.join(rootPath, "test.sh");
+    tempFiles.push(file);
+
+    const file2 = path.join(dirName, "test2.SH");
+    tempFiles.push(file2);
+
+    const file3 = path.join(dirNameIgn, "test3.sh");
+    tempFiles.push(file3);
+
+    fs.writeFileSync(file, "echo testing bash file\n");
+    fs.writeFileSync(file2, "echo testing bash file 2\n");
+    fs.writeFileSync(file3, "echo testing bash file 3\n");
+}
+
+
+function setupGrunt()
+{
+    if (!rootPath || !dirName || !dirNameIgn || !dirNameL2) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+
+    createGruntFile();
+
+    const file2 = path.join(dirName, "Gruntfile.js");
+    tempFiles.push(file2);
+
+    const file3 = path.join(dirNameIgn, "Gruntfile.js");
+    tempFiles.push(file3);
+
+    const file4 = path.join(dirNameL2, "GRUNTFILE.JS");
+    tempFiles.push(file4);
+
+    fs.writeFileSync(
+        file2,
+        "module.exports = function(grunt) {\n" +
+        '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
+        '    grunt.registerTask("upload2", ["s3"]);\n' +
+        "};\n"
+    );
+
+    fs.writeFileSync(
+        file3,
+        "module.exports = function(grunt) {\n" +
+        '    grunt.registerTask(\n"default3", ["jshint:myproject"]);\n' +
+        '    grunt.registerTask("upload3", ["s3"]);\n' +
+        "};\n"
+    );
+
+    fs.writeFileSync(
+        file4,
+        "module.exports = function(grunt) {\n" +
+        '    grunt.registerTask("grp-test-svr-build1", ["s1"]);\n' +
+        '    grunt.registerTask("grp-test-svr-build2", ["s2"]);\n' +
+        "};\n"
+    );
+}
+
+
+function setupAppPublisher()
+{
+    if (!rootPath) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+    createAppPublisherFile();
+}
+
+
+function setupMaven()
+{
+    if (!rootPath) {
+        assert.fail("        ✘ Workspace folder does not exist");
+    }
+    createMavenPomFile();
+}
 
 
 function createAntFile()
