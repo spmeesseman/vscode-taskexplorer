@@ -112,6 +112,8 @@
 	"config.taskExplorer.numLastTasksDsc": "The number of tasks to store in the 'Last Tasks' tree pseudo-folder.",
 
 	"config.taskExplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
+
+	"config.taskExplorer.rename": "Configure labels that should be used in the Special Folders.",
 	
 	"config.taskExplorer.showLastTasks": "Show the 'last tasks' as a node in the task tree.",
 	"config.taskExplorer.showRunningTask": "Show the last ran running task in the status bar.",

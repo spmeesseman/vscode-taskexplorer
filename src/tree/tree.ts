@@ -1139,7 +1139,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private getSpecialTaskName(taskItem: TaskItem)
     {
-        return taskItem.label + " (" + taskItem.taskFile.folder.label + " - " + taskItem.taskSource + ")";
+        let label = taskItem.taskFile.folder.label + " - " + taskItem.taskSource;
+        const renames: string[][] = configuration.get("rename");
+        for (const i in renames)
+        {
+            if (taskItem.resourceUri?.fsPath === renames[i][0] && renames[i][1]) {
+                label = renames[1][1];
+            }
+        }
+        return taskItem.label + " (" + label + ")";
     }
 
 
