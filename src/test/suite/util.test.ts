@@ -3,9 +3,9 @@
 
 import * as assert from "assert";
 import { workspace } from "vscode";
-import * as util from "../common/utils";
-import * as log from "../common/log";
-import { storage } from "../common/storage";
+import * as util from "../../common/utils";
+import * as log from "../../common/log";
+import { storage } from "../../common/storage";
 
 
 suite("Util tests", () =>
@@ -25,7 +25,7 @@ suite("Util tests", () =>
     {
         const uri = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined;
         if (!uri) {
-            assert.fail("         ✘ Worksapce folder does not exist");
+            assert.fail("         ✘ Workspace folder does not exist");
         }
 
         console.log("      Logging");

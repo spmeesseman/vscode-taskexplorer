@@ -38,13 +38,15 @@ if (process.platform === "linux")
 
 export async function run(): Promise<void>
 {
-    const testsRoot = path.resolve(__dirname, "..");
+    // const testsRoot = path.resolve(__dirname, "..", "..");
+    const testsRoot = __dirname,
+          nycRoot = path.resolve(__dirname, "..", "..", "..");
 
     // Setup coverage pre-test, including post-test hook to report
     const nyc = new NYC({
         // ...baseConfig,
         extends: "@istanbuljs/nyc-config-typescript",
-        cwd: path.join(__dirname, "..", ".."),
+        cwd: nycRoot,
         reporter: ["text-summary", "html", "lcov", "cobertura" ],
         all: true,
         silent: false,

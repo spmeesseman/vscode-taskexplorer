@@ -2,29 +2,39 @@ import { execSync } from "child_process";
 import * as path from "path";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { runTests } from "vscode-test";
+// import { runTests } from "@vscode/test-electron";
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 async function main()
 {
     try {
-        const extensionDevelopmentPath = path.resolve(__dirname, "../../");
-        const extensionTestsPath = path.resolve(__dirname, "../../dist/test");
-        // const extensionTestsWsPath = path.resolve(__dirname, "../../testFixture");
-        const extensionTestsWsPath = extensionTestsPath;
-
         console.log("clear package.json activation event");
         execSync("enable-full-coverage.sh", { cwd: "tools" });
-
+        //
+        // The folder containing the Extension Manifest package.json
+        // Passed to '--extensionDevelopmentPath'
+        //
+        const extensionDevelopmentPath = path.resolve(__dirname, "../../");
+        //
+        // The path to test runner
+        // Passed to --extensionTestsPath
+        //
+        const extensionTestsPath = path.resolve(__dirname, "./suite/index");
+        const extensionTestsWsPath = path.resolve(__dirname, "../../test-files");
+        //
+        // Download VS Code, unzip it and run the integration test
+        //
         await runTests({
-            version: process.env.CODE_VERSION,
+            // version: process.env.CODE_VERSION,
+            version: "1.60.1",
             extensionDevelopmentPath,
             extensionTestsPath,
-            launchArgs: [ extensionTestsWsPath, "--disable-extensions", "--disable-workspace-trust" ]
+            launchArgs: [ "--disable-extensions", "--disable-workspace-trust", extensionTestsWsPath ]
         });
-
         console.log("restore package.json activation event");
         execSync("enable-full-coverage.sh --off", { cwd: "tools" });
-    } catch (err) {
+    }
+    catch (err) {
         console.error(`Failed to run tests: ${err}\n${err.stack ?? "No call stack details found"}`);
         console.log("restore package.json activation event");
         execSync("enable-full-coverage.sh --off", { cwd: "tools" });

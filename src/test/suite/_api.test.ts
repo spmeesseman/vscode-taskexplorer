@@ -3,89 +3,31 @@
 
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { configuration } from "../common/configuration";
-import { timeout } from "../common/utils";
-import { TaskExplorerApi } from "../extension";
-import * as log from "../common/log";
+import { configuration } from "../../common/configuration";
+import { timeout } from "../../common/utils";
+import { TaskExplorerApi } from "../../extension";
+import * as log from "../../common/log";
+import { activate } from "../helper";
 
 
-export let teApi: TaskExplorerApi;
+let teApi: TaskExplorerApi;
 
 
-suite("Extension Tests", () =>
+suite("API Init and Tests", () =>
 {
     setup(async () =>
     {
-    });
-
-
-    teardown(() =>
-    {
-    });
-
-
-    test("Enable required testing options", async function()
-    {
-        this.timeout(10 * 1000);
         assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
         await initSettings();
         await vscode.workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                          "C:\\Windows\\System32\\cmd.exe",
                                                          vscode.ConfigurationTarget.Workspace);
-        log.setWriteToConsole(false); // FOR DEBUGGING - write debug logging from exiension to console
+        teApi = await activate();
     });
 
 
-    test("Get active extension", async function()
+    teardown(() =>
     {
-        let wait = 0;
-        const maxWait = 15;  // seconds
-
-        this.timeout(20 * 1000);
-
-        const ext = vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer");
-        assert(ext, "Could not find extension");
-
-        //
-        // For coverage, we remove activationEvents "*" in package.json, we should
-        // not be active at this point
-        //
-        if (!ext.isActive)
-        {
-            console.log("        Manually activating extension for full coverage");
-            try {
-                teApi = await ext.activate();
-            }
-            catch(e) {
-                assert.fail("Failed to activate extension");
-            }
-            console.log("         ✔ Extension activated");
-        }
-        else {
-            console.log("         ℹ Extension is already activated, coverage will not occur");
-            console.log("         ℹ Remove the activation event from package.json before running tests");
-            //
-            // Wait for extension to activate
-            //
-            while (!ext.isActive && wait < maxWait * 10) {
-                wait += 1;
-                await timeout(100);
-            }
-            assert(!ext.isActive || wait < maxWait * 10, "Extension did not finish activation within " + maxWait + " seconds");
-            //
-            // If we could somehow deactivate and reactivate the extension here possibly coverage would work?
-            //
-            // ext.deactivate();
-            //
-            // Set extension api exports
-            //
-            if (!teApi) {
-                console.log("         ℹ Reset Api");
-                teApi = ext.exports;
-            }
-        }
-
-        assert(teApi, "Exported API is empty");
     });
 
 

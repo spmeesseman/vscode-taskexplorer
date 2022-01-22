@@ -8,17 +8,17 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder, WorkspaceEdit } from "vscode";
-import * as testUtil from "./testUtil";
-import { timeout, removeFromArray, forEachMapAsync } from "../common/utils";
-import { teApi } from "./extension.test";
-import TaskItem from "../tree/item";
-import TaskFile from "../tree/file";
-import { waitForCache } from "../cache";
-import { addWsFolder, removeWsFolder } from "../extension";
-import { configuration } from "../common/configuration";
-import constants from "../common/constants";
+import { timeout, removeFromArray, forEachMapAsync } from "../../common/utils";
+import TaskItem from "../../tree/item";
+import TaskFile from "../../tree/file";
+import { waitForCache } from "../../cache";
+import { addWsFolder, removeWsFolder, TaskExplorerApi } from "../../extension";
+import { configuration } from "../../common/configuration";
+import constants from "../../common/constants";
+import { activate, findIdInTaskMap } from "../helper";
 
 
+let teApi: TaskExplorerApi;
 let rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
 let dirName: string | undefined;
 let dirNameL2: string | undefined;
@@ -35,6 +35,8 @@ suite("Task tests", () =>
 
     suiteSetup(async () =>
     {
+        teApi = await activate();
+
         rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
 
         if (!rootPath) {
@@ -46,8 +48,6 @@ suite("Task tests", () =>
         ws2DirName = path.join(rootPath, "ws2");
         dirNameIgn = path.join(rootPath, "tasks_test_ignore_");
         dirNameCode = path.join(rootPath, ".vscode");
-
-        await testUtil.activeExtension();
 
         //
         // Add some excludes, use both config update and task explorer addExclude command
@@ -841,43 +841,43 @@ suite("Task tests", () =>
 
         console.log("         Finding and counting tasks");
 
-        let taskCount = testUtil.findIdInTaskMap(":ant", taskMap);
+        let taskCount = findIdInTaskMap(":ant", taskMap);
         console.log("            Ant          : " + taskCount.toString());
-        if (taskCount !== 4) {
-            assert.fail("Unexpected Ant task count (Found " + taskCount + " of 4)");
+        if (taskCount !== 7) {
+            assert.fail("Unexpected Ant task count (Found " + taskCount + " of 7)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(":app-publisher:", taskMap);
+        taskCount = findIdInTaskMap(":app-publisher:", taskMap);
         console.log("            App-Publisher: " + taskCount.toString());
         if (taskCount < 6) {
             assert.fail("Unexpected App-Publisher task count (Found " + taskCount + " of 6)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(":bash:", taskMap);
+        taskCount = findIdInTaskMap(":bash:", taskMap);
         console.log("            Bash         : " + taskCount.toString());
         if (taskCount !== 2) {
             assert.fail("Unexpected Bash task count (Found " + taskCount + " of 2)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(":batch:", taskMap);
+        taskCount = findIdInTaskMap(":batch:", taskMap);
         console.log("            Batch        : " + taskCount.toString());
         if (taskCount !== 2) {
             assert.fail("Unexpected Batch task count (Found " + taskCount + " of 2)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(":gradle:", taskMap);
+        taskCount = findIdInTaskMap(":gradle:", taskMap);
         console.log("            Gradle       : " + taskCount.toString());
         if (taskCount !== 2) {
             assert.fail("Unexpected Gradle task count (Found " + taskCount + " of 2)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(":grunt:", taskMap);
+        taskCount = findIdInTaskMap(":grunt:", taskMap);
         console.log("            Grunt        : " + taskCount.toString());
         if (taskCount !== 6) {
             assert.fail("Unexpected Grunt task count (Found " + taskCount + " of 6)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(":gulp:", taskMap);
+        taskCount = findIdInTaskMap(":gulp:", taskMap);
         console.log("            Gulp         : " + taskCount.toString());
         if (taskCount !== 15) {
             assert.fail("Unexpected Gulp task count (Found " + taskCount + " of 15)");
@@ -888,7 +888,7 @@ suite("Task tests", () =>
         // provide the tasks once the package.json files are created, then its not
         // out fault
         //
-        taskCount = testUtil.findIdInTaskMap(":npm:", taskMap);
+        taskCount = findIdInTaskMap(":npm:", taskMap);
         console.log("            NPM          : " + taskCount.toString());
         if (taskCount !== 4) {
             if (taskCount === 0) {
@@ -899,13 +899,13 @@ suite("Task tests", () =>
             }
         }
 
-        taskCount = testUtil.findIdInTaskMap(":tsc:", taskMap);
+        taskCount = findIdInTaskMap(":tsc:", taskMap);
         console.log("            TSC          : " + taskCount.toString());
         if (taskCount !== 4) {
             assert.fail("Unexpected Typescript task count (Found " + taskCount + " of 4)");
         }
 
-        taskCount = testUtil.findIdInTaskMap(":Workspace:", taskMap);
+        taskCount = findIdInTaskMap(":Workspace:", taskMap);
         console.log("            VSCode       : " + taskCount.toString());
         if (taskCount !== 7) {
             assert.fail("Unexpected VSCode task count (Found " + taskCount + " of 7)");

@@ -1,7 +1,19 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import * as cp from "child_process";
-import { CancellationToken, extensions, QuickPickOptions, window } from "vscode";
+import * as path from "path";
+import * as assert from "assert";
+import { CancellationToken, extensions, QuickPickOptions, window, workspace } from "vscode";
+import { TaskExplorerApi } from "../extension";
 import TaskItem from "../tree/item";
+import { configuration } from "../common/configuration";
+
+
+let activated = false;
+let teApi: TaskExplorerApi;
+const serverActivationDelay = 2500;
+const invalidationDelay = 400;
+let docValidationDelay: number | undefined;
+let taskExplorerEnabled: boolean;
 
 
 export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
@@ -64,6 +76,31 @@ export async function waitForActiveExtension(extension: Extension<any>)
 }
 */
 
+/**
+ * Activates the spmeesseman.vscode-taskexplorer extension
+ */
+export async function activate()
+{
+    const ext = extensions.getExtension("spmeesseman.vscode-taskexplorer")!;
+    assert(ext, "Could not find extension");
+
+    if (!activated)
+    {
+        teApi = await ext.activate();
+        await sleep(serverActivationDelay); // Wait for server activation
+        activated = true;
+    }
+    return teApi;
+}
+
+
+export async function cleanup()
+{
+    // await configuration.update("validationDelay", docValidationDelay);
+    // await workspace.getConfiguration().update("extjsIntellisense.enableTaskView", taskExplorerEnabled);
+}
+
+
 export function activeExtension()
 {
     return new Promise<void>((resolve, reject) =>
@@ -83,12 +120,24 @@ export function activeExtension()
 }
 
 
+export const getDocPath = (p: string) =>
+{
+	return path.normalize(path.resolve(__dirname, "../../../test-files", p));
+};
+
+
 const overridesShowInputBox: any[] = [];
 
 
 export function overrideNextShowInputBox(value: any)
 {
     overridesShowInputBox.push(value);
+}
+
+
+export async function sleep(ms: number)
+{
+	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
