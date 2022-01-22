@@ -7,11 +7,10 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { tasks, workspace, WorkspaceFolder } from "vscode";
+import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, buildTree, isReady } from "../helper";
+import { activate, isReady, sleep } from "../helper";
 import { TaskExplorerApi } from "../../extension";
-import { AntTaskProvider } from "../../providers/ant";
 import { ComposerTaskProvider } from "../../providers/composer";
 
 
@@ -19,7 +18,7 @@ let teApi: TaskExplorerApi;
 let rootWorkspace: WorkspaceFolder;
 let pathToComposer: string;
 let enableComposer: boolean;
-let file: string;
+let mainFile: Uri;
 
 
 suite("Composer Tests", () =>
@@ -35,7 +34,7 @@ suite("Composer Tests", () =>
         // File path for create/remove
         //
         rootWorkspace = (workspace.workspaceFolders ? workspace.workspaceFolders[0]: undefined) as WorkspaceFolder;
-        file = path.join(rootWorkspace.uri.fsPath, "tasks_test_", "composer.json");
+        mainFile = Uri.file(path.join(rootWorkspace.uri.fsPath, "composer.json"));
         //
         // Store / set initial settings
         //
@@ -44,8 +43,6 @@ suite("Composer Tests", () =>
         enableComposer = configuration.get<boolean>("enableComposer");
         await configuration.update("pathToComposer", "php\\composer.exe");
         await configuration.update("enableComposer", true);
-
-        await buildTree(this);
     });
 
 
@@ -78,6 +75,8 @@ suite("Composer Tests", () =>
     test("Composer Disable", async () =>
     {
         await configuration.update("enableComposer", false);
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache("composer", mainFile);
         const cTasks = await tasks.fetchTasks({ type: "composer" });
         assert(cTasks.length === 0, "Did not read 0 composer tasks");
     });
@@ -86,6 +85,8 @@ suite("Composer Tests", () =>
     test("Composer Re-enable", async () =>
     {
         await configuration.update("enableComposer", true);
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache("composer", mainFile);
         const cTasks = await tasks.fetchTasks({ type: "composer" });
         assert(cTasks.length === 2, "Did not read 2 composer tasks");
     });
@@ -93,8 +94,11 @@ suite("Composer Tests", () =>
 
     test("Composer Create File", async () =>
     {
+        const dirName = path.join(rootWorkspace.uri.fsPath, "tasks_test_"),
+              file = Uri.file(path.join(dirName, "composer.json"));
+
         fs.writeFileSync(
-            file,
+            file.fsPath,
             "{\n" +
             '  "scripts":\n' +
             "  {\n" +
@@ -107,15 +111,19 @@ suite("Composer Tests", () =>
             "}\n"
         );
 
-        const cTasks = await tasks.fetchTasks({ type: "composer" });
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache("composer", file);
+        let cTasks = await tasks.fetchTasks({ type: "composer" });
         assert(cTasks.length === 5, "Did not read 5 composer tasks");
-    });
 
+        fs.unlinkSync(file.fsPath);
+        fs.rmdirSync(dirName, {
+            recursive: true
+        });
 
-    test("Composer Remove File", async () =>
-    {
-        fs.unlinkSync(file);
-        const cTasks = await tasks.fetchTasks({ type: "composer" });
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache("composer", file);
+        cTasks = await tasks.fetchTasks({ type: "composer" });
         assert(cTasks.length === 2, "Did not read 2 composer tasks");
     });
 

@@ -508,9 +508,9 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
 
 function logFileWatcherEvent(uri: Uri, type: string)
 {
-    log.write("file change event");
-    log.value("   type", type);
-    log.value("   file", uri.fsPath);
+    log.write("file change event", 1);
+    log.value("   type", type, 1);
+    log.value("   file", uri.fsPath, 1);
 }
 
 

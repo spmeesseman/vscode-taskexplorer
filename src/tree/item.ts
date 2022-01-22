@@ -156,7 +156,7 @@ export default class TaskItem extends TreeItem
         // Note that TaskItems of type 'scriptFile' can be ran with arguments and this will have an additional
         // entry added to it's context menu - "Run with arguments"
         //
-        if (util.isSpecialTask(this))
+        if (util.isSpecial(this))
         {
             if (task.definition.scriptFile || this.taskSource === "gradle") {
                 this.contextValue = running ? "scriptRunningS" : "scriptFileS";

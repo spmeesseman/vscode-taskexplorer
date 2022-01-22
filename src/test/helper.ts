@@ -13,7 +13,6 @@ import { waitForCache } from "../cache";
 let treeItems: TreeItem[];
 let activated = false;
 let teApi: TaskExplorerApi;
-const serverActivationDelay = 2500;
 
 
 export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
@@ -82,17 +81,16 @@ export async function waitForActiveExtension(extension: Extension<any>)
 /**
  * Activates the spmeesseman.vscode-taskexplorer extension
  */
-export async function activate()
+export async function activate(instance?: any)
 {
     const ext = extensions.getExtension("spmeesseman.vscode-taskexplorer")!;
     assert(ext, "Could not find extension");
+    if (instance) instance.timeout(45 * 1000);
 
     if (!activated)
     {
         initSettings(true);
         teApi = await ext.activate();
-        await sleep(serverActivationDelay); // Wait for server activation
-        await commands.executeCommand("taskExplorer.addToExcludes", "**/tasks_test_ignore_/**", "**/ant/**");
         activated = true;
     }
     return teApi;
@@ -106,7 +104,7 @@ export async function cleanup()
 }
 
 
-export async function buildTree(instance: any)
+export async function buildTree(instance: any, waitTime?: number)
 {
     if (!teApi || !teApi.explorerProvider) {
         assert.fail("        ✘ Not initialized");
@@ -123,7 +121,7 @@ export async function buildTree(instance: any)
         assert.fail("        ✘ Task Explorer tree instance does not exist");
     }
 
-    await sleep(7500); // wait for filesystem change events
+    await sleep(waitTime || 1);
     await waitForCache();
 
     console.log("         ✔ Cache done building");
@@ -132,9 +130,6 @@ export async function buildTree(instance: any)
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("groupMaxLevel", 5);
 
-    //
-    // Refresh for better coverage
-    //
     await teApi.explorerProvider.refresh("tests");
     await sleep(4000);
     await waitForCache();
@@ -143,6 +138,11 @@ export async function buildTree(instance: any)
     // Mock explorer open view which would call this function
     //
     treeItems = await teApi.explorerProvider.getChildren(undefined, "        ");
+
+    await teApi.explorerProvider.refresh();
+    await sleep(4000);
+    await waitForCache();
+
     return treeItems;
 }
 

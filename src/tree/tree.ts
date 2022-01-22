@@ -77,7 +77,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | string) => { await this.addToExcludes(taskFile); }, this));
         subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => { await this.addRemoveFavorite(taskItem); }, this));
         subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
-        subscriptions.push(commands.registerCommand(name + ".renameSpecial", async (taskItem: TaskItem) => { await this.renameSpecial(taskItem); }, this));
+        subscriptions.push(commands.registerCommand(name + ".renameSpecial", async (taskItem: TaskItem) => { await this.addRemoveSpecialLabel(taskItem); }, this));
 
         tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e));
         tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e));
@@ -127,7 +127,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async renameSpecial(taskItem: TaskItem)
+    private async addRemoveSpecialLabel(taskItem: TaskItem)
     {
         let addRemoved = false,
             index = 0;
@@ -1650,7 +1650,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             log.write("   invalidate " + opt1 + " provider file ", 1, logPad);
             log.value("      file", opt2, 1, logPad);
             const provider = providers.get(util.getScriptProviderType(opt1));
-            await provider?.invalidateTasksCache(opt2, logPad + "   "); // NPM/Workspace tasks don't implement TaskExplorerProvider
+            // NPM/Workspace tasks don't implement TaskExplorerProvider
+            await provider?.invalidateTasksCache(opt2, logPad + "   ");
         }
         else { // If opt1 is undefined, refresh all providers
             if (!opt1) {
@@ -1661,9 +1662,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     await p.invalidateTasksCache(undefined, logPad + "   ");
                 }
             }
-            else {
+            else { // NPM/Workspace tasks don't implement TaskExplorerProvider
                 log.write("   invalidate " + opt1 + " provider", 1, logPad);
-                await providers.get(opt1)?.invalidateTasksCache(undefined, logPad + "   ");  // NPM/Workspace tasks don't implement TaskExplorerProvider
+                await providers.get(util.getScriptProviderType(opt1))?.invalidateTasksCache(undefined, logPad + "   ");
             }
         }
 
@@ -1727,7 +1728,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return true;
         }
 
-        log.value("   enabled in settings", configuration.get(settingName), 2, logPad);
+        log.value("   enabled in settings", srcEnabled, 2, logPad);
         log.value("   is npm install task", isNpmInstallTask, 2, logPad);
 
         if (isNpmInstallTask && srcEnabled) {

@@ -64,18 +64,6 @@ export async function forEachAsync(array: any, callback: any)
 }
 
 
-export function getCwd(uri: Uri): string
-{
-    return uri.fsPath.substring(0, uri.fsPath.lastIndexOf(path.sep) + 1);
-}
-
-
-export function getGroupSeparator()
-{
-    return configuration.get<string>("groupSeparator") || constants.DEFAULT_SEPARATOR;
-}
-
-
 export function getCombinedGlobPattern(defaultPattern: string, globs: string[]): string
 {
     let multiFilePattern = defaultPattern;
@@ -96,6 +84,18 @@ export function getCombinedGlobPattern(defaultPattern: string, globs: string[]):
         multiFilePattern += "}";
     }
     return multiFilePattern;
+}
+
+
+export function getCwd(uri: Uri): string
+{
+    return uri.fsPath.substring(0, uri.fsPath.lastIndexOf(path.sep) + 1);
+}
+
+
+export function getGroupSeparator()
+{
+    return configuration.get<string>("groupSeparator") || constants.DEFAULT_SEPARATOR;
 }
 
 
@@ -293,15 +293,6 @@ export function getTaskItemId(taskItem: TaskItem)
 }
 
 
-export function isSpecialTask(taskItem: TaskItem)
-{
-    return taskItem && taskItem.id &&
-           (taskItem.id.includes(constants.LAST_TASKS_LABEL + ":") ||
-           taskItem.id.includes(constants.FAV_TASKS_LABEL + ":") ||
-           taskItem.id.includes(constants.USER_TASKS_LABEL + ":"));
-}
-
-
 export function isExcluded(uriPath: string, logPad = "")
 {
     function testForExclusionPattern(path: string, pattern: string): boolean
@@ -332,6 +323,15 @@ export function isExcluded(uriPath: string, logPad = "")
 export function isScriptType(source: string)
 {
     return getScriptTaskTypes().includes(source);
+}
+
+
+export function isSpecial(taskItem: TaskItem)
+{
+    return taskItem && taskItem.id &&
+           (taskItem.id.includes(constants.LAST_TASKS_LABEL + ":") ||
+           taskItem.id.includes(constants.FAV_TASKS_LABEL + ":") ||
+           taskItem.id.includes(constants.USER_TASKS_LABEL + ":"));
 }
 
 

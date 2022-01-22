@@ -4,7 +4,7 @@ import * as path from "path";
 import * as util from "../common/utils";
 import * as log from "../common/log";
 import { configuration } from "../common/configuration";
-import { filesCache } from "../cache";
+import { filesCache, removeFileFromCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../taskDefinition";
 
@@ -45,9 +45,10 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
-        const paths = filesCache.get("composer");
+        const paths = filesCache.get(this.providerName),
+              enabled = configuration.get<boolean>("enable" + util.properCase(this.providerName));
 
-        if (workspace.workspaceFolders && paths)
+        if (enabled && workspace.workspaceFolders && paths)
         {
             for (const fObj of paths)
             {
@@ -62,8 +63,12 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
                 }
             }
         }
+        else {
+            // removeFileFromCache(this.providerName);
+        }
 
         log.value("   # of tasks", allTasks.length, 2, logPad);
+        log.value("   enabled", enabled, 2, logPad);
         log.methodDone("detect composer files", 1, logPad, true);
         return allTasks;
     }

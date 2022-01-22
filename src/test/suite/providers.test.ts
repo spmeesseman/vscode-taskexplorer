@@ -127,11 +127,13 @@ suite("Provider Tests", () =>
         }];
 
         workspace.workspaceFolders?.concat(wsf);
+        await teApi.explorerProvider?.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
 
         setupNpm(); setupVscode(); setupAnt(); setupGradle(); setupTsc(); setupMakefile();
         setupBash(); setupBatch(); setupGrunt(); setupGulp(); setupAppPublisher(); setupMaven();
 
-        await buildTree(this);
+        this.timeout(45000);
+        await buildTree(this, 7500);
 
         //
         // Check VSCode provided task types for the hell of it
@@ -249,18 +251,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Verify tree validity and open tasks for edit", async function()
-    {
-        if (!teApi || !teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-        await teApi.explorerProvider.refresh();
-        await timeout(4000);
-        await waitForCache();
-    });
-
-
-    test("Verify tree validity and open tasks for edit", async function()
+    test("Open tasks for edit", async function()
     {
         if (!rootPath || !dirNameIgn || !dirName) {
             assert.fail("        ✘ Workspace folder does not exist");
@@ -354,150 +345,6 @@ suite("Provider Tests", () =>
         console.log("            VSCode       : " + taskCount.toString());
         if (taskCount !== 7) {
             assert.fail("Unexpected VSCode task count (Found " + taskCount + " of 7)");
-        }
-    });
-
-
-    test("Run, pause, open, and stop a task", async function()
-    {
-        let ranBash = false;
-        let ranBatch = false;
-
-        if (!rootPath) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        if (!teApi || !teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-
-        this.timeout(75 * 1000);
-
-        //
-        // Just find and task, a batch task, and run all commands on it
-        //
-        let lastTask: TaskItem | null = null;
-        for (const map of taskMap)
-        {
-            const value = map[1];
-            if (value && value.taskSource === "batch")
-            {
-                console.log("Run batch task: " + value.label);
-                console.log("   Folder: " + value.getFolder()?.name);
-                if (lastTask) {
-                    await commands.executeCommand("taskExplorer.open", value);
-                    await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
-                    await configuration.updateWs("keepTermOnStop", true);
-                    await configuration.updateWs("clickAction", "Execute");
-                    await commands.executeCommand("taskExplorer.run", lastTask);
-                    await timeout(1000);
-                    await configuration.updateWs("clickAction", "Open");
-                    await commands.executeCommand("taskExplorer.pause", value);
-                    await timeout(1000);
-                    await commands.executeCommand("taskExplorer.run", value);
-                    await timeout(1000);
-                    await commands.executeCommand("taskExplorer.stop", value);
-                    //
-                    // Cover code that removes a "Last Task" if it was removed
-                    //
-                    value.taskFile.removeTreeNode(value);
-                    await commands.executeCommand("taskExplorer.runLastTask");
-                    await commands.executeCommand("taskExplorer.stop", value);
-                    value.taskFile.addTreeNode(value); // remove fav coverage
-                }
-                await configuration.updateWs("keepTermOnStop", false);
-                await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
-                await commands.executeCommand("taskExplorer.open", value);
-                await commands.executeCommand("taskExplorer.runWithArgs", value, "--test --test2");
-                await timeout(250);
-                await commands.executeCommand("taskExplorer.stop", value);
-                await configuration.updateWs("keepTermOnStop", true);
-                await commands.executeCommand("taskExplorer.run", value);
-                await timeout(250);
-                await commands.executeCommand("taskExplorer.pause", value);
-                await configuration.updateWs("clickAction", "Execute");
-                await commands.executeCommand("taskExplorer.run", value);
-                await configuration.updateWs("clickAction", "Open");
-                await timeout(250);
-                await commands.executeCommand("taskExplorer.openTerminal", value);
-                await commands.executeCommand("taskExplorer.pause", value);
-                await timeout(250);
-                await commands.executeCommand("taskExplorer.stop", value);
-                await commands.executeCommand("taskExplorer.runLastTask", value);
-                await timeout(250);
-                await configuration.updateWs("keepTermOnStop", false);
-                await commands.executeCommand("taskExplorer.restart", value);
-                await timeout(250);
-                await commands.executeCommand("taskExplorer.stop", value);
-                await commands.executeCommand("taskExplorer.runNoTerm", value);
-                await timeout(250);
-                await commands.executeCommand("taskExplorer.stop", value);
-                await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value); // remove fav coverage
-                if (lastTask) {
-                    await commands.executeCommand("taskExplorer.openTerminal", lastTask);
-                }
-                ranBatch = !!lastTask;
-                lastTask = value;
-                if (ranBash && ranBatch) break;
-            }
-            else if (value && value.taskSource === "bash")
-            {
-                console.log("Run bash task: " + value.label);
-                console.log("   Folder: " + value.getFolder()?.name);
-                await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
-                await commands.executeCommand("taskExplorer.run", value);
-                await timeout(1000);
-                await workspace.getConfiguration().update("terminal.integrated.shell.windows",
-                                                          "bash.exe", ConfigurationTarget.Workspace);
-                await commands.executeCommand("taskExplorer.run", value);
-                await timeout(1000);
-                await workspace.getConfiguration().update("terminal.integrated.shell.windows",
-                                                          "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
-                ranBash = true;
-                await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
-                await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
-                await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
-                await commands.executeCommand("taskExplorer.openTerminal", value);
-                if (ranBash && ranBatch) break;
-            }
-        }
-
-        //
-        // Clear Last Tasks folder
-        //
-        await commands.executeCommand("taskExplorer.clearSpecialFolder", constants.LAST_TASKS_LABEL);
-        await commands.executeCommand("taskExplorer.clearSpecialFolder", constants.FAV_TASKS_LABEL);
-
-        //
-        // Find an npm file and run an "npm install"
-        //
-        console.log("    Run npm install");
-        await configuration.updateWs("clickAction", "Open");
-        let npmRan = false;
-        for (const map of taskMap)
-        {
-            const value = map[1];
-            if (value && value.taskSource === "npm")
-            {
-                // await commands.executeCommand("taskExplorer.open", value);
-                await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
-                npmRan = true;
-                break;
-            }
-        }
-        if (!npmRan) {
-            console.log("        ℹ Running npm install in local testing env");
-            // TODO - how to run with local test ran in vscode dev host?
-            // await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
-            // const npmTasks = await tasks.fetchTasks({ type: "npm" });
-            // if (npmTasks)
-            // {
-            //     for (const npmTask of npmTasks)
-            //     {
-            //         console.log(npmTask.name);
-            //         await commands.executeCommand("taskExplorer.open", npmTask);
-            //     }
-            // }
         }
     });
 
@@ -777,7 +624,6 @@ suite("Provider Tests", () =>
         if (!teApi.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        console.log("    Show/hide last tasks");
         await teApi.explorerProvider.showSpecialTasks(true);
         await teApi.explorerProvider.showSpecialTasks(false);
         await configuration.updateWs("showLastTasks", false);
@@ -794,7 +640,6 @@ suite("Provider Tests", () =>
         if (!teApi?.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        console.log("    Show/hide favorite tasks");
         await teApi.explorerProvider.showSpecialTasks(true, true);
         await teApi.explorerProvider.showSpecialTasks(false, true);
     });
@@ -808,7 +653,6 @@ suite("Provider Tests", () =>
         if (!teApi?.explorerProvider) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        console.log("    Enable groups with separator and rebuild cache");
         await configuration.updateWs("groupWithSeparator", true);
         await configuration.updateWs("groupSeparator", "-");
         await configuration.updateWs("groupMaxLevel", 5);
