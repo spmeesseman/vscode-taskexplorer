@@ -8,6 +8,7 @@ import constants from "./constants";
 import * as path from "path";
 import * as os from "os";
 import * as log from "./log";
+import TaskItem from "../tree/item";
 
 
 /**
@@ -278,6 +279,14 @@ export function getScriptProviderType(source: string): string
         return "script";
     }
     return source;
+}
+
+
+export function getTaskItemId(taskItem: TaskItem)
+{
+    return taskItem?.id?.replace(constants.LAST_TASKS_LABEL + ":", "")
+                        .replace(constants.FAV_TASKS_LABEL + ":", "")
+                        .replace(constants.USER_TASKS_LABEL + ":", "");
 }
 
 

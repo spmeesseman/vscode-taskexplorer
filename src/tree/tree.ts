@@ -77,6 +77,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | string) => { await this.addToExcludes(taskFile); }, this));
         subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => { await this.addRemoveFavorite(taskItem); }, this));
         subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
+        subscriptions.push(commands.registerCommand(name + ".renameSpecial", async (taskItem: TaskItem) => { await this.renameSpecial(taskItem); }, this));
 
         tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e));
         tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e));
@@ -95,7 +96,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async addRemoveFavorite(taskItem: TaskItem)
     {
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        const favId = this.getTaskItemId(taskItem);
+        const favId = util.getTaskItemId(taskItem);
 
         log.methodStart("add/remove favorite", 1, "", false, [
             ["id", taskItem.id ], [ "current fav count", favTasks.length ]
@@ -123,6 +124,56 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             await this.showSpecialTasks(true, true, undefined, "   ");
         }
         log.methodDone("add/remove favorite", 1);
+    }
+
+
+    private async renameSpecial(taskItem: TaskItem)
+    {
+        let addRemoved = false,
+            index = 0;
+        const renames: string[][] = configuration.get("renameSpecial", []),
+              id = util.getTaskItemId(taskItem);
+
+        log.methodStart("add/remove rename special", 1, "", false, [["id", id]]);
+
+        if (!id) {
+            return;
+        }
+
+        for (const i in renames)
+        {
+            if (id === renames[i][0])
+            {
+                addRemoved = true;
+                renames.splice(index, 1);
+                break;
+            }
+            ++index;
+        }
+
+        if (!addRemoved)
+        {
+            const opts: InputBoxOptions = { prompt: "Enter favorites label" };
+            await window.showInputBox(opts).then(async (str) =>
+            {
+                if (id && str !== undefined)
+                {
+                    addRemoved = true;
+                    renames.push([id, str]);
+                }
+            });
+        }
+
+        //
+        // Update
+        //
+        if (addRemoved) {
+            await configuration.update("renameSpecial", renames);
+            await this.showSpecialTasks(true, true, undefined, "   ");
+            await this.showSpecialTasks(true, false, undefined, "   ");
+        }
+
+        log.methodDone("add/remove rename special", 1);
     }
 
 
@@ -902,7 +953,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (configuration.get<boolean>("showLastTasks") === true)
         {
             const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-            if (util.existsInArray(lastTasks, this.getTaskItemId(taskItem)) !== false)
+            if (util.existsInArray(lastTasks, util.getTaskItemId(taskItem)) !== false)
             {
                 if (this.taskTree[0].label === constants.LAST_TASKS_LABEL)
                 {
@@ -915,7 +966,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // Fire change event for the 'Favorites' folder if the task exists there
         //
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        if (util.existsInArray(favTasks, this.getTaskItemId(taskItem)) !== false)
+        if (util.existsInArray(favTasks, util.getTaskItemId(taskItem)) !== false)
         {
             if (this.taskTree[0].label === constants.FAV_TASKS_LABEL)
             {
@@ -1140,11 +1191,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private getSpecialTaskName(taskItem: TaskItem)
     {
         let label = taskItem.taskFile.folder.label + " - " + taskItem.taskSource;
-        const renames: string[][] = configuration.get("rename");
+        const renames: string[][] = configuration.get("renameSpecial"),
+              id = util.getTaskItemId(taskItem);
         for (const i in renames)
         {
-            if (taskItem.resourceUri?.fsPath === renames[i][0] && renames[i][1]) {
-                label = renames[1][1];
+            if (id === renames[i][0])
+            {
+                label = renames[i][1];
+                break;
             }
         }
         return taskItem.label + " (" + label + ")";
@@ -1367,14 +1421,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
 
         return taskFile;
-    }
-
-
-    private getTaskItemId(taskItem: TaskItem)
-    {
-        return taskItem?.id?.replace(constants.LAST_TASKS_LABEL + ":", "")
-                            .replace(constants.FAV_TASKS_LABEL + ":", "")
-                            .replace(constants.USER_TASKS_LABEL + ":", "");
     }
 
 
@@ -1853,7 +1899,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         let taskItem2: TaskItem | undefined;
         const ltFolder = this.taskTree ? this.taskTree[treeIndex] as TaskFolder : undefined;
-        const taskId = label + ":" + this.getTaskItemId(taskItem);
+        const taskId = label + ":" + util.getTaskItemId(taskItem);
 
         if (!ltFolder || !taskItem.task) {
             return;
@@ -2414,7 +2460,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const storeName: string = !isFavorite ? constants.LAST_TASKS_STORE : constants.FAV_TASKS_STORE;
         const label: string = !isFavorite ? constants.LAST_TASKS_LABEL : constants.FAV_TASKS_LABEL;
         const cstTasks = storage.get<string[]>(storeName, []);
-        const taskId =  this.getTaskItemId(taskItem);
+        const taskId =  util.getTaskItemId(taskItem);
 
         log.methodStart("save task", 1, logPad, false, [
             [ "treenode label", label ], [ "max tasks", maxTasks ], [ "is favorite", isFavorite ],

@@ -113,7 +113,7 @@
 
 	"config.taskExplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
 
-	"config.taskExplorer.rename": "Configure labels that should be used in the Special Folders.",
+	"config.taskExplorer.renameSpecial": "Configure labels that should be used in the Special Folders.",
 	
 	"config.taskExplorer.showLastTasks": "Show the 'last tasks' as a node in the task tree.",
 	"config.taskExplorer.showRunningTask": "Show the last ran running task in the status bar.",
@@ -132,7 +132,7 @@
 	"taskdef.task.uri": "The uri of the task file.",
 	"taskdef.task.taskItemId": "The tree item id that the task is associated with.",
 	"taskdef.task.isDefault": "For Ant tasks, indicates the 'default' task.",
-	"taskdef.task.scriptType": "The type of script (bash, batch, pythin, etc...).",
+	"taskdef.task.scriptType": "The type of script (bash, batch, python, etc...).",
 	"taskdef.task.cmdLine": "The command line used to execute the script in a shell.",
 	"taskdef.task.scriptFile": "Boolean to display filename as the script target. Set to true.",
 	"taskdef.task.takesArgs": "Boolean to indicate if the script accepts command line args.",
@@ -153,6 +153,7 @@
 	"command.debug": "Debugging ",
 	"command.open": "Open",
 	"command.openTerminal": "Open Terminal",
+	"command.renameSpecial": "Add/Remove special folders label",
 	"command.runInstall": "Run pkg mgr install",
 	"command.runAudit": "Run pkg mgr audit",
 	"command.runAuditFix": "Run pkg mgr audit fix",

@@ -6,6 +6,8 @@ from "vscode";
 import * as path from "path";
 import TaskFile from "./file";
 import * as util from "../common/utils";
+import { storage } from "../common/storage";
+import constants from "../common/constants";
 
 
 /**
@@ -137,7 +139,21 @@ export default class TaskItem extends TreeItem
 
 
     setContextValue(task: Task, running: boolean)
-    {   //
+    {
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []),
+              lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []),
+              id = util.getTaskItemId(this);
+
+        if (util.existsInArray(favTasks, id) || util.existsInArray(lastTasks, id))
+        {
+            if (task.definition.scriptFile || this.taskSource === "gradle") {
+                this.contextValue = running ? "scriptSRunning" : "scriptFileS";
+            }
+            else {
+                this.contextValue = running ? "scriptSRunning" : "scriptS";
+            }
+        }
+        //
         // Context view controls the view parameters to the ui, see package.json /views/context node.
         //
         //     script        - Standard task item, e.g. "npm", "Workspace", "gulp", etc
@@ -147,11 +163,14 @@ export default class TaskItem extends TreeItem
         // Note that TaskItems of type 'scriptFile' can be ran with arguments and this will have an additional
         // entry added to it's context menu - "Run with arguments"
         //
-        if (task.definition.scriptFile || this.taskSource === "gradle") {
-            this.contextValue = running ? "scriptRunning" : "scriptFile";
-        }
-        else {
-            this.contextValue = running ? "scriptRunning" : "script";
+        else
+        {
+            if (task.definition.scriptFile || this.taskSource === "gradle") {
+                this.contextValue = running ? "scriptRunning" : "scriptFile";
+            }
+            else {
+                this.contextValue = running ? "scriptRunning" : "script";
+            }
         }
     }
 
