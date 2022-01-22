@@ -9,24 +9,24 @@ import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../taskDefinition";
 
 
-export class GradleTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
+export class ComposerTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
-    constructor() { super("gradle"); }
+    constructor() { super("composer"); }
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
     {
         const getCommand = (folder: WorkspaceFolder, cmd: string): string =>
         {
-            let gradle = "gradlew";
+            let composer = "composer";
             if (process.platform === "win32") {
-                gradle = "gradlew.bat";
+                composer = "composer.exe";
             }
-            if (configuration.get<string>("pathToGradle")) {
-                gradle = configuration.get("pathToGradle");
+            if (configuration.get<string>("pathToComposer")) {
+                composer = configuration.get("pathToComposer");
             }
-            return gradle;
+            return composer;
         };
 
         const def = this.getDefaultDefinition(target, folder, uri);
@@ -35,26 +35,27 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         const options = { cwd };
         const execution = new ShellExecution(getCommand(folder, cmd), args, options);
 
-        return new Task(def, folder, target, "gradle", execution, undefined);
+        return new Task(def, folder, target, "composer", execution, undefined);
     }
 
 
     public async readTasks(logPad = ""): Promise<Task[]>
     {
-        log.methodStart("detect gradle files", 1, logPad, true);
+        log.methodStart("detect composer files", 1, logPad, true);
 
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
-        const paths = filesCache.get("gradle");
+        const paths = filesCache.get("composer");
 
         if (workspace.workspaceFolders && paths)
         {
             for (const fObj of paths)
             {
-                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath)) {
+                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
+                {
                     visitedFiles.add(fObj.uri.fsPath);
                     const tasks = await this.readUriTasks(fObj.uri, undefined, logPad + "   ");
-                    log.write("   processed gradle file", 3, logPad);
+                    log.write("   processed composer file", 3, logPad);
                     log.value("      file", fObj.uri.fsPath, 3, logPad);
                     log.value("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
@@ -63,62 +64,33 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         }
 
         log.value("   # of tasks", allTasks.length, 2, logPad);
-        log.methodDone("detect gradle files", 1, logPad, true);
+        log.methodDone("detect composer files", 1, logPad, true);
         return allTasks;
     }
 
 
     private findTargets(fsPath: string, logPad = ""): string[]
     {
-        const json: any = "";
-        const scripts: string[] = [];
+        const targets: string[] = [];
 
-        log.methodStart("find gradle targets", 1, logPad, true);
+        log.methodStart("find composer targets", 1, logPad, true);
 
-        const contents = util.readFileSync(fsPath);
-        let idx = 0;
-        let eol = contents.indexOf("\n", 0);
+        const json = JSON.parse(util.readFileSync(fsPath)),
+              scripts = json.scripts;
 
-        while (eol !== -1)
-        {
-            const line: string = contents.substring(idx, eol).trim();
-            if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("task "))
-            {
-                let idx1 = line.trimLeft().indexOf(" ");
-                if (idx1 !== -1)
-                {
-                    idx1++;
-                    let idx2 = line.indexOf("(", idx1);
-                    if (idx2 === -1) {
-                        idx2 = line.indexOf("{", idx1);
-                    }
-                    if (idx2 !== -1)
-                    {
-                        const tgtName = line.substring(idx1, idx2).trim();
-
-                        if (tgtName)
-                        {
-                            scripts.push(tgtName);
-                            log.write("      found gradle target", 1, logPad);
-                            log.value("         name", tgtName, 1, logPad);
-                        }
-                    }
-                }
-            }
-
-            idx = eol + 1;
-            eol = contents.indexOf("\n", idx);
+        if (scripts) {
+            Object.keys(scripts).forEach((k) => { targets.push(k); });
         }
 
-        log.methodDone("Find gradle targets", 1, logPad, true);
-        return scripts;
+        log.methodDone("Find composer targets", 1, logPad, true);
+        return targets;
     }
 
 
     public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
         const def: TaskExplorerDefinition = {
-            type: "gradle",
+            type: "composer",
             script: target,
             target,
             path: util.getRelativePath(folder, uri),
@@ -131,6 +103,16 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public getDocumentPosition(scriptName: string | undefined, documentText: string | undefined): number
     {
+        if (documentText)
+        {
+            const json = JSON.parse(documentText);
+            const idx = documentText.indexOf("\"scripts\"");
+            if (idx !== -1)
+            {
+                const idx2 = documentText.indexOf(`"${scriptName}"`);
+                return idx2 !== -1 ? idx2 : idx;
+            }
+        }
         return 0;
     }
 
@@ -140,7 +122,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         const result: Task[] = [];
         const folder = wsFolder || workspace.getWorkspaceFolder(uri);
 
-        log.methodStart("read gradle file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
+        log.methodStart("read composer file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
 
         if (folder)
         {
@@ -156,7 +138,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             }
         }
 
-        log.methodDone("read gradle file uri task", 1, logPad, true);
+        log.methodDone("read composer file uri task", 1, logPad, true);
         return result;
     }
 

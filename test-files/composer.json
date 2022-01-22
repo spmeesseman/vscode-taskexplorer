@@ -1,0 +1,68 @@
+{
+    "authors": [
+      {
+        "email": "dimaslanjaka@gmail.com",
+        "homepage": "https://github.com/dimaslanjaka/universal-framework",
+        "name": "Dimas Lanjaka",
+        "role": "Developer"
+      }
+    ],
+    "autoload": {
+      "classmap": [
+        "src/bulletproof/src/"
+      ],
+      "files": [
+        "src/shim/autoload.php",
+        "src/bulletproof/src/bulletproof.php"
+      ],
+      "psr-4": {
+        "Accounting\\": "src/Accounting/",
+        "AGC\\": "src/AGC/",
+        "ArrayHelper\\": "src/ArrayHelper/",
+        "Cookie\\": "src/Cookie/",
+        "Crypto\\": "src/Crypto/",
+        "DB\\": "src/DB/",
+        "DDOS\\": "src/DDOS/",
+        "Extender\\": "src/Extender/",
+        "Facebook\\": "src/Facebook/",
+        "Filemanager\\": "src/Filemanager/",
+        "GoogleExt\\": "src/GoogleExt/",
+        "HTML\\": "src/HTML/",
+        "IMEI\\": "src/IMEI/",
+        "img\\": "src/img/",
+        "Indosat\\": "src/Indosat/",
+        "JSON\\": "src/JSON/",
+        "MVC\\": "src/MVC/",
+        "Naneau\\Obfuscator\\": "src/Naneau/Obfuscator/",
+        "Netscape\\": "src/Netscape/",
+        "Office\\": "src/Office/",
+        "Proxy\\": "src/Proxy/",
+        "Session\\": "src/Session/",
+        "simplehtmldom\\": "src/simplehtmldom/",
+        "Telkomsel\\": "src/Telkomsel/",
+        "Typehint\\": "src/Typehint/",
+        "User\\": "src/User/",
+        "Utils\\": "src/Utils/"
+      }
+    },
+    "bin": [
+      "libs/bin/php-obfuscate",
+      "libs/bin"
+    ],
+    "description": "Framework PHPJS full typehinting support with easy helper",
+    "license": "MIT",
+    "name": "dimaslanjaka/universal-framework",
+    "version": "1.1.0",
+    "require": {
+       "id/package": "version"
+    },
+    "scripts": {
+      "php-cs-fixer": "php-cs-fixer fix src --config=./.php_cs.dist",
+      "doc": [
+        "phpdoc --ansi"
+      ]
+    },
+    "require-dev": {
+      "id/package": "version"
+    }
+  }

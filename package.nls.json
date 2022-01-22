@@ -65,6 +65,11 @@
 	"config.taskExplorer.pathToPerl": "Perl - Path",
 	"config.taskExplorer.pathToPerlDsc": "The path to the perl program, if not registered in system path.",
 
+	"config.taskExplorer.enableComposer": "PHP - Enable",
+	"config.taskExplorer.enableComposerDsc": "Enable/show php scripts from composer.json as tasks.",
+	"config.taskExplorer.pathToComposer": "PHP - Path",
+	"config.taskExplorer.pathToComposerDsc": "The path to the php program, if not registered in system path.",
+
 	"config.taskExplorer.enablePython": "Python - Enable",
 	"config.taskExplorer.enablePythonDsc": "Enable/show python scripts as tasks.",
 	"config.taskExplorer.pathToPython": "Python - Path",

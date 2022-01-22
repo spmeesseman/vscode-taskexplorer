@@ -2,7 +2,7 @@
     "name": "vscode-taskexplorer",
     "version": "2.5.7",
     "displayName": "Task Explorer",
-    "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash, php, make, maven, python, perl, powershell, ruby, pipenv and nsis",
+    "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash,php composer, make, maven, python, perl, powershell, ruby, pipenv and nsis",
     "icon": "res/gears-r-colors.png",
     "publisher": "spmeesseman",
     "license": "See LICENSE",
@@ -34,10 +34,10 @@
         "grunt",
         "gulp",
         "yarn",
-        "php",
         "ant",
         "makefile",
         "composer",
+        "php",
         "multi-root ready",
         "c c++",
         "gradle",
@@ -1430,11 +1430,11 @@
                     "title": "%config.taskExplorer.enablePerl%",
                     "description": "%config.taskExplorer.enablePerlDsc%"
                 },
-                "taskExplorer.enablePhp": {
+                "taskExplorer.enableComposer": {
                     "type": "boolean",
                     "default": true,
-                    "title": "%config.taskExplorer.enablePhp%",
-                    "description": "%config.taskExplorer.enablePhpDsc%"
+                    "title": "%config.taskExplorer.enableComposer%",
+                    "description": "%config.taskExplorer.enableComposerDsc%"
                 },
                 "taskExplorer.enablePipenv": {
                     "type": "boolean",
@@ -1549,11 +1549,11 @@
                     "title": "%config.taskExplorer.pathToPerl%",
                     "description": "%config.taskExplorer.pathToPerlDsc%"
                 },
-                "taskExplorer.pathToPhp": {
+                "taskExplorer.pathToComposer": {
                     "type": "string",
-                    "default": "php",
-                    "title": "%config.taskExplorer.pathToPhp%",
-                    "description": "%config.taskExplorer.pathToPhpDsc%"
+                    "default": "composer",
+                    "title": "%config.taskExplorer.pathToComposer%",
+                    "description": "%config.taskExplorer.pathToComposerDsc%"
                 },
                 "taskExplorer.pathToPipenv": {
                     "type": "string",
@@ -1972,6 +1972,36 @@
             },
             {
                 "type": "make",
+                "required": [],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.task.script%"
+                    },
+                    "target": {
+                        "type": "string",
+                        "description": "%taskdef.task.target%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.task.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.task.fileUri%"
+                    },
+                    "taskItemId": {
+                        "type": "string",
+                        "description": "%taskdef.task.taskItemId%"
+                    }
+                }
+            },
+            {
+                "type": "composer",
                 "required": [],
                 "properties": {
                     "script": {

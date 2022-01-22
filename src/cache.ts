@@ -111,6 +111,12 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined, log
         await buildCache("perl", constants.GLOB_PERL, folder, false, logPad + "   ");
     }
     //
+    // COMPOSER
+    //
+    if (!cancel && configuration.get<boolean>("enableComposer")) {
+        await buildCache("composer", constants.GLOB_COMPOSER, folder, false, logPad + "   ");
+    }
+    //
     // Powershell
     //
     if (!cancel && configuration.get<boolean>("enablePowershell")) {

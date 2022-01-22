@@ -145,8 +145,8 @@ export function getScriptTaskTypes(): string[]
 export function getTaskTypes(): string[]
 {
     return [
-        "ant", "app-publisher", "bash", "batch", "gradle", "grunt", "gulp", "make",
-        "maven", "npm", "nsis", "perl", "powershell", "python", "pipenv", "ruby", "workspace"
+        "ant", "app-publisher", "bash", "batch", "gradle", "grunt", "gulp", "make", "maven",
+        "npm", "nsis", "perl", "composer",  "powershell", "python", "pipenv", "ruby", "workspace"
     ];
 }
 
