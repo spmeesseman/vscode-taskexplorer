@@ -1334,6 +1334,12 @@
             "type": "object",
             "title": "Task Explorer",
             "properties": {
+                "taskExplorer.disableAnimatedIcons": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "%config.taskExplorer.disableAnimatedIcons%",
+                    "description": "%config.taskExplorer.disableAnimatedIconsDsc%"
+                },
                 "taskExplorer.enableExplorerView": {
                     "type": "boolean",
                     "default": true,

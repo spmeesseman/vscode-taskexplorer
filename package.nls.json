@@ -111,7 +111,11 @@
 	"config.taskExplorer.numLastTasks": "# of Tasks to Remember",
 	"config.taskExplorer.numLastTasksDsc": "The number of tasks to store in the 'Last Tasks' tree pseudo-folder.",
 
+	"config.taskExplorer.disableAnimatedIcons": "Disable animated icons",
+	"config.taskExplorer.disableAnimatedIconsDsc": "Use static non-animated icons for running tasks as opposed to the spinning icons.",
+
 	"config.taskExplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
+
 
 	"config.taskExplorer.renameSpecial": "Configure labels that should be used in the Special Folders.",
 	

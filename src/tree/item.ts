@@ -8,6 +8,7 @@ import TaskFile from "./file";
 import * as util from "../common/utils";
 import { storage } from "../common/storage";
 import constants from "../common/constants";
+import { configuration } from "../common/configuration";
 
 
 /**
@@ -191,9 +192,10 @@ export default class TaskItem extends TreeItem
         //
         if (running) // && task.definition.type !== "$empty")
         {
+            const disableAnimated = configuration.get<boolean>("disableAnimatedIcons");
             this.iconPath = {
-                light: context.asAbsolutePath(path.join("res", "light", "loading.svg")),
-                dark: context.asAbsolutePath(path.join("res", "dark", "loading.svg"))
+                light: context.asAbsolutePath(path.join("res", "light", !disableAnimated ? "loading.svg" : "loadingna.svg")),
+                dark: context.asAbsolutePath(path.join("res", "dark", !disableAnimated ? "loading.svg" : "loadingna.svg"))
             };
         } else
         {
