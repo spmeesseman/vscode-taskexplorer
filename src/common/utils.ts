@@ -330,10 +330,10 @@ function logUserDataEnv(padding = "")
 }
 
 
-export function pathExists(path: string)
+export function pathExists(pathToCheck: string)
 {
     try {
-        fs.accessSync(path);
+        fs.accessSync(path.resolve(process.cwd(), pathToCheck));
     } catch (err) {
         return false;
     }

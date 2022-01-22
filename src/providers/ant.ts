@@ -118,7 +118,6 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         if (!taskName || !documentText) {
             return 0;
         }
-
         taskName = taskName.replace(" - Default", "");
         let idx = this.getDocumentPositionLine("name=", taskName, documentText, 6);
         if (idx > 0)
