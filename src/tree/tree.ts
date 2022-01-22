@@ -15,7 +15,6 @@ import TaskFile from "./file";
 import TaskFolder from "./folder";
 import { visit, JSONVisitor } from "jsonc-parser";
 import { storage } from "../common/storage";
-import { views } from "../views";
 import { rebuildCache } from "../cache";
 import { configuration } from "../common/configuration";
 import { providers } from "../extension";
@@ -992,7 +991,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 const taskItems = await tasks.fetchTasks({
                     type: !util.isScriptType(this.currentInvalidation) ? this.currentInvalidation : "script"
                 });
-                for (const t of this.tasks)
+                for (const t of taskItems)
                 {   //
                     // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
                     // if the script type set for the task in tasks.json is of type 'currentInvalidation'.

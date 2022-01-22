@@ -63,17 +63,6 @@ export async function forEachAsync(array: any, callback: any)
 }
 
 
-export async function forEachMapAsync(map: any, callback: any)
-{
-    for (const entry of map.entries()) {
-        const result = await callback(entry[1], entry[0], map);
-        if (result === false) {
-            break;
-        }
-    }
-}
-
-
 export function getCwd(uri: Uri): string
 {
     return uri.fsPath.substring(0, uri.fsPath.lastIndexOf(path.sep) + 1);

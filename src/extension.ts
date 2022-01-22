@@ -42,6 +42,7 @@ export interface TaskExplorerApi
     sidebarProvider: TaskTreeDataProvider | undefined;
     utilities: any;
     fileCache: any;
+    taskProviders: Map<string, TaskExplorerProvider>;
 }
 
 
@@ -99,7 +100,8 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         explorerProvider: treeDataProvider2,
         sidebarProvider: treeDataProvider,
         utilities: util,
-        fileCache: cache
+        fileCache: cache,
+        taskProviders: providers
     };
 }
 
@@ -144,9 +146,10 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[] | undefined
     {
         log.value("      folder", f.name, 1, logPad);
         // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
-        await util.forEachMapAsync(cache.filesCache, (files: Set<cache.ICacheItem>, provider: string) =>
+        for (const c of cache.filesCache)
         {
-            const toRemove: cache.ICacheItem[] = [];
+            const files = c[1], provider = c[0],
+                  toRemove: cache.ICacheItem[] = [];
 
             log.value("      start remove task files from cache", provider, 2, logPad);
 
@@ -168,7 +171,7 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[] | undefined
             }
 
             log.value("      completed remove files from cache", provider, 2, logPad);
-        });
+        }
         log.write("   folder removed", 1, logPad);
     }
 

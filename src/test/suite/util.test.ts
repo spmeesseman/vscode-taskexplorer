@@ -110,11 +110,12 @@ suite("Util tests", () =>
             }, 100);
         };
 
-        await util.forEachMapAsync(arr, async function(n: number, n2: number)
+        for (const a of arr)
         {
+            const n = a[1], n2 = a[0];
             assert(n === n2);
             await asyncFn(n);
-        });
+        }
     });
 
 

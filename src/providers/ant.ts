@@ -67,23 +67,20 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     {
         log.methodStart("detect ant files", 1, logPad, true);
 
-        const allTasks: Task[] = [];
-        const visitedFiles: Set<string> = new Set();
-        const paths = filesCache.get("ant");
+        const allTasks: Task[] = [],
+              visitedFiles: Set<string> = new Set(),
+              paths = filesCache.get("ant") || [];
 
-        if (workspace.workspaceFolders && paths)
+        for (const fObj of paths)
         {
-            for (const fobj of paths)
+            if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
             {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
-                {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri, undefined, logPad + "   ");
-                    log.write("   processed ant file", 3, logPad);
-                    log.value("      file", fobj.uri.fsPath, 3, logPad);
-                    log.value("      targets in file", tasks.length, 3, logPad);
-                    allTasks.push(...tasks);
-                }
+                visitedFiles.add(fObj.uri.fsPath);
+                const tasks = await this.readUriTasks(fObj.uri, undefined, logPad + "   ");
+                log.write("   processed ant file", 3, logPad);
+                log.value("      file", fObj.uri.fsPath, 3, logPad);
+                log.value("      targets in file", tasks.length, 3, logPad);
+                allTasks.push(...tasks);
             }
         }
 

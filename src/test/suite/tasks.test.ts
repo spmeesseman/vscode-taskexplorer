@@ -8,7 +8,7 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder, WorkspaceEdit } from "vscode";
-import { timeout, removeFromArray, forEachMapAsync } from "../../common/utils";
+import { timeout, removeFromArray } from "../../common/utils";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import { waitForCache } from "../../cache";
@@ -393,7 +393,7 @@ suite("Task tests", () =>
 
         const file2 = path.join(dirName, "test.xml");
         const file3 = path.join(dirName, "emptytarget.xml");
-        const file4 = path.join(dirName, "emtyproject.xml");
+        const file4 = path.join(dirName, "emptyproject.xml");
         const file5 = path.join(dirNameIgn, "build.xml");
 
         tempFiles.push(file2);
@@ -751,6 +751,7 @@ suite("Task tests", () =>
         createAppPublisherFile();
     });
 
+
     test("Create maven pom file", async function()
     {
         if (!rootPath) {
@@ -861,26 +862,26 @@ suite("Task tests", () =>
 
         taskCount = findIdInTaskMap(":batch:", taskMap);
         console.log("            Batch        : " + taskCount.toString());
-        if (taskCount !== 2) {
-            assert.fail("Unexpected Batch task count (Found " + taskCount + " of 2)");
+        if (taskCount !== 4) {
+            assert.fail("Unexpected Batch task count (Found " + taskCount + " of 4)");
         }
 
         taskCount = findIdInTaskMap(":gradle:", taskMap);
         console.log("            Gradle       : " + taskCount.toString());
-        if (taskCount !== 2) {
-            assert.fail("Unexpected Gradle task count (Found " + taskCount + " of 2)");
+        if (taskCount !== 3) {
+            assert.fail("Unexpected Gradle task count (Found " + taskCount + " of 3)");
         }
 
         taskCount = findIdInTaskMap(":grunt:", taskMap);
         console.log("            Grunt        : " + taskCount.toString());
-        if (taskCount !== 6) {
-            assert.fail("Unexpected Grunt task count (Found " + taskCount + " of 6)");
+        if (taskCount !== 13) {
+            assert.fail("Unexpected Grunt task count (Found " + taskCount + " of 13)");
         }
 
         taskCount = findIdInTaskMap(":gulp:", taskMap);
         console.log("            Gulp         : " + taskCount.toString());
-        if (taskCount !== 15) {
-            assert.fail("Unexpected Gulp task count (Found " + taskCount + " of 15)");
+        if (taskCount !== 32) {
+            assert.fail("Unexpected Gulp task count (Found " + taskCount + " of 32)");
         }
 
         //
@@ -931,9 +932,10 @@ suite("Task tests", () =>
         //
         // Just find and task, a batch task, and run all commands on it
         //
-        let lastTask: TaskItem;
-        await forEachMapAsync(taskMap, async (value: TaskItem) =>
+        let lastTask: TaskItem | null = null;
+        for (const map of taskMap)
         {
+            const value = map[1];
             if (value && value.taskSource === "batch")
             {
                 console.log("Run batch task: " + value.label);
@@ -992,7 +994,7 @@ suite("Task tests", () =>
                 }
                 ranBatch = !!lastTask;
                 lastTask = value;
-                return !(ranBash && ranBatch); // break foreach
+                if (ranBash && ranBatch) break;
             }
             else if (value && value.taskSource === "bash")
             {
@@ -1012,9 +1014,9 @@ suite("Task tests", () =>
                 await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
                 await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
                 await commands.executeCommand("taskExplorer.openTerminal", value);
-                return !(ranBash && ranBatch); // break foreach
+                if (ranBash && ranBatch) break;
             }
-        });
+        }
 
         //
         // Clear Last Tasks folder
@@ -1028,16 +1030,17 @@ suite("Task tests", () =>
         console.log("    Run npm install");
         await configuration.updateWs("clickAction", "Open");
         let npmRan = false;
-        await forEachMapAsync(taskMap, async (value: TaskItem) =>
+        for (const map of taskMap)
         {
+            const value = map[1];
             if (value && value.taskSource === "npm")
             {
                 // await commands.executeCommand("taskExplorer.open", value);
                 await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
                 npmRan = true;
-                return false; // break foreach
+                break;
             }
-        });
+        }
         if (!npmRan) {
             console.log("        ℹ Running npm install in local testing env");
             // TODO - how to run with local test ran in vscode dev host?
@@ -1057,31 +1060,19 @@ suite("Task tests", () =>
 
     test("Test add to excludes", async function()
     {
-        if (!rootPath) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        if (!teApi || !teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-
         let taskItems = await tasks.fetchTasks({ type: "grunt" });
         const gruntCt = taskItems.length;
 
-        console.log(taskItems.length);
-        for (const t of taskItems)
-        {
-            console.log("   " + t.name);
-        }
-
         console.log("    Simulate add to exclude");
-        await forEachMapAsync(taskMap, async (value: TaskItem) =>  {
-            if (value && value.taskSource === "grunt") {
+        for (const map of taskMap)
+        {
+            const value = map[1];
+            if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt")) {
                 await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile);
                 await teApi.explorerProvider?.invalidateTasksCache("grunt", value.taskFile.resourceUri);
-                return false; // break forEachMapAsync()
+                break;
             }
-        });
+        }
 
         taskItems = await tasks.fetchTasks({ type: "grunt" });
         if (taskItems.length !== gruntCt - 2) {
@@ -1248,17 +1239,18 @@ suite("Task tests", () =>
         await(timeout(100));
 
         console.log("    Running all other invalidations");
-        await forEachMapAsync(taskMap, async(value: TaskItem) =>  {
+        for (const map of taskMap)
+        {
+            const value = map[1];
             if (value && value.task && teApi && teApi.explorerProvider && value.taskFile.resourceUri) {
                 if (fs.existsSync(value.taskFile.resourceUri.fsPath)) {
-                    console.log("         Invalidate task type '" + value.taskSource + "'");
                     await teApi.explorerProvider.invalidateTasksCache(value.taskSource, value.task.definition.uri);
                 }
             }
             else {
                 assert.fail("        ✘ TaskItem definition is incomplete");
             }
-        });
+        }
 
         console.log("     Disable all task providers");
         await configuration.updateWs("enableAnt", false);
@@ -1397,8 +1389,9 @@ suite("Task tests", () =>
         const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItemsB4.length;
 
-        await forEachMapAsync(taskMap, async (value: TaskItem) =>
+        for (const map of taskMap)
         {
+            const value = map[1];
             if (value && value.taskSource === "grunt")
             {
                 let taskFile = value.taskFile;
@@ -1406,14 +1399,14 @@ suite("Task tests", () =>
                 {
                     taskFile = taskFile.treeNodes[0];
                 }
-                if (taskFile && taskFile.isGroup)
+                if (taskFile && taskFile.isGroup && !value.taskFile.path.startsWith("grunt"))
                 {
                     await commands.executeCommand("taskExplorer.addToExcludes", taskFile);
                     await teApi.explorerProvider?.invalidateTasksCache("grunt", taskFile.resourceUri);
-                    return false; // break forEachMapAsync()
+                    break;
                 }
             }
-        });
+        }
 
         timeout(500);
         const taskItems = await tasks.fetchTasks({ type: "grunt" });
