@@ -22,6 +22,9 @@ export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
     for (const [ k, task ] of taskMap)
     {
         if (task.id?.includes(id) && !task.isUser) {
+            if (task.id === ":ant") {
+                console.error("ant: " + task.resourceUri?.fsPath);
+            }
             found++;
         }
     }
@@ -120,7 +123,7 @@ export function activeExtension()
 }
 
 
-export const getDocPath = (p: string) =>
+export const getWsPath = (p: string) =>
 {
 	return path.normalize(path.resolve(__dirname, "../../../test-files", p));
 };

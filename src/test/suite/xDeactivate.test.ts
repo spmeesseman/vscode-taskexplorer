@@ -3,7 +3,7 @@ import { deactivate } from "../../extension";
 import { activate, cleanup } from "../helper";
 
 
-suite("Deactivate extension", () =>
+suite("Deactivate Extension", () =>
 {
 	suiteSetup(async () =>
     {

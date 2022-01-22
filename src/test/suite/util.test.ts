@@ -8,18 +8,8 @@ import * as log from "../../common/log";
 import { storage } from "../../common/storage";
 
 
-suite("Util tests", () =>
+suite("Util Tests", () =>
 {
-    suiteSetup(async () =>
-    {
-
-    });
-
-    suiteTeardown(() =>
-    {
-
-    });
-
 
     test("Test utility methids general", async function()
     {

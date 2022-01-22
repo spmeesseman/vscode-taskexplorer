@@ -19,6 +19,14 @@ import * as glob from "glob";
 import "ts-node/register";
 import "source-map-support/register";
 
+const fileToTest = "*";
+// const fileToTest = "_api";
+// const fileToTest = "ant";
+// const fileToTest = "provider";
+// const fileToTest = "tasks";
+// const fileToTest = "commands";
+// const fileToTest = "util";
+
 
 //
 // Linux: prevent a weird NPE when mocha on Linux requires the window size from the TTY
@@ -104,7 +112,7 @@ export async function run(): Promise<void>
     //
     // Add all files to the test suite
     //
-    const files = glob.sync("**/*.test.js", { cwd: testsRoot });
+    const files = glob.sync(`**/${fileToTest}.test.js`, { cwd: testsRoot });
     files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
 
     const failures: number = await new Promise(resolve => mocha.run(resolve));

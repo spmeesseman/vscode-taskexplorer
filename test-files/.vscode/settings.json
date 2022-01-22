@@ -1,3 +1,5 @@
 {
+    "taskExplorer.keepTermOnStop": false,
+    "taskExplorer.clickAction": "Open",
     "taskExplorer.debug": true
 }

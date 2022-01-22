@@ -34,7 +34,8 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         {
             let ansicon = "ansicon.exe";
             const ansiPath: string = configuration.get("pathToAnsicon");
-            if (ansiPath && util.pathExists(ansiPath)) {
+            if (ansiPath && util.pathExists(ansiPath))
+            {
                 ansicon = ansiPath;
                 if (!ansicon.endsWith("ansicon.exe") && !ansicon.endsWith("\\")) {
                     ansicon = path.join(ansicon, "ansicon.exe");

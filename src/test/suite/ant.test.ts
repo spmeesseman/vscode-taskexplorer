@@ -6,7 +6,7 @@
 //
 import * as assert from "assert";
 import * as path from "path";
-import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
+import { Task, tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
 import { activate } from "../helper";
 import { TaskExplorerApi } from "../../extension";
@@ -16,24 +16,28 @@ import { AntTaskProvider } from "../../providers/ant";
 let teApi: TaskExplorerApi;
 let provider: AntTaskProvider;
 let rootWorkspace: WorkspaceFolder;
+let buildXmlFile: string;
 
 
-suite("Ant tests", () =>
+suite("Ant Tests", () =>
 {
 
     setup(async () =>
     {
         teApi = await activate();
+        assert(teApi, "        ✘ TeApi null");
         provider = teApi.taskProviders.get("ant") as AntTaskProvider;
-        assert(provider);
+        assert(provider, "        ✘ Provider null");
         rootWorkspace = (workspace.workspaceFolders ? workspace.workspaceFolders[0]: undefined) as WorkspaceFolder;
         assert(rootWorkspace, "        ✘ Workspace folder does not exist");
+        await configuration.updateWs("pathToAnt", path.resolve(process.cwd(), "..\\..\\test-files\\ant\\bin\\ant.bat"));
+        buildXmlFile = path.join(process.cwd(), "..\\..\\test-files\\build.xml");
     });
 
 
     test("Ant utility function cases", async () =>
     {
-        provider.readTasks();
+        // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
     });
@@ -47,42 +51,46 @@ suite("Ant tests", () =>
         //
         // Enable Ansicon
         //
-        await configuration.updateWs("pathToAnsicon", "ansicon\\x64\\ansicon.exe");
-        await configuration.updateWs("enableAnsiconForAnt", true);
-        await tasks.fetchTasks({ type: "ant" });
-
-        //
-        // Remove path
-        //
-        await configuration.updateWs("pathToAnsicon", "");
-        await tasks.fetchTasks({ type: "ant" });
+        await configuration.update("pathToAnsicon", "ansicon\\x64\\ansicon.exe");
+        await configuration.update("enableAnsiconForAnt", true);
+        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        await configuration.update("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64\\ansicon.exe");
+        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        await configuration.update("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64\\");
+        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        await configuration.update("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64");
+        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
 
         //
         // Disable Ansicon
         //
-        await configuration.updateWs("pathToAnsicon", "ansicon\\x64\\ansicon.exe");
-        await configuration.updateWs("enableAnsiconForAnt", false);
+        await configuration.update("pathToAnsicon", "ansicon\\x64\\ansicon.exe");
+        await configuration.update("enableAnsiconForAnt", false);
+        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        await configuration.update("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64\\ansicon.exe");
+        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
         await tasks.fetchTasks({ type: "ant" });
 
         //
         // Remove path
         //
-        await configuration.updateWs("pathToAnsicon", "ansicon\\x64\\ansicon.exe");
+        await configuration.update("pathToAnsicon", undefined);
+        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
         await tasks.fetchTasks({ type: "ant" });
 
         //
         // Non-win32 case
         //
-        const platform = process.platform;
-        process.platform = "linux";
-        provider.createTask("test", "test", rootWorkspace, Uri.file(path.join(process.cwd(), "build.xml")), []);
-        process.platform = platform;
+        // const platform = process.platform;
+        // process.platform = "linux";
+        // provider.createTask("test", "test", rootWorkspace, Uri.file(path.join(process.cwd(), "build.xml")), []);
+        // process.platform = platform;
 
         //
         // Reset
         //
-        await configuration.updateWs("pathToAnsicon", pathToAnsicon);
-        await configuration.updateWs("enableAnsiconForAnt", enableAnsiconForAnt);
+        await configuration.update("pathToAnsicon", pathToAnsicon);
+        await configuration.update("enableAnsiconForAnt", enableAnsiconForAnt);
         await tasks.fetchTasks({ type: "ant" });
     });
 
@@ -90,26 +98,33 @@ suite("Ant tests", () =>
 
     test("Ant reader", async () =>
     {
-        const useAnt = configuration.get<boolean>("useAnt");
+        // let antTasks: Task[];
+        // const useAnt = configuration.get<boolean>("useAnt");
 
         //
         // Use Ant
         //
-        await configuration.updateWs("useAnt", true);
-        await teApi.explorerProvider?.invalidateTasksCache("ant");
-        await tasks.fetchTasks({ type: "ant" });
+        // await configuration.updateWs("useAnt", true);
+        // await teApi.explorerProvider?.invalidateTasksCache("ant");
+        // await tasks.fetchTasks({ type: "ant" });
+        // antTasks = await provider.readUriTasks(Uri.file(buildXmlFile));
+        // assert(antTasks.length === 2, "");
+        // antTasks = await provider.readUriTasks(Uri.file(buildXmlFile), rootWorkspace);
+        // assert(antTasks.length === 2, "");
 
         //
         // Don't use Ant, use o.g. custom parser
         //
-        await configuration.updateWs("useAnt", false);
-        await teApi.explorerProvider?.invalidateTasksCache("ant");
-        await tasks.fetchTasks({ type: "ant" });
+        // await configuration.updateWs("useAnt", false);
+        // await teApi.explorerProvider?.invalidateTasksCache("ant");
+        // antTasks = await provider.readUriTasks(Uri.file(buildXmlFile), rootWorkspace);
+        // assert(antTasks.length === 2, "");
 
         //
         // Reset
         //
-        await configuration.updateWs("useAnt", useAnt);
+        await configuration.updateWs("useAnt", false);
+        await configuration.update("useAnt", false);
     });
 
 });

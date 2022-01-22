@@ -30,7 +30,7 @@ let didCodeDirExist = false;
 let taskMap: Map<string, TaskItem> = new Map();
 
 
-suite("Task tests", () =>
+suite("Task Tests", () =>
 {
 
     suiteSetup(async () =>
@@ -54,7 +54,7 @@ suite("Task tests", () =>
         // for full coverage.  The 'addExclude' command will add the setting globally though,
         // so add it to the workspace setting as well
         //
-        await configuration.updateWs("exclude", ["**/coveronly/**"]);
+        await configuration.updateWs("exclude", ["**/tasks_test_ignore_/**", "**/ant/**"]);
         await commands.executeCommand("taskExplorer.addToExcludes", "**/tasks_test_ignore_/**");
 
         //

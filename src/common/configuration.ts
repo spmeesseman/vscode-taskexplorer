@@ -50,7 +50,7 @@ class Configuration
 
     public updateWs(section: string, value: any): Thenable<void>
     {
-        return workspace.getConfiguration(extensionName).update(section, value, ConfigurationTarget.Workspace);
+        return this.configuration.update(section, value, ConfigurationTarget.Workspace);
     }
 
 

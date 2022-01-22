@@ -4,10 +4,9 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import { configuration } from "../../common/configuration";
-import { timeout } from "../../common/utils";
 import { TaskExplorerApi } from "../../extension";
-import * as log from "../../common/log";
 import { activate } from "../helper";
+import { commands } from "vscode";
 
 
 let teApi: TaskExplorerApi;
@@ -17,12 +16,20 @@ suite("API Init and Tests", () =>
 {
     setup(async () =>
     {
-        assert.ok(vscode.extensions.getExtension("spmeesseman.vscode-taskexplorer"));
         await initSettings();
         await vscode.workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                          "C:\\Windows\\System32\\cmd.exe",
                                                          vscode.ConfigurationTarget.Workspace);
+
+        //
+        // Add some excludes, use both config update and task explorer addExclude command
+        // for full coverage.  The 'addExclude' command will add the setting globally though,
+        // so add it to the workspace setting as well
+        //
         teApi = await activate();
+        assert(teApi, "        ✘ TeApi null");
+        await configuration.updateWs("exclude", ["**/tasks_test_ignore_/**", "**/ant/**"]);
+        await commands.executeCommand("taskExplorer.addToExcludes", "**/tasks_test_ignore_/**", "**/ant/**");
     });
 
 
@@ -66,7 +73,7 @@ suite("API Init and Tests", () =>
     test("Check settings", function(done)
     {
         //
-        // On Insiders tests, for whareve reason all settings are OFF, and the run produces
+        // On Insiders tests, for whatever reason all settings are OFF, and the run produces
         // near 0% coverage, check to see if there are some enabled* options turned ON, since
         // they should ALL be on
         //

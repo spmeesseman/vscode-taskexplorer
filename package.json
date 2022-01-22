@@ -56,7 +56,7 @@
         "publish": "vsce publish",
         "rebuild": "rimraf dist && npm run build",
         "install_extensions.bat": "cmd /c .\\install_extensions.bat",
-        "coverage-open_report": "cmd /c \"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\" file://c:/Projects/vscode/vscode-taskexplorer/coverage/index.html",
+        "coverage-open_report": "cmd /c \"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\" file://c:/Projects/vscode-taskexplorer/coverage/index.html",
         "coverage-full_on": "tools\\enable-full-coverage.sh",
         "coverage-full_off": "tools\\enable-full-coverage.sh --off",
         "coverage-codecov-publish": "node_modules/.bin/codecov --disable=gcov --disable=detect",
