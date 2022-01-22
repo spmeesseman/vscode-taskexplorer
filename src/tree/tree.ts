@@ -66,7 +66,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".stop",  (item: TaskItem) => { this.stop(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => { this.pause(item); }, this));
-        subscriptions.push(commands.registerCommand(name + ".open", async (item: TaskItem) => { await this.open(item); }, this));
+        subscriptions.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick: boolean) => { await this.open(item, itemClick); }, this));
         subscriptions.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => { this.openTerminal(item); }, this));
         subscriptions.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
         subscriptions.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "install"); }, this));
@@ -1032,7 +1032,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (!this.tasks || this.currentInvalidation === "workspace") {
                 this.tasks = await tasks.fetchTasks();
             }
-            else if (this.currentInvalidation)
+            else if (this.tasks && this.currentInvalidation)
             {   //
                 // Get all tasks of the type defined in 'currentInvalidation' from VSCode, remove
                 // all tasks of the type defined in 'currentInvalidation' from the tasks list cache,
@@ -1042,7 +1042,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 const taskItems = await tasks.fetchTasks({
                     type: !util.isScriptType(this.currentInvalidation) ? this.currentInvalidation : "script"
                 });
-                for (const t of taskItems)
+                for (const t of this.tasks)
                 {   //
                     // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
                     // if the script type set for the task in tasks.json is of type 'currentInvalidation'.
@@ -1812,7 +1812,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async open(selection: TaskItem)
+    private async open(selection: TaskItem, itemClick = false)
     {
         const clickAction = configuration.get<string>("clickAction") || "Open";
 
@@ -1820,7 +1820,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // As of v1.30.0, added option to change the entry item click to execute.  In order to avoid having
         // to re-register the handler when the setting changes, we just re-route the request here
         //
-        if (clickAction === "Execute") {
+        if (clickAction === "Execute" && itemClick === true) {
             await this.run(selection);
             return;
         }

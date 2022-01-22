@@ -79,7 +79,7 @@ export default class TaskItem extends TreeItem
         this.command = {                    // Note that 'groupLevel' will be set by TaskFile.addScript()
             title: "Open definition",       // Default click action is Open file since it's easy to click on accident
             command: "taskExplorer.open",   // Default click action can be set to 'Execute/Run' in Settings
-            arguments: [this]               // If the def. action is 'Run', then it is redirected in the 'Open' cmd
+            arguments: [this, true]         // If the def. action is 'Run', then it is redirected in the 'Open' cmd
         };
         //
         // The task source, i.e. "npm", "workspace", or any of the TaskExplorer provided task mnemonics,
