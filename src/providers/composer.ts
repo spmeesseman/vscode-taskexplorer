@@ -105,9 +105,8 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
     {
         if (documentText)
         {
-            const json = JSON.parse(documentText);
             const idx = documentText.indexOf("\"scripts\"");
-            if (idx !== -1)
+            if (idx !== -1 && scriptName)
             {
                 const idx2 = documentText.indexOf(`"${scriptName}"`);
                 return idx2 !== -1 ? idx2 : idx;

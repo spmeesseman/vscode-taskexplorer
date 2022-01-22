@@ -145,8 +145,8 @@ export function getScriptTaskTypes(): string[]
 export function getTaskTypes(): string[]
 {
     return [
-        "ant", "app-publisher", "bash", "batch", "gradle", "grunt", "gulp", "make", "maven",
-        "npm", "nsis", "perl", "composer",  "powershell", "python", "pipenv", "ruby", "workspace"
+        "ant", "app-publisher", "bash", "batch", "composer",  "gradle", "grunt", "gulp", "make",
+        "maven", "npm", "nsis", "perl", "powershell", "python", "pipenv", "ruby", "workspace"
     ];
 }
 
@@ -290,6 +290,15 @@ export function getTaskItemId(taskItem: TaskItem)
     return taskItem?.id?.replace(constants.LAST_TASKS_LABEL + ":", "")
                         .replace(constants.FAV_TASKS_LABEL + ":", "")
                         .replace(constants.USER_TASKS_LABEL + ":", "");
+}
+
+
+export function isSpecialTask(taskItem: TaskItem)
+{
+    return taskItem && taskItem.id &&
+           (taskItem.id.includes(constants.LAST_TASKS_LABEL + ":") ||
+           taskItem.id.includes(constants.FAV_TASKS_LABEL + ":") ||
+           taskItem.id.includes(constants.USER_TASKS_LABEL + ":"));
 }
 
 
