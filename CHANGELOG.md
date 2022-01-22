@@ -1,5 +1,23 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.6.0 (January 22nd, 2022)
+
+### Bug Fixes
+
+- when settings for click action is 'Execute', can't use the other 'Open' actions. [Fixes #160]
+- pause button does not work in Explorer view
+
+### Features
+
+- add support for php composer tasks found in composer.json [Closes #150]
+- add new setting 'Glob Patterns Bash' for specifying glob patterns for identifying bash scripts with no extension. [Closes #153]
+- add new setting 'Disable animated icons' to disable spinning icons when running tasks, known to cause high CPU usage on some systems. [Closes #157]
+- add label rename command for special folder items [Closes #164]
+
+### Refactoring
+
+- the 'Include Ant' setting has been deprecated, use 'Glob Patterns Ant'.
+
 ## Version 2.5.7 (August 28th, 2021)
 
 ### Bug Fixes
