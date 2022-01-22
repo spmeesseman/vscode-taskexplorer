@@ -26,6 +26,7 @@ import { TaskExplorerProvider } from "./providers/provider";
 import * as util from "./common/utils";
 import * as cache from "./cache";
 import * as log from "./common/log";
+import constants from "./common/constants";
 
 
 export let treeDataProvider: TaskTreeDataProvider | undefined;
@@ -267,11 +268,25 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     }
 
     //
-    // Extra Apache Ant 'include' paths
+    // Extra Bash Globs (for extensionless script files)
     //
-    if (e.affectsConfiguration("taskExplorer.includeAnt")) {
+    if (e.affectsConfiguration("taskExplorer.globPatternsBash")) {
+        if (util.existsInArray(refreshTaskTypes, "bash") === false){
+            await registerFileWatcher(context, "bash",
+                                      util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", [])),
+                                      false, configuration.get<boolean>("enableBash"));
+            registerChange("bash");
+        }
+    }
+
+    //
+    // Extra Apache Globs (for non- build.xml files)s
+    //
+    if (e.affectsConfiguration("taskExplorer.includeAnt") || e.affectsConfiguration("taskExplorer.globPatternsAnt")) {
         if (util.existsInArray(refreshTaskTypes, "ant") === false){
-            await registerFileWatcher(context, "ant", util.getAntGlobPattern(), false, configuration.get<boolean>("enableAnt"));
+            const antGlobs = [...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", [])];
+            await registerFileWatcher(context, "ant", util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs),
+                                      false, configuration.get<boolean>("enableAnt"));
             registerChange("ant");
         }
     }

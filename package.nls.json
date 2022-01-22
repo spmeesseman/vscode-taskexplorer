@@ -48,10 +48,12 @@
 	"config.taskExplorer.useAnt": "Ant - Use Ant",
 	"config.taskExplorer.useAntDsc": "Use the ant program itself to find its tasks",
 	"config.taskExplorer.includeAnt": "Ant - Extra Files",
-	"config.taskExplorer.includeAntDsc": "Configure glob patterns for locating Apache Ant files not named b(B)uild.xml.",
+	"config.taskExplorer.includeAntDsc": "Configure glob patterns for locating Apache Ant files not named b(B)uild.xml. **(Deprecated - Use 'globPatternsAnt')**",
+	"config.taskExplorer.globPatternsAnt": "Ant - Glob Patterns",
+	"config.taskExplorer.globPatternsAntDsc": "Configure glob patterns for locating Apache Ant files not named b(B)uild.xml.",
 
 	"config.taskExplorer.enableAppPublisher": "App Publisher - Enable",
-	"config.taskExplorer.enableAppPublisherDsc": "Enable/show app-publsiher tasks.",
+	"config.taskExplorer.enableAppPublisherDsc": "Enable/show app-publisher tasks.",
 	"config.taskExplorer.pathToAppPublisher": "App Publisher - Path",
 	"config.taskExplorer.pathToAppPublisherDsc": "The path to the app-publisher program, if not registered in system path",
 
@@ -82,6 +84,8 @@
 	"config.taskExplorer.enableBashDsc": "Enable/show bash/sh scripts as tasks.",
 	"config.taskExplorer.pathToBash": "Bash/sh - Path",
 	"config.taskExplorer.pathToBashDsc": "The path to the bash/sh program (on Windows, if not registered in system path)",
+	"config.taskExplorer.globPatternsBash": "Bash - Glob Patterns",
+	"config.taskExplorer.globPatternsBashDsc": "Configure the glob patterns for locating bash scripts, can be used to locate scripts with no extension.",
 
 	"config.taskExplorer.enableNsis": "Nullsoft Installer - Enable",
 	"config.taskExplorer.enableNsisDsc": "Enable/show Nullsoft Installer scripts as tasks.",

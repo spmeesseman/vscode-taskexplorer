@@ -39,7 +39,9 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined, log
     // util.getAntGlllobPattern() to comine the glob patterns with the default
     //
     if (!cancel && configuration.get<boolean>("enableAnt")) {
-        await buildCache("ant", util.getAntGlobPattern(), folder, false, logPad + "   ");
+        await buildCache("ant", util.getCombinedGlobPattern(constants.GLOB_ANT,
+                         [...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", [])]),
+                         folder, false, logPad + "   ");
     }
     //
     // App Publisher (work related)
@@ -51,7 +53,7 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined, log
     // Bash
     //
     if (!cancel && configuration.get<boolean>("enableBash")) {
-        await buildCache("bash", constants.GLOB_BASH, folder, false, logPad + "   ");
+        await buildCache("bash", util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", [])), folder, false, logPad + "   ");
     }
     //
     // Batch / Cmd

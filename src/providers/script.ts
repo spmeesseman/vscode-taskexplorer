@@ -84,7 +84,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         }
 
         //
-        // If the defualt terminal cmd/powershell?  On linux and darwin, no, on windows, maybe...
+        // If the default terminal cmd/powershell?  On linux and darwin, no, on windows, maybe...
         //
         if (process.platform === "win32")
         {
@@ -98,7 +98,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
         //
         // Handle bash script on windows - set the shell executable as bash.exe if it isnt the default.
-        // This can be set by usernin settings, otherwise Git Bash will be tried in the default install
+        // This can be set by users in settings, otherwise Git Bash will be tried in the default install
         // location ("C:\Program Files\Git\bin). Otherwise, use "bash.exe" and assume the command and
         // other shell commands are in PATH
         //
@@ -147,7 +147,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         }
 
         //
-        // Add extra argumants is specified
+        // Add extra arguments is specified
         //
         if (xArgs) {
             args.push(...xArgs);
@@ -219,16 +219,16 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
         if (workspace.workspaceFolders && paths)
         {
-            for (const fobj of paths)
+            for (const fObj of paths)
             {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
+                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
                 {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    const task = this.createTask(path.extname(fobj.uri.fsPath).substring(1), undefined, fobj.folder, fobj.uri);
+                    visitedFiles.add(fObj.uri.fsPath);
+                    const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri);
                     if (task) {
                         allTasks.push(task);
                         log.write("   found script target/file", 3, logPad);
-                        log.value("      script file", fobj.uri.fsPath, 3, logPad);
+                        log.value("      script file", fObj.uri.fsPath, 3, logPad);
                     }
                 }
             }

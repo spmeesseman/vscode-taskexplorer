@@ -76,23 +76,22 @@ export function getGroupSeparator()
 }
 
 
-export function getAntGlobPattern(): string
+export function getCombinedGlobPattern(defaultPattern: string, globs: string[]): string
 {
-    let multiFilePattern = constants.GLOB_ANT;
-    const includes: string[] = configuration.get("includeAnt");
-    if (includes && includes.length > 0)
+    let multiFilePattern = defaultPattern;
+    if (globs && globs.length > 0)
     {
         multiFilePattern = "{" + constants.GLOB_ANT;
-        if (Array.isArray(includes))
+        if (Array.isArray(globs))
         {
-            for (const i of includes) {
+            for (const i of globs) {
                 multiFilePattern += ",";
                 multiFilePattern += i;
             }
         }
         else {
             multiFilePattern += ",";
-            multiFilePattern += includes;
+            multiFilePattern += globs;
         }
         multiFilePattern += "}";
     }
@@ -251,7 +250,11 @@ export function getGlobPattern(taskType: string): string
     if (taskType) {
         taskType = taskType.replace(/\W*\-/, "");
         if (taskType === "ant") {
-            return getAntGlobPattern();
+            return getCombinedGlobPattern(constants.GLOB_ANT,
+                   [...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", [])]);
+        }
+        else if (taskType === "bash") {
+            return getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
         }
         else {
             return constants["GLOB_" + taskType.toUpperCase()];
