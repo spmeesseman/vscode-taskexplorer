@@ -2,10 +2,10 @@
     "name": "vscode-taskexplorer",
     "version": "2.5.7",
     "displayName": "Task Explorer",
-    "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash, make, maven, python, perl, powershell, ruby, and nsis",
+    "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash, php, make, maven, python, perl, powershell, ruby, pipenv and nsis",
     "icon": "res/gears-r-colors.png",
     "publisher": "spmeesseman",
-    "license": "MIT",
+    "license": "See LICENSE",
     "homepage": "https://github.com/spmeesseman/vscode-taskexplorer/blob/master/README.md",
     "author": {
         "name": "Scott Meesseman"
@@ -34,8 +34,10 @@
         "grunt",
         "gulp",
         "yarn",
+        "php",
         "ant",
         "makefile",
+        "composer",
         "multi-root ready",
         "c c++",
         "gradle",
@@ -1428,6 +1430,12 @@
                     "title": "%config.taskExplorer.enablePerl%",
                     "description": "%config.taskExplorer.enablePerlDsc%"
                 },
+                "taskExplorer.enablePhp": {
+                    "type": "boolean",
+                    "default": true,
+                    "title": "%config.taskExplorer.enablePhp%",
+                    "description": "%config.taskExplorer.enablePhpDsc%"
+                },
                 "taskExplorer.enablePipenv": {
                     "type": "boolean",
                     "default": true,
@@ -1541,17 +1549,23 @@
                     "title": "%config.taskExplorer.pathToPerl%",
                     "description": "%config.taskExplorer.pathToPerlDsc%"
                 },
-                "taskExplorer.pathToPython": {
+                "taskExplorer.pathToPhp": {
                     "type": "string",
-                    "default": "python",
-                    "title": "%config.taskExplorer.pathToPython%",
-                    "description": "%config.taskExplorer.pathToPythonDsc%"
+                    "default": "php",
+                    "title": "%config.taskExplorer.pathToPhp%",
+                    "description": "%config.taskExplorer.pathToPhpDsc%"
                 },
                 "taskExplorer.pathToPipenv": {
                     "type": "string",
                     "default": "pipenv",
                     "title": "%config.taskExplorer.pathToPipenv%",
                     "description": "%config.taskExplorer.pathToPipenvDsc%"
+                },
+                "taskExplorer.pathToPython": {
+                    "type": "string",
+                    "default": "python",
+                    "title": "%config.taskExplorer.pathToPython%",
+                    "description": "%config.taskExplorer.pathToPythonDsc%"
                 },
                 "taskExplorer.pathToPowershell": {
                     "type": "string",
