@@ -31,6 +31,8 @@ export default class TaskItem extends TreeItem
      */
     public nodePath: string;
     public groupLevel: number;
+    public taskItemId: string | undefined;
+
 
     taskFile: TaskFile;
 
@@ -104,6 +106,10 @@ export default class TaskItem extends TreeItem
         //
         this.tooltip = "Open " + task.name + (task.detail ? ` | ${task.detail}` : "");
         //
+        // TaskItemId, for saving
+        //
+        this.taskItemId = util.getTaskItemId(this);
+        //
         // Refresh state - sets context value, icon path from execution state
         //
         this.refreshState();
@@ -141,10 +147,10 @@ export default class TaskItem extends TreeItem
     setContextValue(task: Task, running: boolean)
     {
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []),
-              lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []),
-              id = util.getTaskItemId(this);
+              lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
 
-        if (util.existsInArray(favTasks, id) || util.existsInArray(lastTasks, id))
+        if (this.taskItemId && (util.existsInArray(favTasks, this.taskItemId) ||
+                                util.existsInArray(lastTasks, this.taskItemId)))
         {
             if (task.definition.scriptFile || this.taskSource === "gradle") {
                 this.contextValue = running ? "scriptSRunning" : "scriptFileS";
@@ -159,6 +165,10 @@ export default class TaskItem extends TreeItem
         //     script        - Standard task item, e.g. "npm", "Workspace", "gulp", etc
         //     scriptFile    - A file that is ran as a task, ie. "batch" or "bash", i.e. script type "script".
         //     scriptRunning - Obviously, a task/script that is running.
+        //
+        //     scriptS        - Same as above, but for a TaskItem in the Fav/LastTasks folder
+        //     scriptFileS    - Same as above, but for a TaskItem in the Fav/LastTasks folder
+        //     scriptRunningS - Same as above, but for a TaskItem in the Fav/LastTasks folder
         //
         // Note that TaskItems of type 'scriptFile' can be ran with arguments and this will have an additional
         // entry added to it's context menu - "Run with arguments"
