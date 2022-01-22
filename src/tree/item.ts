@@ -149,17 +149,6 @@ export default class TaskItem extends TreeItem
     {
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []),
               lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-
-        if (this.taskItemId && (util.existsInArray(favTasks, this.taskItemId) ||
-                                util.existsInArray(lastTasks, this.taskItemId)))
-        {
-            if (task.definition.scriptFile || this.taskSource === "gradle") {
-                this.contextValue = running ? "scriptSRunning" : "scriptFileS";
-            }
-            else {
-                this.contextValue = running ? "scriptSRunning" : "scriptS";
-            }
-        }
         //
         // Context view controls the view parameters to the ui, see package.json /views/context node.
         //
@@ -174,6 +163,16 @@ export default class TaskItem extends TreeItem
         // Note that TaskItems of type 'scriptFile' can be ran with arguments and this will have an additional
         // entry added to it's context menu - "Run with arguments"
         //
+        if (this.taskItemId && (util.existsInArray(favTasks, this.taskItemId) ||
+                                util.existsInArray(lastTasks, this.taskItemId)))
+        {
+            if (task.definition.scriptFile || this.taskSource === "gradle") {
+                this.contextValue = running ? "scriptRunningS" : "scriptFileS";
+            }
+            else {
+                this.contextValue = running ? "scriptRunningS" : "scriptS";
+            }
+        }
         else
         {
             if (task.definition.scriptFile || this.taskSource === "gradle") {
