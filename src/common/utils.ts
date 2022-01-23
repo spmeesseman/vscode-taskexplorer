@@ -66,16 +66,15 @@ export async function forEachAsync(array: any, callback: any)
 
 export function getCombinedGlobPattern(defaultPattern: string, globs: string[]): string
 {
-    let multiFilePattern = defaultPattern;
+    let multiFilePattern = defaultPattern ? "{" + defaultPattern : "{";
     if (globs && globs.length > 0)
     {
-        multiFilePattern = "{" + constants.GLOB_ANT;
         for (const i of globs) {
             multiFilePattern += ",";
             multiFilePattern += i;
         }
-        multiFilePattern += "}";
     }
+    multiFilePattern += "}";
     return multiFilePattern;
 }
 
