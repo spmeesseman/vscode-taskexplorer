@@ -1,3 +1,3 @@
 
 @echo hello %1
-@rem timeout /t 5
+timeout /t 5

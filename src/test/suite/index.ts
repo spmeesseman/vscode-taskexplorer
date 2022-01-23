@@ -23,9 +23,9 @@ const fileToTest = "*";
 // const fileToTest = "_api";
 // const fileToTest = "ant";
 // const fileToTest = "composer";
-// const fileToTest = "provider";
+// const fileToTest = "providers";
 // const fileToTest = "tasks";
-// const fileToTest = "commands";
+// const fileToTest = "tree";
 // const fileToTest = "util";
 
 
@@ -113,7 +113,8 @@ export async function run(): Promise<void>
     //
     // Add all files to the test suite
     //
-    const files = glob.sync(`{**/_api.test.js,**/${fileToTest}.test.js}`, { cwd: testsRoot });
+    const files = glob.sync(`**/${fileToTest}.test.js`, { cwd: testsRoot });
+    // const files = glob.sync(`{**/_api.test.js,**/${fileToTest}.test.js}`, { cwd: testsRoot });
     files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
 
     const failures: number = await new Promise(resolve => mocha.run(resolve));

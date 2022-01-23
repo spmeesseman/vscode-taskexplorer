@@ -11,8 +11,9 @@ import { commands, ConfigurationTarget, tasks, workspace } from "vscode";
 import { configuration } from "../../common/configuration";
 import constants from "../../common/constants";
 import { TaskExplorerApi } from "../../extension";
+import TaskFile from "../../tree/file";
 import TaskItem from "../../tree/item";
-import { activate, findIdInTaskMap, sleep } from "../helper";
+import { activate, findIdInTaskMap, isReady, sleep } from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -26,14 +27,12 @@ suite("Task Tests", () =>
     suiteSetup(async () =>
     {
         teApi = await activate();
-        assert(teApi, "   ✘ TeApi null");
-        assert(teApi.explorerProvider, "   ✘ Task Explorer tree instance does not exist");
+        assert(isReady() === true, "Setup failed");
         rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
-        assert(rootPath, "   ✘ Workspace folder does not exist");
         //
         // Scan task tree using internal explorer scanner fn
         //
-        taskMap = await teApi.explorerProvider.getTaskItems(undefined, "      ", true) as Map<string, TaskItem>;
+        taskMap = await teApi.explorerProvider?.getTaskItems(undefined) as Map<string, TaskItem>;
     });
 
 
@@ -77,7 +76,7 @@ suite("Task Tests", () =>
     });
 
 
-    test("NPM Install", async function()
+    test("NPM", async function()
     {
         const file = path.join(rootPath as string, "package.json");
         fs.writeFileSync(
@@ -116,8 +115,16 @@ suite("Task Tests", () =>
             const value = map[1];
             if (value && value.taskSource === "npm")
             {
-                // await commands.executeCommand("taskExplorer.open", value);
-                await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
+                // await executeTeCommand("open", value);
+                await executeTeCommand("runInstall", value.taskFile);
+                await sleep(500);
+                await executeTeCommand("runUpdate", value.taskFile);
+                await sleep(500);
+                await executeTeCommand("runUpdatePackage", value.taskFile, "@spmeesseman/app-publisher");
+                await sleep(500);
+                await executeTeCommand("runAudit", value.taskFile);
+                await sleep(500);
+                await executeTeCommand("runAuditFix", value.taskFile);
                 npmRan = true;
                 break;
             }
@@ -125,14 +132,14 @@ suite("Task Tests", () =>
         if (!npmRan) {
             console.log("        ℹ Running npm install in local testing env");
             // TODO - how to run with local test ran in vscode dev host?
-            // await commands.executeCommand("taskExplorer.runInstall", value.taskFile);
+            // await executeTeCommand("runInstall", value.taskFile);
             // const npmTasks = await tasks.fetchTasks({ type: "npm" });
             // if (npmTasks)
             // {
             //     for (const npmTask of npmTasks)
             //     {
             //         console.log(npmTask.name);
-            //         await commands.executeCommand("taskExplorer.open", npmTask);
+            //         await executeTeCommand("open", npmTask);
             //     }
             // }
         }
@@ -153,77 +160,88 @@ suite("Task Tests", () =>
 });
 
 
+async function executeTeCommand(command: string, ...args: any[])
+{
+    try {
+        await commands.executeCommand(`taskExplorer.${command}`, ...args);
+    }
+    catch (e) { console.log("✘ " + e.toString().substring(0, e.toString().indexOf("\n"))); }
+}
+
+
 async function runTask(value: TaskItem, lastTask: TaskItem | null)
 {
     if (value.taskSource !== "bash")
     {
         if (lastTask) {
-            await commands.executeCommand("taskExplorer.open", value);
-            await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
+            await executeTeCommand("open", value);
+            await executeTeCommand("addRemoveFromFavorites", value);
             await configuration.updateWs("keepTermOnStop", true);
             await configuration.updateWs("clickAction", "Execute");
-            await commands.executeCommand("taskExplorer.run", lastTask);
+            await executeTeCommand("run", lastTask);
             await sleep(1000);
             await configuration.updateWs("clickAction", "Open");
-            await commands.executeCommand("taskExplorer.pause", value);
+            await executeTeCommand("pause", value);
             await sleep(1000);
-            await commands.executeCommand("taskExplorer.run", value);
+            await executeTeCommand("run", value);
             await sleep(1000);
-            await commands.executeCommand("taskExplorer.stop", value);
+            await executeTeCommand("stop", value);
             //
             // Cover code that removes a "Last Task" if it was removed
             //
             value.taskFile.removeTreeNode(value);
-            await commands.executeCommand("taskExplorer.runLastTask");
-            await commands.executeCommand("taskExplorer.stop", value);
+            await executeTeCommand("runLastTask");
+            await executeTeCommand("stop", value);
             value.taskFile.addTreeNode(value); // remove fav coverage
         }
         await configuration.updateWs("keepTermOnStop", false);
-        await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
-        await commands.executeCommand("taskExplorer.open", value);
-        await commands.executeCommand("taskExplorer.runWithArgs", value, "--test --test2");
+        await executeTeCommand("addRemoveFromFavorites", value);
+        await executeTeCommand("renameSpecial", value, "test label");
+        await executeTeCommand("renameSpecial", value);
+        await executeTeCommand("open", value);
+        await executeTeCommand("runWithArgs", value, "--test --test2");
         await sleep(250);
-        await commands.executeCommand("taskExplorer.stop", value);
+        await executeTeCommand("stop", value);
         await configuration.updateWs("keepTermOnStop", true);
-        await commands.executeCommand("taskExplorer.run", value);
+        await executeTeCommand("run", value);
         await sleep(250);
-        await commands.executeCommand("taskExplorer.pause", value);
+        await executeTeCommand("pause", value);
         await configuration.updateWs("clickAction", "Execute");
-        await commands.executeCommand("taskExplorer.run", value);
+        await executeTeCommand("run", value);
         await configuration.updateWs("clickAction", "Open");
         await sleep(250);
-        await commands.executeCommand("taskExplorer.openTerminal", value);
-        await commands.executeCommand("taskExplorer.pause", value);
+        await executeTeCommand("openTerminal", value);
+        await executeTeCommand("pause", value);
         await sleep(250);
-        await commands.executeCommand("taskExplorer.stop", value);
-        await commands.executeCommand("taskExplorer.runLastTask", value);
+        await executeTeCommand("stop", value);
+        await executeTeCommand("runLastTask", value);
         await sleep(250);
         await configuration.updateWs("keepTermOnStop", false);
-        await commands.executeCommand("taskExplorer.restart", value);
+        await executeTeCommand("restart", value);
         await sleep(250);
-        await commands.executeCommand("taskExplorer.stop", value);
-        await commands.executeCommand("taskExplorer.runNoTerm", value);
+        await executeTeCommand("stop", value);
+        await executeTeCommand("runNoTerm", value);
         await sleep(250);
-        await commands.executeCommand("taskExplorer.stop", value);
-        await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value); // remove fav coverage
+        await executeTeCommand("stop", value);
+        await executeTeCommand("addRemoveFromFavorites", value); // remove fav coverage
     }
     else
     {
         if (lastTask) {
-            await commands.executeCommand("taskExplorer.openTerminal", lastTask);
+            await executeTeCommand("openTerminal", lastTask);
         }
-        await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
-        await commands.executeCommand("taskExplorer.run", value);
+        await executeTeCommand("addRemoveFromFavorites", value);
+        await executeTeCommand("run", value);
         await sleep(1000);
         await workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                     "bash.exe", ConfigurationTarget.Workspace);
-        await commands.executeCommand("taskExplorer.run", value);
+        await executeTeCommand("run", value);
         await sleep(1000);
         await workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                     "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
         await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
         await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
-        await commands.executeCommand("taskExplorer.addRemoveFromFavorites", value);
-        await commands.executeCommand("taskExplorer.openTerminal", value);
+        await executeTeCommand("addRemoveFromFavorites", value);
+        await executeTeCommand("openTerminal", value);
     }
 }

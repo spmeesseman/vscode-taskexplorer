@@ -2,5 +2,6 @@
     "terminal.integrated.shell.windows": "C:\\Windows\\System32\\cmd.exe",
     "taskExplorer.keepTermOnStop": false,
     "taskExplorer.clickAction": "Open",
-    "taskExplorer.debug": true
+    "taskExplorer.showLastTasks": false,
+    "taskExplorer.debug": false
 }

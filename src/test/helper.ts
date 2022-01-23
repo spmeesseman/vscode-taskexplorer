@@ -107,24 +107,21 @@ export async function cleanup()
 export async function buildTree(instance: any, waitTime?: number)
 {
     if (!teApi || !teApi.explorerProvider) {
-        assert.fail("        ✘ Not initialized");
+        assert.fail("   ✘ Not initialized");
     }
 
     if (treeItems) {
         return treeItems;
     }
 
-    console.log("    Constructing task tree");
     instance.timeout(45 * 1000);
 
     if (!teApi || !teApi.explorerProvider) {
-        assert.fail("        ✘ Task Explorer tree instance does not exist");
+        assert.fail("   ✘ Task Explorer tree instance does not exist");
     }
 
     await sleep(waitTime || 1);
     await waitForCache();
-
-    console.log("         ✔ Cache done building");
 
     await configuration.updateWs("groupWithSeparator", true);
     await configuration.updateWs("groupSeparator", "-");
@@ -227,18 +224,20 @@ export async function initSettings(enable = true)
 export function isReady(taskType?: string)
 {
     let err: string | undefined;
-    if (!teApi)                                     err = "        ✘ TeApi null";
-    if (!err && !teApi.explorerProvider)            err = "        ✘ TeApi Explorer provider null";
-    if (!err  && !teApi.sidebarProvider)            err = "        ✘ TeApi Sidebar Provider null";
-    if (!err  && !teApi.taskProviders)              err = "        ✘ Providers null";
-    if (!err  && taskType) {
-        if (!teApi.taskProviders.get(taskType))     err = `        ✘ ${taskType} Provider null`;
+    if (!teApi)                                 err = "        ✘ TeApi null";
+    else {
+        if (!teApi.explorerProvider)            err = "        ✘ TeApi Explorer provider null";
+        else if (!teApi.sidebarProvider)        err = "        ✘ TeApi Sidebar Provider null";
+        else if (!teApi.taskProviders)          err = "        ✘ Providers null";
+    }
+    if (!err && taskType) {
+        if (!teApi.taskProviders.get(taskType)) err = `        ✘ ${taskType} Provider null`;
     }
     if (!err && !(workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined)) {
-                                                    err = "        ✘ Workspace folder does not exist";
+                                                err = "        ✘ Workspace folder does not exist";
     }
     if (!err && !extensions.getExtension("spmeesseman.vscode-taskexplorer")) {
-                                                    err = "        ✘ Extension not found";
+                                                err = "        ✘ Extension not found";
     }
     if (err) {
         console.log(err);

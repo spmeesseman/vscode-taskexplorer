@@ -504,7 +504,7 @@ suite("Provider Tests", () =>
             }
         }
 
-        console.log("     Disable all task providers");
+        console.log("   Disable all task providers");
         await configuration.updateWs("enableAnt", false);
         await configuration.updateWs("enableAppPublisher", false);
         await configuration.updateWs("enableBash", false);
@@ -530,7 +530,7 @@ suite("Provider Tests", () =>
         await teApi.fileCache.addFolderToCache();
         await teApi.fileCache.addFolderToCache(workspace.workspaceFolders[0]);
 
-        console.log("     Re-enable all task providers");
+        console.log("   Re-enable all task providers");
         await configuration.updateWs("enableAnt", true);
         await configuration.updateWs("enableAppPublisher", true);
         await configuration.updateWs("enableBash", true);
@@ -580,40 +580,8 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Show/hide last tasks", async function()
-    {
-        if (!teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-        await teApi.explorerProvider.showSpecialTasks(true);
-        await teApi.explorerProvider.showSpecialTasks(false);
-        await configuration.updateWs("showLastTasks", false);
-        await teApi.explorerProvider.showSpecialTasks(true);
-        await teApi.explorerProvider.showSpecialTasks(false);
-    });
-
-
-    test("Show/hide favorite tasks", async function()
-    {
-        if (!rootPath || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-        if (!teApi?.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-        await teApi.explorerProvider.showSpecialTasks(true, true);
-        await teApi.explorerProvider.showSpecialTasks(false, true);
-    });
-
-
     test("Groups with separator", async function()
     {
-        if (!rootPath || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-        if (!teApi?.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
         await configuration.updateWs("groupWithSeparator", true);
         await configuration.updateWs("groupSeparator", "-");
         await configuration.updateWs("groupMaxLevel", 5);
@@ -625,14 +593,6 @@ suite("Provider Tests", () =>
 
     test("Add to excludes after grouping", async function()
     {
-        if (!rootPath) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        if (!teApi || !teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-
         const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItemsB4.length;
 
@@ -666,12 +626,6 @@ suite("Provider Tests", () =>
 
     test("Cancel rebuild cache", async function()
     {
-        if (!rootPath || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-        if (!teApi?.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
         this.timeout(60 * 1000);
         //
         // Try a bunch of times to cover all of the hooks in the processing loops
@@ -693,12 +647,6 @@ suite("Provider Tests", () =>
 
     test("Enable and disable views", async function()
     {
-        if (!rootPath || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-        if (!teApi?.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
         await configuration.updateWs("enableExplorerView", false);
         await configuration.updateWs("enableSideBar", false);
         await configuration.updateWs("enableExplorerView", true);
@@ -709,14 +657,6 @@ suite("Provider Tests", () =>
 
     test("Add and remove a workspace folder", async function()
     {
-        if (!rootPath || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-        if (!teApi?.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-        // Simulate add/remove folder (cannot use workspace.updateWOrkspaceFolders() in tests)
-        //
         addWsFolder(workspace.workspaceFolders);
         removeWsFolder(workspace.workspaceFolders);
     });

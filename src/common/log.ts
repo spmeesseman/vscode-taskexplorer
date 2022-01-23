@@ -24,7 +24,7 @@ let writeToConsoleLevel = 2;
 let logOutputChannel: OutputChannel | undefined;
 
 
-export function initLog(settingGrpName: string, dispName: string, context?: ExtensionContext, showLog?: boolean)
+export function initLog(settingGrpName: string, dispName: string, context: ExtensionContext, showLog?: boolean)
 {
     function showLogOutput(show: boolean)
     {
@@ -36,13 +36,10 @@ export function initLog(settingGrpName: string, dispName: string, context?: Exte
     // Set up a log in the Output window
     //
     logOutputChannel = window.createOutputChannel(dispName);
-    if (context)
-    {
-        context.subscriptions.push(logOutputChannel);
-        context.subscriptions.push(
-            commands.registerCommand(settingGrpName + ".showOutput", showLogOutput)
-        );
-    }
+    context.subscriptions.push(logOutputChannel);
+    context.subscriptions.push(
+        commands.registerCommand(settingGrpName + ".showOutput", showLogOutput)
+    );
     showLogOutput(showLog || false);
 }
 
@@ -55,10 +52,6 @@ export function isLoggingEnabled()
 
 export function methodStart(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][], color?: LogColor)
 {
-    if (msg === null || msg === undefined) {
-        return;
-    }
-
     if (isLoggingEnabled())
     {
         const lLevel = level || 1;
@@ -78,10 +71,6 @@ export function methodStart(msg: string, level?: number, logPad = "", doLogBlank
 
 export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][])
 {
-    if (msg === null || msg === undefined) {
-        return;
-    }
-
     if (isLoggingEnabled())
     {
         const lLevel = level || 1;
@@ -101,10 +90,6 @@ export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?
 
 export function write(msg: string, level?: number, logPad = "", color?: LogColor)
 {
-    if (msg === null || msg === undefined) {
-        return;
-    }
-
     if (isLoggingEnabled())
     {
         // if (color) {
@@ -131,10 +116,6 @@ export function blank(level?: number)
 
 export function error(msg: string | string[])
 {
-    if (msg === null || msg === undefined) {
-        return;
-    }
-
     if (isLoggingEnabled())
     {
         write("***");
@@ -179,10 +160,6 @@ export function value(msg: string, value: any, level?: number, logPad = "")
 
 export function values(level: number, logPad: string, params: any | (string|any)[][], doLogBlank?: boolean)
 {
-    if (params === null || params === undefined || params.length === 0) {
-        return;
-    }
-
     if (isLoggingEnabled())
     {
         if (doLogBlank === true) {

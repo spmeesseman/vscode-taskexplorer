@@ -7,6 +7,11 @@ import * as util from "../../common/utils";
 import * as log from "../../common/log";
 import { storage } from "../../common/storage";
 import { getUserDataPath } from "../../common/utils";
+import { configuration } from "../../common/configuration";
+
+
+const creator = "spmeesseman",
+	  extension = "vscode-taskexplorer";
 
 
 suite("Util Tests", () =>
@@ -19,17 +24,35 @@ suite("Util Tests", () =>
             assert.fail("         ✘ Workspace folder does not exist");
         }
 
-        console.log("      Logging");
         assert(workspace.getConfiguration("taskExplorer").update("debug", true));
         log.blank();
-        log.write("        spmeesseman.vscode-taskexplorer");
-        log.value("        spmeesseman.vscode-taskexplorer", "true");
-        log.value("        spmeesseman.vscode-taskexplorer", null);
-        log.value("        spmeesseman.vscode-taskexplorer", undefined);
-        log.error("        spmeesseman.vscode-taskexplorer");
-        log.error([ "        spmeesseman.vscode-taskexplorer",
-                        "        spmeesseman.vscode-taskexplorer",
-                        "        spmeesseman.vscode-taskexplorer" ]);
+        log.write(`        ${creator}.${extension}`);
+        log.value(`        ${creator}.${extension}`, "true");
+        log.value(`        ${creator}.${extension}`, null);
+        log.value(`        ${creator}.${extension}`, undefined);
+        log.error(`        ${creator}.${extension}`);
+        log.error([ `        ${creator}.${extension}`,
+                    `        ${creator}.${extension}`,
+                    `        ${creator}.${extension}` ]);
+		// 1 param
+		log.methodStart("message");
+		log.methodDone("message");
+
+		log.setWriteToConsole(true);
+		log.write("test");
+		log.value("test", "1");
+		log.setWriteToConsole(false);
+
+		// nullvalue
+		log.value("null value", null);
+		log.value("empty string value", "");
+
+		// Disabled logging
+		const dbg = configuration.get<boolean>("debug");
+		configuration.updateWs("debug", false);
+		log.write("test");
+		log.value("test", "1");
+		configuration.updateWs("debug", dbg);
 
         assert(util.camelCase("taskexplorer", 4) === "taskExplorer");
         assert(util.camelCase(undefined, 4) === undefined);
@@ -144,7 +167,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "test";
 		dataPath = getUserDataPath("win32");
-		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1\\test\\AppData\\Roaming\\vscode");
+		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\test\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
 		//
@@ -153,7 +176,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
 		dataPath = getUserDataPath("nothing");
-		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1");
+		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1`);
 		//
 		// Set environment variables for specific test
 		//
@@ -185,7 +208,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
 		dataPath = getUserDataPath("win32");
-		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode");
+		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
 		//
@@ -194,13 +217,13 @@ suite("Util Tests", () =>
 		process.env.USERPROFILE = "";
 		process.env.VSCODE_APPDATA = "";
 		dataPath = getUserDataPath("linux");
-		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1\\.config\\vscode");
+		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\.config\\vscode`);
 		dataPath = getUserDataPath("win32");
-		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode");
+		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode`);
 		dataPath = getUserDataPath("darwin");
-		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1\\Library\\Application Support\\vscode");
+		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\Library\\Application Support\\vscode`);
 		dataPath = getUserDataPath("invalid_platform");
-		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1");
+		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1`);
 		//
 		// Set environment variables for specific test
 		//
@@ -261,8 +284,10 @@ suite("Util Tests", () =>
     {
         if (storage)
         {
-            await storage?.update("TEST_KEY", "This is a test");
-            assert(storage?.get<string>("TEST_KEY") === "This is a test");
+			storage.keys(); // internal keys
+            await storage.update("TEST_KEY", "This is a test");
+            assert(storage.get<string>("TEST_KEY") === "This is a test");
+            assert(storage.get<string>("TEST_KEY_DONT_EXIST", "defValue") === "defValue");
             console.log("         ✔ Successfully updated/read storage");
             //
             // tasks.tests will cover storage.update(key, defaultVal) w/ Last Tasks and Favs folders

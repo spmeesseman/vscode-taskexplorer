@@ -71,13 +71,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
         subscriptions.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "install"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update <packagename>"); }, this));
+        subscriptions.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile, pkg: string) => { await this.runNpmCommand(taskFile, pkg || "update <packagename>"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
         subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | string) => { await this.addToExcludes(taskFile); }, this));
         subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => { await this.addRemoveFavorite(taskItem); }, this));
         subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
-        subscriptions.push(commands.registerCommand(name + ".renameSpecial", async (taskItem: TaskItem) => { await this.addRemoveSpecialLabel(taskItem); }, this));
+        subscriptions.push(commands.registerCommand(name + ".renameSpecial", async (taskItem: TaskItem, label: string) => { await this.addRemoveSpecialLabel(taskItem, label); }, this));
 
         tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e));
         tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e));
@@ -127,7 +127,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async addRemoveSpecialLabel(taskItem: TaskItem)
+    private async addRemoveSpecialLabel(taskItem: TaskItem, label: string)
     {
         let addRemoved = false,
             index = 0;
@@ -153,15 +153,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         if (!addRemoved)
         {
-            const opts: InputBoxOptions = { prompt: "Enter favorites label" };
-            await window.showInputBox(opts).then(async (str) =>
-            {
-                if (id && str !== undefined)
+            if (!label) {
+                const opts: InputBoxOptions = { prompt: "Enter favorites label" };
+                await window.showInputBox(opts).then(async (str) =>
                 {
-                    addRemoved = true;
-                    renames.push([id, str]);
-                }
-            });
+                    if (id && str !== undefined)
+                    {
+                        addRemoved = true;
+                        renames.push([id, str]);
+                    }
+                });
+            }
+            else if (id) {
+                addRemoved = true;
+                renames.push([id, label]);
+            }
         }
 
         //

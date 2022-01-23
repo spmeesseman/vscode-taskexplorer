@@ -70,16 +70,9 @@ export function getCombinedGlobPattern(defaultPattern: string, globs: string[]):
     if (globs && globs.length > 0)
     {
         multiFilePattern = "{" + constants.GLOB_ANT;
-        if (Array.isArray(globs))
-        {
-            for (const i of globs) {
-                multiFilePattern += ",";
-                multiFilePattern += i;
-            }
-        }
-        else {
+        for (const i of globs) {
             multiFilePattern += ",";
-            multiFilePattern += globs;
+            multiFilePattern += i;
         }
         multiFilePattern += "}";
     }
@@ -151,7 +144,7 @@ export function getPortableDataPath(padding = "")
 }
 
 
-export function getUserDataPath(padding = "")
+export function getUserDataPath(platform?: string, padding = "")
 {
     let userPath: string | undefined = "";
 
@@ -178,7 +171,7 @@ export function getUserDataPath(padding = "")
     {   //
         // Use system user data path
         //
-        userPath = getDefaultUserDataPath();
+        userPath = getDefaultUserDataPath(platform);
     }
     userPath = path.resolve(userPath);
     log.value(padding + "user path is", userPath, 1);
@@ -186,7 +179,7 @@ export function getUserDataPath(padding = "")
 }
 
 
-function getDefaultUserDataPath()
+function getDefaultUserDataPath(platform?: string)
 {   //
     // Support global VSCODE_APPDATA environment variable
     //
@@ -195,14 +188,11 @@ function getDefaultUserDataPath()
     // Otherwise check per platform
     //
     if (!appDataPath) {
-        switch (process.platform) {
+        switch (platform || process.platform) {
             case "win32":
                 appDataPath = process.env.APPDATA;
                 if (!appDataPath) {
-                    const userProfile = process.env.USERPROFILE;
-                    if (typeof userProfile !== "string") {
-                        throw new Error("Windows: Unexpected undefined %USERPROFILE% environment variable");
-                    }
+                    const userProfile = process.env.USERPROFILE || "";
                     appDataPath = path.join(userProfile, "AppData", "Roaming");
                 }
                 break;
@@ -213,7 +203,7 @@ function getDefaultUserDataPath()
                 appDataPath = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config");
                 break;
             default:
-                throw new Error("Platform not supported");
+                return ".";
         }
     }
     return path.join(appDataPath, "vscode");
