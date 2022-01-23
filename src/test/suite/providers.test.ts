@@ -35,7 +35,7 @@ suite("Provider Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await activate();
+        teApi = await activate(this);
 
         rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
 
@@ -207,12 +207,6 @@ suite("Provider Tests", () =>
             if (fs.existsSync(wsDirName)) {
                 fs.rmdirSync(wsDirName);
             }
-            wsDirName = path.join(rootPath, ".vscode");
-            if (fs.existsSync(wsDirName)) {
-                fs.rmdirSync(wsDirName, {
-                    recursive: true
-                });
-            }
         }
         catch(error) {
             console.log(error);
@@ -256,8 +250,8 @@ suite("Provider Tests", () =>
 
         taskCount = findIdInTaskMap(":app-publisher:", taskMap);
         console.log("            App-Publisher: " + taskCount.toString());
-        if (taskCount < 6) {
-            assert.fail("Unexpected App-Publisher task count (Found " + taskCount + " of 6)");
+        if (taskCount !== 42) {
+            assert.fail("Unexpected App-Publisher task count (Found " + taskCount + " of 42)");
         }
 
         taskCount = findIdInTaskMap(":bash:", taskMap);

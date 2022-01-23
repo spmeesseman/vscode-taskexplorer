@@ -1,8 +1,7 @@
 
-import * as path from "path";
 import * as fs from "fs";
 import { deactivate } from "../../extension";
-import { activate, cleanup, getWsPath } from "../helper";
+import { activate, getWsPath } from "../helper";
 
 
 suite("Deactivate Extension", () =>
@@ -19,10 +18,8 @@ suite("Deactivate Extension", () =>
 
 	test("Cleanup", async () =>
 	{
-		await cleanup();
-
 		const dirNameCode = getWsPath(".vscode");
-		if (fs.existsSync(path.join(dirNameCode))) {
+		if (fs.existsSync(dirNameCode)) {
 			fs.rmdirSync(dirNameCode, {
 				recursive: true
 			});

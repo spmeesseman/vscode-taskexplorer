@@ -82,7 +82,6 @@ export abstract class TaskExplorerProvider implements TaskProvider
         if (uri && this.cachedTasks)
         {
             const rmvTasks: Task[] = [];
-            const folder = workspace.getWorkspaceFolder(uri);
 
             for (const each of this.cachedTasks)
             {

@@ -22,9 +22,9 @@ let buildXmlFile: string;
 suite("Ant Tests", () =>
 {
 
-    suiteSetup(async () =>
+    suiteSetup(async function()
     {
-        teApi = await activate();
+        teApi = await activate(this);
         assert(isReady("ant") === true, "Setup failed");
         provider = teApi.taskProviders.get("ant") as AntTaskProvider;
         rootWorkspace = (workspace.workspaceFolders ? workspace.workspaceFolders[0]: undefined) as WorkspaceFolder;
@@ -34,7 +34,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant utility function cases", async () =>
+    test("Document Position", async () =>
     {
         // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);

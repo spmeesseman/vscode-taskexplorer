@@ -47,7 +47,9 @@
         "bash"
     ],
     "main": "./dist/extension",
-    "activationEvents": [],
+    "activationEvents": [
+        "*"
+    ],
     "scripts": {
         "build": "npx tsc -p ./",
         "clean": "rimraf dist && rimraf .nyc_output && rimraf coverage",

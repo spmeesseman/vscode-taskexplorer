@@ -25,6 +25,7 @@ const fileToTest = "*";
 // const fileToTest = "composer";
 // const fileToTest = "configuration";
 // const fileToTest = "providers";
+// const fileToTest = "python";
 // const fileToTest = "tasks";
 // const fileToTest = "tree";
 // const fileToTest = "util";

@@ -22,9 +22,9 @@ let taskMap: Map<string, TaskItem> = new Map();
 suite("Task Tests", () =>
 {
 
-    suiteSetup(async () =>
+    suiteSetup(async function()
     {
-        teApi = await activate();
+        teApi = await activate(this);
         assert(isReady() === true, "Setup failed");
         rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
         //

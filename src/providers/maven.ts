@@ -84,8 +84,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const cwd = path.dirname(uri.fsPath),
-              folder = workspace.getWorkspaceFolder(uri),
-              args = [];
+              folder = workspace.getWorkspaceFolder(uri);
 
         if (!folder) {
             return [];
@@ -141,7 +140,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
         const kindValidate: TaskExplorerDefinition = {
             ...defaultDef,
             ...{
-                cmdLine: this.getCommand() + " valudate -f " + defaultDef.fileName,
+                cmdLine: this.getCommand() + " validate -f " + defaultDef.fileName,
             }
         };
 
@@ -155,16 +154,16 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
         //
         // Create the shell execution objects
         //
-        const executionClean = kindClean.cmdLine ? new ShellExecution(kindClean.cmdLine, options) : undefined;
-        const executionCompile = kindCompile.cmdLine ? new ShellExecution(kindCompile.cmdLine, options) : undefined;
-        const executionDeploy = kindDeploy.cmdLine ? new ShellExecution(kindDeploy.cmdLine, options) : undefined;
-        const executionInstall = kindInstall.cmdLine ? new ShellExecution(kindInstall.cmdLine, options) : undefined;
-        const executionPackage = kindPackage.cmdLine ? new ShellExecution(kindPackage.cmdLine, options) : undefined;
-        const executionTest = kindTest.cmdLine ? new ShellExecution(kindTest.cmdLine, options) : undefined;
-        const executionValidate = kindValidate.cmdLine ? new ShellExecution(kindValidate.cmdLine, options) : undefined;
-        const executionVerify = kindVerify.cmdLine ? new ShellExecution(kindVerify.cmdLine, options) : undefined;
+        const executionClean = new ShellExecution(kindClean.cmdLine as string, options);
+        const executionCompile = new ShellExecution(kindCompile.cmdLine as string, options);
+        const executionDeploy = new ShellExecution(kindDeploy.cmdLine as string, options);
+        const executionInstall = new ShellExecution(kindInstall.cmdLine as string, options);
+        const executionPackage = new ShellExecution(kindPackage.cmdLine as string, options);
+        const executionTest = new ShellExecution(kindTest.cmdLine as string, options);
+        const executionValidate = new ShellExecution(kindValidate.cmdLine as string, options);
+        const executionVerify = new ShellExecution(kindVerify.cmdLine as string, options);
 
-        log.methodDone("read app-ublisher file uri tasks", 1, logPad, true);
+        log.methodDone("read maven file uri tasks", 1, logPad, true);
 
         return [ new Task(kindClean, folder, "Clean", "maven", executionClean, undefined),
                  new Task(kindCompile, folder, "Compile", "maven", executionCompile, undefined),

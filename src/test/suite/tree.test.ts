@@ -13,9 +13,9 @@ let teApi: TaskExplorerApi;
 
 suite("Tree Tests", () =>
 {
-    suiteSetup(async () =>
+    suiteSetup(async function()
     {
-        teApi = await activate();
+        teApi = await activate(this);
         assert(isReady() === true, "Setup failed");
     });
 

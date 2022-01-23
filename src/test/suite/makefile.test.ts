@@ -19,9 +19,9 @@ let provider: MakeTaskProvider;
 suite("Makefile Tests", () =>
 {
 
-    suiteSetup(async () =>
+    suiteSetup(async function()
     {
-        teApi = await activate();
+        teApi = await activate(this);
         assert(isReady("make") === true, "Setup failed");
         provider = teApi.taskProviders.get("make") as MakeTaskProvider;
     });

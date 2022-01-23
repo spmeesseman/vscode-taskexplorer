@@ -84,7 +84,7 @@ export async function activate(instance?: any)
 {
     const ext = extensions.getExtension("spmeesseman.vscode-taskexplorer")!;
     assert(ext, "Could not find extension");
-    if (instance) instance.timeout(45 * 1000);
+    if (instance) instance.timeout(60 * 1000);
 
     if (!activated)
     {
@@ -93,13 +93,6 @@ export async function activate(instance?: any)
         activated = true;
     }
     return teApi;
-}
-
-
-export async function cleanup()
-{
-    // await configuration.update("validationDelay", docValidationDelay);
-    // await workspace.getConfiguration().update("extjsIntellisense.enableTaskView", taskExplorerEnabled);
 }
 
 
@@ -113,7 +106,7 @@ export async function buildTree(instance: any, waitTime?: number)
         return treeItems;
     }
 
-    instance.timeout(45 * 1000);
+    instance.timeout(60 * 1000);
 
     if (!teApi || !teApi.explorerProvider) {
         assert.fail("   ✘ Task Explorer tree instance does not exist");
