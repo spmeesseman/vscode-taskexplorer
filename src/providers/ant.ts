@@ -64,7 +64,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
-    public async readTasks(logPad = ""): Promise<Task[]>
+    public async readTasks(logPad: string): Promise<Task[]>
     {
         log.methodStart("detect ant files", 1, logPad, true);
 
@@ -77,7 +77,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
             {
                 visitedFiles.add(fObj.uri.fsPath);
-                const tasks = await this.readUriTasks(fObj.uri, undefined, logPad + "   ");
+                const tasks = await this.readUriTasks(fObj.uri, logPad + "   ");
                 log.write("   processed ant file", 3, logPad);
                 log.value("      file", fObj.uri.fsPath, 3, logPad);
                 log.value("      targets in file", tasks.length, 3, logPad);
@@ -264,10 +264,10 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
-    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
+    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const result: Task[] = [];
-        const folder = wsFolder || workspace.getWorkspaceFolder(uri);
+        const folder = workspace.getWorkspaceFolder(uri);
 
         log.methodStart("read ant file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
 

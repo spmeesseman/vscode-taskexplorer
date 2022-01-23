@@ -252,9 +252,9 @@ export function getScriptProviderType(source: string): string
 
 export function getTaskItemId(taskItem: TaskItem)
 {
-    return taskItem?.id?.replace(constants.LAST_TASKS_LABEL + ":", "")
-                        .replace(constants.FAV_TASKS_LABEL + ":", "")
-                        .replace(constants.USER_TASKS_LABEL + ":", "");
+    return taskItem.id?.replace(constants.LAST_TASKS_LABEL + ":", "")
+                       .replace(constants.FAV_TASKS_LABEL + ":", "")
+                       .replace(constants.USER_TASKS_LABEL + ":", "");
 }
 
 

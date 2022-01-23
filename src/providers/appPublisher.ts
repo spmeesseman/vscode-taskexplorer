@@ -43,7 +43,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
     }
 
 
-    public async readTasks(logPad = ""): Promise<Task[]>
+    public async readTasks(logPad: string): Promise<Task[]>
     {
         log.methodStart("detect app-publisher files", 1, logPad, true);
 
@@ -53,12 +53,12 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
 
         if (workspace.workspaceFolders && paths)
         {
-            for (const fobj of paths)
+            for (const fObj of paths)
             {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath))
+                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
                 {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    allTasks.push(...await this.readUriTasks(fobj.uri));
+                    visitedFiles.add(fObj.uri.fsPath);
+                    allTasks.push(...await this.readUriTasks(fObj.uri, logPad + "   "));
                 }
             }
         }
@@ -76,10 +76,10 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
     }
 
 
-    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
+    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const cwd = path.dirname(uri.fsPath),
-              folder = wsFolder || workspace.getWorkspaceFolder(uri),
+              folder = workspace.getWorkspaceFolder(uri),
               groupSeparator = configuration.get<string>("groupSeparator");
 
         if (!folder) {

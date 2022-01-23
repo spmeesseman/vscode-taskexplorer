@@ -45,7 +45,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    private findTargets(fsPath: string, logPad = ""): string[]
+    private findTargets(fsPath: string, logPad: string): string[]
     {
         let scripts: string[] = [];
 
@@ -262,7 +262,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    public async readTasks(logPad = ""): Promise<Task[]>
+    public async readTasks(logPad: string): Promise<Task[]>
     {
         log.methodStart("detect gulp files", 1, logPad, true);
 
@@ -272,13 +272,13 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
 
         if (workspace.workspaceFolders && paths)
         {
-            for (const fobj of paths)
+            for (const fObj of paths)
             {
-                if (!util.isExcluded(fobj.uri.path) && !visitedFiles.has(fobj.uri.fsPath)) {
-                    visitedFiles.add(fobj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fobj.uri, undefined, logPad + "   ");
+                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath)) {
+                    visitedFiles.add(fObj.uri.fsPath);
+                    const tasks = await this.readUriTasks(fObj.uri, logPad + "   ");
                     log.write("   processed gulp file", 3, logPad);
-                    log.value("      file", fobj.uri.fsPath, 3, logPad);
+                    log.value("      file", fObj.uri.fsPath, 3, logPad);
                     log.value("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
                 }
@@ -291,10 +291,10 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
+    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const result: Task[] = [];
-        const folder = wsFolder || workspace.getWorkspaceFolder(uri);
+        const folder = workspace.getWorkspaceFolder(uri);
 
         log.methodStart("read gulp file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
 

@@ -209,7 +209,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public async readTasks(logPad = ""): Promise<Task[]>
+    public async readTasks(logPad: string): Promise<Task[]>
     {
         log.methodStart("detect script files", 1, logPad, true);
 
@@ -240,9 +240,9 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public async readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad = ""): Promise<Task[]>
+    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
-        const folder = wsFolder || workspace.getWorkspaceFolder(uri);
+        const folder = workspace.getWorkspaceFolder(uri);
         log.methodStart("read script file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
         let task: Task | undefined;
         if (folder) {

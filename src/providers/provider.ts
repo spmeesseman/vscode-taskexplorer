@@ -13,8 +13,8 @@ export abstract class TaskExplorerProvider implements TaskProvider
     abstract getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition;
     abstract createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined;
     abstract getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number;
-    abstract readTasks(logPad?: string): Promise<Task[]>;
-    abstract readUriTasks(uri: Uri, wsFolder?: WorkspaceFolder, logPad?: string): Promise<Task[]>;
+    abstract readTasks(logPad: string): Promise<Task[]>;
+    abstract readUriTasks(uri: Uri, logPad: string): Promise<Task[]>;
 
 
     public cachedTasks: Task[] | undefined;
@@ -109,7 +109,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
                 if (util.pathExists(uri.fsPath) && util.existsInArray(configuration.get("exclude") || [], uri.path) === false)
                 {
-                    const tasks = await this.readUriTasks(uri, folder, logPad + "   ");
+                    const tasks = await this.readUriTasks(uri, logPad + "   ");
                     this.cachedTasks?.push(...tasks);
                 }
 
