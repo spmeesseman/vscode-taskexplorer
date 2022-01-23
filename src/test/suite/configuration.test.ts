@@ -49,13 +49,13 @@ suite("Configuration / Settings Tests", () =>
     test("Bash Glob", async function()
     {
         const globPatterns = configuration.get<string[]>("globPatternsBash");
-        // await configuration.updateWs("enableBash", false);
-        // globPatterns.push("**/extensionless/**");
-        // await configuration.updateWs("globPatternsBash", globPatterns);
-        // await sleep(100);
-        // await configuration.updateWs("enableBash", true);
-        // globPatterns.pop();
-        // await configuration.updateWs("globPatternsBash", globPatterns);
+        await configuration.updateWs("enableBash", false);
+        globPatterns.push("**/extensionless/**");
+        await configuration.updateWs("globPatternsBash", globPatterns);
+        await sleep(100);
+        await configuration.updateWs("enableBash", true);
+        globPatterns.pop();
+        await configuration.updateWs("globPatternsBash", globPatterns);
         await sleep(100);
     });
 

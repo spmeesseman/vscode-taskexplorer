@@ -99,13 +99,10 @@ suite("Ant Tests", () =>
 
     test("Ant reader", async () =>
     {
-        // let antTasks: Task[];
-        // const useAnt = configuration.get<boolean>("useAnt");
-
         //
         // Use Ant
         //
-        // await configuration.updateWs("useAnt", true);
+        await configuration.updateWs("useAnt", true);
         // await teApi.explorerProvider?.invalidateTasksCache("ant");
         // await tasks.fetchTasks({ type: "ant" });
         // antTasks = await provider.readUriTasks(Uri.file(buildXmlFile));
@@ -125,7 +122,6 @@ suite("Ant Tests", () =>
         // Reset
         //
         await configuration.updateWs("useAnt", false);
-        await configuration.update("useAnt", false);
     });
 
 });

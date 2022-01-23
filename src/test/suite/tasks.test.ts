@@ -36,15 +36,14 @@ suite("Task Tests", () =>
 
     test("Run, pause, open, and stop tasks", async function()
     {
-        let ranBash = false;
-        let ranBatch = false;
+        let ranBash = 0, ranBatch = 0,
+            lastTask: TaskItem | null = null;
 
         this.timeout(75 * 1000);
 
         //
         // Just find and task, a batch task, and run all commands on it
         //
-        let lastTask: TaskItem | null = null;
         for (const map of taskMap)
         {
             const value = map[1];
@@ -53,18 +52,17 @@ suite("Task Tests", () =>
                 console.log("Run batch task: " + value.label);
                 console.log("   Folder: " + value.getFolder()?.name);
                 await runTask(value, lastTask);
-                ranBatch = !!lastTask;
-                lastTask = value;
-                if (ranBash && ranBatch) break;
+                ranBatch++;
             }
             else if (value && value.taskSource === "bash")
             {
                 console.log("Run bash task: " + value.label);
                 console.log("   Folder: " + value.getFolder()?.name);
                 await runTask(value, lastTask);
-                ranBash = true;
-                if (ranBash && ranBatch) break;
+                ranBash++;
             }
+            if (ranBash && ranBatch >= 2) break;
+            lastTask = value;
         }
 
         //
@@ -155,7 +153,8 @@ async function runTask(value: TaskItem, lastTask: TaskItem | null)
 {
     if (value.taskSource !== "bash")
     {
-        if (lastTask) {
+        if (lastTask)
+        {
             await executeTeCommand("open", value);
             await executeTeCommand("addRemoveFromFavorites", value);
             await configuration.updateWs("keepTermOnStop", true);
