@@ -65,6 +65,7 @@ suite("Task Tests", () =>
             lastTask = value;
         }
 
+        assert(ranBash >= 1 && ranBatch >= 2, "# of tasks expected did not run");
         //
         // Wait for any missed running tasks
         //

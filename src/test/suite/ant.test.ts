@@ -51,30 +51,30 @@ suite("Ant Tests", () =>
         //
         // Enable Ansicon
         //
-        await configuration.update("pathToAnsicon", "ansicon\\x64\\ansicon.exe");
-        await configuration.update("enableAnsiconForAnt", true);
+        await configuration.updateWs("pathToAnsicon", "ansicon\\x64\\ansicon.exe");
+        await configuration.updateWs("enableAnsiconForAnt", true);
         provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
-        await configuration.update("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64\\ansicon.exe");
+        await configuration.updateWs("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64\\ansicon.exe");
         provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
-        await configuration.update("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64\\");
+        await configuration.updateWs("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64\\");
         provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
-        await configuration.update("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64");
+        await configuration.updateWs("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64");
         provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
 
         //
         // Disable Ansicon
         //
-        await configuration.update("pathToAnsicon", "ansicon\\x64\\ansicon.exe");
-        await configuration.update("enableAnsiconForAnt", false);
+        await configuration.updateWs("pathToAnsicon", "ansicon\\x64\\ansicon.exe");
+        await configuration.updateWs("enableAnsiconForAnt", false);
         provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
-        await configuration.update("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64\\ansicon.exe");
+        await configuration.updateWs("pathToAnsicon", "..\\..\\test-files\\ansicon\\x64\\ansicon.exe");
         provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
         await tasks.fetchTasks({ type: "ant" });
 
         //
         // Remove path
         //
-        await configuration.update("pathToAnsicon", undefined);
+        await configuration.updateWs("pathToAnsicon", undefined);
         provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
         await tasks.fetchTasks({ type: "ant" });
 
@@ -89,8 +89,8 @@ suite("Ant Tests", () =>
         //
         // Reset
         //
-        await configuration.update("pathToAnsicon", pathToAnsicon);
-        await configuration.update("enableAnsiconForAnt", enableAnsiconForAnt);
+        await configuration.updateWs("pathToAnsicon", pathToAnsicon);
+        await configuration.updateWs("enableAnsiconForAnt", enableAnsiconForAnt);
         await tasks.fetchTasks({ type: "ant" });
     });
 

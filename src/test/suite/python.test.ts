@@ -39,8 +39,8 @@ suite("Python Tests", () =>
         await configuration.updateWs(`pathTo${testsNameProper}`, path.resolve(process.cwd(), "..\\..\\test-files\\ant\\bin\\ant.bat"));
         pathToPython = configuration.get<string>(`pathTo${testsNameProper}`);
         enablePython = configuration.get<boolean>(`enable${testsNameProper}`);
-        await configuration.update(`pathTo${testsNameProper}`, "php\\composer.exe");
-        await configuration.update(`enable${testsNameProper}`, true);
+        await configuration.updateWs(`pathTo${testsNameProper}`, "php\\composer.exe");
+        await configuration.updateWs(`enable${testsNameProper}`, true);
     });
 
 
@@ -48,8 +48,8 @@ suite("Python Tests", () =>
     {   //
         // Reset settings
         //
-        await configuration.update(`pathTo${testsNameProper}`, pathToPython);
-        await configuration.update(`enable${testsNameProper}`, enablePython);
+        await configuration.updateWs(`pathTo${testsNameProper}`, pathToPython);
+        await configuration.updateWs(`enable${testsNameProper}`, enablePython);
     });
 
 
@@ -64,7 +64,7 @@ suite("Python Tests", () =>
 
     test("Disable", async () =>
     {
-        await configuration.update(`enable${testsNameProper}`, false);
+        await configuration.updateWs(`enable${testsNameProper}`, false);
         await sleep(1750);
         await teApi.explorerProvider?.invalidateTasksCache(testsName, mainFile);
         await sleep(1750);
@@ -75,7 +75,7 @@ suite("Python Tests", () =>
 
     test("Re-enable", async () =>
     {
-        await configuration.update(`enable${testsNameProper}`, true);
+        await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName, mainFile);
         // const cTasks = await tasks.fetchTasks({ type: testsName });

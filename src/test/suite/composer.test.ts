@@ -42,8 +42,8 @@ suite("Composer Tests", () =>
         await configuration.updateWs(`pathTo${testsNameProper}`, getWsPath("ant\\bin\\ant.bat"));
         pathToComposer = configuration.get<string>(`pathTo${testsNameProper}`);
         enableComposer = configuration.get<boolean>(`enable${testsNameProper}`);
-        await configuration.update(`pathTo${testsNameProper}`, "php\\composer.exe");
-        await configuration.update(`enable${testsNameProper}`, true);
+        await configuration.updateWs(`pathTo${testsNameProper}`, "php\\composer.exe");
+        await configuration.updateWs(`enable${testsNameProper}`, true);
     });
 
 
@@ -51,8 +51,8 @@ suite("Composer Tests", () =>
     {   //
         // Reset settings
         //
-        await configuration.update(`pathTo${testsNameProper}`, pathToComposer);
-        await configuration.update(`enable${testsNameProper}`, enableComposer);
+        await configuration.updateWs(`pathTo${testsNameProper}`, pathToComposer);
+        await configuration.updateWs(`enable${testsNameProper}`, enableComposer);
     });
 
 
