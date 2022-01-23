@@ -6,12 +6,13 @@ import { workspace } from "vscode";
 import * as util from "../../common/utils";
 import * as log from "../../common/log";
 import { storage } from "../../common/storage";
+import { getUserDataPath } from "../../common/utils";
 
 
 suite("Util Tests", () =>
 {
 
-    test("Test utility methids general", async function()
+    test("General Utility methods", async function()
     {
         const uri = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined;
         if (!uri) {
@@ -30,21 +31,17 @@ suite("Util Tests", () =>
                         "        spmeesseman.vscode-taskexplorer",
                         "        spmeesseman.vscode-taskexplorer" ]);
 
-        console.log("      Camel casing");
         assert(util.camelCase("taskexplorer", 4) === "taskExplorer");
         assert(util.camelCase(undefined, 4) === undefined);
         assert(util.camelCase("testgreaterindex", 19) === "testgreaterindex");
         assert(util.camelCase("test", -1) === "test");
 
-        console.log("      Proper casing");
         assert(util.properCase("taskexplorer") === "Taskexplorer");
         assert(util.properCase(undefined) === undefined);
 
-        console.log("      Script type");
         assert(util.isScriptType("batch"));
         assert(util.getScriptTaskTypes().length > 0);
 
-        console.log("      Array functions");
         const arr = [ 1, 2, 3, 4, 5 ];
         util.removeFromArray(arr, 3);
         await util.removeFromArrayAsync(arr, 1);
@@ -55,13 +52,10 @@ suite("Util Tests", () =>
         assert(util.existsInArray(arr, 3) === false);
         assert(util.existsInArray(arr, 1) === false);
 
-        console.log("      Get CWD");
         assert(util.getCwd(uri) !== undefined);
 
-        console.log("      Set a timeout");
         assert(util.timeout(10));
 
-        console.log("      Get group separator");
         assert (util.getGroupSeparator() === "-");
     });
 
@@ -83,6 +77,7 @@ suite("Util Tests", () =>
             await asyncFn(n);
         }
     });
+
 
     test("Asynchronous mapForEach", async function()
     {
@@ -109,6 +104,142 @@ suite("Util Tests", () =>
     });
 
 
+	test("Data paths", async () =>
+	{   //
+		// The fs module on dev test will run through win32 path get.  Simulate
+		// path get here for linux and mac for increased coverage since we're only
+		// running the tests in a windows machine for release right now with ap.
+		//
+		let dataPath: string | undefined = getUserDataPath("darwin");
+		dataPath = getUserDataPath("linux");
+
+		//
+		// Simulate --user-data-dir vscode command line option
+		//
+		const oArgv = process.argv;
+		process.argv = [ "--user-data-dir", dataPath ];
+		dataPath = getUserDataPath("linux");
+		dataPath = getUserDataPath("win32");
+		dataPath = getUserDataPath("darwin");
+
+		//
+		// 0 args, which would probably never happen but the getUserDataPath() call
+		// handles it an ;et's cover it
+		//
+		process.argv = [];
+		dataPath = getUserDataPath("win32");
+
+		//
+		// Save current environment
+		//
+		dataPath = process.env.VSCODE_PORTABLE;
+		const dataPath1 = dataPath;
+		const dataPath2 = process.env.APPDATA;
+		const dataPath3 = process.env.USERPROFILE;
+		const dataPath4 = process.env.VSCODE_APPDATA;
+		//
+		// Set environment variables for specific test
+		//
+		process.env.VSCODE_PORTABLE = getUserDataPath("win32");
+		process.env.APPDATA = "";
+		process.env.USERPROFILE = "test";
+		dataPath = getUserDataPath("win32");
+		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1\\test\\AppData\\Roaming\\vscode");
+		//
+		// Set environment variables for specific test
+		//
+		dataPath = "";
+		process.env.VSCODE_PORTABLE = dataPath;
+		process.env.APPDATA = dataPath2;
+		process.env.USERPROFILE = dataPath3;
+		dataPath = getUserDataPath("nothing");
+		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1");
+		//
+		// Set environment variables for specific test
+		//
+		process.env.VSCODE_PORTABLE = undefined;
+		process.env.APPDATA = dataPath2;
+		process.env.USERPROFILE = dataPath3;
+		dataPath = getUserDataPath("win32");
+		assert.strictEqual(dataPath, "C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
+		//
+		// Set environment variables for specific test
+		//
+		process.env.VSCODE_PORTABLE = "c:\\some\\invalid\\path";
+		process.env.APPDATA = dataPath2;
+		process.env.USERPROFILE = dataPath3;
+		dataPath = getUserDataPath("win32");
+		assert.strictEqual(dataPath, "C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
+		//
+		// Set environment variables for specific test
+		//
+		process.env.VSCODE_PORTABLE = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
+		process.env.APPDATA = "";
+		process.env.USERPROFILE = "";
+		dataPath = getUserDataPath("win32");
+		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
+		//
+		// Set environment variables for specific test
+		//
+		process.env.VSCODE_PORTABLE = "";
+		process.env.APPDATA = "";
+		process.env.USERPROFILE = "";
+		dataPath = getUserDataPath("win32");
+		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode");
+		//
+		// Set environment variables for specific test
+		//
+		process.env.VSCODE_PORTABLE = "";
+		process.env.APPDATA = "";
+		process.env.USERPROFILE = "";
+		process.env.VSCODE_APPDATA = "";
+		dataPath = getUserDataPath("linux");
+		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1\\.config\\vscode");
+		dataPath = getUserDataPath("win32");
+		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode");
+		dataPath = getUserDataPath("darwin");
+		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1\\Library\\Application Support\\vscode");
+		dataPath = getUserDataPath("invalid_platform");
+		assert.strictEqual(dataPath, "C:\\Projects\\vscode-extjs\\.vscode-test\\vscode-win32-archive-1.60.1");
+		//
+		// Set environment variables for specific test
+		//
+		process.env.VSCODE_APPDATA = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
+		dataPath = getUserDataPath("linux");
+		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
+		dataPath = getUserDataPath("win32");
+		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
+		dataPath = getUserDataPath("darwin");
+		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
+		dataPath = getUserDataPath("invalid_platform");
+		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
+		//
+		// Set portable / invalid platform
+		//
+		process.env.VSCODE_PORTABLE = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
+		dataPath = getUserDataPath("invalid_platform");
+		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
+		//
+		// Empty platform
+		//
+		dataPath = getUserDataPath("");
+		process.env.VSCODE_PORTABLE = "";
+		dataPath = getUserDataPath("");
+		//
+		//
+		// Restore process argv
+		//
+		process.argv = oArgv;
+		//
+		// Restore environment
+		//
+		process.env.VSCODE_PORTABLE = dataPath1;
+		process.env.APPDATA = dataPath2;
+		process.env.USERPROFILE = dataPath3;
+		process.env.VSCODE_APPDATA = dataPath4;
+	});
+
+
     test("Get user data paths", function()
     {
         const dataPath = util.getUserDataPath();
@@ -124,6 +255,7 @@ suite("Util Tests", () =>
             assert.fail("         ✘ Could not find user data path");
         }
     });
+
 
     test("Get storage", async function()
     {

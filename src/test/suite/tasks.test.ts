@@ -5,12 +5,14 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import { commands, ConfigurationTarget, workspace } from "vscode";
+import * as fs from "fs";
+import * as path from "path";
+import { commands, ConfigurationTarget, tasks, workspace } from "vscode";
 import { configuration } from "../../common/configuration";
 import constants from "../../common/constants";
 import { TaskExplorerApi } from "../../extension";
 import TaskItem from "../../tree/item";
-import { activate, sleep } from "../helper";
+import { activate, findIdInTaskMap, sleep } from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -24,14 +26,13 @@ suite("Task Tests", () =>
     suiteSetup(async () =>
     {
         teApi = await activate();
-        assert(teApi, "        ✘ TeApi null");
-        assert(teApi.explorerProvider, "        ✘ Task Explorer tree instance does not exist");
+        assert(teApi, "   ✘ TeApi null");
+        assert(teApi.explorerProvider, "   ✘ Task Explorer tree instance does not exist");
         rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
-        assert(rootPath, "        ✘ Workspace folder does not exist");
+        assert(rootPath, "   ✘ Workspace folder does not exist");
         //
         // Scan task tree using internal explorer scanner fn
         //
-        console.log("    Scan task tree for tasks");
         taskMap = await teApi.explorerProvider.getTaskItems(undefined, "      ", true) as Map<string, TaskItem>;
     });
 
@@ -41,15 +42,7 @@ suite("Task Tests", () =>
         let ranBash = false;
         let ranBatch = false;
 
-        if (!rootPath) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        if (!teApi || !teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-
-        this.sleep(75 * 1000);
+        this.timeout(75 * 1000);
 
         //
         // Just find and task, a batch task, and run all commands on it
@@ -76,23 +69,47 @@ suite("Task Tests", () =>
                 if (ranBash && ranBatch) break;
             }
         }
-    });
 
-
-    test("Clear Special Folders", async function()
-    {
-        await commands.executeCommand("taskExplorer.clearSpecialFolder", constants.LAST_TASKS_LABEL);
-        await commands.executeCommand("taskExplorer.clearSpecialFolder", constants.FAV_TASKS_LABEL);
+        //
+        // Wait for any missed running tasks
+        //
+        await sleep(2500);
     });
 
 
     test("NPM Install", async function()
     {
+        const file = path.join(rootPath as string, "package.json");
+        fs.writeFileSync(
+            file,
+            "{\r\n" +
+            '    "name": "vscode-taskexplorer",\r\n' +
+            '    "version": "0.0.1",\r\n' +
+            '    "scripts":{\r\n' +
+            '        "test": "node ./node_modules/vscode/bin/test",\r\n' +
+            '        "compile": "cmd.exe /c test.bat",\r\n' +
+            '        "watch": "tsc -watch -p ./",\r\n' +
+            '        "build": "npx tsc -p ./"\r\n' +
+            "    }\r\n" +
+            "}\r\n"
+        );
+
+        await sleep(1500);
+        const npmTasks = await tasks.fetchTasks({ type: "npm" });
+        assert(npmTasks.length > 0, "No npm tasks registered");
+
+        taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
+
         //
-        // Find an npm file and run an "npm install"
+        // We just wont check NPM files.  If the vascode engine isnt fast enough to
+        // provide the tasks once the package.json files are created, then its not
+        // out fault
         //
-        console.log("    Run npm install");
-        await configuration.updateWs("clickAction", "Open");
+        const taskCount = findIdInTaskMap(":npm:", taskMap);
+        if (taskCount !== 4) {
+            assert.fail("Unexpected NPM task count (Found " + taskCount + " of 4)");
+        }
+
         let npmRan = false;
         for (const map of taskMap)
         {
@@ -118,6 +135,18 @@ suite("Task Tests", () =>
             //         await commands.executeCommand("taskExplorer.open", npmTask);
             //     }
             // }
+        }
+
+        await sleep(100);
+
+        fs.unlinkSync(path.join(rootPath as string, "package.json"));
+        if (fs.existsSync(path.join(rootPath as string, "package-lock.json"))) {
+            try {
+                fs.unlinkSync(path.join(rootPath as string, "package-lock.json"));
+            }
+            catch (error) {
+                console.log(error);
+            }
         }
     });
 

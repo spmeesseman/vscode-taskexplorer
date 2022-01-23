@@ -3,7 +3,8 @@
 
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { configuration } from "../../common/configuration";
+import constants from "../../common/constants";
+import { commands } from "vscode";
 import { TaskExplorerApi } from "../../extension";
 import { activate, initSettings, isReady } from "../helper";
 
@@ -37,29 +38,10 @@ suite("API Init and Tests", () =>
     });
 
 
-    test("Check settings", function(done)
+    test("Clear Special Folders", async function()
     {
-        //
-        // On Insiders tests, for whatever reason all settings are OFF, and the run produces
-        // near 0% coverage, check to see if there are some enabled* options turned ON, since
-        // they should ALL be on
-        //
-        if (configuration.get<boolean>("enableAnt") === false)
-        {
-            console.log("THE SETTINGS DID NOT TAKE!!!");
-        }
-
-        done();
-    });
-
-
-    test("Cover getItems on empty workspace", async function()
-    {
-        if (!teApi?.explorerProvider) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-        // Cover getitems before tree is built
-        await teApi.explorerProvider.getTaskItems(undefined, "         ", true);
+        await commands.executeCommand("taskExplorer.clearSpecialFolder", constants.LAST_TASKS_LABEL);
+        await commands.executeCommand("taskExplorer.clearSpecialFolder", constants.FAV_TASKS_LABEL);
     });
 
 });

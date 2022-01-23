@@ -1599,6 +1599,26 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     /**
      * This function should only be called by the unit tests
      *
+     * All internal task providers export an invalidate() function...
+     *
+     * If 'opt1' is a string then a filesystemwatcher, settings change, or taskevent was
+     * triggered for the task type defined in the 'opt1' parameter.
+     *
+     * The 'opt1' parameter may also have a value of 'tests', which indicates this is
+     * being called from the unit tests, so some special handling is required.
+     *
+     * In the case of a settings change, 'opt2' will be undefined.  Depending on how many task
+     * types configs' were altered in settings, this function may run through more than once
+     * right now for each task type affected.  Some settings require a global refresh, for example
+     * the 'groupDashed' settings, or 'enableSideBar',etc.  If a global refresh is to be performed,
+     * then both 'opt1' and 'opt2' will be undefined.
+     *
+     * In the cases of a task event, 'opt2' is undefined.
+     *
+     * If a FileSystemWatcher event, then 'opt2' should contain the Uri of the file that was
+     * modified, created, or deleted.
+     *
+     *
      * @param opt1 Task provider type.  Can be one of:
      *     "ant"
      *     "app-publisher"
@@ -1625,26 +1645,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         ]);
         this.busy = true;
 
-        //
-        // All internal task providers export an invalidate() function...
-        //
-        // If 'opt1' is a string then a filesystemwatcher, settings change, or taskevent was
-        // triggered for the task type defined in the 'opt1' parameter.
-        //
-        // The 'opt1' parameter may also have a value of 'tests', which indicates this is
-        // being called from the unit tests, so some special handling is required.
-        //
-        // In the case of a settings change, 'opt2' will be undefined.  Depending on how many task
-        // types configs' were altered in settings, this function may run through more than once
-        // right now for each task type affected.  Some settings require a global refresh, for example
-        // the 'groupDashed' settings, or 'enableSideBar',etc.  If a global refresh is to be performed,
-        // then both 'opt1' and 'opt2' will be undefined.
-        //
-        // In the cases of a task event, 'opt2' is undefined.
-        //
-        // If a FileSystemWatcher event, then 'opt2' should contain the Uri of the file that was
-        // modified, created, or deleted.
-        //
         if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
         {
             log.write("   invalidate " + opt1 + " provider file ", 1, logPad);
@@ -2328,20 +2328,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async runNpmCommand(taskFile: TaskFile, command: string)
     {
-        const pkgMgr = util.getPackageManager();
-
-        if (!taskFile.resourceUri) {
-            return;
-        }
+        const pkgMgr = util.getPackageManager(),
+              uri = taskFile.resourceUri as Uri;
 
         const options = {
-            cwd: path.dirname(taskFile.resourceUri.fsPath)
+            cwd: path.dirname(uri.fsPath)
         };
 
         const kind: TaskDefinition = {
             type: "npm",
             script: "install",
-            path: path.dirname(taskFile.resourceUri.fsPath)
+            path: path.dirname(uri.fsPath)
         };
 
         if (command.indexOf("<packagename>") === -1)

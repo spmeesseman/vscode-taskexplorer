@@ -95,32 +95,7 @@ export function getCwd(uri: Uri): string
 
 export function getGroupSeparator()
 {
-    return configuration.get<string>("groupSeparator") || constants.DEFAULT_SEPARATOR;
-}
-
-
-export function getExcludesGlob(folder: string | WorkspaceFolder): RelativePattern
-{
-    let multiFilePattern = "{**/node_modules/**,**/work/**";
-    const excludes: string[] = configuration.get("exclude");
-
-    if (excludes && excludes.length > 0)
-    {
-        if (Array.isArray(excludes))
-        {
-            for (const e of excludes) {
-                multiFilePattern += ",";
-                multiFilePattern += e;
-            }
-        }
-        else {
-            multiFilePattern += ",";
-            multiFilePattern += excludes;
-        }
-    }
-    multiFilePattern += "}";
-
-    return new RelativePattern(folder, multiFilePattern);
+    return configuration.get<string>("groupSeparator", constants.DEFAULT_SEPARATOR);
 }
 
 
@@ -384,19 +359,6 @@ export function properCase(name: string | undefined)
 }
 
 
-export async function readFile(file: string): Promise<string>
-{
-    return new Promise<string>((resolve, reject) => {
-        fs.readFile(file, (err, data) => {
-            if (err) {
-                reject(err);
-            }
-            resolve(data ? data.toString() : "");
-        });
-    });
-}
-
-
 export function readFileSync(file: string)
 {
     const buf = fs.readFileSync(file);
@@ -440,15 +402,6 @@ export async function removeFromArrayAsync(arr: any[], item: any)
     if (idx2 !== -1 && idx2 < arr.length) {
         arr.splice(idx2, 1);
     }
-}
-
-
-export function sortMapByKey(map: Map<string, any>)
-{
-    map = new Map([...map].sort((a: [ string, any], b: [ string, any]) =>
-    {
-        return a[0]?.localeCompare(b[0].toString());
-    }));
 }
 
 

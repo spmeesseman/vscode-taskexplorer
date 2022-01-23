@@ -268,19 +268,19 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
 
     try {
         const relativePattern = new RelativePattern(folder, fileGlob);
-        const paths = await workspace.findFiles(relativePattern, util.getExcludesGlob(folder));
-        for (const fpath of paths)
+        const paths = await workspace.findFiles(relativePattern, getExcludesPattern(folder));
+        for (const fPath of paths)
         {
             if (cancel) {
                 cancelInternal(setCacheBuilding, statusBarSpace);
                 return;
             }
-            if (!util.isExcluded(fpath.path, "   ")) {
+            if (!util.isExcluded(fPath.path, "   ")) {
                 fCache.add({
-                    uri: fpath,
+                    uri: fPath,
                     folder
                 });
-                log.value("   Added to cache", fpath.fsPath, 3, logPad);
+                log.value("   Added to cache", fPath.fsPath, 3, logPad);
             }
         }
     } catch (error) {
@@ -348,6 +348,24 @@ function disposeStatusBarSpace(statusBarSpace: StatusBarItem)
 {
     statusBarSpace?.hide();
     statusBarSpace?.dispose();
+}
+
+
+function getExcludesPattern(folder: string | WorkspaceFolder): RelativePattern
+{
+    let multiFilePattern = "{**/node_modules/**,**/work/**";
+    const excludes: string[] = configuration.get("exclude");
+
+    if (excludes && excludes.length > 0)
+    {
+        for (const e of excludes) {
+            multiFilePattern += ",";
+            multiFilePattern += e;
+        }
+    }
+    multiFilePattern += "}";
+
+    return new RelativePattern(folder, multiFilePattern);
 }
 
 

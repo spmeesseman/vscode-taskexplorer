@@ -24,15 +24,16 @@
             "preLaunchTask": "npm: watch"
         },
         {
-            "name": "Launch",
+            "name": "Launch (TSC)",
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
             "args": [
-                "--disable-extensions",
+				"--disable-extensions",
                 "--disable-workspace-trust",
-                "--extensionDevelopmentPath=${workspaceFolder}"
-            ],
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"${workspaceFolder}/test-files"
+			],
             "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": [
@@ -48,7 +49,8 @@
 			"args": [
 				"--disable-extensions",
                 "--disable-workspace-trust",
-				"--extensionDevelopmentPath=${workspaceRoot}"
+				"--extensionDevelopmentPath=${workspaceRoot}",
+				"${workspaceFolder}/test-files"
 			],
 			"outFiles": ["${workspaceRoot}/dist/client/**/*.js"],
 			"stopOnEntry": false,

@@ -5,6 +5,7 @@ import { configuration } from "../common/configuration";
 import * as util from "../common/utils";
 import * as log from "../common/log";
 import TaskItem from "../tree/item";
+import { removeFileFromCache } from "../cache";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
@@ -112,11 +113,18 @@ export abstract class TaskExplorerProvider implements TaskProvider
                     this.cachedTasks?.push(...tasks);
                 }
 
+                if (!util.pathExists(uri.fsPath)) {
+                    await removeFileFromCache(this.providerName, uri, "   ");
+                }
+
                 if (this.cachedTasks?.length > 0)
                 {
                     await this.processQueue();
                     return;
                 }
+            }
+            else if (!util.pathExists(uri.fsPath)) {
+                await removeFileFromCache(this.providerName, uri, "   ");
             }
         }
 

@@ -12,6 +12,7 @@ import { configuration } from "../../common/configuration";
 import { activate, isReady, sleep } from "../helper";
 import { TaskExplorerApi } from "../../extension";
 import { ComposerTaskProvider } from "../../providers/composer";
+import { properCase } from "../../common/utils";
 
 
 let teApi: TaskExplorerApi;
@@ -23,13 +24,15 @@ let mainFile: Uri;
 
 suite("Composer Tests", () =>
 {
+    const testsName = "composer",
+          testsNameProper = properCase(testsName);
 
     suiteSetup(async function()
     {   //
         // Initialize
         //
         teApi = await activate();
-        assert(isReady("composer") === true, "Setup failed");
+        assert(isReady(testsName) === true, "Setup failed");
         //
         // File path for create/remove
         //
@@ -38,11 +41,11 @@ suite("Composer Tests", () =>
         //
         // Store / set initial settings
         //
-        await configuration.updateWs("pathToComposer", path.resolve(process.cwd(), "..\\..\\test-files\\ant\\bin\\ant.bat"));
-        pathToComposer = configuration.get<string>("pathToAnsicon");
-        enableComposer = configuration.get<boolean>("enableComposer");
-        await configuration.update("pathToComposer", "php\\composer.exe");
-        await configuration.update("enableComposer", true);
+        await configuration.updateWs(`pathTo${testsNameProper}`, path.resolve(process.cwd(), "..\\..\\test-files\\ant\\bin\\ant.bat"));
+        pathToComposer = configuration.get<string>(`pathTo${testsNameProper}`);
+        enableComposer = configuration.get<boolean>(`enable${testsNameProper}`);
+        await configuration.update(`pathTo${testsNameProper}`, "php\\composer.exe");
+        await configuration.update(`enable${testsNameProper}`, true);
     });
 
 
@@ -50,14 +53,14 @@ suite("Composer Tests", () =>
     {   //
         // Reset settings
         //
-        await configuration.update("pathToComposer", pathToComposer);
-        await configuration.update("enableComposer", enableComposer);
+        await configuration.update(`pathTo${testsNameProper}`, pathToComposer);
+        await configuration.update(`enable${testsNameProper}`, enableComposer);
     });
 
 
-    test("Composer utility function cases", async () =>
+    test("Utility function cases", async () =>
     {
-        const provider = teApi.taskProviders.get("composer") as ComposerTaskProvider;
+        const provider = teApi.taskProviders.get(testsName) as ComposerTaskProvider;
         // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
@@ -65,37 +68,42 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Composer Start", async () =>
+    test("Start", async () =>
     {
-        const cTasks = await tasks.fetchTasks({ type: "composer" });
-        assert(cTasks.length === 2, "Did not read 2 composer tasks");
+        const cTasks = await tasks.fetchTasks({ type: testsName });
+        assert(cTasks && cTasks.length === 2, "Did not read 2 composer tasks");
     });
 
 
-    test("Composer Disable", async () =>
+    test("Disable", async () =>
     {
-        await configuration.update("enableComposer", false);
+        await configuration.update(`enable${testsNameProper}`, false);
+        await sleep(1750);
+        await teApi.explorerProvider?.invalidateTasksCache(testsName, mainFile);
+        await sleep(1750);
+        const cTasks = await tasks.fetchTasks({ type: testsName });
+        assert(!cTasks || cTasks.length === 0, "Did not read 0 composer tasks");
+    });
+
+
+    test("Re-enable", async () =>
+    {
+        await configuration.update(`enable${testsNameProper}`, true);
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache("composer", mainFile);
-        const cTasks = await tasks.fetchTasks({ type: "composer" });
-        assert(cTasks.length === 0, "Did not read 0 composer tasks");
+        await teApi.explorerProvider?.invalidateTasksCache(testsName, mainFile);
+        const cTasks = await tasks.fetchTasks({ type: testsName });
+        assert(cTasks && cTasks.length === 2, "Did not read 2 composer tasks");
     });
 
 
-    test("Composer Re-enable", async () =>
-    {
-        await configuration.update("enableComposer", true);
-        await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache("composer", mainFile);
-        const cTasks = await tasks.fetchTasks({ type: "composer" });
-        assert(cTasks.length === 2, "Did not read 2 composer tasks");
-    });
-
-
-    test("Composer Create File", async () =>
+    test("Create File", async () =>
     {
         const dirName = path.join(rootWorkspace.uri.fsPath, "tasks_test_"),
               file = Uri.file(path.join(dirName, "composer.json"));
+
+        if (!fs.existsSync(dirName)) {
+            fs.mkdirSync(dirName, { mode: 0o777 });
+        }
 
         fs.writeFileSync(
             file.fsPath,
@@ -103,8 +111,8 @@ suite("Composer Tests", () =>
             '  "scripts":\n' +
             "  {\n" +
             '    "test1": "run -r test",\n' +
-            '    "test2": open -p tmp.txt,\n' +
-            '    "test3": "start -x 1 -y 2",\n' +
+            '    "test2": "open -p tmp.txt",\n' +
+            '    "test3": "start -x 1 -y 2"\n' +
             "  },\n" +
             '  "include": ["**/*"],\n' +
             '  "exclude": ["node_modules"]\n' +
@@ -112,9 +120,9 @@ suite("Composer Tests", () =>
         );
 
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache("composer", file);
-        let cTasks = await tasks.fetchTasks({ type: "composer" });
-        assert(cTasks.length === 5, "Did not read 5 composer tasks");
+        await teApi.explorerProvider?.invalidateTasksCache(testsName, file);
+        let cTasks = await tasks.fetchTasks({ type: testsName });
+        assert(cTasks && cTasks.length === 5, "Did not read 5 composer tasks");
 
         fs.unlinkSync(file.fsPath);
         fs.rmdirSync(dirName, {
@@ -122,8 +130,8 @@ suite("Composer Tests", () =>
         });
 
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache("composer", file);
-        cTasks = await tasks.fetchTasks({ type: "composer" });
+        await teApi.explorerProvider?.invalidateTasksCache(testsName, file);
+        cTasks = await tasks.fetchTasks({ type: testsName });
         assert(cTasks.length === 2, "Did not read 2 composer tasks");
     });
 
