@@ -1,5 +1,12 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.6.1 (January 23rd, 2022)
+
+### Bug Fixes
+
+- new bash glob patterns do not work
+- the new setting to disable animated icons broke context for running tasks
+
 ## Version 2.6.0 (January 22nd, 2022)
 
 ### Bug Fixes
