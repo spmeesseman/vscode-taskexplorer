@@ -31,7 +31,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
 
         const def = this.getDefaultDefinition(target, folder, uri);
         const cwd = path.dirname(uri.fsPath);
-        const args = [target];
+        const args = ["run-script", target];
         const options = { cwd };
         const execution = new ShellExecution(getCommand(folder, cmd), args, options);
 
