@@ -166,24 +166,20 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined, log
 }
 
 
-export async function buildCache(taskType: string, fileGlob: string, wsfolder?: WorkspaceFolder | undefined, setCacheBuilding = true, logPad = "")
+export async function buildCache(taskType: string, fileGlob: string, wsFolder?: WorkspaceFolder | undefined, setCacheBuilding = true, logPad = "")
 {
     const taskAlias = !util.isScriptType(taskType) ? taskType : "script";
 
     log.methodStart("build file cache", 2, logPad, true, [
-        [ "folder", !wsfolder ? "entire workspace" : wsfolder.name ], [ "task type", taskType ],
+        [ "folder", !wsFolder ? "entire workspace" : wsFolder.name ], [ "task type", taskType ],
         [ "task alias", taskAlias ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
     ]);
 
     if (!filesCache.get(taskAlias)) {
         filesCache.set(taskAlias, new Set());
     }
-    const fCache = filesCache.get(taskAlias),
-          dispTaskType = util.properCase(taskType);
-
-    if (!fCache || !dispTaskType) {
-        return;
-    }
+    const fCache = filesCache.get(taskAlias) as Set<ICacheItem>,
+          dispTaskType = util.properCase(taskType) as string;
 
     if (setCacheBuilding) {
         //
@@ -221,24 +217,24 @@ export async function buildCache(taskType: string, fileGlob: string, wsfolder?: 
     // TODO - Check the need for a cache clear on a task type
     // We do it above for Ant tasks when the file glob changes in settings (this is most definitely
     // needed for Ant tasks, but other tasks' globs can't change).
-    // I believe we should be doing a fCache.clear() here, I don't thik the buildTaskFolder/s()
-    // function chack object existence in the Set before inserting them.  Note calling clear()
+    // I believe we should be doing a fCache.clear() here, I don't think the buildTaskFolder/s()
+    // function check object existence in the Set before inserting them.  Note calling clear()
     // on the 'script' task alias won't work unless we have a unique set for each script type
     // e.g. batch, bash, etc.
     //
 
     //
-    // If 'wsfolder' if falsey, build the entire cache.  If truthy, build the cache for the
+    // If 'wsFolder' if falsey, build the entire cache.  If truthy, build the cache for the
     // specified folder only
     //
-    if (!wsfolder)
+    if (!wsFolder)
     {
         log.blank(1);
         log.write("   Build cache - Scan all projects for taskType '" + taskType + "' (" + dispTaskType + ")", 1, logPad);
         await buildFolderCaches(fCache, dispTaskType, fileGlob, statusBarSpace, setCacheBuilding, logPad + "   ");
     }
     else {
-        await buildFolderCache(fCache, wsfolder, dispTaskType, fileGlob, statusBarSpace, setCacheBuilding, logPad + "   ");
+        await buildFolderCache(fCache, wsFolder, dispTaskType, fileGlob, statusBarSpace, setCacheBuilding, logPad + "   ");
     }
 
     //
@@ -255,43 +251,34 @@ export async function buildCache(taskType: string, fileGlob: string, wsfolder?: 
 }
 
 
-async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskType: string, fileGlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean, logPad = "")
+async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskType: string, fileGlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean, logPad: string)
 {
-    if (cancel) {
-        cancelInternal(setCacheBuilding, statusBarSpace);
-        return;
-    }
-
     const logMsg = "Scan project " + folder.name + " for " + taskType + " tasks";
     log.methodStart(logMsg, 1, logPad, true);
     statusBarSpace.text = getStatusString("Scanning for " + taskType + " tasks in project " + folder.name, 65);
 
-    try {
-        const relativePattern = new RelativePattern(folder, fileGlob);
-        const paths = await workspace.findFiles(relativePattern, getExcludesPattern(folder));
-        for (const fPath of paths)
-        {
-            if (cancel) {
-                cancelInternal(setCacheBuilding, statusBarSpace);
-                return;
-            }
-            if (!util.isExcluded(fPath.path, "   ")) {
-                fCache.add({
-                    uri: fPath,
-                    folder
-                });
-                log.value("   Added to cache", fPath.fsPath, 3, logPad);
-            }
+    const relativePattern = new RelativePattern(folder, fileGlob);
+    const paths = await workspace.findFiles(relativePattern, getExcludesPattern(folder));
+    for (const fPath of paths)
+    {
+        if (cancel) {
+            cancelInternal(setCacheBuilding, statusBarSpace);
+            return;
         }
-    } catch (error) {
-        log.error(error.toString());
+        if (!util.isExcluded(fPath.path, "   ")) {
+            fCache.add({
+                uri: fPath,
+                folder
+            });
+            log.value("   Added to cache", fPath.fsPath, 3, logPad);
+        }
     }
 
     log.methodDone(logMsg, 1, logPad, true);
 }
 
 
-async function buildFolderCaches(fCache: Set<any>, taskType: string, fileGlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean, logPad = "")
+async function buildFolderCaches(fCache: Set<any>, taskType: string, fileGlob: string, statusBarSpace: StatusBarItem, setCacheBuilding: boolean, logPad: string)
 {
     if (workspace.workspaceFolders) // ensure workspace folders exist
     {
@@ -371,23 +358,19 @@ function getExcludesPattern(folder: string | WorkspaceFolder): RelativePattern
 
 function getStatusString(msg: string, statusLength = 0)
 {
-    if (msg)
+    if (statusLength > 0)
     {
-        if (statusLength > 0)
+        if (msg.length < statusLength)
         {
-            if (msg.length < statusLength)
-            {
-                for (let i = msg.length; i < statusLength; i++) {
-                    msg += " ";
-                }
-            }
-            else {
-                msg = msg.substring(0, statusLength - 3) + "...";
+            for (let i = msg.length; i < statusLength; i++) {
+                msg += " ";
             }
         }
-        return "$(loading~spin) " + msg;
+        else {
+            msg = msg.substring(0, statusLength - 3) + "...";
+        }
     }
-    return "";
+    return "$(loading~spin) " + msg;
 }
 
 

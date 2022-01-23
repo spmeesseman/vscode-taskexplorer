@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { execSync, exec } from "child_process";
 import * as path from "path";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { runTests } from "@vscode/test-electron";
@@ -37,7 +37,7 @@ async function main()
     }
     catch (err) {
         console.error(`Failed to run tests: ${err}\n${err.stack ?? "No call stack details found"}`);
-        console.log("restore package.json activation event");
+        console.log("restore package.json activation event after error");
         execSync("enable-full-coverage.sh --off", { cwd: "tools" });
         process.exit(1);
     }

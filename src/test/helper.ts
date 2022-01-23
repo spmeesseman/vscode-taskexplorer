@@ -181,14 +181,13 @@ export async function initSettings(enable = true)
     await configuration.update("debugLevel", 3);
     await configuration.updateWs("debug", true);
     await configuration.updateWs("debugLevel", 3);
-
+    await configuration.updateWs("autoRefresh", enable);
     await configuration.updateWs("useGulp", false);
     await configuration.updateWs("useAnt", false);
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("numLastTasks", 10);
     await configuration.updateWs("groupMaxLevel", 1);
     await configuration.updateWs("clickAction", "Open");
-
     //
     // Enabled all options, use workspace level so that running this test from Code itself
     // in development doesnt trigger the TaskExplorer instance installed in the dev IDE

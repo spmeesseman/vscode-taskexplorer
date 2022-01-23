@@ -7,12 +7,10 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
+import TaskItem from "../../tree/item";
 import { commands, ConfigurationTarget, tasks, workspace } from "vscode";
 import { configuration } from "../../common/configuration";
-import constants from "../../common/constants";
 import { TaskExplorerApi } from "../../extension";
-import TaskFile from "../../tree/file";
-import TaskItem from "../../tree/item";
 import { activate, findIdInTaskMap, isReady, sleep } from "../helper";
 
 
@@ -109,7 +107,6 @@ suite("Task Tests", () =>
             assert.fail("Unexpected NPM task count (Found " + taskCount + " of 4)");
         }
 
-        let npmRan = false;
         for (const map of taskMap)
         {
             const value = map[1];
@@ -125,23 +122,8 @@ suite("Task Tests", () =>
                 await executeTeCommand("runAudit", value.taskFile);
                 await sleep(500);
                 await executeTeCommand("runAuditFix", value.taskFile);
-                npmRan = true;
                 break;
             }
-        }
-        if (!npmRan) {
-            console.log("        ℹ Running npm install in local testing env");
-            // TODO - how to run with local test ran in vscode dev host?
-            // await executeTeCommand("runInstall", value.taskFile);
-            // const npmTasks = await tasks.fetchTasks({ type: "npm" });
-            // if (npmTasks)
-            // {
-            //     for (const npmTask of npmTasks)
-            //     {
-            //         console.log(npmTask.name);
-            //         await executeTeCommand("open", npmTask);
-            //     }
-            // }
         }
 
         await sleep(100);

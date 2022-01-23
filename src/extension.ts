@@ -136,13 +136,9 @@ export async function deactivate()
 }
 
 
-export async function removeWsFolder(wsf: readonly WorkspaceFolder[] | undefined, logPad = "")
+export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "")
 {
     log.methodStart("process remove workspace folder", 1, logPad, true);
-
-    if (!wsf) {
-        return;
-    }
 
     for (const f of wsf)
     {
@@ -359,7 +355,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     if (e.affectsConfiguration("terminal.integrated.shell.windows") ||
         e.affectsConfiguration("terminal.integrated.shell.linux") ||
-        e.affectsConfiguration("terminal.integrated.shell.macos")) {
+        e.affectsConfiguration("terminal.integrated.shell.osx")) {
         //
         // Script type task defs will change with terminal change
         //
@@ -374,7 +370,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     if (refresh) {
         await refreshTree();
     }
-    else if (refreshTaskTypes?.length > 0) {
+    else if (refreshTaskTypes.length > 0) {
         for (const t of refreshTaskTypes) {
             await refreshTree(t);
         }

@@ -7,14 +7,14 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder, WorkspaceEdit } from "vscode";
-import { removeFromArray } from "../../common/utils";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
+import constants from "../../common/constants";
+import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder, WorkspaceEdit } from "vscode";
+import { removeFromArray } from "../../common/utils";
 import { waitForCache } from "../../cache";
 import { addWsFolder, removeWsFolder, TaskExplorerApi } from "../../extension";
 import { configuration } from "../../common/configuration";
-import constants from "../../common/constants";
 import { activate, buildTree, findIdInTaskMap, sleep } from "../helper";
 
 
@@ -504,7 +504,7 @@ suite("Provider Tests", () =>
             }
         }
 
-        console.log("   Disable all task providers");
+        console.log("    Disable all task providers");
         await configuration.updateWs("enableAnt", false);
         await configuration.updateWs("enableAppPublisher", false);
         await configuration.updateWs("enableBash", false);
@@ -530,7 +530,7 @@ suite("Provider Tests", () =>
         await teApi.fileCache.addFolderToCache();
         await teApi.fileCache.addFolderToCache(workspace.workspaceFolders[0]);
 
-        console.log("   Re-enable all task providers");
+        console.log("    Re-enable all task providers");
         await configuration.updateWs("enableAnt", true);
         await configuration.updateWs("enableAppPublisher", true);
         await configuration.updateWs("enableBash", true);
@@ -658,7 +658,7 @@ suite("Provider Tests", () =>
     test("Add and remove a workspace folder", async function()
     {
         addWsFolder(workspace.workspaceFolders);
-        removeWsFolder(workspace.workspaceFolders);
+        removeWsFolder(workspace.workspaceFolders as WorkspaceFolder[]);
     });
 
 });

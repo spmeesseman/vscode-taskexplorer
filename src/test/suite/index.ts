@@ -23,6 +23,7 @@ const fileToTest = "*";
 // const fileToTest = "_api";
 // const fileToTest = "ant";
 // const fileToTest = "composer";
+// const fileToTest = "configuration";
 // const fileToTest = "providers";
 // const fileToTest = "tasks";
 // const fileToTest = "tree";

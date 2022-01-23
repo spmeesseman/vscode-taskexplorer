@@ -132,13 +132,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let addRemoved = false,
             index = 0;
         const renames: string[][] = configuration.get("renameSpecial", []),
-              id = util.getTaskItemId(taskItem);
+              id = util.getTaskItemId(taskItem) as string;
 
         log.methodStart("add/remove rename special", 1, "", false, [["id", id]]);
-
-        if (!id) {
-            return;
-        }
 
         for (const i in renames)
         {

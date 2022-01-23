@@ -6,7 +6,7 @@
 //
 import * as assert from "assert";
 import * as path from "path";
-import { Task, tasks, Uri, workspace, WorkspaceFolder } from "vscode";
+import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
 import { activate } from "../helper";
 import { TaskExplorerApi } from "../../extension";

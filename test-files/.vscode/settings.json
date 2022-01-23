@@ -3,5 +3,5 @@
     "taskExplorer.keepTermOnStop": false,
     "taskExplorer.clickAction": "Open",
     "taskExplorer.showLastTasks": false,
-    "taskExplorer.debug": false
+    "taskExplorer.debug": true
 }

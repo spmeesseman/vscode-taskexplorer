@@ -34,6 +34,7 @@ suite("API Init and Tests", () =>
         teApi.explorerProvider?.showSpecialTasks(true);
         teApi.explorerProvider?.showSpecialTasks(true, true);
         await teApi.explorerProvider?.refresh("tests");
+        await commands.executeCommand("taskExplorer.refresh");
         await initSettings();
     });
 

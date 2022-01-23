@@ -4,7 +4,6 @@
 import * as assert from "assert";
 import { TaskExplorerApi } from "../../extension";
 import { activate, initSettings, isReady } from "../helper";
-import TaskItem from "../../tree/item";
 import { configuration } from "../../common/configuration";
 
 
