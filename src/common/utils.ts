@@ -350,7 +350,7 @@ export function properCase(name: string | undefined)
 
 export function readFileSync(file: string)
 {
-    const buf = fs.readFileSync(file);
+    const buf = fs.readFileSync(path.resolve(process.cwd(), file));
     return (buf ? buf.toString() : "");
 }
 

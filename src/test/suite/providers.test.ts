@@ -161,14 +161,9 @@ suite("Provider Tests", () =>
             }
         }
 
-        if (dirName && ws2DirName && dirNameCode && dirNameIgn && dirNameL2)
+        if (dirName && ws2DirName && dirNameIgn && dirNameL2)
         {
             try {
-                if (!didCodeDirExist) {
-                    fs.rmdirSync(dirNameCode, {
-                        recursive: true
-                    });
-                }
                 fs.rmdirSync(ws2DirName, {
                     recursive: true
                 });
@@ -188,9 +183,8 @@ suite("Provider Tests", () =>
         }
 
         rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
-
         if (!rootPath) {
-            assert.fail("        ✘ Workspace folder does not exist");
+            assert.fail("   ✘ Workspace folder does not exist");
         }
 
         //

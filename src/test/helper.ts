@@ -2,11 +2,10 @@
 import * as cp from "child_process";
 import * as path from "path";
 import * as assert from "assert";
-import { CancellationToken, commands, ConfigurationTarget, extensions, QuickPickOptions, tasks, TreeItem, window, workspace, WorkspaceFolder } from "vscode";
-import { TaskExplorerApi } from "../extension";
 import TaskItem from "../tree/item";
+import { ConfigurationTarget, extensions, TreeItem, window, workspace } from "vscode";
+import { TaskExplorerApi } from "../extension";
 import { configuration } from "../common/configuration";
-import { TaskExplorerProvider } from "../providers/provider";
 import { waitForCache } from "../cache";
 
 
@@ -146,7 +145,7 @@ export async function buildTree(instance: any, waitTime?: number)
 
 export const getWsPath = (p: string) =>
 {
-	return path.normalize(path.resolve(__dirname, "../../../test-files", p));
+	return path.normalize(path.resolve(__dirname, "../../test-files", p));
 };
 
 
