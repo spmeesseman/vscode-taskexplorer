@@ -69,6 +69,8 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task | undefined
     {
+        log.methodStart("create script task", 2, "   ", false, [["target", target], ["cmd", cmd], ["path", uri.fsPath]]);
+
         let sep: string = (process.platform === "win32" ? "\\" : "/");
         const scriptDef = this.scriptTable[target?.toLowerCase()],
               cwd = path.dirname(uri.fsPath),
@@ -162,6 +164,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             exec = exec.replace(/\\/g, "/");
         }
 
+        log.methodDone("create script task", 2, "   ");
         //
         // Create the shell execution object and task
         //
