@@ -1,5 +1,11 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.6.2 (January 23rd, 2022)
+
+### Bug Fixes
+
+- composer tasks use an incorrect command when executed. [Fixes #166]
+
 ## Version 2.6.1 (January 23rd, 2022)
 
 ### Bug Fixes
