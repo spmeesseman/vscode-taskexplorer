@@ -21,7 +21,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
     }
 
 
-    public getDefaultDefinition(target: string | undefined, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string | undefined, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
         const def: TaskExplorerDefinition = {
             type: "maven",

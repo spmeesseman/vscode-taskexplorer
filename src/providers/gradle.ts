@@ -115,7 +115,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
         const def: TaskExplorerDefinition = {
             type: "gradle",

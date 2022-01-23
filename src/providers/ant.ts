@@ -250,7 +250,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
-    public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
         const def: TaskExplorerDefinition = {
             type: "ant",

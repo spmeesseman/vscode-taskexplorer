@@ -122,7 +122,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     }
 
 
-    public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
         const def: TaskExplorerDefinition = {
             type: "grunt",

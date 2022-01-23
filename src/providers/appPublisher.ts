@@ -21,7 +21,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
     }
 
 
-    public getDefaultDefinition(target: string | undefined, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string | undefined, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
         const def: TaskExplorerDefinition = {
             type: "app-publisher",

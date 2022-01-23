@@ -92,7 +92,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
     }
 
 
-    public getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
         const def: TaskExplorerDefinition = {
             type: "composer",
