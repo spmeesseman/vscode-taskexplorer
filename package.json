@@ -1750,7 +1750,7 @@
                     "title": "%config.taskExplorer.globPatternsAnt%",
                     "description": "%config.taskExplorer.globPatternsAntDsc%"
                 },
-                "taskExplorer.globsPatternsBash": {
+                "taskExplorer.globPatternsBash": {
                     "type": [
                         "array"
                     ],
