@@ -5,7 +5,7 @@ import { configuration } from "../common/configuration";
 import * as util from "../common/utils";
 import * as log from "../common/log";
 import TaskItem from "../tree/item";
-import { removeFileFromCache } from "../cache";
+import { filesCache, removeFileFromCache } from "../cache";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
@@ -61,6 +61,35 @@ export abstract class TaskExplorerProvider implements TaskProvider
     }
 
 
+    // public async readTasks(logPad: string): Promise<Task[]>
+    // {
+    //     const allTasks: Task[] = [];
+    //     const visitedFiles: Set<string> = new Set();
+    //     const paths = filesCache.get(this.providerName),
+    //           enabled = configuration.get<boolean>(util.getTaskEnabledSettingName(this.providerName));
+    //
+    //     log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["enabled", enabled]]);
+    //
+    //     if (enabled && paths)
+    //     {
+    //         for (const fObj of paths)
+    //         {
+    //             if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath)) {
+    //                 visitedFiles.add(fObj.uri.fsPath);
+    //                 const tasks = await this.readUriTasks(fObj.uri, logPad + "   ");
+    //                 log.write(`   processed ${this.providerName} file`, 3, logPad);
+    //                 log.value("      file", fObj.uri.fsPath, 3, logPad);
+    //                 log.value("      targets in file", tasks.length, 3, logPad);
+    //                 allTasks.push(...tasks);
+    //             }
+    //         }
+    //     }
+    //
+    //     log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [["# of tasks", allTasks.length]]);
+    //     return allTasks;
+    // }
+
+
     public resolveTask(_task: Task): Task | undefined
     {
         return undefined;
@@ -79,62 +108,56 @@ export abstract class TaskExplorerProvider implements TaskProvider
         }
         this.invalidating = true;
 
-        if (uri && this.cachedTasks)
+        if (this.cachedTasks)
         {
             const rmvTasks: Task[] = [];
 
-            for (const each of this.cachedTasks)
+            if (uri)
             {
-                const cstDef: TaskExplorerDefinition = each.definition;
-                if (cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath)))
-                {
-                    rmvTasks.push(each);
-                }
-            }
+                const pathExists = util.pathExists(uri.fsPath);
+                // this.cachedTasks.filter(t => t.definition.uri && (t.definition.uri.fsPath === uri.fsPath || !util.pathExists(t.definition.uri.fsPath))).forEach((t) =>
+                // {
+                //     rmvTasks.push(t);
+                // });
 
-            //
-            // TODO - Bug
-            // Technically this function can be called back into when waiting for a promise
-            // to return on the asncForEach() above, and cachedTask array can be set to undefined,
-            // this is happening with a broken await() somewere that I cannot find
-            //
-            if (this.cachedTasks)
-            {
+                for (const each of this.cachedTasks)
+                {
+                    const cstDef = each.definition;
+                    if (cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath)))
+                    {
+                        rmvTasks.push(each);
+                    }
+                }
+
                 for (const each of rmvTasks) {
                     log.write("   removing old task " + each.name, 2, logPad);
                     util.removeFromArray(this.cachedTasks, each);
                 }
 
-                if (util.pathExists(uri.fsPath) && util.existsInArray(configuration.get("exclude") || [], uri.path) === false)
+                if (pathExists && util.existsInArray(configuration.get("exclude", []), uri.path) === false)
                 {
                     const tasks = await this.readUriTasks(uri, logPad + "   ");
-                    this.cachedTasks?.push(...tasks);
+                    this.cachedTasks.push(...tasks);
                 }
-
-                if (!util.pathExists(uri.fsPath)) {
+                else if (!pathExists) {
                     await removeFileFromCache(this.providerName, uri, "   ");
                 }
 
-                if (this.cachedTasks?.length > 0)
-                {
-                    await this.processQueue();
-                    return;
-                }
+                this.cachedTasks = this.cachedTasks.length > 0 ? this.cachedTasks : undefined;
             }
-            else if (!util.pathExists(uri.fsPath)) {
-                await removeFileFromCache(this.providerName, uri, "   ");
+            else {
+                this.cachedTasks = undefined;
             }
         }
 
-        this.cachedTasks = undefined;
         log.methodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad);
+        this.invalidating = false;
         await this.processQueue();
     }
 
 
     private async processQueue()
     {
-        this.invalidating = false;
         if (this.queue.length > 0) {
             await this.invalidateTasksCache(this.queue.shift());
         }

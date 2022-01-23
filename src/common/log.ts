@@ -2,6 +2,7 @@
 
 import { configuration } from "./configuration";
 import { OutputChannel, ExtensionContext, commands, window } from "vscode";
+import { writeFileSync } from "fs";
 
 
 
@@ -21,7 +22,33 @@ export enum LogColor
 const logValueWhiteSpace = 40;
 let writeToConsole = false;
 let writeToConsoleLevel = 2;
+let writeToFile = false;
+let writeToFileLevel = 2;
 let logOutputChannel: OutputChannel | undefined;
+
+
+export function blank(level?: number)
+{
+    write("", level);
+}
+
+
+export function error(msg: string | string[])
+{
+    if (isLoggingEnabled())
+    {
+        write("***");
+        if (typeof msg === "string") {
+            write("*** " + msg);
+        }
+        else {
+            for (const m of msg) {
+                write("*** " + m);
+            }
+        }
+        write("***");
+    }
+}
 
 
 export function initLog(settingGrpName: string, dispName: string, context: ExtensionContext, showLog?: boolean)
@@ -88,47 +115,16 @@ export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?
 }
 
 
-export function write(msg: string, level?: number, logPad = "", color?: LogColor)
+export function setWriteToFile(set: boolean, level = 2)
 {
-    if (isLoggingEnabled())
-    {
-        // if (color) {
-        //     msg = color + msg + LogColor.white;
-        // }
-        const tsMsg = new Date().toISOString().replace(/[TZ]/g, " ") + logPad + msg;
-        if (logOutputChannel && (!level || level <= (configuration.get<number>("debugLevel") || -1))) {
-            logOutputChannel.appendLine(tsMsg);
-        }
-        if (writeToConsole) {
-            if (!level || level <= writeToConsoleLevel) {
-                console.log(tsMsg);
-            }
-        }
-    }
+    writeToFile = set;
+    writeToFileLevel = level;
 }
 
-
-export function blank(level?: number)
+export function setWriteToConsole(set: boolean, level = 2)
 {
-    write("", level);
-}
-
-
-export function error(msg: string | string[])
-{
-    if (isLoggingEnabled())
-    {
-        write("***");
-        if (typeof msg === "string") {
-            write("*** " + msg);
-        }
-        else {
-            for (const m of msg) {
-                write("*** " + m);
-            }
-        }
-        write("***");
-    }
+    writeToConsole = set;
+    writeToConsoleLevel = level;
 }
 
 
@@ -172,8 +168,26 @@ export function values(level: number, logPad: string, params: any | (string|any)
 }
 
 
-export function setWriteToConsole(set: boolean, level = 2)
+export function write(msg: string, level?: number, logPad = "", color?: LogColor)
 {
-    writeToConsole = set;
-    writeToConsoleLevel = level;
+    if (isLoggingEnabled())
+    {
+        // if (color) {
+        //     msg = color + msg + LogColor.white;
+        // }
+        const tsMsg = new Date().toISOString().replace(/[TZ]/g, " ") + logPad + msg;
+        if (logOutputChannel && (!level || level <= (configuration.get<number>("debugLevel") || -1))) {
+            logOutputChannel.appendLine(tsMsg);
+        }
+        if (writeToConsole) {
+            if (!level || level <= writeToConsoleLevel) {
+                console.log(tsMsg);
+            }
+        }
+        if (writeToFile) {
+            if (!level || level <= writeToFileLevel) {
+                writeFileSync("taskexplorer.log", tsMsg);
+            }
+        }
+    }
 }

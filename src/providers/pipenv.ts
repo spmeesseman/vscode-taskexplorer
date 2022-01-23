@@ -46,13 +46,14 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public async readTasks(logPad: string): Promise<Task[]>
     {
-        log.methodStart("detect pipenv Pipfile files", 1, logPad, true);
-
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
-        const paths = filesCache.get("pipenv");
+        const paths = filesCache.get(this.providerName),
+              enabled = configuration.get<boolean>(util.getTaskEnabledSettingName(this.providerName));
 
-        if (workspace.workspaceFolders && paths)
+        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["enabled", enabled]]);
+
+        if (enabled && paths)
         {
             for (const obj of paths)
             {
@@ -60,7 +61,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
                 {
                     visitedFiles.add(obj.uri.fsPath);
                     const tasks = await this.readUriTasks(obj.uri, logPad + "   ");
-                    log.write("   processed pipenv Pipfile file", 3, logPad);
+                    log.write(`   processed ${this.providerName} file`, 3, logPad);
                     log.value("      file", obj.uri.fsPath, 3, logPad);
                     log.value("      targets in file", tasks.length, 3, logPad);
                     allTasks.push(...tasks);
@@ -68,8 +69,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
             }
         }
 
-        log.value("   # of tasks", allTasks.length, 2, logPad);
-        log.methodDone("detect pipenv Pipfile files", 1, logPad, true);
+        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [["# of tasks", allTasks.length]]);
         return allTasks;
     }
 

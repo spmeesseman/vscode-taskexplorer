@@ -71,19 +71,22 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     {
         log.methodStart("create script task", 2, "   ", false, [["target", target], ["cmd", cmd], ["path", uri.fsPath]]);
 
-        let sep: string = (process.platform === "win32" ? "\\" : "/");
-        const scriptDef = this.scriptTable[target?.toLowerCase()],
+        const extension = target.toLowerCase(),
+              scriptDef = this.scriptTable[extension],
               cwd = path.dirname(uri.fsPath),
-              fileName = path.basename(uri.fsPath),
               def = this.getDefaultDefinition(target, folder, uri),
               options: ShellExecutionOptions = { cwd },
               args: string[] = [];
-        let isWinShell = false,
-            exec: string = scriptDef.exec;
 
-        if (!scriptDef) {
+        if (!def) {
+            log.error(`Script extension type ${target} not found in mapping`);
             return;
         }
+
+        let isWinShell = false,
+            exec: string = scriptDef.exec,
+            fileName = path.basename(uri.fsPath),
+            sep: string = (process.platform === "win32" ? "\\" : "/");
 
         //
         // If the default terminal cmd/powershell?  On linux and darwin, no, on windows, maybe...
@@ -140,12 +143,15 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             //
             args.push(scriptDef.type !== "powershell" ? fileName : fileNamePathPre);
         }
+
         //
         // For python setup.py scripts, use the bdist_egg argument - the egg will be built and stored
         // at dist/PackageName-Version.egg
         //
-        if (scriptDef.type === "python") {
+        if (scriptDef.type === "python" && fileName.toLowerCase() === "setup.py")
+        {
             args.push("bdist_egg");
+            fileName = "build egg";
         }
 
         //
@@ -164,26 +170,36 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             exec = exec.replace(/\\/g, "/");
         }
 
+        //
+        // TODO - match a problem matcher to script type
+        //
+        const problemMatcher = "$msCompile";
+
+
         log.methodDone("create script task", 2, "   ");
         //
         // Create the shell execution object and task
         //
         const execution = new ShellExecution(exec, args, options);
-        return new Task(def, folder, scriptDef.type !== "python" ? fileName : "build egg", scriptDef.type, execution, "$msCompile");
+        return new Task(def, folder, fileName, scriptDef.type, execution, problemMatcher);
     }
 
 
-    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition | undefined
     {
         const tgt = target?.toLowerCase(),
               scriptDef = this.scriptTable[tgt],
               fileName = path.basename(uri.fsPath);
 
+        if (!scriptDef) {
+            return;
+        }
+
         const def: TaskExplorerDefinition = {
             type: "script",
-            script: target?.toLowerCase(),
+            script: target.toLowerCase(),
             target: tgt,
-            scriptType: scriptDef?.type || "unknown",
+            scriptType: scriptDef.type || "unknown",
             fileName,
             scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
             path: util.getRelativePath(folder, uri),
@@ -206,7 +222,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number
+    public getDocumentPosition(): number
     {
         return 0;
     }
@@ -214,31 +230,28 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public async readTasks(logPad: string): Promise<Task[]>
     {
-        log.methodStart("detect script files", 1, logPad, true);
+        const allTasks: Task[] = [],
+              visitedFiles: Set<string> = new Set(),
+              paths = filesCache.get(this.providerName) || new Set();
 
-        const allTasks: Task[] = [];
-        const visitedFiles: Set<string> = new Set();
-        const paths = filesCache.get("script");
+        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["path", paths.size]]);
 
-        if (workspace.workspaceFolders && paths)
+        for (const fObj of paths)
         {
-            for (const fObj of paths)
+            if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
             {
-                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
+                visitedFiles.add(fObj.uri.fsPath);
+                const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri);
+                if (task && configuration.get<boolean>(util.getTaskEnabledSettingName(task.source)))
                 {
-                    visitedFiles.add(fObj.uri.fsPath);
-                    const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri);
-                    if (task) {
-                        allTasks.push(task);
-                        log.write("   found script target/file", 3, logPad);
-                        log.value("      script file", fObj.uri.fsPath, 3, logPad);
-                    }
+                    allTasks.push(task);
+                    log.write(`   processed ${this.providerName} file`, 3, logPad);
+                    log.value("      script file", fObj.uri.fsPath, 3, logPad);
                 }
             }
         }
 
-        log.value("   # of tasks", allTasks.length, 2, logPad);
-        log.methodDone("detect script files", 1, logPad, true);
+        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [["# of tasks", allTasks.length]]);
         return allTasks;
     }
 

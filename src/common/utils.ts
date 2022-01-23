@@ -240,7 +240,7 @@ export function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
 }
 
 
-export function getScriptProviderType(source: string): string
+export function getTaskProviderType(source: string): string
 {
     if (isScriptType(source)) {
         return "script";
@@ -254,6 +254,12 @@ export function getTaskItemId(taskItem: TaskItem)
     return taskItem.id?.replace(constants.LAST_TASKS_LABEL + ":", "")
                        .replace(constants.FAV_TASKS_LABEL + ":", "")
                        .replace(constants.USER_TASKS_LABEL + ":", "");
+}
+
+
+export function getTaskEnabledSettingName(taskType: string)
+{
+    return "enable" + (taskType !== "app-publisher" ? properCase(taskType) : "AppPublisher");
 }
 
 

@@ -66,27 +66,30 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
     public async readTasks(logPad: string): Promise<Task[]>
     {
-        log.methodStart("detect ant files", 1, logPad, true);
-
         const allTasks: Task[] = [],
               visitedFiles: Set<string> = new Set(),
-              paths = filesCache.get("ant") || [];
+              paths = filesCache.get(this.providerName),
+              enabled = configuration.get<boolean>(util.getTaskEnabledSettingName(this.providerName));
 
-        for (const fObj of paths)
+        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["enabled", enabled]]);
+
+        if (enabled && paths)
         {
-            if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
+            for (const fObj of paths)
             {
-                visitedFiles.add(fObj.uri.fsPath);
-                const tasks = await this.readUriTasks(fObj.uri, logPad + "   ");
-                log.write("   processed ant file", 3, logPad);
-                log.value("      file", fObj.uri.fsPath, 3, logPad);
-                log.value("      targets in file", tasks.length, 3, logPad);
-                allTasks.push(...tasks);
+                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
+                {
+                    visitedFiles.add(fObj.uri.fsPath);
+                    const tasks = await this.readUriTasks(fObj.uri, logPad + "   ");
+                    log.write("   processed ant file", 3, logPad);
+                    log.value("      file", fObj.uri.fsPath, 3, logPad);
+                    log.value("      targets in file", tasks.length, 3, logPad);
+                    allTasks.push(...tasks);
+                }
             }
         }
 
-        log.value("   # of tasks", allTasks.length, 2, logPad);
-        log.methodDone("detect ant files", 1, logPad, true);
+        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [["# of tasks", allTasks.length]]);
         return allTasks;
     }
 
