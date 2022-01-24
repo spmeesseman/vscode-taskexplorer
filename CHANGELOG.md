@@ -1,5 +1,19 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.6.3 (January 24th, 2022)
+
+### Bug Fixes
+
+- **Providers:** custom parser throws exception on invalid file
+- **Providers:** ant-program parser does not work
+- **Api:** using the 'stop' command on a detached task throws unhandled exception
+- **Tree:** deleting a folder from outside VSCode while  open causes tree to break
+
+### Refactoring
+
+- **General:** use internal storage as opposed to vscode setting for storing custom task labels
+- **Providers:** add check for ignore in ReadTask
+
 ## Version 2.6.2 (January 23rd, 2022)
 
 ### Bug Fixes
