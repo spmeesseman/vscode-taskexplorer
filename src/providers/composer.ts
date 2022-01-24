@@ -4,7 +4,7 @@ import * as path from "path";
 import * as util from "../common/utils";
 import * as log from "../common/log";
 import { configuration } from "../common/configuration";
-import { filesCache, removeFileFromCache } from "../cache";
+import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../taskDefinition";
 
@@ -52,7 +52,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
         {
             for (const fObj of paths)
             {
-                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
+                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
                 {
                     visitedFiles.add(fObj.uri.fsPath);
                     const tasks = await this.readUriTasks(fObj.uri, logPad + "   ");

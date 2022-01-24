@@ -57,7 +57,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
         {
             for (const obj of paths)
             {
-                if (!util.isExcluded(obj.uri.path) && !visitedFiles.has(obj.uri.fsPath))
+                if (!util.isExcluded(obj.uri.path) && !visitedFiles.has(obj.uri.fsPath) && util.pathExists(obj.uri.fsPath))
                 {
                     visitedFiles.add(obj.uri.fsPath);
                     const tasks = await this.readUriTasks(obj.uri, logPad + "   ");

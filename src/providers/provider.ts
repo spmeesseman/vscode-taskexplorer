@@ -1,11 +1,9 @@
 
-import { Uri, Task, WorkspaceFolder, workspace, TaskProvider } from "vscode";
-import { TaskExplorerDefinition } from "../taskDefinition";
+import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { configuration } from "../common/configuration";
 import * as util from "../common/utils";
 import * as log from "../common/log";
-import TaskItem from "../tree/item";
-import { filesCache, removeFileFromCache } from "../cache";
+import { removeFileFromCache } from "../cache";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
@@ -53,10 +51,10 @@ export abstract class TaskExplorerProvider implements TaskProvider
     public async provideTasks()
     {
         log.methodStart(`provide ${this.providerName} tasks`, 1, "", true);
-
         if (!this.cachedTasks) {
             this.cachedTasks = await this.readTasks("   ");
         }
+        log.methodDone(`provide ${this.providerName} tasks`, 1, "", true);
         return this.cachedTasks;
     }
 
@@ -115,10 +113,6 @@ export abstract class TaskExplorerProvider implements TaskProvider
             if (uri)
             {
                 const pathExists = util.pathExists(uri.fsPath);
-                // this.cachedTasks.filter(t => t.definition.uri && (t.definition.uri.fsPath === uri.fsPath || !util.pathExists(t.definition.uri.fsPath))).forEach((t) =>
-                // {
-                //     rmvTasks.push(t);
-                // });
 
                 for (const each of this.cachedTasks)
                 {
@@ -129,7 +123,8 @@ export abstract class TaskExplorerProvider implements TaskProvider
                     }
                 }
 
-                for (const each of rmvTasks) {
+                for (const each of rmvTasks)
+                {
                     log.write("   removing old task " + each.name, 2, logPad);
                     util.removeFromArray(this.cachedTasks, each);
                 }

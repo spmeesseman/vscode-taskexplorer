@@ -189,7 +189,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         {
             for (const fObj of paths)
             {
-                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
+                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
                 {
                     visitedFiles.add(fObj.uri.fsPath);
                     const tasks = await this.readUriTasks(fObj.uri, logPad + "   ");

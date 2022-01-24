@@ -232,21 +232,24 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     {
         const allTasks: Task[] = [],
               visitedFiles: Set<string> = new Set(),
-              paths = filesCache.get(this.providerName) || new Set();
+              paths = filesCache.get(this.providerName);
 
-        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["path", paths.size]]);
+        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["path", paths ? paths.size : 0]]);
 
-        for (const fObj of paths)
+        if (paths)
         {
-            if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath))
+            for (const fObj of paths)
             {
-                visitedFiles.add(fObj.uri.fsPath);
-                const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri);
-                if (task && configuration.get<boolean>(util.getTaskEnabledSettingName(task.source)))
+                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
                 {
-                    allTasks.push(task);
-                    log.write(`   processed ${this.providerName} file`, 3, logPad);
-                    log.value("      script file", fObj.uri.fsPath, 3, logPad);
+                    visitedFiles.add(fObj.uri.fsPath);
+                    const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri);
+                    if (task && configuration.get<boolean>(util.getTaskEnabledSettingName(task.source)))
+                    {
+                        allTasks.push(task);
+                        log.write(`   processed ${this.providerName} file`, 3, logPad);
+                        log.value("      script file", fObj.uri.fsPath, 3, logPad);
+                    }
                 }
             }
         }

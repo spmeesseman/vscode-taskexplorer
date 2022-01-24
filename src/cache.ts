@@ -5,6 +5,8 @@ import * as util from "./common/utils";
 import * as log from "./common/log";
 import constants from "./common/constants";
 import { configuration } from "./common/configuration";
+import { dirname } from "path";
+import { lstatSync } from "fs";
 
 let cacheBuilding = false;
 let folderCaching = false;
@@ -385,31 +387,26 @@ export async function rebuildCache(logPad = "")
 
 export async function removeFileFromCache(taskAlias: string, uri: Uri, logPad = "")
 {
-    log.blank(1);
+    const itemCache = filesCache.get(taskAlias),
+          toRemove = [];
+
     log.write("remove file from cache", 1, logPad);
     log.value("   task type", taskAlias, 2, logPad);
     log.value("   file", uri.fsPath, 2, logPad);
 
-    if (!filesCache.get(taskAlias)) {
-        return;
-    }
-
-    const taskCache = filesCache.get(taskAlias);
-    const toRemove = [];
-
-    if (taskCache)
+    if (itemCache)
     {
-        for (const item of taskCache)
+        log.value("   cache size", itemCache.size, 2, logPad);
+
+        for (const item of itemCache)
         {
-            if (item.uri.fsPath === uri.fsPath) {
+            if (item.uri.fsPath === uri.fsPath || !util.pathExists(item.uri.path))
+            {
                 toRemove.push(item);
             }
         }
-
-        if (toRemove.length > 0) {
-            for (const tr of toRemove) {
-                taskCache.delete(tr);
-            }
+        for (const tr of toRemove) {
+            itemCache.delete(tr);
         }
     }
 }
