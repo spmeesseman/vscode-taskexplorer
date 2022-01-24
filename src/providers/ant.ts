@@ -76,7 +76,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         //
         if (useAnt === true)
         {
-            this.findTasksWithAnt(scripts);
+            this.findTasksWithAnt(path, scripts);
         }
         else {
             await this.findTasksWithXml2Js(path, scripts);
@@ -109,7 +109,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
-    private findTasksWithAnt(scripts: StringMap)
+    private findTasksWithAnt(path: string, scripts: StringMap)
     {
         let stdout: Buffer;
 
@@ -137,9 +137,11 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         //     Default target: G64
         //
         try {
+console.log("1: " + this.getCommand() + " -f " + path + " -p");
             stdout = execSync(this.getCommand() + " -f " + path + " -p");
         }
         catch (ex) {
+console.log(ex.toString());
             this.logException(ex);
             return;
         }
