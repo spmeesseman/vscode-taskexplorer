@@ -557,8 +557,8 @@ suite("Provider Tests", () =>
 
     test("Add and remove a workspace folder", async function()
     {
-        //addWsFolder(workspace.workspaceFolders);
-        //removeWsFolder((workspace.workspaceFolders as WorkspaceFolder[]).filter(f =>  f.index > 0));
+        addWsFolder(workspace.workspaceFolders);
+        removeWsFolder((workspace.workspaceFolders as WorkspaceFolder[]).filter(f =>  f.index > 0));
     });
 
 });

@@ -109,8 +109,8 @@ suite("Python Tests", () =>
 
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName, file);
-        // let cTasks = await tasks.fetchTasks({ type: testsName });
-        // assert(cTasks && cTasks.length === 2, "Did not read 2 python tasks");
+        let cTasks = await tasks.fetchTasks({ type: "script" });
+        assert(cTasks && cTasks.filter(t => t.source === testsName).length === 3, "Did not read 3 python tasks");
 
         fs.unlinkSync(file.fsPath);
         fs.rmdirSync(dirName, {
@@ -119,8 +119,8 @@ suite("Python Tests", () =>
 
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName, file);
-        // cTasks = await tasks.fetchTasks({ type: testsName });
-        // assert(cTasks.length === 1, "Did not read 2 python tasks");
+        cTasks = await tasks.fetchTasks({ type: "script" });
+        assert(cTasks && cTasks.filter(t => t.source === testsName).length === 2, "Did not read 2 python tasks");
     });
 
 });

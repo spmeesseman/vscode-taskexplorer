@@ -30,11 +30,11 @@ suite("Task Tests", () =>
         //
         // Scan task tree using internal explorer scanner fn
         //
-        taskMap = await teApi.explorerProvider?.getTaskItems(undefined) as Map<string, TaskItem>;
+        taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ") as Map<string, TaskItem>;
     });
 
 
-    test("Run, pause, open, and stop tasks", async function()
+    test("Bash / Batch", async function()
     {
         let ranBash = 0, ranBatch = 0,
             lastTask: TaskItem | null = null;
@@ -47,6 +47,7 @@ suite("Task Tests", () =>
         for (const map of taskMap)
         {
             const value = map[1];
+
             if (value && value.taskSource === "batch")
             {
                 console.log("Run batch task: " + value.label);
@@ -67,9 +68,9 @@ suite("Task Tests", () =>
 
         assert(ranBash >= 1 && ranBatch >= 2, "# of tasks expected did not run");
         //
-        // Wait for any missed running tasks
+        // Wait for any missed running tasks (5 seconds worth of timeouts in test scripts)
         //
-        await sleep(2500);
+        await sleep(5000);
     });
 
 
@@ -94,7 +95,7 @@ suite("Task Tests", () =>
         const npmTasks = await tasks.fetchTasks({ type: "npm" });
         assert(npmTasks.length > 0, "No npm tasks registered");
 
-        taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
+        taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ") as Map<string, TaskItem>;
 
         //
         // We just wont check NPM files.  If the vascode engine isnt fast enough to
@@ -112,15 +113,11 @@ suite("Task Tests", () =>
             if (value && value.taskSource === "npm")
             {
                 // await executeTeCommand("open", value);
-                await executeTeCommand("runInstall", value.taskFile);
-                await sleep(500);
-                await executeTeCommand("runUpdate", value.taskFile);
-                await sleep(500);
-                await executeTeCommand("runUpdatePackage", value.taskFile, "@spmeesseman/app-publisher");
-                await sleep(500);
-                await executeTeCommand("runAudit", value.taskFile);
-                await sleep(500);
-                await executeTeCommand("runAuditFix", value.taskFile);
+                await executeTeCommand("runInstall", 500, value.taskFile);
+                await executeTeCommand("runUpdate", 500, value.taskFile);
+                await executeTeCommand("runUpdatePackage", 500, value.taskFile, "@spmeesseman/app-publisher");
+                await executeTeCommand("runAudit", 500, value.taskFile);
+                await executeTeCommand("runAuditFix", 0, value.taskFile);
                 break;
             }
         }
@@ -141,10 +138,11 @@ suite("Task Tests", () =>
 });
 
 
-async function executeTeCommand(command: string, ...args: any[])
+async function executeTeCommand(command: string, timeout: number, ...args: any[])
 {
     try {
         await commands.executeCommand(`taskExplorer.${command}`, ...args);
+        if (timeout) { await sleep(timeout); }
     }
     catch (e) { console.log("✘ " + e.toString().substring(0, e.toString().indexOf("\n"))); }
 }
@@ -152,78 +150,53 @@ async function executeTeCommand(command: string, ...args: any[])
 
 async function runTask(value: TaskItem, lastTask: TaskItem | null)
 {
+    await configuration.updateWs("clickAction", "Execute");
+
+    await executeTeCommand("addRemoveFromFavorites", 0, value);
+    await executeTeCommand("addRemoveCustomLabel", 0, value, "test label");
+
+    if (lastTask) {
+        await executeTeCommand("openTerminal", 0, lastTask);
+    }
+
     if (value.taskSource !== "bash")
     {
-        if (lastTask)
-        {
-            await executeTeCommand("open", value);
-            await executeTeCommand("addRemoveFromFavorites", value);
-            await configuration.updateWs("keepTermOnStop", true);
-            await configuration.updateWs("clickAction", "Execute");
-            await executeTeCommand("run", lastTask);
-            await sleep(1000);
-            await configuration.updateWs("clickAction", "Open");
-            await executeTeCommand("pause", value);
-            await sleep(1000);
-            await executeTeCommand("run", value);
-            await sleep(1000);
-            await executeTeCommand("stop", value);
-            //
-            // Cover code that removes a "Last Task" if it was removed
-            //
-            value.taskFile.removeTreeNode(value);
-            await executeTeCommand("runLastTask");
-            await executeTeCommand("stop", value);
-            value.taskFile.addTreeNode(value); // remove fav coverage
-        }
         await configuration.updateWs("keepTermOnStop", false);
-        await executeTeCommand("addRemoveFromFavorites", value);
-        await executeTeCommand("addRemoveCustomLabel", value, "test label");
-        await executeTeCommand("addRemoveCustomLabel", value);
-        await executeTeCommand("open", value);
-        await executeTeCommand("runWithArgs", value, "--test --test2");
-        await sleep(250);
-        await executeTeCommand("stop", value);
+        await executeTeCommand("open", 50, value);
+        await executeTeCommand("runWithArgs", 2500, value, "--test --test2");
+        await executeTeCommand("stop", 0, value);
         await configuration.updateWs("keepTermOnStop", true);
-        await executeTeCommand("run", value);
-        await sleep(250);
-        await executeTeCommand("pause", value);
-        await configuration.updateWs("clickAction", "Execute");
-        await executeTeCommand("run", value);
+        await executeTeCommand("run", 2500, value);
+        await executeTeCommand("pause", 1000, value);
+        await executeTeCommand("run", 500, value);
         await configuration.updateWs("clickAction", "Open");
-        await sleep(250);
-        await executeTeCommand("openTerminal", value);
-        await executeTeCommand("pause", value);
-        await sleep(250);
-        await executeTeCommand("stop", value);
-        await executeTeCommand("runLastTask", value);
-        await sleep(250);
+        await executeTeCommand("run", 500, value);
+        await configuration.updateWs("clickAction", "Execute");
+        await executeTeCommand("openTerminal", 0, value);
+        await executeTeCommand("pause", 1000, value);
+        await executeTeCommand("stop", 0, value);
+        await executeTeCommand("runLastTask", 1500, value);
         await configuration.updateWs("keepTermOnStop", false);
-        await executeTeCommand("restart", value);
-        await sleep(250);
-        await executeTeCommand("stop", value);
-        await executeTeCommand("runNoTerm", value);
-        await sleep(250);
-        await executeTeCommand("stop", value);
-        await executeTeCommand("addRemoveFromFavorites", value); // remove fav coverage
+        await executeTeCommand("restart", 2500, value);
+        await executeTeCommand("stop", 500, value);
+        await executeTeCommand("runNoTerm", 2500, value);
+        await executeTeCommand("stop", 0, value);
     }
     else
     {
-        if (lastTask) {
-            await executeTeCommand("openTerminal", lastTask);
-        }
-        await executeTeCommand("addRemoveFromFavorites", value);
-        await executeTeCommand("run", value);
-        await sleep(1000);
+        await executeTeCommand("run", 2000, value);
+        await executeTeCommand("stop", 0, value);
         await workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                     "bash.exe", ConfigurationTarget.Workspace);
-        await executeTeCommand("run", value);
-        await sleep(1000);
+        await executeTeCommand("run", 2000, value);
+        await executeTeCommand("stop", 1000, value);
         await workspace.getConfiguration().update("terminal.integrated.shell.windows",
                                                     "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
         await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
         await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
-        await executeTeCommand("addRemoveFromFavorites", value);
-        await executeTeCommand("openTerminal", value);
     }
+
+    await executeTeCommand("openTerminal", 0, value);
+    await executeTeCommand("addRemoveCustomLabel", 0, value);
+    await executeTeCommand("addRemoveFromFavorites", 0, value);
 }

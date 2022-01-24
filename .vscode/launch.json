@@ -6,76 +6,76 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch w Root",
+            "name": "Launch (TSC)(Project Root)",
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "npm: watch",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ],
             "args": [
                 "--disable-extensions",
                 "--disable-workspace-trust",
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "${workspaceRoot}"
-            ],
-            "stopOnEntry": false,
-            "sourceMaps": true,
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ],
-            "preLaunchTask": "npm: watch"
+            ]
         },
         {
-            "name": "Launch (TSC)",
+            "name": "Launch (TSC)(TestFixture Root)",
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "npm: watch",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ],
             "args": [
 				"--disable-extensions",
                 "--disable-workspace-trust",
 				"--extensionDevelopmentPath=${workspaceFolder}",
 				"${workspaceFolder}/test-files"
-			],
-            "stopOnEntry": false,
-            "sourceMaps": true,
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ],
-            "preLaunchTask": "npm: watch"
+			]
         },
         {
 			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch (Webpack)",
+			"name": "Launch (Webpack)(TestFixture Root)",
 			"runtimeExecutable": "${execPath}",
+			"outFiles": ["${workspaceRoot}/dist/client/**/*.js"],
+			"stopOnEntry": false,
+            "sourceMaps": true,
+			"preLaunchTask": "npm: webpack-watch",
 			"args": [
 				"--disable-extensions",
                 "--disable-workspace-trust",
 				"--extensionDevelopmentPath=${workspaceRoot}",
 				"${workspaceFolder}/test-files"
-			],
-			"outFiles": ["${workspaceRoot}/dist/client/**/*.js"],
-			"stopOnEntry": false,
-            "sourceMaps": true,
-			"preLaunchTask": "npm: webpack-watch"
+			]
 		},
         {
             "name": "Launch Tests",
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "npm: test:before",
+            "postDebugTask": "npm: test:after",
+            "outFiles": [
+                "${workspaceFolder}/dist/test/**/*.js"
+            ],
             "args": [
                 "${workspaceFolder}/dist/test",
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "--extensionTestsPath=${workspaceFolder}/dist/test",
                 "--disable-extensions",
                 "--disable-workspace-trust"
-            ],
-            "stopOnEntry": false,
-            "sourceMaps": true,
-            "outFiles": [
-                "${workspaceFolder}/dist/test/**/*.js"
-            ],
-            "preLaunchTask": "npm: test:before",
-            "postDebugTask": "npm: test:after"
+            ]
         }
     ]
 }

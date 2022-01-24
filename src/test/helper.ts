@@ -129,15 +129,21 @@ export async function cleanup()
     deactivate();
 
     if (fs.existsSync(settingsFile)) {
-        fs.unlinkSync(settingsFile);
+        try {
+            fs.unlinkSync(settingsFile);
+        } catch {}
     }
     if (fs.existsSync(tasksFile)) {
-        fs.unlinkSync(tasksFile);
+        try {
+            fs.unlinkSync(tasksFile);
+        } catch {}
     }
     if (fs.existsSync(dirNameCode)) {
-        fs.rmdirSync(dirNameCode, {
-            recursive: true
-        });
+        try {
+            fs.rmdirSync(dirNameCode, {
+                recursive: true
+            });
+        } catch {}
     }
 }
 
@@ -213,7 +219,7 @@ export async function initSettings(enable = true)
     // Set misc settings, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("includeAnt", ["**/test.xml", "**/emptytarget.xml", "**/emtyproject.xml", "**/hello.xml"]);
+    await configuration.updateWs("includeAnt", ["**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml"]);
     // Use update() here for coverage, since these two settings wont trigger any processing
     await configuration.update("debug", true);
     await configuration.update("debugLevel", 3);
