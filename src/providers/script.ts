@@ -265,12 +265,9 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
-        const folder = workspace.getWorkspaceFolder(uri);
-        log.methodStart("read script file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
-        let task: Task | undefined;
-        if (folder) {
-            task = this.createTask(path.extname(uri.fsPath).substring(1), undefined, folder, uri);
-        }
+        const folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
+        log.methodStart("read script file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
+        const task = this.createTask(path.extname(uri.fsPath).substring(1), undefined, folder, uri);
         log.methodDone("read script file uri task", 1, logPad, true);
         return task ? [ task ] : [];
     }

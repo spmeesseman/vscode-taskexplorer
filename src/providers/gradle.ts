@@ -108,23 +108,17 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
-        const result: Task[] = [];
-        const folder = workspace.getWorkspaceFolder(uri);
+        const result: Task[] = [],
+              folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read gradle file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
+        log.methodStart("read gradle file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
 
-        if (folder)
+        const scripts = this.findTargets(uri.fsPath, logPad + "   ");
+        for (const s of scripts)
         {
-            const scripts = this.findTargets(uri.fsPath, logPad + "   ");
-            if (scripts)
-            {
-                for (const s of scripts)
-                {
-                    const task = this.createTask(s, s, folder, uri);
-                    task.group = TaskGroup.Build;
-                    result.push(task);
-                }
-            }
+            const task = this.createTask(s, s, folder, uri);
+            task.group = TaskGroup.Build;
+            result.push(task);
         }
 
         log.methodDone("read gradle file uri task", 1, logPad, true);

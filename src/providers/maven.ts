@@ -56,16 +56,11 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const cwd = path.dirname(uri.fsPath),
-              folder = workspace.getWorkspaceFolder(uri);
-
-        if (!folder) {
-            return [];
-        }
-
-        const defaultDef = this.getDefaultDefinition(undefined, folder, uri),
+              folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
+              defaultDef = this.getDefaultDefinition(undefined, folder, uri),
               options: ShellExecutionOptions = { cwd };
 
-        log.methodStart("read maven file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
+        log.methodStart("read maven file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
 
         const kindClean: TaskExplorerDefinition = {
             ...defaultDef,

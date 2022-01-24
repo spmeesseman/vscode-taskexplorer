@@ -17,7 +17,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
     {
-        const getCommand = (folder: WorkspaceFolder, cmd: string): string =>
+        const getCommand = (): string =>
         {
             let composer = "composer";
             if (process.platform === "win32") {
@@ -33,7 +33,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
         const cwd = path.dirname(uri.fsPath);
         const args = ["run-script", target];
         const options = { cwd };
-        const execution = new ShellExecution(getCommand(folder, cmd), args, options);
+        const execution = new ShellExecution(getCommand(), args, options);
 
         return new Task(def, folder, target, "composer", execution, undefined);
     }
@@ -92,23 +92,17 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
 
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
-        const result: Task[] = [];
-        const folder = workspace.getWorkspaceFolder(uri);
+        const result: Task[] = [],
+              folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read composer file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
+        log.methodStart("read composer file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
 
-        if (folder)
+        const scripts = this.findTargets(uri.fsPath, logPad + "   ");
+        for (const s of scripts)
         {
-            const scripts = this.findTargets(uri.fsPath, logPad + "   ");
-            if (scripts)
-            {
-                for (const s of scripts)
-                {
-                    const task = this.createTask(s, s, folder, uri);
-                    task.group = TaskGroup.Build;
-                    result.push(task);
-                }
-            }
+            const task = this.createTask(s, s, folder, uri);
+            task.group = TaskGroup.Build;
+            result.push(task);
         }
 
         log.methodDone("read composer file uri task", 1, logPad, true);

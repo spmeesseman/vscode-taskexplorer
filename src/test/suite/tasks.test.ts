@@ -188,7 +188,7 @@ async function runTask(value: TaskItem, letFinish: boolean, lastTask: TaskItem |
             await executeTeCommand("stop", 0, value);
         }
         else {
-            await sleep(8000);
+            await sleep(9000);
         }
     }
     else

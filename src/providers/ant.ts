@@ -237,22 +237,19 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
-        const result: Task[] = [];
-        const folder = workspace.getWorkspaceFolder(uri);
+        const result: Task[] = [],
+              folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read ant file uri task", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
+        log.methodStart("read ant file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
 
         if (folder)
         {
             const scripts = await this.findAllAntScripts(uri.fsPath, logPad + "   ");
-            if (scripts)
+            for (const s of Object.keys(scripts))
             {
-                for (const s of Object.keys(scripts))
-                {
-                    const task = this.createTask(scripts[s] ? scripts[s] : s, s, folder, uri);
-                    task.group = TaskGroup.Build;
-                    result.push(task);
-                }
+                const task = this.createTask(scripts[s] ? scripts[s] : s, s, folder, uri);
+                task.group = TaskGroup.Build;
+                result.push(task);
             }
         }
 
