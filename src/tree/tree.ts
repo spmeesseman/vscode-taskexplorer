@@ -2245,6 +2245,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
 
         log.methodStart("run task", 1, "", true, [["task name", taskItem.label]]);
+        taskItem.taskDetached = undefined;
 
         if (withArgs === true)
 		{
@@ -2268,17 +2269,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 // line arguments.  In this case, its simply a property task.presentationOption on an instantiated
                 // task.  No idea.  But this works fine for now.
                 //
-                const def = newTask.definition;
-                const p = providers.get(util.getTaskProviderType(def.type)),
+                const def = newTask.definition,
+                      p = providers.get(util.getTaskProviderType(def.type)),
                       folder = taskItem.getFolder();
-                if (folder) {
-                    newTask = p?.createTask(def.target, undefined, folder, def.uri);
+                if (folder && p)
+                {
+                    newTask = p.createTask(def.target, undefined, folder, def.uri, undefined, "   ");
                     //
                     // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
                     // an instance of this task.
                     //
                     if (newTask) {
                         newTask.definition.taskItemId = def.taskItemId;
+                        taskItem.taskDetached = newTask;
+                    }
+                    else {
+                        newTask = taskItem.task;
                     }
                 }
             }
@@ -2658,19 +2664,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         log.methodStart("stop", 1, "", true);
 
-        if (!taskItem || this.busy)
+        if (this.busy)
         {
             window.showInformationMessage("Busy, please wait...");
             return;
         }
 
-        const task = taskItem.task,        // taskItem.execution will not be set if the view hasnt been visible yet
-              exec = taskItem.execution || // this really would only occur in the tests
-                     tasks.taskExecutions.find(e => e.task.name === task?.name && e.task.source === task.source &&
-                     e.task.scope === task.scope && e.task.definition.path === task.definition.path);
+        if (!taskItem || !taskItem.task)
+        {
+            window.showInformationMessage("Busy, please wait...");
+            return;
+        }
+
+        const exec = taskItem.isExecuting();
         if (exec)
         {
-            if (configuration.get<boolean>("keepTermOnStop") === true)
+            if (configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
             {
                 const terminal = this.getTerminal(taskItem, "   ");
                 log.write("   keep terminal open", 1);
@@ -2697,8 +2706,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
             }
             else {
-                log.write("   kill terminal", 1);
-                exec.terminate();
+                log.write("   kill task execution", 1);
+                try {
+                    exec.terminate();
+                }
+                catch {}
             }
         }
         else {
@@ -2773,6 +2785,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             //
             this.showStatusMessage(task);
             const taskItem = await this.getTaskItems(taskId, "   ", false, 2) as TaskItem;
+            taskItem.taskDetached = undefined;
             this.fireTaskChangeEvents(taskItem, "   ", 1);
             log.methodDone("task finished event", 1);
         }, 50);

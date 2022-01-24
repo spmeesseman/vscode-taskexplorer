@@ -25,6 +25,7 @@ export default class TaskItem extends TreeItem
     public readonly taskGroup: string;
     public readonly isUser: boolean;
     public task: Task | undefined;
+    public taskDetached: Task | undefined;
     public execution: TaskExecution | undefined;
     public paused: boolean;
     /**
@@ -121,13 +122,21 @@ export default class TaskItem extends TreeItem
 
     isExecuting(task?: Task | undefined)
     {
-        this.task = task ?? this.task;
-        if (this.task) {
-            this.execution = tasks.taskExecutions.find(e => e.task.name === this.task?.name && e.task.source === this.task.source &&
-                e.task.scope === this.task.scope && e.task.definition.path === this.task.definition.path);
-            return !!this.execution;
+        let exec;
+        if (this.taskDetached)
+        {
+            exec = tasks.taskExecutions.find(e => e.task.name === this.taskDetached?.name && e.task.source === this.taskDetached.source &&
+                   e.task.scope === this.taskDetached?.scope && e.task.definition.path === this.taskDetached.definition.path);
         }
-        return false;
+        if (!exec)
+        {
+            this.task = task ?? this.task;
+            if (this.task) {
+                this.execution = exec = tasks.taskExecutions.find(e => e.task.name === this.task?.name && e.task.source === this.task.source &&
+                                        e.task.scope === this.task.scope && e.task.definition.path === this.task.definition.path);
+            }
+        }
+        return exec;
     }
 
 
@@ -135,8 +144,8 @@ export default class TaskItem extends TreeItem
     {
         const isExecuting = this.isExecuting(task);
         if (this.task) {
-            this.setContextValue(this.task, isExecuting);
-            this.setIconPath(this.task, this.context, isExecuting);
+            this.setContextValue(this.task, !!isExecuting);
+            this.setIconPath(this.task, this.context, !!isExecuting);
         }
     }
 
