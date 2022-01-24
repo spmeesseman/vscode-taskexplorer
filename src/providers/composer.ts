@@ -45,11 +45,15 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
 
         log.methodStart("find composer targets", 1, logPad, true);
 
-        const json = JSON.parse(util.readFileSync(fsPath)),
-              scripts = json.scripts;
+        try {
+            const json = JSON.parse(util.readFileSync(fsPath)),
+                scripts = json.scripts;
 
-        if (scripts) {
-            Object.keys(scripts).forEach((k) => { targets.push(k); });
+            if (scripts) {
+                Object.keys(scripts).forEach((k) => { targets.push(k); });
+            }
+        } catch {
+            log.error("Invalid JSON found in " + fsPath);
         }
 
         log.methodDone("Find composer targets", 1, logPad, true);
