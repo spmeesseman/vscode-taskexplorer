@@ -18,6 +18,7 @@ import { storage } from "../common/storage";
 import { rebuildCache } from "../cache";
 import { configuration } from "../common/configuration";
 import { providers } from "../extension";
+import { TaskExplorerProvider } from "../providers/provider";
 
 
 const localize = nls.loadMessageBundle();
@@ -76,8 +77,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
         subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | string) => { await this.addToExcludes(taskFile); }, this));
         subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => { await this.addRemoveFavorite(taskItem); }, this));
+        subscriptions.push(commands.registerCommand(name + ".addRemoveCustomLabel", async (taskItem: TaskItem, label: string) => { await this.addRemoveSpecialLabel(taskItem, label); }, this));
         subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
-        subscriptions.push(commands.registerCommand(name + ".renameSpecial", async (taskItem: TaskItem, label: string) => { await this.addRemoveSpecialLabel(taskItem, label); }, this));
 
         tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e));
         tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e));
@@ -131,7 +132,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         let addRemoved = false,
             index = 0;
-        const renames: string[][] = configuration.get("renameSpecial", []),
+        const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
               id = util.getTaskItemId(taskItem) as string;
 
         log.methodStart("add/remove rename special", 1, "", false, [["id", id]]);
@@ -170,7 +171,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // Update
         //
         if (addRemoved) {
-            await configuration.update("renameSpecial", renames);
+            await storage.update(constants.TASKS_RENAME_STORE, renames);
             await this.showSpecialTasks(true, true, undefined, "   ");
             await this.showSpecialTasks(true, false, undefined, "   ");
         }
@@ -918,7 +919,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             scriptOffset = this.findJsonDocumentPosition(documentText, taskItem);
         }
         else {
-            const provider = providers.get(util.getScriptProviderType(def.type));
+            const provider = providers.get(util.getTaskProviderType(def.type));
             scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || -1;
         }
 
@@ -1193,7 +1194,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private getSpecialTaskName(taskItem: TaskItem)
     {
         let label = taskItem.taskFile.folder.label + " - " + taskItem.taskSource;
-        const renames: string[][] = configuration.get("renameSpecial"),
+        const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
               id = util.getTaskItemId(taskItem);
         for (const i in renames)
         {
@@ -1651,12 +1652,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             log.write("   invalidate " + opt1 + " provider file ", 1, logPad);
             log.value("      file", opt2, 1, logPad);
-            const provider = providers.get(util.getScriptProviderType(opt1));
+            const provider = providers.get(util.getTaskProviderType(opt1));
             // NPM/Workspace tasks don't implement TaskExplorerProvider
             await provider?.invalidateTasksCache(opt2, logPad + "   ");
         }
-        else { // If opt1 is undefined, refresh all providers
-            if (!opt1) {
+        else //
+        {   // If opt1 is undefined, refresh all providers
+            //
+            if (!opt1)
+            {
                 log.write("   invalidate all providers", 1, logPad);
                 for (const [ key, p ] of providers)
                 {
@@ -1666,7 +1670,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
             else { // NPM/Workspace tasks don't implement TaskExplorerProvider
                 log.write("   invalidate " + opt1 + " provider", 1, logPad);
-                await providers.get(util.getScriptProviderType(opt1))?.invalidateTasksCache(undefined, logPad + "   ");
+                await providers.get(util.getTaskProviderType(opt1))?.invalidateTasksCache(undefined, logPad + "   ");
             }
         }
 
@@ -2265,7 +2269,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 // task.  No idea.  But this works fine for now.
                 //
                 const def = newTask.definition;
-                const p = providers.get(util.getScriptProviderType(def.type)),
+                const p = providers.get(util.getTaskProviderType(def.type)),
                       folder = taskItem.getFolder();
                 if (folder) {
                     newTask = p?.createTask(def.target, undefined, folder, def.uri);
