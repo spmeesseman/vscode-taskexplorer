@@ -11,74 +11,26 @@ import { waitForCache } from "../cache";
 
 
 const writeToConsole = false;
+const originalShowInputBox = window.showInputBox;
+const overridesShowInputBox: any[] = [];
 
 let treeItems: TreeItem[];
 let activated = false;
 let teApi: TaskExplorerApi;
 
-
-export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
+window.showInputBox = (...args: any[]) =>
 {
-    let found = 0;
-    for (const [ k, task ] of taskMap)
+    const next = overridesShowInputBox.shift();
+    if (typeof next === "undefined")
     {
-        if (task.id?.includes(id) && !task.isUser) {
-            if (task.id === ":ant") {
-                console.error("ant: " + task.resourceUri?.fsPath);
-            }
-            found++;
-        }
+        return originalShowInputBox.call(null, args as any);
     }
-    return found;
-}
-
-
-export function spawn(command: string, args?: string[], options?: cp.SpawnOptions): cp.ChildProcess
-{
-    let proc: cp.ChildProcess;
-    if (options) {
-        proc = cp.spawn(command, args || [], options);
-    }
-    else {
-        proc = cp.spawn(command, args || []);
-    }
-
-    // let fullCommand = "command: " + command;
-
-    // if (args) {
-    //   fullCommand += ' "' + args.join('" "') + '"';
-    // }
-    // console.log(fullCommand);
-
-    // proc.stdout.on("data", function(data) {
-    //   console.log("stdout: " + data.toString());
-    // });
-
-    // proc.stderr.on("data", function(data) {
-    //   console.log("stderr: " + data.toString());
-    // });
-
-    // proc.on("exit", function(code) {
-    //   console.log("child process exited with code " + code.toString());
-    // });
-
-    return proc;
-}
-
-/*
-export async function waitForActiveExtension(extension: Extension<any>)
-{
-    return new Promise((resolve,reject) => setTimeout(() =>
+    return new Promise((resolve, reject) =>
     {
-        if (!extension || !extension.isActive) {
-            return waitForActiveExtension();
-        }
-        else {
-            resolve();
-        }
-    }, 500));
-}
-*/
+        resolve(next);
+    });
+};
+
 
 /**
  * Activates the spmeesseman.vscode-taskexplorer extension
@@ -188,19 +140,26 @@ export async function buildTree(instance: any, waitTime?: number)
 }
 
 
+export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
+{
+    let found = 0;
+    for (const [ k, task ] of taskMap)
+    {
+        if (task.id?.includes(id) && !task.isUser) {
+            if (task.id === ":ant") {
+                console.error("ant: " + task.resourceUri?.fsPath);
+            }
+            found++;
+        }
+    }
+    return found;
+}
+
+
 export const getWsPath = (p: string) =>
 {
 	return path.normalize(path.resolve(__dirname, "../../test-files", p));
 };
-
-
-const overridesShowInputBox: any[] = [];
-
-
-export function overrideNextShowInputBox(value: any)
-{
-    overridesShowInputBox.push(value);
-}
 
 
 export async function initSettings(enable = true)
@@ -289,25 +248,46 @@ export function isReady(taskType?: string)
 }
 
 
+export function overrideNextShowInputBox(value: any)
+{
+    overridesShowInputBox.push(value);
+}
+
+
 export async function sleep(ms: number)
 {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
-const originalShowInputBox = window.showInputBox;
-
-
-window.showInputBox = (...args: any[]) =>
+export function spawn(command: string, args?: string[], options?: cp.SpawnOptions): cp.ChildProcess
 {
-    const next = overridesShowInputBox.shift();
-    if (typeof next === "undefined")
-    {
-        return originalShowInputBox.call(null, args as any);
+    let proc: cp.ChildProcess;
+    if (options) {
+        proc = cp.spawn(command, args || [], options);
     }
-    return new Promise((resolve, reject) =>
-    {
-        resolve(next);
-    });
-};
+    else {
+        proc = cp.spawn(command, args || []);
+    }
 
+    // let fullCommand = "command: " + command;
+
+    // if (args) {
+    //   fullCommand += ' "' + args.join('" "') + '"';
+    // }
+    // console.log(fullCommand);
+
+    // proc.stdout.on("data", function(data) {
+    //   console.log("stdout: " + data.toString());
+    // });
+
+    // proc.stderr.on("data", function(data) {
+    //   console.log("stderr: " + data.toString());
+    // });
+
+    // proc.on("exit", function(code) {
+    //   console.log("child process exited with code " + code.toString());
+    // });
+
+    return proc;
+}

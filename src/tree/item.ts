@@ -125,15 +125,18 @@ export default class TaskItem extends TreeItem
         let exec;
         if (this.taskDetached)
         {
-            exec = tasks.taskExecutions.find(e => e.task.name === this.taskDetached?.name && e.task.source === this.taskDetached.source &&
-                   e.task.scope === this.taskDetached?.scope && e.task.definition.path === this.taskDetached.definition.path);
+            const detached = this.taskDetached;
+            exec = tasks.taskExecutions.find(e => e.task.name === detached.name && e.task.source === detached.source &&
+                   e.task.scope === detached.scope && e.task.definition.path === detached.definition.path);
         }
         if (!exec)
         {
             this.task = task ?? this.task;
-            if (this.task) {
-                this.execution = exec = tasks.taskExecutions.find(e => e.task.name === this.task?.name && e.task.source === this.task.source &&
-                                        e.task.scope === this.task.scope && e.task.definition.path === this.task.definition.path);
+            if (this.task)
+            {
+                const task = this.task;
+                this.execution = exec = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
+                                        e.task.scope === task.scope && e.task.definition.path === task.definition.path);
             }
         }
         return exec;

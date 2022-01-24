@@ -11,7 +11,7 @@ import TaskItem from "../../tree/item";
 import { commands, ConfigurationTarget, tasks, workspace } from "vscode";
 import { configuration } from "../../common/configuration";
 import { TaskExplorerApi } from "../../extension";
-import { activate, findIdInTaskMap, isReady, sleep } from "../helper";
+import { activate, findIdInTaskMap, isReady, overrideNextShowInputBox, sleep } from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -38,7 +38,6 @@ suite("Task Tests", () =>
     {
         let ranBash = 0, ranBatch = 0,
             lastTask: TaskItem | null = null;
-
         this.timeout(75 * 1000);
 
         //
@@ -50,16 +49,16 @@ suite("Task Tests", () =>
 
             if (value && value.taskSource === "batch")
             {
-                console.log("Run batch task: " + value.label);
-                console.log("   Folder: " + value.getFolder()?.name);
-                await runTask(value, lastTask);
+                console.log("    Run batch task: " + value.label);
+                console.log("        Folder: " + value.getFolder()?.name);
+                await runTask(value, ranBatch > 0, lastTask);
                 ranBatch++;
             }
             else if (value && value.taskSource === "bash")
             {
-                console.log("Run bash task: " + value.label);
-                console.log("   Folder: " + value.getFolder()?.name);
-                await runTask(value, lastTask);
+                console.log("    Run bash task: " + value.label);
+                console.log("        Folder: " + value.getFolder()?.name);
+                await runTask(value, false, lastTask);
                 ranBash++;
             }
             if (ranBash && ranBatch >= 2) break;
@@ -115,7 +114,8 @@ suite("Task Tests", () =>
                 // await executeTeCommand("open", value);
                 await executeTeCommand("runInstall", 500, value.taskFile);
                 await executeTeCommand("runUpdate", 500, value.taskFile);
-                await executeTeCommand("runUpdatePackage", 500, value.taskFile, "@spmeesseman/app-publisher");
+                overrideNextShowInputBox("@spmeesseman/app-publisher");
+                await executeTeCommand("runUpdatePackage", 500, value.taskFile);
                 await executeTeCommand("runAudit", 500, value.taskFile);
                 await executeTeCommand("runAuditFix", 0, value.taskFile);
                 break;
@@ -148,12 +148,13 @@ async function executeTeCommand(command: string, timeout: number, ...args: any[]
 }
 
 
-async function runTask(value: TaskItem, lastTask: TaskItem | null)
+async function runTask(value: TaskItem, letFinish: boolean, lastTask: TaskItem | null)
 {
     await configuration.updateWs("clickAction", "Execute");
 
     await executeTeCommand("addRemoveFromFavorites", 0, value);
-    await executeTeCommand("addRemoveCustomLabel", 0, value, "test label");
+    overrideNextShowInputBox("test label");
+    await executeTeCommand("addRemoveCustomLabel", 0, value);
 
     if (lastTask) {
         await executeTeCommand("openTerminal", 0, lastTask);
@@ -164,36 +165,50 @@ async function runTask(value: TaskItem, lastTask: TaskItem | null)
         await configuration.updateWs("keepTermOnStop", false);
         await executeTeCommand("open", 50, value);
         await executeTeCommand("runWithArgs", 2500, value, "--test --test2");
-        await executeTeCommand("stop", 0, value);
-        await configuration.updateWs("keepTermOnStop", true);
-        await executeTeCommand("run", 2500, value);
-        await executeTeCommand("pause", 1000, value);
-        await executeTeCommand("run", 500, value);
-        await configuration.updateWs("clickAction", "Open");
-        await executeTeCommand("run", 500, value);
-        await configuration.updateWs("clickAction", "Execute");
-        await executeTeCommand("openTerminal", 0, value);
-        await executeTeCommand("pause", 1000, value);
-        await executeTeCommand("stop", 0, value);
-        await executeTeCommand("runLastTask", 1500, value);
-        await configuration.updateWs("keepTermOnStop", false);
-        await executeTeCommand("restart", 2500, value);
-        await executeTeCommand("stop", 500, value);
-        await executeTeCommand("runNoTerm", 2500, value);
-        await executeTeCommand("stop", 0, value);
+        if (!letFinish)
+        {
+            await executeTeCommand("stop", 0, value);
+            await configuration.updateWs("keepTermOnStop", true);
+            await executeTeCommand("run", 2500, value);
+            await executeTeCommand("run", 0, value); // throw 'Busy, please wait...'
+            await executeTeCommand("pause", 1000, value);
+            await executeTeCommand("run", 500, value);
+            await configuration.updateWs("clickAction", "Open");
+            await executeTeCommand("run", 500, value);
+            await configuration.updateWs("clickAction", "Execute");
+            await executeTeCommand("openTerminal", 0, value);
+            await executeTeCommand("pause", 1000, value);
+            await executeTeCommand("stop", 0, value);
+            await executeTeCommand("runLastTask", 1500, value);
+            await executeTeCommand("runLastTask", 0, value); // throw 'Busy, please wait...'
+            await configuration.updateWs("keepTermOnStop", false);
+            await executeTeCommand("restart", 2500, value);
+            await executeTeCommand("stop", 500, value);
+            await executeTeCommand("runNoTerm", 2500, value);
+            await executeTeCommand("stop", 0, value);
+        }
+        else {
+            await sleep(8000);
+        }
     }
     else
     {
         await executeTeCommand("run", 2000, value);
-        await executeTeCommand("stop", 0, value);
-        await workspace.getConfiguration().update("terminal.integrated.shell.windows",
-                                                    "bash.exe", ConfigurationTarget.Workspace);
-        await executeTeCommand("run", 2000, value);
-        await executeTeCommand("stop", 1000, value);
-        await workspace.getConfiguration().update("terminal.integrated.shell.windows",
-                                                    "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
-        await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
-        await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
+        if (!letFinish)
+        {
+            await executeTeCommand("stop", 0, value);
+            await workspace.getConfiguration().update("terminal.integrated.shell.windows",
+                                                        "bash.exe", ConfigurationTarget.Workspace);
+            await executeTeCommand("run", 2000, value);
+            await executeTeCommand("stop", 1000, value);
+            await workspace.getConfiguration().update("terminal.integrated.shell.windows",
+                                                        "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
+            await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
+            await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
+        }
+        else {
+            await sleep(8000);
+        }
     }
 
     await executeTeCommand("openTerminal", 0, value);
