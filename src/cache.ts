@@ -64,7 +64,13 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined, log
         await buildCache("batch", constants.GLOB_BATCH, folder, false, logPad + "   ");
     }
     //
-    // Gradle Mulit-Language Automation Tool
+    // COMPOSER
+    //
+    if (!cancel && configuration.get<boolean>("enableComposer")) {
+        await buildCache("composer", constants.GLOB_COMPOSER, folder, false, logPad + "   ");
+    }
+    //
+    // Gradle Multi-Language Automation Tool
     //
     if (!cancel && configuration.get<boolean>("enableGradle")) {
         await buildCache("gradle", constants.GLOB_GRADLE, folder, false, logPad + "   ");
@@ -111,12 +117,6 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined, log
     //
     if (!cancel && configuration.get<boolean>("enablePerl")) {
         await buildCache("perl", constants.GLOB_PERL, folder, false, logPad + "   ");
-    }
-    //
-    // COMPOSER
-    //
-    if (!cancel && configuration.get<boolean>("enableComposer")) {
-        await buildCache("composer", constants.GLOB_COMPOSER, folder, false, logPad + "   ");
     }
     //
     // Powershell
