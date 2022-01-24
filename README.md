@@ -36,6 +36,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Using Groups with a Separator](#using-groups-with-a-separator)
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
+  - [Running Task Icon Animations](#running-task-icon-animations)
   - [Feedback & Contributing](#feedback--contributing)
     - [Rate It - Leave Some Stars](#rate-it---leave-some-stars)
   - [Thank You](#thank-you)
@@ -205,6 +206,10 @@ Detection of all internally provided task types can be turned on/off in Settings
 ## Running bash/sh scripts in Windows Environment
 
 Bash/sh scripts in Windows will have the shell executable automatically set to a bash shell (if the default shell set in VSCode is not bash).  The shell executable used can be set in Settings using the `pathToBash` setting.  If there is no value set in Settings, and Git Bash exists at the default installation installation, Git Bash will be used (MinGW).  If Git Bash does not exist at the default install location, it is assumed the the path to bash.exe is part of the system PATH variable.  If you experience errors running Bash scripts in Windows, please check these items.
+
+## Running Task Icon Animations
+
+FOr whatever reason, on some systems the animated running task icon eats a lot of CPU.  If this is your case, the animated icon can be turned off in settings (on by default).
 
 ## Feedback & Contributing
 
