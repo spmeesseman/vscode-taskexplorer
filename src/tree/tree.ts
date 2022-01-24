@@ -200,7 +200,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     pathValue = pathValue.substring(0, pathValue.length - 1);
                 }
             }
-            else if (uri)
+            else
             {
                 log.value("  file glob", uri.path);
                 pathValue = uri.path;
@@ -1110,12 +1110,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             id += labelSplit[i];
         }
-        if (file.resourceUri) {
-            id += file.resourceUri.fsPath.replace(/\W/gi, "");
-        }
-        else if (file.fileName) {
-            id += file.fileName.replace(/\W/gi, "");
-        }
+        id += file.resourceUri.fsPath.replace(/\W/gi, "");
         return folder.label + file.taskSource + id + (treeLevel || treeLevel === 0 ? treeLevel.toString() : "");
     }
 
@@ -1829,20 +1824,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const uri = !util.isScriptType(selection.taskSource) ?
                     selection.taskFile.resourceUri : Uri.file(selection.task?.definition.uri.fsPath);
 
-        if (uri)
-        {
-            log.methodStart("open document at position", 1, "", true, [
-                [ "command", selection.command?.command ], [ "source", selection.taskSource ],
-                [ "uri path", uri.path ], [ "fs path", uri.fsPath ]
-            ]);
 
-            if (util.pathExists(uri.fsPath))
-            {
-                const document: TextDocument = await workspace.openTextDocument(uri);
-                const offset = this.findDocumentPosition(document, selection instanceof TaskItem ? selection : undefined);
-                const position = document.positionAt(offset);
-                await window.showTextDocument(document, { selection: new Selection(position, position) });
-            }
+        log.methodStart("open document at position", 1, "", true, [
+            [ "command", selection.command?.command ], [ "source", selection.taskSource ],
+            [ "uri path", uri.path ], [ "fs path", uri.fsPath ]
+        ]);
+
+        if (util.pathExists(uri.fsPath))
+        {
+            const document: TextDocument = await workspace.openTextDocument(uri);
+            const offset = this.findDocumentPosition(document, selection instanceof TaskItem ? selection : undefined);
+            const position = document.positionAt(offset);
+            await window.showTextDocument(document, { selection: new Selection(position, position) });
         }
     }
 

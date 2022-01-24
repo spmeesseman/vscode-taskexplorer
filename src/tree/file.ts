@@ -73,6 +73,7 @@ export default class TaskFile extends TreeItem
      */
     public readonly isUser: boolean;
 
+    resourceUri: Uri;
 
     /**
      * @constructor
@@ -122,6 +123,7 @@ export default class TaskFile extends TreeItem
         }
 
         this.fileName = this.getFileNameFromSource(source, folder, taskDef, true);
+        this.resourceUri = Uri.file(path.resolve(this.fileName));
         if (folder.resourceUri)
         {
             if (relativePath && source !== "Workspace") {
