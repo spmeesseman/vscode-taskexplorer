@@ -43,6 +43,11 @@ suite("Util Tests", () =>
 		log.value("test", "1");
 		log.setWriteToConsole(false);
 
+		log.setWriteToFile(true);
+		log.write("test");
+		log.value("test", "1");
+		log.setWriteToFile(false);
+
 		// nullvalue
 		log.value("null value", null);
 		log.value("empty string value", "");

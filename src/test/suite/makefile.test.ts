@@ -10,10 +10,12 @@ import { activate, getWsPath, isReady } from "../helper";
 import { TaskExplorerApi } from "../../extension";
 import { MakeTaskProvider } from "../../providers/make";
 import { readFileSync } from "../../common/utils";
+import { Uri, workspace, WorkspaceFolder } from "vscode";
 
 
 let teApi: TaskExplorerApi;
 let provider: MakeTaskProvider;
+let wsFolder: WorkspaceFolder;
 
 
 suite("Makefile Tests", () =>
@@ -24,10 +26,14 @@ suite("Makefile Tests", () =>
         teApi = await activate(this);
         assert(isReady("make") === true, "Setup failed");
         provider = teApi.taskProviders.get("make") as MakeTaskProvider;
+        //
+        // File path for create/remove
+        //
+        wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
     });
 
 
-    test("Makefile Utility", async () =>
+    test("Document Position", async () =>
     {
         // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);

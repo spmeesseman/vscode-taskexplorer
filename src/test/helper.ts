@@ -1,13 +1,16 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import * as cp from "child_process";
+import * as fs from "fs";
 import * as path from "path";
 import * as assert from "assert";
 import TaskItem from "../tree/item";
-import { ConfigurationTarget, extensions, TreeItem, window, workspace } from "vscode";
-import { TaskExplorerApi } from "../extension";
+import { ConfigurationTarget, extensions, TreeItem, window, workspace, WorkspaceFolder } from "vscode";
+import { TaskExplorerApi, deactivate } from "../extension";
 import { configuration } from "../common/configuration";
 import { waitForCache } from "../cache";
 
+
+const writeToConsole = false;
 
 let treeItems: TreeItem[];
 let activated = false;
@@ -87,12 +90,55 @@ export async function activate(instance?: any)
     if (instance) instance.timeout(60 * 1000);
 
     if (!activated)
-    {
+    {   //
+        // Create .vscode directory if it doesn't exist
+        //
+        const dirNameCode = getWsPath(".vscode"),
+			  settingsFile = path.join(dirNameCode, "settings.json");
+        if (!fs.existsSync(dirNameCode)) {
+            fs.mkdirSync(dirNameCode, { mode: 0o777 });
+        }
+        if (!fs.existsSync(settingsFile)) {
+            fs.writeFileSync(settingsFile, "{}");
+        }
+        //
+        // Init settings
+        // Note that the '*' is removed from package.json[activationEvents] before the runTest() call
+        //
         initSettings(true);
+        //
+        // Activate extension
+        //
         teApi = await ext.activate();
         activated = true;
+        //
+        // For debugging
+        //
+        teApi.logging.setWriteToConsole(writeToConsole);
     }
     return teApi;
+}
+
+
+export async function cleanup()
+{
+    const dirNameCode = getWsPath(".vscode"),
+          settingsFile = path.join(dirNameCode, "settings.json"),
+          tasksFile = path.join(dirNameCode, "tasks.json");
+
+    deactivate();
+
+    if (fs.existsSync(settingsFile)) {
+        fs.unlinkSync(settingsFile);
+    }
+    if (fs.existsSync(tasksFile)) {
+        fs.unlinkSync(tasksFile);
+    }
+    if (fs.existsSync(dirNameCode)) {
+        fs.rmdirSync(dirNameCode, {
+            recursive: true
+        });
+    }
 }
 
 

@@ -16,17 +16,17 @@ import { waitForCache } from "../../cache";
 import { addWsFolder, removeWsFolder, TaskExplorerApi } from "../../extension";
 import { configuration } from "../../common/configuration";
 import { activate, buildTree, findIdInTaskMap, sleep } from "../helper";
+import { TaskTreeDataProvider } from "../../tree/tree";
 
 
 let teApi: TaskExplorerApi;
-let rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
-let dirName: string | undefined;
-let dirNameL2: string | undefined;
-let ws2DirName: string | undefined;
-let dirNameIgn: string | undefined;
-let dirNameCode: string | undefined;
+let rootPath: string;
+let dirName: string;
+let dirNameL2: string;
+let ws2DirName: string;
+let dirNameIgn: string;
+let dirNameCode: string;
 const tempFiles: string[] = [];
-let didCodeDirExist = false;
 let taskMap: Map<string, TaskItem> = new Map();
 
 
@@ -37,8 +37,7 @@ suite("Provider Tests", () =>
     {
         teApi = await activate(this);
 
-        rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
-
+        rootPath = (workspace.workspaceFolders as WorkspaceFolder[])[0].uri.fsPath;
         if (!rootPath) {
             assert.fail("        ✘ Workspace folder does not exist");
         }
@@ -72,15 +71,9 @@ suite("Provider Tests", () =>
         if (!fs.existsSync(dirNameIgn)) {
             fs.mkdirSync(dirNameIgn, { mode: 0o777 });
         }
-        if (!fs.existsSync(dirNameCode)) {
-            fs.mkdirSync(dirNameCode, { mode: 0o777 });
-        }
-        else {
-            didCodeDirExist = true;
-        }
 
         //
-        // Workspace folders
+        // New Workspace folders
         //
         let wsDirName = path.join(rootPath, "newA");
         if (!fs.existsSync(wsDirName)) {
@@ -125,8 +118,14 @@ suite("Provider Tests", () =>
             name: "D Test Workspace",
             index: 5
         }];
+        //
+        // Merge VSCode ws folders
+        //
+        (workspace.workspaceFolders as WorkspaceFolder[]).concat(wsf);
 
-        workspace.workspaceFolders?.concat(wsf);
+        //
+        // Do work son
+        //
         await teApi.explorerProvider?.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
 
         setupVscode(); setupAnt(); setupGradle(); setupTsc(); setupMakefile();
@@ -182,11 +181,6 @@ suite("Provider Tests", () =>
             }
         }
 
-        rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
-        if (!rootPath) {
-            assert.fail("   ✘ Workspace folder does not exist");
-        }
-
         //
         // Workspace folders
         //
@@ -218,83 +212,8 @@ suite("Provider Tests", () =>
 
     test("Open tasks for edit", async function()
     {
-        if (!rootPath || !dirNameIgn || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        if (!teApi || !teApi.explorerProvider) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-
-        //
-        // Scan task tree using internal explorer scanner fn
-        //
-        console.log("    Scan task tree for tasks");
-
-        taskMap = await teApi.explorerProvider.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
-
-        //
-        // Find all created tasks in the task tree and ensure the counts are correct.
-        //
-        // We added some files in the ignored directory, which would make the
-        // task counts higher if these files weren't ignored
-        //
-
-        console.log("         Finding and counting tasks");
-
-        let taskCount = findIdInTaskMap(":ant", taskMap);
-        console.log("            Ant          : " + taskCount.toString());
-        if (taskCount !== 7) {
-            assert.fail("Unexpected Ant task count (Found " + taskCount + " of 7)");
-        }
-
-        taskCount = findIdInTaskMap(":app-publisher:", taskMap);
-        console.log("            App-Publisher: " + taskCount.toString());
-        if (taskCount !== 42) {
-            assert.fail("Unexpected App-Publisher task count (Found " + taskCount + " of 42)");
-        }
-
-        taskCount = findIdInTaskMap(":bash:", taskMap);
-        console.log("            Bash         : " + taskCount.toString());
-        if (taskCount !== 3) {
-            assert.fail("Unexpected Bash task count (Found " + taskCount + " of 3)");
-        }
-
-        taskCount = findIdInTaskMap(":batch:", taskMap);
-        console.log("            Batch        : " + taskCount.toString());
-        if (taskCount !== 4) {
-            assert.fail("Unexpected Batch task count (Found " + taskCount + " of 4)");
-        }
-
-        taskCount = findIdInTaskMap(":gradle:", taskMap);
-        console.log("            Gradle       : " + taskCount.toString());
-        if (taskCount !== 3) {
-            assert.fail("Unexpected Gradle task count (Found " + taskCount + " of 3)");
-        }
-
-        taskCount = findIdInTaskMap(":grunt:", taskMap);
-        console.log("            Grunt        : " + taskCount.toString());
-        if (taskCount !== 13) {
-            assert.fail("Unexpected Grunt task count (Found " + taskCount + " of 13)");
-        }
-
-        taskCount = findIdInTaskMap(":gulp:", taskMap);
-        console.log("            Gulp         : " + taskCount.toString());
-        if (taskCount !== 32) {
-            assert.fail("Unexpected Gulp task count (Found " + taskCount + " of 32)");
-        }
-
-        taskCount = findIdInTaskMap(":tsc:", taskMap);
-        console.log("            TSC          : " + taskCount.toString());
-        if (taskCount !== 4) {
-            assert.fail("Unexpected Typescript task count (Found " + taskCount + " of 4)");
-        }
-
-        taskCount = findIdInTaskMap(":Workspace:", taskMap);
-        console.log("            VSCode       : " + taskCount.toString());
-        if (taskCount !== 7) {
-            assert.fail("Unexpected VSCode task count (Found " + taskCount + " of 7)");
-        }
+        taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
+        checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 7);
     });
 
 
@@ -322,16 +241,9 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Invalidation tests", async function()
+    test("Invalidation", async function()
     {
-        if (!rootPath || !dirName) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
-        if (!teApi || !teApi.explorerProvider || !workspace.workspaceFolders) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-
+        const explorerProvider = teApi.explorerProvider as TaskTreeDataProvider;
         this.timeout(30 * 1000);
 
         //
@@ -340,16 +252,16 @@ suite("Provider Tests", () =>
         console.log("    Running app-publisher invalidation");
         let file = path.join(rootPath, ".publishrc.json");
         let uri = Uri.parse(file);
-        await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
+        await explorerProvider.invalidateTasksCache("app-publisher", uri);
         removeFromArray(tempFiles, file);
         try {
             fs.unlinkSync(file);
         }
         catch {}
-        await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
+        await explorerProvider.invalidateTasksCache("app-publisher", uri);
         await(sleep(1000));
         createAppPublisherFile();
-        await teApi.explorerProvider.invalidateTasksCache("app-publisher", uri);
+        await explorerProvider.invalidateTasksCache("app-publisher", uri);
         await(sleep(100));
 
         //
@@ -358,16 +270,16 @@ suite("Provider Tests", () =>
         console.log("    Running ant invalidation");
         file = path.join(dirName, "build.xml");
         uri = Uri.parse(file);
-        await teApi.explorerProvider.invalidateTasksCache("ant", uri);
+        await explorerProvider.invalidateTasksCache("ant", uri);
         await removeFromArray(tempFiles, file);
         try {
             fs.unlinkSync(file);
         }
         catch {}
-        await teApi.explorerProvider.invalidateTasksCache("ant", uri);
+        await explorerProvider.invalidateTasksCache("ant", uri);
         await(sleep(1000));
         createAntFile();
-        await teApi.explorerProvider.invalidateTasksCache("ant", uri);
+        await explorerProvider.invalidateTasksCache("ant", uri);
         await(sleep(100));
 
         //
@@ -376,16 +288,16 @@ suite("Provider Tests", () =>
         console.log("    Running gradle invalidation");
         file = path.join(dirName, "build.gradle");
         uri = Uri.parse(file);
-        await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
+        await explorerProvider.invalidateTasksCache("gradle", uri);
         removeFromArray(tempFiles, file);
         try {
             fs.unlinkSync(file);
         }
         catch {}
-        await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
+        await explorerProvider.invalidateTasksCache("gradle", uri);
         await(sleep(1000));
         createGradleFile();
-        await teApi.explorerProvider.invalidateTasksCache("gradle", uri);
+        await explorerProvider.invalidateTasksCache("gradle", uri);
         await(sleep(100));
 
         //
@@ -394,16 +306,16 @@ suite("Provider Tests", () =>
         console.log("    Running grunt invalidation");
         file = path.join(rootPath, "GRUNTFILE.js");
         uri = Uri.parse(file);
-        await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
+        await explorerProvider.invalidateTasksCache("grunt", uri);
         removeFromArray(tempFiles, file);
         try {
             fs.unlinkSync(file);
         }
         catch {}
-        await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
+        await explorerProvider.invalidateTasksCache("grunt", uri);
         await(sleep(1000));
         createGruntFile();
-        await teApi.explorerProvider.invalidateTasksCache("grunt", uri);
+        await explorerProvider.invalidateTasksCache("grunt", uri);
         await(sleep(100));
 
         //
@@ -412,16 +324,16 @@ suite("Provider Tests", () =>
         console.log("    Running gulp invalidation");
         file = path.join(rootPath, "gulpfile.js");
         uri = Uri.parse(file);
-        await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
+        await explorerProvider.invalidateTasksCache("gulp", uri);
         removeFromArray(tempFiles, file);
         try {
             fs.unlinkSync(file);
         }
         catch {}
-        await teApi.explorerProvider.refresh("gulp", uri);
+        await explorerProvider.refresh("gulp", uri);
         await(sleep(1000));
         createGulpFile();
-        await teApi.explorerProvider.invalidateTasksCache("gulp", uri);
+        await explorerProvider.invalidateTasksCache("gulp", uri);
         await(sleep(100));
 
         //
@@ -430,16 +342,16 @@ suite("Provider Tests", () =>
         console.log("    Running makefile invalidation");
         file = path.join(rootPath, "Makefile");
         uri = Uri.parse(file);
-        await teApi.explorerProvider.invalidateTasksCache("make", uri);
+        await explorerProvider.invalidateTasksCache("make", uri);
         removeFromArray(tempFiles, file);
         try {
             fs.unlinkSync(file);
         }
         catch {}
-        await teApi.explorerProvider.invalidateTasksCache("make", uri);
+        await explorerProvider.invalidateTasksCache("make", uri);
         await(sleep(1000));
         createMakeFile();
-        await teApi.explorerProvider.refresh("make", uri);
+        await explorerProvider.refresh("make", uri);
         await(sleep(100));
 
         //
@@ -448,16 +360,16 @@ suite("Provider Tests", () =>
         console.log("    Running maven invalidation");
         file = path.join(rootPath, "pom.xml");
         uri = Uri.parse(file);
-        await teApi.explorerProvider.invalidateTasksCache("maven", uri);
+        await explorerProvider.invalidateTasksCache("maven", uri);
         removeFromArray(tempFiles, file);
         try {
             fs.unlinkSync(file);
         }
         catch {}
-        await teApi.explorerProvider.invalidateTasksCache("maven", uri);
+        await explorerProvider.invalidateTasksCache("maven", uri);
         await(sleep(1000));
         createMavenPomFile();
-        await teApi.explorerProvider.invalidateTasksCache("maven", uri);
+        await explorerProvider.invalidateTasksCache("maven", uri);
         await(sleep(100));
 
         //
@@ -466,25 +378,25 @@ suite("Provider Tests", () =>
         console.log("    Running script file invalidation");
         file = path.join(rootPath, "test.bat");
         uri = Uri.parse(file);
-        await teApi.explorerProvider.invalidateTasksCache("batch", uri);
+        await explorerProvider.invalidateTasksCache("batch", uri);
         removeFromArray(tempFiles, file);
         try {
             fs.unlinkSync(file);
         }
         catch {}
-        await teApi.explorerProvider.invalidateTasksCache("batch", uri);
+        await explorerProvider.invalidateTasksCache("batch", uri);
         await(sleep(1000));
         createBatchFile();
-        await teApi.explorerProvider.refresh("batch", uri);
+        await explorerProvider.refresh("batch", uri);
         await(sleep(100));
 
         console.log("    Running all other invalidations");
         for (const map of taskMap)
         {
             const value = map[1];
-            if (value && value.task && teApi && teApi.explorerProvider && value.taskFile.resourceUri) {
+            if (value && value.task && teApi && explorerProvider && value.taskFile.resourceUri) {
                 if (fs.existsSync(value.taskFile.resourceUri.fsPath)) {
-                    await teApi.explorerProvider.invalidateTasksCache(value.taskSource, value.task.definition.uri);
+                    await explorerProvider.invalidateTasksCache(value.taskSource, value.task.definition.uri);
                 }
             }
             else {
@@ -516,7 +428,7 @@ suite("Provider Tests", () =>
         // Cover single-if branches in cache module
         //
         await teApi.fileCache.addFolderToCache();
-        await teApi.fileCache.addFolderToCache(workspace.workspaceFolders[0]);
+        await teApi.fileCache.addFolderToCache((workspace.workspaceFolders as WorkspaceFolder[])[0]);
 
         console.log("    Re-enable all task providers");
         await configuration.updateWs("enableAnt", true);
@@ -540,7 +452,7 @@ suite("Provider Tests", () =>
 
         console.log("    Running global invalidation");
         // await commands.executeCommand("taskExplorer.refresh");
-        await teApi.explorerProvider.invalidateTasksCache();
+        await explorerProvider.invalidateTasksCache();
 
         await sleep(1000); // wait for filesystem change events
     });
@@ -645,19 +557,81 @@ suite("Provider Tests", () =>
 
     test("Add and remove a workspace folder", async function()
     {
-        addWsFolder(workspace.workspaceFolders);
-        removeWsFolder(workspace.workspaceFolders as WorkspaceFolder[]);
+        //addWsFolder(workspace.workspaceFolders);
+        //removeWsFolder((workspace.workspaceFolders as WorkspaceFolder[]).filter(f =>  f.index > 0));
     });
 
 });
 
 
-function setupVscode()
+function checkTasks(ant: number, ap: number, bash: number, bat: number, gradle: number, grunt: number, gulp: number, python: number, tsc: number, vsc: number)
 {
-    if (!rootPath || !dirNameCode) {
-        assert.fail("        ✘ Workspace folder does not exist");
+    console.log("    Task Counts");
+
+    let taskCount = findIdInTaskMap(":ant", taskMap);
+    console.log("      Ant           : " + taskCount.toString());
+    if (taskCount !== ant) {
+        assert.fail(`Unexpected Ant task count (Found ${taskCount} of ${ant})`);
     }
 
+    taskCount = findIdInTaskMap(":app-publisher:", taskMap);
+    console.log("      App-Publisher : " + taskCount.toString());
+    if (taskCount !== ap) {
+        assert.fail(`Unexpected AppPublisher task count (Found ${taskCount} of ${ap})`);
+    }
+
+    taskCount = findIdInTaskMap(":bash:", taskMap);
+    console.log("      Bash          : " + taskCount.toString());
+    if (taskCount !== bash) {
+        assert.fail(`Unexpected Bash task count (Found ${taskCount} of ${bash})`);
+    }
+
+    taskCount = findIdInTaskMap(":batch:", taskMap);
+    console.log("      Batch         : " + taskCount.toString());
+    if (taskCount !== bat) {
+        assert.fail(`Unexpected Batch task count (Found ${taskCount} of ${bat})`);
+    }
+
+    taskCount = findIdInTaskMap(":gradle:", taskMap);
+    console.log("      Gradle        : " + taskCount.toString());
+    if (taskCount !== gradle) {
+        assert.fail(`Unexpected Gradle task count (Found ${taskCount} of ${gradle})`);
+    }
+
+    taskCount = findIdInTaskMap(":grunt:", taskMap);
+    console.log("      Grunt         : " + taskCount.toString());
+    if (taskCount !== grunt) {
+        assert.fail(`Unexpected Grunt task count (Found ${taskCount} of ${grunt})`);
+    }
+
+    taskCount = findIdInTaskMap(":gulp:", taskMap);
+    console.log("      Gulp          : " + taskCount.toString());
+    if (taskCount !== gulp) {
+        assert.fail(`Unexpected Gulp task count (Found ${taskCount} of ${gulp})`);
+    }
+
+    taskCount = findIdInTaskMap(":python:", taskMap);
+    console.log("      Python        : " + taskCount.toString());
+    if (taskCount !== python) {
+        assert.fail(`Unexpected Python task count (Found ${taskCount} of ${python})`);
+    }
+
+    taskCount = findIdInTaskMap(":tsc:", taskMap);
+    console.log("      TypeScript    : " + taskCount.toString());
+    if (taskCount !== tsc) {
+        assert.fail(`Unexpected Typescript task count (Found ${taskCount} of ${tsc})`);
+    }
+
+    taskCount = findIdInTaskMap(":Workspace:", taskMap);
+    console.log("      VSCode        : " + taskCount.toString());
+    if (taskCount !== vsc) {
+        assert.fail(`Unexpected VSCode task count (Found ${taskCount} of ${vsc})`);
+    }
+}
+
+
+function setupVscode()
+{
     const file = path.join(dirNameCode, "tasks.json");
     tempFiles.push(file);
 

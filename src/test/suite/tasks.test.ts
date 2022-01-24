@@ -178,8 +178,8 @@ async function runTask(value: TaskItem, lastTask: TaskItem | null)
         }
         await configuration.updateWs("keepTermOnStop", false);
         await executeTeCommand("addRemoveFromFavorites", value);
-        await executeTeCommand("renameSpecial", value, "test label");
-        await executeTeCommand("renameSpecial", value);
+        await executeTeCommand("addRemoveCustomLabel", value, "test label");
+        await executeTeCommand("addRemoveCustomLabel", value);
         await executeTeCommand("open", value);
         await executeTeCommand("runWithArgs", value, "--test --test2");
         await sleep(250);

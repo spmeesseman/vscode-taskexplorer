@@ -18,7 +18,6 @@ import { properCase } from "../../common/utils";
 let teApi: TaskExplorerApi;
 let pathToComposer: string;
 let enableComposer: boolean;
-let mainFile: Uri;
 
 
 suite("Composer Tests", () =>
@@ -30,12 +29,8 @@ suite("Composer Tests", () =>
     {   //
         // Initialize
         //
-        teApi = await activate();
+        teApi = await activate(this);
         assert(isReady(testsName) === true, "Setup failed");
-        //
-        // File path for create/remove
-        //
-        mainFile = Uri.file(getWsPath("composer.json"));
         //
         // Store / set initial settings
         //
@@ -76,9 +71,9 @@ suite("Composer Tests", () =>
     test("Disable", async () =>
     {
         await configuration.updateWs(`enable${testsNameProper}`, false);
-        await sleep(1750);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName, mainFile);
-        await sleep(1750);
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        await sleep(500);
         const cTasks = await tasks.fetchTasks({ type: testsName });
         assert(!cTasks || cTasks.length === 0, "Did not read 0 composer tasks");
     });
@@ -88,13 +83,13 @@ suite("Composer Tests", () =>
     {
         await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName, mainFile);
+        await teApi.explorerProvider?.invalidateTasksCache(testsName);
         const cTasks = await tasks.fetchTasks({ type: testsName });
         assert(cTasks && cTasks.length === 2, "Did not read 2 composer tasks");
     });
 
 
-    test("Create File", async () =>
+    test("Create file", async () =>
     {
         const dirName = getWsPath("tasks_test_"),
               file = Uri.file(path.join(dirName, "composer.json"));

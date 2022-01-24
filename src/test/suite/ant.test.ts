@@ -8,7 +8,7 @@ import * as assert from "assert";
 import * as path from "path";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, isReady } from "../helper";
+import { activate, getWsPath, isReady } from "../helper";
 import { TaskExplorerApi } from "../../extension";
 import { AntTaskProvider } from "../../providers/ant";
 
@@ -26,9 +26,17 @@ suite("Ant Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady("ant") === true, "Setup failed");
+        //
+        // Task provider
+        //
         provider = teApi.taskProviders.get("ant") as AntTaskProvider;
-        rootWorkspace = (workspace.workspaceFolders ? workspace.workspaceFolders[0]: undefined) as WorkspaceFolder;
-        assert(rootWorkspace, "        ✘ Workspace folder does not exist");
+        //
+        // File path for create/remove
+        //
+        rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0];
+        //
+        // Store / set initial settings
+        //
         await configuration.updateWs("pathToAnt", path.resolve(process.cwd(), "..\\..\\test-files\\ant\\bin\\ant.bat"));
         buildXmlFile = path.join(process.cwd(), "..\\..\\test-files\\build.xml");
     });
@@ -36,7 +44,6 @@ suite("Ant Tests", () =>
 
     test("Document Position", async () =>
     {
-        // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");

@@ -1,3 +1,7 @@
 
 @echo hello %1
-timeout /t 5
+timeout /t 1
+timeout /t 1
+timeout /t 1
+timeout /t 1
+timeout /t 1

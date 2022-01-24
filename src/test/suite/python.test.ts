@@ -7,7 +7,7 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { tasks, Uri } from "vscode";
+import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
 import { activate, getWsPath, isReady, sleep } from "../helper";
 import { TaskExplorerApi } from "../../extension";
@@ -18,7 +18,7 @@ import { properCase } from "../../common/utils";
 let teApi: TaskExplorerApi;
 let pathToPython: string;
 let enablePython: boolean;
-let mainFile: Uri;
+let wsFolder: WorkspaceFolder;
 
 
 suite("Python Tests", () =>
@@ -30,9 +30,9 @@ suite("Python Tests", () =>
     {   //
         // Initialize
         //
-        teApi = await activate();
+        teApi = await activate(this);
         assert(isReady("script") === true, "Setup failed");
-        mainFile = Uri.file(getWsPath("test.py"));
+        wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         //
         // Store / set initial settings
         //
@@ -56,20 +56,28 @@ suite("Python Tests", () =>
     test("Document Position", async () =>
     {
         const provider = teApi.taskProviders.get("script") as ScriptTaskProvider;
-        provider.getDocumentPosition(undefined, undefined);
-        provider.getDocumentPosition("test", undefined);
-        provider.getDocumentPosition(undefined, "test");
+        assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
+    });
+
+
+    test("Invalid Script Type", async () =>
+    {
+        const provider = teApi.taskProviders.get("script") as ScriptTaskProvider;
+        assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.py"))),
+               "Script type should return position 1");
     });
 
 
     test("Disable", async () =>
     {
+        let cTasks = await tasks.fetchTasks({ type: "script" });
+        assert(cTasks && cTasks.filter(t => t.source === testsName).length === 2, "Did not read initial 2 python tasks");
         await configuration.updateWs(`enable${testsNameProper}`, false);
-        await sleep(1750);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName, mainFile);
-        await sleep(1750);
-        // const cTasks = await tasks.fetchTasks({ type: testsName });
-        // assert(!cTasks || cTasks.length === 0, "Did not read 0 python tasks");
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        await sleep(500);
+        cTasks = await tasks.fetchTasks({ type: "script" });
+        assert(!cTasks || cTasks.filter(t => t.source === testsName).length === 0, "Did not read 0 python tasks");
     });
 
 
@@ -77,9 +85,10 @@ suite("Python Tests", () =>
     {
         await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName, mainFile);
-        // const cTasks = await tasks.fetchTasks({ type: testsName });
-        // assert(cTasks && cTasks.length === 2, "Did not read 2 python tasks");
+        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        await sleep(500);
+        const cTasks = await tasks.fetchTasks({ type: "script" });
+        assert(cTasks && cTasks.filter(t => t.source === testsName).length === 2, "Did not read 2 python tasks");
     });
 
 

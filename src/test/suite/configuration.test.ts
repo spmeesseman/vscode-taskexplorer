@@ -32,7 +32,7 @@ suite("Configuration / Settings Tests", () =>
     });
 
 
-    test("Ant Glob", async function()
+    test("Ant glob", async function()
     {
         const globPatterns = configuration.get<string[]>("globPatternsAnt");
         await configuration.updateWs("enableAnt", false);
@@ -46,7 +46,7 @@ suite("Configuration / Settings Tests", () =>
     });
 
 
-    test("Bash Glob", async function()
+    test("Bash glob", async function()
     {
         const globPatterns = configuration.get<string[]>("globPatternsBash");
         await configuration.updateWs("enableBash", false);
@@ -60,7 +60,7 @@ suite("Configuration / Settings Tests", () =>
     });
 
 
-    test("Package Manager", async function()
+    test("Package manager", async function()
     {
         const wsGlobalConfig= workspace.getConfiguration(),
               pkgMgr = wsGlobalConfig.get<string>("npm.packageManager");
@@ -73,7 +73,7 @@ suite("Configuration / Settings Tests", () =>
     });
 
 
-    test("Default Shell", async function()
+    test("Default shell", async function()
     {
         const wsGlobalConfig= workspace.getConfiguration(),
               shellW32 = wsGlobalConfig.get<string>("npm.packageManager"),

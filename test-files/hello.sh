@@ -1,2 +1,4 @@
 echo Hello - testing bash file
-sleep 3
+sleep 1
+sleep 1
+sleep 1
