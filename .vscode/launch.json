@@ -42,6 +42,24 @@
 			]
         },
         {
+            "name": "Launch (TSC)(GEMS2 Root)",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "npm: watch",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ],
+            "args": [
+                "--disable-extensions",
+                "--disable-workspace-trust",
+                "--extensionDevelopmentPath=${workspaceFolder}",
+                "${workspaceRoot}/../GEMS2"
+            ]
+        },
+        {
 			"type": "extensionHost",
 			"request": "launch",
 			"name": "Launch (Webpack)(TestFixture Root)",

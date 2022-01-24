@@ -94,7 +94,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         if (process.platform === "win32")
         {
             isWinShell = true;
-            const winShell = workspace.getConfiguration().get<string>("terminal.integrated.shell.windows", "");
+            const winShell = workspace.getConfiguration().get<string>("terminal.integrated.shell.windows", "") || "";
             if (winShell.includes("bash.exe")) {
                 sep = "/";
                 isWinShell = false;
