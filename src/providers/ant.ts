@@ -74,13 +74,19 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         //
         // Try running 'ant' itself to get the targets.  If fail, just custom parse
         //
-        if (useAnt === true)
-        {
-            this.findTasksWithAnt(path, scripts);
+        try {
+            if (useAnt === true)
+            {
+                this.findTasksWithAnt(path, scripts);
+            }
+            else {
+                await this.findTasksWithXml2Js(path, scripts);
+            }
         }
-        else {
-            await this.findTasksWithXml2Js(path, scripts);
+        catch (ex) {
+            this.logException(ex);
         }
+
 
         log.methodDone("find ant targets complete", 1, logPad, true);
         return scripts;
@@ -111,8 +117,6 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
     private findTasksWithAnt(path: string, scripts: StringMap)
     {
-        let stdout: Buffer;
-
         //
         // Execute 'ant'/'ant.bat' to find defined tasks (ant targets)
         //
@@ -136,15 +140,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         //
         //     Default target: G64
         //
-        try {
-console.log("1: " + this.getCommand() + " -f " + path + " -p");
-            stdout = execSync(this.getCommand() + " -f " + path + " -p");
-        }
-        catch (ex) {
-console.log(ex.toString());
-            this.logException(ex);
-            return;
-        }
+        const stdout: Buffer = execSync(this.getCommand() + " -f " + path + " -p");
 
         if (stdout)
         {
