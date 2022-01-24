@@ -3,7 +3,6 @@ import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOp
 import * as path from "path";
 import * as util from "../common/utils";
 import * as log from "../common/log";
-import { filesCache } from "../cache";
 import { configuration } from "../common/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../taskDefinition";
@@ -40,34 +39,6 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
     public getDocumentPosition(scriptName: string | undefined, documentText: string | undefined): number
     {
         return 0;
-    }
-
-
-    public async readTasks(logPad: string): Promise<Task[]>
-    {
-        const allTasks: Task[] = [];
-        const visitedFiles: Set<string> = new Set();
-        const paths = filesCache.get(this.providerName),
-              enabled = configuration.get<boolean>(util.getTaskEnabledSettingName(this.providerName));
-
-        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["enabled", enabled]]);
-
-        if (enabled && paths)
-        {
-            for (const fObj of paths)
-            {
-                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
-                {
-                    visitedFiles.add(fObj.uri.fsPath);
-                    log.write(`   processed ${this.providerName} file`, 3, logPad);
-                    log.value("      file", fObj.uri.fsPath, 3, logPad);
-                    allTasks.push(...await this.readUriTasks(fObj.uri, logPad + "   "));
-                }
-            }
-        }
-
-        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [["# of tasks", allTasks.length]]);
-        return allTasks;
     }
 
 

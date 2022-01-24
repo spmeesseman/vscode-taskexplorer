@@ -400,7 +400,7 @@ export async function removeFileFromCache(taskAlias: string, uri: Uri, logPad = 
 
         for (const item of itemCache)
         {
-            if (item.uri.fsPath === uri.fsPath || !util.pathExists(item.uri.path))
+            if (item.uri.fsPath === uri.fsPath) // || !util.pathExists(item.uri.path)) // <- why does this break shit?!?!
             {
                 toRemove.push(item);
             }

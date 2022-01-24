@@ -3,14 +3,13 @@ import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { configuration } from "../common/configuration";
 import * as util from "../common/utils";
 import * as log from "../common/log";
-import { removeFileFromCache } from "../cache";
+import { filesCache, removeFileFromCache } from "../cache";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
 {
     abstract createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined;
     abstract getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number;
-    abstract readTasks(logPad: string): Promise<Task[]>;
     abstract readUriTasks(uri: Uri, logPad: string): Promise<Task[]>;
 
 
@@ -59,33 +58,34 @@ export abstract class TaskExplorerProvider implements TaskProvider
     }
 
 
-    // public async readTasks(logPad: string): Promise<Task[]>
-    // {
-    //     const allTasks: Task[] = [];
-    //     const visitedFiles: Set<string> = new Set();
-    //     const paths = filesCache.get(this.providerName),
-    //           enabled = configuration.get<boolean>(util.getTaskEnabledSettingName(this.providerName));
-    //
-    //     log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["enabled", enabled]]);
-    //
-    //     if (enabled && paths)
-    //     {
-    //         for (const fObj of paths)
-    //         {
-    //             if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath)) {
-    //                 visitedFiles.add(fObj.uri.fsPath);
-    //                 const tasks = await this.readUriTasks(fObj.uri, logPad + "   ");
-    //                 log.write(`   processed ${this.providerName} file`, 3, logPad);
-    //                 log.value("      file", fObj.uri.fsPath, 3, logPad);
-    //                 log.value("      targets in file", tasks.length, 3, logPad);
-    //                 allTasks.push(...tasks);
-    //             }
-    //         }
-    //     }
-    //
-    //     log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [["# of tasks", allTasks.length]]);
-    //     return allTasks;
-    // }
+    protected async readTasks(logPad: string): Promise<Task[]>
+    {
+        const allTasks: Task[] = [];
+        const visitedFiles: Set<string> = new Set();
+        const paths = filesCache.get(this.providerName),
+              enabled = configuration.get<boolean>(util.getTaskEnabledSettingName(this.providerName));
+
+        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["enabled", enabled]]);
+
+        if (enabled && paths)
+        {
+            for (const fObj of paths)
+            {
+                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
+                {
+                    visitedFiles.add(fObj.uri.fsPath);
+                    const tasks = await this.readUriTasks(fObj.uri, logPad + "   ");
+                    log.write(`   processed ${this.providerName} file`, 3, logPad);
+                    log.value("      file", fObj.uri.fsPath, 3, logPad);
+                    log.value("      targets in file", tasks.length, 3, logPad);
+                    allTasks.push(...tasks);
+                }
+            }
+        }
+
+        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [["# of tasks", allTasks.length]]);
+        return allTasks;
+    }
 
 
     public resolveTask(_task: Task): Task | undefined

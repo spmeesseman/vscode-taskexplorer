@@ -3,7 +3,6 @@ import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, Shell
 import * as path from "path";
 import * as util from "../common/utils";
 import * as log from "../common/log";
-import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../taskDefinition";
 import { configuration } from "../common/configuration";
@@ -41,36 +40,6 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
         const execution = new ShellExecution(pythonPath ?? pipenv, args, options);
 
         return new Task(def, folder, target, "pipenv", execution, "$msCompile");
-    }
-
-
-    public async readTasks(logPad: string): Promise<Task[]>
-    {
-        const allTasks: Task[] = [];
-        const visitedFiles: Set<string> = new Set();
-        const paths = filesCache.get(this.providerName),
-              enabled = configuration.get<boolean>(util.getTaskEnabledSettingName(this.providerName));
-
-        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["enabled", enabled]]);
-
-        if (enabled && paths)
-        {
-            for (const obj of paths)
-            {
-                if (!util.isExcluded(obj.uri.path) && !visitedFiles.has(obj.uri.fsPath) && util.pathExists(obj.uri.fsPath))
-                {
-                    visitedFiles.add(obj.uri.fsPath);
-                    const tasks = await this.readUriTasks(obj.uri, logPad + "   ");
-                    log.write(`   processed ${this.providerName} file`, 3, logPad);
-                    log.value("      file", obj.uri.fsPath, 3, logPad);
-                    log.value("      targets in file", tasks.length, 3, logPad);
-                    allTasks.push(...tasks);
-                }
-            }
-        }
-
-        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [["# of tasks", allTasks.length]]);
-        return allTasks;
     }
 
 

@@ -227,8 +227,12 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         return 0;
     }
 
-
-    public async readTasks(logPad: string): Promise<Task[]>
+    /**
+     * Override TaskExplorerProvider
+     *
+     * @param logPad Log padding
+     */
+    protected async readTasks(logPad: string): Promise<Task[]>
     {
         const allTasks: Task[] = [],
               visitedFiles: Set<string> = new Set(),
