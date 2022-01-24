@@ -84,6 +84,9 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number
     {
+        if (!taskName || !documentText) {
+            return 0;
+        }
         return this.getDocumentPositionLine("", taskName, documentText, 0 , 0, true);
     }
 

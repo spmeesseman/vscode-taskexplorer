@@ -107,6 +107,9 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
 
     public getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number
     {
+        if (!taskName || !documentText) {
+            return 0;
+        }
         return this.getDocumentPositionLine("grunt.registerTask(", taskName, documentText);
     }
 

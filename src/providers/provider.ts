@@ -26,11 +26,8 @@ export abstract class TaskExplorerProvider implements TaskProvider
     }
 
 
-    getDocumentPositionLine(lineName: string, scriptName: string | undefined, documentText: string | undefined, advance = 0, start = 0, skipQuotes = false): number
+    getDocumentPositionLine(lineName: string, scriptName: string, documentText: string, advance = 0, start = 0, skipQuotes = false): number
     {
-        if (!scriptName || !documentText) {
-            return 0;
-        }
         //
         // TODO - This is crap, use regex to detect spaces between quotes
         //
