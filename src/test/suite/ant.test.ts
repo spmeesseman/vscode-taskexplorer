@@ -114,7 +114,11 @@ suite("Ant Tests", () =>
         await configuration.updateWs("pathToAnsicon", undefined);
         provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
         await tasks.fetchTasks({ type: testsName });
+    });
 
+
+    test("Non-Win32 create task", async () =>
+    {
         //
         // Non-win32 case
         //
@@ -124,7 +128,6 @@ suite("Ant Tests", () =>
         // process.platform = platform;
         await tasks.fetchTasks({ type: testsName });
     });
-
 
 
     test("Ant Parser", async () =>

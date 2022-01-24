@@ -86,7 +86,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         let isWinShell = false,
             exec: string = scriptDef.exec,
             fileName = path.basename(uri.fsPath),
-            sep: string = (process.platform === "win32" ? "\\" : "/");
+            sep: string = path.sep;
 
         //
         // If the default terminal cmd/powershell?  On linux and darwin, no, on windows, maybe...
@@ -94,8 +94,8 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         if (process.platform === "win32")
         {
             isWinShell = true;
-            const winShell: string | undefined = workspace.getConfiguration().get("terminal.integrated.shell.windows");
-            if (winShell?.includes("bash.exe")) {
+            const winShell = workspace.getConfiguration().get<string>("terminal.integrated.shell.windows", "");
+            if (winShell.includes("bash.exe")) {
                 sep = "/";
                 isWinShell = false;
             }
