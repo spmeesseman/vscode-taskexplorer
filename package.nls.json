@@ -124,9 +124,6 @@
 	"config.taskExplorer.disableAnimatedIconsDsc": "Use static non-animated icons for running tasks as opposed to the spinning icons.",
 
 	"config.taskExplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
-
-
-	"config.taskExplorer.renameSpecial": "Configure labels that should be used in the Special Folders.",
 	
 	"config.taskExplorer.showLastTasks": "Show the 'last tasks' as a node in the task tree.",
 	"config.taskExplorer.showRunningTask": "Show the last ran running task in the status bar.",
@@ -152,6 +149,7 @@
 
 	"view.name": "Task Explorer",
 
+	"command.getApi": "Get Task Explorer API object",
 	"command.refresh": "Refresh",
 	"command.run": "Run",
 	"command.restart": "Restart",
@@ -159,6 +157,7 @@
 	"command.runWithArgs": "Run with arguments",
 	"command.runLastTask": "Run last task",
 	"command.addToExcludes": "Add to excludes list",
+	"command.addRemoveCustomLabel": "Add/Remove special folders label",
 	"command.addRemoveFromFavorites": "Add/Remove from favorites list",
 	"command.clearSpecialFolder": "Clear all tasks from this folder",
 	"command.stop": "Stop",
@@ -166,7 +165,6 @@
 	"command.debug": "Debugging ",
 	"command.open": "Open",
 	"command.openTerminal": "Open Terminal",
-	"command.renameSpecial": "Add/Remove special folders label",
 	"command.runInstall": "Run pkg mgr install",
 	"command.runAudit": "Run pkg mgr audit",
 	"command.runAuditFix": "Run pkg mgr audit fix",

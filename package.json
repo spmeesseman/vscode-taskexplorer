@@ -218,13 +218,9 @@
                 }
             },
             {
-                "command": "taskExplorerSideBar.renameSpecial",
-                "title": "%command.renameSpecial%",
-                "when": "config.taskExplorer.enableSideBar",
-                "icon": {
-                    "light": "res/light/continue.svg",
-                    "dark": "res/dark/continue.svg"
-                }
+                "command": "taskExplorerSideBar.addRemoveCustomLabel",
+                "title": "%command.addRemoveCustomLabel%",
+                "when": "config.taskExplorer.enableSideBar"
             },
             {
                 "command": "taskExplorerSideBar.clearSpecialFolder",
@@ -361,13 +357,9 @@
                 }
             },
             {
-                "command": "taskExplorer.renameSpecial",
-                "title": "%command.renameSpecial%",
-                "when": "config.taskExplorer.enableExplorerView",
-                "icon": {
-                    "light": "res/light/continue.svg",
-                    "dark": "res/dark/continue.svg"
-                }
+                "command": "taskExplorer.addRemoveCustomLabel",
+                "title": "%command.addRemoveCustomLabel%",
+                "when": "config.taskExplorer.enableExplorerView"
             },
             {
                 "command": "taskExplorer.clearSpecialFolder",
@@ -457,6 +449,10 @@
                 "command": "taskExplorer.showOutput",
                 "title": "%command.showOutput%",
                 "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
+                "command": "taskExplorer.getApi",
+                "title": "%command.getApi%"
             }
         ],
         "keybindings": [
@@ -728,15 +724,15 @@
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS"
                 },
                 {
-                    "command": "taskExplorer.renameSpecial",
+                    "command": "taskExplorer.addRemoveCustomLabel",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
                 },
                 {
-                    "command": "taskExplorer.renameSpecial",
+                    "command": "taskExplorer.addRemoveCustomLabel",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
                 },
                 {
-                    "command": "taskExplorer.renameSpecial",
+                    "command": "taskExplorer.addRemoveCustomLabel",
                     "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS"
                 },
                 {
@@ -1150,15 +1146,15 @@
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS"
                 },
                 {
-                    "command": "taskExplorerSideBar.renameSpecial",
+                    "command": "taskExplorerSideBar.addRemoveCustomLabel",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
                 },
                 {
-                    "command": "taskExplorerSideBar.renameSpecial",
+                    "command": "taskExplorerSideBar.addRemoveCustomLabel",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
                 },
                 {
-                    "command": "taskExplorerSideBar.renameSpecial",
+                    "command": "taskExplorerSideBar.addRemoveCustomLabel",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS"
                 },
                 {
@@ -1715,17 +1711,6 @@
                     "default": false,
                     "title": "%config.taskExplorer.useGulp%",
                     "description": "%config.taskExplorer.useGulpDsc%"
-                },
-                "taskExplorer.renameSpecial": {
-                    "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "default": [],
-                    "description": "%config.taskExplorer.renameSpecial%"
                 },
                 "taskExplorer.includeAnt": {
                     "type": [

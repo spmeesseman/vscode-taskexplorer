@@ -7,7 +7,7 @@
 
 import {
     Disposable, ExtensionContext, Uri, tasks, TaskProvider,
-    workspace, window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder, Task
+    workspace, window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder, Task, commands
 } from "vscode";
 import { TaskTreeDataProvider } from "./tree/tree";
 import { AntTaskProvider } from "./providers/ant";
@@ -40,6 +40,7 @@ export interface TaskExplorerApi
     utilities: any;
     fileCache: any;
     taskProviders: Map<string, TaskExplorerProvider>;
+    logging: any;
 }
 
 
@@ -61,6 +62,11 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     // by VSCode, not internally.
     //
     registerTaskProviders(context);
+
+    //
+    // Register GetAPI task
+    //
+    context.subscriptions.push(commands.registerCommand("taskExplorer.getApi", () => teApi));
 
     //
     // Register the tree providers
@@ -100,8 +106,9 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         sidebarProvider: treeDataProvider,
         utilities: util,
         fileCache: cache,
-        taskProviders: providers // ,
+        taskProviders: providers,
         // appDataPath: appDataPath
+        logging: log
     };
 
     return teApi;
@@ -136,44 +143,11 @@ export async function deactivate()
 }
 
 
-export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "")
+function logFileWatcherEvent(uri: Uri, type: string)
 {
-    log.methodStart("process remove workspace folder", 1, logPad, true);
-
-    for (const f of wsf)
-    {
-        log.value("      folder", f.name, 1, logPad);
-        // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
-        for (const c of cache.filesCache)
-        {
-            const files = c[1], provider = c[0],
-                  toRemove: cache.ICacheItem[] = [];
-
-            log.value("      start remove task files from cache", provider, 2, logPad);
-
-            for (const file of files)
-            {
-                log.value("         checking cache file", file.uri.fsPath, 4, logPad);
-                if (file.folder.uri.fsPath === f.uri.fsPath) {
-                    log.write("            added for removal",  4, logPad);
-                    toRemove.push(file);
-                }
-            }
-
-            if (toRemove.length > 0)
-            {
-                for (const tr of toRemove) {
-                    log.value("         remove file", tr.uri.fsPath, 2, logPad);
-                    files.delete(tr);
-                }
-            }
-
-            log.value("      completed remove files from cache", provider, 2, logPad);
-        }
-        log.write("   folder removed", 1, logPad);
-    }
-
-    log.methodDone("process remove workspace folder", 1, logPad, true);
+    log.write("file change event", 1);
+    log.value("   type", type, 1);
+    log.value("   file", uri.fsPath, 1);
 }
 
 
@@ -238,8 +212,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         if (taskTypes.hasOwnProperty(i))
         {
             const taskType = taskTypes[i],
-                taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher",
-                enabledSetting = "enable" + taskTypeP;
+                enabledSetting = util.getTaskEnabledSettingName(taskType);
             if (e.affectsConfiguration("taskExplorer." + enabledSetting))
             {
                 const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher";
@@ -382,6 +355,47 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
 }
 
 
+export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "")
+{
+    log.methodStart("process remove workspace folder", 1, logPad, true);
+
+    for (const f of wsf)
+    {
+        log.value("      folder", f.name, 1, logPad);
+        // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
+        for (const c of cache.filesCache)
+        {
+            const files = c[1], provider = c[0],
+                  toRemove: cache.ICacheItem[] = [];
+
+            log.value("      start remove task files from cache", provider, 2, logPad);
+
+            for (const file of files)
+            {
+                log.value("         checking cache file", file.uri.fsPath, 4, logPad);
+                if (file.folder.uri.fsPath === f.uri.fsPath) {
+                    log.write("            added for removal",  4, logPad);
+                    toRemove.push(file);
+                }
+            }
+
+            if (toRemove.length > 0)
+            {
+                for (const tr of toRemove) {
+                    log.value("         remove file", tr.uri.fsPath, 2, logPad);
+                    files.delete(tr);
+                }
+            }
+
+            log.value("      completed remove files from cache", provider, 2, logPad);
+        }
+        log.write("   folder removed", 1, logPad);
+    }
+
+    log.methodDone("process remove workspace folder", 1, logPad, true);
+}
+
+
 async function registerFileWatchers(context: ExtensionContext)
 {
     const taskTypes = util.getTaskTypes();
@@ -503,14 +517,6 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
             await refreshTree(taskType, _e);
         }));
     }
-}
-
-
-function logFileWatcherEvent(uri: Uri, type: string)
-{
-    log.write("file change event", 1);
-    log.value("   type", type, 1);
-    log.value("   file", uri.fsPath, 1);
 }
 
 
