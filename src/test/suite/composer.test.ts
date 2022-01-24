@@ -7,7 +7,7 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
+import { tasks, Uri } from "vscode";
 import { configuration } from "../../common/configuration";
 import { activate, getWsPath, isReady, sleep } from "../helper";
 import { TaskExplorerApi } from "../../extension";
@@ -64,7 +64,7 @@ suite("Composer Tests", () =>
     test("Start", async () =>
     {
         const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 2, "Did not read 2 composer tasks");
+        assert(cTasks && cTasks.length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
     });
 
 
@@ -75,7 +75,7 @@ suite("Composer Tests", () =>
         await teApi.explorerProvider?.invalidateTasksCache(testsName);
         await sleep(500);
         const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(!cTasks || cTasks.length === 0, "Did not read 0 composer tasks");
+        assert(!cTasks || cTasks.length === 0, `Did not read 0 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
     });
 
 
@@ -85,7 +85,7 @@ suite("Composer Tests", () =>
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName);
         const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 2, "Did not read 2 composer tasks");
+        assert(cTasks && cTasks.length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
     });
 
 
@@ -115,7 +115,7 @@ suite("Composer Tests", () =>
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName, file);
         let cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 5, "Did not read 5 composer tasks");
+        assert(cTasks && cTasks.length === 5, `Did not read 5 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
 
         fs.unlinkSync(file.fsPath);
         fs.rmdirSync(dirName, {
@@ -125,7 +125,7 @@ suite("Composer Tests", () =>
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName, file);
         cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks.length === 2, "Did not read 2 composer tasks");
+        assert(cTasks.length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
     });
 
 });
