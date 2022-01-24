@@ -18,6 +18,11 @@ rule2:
 .special: special_rule2_dont_parse
     @echo special
 
+# Clean
+
+clean    :  TEST
+   rd /q /s dir
+
 # The ":=" referenced in ticket 146 must not be a windows nmake thing,
 # get 'invalid character '='' errors when uncommented.  but they are no
 # longer parsed as tasks.

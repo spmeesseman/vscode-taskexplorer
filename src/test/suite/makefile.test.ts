@@ -42,6 +42,7 @@ suite("Makefile Tests", () =>
         const makefileContent = readFileSync(getWsPath("make\\makefile"));
         provider.getDocumentPosition("rule1", makefileContent);
         provider.getDocumentPosition("rule2", makefileContent);
+        provider.getDocumentPosition("clean", makefileContent);
         provider.getDocumentPosition("rule_does_not_exist", makefileContent);
     });
 
