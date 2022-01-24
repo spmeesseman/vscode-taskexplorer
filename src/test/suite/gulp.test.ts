@@ -41,119 +41,115 @@ suite("Gulp Tests", () =>
     });
 
 
-    // test("Start", async () =>
-    // {
-    //     const cTasks = await tasks.fetchTasks({ type: testsName });
-    //     assert(cTasks && cTasks.length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
-    // });
+    test("Start", async () =>
+    {
+        const cTasks = await tasks.fetchTasks({ type: testsName });
+        assert(cTasks && cTasks.length === 17, `Did not read 17 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+    });
 
 
-    // test("Disable", async () =>
-    // {
-    //     await configuration.updateWs(`enable${testsNameProper}`, false);
-    //     await sleep(500);
-    //     await teApi.explorerProvider?.invalidateTasksCache(testsName);
-    //     await sleep(500);
-    //     const cTasks = await tasks.fetchTasks({ type: testsName });
-    //     assert(!cTasks || cTasks.length === 0, `Did not read 0 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
-    // });
+    test("Disable", async () =>
+    {
+        await configuration.updateWs(`enable${testsNameProper}`, false);
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        await sleep(500);
+        const cTasks = await tasks.fetchTasks({ type: testsName });
+        assert(!cTasks || cTasks.length === 0, `Did not read 0 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+    });
 
 
-    // test("Re-enable", async () =>
-    // {
-    //     await configuration.updateWs(`enable${testsNameProper}`, true);
-    //     await sleep(500);
-    //     await teApi.explorerProvider?.invalidateTasksCache(testsName);
-    //     const cTasks = await tasks.fetchTasks({ type: testsName });
-    //     assert(cTasks && cTasks.length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
-    // });
+    test("Re-enable", async () =>
+    {
+        await configuration.updateWs(`enable${testsNameProper}`, true);
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        const cTasks = await tasks.fetchTasks({ type: testsName });
+        assert(cTasks && cTasks.length === 17, `Did not read 17 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+    });
 
 
-    // test("Create file", async () =>
-    // {
-    //     if (!fs.existsSync(dirName)) {
-    //         fs.mkdirSync(dirName, { mode: 0o777 });
-    //     }
-    //
-    //     fs.writeFileSync(
-    //         fileUri.fsPath,
-    //         "{\n" +
-    //         '  "scripts":\n' +
-    //         "  {\n" +
-    //         '    "test1": "run -r test",\n' +
-    //         '    "test2": "open -p tmp.txt",\n' +
-    //         '    "test3": "start -x 1 -y 2"\n' +
-    //         "  },\n" +
-    //         '  "include": ["**/*"],\n' +
-    //         '  "exclude": ["node_modules"]\n' +
-    //         "}\n"
-    //     );
-    //
-    //     await sleep(500);
-    //     await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
-    //     const cTasks = await tasks.fetchTasks({ type: testsName });
-    //     assert(cTasks && cTasks.length === 5, `Did not read 5 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
-    // });
+    test("Create file", async () =>
+    {
+        if (!fs.existsSync(dirName)) {
+            fs.mkdirSync(dirName, { mode: 0o777 });
+        }
+
+        fs.writeFileSync(
+            fileUri.fsPath,
+            "var gulp = require('gulp');\n" +
+            "gulp.task('hello3', (done) => {\n" +
+            "    console.log('Hello3!');\n" +
+            "    done();\n" +
+            "});\n" +
+            'gulp.task(\n"hello4", (done) => {\n' +
+            "    console.log('Hello4!');\n" +
+            "    done();\n" +
+            "});\n"
+        );
+
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+        const cTasks = await tasks.fetchTasks({ type: testsName });
+        assert(cTasks && cTasks.length === 19, `Did not read 19 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+    });
 
 
-    // test("Add task to file", async () =>
-    // {
-    //     fs.writeFileSync(
-    //         fileUri.fsPath,
-    //         "{\n" +
-    //         '  "scripts":\n' +
-    //         "  {\n" +
-    //         '    "test1": "run -r test",\n' +
-    //         '    "test2": "open -p tmp.txt",\n' +
-    //         '    "test3": "start -x 1 -y 2",\n' +
-    //         '    "test4": "start -x 2 -y 3"\n' +
-    //         "  },\n" +
-    //         '  "include": ["**/*"],\n' +
-    //         '  "exclude": ["node_modules"]\n' +
-    //         "}\n"
-    //     );
-    //
-    //     await sleep(500);
-    //     await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
-    //     const cTasks = await tasks.fetchTasks({ type: testsName });
-    //     assert(cTasks && cTasks.length === 6, `Did not read 6 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
-    // });
+    test("Add task to file", async () =>
+    {
+        fs.writeFileSync(
+            fileUri.fsPath,
+            "var gulp = require('gulp');\n" +
+            "gulp.task('hello3', (done) => {\n" +
+            "    console.log('Hello3!');\n" +
+            "    done();\n" +
+            "});\n" +
+            'gulp.task(\n"hello4", (done) => {\n' +
+            "    console.log('Hello4!');\n" +
+            "    done();\n" +
+            "});\n" +
+            'gulp.task(\n"hello5", (done) => {\n' +
+            "    console.log('Hello5!');\n" +
+            "    done();\n" +
+            "});\n"
+        );
+
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+        const cTasks = await tasks.fetchTasks({ type: testsName });
+        assert(cTasks && cTasks.length === 20, `Did not read 20 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+    });
 
 
-    // test("Remove task from file", async () =>
-    // {
-    //     fs.writeFileSync(
-    //         fileUri.fsPath,
-    //         "{\n" +
-    //         '  "scripts":\n' +
-    //         "  {\n" +
-    //         '    "test1": "run -r test",\n' +
-    //         '    "test2": "open -p tmp.txt"\n' +
-    //         "  },\n" +
-    //         '  "include": ["**/*"],\n' +
-    //         '  "exclude": ["node_modules"]\n' +
-    //         "}\n"
-    //     );
-    //
-    //     await sleep(500);
-    //     await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
-    //     const cTasks = await tasks.fetchTasks({ type: testsName });
-    //     assert(cTasks && cTasks.length === 4, `Did not read 4 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
-    // });
+    test("Remove task from file", async () =>
+    {
+        fs.writeFileSync(
+            fileUri.fsPath,
+            "var gulp = require('gulp');\n" +
+            "gulp.task('hello3', (done) => {\n" +
+            "    console.log('Hello3!');\n" +
+            "    done();\n" +
+            "});\n"
+        );
+
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+        const cTasks = await tasks.fetchTasks({ type: testsName });
+        assert(cTasks && cTasks.length === 18, `Did not read 18 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+    });
 
 
-    // test("Delete file", async () =>
-    // {
-    //     fs.unlinkSync(fileUri.fsPath);
-    //     fs.rmdirSync(dirName, {
-    //         recursive: true
-    //     });
-    //
-    //     await sleep(500);
-    //     await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
-    //     const cTasks = await tasks.fetchTasks({ type: testsName });
-    //     assert(cTasks.length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
-    // });
+    test("Delete file", async () =>
+    {
+        fs.unlinkSync(fileUri.fsPath);
+        fs.rmdirSync(dirName, {
+            recursive: true
+        });
+        await sleep(500);
+        await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+        const cTasks = await tasks.fetchTasks({ type: testsName });
+        assert(cTasks.length === 17, `Did not read 17 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+    });
 
 
     test("Gulp Parser", async () =>
