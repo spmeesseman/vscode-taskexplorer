@@ -1,9 +1,10 @@
 
-import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
-import { configuration } from "../common/configuration";
 import * as util from "../common/utils";
 import * as log from "../common/log";
+import constants from "../common/constants";
+import { configuration } from "../common/configuration";
 import { filesCache, removeFileFromCache } from "../cache";
+import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
@@ -41,6 +42,17 @@ export abstract class TaskExplorerProvider implements TaskProvider
             idx += advance;
         }
         return idx;
+    }
+
+
+    /**
+     * Override for external providers or custom globs (for ant/bash)
+     *
+     * @since 2.6.3
+     */
+    public getGlobPattern(subType?: string)
+    {
+        return constants[`GLOB_${this.providerName.replace(/\-/g, "").toUpperCase()}`];
     }
 
 

@@ -6,7 +6,7 @@ import * as log from "../common/log";
 import { configuration } from "../common/configuration";
 import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../taskDefinition";
+import { TaskExplorerDefinition } from "../interface/taskDefinition";
 
 
 export class ComposerTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider

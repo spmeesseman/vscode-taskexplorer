@@ -1,12 +1,14 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem } from "vscode";
 import * as util from "./common/utils";
 import * as log from "./common/log";
 import constants from "./common/constants";
 import { configuration } from "./common/configuration";
-import { dirname } from "path";
-import { lstatSync } from "fs";
+import { providers } from "./extension";
+import {
+    workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
+} from "vscode";
+
 
 let cacheBuilding = false;
 let folderCaching = false;
@@ -22,10 +24,10 @@ export interface ICacheItem
 
 export const filesCache: Map<string, Set<ICacheItem>> = new Map();
 
-export async function addFolderToCache(folder?: WorkspaceFolder | undefined, logPad = "")
+
+export async function addFolderToCache(folder: WorkspaceFolder | undefined, logPad: string)
 {
-    log.write("Add folder to cache", 3, logPad);
-    log.value("   folder", !folder ? "entire workspace" : folder.name, 3, logPad);
+    log.methodStart("add folder to cache", 3, logPad, false, [["folder", !folder ? "entire workspace" : folder.name]]);
 
     //
     // Wait for caches to get done building before proceeding
@@ -36,69 +38,29 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined, log
     folderCaching = true;  // set flag
     cacheBuilding = true;  // set flag
 
-    //
-    // For Ant tasks, users can add additional file matching globs in Settings, so use the
-    // util.getAntGlllobPattern() to comine the glob patterns with the default
-    //
-    if (!cancel && configuration.get<boolean>("enableAnt")) {
-        await buildCache("ant", util.getCombinedGlobPattern(constants.GLOB_ANT,
-                         [...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", [])]),
-                         folder, false, logPad + "   ");
+    for (const p of providers)
+    {
+        const provider = p[1];
+        if (provider.providerName !== "script")
+        {
+            if (!cancel && configuration.get<boolean>(util.getTaskEnabledSettingName(provider.providerName)))
+            {
+                log.value("   building cache for provider", provider.providerName, 3, logPad);
+                await buildCache(provider.providerName, provider.getGlobPattern(), folder, false, logPad + "   ");
+            }
+        }
+        else {
+            for (const scriptType of util.getScriptTaskTypes())
+            {
+                if (!cancel && configuration.get<boolean>(util.getTaskEnabledSettingName(scriptType)))
+                {
+                    log.value("   building cache for script provider", scriptType, 3, logPad);
+                    await buildCache(scriptType, provider.getGlobPattern(scriptType), folder, false, logPad + "   ");
+                }
+            }
+        }
     }
-    //
-    // App Publisher (work related)
-    //
-    if (!cancel && configuration.get<boolean>("enableAppPublisher")) {
-        await buildCache("app-publisher", constants.GLOB_APPPUBLISHER, folder, false, logPad + "   ");
-    }
-    //
-    // Bash
-    //
-    if (!cancel && configuration.get<boolean>("enableBash")) {
-        await buildCache("bash", util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", [])), folder, false, logPad + "   ");
-    }
-    //
-    // Batch / Cmd
-    //
-    if (!cancel && configuration.get<boolean>("enableBatch")) {
-        await buildCache("batch", constants.GLOB_BATCH, folder, false, logPad + "   ");
-    }
-    //
-    // COMPOSER
-    //
-    if (!cancel && configuration.get<boolean>("enableComposer")) {
-        await buildCache("composer", constants.GLOB_COMPOSER, folder, false, logPad + "   ");
-    }
-    //
-    // Gradle Multi-Language Automation Tool
-    //
-    if (!cancel && configuration.get<boolean>("enableGradle")) {
-        await buildCache("gradle", constants.GLOB_GRADLE, folder, false, logPad + "   ");
-    }
-    //
-    // Grunt JavaScript Task Runner
-    //
-    if (!cancel && configuration.get<boolean>("enableGrunt")) {
-        await buildCache("grunt", constants.GLOB_GRUNT, folder, false, logPad + "   ");
-    }
-    //
-    // Gulp JavaScript Toolkit
-    //
-    if (!cancel && configuration.get<boolean>("enableGulp")) {
-        await buildCache("gulp", constants.GLOB_GULP, folder, false, logPad + "   ");
-    }
-    //
-    // C/C++ Makefile
-    //
-    if (!cancel && configuration.get<boolean>("enableMake")) {
-        await buildCache("make", constants.GLOB_MAKE, folder, false, logPad + "   ");
-    }
-    //
-    // Maven
-    //
-    if (!cancel && configuration.get<boolean>("enableMaven")) {
-        await buildCache("maven", constants.GLOB_MAVEN, folder, false, logPad + "   ");
-    }
+
     //
     // NPM
     // Note that NPM tasks are provided by VSCode, not this extension
@@ -107,43 +69,8 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined, log
         await buildCache("npm", constants.GLOB_NPM, folder, false, logPad + "   ");
     }
     //
-    // Nullsoft NSIS Installer
-    //
-    if (!cancel && configuration.get<boolean>("enableNsis")) {
-        await buildCache("nsis", constants.GLOB_NSIS, folder, false, logPad + "   ");
-    }
-    //
-    // Old Lady Perl
-    //
-    if (!cancel && configuration.get<boolean>("enablePerl")) {
-        await buildCache("perl", constants.GLOB_PERL, folder, false, logPad + "   ");
-    }
-    //
-    // Powershell
-    //
-    if (!cancel && configuration.get<boolean>("enablePowershell")) {
-        await buildCache("powershell", constants.GLOB_POWERSHELL, folder, false, logPad + "   ");
-    }
-    //
-    // Python
-    //
-    if (!cancel && configuration.get<boolean>("enablePython")) {
-        await buildCache("python", constants.GLOB_PYTHON, folder, false, logPad + "   ");
-    }
-    //
-    // Pipenv (Python)
-    //
-    if (!cancel && configuration.get<boolean>("enablePipenv")) {
-        await buildCache("pipenv", constants.GLOB_PIPENV, folder, false, logPad + "   ");
-    }
-    //
-    // Ruby
-    //
-    if (!cancel && configuration.get<boolean>("enableRuby")) {
-        await buildCache("ruby", constants.GLOB_RUBY, folder, false, logPad + "   ");
-    }
-    //
     // Typescript
+    // Note that Typescript tasks are provided by VSCode, not this extension
     //
     if (!cancel && configuration.get<boolean>("enableTsc")) {
         await buildCache("tsc", constants.GLOB_TSC, folder, false, logPad + "   ");
@@ -165,10 +92,12 @@ export async function addFolderToCache(folder?: WorkspaceFolder | undefined, log
         log.write("Add folder to cache complete", 3, logPad);
     }
     cancel = false;          // un-set flag
+
+    log.methodDone("add folder to cache", 3, logPad);
 }
 
 
-export async function buildCache(taskType: string, fileGlob: string, wsFolder?: WorkspaceFolder | undefined, setCacheBuilding = true, logPad = "")
+export async function buildCache(taskType: string, fileGlob: string, wsFolder: WorkspaceFolder | undefined, setCacheBuilding: boolean, logPad: string)
 {
     const taskAlias = !util.isScriptType(taskType) ? taskType : "script";
 
@@ -385,7 +314,7 @@ export async function rebuildCache(logPad = "")
 }
 
 
-export async function removeFileFromCache(taskAlias: string, uri: Uri, logPad = "")
+export async function removeFileFromCache(taskAlias: string, uri: Uri, logPad: string)
 {
     const itemCache = filesCache.get(taskAlias),
           toRemove = [];

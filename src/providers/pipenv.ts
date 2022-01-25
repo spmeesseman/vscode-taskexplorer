@@ -1,12 +1,13 @@
 
-import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
+import * as bombadil from "@sgarciac/bombadil";
+import * as log from "../common/log";
 import * as path from "path";
 import * as util from "../common/utils";
-import * as log from "../common/log";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../taskDefinition";
+import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { configuration } from "../common/configuration";
-import * as bombadil from "@sgarciac/bombadil";
+import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
+
 
 /**
  * Parses [scripts] from the pipenv Python package manager's Pipfile.

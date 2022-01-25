@@ -2,7 +2,7 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, Terminal, StatusBarItem, StatusBarAlignment, CustomExecution
+    ShellExecution, Terminal, StatusBarItem, StatusBarAlignment, CustomExecution, CancellationTokenSource
 } from "vscode";
 import * as path from "path";
 import * as util from "../common/utils";
@@ -17,7 +17,8 @@ import { visit, JSONVisitor } from "jsonc-parser";
 import { storage } from "../common/storage";
 import { rebuildCache } from "../cache";
 import { configuration } from "../common/configuration";
-import { providers } from "../extension";
+import { providers, providersExternal } from "../extension";
+import { ScriptTaskProvider } from "../providers/script";
 
 
 const localize = nls.loadMessageBundle();
@@ -985,6 +986,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
+    /**
+     * The main method VSCode TaskTreeProvider calls into
+     *
+     * @param element The tree item requested
+     * @param logPad Log padding
+     * @param logLevel Log level
+     */
     async getChildren(element?: TreeItem, logPad = "", logLevel = 2): Promise<TreeItem[]>
     {
         let waited = 0;
@@ -1063,6 +1071,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
                 this.tasks.push(...taskItems);
             }
+
+            for (const externalProviderMap of providersExternal)
+            {
+                const token = (new CancellationTokenSource()).token,
+                      externalTasks = await externalProviderMap[1].provideTasks(token);
+                this.tasks.push(...(externalTasks || []));
+            }
+
             if (this.tasks)
             {   //
                 // Build the entire task tree
@@ -2334,7 +2350,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private async runNpmCommand(taskFile: TaskFile, command: string)
     {
         const pkgMgr = util.getPackageManager(),
-              uri = taskFile.resourceUri as Uri;
+              uri = taskFile.resourceUri;
 
         const options = {
             cwd: path.dirname(uri.fsPath)
@@ -2422,25 +2438,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 if (_args)
                 {
-                    let newTask: Task | undefined = taskItem?.task;
-                    if (newTask && taskItem.task) {
-                        const def = taskItem.task.definition,
-                                folder = taskItem.getFolder();
-                        if (folder) {
-                            newTask = providers.get("script")?.createTask(def.script, undefined, folder, def.uri, _args.trim().split(" "));
-                            //
-                            // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
-                            // an instance of this task.
-                            //
-                            if (newTask) {
-                                newTask.definition.taskItemId = def.taskItemId;
-                            }
-                        }
+                    let newTask = taskItem.task;
+                    const def = taskItem.task.definition,
+                          folder = taskItem.getFolder();
+                    if (folder) {
+                        newTask = (providers.get("script") as ScriptTaskProvider).createTask(def.script, undefined, folder, def.uri, _args.trim().split(" ")) as Task;
+                        newTask.definition.taskItemId = def.taskItemId;
                     }
-                    if (newTask) {
-                        if (await this.runTask(newTask, noTerminal)) {
-                            await me.saveTask(taskItem, configuration.get<number>("numLastTasks"));
-                        }
+                    if (await this.runTask(newTask, noTerminal)) {
+                        await me.saveTask(taskItem, configuration.get<number>("numLastTasks"));
                     }
                 }
             };

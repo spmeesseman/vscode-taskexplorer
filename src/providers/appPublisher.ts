@@ -5,7 +5,7 @@ import * as util from "../common/utils";
 import * as log from "../common/log";
 import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../taskDefinition";
+import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { configuration } from "../common/configuration";
 
 

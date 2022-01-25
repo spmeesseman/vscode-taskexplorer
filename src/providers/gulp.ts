@@ -1,12 +1,12 @@
 
-import { Task, TaskGroup, WorkspaceFolder, RelativePattern, ShellExecution, Uri, workspace } from "vscode";
 import * as path from "path";
 import * as util from "../common/utils";
 import * as log from "../common/log";
 import { configuration } from "../common/configuration";
 import { execSync } from "child_process";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../taskDefinition";
+import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 
 
 export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider

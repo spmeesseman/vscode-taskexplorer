@@ -1,14 +1,9 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-/* ---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
-import {
-    Disposable, ExtensionContext, Uri, tasks, TaskProvider,
-    workspace, window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder, Task, commands
-} from "vscode";
+import * as util from "./common/utils";
+import * as cache from "./cache";
+import * as log from "./common/log";
+import constants from "./common/constants";
 import { TaskTreeDataProvider } from "./tree/tree";
 import { AntTaskProvider } from "./providers/ant";
 import { MakeTaskProvider } from "./providers/make";
@@ -24,24 +19,18 @@ import { configuration } from "./common/configuration";
 import { initStorage } from "./common/storage";
 import { views } from "./views";
 import { TaskExplorerProvider } from "./providers/provider";
-import * as util from "./common/utils";
-import * as cache from "./cache";
-import * as log from "./common/log";
-import constants from "./common/constants";
+import { TaskExplorerApi } from "./interface/taskExplorerApi";
+import {
+    Disposable, ExtensionContext, Uri, tasks, TaskProvider,
+    workspace, window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder, Task, commands
+} from "vscode";
+
 
 let teApi: TaskExplorerApi;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
 export const providers: Map<string, TaskExplorerProvider> = new Map();
-export interface TaskExplorerApi
-{
-    explorerProvider: TaskTreeDataProvider | undefined;
-    sidebarProvider: TaskTreeDataProvider | undefined;
-    utilities: any;
-    fileCache: any;
-    taskProviders: Map<string, TaskExplorerProvider>;
-    logging: any;
-}
+export const providersExternal: Map<string, TaskProvider> = new Map();
 
 
 export async function activate(context: ExtensionContext, disposables: Disposable[]): Promise<TaskExplorerApi>
@@ -104,10 +93,10 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     teApi = {
         explorerProvider: treeDataProvider2,
         sidebarProvider: treeDataProvider,
+        registerProvider: registerExternalProvider,
         utilities: util,
         fileCache: cache,
         taskProviders: providers,
-        // appDataPath: appDataPath
         logging: log
     };
 
@@ -119,10 +108,12 @@ export async function addWsFolder(wsf: readonly WorkspaceFolder[] | undefined)
 {
     if (wsf)
     {
-        for (const f in wsf) {
+        for (const f in wsf)
+        {
             if (wsf.hasOwnProperty(f)) { // skip over properties inherited by prototype
-                log.write("Workspace folder added: " + wsf[f].name, 1);
-                await cache.addFolderToCache(wsf[f]);
+                log.methodStart("workspace folder added", 1, "", true, [["name", wsf[f].name]]);
+                await cache.addFolderToCache(wsf[f], "   ");
+                log.methodDone("workspace folder added", 1, "");
             }
         }
     }
@@ -212,10 +203,10 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         if (taskTypes.hasOwnProperty(i))
         {
             const taskType = taskTypes[i],
-                enabledSetting = util.getTaskEnabledSettingName(taskType);
+                  enabledSetting = util.getTaskEnabledSettingName(taskType);
             if (e.affectsConfiguration("taskExplorer." + enabledSetting))
             {
-                const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher";
+                const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher" || taskType === "maven";
                 await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), ignoreModify, configuration.get<boolean>(enabledSetting));
                 registerChange(taskType);
             }
@@ -440,6 +431,12 @@ export async function refreshTree(taskType?: string, uri?: Uri)
 }
 
 
+function registerExternalProvider(providerName: string, provider: TaskProvider)
+{
+    providersExternal.set(providerName, provider);
+}
+
+
 function registerTaskProvider(providerName: string, provider: TaskExplorerProvider, context: ExtensionContext)
 {
     context.subscriptions.push(tasks.registerTaskProvider(providerName, provider));
@@ -452,20 +449,20 @@ function registerTaskProviders(context: ExtensionContext)
     // Internal Task Providers
     //
     // These tak types are provided internally by the extension.  Some task types (npm, grunt,
-    //  gulp) are provided by VSCode itself
+    //  gulp, ts) are provided by VSCode itself
     //
     // TODO: VSCODE API now implements "resolveTask" in addition to "provideTask".  Need to implement
     //     https://code.visualstudio.com/api/extension-guides/task-provider
     //
     registerTaskProvider("ant", new AntTaskProvider(), context);                      // Apache Ant Build Automation Tool
     registerTaskProvider("app-publisher", new AppPublisherTaskProvider(), context);   // App Publisher (work related)
+    registerTaskProvider("composer", new ComposerTaskProvider(), context);            // PHP / composer.json
     registerTaskProvider("gradle", new GradleTaskProvider(), context);                // Gradle multi-Language Automation Tool
     registerTaskProvider("grunt", new GruntTaskProvider(), context);                  // Gulp JavaScript Toolkit
     registerTaskProvider("gulp", new GulpTaskProvider(), context);                    // Grunt JavaScript Task Runner
     registerTaskProvider("make", new MakeTaskProvider(), context);                    // C/C++ Makefile
     registerTaskProvider("maven", new MavenTaskProvider(), context);                  // Apache Maven Toolset
     registerTaskProvider("pipenv", new PipenvTaskProvider(), context);                // Pipfile for Python pipenv package manager
-    registerTaskProvider("composer", new ComposerTaskProvider(), context);                      // PHP / composer.json
     //
     // The 'script' provider handles all file based 'scripts', e.g. batch files, bash, powershell, etc
     //
@@ -480,7 +477,7 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
     let watcher = watchers.get(taskType);
 
     if (workspace.workspaceFolders) {
-        await cache.buildCache(taskType, fileBlob);
+        await cache.buildCache(taskType, fileBlob, undefined, false, "   ");
     }
 
     if (watcher)
@@ -508,7 +505,7 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
         }
         watcherDisposables.set(taskType, watcher.onDidDelete(async _e => {
             logFileWatcherEvent(_e, "delete");
-            await cache.removeFileFromCache(taskType, _e);
+            await cache.removeFileFromCache(taskType, _e, "");
             await refreshTree(taskType, _e);
         }));
         watcherDisposables.set(taskType, watcher.onDidCreate(async _e => {

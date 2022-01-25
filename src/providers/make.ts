@@ -1,13 +1,13 @@
 
-import {
-    Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions, extensions
-} from "vscode";
 import * as path from "path";
 import * as util from "../common/utils";
 import * as log from "../common/log";
 import { configuration } from "../common/configuration";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../taskDefinition";
+import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import {
+    Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions, extensions
+} from "vscode";
 
 
 export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider

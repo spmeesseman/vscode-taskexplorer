@@ -8,7 +8,8 @@ import { parseStringPromise } from "xml2js";
 import { configuration } from "../common/configuration";
 import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../taskDefinition";
+import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import constants from "../common/constants";
 
 
 interface StringMap { [s: string]: string }
@@ -239,6 +240,14 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             uri
         };
         return def;
+    }
+
+
+    public getGlobPattern()
+    {
+        return util.getCombinedGlobPattern(constants.GLOB_ANT,
+                                           [...configuration.get<string[]>("includeAnt", []),
+                                            ...configuration.get<string[]>("globPatternsAnt", [])]);
     }
 
 

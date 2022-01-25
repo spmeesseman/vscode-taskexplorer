@@ -1,12 +1,13 @@
 
-import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 import * as path from "path";
 import * as util from "../common/utils";
 import * as log from "../common/log";
+import constants from "../common/constants";
 import { configuration } from "../common/configuration";
 import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../taskDefinition";
+import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 
 
 export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -225,6 +226,15 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     public getDocumentPosition(): number
     {
         return 0;
+    }
+
+
+    public getGlobPattern(scriptType: string)
+    {
+        if (scriptType === "bash") {
+            return util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
+        }
+        return constants[`GLOB_${scriptType.replace(/\-/g, "").toUpperCase()}`];
     }
 
     /**
