@@ -62,38 +62,36 @@ suite("Configuration / Settings Tests", () =>
 
     test("Package manager", async function()
     {
-        const wsGlobalConfig= workspace.getConfiguration(),
-              pkgMgr = wsGlobalConfig.get<string>("npm.packageManager");
-        await wsGlobalConfig.update("npm.packageManager", "yarn", ConfigurationTarget.Workspace);
+        const pkgMgr = configuration.getVs<string>("npm.packageManager");
+        await configuration.updateVs("npm.packageManager", "yarn", ConfigurationTarget.Workspace);
         await sleep(100);
-        await wsGlobalConfig.update("npm.packageManager", "npm", ConfigurationTarget.Workspace);
+        await configuration.updateVs("npm.packageManager", "npm", ConfigurationTarget.Workspace);
         await sleep(100);
-        await wsGlobalConfig.update("npm.packageManager", pkgMgr, ConfigurationTarget.Workspace);
+        await configuration.updateVs("npm.packageManager", pkgMgr, ConfigurationTarget.Workspace);
         await sleep(100);
     });
 
 
     test("Default shell", async function()
     {
-        const wsGlobalConfig= workspace.getConfiguration(),
-              shellW32 = wsGlobalConfig.get<string>("npm.packageManager"),
-              shellLnx = wsGlobalConfig.get<string>("npm.packageManager"),
-              shellOsx = wsGlobalConfig.get<string>("npm.packageManager");
+        const shellW32 = configuration.getVs<string>("npm.packageManager"),
+              shellLnx = configuration.getVs<string>("npm.packageManager"),
+              shellOsx = configuration.getVs<string>("npm.packageManager");
         await sleep(100);
-        await wsGlobalConfig.update("terminal.integrated.shell.osx", "/usr/bin/sh", ConfigurationTarget.Workspace);
+        await configuration.updateVs("terminal.integrated.shell.osx", "/usr/bin/sh", ConfigurationTarget.Workspace);
         await sleep(100);
-        await wsGlobalConfig.update("terminal.integrated.shell.linux", "/bin/sh", ConfigurationTarget.Workspace);
+        await configuration.updateVs("terminal.integrated.shell.linux", "/bin/sh", ConfigurationTarget.Workspace);
         await sleep(100);
-        await wsGlobalConfig.update("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
+        await configuration.updateVs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
         await sleep(100);
         await initSettings(false);
         await sleep(100);
-        await wsGlobalConfig.update("terminal.integrated.shell.linux", shellLnx, ConfigurationTarget.Workspace);
+        await configuration.updateVs("terminal.integrated.shell.linux", shellLnx, ConfigurationTarget.Workspace);
         await sleep(100);
-        await wsGlobalConfig.update("terminal.integrated.shell.osx", shellOsx, ConfigurationTarget.Workspace);
-        configuration.updateWs("enableNsis", true); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
+        await configuration.updateVs("terminal.integrated.shell.osx", shellOsx, ConfigurationTarget.Workspace);
+        await configuration.updateWs("enableNsis", true); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
         await sleep(100);
-        await wsGlobalConfig.update("terminal.integrated.shell.windows", shellW32, ConfigurationTarget.Workspace);
+        await configuration.updateVs("terminal.integrated.shell.windows", shellW32, ConfigurationTarget.Workspace);
         await sleep(100);
         await initSettings();
     });

@@ -464,8 +464,8 @@ suite("Provider Tests", () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
-        await workspace.getConfiguration().update("terminal.integrated.shell.windows",
-                                                  "C:\\Program Files\\Git\\bin\\bash.exe", ConfigurationTarget.Workspace);
+        await configuration.updateVs("terminal.integrated.shell.windows",
+                                     "C:\\Program Files\\Git\\bin\\bash.exe", ConfigurationTarget.Workspace);
         await sleep(1000);
         await teApi.fileCache.buildCache("bash", "bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
     });

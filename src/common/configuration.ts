@@ -10,6 +10,7 @@ const extensionName = "taskExplorer";
 class Configuration
 {
     private configuration: WorkspaceConfiguration;
+    private configurationWs: WorkspaceConfiguration;
     private _onDidChange = new EventEmitter<ConfigurationChangeEvent>();
 
 
@@ -22,6 +23,7 @@ class Configuration
     constructor()
     {
         this.configuration = workspace.getConfiguration(extensionName);
+        this.configurationWs = workspace.getConfiguration();
         workspace.onDidChangeConfiguration(this.onConfigurationChanged, this);
     }
 
@@ -36,21 +38,38 @@ class Configuration
     }
 
 
-    public get<T>(section: string, defaultValue?: T): T
+    public get<T>(key: string, defaultValue?: T): T
     {
-        return this.configuration.get<T>(section, defaultValue!);
+        return this.configuration.get<T>(key, defaultValue!);
     }
 
 
-    public update(section: string, value: any): Thenable<void>
+    /**
+     * Include entire settings key.  This is just workspace.getConfiguration().
+     * Example:
+     *     getGlobal<string>("terminal.integrated.shell.windows", "")
+     */
+    public getVs<T>(key: string, defaultValue?: T): T
     {
-        return this.configuration.update(section, value, ConfigurationTarget.Global);
+        return this.configurationWs.get<T>(key, defaultValue!);
     }
 
 
-    public updateWs(section: string, value: any): Thenable<void>
+    public updateVs(key: string, value: any, cfgTarget?: ConfigurationTarget): Thenable<void>
     {
-        return this.configuration.update(section, value, ConfigurationTarget.Workspace);
+        return this.configurationWs.update(key, value, cfgTarget || ConfigurationTarget.Global);
+    }
+
+
+    public update(key: string, value: any): Thenable<void>
+    {
+        return this.configuration.update(key, value, ConfigurationTarget.Global);
+    }
+
+
+    public updateWs(key: string, value: any): Thenable<void>
+    {
+        return this.configuration.update(key, value, ConfigurationTarget.Workspace);
     }
 
 

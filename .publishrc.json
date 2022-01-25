@@ -3,7 +3,7 @@
     "branch":                   "master",
     "buildCommand":             "npm run webpack-rebuild",
     "buildPostCommand": [
-        "npm run test",
+        "npm run test-all",
         "npm run webpack-rebuild"
     ],
     "changelogFile":            "CHANGELOG.md",

@@ -19,17 +19,6 @@ import * as glob from "glob";
 import "ts-node/register";
 import "source-map-support/register";
 
-const fileToTest = "*";
-// const fileToTest = "_api";
-// const fileToTest = "ant";
-// const fileToTest = "composer";
-// const fileToTest = "configuration";
-// const fileToTest = "providers";
-// const fileToTest = "python";
-// const fileToTest = "tasks";
-// const fileToTest = "tree";
-// const fileToTest = "util";
-
 
 //
 // Linux: prevent a weird NPE when mocha on Linux requires the window size from the TTY
@@ -112,10 +101,25 @@ export async function run(): Promise<void>
 
     mocha.useColors(true);
 
+    let filesToTest = "**/*.test.js";
+    if (process.env.testArgs)
+    {
+        const args = process.env.testArgs.split(",");
+        filesToTest = (args.length > 1 ? "{" : "");
+        args.forEach((a) =>
+        {
+            if (filesToTest.length > 1) {
+                filesToTest += ",";
+            }
+            filesToTest += `**/${a}.test.js`;
+        });
+        filesToTest += (args.length > 1 ? "}" : "");
+    }
+
     //
     // Add all files to the test suite
     //
-    const files = glob.sync(`**/${fileToTest}.test.js`, { cwd: testsRoot });
+    const files = glob.sync(filesToTest, { cwd: testsRoot });
     // const files = glob.sync(`{**/_api.test.js,**/${fileToTest}.test.js}`, { cwd: testsRoot });
     files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
 

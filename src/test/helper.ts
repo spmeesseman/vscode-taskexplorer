@@ -164,9 +164,9 @@ export const getWsPath = (p: string) =>
 
 export async function initSettings(enable = true)
 {
-    await workspace.getConfiguration().update("terminal.integrated.shell.windows",
-                                              "C:\\Windows\\System32\\cmd.exe",
-                                              ConfigurationTarget.Workspace);
+    await configuration.updateVs("terminal.integrated.shell.windows",
+                                 "C:\\Windows\\System32\\cmd.exe",
+                                 ConfigurationTarget.Workspace);
     await configuration.updateWs("exclude", ["**/tasks_test_ignore_/**", "**/ant/**"]);
     //
     // Enable views, use workspace level so that running this test from Code itself
@@ -180,8 +180,6 @@ export async function initSettings(enable = true)
     //
     await configuration.updateWs("includeAnt", ["**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml"]);
     // Use update() here for coverage, since these two settings wont trigger any processing
-    await configuration.update("debug", true);
-    await configuration.update("debugLevel", 3);
     await configuration.updateWs("debug", true);
     await configuration.updateWs("debugLevel", 3);
     await configuration.updateWs("autoRefresh", enable);

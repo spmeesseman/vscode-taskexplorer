@@ -6,9 +6,10 @@ import { runTests } from "@vscode/test-electron";
 // import { runTests } from "vscode-test";
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
-async function main()
+async function main(args: string[])
 {
     try {
+        console.log("Arguments: " + (args && args.length > 0 ? args.toString() : "None"));
         console.log("clear package.json activation event");
         execSync("enable-full-coverage.sh", { cwd: "tools" });
         //
@@ -30,7 +31,8 @@ async function main()
             version: "1.60.1",
             extensionDevelopmentPath,
             extensionTestsPath,
-            launchArgs: [ "--disable-extensions", "--disable-workspace-trust", extensionTestsWsPath ]
+            launchArgs: [ "--disable-extensions", "--disable-workspace-trust", extensionTestsWsPath ],
+            extensionTestsEnv: { testArgs: args && args.length > 0 ? args.toString() : "" }
         });
         console.log("restore package.json activation event");
         execSync("enable-full-coverage.sh --off", { cwd: "tools" });
@@ -43,4 +45,4 @@ async function main()
     }
 }
 
-main();
+main(process.argv.slice(2));

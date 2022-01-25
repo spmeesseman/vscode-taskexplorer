@@ -141,8 +141,9 @@ suite("Task Tests", () =>
 async function executeTeCommand(command: string, timeout: number, ...args: any[])
 {
     try {
-        await commands.executeCommand(`taskExplorer.${command}`, ...args);
+        const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
         if (timeout) { await sleep(timeout); }
+        return rc;
     }
     catch (e) { console.log("✘ " + e.toString().substring(0, e.toString().indexOf("\n"))); }
 }
@@ -152,9 +153,16 @@ async function runTask(value: TaskItem, letFinish: boolean, lastTask: TaskItem |
 {
     await configuration.updateWs("clickAction", "Execute");
 
-    await executeTeCommand("addRemoveFromFavorites", 0, value);
+    let removed = await executeTeCommand("addRemoveFromFavorites", 0, value);
+    if (removed) {
+        await executeTeCommand("addRemoveFromFavorites", 0, value);
+    }
+
     overrideNextShowInputBox("test label");
-    await executeTeCommand("addRemoveCustomLabel", 0, value);
+    removed = await executeTeCommand("addRemoveCustomLabel", 0, value);
+    if (removed) {
+        await executeTeCommand("addRemoveFromFavorites", 0, value);
+    }
 
     if (lastTask) {
         await executeTeCommand("openTerminal", 0, lastTask);
@@ -179,6 +187,7 @@ async function runTask(value: TaskItem, letFinish: boolean, lastTask: TaskItem |
             await executeTeCommand("openTerminal", 0, value);
             await executeTeCommand("pause", 1000, value);
             await executeTeCommand("stop", 0, value);
+            await configuration.updateWs("disableAnimatedIcons", true);
             await executeTeCommand("runLastTask", 1500, value);
             await executeTeCommand("runLastTask", 0, value); // throw 'Busy, please wait...'
             await configuration.updateWs("keepTermOnStop", false);
@@ -186,6 +195,7 @@ async function runTask(value: TaskItem, letFinish: boolean, lastTask: TaskItem |
             await executeTeCommand("stop", 500, value);
             await executeTeCommand("runNoTerm", 2500, value);
             await executeTeCommand("stop", 0, value);
+            await configuration.updateWs("disableAnimatedIcons", false);
         }
         else {
             await sleep(9000);
@@ -193,21 +203,24 @@ async function runTask(value: TaskItem, letFinish: boolean, lastTask: TaskItem |
     }
     else
     {
+        await configuration.updateWs("disableAnimatedIcons", true);
         await executeTeCommand("run", 2000, value);
         if (!letFinish)
         {
             await executeTeCommand("stop", 0, value);
-            await workspace.getConfiguration().update("terminal.integrated.shell.windows",
-                                                        "bash.exe", ConfigurationTarget.Workspace);
+            await configuration.updateVs("terminal.integrated.shell.windows",
+                                         "bash.exe", ConfigurationTarget.Workspace);
+            await configuration.updateWs("disableAnimatedIcons", false);
             await executeTeCommand("run", 2000, value);
             await executeTeCommand("stop", 1000, value);
-            await workspace.getConfiguration().update("terminal.integrated.shell.windows",
-                                                        "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
+            await configuration.updateVs("terminal.integrated.shell.windows",
+                                         "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
             await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
             await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
         }
         else {
             await sleep(8000);
+            await configuration.updateWs("disableAnimatedIcons", false);
         }
     }
 

@@ -24,7 +24,8 @@ suite("Util Tests", () =>
             assert.fail("         ✘ Workspace folder does not exist");
         }
 
-        assert(workspace.getConfiguration("taskExplorer").update("debug", true));
+        await configuration.updateWs("debug", true);
+
         log.blank();
         log.write(`        ${creator}.${extension}`);
         log.value(`        ${creator}.${extension}`, "true");
@@ -53,11 +54,9 @@ suite("Util Tests", () =>
 		log.value("empty string value", "");
 
 		// Disabled logging
-		const dbg = configuration.get<boolean>("debug");
-		configuration.updateWs("debug", false);
+		await configuration.updateWs("debug", false);
 		log.write("test");
 		log.value("test", "1");
-		configuration.updateWs("debug", dbg);
 
         assert(util.camelCase("taskexplorer", 4) === "taskExplorer");
         assert(util.camelCase(undefined, 4) === undefined);
