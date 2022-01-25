@@ -29,7 +29,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     {
         const scripts: string[] = [];
 
-        log.methodStart("find grunt targets", 1, logPad, true);
+        log.methodStart("find grunt targets", 1, logPad, true, [["path", fsPath]]);
 
         const contents = util.readFileSync(fsPath);
         let idx = 0;

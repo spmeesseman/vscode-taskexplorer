@@ -47,7 +47,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
     {
         const scripts: string[] = [];
 
-        log.methodStart("find pipenv Pipfile targets", 1, logPad, true);
+        log.methodStart("find pipenv Pipfile targets", 1, logPad, true, [["path", fsPath]]);
 
         const contents = util.readFileSync(fsPath);
 

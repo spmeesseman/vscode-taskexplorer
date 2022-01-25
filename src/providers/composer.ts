@@ -43,7 +43,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
     {
         const targets: string[] = [];
 
-        log.methodStart("find composer targets", 1, logPad, true);
+        log.methodStart("find composer targets", 1, logPad, true, [["path", fsPath]]);
 
         try {
             const json = JSON.parse(util.readFileSync(fsPath)),

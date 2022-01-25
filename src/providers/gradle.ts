@@ -41,10 +41,9 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     private findTargets(fsPath: string, logPad: string): string[]
     {
-        const json: any = "";
         const scripts: string[] = [];
 
-        log.methodStart("find gradle targets", 1, logPad, true);
+        log.methodStart("find gradle targets", 1, logPad, true, [["path", fsPath]]);
 
         const contents = util.readFileSync(fsPath);
         let idx = 0;

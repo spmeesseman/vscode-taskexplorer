@@ -48,7 +48,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     {
         let scripts: string[] = [];
 
-        log.methodStart("find gulp targets", 1, logPad, true);
+        log.methodStart("find gulp targets", 1, logPad, true, [["path", fsPath]]);
         //
         // Try running 'gulp' itself to get the targets.  If fail, just custom parse
         //

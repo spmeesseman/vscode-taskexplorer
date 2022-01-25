@@ -40,7 +40,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad = ""): Task
     {
-        log.methodStart("create make task", 4, logPad, true);
+        log.methodStart("create make task", 4, logPad, true, [["target", target], ["cmd", cmd]]);
 
         const getCommand = (): string =>
         {
@@ -112,9 +112,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     private findTargets(fsPath: string, logPad: string): string[]
     {
         const scripts: string[] = [];
-
-        log.blank(1);
-        log.write(logPad + "find makefile targets");
+        log.methodStart("find makefile targets", 1, logPad, true, [["path", fsPath]]);
 
         const contents = util.readFileSync(fsPath);
         let match;
@@ -135,8 +133,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             }
         }
 
-        log.write(logPad + "find makefile targets complete", 1);
-
+        log.methodDone("find makefile targets", 1, logPad, true);
         return scripts;
     }
 

@@ -129,13 +129,18 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 if (pathExists && util.existsInArray(configuration.get("exclude", []), uri.path) === false)
                 {
                     const tasks = await this.readUriTasks(uri, logPad + "   ");
-                    this.cachedTasks.push(...tasks);
+                    //
+                    // If the implementation of the readUri() method awaits, it can theoretically reset
+                    // this.cachedTasks under certain circumstances via invalidation by the tree that's
+                    // called into by the main VSCode thread. So ensure it's defined before the push()...
+                    //
+                    this.cachedTasks?.push(...tasks);
                 }
                 else if (!pathExists) {
                     await removeFileFromCache(this.providerName, uri, "   ");
                 }
 
-                this.cachedTasks = this.cachedTasks.length > 0 ? this.cachedTasks : undefined;
+                this.cachedTasks = this.cachedTasks && this.cachedTasks.length > 0 ? this.cachedTasks : undefined;
             }
             else {
                 this.cachedTasks = undefined;
