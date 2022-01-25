@@ -4,9 +4,9 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import constants from "../../common/constants";
-import { commands } from "vscode";
+import { commands, tasks } from "vscode";
 import { TaskExplorerApi } from "../../interface/taskExplorerApi";
-import { activate, initSettings, isReady } from "../helper";
+import { activate, initSettings, isReady, sleep } from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -33,9 +33,9 @@ suite("API Init and Tests", () =>
         await initSettings(false);
         teApi.explorerProvider?.showSpecialTasks(true);
         teApi.explorerProvider?.showSpecialTasks(true, true);
+        await initSettings();
         await teApi.explorerProvider?.refresh("tests");
         await commands.executeCommand("taskExplorer.refresh");
-        await initSettings();
     });
 
 

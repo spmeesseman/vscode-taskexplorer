@@ -61,6 +61,7 @@ suite("Ant Tests", () =>
 
     test("Start", async () =>
     {
+        await teApi.explorerProvider?.invalidateTasksCache(testsName);
         const cTasks = await tasks.fetchTasks({ type: testsName });
         assert(cTasks && cTasks.length === 3, `Did not read 3 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
     });

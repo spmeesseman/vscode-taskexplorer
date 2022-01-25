@@ -264,42 +264,29 @@ export async function cancelBuildCache(wait?: boolean)
 
 function disposeStatusBarSpace(statusBarSpace: StatusBarItem)
 {
-    statusBarSpace?.hide();
-    statusBarSpace?.dispose();
+    statusBarSpace.hide();
+    statusBarSpace.dispose();
 }
 
 
 function getExcludesPattern(folder: string | WorkspaceFolder): RelativePattern
 {
-    let multiFilePattern = "{**/node_modules/**,**/work/**";
-    const excludes: string[] = configuration.get("exclude");
-
-    if (excludes && excludes.length > 0)
-    {
-        for (const e of excludes) {
-            multiFilePattern += ",";
-            multiFilePattern += e;
-        }
-    }
-    multiFilePattern += "}";
-
+    const excludes: string[] = configuration.get("exclude"),
+          multiFilePattern = util.getCombinedGlobPattern("**/node_modules/**,**/work/**", excludes);
     return new RelativePattern(folder, multiFilePattern);
 }
 
 
-function getStatusString(msg: string, statusLength = 0)
+function getStatusString(msg: string, statusLength: number)
 {
-    if (statusLength > 0)
+    if (msg.length < statusLength)
     {
-        if (msg.length < statusLength)
-        {
-            for (let i = msg.length; i < statusLength; i++) {
-                msg += " ";
-            }
+        for (let i = msg.length; i < statusLength; i++) {
+            msg += " ";
         }
-        else {
-            msg = msg.substring(0, statusLength - 3) + "...";
-        }
+    }
+    else {
+        msg = msg.substring(0, statusLength - 3) + "...";
     }
     return "$(loading~spin) " + msg;
 }
