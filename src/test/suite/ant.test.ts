@@ -54,7 +54,8 @@ suite("Ant Tests", () =>
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
         provider.getDocumentPosition("test_isnt_there", xml);
-        provider.getDocumentPosition("test-build2", xml);
+        const index = provider.getDocumentPosition("test-build2", xml);
+        assert(index === 275, `test-build2 task position should be 275 (actual ${index}`);
     });
 
 
@@ -102,37 +103,37 @@ suite("Ant Tests", () =>
         //
         await configuration.updateWs("pathToAnsicon", "ansicon\\x64\\ansicon.exe");
         await configuration.updateWs("enableAnsiconForAnt", true);
-        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await configuration.updateWs("pathToAnsicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
-        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await configuration.updateWs("pathToAnsicon", getWsPath("..\\tools\\ansicon\\x64") + "\\");
-        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await configuration.updateWs("pathToAnsicon", getWsPath("..\\tools\\ansicon\\x64"));
-        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
 
         //
         // Disable Ansicon
         //
         await configuration.updateWs("pathToAnsicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
         await configuration.updateWs("enableAnsiconForAnt", false);
-        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await configuration.updateWs("pathToAnsicon", getWsPath("..\\tools\\ansicon\\x64\\"));
-        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
 
         //
         // Remove path
         //
         await configuration.updateWs("pathToAnsicon", undefined);
-        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
     });
 
 
     test("Win32 create task", async () =>
     {
         await configuration.updateWs("pathToAnt", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
-        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await configuration.updateWs("pathToAnt", getWsPath("..\\tools\\ant\\bin\\ant"));
-        provider.createTask("test", "test", rootWorkspace, Uri.file(buildXmlFile), []);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
     });
 
 
