@@ -6,6 +6,23 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch (TSC)",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "npm: watch",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ],
+            "args": [
+                "--disable-extensions",
+                "--disable-workspace-trust",
+                "--extensionDevelopmentPath=${workspaceFolder}"
+            ]
+        },
+        {
             "name": "Launch (TSC)(Project Root)",
             "type": "extensionHost",
             "request": "launch",

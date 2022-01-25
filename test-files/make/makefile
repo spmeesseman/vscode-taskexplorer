@@ -20,8 +20,13 @@ rule2:
 
 # Clean
 
-clean    :  TEST
+clean    : TEST
    rd /q /s dir
+
+# clean2
+
+clean2    :
+   rd /q /s dir2
 
 # The ":=" referenced in ticket 146 must not be a windows nmake thing,
 # get 'invalid character '='' errors when uncommented.  but they are no
@@ -31,3 +36,6 @@ clean    :  TEST
 # else
 # VAR4:=bar
 # VAR5 := bar
+
+# clean3
+clean3: echo 876
