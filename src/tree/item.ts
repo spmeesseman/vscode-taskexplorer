@@ -1,14 +1,13 @@
 
+import * as log from "../common/log";
+import * as path from "path";
+import * as util from "../common/utils";
+import TaskFile from "./file";
+import { configuration } from "../common/configuration";
 import {
     Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks
 }
 from "vscode";
-import * as path from "path";
-import TaskFile from "./file";
-import * as util from "../common/utils";
-import { storage } from "../common/storage";
-import constants from "../common/constants";
-import { configuration } from "../common/configuration";
 
 
 /**
@@ -24,7 +23,7 @@ export default class TaskItem extends TreeItem
     public readonly taskSource: string;
     public readonly taskGroup: string;
     public readonly isUser: boolean;
-    public task: Task | undefined;
+    public task: Task;
     public taskDetached: Task | undefined;
     public execution: TaskExecution | undefined;
     public paused: boolean;
@@ -72,7 +71,7 @@ export default class TaskItem extends TreeItem
         // Since we save tasks (last tasks and favorites), we need a known unique key to
         // save them with.  We can just use the existing id parameter...
         //
-        const fsPath = taskFile.resourceUri ? taskFile.resourceUri.fsPath : "root";
+        const fsPath = taskFile.resourceUri.fsPath;
         this.id = fsPath + ":" + task.source + ":" + task.name + ":" + (taskGroup || "");
         this.paused = false;                // paused flag used by start/stop/pause task functionality
         this.taskFile = taskFile;           // Save a reference to the TaskFile that this TaskItem belongs to
@@ -110,7 +109,7 @@ export default class TaskItem extends TreeItem
         //
         // Refresh state - sets context value, icon path from execution state
         //
-        this.refreshState();
+        this.refreshState(false);
     }
 
 
@@ -120,36 +119,21 @@ export default class TaskItem extends TreeItem
     }
 
 
-    isExecuting(task?: Task | undefined)
+    isExecuting()
     {
-        let exec;
-        if (this.taskDetached)
-        {
-            const detached = this.taskDetached;
-            exec = tasks.taskExecutions.find(e => e.task.name === detached.name && e.task.source === detached.source &&
-                   e.task.scope === detached.scope && e.task.definition.path === detached.definition.path);
-        }
-        if (!exec)
-        {
-            this.task = task ?? this.task;
-            if (this.task)
-            {
-                const task = this.task;
-                this.execution = exec = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
-                                        e.task.scope === task.scope && e.task.definition.path === task.definition.path);
-            }
-        }
-        return exec;
+        const task = this.taskDetached ?? this.task;
+        return tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
+                                         e.task.scope === task.scope && e.task.definition.path === task.definition.path);
     }
 
 
-    refreshState(task?: Task | undefined)
+    refreshState(doLog: boolean)
     {
-        const isExecuting = this.isExecuting(task);
-        if (this.task) {
-            this.setContextValue(this.task, !!isExecuting);
-            this.setIconPath(this.task, this.context, !!isExecuting);
-        }
+        const isExecuting = !!this.isExecuting();
+        log.methodStart("refresh state", 5, "   ", false, [["is executing", isExecuting]]);
+        this.setContextValue(this.task, isExecuting);
+        this.setIconPath(this.task, this.context, isExecuting);
+        log.methodDone("refresh state", 5, "   ", false, [["is executing", isExecuting]]);
     }
 
 

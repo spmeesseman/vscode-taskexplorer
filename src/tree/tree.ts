@@ -18,7 +18,6 @@ import { storage } from "../common/storage";
 import { rebuildCache } from "../cache";
 import { configuration } from "../common/configuration";
 import { providers } from "../extension";
-import { TaskExplorerProvider } from "../providers/provider";
 
 
 const localize = nls.loadMessageBundle();
@@ -76,8 +75,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         subscriptions.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
         subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | string) => { await this.addToExcludes(taskFile); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => { await this.addRemoveFavorite(taskItem); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addRemoveCustomLabel", async (taskItem: TaskItem) => { await this.addRemoveSpecialLabel(taskItem); }, this));
+        subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
+        subscriptions.push(commands.registerCommand(name + ".addRemoveCustomLabel", async (taskItem: TaskItem) => this.addRemoveSpecialLabel(taskItem), this));
         subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
 
         tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e));
@@ -96,6 +95,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      */
     private async addRemoveFavorite(taskItem: TaskItem)
     {
+        let removed = false;
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         const favId = util.getTaskItemId(taskItem);
 
@@ -123,14 +123,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             // Update
             //
             await this.showSpecialTasks(true, true, undefined, "   ");
+            removed = true;
         }
+
         log.methodDone("add/remove favorite", 1);
+        return removed;
     }
 
 
     private async addRemoveSpecialLabel(taskItem: TaskItem)
     {
-        let addRemoved = false,
+        let removed = false,
+            addRemoved = false,
             index = 0;
         const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
               id = util.getTaskItemId(taskItem) as string;
@@ -142,6 +146,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             if (id === renames[i][0])
             {
                 addRemoved = true;
+                removed = true;
                 renames.splice(index, 1);
                 break;
             }
@@ -171,6 +176,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
 
         log.methodDone("add/remove rename special", 1);
+        return removed;
     }
 
 
@@ -1557,7 +1563,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         log.value("   label", element?.label, 3);
         if (element instanceof TaskItem) {
             log.write("   refresh task item state", 3);
-            element.refreshState();
+            element.refreshState(true);
         }
         return element;
     }
@@ -2261,7 +2267,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                       folder = taskItem.getFolder();
                 if (folder && p)
                 {
-                    newTask = p.createTask(def.target, undefined, folder, def.uri, undefined, "   ");
+                    newTask = p.createTask(def.target, undefined, folder, def.uri, undefined, "   ") as Task;
                     //
                     // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
                     // an instance of this task.
