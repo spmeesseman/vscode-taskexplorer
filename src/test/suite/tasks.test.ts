@@ -10,7 +10,7 @@ import * as path from "path";
 import TaskItem from "../../tree/item";
 import { commands, ConfigurationTarget, tasks, workspace } from "vscode";
 import { configuration } from "../../common/configuration";
-import { TaskExplorerApi } from "../../extension";
+import { TaskExplorerApi } from "../../interface/taskExplorerApi";
 import { activate, findIdInTaskMap, isReady, overrideNextShowInputBox, sleep } from "../helper";
 
 

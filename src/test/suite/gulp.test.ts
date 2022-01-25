@@ -7,7 +7,7 @@ import * as path from "path";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
 import { activate, getWsPath, isReady, sleep } from "../helper";
-import { TaskExplorerApi } from "../../extension";
+import { TaskExplorerApi } from "../../interface/taskExplorerApi";
 import { GulpTaskProvider } from "../../providers/gulp";
 import { properCase } from "../../common/utils";
 

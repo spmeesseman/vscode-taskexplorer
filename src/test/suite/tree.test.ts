@@ -2,8 +2,8 @@
 /* tslint:disable */
 
 import * as assert from "assert";
-import { TaskExplorerApi } from "../../extension";
-import { activate, initSettings, isReady } from "../helper";
+import { TaskExplorerApi } from "../../interface/taskExplorerApi";
+import { activate, isReady } from "../helper";
 import { configuration } from "../../common/configuration";
 
 

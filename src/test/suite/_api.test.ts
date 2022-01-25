@@ -5,7 +5,7 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import constants from "../../common/constants";
 import { commands } from "vscode";
-import { TaskExplorerApi } from "../../extension";
+import { TaskExplorerApi } from "../../interface/taskExplorerApi";
 import { activate, initSettings, isReady } from "../helper";
 
 

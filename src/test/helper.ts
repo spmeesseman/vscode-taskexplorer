@@ -4,10 +4,11 @@ import * as fs from "fs";
 import * as path from "path";
 import * as assert from "assert";
 import TaskItem from "../tree/item";
-import { ConfigurationTarget, extensions, TreeItem, window, workspace, WorkspaceFolder } from "vscode";
-import { TaskExplorerApi, deactivate } from "../extension";
+import { deactivate } from "../extension";
+import { TaskExplorerApi } from "../interface/taskExplorerApi";
 import { configuration } from "../common/configuration";
 import { waitForCache } from "../cache";
+import { ConfigurationTarget, extensions, TreeItem, window, workspace } from "vscode";
 
 
 const writeToConsole = false;

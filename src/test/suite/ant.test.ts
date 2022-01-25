@@ -7,7 +7,7 @@ import * as util from "../../common/utils";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
 import { activate, getWsPath, isReady, sleep } from "../helper";
-import { TaskExplorerApi } from "../../extension";
+import { TaskExplorerApi } from "../../interface/taskExplorerApi";
 import { AntTaskProvider } from "../../providers/ant";
 import { properCase } from "../../common/utils";
 
