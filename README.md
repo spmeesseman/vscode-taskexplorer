@@ -231,6 +231,17 @@ To remove a provider:
 
 Where "taskTypeName" is the name of the task type, i.e. "npm", "ant", "gulp", etc, and `myProvider` is the instance of TaskProvider that implements the `provideTasks` method.
 
+The provided tasks must implement the taskExplorer.external task interface:
+
+    {
+        script: "the task name",
+        target: "command to run",
+        path: "file path",
+        fileName: "file name",
+        uri: file `Uri`,
+        taskItemId: (internal use, ignore)
+    }
+
 As of v2.7.0:
 
 - Has not been formally tested
