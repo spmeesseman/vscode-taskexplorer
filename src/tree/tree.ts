@@ -1077,8 +1077,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
             for (const externalProviderMap of providersExternal)
             {
-                const token = (new CancellationTokenSource()).token,
-                      externalTasks = await externalProviderMap[1].provideTasks(token);
+                const externalTasks = await externalProviderMap[1].provideTasks();
                 this.tasks.push(...(externalTasks || []));
             }
 
@@ -1683,10 +1682,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         log.write("   invalidate " + key + " provider", 1, logPad);
                         await p.invalidateTasksCache(undefined, logPad + "   ");
                     }
+                    for (const [ key, p ] of providersExternal)
+                    {
+                        log.write("   invalidate " + key + " provider", 1, logPad);
+                        await p.invalidateTasksCache(undefined, logPad + "   ");
+                    }
                 }
                 else { // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
                     log.write("   invalidate " + opt1 + " provider", 1, logPad);
-                    await providers.get(util.getTaskProviderType(opt1))?.invalidateTasksCache(undefined, logPad + "   ");
+                    const provider = providers.get(util.getTaskProviderType(opt1)) ||
+                                     providersExternal.get(opt1);
+                    provider?.invalidateTasksCache(undefined, logPad + "   ");
                 }
             }
         }
@@ -1737,6 +1743,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
                 return relativePath;
             }
+        }
+
+        //
+        // External tasks
+        //
+        if (providersExternal.get(task.source)) {
+            return !!task.definition && !!task.name && !!task.execution;
         }
 
         //

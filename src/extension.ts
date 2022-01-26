@@ -20,6 +20,7 @@ import { initStorage } from "./common/storage";
 import { views } from "./views";
 import { TaskExplorerProvider } from "./providers/provider";
 import { TaskExplorerApi } from "./interface/taskExplorerApi";
+import { ExternalTaskProvider } from "./providers/external";
 import {
     Disposable, ExtensionContext, Uri, tasks, TaskProvider,
     workspace, window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder, Task, commands
@@ -30,7 +31,7 @@ let teApi: TaskExplorerApi;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
 export const providers: Map<string, TaskExplorerProvider> = new Map();
-export const providersExternal: Map<string, TaskProvider> = new Map();
+export const providersExternal: Map<string, ExternalTaskProvider> = new Map();
 
 
 export async function activate(context: ExtensionContext, disposables: Disposable[]): Promise<TaskExplorerApi>
@@ -91,8 +92,8 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     log.write("   Task Explorer activated");
 
     teApi = {
-        explorerProvider: treeDataProvider2,
-        sidebarProvider: treeDataProvider,
+        explorer: treeDataProvider2,
+        sidebar: treeDataProvider,
         registerProvider: registerExternalProvider,
         unregisterProvider: unregisterExternalProvider,
         utilities: util,
@@ -187,13 +188,13 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     if (e.affectsConfiguration("taskExplorer.showLastTasks"))
     {
-        if (configuration.get<boolean>("enableSideBar") && teApi.sidebarProvider)
+        if (configuration.get<boolean>("enableSideBar") && teApi.sidebar)
         {
-            await teApi.sidebarProvider.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
+            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
         }
-        if (configuration.get<boolean>("enableExplorerView") && teApi.explorerProvider)
+        if (configuration.get<boolean>("enableExplorerView") && teApi.explorer)
         {
-            await teApi.explorerProvider.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
+            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
         }
     }
 
@@ -287,16 +288,16 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     {
         if (configuration.get<boolean>("enableSideBar"))
         {
-            if (teApi.sidebarProvider) {
+            if (teApi.sidebar) {
                 // TODO - remove/add view on enable/disable view
                 refresh = true;
             }
             else {
-                teApi.sidebarProvider = registerExplorer("taskExplorerSideBar", context);
+                teApi.sidebar = registerExplorer("taskExplorerSideBar", context);
             }
         }
         // else {
-        //     teApi.sidebarProvider = undefined;
+        //     teApi.sidebar = undefined;
         // }
     }
 
@@ -307,16 +308,16 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     {
         if (configuration.get<boolean>("enableExplorerView"))
         {
-            if (teApi.explorerProvider) {
+            if (teApi.explorer) {
                 // TODO - remove/add view on enable/disable view
                 refresh = true;
             }
             else {
-                teApi.explorerProvider = registerExplorer("taskExplorer", context);
+                teApi.explorer = registerExplorer("taskExplorer", context);
             }
         }
         // else {
-        //     teApi.explorerProvider = undefined;
+        //     teApi.explorer = undefined;
         // }
     }
 
@@ -367,11 +368,11 @@ export async function refreshTree(taskType?: string, uri?: Uri)
     // Note the static task cache only needs to be refreshed once if both the explorer view
     // and the sidebar view are being used and/or enabled
     //
-    if (configuration.get<boolean>("enableSideBar") && teApi.sidebarProvider) {
-        await teApi.sidebarProvider.refresh(taskType, uri);
+    if (configuration.get<boolean>("enableSideBar") && teApi.sidebar) {
+        await teApi.sidebar.refresh(taskType, uri);
     }
-    if (configuration.get<boolean>("enableExplorerView") && teApi.explorerProvider) {
-        await teApi.explorerProvider.refresh(taskType, uri);
+    if (configuration.get<boolean>("enableExplorerView") && teApi.explorer) {
+        await teApi.explorer.refresh(taskType, uri);
     }
 }
 
@@ -401,9 +402,11 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
 }
 
 
-async function registerExternalProvider(providerName: string, provider: TaskProvider)
+async function registerExternalProvider(providerName: string, provider: ExternalTaskProvider)
 {
     providersExternal.set(providerName, provider);
+    await teApi.explorer?.invalidateTasksCache();
+    await teApi.sidebar?.invalidateTasksCache();
     await refreshTree(providerName);
 }
 
