@@ -261,7 +261,7 @@ For reference, the entire API object is:
     }
 
 - As of v2.7.0, the external task API has not been formally tested, a.  Who will be the guineau?  Hahaha ;)
-- As of v2.7.0, the API does not support custom icons, but for extension testing you can place icons in `res` of the TaskExplorer installation folder, named using the same task type name in the `registerProvider` call mentioned above.
+- As of v2.7.0, the API does not support custom icons from the task definition, but for extension testing you can place an icon in `res/sources` or `res/dark` / `res/light` of the TaskExplorer installation folder, named using the same task type name in the `registerProvider` call mentioned above, and will be used by the Task Explorer tree.
 
 ## Feedback & Contributing
 
