@@ -101,20 +101,22 @@ export function getPackageManager(): string
 }
 
 
-export function getScriptTaskTypes(): string[]
+export function getGlobPattern(taskType: string): string
 {
-    return [
-        "bash", "batch", "nsis", "perl", "powershell", "python", "ruby"
-    ];
-}
-
-
-export function getTaskTypes(): string[]
-{
-    return [
-        "ant", "app-publisher", "bash", "batch", "composer",  "gradle", "grunt", "gulp", "make",
-        "maven", "npm", "nsis", "perl", "powershell", "python", "pipenv", "ruby", "workspace"
-    ];
+    if (taskType) {
+        taskType = taskType.replace(/\W*\-/, "");
+        if (taskType === "ant") {
+            return getCombinedGlobPattern(constants.GLOB_ANT,
+                   [...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", [])]);
+        }
+        else if (taskType === "bash") {
+            return getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
+        }
+        else {
+            return constants["GLOB_" + taskType.toUpperCase()];
+        }
+    }
+    return "*/**";
 }
 
 
@@ -140,6 +142,64 @@ export function getPortableDataPath(padding = "")
         }
     }
     return;
+}
+
+
+export function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
+{
+    let rtn = "";
+    if (folder) {
+        const rootUri = folder.uri;
+        const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
+        rtn = absolutePath.substring(rootUri.path.length + 1);
+    }
+    return rtn;
+}
+
+
+export function getScriptTaskTypes(): string[]
+{
+    return [
+        "bash", "batch", "nsis", "perl", "powershell", "python", "ruby"
+    ];
+}
+
+
+export function getTaskItemId(taskItem: TaskItem)
+{
+    return taskItem.id?.replace(constants.LAST_TASKS_LABEL + ":", "")
+                       .replace(constants.FAV_TASKS_LABEL + ":", "")
+                       .replace(constants.USER_TASKS_LABEL + ":", "");
+}
+
+
+export function getTaskTypeSettingName(taskType: string, settingPart: string)
+{
+    return settingPart + (taskType !== "app-publisher" ? properCase(taskType) : "AppPublisher");
+}
+
+
+export function getTaskTypeEnabledSettingName(taskType: string)
+{
+    return getTaskTypeSettingName(taskType, "enable");
+}
+
+
+export function getTaskProviderType(source: string): string
+{
+    if (isScriptType(source)) {
+        return "script";
+    }
+    return source;
+}
+
+
+export function getTaskTypes(): string[]
+{
+    return [
+        "ant", "app-publisher", "bash", "batch", "composer",  "gradle", "grunt", "gulp", "make",
+        "maven", "npm", "nsis", "perl", "powershell", "python", "pipenv", "ruby", "tsc",  "workspace"
+    ];
 }
 
 
@@ -209,60 +269,6 @@ function getDefaultUserDataPath(platform?: string)
 }
 
 
-export function getGlobPattern(taskType: string): string
-{
-    if (taskType) {
-        taskType = taskType.replace(/\W*\-/, "");
-        if (taskType === "ant") {
-            return getCombinedGlobPattern(constants.GLOB_ANT,
-                   [...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", [])]);
-        }
-        else if (taskType === "bash") {
-            return getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
-        }
-        else {
-            return constants["GLOB_" + taskType.toUpperCase()];
-        }
-    }
-    return "*/**";
-}
-
-
-export function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
-{
-    let rtn = "";
-    if (folder) {
-        const rootUri = folder.uri;
-        const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
-        rtn = absolutePath.substring(rootUri.path.length + 1);
-    }
-    return rtn;
-}
-
-
-export function getTaskProviderType(source: string): string
-{
-    if (isScriptType(source)) {
-        return "script";
-    }
-    return source;
-}
-
-
-export function getTaskItemId(taskItem: TaskItem)
-{
-    return taskItem.id?.replace(constants.LAST_TASKS_LABEL + ":", "")
-                       .replace(constants.FAV_TASKS_LABEL + ":", "")
-                       .replace(constants.USER_TASKS_LABEL + ":", "");
-}
-
-
-export function getTaskEnabledSettingName(taskType: string)
-{
-    return "enable" + (taskType !== "app-publisher" ? properCase(taskType) : "AppPublisher");
-}
-
-
 export function isExcluded(uriPath: string, logPad = "")
 {
     function testForExclusionPattern(path: string, pattern: string): boolean
@@ -302,6 +308,18 @@ export function isSpecial(taskItem: TaskItem)
            (taskItem.id.includes(constants.LAST_TASKS_LABEL + ":") ||
            taskItem.id.includes(constants.FAV_TASKS_LABEL + ":") ||
            taskItem.id.includes(constants.USER_TASKS_LABEL + ":"));
+}
+
+
+export function isWatchTask(source: string)
+{
+    return [ "npm", "tsc", "workspace" ].includes(source);
+}
+
+
+export function isExternalTask(source: string)
+{
+    return !getTaskTypes().includes(getTaskProviderType(source));
 }
 
 
