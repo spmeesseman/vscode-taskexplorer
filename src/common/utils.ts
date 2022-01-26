@@ -317,7 +317,7 @@ export function isWatchTask(source: string)
 }
 
 
-export function isExternalTask(source: string)
+export function isExternalTeProviderType(source: string)
 {
     return !getTaskTypes().includes(getTaskProviderType(source));
 }

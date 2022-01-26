@@ -4,10 +4,11 @@ import * as util from "./common/utils";
 import * as log from "./common/log";
 import constants from "./common/constants";
 import { configuration } from "./common/configuration";
-import { providers } from "./extension";
+import { providers, providersExternal } from "./extension";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
 } from "vscode";
+import { TaskExplorerProvider } from "./providers/provider";
 
 
 let cacheBuilding = false;
@@ -38,53 +39,30 @@ export async function addFolderToCache(folder: WorkspaceFolder | undefined, logP
     folderCaching = true;  // set flag
     cacheBuilding = true;  // set flag
 
-    for (const p of providers)
+    const taskProviders = ([ ...util.getTaskTypes(), ...providersExternal.keys()]).sort();
+    for (const providerName of taskProviders)
     {
-        const provider = p[1];
-        if (provider.providerName !== "script")
+        const isExternal = util.isExternalTeProviderType(providerName);
+        if (!cancel && (isExternal || configuration.get<boolean>(util.getTaskTypeEnabledSettingName(providerName))))
         {
-            if (!cancel && configuration.get<boolean>(util.getTaskEnabledSettingName(provider.providerName)))
+            let glob;
+            if (!util.isWatchTask(providerName))
             {
-                log.value("   building cache for provider", provider.providerName, 3, logPad);
-                await buildCache(provider.providerName, provider.getGlobPattern(), folder, false, logPad + "   ");
+                const provider = providers.get(util.getTaskProviderType(providerName)) || providersExternal.get(providerName);
+                glob = !isExternal ? (provider as TaskExplorerProvider).getGlobPattern() : "**/*";
             }
-        }
-        else {
-            for (const scriptType of util.getScriptTaskTypes())
-            {
-                if (!cancel && configuration.get<boolean>(util.getTaskEnabledSettingName(scriptType)))
-                {
-                    log.value("   building cache for script provider", scriptType, 3, logPad);
-                    await buildCache(scriptType, provider.getGlobPattern(scriptType), folder, false, logPad + "   ");
-                }
+            else {
+                glob = util.getGlobPattern(providerName);
             }
-        }
-    }
 
-    //
-    // NPM
-    // Note that NPM tasks are provided by VSCode, not this extension
-    //
-    if (!cancel && configuration.get<boolean>("enableNpm")) {
-        await buildCache("npm", constants.GLOB_NPM, folder, false, logPad + "   ");
-    }
-    //
-    // Typescript
-    // Note that Typescript tasks are provided by VSCode, not this extension
-    //
-    if (!cancel && configuration.get<boolean>("enableTsc")) {
-        await buildCache("tsc", constants.GLOB_TSC, folder, false, logPad + "   ");
-    }
-    //
-    // VSCode / Workspace
-    // Note that VSCode tasks are provided by VSCode, not this extension
-    //
-    if (!cancel && configuration.get<boolean>("enableWorkspace")) {
-        await buildCache("workspace", constants.GLOB_WORKSPACE, folder, false, logPad + "   ");
+            log.value("   building cache for provider", providerName, 3, logPad);
+            await buildCache(providerName, glob, folder, false, logPad + "   ");
+        }
     }
 
     cacheBuilding = false;   // un-set flag
     folderCaching = false;   // un-set flag
+
     if (cancel) {
         log.write("Add folder to cache cancelled", 3, logPad);
     }
@@ -131,6 +109,7 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
     // Handle glob changes
     // For 'script' alias, to support this, we'd need to keep separate cache maps for each
     // script type (batch, powershell, python, etc)
+    // The `fileGlob` parameter will be undefined for external task providers
     //
     if (taskGlobs[taskType] && taskAlias !== "script")
     {   //
@@ -188,21 +167,27 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
     log.methodStart(logMsg, 1, logPad, true);
     statusBarSpace.text = getStatusString("Scanning for " + taskType + " tasks in project " + folder.name, 65);
 
-    const relativePattern = new RelativePattern(folder, fileGlob);
-    const paths = await workspace.findFiles(relativePattern, getExcludesPattern(folder));
-    for (const fPath of paths)
+    if (!util.isExternalTeProviderType(taskType.toLowerCase()))
     {
-        if (cancel) {
-            cancelInternal(setCacheBuilding, statusBarSpace);
-            return;
+        const relativePattern = new RelativePattern(folder, fileGlob);
+        const paths = await workspace.findFiles(relativePattern, getExcludesPattern(folder));
+        for (const fPath of paths)
+        {
+            if (cancel) {
+                cancelInternal(setCacheBuilding, statusBarSpace);
+                return;
+            }
+            if (!util.isExcluded(fPath.path, "   ")) {
+                fCache.add({
+                    uri: fPath,
+                    folder
+                });
+                log.value("   Added to cache", fPath.fsPath, 3, logPad);
+            }
         }
-        if (!util.isExcluded(fPath.path, "   ")) {
-            fCache.add({
-                uri: fPath,
-                folder
-            });
-            log.value("   Added to cache", fPath.fsPath, 3, logPad);
-        }
+    }
+    else {
+        await util.timeout(150);
     }
 
     log.methodDone(logMsg, 1, logPad, true);

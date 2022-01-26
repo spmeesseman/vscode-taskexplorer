@@ -923,8 +923,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             scriptOffset = this.findJsonDocumentPosition(documentText, taskItem);
         }
         else {
-            const provider = providers.get(util.getTaskProviderType(def.type));
-            scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || -1;
+            const provider = providers.get(util.getTaskProviderType(def.type)) ||
+                             providersExternal.get(def.type);
+            scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || 0;
         }
 
         if (scriptOffset === -1) {
@@ -1017,12 +1018,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // have 'LastTasks' and 'Favorites', we need to load everything.  Oh well.
         //
         while (this.treeBuilding) {
-            log.write(logPad + "   waiting...", logLevel);
+            log.write("   waiting...", logLevel, logPad);
             await util.timeout(100);
             waited += 100;
         }
         if (waited) {
-            log.write(logPad + "   waited " + waited + " ms", logLevel);
+            log.write("   waited " + waited + " ms", logLevel, logPad);
         }
 
         //
@@ -1078,6 +1079,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             for (const externalProviderMap of providersExternal)
             {
                 const externalTasks = await externalProviderMap[1].provideTasks();
+                log.write(`   Get tasks from external provider ${externalProviderMap[0]}`, logLevel + 1, logPad);
                 this.tasks.push(...(externalTasks || []));
             }
 
@@ -1682,16 +1684,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         log.write("   invalidate " + key + " provider", 1, logPad);
                         await p.invalidateTasksCache(undefined, logPad + "   ");
                     }
-                    for (const [ key, p ] of providersExternal)
-                    {
-                        log.write("   invalidate " + key + " provider", 1, logPad);
-                        await p.invalidateTasksCache(undefined, logPad + "   ");
-                    }
                 }
                 else { // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
                     log.write("   invalidate " + opt1 + " provider", 1, logPad);
-                    const provider = providers.get(util.getTaskProviderType(opt1)) ||
-                                     providersExternal.get(opt1);
+                    const provider = providers.get(util.getTaskProviderType(opt1));
                     provider?.invalidateTasksCache(undefined, logPad + "   ");
                 }
             }

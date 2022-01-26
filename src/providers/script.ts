@@ -258,7 +258,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
                 {
                     visitedFiles.add(fObj.uri.fsPath);
                     const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri);
-                    if (task && configuration.get<boolean>(util.getTaskEnabledSettingName(task.source)))
+                    if (task && configuration.get<boolean>(util.getTaskTypeEnabledSettingName(task.source)))
                     {
                         allTasks.push(task);
                         log.write(`   processed ${this.providerName} file`, 3, logPad);

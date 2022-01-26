@@ -92,15 +92,16 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     log.write("   Task Explorer activated");
 
     teApi = {
-        explorer: treeDataProvider2,
-        sidebar: treeDataProvider,
-        registerProvider: registerExternalProvider,
-        unregisterProvider: unregisterExternalProvider,
+        log,
+        providers,
         utilities: util,
         fileCache: cache,
-        providers,
         providersExternal,
-        log
+        explorer: treeDataProvider2,
+        sidebar: treeDataProvider,
+        refresh: refreshExternalProvider,
+        register: registerExternalProvider,
+        unregister: unregisterExternalProvider
     };
 
     return teApi;
@@ -206,7 +207,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         if (taskTypes.hasOwnProperty(i))
         {
             const taskType = taskTypes[i],
-                  enabledSetting = util.getTaskEnabledSettingName(taskType);
+                  enabledSetting = util.getTaskTypeEnabledSettingName(taskType);
             if (e.affectsConfiguration("taskExplorer." + enabledSetting))
             {
                 const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher" || taskType === "maven";
@@ -221,12 +222,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     for (const type of util.getTaskTypes())
     {
-        if (type === "app-publisher") {
-            if (e.affectsConfiguration("taskExplorer.pathToAppPublisher")) {
-                refreshTaskTypes.push("app-publisher");
-            }
-        }
-        else if (e.affectsConfiguration("taskExplorer.pathTo" + util.properCase(type))) {
+        if (e.affectsConfiguration(util.getTaskTypeSettingName(type, "pathTo"))) {
             refreshTaskTypes.push(type);
         }
     }
@@ -349,6 +345,15 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
 }
 
 
+async function refreshExternalProvider(providerName: string)
+{
+    if (providersExternal.get(providerName))
+    {
+        await refreshTree(providerName);
+    }
+}
+
+
 export async function refreshTree(taskType?: string, uri?: Uri)
 {
     // let refreshedTasks = false;
@@ -405,8 +410,6 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
 async function registerExternalProvider(providerName: string, provider: ExternalTaskProvider)
 {
     providersExternal.set(providerName, provider);
-    await teApi.explorer?.invalidateTasksCache();
-    await teApi.sidebar?.invalidateTasksCache();
     await refreshTree(providerName);
 }
 
