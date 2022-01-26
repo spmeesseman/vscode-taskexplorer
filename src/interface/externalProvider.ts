@@ -1,5 +1,5 @@
 
-import { CancellationToken, ProviderResult, Task, TaskProvider, Uri, WorkspaceFolder } from "vscode";
+import { ProviderResult, Task, TaskProvider, Uri, WorkspaceFolder } from "vscode";
 
 
 export abstract class ExternalExplorerProvider implements TaskProvider

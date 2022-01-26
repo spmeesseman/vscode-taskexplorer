@@ -22,8 +22,8 @@ import { TaskExplorerProvider } from "./providers/provider";
 import { TaskExplorerApi } from "./interface/taskExplorerApi";
 import { ExternalTaskProvider } from "./providers/external";
 import {
-    Disposable, ExtensionContext, Uri, tasks, TaskProvider,
-    workspace, window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder, Task, commands
+    Disposable, ExtensionContext, Uri, tasks, commands, workspace,
+    window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder
 } from "vscode";
 
 

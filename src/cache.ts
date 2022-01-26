@@ -125,8 +125,8 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
     //
     // *** IMPORTANT NOTE ***
     // TODO - Check the need for a cache clear on a task type
-    // We do it above for Ant tasks when the file glob changes in settings (this is most definitely
-    // needed for Ant tasks, but other tasks' globs can't change).
+    // We do it above for Ant and Bash tasks when the file glob changes in settings (this is most
+    // definitely needed for Ant/Bash tasks, but other tasks' globs can't change).
     // I believe we should be doing a fCache.clear() here, I don't think the buildTaskFolder/s()
     // function check object existence in the Set before inserting them.  Note calling clear()
     // on the 'script' task alias won't work unless we have a unique set for each script type

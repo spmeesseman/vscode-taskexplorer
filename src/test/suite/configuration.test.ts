@@ -3,7 +3,7 @@
 
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { ConfigurationTarget, workspace } from "vscode";
+import { ConfigurationTarget } from "vscode";
 import { TaskExplorerApi } from "../../interface/taskExplorerApi";
 import { activate, initSettings, isReady, sleep } from "../helper";
 import { configuration } from "../../common/configuration";

@@ -3,7 +3,6 @@
 
 import * as assert from "assert";
 import * as fs from "fs";
-import { TaskExplorerApi } from "../../interface/taskExplorerApi";
 import TaskItem from "../../tree/item";
 import { getPackageManager } from "../../common/utils";
 import {
