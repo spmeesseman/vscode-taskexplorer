@@ -58,6 +58,20 @@ suite("Util Tests", () =>
 		log.write("test");
 		log.value("test", "1");
 
+		log.write("Test1", 1);
+		log.value("Test2", "value", 1);
+		log.value("Test3", null, 1);
+		log.value("Test4", undefined, 1);
+
+		log.values(1, "   ", [["Test5", "5"]]);
+		log.values(1, "   ", [["Test6", "6"]], true);
+
+		log.error("Test5 error");
+		log.error(new Error("Test error object"));
+		log.error([ "Test error 1", "Test error 2" ]);
+		log.error([ "Test error 1",  new Error("Test error object") ]);
+		log.error([ "Test error 1", "Test error 2" ], [["Test param error", "Test param value"]]);
+
         assert(util.camelCase("taskexplorer", 4) === "taskExplorer");
         assert(util.camelCase(undefined, 4) === undefined);
         assert(util.camelCase("testgreaterindex", 19) === "testgreaterindex");
@@ -269,18 +283,8 @@ suite("Util Tests", () =>
 
     test("Get user data paths", function()
     {
-        const dataPath = util.getUserDataPath();
-        const portablePath = util.getPortableDataPath();
-        if (portablePath) {
-            console.log("         ℹ Portable data path = " + portablePath);
-        }
-        if (dataPath) {
-            console.log("         ℹ Data path = " + dataPath);
-            console.log("         ✔ Successfully located user data directory");
-        }
-        else {
-            assert.fail("         ✘ Could not find user data path");
-        }
+        util.getPortableDataPath();
+        assert(util.getUserDataPath(), "✘ Could not find user data path");
     });
 
 
@@ -298,18 +302,6 @@ suite("Util Tests", () =>
         }   //
         else {
             console.log("         ℹ Storage not initialized");
-        }
-    });
-
-    test("Get package manager", function()
-    {
-        const pkgMgr = util.getPackageManager();
-        if (pkgMgr) {
-            console.log("         ℹ Portable data path = " + pkgMgr);
-            console.log("         ✔ Successfully read package manager setting");
-        }
-        else {
-            assert.fail("         ✘ Task Explorer tree instance does not exist");
         }
     });
 

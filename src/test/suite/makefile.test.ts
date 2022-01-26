@@ -25,7 +25,7 @@ suite("Makefile Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady("make") === true, "Setup failed");
+        assert(isReady("make") === true, "TeApi not ready");
         provider = teApi.taskProviders.get("make") as MakeTaskProvider;
         //
         // File path for create/remove

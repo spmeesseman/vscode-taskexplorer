@@ -32,7 +32,7 @@ suite("Composer Tests", () =>
         // Initialize
         //
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "Setup failed");
+        assert(isReady(testsName) === true, "TeApi not ready");
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "composer.json"));
         //

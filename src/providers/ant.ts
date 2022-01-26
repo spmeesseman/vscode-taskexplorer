@@ -208,7 +208,41 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
                 }
             }
         }
+
         log.methodDone("find tasks with xml2js", 3, logPad, false, [["# of tasks", taskMap.size]]);
+
+        // return new Promise((resolve, reject) =>
+        // {
+        //     log.methodStart("find tasks with xml2js", 3, logPad, false, [["path", path]]);
+        //     const buffer = util.readFileSync(path);
+        //
+        //     parseString(buffer, (err, text) =>
+        //     {
+        //         if (err){
+        //             log.methodDone("find tasks with xml2js", 3, logPad, false, [["error", err.toString()]]);
+        //             reject(err);
+        //         }
+        //         else {
+        //             //
+        //             // We should have a main 'project' object and a 'project.target' array
+        //             //
+        //             if (text && text.project && text.project.target)
+        //             {
+        //                 const defaultTask = text.project.$.default; // Is default task?  It's always defined on the main project node
+        //                 const targets = text.project.target;
+        //                 for (const tgt of targets)                  // Check .$ and .$.name (xml2js output format)
+        //                 {
+        //                     if (tgt.$ && tgt.$.name) {
+        //                         log.value("   Found target (cst.)", tgt.$.name);
+        //                         taskMap[defaultTask === tgt.$.name ? tgt.$.name + " - Default" : tgt.$.name] = tgt.$.name;
+        //                     }
+        //                 }
+        //             }
+        //             log.methodDone("find tasks with xml2js", 3, logPad, false, [["# of tasks", taskMap.size]]);
+        //             resolve(taskMap);
+        //         }
+        //     });
+        // });
     }
 
 

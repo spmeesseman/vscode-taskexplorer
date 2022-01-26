@@ -8,7 +8,7 @@ import { deactivate } from "../extension";
 import { TaskExplorerApi } from "../interface/taskExplorerApi";
 import { configuration } from "../common/configuration";
 import { waitForCache } from "../cache";
-import { ConfigurationTarget, extensions, TreeItem, window, workspace } from "vscode";
+import { commands, ConfigurationTarget, extensions, tasks, TreeItem, window, workspace } from "vscode";
 
 
 const writeToConsole = false;
@@ -141,6 +141,23 @@ export async function buildTree(instance: any, waitTime?: number)
 }
 
 
+export async function executeTeCommand(command: string, timeout: number, ...args: any[])
+{
+    try {
+        const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
+        if (timeout) { await sleep(timeout); }
+        return rc;
+    }
+    catch (e) {
+        console.log("✘");
+        console.log("✘ Error running TE command");
+        console.log("✘    Skipping fail, continuing...");
+        console.log("✘ " + e.toString());
+        console.log("✘");
+    }
+}
+
+
 export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
 {
     let found = 0;
@@ -154,6 +171,35 @@ export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
         }
     }
     return found;
+}
+
+
+export async function getTreeTasks(taskType: string, expectedCount: number)
+{
+    const taskItems: TaskItem[] = [];
+    //
+    // Get the task mapped tree items
+    //
+    const taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ") as Map<string, TaskItem>;
+    //
+    // Make sure the tasks have been mapped in the explorer tree
+    // There should be one less task as the VSCode enginereturned above as the Explorer
+    // tree does not display the 'install' task
+    //
+    const taskCount = findIdInTaskMap(`:${taskType}:`, taskMap);
+    if (taskCount !== expectedCount) {
+        assert.fail(`Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
+    }
+    //
+    // Get the NPM tasks from the tree mappings
+    //
+    for (const map of taskMap)
+    {
+        if (map[1] && map[1].taskSource === taskType) {
+            taskItems.push(map[1]);
+        }
+    }
+    return taskItems;
 }
 
 
@@ -289,4 +335,11 @@ export function spawn(command: string, args?: string[], options?: cp.SpawnOption
     // });
 
     return proc;
+}
+
+
+export async function verifyTaskCount(taskType: string, expectedCount: number)
+{
+    const tTasks = await tasks.fetchTasks({ type: taskType });
+    assert(tTasks && tTasks.length === expectedCount, `Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
 }

@@ -6,7 +6,7 @@ import * as fs from "fs";
 import * as util from "../../common/utils";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, getWsPath, isReady, sleep } from "../helper";
+import { activate, getWsPath, isReady, sleep, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "../../interface/taskExplorerApi";
 import { AntTaskProvider } from "../../providers/ant";
 import { properCase } from "../../common/utils";
@@ -29,7 +29,7 @@ suite("Ant Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "Setup failed");
+        assert(isReady(testsName) === true, "TeApi not ready");
 
         provider = teApi.taskProviders.get(testsName) as AntTaskProvider;
         rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0];
@@ -62,8 +62,7 @@ suite("Ant Tests", () =>
     test("Start", async () =>
     {
         await teApi.explorerProvider?.invalidateTasksCache(testsName);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 3, `Did not read 3 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await verifyTaskCount("ant", 3);
     });
 
 
@@ -73,8 +72,7 @@ suite("Ant Tests", () =>
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName);
         await sleep(500);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(!cTasks || cTasks.length === 0, `Did not read 0 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await verifyTaskCount("ant", 0);
     });
 
 
@@ -83,8 +81,7 @@ suite("Ant Tests", () =>
         await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName);
-        const antTasks = await tasks.fetchTasks({ type: testsName });
-        assert(antTasks && antTasks.length === 3, `Did not read 3 ${testsName} tasks (actual ${antTasks ? antTasks.length : 0})`);
+        await verifyTaskCount("ant", 3);
     });
 
 

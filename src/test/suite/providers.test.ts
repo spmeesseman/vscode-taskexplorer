@@ -10,14 +10,13 @@ import * as path from "path";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import constants from "../../common/constants";
-import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder, WorkspaceEdit } from "vscode";
+import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../common/utils";
 import { waitForCache } from "../../cache";
 import { addWsFolder, removeWsFolder } from "../../extension";
 import { TaskExplorerApi } from "../../interface/taskExplorerApi";
 import { configuration } from "../../common/configuration";
-import { activate, buildTree, findIdInTaskMap, sleep } from "../helper";
-import { TaskTreeDataProvider } from "../../tree/tree";
+import { activate, buildTree, findIdInTaskMap, sleep, verifyTaskCount } from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -128,20 +127,8 @@ suite("Provider Tests", () =>
         // Do work son
         //
         await teApi.explorerProvider?.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
-
         setupVscode(); setupAnt(); setupGradle(); setupTsc(); setupMakefile();
         setupBash(); setupBatch(); setupGrunt(); setupGulp(); setupAppPublisher(); setupMaven();
-
-        this.timeout(45000);
-        await buildTree(this, 7500);
-
-        //
-        // Check VSCode provided task types for the hell of it
-        //
-        let nTasks = await tasks.fetchTasks({ type: "grunt" });
-        assert(nTasks.length > 0, "No grunt tasks registered");
-        nTasks = await tasks.fetchTasks({ type: "gulp" });
-        assert(nTasks.length > 0, "No gulp tasks registered");
     });
 
 
@@ -211,8 +198,24 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Open tasks for edit", async function()
+    test("Build tree", async function()
     {
+        this.timeout(45000);
+        await buildTree(this, 7500);
+        //
+        // Check VSCode provided task types for the hell of it
+        //
+        let nTasks = await tasks.fetchTasks({ type: "grunt" });
+        assert(nTasks.length > 0, "No grunt tasks registered");
+        nTasks = await tasks.fetchTasks({ type: "gulp" });
+        assert(nTasks.length > 0, "No gulp tasks registered");
+    });
+
+
+    test("Open tasks for edit", async function()
+    {   //
+        // The 3rd param `true` will open the task files and locate task positions while parsing the tree
+        //
         taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 7);
     });
@@ -220,192 +223,126 @@ suite("Provider Tests", () =>
 
     test("Add to excludes", async function()
     {
-        let taskItems = await tasks.fetchTasks({ type: "grunt" });
-        const gruntCt = taskItems.length;
+        const taskItems = await tasks.fetchTasks({ type: "grunt" }),
+              gruntCt = taskItems.length;
 
-        console.log("    Simulate add to exclude");
         for (const map of taskMap)
         {
             const value = map[1];
             if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt")) {
                 await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile);
-                await teApi.explorerProvider?.invalidateTasksCache("grunt", value.taskFile.resourceUri);
+                await sleep(3000);
                 break;
             }
         }
 
-        taskItems = await tasks.fetchTasks({ type: "grunt" });
-        if (taskItems.length !== gruntCt - 2) {
-            assert.fail("Unexpected Grunt task count (Found " + taskItems.length + " of " +
-                        (gruntCt - 2).toString() + ")");
-        }
+        await verifyTaskCount("grunt", gruntCt - 2);
     });
 
 
-    test("Invalidation", async function()
+    test("App Publisher delete / add", async function()
     {
-        const explorerProvider = teApi.explorerProvider as TaskTreeDataProvider;
-        this.timeout(30 * 1000);
-
-        //
-        // App-Publisher - Delete and invalidate, re-add and invalidate
-        //
-        console.log("    Running app-publisher invalidation");
-        let file = path.join(rootPath, ".publishrc.json");
-        let uri = Uri.parse(file);
-        await explorerProvider.invalidateTasksCache("app-publisher", uri);
+        const file = path.join(rootPath, ".publishrc.json");
         removeFromArray(tempFiles, file);
-        try {
-            fs.unlinkSync(file);
-        }
-        catch {}
-        await explorerProvider.invalidateTasksCache("app-publisher", uri);
-        await(sleep(1000));
+        fs.unlinkSync(file);
+        await sleep(1000);
         createAppPublisherFile();
-        await explorerProvider.invalidateTasksCache("app-publisher", uri);
-        await(sleep(100));
+        await sleep(1000);
+    });
 
-        //
-        // Ant type - Delete and invalidate, re-add and invalidate
-        //
-        console.log("    Running ant invalidation");
-        file = path.join(dirName, "build.xml");
-        uri = Uri.parse(file);
-        await explorerProvider.invalidateTasksCache("ant", uri);
-        await removeFromArray(tempFiles, file);
-        try {
-            fs.unlinkSync(file);
-        }
-        catch {}
-        await explorerProvider.invalidateTasksCache("ant", uri);
-        await(sleep(1000));
+
+    test("Ant delete / add", async function()
+    {
+        const file = path.join(dirName, "build.xml");
+        removeFromArray(tempFiles, file);
+        fs.unlinkSync(file);
+        await sleep(1000);
         createAntFile();
-        await explorerProvider.invalidateTasksCache("ant", uri);
-        await(sleep(100));
+        await sleep(1000);
+    });
 
-        //
-        // Gradle type - Delete and invalidate, re-add and invalidate
-        //
-        console.log("    Running gradle invalidation");
-        file = path.join(dirName, "build.gradle");
-        uri = Uri.parse(file);
-        await explorerProvider.invalidateTasksCache("gradle", uri);
+
+    test("Gradle delete / add", async function()
+    {
+        const file = path.join(dirName, "build.gradle");
         removeFromArray(tempFiles, file);
-        try {
-            fs.unlinkSync(file);
-        }
-        catch {}
-        await explorerProvider.invalidateTasksCache("gradle", uri);
-        await(sleep(1000));
+        fs.unlinkSync(file);
+        await sleep(1000);
         createGradleFile();
-        await explorerProvider.invalidateTasksCache("gradle", uri);
-        await(sleep(100));
+        await sleep(1000);
+    });
 
-        //
-        // Grunt type - Delete and invalidate, re-add and invalidate
-        //
-        console.log("    Running grunt invalidation");
-        file = path.join(rootPath, "GRUNTFILE.js");
-        uri = Uri.parse(file);
-        await explorerProvider.invalidateTasksCache("grunt", uri);
+
+    test("Grunt delete / add", async function()
+    {
+        const file = path.join(rootPath, "GRUNTFILE.js");
         removeFromArray(tempFiles, file);
-        try {
-            fs.unlinkSync(file);
-        }
-        catch {}
-        await explorerProvider.invalidateTasksCache("grunt", uri);
-        await(sleep(1000));
+        fs.unlinkSync(file);
+        await sleep(1000);
         createGruntFile();
-        await explorerProvider.invalidateTasksCache("grunt", uri);
-        await(sleep(100));
+        await sleep(1000);
+    });
 
-        //
-        // Gulp type - Delete and invalidate, re-add and invalidate
-        //
-        console.log("    Running gulp invalidation");
-        file = path.join(rootPath, "gulpfile.js");
-        uri = Uri.parse(file);
-        await explorerProvider.invalidateTasksCache("gulp", uri);
+
+    test("Gulp delete / add", async function()
+    {
+        const file = path.join(rootPath, "gulpfile.js");
         removeFromArray(tempFiles, file);
-        try {
-            fs.unlinkSync(file);
-        }
-        catch {}
-        await explorerProvider.refresh("gulp", uri);
-        await(sleep(1000));
+        fs.unlinkSync(file);
+        await sleep(1000);
         createGulpFile();
-        await explorerProvider.invalidateTasksCache("gulp", uri);
-        await(sleep(100));
+        await sleep(1000);
+    });
 
-        //
-        // Make type - Delete and invalidate, re-add and invalidate
-        //
-        console.log("    Running makefile invalidation");
-        file = path.join(rootPath, "Makefile");
-        uri = Uri.parse(file);
-        await explorerProvider.invalidateTasksCache("make", uri);
+
+    test("Makefile delete / add", async function()
+    {
+        const file = path.join(rootPath, "Makefile");
         removeFromArray(tempFiles, file);
-        try {
-            fs.unlinkSync(file);
-        }
-        catch {}
-        await explorerProvider.invalidateTasksCache("make", uri);
-        await(sleep(1000));
+        fs.unlinkSync(file);
+        await sleep(1000);
         createMakeFile();
-        await explorerProvider.refresh("make", uri);
-        await(sleep(100));
+        await sleep(1000);
+    });
 
-        //
-        // Maven - Delete and invalidate, re-add and invalidate
-        //
-        console.log("    Running maven invalidation");
-        file = path.join(rootPath, "pom.xml");
-        uri = Uri.parse(file);
-        await explorerProvider.invalidateTasksCache("maven", uri);
+
+    test("Maven delete / add", async function()
+    {
+        const file = path.join(rootPath, "pom.xml");
         removeFromArray(tempFiles, file);
-        try {
-            fs.unlinkSync(file);
-        }
-        catch {}
-        await explorerProvider.invalidateTasksCache("maven", uri);
-        await(sleep(1000));
+        fs.unlinkSync(file);
+        await sleep(1000);
         createMavenPomFile();
-        await explorerProvider.invalidateTasksCache("maven", uri);
-        await(sleep(100));
+        await sleep(1000);
 
-        //
-        // Script type - Delete and invalidate, re-add and invalidate
-        //
-        console.log("    Running script file invalidation");
-        file = path.join(rootPath, "test.bat");
-        uri = Uri.parse(file);
-        await explorerProvider.invalidateTasksCache("batch", uri);
+    });
+
+
+    test("Batch delete / add", async function()
+    {
+        const file = path.join(rootPath, "test.bat");
         removeFromArray(tempFiles, file);
-        try {
-            fs.unlinkSync(file);
-        }
-        catch {}
-        await explorerProvider.invalidateTasksCache("batch", uri);
-        await(sleep(1000));
+        fs.unlinkSync(file);
+        await sleep(1000);
         createBatchFile();
-        await explorerProvider.refresh("batch", uri);
-        await(sleep(100));
+        await sleep(1000);
+    });
 
-        console.log("    Running all other invalidations");
-        for (const map of taskMap)
-        {
-            const value = map[1];
-            if (value && value.task && teApi && explorerProvider && value.taskFile.resourceUri) {
-                if (fs.existsSync(value.taskFile.resourceUri.fsPath)) {
-                    await explorerProvider.invalidateTasksCache(value.taskSource, value.task.definition.uri);
-                }
-            }
-            else {
-                assert.fail("        ✘ TaskItem definition is incomplete");
-            }
-        }
 
-        console.log("    Disable all task providers");
+
+    test("Add ws folder to file cache", async function()
+    {   //
+        // Cover single-if branches in cache module
+        //
+        await teApi.fileCache.addFolderToCache();
+        await teApi.fileCache.addFolderToCache((workspace.workspaceFolders as WorkspaceFolder[])[0]);
+        await sleep(5000);
+        await waitForCache();
+    });
+
+
+    test("Disable all task providers", async function()
+    {
         await configuration.updateWs("enableAnt", false);
         await configuration.updateWs("enableAppPublisher", false);
         await configuration.updateWs("enableBash", false);
@@ -424,14 +361,13 @@ suite("Provider Tests", () =>
         await configuration.updateWs("enableRuby", false);
         await configuration.updateWs("enableTsc", false);
         await configuration.updateWs("enableWorkspace", false);
+        await sleep(5000);
+        await waitForCache();
+    });
 
-        //
-        // Cover single-if branches in cache module
-        //
-        await teApi.fileCache.addFolderToCache();
-        await teApi.fileCache.addFolderToCache((workspace.workspaceFolders as WorkspaceFolder[])[0]);
 
-        console.log("    Re-enable all task providers");
+    test("Re-enable all task providers", async function()
+    {
         await configuration.updateWs("enableAnt", true);
         await configuration.updateWs("enableAppPublisher", true);
         await configuration.updateWs("enableBash", true);
@@ -451,11 +387,16 @@ suite("Provider Tests", () =>
         await configuration.updateWs("enableTsc", true);
         await configuration.updateWs("enableWorkspace", true);
 
-        console.log("    Running global invalidation");
-        // await commands.executeCommand("taskExplorer.refresh");
-        await explorerProvider.invalidateTasksCache();
+        await sleep(2000); // wait for filesystem change events
+        await waitForCache();
+    });
 
-        await sleep(1000); // wait for filesystem change events
+
+    test("Refresh task", async function()
+    {
+        await commands.executeCommand("taskExplorer.refresh");
+        await sleep(5000);
+        await waitForCache();
     });
 
 
@@ -510,24 +451,25 @@ suite("Provider Tests", () =>
                 if (taskFile && taskFile.isGroup && !value.taskFile.path.startsWith("grunt"))
                 {
                     await commands.executeCommand("taskExplorer.addToExcludes", taskFile);
-                    await teApi.explorerProvider?.invalidateTasksCache("grunt", taskFile.resourceUri);
+                    await sleep(1000);
                     break;
                 }
             }
         }
 
-        sleep(500);
+        await sleep(500);
         const taskItems = await tasks.fetchTasks({ type: "grunt" });
-        sleep(500);
+        await sleep(500);
         if (taskItems.length !== gruntCt - 2) { // grunt file that just got ignored had 7 tasks
             assert.fail("Unexpected grunt task count (Found " + taskItems.length + " of " +
                         (gruntCt - 2).toString() + ")");
         }
     });
 
+
     test("Cancel rebuild cache", async function()
     {
-        this.timeout(60 * 1000);
+        this.timeout(45000);
         //
         // Try a bunch of times to cover all of the hooks in the processing loops
         //

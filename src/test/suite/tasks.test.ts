@@ -5,18 +5,20 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import * as fs from "fs";
-import * as path from "path";
 import TaskItem from "../../tree/item";
-import { commands, ConfigurationTarget, tasks, workspace } from "vscode";
 import { configuration } from "../../common/configuration";
 import { TaskExplorerApi } from "../../interface/taskExplorerApi";
-import { activate, findIdInTaskMap, isReady, overrideNextShowInputBox, sleep } from "../helper";
+import { activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInputBox, sleep } from "../helper";
+import { storage } from "../../common/storage";
+import constants from "../../common/constants";
 
 
+let runCount = 0;
+let lastTask: TaskItem | null = null;
 let teApi: TaskExplorerApi;
-let rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
-let taskMap: Map<string, TaskItem> = new Map();
+let ant: TaskItem[];
+let bash: TaskItem[];
+let batch: TaskItem[];
 
 
 suite("Task Tests", () =>
@@ -25,206 +27,162 @@ suite("Task Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady() === true, "Setup failed");
-        rootPath = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : undefined;
-        //
-        // Scan task tree using internal explorer scanner fn
-        //
-        taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ") as Map<string, TaskItem>;
+        assert(isReady() === true, "TeApi not ready");
+        ant = await getTreeTasks("ant", 3);
+        bash = await getTreeTasks("bash", 1);
+        batch = await getTreeTasks("batch", 2);
     });
 
 
-    test("Bash / Batch", async function()
+    test("Empty taskitem parameter", async function()
     {
-        let ranBash = 0, ranBatch = 0,
-            lastTask: TaskItem | null = null;
-        this.timeout(75 * 1000);
-
-        //
-        // Just find and task, a batch task, and run all commands on it
-        //
-        for (const map of taskMap)
-        {
-            const value = map[1];
-
-            if (value && value.taskSource === "batch")
-            {
-                console.log("    Run batch task: " + value.label);
-                console.log("        Folder: " + value.getFolder()?.name);
-                await runTask(value, ranBatch > 0, lastTask);
-                ranBatch++;
-            }
-            else if (value && value.taskSource === "bash")
-            {
-                console.log("    Run bash task: " + value.label);
-                console.log("        Folder: " + value.getFolder()?.name);
-                await runTask(value, false, lastTask);
-                ranBash++;
-            }
-            if (ranBash && ranBatch >= 2) break;
-            lastTask = value;
-        }
-
-        assert(ranBash >= 1 && ranBatch >= 2, "# of tasks expected did not run");
-        //
-        // Wait for any missed running tasks (5 seconds worth of timeouts in test scripts)
-        //
-        await sleep(5000);
+        await executeTeCommand("run", 500);
+        await executeTeCommand("pause", 500);
+        await executeTeCommand("restart", 500);
     });
 
 
-    test("NPM", async function()
+    test("Run non-existent last task", async function()
     {
-        const file = path.join(rootPath as string, "package.json");
-        fs.writeFileSync(
-            file,
-            "{\r\n" +
-            '    "name": "vscode-taskexplorer",\r\n' +
-            '    "version": "0.0.1",\r\n' +
-            '    "scripts":{\r\n' +
-            '        "test": "node ./node_modules/vscode/bin/test",\r\n' +
-            '        "compile": "cmd.exe /c test.bat",\r\n' +
-            '        "watch": "tsc -watch -p ./",\r\n' +
-            '        "build": "npx tsc -p ./"\r\n' +
-            "    }\r\n" +
-            "}\r\n"
-        );
-
-        await sleep(1500);
-        const npmTasks = await tasks.fetchTasks({ type: "npm" });
-        assert(npmTasks.length > 0, "No npm tasks registered");
-
-        taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ") as Map<string, TaskItem>;
-
-        //
-        // We just wont check NPM files.  If the vascode engine isnt fast enough to
-        // provide the tasks once the package.json files are created, then its not
-        // out fault
-        //
-        const taskCount = findIdInTaskMap(":npm:", taskMap);
-        if (taskCount !== 4) {
-            assert.fail("Unexpected NPM task count (Found " + taskCount + " of 4)");
-        }
-
-        for (const map of taskMap)
+        const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []),
+              hasLastTasks = lastTasks && lastTasks.length > 0;
+        if (hasLastTasks)
         {
-            const value = map[1];
-            if (value && value.taskSource === "npm")
-            {
-                // await executeTeCommand("open", value);
-                await executeTeCommand("runInstall", 500, value.taskFile);
-                await executeTeCommand("runUpdate", 500, value.taskFile);
-                overrideNextShowInputBox("@spmeesseman/app-publisher");
-                await executeTeCommand("runUpdatePackage", 500, value.taskFile);
-                await executeTeCommand("runAudit", 500, value.taskFile);
-                await executeTeCommand("runAuditFix", 0, value.taskFile);
-                break;
-            }
+            await storage.update(constants.LAST_TASKS_STORE, undefined);
         }
+        await executeTeCommand("runLastTask", 500);
+        if (hasLastTasks)
+        {
+            await storage.update(constants.LAST_TASKS_STORE, lastTasks);
+        }
+    });
 
-        await sleep(100);
 
-        fs.unlinkSync(path.join(rootPath as string, "package.json"));
-        if (fs.existsSync(path.join(rootPath as string, "package-lock.json"))) {
-            try {
-                fs.unlinkSync(path.join(rootPath as string, "package-lock.json"));
+    test("Keep terminal on stop", async function()
+    {
+        await configuration.updateWs("keepTermOnStop", true);
+        await executeTeCommand("run", 2500, batch[0]);
+        await executeTeCommand("stop", 500, batch[0]);
+        await configuration.updateWs("keepTermOnStop", false);
+        await executeTeCommand("run", 2500, batch[0]);
+        await executeTeCommand("stop", 500, batch[0]);
+    });
+
+
+    test("Trigger busy on run last task", async function()
+    {
+        /* Don't await -> */ teApi.explorerProvider?.invalidateTasksCache();
+        await executeTeCommand("runLastTask", 5000);
+    });
+
+
+    test("Resume task no terminal", async function()
+    {
+        bash[0].paused = true;
+        await executeTeCommand("runLastTask", 5000, batch[0]);
+        bash[0].paused = false;
+    });
+
+
+    test("Pause", async function()
+    {
+        await executeTeCommand("run", 2500, batch[0]);
+        await executeTeCommand("pause", 1000, batch[0]);
+        await executeTeCommand("stop", 500, batch[0]);
+    });
+
+
+    test("Ant", async function()
+    {
+        const antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
+        await executeTeCommand("run", 3000, antTask);
+        lastTask = antTask;
+    });
+
+
+    test("Bash", async function()
+    {   //
+        // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
+        //
+        await configuration.updateWs("disableAnimatedIcons", true);
+        await startTask(bash[0]);
+        await executeTeCommand("run", 7000, bash[0]);
+        await endTask(bash[0]);
+        await configuration.updateWs("disableAnimatedIcons", false);
+        lastTask = bash[0];
+    });
+
+
+    test("Batch", async function()
+    {
+        this.timeout(45000);
+        //
+        // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
+        //
+        for (const batchTask of batch)
+        {
+            await startTask(batchTask);
+            await configuration.updateWs("keepTermOnStop", false);
+            await executeTeCommand("open", 50, batchTask);
+            await executeTeCommand("runWithArgs", 2500, batchTask, "--test --test2");
+            if (runCount % 1 === 0)
+            {
+                await executeTeCommand("stop", 0, batchTask);
+                await executeTeCommand("run", 2500, batchTask);
+                await executeTeCommand("pause", 1000, batchTask);
+                await executeTeCommand("run", 500, batchTask);
+                await configuration.updateWs("clickAction", "Open");
+                await executeTeCommand("run", 500, batchTask);
+                await configuration.updateWs("clickAction", "Execute");
+                await executeTeCommand("openTerminal", 0, batchTask);
+                await executeTeCommand("pause", 1000, batchTask);
+                await configuration.updateWs("keepTermOnStop", true);
+                await executeTeCommand("stop", 0, batchTask);
+                await configuration.updateWs("disableAnimatedIcons", true);
+                await executeTeCommand("runLastTask", 1500, batchTask);
+                await configuration.updateWs("keepTermOnStop", false);
+                await executeTeCommand("restart", 2500, batchTask);
+                await executeTeCommand("stop", 500, batchTask);
+                await executeTeCommand("runNoTerm", 2500, batchTask);
+                await executeTeCommand("stop", 0, batchTask);
+                await configuration.updateWs("disableAnimatedIcons", false);
             }
-            catch (error) {
-                console.log(error);
+            else {
+                await sleep(8000);
             }
+            await endTask(batchTask);
         }
     });
 
 });
 
 
-async function executeTeCommand(command: string, timeout: number, ...args: any[])
+async function startTask(taskItem: TaskItem)
 {
-    try {
-        const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
-        if (timeout) { await sleep(timeout); }
-        return rc;
-    }
-    catch (e) { console.log("✘ " + e.toString().substring(0, e.toString().indexOf("\n"))); }
-}
-
-
-async function runTask(value: TaskItem, letFinish: boolean, lastTask: TaskItem | null)
-{
+    console.log(`    ℹ Run ${taskItem.taskSource} task: ${taskItem.label}`);
+    console.log(`        Folder: ${taskItem.getFolder()?.name}`);
     await configuration.updateWs("clickAction", "Execute");
-
-    let removed = await executeTeCommand("addRemoveFromFavorites", 0, value);
+    await configuration.updateWs("showLastTasks", ++runCount % 2 === 1);
+    let removed = await executeTeCommand("addRemoveFromFavorites", 0, taskItem);
     if (removed) {
-        await executeTeCommand("addRemoveFromFavorites", 0, value);
+        await executeTeCommand("addRemoveFromFavorites", 0, taskItem);
     }
-
     overrideNextShowInputBox("test label");
-    removed = await executeTeCommand("addRemoveCustomLabel", 0, value);
+    removed = await executeTeCommand("addRemoveCustomLabel", 0, taskItem);
     if (removed) {
-        await executeTeCommand("addRemoveFromFavorites", 0, value);
+        await executeTeCommand("addRemoveFromFavorites", 0, taskItem);
     }
-
     if (lastTask) {
         await executeTeCommand("openTerminal", 0, lastTask);
     }
+}
 
-    if (value.taskSource !== "bash")
-    {
-        await configuration.updateWs("keepTermOnStop", false);
-        await executeTeCommand("open", 50, value);
-        await executeTeCommand("runWithArgs", 2500, value, "--test --test2");
-        if (!letFinish)
-        {
-            await executeTeCommand("stop", 0, value);
-            await configuration.updateWs("keepTermOnStop", true);
-            await executeTeCommand("run", 2500, value);
-            await executeTeCommand("run", 0, value); // throw 'Busy, please wait...'
-            await executeTeCommand("pause", 1000, value);
-            await executeTeCommand("run", 500, value);
-            await configuration.updateWs("clickAction", "Open");
-            await executeTeCommand("run", 500, value);
-            await configuration.updateWs("clickAction", "Execute");
-            await executeTeCommand("openTerminal", 0, value);
-            await executeTeCommand("pause", 1000, value);
-            await executeTeCommand("stop", 0, value);
-            await configuration.updateWs("disableAnimatedIcons", true);
-            await executeTeCommand("runLastTask", 1500, value);
-            await executeTeCommand("runLastTask", 0, value); // throw 'Busy, please wait...'
-            await configuration.updateWs("keepTermOnStop", false);
-            await executeTeCommand("restart", 2500, value);
-            await executeTeCommand("stop", 500, value);
-            await executeTeCommand("runNoTerm", 2500, value);
-            await executeTeCommand("stop", 0, value);
-            await configuration.updateWs("disableAnimatedIcons", false);
-        }
-        else {
-            await sleep(9000);
-        }
-    }
-    else
-    {
-        await configuration.updateWs("disableAnimatedIcons", true);
-        await executeTeCommand("run", 2000, value);
-        if (!letFinish)
-        {
-            await executeTeCommand("stop", 0, value);
-            await configuration.updateVs("terminal.integrated.shell.windows",
-                                         "bash.exe", ConfigurationTarget.Workspace);
-            await configuration.updateWs("disableAnimatedIcons", false);
-            await executeTeCommand("run", 2000, value);
-            await executeTeCommand("stop", 1000, value);
-            await configuration.updateVs("terminal.integrated.shell.windows",
-                                         "C:\\Windows\\System32\\cmd.exe", ConfigurationTarget.Workspace);
-            await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
-            await commands.executeCommand("workbench.action.terminal.new"); // force openTerminal to search through a set of terminals
-        }
-        else {
-            await sleep(8000);
-            await configuration.updateWs("disableAnimatedIcons", false);
-        }
-    }
 
-    await executeTeCommand("openTerminal", 0, value);
-    await executeTeCommand("addRemoveCustomLabel", 0, value);
-    await executeTeCommand("addRemoveFromFavorites", 0, value);
+async function endTask(taskItem: TaskItem)
+{
+    await executeTeCommand("openTerminal", 0, taskItem);
+    await executeTeCommand("addRemoveCustomLabel", 0, taskItem);
+    await executeTeCommand("addRemoveFromFavorites", 0, taskItem);
+    console.log(`    ✔ Done ${taskItem.taskSource} task: ${taskItem.label}`);
+    lastTask = taskItem;
 }

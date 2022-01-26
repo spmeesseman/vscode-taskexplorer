@@ -33,21 +33,46 @@ export function blank(level?: number)
 }
 
 
-export function error(msg: string | string[])
+function writeError(e: Error)
 {
-    if (isLoggingEnabled())
-    {
-        write("***");
-        if (typeof msg === "string") {
-            write("*** " + msg);
-        }
-        else {
-            for (const m of msg) {
-                write("*** " + m);
-            }
-        }
-        write("***");
+    const currentWriteToConsole = writeToConsole;
+    writeToConsole = true;
+    write("✘ " + e.name);
+    write("✘ " + e.message);
+    if (e.stack) {
+        const stackFmt = e.stack.replace(/\n/g, "\n                        ✘ ");
+        write("✘ " + stackFmt);
     }
+    writeToConsole = currentWriteToConsole;
+}
+
+
+export function error(msg: string | (string|Error)[] | Error, params?: (string|any)[][])
+{
+    write("✘");
+    if (typeof msg === "string") {
+        write("✘ " + msg);
+    }
+    else if (msg instanceof Error) {
+        writeError(msg);
+    }
+    else {
+        msg.forEach((m: string | Error) => {
+            if (m instanceof Error) {
+                writeError(m);
+            }
+            else {
+                write("✘ " + m);
+            }
+        });
+    }
+    if (params)
+    {
+        for (const [ n, v, l ] of params) {
+            value("✘   " + n, v);
+        }
+    }
+    write("✘");
 }
 
 

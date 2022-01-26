@@ -16,7 +16,7 @@ suite("Tree Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady() === true, "Setup failed");
+        assert(isReady() === true, "TeApi not ready");
     });
 
 

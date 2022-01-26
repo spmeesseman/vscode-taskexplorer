@@ -6,7 +6,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, getWsPath, isReady, sleep } from "../helper";
+import { activate, getWsPath, isReady, sleep, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "../../interface/taskExplorerApi";
 import { GulpTaskProvider } from "../../providers/gulp";
 import { properCase } from "../../common/utils";
@@ -26,7 +26,7 @@ suite("Gulp Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "Setup failed");
+        assert(isReady(testsName) === true, "TeApi not ready");
         provider = teApi.taskProviders.get(testsName) as GulpTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "gulpfile.js"));
@@ -43,8 +43,7 @@ suite("Gulp Tests", () =>
 
     test("Start", async () =>
     {
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 17, `Did not read 17 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await verifyTaskCount("gulp", 17);
     });
 
 
@@ -54,8 +53,7 @@ suite("Gulp Tests", () =>
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName);
         await sleep(500);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(!cTasks || cTasks.length === 0, `Did not read 0 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await verifyTaskCount("gulp", 0);
     });
 
 
@@ -64,8 +62,7 @@ suite("Gulp Tests", () =>
         await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 17, `Did not read 17 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await verifyTaskCount("gulp", 17);
     });
 
 
@@ -90,8 +87,7 @@ suite("Gulp Tests", () =>
 
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 19, `Did not read 19 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await verifyTaskCount("gulp", 19);
     });
 
 
@@ -116,8 +112,7 @@ suite("Gulp Tests", () =>
 
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 20, `Did not read 20 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await verifyTaskCount("gulp", 20);
     });
 
 
@@ -134,8 +129,7 @@ suite("Gulp Tests", () =>
 
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 18, `Did not read 18 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await verifyTaskCount("gulp", 18);
     });
 
 
@@ -147,8 +141,7 @@ suite("Gulp Tests", () =>
         });
         await sleep(500);
         await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks.length === 17, `Did not read 17 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await verifyTaskCount("gulp", 17);
     });
 
 
