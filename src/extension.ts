@@ -94,10 +94,11 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         explorerProvider: treeDataProvider2,
         sidebarProvider: treeDataProvider,
         registerProvider: registerExternalProvider,
+        unregisterProvider: unregisterExternalProvider,
         utilities: util,
         fileCache: cache,
         taskProviders: providers,
-        logging: log
+        log
     };
 
     return teApi;
@@ -346,63 +347,6 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
 }
 
 
-export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "")
-{
-    log.methodStart("process remove workspace folder", 1, logPad, true);
-
-    for (const f of wsf)
-    {
-        log.value("      folder", f.name, 1, logPad);
-        // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
-        for (const c of cache.filesCache)
-        {
-            const files = c[1], provider = c[0],
-                  toRemove: cache.ICacheItem[] = [];
-
-            log.value("      start remove task files from cache", provider, 2, logPad);
-
-            for (const file of files)
-            {
-                log.value("         checking cache file", file.uri.fsPath, 4, logPad);
-                if (file.folder.uri.fsPath === f.uri.fsPath) {
-                    log.write("            added for removal",  4, logPad);
-                    toRemove.push(file);
-                }
-            }
-
-            if (toRemove.length > 0)
-            {
-                for (const tr of toRemove) {
-                    log.value("         remove file", tr.uri.fsPath, 2, logPad);
-                    files.delete(tr);
-                }
-            }
-
-            log.value("      completed remove files from cache", provider, 2, logPad);
-        }
-        log.write("   folder removed", 1, logPad);
-    }
-
-    log.methodDone("process remove workspace folder", 1, logPad, true);
-}
-
-
-async function registerFileWatchers(context: ExtensionContext)
-{
-    const taskTypes = util.getTaskTypes();
-    for (const t of taskTypes)
-    {
-        const taskType = t,
-            taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher";
-        if (configuration.get<boolean>("enable" + taskTypeP))
-        {
-            const watchModify = util.isScriptType(taskType) || taskType === "app-publisher";
-            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), watchModify);
-        }
-    }
-}
-
-
 export async function refreshTree(taskType?: string, uri?: Uri)
 {
     // let refreshedTasks = false;
@@ -431,42 +375,50 @@ export async function refreshTree(taskType?: string, uri?: Uri)
 }
 
 
+function registerExplorer(name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined
+{
+    log.write("Register explorer view / tree provider '" + name + "'");
+
+    if (enabled !== false)
+    {
+        if (workspace.workspaceFolders)
+        {
+            const treeDataProvider = new TaskTreeDataProvider(name, context);
+            const treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
+            views.set(name, treeView);
+            const view = views.get(name);
+            if (view) {
+                context.subscriptions.push(view);
+                log.write("   Tree data provider registered'" + name + "'");
+            }
+            return treeDataProvider;
+        }
+        else {
+            log.write("✘ No workspace folders!!!");
+        }
+    }
+}
+
+
 function registerExternalProvider(providerName: string, provider: TaskProvider)
 {
     providersExternal.set(providerName, provider);
 }
 
 
-function registerTaskProvider(providerName: string, provider: TaskExplorerProvider, context: ExtensionContext)
+async function registerFileWatchers(context: ExtensionContext)
 {
-    context.subscriptions.push(tasks.registerTaskProvider(providerName, provider));
-    providers.set(providerName, provider);
-}
-
-
-function registerTaskProviders(context: ExtensionContext)
-{   //
-    // Internal Task Providers
-    //
-    // These tak types are provided internally by the extension.  Some task types (npm, grunt,
-    //  gulp, ts) are provided by VSCode itself
-    //
-    // TODO: VSCODE API now implements "resolveTask" in addition to "provideTask".  Need to implement
-    //     https://code.visualstudio.com/api/extension-guides/task-provider
-    //
-    registerTaskProvider("ant", new AntTaskProvider(), context);                      // Apache Ant Build Automation Tool
-    registerTaskProvider("app-publisher", new AppPublisherTaskProvider(), context);   // App Publisher (work related)
-    registerTaskProvider("composer", new ComposerTaskProvider(), context);            // PHP / composer.json
-    registerTaskProvider("gradle", new GradleTaskProvider(), context);                // Gradle multi-Language Automation Tool
-    registerTaskProvider("grunt", new GruntTaskProvider(), context);                  // Gulp JavaScript Toolkit
-    registerTaskProvider("gulp", new GulpTaskProvider(), context);                    // Grunt JavaScript Task Runner
-    registerTaskProvider("make", new MakeTaskProvider(), context);                    // C/C++ Makefile
-    registerTaskProvider("maven", new MavenTaskProvider(), context);                  // Apache Maven Toolset
-    registerTaskProvider("pipenv", new PipenvTaskProvider(), context);                // Pipfile for Python pipenv package manager
-    //
-    // The 'script' provider handles all file based 'scripts', e.g. batch files, bash, powershell, etc
-    //
-    registerTaskProvider("script", new ScriptTaskProvider(), context);
+    const taskTypes = util.getTaskTypes();
+    for (const t of taskTypes)
+    {
+        const taskType = t,
+            taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher";
+        if (configuration.get<boolean>("enable" + taskTypeP))
+        {
+            const watchModify = util.isScriptType(taskType) || taskType === "app-publisher";
+            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), watchModify);
+        }
+    }
 }
 
 
@@ -517,26 +469,81 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
 }
 
 
-function registerExplorer(name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined
+function registerTaskProvider(providerName: string, provider: TaskExplorerProvider, context: ExtensionContext)
 {
-    log.write("Register explorer view / tree provider '" + name + "'");
+    context.subscriptions.push(tasks.registerTaskProvider(providerName, provider));
+    providers.set(providerName, provider);
+}
 
-    if (enabled !== false)
+
+function registerTaskProviders(context: ExtensionContext)
+{   //
+    // Internal Task Providers
+    //
+    // These tak types are provided internally by the extension.  Some task types (npm, grunt,
+    //  gulp, ts) are provided by VSCode itself
+    //
+    // TODO: VSCODE API now implements "resolveTask" in addition to "provideTask".  Need to implement
+    //     https://code.visualstudio.com/api/extension-guides/task-provider
+    //
+    registerTaskProvider("ant", new AntTaskProvider(), context);                      // Apache Ant Build Automation Tool
+    registerTaskProvider("app-publisher", new AppPublisherTaskProvider(), context);   // App Publisher (work related)
+    registerTaskProvider("composer", new ComposerTaskProvider(), context);            // PHP / composer.json
+    registerTaskProvider("gradle", new GradleTaskProvider(), context);                // Gradle multi-Language Automation Tool
+    registerTaskProvider("grunt", new GruntTaskProvider(), context);                  // Gulp JavaScript Toolkit
+    registerTaskProvider("gulp", new GulpTaskProvider(), context);                    // Grunt JavaScript Task Runner
+    registerTaskProvider("make", new MakeTaskProvider(), context);                    // C/C++ Makefile
+    registerTaskProvider("maven", new MavenTaskProvider(), context);                  // Apache Maven Toolset
+    registerTaskProvider("pipenv", new PipenvTaskProvider(), context);                // Pipfile for Python pipenv package manager
+    //
+    // The 'script' provider handles all file based 'scripts', e.g. batch files, bash, powershell, etc
+    //
+    registerTaskProvider("script", new ScriptTaskProvider(), context);
+}
+
+
+export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "")
+{
+    log.methodStart("process remove workspace folder", 1, logPad, true);
+
+    for (const f of wsf)
     {
-        if (workspace.workspaceFolders)
+        log.value("      folder", f.name, 1, logPad);
+        // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
+        for (const c of cache.filesCache)
         {
-            const treeDataProvider = new TaskTreeDataProvider(name, context);
-            const treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
-            views.set(name, treeView);
-            const view = views.get(name);
-            if (view) {
-                context.subscriptions.push(view);
-                log.write("   Tree data provider registered'" + name + "'");
+            const files = c[1], provider = c[0],
+                  toRemove: cache.ICacheItem[] = [];
+
+            log.value("      start remove task files from cache", provider, 2, logPad);
+
+            for (const file of files)
+            {
+                log.value("         checking cache file", file.uri.fsPath, 4, logPad);
+                if (file.folder.uri.fsPath === f.uri.fsPath) {
+                    log.write("            added for removal",  4, logPad);
+                    toRemove.push(file);
+                }
             }
-            return treeDataProvider;
+
+            if (toRemove.length > 0)
+            {
+                for (const tr of toRemove) {
+                    log.value("         remove file", tr.uri.fsPath, 2, logPad);
+                    files.delete(tr);
+                }
+            }
+
+            log.value("      completed remove files from cache", provider, 2, logPad);
         }
-        else {
-            log.write("✘ No workspace folders!!!");
-        }
+        log.write("   folder removed", 1, logPad);
     }
+
+    log.methodDone("process remove workspace folder", 1, logPad, true);
+}
+
+
+function unregisterExternalProvider(providerName: string)
+{
+    providersExternal.delete(providerName);
 }
