@@ -97,7 +97,8 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         unregisterProvider: unregisterExternalProvider,
         utilities: util,
         fileCache: cache,
-        taskProviders: providers,
+        providers,
+        providersExternal,
         log
     };
 
@@ -400,9 +401,10 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
 }
 
 
-function registerExternalProvider(providerName: string, provider: TaskProvider)
+async function registerExternalProvider(providerName: string, provider: TaskProvider)
 {
     providersExternal.set(providerName, provider);
+    await refreshTree(providerName);
 }
 
 
@@ -543,7 +545,8 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "
 }
 
 
-function unregisterExternalProvider(providerName: string)
+async function unregisterExternalProvider(providerName: string)
 {
     providersExternal.delete(providerName);
+    await refreshTree(providerName);
 }
