@@ -275,10 +275,10 @@ export function isReady(taskType?: string)
     else {
         if (!teApi.explorerProvider)            err = "        ✘ TeApi Explorer provider null";
         else if (!teApi.sidebarProvider)        err = "        ✘ TeApi Sidebar Provider null";
-        else if (!teApi.taskProviders)          err = "        ✘ Providers null";
+        else if (!teApi.providers)          err = "        ✘ Providers null";
     }
     if (!err && taskType) {
-        if (!teApi.taskProviders.get(taskType)) err = `        ✘ ${taskType} Provider null`;
+        if (!teApi.providers.get(taskType)) err = `        ✘ ${taskType} Provider null`;
     }
     if (!err && !(workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined)) {
                                                 err = "        ✘ Workspace folder does not exist";

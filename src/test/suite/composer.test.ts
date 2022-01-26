@@ -57,7 +57,7 @@ suite("Composer Tests", () =>
 
     test("Document Position", async () =>
     {
-        const provider = teApi.taskProviders.get(testsName) as ComposerTaskProvider;
+        const provider = teApi.providers.get(testsName) as ComposerTaskProvider;
         // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);

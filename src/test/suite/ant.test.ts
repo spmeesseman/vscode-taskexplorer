@@ -31,7 +31,7 @@ suite("Ant Tests", () =>
         teApi = await activate(this);
         assert(isReady(testsName) === true, "TeApi not ready");
 
-        provider = teApi.taskProviders.get(testsName) as AntTaskProvider;
+        provider = teApi.providers.get(testsName) as AntTaskProvider;
         rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         buildXmlFile = getWsPath("build.xml");
         buildXmlFileUri = Uri.file(buildXmlFile);

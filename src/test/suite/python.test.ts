@@ -60,14 +60,14 @@ suite("Python Tests", () =>
 
     test("Document Position", async () =>
     {
-        const provider = teApi.taskProviders.get("script") as ScriptTaskProvider;
+        const provider = teApi.providers.get("script") as ScriptTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
     });
 
 
     test("Invalid Script Type", async () =>
     {
-        const provider = teApi.taskProviders.get("script") as ScriptTaskProvider;
+        const provider = teApi.providers.get("script") as ScriptTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.py"))),
                "Script type should return position 1");
     });

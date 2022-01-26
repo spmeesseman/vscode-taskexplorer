@@ -16,7 +16,6 @@ import { configuration } from "../../common/configuration";
 
 let teApi: TaskExplorerApi;
 let provider: MakeTaskProvider;
-let wsFolder: WorkspaceFolder;
 
 
 suite("Makefile Tests", () =>
@@ -26,11 +25,7 @@ suite("Makefile Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady("make") === true, "TeApi not ready");
-        provider = teApi.taskProviders.get("make") as MakeTaskProvider;
-        //
-        // File path for create/remove
-        //
-        wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
+        provider = teApi.providers.get("make") as MakeTaskProvider;
     });
 
 
