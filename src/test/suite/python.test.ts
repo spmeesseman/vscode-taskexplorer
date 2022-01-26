@@ -79,7 +79,7 @@ suite("Python Tests", () =>
         assert(cTasks && cTasks.filter(t => t.source === testsName).length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
         await configuration.updateWs(`enable${testsNameProper}`, false);
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        await teApi.explorer?.invalidateTasksCache(testsName);
         await sleep(500);
         cTasks = await tasks.fetchTasks({ type: "script" });
         assert(!cTasks || cTasks.filter(t => t.source === testsName).length === 0, `Did not read 0 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
@@ -90,7 +90,7 @@ suite("Python Tests", () =>
     {
         await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        await teApi.explorer?.invalidateTasksCache(testsName);
         await sleep(500);
         const cTasks = await tasks.fetchTasks({ type: "script" });
         assert(cTasks && cTasks.filter(t => t.source === testsName).length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
@@ -110,7 +110,7 @@ suite("Python Tests", () =>
         );
 
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
         const cTasks = await tasks.fetchTasks({ type: "script" });
         assert(cTasks && cTasks.filter(t => t.source === testsName).length === 3, `Did not read 3 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
     });
@@ -134,7 +134,7 @@ suite("Python Tests", () =>
     //     );
     //
     //     await sleep(500);
-    //     await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+    //     await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
     //     const cTasks = await tasks.fetchTasks({ type: testsName });
     //     assert(cTasks && cTasks.length === 6, `Did not read 6 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
     // });
@@ -156,7 +156,7 @@ suite("Python Tests", () =>
     //     );
     //
     //     await sleep(500);
-    //     await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+    //     await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
     //     const cTasks = await tasks.fetchTasks({ type: testsName });
     //     assert(cTasks && cTasks.length === 4, `Did not read 4 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
     // });
@@ -170,7 +170,7 @@ suite("Python Tests", () =>
         });
 
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
         const cTasks = await tasks.fetchTasks({ type: "script" });
         assert(cTasks && cTasks.filter(t => t.source === testsName).length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
     });

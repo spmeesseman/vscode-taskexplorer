@@ -31,10 +31,10 @@ suite("API Init and Tests", () =>
     test("Cover pre-init cases", async function()
     {
         await initSettings(false);
-        teApi.explorerProvider?.showSpecialTasks(true);
-        teApi.explorerProvider?.showSpecialTasks(true, true);
+        teApi.explorer?.showSpecialTasks(true);
+        teApi.explorer?.showSpecialTasks(true, true);
         await initSettings();
-        await teApi.explorerProvider?.refresh("tests");
+        await teApi.explorer?.refresh("tests");
         await commands.executeCommand("taskExplorer.refresh");
     });
 

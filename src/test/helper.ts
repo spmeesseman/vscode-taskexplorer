@@ -103,7 +103,7 @@ export async function cleanup()
 
 export async function buildTree(instance: any, waitTime?: number)
 {
-    if (!teApi || !teApi.explorerProvider) {
+    if (!teApi || !teApi.explorer) {
         assert.fail("   ✘ Not initialized");
     }
 
@@ -113,7 +113,7 @@ export async function buildTree(instance: any, waitTime?: number)
 
     instance.timeout(60 * 1000);
 
-    if (!teApi || !teApi.explorerProvider) {
+    if (!teApi || !teApi.explorer) {
         assert.fail("   ✘ Task Explorer tree instance does not exist");
     }
 
@@ -124,16 +124,16 @@ export async function buildTree(instance: any, waitTime?: number)
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("groupMaxLevel", 5);
 
-    await teApi.explorerProvider.refresh("tests");
+    await teApi.explorer.refresh("tests");
     await sleep(4000);
     await waitForCache();
 
     //
     // Mock explorer open view which would call this function
     //
-    treeItems = await teApi.explorerProvider.getChildren(undefined, "        ");
+    treeItems = await teApi.explorer.getChildren(undefined, "        ");
 
-    await teApi.explorerProvider.refresh();
+    await teApi.explorer.refresh();
     await sleep(4000);
     await waitForCache();
 
@@ -180,7 +180,7 @@ export async function getTreeTasks(taskType: string, expectedCount: number)
     //
     // Get the task mapped tree items
     //
-    const taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ") as Map<string, TaskItem>;
+    const taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as Map<string, TaskItem>;
     //
     // Make sure the tasks have been mapped in the explorer tree
     // There should be one less task as the VSCode enginereturned above as the Explorer
@@ -273,12 +273,12 @@ export function isReady(taskType?: string)
     let err: string | undefined;
     if (!teApi)                                 err = "        ✘ TeApi null";
     else {
-        if (!teApi.explorerProvider)            err = "        ✘ TeApi Explorer provider null";
-        else if (!teApi.sidebarProvider)        err = "        ✘ TeApi Sidebar Provider null";
-        else if (!teApi.providers)          err = "        ✘ Providers null";
+        if (!teApi.explorer)                    err = "        ✘ TeApi Explorer provider null";
+        else if (!teApi.sidebar)                err = "        ✘ TeApi Sidebar Provider null";
+        else if (!teApi.providers)              err = "        ✘ Providers null";
     }
     if (!err && taskType) {
-        if (!teApi.providers.get(taskType)) err = `        ✘ ${taskType} Provider null`;
+        if (!teApi.providers.get(taskType))     err = `        ✘ ${taskType} Provider null`;
     }
     if (!err && !(workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined)) {
                                                 err = "        ✘ Workspace folder does not exist";
@@ -338,8 +338,16 @@ export function spawn(command: string, args?: string[], options?: cp.SpawnOption
 }
 
 
-export async function verifyTaskCount(taskType: string, expectedCount: number)
+export async function verifyTaskCount(taskType: string, expectedCount: number, checkTree?: boolean | number, taskMap?: Map<string, TaskItem>)
 {
     const tTasks = await tasks.fetchTasks({ type: taskType });
-    assert(tTasks && tTasks.length === expectedCount, `Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
+    assert(tTasks && tTasks.length === expectedCount, `Unexpected ${taskType} task count (1)(Found ${tTasks.length} of ${expectedCount})`);
+
+    if (checkTree)
+    {
+        const tasksMap = taskMap || (await teApi.explorer?.getTaskItems(undefined, "   ") as Map<string, TaskItem>),
+              taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
+        expectedCount = (typeof checkTree === "number" ? checkTree : expectedCount);
+        assert(taskCount === expectedCount, `Unexpected ${taskType} task count (2)(Found ${taskCount} of ${expectedCount})`);
+    }
 }

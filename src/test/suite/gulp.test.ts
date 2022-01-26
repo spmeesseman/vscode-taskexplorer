@@ -51,7 +51,7 @@ suite("Gulp Tests", () =>
     {
         await configuration.updateWs(`enable${testsNameProper}`, false);
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        await teApi.explorer?.invalidateTasksCache(testsName);
         await sleep(500);
         await verifyTaskCount("gulp", 0);
     });
@@ -61,7 +61,7 @@ suite("Gulp Tests", () =>
     {
         await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("gulp", 17);
     });
 
@@ -86,7 +86,7 @@ suite("Gulp Tests", () =>
         );
 
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
         await verifyTaskCount("gulp", 19);
     });
 
@@ -111,7 +111,7 @@ suite("Gulp Tests", () =>
         );
 
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
         await verifyTaskCount("gulp", 20);
     });
 
@@ -128,7 +128,7 @@ suite("Gulp Tests", () =>
         );
 
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
         await verifyTaskCount("gulp", 18);
     });
 
@@ -140,7 +140,7 @@ suite("Gulp Tests", () =>
             recursive: true
         });
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName, fileUri);
+        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
         await verifyTaskCount("gulp", 17);
     });
 
@@ -154,7 +154,7 @@ suite("Gulp Tests", () =>
         //
         await configuration.updateWs("useGulp", true);
 
-        // await teApi.explorerProvider?.invalidateTasksCache("gulp");
+        // await teApi.explorer?.invalidateTasksCache("gulp");
         // await tasks.fetchTasks({ type: "gulp" });
         // gulpTasks = await provider.readUriTasks(Uri.file(buildXmlFile));
         // assert(gulpTasks.length === 2, "# of Gulp tasks should be 2");

@@ -22,28 +22,28 @@ suite("Tree Tests", () =>
 
     test("Show/hide last tasks", async function()
     {
-        if (!teApi.explorerProvider) {
+        if (!teApi.explorer) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        await teApi.explorerProvider.showSpecialTasks(true);
-        await teApi.explorerProvider.showSpecialTasks(false);
+        await teApi.explorer.showSpecialTasks(true);
+        await teApi.explorer.showSpecialTasks(false);
         await configuration.updateWs("showLastTasks", false);
-        await teApi.explorerProvider.showSpecialTasks(true);
-        await teApi.explorerProvider.showSpecialTasks(false);
+        await teApi.explorer.showSpecialTasks(true);
+        await teApi.explorer.showSpecialTasks(false);
     });
 
 
     test("Show/hide favorite tasks", async function()
     {
-        await teApi.explorerProvider?.showSpecialTasks(true, true);
-        await teApi.explorerProvider?.showSpecialTasks(false, true);
+        await teApi.explorer?.showSpecialTasks(true, true);
+        await teApi.explorer?.showSpecialTasks(false, true);
     });
 
 
     test("Get Element", async function()
     {
-        // taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
-        // const element = teApi.explorerProvider?.getTreeItem();
+        // taskMap = await teApi.explorer?.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
+        // const element = teApi.explorer?.getTreeItem();
     });
 
 });

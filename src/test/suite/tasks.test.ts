@@ -71,7 +71,7 @@ suite("Task Tests", () =>
 
     test("Trigger busy on run last task", async function()
     {
-        /* Don't await -> */ teApi.explorerProvider?.invalidateTasksCache();
+        /* Don't await -> */ teApi.explorer?.invalidateTasksCache();
         await executeTeCommand("runLastTask", 5000);
     });
 

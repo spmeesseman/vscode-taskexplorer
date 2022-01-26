@@ -61,7 +61,7 @@ suite("Ant Tests", () =>
 
     test("Start", async () =>
     {
-        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("ant", 3);
     });
 
@@ -70,7 +70,7 @@ suite("Ant Tests", () =>
     {
         await configuration.updateWs(`enable${testsNameProper}`, false);
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        await teApi.explorer?.invalidateTasksCache(testsName);
         await sleep(500);
         await verifyTaskCount("ant", 0);
     });
@@ -80,7 +80,7 @@ suite("Ant Tests", () =>
     {
         await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
-        await teApi.explorerProvider?.invalidateTasksCache(testsName);
+        await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("ant", 3);
     });
 

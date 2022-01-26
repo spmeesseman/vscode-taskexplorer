@@ -126,7 +126,7 @@ suite("Provider Tests", () =>
         //
         // Do work son
         //
-        await teApi.explorerProvider?.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
+        await teApi.explorer?.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
         setupVscode(); setupAnt(); setupGradle(); setupTsc(); setupMakefile();
         setupBash(); setupBatch(); setupGrunt(); setupGulp(); setupAppPublisher(); setupMaven();
     });
@@ -216,7 +216,7 @@ suite("Provider Tests", () =>
     {   //
         // The 3rd param `true` will open the task files and locate task positions while parsing the tree
         //
-        taskMap = await teApi.explorerProvider?.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
+        taskMap = await teApi.explorer?.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 7);
     });
 
@@ -402,7 +402,7 @@ suite("Provider Tests", () =>
 
     test("Invalidate bash tasks with new bash shell setting", async function()
     {
-        if (!teApi || !teApi.explorerProvider || !workspace.workspaceFolders) {
+        if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
@@ -415,7 +415,7 @@ suite("Provider Tests", () =>
 
     test("Rebuild cache on workspace folder", async function()
     {
-        if (!teApi || !teApi.explorerProvider || !workspace.workspaceFolders) {
+        if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         await teApi.fileCache.buildCache("gulp", "gulp", constants.GLOB_GULP, workspace.workspaceFolders[0], true);
