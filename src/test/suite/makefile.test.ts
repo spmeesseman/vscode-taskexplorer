@@ -7,7 +7,7 @@
 import * as assert from "assert";
 import * as path from "path";
 import { activate, getWsPath, isReady } from "../helper";
-import { TaskExplorerApi } from "../../interface/taskExplorerApi";
+import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MakeTaskProvider } from "../../providers/make";
 import { readFileSync } from "../../common/utils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";

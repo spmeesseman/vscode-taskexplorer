@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 import * as assert from "assert";
-import { TaskExplorerApi } from "../../interface/taskExplorerApi";
+import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, isReady } from "../helper";
 import { configuration } from "../../common/configuration";
 

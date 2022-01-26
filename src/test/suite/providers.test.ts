@@ -14,7 +14,7 @@ import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder }
 import { removeFromArray } from "../../common/utils";
 import { waitForCache } from "../../cache";
 import { addWsFolder, removeWsFolder } from "../../extension";
-import { TaskExplorerApi } from "../../interface/taskExplorerApi";
+import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
 import { activate, buildTree, findIdInTaskMap, sleep, verifyTaskCount } from "../helper";
 

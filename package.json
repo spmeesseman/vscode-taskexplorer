@@ -90,6 +90,7 @@
     },
     "dependencies": {
         "@sgarciac/bombadil": "^2.3.0",
+        "@spmeesseman/vscode-taskexplorer-types": "0.0.2",
         "@types/webpack-node-externals": "^2.5.3",
         "glob": "^7.2.0",
         "is-utf8": "^0.2.1",

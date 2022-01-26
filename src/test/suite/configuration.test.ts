@@ -4,7 +4,7 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import { ConfigurationTarget } from "vscode";
-import { TaskExplorerApi } from "../../interface/taskExplorerApi";
+import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, initSettings, isReady, sleep } from "../helper";
 import { configuration } from "../../common/configuration";
 

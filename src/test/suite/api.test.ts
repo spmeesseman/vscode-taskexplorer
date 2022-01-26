@@ -6,7 +6,7 @@
 //
 import * as assert from "assert";
 import { activate, isReady, sleep, verifyTaskCount } from "../helper";
-import { TaskExplorerApi } from "../../interface/taskExplorerApi";
+import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ExternalTaskProvider } from "../../providers/external";
 import { waitForCache } from "../../cache";

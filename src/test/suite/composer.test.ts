@@ -10,7 +10,7 @@ import * as path from "path";
 import { tasks, Uri } from "vscode";
 import { configuration } from "../../common/configuration";
 import { activate, getWsPath, isReady, sleep } from "../helper";
-import { TaskExplorerApi } from "../../interface/taskExplorerApi";
+import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ComposerTaskProvider } from "../../providers/composer";
 import { properCase } from "../../common/utils";
 

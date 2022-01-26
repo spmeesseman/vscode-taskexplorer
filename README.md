@@ -215,7 +215,7 @@ FOr whatever reason, on some systems the animated running task icon eats a lot o
 
 ## External Provider Integration API
 
-Any extension that implements `TaskProvider` (specifically it's `provideTasks` method) can add it's tasks to the Task Explorer tree.  TO register an external provider, follow these steps:
+Any extension that implements `TaskProvider` (specifically it's `provideTasks` method) can add it's tasks to the Task Explorer tree.  To register an external provider, follow these steps:
 
 Get the TaskExplorer API object:
 
@@ -230,6 +230,10 @@ To remove a provider:
     await teApi.unregisterProvider("taskTypeName");
 
 Where "taskTypeName" is the name of the task type, i.e. "npm", "ant", "gulp", etc, and `myProvider` is the instance of TaskProvider that implements the `provideTasks` method.
+
+You can optionally install the Task Explorer API types:
+
+    npm install @spmeesseman/vscode-taskexplorer-types
 
 The provided tasks must implement the taskExplorer.external task interface:
 

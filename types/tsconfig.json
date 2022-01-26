@@ -9,7 +9,7 @@
 		"composite": true,
         "declaration": true,
         "declarationMap": true,
-		"emitDeclarationOnly": true
+		"emitDeclarationOnly": false
 	},
 	"include": ["../src/interface"],
 	"exclude": [
