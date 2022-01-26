@@ -11,11 +11,11 @@
         "declarationMap": true,
 		"emitDeclarationOnly": true
 	},
-	"include": ["../src/*.ts"],
+	"include": ["../src/interface"],
 	"exclude": [
 		"../src/common",
 		"../src/providers",
 		"../src/test",
-		"../tree"
+		"../src/tree"
 	]
 }

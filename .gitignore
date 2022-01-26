@@ -5,4 +5,5 @@ dist
 coverage
 .nyc_output
 install_extensions.bat
-
+types/lib
+tsconfig.tsbuildinfo
