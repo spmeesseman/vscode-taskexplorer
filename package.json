@@ -52,6 +52,7 @@
     ],
     "scripts": {
         "build": "npx tsc -p ./",
+        "build-types": "tsc -p ./types",
         "clean": "rimraf dist && rimraf .nyc_output && rimraf coverage",
         "lint": "eslint -c .eslintrc.js --ext .ts .",
         "package": "vsce package",

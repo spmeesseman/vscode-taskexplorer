@@ -19,10 +19,13 @@ module.exports = {
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "project": "tsconfig.json",
+        "project": [
+            "tsconfig.json"
+        ],
         "sourceType": "module",
         "ecmaVersion": 2019
     },
+    "ignorePatterns": ["**/test-files/*.js", "lib", "**/*.js", "*.json" ],
     "overrides": [
     {
         "files": ["src/**/*.ts"],

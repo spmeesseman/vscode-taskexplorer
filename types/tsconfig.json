@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"module": "commonjs",
+		"sourceMap": true,
+		"strict": true,
+		"outDir": "lib",
+		"rootDir": "../src/interface",
+		"composite": true,
+        "declaration": true,
+        "declarationMap": true,
+		"emitDeclarationOnly": true
+	},
+	"include": ["../src/*.ts"],
+	"exclude": [
+		"../src/common",
+		"../src/providers",
+		"../src/test",
+		"../tree"
+	]
+}

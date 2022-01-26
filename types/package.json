@@ -1,0 +1,27 @@
+{
+    "name": "@spmeesseman/vscode-taskexplorer-types",
+    "version": "0.0.1",
+    "displayName": "Task Explorer Types",
+    "description": "Task Explorer API Types",
+    "icon": "../res/gears-r-colors.png",
+    "publisher": "spmeesseman",
+    "license": "MIT",
+    "homepage": "https://github.com/spmeesseman/vscode-taskexplorer/blob/master/README.md",
+    "author": {
+        "name": "Scott Meesseman"
+    },
+    "bugs": {
+        "url": "https://github.com/spmeesseman/vscode-taskexplorer/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/spmeesseman/vscode-taskexplorer.git"
+    },
+    "keywords": [
+        "types",
+        "taskexplorer"
+    ],
+    "scripts": {
+        "build": "npx tsc -p ./"
+    }
+}
