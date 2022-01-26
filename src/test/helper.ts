@@ -67,7 +67,7 @@ export async function activate(instance?: any)
         //
         // For debugging
         //
-        teApi.logging.setWriteToConsole(writeToConsole);
+        teApi.log.setWriteToConsole(writeToConsole);
     }
     return teApi;
 }

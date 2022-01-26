@@ -6,11 +6,12 @@ import { TaskTreeDataProvider } from "../tree/tree";
 
 export interface TaskExplorerApi
 {
-    explorerProvider: TaskTreeDataProvider | undefined;
-    sidebarProvider: TaskTreeDataProvider | undefined;
+    log: any;
     utilities: any;
     fileCache: any;
+    explorerProvider: TaskTreeDataProvider | undefined;
+    sidebarProvider: TaskTreeDataProvider | undefined;
     taskProviders: Map<string, TaskExplorerProvider>;
-    logging: any;
     registerProvider(providerName: string, provider: TaskProvider): void;
+    unregisterProvider(providerName: string): void;
 }
