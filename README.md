@@ -239,13 +239,12 @@ The provided tasks must implement the taskExplorer.external task interface:
         path: "file path",
         fileName: "file name",
         uri: file `Uri`,
-        taskItemId: (internal use, ignore)
+        taskItemId: (internal use, ignore),
+        icon: {
+            light: "/path/to/light.svg",
+            dark: "/path/to/dark.svg"
+        }
     }
-
-As of v2.7.0:
-
-- Has not been formally tested
-- Currently, the API does not support custom icons, but for extension testing you can place icons in the res folder of the TaskExplorer installation folder, named using the same task type name in the `registerProvider` call mentioned above.
 
 For reference, the entire API object is:
 
@@ -260,6 +259,9 @@ For reference, the entire API object is:
         registerProvider(providerName: string, provider: TaskProvider): void;
         unregisterProvider(providerName: string): void;
     }
+
+- As of v2.7.0, the external task API has not been formally tested, a.  Who will be the guineau?  Hahaha ;)
+- As of v2.7.0, the API does not support custom icons, but for extension testing you can place icons in `res` of the TaskExplorer installation folder, named using the same task type name in the `registerProvider` call mentioned above.
 
 ## Feedback & Contributing
 

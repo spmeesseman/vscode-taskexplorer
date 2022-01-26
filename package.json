@@ -1815,6 +1815,10 @@
                         "type": "string",
                         "description": "%taskdef.task.fileName%"
                     },
+                    "icon": {
+                        "type": "object",
+                        "description": "%taskdef.task.icon%"
+                    },
                     "uri": {
                         "type": "object",
                         "description": "%taskdef.task.fileUri%"

@@ -136,6 +136,7 @@
 
 	"taskdef.task.fileName": "The file that the target was found in.",
 	"taskdef.task.fileUri": "The uri object of file that the target was found in.",
+	"taskdef.task.icon": "The icon paths to use in the task tree.  Specify two properties on an object - light and dark",
 	"taskdef.task.script": "The script/target name.",
 	"taskdef.task.target": "The target name.",
 	"taskdef.task.path": "The relative path to the folder that contains the task file.",
