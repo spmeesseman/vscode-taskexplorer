@@ -38,7 +38,7 @@ suite("API Tests", () =>
     test("Register external task provider", async function()
     {
         taskProvider.getDocumentPosition("test_1_task_name", "test_1_task_name");
-        await teApi.registerProvider("external", taskProvider);
+        await teApi.register("external", taskProvider);
         await sleep(3000);
         await waitForCache();
         await verifyTaskCount("external", 2, true);
@@ -50,9 +50,6 @@ suite("API Tests", () =>
         const provider = teApi.providersExternal.get("external") as ExternalTaskProvider;
         assert(provider);
         const task = provider.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
-        await provider.readUriTasks(Uri.file("dummy_path"), "");
-        await provider.invalidateTasksCache(Uri.file("dummy_path"));
-        await provider.invalidateTasksCache(Uri.file("dummy_path"), "");
         provider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         provider.resolveTask(task);
     });
@@ -60,7 +57,7 @@ suite("API Tests", () =>
 
     test("Unregister external task provider", async function()
     {
-        await teApi.unregisterProvider("external");
+        await teApi.unregister("external");
         await sleep(3000);
         await waitForCache();
         await verifyTaskCount("external", 2, 0);

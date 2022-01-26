@@ -69,14 +69,7 @@ suite("NPM Tests", () =>
 
     test("Get package manager", function()
     {
-        const pkgMgr = getPackageManager();
-        if (pkgMgr) {
-            console.log("         ℹ Portable data path = " + pkgMgr);
-            console.log("         ✔ Successfully read package manager setting");
-        }
-        else {
-            assert.fail("         ✘ Task Explorer tree instance does not exist");
-        }
+        getPackageManager();
     });
 
 
