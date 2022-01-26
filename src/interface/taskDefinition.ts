@@ -18,4 +18,5 @@ export interface TaskExplorerDefinition extends TaskDefinition
     scriptFile?: boolean;
     scriptType?: string;
     cmdLine?: string;
+    icon?: string;
 }
