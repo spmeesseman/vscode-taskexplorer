@@ -3,7 +3,6 @@ import { ExternalTaskProvider } from "../providers/external";
 import { TaskExplorerProvider } from "../providers/provider";
 import { TaskTreeDataProvider } from "../tree/tree";
 
-
 export interface TaskExplorerApi
 {
     log: any;
@@ -13,6 +12,8 @@ export interface TaskExplorerApi
     sidebar: TaskTreeDataProvider | undefined;
     providers: Map<string, TaskExplorerProvider>;
     providersExternal: Map<string, ExternalTaskProvider>;
-    registerProvider(providerName: string, provider: ExternalTaskProvider): Promise<void>;
-    unregisterProvider(providerName: string): Promise<void>;
+
+    refresh(taskSource: string): Promise<void>;
+    register(taskSource: string, provider: ExternalTaskProvider): Promise<void>;
+    unregister(taskSource: string): Promise<void>;
 }

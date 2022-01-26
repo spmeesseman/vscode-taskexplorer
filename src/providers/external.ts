@@ -5,13 +5,16 @@ import * as util from "../common/utils";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, TaskProvider } from "vscode";
+import { ExternalExplorerProvider } from "../interface/externalProvider";
 
 
 /**
  * Test class for external task providers
  */
-export class ExternalTaskProvider implements TaskProvider
+export class ExternalTaskProvider implements ExternalExplorerProvider
 {
+    public providerName = "external";
+
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
     {
@@ -35,24 +38,13 @@ export class ExternalTaskProvider implements TaskProvider
         return 0;
     }
 
-    public async invalidateTasksCache(uri?: Uri, logPad = ""): Promise<void>
-    {
-        return;
-    }
-
-
     public async provideTasks()
     {
-        return this.readUriTasks(Uri.file("/dummy_path"), "");
-    }
-
-
-    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
-    {
         const result: Task[] = [],
+              uri = Uri.file("/dummy_path"),
               folder = (workspace.workspaceFolders as WorkspaceFolder[])[0]; // for tests only!
 
-        log.methodStart("read external tasks", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read external tasks", 1, "", true, [["path", uri.fsPath], ["project folder", folder.name]]);
 
         const task = this.createTask("test_1_task_name", "test_1_task_name", folder, uri);
         task.group = TaskGroup.Build;
@@ -62,7 +54,7 @@ export class ExternalTaskProvider implements TaskProvider
         task.group = TaskGroup.Build;
         result.push(task2);
 
-        log.methodDone("read external tasks", 1, logPad, true);
+        log.methodDone("read external tasks", 1, "", true);
         return result;
     }
 
