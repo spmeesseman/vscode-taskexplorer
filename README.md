@@ -37,6 +37,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
   - [Running Task Icon Animations](#running-task-icon-animations)
+  - [External Provider Integration API](#external-provider-integration-api)
   - [Feedback & Contributing](#feedback--contributing)
     - [Rate It - Leave Some Stars](#rate-it---leave-some-stars)
   - [Thank You](#thank-you)
@@ -65,6 +66,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Features by Version
 
+- v2.7 - External provider integration API [#22](https://github.com/spmeesseman/vscode-taskexplorer/issues/22)
 - v2.6 - Composer support [#150](https://github.com/spmeesseman/vscode-taskexplorer/issues/153) Include shellscripts with no extension [#153](https://github.com/spmeesseman/vscode-taskexplorer/issues/153) Rename tasks [#164](https://github.com/spmeesseman/vscode-taskexplorer/issues/164)
 - v2.5 - Webpack build - Runs 10-15% faster.
 - v2.4 - Add Pipenv support for Python Pipfile scripts. (thanks **rob4226**) [#155](https://github.com/spmeesseman/vscode-taskexplorer/issues/155)
@@ -210,6 +212,43 @@ Bash/sh scripts in Windows will have the shell executable automatically set to a
 ## Running Task Icon Animations
 
 FOr whatever reason, on some systems the animated running task icon eats a lot of CPU.  If this is your case, the animated icon can be turned off in settings (on by default).
+
+## External Provider Integration API
+
+Any extension that implements `TaskProvider` (specifically it's `provideTasks` method) can add it's tasks to the Task Explorer tree.  TO register an external provider, follow these steps:
+
+Get the TaskExplorer API object:
+
+    const teApi = await vscode.commands.executeCommand("taskExplorer.getApi");
+
+Register the instance of `TaskProvider` using the registerProvider method of the Task Explorer API object:
+
+    await teApi.registerProvider("taskTypeName", myProvider as TaskProvider);
+
+To remove a provider:
+
+    await teApi.unregisterProvider("taskTypeName");
+
+Where "taskTypeName" is the name of the task type, i.e. "npm", "ant", "gulp", etc, and `myProvider` is the instance of TaskProvider that implements the `provideTasks` method.
+
+As of v2.7.0:
+
+- Has not been formally tested
+- Currently, the API does not support custom icons, but for extension testing you can place icons in the res folder of the TaskExplorer installation folder, named using the same task type name in the `registerProvider` call mentioned above.
+
+For reference, the entire API object is:
+
+    interface TaskExplorerApi
+    {
+        log: any;
+        utilities: any;
+        fileCache: any;
+        explorerProvider: TaskTreeDataProvider | undefined;
+        sidebarProvider: TaskTreeDataProvider | undefined;
+        taskProviders: Map<string, TaskExplorerProvider>;
+        registerProvider(providerName: string, provider: TaskProvider): void;
+        unregisterProvider(providerName: string): void;
+    }
 
 ## Feedback & Contributing
 
