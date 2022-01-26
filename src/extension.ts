@@ -477,7 +477,7 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
     let watcher = watchers.get(taskType);
 
     if (workspace.workspaceFolders) {
-        await cache.buildCache(taskType, fileBlob, undefined, false, "   ");
+        await cache.buildCache(taskType, fileBlob, undefined, true, "   ");
     }
 
     if (watcher)
