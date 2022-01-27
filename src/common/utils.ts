@@ -134,8 +134,8 @@ export function getPortableDataPath(padding = "")
                     log.value(padding + "found portable user data path", fullPath, 1);
                     return fullPath;
                 }
-                catch (e) {
-                    log.write(e.toString());
+                catch (e: any) {
+                    log.error(e);
                     return;
                 }
             }

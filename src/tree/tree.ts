@@ -1091,8 +1091,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 try {
                     this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel);
                 }
-                catch (e) {
-                    log.error(e.toString());
+                catch (e: any) {
+                    log.error(e);
                 }
                 log.blank(1);
                 if (!this.taskTree || this.taskTree.length === 0)
@@ -1697,7 +1697,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
             }
         }
-        catch (e) {
+        catch (e: any) {
             log.error(["Error invalidating task cache", e]);
         }
 
@@ -2418,7 +2418,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         try {
             await tasks.executeTask(task);
         }
-        catch (e) {
+        catch (e: any) {
             const err = e.toString();
             if (err.indexOf("No workspace folder") !== -1)
             {

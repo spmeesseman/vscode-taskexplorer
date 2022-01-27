@@ -108,7 +108,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                     cwd: path.dirname(fsPath)
                 });
             }
-            catch (e) { log.write(e); }
+            catch (e: any) { log.error(e); }
             //
             // Loop through all the lines and extract the task names
             //

@@ -125,7 +125,7 @@ export async function executeTeCommand(command: string, timeout: number, ...args
         if (timeout) { await sleep(timeout); }
         return rc;
     }
-    catch (e) {
+    catch (e: any) {
         console.log("✘");
         console.log("✘ Error running TE command");
         console.log("✘    Skipping fail, continuing...");

@@ -37,7 +37,7 @@ async function main(args: string[])
         console.log("restore package.json activation event");
         execSync("enable-full-coverage.sh --off", { cwd: "tools" });
     }
-    catch (err) {
+    catch (err: any) {
         console.error(`Failed to run tests: ${err}\n${err.stack ?? "No call stack details found"}`);
         console.log("restore package.json activation event after error");
         execSync("enable-full-coverage.sh --off", { cwd: "tools" });
