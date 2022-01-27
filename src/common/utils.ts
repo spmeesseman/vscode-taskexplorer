@@ -167,9 +167,9 @@ export function getScriptTaskTypes(): string[]
 
 export function getTaskItemId(taskItem: TaskItem)
 {
-    return taskItem.id?.replace(constants.LAST_TASKS_LABEL + ":", "")
-                       .replace(constants.FAV_TASKS_LABEL + ":", "")
-                       .replace(constants.USER_TASKS_LABEL + ":", "");
+    return taskItem.id.replace(constants.LAST_TASKS_LABEL + ":", "")
+                      .replace(constants.FAV_TASKS_LABEL + ":", "")
+                      .replace(constants.USER_TASKS_LABEL + ":", "");
 }
 
 
@@ -313,13 +313,7 @@ export function isSpecial(taskItem: TaskItem)
 
 export function isWatchTask(source: string)
 {
-    return [ "npm", "tsc", "workspace" ].includes(source);
-}
-
-
-export function isExternalTeProviderType(source: string)
-{
-    return !getTaskTypes().includes(getTaskProviderType(source));
+    return [ "npm", "tsc", "workspace", "Workspace" ].includes(source);
 }
 
 

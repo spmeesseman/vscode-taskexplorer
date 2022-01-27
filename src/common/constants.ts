@@ -17,6 +17,7 @@ const constants: IDictionary<string> =
     GLOB_MAVEN: "**/pom.xml",
     GLOB_BASH: "**/*.[Ss][Hh]",
     GLOB_BATCH: "**/*.{[Bb][Aa][Tt],[Cc][Mm][Dd]}",
+    GLOB_EXTERNAL: "**/tasks.test",
     GLOB_GULP: "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].{[Jj][Ss],[Tt][Ss],[Mm][Jj][Ss],[Bb][Aa][Bb][Ee][Ll].[Jj][Ss]}",
     GLOB_GRADLE: "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]",
     GLOB_GRUNT: "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]",

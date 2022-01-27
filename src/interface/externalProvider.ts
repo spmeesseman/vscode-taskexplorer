@@ -7,6 +7,7 @@ export abstract class ExternalExplorerProvider implements TaskProvider
 
     abstract createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined;
     abstract getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number;
+    abstract getGlobPattern(): string;
 
     public providerName = "external";
 

@@ -2,10 +2,10 @@
 import * as log from "../common/log";
 import * as path from "path";
 import * as util from "../common/utils";
-import { TaskExplorerProvider } from "./provider";
+import constants from "../common/constants";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
-import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, TaskProvider } from "vscode";
 import { ExternalExplorerProvider } from "../interface/externalProvider";
+import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 
 
 /**
@@ -37,6 +37,13 @@ export class ExternalTaskProvider implements ExternalExplorerProvider
     {
         return 0;
     }
+
+
+    public getGlobPattern(): string
+    {
+        return constants.GLOB_EXTERNAL;
+    }
+
 
     public async provideTasks()
     {

@@ -4,6 +4,7 @@ import * as util from "./common/utils";
 import * as cache from "./cache";
 import * as log from "./common/log";
 import constants from "./common/constants";
+import { views } from "./views";
 import { TaskTreeDataProvider } from "./tree/tree";
 import { AntTaskProvider } from "./providers/ant";
 import { MakeTaskProvider } from "./providers/make";
@@ -17,10 +18,8 @@ import { GulpTaskProvider } from "./providers/gulp";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
 import { configuration } from "./common/configuration";
 import { initStorage } from "./common/storage";
-import { views } from "./views";
 import { TaskExplorerProvider } from "./providers/provider";
-import { TaskExplorerApi } from "./interface/taskExplorerApi";
-import { ExternalTaskProvider } from "./providers/external";
+import { ExternalExplorerProvider, TaskExplorerApi } from "./interface";
 import {
     Disposable, ExtensionContext, Uri, tasks, commands, workspace,
     window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder
@@ -31,7 +30,7 @@ let teApi: TaskExplorerApi;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
 export const providers: Map<string, TaskExplorerProvider> = new Map();
-export const providersExternal: Map<string, ExternalTaskProvider> = new Map();
+export const providersExternal: Map<string, ExternalExplorerProvider> = new Map();
 
 
 export async function activate(context: ExtensionContext, disposables: Disposable[]): Promise<TaskExplorerApi>
@@ -407,7 +406,7 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
 }
 
 
-async function registerExternalProvider(providerName: string, provider: ExternalTaskProvider)
+async function registerExternalProvider(providerName: string, provider: ExternalExplorerProvider)
 {
     providersExternal.set(providerName, provider);
     await refreshTree(providerName);
