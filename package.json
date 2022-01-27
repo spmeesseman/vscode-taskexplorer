@@ -107,7 +107,7 @@
         "@types/node": "^13.13.41",
         "@types/semver": "^7.3.9",
         "@types/terser-webpack-plugin": "^5.2.0",
-        "@types/vscode": "^1.63.1",
+        "@types/vscode": "^1.50.0",
         "@types/webpack": "^5.28.0",
         "@types/xml2js": "^0.4.8",
         "@typescript-eslint/eslint-plugin": "^4.33.0",
