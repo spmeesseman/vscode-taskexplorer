@@ -29,7 +29,7 @@ suite("Ant Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "TeApi not ready");
+        assert(isReady(testsName) === true, "    ✘ TeApi not ready");
 
         provider = teApi.providers.get(testsName) as AntTaskProvider;
         rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0];

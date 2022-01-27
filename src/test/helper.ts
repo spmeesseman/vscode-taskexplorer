@@ -101,46 +101,6 @@ export async function cleanup()
 }
 
 
-export async function buildTree(instance: any, waitTime?: number)
-{
-    if (!teApi || !teApi.explorer) {
-        assert.fail("   ✘ Not initialized");
-    }
-
-    if (treeItems) {
-        return treeItems;
-    }
-
-    instance.timeout(60 * 1000);
-
-    if (!teApi || !teApi.explorer) {
-        assert.fail("   ✘ Task Explorer tree instance does not exist");
-    }
-
-    await sleep(waitTime || 1);
-    await waitForCache();
-
-    await configuration.updateWs("groupWithSeparator", true);
-    await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("groupMaxLevel", 5);
-
-    await teApi.explorer.refresh("tests");
-    await sleep(4000);
-    await waitForCache();
-
-    //
-    // Mock explorer open view which would call this function
-    //
-    treeItems = await teApi.explorer.getChildren(undefined, "        ");
-
-    await teApi.explorer.refresh();
-    await sleep(4000);
-    await waitForCache();
-
-    return treeItems;
-}
-
-
 export async function executeTeCommand(command: string, timeout: number, ...args: any[])
 {
     try {
@@ -296,6 +256,14 @@ export function isReady(taskType?: string)
 export function overrideNextShowInputBox(value: any)
 {
     overridesShowInputBox.push(value);
+}
+
+
+export async function refresh()
+{
+	await executeTeCommand("refresh", 500);
+    await waitForCache();
+    return teApi.explorer.getChildren();
 }
 
 

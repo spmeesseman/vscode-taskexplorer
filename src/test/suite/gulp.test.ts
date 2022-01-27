@@ -26,7 +26,7 @@ suite("Gulp Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "TeApi not ready");
+        assert(isReady(testsName) === true, "    ✘ TeApi not ready");
         provider = teApi.providers.get(testsName) as GulpTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "gulpfile.js"));

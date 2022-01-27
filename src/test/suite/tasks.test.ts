@@ -27,7 +27,7 @@ suite("Task Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady() === true, "TeApi not ready");
+        assert(isReady() === true, "    ✘ TeApi not ready");
         ant = await getTreeTasks("ant", 3);
         bash = await getTreeTasks("bash", 1);
         batch = await getTreeTasks("batch", 2);
@@ -123,12 +123,13 @@ suite("Task Tests", () =>
         {
             await startTask(batchTask);
             await configuration.updateWs("keepTermOnStop", false);
-            await executeTeCommand("open", 50, batchTask);
+            await executeTeCommand("open", 50, batchTask, true); // clickaction=execute
             await executeTeCommand("runWithArgs", 2500, batchTask, "--test --test2");
             if (runCount % 1 === 0)
             {
                 await executeTeCommand("stop", 0, batchTask);
                 await executeTeCommand("run", 2500, batchTask);
+                executeTeCommand("pause", 1000, batchTask);
                 await executeTeCommand("pause", 1000, batchTask);
                 await executeTeCommand("run", 500, batchTask);
                 await configuration.updateWs("clickAction", "Open");
@@ -144,8 +145,11 @@ suite("Task Tests", () =>
                 await executeTeCommand("restart", 2500, batchTask);
                 await executeTeCommand("stop", 500, batchTask);
                 await executeTeCommand("runNoTerm", 2500, batchTask);
-                await executeTeCommand("stop", 0, batchTask);
+                await executeTeCommand("stop", 200, batchTask);
                 await configuration.updateWs("disableAnimatedIcons", false);
+                overrideNextShowInputBox("--test --test2");
+                await executeTeCommand("runWithArgs", 2500, batchTask);
+                await executeTeCommand("stop", 200, batchTask);
             }
             else {
                 await sleep(8000);
@@ -181,8 +185,6 @@ async function startTask(taskItem: TaskItem)
 async function endTask(taskItem: TaskItem)
 {
     await executeTeCommand("openTerminal", 0, taskItem);
-    await executeTeCommand("addRemoveCustomLabel", 0, taskItem);
-    await executeTeCommand("addRemoveFromFavorites", 0, taskItem);
     console.log(`    ✔ Done ${taskItem.taskSource} task: ${taskItem.label}`);
     lastTask = taskItem;
 }

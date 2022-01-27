@@ -9,7 +9,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { tasks, Uri } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, getWsPath, isReady, sleep } from "../helper";
+import { activate, getWsPath, isReady, sleep, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ComposerTaskProvider } from "../../providers/composer";
 import { properCase } from "../../common/utils";
@@ -32,7 +32,7 @@ suite("Composer Tests", () =>
         // Initialize
         //
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "TeApi not ready");
+        assert(isReady(testsName) === true, "    ✘ TeApi not ready");
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "composer.json"));
         //
@@ -114,9 +114,8 @@ suite("Composer Tests", () =>
         );
 
         await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 5, `Did not read 5 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await teApi.explorer.invalidateTasksCache(testsName, fileUri);
+        verifyTaskCount(testsName, 5);
     });
 
 

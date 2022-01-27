@@ -23,7 +23,7 @@ suite("API Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady("make") === true, "TeApi not ready");
+        assert(isReady("make") === true, "    ✘ TeApi not ready");
         taskProvider = new ExternalTaskProvider();
         dispose = tasks.registerTaskProvider("external", taskProvider);
         // teApi.log.setWriteToConsole(true, 3);

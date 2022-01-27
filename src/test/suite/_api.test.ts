@@ -6,7 +6,7 @@ import * as vscode from "vscode";
 import constants from "../../common/constants";
 import { commands, tasks } from "vscode";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, initSettings, isReady, sleep } from "../helper";
+import { activate, executeTeCommand, initSettings, isReady, sleep } from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -17,7 +17,7 @@ suite("API Init and Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady() === true, "TeApi not ready");
+        assert(isReady() === true, "    ✘ TeApi not ready");
     });
 
 
@@ -30,19 +30,9 @@ suite("API Init and Tests", () =>
 
     test("Cover pre-init cases", async function()
     {
-        await initSettings(false);
-        teApi.explorer?.showSpecialTasks(true);
-        teApi.explorer?.showSpecialTasks(true, true);
         await initSettings();
         await teApi.explorer?.refresh("tests");
-        await commands.executeCommand("taskExplorer.refresh");
-    });
-
-
-    test("Clear Special Folders", async function()
-    {
-        await commands.executeCommand("taskExplorer.clearSpecialFolder", constants.LAST_TASKS_LABEL);
-        await commands.executeCommand("taskExplorer.clearSpecialFolder", constants.FAV_TASKS_LABEL);
+        await executeTeCommand("refresh", 100);
     });
 
 });

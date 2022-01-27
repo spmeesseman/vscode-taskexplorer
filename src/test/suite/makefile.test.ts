@@ -24,7 +24,7 @@ suite("Makefile Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady("make") === true, "TeApi not ready");
+        assert(isReady("make") === true, "    ✘ TeApi not ready");
         provider = teApi.providers.get("make") as MakeTaskProvider;
     });
 

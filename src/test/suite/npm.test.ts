@@ -20,7 +20,7 @@ suite("NPM Tests", () =>
     suiteSetup(async function()
     {
         await activate(this);
-        assert(isReady() === true, "TeApi not ready");
+        assert(isReady() === true, "    ✘ TeApi not ready");
         //
         // Create NPM package.json
         //

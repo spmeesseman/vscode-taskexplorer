@@ -16,7 +16,7 @@ import { waitForCache } from "../../cache";
 import { addWsFolder, removeWsFolder } from "../../extension";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
-import { activate, buildTree, findIdInTaskMap, sleep, verifyTaskCount } from "../helper";
+import { activate, findIdInTaskMap, refresh, sleep, verifyTaskCount } from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -329,7 +329,6 @@ suite("Provider Tests", () =>
     });
 
 
-
     test("Add ws folder to file cache", async function()
     {   //
         // Cover single-if branches in cache module
@@ -505,6 +504,37 @@ suite("Provider Tests", () =>
     });
 
 });
+
+
+export async function buildTree(instance: any, waitTime?: number)
+{
+    if (!teApi || !teApi.explorer) {
+        assert.fail("   ✘ Not initialized");
+    }
+
+    instance.timeout(60 * 1000);
+
+    if (!teApi || !teApi.explorer) {
+        assert.fail("   ✘ Task Explorer tree instance does not exist");
+    }
+
+    await sleep(waitTime || 1);
+    await waitForCache();
+
+    await configuration.updateWs("groupWithSeparator", true);
+    await configuration.updateWs("groupSeparator", "-");
+    await configuration.updateWs("groupMaxLevel", 5);
+
+    //
+    // A special refresh() for test suite, will open all task files and open to psition
+    //
+    await teApi.explorer.refresh("tests");
+    await waitForCache();
+
+    const treeItems = await refresh();
+
+    return treeItems;
+}
 
 
 function checkTasks(ant: number, ap: number, bash: number, bat: number, gradle: number, grunt: number, gulp: number, python: number, tsc: number, vsc: number)
