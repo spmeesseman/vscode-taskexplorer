@@ -188,9 +188,8 @@ export const getWsPath = (p: string) =>
 
 export async function initSettings(enable = true)
 {
-    await configuration.updateVs("terminal.integrated.shell.windows",
-                                 "C:\\Windows\\System32\\cmd.exe",
-                                 ConfigurationTarget.Workspace);
+    await configuration.updateVsWs("terminal.integrated.shell.windows",
+                                 "C:\\Windows\\System32\\cmd.exe");
     await configuration.updateWs("exclude", ["**/tasks_test_ignore_/**", "**/ant/**"]);
     //
     // Enable views, use workspace level so that running this test from Code itself

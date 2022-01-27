@@ -53,6 +53,12 @@ suite("Util Tests", () =>
 		log.value("null value", null);
 		log.value("empty string value", "");
 
+		log.error("Test5 error");
+		log.error(new Error("Test error object"));
+		log.error([ "Test error 1", "Test error 2" ]);
+		log.error([ "Test error 1",  new Error("Test error object") ]);
+		log.error([ "Test error 1", "Test error 2" ], [["Test param error", "Test param value"]]);
+
 		// Disabled logging
 		await configuration.updateWs("debug", false);
 		log.write("test");
@@ -71,6 +77,9 @@ suite("Util Tests", () =>
 		log.error([ "Test error 1", "Test error 2" ]);
 		log.error([ "Test error 1",  new Error("Test error object") ]);
 		log.error([ "Test error 1", "Test error 2" ], [["Test param error", "Test param value"]]);
+
+		// Re-enable logging
+		await configuration.updateWs("debug", true);
 
         assert(util.camelCase("taskexplorer", 4) === "taskExplorer");
         assert(util.camelCase(undefined, 4) === undefined);
@@ -288,7 +297,7 @@ suite("Util Tests", () =>
     });
 
 
-    test("Get storage", async function()
+    test("Storage", async function()
     {
         if (storage)
         {
@@ -296,12 +305,9 @@ suite("Util Tests", () =>
             await storage.update("TEST_KEY", "This is a test");
             assert(storage.get<string>("TEST_KEY") === "This is a test");
             assert(storage.get<string>("TEST_KEY_DONT_EXIST", "defValue") === "defValue");
-            console.log("         ✔ Successfully updated/read storage");
-            //
-            // tasks.tests will cover storage.update(key, defaultVal) w/ Last Tasks and Favs folders
-        }   //
-        else {
-            console.log("         ℹ Storage not initialized");
+            await storage.update("TEST_KEY", "");
+            assert(storage.get<string>("TEST_KEY_DONT_EXIST", "defValue") === "defValue");
+            await storage.update("TEST_KEY", undefined);
         }
     });
 

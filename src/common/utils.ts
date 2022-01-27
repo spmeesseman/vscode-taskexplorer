@@ -66,7 +66,7 @@ export async function forEachAsync(array: any, callback: any)
 
 export function getCombinedGlobPattern(defaultPattern: string, globs: string[]): string
 {
-    let multiFilePattern = defaultPattern ? "{" + defaultPattern : "{";
+    let multiFilePattern = "{" + defaultPattern;
     if (globs && globs.length > 0)
     {
         for (const i of globs) {
@@ -103,20 +103,17 @@ export function getPackageManager(): string
 
 export function getGlobPattern(taskType: string): string
 {
-    if (taskType) {
-        taskType = taskType.replace(/\W*\-/, "");
-        if (taskType === "ant") {
-            return getCombinedGlobPattern(constants.GLOB_ANT,
-                   [...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", [])]);
-        }
-        else if (taskType === "bash") {
-            return getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
-        }
-        else {
-            return constants["GLOB_" + taskType.toUpperCase()];
-        }
+    taskType = taskType.replace(/\W*\-/, "");
+    if (taskType === "ant") {
+        return getCombinedGlobPattern(constants.GLOB_ANT,
+                [...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", [])]);
     }
-    return "*/**";
+    else if (taskType === "bash") {
+        return getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
+    }
+    else {
+        return constants["GLOB_" + taskType.toUpperCase()];
+    }
 }
 
 
@@ -317,7 +314,7 @@ export function isWatchTask(source: string)
 }
 
 
-function logUserDataEnv(padding = "")
+function logUserDataEnv(padding: string)
 {
     if (log.isLoggingEnabled())
     {
@@ -369,7 +366,7 @@ export function properCase(name: string | undefined)
 export function readFileSync(file: string)
 {
     const buf = fs.readFileSync(path.resolve(process.cwd(), file));
-    return (buf ? buf.toString() : "");
+    return buf.toString();
 }
 
 

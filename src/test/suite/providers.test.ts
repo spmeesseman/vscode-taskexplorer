@@ -16,7 +16,7 @@ import { waitForCache } from "../../cache";
 import { addWsFolder, removeWsFolder } from "../../extension";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
-import { activate, findIdInTaskMap, refresh, sleep, verifyTaskCount } from "../helper";
+import { activate, findIdInTaskMap, getTreeTasks, refresh, sleep, verifyTaskCount } from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -26,6 +26,7 @@ let dirNameL2: string;
 let ws2DirName: string;
 let dirNameIgn: string;
 let dirNameCode: string;
+let batch: TaskItem[];
 const tempFiles: string[] = [];
 let taskMap: Map<string, TaskItem> = new Map();
 
@@ -129,6 +130,8 @@ suite("Provider Tests", () =>
         await teApi.explorer?.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
         setupVscode(); setupAnt(); setupGradle(); setupTsc(); setupMakefile();
         setupBash(); setupBatch(); setupGrunt(); setupGulp(); setupAppPublisher(); setupMaven();
+
+        batch = await getTreeTasks("batch", 2);
     });
 
 
@@ -218,6 +221,14 @@ suite("Provider Tests", () =>
         //
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 7);
+    });
+
+
+    test("Resolve task", async function()
+    {
+        const provider = teApi.providers.get("script");
+        assert(provider);
+        provider.resolveTask(batch[0]);
     });
 
 
@@ -405,8 +416,8 @@ suite("Provider Tests", () =>
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
 
-        await configuration.updateVs("terminal.integrated.shell.windows",
-                                     "C:\\Program Files\\Git\\bin\\bash.exe", ConfigurationTarget.Workspace);
+        await configuration.updateVsWs("terminal.integrated.shell.windows",
+                                       "C:\\Program Files\\Git\\bin\\bash.exe");
         await sleep(1000);
         await teApi.fileCache.buildCache("bash", "bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
     });

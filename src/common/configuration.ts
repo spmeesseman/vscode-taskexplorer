@@ -55,9 +55,15 @@ class Configuration
     }
 
 
-    public updateVs(key: string, value: any, cfgTarget?: ConfigurationTarget): Thenable<void>
+    public updateVs(key: string, value: any): Thenable<void>
     {
-        return this.configurationWs.update(key, value, cfgTarget || ConfigurationTarget.Global);
+        return this.configurationWs.update(key, value, ConfigurationTarget.Global);
+    }
+
+
+    public updateVsWs(key: string, value: any): Thenable<void>
+    {
+        return this.configurationWs.update(key, value, ConfigurationTarget.Workspace);
     }
 
 
