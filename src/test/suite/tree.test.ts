@@ -2,15 +2,17 @@
 /* tslint:disable */
 
 import * as assert from "assert";
+import * as util from "../../common/utils";
+import TaskFolder from "../../tree/folder";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInputBox, refresh, sleep } from "../helper";
 import { configuration } from "../../common/configuration";
 import constants from "../../common/constants";
 import { storage } from "../../common/storage";
 import TaskItem from "../../tree/item";
-import * as util from "../../common/utils";
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
-import TaskFolder from "../../tree/folder";
+import {
+    activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, refresh
+} from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -65,11 +67,17 @@ suite("Tree Tests", () =>
 
     test("Add custom labels", async function()
     {
+        overrideNextShowInputBox("Label 1");
         await executeTeCommand("addRemoveCustomLabel", 50, batch[0]);
+        overrideNextShowInputBox("Label 2");
         await executeTeCommand("addRemoveCustomLabel", 50, batch[0]);
+        overrideNextShowInputBox("Label 3");
         await executeTeCommand("addRemoveCustomLabel", 50, batch[1]);
+        overrideNextShowInputBox("Label 4");
         await executeTeCommand("addRemoveCustomLabel", 50, batch[1]);
+        overrideNextShowInputBox("Label 5");
         await executeTeCommand("addRemoveCustomLabel", 50, ant[0]);
+        overrideNextShowInputBox("Label 6");
         await executeTeCommand("addRemoveCustomLabel", 50, ant[0]);
     });
 
@@ -137,7 +145,7 @@ suite("Tree Tests", () =>
         await executeTeCommand("clearSpecialFolder", 1000, constants.LAST_TASKS_LABEL);
         await executeTeCommand("clearSpecialFolder", 1000, constants.FAV_TASKS_LABEL);
         await executeTeCommand("clearSpecialFolder", 1000, "Invalid");
-        overrideNextShowInputBox("test ask");
+        overrideNextShowInfoBox("test ask");
         await executeTeCommand("clearSpecialFolder", 1000, batch[0].getFolder());
     });
 

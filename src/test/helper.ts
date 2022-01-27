@@ -13,11 +13,14 @@ import { commands, ConfigurationTarget, extensions, tasks, TreeItem, window, wor
 
 const writeToConsole = false;
 const originalShowInputBox = window.showInputBox;
+const originalShowInfoBox = window.showInformationMessage;
 const overridesShowInputBox: any[] = [];
+const overridesShowInfoBox: any[] = [];
 
 let treeItems: TreeItem[];
 let activated = false;
 let teApi: TaskExplorerApi;
+
 
 window.showInputBox = (...args: any[]) =>
 {
@@ -25,6 +28,20 @@ window.showInputBox = (...args: any[]) =>
     if (typeof next === "undefined")
     {
         return originalShowInputBox.call(null, args as any);
+    }
+    return new Promise((resolve, reject) =>
+    {
+        resolve(next);
+    });
+};
+
+
+window.showInformationMessage = (str: string, ...args: any[]) =>
+{
+    const next = overridesShowInfoBox.shift();
+    if (typeof next === "undefined")
+    {
+        return originalShowInfoBox(str, args as any);
     }
     return new Promise((resolve, reject) =>
     {
@@ -257,6 +274,13 @@ export function overrideNextShowInputBox(value: any)
 {
     overridesShowInputBox.push(value);
 }
+
+
+export function overrideNextShowInfoBox(value: any)
+{
+    overridesShowInfoBox.push(value);
+}
+
 
 
 export async function refresh()

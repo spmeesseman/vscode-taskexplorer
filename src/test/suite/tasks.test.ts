@@ -140,18 +140,21 @@ suite("Task Tests", () =>
                 await configuration.updateWs("keepTermOnStop", true);
                 await executeTeCommand("stop", 0, batchTask);
                 await configuration.updateWs("disableAnimatedIcons", true);
+                await configuration.updateWs("showRunningTask", false);
                 await executeTeCommand("runLastTask", 1500, batchTask);
                 await configuration.updateWs("keepTermOnStop", false);
                 await executeTeCommand("restart", 2500, batchTask);
                 await executeTeCommand("stop", 500, batchTask);
                 await executeTeCommand("runNoTerm", 2500, batchTask);
                 await executeTeCommand("stop", 200, batchTask);
+            }
+            else {
+                await executeTeCommand("stop", 200, batchTask);
                 await configuration.updateWs("disableAnimatedIcons", false);
                 overrideNextShowInputBox("--test --test2");
                 await executeTeCommand("runWithArgs", 2500, batchTask);
                 await executeTeCommand("stop", 200, batchTask);
-            }
-            else {
+                await configuration.updateWs("showRunningTask", true);
                 await sleep(8000);
             }
             await endTask(batchTask);
