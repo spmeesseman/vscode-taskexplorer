@@ -1,5 +1,24 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.7.0 (January 27th, 2022)
+
+### Bug Fixes
+
+- **Explorer:** tsc tasks are not refreshed if a tsconfig.json is removed or moved.
+- **Api:** if multiple enable/disable settings are changed quickly programatically, several progress messages for parsing are opened in the toolbar.
+- **Providers:** makefile task does not use custom $gccte parser if ms-vscode.cpptools extension is not installed
+- **Providers:** composer parser throws unhandled exception parsing invalid JSON
+- **Providers:** composer tasks are scanned out of alpha order
+
+### Documentation
+
+- **Readme:** add section on external task provider api. [References #22]
+- **Readme:** add section on animated running task icons
+
+### Features
+
+- **Api:** working initial implementation of external task provider api [References #22]
+
 ## Version 2.6.3 (January 24th, 2022)
 
 ### Bug Fixes
