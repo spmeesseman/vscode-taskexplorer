@@ -33,6 +33,7 @@ export default class TaskItem extends TreeItem
     public nodePath: string;
     public groupLevel: number;
     public taskItemId: string | undefined;
+    public id: string;
 
 
     taskFile: TaskFile;

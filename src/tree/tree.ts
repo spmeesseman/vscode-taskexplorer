@@ -138,7 +138,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             addRemoved = false,
             index = 0;
         const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
-              id = util.getTaskItemId(taskItem) as string;
+              id = util.getTaskItemId(taskItem);
 
         log.methodStart("add/remove rename special", 1, "", false, [["id", id]]);
 
@@ -258,7 +258,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async buildGroupings(folders: Map<string, TaskFolder>, logPad = "", logLevel = 1)
+    private async buildGroupings(folders: Map<string, TaskFolder>, logPad: string, logLevel: number)
     {
         log.methodStart("build tree node groupings", logLevel, logPad);
 
@@ -289,7 +289,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async buildTaskTree(tasksList: Task[], logPad = "", logLevel = 1): Promise<TaskFolder[] | NoScripts[]>
+    private async buildTaskTree(tasksList: Task[], logPad: string, logLevel: number): Promise<TaskFolder[] | NoScripts[]>
     {
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
@@ -377,7 +377,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      * @param favTasks List of Task ID's currently in the "Favorites" TaskFolder.
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
-    private buildTaskTreeList(each: Task, folders: Map<string, TaskFolder>, files: Map<string, TaskFile>, ltFolder: TaskFolder | undefined, favFolder: TaskFolder | undefined, lastTasks: string[], favTasks: string[], logPad = "")
+    private buildTaskTreeList(each: Task, folders: Map<string, TaskFolder>, files: Map<string, TaskFile>, ltFolder: TaskFolder | undefined, favFolder: TaskFolder | undefined, lastTasks: string[], favTasks: string[], logPad: string)
     {
         let folder: TaskFolder | undefined,
             scopeName: string;
@@ -393,7 +393,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Make sure this task shouldn't be ignored based on various criteria...
         // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
-        // By default, also ignore npm 'install' tasks, since its available in the context menu
+        // By default, also ignore npm 'install' tasks, since its available in the context menu, ignore
+        // other providers unless it has registered as an external provider via Task Explorer API
         //
         const include: boolean | string = this.isTaskIncluded(each, relativePath, logPad + "   ");
         if (!include) {
@@ -481,9 +482,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      */
     private async clearSpecialFolder(folder: TaskFolder | string)
     {
-        const choice = typeof folder === "string" ?
-                       "Yes" : await window.showInformationMessage("Clear all tasks from this folder?", "Yes", "No"),
-              label = typeof folder === "string" ? folder : folder.label;
+        const isString = typeof folder === "string" || folder instanceof String,
+              choice = isString ? "Yes" : await window.showInformationMessage("Clear all tasks from this folder?", "Yes", "No"),
+              label = isString ? folder : (folder as TaskFolder).label;
         if (choice === "Yes")
         {
             if (label === constants.FAV_TASKS_LABEL) {
@@ -511,7 +512,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      * @param sort Whether or not to sort any existing items in the folder.
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
-    private async createSpecialFolder(storeName: string, label: string, treeIndex: number, sort: boolean, logPad = "")
+    private async createSpecialFolder(storeName: string, label: string, treeIndex: number, sort: boolean, logPad: string)
     {
         const lTasks = storage.get<string[]>(storeName, []);
         const folder = new TaskFolder(label);
@@ -554,7 +555,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *
      * @param folder The TaskFolder to process
      */
-    private async createTaskGroupings(folder: TaskFolder, logPad = "", logLevel = 1)
+    private async createTaskGroupings(folder: TaskFolder, logPad: string, logLevel: number)
     {
         let prevTaskFile: TaskItem | TaskFile | undefined;
         const subfolders: Map<string, TaskFile> = new Map();
@@ -906,26 +907,26 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private findDocumentPosition(document: TextDocument, taskItem?: TaskItem): number
+    private findDocumentPosition(document: TextDocument, taskItem: TaskItem): number
     {
         let scriptOffset = 0;
         const documentText = document.getText();
 
         log.methodStart("find task definition document position", 1, "", true,
-            [ [ "task label", taskItem?.label], [ "task source", taskItem?.taskSource] ]
+            [ [ "task label", taskItem.label], [ "task source", taskItem.taskSource] ]
         );
-
-        if (!taskItem || !taskItem.task) { return 0; }
 
         const def = taskItem.task.definition;
         if (taskItem.taskSource === "npm" || taskItem.taskSource === "Workspace")
         {
+            log.write("   find json position", 2);
             scriptOffset = this.findJsonDocumentPosition(documentText, taskItem);
         }
-        else {
+        else if (!util.isWatchTask(taskItem.taskSource))
+        {
             const provider = providers.get(util.getTaskProviderType(def.type)) ||
                              providersExternal.get(def.type);
-            scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || 0;
+            scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || -1;
         }
 
         if (scriptOffset === -1) {
@@ -997,7 +998,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      * @param logPad Log padding
      * @param logLevel Log level
      */
-    async getChildren(element?: TreeItem, logPad = "", logLevel = 2): Promise<TreeItem[]>
+    async getChildren(element?: TreeItem, logPad = "", logLevel = 1): Promise<TreeItem[]>
     {
         let waited = 0;
         let items: any = [];
@@ -1165,7 +1166,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private getSortedRoot(folders: Map<string, TaskFolder>): TaskFolder[]
     {
-        return [...folders.values()]?.sort((a: TaskFolder, b: TaskFolder) =>
+        return [...folders.values()].sort((a: TaskFolder, b: TaskFolder) =>
         {
             const sFolders = [ constants.FAV_TASKS_LABEL, constants.LAST_TASKS_LABEL, constants.USER_TASKS_LABEL];
             if (a.label === constants.LAST_TASKS_LABEL) {
@@ -1373,9 +1374,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             if (item instanceof TaskFolder)
             {
-                const isFav = item.label?.toString().includes(constants.FAV_TASKS_LABEL);
-                const isLast = item.label?.toString().includes(constants.LAST_TASKS_LABEL);
-                const isUser = item.label?.toString().includes(constants.USER_TASKS_LABEL);
+                let isFav = false, isLast = false, isUser = false;
+                if (item.label)
+                {
+                    isFav = item.label.toString().includes(constants.FAV_TASKS_LABEL);
+                    isLast = item.label.toString().includes(constants.LAST_TASKS_LABEL);
+                    isUser = item.label.toString().includes(constants.USER_TASKS_LABEL);
+                }
                 const tmp: any = me.getParent(item);
                 assert(tmp === null, "Invalid parent type, should be null for TaskFolder");
                 log.write("   Task Folder " + item.label + ":  " + (!isFav && !isLast && !isUser ?
@@ -1406,7 +1411,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private getTaskFileNode(task: Task, folder: TaskFolder, files: any, relativePath: string, scopeName: string, logPad = ""): TaskFile
+    private getTaskFileNode(task: Task, folder: TaskFolder, files: any, relativePath: string, scopeName: string, logPad: string): TaskFile
     {
         let taskFile: TaskFile;
         //
@@ -1589,7 +1594,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async handleFileWatcherEvent(invalidate: any, opt?: boolean | Uri, logPad = "")
+    private async handleFileWatcherEvent(invalidate: any, opt: boolean | Uri | undefined, logPad: string)
     {
         log.methodStart("handle filewatcher / settings change / test event", 1, logPad);
         //
@@ -1608,7 +1613,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (invalidate !== "tests") {
             log.write("   handling 'invalidate tasks cache' event", 1, logPad);
-            await this.invalidateTasksCache(invalidate, opt, logPad + "   ");
+            await this.invalidateTasksCache(invalidate !== true ? invalidate : undefined, opt, logPad + "   ");
         }
         log.methodDone("   handle filewatcher / settings change / test event", 1, logPad);
     }
@@ -1656,9 +1661,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      *     "Workspace"
      * @param opt2 The uri of the file that contains/owns the task
      */
-    public async invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad = "")
+    public async invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad?: string)
     {
-        log.methodStart("invalidate tasks cache", 1, logPad, true, [
+        log.methodStart("invalidate tasks cache", 1, logPad, false, [
             [ "opt1", opt1 ], [ "opt2", opt2 && opt2 instanceof Uri ? opt2.fsPath : opt2 ]
         ]);
 
@@ -1697,7 +1702,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
 
         this.busy = false;
-        log.methodDone("invalidate tasks cache", 1, logPad, true);
+        log.methodDone("invalidate tasks cache", 1, logPad);
     }
 
 
@@ -1742,22 +1747,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
 
         //
-        // External tasks
+        // External tasks registered via Task Explorer API
         //
         if (providersExternal.get(task.source)) {
             return !!task.definition && !!task.name && !!task.execution;
         }
 
         //
-        // Remove the '-' from app-publisher task.  VSCode doesn't like dashes in the settings names, so...
+        // Check enabled and npm install task
+        // THis will ignore tasks from other providers as well, unless it has registered
+        // as an external provider via Task Explorer API
         //
-        let settingName: string = "enable" + util.properCase(task.source);
-        if (settingName === "enableApp-publisher") {
-            settingName = "enableAppPublisher";
-        }
-        const srcEnabled = configuration.get(settingName);
-
-        const isNpmInstallTask = this.isNpmInstallTask(task);
+        const srcEnabled = configuration.get(util.getTaskTypeEnabledSettingName(task.source)),
+              isNpmInstallTask = this.isNpmInstallTask(task);
         if ((srcEnabled || !this.isWorkspaceFolder(task.scope)) && !isNpmInstallTask)
         {
             return true;
@@ -1781,7 +1783,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private logTask(task: Task, scopeName: string, logPad = "")
+    private logTask(task: Task, scopeName: string, logPad: string)
     {
         const definition = task.definition;
 
@@ -1873,7 +1875,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (util.pathExists(uri.fsPath))
         {
             const document: TextDocument = await workspace.openTextDocument(uri);
-            const offset = this.findDocumentPosition(document, selection instanceof TaskItem ? selection : undefined);
+            const offset = this.findDocumentPosition(document, selection);
             const position = document.positionAt(offset);
             await window.showTextDocument(document, { selection: new Selection(position, position) });
         }
@@ -2123,7 +2125,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      * @param subfolders Current tree subfolders map
      * @param level Current grouping level
      */
-    private removeScripts(taskFile: TaskFile, folder: TaskFolder, subfolders: Map<string, TaskFile>, level = 0, logPad = "", logLevel = 3)
+    private removeScripts(taskFile: TaskFile, folder: TaskFolder, subfolders: Map<string, TaskFile>, level: number, logPad: string, logLevel: number)
     {
         const me = this;
         const taskTypesRmv: (TaskItem|TaskFile)[] = [];
@@ -2133,13 +2135,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         for (const each of taskFile.treeNodes)
         {
-            const label = each.label?.toString();
-
-            if (!label) {
+            if (!each.label) {
                 continue;
             }
+            const label = each.label.toString();
 
-            const labelPart = label?.split(groupSeparator)[level];
+            const labelPart = label.split(groupSeparator)[level];
             const id = this.getGroupedId(folder, taskFile, label, level);
 
             if (each instanceof TaskItem)
@@ -2184,14 +2185,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private async renameGroupedTasks(taskFile: TaskFile)
     {
-        if (!configuration.get<boolean>("groupStripTaskLabel", true)) {
+        if (!configuration.get<boolean>("groupStripTaskLabel", true) || !taskFile.label) {
             return;
         }
 
         const groupSeparator = util.getGroupSeparator();
-        let rmvLbl = taskFile.label?.toString();
-        rmvLbl = rmvLbl?.replace(/\(/gi, "\\(").replace(/\[/gi, "\\[");
-        rmvLbl = rmvLbl?.replace(/\)/gi, "\\)").replace(/\]/gi, "\\]");
+        let rmvLbl = taskFile.label.toString();
+        rmvLbl = rmvLbl.replace(/\(/gi, "\\(").replace(/\[/gi, "\\[");
+        rmvLbl = rmvLbl.replace(/\)/gi, "\\)").replace(/\]/gi, "\\]");
 
         for (const each2 of taskFile.treeNodes)
         {
@@ -2489,11 +2490,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             [ "treenode label", label ], [ "max tasks", maxTasks ], [ "is favorite", isFavorite ],
             [ "task id", taskId ], [ "current saved task ids", cstTasks.toString() ]
         ]);
-
-        if (!taskId) {
-            log.write("   invalid task id, exit", 1, logPad);
-            return;
-        }
 
         //
         // Moving it to the top of the list it if it already exists
