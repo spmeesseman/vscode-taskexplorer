@@ -2,14 +2,11 @@
 
 import * as util from "./common/utils";
 import * as log from "./common/log";
-import constants from "./common/constants";
 import { configuration } from "./common/configuration";
 import { providers, providersExternal } from "./extension";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
 } from "vscode";
-import { TaskExplorerProvider } from "./providers/provider";
-import { getTaskProviderType } from "./common/utils";
 
 
 let cacheBuilding = false;
