@@ -292,7 +292,7 @@ suite("Util Tests", () =>
     {
         if (storage)
         {
-			// sstorage.keys(); // internal keys
+			storage.keys(); // internal keys
             await storage.update("TEST_KEY", "This is a test");
             assert(storage.get<string>("TEST_KEY") === "This is a test");
             assert(storage.get<string>("TEST_KEY_DONT_EXIST", "defValue") === "defValue");
