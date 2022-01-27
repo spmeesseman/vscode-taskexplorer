@@ -1043,9 +1043,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             // file, there in actuality is no task type called 'workspace'.  Tasks found in these
             // files can be of any type that is available to VSCode's task provider interface
             // (including providers implemented in this extension).  In this case, we have to ask
-            // for all tasks.
+            // for all tasks.  Same goes for typescript tasks.
             //
-            if (!this.tasks || this.currentInvalidation === "workspace") {
+            if (!this.tasks || this.currentInvalidation  === "workspace" || this.currentInvalidation === "tsc") {
                 this.tasks = await tasks.fetchTasks();
             }
             else if (this.tasks && this.currentInvalidation)
@@ -2673,13 +2673,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         log.methodStart("stop", 1, "", true);
 
-        if (this.busy)
-        {
-            window.showInformationMessage("Busy, please wait...");
-            return;
-        }
-
-        if (!taskItem || !taskItem.task)
+        if (this.busy || !taskItem)
         {
             window.showInformationMessage("Busy, please wait...");
             return;
