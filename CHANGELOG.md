@@ -1,5 +1,11 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.7.1 (January 28th, 2022)
+
+### Bug Fixes
+
+- **Tree:** becomes unresponsive after editing a tsconfig.json file
+
 ## Version 2.7.0 (January 27th, 2022)
 
 ### Bug Fixes
