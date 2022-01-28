@@ -74,7 +74,7 @@ suite("Configuration / Settings Tests", () =>
         assert(util.getPackageManager() === "npm");
         await configuration.updateVsWs("npm.packageManager", pkgMgr);
         await configuration.updateVs("npm.packageManager", pkgMgr); // cover global
-        assert(util.getPackageManager() === pkgMgr);
+        assert(util.getPackageManager() === (pkgMgr === "auto" ? "npm" : pkgMgr));
     });
 
 
