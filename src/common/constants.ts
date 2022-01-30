@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { IDictionary } from "./interface";
+interface IDictionary<TValue>
+{
+    [id: string]: TValue;
+}
+
 
 
 const constants: IDictionary<string> =
@@ -30,7 +34,7 @@ const constants: IDictionary<string> =
     GLOB_PYTHON: "**/*.[Pp][Yy]",
     GLOB_PIPENV: "**/[Pp][Ii][Pp][Ff][Ii][Ll][Ee]",
     GLOB_RUBY: "**/*.rb",
-    GLOB_TSC: "**/tsconfig.json",
+    GLOB_TSC: "**/tsconfig.{json,*.json}",
     GLOB_WORKSPACE: "**/.vscode/tasks.json"
 };
 
