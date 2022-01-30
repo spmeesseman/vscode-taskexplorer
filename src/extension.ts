@@ -16,6 +16,7 @@ import { ComposerTaskProvider } from "./providers/composer";
 import { PipenvTaskProvider } from "./providers/pipenv";
 import { GulpTaskProvider } from "./providers/gulp";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
+import { displayInfoPage } from "./common/infoPage";
 import { configuration } from "./common/configuration";
 import { initStorage } from "./common/storage";
 import { TaskExplorerProvider } from "./providers/provider";
@@ -26,7 +27,10 @@ import {
 } from "vscode";
 
 
-let teApi: TaskExplorerApi;
+let teApi: TaskExplorerApi,
+    hasLicense: boolean,
+    version: string;
+
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
 export const providers: Map<string, TaskExplorerProvider> = new Map();
@@ -88,6 +92,23 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     });
     context.subscriptions.push(d);
 
+    //
+    // Store  extensionversion
+    //
+    version = context.extension.packageJSON.version;
+
+    //
+    // Check license / info display
+    //
+    // const panel = await displayInfoPage(version);
+    // if (panel) {
+    //     panel.onDidDispose(() =>
+    //     {
+    //
+    //     },
+    //     null, context.subscriptions);
+    // }
+
     log.write("   Task Explorer activated");
 
     teApi = {
@@ -134,6 +155,12 @@ export async function deactivate()
     }
 
     await cache.cancelBuildCache(true);
+}
+
+
+export function getVersion()
+{
+    return version;
 }
 
 
