@@ -92,7 +92,7 @@
     },
     "dependencies": {
         "@sgarciac/bombadil": "^2.3.0",
-        "@spmeesseman/vscode-taskexplorer-types": "0.0.2",
+        "@spmeesseman/vscode-taskexplorer-types": "0.0.5",
         "glob": "^7.1.7",
         "is-utf8": "^0.2.1",
         "jsonc-parser": "^2.3.1",
