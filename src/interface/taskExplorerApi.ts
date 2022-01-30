@@ -16,6 +16,7 @@ export interface TaskExplorerApi
     // providers: Map<string, TaskExplorerProvider>;
     providersExternal: Map<string, ExternalExplorerProvider>;
 
+    isBusy(): boolean;
     refresh(taskSource: string): Promise<void>;
     register(taskSource: string, provider: ExternalExplorerProvider): Promise<void>;
     unregister(taskSource: string): Promise<void>;

@@ -274,6 +274,12 @@ function getStatusString(msg: string, statusLength: number)
 }
 
 
+export function isCachingBusy()
+{
+    return cacheBuilding === true || folderCaching === true;
+}
+
+
 export async function rebuildCache(logPad = "")
 {
     log.blank(1);

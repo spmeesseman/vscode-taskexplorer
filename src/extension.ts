@@ -16,9 +16,10 @@ import { ComposerTaskProvider } from "./providers/composer";
 import { PipenvTaskProvider } from "./providers/pipenv";
 import { GulpTaskProvider } from "./providers/gulp";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
-import { displayInfoPage } from "./common/infoPage";
+// import { displayInfoPage } from "./common/infoPage";
 import { configuration } from "./common/configuration";
 import { initStorage } from "./common/storage";
+import { isCachingBusy } from "./cache";
 import { TaskExplorerProvider } from "./providers/provider";
 import { ExternalExplorerProvider, TaskExplorerApi } from "./interface";
 import {
@@ -119,6 +120,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         providersExternal,
         explorer: treeDataProvider2,
         sidebar: treeDataProvider,
+        isBusy: isTaskExplorerBusy,
         refresh: refreshExternalProvider,
         register: registerExternalProvider,
         unregister: unregisterExternalProvider
@@ -161,6 +163,12 @@ export async function deactivate()
 export function getVersion()
 {
     return version;
+}
+
+
+function isTaskExplorerBusy()
+{
+    return isCachingBusy();
 }
 
 
