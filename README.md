@@ -221,15 +221,26 @@ Get the TaskExplorer API object:
 
     const teApi = await vscode.commands.executeCommand("taskExplorer.getApi");
 
-Register the instance of `TaskProvider` using the registerProvider method of the Task Explorer API object:
+Alternatively, using the Task Explorer type definitions:
 
-    await teApi.registerProvider("taskTypeName", myProvider as TaskProvider);
+    let teApi;
+    const taskExplorer = extensions.getExtension("spmeesseman.vscode-taskexplorer");
+    if (taskExplorer && taskExplorer.isActive)
+    {
+        teApi = taskExplorer.exports as TaskExplorerApi;
+    }
 
-To remove a provider:
+Register the instance of `TaskProvider` or `ExternalExplorerProvider` using the `register` method of the Task Explorer API object:
 
-    await teApi.unregisterProvider("taskTypeName");
+    await teApi.register("taskTypeName", myProvider as TaskProvider);
 
-Where "taskTypeName" is the name of the task type, i.e. "npm", "ant", "gulp", etc, and `myProvider` is the instance of TaskProvider that implements the `provideTasks` method.
+Where *taskTypeName* is the name of the task type, i.e. "npm", "ant", "gulp", etc, and `myProvider` is the instance of TaskProvider that implements the `provideTasks` method.
+
+Any provider(s) should be unregistered in the deactivate method of an extension, to remove a provider:
+
+    await teApi.unregister("taskTypeName");
+
+Where *taskTypeName* is the name of the task type, i.e. "npm", "ant", "gulp".
 
 You can optionally install the Task Explorer API types:
 
