@@ -230,6 +230,8 @@ Alternatively, using the Task Explorer type definitions:
         teApi = taskExplorer.exports as TaskExplorerApi;
     }
 
+**Note:** Before using any of the API functions, check busy status using the `teApi.isBusy` API function first, to ensure the indexer is not running.
+
 Register the instance of `TaskProvider` or `ExternalExplorerProvider` using the `register` method of the Task Explorer API object:
 
     await teApi.register("taskTypeName", myProvider as TaskProvider);
@@ -273,6 +275,51 @@ For reference, the entire API object is:
         taskProviders: Map<string, TaskExplorerProvider>;
         registerProvider(providerName: string, provider: TaskProvider): void;
         unregisterProvider(providerName: string): void;
+    }
+
+Putting it all together:
+
+    async function activate()
+    {
+        ... other code ...
+        const taskProvider = new ExtJsTaskProvider();
+        context.subscriptions.push(tasks.registerTaskProvider("extjs", taskProvider));
+        registerWithTaskExplorer(taskProvider);
+        ... other code ...
+    }
+
+    async function deactivate()
+    {
+        ... other code ...
+        const taskExplorer = extensions.getExtension("spmeesseman.vscode-taskexplorer");
+        if (taskExplorer && taskExplorer.isActive && taskExplorerRegistered)
+        {
+            const teApi = taskExplorer.exports as TaskExplorerApi;
+            await teApi.unregister("extjs");
+        }
+        ... other code ...
+        return Promise.resolve();
+    }
+
+    function registerWithTaskExplorer(taskProvider: ExternalExplorerProvider)
+    {
+        const taskExplorer = extensions.getExtension("spmeesseman.vscode-taskexplorer");
+        if (taskExplorer && taskExplorer.isActive)
+        {
+            const teApi = taskExplorer.exports as TaskExplorerApi;
+            if (!teApi.isBusy())
+            {
+                teApi.register("taskTypeName", taskProvider);
+                taskExplorerRegistered = true;
+            }
+            else {
+                setTimeout(() => registerWithTaskExplorer(taskProvider), 1000);
+            }
+        }
+        else
+        {
+            setTimeout(() => registerWithTaskExplorer(taskProvider), 5000);
+        }
     }
 
 - As of v2.7.0, the external task API has not been formally tested, a.  Who will be the guineau?  Hahaha ;)
