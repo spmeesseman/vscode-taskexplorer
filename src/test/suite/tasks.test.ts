@@ -7,10 +7,10 @@
 import * as assert from "assert";
 import TaskItem from "../../tree/item";
 import { configuration } from "../../common/configuration";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInputBox, sleep } from "../helper";
 import { storage } from "../../common/storage";
 import constants from "../../common/constants";
+import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInputBox, sleep } from "../helper";
 
 
 let runCount = 0;

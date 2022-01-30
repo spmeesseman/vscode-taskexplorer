@@ -140,6 +140,12 @@ suite("Tree Tests", () =>
     });
 
 
+    test("User tasks", async function()
+    {
+        // const json = await readFileSync(".vscode/workspace.json");
+    });
+
+
     test("Clear Special Folders", async function()
     {
         await executeTeCommand("clearSpecialFolder", 1000, constants.LAST_TASKS_LABEL);

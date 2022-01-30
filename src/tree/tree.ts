@@ -1583,12 +1583,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     public getTreeItem(element: TaskItem | TaskFile | TaskFolder): TreeItem
     {
-        log.blank(3);
-        log.write("get tree item", 3);
-        log.value("   label", element?.label, 3);
         if (element instanceof TaskItem) {
+            log.methodStart("get tree item", 3, "", true, [["label", element?.label]]);
             log.write("   refresh task item state", 3);
             element.refreshState(true);
+            log.methodDone("get tree item", 3);
         }
         return element;
     }
