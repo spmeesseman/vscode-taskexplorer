@@ -1,10 +1,11 @@
 
-import { ThemeIcon, TreeItem, TreeItemCollapsibleState, TaskDefinition, ExtensionContext, Uri } from "vscode";
+import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } from "vscode";
 import * as path from "path";
 import * as util from "../common/utils";
 import { configuration } from "../common/configuration";
 import TaskItem from "./item";
 import TaskFolder  from "./folder";
+import { TaskExplorerDefinition } from "../interface";
 
 
 /**
@@ -88,7 +89,7 @@ export default class TaskFile extends TreeItem
      * @param label The display label.
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
-    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskDefinition, source: string, relativePath: string, groupLevel: number, group?: boolean, label?: string, logPad = "")
+    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskExplorerDefinition, source: string, relativePath: string, groupLevel: number, group?: boolean, label?: string, logPad = "")
     {
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group || false), TreeItemCollapsibleState.Collapsed);
 
@@ -168,19 +169,29 @@ export default class TaskFile extends TreeItem
             src = util.getPackageManager();
         }
 
-        if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", src + ".svg"))))
+        if (!taskDef.icon)
         {
-            this.iconPath = {
-                light: context.asAbsolutePath(path.join("res", "sources", src + ".svg")),
-                dark: context.asAbsolutePath(path.join("res", "sources", src + ".svg"))
-            };
+            if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", src + ".svg"))))
+            {
+                this.iconPath = {
+                    light: context.asAbsolutePath(path.join("res", "sources", src + ".svg")),
+                    dark: context.asAbsolutePath(path.join("res", "sources", src + ".svg"))
+                };
+            }
+            else if (util.pathExists(context.asAbsolutePath(path.join("res", "light", src + ".svg"))) &&
+                    util.pathExists(context.asAbsolutePath(path.join("res", "dark", src + ".svg"))))
+            {
+                this.iconPath = {
+                    light: context.asAbsolutePath(path.join("res", "light", src + ".svg")),
+                    dark: context.asAbsolutePath(path.join("res", "dark", src + ".svg"))
+                };
+            }
         }
-        else if (util.pathExists(context.asAbsolutePath(path.join("res", "light", src + ".svg"))) &&
-                 util.pathExists(context.asAbsolutePath(path.join("res", "dark", src + ".svg"))))
+        else
         {
             this.iconPath = {
-                light: context.asAbsolutePath(path.join("res", "light", src + ".svg")),
-                dark: context.asAbsolutePath(path.join("res", "dark", src + ".svg"))
+                light: taskDef.icon,
+                dark: taskDef.iconDark || taskDef.icon
             };
         }
     }
@@ -204,7 +215,7 @@ export default class TaskFile extends TreeItem
      *
      * @param treeNode The node/item to add to this TaskFile node.
      */
-    private static getLabel(taskDef: TaskDefinition, source: string, relativePath: string, group: boolean): string
+    private static getLabel(taskDef: TaskExplorerDefinition, source: string, relativePath: string, group: boolean): string
     {
         let label = source;
 
@@ -229,12 +240,12 @@ export default class TaskFile extends TreeItem
                 }
             }
 
-            if (source === "app-publisher")
+            else if (source === "app-publisher")
             {   //
                 // For ap files in the same dir, nsamed with a tag, e.g.:
                 //    .publishrc.spm.json
                 //
-                const match = taskDef.fileName.match(/\.publishrc\.(.+)\.(?:js(?:on)?|ya?ml)$/i);
+                const match = taskDef.fileName?.match(/\.publishrc\.(.+)\.(?:js(?:on)?|ya?ml)$/i);
                 if (match && match.length > 1 && match[1])
                 {
                     return (label + " (" + match[1].toLowerCase() + ")");
@@ -242,14 +253,14 @@ export default class TaskFile extends TreeItem
             }
 
             //
-            // Reference ticket #133, vscode folder should not use a path appendature in it's folder label
+            // Reference ticket #133, vscode folder should not use a path appenditure in it's folder label
             // in the task tree, there is only one path for vscode/workspace tasks, /.vscode.  The fact that
             // you can set the path variable inside a vscode task changes the relativePath for the task,
             // causing an endless loop when putting the tasks into groups (see taskTree.createTaskGroupings).
-            // All othr task types will have a relative path of it's location on the filesystem (with
-            // eception of TSC, which is handled elsewhere).
+            // All other task types will have a relative path of it's location on the filesystem (with
+            // exception of TSC, which is handled elsewhere).
             //
-            if (relativePath.length > 0 && relativePath !== ".vscode" && source !== "Workspace")
+            else if (relativePath.length > 0 && relativePath !== ".vscode" && source !== "Workspace" && relativePath !== ".")
             {
                 if (relativePath.endsWith("\\") || relativePath.endsWith("/")) // trim slash chars
                 {
@@ -273,7 +284,7 @@ export default class TaskFile extends TreeItem
      *
      * @returns File name
      */
-    private getFileNameFromSource(source: string, folder: TaskFolder, taskDef: TaskDefinition, incRelPathForCode?: boolean): string
+    private getFileNameFromSource(source: string, folder: TaskFolder, taskDef: TaskExplorerDefinition, incRelPathForCode?: boolean): string
     {
         //
         // Ant tasks or any tasks provided by this extension will have a "fileName" definition
