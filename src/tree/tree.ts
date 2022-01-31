@@ -19,6 +19,7 @@ import { rebuildCache } from "../cache";
 import { configuration } from "../common/configuration";
 import { providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
+import { TaskExplorerDefinition } from "../interface";
 
 
 const localize = nls.loadMessageBundle();
@@ -387,7 +388,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             [ "definition type", each.definition.type ], [ "definition path", each.definition.path ]
         ]);
 
-        const definition: TaskDefinition = each.definition;
+        const definition: TaskExplorerDefinition | TaskDefinition = each.definition;
         let relativePath = definition.path ?? "";
 
         //
@@ -484,6 +485,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         const isString = typeof folder === "string" || folder instanceof String,
               choice = isString ? "Yes" : await window.showInformationMessage("Clear all tasks from this folder?", "Yes", "No"),
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
               label = isString ? folder : (folder as TaskFolder).label;
         if (choice === "Yes")
         {
@@ -1070,18 +1072,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                             toRemove.push(t);
                         }
                     }
+
+                    // for (const externalProviderMap of providersExternal)
+                    // {
+                    //     const externalTasks = await externalProviderMap[1].provideTasks();
+                    //     log.write(`   Get tasks from external provider ${externalProviderMap[0]}`, logLevel + 1, logPad);
+                    //     this.tasks.push(...(externalTasks || []));
+                    // }
                 }
                 for (const t of toRemove) {
                     util.removeFromArray(this.tasks, t);
                 }
                 this.tasks.push(...taskItems);
-            }
-
-            for (const externalProviderMap of providersExternal)
-            {
-                const externalTasks = await externalProviderMap[1].provideTasks();
-                log.write(`   Get tasks from external provider ${externalProviderMap[0]}`, logLevel + 1, logPad);
-                this.tasks.push(...(externalTasks || []));
             }
 
             if (this.tasks)
@@ -2466,7 +2468,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             };
 
             if (!args) {
-                window.showInputBox(opts).then(async (str) => { _run(str); });
+                await _run(await window.showInputBox(opts));
             }
             else {
                 await _run(args);
