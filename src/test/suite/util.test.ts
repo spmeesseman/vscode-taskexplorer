@@ -10,8 +10,8 @@ import { storage } from "../../common/storage";
 import { getUserDataPath } from "../../common/utils";
 import { configuration } from "../../common/configuration";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { displayInfoPage, getLicenseKey, setLicenseKey } from "../../common/infoPage";
-import { getVersion } from "../../extension";
+// import { displayInfoPage, getLicenseKey, setLicenseKey } from "../../common/infoPage";
+// import { getVersion } from "../../extension";
 
 
 const creator = "spmeesseman",
@@ -123,50 +123,52 @@ suite("Util Tests", () =>
     });
 
 
-    test("Info Page / Licensing", async function()
-    {
-		const licenseKey = getLicenseKey(),
-			  version = getVersion(),
-			  storedVersion = storage.get<string>("version") as string;
-
-		await setLicenseKey(undefined);
-        let panel = await displayInfoPage(storedVersion);
-		assert(panel);
-		await sleep(100);
-		panel.dispose();
-		await sleep(100);
-
-		await storage.update("version", "10.0.0.0");
-        panel = await displayInfoPage(storedVersion);
-		assert(panel);
-		await sleep(100);
-		panel.dispose();
-		await sleep(100);
-
-		await setLicenseKey("1111-2222-3333-4444");
-        panel = await displayInfoPage(storedVersion);
-		assert(panel);
-		await sleep(100);
-		panel.dispose();
-		await sleep(100);
-
-		await storage.update("version", storedVersion);
-        panel = await displayInfoPage(version);
-		assert(panel);
-		await sleep(100);
-		panel.dispose();
-		await sleep(100);
-
-		await storage.update("version", version);
-        panel = await displayInfoPage(version);
-		assert(panel);
-		await sleep(100);
-		panel.dispose();
-		await sleep(100);
-
-		await storage.update("version", storedVersion); // restore
-		await setLicenseKey(licenseKey);                // restore
-    });
+    // test("Info Page / Licensing", async function()
+    // {
+	// 	const licenseKey = getLicenseKey(),
+	// 		  version = getVersion(),
+	// 		  storedVersion = storage.get<string>("version") as string;
+//
+	// 	this.timeout(45000);
+//
+	// 	await setLicenseKey(undefined);
+    //     let panel = await displayInfoPage(storedVersion);
+	// 	assert(panel);
+	// 	await sleep(100);
+	// 	panel.dispose();
+	// 	await sleep(100);
+//
+	// 	await storage.update("version", "10.0.0.0");
+    //     panel = await displayInfoPage(storedVersion);
+	// 	assert(panel);
+	// 	await sleep(100);
+	// 	panel.dispose();
+	// 	await sleep(100);
+//
+	// 	await setLicenseKey("1111-2222-3333-4444");
+    //     panel = await displayInfoPage(storedVersion);
+	// 	assert(panel);
+	// 	await sleep(100);
+	// 	panel.dispose();
+	// 	await sleep(100);
+//
+	// 	await storage.update("version", storedVersion);
+    //     panel = await displayInfoPage(version);
+	// 	assert(panel);
+	// 	await sleep(100);
+	// 	panel.dispose();
+	// 	await sleep(100);
+//
+	// 	await storage.update("version", version);
+    //     panel = await displayInfoPage(version);
+	// 	assert(panel);
+	// 	await sleep(100);
+	// 	panel.dispose();
+	// 	await sleep(100);
+//
+	// 	await storage.update("version", storedVersion); // restore
+	// 	await setLicenseKey(licenseKey);                // restore
+    // });
 
 
     test("Asynchronous forEach", async function()
