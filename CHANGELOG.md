@@ -1,5 +1,20 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.8.0 (January 31st, 2022)
+
+### Bug Fixes
+
+- **Api:** tree nodes show when external providers registers but expanding them throws error
+- **Tree:** typescript config files not names 'tsconfig.json' do not update in the tree if moved/renamed.
+
+### Documentation
+
+- **Readme:** update api section
+
+### Features
+
+- **Api:** add icon support for API
+
 ## Version 2.7.1 (January 28th, 2022)
 
 ### Bug Fixes
