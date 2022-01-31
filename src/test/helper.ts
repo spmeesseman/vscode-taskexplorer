@@ -21,7 +21,6 @@ let treeItems: TreeItem[];
 let activated = false;
 let teApi: TaskExplorerApi;
 
-
 window.showInputBox = (...args: any[]) =>
 {
     const next = overridesShowInputBox.shift();
@@ -34,7 +33,6 @@ window.showInputBox = (...args: any[]) =>
         resolve(next);
     });
 };
-
 
 window.showInformationMessage = (str: string, ...args: any[]) =>
 {
@@ -61,7 +59,8 @@ export async function activate(instance?: any)
 
     if (!activated)
     {   //
-        // Create .vscode directory if it doesn't exist
+        // Create .vscode directory if it doesn't exist, so the we have perms to
+		// remove it after tests are done
         //
         const dirNameCode = getWsPath(".vscode"),
 			  settingsFile = path.join(dirNameCode, "settings.json");
@@ -96,7 +95,7 @@ export async function cleanup()
           settingsFile = path.join(dirNameCode, "settings.json"),
           tasksFile = path.join(dirNameCode, "tasks.json");
 
-    deactivate();
+    await deactivate();
 
     if (fs.existsSync(settingsFile)) {
         try {
@@ -279,7 +278,6 @@ export function overrideNextShowInfoBox(value: any)
 {
     overridesShowInfoBox.push(value);
 }
-
 
 
 export async function refresh()
