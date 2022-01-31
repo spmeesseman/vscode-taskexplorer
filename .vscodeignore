@@ -12,12 +12,15 @@ src
 **/test/**
 coverage
 test-files
+testFixture
 *.yml
 *.vsix
 *.sh
 package-lock.json
 tsconfig.json
+tsconfig.*.json
 tslint.json
 webpack.config.*
 node_modules
 tools
+types
