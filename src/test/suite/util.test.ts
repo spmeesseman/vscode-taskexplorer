@@ -127,7 +127,7 @@ suite("Util Tests", () =>
     {
 		const licenseKey = getLicenseKey(),
 			  version = getVersion(),
-			  storedVersion = storage.get<string>("version");
+			  storedVersion = storage.get<string>("version") as string;
 
 		await setLicenseKey(undefined);
         let panel = await displayInfoPage(storedVersion);
