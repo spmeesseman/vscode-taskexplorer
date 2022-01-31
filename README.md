@@ -309,7 +309,7 @@ Putting it all together:
             const teApi = taskExplorer.exports as TaskExplorerApi;
             if (!teApi.isBusy())
             {
-                teApi.register("taskTypeName", taskProvider);
+                await teApi.register("taskTypeName", taskProvider);
                 taskExplorerRegistered = true;
             }
             else {
