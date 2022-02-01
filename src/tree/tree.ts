@@ -1678,7 +1678,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 log.write("   invalidate " + opt1 + " provider file ", 1, logPad);
                 log.value("      file", opt2.fsPath, 1, logPad);
-                const provider = providers.get(util.getTaskProviderType(opt1));
+                const provider = providers.get(util.getTaskProviderType(opt1)); //  ||
+                                 // providersExternal.get(def.type)
                 // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
                 await provider?.invalidateTasksCache(opt2, logPad + "   ");
             }
@@ -1696,7 +1697,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
                 else { // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
                     log.write("   invalidate " + opt1 + " provider", 1, logPad);
-                    const provider = providers.get(util.getTaskProviderType(opt1));
+                    const provider = providers.get(util.getTaskProviderType(opt1)); //  ||
+                                     // providersExternal.get(def.type)
                     provider?.invalidateTasksCache(undefined, logPad + "   ");
                 }
             }
@@ -2322,8 +2324,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 // task.  No idea.  But this works fine for now.
                 //
                 const def = newTask.definition,
-                      p = providers.get(util.getTaskProviderType(def.type)),
-                      folder = taskItem.getFolder();
+                      folder = taskItem.getFolder(),
+                      p = providers.get(util.getTaskProviderType(def.type)) ||
+                          providersExternal.get(def.type);
                 if (folder && p)
                 {
                     newTask = p.createTask(def.target, undefined, folder, def.uri, undefined, "   ") as Task;
