@@ -2,7 +2,7 @@
     "name": "vscode-taskexplorer",
     "version": "2.8.0",
     "displayName": "Task Explorer",
-    "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash,php composer, make, maven, python, perl, powershell, ruby, pipenv and nsis",
+    "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash,php composer, make, maven, python, perl, powershell, ruby, pipenv, nsis.  Supports external task providers via API.",
     "icon": "res/gears-r-colors.png",
     "publisher": "spmeesseman",
     "license": "See LICENSE",
@@ -1792,40 +1792,6 @@
                     "isDefault": {
                         "type": "boolean",
                         "description": "%taskdef.task.isDefault%"
-                    }
-                }
-            },
-            {
-                "type": "external",
-                "required": [],
-                "properties": {
-                    "script": {
-                        "type": "string",
-                        "description": "%taskdef.task.script%"
-                    },
-                    "target": {
-                        "type": "string",
-                        "description": "%taskdef.task.target%"
-                    },
-                    "path": {
-                        "type": "string",
-                        "description": "%taskdef.task.path%"
-                    },
-                    "fileName": {
-                        "type": "string",
-                        "description": "%taskdef.task.fileName%"
-                    },
-                    "icon": {
-                        "type": "object",
-                        "description": "%taskdef.task.icon%"
-                    },
-                    "uri": {
-                        "type": "object",
-                        "description": "%taskdef.task.fileUri%"
-                    },
-                    "taskItemId": {
-                        "type": "string",
-                        "description": "%taskdef.task.taskItemId%"
                     }
                 }
             },
