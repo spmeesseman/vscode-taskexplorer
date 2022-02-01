@@ -1,5 +1,25 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.9.0 (February 1st, 2022)
+
+### Bug Fixes
+
+- **Api:** external tasks fail to run as background tasks
+- **Logging:** value log writes are spaced differently in random blocks
+
+### Features
+
+- **Api:** add invalidate call through for task providers that want TE to do the file system watching and invalidation notifying (works with getGlobPattern)
+
+### Refactoring
+
+- **Logging:** add additional logging for task tree and tree files
+- **Api:** peform checks on icon paths specified by external task providers
+
+### Build System
+
+- update .vscodeignore
+
 ## Version 2.8.0 (January 31st, 2022)
 
 ### Bug Fixes
