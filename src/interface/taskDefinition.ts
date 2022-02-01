@@ -6,71 +6,96 @@ export interface TaskExplorerDefinition extends TaskDefinition
 {
     /**
      * @property target
-     * label
+     *
+     * The task 'name'.  This is also used to call the task provider's (TaskExplorerProvider /
+     * ExternalExplorerProvider) createTask() function when a background task is to be created.
      */
     target?: string;
     /**
-     * @property target
-     * @deprecated
-     * set to same as `target` for now.
+     * @property script
+     *
+     * Used by a `script` task provider i.e. bash, batch, python, etc.  Set to the resource
+     * file path.
      */
     script?: string;
     /**
      * @property path
-     * path to file task is from
+     *
+     * Relative path to the file that the task is from, relative to the containing workspace
+     * directory
      */
     path?: string;
     /**
      * @property fileName
-     * file name task is from
+     *
+     * File name that the task is from (no path).
      */
     fileName?: string;
     /**
      * @property uri
-     * uri of file task is from
+     *
+     * The `Uri` of file task is from
      */
     uri?: Uri;
     /**
      * @property isDefault
-     * Is default task in group
+     *
+     * Is default task in the file that the tasks were read from.  Will be labled in the task
+     * tree as such.
      */
     isDefault?: boolean;
     /**
      * @property takesArgs
-     * `true` if this is type='script' and argument paremeters were found in the file content
+     *
+     * @readonly
+     *
+     * Gets set to `true` if this is `script` provider and argument paremeters were found in
+     * the file content.
      */
     takesArgs?: boolean;
     /**
      * @property taskItemId
+     *
      * @readonly
+     *
      *  Internal use only.
      */
     taskItemId?: string;
     /**
      * @property scriptFile
-     * Specified the file itself is a script to run, e.g. bash, python
+     *
+     * Specifies the file itself is a script to run, e.g. bash, python.  The script is specified
+     * by the `script` property.
      */
     scriptFile?: boolean;
     /**
      * @property scriptType
+     *
      * The `script` task provider has multiple sub-task-types, e.g. bash, python
      */
     scriptType?: string;
     /**
      * @property cmdLine
-     * The command to execute for this task
+     *
+     * The full command that is executed for this task.  This should be the same as the command
+     * line used to create the Execution.  Used by background tasks to build a new Execution item.
      */
     cmdLine?: string;
     /**
-     * @property icon
+     * @property icons
+     *
      * @since 2.8.0
-     * The icon to use for tree file nodes
+     *
+     * The icon to use for tree file / folder nodes.
      */
     icon?: string;
     /**
-     * @property icon
+     * @property iconDark
+     *
      * @since 2.8.0
-     * The icon to use for tree file nodes when UI is in dark mode.  Defaults to `icon` if not specified.
+     *
+     * The icon to use for tree file / folder nodes when UI is in dark mode.  Defaults to `icon` if
+     * not specified.
      */
     iconDark?: string;
 }
