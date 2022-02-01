@@ -21,4 +21,9 @@ export abstract class ExternalExplorerProvider implements TaskProvider
         throw new Error("Method not implemented.");
     }
 
+    async invalidate(uri?: Uri, logPad?: string): Promise<void>
+    {
+        return;
+    }
+
 }

@@ -103,7 +103,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     }
 
 
-    public async invalidateTasksCache(uri?: Uri, logPad = ""): Promise<void>
+    public async invalidate(uri?: Uri, logPad = ""): Promise<void>
     {
         log.methodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, true,
             [["uri", uri?.path], ["has cached tasks", !!this.cachedTasks]]
@@ -168,7 +168,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     private async processQueue()
     {
         if (this.queue.length > 0) {
-            await this.invalidateTasksCache(this.queue.shift());
+            await this.invalidate(this.queue.shift());
         }
     }
 

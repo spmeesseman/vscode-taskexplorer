@@ -11,7 +11,7 @@ import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from
 /**
  * Test class for external task providers
  */
-export class ExternalTaskProvider implements ExternalExplorerProvider
+export class ExternalTaskProvider extends ExternalExplorerProvider implements ExternalExplorerProvider
 {
     public providerName = "external";
 
