@@ -1,5 +1,6 @@
 
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } from "vscode";
+import * as log from "../common/log";
 import * as path from "path";
 import * as util from "../common/utils";
 import { configuration } from "../common/configuration";
@@ -89,9 +90,17 @@ export default class TaskFile extends TreeItem
      * @param label The display label.
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
-    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskExplorerDefinition, source: string, relativePath: string, groupLevel: number, group?: boolean, label?: string, logPad = "")
+    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskExplorerDefinition, source: string,
+                relativePath: string, groupLevel: number, group?: boolean, label?: string, logPad = "")
     {
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group || false), TreeItemCollapsibleState.Collapsed);
+
+        log.methodStart("Construct tree file", 4, logPad, false, [
+            ["source", source], ["source", source], ["relativePath", relativePath], ["task folder", folder.label],
+            ["groupLevel", groupLevel], ["group", group], ["label", label], ["taskDef cmd line", taskDef.cmdLine],
+            ["taskDef file name", taskDef.fileName], ["taskDef icon light", taskDef.icon], ["taskDef icon dark", taskDef.iconDark],
+            ["taskDef script", taskDef.script], ["taskDef target", taskDef.target], ["taskDef path", taskDef.path]
+        ]);
 
         this.folder = folder;
         this.path = this.label !== "vscode" ? relativePath : ".vscode";
@@ -102,7 +111,7 @@ export default class TaskFile extends TreeItem
         this.groupLevel = 0;
 
         //
-        // Reference ticket #133, vscode folder should not use a path appendature in it's folder label
+        // Reference ticket #133, vscode folder should not use a path appenditure in it's folder label
         // in the task tree, there is only one path for vscode/workspace tasks, /.vscode.  The fact that
         // you can set the path variable inside a vscode task changes the relativePath for the task,
         // causing an endless loop when putting the tasks into groups (see taskTree.createTaskGroupings).
@@ -157,10 +166,11 @@ export default class TaskFile extends TreeItem
         }
 
         //
-        // Set context icon
+        // Set context icons
         //
         this.iconPath = ThemeIcon.File;
-        let src = this.taskSource;
+        let src = this.taskSource,
+            iconLight: string | undefined, iconDark: string | undefined;
         //
         // If npm TaskFile, check package manager set in vscode settings, (npm, pnpm, or yarn) to determine
         // which icon to display
@@ -173,27 +183,35 @@ export default class TaskFile extends TreeItem
         {
             if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", src + ".svg"))))
             {
-                this.iconPath = {
-                    light: context.asAbsolutePath(path.join("res", "sources", src + ".svg")),
-                    dark: context.asAbsolutePath(path.join("res", "sources", src + ".svg"))
-                };
+                iconLight = context.asAbsolutePath(path.join("res", "sources", src + ".svg"));
+                iconDark = context.asAbsolutePath(path.join("res", "sources", src + ".svg"));
+                this.iconPath = { light: iconLight, dark: iconDark };
             }
             else if (util.pathExists(context.asAbsolutePath(path.join("res", "light", src + ".svg"))) &&
                     util.pathExists(context.asAbsolutePath(path.join("res", "dark", src + ".svg"))))
             {
-                this.iconPath = {
-                    light: context.asAbsolutePath(path.join("res", "light", src + ".svg")),
-                    dark: context.asAbsolutePath(path.join("res", "dark", src + ".svg"))
-                };
+                iconLight = context.asAbsolutePath(path.join("res", "light", src + ".svg"));
+                iconDark = context.asAbsolutePath(path.join("res", "dark", src + ".svg"));
+                this.iconPath = { light: iconLight, dark: iconDark };
             }
+            log.write(`   icons read for task source '${source}'`, 4, logPad);
+            log.value("      light", iconLight, 4, logPad);
+            log.value("      dark", iconDark, 4, logPad);
         }
-        else
+        else if (util.pathExists(taskDef.icon) && path.extname(taskDef.icon) === ".svg")
         {
-            this.iconPath = {
-                light: taskDef.icon,
-                dark: taskDef.iconDark || taskDef.icon
-            };
+            iconLight = taskDef.icon;
+            iconDark = taskDef.iconDark && util.pathExists(taskDef.iconDark) && path.extname(taskDef.iconDark) === ".svg" ?
+                        taskDef.iconDark : taskDef.icon;
+            this.iconPath = { light: iconLight, dark: iconDark };
+            log.write(`   custom icons read for task source '${source}'`, 4, logPad);
+            log.value("      light", iconLight, 4, logPad);
+            log.value("      dark", iconDark, 4, logPad);
         }
+
+        log.methodDone("Construct tree file", 4, logPad, false, [
+            ["filename", this.fileName], ["resource uri", this.resourceUri], ["icon light", iconLight], ["icon dark", iconDark]
+        ]);
     }
 
     /**
@@ -288,6 +306,7 @@ export default class TaskFile extends TreeItem
     {
         //
         // Ant tasks or any tasks provided by this extension will have a "fileName" definition
+        // External tasks registered throughthe API also define fileName
         //
         if (taskDef.fileName)
         {
