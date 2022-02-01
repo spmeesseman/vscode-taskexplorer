@@ -7,3 +7,4 @@ coverage
 install_extensions.bat
 types/lib
 tsconfig.tsbuildinfo
+.dccache
