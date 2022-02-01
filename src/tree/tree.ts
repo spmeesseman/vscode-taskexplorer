@@ -1416,6 +1416,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private getTaskFileNode(task: Task, folder: TaskFolder, files: any, relativePath: string, scopeName: string, logPad: string): TaskFile
     {
         let taskFile: TaskFile;
+        log.methodStart("get task file node", 2, logPad, false, [["relative path", relativePath], ["scope name", scopeName]]);
+
         //
         // Reference ticket #133, vscode folder should not use a path appenditure in it's folder label
         // in the task tree, there is only one path for vscode/workspace tasks, /.vscode.  The fact that
@@ -1439,12 +1441,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (!taskFile)
         {
-            log.value(logPad + "   Add source file container", task.source);
-            taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath, 0, false, undefined, logPad);
+            log.value("   Add source file container", task.source, 2, logPad);
+            taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath, 0, false, undefined, logPad + "   ");
             folder.addTaskFile(taskFile);
             files.set(id, taskFile);
         }
 
+        log.methodDone("get task file node", 2, logPad, false);
         return taskFile;
     }
 
@@ -1792,62 +1795,82 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
-        log.value("name", task.name, 3, logPad);
-        log.value("source", task.source, 3, logPad);
-        log.value("scope name", scopeName, 4, logPad);
+        log.write("Task Details:", 3, logPad);
+        log.value("   name", task.name, 3, logPad);
+        log.value("   source", task.source, 3, logPad);
+        log.value("   scope name", scopeName, 4, logPad);
         if (this.isWorkspaceFolder(task.scope))
         {
-            log.value("scope.name", task.scope.name, 4, logPad);
-            log.value("scope.uri.path", task.scope.uri.path, 4, logPad);
-            log.value("scope.uri.fsPath", task.scope.uri.fsPath, 4, logPad);
+            log.value("   scope.name", task.scope.name, 4, logPad);
+            log.value("   scope.uri.path", task.scope.uri.path, 4, logPad);
+            log.value("   scope.uri.fsPath", task.scope.uri.fsPath, 4, logPad);
         }
         else // User tasks
         {
-            log.value("scope.uri.path", "N/A (User)", 4, logPad);
+            log.value("   scope.uri.path", "N/A (User)", 4, logPad);
         }
-        log.value("relative Path", definition.path ? definition.path : "", 4, logPad);
-        log.value("type", definition.type, 4, logPad);
+        log.value("   type", definition.type, 4, logPad);
+        log.value("   relative Path", definition.path ? definition.path : "", 4, logPad);
         if (definition.scriptType)
         {
-            log.value("   script type", definition.scriptType, 4, logPad);	// if 'script' is defined, this is type npm
+            log.value("      script type", definition.scriptType, 4, logPad);
         }
         if (definition.scriptFile)
         {
-            log.value("   script file", definition.scriptFile, 4, logPad);	// if 'script' is defined, this is type npm
+            log.value("      script file", definition.scriptFile, 4, logPad);
         }
         if (definition.script)
         {
-            log.value("script", definition.script, 4, logPad);	// if 'script' is defined, this is type npm
+            log.value("   script", definition.script, 4, logPad);
+        }
+        if (definition.target)
+        {
+            log.value("   target", definition.target, 4, logPad);
         }
         if (definition.path)
         {
-            log.value("path", definition.path, 4, logPad);
+            log.value("   path", definition.path, 4, logPad);
         }
         //
         // Internal task providers will set a fileName property
         //
         if (definition.fileName)
         {
-            log.value("file name", definition.fileName, 4, logPad);
+            log.value("   file name", definition.fileName, 4, logPad);
         }
         //
         // Internal task providers will set a uri property
         //
         if (definition.uri)
         {
-            log.value("file path", definition.uri.fsPath, 4, logPad);
+            log.value("   file path", definition.uri.fsPath, 4, logPad);
         }
         //
-        // Script task providers will set a fileName property
+        // Script task providers will set a takesArgs property
         //
         if (definition.takesArgs)
         {
-            log.value("script requires args", "true", 4, logPad);
+            log.value("   requires args", definition.takesArgs, 4, logPad);
         }
         if (definition.cmdLine)
         {
-            log.value("script cmd line", definition.cmdLine, 4, logPad);
+            log.value("   cmd line", definition.cmdLine, 4, logPad);
         }
+        //
+        // External task providers can set a icon/iconDark property
+        //
+        if (definition.icon)
+        {
+            log.value("   icon", definition.icon, 4, logPad);
+        }
+        //
+        // External task providers can set a icon/iconDark property
+        //
+        if (definition.iconDark)
+        {
+            log.value("   icon dark", definition.iconDark, 4, logPad);
+        }
+        log.write("Task Details Done", 3, logPad);
     }
 
 
