@@ -1,6 +1,6 @@
 {
     "name": "@spmeesseman/vscode-taskexplorer-types",
-    "version": "0.0.7",
+    "version": "2.8.0",
     "displayName": "Task Explorer API Types",
     "description": "Task Explorer API types for external task providers",
     "publisher": "spmeesseman",
