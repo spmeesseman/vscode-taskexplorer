@@ -1,11 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 
-import * as log from "../common/log";
+import * as log from "../../common/log";
 import * as path from "path";
-import * as util from "../common/utils";
-import constants from "../common/constants";
-import { TaskExplorerDefinition } from "../interface/taskDefinition";
-import { ExternalExplorerProvider } from "../interface/externalProvider";
+import * as util from "../../common/utils";
+import constants from "../../common/constants";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
+import { ExternalExplorerProvider, TaskExplorerDefinition } from "@spmeesseman/vscode-taskexplorer-types";
 
 
 /**
