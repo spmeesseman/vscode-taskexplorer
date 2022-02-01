@@ -215,7 +215,7 @@ FOr whatever reason, on some systems the animated running task icon eats a lot o
 
 ## External Provider Integration API
 
-Any extension that implements `TaskProvider` (specifically it's `provideTasks` method) can add it's tasks to the Task Explorer tree.  To register an external provider, follow these steps:
+Any extension that implements `TaskProvider` (specifically it's `provideTasks` method) can add it's tasks to the Task Explorer tree.  To register an external provider with Task Explorer, follow these steps:
 
 Get the TaskExplorer API object:
 
@@ -263,7 +263,59 @@ The provided tasks must implement the taskExplorer.external task interface:
         }
     }
 
-For reference, the entire API object is:
+The task definition must also define most of the interface properties in the package.json, for completeness, the entire definition is:
+
+    "taskDefinitions": [
+    {
+        "type": "extjs",
+        "required": [],
+        "properties": {
+            "script": {
+                "type": "string",
+                "description": "taskdef.task.script"
+            },
+            "target": {
+                "type": "string",
+                "description": "taskdef.task.target"
+            },
+            "cmdLine": {
+                "type": "string",
+                "description": "taskdef.task.cmdLine"
+            },
+            "fileName": {
+                "type": "string",
+                "description": "taskdef.task.fileName"
+            },
+            "icon": {
+                "type": "string",
+                "description": "taskdef.task.icon"
+            },
+            "iconDark": {
+                "type": "string",
+                "description": "taskdef.task.icon.dark"
+            },
+            "isDefault": {
+                "type": "boolean",
+                "description": "taskdef.task.isDefault"
+            },
+            "path": {
+                "type": "string",
+                "description": "taskdef.task.path"
+            },
+            "taskItemId": {
+                "type": "string",
+                "description": "taskdef.task.taskItemId"
+            },
+            "uri": {
+                "type": "object",
+                "description": "taskdef.task.fileUri"
+            }
+        }
+    }]
+
+The definition will be reduced in the future.  This definition is remnant of Task Explorer's early days and is in need of a cleanup.
+
+For reference, the entire Task Explorer API object is:
 
     interface TaskExplorerApi
     {
