@@ -187,7 +187,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
           taskTypes = util.getTaskTypes();
 
     const registerChange = (taskType: string) => {
-        if (util.existsInArray(refreshTaskTypes, taskType) === false) {
+        if (!refreshTaskTypes.includes(taskType)) {
             refreshTaskTypes.push(taskType);
         }
     };
