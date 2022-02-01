@@ -1502,10 +1502,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         };
 
         let relPath = taskItem.task.definition.path ? taskItem.task.definition.path : "";
-        if (relPath[relPath.length - 1] === "/") {
-            relPath = relPath.substring(0, relPath.length - 1);
-        }
-        else if (relPath[relPath.length - 1] === "\\") {
+        if (relPath[relPath.length - 1] === "/" || relPath[relPath.length - 1] === "\\")
+        {
             relPath = relPath.substring(0, relPath.length - 1);
         }
 
