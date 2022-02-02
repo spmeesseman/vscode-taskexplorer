@@ -95,7 +95,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
 
         taskDefs.push({
             label: "release" + groupSeparator + "dry" + groupSeparator + "publish (prompt version)",
-            cmdLine: "npx app-publisher --no-ci --dry-run --prompt-version"
+            cmdLine: "npx app-publisher --no-ci --dry-run --prompt-version Y"
         });
 
         taskDefs.push({
@@ -105,7 +105,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
 
         taskDefs.push({
             label: "release" + groupSeparator + "publish (prompt version)",
-            cmdLine: "npx app-publisher --no-ci --prompt-version"
+            cmdLine: "npx app-publisher --no-ci --prompt-version Y"
         });
 
         taskDefs.push({
