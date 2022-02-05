@@ -9,6 +9,7 @@ import { activate, isReady, sleep } from "../helper";
 import { storage } from "../../common/storage";
 import { getUserDataPath } from "../../common/utils";
 import { configuration } from "../../common/configuration";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 // import { displayInfoPage, getLicenseKey, setLicenseKey } from "../../common/infoPage";
 // import { getVersion } from "../../extension";
