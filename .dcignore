@@ -5,6 +5,7 @@
 **/target
 **/lib-cov
 **/coverage
+**/.coverage
 *.lcov
 **/bower_components
 **/.nyc_output
