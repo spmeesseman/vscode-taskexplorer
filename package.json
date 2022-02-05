@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "2.9.0",
+    "version": "2.9.1",
     "displayName": "Task Explorer",
     "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash,php composer, make, maven, python, perl, powershell, ruby, pipenv, nsis.  Supports external task providers via API.",
     "icon": "res/gears-r-colors.png",

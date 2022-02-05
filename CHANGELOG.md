@@ -1,5 +1,15 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.9.1 (February 4th, 2022)
+
+### Bug Fixes
+
+- **Providers:** app-publisher 'prompt version' task fails.
+
+### Documentation
+
+- **Readme:** update api section with task definition info
+
 ## Version 2.9.0 (February 1st, 2022)
 
 ### Bug Fixes
