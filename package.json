@@ -181,13 +181,13 @@
         "commands": [
             {
                 "command": "taskExplorer.enterLicense",
-                "title": "Task Explorer: Enter License Key",
-                "enablement": "false"
+                "title": "Task Explorer: Enter License Key"
             },
             {
                 "command": "taskExplorerSideBar.run",
                 "title": "%command.run%",
                 "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false",
                 "icon": {
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
@@ -197,6 +197,7 @@
                 "command": "taskExplorerSideBar.runNoTerm",
                 "title": "%command.runNoTerm%",
                 "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false",
                 "icon": {
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
@@ -206,6 +207,7 @@
                 "command": "taskExplorerSideBar.runWithArgs",
                 "title": "%command.runWithArgs%",
                 "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false",
                 "icon": {
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
@@ -215,6 +217,7 @@
                 "command": "taskExplorerSideBar.runLastTask",
                 "title": "%command.runLastTask%",
                 "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false",
                 "icon": {
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
@@ -223,12 +226,14 @@
             {
                 "command": "taskExplorerSideBar.addToExcludes",
                 "title": "%command.addToExcludes%",
-                "when": "config.taskExplorer.enableSideBar"
+                "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorerSideBar.addRemoveFromFavorites",
                 "title": "%command.addRemoveFromFavorites%",
                 "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/favorite.svg",
                     "light": "res/light/favorite.svg"
@@ -237,17 +242,20 @@
             {
                 "command": "taskExplorerSideBar.addRemoveCustomLabel",
                 "title": "%command.addRemoveCustomLabel%",
-                "when": "config.taskExplorer.enableSideBar"
+                "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorerSideBar.clearSpecialFolder",
                 "title": "CLR",
-                "when": "config.taskExplorer.enableSideBar"
+                "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorerSideBar.pause",
                 "title": "%command.pause%",
                 "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/pause.svg",
                     "light": "res/light/pause.svg"
@@ -257,6 +265,7 @@
                 "command": "taskExplorerSideBar.restart",
                 "title": "%command.restart%",
                 "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/restart.svg",
                     "light": "res/light/restart.svg"
@@ -266,6 +275,7 @@
                 "command": "taskExplorerSideBar.stop",
                 "title": "%command.stop%",
                 "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/stop.svg",
                     "light": "res/light/stop.svg"
@@ -275,6 +285,7 @@
                 "command": "taskExplorerSideBar.open",
                 "title": "%command.open%",
                 "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/file.svg",
                     "light": "res/light/file.svg"
@@ -284,6 +295,7 @@
                 "command": "taskExplorerSideBar.openTerminal",
                 "title": "%command.openTerminal%",
                 "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/terminal.svg",
                     "light": "res/light/terminal.svg"
@@ -292,32 +304,38 @@
             {
                 "command": "taskExplorerSideBar.runInstall",
                 "title": "%command.runInstall%",
-                "when": "config.taskExplorer.enableSideBar"
+                "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorerSideBar.runUpdate",
                 "title": "%command.runUpdate%",
-                "when": "config.taskExplorer.enableSideBar"
+                "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorerSideBar.runUpdatePackage",
                 "title": "%command.runUpdatePackage%",
-                "when": "config.taskExplorer.enableSideBar"
+                "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorerSideBar.runAudit",
                 "title": "%command.runAudit%",
-                "when": "config.taskExplorer.enableSideBar"
+                "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorerSideBar.runAuditFix",
                 "title": "%command.runAuditFix%",
-                "when": "config.taskExplorer.enableSideBar"
+                "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorerSideBar.refresh",
                 "title": "%command.refresh%",
                 "when": "config.taskExplorer.enableSideBar",
+                "enablement": "false",
                 "icon": {
                     "light": "res/light/refresh.svg",
                     "dark": "res/dark/refresh.svg"
@@ -327,6 +345,7 @@
                 "command": "taskExplorer.run",
                 "title": "%command.run%",
                 "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false",
                 "icon": {
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
@@ -336,6 +355,7 @@
                 "command": "taskExplorer.runNoTerm",
                 "title": "%command.runNoTerm%",
                 "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false",
                 "icon": {
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
@@ -345,6 +365,7 @@
                 "command": "taskExplorer.runWithArgs",
                 "title": "%command.runWithArgs%",
                 "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false",
                 "icon": {
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
@@ -354,6 +375,7 @@
                 "command": "taskExplorer.runLastTask",
                 "title": "%command.runLastTask%",
                 "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false",
                 "icon": {
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
@@ -362,12 +384,14 @@
             {
                 "command": "taskExplorer.addToExcludes",
                 "title": "%command.addToExcludes%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorer.addRemoveFromFavorites",
                 "title": "%command.addRemoveFromFavorites%",
                 "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/favorite.svg",
                     "light": "res/light/favorite.svg"
@@ -376,17 +400,20 @@
             {
                 "command": "taskExplorer.addRemoveCustomLabel",
                 "title": "%command.addRemoveCustomLabel%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorer.clearSpecialFolder",
                 "title": "CLR",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorer.pause",
                 "title": "%command.pause%",
                 "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/pause.svg",
                     "light": "res/light/pause.svg"
@@ -396,6 +423,7 @@
                 "command": "taskExplorer.restart",
                 "title": "%command.restart%",
                 "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/restart.svg",
                     "light": "res/light/restart.svg"
@@ -405,6 +433,7 @@
                 "command": "taskExplorer.open",
                 "title": "%command.open%",
                 "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/file.svg",
                     "light": "res/light/file.svg"
@@ -414,6 +443,7 @@
                 "command": "taskExplorer.openTerminal",
                 "title": "%command.openTerminal%",
                 "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/terminal.svg",
                     "light": "res/light/terminal.svg"
@@ -423,6 +453,7 @@
                 "command": "taskExplorer.stop",
                 "title": "%command.stop%",
                 "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false",
                 "icon": {
                     "dark": "res/dark/stop.svg",
                     "light": "res/light/stop.svg"
@@ -431,32 +462,38 @@
             {
                 "command": "taskExplorer.runInstall",
                 "title": "%command.runInstall%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorer.runUpdate",
                 "title": "%command.runUpdate%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorer.runUpdatePackage",
                 "title": "%command.runUpdatePackage%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorer.runAudit",
                 "title": "%command.runAudit%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorer.runAuditFix",
                 "title": "%command.runAuditFix%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorer.refresh",
                 "title": "%command.refresh%",
                 "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false",
                 "icon": {
                     "light": "res/light/refresh.svg",
                     "dark": "res/dark/refresh.svg"
@@ -465,11 +502,13 @@
             {
                 "command": "taskExplorer.showOutput",
                 "title": "%command.showOutput%",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskExplorer.enableExplorerView",
+                "enablement": "false"
             },
             {
                 "command": "taskExplorer.getApi",
-                "title": "%command.getApi%"
+                "title": "%command.getApi%",
+                "enablement": "false"
             }
         ],
         "keybindings": [
