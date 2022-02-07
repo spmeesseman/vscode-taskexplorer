@@ -17,6 +17,8 @@
 
 ![src0](res/sources/npm.png?raw=true) ![src1](res/sources/ant.png?raw=true) ![src0y](res/sources/yarn.png?raw=true) ![src2](res/sources/grunt.png?raw=true) ![src3](res/sources/gulp.png?raw=true) ![src13](res/sources/gradle.png?raw=true) ![src4](res/sources/workspace.png?raw=true) ![src5](res/sources/make.png?raw=true) ![src6](res/sources/ts.png?raw=true) ![src7](res/sources/bat.png?raw=true) ![src8](res/sources/ruby.png?raw=true) ![src9](res/sources/powershell.png?raw=true) ![src10](res/sources/bash.png?raw=true) ![src11](res/sources/python.png?raw=true) ![src12](res/sources/nsis.png?raw=true) ![src13](res/sources/maven.png?raw=true)
 
+_**IMPORTANT NOTE**_: *This extension has surpassed where I was ever going to take it, and the time that ended up going into it were more than I ever intended.  Considering a pay scheme (cheap, e.g. $10 - $20), with free usage up to the # of to-be-determined number of parsed tasks.  Note the license, this codebase is NOT permitted to be copied or distributed without my permission.
+
 ## Description
 
 Provides a view in either (or both) the SideBar and/or Explorer that displays all supported tasks organized into a treeview, with parent task file nodes, grouped nodes, and project folders (convenient for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped, among other things for specific task types, for example NPM file nodes support common npm command(s) (i.e. 'install') via context menu.

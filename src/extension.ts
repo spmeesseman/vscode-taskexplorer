@@ -4,6 +4,7 @@ import * as util from "./common/utils";
 import * as cache from "./cache";
 import * as log from "./common/log";
 import constants from "./common/constants";
+import registerEnterLicenseCommand from "./commands/enterLicense";
 import { views } from "./views";
 import { TaskTreeDataProvider } from "./tree/tree";
 import { AntTaskProvider } from "./providers/ant";
@@ -21,16 +22,18 @@ import { configuration } from "./common/configuration";
 import { initStorage } from "./common/storage";
 import { isCachingBusy } from "./cache";
 import { TaskExplorerProvider } from "./providers/provider";
+import { ILicenseManager } from "./interface/licenseManager";
 import { ExternalExplorerProvider, TaskExplorerApi } from "./interface";
 import {
     Disposable, ExtensionContext, Uri, tasks, commands, workspace,
     window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder
 } from "vscode";
+import { LicenseManager } from "./lib/licenseManager";
 
 
 let teApi: TaskExplorerApi,
     hasLicense: boolean,
-    version: string;
+    licenseManager: ILicenseManager;
 
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
@@ -58,9 +61,9 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     registerTaskProviders(context);
 
     //
-    // Register GetAPI task
+    // Register non-ui commands found in package.json contributes.commands
     //
-    context.subscriptions.push(commands.registerCommand("taskExplorer.getApi", () => teApi));
+    registerCommands(context);
 
     //
     // Register the tree providers
@@ -93,23 +96,6 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     });
     context.subscriptions.push(d);
 
-    //
-    // Store  extensionversion
-    //
-    version = context.extension.packageJSON.version;
-
-    //
-    // Check license / info display
-    //
-    // const panel = await displayInfoPage(version);
-    // if (panel) {
-    //     panel.onDidDispose(() =>
-    //     {
-    //
-    //     },
-    //     null, context.subscriptions);
-    // }
-
     log.write("   Task Explorer activated");
 
     teApi = {
@@ -125,6 +111,11 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         register: registerExternalProvider,
         unregister: unregisterExternalProvider
     };
+
+    //
+    // Create license manager instance
+    //
+    licenseManager = new LicenseManager(teApi, context);
 
     return teApi;
 }
@@ -160,9 +151,9 @@ export async function deactivate()
 }
 
 
-export function getVersion()
+export function getLicenseManager()
 {
-    return version;
+    return licenseManager;
 }
 
 
@@ -413,6 +404,17 @@ export async function refreshTree(taskType?: string, uri?: Uri)
     if (configuration.get<boolean>("enableExplorerView") && teApi.explorer) {
         await teApi.explorer.refresh(taskType, uri);
     }
+}
+
+
+
+function registerCommands(context: ExtensionContext)
+{
+    registerEnterLicenseCommand(context);
+    //
+    // Register GetAPI task
+    //
+    context.subscriptions.push(commands.registerCommand("taskExplorer.getApi", () => teApi));
 }
 
 

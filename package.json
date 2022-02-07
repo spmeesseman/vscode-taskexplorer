@@ -180,6 +180,11 @@
         },
         "commands": [
             {
+                "command": "taskExplorer.enterLicense",
+                "title": "Task Explorer: Enter License Key",
+                "enablement": "false"
+            },
+            {
                 "command": "taskExplorerSideBar.run",
                 "title": "%command.run%",
                 "when": "config.taskExplorer.enableSideBar",
