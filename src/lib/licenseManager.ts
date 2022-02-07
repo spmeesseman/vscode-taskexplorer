@@ -69,18 +69,15 @@ export class LicenseManager implements ILicenseManager
 		else if (displayPopup)
 		{
 			const msg = "Purchase a license to unlock unlimited parsed components.",
-				action = await window.showInformationMessage(msg, "Purchase", "Not Now");
+				  action = await window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now");
 
 			if (action === "Purchase")
 			{
-				const opts: InputBoxOptions = { prompt: "Enter license key" };
-				await window.showInputBox(opts).then(async (str) =>
-				{
-					if (str !== undefined)
-					{
-						await storage.update("license_key", str);
-					}
-				});
+				this.enterLicenseKey();
+			}
+			else if (action === "Info")
+			{
+				window.showInformationMessage("License Info page not implemented yet");
 			}
 		}
 
@@ -180,7 +177,17 @@ export class LicenseManager implements ILicenseManager
 
 	async enterLicenseKey()
 	{
-		return true;
+		const opts: InputBoxOptions = { prompt: "Enter license key" };
+		try {
+			const input = await window.showInputBox(opts);
+			if (input !== undefined)
+			{
+				await this.setLicenseKey(input);
+				return true;
+			}
+		}
+		catch (e) {}
+		return false;
 	}
 
 
