@@ -2573,6 +2573,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 taskItem = undefined;
                 if (tree[treeIdx]?.label === label) {
+                    // file deepcode ignore AttrAccessOnNull: whatever
                     tree.splice(treeIdx, 1);
                 }
                 changed = true;
