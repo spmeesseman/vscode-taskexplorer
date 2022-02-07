@@ -170,7 +170,7 @@ export function value(msg: string, value: any, level?: number, logPad = "")
         else if (value === undefined) {
             logMsg += ": undefined";
         }
-        else if (value === null) {
+        else {
             logMsg += ": null";
         }
 
