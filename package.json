@@ -184,6 +184,15 @@
                 "title": "Task Explorer: Enter License Key"
             },
             {
+                "command": "taskExplorer.getApi",
+                "title": "%command.getApi%",
+                "enablement": "false"
+            },
+            {
+                "command": "taskExplorer.viewReport",
+                "title": "Task Explorer: View Parsing Report"
+            },
+            {
                 "command": "taskExplorerSideBar.run",
                 "title": "%command.run%",
                 "when": "config.taskExplorer.enableSideBar",
@@ -503,11 +512,6 @@
                 "command": "taskExplorer.showOutput",
                 "title": "%command.showOutput%",
                 "when": "config.taskExplorer.enableExplorerView",
-                "enablement": "false"
-            },
-            {
-                "command": "taskExplorer.getApi",
-                "title": "%command.getApi%",
                 "enablement": "false"
             }
         ],
@@ -1380,6 +1384,13 @@
                     "command": "taskExplorerSideBar.clearSpecialFolder",
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == lasttasks",
                     "group": "inline"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "taskExplorer.viewReport",
+                    "group": "9_taskexplorer",
+                    "when": "explorerViewletVisible && filesExplorerFocus && explorerResourceIsRoot && !inputFocus && resourcePath"
                 }
             ]
         },

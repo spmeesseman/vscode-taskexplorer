@@ -39,6 +39,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
   - [Running Task Icon Animations](#running-task-icon-animations)
+  - [Parsing Reports](#parsing-reports)
   - [External Provider Integration API](#external-provider-integration-api)
   - [Feedback & Contributing](#feedback--contributing)
     - [Rate It - Leave Some Stars](#rate-it---leave-some-stars)
@@ -214,6 +215,13 @@ Bash/sh scripts in Windows will have the shell executable automatically set to a
 ## Running Task Icon Animations
 
 FOr whatever reason, on some systems the animated running task icon eats a lot of CPU.  If this is your case, the animated icon can be turned off in settings (on by default).
+
+## Parsing Reports
+
+For debugging or curiosity, a report can be generated listing all parsed components and the properties found.  You can generate a report in the explorer context menus using the `Task Explorer: View Parsing Report` menu item.
+
+![parsing-report-img](resources/readme/../../res/readme/parsingreport.png)
+
 
 ## External Provider Integration API
 

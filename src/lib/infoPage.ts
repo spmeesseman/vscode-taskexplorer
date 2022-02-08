@@ -1,87 +1,34 @@
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
-import * as log from "../common/log";
-import { storage } from "../common/storage";
-import { InputBoxOptions, ViewColumn, WebviewPanel, window } from "vscode";
+
+import * as path from "path";
+import * as log  from "../common/log";
+import { teApi } from "../extension";
+import { Task, Uri, ViewColumn, WebviewPanel, window, workspace, WorkspaceFolder } from "vscode";
+import { getHeaderContent, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../common/utils";
 
 
 let panel: WebviewPanel | undefined;
 
 
-export async function displayInfoPage(version: string)
+export async function displayParsingReport(logPad: string, logLevel: number, uri?: Uri)
 {
-    let displayInfo = false, displayPopup = false;
-    const storedVersion = storage.get<string>("version");
+    log.methodStart("display parsing report", logLevel, logPad);
 
-    log.methodStart("display info startup page", 1, "", false, [["stored version", storedVersion]]);
-
-    let content = getHeaderContent();
-
-    if (version !== storedVersion)
-    {
-        content += getInfoContent();
-        displayInfo = true;
-    }
-
-    const hasLicense = checkLicense();
-    if (!hasLicense)
-    {
-        content += getLicenseContent();
-        displayPopup = !displayInfo;
-        // displayInfo = true; // temp
-    }
-
+    let content = getHeaderContent("Task Explorer Parsing Report");
+	content += getBodyContent(logPad + "   ", logLevel + 1, uri);
     content += getFooterContent();
 
-    if (displayInfo)
-    {
-        panel = window.createWebviewPanel(
-            "taskExplorer",    // Identifies the type of the webview. Used internally
-            "Task Explorer",   // Title of the panel displayed to the users
-            ViewColumn.One,    // Editor column to show the new webview panel in.
-            {}                 // Webview options.
-        );
-        panel.webview.html = content;
-        panel.reveal();
-        await storage.update("version", version);
-    }
-    else if (displayPopup)
-    {
-        const msg = "Purchase a license to unlock unlimited tasks.",
-              action = await window.showInformationMessage(msg, "Purchase", "Not Now");
+	panel = window.createWebviewPanel(
+		"taskExplorer",                 // Identifies the type of the webview. Used internally
+		"Task Explorer Parsing Report", // Title of the panel displayed to the users
+		ViewColumn.One,                 // Editor column to show the new webview panel in.
+		{}                              // Webview options.
+	);
+	panel.webview.html = content;
+	panel.reveal();
 
-        if (action === "Purchase")
-        {
-            const opts: InputBoxOptions = { prompt: "Enter license key" };
-            await window.showInputBox(opts).then(async (str) =>
-            {
-                if (str !== undefined)
-                {
-                    await storage.update("license_key", str);
-                }
-            });
-        }
-    }
-
-    log.methodDone("display info startup page", 1, "", false, [["has license", hasLicense]]);
+    log.methodDone("display parsing report", logLevel, logPad);
 
     return panel;
-}
-
-
-function checkLicense()
-{
-    let validLicense = false;
-    const storedLicenseKey = getLicenseKey();
-
-    log.methodStart("check license", 1, "   ", false, [["stored license key", storedLicenseKey]]);
-
-    if (storedLicenseKey)
-    {
-        validLicense = validateLicense(storedLicenseKey);
-    }
-
-    log.methodDone("check license", 1, "   ", false, [["valid license", validLicense]]);
-    return validLicense;
 }
 
 
@@ -90,130 +37,57 @@ function checkLicense()
 //     panel?.dispose();
 // }
 
-
-export function getLicenseKey()
-{
-    return storage.get<string>("license_key");
-}
-
-
 function getFooterContent()
 {
     return "</body></html>";
 }
 
 
-function getHeaderContent()
+function getBodyContent(logPad: string, logLevel: number, uri?: Uri)
 {
-    return `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Explorer</title>
-  </head>
-  <body style="padding:20px">
-    <table>
-        <tr>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/gears-r-colors.png" height="50" />
-            </td>
-            <td valign="middle" style="font-size:40px;font-weight:bold"> &nbsp;Task Explorer</td>
-        </tr>
-        </table>
-        <table style="margin-top:15px">
-        <tr>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/npm.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ant.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/yarn.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/grunt.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/gulp.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/php.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/workspace.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/make.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ts.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bat.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ruby.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/powershell.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bash.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/python.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/nsis.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/perl.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/maven.png" />
-            </td>
-        </tr>
-    </table>`;
-}
+    log.methodStart("get body content", logLevel, logPad);
 
+	let project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 
-function getLicenseContent()
-{
-    return '<table style="margin-top:15px"><tr><td>Purchase a license!!</td></tr></table>';
-}
+	let details = `<table style="margin-top:15px" width="97%" align="center">
+	<tr style="font-size:16px;font-weight:bold">
+		<td style="padding-right:20px">Source</td>
+		<td style="padding-right:20px">Name</td>
+		<td style="padding-right:20px">Project</td>
+		<td style="padding-right:20px">Default</td>
+		<td style="padding-right:20px">Provider</td>
+		<td style="padding-right:20px">File</td>
+	</tr><tr><td colspan="6"><hr></td></tr>`;
 
+	const tasks = teApi.explorer.getTasks().filter((t: Task) => !project || (isWorkspaceFolder(t.scope) && 
+                                                    project === getWorkspaceProjectName(t.scope.uri.fsPath))),
+		  projects: string[] = [];
 
-function getInfoContent()
-{
-    return `<table style="margin-top:15px">
-        <tr>
-            <td style="font-size:16px;font-weight:bold">
-                What's new in v3.0
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <ul>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                </ul>
-            </td>
-        </tr>
-        </tr>
-    </table>`;
-}
+	tasks.forEach((t: Task) =>
+	{
+		const wsFolder = t.scope as WorkspaceFolder;
+		project = project || getWorkspaceProjectName(wsFolder.uri.fsPath);
 
+		details += `
+	<tr style="font-size:12px">
+		<td valign="top" style="font-size:14px;font-decoration:italic;padding-right:20px" nowrap>${t.source}</td>
+		<td valign="top" style="padding-right:20px">${t.name}</td>
+		<td valign="top" style="padding-right:20px">${project}</td>
+		<td valign="top" style="padding-right:20px">${t.definition.isDefault || "N/A"}</td>
+		<td valign="top" style="padding-right:20px">${t.source}</td>
+		<td valign="top" style="padding-right:20px">${wsFolder ? path.relative(path.dirname(wsFolder.uri.fsPath), t.name) : "N/A"}</td>
+	</tr>
+	<tr><td height="10"></td></tr>`;
 
-export async function setLicenseKey(licenseKey: string | undefined)
-{
-    await storage.update("license_key", licenseKey);
-}
+		pushIfNotExists(projects, wsFolder?.name);
+	});
 
+	details += "</table>"
 
-function validateLicense(licenseKey: string)
-{
-    return !!licenseKey;
+	let summary = `# of Tasks: ${tasks.length}<br><br>Projects: ${projects.join(", ")}`;
+
+	log.methodDone("get body content", logLevel, logPad);
+
+	return `<table><tr><td>${summary}</td><?tr></table>
+<table><tr><td>${details}</td><?tr></table>`
 }
