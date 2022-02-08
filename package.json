@@ -221,7 +221,7 @@
             },
             {
                 "command": "taskExplorerSideBar.runLastTask",
-                "title": "%command.runLastTask%",
+                "title": "Task Explorer: Run Last Task",
                 "when": "config.taskExplorer.enableSideBar",
                 "icon": {
                     "light": "res/light/continue.svg",
@@ -360,7 +360,7 @@
             },
             {
                 "command": "taskExplorer.runLastTask",
-                "title": "%command.runLastTask%",
+                "title": "Task Explorer: Run Last Task",
                 "when": "config.taskExplorer.enableExplorerView",
                 "icon": {
                     "light": "res/light/continue.svg",
@@ -1352,6 +1352,156 @@
                     "command": "taskExplorer.viewReport",
                     "group": "9_taskexplorer",
                     "when": "explorerViewletVisible && filesExplorerFocus && explorerResourceIsRoot && !inputFocus && resourcePath"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "taskExplorerSideBar.run",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runNoTerm",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runWithArgs",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.addToExcludes",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.addRemoveFromFavorites",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.addRemoveCustomLabel",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.clearSpecialFolder",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.pause",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.restart",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.stop",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.open",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.openTerminal",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runInstall",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runUpdate",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runUpdatePackage",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runAudit",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runAuditFix",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.refresh",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.run",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runNoTerm",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runWithArgs",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.addRemoveFromFavorites",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.addRemoveCustomLabel",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.clearSpecialFolder",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.pause",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.restart",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.open",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.openTerminal",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.stop",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runInstall",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runUpdate",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runUpdatePackage",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runAudit",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runAuditFix",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.refresh",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.showOutput",
+                    "when": "false"
                 }
             ]
         },
