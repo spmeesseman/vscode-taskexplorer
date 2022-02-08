@@ -2,49 +2,48 @@
 
 import * as log from "../common/log";
 import { storage } from "../common/storage";
-import { ExtensionContext, InputBoxOptions, ViewColumn, WebviewPanel, window } from "vscode";
+import { commands, ExtensionContext, InputBoxOptions, Task, ViewColumn, WebviewPanel, window, workspace } from "vscode";
 import { ILicenseManager } from "../interface/licenseManager";
+import { getHeaderContent, pushIfNotExists } from "../common/utils";
 import { TaskExplorerApi } from "../interface";
 
 
 export class LicenseManager implements ILicenseManager
 {
 
-	private version: string;
-	private context: ExtensionContext;
+	private licensed = false;
+	private version: string;;
 	private panel: WebviewPanel | undefined;
 	private teApi: TaskExplorerApi;
 
 
 	constructor(teApi: TaskExplorerApi, context: ExtensionContext)
     {
-        this.teApi = teApi;
-		this.context = context;
+		this.teApi = teApi;
         //
-        // Store  extensionversion
+        // Store extension version
 		// Note context.extension depends on VSCode 1.55+
         //
         this.version = context.extension.packageJSON.version;
-		this.initialize().then().catch();
     }
 
 
-	async initialize()
+	async initialize(components: Task[])
 	{
 		let displayInfo = false, displayPopup = false;
 		const storedVersion = storage.get<string>("version");
 
 		log.methodStart("display info startup page", 1, "", false, [["stored version", storedVersion]]);
 
-		let content = this.getHeaderContent("ExtJs Intellisense Licensing");
+		let content = getHeaderContent("Welcome to Task Explorer");
 
 		if (this.version !== storedVersion)
 		{
-			content += this.getInfoContent();
+			content += this.getInfoContent(components);
 			displayInfo = true;
 		}
 
-		const hasLicense = this.checkLicenseKey();
+		const hasLicense = await this.checkLicenseKey();
 		if (!hasLicense)
 		{
 			content += this.getLicenseContent();
@@ -57,21 +56,21 @@ export class LicenseManager implements ILicenseManager
 		if (displayInfo)
 		{
 			this.panel = window.createWebviewPanel(
-				"extjsIntellisense",  // Identifies the type of the webview. Used internally
-				"ExtJs Intellisense", // Title of the panel displayed to the users
-				ViewColumn.One,       // Editor column to show the new webview panel in.
-				{}                    // Webview options.
+				"taskExplorer",   // Identifies the type of the webview. Used internally
+				"Task Explorer",  // Title of the panel displayed to the users
+				ViewColumn.One,   // Editor column to show the new webview panel in.
+				{}                // Webview options.
 			);
 			this.panel.webview.html = content;
 			this.panel.reveal();
-			// await storage.update("version", this.version);
+			await storage.update("version", this.version);
 		}
 		else if (displayPopup)
 		{
-			const msg = "Purchase a license to unlock unlimited parsed components.",
+			const msg = "Purchase a license to unlock unlimited parsed tasks.",
 				  action = await window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now");
 
-			if (action === "Purchase")
+			if (action === "Enter License Key")
 			{
 				this.enterLicenseKey();
 			}
@@ -85,7 +84,7 @@ export class LicenseManager implements ILicenseManager
 	}
 
 
-	private checkLicenseKey()
+	private async checkLicenseKey()
 	{
 		let validLicense = false;
 		const storedLicenseKey = this.getLicenseKey();
@@ -94,11 +93,25 @@ export class LicenseManager implements ILicenseManager
 
 		if (storedLicenseKey)
 		{
-			validLicense = this.validateLicense(storedLicenseKey);
+			validLicense = await this.validateLicense(storedLicenseKey);
 		}
 
 		log.methodDone("check license", 1, "   ", false, [["valid license", validLicense]]);
 		return validLicense;
+	}
+
+
+	async enterLicenseKey()
+	{
+		const opts: InputBoxOptions = { prompt: "Enter license key" };
+		try {
+			const input = await window.showInputBox(opts);
+			if (input) {
+				return this.validateLicense(input);
+			}
+		}
+		catch (e) {}
+		return false;
 	}
 
 
@@ -108,30 +121,9 @@ export class LicenseManager implements ILicenseManager
 	// }
 
 
-	private getLicenseKey()
+	getLicenseKey()
 	{
 		return storage.get<string>("license_key");
-	}
-
-
-	private getHeaderContent(title: string)
-	{
-    	return `<!DOCTYPE html>
-<html lang="en">
-    <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExtJs Intellisense</title>
-    </head>
-    <body style="padding:20px">
-    <table>
-        <tr>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-extjs/master/res/icon.png" height="45" />
-            </td>
-            <td valign="middle" style="font-size:36px;font-weight:bold"> &nbsp;${title}</td>
-        </tr>
-    </table>`;
 	}
 
 
@@ -143,24 +135,66 @@ export class LicenseManager implements ILicenseManager
 
 	private getLicenseContent()
 	{
-		return '<table style="margin-top:15px"><tr><td>Purchase a license!!</td></tr></table>';
+		return `<table style="margin-top:15px">
+			<tr><td style="font-weight:bold;font-size:14px">
+				Licensing Note
+			</td></tr>
+			<tr><td>
+				This extension is free to use but am considering a small license for an
+				unlimited parsed component type of thing (e.g $10 - $20), as the time spent
+				and functionality have went way beyond what was at first intended.
+				<br><br>Hey Sencha, you can buy it and replace your own product if you want ;).
+			</td></tr></table>
+			<table style="margin-top:30px">
+				<tr><td>You can view a detailed parsing report using the "<i>Task Explorer: View Parsing Report</i>"
+				command in the Explorer context menu for any project.  It can alternatively be ran from the
+				command pallette for "all projects".
+				<tr><td height="20"></td></tr>
+				<tr><td>
+					<img src="https://raw.githubusercontent.com/spmeesseman/vscode-extjs/master/res/readme/ast-report.png">
+				</td></tr>
+			</table>`;
 	}
 
 
-	private getInfoContent()
+	private getInfoContent(tasks: Task[])
 	{
+		let taskCounts: any = {},
+			projects: string[] = [];
+
+		tasks.forEach((t) =>
+		{
+			if (!taskCounts[t.source]) {
+				taskCounts[t.source] = 0;
+			}
+			taskCounts[t.source]++;
+		});
+
+		if (workspace.workspaceFolders)
+		{
+			for (const wf of workspace.workspaceFolders)
+			{
+				projects.push(wf.name)
+			}
+		}
+
 		return `<table style="margin-top:15px">
 			<tr>
 				<td style="font-size:16px;font-weight:bold">
-					What's new in v3.0
+					ExtJs Intellisense has parsed ${taskCounts.length} components in
+					${projects.length} project${projects.length > 1 ? "s" : ""}.
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<ul>
-						<li></li>
-						<li></li>
-						<li></li>
+						<li>${taskCounts.length} tasks</li>
+						<li>${taskCounts.npm || "0"} NPM tasks</li>
+						<li>${taskCounts.Workspace || "0"} VSCode tasks</li>
+						<li>${taskCounts.ant || "0"} Ant tasks</li>
+						<li>${taskCounts.bash || "0"} Bash scripts</li>
+						<li>${taskCounts.batch || "0"} Batch scripts</li>
+						<li>${taskCounts.python || "0"} Python tasks</li>
 					</ul>
 				</td>
 			</tr>
@@ -169,30 +203,24 @@ export class LicenseManager implements ILicenseManager
 	}
 
 
-	private async setLicenseKey(licenseKey: string | undefined)
+	getVersion()
+	{
+		return this.version;
+	}
+
+
+	async setLicenseKey(licenseKey: string | undefined)
 	{
 		await storage.update("license_key", licenseKey);
 	}
 
 
-	async enterLicenseKey()
+	private async validateLicense(licenseKey: string)
 	{
-		const opts: InputBoxOptions = { prompt: "Enter license key" };
-		try {
-			const input = await window.showInputBox(opts);
-			if (input !== undefined)
-			{
-				await this.setLicenseKey(input);
-				return true;
-			}
+		this.licensed = !!licenseKey;
+		if (this.licensed) {
+			await this.setLicenseKey(licenseKey);
 		}
-		catch (e) {}
-		return false;
-	}
-
-
-	validateLicense(licenseKey: string)
-	{
-		return !!licenseKey;
+		return this.licensed;
 	}
 }

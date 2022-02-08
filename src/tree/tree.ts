@@ -17,7 +17,7 @@ import { visit, JSONVisitor } from "jsonc-parser";
 import { storage } from "../common/storage";
 import { rebuildCache } from "../cache";
 import { configuration } from "../common/configuration";
-import { providers, providersExternal } from "../extension";
+import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
 import { TaskExplorerDefinition } from "../interface";
 
@@ -413,7 +413,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // Set scope name and create the TaskFolder, a "user" task will have a TaskScope scope, not
         // a WorkspaceFolder scope.
         //
-        if (this.isWorkspaceFolder(each.scope))
+        if (util.isWorkspaceFolder(each.scope))
         {
             scopeName = each.scope.name;
             folder = folders.get(scopeName);
@@ -1004,12 +1004,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         let waited = 0;
         let items: any = [];
+        const firstRun = this.name === "taskExplorer" && !this.tasks && !this.taskTree;
 
         log.methodStart("get tree children", logLevel, logPad, false, [
             [ "task folder", element?.label ], [ "all tasks need to be retrieved", !this.tasks ],
             [ "specific tasks need to be retrieved", !!this.currentInvalidation ],
             [ "current invalidation", this.currentInvalidation ],
-            [ "task tree needs to be built", !this.taskTree ]
+            [ "task tree needs to be built", !this.taskTree ], ["first run", firstRun]
         ]);
 
         //
@@ -1121,6 +1122,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             {
                 items = this.taskTree;
             }
+        }
+
+        if (firstRun && this.tasks)
+        {   //
+            // Initialize license manager
+            // TODO - This gets enabled when licensing goes into effect
+            //
+            // await getLicenseManager().initialize(this.tasks);
         }
 
         log.methodDone("get tree children", logLevel, logPad);
@@ -1312,7 +1321,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                         {
                             let tPath: string;
 
-                            if (me.isWorkspaceFolder(item3)) {
+                            if (util.isWorkspaceFolder(item3)) {
                                 tPath = item3.task.definition.uri ? item3.task.definition.uri.fsPath :
                                     (item3.task.definition.path ? item3.task.definition.path : "root");
                             }
@@ -1400,6 +1409,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return taskMap.get(taskId);
         }
         return taskMap;
+    }
+
+
+    public getTasks()
+    {
+        return this.tasks;
     }
 
 
@@ -1736,7 +1751,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //     watch - tsconfig.json
         //     watch - .vscode-test\vscode-1.32.3\resources\app\tsconfig.schema.json
         //
-        if (task.source === "tsc" && this.isWorkspaceFolder(task.scope))
+        if (task.source === "tsc" && util.isWorkspaceFolder(task.scope))
         {
             if (task.name.indexOf(" - ") !== -1 && task.name.indexOf(" - tsconfig.json") === -1)
             {
@@ -1764,7 +1779,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         const srcEnabled = configuration.get(util.getTaskTypeEnabledSettingName(task.source)),
               isNpmInstallTask = this.isNpmInstallTask(task);
-        if ((srcEnabled || !this.isWorkspaceFolder(task.scope)) && !isNpmInstallTask)
+        if ((srcEnabled || !util.isWorkspaceFolder(task.scope)) && !isNpmInstallTask)
         {
             return true;
         }
@@ -1781,12 +1796,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private isWorkspaceFolder(value: any): value is WorkspaceFolder
-    {
-        return value && typeof value !== "number";
-    }
-
-
     private logTask(task: Task, scopeName: string, logPad: string)
     {
         const definition = task.definition;
@@ -1799,7 +1808,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         log.value("   name", task.name, 3, logPad);
         log.value("   source", task.source, 3, logPad);
         log.value("   scope name", scopeName, 4, logPad);
-        if (this.isWorkspaceFolder(task.scope))
+        if (util.isWorkspaceFolder(task.scope))
         {
             log.value("   scope.name", task.scope.name, 4, logPad);
             log.value("   scope.uri.path", task.scope.uri.path, 4, logPad);

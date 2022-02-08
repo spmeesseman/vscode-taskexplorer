@@ -117,6 +117,82 @@ export function getGlobPattern(taskType: string): string
 }
 
 
+export function getHeaderContent(title: string)
+{
+    return `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Explorer</title>
+  </head>
+  <body style="padding:20px">
+    <table>
+        <tr>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/gears-r-colors.png" height="50" />
+            </td>
+            <td valign="middle" style="font-size:40px;font-weight:bold"> &nbsp;${title}</td>
+        </tr>
+        </table>
+        <table style="margin-top:15px">
+        <tr>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/npm.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ant.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/yarn.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/grunt.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/gulp.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/php.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/workspace.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/make.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ts.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bat.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ruby.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/powershell.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bash.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/python.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/nsis.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/perl.png" />
+            </td>
+            <td>
+                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/maven.png" />
+            </td>
+        </tr>
+    </table>`;
+}
+
+
 export function getPortableDataPath(padding = "")
 {
     if (process.env.VSCODE_PORTABLE)
@@ -266,6 +342,17 @@ function getDefaultUserDataPath(platform?: string)
 }
 
 
+export function getWorkspaceProjectName(fsPath: string)
+{
+     let project = path.basename(fsPath);
+     const wsf = workspace.getWorkspaceFolder(Uri.file(fsPath));
+     if (wsf) {
+         project = path.basename(wsf.uri.fsPath);
+     }
+     return project;
+}
+
+
 export function isExcluded(uriPath: string, logPad = "")
 {
     function testForExclusionPattern(path: string, pattern: string): boolean
@@ -311,6 +398,12 @@ export function isSpecial(taskItem: TaskItem)
 export function isWatchTask(source: string)
 {
     return [ "npm", "tsc", "workspace", "Workspace" ].includes(source);
+}
+
+
+export function isWorkspaceFolder(value: any): value is WorkspaceFolder
+{
+    return value && typeof value !== "number";
 }
 
 

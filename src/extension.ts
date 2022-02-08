@@ -5,6 +5,7 @@ import * as cache from "./cache";
 import * as log from "./common/log";
 import constants from "./common/constants";
 import registerEnterLicenseCommand from "./commands/enterLicense";
+import registerViewReportCommand from "./commands/viewReport";
 import { views } from "./views";
 import { TaskTreeDataProvider } from "./tree/tree";
 import { AntTaskProvider } from "./providers/ant";
@@ -31,10 +32,8 @@ import {
 import { LicenseManager } from "./lib/licenseManager";
 
 
-let teApi: TaskExplorerApi,
-    hasLicense: boolean,
-    licenseManager: ILicenseManager;
-
+export let teApi: TaskExplorerApi;
+let licenseManager: ILicenseManager;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
 export const providers: Map<string, TaskExplorerProvider> = new Map();
@@ -411,6 +410,7 @@ export async function refreshTree(taskType?: string, uri?: Uri)
 function registerCommands(context: ExtensionContext)
 {
     registerEnterLicenseCommand(context);
+    registerViewReportCommand(context);
     //
     // Register GetAPI task
     //
