@@ -117,6 +117,20 @@ export async function cleanup()
 }
 
 
+export async function closeActiveDocuments()
+{
+	try {
+		// while (window.activeTextEditor) {
+			await commands.executeCommand("workbench.action.closeActiveEditor");
+		// }
+	}
+	catch (e) {
+		console.error(e);
+	}
+	// await waitForValidation();
+}
+
+
 export async function executeTeCommand(command: string, timeout: number, ...args: any[])
 {
     try {
@@ -324,6 +338,12 @@ export function spawn(command: string, args?: string[], options?: cp.SpawnOption
     // });
 
     return proc;
+}
+
+
+export async function testCommand(command: string, ...args: any[])
+{
+	return commands.executeCommand("taskExplorer." + command, ...args);
 }
 
 
