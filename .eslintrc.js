@@ -137,6 +137,17 @@ module.exports = {
         ],
         "@typescript-eslint/type-annotation-spacing": "warn",
         "@typescript-eslint/unified-signatures": "warn",
+        "array-bracket-spacing": [ 
+            1, "always",
+            {
+                "objectsInArrays": false,
+                "arraysInArrays": false,
+                "singleValue": true
+            }
+        ],
+        "array-bracket-newline": [
+            0, { "multiline": true, "minItems": 8 }
+        ],
         "arrow-body-style": "off",
         "arrow-parens": [
             "off",
@@ -158,7 +169,8 @@ module.exports = {
             "warn",
             "always"
         ],
-        "guard-for-in": "off",
+        "guard-for-in": "error",
+        "no-prototype-builtins": "warn",
         "id-blacklist": [
             "warn",
             "any",
