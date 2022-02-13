@@ -191,7 +191,19 @@ module.exports = {
             }
         ],
         "import/no-internal-modules": "off",
-        "import/order": "off",
+        "import/order": "off","indent": [
+            "warn", 4,
+            {
+                "ArrayExpression": "off",
+                "ObjectExpression": "off",
+                "CallExpression": {"arguments": "off"},
+                "MemberExpression": 0,
+                "FunctionExpression": {"parameters": "first"},
+                "ignoredNodes": ["ConditionalExpression"],
+                "flatTernaryExpressions": false,
+                "VariableDeclarator": { "var": 1, "let": 1, "const": 1.5 }
+            }
+        ],
         "jsdoc/check-alignment": "warn",
         "jsdoc/check-indentation": "off",
         "jsdoc/newline-after-description": "warn",
