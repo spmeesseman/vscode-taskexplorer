@@ -11,6 +11,7 @@ dist/**/*.map
 src
 **/test/**
 coverage
+.coverage
 test-files
 testFixture
 *.yml
