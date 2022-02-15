@@ -191,8 +191,9 @@ module.exports = {
             }
         ],
         "import/no-internal-modules": "off",
-        "import/order": "off","indent": [
-            "warn", 4,
+        "import/order": "off",
+        "indent": [
+            "off", 4,
             {
                 "ArrayExpression": "off",
                 "ObjectExpression": "off",
@@ -201,7 +202,7 @@ module.exports = {
                 "FunctionExpression": {"parameters": "first"},
                 "ignoredNodes": ["ConditionalExpression"],
                 "flatTernaryExpressions": false,
-                "VariableDeclarator": { "var": 1, "let": 1, "const": 1.5 }
+                "VariableDeclarator": { "var": 1, "let": 1, "const": 1 }
             }
         ],
         "jsdoc/check-alignment": "warn",
