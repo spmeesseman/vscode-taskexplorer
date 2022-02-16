@@ -5,18 +5,17 @@ import { OutputChannel, ExtensionContext, commands, window } from "vscode";
 import { writeFileSync } from "fs";
 
 
-
-export enum LogColor
-{
-    black = "\\u001b[30m",
-    red = "\\u001b[31",
-    green = "\\u001b[32m",
-    yellow = "\\u001b[33m",
-    blue = "\\u001b[34m", // "<span style=\"color:blue\">"  "</style>"
-    magenta = "\\u001b[35",
-    cyan = "\\u001b[36m",
-    white = "\\u001b[37m"
-}
+// export enum LogColor
+// {
+//     black = "\\u001b[30m",
+//     red = "\\u001b[31",
+//     green = "\\u001b[32m",
+//     yellow = "\\u001b[33m",
+//     blue = "\\u001b[34m", // "<span style=\"color:blue\">"  "</style>"
+//     magenta = "\\u001b[35",
+//     cyan = "\\u001b[36m",
+//     white = "\\u001b[37m"
+// }
 
 
 const logValueWhiteSpace = 40;
@@ -24,6 +23,7 @@ let writeToConsole = false;
 let writeToConsoleLevel = 2;
 let writeToFile = false;
 let writeToFileLevel = 2;
+let lastWriteWasBlank = false;
 let logOutputChannel: OutputChannel | undefined;
 
 
@@ -102,7 +102,7 @@ export function isLoggingEnabled()
 }
 
 
-export function methodStart(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][], color?: LogColor)
+export function methodStart(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][]) // , color?: LogColor)
 {
     if (isLoggingEnabled())
     {
@@ -110,10 +110,10 @@ export function methodStart(msg: string, level?: number, logPad = "", doLogBlank
         if (doLogBlank === true) {
             blank(lLevel);
         }
-        write(logPad + "*start* " + msg, lLevel, color);
+        write(logPad + "*start* " + msg, lLevel); // , color);
         if (params)
         {
-            for (const [ n, v] of params) {
+            for (const [ n, v ] of params) {
                 value("   " + n, v, lLevel + 1, logPad);
             }
         }
@@ -131,11 +131,11 @@ export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?
         }
         if (params)
         {
-            for (const [ n, v] of params) {
+            for (const [ n, v ] of params) {
                 value("   " + n, v, lLevel + 1, logPad);
             }
         }
-        write("*done* " + msg, lLevel, logPad, LogColor.cyan);
+        write("*done* " + msg, lLevel, logPad); // , LogColor.cyan);
     }
 }
 
@@ -186,15 +186,19 @@ export function values(level: number, logPad: string, params: any | (string|any)
         if (doLogBlank === true) {
             blank(level);
         }
-        for (const [ n, v] of params) {
+        for (const [ n, v ] of params) {
             value(n, v, level, logPad);
         }
     }
 }
 
 
-export function write(msg: string, level?: number, logPad = "", color?: LogColor)
+export function write(msg: string, level?: number, logPad = "") // , color?: LogColor)
 {
+    if (msg === null || msg === undefined || (lastWriteWasBlank && msg === "")) {
+        return;
+    }
+
     if (isLoggingEnabled())
     {
         // if (color) {
@@ -214,5 +218,6 @@ export function write(msg: string, level?: number, logPad = "", color?: LogColor
                 writeFileSync("taskexplorer.log", tsMsg);
             }
         }
+        lastWriteWasBlank = msg === "";
     }
 }
