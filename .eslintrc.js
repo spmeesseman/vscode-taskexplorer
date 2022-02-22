@@ -208,6 +208,7 @@ module.exports = {
         "jsdoc/check-alignment": "warn",
         "jsdoc/check-indentation": "off",
         "jsdoc/newline-after-description": "warn",
+        "key-spacing":"warn",
         "linebreak-style": "off",
         "max-classes-per-file": "off",
         "max-len": "off",
