@@ -133,18 +133,18 @@ export async function closeActiveDocuments()
 
 export async function executeTeCommand(command: string, timeout: number, ...args: any[])
 {
-    try {
+    // try {
         const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
         if (timeout) { await sleep(timeout); }
         return rc;
-    }
-    catch (e: any) {
-        console.log("✘");
-        console.log("✘ Error running TE command");
-        console.log("✘    Skipping fail, continuing...");
-        console.log("✘ " + e.toString());
-        console.log("✘");
-    }
+    // }
+    // catch (e: any) {
+    //     console.log("✘");
+    //     console.log("✘ Error running TE command");
+    //     console.log("✘    Skipping fail, continuing...");
+    //     console.log("✘ " + e.toString());
+    //     console.log("✘");
+    // }
 }
 
 

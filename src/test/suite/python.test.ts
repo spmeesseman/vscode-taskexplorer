@@ -50,7 +50,7 @@ suite("Python Tests", () =>
     });
 
 
-    suiteTeardown(async() =>
+    suiteTeardown(async function()
     {   //
         // Reset settings
         //
@@ -59,14 +59,14 @@ suite("Python Tests", () =>
     });
 
 
-    test("Document Position", async () =>
+    test("Document Position", async function()
     {
         const provider = teApi.providers.get("script") as ScriptTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
     });
 
 
-    test("Invalid Script Type", async () =>
+    test("Invalid Script Type", async function()
     {
         const provider = teApi.providers.get("script") as ScriptTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.py"))),
@@ -74,7 +74,7 @@ suite("Python Tests", () =>
     });
 
 
-    test("Disable", async () =>
+    test("Disable", async function()
     {
         let cTasks = await tasks.fetchTasks({ type: "script" });
         assert(cTasks && cTasks.filter(t => t.source === testsName).length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
@@ -87,7 +87,7 @@ suite("Python Tests", () =>
     });
 
 
-    test("Re-enable", async () =>
+    test("Re-enable", async function()
     {
         await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
@@ -98,7 +98,7 @@ suite("Python Tests", () =>
     });
 
 
-    test("Create File", async () =>
+    test("Create File", async function()
     {
         if (!fs.existsSync(dirName)) {
             fs.mkdirSync(dirName, { mode: 0o777 });
@@ -163,7 +163,7 @@ suite("Python Tests", () =>
     // });
 
 
-    test("Delete file", async () =>
+    test("Delete file", async function()
     {
         fs.unlinkSync(fileUri.fsPath);
         fs.rmdirSync(dirName, {

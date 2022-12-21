@@ -1,3 +1,5 @@
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as assert from "assert";
 import { ILicenseManager } from "../../interface/licenseManager";
@@ -5,10 +7,11 @@ import { storage } from "../../common/storage";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { getLicenseManager } from "../../extension";
+import { waitForCache } from "../../cache";
 import { Task } from "vscode";
 import {
 	activate, closeActiveDocuments, isReady, overrideNextShowInfoBox,
-	overrideNextShowInputBox, sleep, testCommand
+	overrideNextShowInputBox, sleep, testCommand, executeTeCommand
 } from "../helper";
 
 
@@ -25,17 +28,24 @@ suite("License Manager Tests", () =>
 	{
 		teApi = await activate(this);
         assert(isReady("make") === true, "    ✘ TeApi not ready");
-		await testCommand("focus");
+		await executeTeCommand("focus", 1000);
 	});
 
 
-	suiteTeardown(async () =>
+	suiteTeardown(async function()
     {
 		await closeActiveDocuments();
 	});
 
 
-	test("Open lLicense Manager", async () =>
+    test("Refresh", async function()
+    {
+        await executeTeCommand("refresh", 1000);
+		await waitForCache();
+    });
+
+
+	test("Open License Manager", async function()
 	{
 		await sleep(1000);
 		licMgr = getLicenseManager();
@@ -43,7 +53,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Open welcome page", async () =>
+	test("Open welcome page", async function()
 	{
 		const licenseKey = licMgr.getLicenseKey(),
 			  version = licMgr.getVersion(); // will be set on ext. startup
@@ -94,7 +104,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("License info", async () =>
+	test("License info", async function()
 	{
 		const licenseKey = licMgr.getLicenseKey(); // will be set on ext. startup
 		licMgr.setLicenseKey(undefined);
@@ -106,7 +116,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("License not now", async () =>
+	test("License not now", async function()
 	{
 		const licenseKey = licMgr.getLicenseKey(); // will be set on ext. startup
 		licMgr.setLicenseKey(undefined);
@@ -118,7 +128,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Enter license key on startup", async () =>
+	test("Enter license key on startup", async function()
 	{
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("1111-2222-3333-4444-5555");
@@ -132,7 +142,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Multi projects startup", async () =>
+	test("Multi projects startup", async function()
 	{
 
 		// if (await pathExists(getProjectPath("extjs-pkg-server")))

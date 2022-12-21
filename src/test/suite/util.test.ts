@@ -216,7 +216,7 @@ suite("Util Tests", () =>
     });
 
 
-	test("Data paths", async () =>
+	test("Data paths", async function()
 	{   //
 		// The fs module on dev test will run through win32 path get.  Simulate
 		// path get here for linux and mac for increased coverage since we're only

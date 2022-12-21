@@ -47,7 +47,7 @@ suite("Composer Tests", () =>
     });
 
 
-    suiteTeardown(async() =>
+    suiteTeardown(async function()
     {   //
         // Reset settings
         //
@@ -56,7 +56,7 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Document Position", async () =>
+    test("Document Position", async function()
     {
         const provider = teApi.providers.get(testsName) as ComposerTaskProvider;
         // provider.readTasks();
@@ -66,14 +66,14 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Start", async () =>
+    test("Start", async function()
     {
         const cTasks = await tasks.fetchTasks({ type: testsName });
         assert(cTasks && cTasks.length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
     });
 
 
-    test("Disable", async () =>
+    test("Disable", async function()
     {
         await configuration.updateWs(`enable${testsNameProper}`, false);
         await sleep(500);
@@ -84,7 +84,7 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Re-enable", async () =>
+    test("Re-enable", async function()
     {
         await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
@@ -94,7 +94,7 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Create file", async () =>
+    test("Create file", async function()
     {
         if (!fs.existsSync(dirName)) {
             fs.mkdirSync(dirName, { mode: 0o777 });
@@ -120,7 +120,7 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Add task to file", async () =>
+    test("Add task to file", async function()
     {
         fs.writeFileSync(
             fileUri.fsPath,
@@ -144,7 +144,7 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Remove task from file", async () =>
+    test("Remove task from file", async function()
     {
         fs.writeFileSync(
             fileUri.fsPath,
@@ -166,7 +166,7 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Invalid JSON", async () =>
+    test("Invalid JSON", async function()
     {
         fs.writeFileSync(
             fileUri.fsPath,
@@ -189,7 +189,7 @@ suite("Composer Tests", () =>
 
 
 
-    test("Delete file", async () =>
+    test("Delete file", async function()
     {
         fs.unlinkSync(fileUri.fsPath);
         fs.rmdirSync(dirName, {

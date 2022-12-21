@@ -73,7 +73,7 @@ suite("NPM Tests", () =>
     });
 
 
-    test("Document Position", async () =>
+    test("Document Position", async function()
     {
         for (const taskItem of npmTaskItems) {
             await executeTeCommand("open", 500, taskItem);

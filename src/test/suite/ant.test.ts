@@ -48,7 +48,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Document Position", async () =>
+    test("Document Position", async function()
     {
         const xml = util.readFileSync(buildXmlFileUri.fsPath);
         provider.getDocumentPosition(undefined, undefined);
@@ -60,14 +60,14 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Start", async () =>
+    test("Start", async function()
     {
         await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("ant", 3);
     });
 
 
-    test("Disable", async () =>
+    test("Disable", async function()
     {
         await configuration.updateWs(`enable${testsNameProper}`, false);
         await sleep(500);
@@ -77,7 +77,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Re-enable", async () =>
+    test("Re-enable", async function()
     {
         await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
@@ -86,7 +86,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Non-existent file", async () =>
+    test("Non-existent file", async function()
     {
         await provider.readUriTasks(Uri.file(getWsPath("build2.xml")), "");
         await configuration.updateWs("useAnt", true);
@@ -95,7 +95,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ansicon", async () =>
+    test("Ansicon", async function()
     {
         //
         // Enable Ansicon
@@ -127,7 +127,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Win32 create task", async () =>
+    test("Win32 create task", async function()
     {
         await configuration.updateWs("pathToAnt", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -136,7 +136,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Non-Win32 create task", async () =>
+    test("Non-Win32 create task", async function()
     {
         // const platform = process.platform;
         // eslint-disable-next-line @typescript-eslint/dot-notation
@@ -148,14 +148,14 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant parser", async () =>
+    test("Ant parser", async function()
     {
         await configuration.updateWs("pathToAnt", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2);
     });
 
 
-    test("Ant parser no default", async () =>
+    test("Ant parser no default", async function()
     {
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
@@ -169,7 +169,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant parser invalid target", async () =>
+    test("Ant parser invalid target", async function()
     {
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
@@ -185,7 +185,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant parser no target", async () =>
+    test("Ant parser no target", async function()
     {
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
@@ -198,7 +198,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant parser no project", async () =>
+    test("Ant parser no project", async function()
     {
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
@@ -211,7 +211,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant parser invalid xml", async () =>
+    test("Ant parser invalid xml", async function()
     {
         fs.writeFileSync(
             buildXmlFileUri.fsPath,

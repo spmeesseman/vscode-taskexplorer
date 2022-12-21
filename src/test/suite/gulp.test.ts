@@ -34,7 +34,7 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Document Position", async () =>
+    test("Document Position", async function()
     {
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
@@ -42,13 +42,13 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Start", async () =>
+    test("Start", async function()
     {
         await verifyTaskCount("gulp", 17);
     });
 
 
-    test("Disable", async () =>
+    test("Disable", async function()
     {
         await configuration.updateWs(`enable${testsNameProper}`, false);
         await sleep(500);
@@ -58,7 +58,7 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Re-enable", async () =>
+    test("Re-enable", async function()
     {
         await configuration.updateWs(`enable${testsNameProper}`, true);
         await sleep(500);
@@ -67,7 +67,7 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Create file", async () =>
+    test("Create file", async function()
     {
         if (!fs.existsSync(dirName)) {
             fs.mkdirSync(dirName, { mode: 0o777 });
@@ -92,7 +92,7 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Add task to file", async () =>
+    test("Add task to file", async function()
     {
         fs.writeFileSync(
             fileUri.fsPath,
@@ -117,7 +117,7 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Remove task from file", async () =>
+    test("Remove task from file", async function()
     {
         fs.writeFileSync(
             fileUri.fsPath,
@@ -134,7 +134,7 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Delete file", async () =>
+    test("Delete file", async function()
     {
         fs.unlinkSync(fileUri.fsPath);
         fs.rmdirSync(dirName, {
@@ -146,7 +146,7 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Gulp Parser", async () =>
+    test("Gulp Parser", async function()
     {
         const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
               gulpFile = getWsPath("gulp\\gulpfile.js");

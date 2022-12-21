@@ -136,7 +136,7 @@ suite("Provider Tests", () =>
     });
 
 
-    suiteTeardown(async () =>
+    suiteTeardown(async function()
     {
         if (tempFiles.length)
         {

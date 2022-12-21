@@ -30,7 +30,7 @@ suite("Makefile Tests", () =>
     });
 
 
-    test("Document Position", async () =>
+    test("Document Position", async function()
     {
         // provider.readTasks();
         let index = provider.getDocumentPosition(undefined, undefined);
@@ -53,7 +53,7 @@ suite("Makefile Tests", () =>
     });
 
 
-    test("Path to make", async () =>
+    test("Path to make", async function()
     {
         const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
               filePath = getWsPath(path.join("make", "makefile")),
