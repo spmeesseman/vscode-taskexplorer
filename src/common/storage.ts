@@ -21,11 +21,6 @@ class Storage
         this.storage = storageMemento;
     }
 
-    public keys(): string[]
-    {
-        return [ "vscode-taskexplorer" ];
-    }
-
     public get<T>(key: string, defaultValue?: T): T | undefined
     {
         if (defaultValue)
