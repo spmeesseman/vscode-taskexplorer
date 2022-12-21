@@ -10,12 +10,12 @@
     "deployCommand":            "npx vsce publish",
     "deployPostCommand":        "${CODE_HOME}\\git\\bin\\bash.exe tools/codecov.sh -t ${CODECOV_TOKEN}",
     "githubAssets": [
-        "CHANGELOG.md",
-        "vscode-taskexplorer-$(VERSION).vsix"
+        "CHANGELOG.md|Changelog File",
+        "vscode-taskexplorer-$(VERSION).vsix|VSIX Installer"
     ],
     "githubRelease":            "Y",
     "githubReleasePreCommand":  "npx vsce package",
-    "githubReleasePostCommand": "npx rimraf *.vsix",
+    "githubReleasePostCommand": "npx rimraf \"*.vsix\"",
     "githubUser":               "spmeesseman",
     "promptVersion":            "N",
     "repo":                     "https://github.com/spmeesseman/vscode-taskexplorer.git",
