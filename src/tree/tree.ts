@@ -918,7 +918,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const documentText = document.getText();
 
         log.methodStart("find task definition document position", 1, "", true,
-            [ [ "task label", taskItem.label], [ "task source", taskItem.taskSource] ]
+            [[ "task label", taskItem.label ], [ "task source", taskItem.taskSource ]]
         );
 
         const def = taskItem.task.definition;
@@ -1425,7 +1425,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     {
         if (relativePath && relativePath.length)
         {
-            return `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
+            if (relativePath.endsWith("/") || relativePath.endsWith("\\")) {
+                return `${script} - ${relativePath.substring(0, relativePath.length - 1)}`;
+            }
+            else {
+                return `${script} - ${relativePath}`;
+            }
         }
         return script;
     }
