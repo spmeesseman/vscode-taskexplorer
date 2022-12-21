@@ -3,11 +3,8 @@
 /* tslint:disable */
 
 import * as assert from "assert";
-import * as vscode from "vscode";
-import constants from "../../common/constants";
-import { commands, tasks } from "vscode";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeTeCommand, initSettings, isReady, sleep } from "../helper";
+import { activate, executeTeCommand, initSettings, isReady, sleep, testCommand } from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -22,10 +19,16 @@ suite("API Init and Tests", () =>
     });
 
 
+    test("Show view", async function()
+    {
+		await testCommand("focus");
+    });
+
+
     test("Show log", async function()
     {
-        await vscode.commands.executeCommand("taskExplorer.showOutput", false);
-        await vscode.commands.executeCommand("taskExplorer.showOutput", true);
+        await testCommand("showOutput", false);
+        await testCommand("showOutput", true);
     });
 
 

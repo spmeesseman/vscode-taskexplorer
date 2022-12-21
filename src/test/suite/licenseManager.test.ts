@@ -1,12 +1,15 @@
 
 import * as assert from "assert";
-import { activate, closeActiveDocuments, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, sleep } from "../helper";
 import { ILicenseManager } from "../../interface/licenseManager";
 import { storage } from "../../common/storage";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
+import {
+	activate, closeActiveDocuments, isReady, overrideNextShowInfoBox,
+	overrideNextShowInputBox, sleep, testCommand
+} from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -22,14 +25,21 @@ suite("License Manager Tests", () =>
 	{
 		teApi = await activate(this);
         assert(isReady("make") === true, "    ✘ TeApi not ready");
-		licMgr = getLicenseManager();
-		tasks = teApi.explorer.getTasks();
+		await testCommand("focus");
 	});
 
 
 	suiteTeardown(async () =>
     {
 		await closeActiveDocuments();
+	});
+
+
+	test("Open lLicense Manager", async () =>
+	{
+		await sleep(1000);
+		licMgr = getLicenseManager();
+		tasks = teApi.explorer.getTasks();
 	});
 
 

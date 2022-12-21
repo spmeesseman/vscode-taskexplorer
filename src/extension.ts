@@ -126,8 +126,8 @@ export async function addWsFolder(wsf: readonly WorkspaceFolder[] | undefined)
     {
         for (const f in wsf)
         {
-            if (wsf.hasOwnProperty(f)) { // skip over properties inherited by prototype
-                log.methodStart("workspace folder added", 1, "", true, [["name", wsf[f].name]]);
+            if ([].hasOwnProperty.call(wsf, f)) { // skip over properties inherited by prototype
+                log.methodStart("workspace folder added", 1, "", true, [[ "name", wsf[f].name ]]);
                 await cache.addFolderToCache(wsf[f], "   ");
                 log.methodDone("workspace folder added", 1, "");
             }
