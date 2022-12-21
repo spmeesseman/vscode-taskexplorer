@@ -16,7 +16,7 @@ async function enterLicense(logPad = "   ", timeout = 45000, logLevel = 3)
 function registerEnterLicenseCommand(context: ExtensionContext)
 {
 	context.subscriptions.push(
-        commands.registerCommand("vscode-extjs:enterLicense", async (logPad?: string, timeout?: number, logLevel?: number) => { await enterLicense(logPad, timeout, logLevel); })
+        commands.registerCommand("taskExplorer.enterLicense", async (logPad?: string, timeout?: number, logLevel?: number) => { await enterLicense(logPad, timeout, logLevel); })
     );
 }
 
