@@ -233,7 +233,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         }
         const paths = pathValue.split(",");
         for (const s in paths) {
-            if (paths.hasOwnProperty(s)) { // skip properties inherited from prototype
+            if ({}.hasOwnProperty.call(paths, s)) { // skip properties inherited from prototype
                 util.pushIfNotExists(excludes, paths[s]);
             }
         }
