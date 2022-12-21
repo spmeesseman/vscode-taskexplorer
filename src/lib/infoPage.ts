@@ -51,12 +51,12 @@ function getBodyContent(logPad: string, logLevel: number, uri?: Uri)
 
 	let details = `<table style="margin-top:15px" width="97%" align="center">
 	<tr style="font-size:16px;font-weight:bold">
-		<td style="padding-right:20px">Source</td>
-		<td style="padding-right:20px">Name</td>
-		<td style="padding-right:20px">Project</td>
-		<td style="padding-right:20px">Default</td>
-		<td style="padding-right:20px">Provider</td>
-		<td style="padding-right:20px">File</td>
+		<td style="padding-right:20px" nowrap>Source</td>
+		<td style="padding-right:20px" nowrap>Name</td>
+		<td style="padding-right:20px" nowrap>Project</td>
+		<td style="padding-right:20px" nowrap>Default</td>
+		<td style="padding-right:20px" nowrap>Provider</td>
+		<td style="padding-right:20px" nowrap>File</td>
 	</tr><tr><td colspan="6"><hr></td></tr>`;
 
 	const tasks = teApi.explorer.getTasks().filter((t: Task) => !project || (isWorkspaceFolder(t.scope) && 
@@ -65,21 +65,52 @@ function getBodyContent(logPad: string, logLevel: number, uri?: Uri)
 
 	tasks.forEach((t: Task) =>
 	{
-		const wsFolder = t.scope as WorkspaceFolder;
-		project = project || getWorkspaceProjectName(wsFolder.uri.fsPath);
+		let wsFolder;
+		if (isWorkspaceFolder(t.scope))
+		{
+			wsFolder = t.scope as WorkspaceFolder;
+			project = project || getWorkspaceProjectName(wsFolder.uri.fsPath);
+		}
+		else {
+			project = "User";
+		}
+
+		let filePath = "N/A";
+		if (t.definition.uri)
+		{
+			if (wsFolder) {
+				filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.definition.uri.fsPath)
+			}
+			else {
+				filePath = t.definition.uri.fsPath;
+			}
+		}
+		else if (wsFolder)
+		{
+			filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.name)
+		}
+		else if (t.definition.path)
+		{
+			filePath = t.definition.path;
+		}
 
 		details += `
 	<tr style="font-size:12px">
 		<td valign="top" style="font-size:14px;font-decoration:italic;padding-right:20px" nowrap>${t.source}</td>
-		<td valign="top" style="padding-right:20px">${t.name}</td>
-		<td valign="top" style="padding-right:20px">${project}</td>
-		<td valign="top" style="padding-right:20px">${t.definition.isDefault || "N/A"}</td>
-		<td valign="top" style="padding-right:20px">${t.source}</td>
-		<td valign="top" style="padding-right:20px">${wsFolder ? path.relative(path.dirname(wsFolder.uri.fsPath), t.name) : "N/A"}</td>
+		<td valign="top" style="padding-right:20px" nowrap>${t.name}</td>
+		<td valign="top" style="padding-right:20px" nowrap>${project}</td>
+		<td valign="top" style="padding-right:20px" nowrap>${t.definition.isDefault || "N/A"}</td>
+		<td valign="top" style="padding-right:20px" nowrap>${t.source}</td>
+		<td valign="top" style="padding-right:20px" nowrap>${filePath}</td>
 	</tr>
 	<tr><td height="10"></td></tr>`;
 
-		pushIfNotExists(projects, wsFolder?.name);
+		if (wsFolder) {
+			pushIfNotExists(projects, wsFolder?.name);
+		}
+		else {
+			pushIfNotExists(projects, "User");
+		}
 	});
 
 	details += "</table>"

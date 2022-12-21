@@ -145,14 +145,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         for (const i in renames)
         {
-            if (id === renames[i][0])
+            if ([].hasOwnProperty.call(renames, i))
             {
-                addRemoved = true;
-                removed = true;
-                renames.splice(index, 1);
-                break;
+                if (id === renames[i][0])
+                {
+                    addRemoved = true;
+                    removed = true;
+                    renames.splice(index, 1);
+                    break;
+                }
+                ++index;
             }
-            ++index;
         }
 
         if (!addRemoved)
