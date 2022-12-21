@@ -1,5 +1,16 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.11.0 (December 21st, 2022)
+
+### Bug Fixes
+
+- last release is inoperable.
+
+### Features
+
+- add new setting 'excludeTask', an array of regex pattern strings that can be used to ignore / exclude specific task names globally.   Available in the context menus as well as editing the VSCode settings manually. [Closes #178]
+- fix(commands) clicking on a task to open the src file does not scroll to the task name in package.json files that are not located in the root project workspace folder.
+
 ## Version 2.10.0 (December 21st, 2022)
 
 ### Bug Fixes
