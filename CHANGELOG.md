@@ -1,5 +1,31 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.10.0 (December 21st, 2022)
+
+### Bug Fixes
+
+- **Reporting:** parsing report fails if there are User type workspace tasks.
+- **Logging:** correct log blank line functionality
+
+### Documentation
+
+- **Readme:** update title
+- **Readme:** update vs marketplace svg badges as all of a sudden microsoft decides to fail releases because of a GD img path.
+
+### Features
+
+- add parsing report available from the command pallette (for all projects) or the Explorer context menu (per project).
+
+### Refactoring
+
+- add 'obj' and 'Assets' to list of default exclude paths
+- some commands should not be avail in cmd pallette
+
+### Build System
+
+- update ap publishrc file to latest ap format.
+- move build system to webpack v5.68.0 and update all webpack dependencies to support NodeJS 17 environment.  Also eliminates 3 dev dependency security vulnerabilities in webpack v4 unfixable by npm audit.
+
 ## Version 2.9.1 (February 4th, 2022)
 
 ### Bug Fixes
