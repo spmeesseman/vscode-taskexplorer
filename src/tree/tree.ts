@@ -185,11 +185,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async addToExcludes(selection: TaskFile | string)
+    private async addToExcludes(selection: TaskFile | TaskItem | string)
     {
         const me = this;
         let pathValue = "";
         let uri: Uri | undefined;
+        let excludesList = "exclude";
 
         log.methodStart("add to excludes", 1, "", true, [[ "global", global ]]);
 
@@ -217,6 +218,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 pathValue = uri.path;
             }
         }
+        else if (selection instanceof TaskItem)
+        {
+            if (util.isScriptType(selection.taskSource))
+            {
+                if (selection.resourceUri) {
+                    log.value("  file glob", selection.resourceUri.path);
+                    pathValue = selection.resourceUri.path;
+                }
+                else if (selection.taskFile) {
+                    log.value("  file glob", selection.taskFile.resourceUri.path);
+                    pathValue = selection.taskFile.resourceUri.path;
+                }
+            }
+            else {
+                excludesList = "excludeTask";
+                pathValue = selection.task.name;
+            }
+        }
         else {
             pathValue = selection;
         }
@@ -227,7 +246,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         log.value("   path value", pathValue, 2);
 
         let excludes: string[] = [];
-        const excludes2 = configuration.get<string[]>("exclude");
+        const excludes2 = configuration.get<string[]>(excludesList);
         if (excludes2 && excludes2 instanceof Array) {
             excludes = excludes2;
         }
@@ -241,8 +260,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         }
 
-        configuration.updateWs("exclude", excludes);
-        // configuration.update("exclude", excludes);
+        configuration.updateWs(excludesList, excludes);
+        // configuration.update(excludesList, excludes);
 
         await me.refresh(selection instanceof TaskFile ? selection.taskSource : false, uri);
 
@@ -1778,6 +1797,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         if (providersExternal.get(task.source)) {
             return !!task.definition && !!task.name && !!task.execution;
+        }
+
+        //
+        // Check task excludes array
+        //
+        const excludeTask = configuration.get<string[]>("excludeTask");
+        if (excludeTask && excludeTask.length > 0)
+        {
+            for (const rgxPattern of excludeTask) {
+                if ((new RegExp(rgxPattern)).test(task.name)) {
+                    log.write("   skipping this task (by 'excludeTask' setting)", 2, logPad);
+                    return false;
+                }
+            }
         }
 
         //

@@ -1,0 +1,38 @@
+{
+    "taskExplorer.exclude": [
+        "**/.vscode-test/**",
+        "**/Assets/**",
+        "**/bin/**",
+        "**/build/**",
+        "**/dist/**",
+        "**/doc/**",
+        "**/example/**",
+        "**/examples/**",
+        "**/ext/**",
+        "**/obj/**",
+        "**/out/**",
+        "**/output/**",
+        "**/packages/**",
+        "**/release/**",
+        "**/releases/**",
+        "**/samples/**",
+        "**/sdks/**",
+        "**/static/**",
+        "**/target/**",
+        "**/test/**",
+        "**/third_party/**",
+        "**/vendor/**",
+        "**/work/**",
+        "**/code-package/src/custom/**",
+        "**/code-package/src/python/**",
+        "**/code-package/script/**",
+        "**/CompiledOutput/**",
+        "**/dep/**",
+        "**/extract-history.ps1",
+        "**/sass/config.rb"
+    ],
+    "taskExplorer.excludeTask": [
+        "pre-launch[0-9]{2}\\.r(?:b|c)",
+        "clean3"
+    ]
+}
