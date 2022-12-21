@@ -12,7 +12,7 @@ import { storage } from "../../common/storage";
 import TaskItem from "../../tree/item";
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
 import {
-    activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, refresh
+    activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, refresh, testCommand
 } from "../helper";
 
 
@@ -32,6 +32,24 @@ suite("Tree Tests", () =>
         assert(isReady() === true, "    ✘ TeApi not ready");
         favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
+    });
+
+
+    suiteTeardown(async function()
+    {
+        await storage.update(constants.FAV_TASKS_STORE, favTasks);
+        await storage.update(constants.LAST_TASKS_STORE, lastTasks);
+    });
+
+
+    test("Refresh", async function()
+    {
+        await executeTeCommand("refresh", 1000);
+    });
+
+
+    test("Show Last Tasks", async function()
+    {
         ant = await getTreeTasks("ant", 3);
         batch = await getTreeTasks("batch", 2);
         if (lastTasks.length === 0)
@@ -42,13 +60,6 @@ suite("Tree Tests", () =>
         }
         await configuration.updateWs("showLastTasks", false);
         await configuration.updateWs("showLastTasks", true);
-    });
-
-
-    suiteTeardown(async function()
-    {
-        await storage.update(constants.FAV_TASKS_STORE, favTasks);
-        await storage.update(constants.LAST_TASKS_STORE, lastTasks);
     });
 
 

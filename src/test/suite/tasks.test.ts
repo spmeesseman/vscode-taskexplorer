@@ -29,9 +29,20 @@ suite("Task Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
-        ant = await getTreeTasks("ant", 3);
+    });
+
+
+    test("Refresh", async function()
+    {
+        await executeTeCommand("refresh", 1000);
+    });
+
+
+    test("Check task counts", async function()
+    {
         bash = await getTreeTasks("bash", 1);
         batch = await getTreeTasks("batch", 2);
+        ant = await getTreeTasks("ant", 3);
     });
 
 

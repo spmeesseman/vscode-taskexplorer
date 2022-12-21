@@ -20,6 +20,7 @@ suite("Report Tests", () =>
 		teApi = await activate(this);
         assert(isReady("make") === true, "    ✘ TeApi not ready");
 		await testCommand("focus");
+		await testCommand("refresh");
 	});
 
 
@@ -35,20 +36,30 @@ suite("Report Tests", () =>
 	    await testCommand("viewReport", projectUri);
 		await sleep(1000);
 		await closeActiveDocuments();
-		await sleep(100);
+	});
+
+
+	test("Report page single project 2", async () =>
+	{
+		await sleep(1000);
 	    await testCommand("viewReport", projectUri, "");
 		await sleep(1000);
 		await closeActiveDocuments();
-		await sleep(100);
+	});
+
+
+	test("Report page single project 3", async () =>
+	{
+		await sleep(1000);
 	    await testCommand("viewReport", projectUri, "", 5);
 		await sleep(1000);
 		await closeActiveDocuments();
-		await sleep(100);
 	});
 
 
 	test("Report page all projects", async () =>
 	{
+		await sleep(1000);
 	    await testCommand("viewReport");
 		await sleep(1000);
 		await closeActiveDocuments();

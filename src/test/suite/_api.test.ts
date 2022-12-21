@@ -19,12 +19,6 @@ suite("API Init and Tests", () =>
     });
 
 
-    test("Show view", async function()
-    {
-		await testCommand("focus");
-    });
-
-
     test("Show log", async function()
     {
         await testCommand("showOutput", false);
