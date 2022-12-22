@@ -108,7 +108,7 @@ suite("Util Tests", () =>
 
         const arr = [ 1, 2, 3, 4, 5 ];
         util.removeFromArray(arr, 3);
-        await util.removeFromArrayAsync(arr, 1);
+        util.removeFromArray(arr, 1);
         assert(arr.length === 3);
         assert(util.existsInArray(arr, 5) !== false);
         assert(util.existsInArray(arr, 2) !== false);
