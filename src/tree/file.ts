@@ -258,7 +258,7 @@ export default class TaskFile extends TreeItem
                 }
             }
 
-            else if (source === "app-publisher")
+            if (source === "app-publisher")
             {   //
                 // For ap files in the same dir, nsamed with a tag, e.g.:
                 //    .publishrc.spm.json
@@ -278,7 +278,7 @@ export default class TaskFile extends TreeItem
             // All other task types will have a relative path of it's location on the filesystem (with
             // exception of TSC, which is handled elsewhere).
             //
-            else if (relativePath.length > 0 && relativePath !== ".vscode" && source !== "Workspace" && relativePath !== ".")
+            if (relativePath.length > 0 && relativePath !== ".vscode" && source !== "Workspace" && relativePath !== ".")
             {
                 if (relativePath.endsWith("\\") || relativePath.endsWith("/")) // trim slash chars
                 {
