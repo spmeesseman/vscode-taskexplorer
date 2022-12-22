@@ -196,7 +196,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     // Main excludes list changes requires global refresh
     //
-    if (e.affectsConfiguration("taskExplorer.exclude")) {
+    if (e.affectsConfiguration("taskExplorer.exclude") || e.affectsConfiguration("taskExplorer.excludeTask")) {
         refresh = true;
     }
 
@@ -215,11 +215,11 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     {
         if (configuration.get<boolean>("enableSideBar") && teApi.sidebar)
         {
-            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
+            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("showLastTasks"), false, true);
         }
         if (configuration.get<boolean>("enableExplorerView") && teApi.explorer)
         {
-            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("showLastTasks"));
+            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("showLastTasks"), false, true);
         }
     }
 
@@ -228,7 +228,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     for (const i in taskTypes)
     {
-        if (taskTypes.hasOwnProperty(i))
+        if ([].hasOwnProperty.call(taskTypes, i))
         {
             const taskType = taskTypes[i],
                   enabledSetting = util.getTaskTypeEnabledSettingName(taskType);
@@ -299,6 +299,13 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     if (e.affectsConfiguration("npm.packageManager", undefined)) {
         registerChange("npm");
+    }
+
+    //
+    // if the 'autoRefresh' settings if turned off, then there's nothing to do
+    //
+    if (e.affectsConfiguration("showHiddenWsTasks")) {
+        registerChange("Workspace");
     }
 
     //
