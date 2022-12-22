@@ -113,14 +113,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // If this task exists in the favorites, remove it, if it doesnt, then add it
         //
-        if (util.existsInArray(favTasks, favId) === false)
+        if (!favTasks.includes(favId))
         {
             await this.saveTask(taskItem, -1, true);
         }
         else //
         {   // Remove
             //
-            await util.removeFromArrayAsync(favTasks, favId);
+            util.removeFromArray(favTasks, favId);
             log.value("   new fav count", favTasks.length, 2);
             //
             // Update local storage for persistence
@@ -878,7 +878,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         if (configuration.get<boolean>("showLastTasks") === true)
         {
             const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-            if (util.existsInArray(lastTasks, util.getTaskItemId(taskItem)) !== false)
+            if (lastTasks.includes(util.getTaskItemId(taskItem)) !== false)
             {
                 if (this.taskTree[0].label === constants.LAST_TASKS_LABEL)
                 {
@@ -891,7 +891,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         // Fire change event for the 'Favorites' folder if the task exists there
         //
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        if (util.existsInArray(favTasks, util.getTaskItemId(taskItem)) !== false)
+        if (favTasks.includes(util.getTaskItemId(taskItem)) !== false)
         {
             if (this.taskTree[0].label === constants.FAV_TASKS_LABEL)
             {
@@ -962,29 +962,35 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             // (including providers implemented in this extension).  In this case, we have to ask
             // for all tasks.  Same goes for typescript tasks.
             //
-            if (!this.tasks || this.currentInvalidation  === "workspace" || this.currentInvalidation === "tsc") {
+            if (!this.tasks || this.currentInvalidation  === "workspace" || this.currentInvalidation === "tsc")
+            {
                 this.tasks = await tasks.fetchTasks();
             }
             else if (this.tasks && this.currentInvalidation)
-            {   //
+            {
+                const isScriptType = util.isScriptType(this.currentInvalidation);
+                //
                 // Get all tasks of the type defined in 'currentInvalidation' from VSCode, remove
                 // all tasks of the type defined in 'currentInvalidation' from the tasks list cache,
                 // and add the new tasks from VSCode into the tasks list.
                 //
-                const toRemove: Task[] = [];
+                const toRemove: number[] = [];
                 const taskItems = await tasks.fetchTasks({
-                    type: !util.isScriptType(this.currentInvalidation) ? this.currentInvalidation : "script"
+                    type: !isScriptType ? this.currentInvalidation : "script"
                 });
-                for (const t of this.tasks)
-                {   //
+
+                for (let i = 0; i < this.tasks.length; i++)
+                {
+                    const t = this.tasks[i];
+                    //
                     // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
                     // if the script type set for the task in tasks.json is of type 'currentInvalidation'.
                     // Remove any Workspace type tasks returned as well, in this case the source type is
                     // != currentInvalidation, but the definition type == currentInvalidation
                     //
-                    if (t.source === this.currentInvalidation || t.source === "Workspace") {
+                    if (t.source === this.currentInvalidation || t.source === "Workspace" || (isScriptType && util.isScriptType(t.source))) {
                         if (t.source !== "Workspace" || t.definition.type === this.currentInvalidation) {
-                            toRemove.push(t);
+                            toRemove.push(i);
                         }
                     }
 
@@ -995,9 +1001,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     //     this.tasks.push(...(externalTasks || []));
                     // }
                 }
+
+                let rmvCount = -1;
                 for (const t of toRemove) {
-                    util.removeFromArray(this.tasks, t);
+                    this.tasks.splice(t - (++rmvCount), 1);
                 }
+
                 this.tasks.push(...taskItems);
             }
 
@@ -2076,7 +2085,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         else
         {
             window.showInformationMessage("Task not found!  Check log for details");
-            await util.removeFromArrayAsync(lastTasks, lastTaskId);
+            util.removeFromArray(lastTasks, lastTaskId);
             await storage.update(constants.LAST_TASKS_STORE, lastTasks);
             await this.showSpecialTasks(true);
         }
@@ -2213,9 +2222,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         // Moving it to the top of the list it if it already exists
         //
-        if (util.existsInArray(cstTasks, taskId) !== false) {
-            await util.removeFromArrayAsync(cstTasks, taskId);
-        }
+        util.removeFromArray(cstTasks, taskId);
 
         if (maxTasks > 0) {
             while (cstTasks.length >= maxTasks)

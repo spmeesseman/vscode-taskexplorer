@@ -31,27 +31,6 @@ export function camelCase(name: string | undefined, indexUpper: number)
 }
 
 
-/**
- * Checks if a value exists in the given array
- *
- * * **IMPORTANT**  This function will return 0 on success if the item is the 1st in the array,
- * always check for a return value of false, and not just using a !existsInArray to determine if
- * the item exists
- *
- * @param arr The array to check
- * @param item The value to check in the given array for
- * @returns The index of the item in the array if the value exists in the arrray, `false` otherwise
- */
-export function existsInArray(arr: any[], item: any): boolean | number
-{
-    for (let i = 0; i < arr.length; i++) {
-        if (item === arr[i]) {
-            return i;
-        }
-    }
-    return false;
-}
-
 
 export async function forEachAsync(array: any, callback: any)
 {
@@ -287,7 +266,7 @@ export function getUserDataPath(platform?: string, padding = "")
     //
     if (process.argv)
     {
-        let argvIdx = existsInArray(process.argv, "--user-data-dir");
+        let argvIdx = process.argv.includes("--user-data-dir");
         if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
             userPath = path.resolve(process.argv[++argvIdx]);
             log.value(padding + "user path is", userPath, 1);
@@ -353,16 +332,16 @@ export function getWorkspaceProjectName(fsPath: string)
 }
 
 
-// export function isArray<T>(value: any): value is T[]
-// {
-//     return !!value && Array.isArray(value);
-// }
+export function isArray<T>(value: any): value is T[]
+{
+    return !!value && Array.isArray(value);
+}
 
 
-// export function isBoolean(value: any): value is boolean
-// {
-//     return !!value && typeof value === "boolean";
-// }
+export function isBoolean(value: any): value is boolean
+{
+    return !!value && typeof value === "boolean";
+}
 
 
 export function isExcluded(uriPath: string, logPad = "")
@@ -392,10 +371,10 @@ export function isExcluded(uriPath: string, logPad = "")
 }
 
 
-// export function isObject(value: any)
-// {
-//     return !!value && (value instanceof Object || typeof value === "object");
-// }
+export function isObject(value: any)
+{
+    return !!value && (value instanceof Object || typeof value === "object");
+}
 
 
 export function isScriptType(source: string)
@@ -476,9 +455,7 @@ export function pathExists(pathToCheck: string)
 
 export function pushIfNotExists(arr: any[], item: any)
 {
-    if (existsInArray(arr, item) === false) {
-        arr.push(item);
-    }
+    if (!arr.includes(item)) { arr.push(item); }
 }
 
 
@@ -508,6 +485,10 @@ export function removeFromArray(arr: any[], item: any)
     let idx = -1;
     let idx2 = -1;
 
+    if (!arr.includes(item)) {
+        return;
+    }
+
     for (const each of arr)
     {
         idx++;
@@ -516,25 +497,6 @@ export function removeFromArray(arr: any[], item: any)
             break;
         }
     }
-
-    if (idx2 !== -1 && idx2 < arr.length) {
-        arr.splice(idx2, 1);
-    }
-}
-
-
-export async function removeFromArrayAsync(arr: any[], item: any)
-{
-    let idx = -1;
-    let idx2 = -1;
-
-    await forEachAsync(arr, (each: any) => {
-        idx++;
-        if (item === each) {
-            idx2 = idx;
-            return false;
-        }
-    });
 
     if (idx2 !== -1 && idx2 < arr.length) {
         arr.splice(idx2, 1);

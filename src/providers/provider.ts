@@ -74,7 +74,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
         const paths = filesCache.get(this.providerName),
               enabled = configuration.get<boolean>(util.getTaskTypeEnabledSettingName(this.providerName));
 
-        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["enabled", enabled]]);
+        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [[ "enabled", enabled ]]);
 
         if (enabled && paths)
         {
@@ -92,7 +92,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             }
         }
 
-        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [["# of tasks", allTasks.length]]);
+        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [[ "# of tasks", allTasks.length ]]);
         return allTasks;
     }
 
@@ -106,7 +106,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     public async invalidate(uri?: Uri, logPad = ""): Promise<void>
     {
         log.methodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, true,
-            [["uri", uri?.path], ["has cached tasks", !!this.cachedTasks]]
+            [[ "uri", uri?.path ], [ "has cached tasks", !!this.cachedTasks ]]
         );
 
         if (uri && this.invalidating) {
@@ -117,28 +117,28 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
         if (this.cachedTasks)
         {
-            const rmvTasks: Task[] = [];
-
             if (uri)
             {
-                const pathExists = util.pathExists(uri.fsPath);
+                const pathExists = util.pathExists(uri.fsPath),
+                      rmvTasks: number[] = [];
 
-                for (const each of this.cachedTasks)
+                for (let i = 0; i < this.cachedTasks.length; i++)
                 {
-                    const cstDef = each.definition;
+                    const cachedTask = this.cachedTasks[i];
+                    const cstDef = cachedTask.definition;
                     if (cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath)))
                     {
-                        rmvTasks.push(each);
+                        rmvTasks.push(i);
                     }
                 }
 
-                for (const each of rmvTasks)
-                {
-                    log.write("   removing old task " + each.name, 2, logPad);
-                    util.removeFromArray(this.cachedTasks, each);
+                let rmvCount = -1;
+                for (const tIdx of rmvTasks) {
+                    log.write("   removing old task " + this.cachedTasks[tIdx].name, 2, logPad);
+                    this.cachedTasks.splice(tIdx - (++rmvCount), 1);
                 }
 
-                if (pathExists && util.existsInArray(configuration.get("exclude", []), uri.path) === false)
+                if (pathExists && !configuration.get<string[]>("exclude", []).includes(uri.path))
                 {
                     const tasks = await this.readUriTasks(uri, logPad + "   ");
                     //
