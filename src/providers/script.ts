@@ -50,13 +50,13 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         bat: {
             exec: "cmd",
             type: "batch",
-            args: ["/c"],
+            args: [ "/c" ],
             enabled: configuration.get("enableBatch")
         },
         cmd: {
             exec: "cmd",
             type: "batch",
-            args: ["/c"],
+            args: [ "/c" ],
             enabled: configuration.get("enableBatch")
         },
         nsi: {
@@ -70,7 +70,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task | undefined
     {
-        log.methodStart("create script task", 2, "   ", false, [["target", target], ["cmd", cmd], ["path", uri.fsPath]]);
+        log.methodStart("create script task", 2, "   ", false, [[ "target", target ], [ "cmd", cmd ], [ "path", uri.fsPath ]]);
 
         const extension = target.toLowerCase(),
               scriptDef = this.scriptTable[extension],
@@ -248,7 +248,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
               visitedFiles: Set<string> = new Set(),
               paths = filesCache.get(this.providerName);
 
-        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [["path", paths ? paths.size : 0]]);
+        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [[ "path", paths ? paths.size : 0 ]]);
 
         if (paths)
         {
@@ -268,7 +268,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             }
         }
 
-        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [["# of tasks", allTasks.length]]);
+        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [[ "# of tasks", allTasks.length ]]);
         return allTasks;
     }
 
@@ -276,7 +276,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
-        log.methodStart("read script file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read script file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
         const task = this.createTask(path.extname(uri.fsPath).substring(1), undefined, folder, uri);
         log.methodDone("read script file uri task", 1, logPad, true);
         return task ? [ task ] : [];
