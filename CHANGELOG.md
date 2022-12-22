@@ -1,5 +1,15 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.12.0 (December 21st, 2022)
+
+### Bug Fixes
+
+- ant tasks no longer show relative path in grouped tree nodes if file is named build.xml. [Fixes #179]
+
+### Features
+
+- add new setting 'expanded', an object that can specify either special or project folders to either be expanded or collapsed in the explorer tree on startup. [Closes #176]
+
 ## Version 2.11.0 (December 21st, 2022)
 
 ### Bug Fixes
