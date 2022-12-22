@@ -250,7 +250,7 @@ export function getTaskTypes(): string[]
 {
     return [
         "ant", "app-publisher", "bash", "batch", "composer",  "gradle", "grunt", "gulp", "make",
-        "maven", "npm", "nsis", "perl", "powershell", "python", "pipenv", "ruby", "tsc",  "workspace"
+        "maven", "npm", "nsis", "perl", "powershell", "python", "pipenv", "ruby", "tsc",  "Workspace"
     ];
 }
 
@@ -400,7 +400,7 @@ export function isString(value: any, notEmpty = false): value is string
 
 export function isWatchTask(source: string)
 {
-    return [ "npm", "tsc", "workspace", "Workspace" ].includes(source);
+    return [ "npm", "tsc", "Workspace" ].includes(source);
 }
 
 

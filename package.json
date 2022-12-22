@@ -96,6 +96,7 @@
         "@sgarciac/bombadil": "^2.3.0",
         "glob": "^7.2.0",
         "is-utf8": "^0.2.1",
+        "json5": "^2.2.2",
         "jsonc-parser": "^2.3.1",
         "minimatch": "^3.1.0",
         "vscode-nls": "^4.1.2",
@@ -1778,10 +1779,16 @@
                     "default": false,
                     "description": "%config.taskExplorer.showExecuteWithNoTerminalButton%"
                 },
+                "taskExplorer.showHiddenWsTasks": {
+                    "type": "boolean",
+                    "default": true,
+                    "title": "Show Hidden VSCode Workspace Tasks",
+                    "markdownDescription": "Include VSCode tasks in the explorer tree that have the `hide` property set to `true`"
+                },
                 "taskExplorer.showLastTasks": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.showLastTasks%"
+                    "markdownDescription": "Show `Last Tasks` as a folder node in the task tree"
                 },
                 "taskExplorer.showRunningTask": {
                     "type": "boolean",
@@ -1813,8 +1820,8 @@
                         20
                     ],
                     "default": 10,
-                    "title": "%config.taskExplorer.numLastTasks%",
-                    "description": "%config.taskExplorer.numLastTasksDsc%"
+                    "title": "# of Tasks to Remember",
+                    "markdownDescription": "The number of tasks to store in the `Last Tasks` tree folder node."
                 },
                 "taskExplorer.autoRefresh": {
                     "type": "boolean",

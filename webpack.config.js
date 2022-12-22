@@ -32,7 +32,8 @@ const config =
 		// the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot
 		// be webpack'ed, -> https://webpack.js.org/configuration/externals/
 		//
-		vscode: 'commonjs vscode'
+		vscode: 'commonjs vscode',
+		json5: 'json5'
 	},
 	resolve:
 	{   //
@@ -48,31 +49,6 @@ const config =
 				loader: 'ts-loader'
 			}]
 		}]
-	},
-	optimization: {
-		minimize: true,
-		minimizer: [
-			new TerserPlugin({ 
-				extractComments: false ,
-				parallel: true,
-				terserOptions: {
-					ecma: undefined,
-					parse: {},
-					compress: {},
-					mangle: true, // Note `mangle.properties` is `false` by default.
-					module: false,
-					// Deprecated
-					output: null,
-					format: null,
-					toplevel: false,
-					nameCache: null,
-					ie8: false,
-					keep_classnames: undefined,
-					keep_fnames: false,
-					safari10: false,
-				}
-			})
-		]
 	}
 };
 module.exports = config;

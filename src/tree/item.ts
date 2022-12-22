@@ -19,7 +19,6 @@ from "vscode";
 export default class TaskItem extends TreeItem
 {
     private readonly context: ExtensionContext;
-    public static readonly defaultSource = "Workspace";
     public readonly taskSource: string;
     public readonly taskGroup: string;
     public readonly isUser: boolean;
@@ -81,10 +80,10 @@ export default class TaskItem extends TreeItem
         this.command = {                    // Note that 'groupLevel' will be set by TaskFile.addScript()
             title: "Open definition",       // Default click action is Open file since it's easy to click on accident
             command: "taskExplorer.open",   // Default click action can be set to 'Execute/Run' in Settings
-            arguments: [this, true]         // If the def. action is 'Run', then it is redirected in the 'Open' cmd
+            arguments: [ this, true ]         // If the def. action is 'Run', then it is redirected in the 'Open' cmd
         };
         //
-        // The task source, i.e. "npm", "workspace", or any of the TaskExplorer provided task mnemonics,
+        // The task source, i.e. "npm", "Workspace", or any of the TaskExplorer provided task mnemonics,
         // i.e. "ant", "gulp", "batch", etc...
         //
         this.taskSource = task.source;
@@ -131,10 +130,10 @@ export default class TaskItem extends TreeItem
     refreshState(doLog: boolean)
     {
         const isExecuting = !!this.isExecuting();
-        log.methodStart("refresh state", 5, "   ", false, [["is executing", isExecuting]]);
+        log.methodStart("refresh state", 5, "   ", false, [[ "is executing", isExecuting ]]);
         this.setContextValue(this.task, isExecuting);
         this.setIconPath(this.task, this.context, isExecuting);
-        log.methodDone("refresh state", 5, "   ", false, [["is executing", isExecuting]]);
+        log.methodDone("refresh state", 5, "   ", false, [[ "is executing", isExecuting ]]);
     }
 
 

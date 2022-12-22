@@ -12,7 +12,7 @@ import TaskFolder from "./folder";
 import { storage } from "../common/storage";
 import { rebuildCache } from "../cache";
 import { configuration } from "../common/configuration";
-import { providers, providersExternal } from "../extension";
+import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
 import { TaskExplorerDefinition } from "../interface";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
@@ -27,8 +27,9 @@ import {
 } from "vscode";
 
 
-const localize = nls.loadMessageBundle();
+const isLicenseManagerActive = false;
 
+const localize = nls.loadMessageBundle();
 
 class NoScripts extends TreeItem
 {
@@ -962,7 +963,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             // (including providers implemented in this extension).  In this case, we have to ask
             // for all tasks.  Same goes for typescript tasks.
             //
-            if (!this.tasks || this.currentInvalidation  === "workspace" || this.currentInvalidation === "tsc")
+            if (!this.tasks || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
             {
                 this.tasks = await tasks.fetchTasks();
             }
@@ -975,7 +976,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 // and add the new tasks from VSCode into the tasks list.
                 //
                 const toRemove: number[] = [];
-                const taskItems = await tasks.fetchTasks({
+                const taskItems = await tasks.fetchTasks(
+                {
                     type: !isScriptType ? this.currentInvalidation : "script"
                 });
 
@@ -988,7 +990,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                     // Remove any Workspace type tasks returned as well, in this case the source type is
                     // != currentInvalidation, but the definition type == currentInvalidation
                     //
-                    if (t.source === this.currentInvalidation || t.source === "Workspace" || (isScriptType && util.isScriptType(t.source))) {
+                    if (t.source === this.currentInvalidation || t.source === "Workspace" || (isScriptType && util.isScriptType(t.source)))
+                    {
                         if (t.source !== "Workspace" || t.definition.type === this.currentInvalidation) {
                             toRemove.push(i);
                         }
@@ -1017,9 +1020,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 try {
                     this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel);
                 }
-                catch (e: any) {
-                    log.error(e);
-                }
+                catch (e: any) { log.error(e); }
                 log.blank(1);
                 if (!this.taskTree || this.taskTree.length === 0)
                 {
@@ -1047,12 +1048,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         }
 
-        if (firstRun && this.tasks)
+        if (firstRun && this.tasks && isLicenseManagerActive)
         {   //
             // Initialize license manager
-            // TODO - This gets enabled when licensing goes into effect
             //
-            // await getLicenseManager().initialize(this.tasks);
+            await getLicenseManager().initialize(this.tasks);
         }
 
         log.methodDone("get tree children", logLevel, logPad);

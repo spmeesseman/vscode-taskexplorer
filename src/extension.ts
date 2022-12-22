@@ -226,25 +226,21 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     // Enable/disable task types
     //
-    for (const i in taskTypes)
+    for (const taskType of taskTypes)
     {
-        if ([].hasOwnProperty.call(taskTypes, i))
+        const enabledSetting = util.getTaskTypeEnabledSettingName(taskType);
+        if (e.affectsConfiguration("taskExplorer." + enabledSetting))
         {
-            const taskType = taskTypes[i],
-                  enabledSetting = util.getTaskTypeEnabledSettingName(taskType);
-            if (e.affectsConfiguration("taskExplorer." + enabledSetting))
-            {
-                const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher" || taskType === "maven";
-                await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), ignoreModify, configuration.get<boolean>(enabledSetting));
-                registerChange(taskType);
-            }
+            const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher" || taskType === "maven";
+            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), ignoreModify, configuration.get<boolean>(enabledSetting));
+            registerChange(taskType);
         }
     }
 
     //
     // Path changes to task programs require task executions to be re-set up
     //
-    for (const type of util.getTaskTypes())
+    for (const type of util.getTaskTypes().filter(t => !util.isWatchTask(t)))
     {
         if (e.affectsConfiguration(util.getTaskTypeSettingName(type, "pathTo"))) {
             refreshTaskTypes.push(type);
@@ -256,7 +252,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     if (e.affectsConfiguration("taskExplorer.globPatternsBash"))
     {
-        if (util.existsInArray(refreshTaskTypes, "bash") === false)
+        if (refreshTaskTypes.includes("bash") === false)
         {
             await registerFileWatcher(context, "bash",
                                       util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", [])),
@@ -270,9 +266,9 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     if (e.affectsConfiguration("taskExplorer.includeAnt") || e.affectsConfiguration("taskExplorer.globPatternsAnt"))
     {
-        if (util.existsInArray(refreshTaskTypes, "ant") === false)
+        if (refreshTaskTypes.includes("ant") === false)
         {
-            const antGlobs = [...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", [])];
+            const antGlobs = [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ];
             await registerFileWatcher(context, "ant", util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs),
                                       false, configuration.get<boolean>("enableAnt"));
             registerChange("ant");
@@ -304,7 +300,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     // if the 'autoRefresh' settings if turned off, then there's nothing to do
     //
-    if (e.affectsConfiguration("showHiddenWsTasks")) {
+    if (e.affectsConfiguration("taskExplorer.showHiddenWsTasks")) {
         registerChange("Workspace");
     }
 
