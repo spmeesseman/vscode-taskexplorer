@@ -3,6 +3,8 @@
 import { configuration } from "./configuration";
 import { OutputChannel, ExtensionContext, commands, window } from "vscode";
 import { writeFileSync } from "fs";
+import { isArray, isObject, isString } from "./utils";
+import G = require("glob");
 
 
 // export enum LogColor
@@ -111,12 +113,7 @@ export function methodStart(msg: string, level?: number, logPad = "", doLogBlank
             blank(lLevel);
         }
         write(logPad + "*start* " + msg, lLevel); // , color);
-        if (params)
-        {
-            for (const [ n, v ] of params) {
-                value("   " + n, v, lLevel + 1, logPad);
-            }
-        }
+        values(lLevel, logPad + "   ", params);
     }
 }
 
@@ -126,15 +123,7 @@ export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?
     if (isLoggingEnabled())
     {
         const lLevel = level || 1;
-        if (doLogBlank === true) {
-            blank(lLevel);
-        }
-        if (params)
-        {
-            for (const [ n, v ] of params) {
-                value("   " + n, v, lLevel + 1, logPad);
-            }
-        }
+        values(lLevel, logPad + "   ", params, doLogBlank);
         write("*done* " + msg, lLevel, logPad); // , LogColor.cyan);
     }
 }
@@ -157,23 +146,48 @@ export function value(msg: string, value: any, level?: number, logPad = "")
 {
     if (isLoggingEnabled())
     {
-        let logMsg = msg;
+        let logMsg = msg,
+            valuePad = "";
         const spaces = msg && msg.length ? msg.length : (value === undefined ? 9 : 4);
         for (let i = spaces; i < logValueWhiteSpace; i++) {
-            logMsg += " ";
+            valuePad += " ";
         }
+        logMsg += (valuePad + ": ");
 
-        if (value || value === 0 || value === "" || value === false) {
-            logMsg += ": ";
+        if (isString(value))
+        {
+            logMsg += value;
+        }
+        else if (isArray(value))
+        {
+            logMsg += `: [ ${value.join(", ")} ]`;
+        }
+        else if (isObject(value))
+        {
+            let objectString;
+            try {
+                objectString = JSON.stringify(value, null, 3);
+            }
+            catch {
+                objectString = value.toString();
+            }
+            logMsg += `\n${objectString}`;
+        }
+        else if (value || value === 0 || value === "" || value === false)
+        {
             logMsg += value.toString();
         }
-        else if (value === undefined) {
-            logMsg += ": undefined";
+        else if (value === undefined)
+        {
+            logMsg += "undefined";
         }
         else {
-            logMsg += ": null";
+            logMsg += "null";
         }
 
+        if (logMsg.includes("\n")) {
+            logMsg = logMsg.replace(/\n/g, `\n${valuePad}  ` + msg.replace(/\W\w/g, " "));
+        }
         write(logMsg, level, logPad);
     }
 }
@@ -186,8 +200,10 @@ export function values(level: number, logPad: string, params: any | (string|any)
         if (doLogBlank === true) {
             blank(level);
         }
-        for (const [ n, v ] of params) {
-            value(n, v, level, logPad);
+        if (params) {
+            for (const [ n, v ] of params) {
+                value(n, v, level, logPad);
+            }
         }
     }
 }
@@ -204,18 +220,33 @@ export function write(msg: string, level?: number, logPad = "") // , color?: Log
         // if (color) {
         //     msg = color + msg + LogColor.white;
         // }
-        const tsMsg = new Date().toISOString().replace(/[TZ]/g, " ") + logPad + msg;
+        const ts = new Date().toISOString().replace(/[TZ]/g, " ");
+
+        const _write = (fn: (...fnArgs: any) => void, ...args: any) =>
+        {
+            const msgs = msg.split("\n");
+            for (const m of msgs)
+            {
+                if (args && args.length > 0) {
+                    fn(...args, ts + logPad + m.trimEnd());
+                }
+                else {
+                    fn(ts + logPad + m.trimEnd());
+                }
+            }
+        };
+
         if (logOutputChannel && (!level || level <= (configuration.get<number>("debugLevel") || -1))) {
-            logOutputChannel.appendLine(tsMsg);
+            _write(logOutputChannel.appendLine);
         }
         if (writeToConsole) {
             if (!level || level <= writeToConsoleLevel) {
-                console.log(tsMsg);
+                _write(console.log);
             }
         }
         if (writeToFile) {
             if (!level || level <= writeToFileLevel) {
-                writeFileSync("taskexplorer.log", tsMsg);
+                _write(writeFileSync, "taskexplorer.log");
             }
         }
         lastWriteWasBlank = msg === "";
