@@ -96,20 +96,18 @@ export default class TaskFile extends TreeItem
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group || false), TreeItemCollapsibleState.Collapsed);
 
         log.methodStart("Construct tree file", 4, logPad, false, [
-            ["source", source], ["source", source], ["relativePath", relativePath], ["task folder", folder.label],
-            ["groupLevel", groupLevel], ["group", group], ["label", label], ["taskDef cmd line", taskDef.cmdLine],
-            ["taskDef file name", taskDef.fileName], ["taskDef icon light", taskDef.icon], ["taskDef icon dark", taskDef.iconDark],
-            ["taskDef script", taskDef.script], ["taskDef target", taskDef.target], ["taskDef path", taskDef.path]
+            [ "source", source ], [ "relativePath", relativePath ], [ "task folder", folder.label ],
+            [ "groupLevel", groupLevel ], [ "group", group ], [ "label", label ?? source ], [ "taskDef cmd line", taskDef.cmdLine ],
+            [ "taskDef file name", taskDef.fileName ], [ "taskDef icon light", taskDef.icon ], [ "taskDef icon dark", taskDef.iconDark ],
+            [ "taskDef script", taskDef.script ], [ "taskDef target", taskDef.target ], [ "taskDef path", taskDef.path ]
         ]);
 
         this.folder = folder;
-        this.path = this.label !== "vscode" ? relativePath : ".vscode";
         this.nodePath = this.label !== "vscode" ? relativePath : "vscode";
         this.taskSource = source;
         this.isGroup = (group === true);
         this.isUser = false;
         this.groupLevel = 0;
-
         //
         // Reference ticket #133, vscode folder should not use a path appenditure in it's folder label
         // in the task tree, there is only one path for vscode/workspace tasks, /.vscode.  The fact that
@@ -210,7 +208,10 @@ export default class TaskFile extends TreeItem
         }
 
         log.methodDone("Construct tree file", 4, logPad, false, [
-            ["filename", this.fileName], ["resource uri", this.resourceUri], ["icon light", iconLight], ["icon dark", iconDark]
+            [ "label", this.label ], [ "Node Path", this.nodePath ], [ "is usertask", this.isUser ],
+            [ "context value", this.contextValue ], [ "is group", this.isGroup ], [ "groupLevel", this.groupLevel ],
+            [ "filename", this.fileName ], [ "resource uri path", this.resourceUri.fsPath ],
+            [ "path", this.path  ], [ "icon light", iconLight ], [ "icon dark", iconDark ]
         ]);
     }
 
