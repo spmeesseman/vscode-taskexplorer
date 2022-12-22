@@ -1945,6 +1945,17 @@
                     "default": [],
                     "title": "%config.taskExplorer.globPatternsBash%",
                     "description": "%config.taskExplorer.globPatternsBashDsc%"
+                },
+                "taskExplorer.expanded": {
+                    "type": "object",
+                    "title": "%config.taskExplorer.expanded%",
+                    "description": "%config.taskExplorer.expandedDsc%",
+                    "default": {
+                        "lastTasks": true,
+                        "favorites": true,
+                        "userTasks": false,
+                        "myProjectCamelCaseNoSpace": true
+                    }
                 }
             }
         },

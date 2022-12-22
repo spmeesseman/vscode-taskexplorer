@@ -18,9 +18,9 @@ export default class TaskFolder extends TreeItem
     public workspaceFolder: WorkspaceFolder | undefined;
 
 
-    constructor(folder: WorkspaceFolder | string)
+    constructor(folder: WorkspaceFolder | string, state: TreeItemCollapsibleState)
     {
-        super(typeof folder === "string" ? folder  : folder.name, TreeItemCollapsibleState.Expanded);
+        super(typeof folder === "string" ? folder  : folder.name, state);
 
         if (this.label === constants.FAV_TASKS_LABEL || this.label === constants.LAST_TASKS_LABEL) {
             this.contextValue = this.label.toLowerCase().replace(/[\W \_\-]/g, "");

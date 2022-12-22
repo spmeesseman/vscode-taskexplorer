@@ -102,7 +102,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const favId = util.getTaskItemId(taskItem);
 
         log.methodStart("add/remove favorite", 1, "", false, [
-            ["id", taskItem.id ], [ "current fav count", favTasks.length ]
+            [ "id", taskItem.id ], [ "current fav count", favTasks.length ]
         ]);
 
         //
@@ -141,7 +141,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
               id = util.getTaskItemId(taskItem);
 
-        log.methodStart("add/remove rename special", 1, "", false, [["id", id]]);
+        log.methodStart("add/remove rename special", 1, "", false, [[ "id", id ]]);
 
         for (const i in renames)
         {
@@ -166,7 +166,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 if (id && str !== undefined)
                 {
                     addRemoved = true;
-                    renames.push([id, str]);
+                    renames.push([ id, str ]);
                 }
             });
         }
@@ -322,6 +322,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         log.methodStart("build task tree", logLevel, logPad);
         this.treeBuilding = true;
+        const nodeExpandedeMap: any = configuration.get<any>("expanded");
 
         //
         // The 'Last Tasks' folder will be 1st in the tree
@@ -331,7 +332,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         {
             if (lastTasks && lastTasks.length > 0)
             {
-                ltFolder = new TaskFolder(constants.LAST_TASKS_LABEL);
+                ltFolder = new TaskFolder(constants.LAST_TASKS_LABEL, nodeExpandedeMap.lastTasks !== false ?
+                                                                      TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
                 folders.set(constants.LAST_TASKS_LABEL, ltFolder);
             }
         }
@@ -343,7 +345,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         if (favTasks && favTasks.length > 0)
         {
-            favFolder = new TaskFolder(constants.FAV_TASKS_LABEL);
+            favFolder = new TaskFolder(constants.FAV_TASKS_LABEL, nodeExpandedeMap.favorites !== false ?
+                                                                  TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
             folders.set(constants.FAV_TASKS_LABEL, favFolder);
         }
 
@@ -412,6 +415,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         const definition: TaskExplorerDefinition | TaskDefinition = each.definition;
         let relativePath = definition.path ?? "";
+        const nodeExpandedeMap: any = configuration.get<any>("expanded");
 
         //
         // Make sure this task shouldn't be ignored based on various criteria...
@@ -441,7 +445,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             folder = folders.get(scopeName);
             if (!folder)
             {
-                folder = new TaskFolder(each.scope);
+                folder = new TaskFolder(each.scope, nodeExpandedeMap[util.lowerCaseFirstChar(scopeName, true)] !== false ?
+                                                    TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
                 folders.set(scopeName, folder);
             }
         }     //
@@ -451,7 +456,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             folder = folders.get(scopeName);
             if (!folder)
             {
-                folder = new TaskFolder(scopeName);
+                folder = new TaskFolder(scopeName, nodeExpandedeMap[util.lowerCaseFirstChar(scopeName, true)] !== false ?
+                                                   TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
                 folders.set(scopeName, folder);
             }
         }
@@ -538,8 +544,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
      */
     private async createSpecialFolder(storeName: string, label: string, treeIndex: number, sort: boolean, logPad: string)
     {
+        const nodeExpandedeMap: any = configuration.get<any>("expanded");
         const lTasks = storage.get<string[]>(storeName, []);
-        const folder = new TaskFolder(label);
+        const folder = new TaskFolder(label, nodeExpandedeMap[util.lowerCaseFirstChar(storeName, true)] !== false ?
+                                             TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
 
         log.methodStart("create special tasks folder", 1, logPad, true, [
             [ "store",  storeName ], [ "name",  label ]
@@ -603,8 +611,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 if (!subfolder)
                 {
                     log.values(logLevel + 2, logPad, [
-                        ["   Add source file sub-container", each.path],
-                        ["      id", id]
+                        [ "   Add source file sub-container", each.path ],
+                        [ "      id", id ]
                     ], true);
                     const node = each.treeNodes[0];
                     if (node instanceof TaskItem)
@@ -709,7 +717,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         log.methodStart("create task groupings by separator", logLevel, logPad, true, [
             [ "folder", folder.label ], [ "label (node name)", taskFile.label ], [ "grouping level", treeLevel ], [ "is group", taskFile.isGroup ],
-            [ "file name", taskFile.fileName ], [ "folder", folder.label ], [ "path", taskFile.path ], ["tree level", treeLevel]
+            [ "file name", taskFile.fileName ], [ "folder", folder.label ], [ "path", taskFile.path ], [ "tree level", treeLevel ]
         ]);
 
         const _setNodePath = (t: TaskItem | undefined, cPath: string) =>
@@ -743,9 +751,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
             log.write("   process task item", logLevel + 1, logPad);
             log.values(logLevel + 2, logPad + "      ", [
-                ["id", each.id], ["label", label], ["node path", each.nodePath], ["command", each.command?.command],
-                ["previous name [tree level]", prevName && prevNameOk ? prevName[treeLevel] : "undefined"],
-                ["this previous name", prevNameThis]
+                [ "id", each.id ], [ "label", label ], [ "node path", each.nodePath ], [ "command", each.command?.command ],
+                [ "previous name [tree level]", prevName && prevNameOk ? prevName[treeLevel] : "undefined" ],
+                [ "this previous name", prevNameThis ]
             ]);
 
             //
@@ -849,7 +857,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         let inTaskLabel: any;
         let scriptOffset = 0;
 
-        log.methodStart("find json document position", 3, "   ", false, [["task name", taskItem.task.name]]);
+        log.methodStart("find json document position", 3, "   ", false, [[ "task name", taskItem.task.name ]]);
 
         const visitor: JSONVisitor =
         {
@@ -926,7 +934,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
         visit(documentText, visitor);
 
-        log.methodDone("find json document position", 3, "   ", false, [["position", scriptOffset]]);
+        log.methodDone("find json document position", 3, "   ", false, [[ "position", scriptOffset ]]);
         return scriptOffset;
     }
 
@@ -957,7 +965,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             scriptOffset = 0;
         }
 
-        log.methodDone("find task definition document position", 1, "", true, [["offset", scriptOffset ]]);
+        log.methodDone("find task definition document position", 1, "", true, [[ "offset", scriptOffset ]]);
         return scriptOffset;
     }
 
@@ -1032,7 +1040,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             [ "task folder", element?.label ], [ "all tasks need to be retrieved", !this.tasks ],
             [ "specific tasks need to be retrieved", !!this.currentInvalidation ],
             [ "current invalidation", this.currentInvalidation ],
-            [ "task tree needs to be built", !this.taskTree ], ["first run", firstRun]
+            [ "task tree needs to be built", !this.taskTree ], [ "first run", firstRun ]
         ]);
 
         //
@@ -1122,7 +1130,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 log.blank(1);
                 if (!this.taskTree || this.taskTree.length === 0)
                 {
-                    this.taskTree = [noScripts];
+                    this.taskTree = [ noScripts ];
                 }
             }
         }
@@ -1199,9 +1207,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
     private getSortedRoot(folders: Map<string, TaskFolder>): TaskFolder[]
     {
-        return [...folders.values()].sort((a: TaskFolder, b: TaskFolder) =>
+        return [ ...folders.values() ].sort((a: TaskFolder, b: TaskFolder) =>
         {
-            const sFolders = [ constants.FAV_TASKS_LABEL, constants.LAST_TASKS_LABEL, constants.USER_TASKS_LABEL];
+            const sFolders = [ constants.FAV_TASKS_LABEL, constants.LAST_TASKS_LABEL, constants.USER_TASKS_LABEL ];
             if (a.label === constants.LAST_TASKS_LABEL) {
                 return -1;
             }
@@ -1458,7 +1466,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     private getTaskFileNode(task: Task, folder: TaskFolder, files: any, relativePath: string, scopeName: string, logPad: string): TaskFile
     {
         let taskFile: TaskFile;
-        log.methodStart("get task file node", 2, logPad, false, [["relative path", relativePath], ["scope name", scopeName]]);
+        log.methodStart("get task file node", 2, logPad, false, [[ "relative path", relativePath ], [ "scope name", scopeName ]]);
 
         //
         // Reference ticket #133, vscode folder should not use a path appenditure in it's folder label
@@ -1629,7 +1637,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     public getTreeItem(element: TaskItem | TaskFile | TaskFolder): TreeItem
     {
         if (element instanceof TaskItem) {
-            log.methodStart("get tree item", 3, "", true, [["label", element?.label]]);
+            log.methodStart("get tree item", 3, "", true, [[ "label", element?.label ]]);
             log.write("   refresh task item state", 3);
             element.refreshState(true);
             log.methodDone("get tree item", 3);
@@ -1744,7 +1752,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             }
         }
         catch (e: any) {
-            log.error(["Error invalidating task cache", e]);
+            log.error([ "Error invalidating task cache", e ]);
         }
 
         this.busy = false;
@@ -2346,7 +2354,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
-        log.methodStart("run task", 1, "", true, [["task name", taskItem.label]]);
+        log.methodStart("run task", 1, "", true, [[ "task name", taskItem.label ]]);
         taskItem.taskDetached = undefined;
 
         if (withArgs === true)
@@ -2421,7 +2429,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             return;
         }
 
-        log.methodStart("Run last task", 1, "", true, [["last task id", lastTaskId]]);
+        log.methodStart("Run last task", 1, "", true, [[ "last task id", lastTaskId ]]);
 
         const taskItem = await this.getTaskItems(lastTaskId, "   ");
 

@@ -133,6 +133,9 @@
 	"config.taskExplorer.showExecuteWithArgumentsButton": "Show the 'Execute with Arguments' button inline with the 'Execute' button",
 	"config.taskExplorer.showFavoritesButton": "Show the 'Favorites' button inline with the 'Execute' button",
 
+	"config.taskExplorer.expanded": "Expand / Collapse Tree Nodes on Startup",
+	"config.taskExplorer.expandedDsc": "Specify any special folder or project name to be either expanded or collapsed in the explorer tree on startup - camel cased with no spaces.",
+
 	"taskExplorer.parseError": "Task Explorer task detection: failed to parse the file {0}",
 
 	"taskdef.task.fileName": "The file that the target was found in.",

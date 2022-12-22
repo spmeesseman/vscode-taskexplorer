@@ -423,6 +423,22 @@ function logUserDataEnv(padding: string)
 }
 
 
+export function lowerCaseFirstChar(s: string, removeSpaces = false)
+{
+    let fs = "";
+    if (s && s.length > 1) {
+        fs = s[0].toString().toLowerCase() + s.substring(1);
+    }
+    else if (s) {
+        fs = s[0].toString();
+    }
+    if (fs && removeSpaces) {
+        fs = fs.replace(/ /g, "");
+    }
+    return fs;
+}
+
+
 export function pathExists(pathToCheck: string)
 {
     try {
