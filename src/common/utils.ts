@@ -106,7 +106,7 @@ export function getGlobPattern(taskType: string): string
     taskType = taskType.replace(/\W*\-/, "");
     if (taskType === "ant") {
         return getCombinedGlobPattern(constants.GLOB_ANT,
-                [...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", [])]);
+                [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ]);
     }
     else if (taskType === "bash") {
         return getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
@@ -353,6 +353,18 @@ export function getWorkspaceProjectName(fsPath: string)
 }
 
 
+// export function isArray<T>(value: any): value is T[]
+// {
+//     return !!value && Array.isArray(value);
+// }
+
+
+// export function isBoolean(value: any): value is boolean
+// {
+//     return !!value && typeof value === "boolean";
+// }
+
+
 export function isExcluded(uriPath: string, logPad = "")
 {
     function testForExclusionPattern(path: string, pattern: string): boolean
@@ -380,6 +392,12 @@ export function isExcluded(uriPath: string, logPad = "")
 }
 
 
+// export function isObject(value: any)
+// {
+//     return !!value && (value instanceof Object || typeof value === "object");
+// }
+
+
 export function isScriptType(source: string)
 {
     return getScriptTaskTypes().includes(source);
@@ -392,6 +410,12 @@ export function isSpecial(taskItem: TaskItem)
            (taskItem.id.includes(constants.LAST_TASKS_LABEL + ":") ||
            taskItem.id.includes(constants.FAV_TASKS_LABEL + ":") ||
            taskItem.id.includes(constants.USER_TASKS_LABEL + ":"));
+}
+
+
+export function isString(value: any, notEmpty = false): value is string
+{
+    return (!!value || (value === "" && !notEmpty)) && value instanceof String || typeof value === "string";
 }
 
 

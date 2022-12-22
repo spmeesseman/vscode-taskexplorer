@@ -203,7 +203,7 @@ export async function initSettings(enable = true)
 {
     await configuration.updateVsWs("terminal.integrated.shell.windows",
                                  "C:\\Windows\\System32\\cmd.exe");
-    await configuration.updateWs("exclude", ["**/tasks_test_ignore_/**", "**/ant/**"]);
+    await configuration.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
     //
     // Enable views, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
@@ -214,7 +214,7 @@ export async function initSettings(enable = true)
     // Set misc settings, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("includeAnt", ["**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml"]);
+    await configuration.updateWs("includeAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
     // Use update() here for coverage, since these two settings wont trigger any processing
     await configuration.updateWs("debug", true);
     await configuration.updateWs("debugLevel", 3);

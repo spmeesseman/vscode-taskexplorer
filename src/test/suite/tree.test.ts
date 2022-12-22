@@ -12,7 +12,7 @@ import { storage } from "../../common/storage";
 import TaskItem from "../../tree/item";
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
 import {
-    activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, refresh, testCommand
+    activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, refresh
 } from "../helper";
 
 
