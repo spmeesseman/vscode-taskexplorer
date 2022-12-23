@@ -2,7 +2,6 @@
 import * as path from "path";
 import * as util from "../common/utils";
 import * as assert from "assert";
-import * as nls from "vscode-nls";
 import constants from "../common/constants";
 import TaskItem from "./item";
 import * as log from "../common/log";
@@ -11,6 +10,7 @@ import TaskFile from "./file";
 import TaskFolder from "./folder";
 import { storage } from "../common/storage";
 import { rebuildCache } from "../cache";
+import { NoScripts } from "../lib/noScripts";
 import { configuration } from "../common/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
@@ -23,22 +23,13 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, Terminal, StatusBarItem, StatusBarAlignment, CustomExecution
+    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution
 } from "vscode";
+import { ExplorerApi } from "../interface/explorer";
 
 
 const isLicenseManagerActive = false;
 
-const localize = nls.loadMessageBundle();
-
-class NoScripts extends TreeItem
-{
-    constructor()
-    {
-        super(localize("noScripts", "No scripts found"), TreeItemCollapsibleState.None);
-        this.contextValue = "noscripts";
-    }
-}
 const noScripts = new NoScripts();
 
 
@@ -47,7 +38,7 @@ const noScripts = new NoScripts();
  *
  * Implements the VSCode TreeDataProvider API to build a tree of tasks to display within a view.
  */
-export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
+export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ExplorerApi
 {
     private static statusBarSpace: StatusBarItem;
     private tasks: Task[] | null = null;
@@ -318,7 +309,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
     }
 
 
-    private async buildTaskTree(tasksList: Task[], logPad: string, logLevel: number): Promise<TaskFolder[] | NoScripts[]>
+    public async buildTaskTree(tasksList: Task[], logPad: string, logLevel: number): Promise<TaskFolder[] | NoScripts[]>
     {
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();

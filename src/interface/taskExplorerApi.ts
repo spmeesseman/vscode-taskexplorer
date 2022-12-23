@@ -1,4 +1,5 @@
 
+import { ExplorerApi } from "./explorer";
 import { ExternalExplorerProvider } from "./externalProvider";
 // import { TaskExplorerProvider } from "../providers/provider";
 // import { TaskTreeDataProvider } from "../tree/tree";
@@ -8,7 +9,7 @@ export interface TaskExplorerApi
     log: any;
     utilities: any;
     fileCache: any; // for tests use only
-    explorer: any | undefined;
+    explorer: ExplorerApi | undefined;
     sidebar: any | undefined;
     providers: Map<string, any>;
     // explorer: TaskTreeDataProvider | undefined;

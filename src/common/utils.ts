@@ -228,7 +228,7 @@ export function getTaskItemId(taskItem: TaskItem)
 export function getTaskTypeSettingName(taskType: string, settingPart: string)
 {
     return settingPart + (taskType !== "app-publisher" ?
-                         (!settingPart.endsWith(".") ? properCase(taskType) : taskType.toLowerCase()) : "appPublisher");
+                         (!settingPart.endsWith(".") ? properCase(taskType) : taskType.toLowerCase()) : "apppublisher");
 }
 
 
@@ -261,7 +261,7 @@ export function getTaskTypeRealName(taskType: string): string
     if (taskType === "workspace") {
         return "Workspace";
     }
-    else if (taskType === "appPublisher") {
+    else if (taskType === "apppublisher") {
         return "app-publisher";
     }
     return taskType.toLowerCase();
