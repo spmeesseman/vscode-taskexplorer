@@ -11,7 +11,7 @@ import * as path from "path";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import constants from "../../common/constants";
-import { workspace, tasks, commands, Uri, ConfigurationTarget, WorkspaceFolder } from "vscode";
+import { workspace, tasks, commands, Uri, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../common/utils";
 import { waitForCache } from "../../cache";
 import { addWsFolder, removeWsFolder } from "../../extension";
@@ -28,7 +28,7 @@ let ws2DirName: string;
 let dirNameIgn: string;
 let batch: TaskItem[];
 const tempFiles: string[] = [];
-let taskMap: Map<string, TaskItem> = new Map();
+let taskMap: Map<string, TaskItem>;
 
 
 suite("Provider Tests", () =>

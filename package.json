@@ -79,6 +79,7 @@
         "test-python": "npm run clean && npm run rebuild_test && node ./dist/test/runTest.js python xDeactivate",
         "test-tasks": "npm run clean && npm run rebuild_test && node ./dist/test/runTest.js tasks xDeactivate",
         "test-tree": "npm run clean && npm run rebuild_test && node ./dist/test/runTest.js tree xDeactivate",
+        "test-workspace": "npm run clean && npm run rebuild_test && node ./dist/test/runTest.js workspace xDeactivate",
         "test-util": "npm run clean && npm run rebuild_test && node ./dist/test/runTest.js util xDeactivate",
         "test:dev": "rimraf c:\\code\\data\\user-data\\cacheddata && npm run test",
         "test:after": "npm run coverage-full_off",

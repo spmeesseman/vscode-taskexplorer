@@ -1057,7 +1057,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             await getLicenseManager().initialize(this.tasks);
         }
 
-        log.methodDone("get tree children", logLevel, logPad);
+        log.methodDone("get tree children", logLevel, logPad, false, [
+            [ "# of tasks total", this.tasks?.length || "0" ], [ "# of tasks returned", items?.length || "0" ]
+        ]);
 
         this.currentInvalidation = undefined; // reset file modification task type flag
         return items;

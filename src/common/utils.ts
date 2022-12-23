@@ -256,6 +256,18 @@ export function getTaskTypes(): string[]
 }
 
 
+export function getTaskTypeRealName(taskType: string): string
+{
+    if (taskType === "workspace") {
+        return "Workspace";
+    }
+    else if (taskType === "appPublisher") {
+        return "app-publisher";
+    }
+    return taskType.toLowerCase();
+}
+
+
 export function getUserDataPath(platform?: string, padding = "")
 {
     let userPath: string | undefined = "";

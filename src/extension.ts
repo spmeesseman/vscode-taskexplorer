@@ -295,7 +295,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         {
             if ({}.hasOwnProperty.call(enabledTasks, p))
             {
-                const taskType = p,
+                const taskType = util.getTaskTypeRealName(p),
                       oldValue = enabledTasks[p],
                       newValue = newEnabledTasks[taskType];
                 if (newValue !== oldValue)
