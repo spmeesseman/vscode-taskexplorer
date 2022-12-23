@@ -45,10 +45,12 @@ suite("NPM Tests", () =>
         //
         await verifyTaskCount("npm", 5);
         //
-        // Get the explorer tree task items (one less task than above since Explorer does
-        // not display the 'install' task in the tree with the other tasks found)
+        // Get the explorer tree task items (three less task than above, one of them tree
+        // does not display the 'install' task with the other tasks found, and two of them
+        // are the 'build' and 'watch' tasks are registered in tasks.json and will show in
+        // the tree under the VSCode tasks node, not the npm node)
         //
-        npmTaskItems = await getTreeTasks("npm", 4);
+        npmTaskItems = await getTreeTasks("npm", 2);
     });
 
 
