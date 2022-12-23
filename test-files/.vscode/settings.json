@@ -38,7 +38,7 @@
     "taskExplorer.pathToPrograms": {
         "ant": "c:\\Code\\ant\\bin\\ant.bat",
         "appPublisher": "",
-        "ansicon": "",
+        "ansicon": "c:\\Code\\ansicon\\x64\\ansicon.exe",
         "bash": "bash",
         "composer": "composer",
         "gradle": "c:\\Code\\gradle\\bin\\gradle.bat",

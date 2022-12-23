@@ -137,20 +137,23 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 async function tempRemapSettingsToNewLayout()
 {
     const didSettingUpgrade = storage.get<boolean>("DID_SETTINGS_UPGRADE", false);
-    if (!didSettingUpgrade)
+    if (didSettingUpgrade)
     {
         const taskTypes = util.getTaskTypes();
+        taskTypes.push("ansicon");
         for (const taskType of taskTypes)
         {
             let oldEnabledSetting = util.getTaskTypeSettingName(taskType, "enable"),
                 newEnabledSetting = util.getTaskTypeEnabledSettingName(taskType);
-            const oldSettingValue1 = configuration.get<boolean | undefined>(oldEnabledSetting, undefined);
-            if (oldSettingValue1 !== undefined)
-            {
-                await configuration.updateWs(newEnabledSetting, oldSettingValue1);
-                await configuration.update(newEnabledSetting, oldSettingValue1);
-                await configuration.updateWs(oldEnabledSetting, undefined);
-                await configuration.update(oldEnabledSetting, undefined);
+            if (taskType !== "ansicon") {
+                const oldSettingValue1 = configuration.get<boolean | undefined>(oldEnabledSetting, undefined);
+                if (oldSettingValue1 !== undefined)
+                {
+                    await configuration.update(newEnabledSetting, oldSettingValue1);
+                    await configuration.updateWs(newEnabledSetting, oldSettingValue1);
+                    await configuration.update(oldEnabledSetting, undefined);
+                    await configuration.updateWs(oldEnabledSetting, undefined);
+                }
             }
 
             oldEnabledSetting = util.getTaskTypeSettingName(taskType, "pathTo");
@@ -158,14 +161,19 @@ async function tempRemapSettingsToNewLayout()
             const oldSettingValue2 = configuration.get<string | undefined>(oldEnabledSetting, undefined);
             if (oldSettingValue2 !== undefined)
             {
-                await configuration.updateWs(newEnabledSetting, oldSettingValue2);
                 await configuration.update(newEnabledSetting, oldSettingValue2);
-                await configuration.updateWs(oldEnabledSetting, undefined);
+                await configuration.updateWs(newEnabledSetting, oldSettingValue2);
                 await configuration.update(oldEnabledSetting, undefined);
+                await configuration.updateWs(oldEnabledSetting, undefined);
             }
         }
-        // await storage.update("DID_SETTINGS_UPGRADE", true);
+        await storage.update("DID_SETTINGS_UPGRADE", true);
     }
+
+    console.log(configuration.get<boolean>("enabledTasks.ant"));
+    console.log(configuration.get<boolean>("enabledTasks.appPublisher"));
+    console.log(configuration.get<string>("pathToAnsicon"));
+    console.log(configuration.get<string>("pathToPrograms.ansicon"));
 }
 
 
