@@ -110,11 +110,6 @@ suite("Util Tests", () =>
         util.removeFromArray(arr, 3);
         util.removeFromArray(arr, 1);
         assert(arr.length === 3);
-        assert(util.existsInArray(arr, 5) !== false);
-        assert(util.existsInArray(arr, 2) !== false);
-        assert(util.existsInArray(arr, 4) !== false);
-        assert(util.existsInArray(arr, 3) === false);
-        assert(util.existsInArray(arr, 1) === false);
 
         assert(util.getCwd(uri) !== undefined);
 
