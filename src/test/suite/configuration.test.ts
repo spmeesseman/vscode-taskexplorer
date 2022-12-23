@@ -96,7 +96,7 @@ suite("Configuration / Settings Tests", () =>
         await configuration.updateVsWs("terminal.integrated.shell.linux", shellLnx);
         await sleep(100);
         await configuration.updateVsWs("terminal.integrated.shell.osx", shellOsx);
-        await configuration.updateWs("enableNsis", true); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
+        await configuration.updateWs("enabledTasks.nsis", true); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
         await sleep(100);
         await configuration.updateVsWs("terminal.integrated.shell.windows", shellW32);
         await sleep(100);

@@ -134,8 +134,9 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
                 let rmvCount = -1;
                 for (const tIdx of rmvTasks) {
-                    log.write("   removing old task " + this.cachedTasks[tIdx].name, 2, logPad);
-                    this.cachedTasks.splice(tIdx - (++rmvCount), 1);
+                    const idx = tIdx - (++rmvCount);
+                    log.write("   removing old task " + this.cachedTasks[idx].name, 2, logPad);
+                    this.cachedTasks.splice(idx, 1);
                 }
 
                 if (pathExists && !configuration.get<string[]>("exclude", []).includes(uri.path))
