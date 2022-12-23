@@ -34,6 +34,7 @@ import { LicenseManager } from "./lib/licenseManager";
 
 export let teApi: TaskExplorerApi;
 let licenseManager: ILicenseManager;
+let enabledTasks: any;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
 export const providers: Map<string, TaskExplorerProvider> = new Map();
@@ -121,6 +122,12 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     };
 
     //
+    // Store the enabledTasks object so we can detect which properties have changed when
+    // the 'enabledTasks' configuration change event occurs
+    //
+    enabledTasks = configuration.get<any>("enabledTasks", {});
+
+    //
     // Create license manager instance
     //
     licenseManager = new LicenseManager(teApi, context);
@@ -145,12 +152,12 @@ async function tempRemapSettingsToNewLayout()
         {
             let oldEnabledSetting = util.getTaskTypeSettingName(taskType, "enable"),
                 newEnabledSetting = util.getTaskTypeEnabledSettingName(taskType);
-            if (taskType !== "ansicon") {
+            if (taskType !== "ansicon")
+            {
                 const oldSettingValue1 = configuration.get<boolean | undefined>(oldEnabledSetting, undefined);
                 if (oldSettingValue1 !== undefined)
                 {
                     await configuration.update(newEnabledSetting, oldSettingValue1);
-                    await configuration.updateWs(newEnabledSetting, oldSettingValue1);
                     await configuration.update(oldEnabledSetting, undefined);
                     await configuration.updateWs(oldEnabledSetting, undefined);
                 }
@@ -162,18 +169,12 @@ async function tempRemapSettingsToNewLayout()
             if (oldSettingValue2 !== undefined)
             {
                 await configuration.update(newEnabledSetting, oldSettingValue2);
-                await configuration.updateWs(newEnabledSetting, oldSettingValue2);
                 await configuration.update(oldEnabledSetting, undefined);
                 await configuration.updateWs(oldEnabledSetting, undefined);
             }
         }
         await storage.update("DID_SETTINGS_UPGRADE", true);
     }
-
-    console.log(configuration.get<boolean>("enabledTasks.ant"));
-    console.log(configuration.get<boolean>("enabledTasks.appPublisher"));
-    console.log(configuration.get<string>("pathToAnsicon"));
-    console.log(configuration.get<string>("pathToPrograms.ansicon"));
 }
 
 
@@ -230,8 +231,7 @@ function logFileWatcherEvent(uri: Uri, type: string)
 async function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
 {
     let refresh = false;
-    const refreshTaskTypes: string[] = [],
-          taskTypes = util.getTaskTypes();
+    const refreshTaskTypes: string[] = [];
 
     const registerChange = (taskType: string) => {
         if (!refreshTaskTypes.includes(taskType)) {
@@ -283,15 +283,25 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     // Enable/disable task types
     //
-    for (const taskType of taskTypes)
+    if (e.affectsConfiguration("taskExplorer.enabledTasks"))
     {
-        const enabledSetting = util.getTaskTypeEnabledSettingName(taskType);
-        if (e.affectsConfiguration("taskExplorer." + enabledSetting))
+        const newEnabledTasks = configuration.get<any>("enabledTasks");
+        for (const p in enabledTasks)
         {
-            const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher" || taskType === "maven";
-            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), ignoreModify, configuration.get<boolean>(enabledSetting));
-            registerChange(taskType);
+            if ({}.hasOwnProperty.call(enabledTasks, p))
+            {
+                const taskType = p,
+                      oldValue = enabledTasks[p],
+                      newValue = newEnabledTasks[taskType];
+                if (newValue !== oldValue)
+                {
+                    const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher" || taskType === "maven";
+                    await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), ignoreModify, newValue);
+                    registerChange(taskType);
+                }
+            }
         }
+        Object.assign(enabledTasks, newEnabledTasks);
     }
 
     //

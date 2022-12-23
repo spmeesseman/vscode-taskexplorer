@@ -2,7 +2,7 @@
 
 import {
     ConfigurationChangeEvent, Event, EventEmitter, workspace,
-    WorkspaceConfiguration, ConfigurationTarget, Uri
+    WorkspaceConfiguration, ConfigurationTarget
 } from "vscode";
 
 const extensionName = "taskExplorer";
