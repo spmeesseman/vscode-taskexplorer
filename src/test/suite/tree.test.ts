@@ -77,44 +77,81 @@ suite("Tree Tests", () =>
     });
 
 
-    test("Add custom labels", async function()
+    test("Add Custom Label 1", async function()
     {
         overrideNextShowInputBox("Label 1");
         await executeTeCommand("addRemoveCustomLabel", 50, batch[0]);
+    });
+
+
+    test("Add Custom Label 2", async function()
+    {
         overrideNextShowInputBox("Label 2");
         await executeTeCommand("addRemoveCustomLabel", 50, batch[0]);
+    });
+
+
+    test("Add Custom Label 3", async function()
+    {
         overrideNextShowInputBox("Label 3");
         await executeTeCommand("addRemoveCustomLabel", 50, batch[1]);
+    });
+
+
+    test("Add Custom Label 4", async function()
+    {
         overrideNextShowInputBox("Label 4");
         await executeTeCommand("addRemoveCustomLabel", 50, batch[1]);
+    });
+
+
+    test("Add Custom Label 5", async function()
+    {
         overrideNextShowInputBox("Label 5");
         await executeTeCommand("addRemoveCustomLabel", 50, ant[0]);
+    });
+
+
+    test("Add Custom Label 6", async function()
+    {
         overrideNextShowInputBox("Label 6");
         await executeTeCommand("addRemoveCustomLabel", 50, ant[0]);
     });
 
 
-    test("Remove custom labels", async function()
+    test("Remove Custom Label 1", async function()
     {
         await executeTeCommand("addRemoveCustomLabel", 50, batch[0]);
+    });
+
+
+    test("Remove Custom Label 2", async function()
+    {
         await executeTeCommand("addRemoveCustomLabel", 50, batch[0]);
+    });
+
+
+    test("Remove Custom Label 3", async function()
+    {
         await executeTeCommand("addRemoveCustomLabel", 50, batch[1]);
+    });
+
+
+    test("Remove Custom Label 4", async function()
+    {
         await executeTeCommand("addRemoveCustomLabel", 50, batch[1]);
-        await executeTeCommand("addRemoveCustomLabel", 50, ant[0]);
+    });
+
+
+    test("Remove Custom Label 5", async function()
+    {
         await executeTeCommand("addRemoveCustomLabel", 50, ant[0]);
     });
 
 
-
-    test("Show last tasks", async function()
+    test("Remove Custom Label 6", async function()
     {
-        await configuration.updateWs("showLastTasks", false);
-        await teApi.explorer.showSpecialTasks(false);
-        await teApi.explorer.showSpecialTasks(true);
-        await configuration.updateWs("showLastTasks", true);
-        await teApi.explorer.showSpecialTasks(false);
-        await teApi.explorer.showSpecialTasks(true);
-        await refresh();
+        await executeTeCommand("addRemoveCustomLabel", 50, ant[0]);
     });
 
 
@@ -123,14 +160,30 @@ suite("Tree Tests", () =>
         await configuration.updateWs("showLastTasks", false);
         await teApi.explorer.showSpecialTasks(false);
         await teApi.explorer.showSpecialTasks(true);
+    });
+
+
+    test("Refresh", async function()
+    {
+        await refresh();
+    });
+
+
+    test("Show last tasks", async function()
+    {
         await configuration.updateWs("showLastTasks", true);
         await teApi.explorer.showSpecialTasks(false);
         await teApi.explorer.showSpecialTasks(true);
+    });
+
+
+    test("Refresh", async function()
+    {
         await refresh();
     });
 
 
-    test("Show favorite tasks", async function()
+    test("Show Favorite Tasks w/ Last Tasks", async function()
     {
         await configuration.updateWs("showLastTasks", false);
         await teApi.explorer.showSpecialTasks(false, true);
@@ -138,16 +191,43 @@ suite("Tree Tests", () =>
         await teApi.explorer.showSpecialTasks(false, true);
         await refresh();
         await configuration.updateWs("showLastTasks", false);
+    });
+
+
+    test("Refresh", async function()
+    {
         await refresh();
     });
 
 
-    test("Hide favorite tasks", async function()
+    test("Show Favorite Tasks Only", async function()
+    {
+        await configuration.updateWs("showLastTasks", false);
+    });
+
+
+    test("Refresh", async function()
+    {
+        await refresh();
+    });
+
+
+    test("Hide Favorite and Last Tasks", async function()
     {
         await configuration.updateWs("showLastTasks", false);
         await teApi.explorer.showSpecialTasks(true, true);
+    });
+
+
+    test("Hide Favorite Tasks", async function()
+    {
         await configuration.updateWs("showLastTasks", true);
         await teApi.explorer.showSpecialTasks(true, true);
+    });
+
+
+    test("Refresh", async function()
+    {
         await refresh();
     });
 

@@ -122,6 +122,7 @@ export default class TaskFile extends TreeItem
             this.nodePath = path.join(this.nodePath, this.label.toString());
         }
 
+        /* istanbul ignore if */
         if (!this.nodePath && this.label === "vscode") {
             this.nodePath = path.join(".vscode", this.label);
         }
@@ -132,6 +133,7 @@ export default class TaskFile extends TreeItem
 
         this.fileName = this.getFileNameFromSource(source, folder, taskDef, true);
         this.resourceUri = Uri.file(path.resolve(this.fileName));
+        /* istanbul ignore else */
         if (folder.resourceUri)
         {
             if (relativePath && source !== "Workspace") {
@@ -177,6 +179,7 @@ export default class TaskFile extends TreeItem
             src = util.getPackageManager();
         }
 
+        /* istanbul ignore else */
         if (!taskDef.icon)
         {
             if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", src + ".svg"))))
@@ -222,6 +225,7 @@ export default class TaskFile extends TreeItem
      */
     public addTreeNode(treeNode: (TaskFile | TaskItem | undefined))
     {
+        /* istanbul ignore else */
         if (treeNode) {
             treeNode.groupLevel = this.groupLevel;
             this.treeNodes.push(treeNode);
@@ -263,7 +267,7 @@ export default class TaskFile extends TreeItem
                 // For ap files in the same dir, nsamed with a tag, e.g.:
                 //    .publishrc.spm.json
                 //
-                const match = taskDef.fileName?.match(/\.publishrc\.(.+)\.(?:js(?:on)?|ya?ml)$/i);
+                const match = (taskDef.fileName as string).match(/\.publishrc\.(.+)\.(?:js(?:on)?|ya?ml)$/i);
                 if (match && match.length > 1 && match[1])
                 {
                     return (label + " (" + match[1].toLowerCase() + ")");
@@ -324,6 +328,7 @@ export default class TaskFile extends TreeItem
         if (source === "Workspace")
         {
             fileName = "tasks.json"; // // note:  user task has no resourceUri
+            /* istanbul ignore else */
             if (incRelPathForCode === true && folder.resourceUri) // project folder task
             {
                 fileName = ".vscode/tasks.json";
@@ -369,6 +374,7 @@ export default class TaskFile extends TreeItem
             }
         });
 
+        /* istanbul ignore else */
         if (idx2 !== -1 && idx2 < this.treeNodes.length)
         {
             this.treeNodes.splice(idx2, 1);

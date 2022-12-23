@@ -8,6 +8,7 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
+import { expect } from "chai";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import constants from "../../common/constants";
@@ -27,6 +28,7 @@ let dirNameL2: string;
 let ws2DirName: string;
 let dirNameIgn: string;
 let batch: TaskItem[];
+let nodeExpandedeMap: any;
 const tempFiles: string[] = [];
 let taskMap: Map<string, TaskItem>;
 
@@ -42,6 +44,8 @@ suite("Provider Tests", () =>
         if (!rootPath) {
             assert.fail("        ✘ Workspace folder does not exist");
         }
+
+        nodeExpandedeMap = configuration.get<any>("expanded");
 
         dirName = path.join(rootPath, "tasks_test_");
         dirNameL2 = path.join(dirName, "subfolder");
@@ -214,6 +218,25 @@ suite("Provider Tests", () =>
     });
 
 
+    test("Build Tree Variations  - Last Tasks Collapsed", async function()
+    {
+        const showLasTasks = configuration.get<boolean>("showLastTasks");
+        await configuration.updateWs("showLastTasks", true);
+        await configuration.updateWs("expanded.lastTasks", false);
+        expect(teApi.explorer.buildTaskTree([])).to.be.an("array").with.length.that.is.equal(2);
+        await configuration.updateWs("expanded.lastTasks", true);
+        await configuration.updateWs("showLastTasks", showLasTasks);
+    });
+
+
+    test("Build Tree Variations - Favorites Collapsed", async function()
+    {
+        await configuration.updateWs("expanded.favorites", false);
+        expect(teApi.explorer.buildTaskTree([])).to.be.an("array").with.length.that.is.equal(2);
+        await configuration.updateWs("expanded.favorites", true);
+    });
+
+
     test("Open Tasks for Edit", async function()
     {   //
         // The 3rd param `true` will open the task files and locate task positions while parsing the tree
@@ -355,7 +378,7 @@ suite("Provider Tests", () =>
     {
         await configuration.updateWs("enabledTasks", {
             ant: false,
-            appPublisher: false,
+            apppublisher: false,
             bash: false,
             batch: false,
             gradle: false,
@@ -365,10 +388,10 @@ suite("Provider Tests", () =>
             maven: false,
             npm: false,
             nsis: false,
-            powershell: false,
             perl: false,
-            python: false,
             pipenv: false,
+            powershell: false,
+            python: false,
             ruby: false,
             tsc: false,
             workspace: false
@@ -382,7 +405,7 @@ suite("Provider Tests", () =>
     {
         await configuration.updateWs("enabledTasks", {
             ant: true,
-            appPublisher: true,
+            appPuplisher: true,
             bash: true,
             batch: true,
             gradle: true,
@@ -392,10 +415,10 @@ suite("Provider Tests", () =>
             maven: true,
             npm: true,
             nsis: true,
-            powershell: true,
             perl: true,
-            python: true,
             pipenv: true,
+            powershell: true,
+            python: true,
             ruby: true,
             tsc: true,
             workspace: true

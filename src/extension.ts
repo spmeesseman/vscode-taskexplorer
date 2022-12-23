@@ -341,7 +341,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     if (!refresh)
     {
-        if (e.affectsConfiguration("pathToPrograms"))
+        if (e.affectsConfiguration("taskExplorer.pathToPrograms"))
         {
             let didSetScriptTypeForRefresh = false;
             const newPathToPrograms = configuration.get<any>("pathToPrograms");

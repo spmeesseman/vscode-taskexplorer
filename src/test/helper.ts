@@ -215,7 +215,7 @@ export async function initSettings(enable = true)
     //
     await configuration.updateWs("enabledTasks", {
         ant: enable,
-        appPublisher: enable,
+        apppublisher: enable,
         bash: enable,
         batch: enable,
         gradle: enable,
@@ -225,8 +225,8 @@ export async function initSettings(enable = true)
         maven: enable,
         npm: enable,
         nsis: enable,
-        powershell: enable,
         perl: enable,
+        powershell: enable,
         python: enable,
         pipenv: enable,
         ruby: enable,
