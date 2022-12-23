@@ -57,28 +57,12 @@ class Configuration
 
     public updateVs(key: string, value: any): Thenable<void>
     {
-        if (key.includes("."))
-        {
-            const keys = key.split(".");
-            key = keys[0];
-            const v = this.get<any>(key);
-            v[keys[1]] = value;
-            value = v;
-        }
         return this.configurationWs.update(key, value, ConfigurationTarget.Global);
     }
 
 
     public updateVsWs(key: string, value: any): Thenable<void>
     {
-        if (key.includes("."))
-        {
-            const keys = key.split(".");
-            key = keys[0];
-            const v = this.get<any>(key);
-            v[keys[1]] = value;
-            value = v;
-        }
         return this.configurationWs.update(key, value, ConfigurationTarget.Workspace);
     }
 

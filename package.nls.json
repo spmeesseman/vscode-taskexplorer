@@ -18,6 +18,7 @@
 	"config.taskExplorer.enabledTaskTypes": "Enabled task types to display in the task tree",
 	"config.taskExplorer.enableAnt": "Ant",
 	"config.taskExplorer.enableAnsiconForAnt": "Ant - Use Ansicon",
+	"config.taskExplorer.enableAnsiconForAntDsc": "Enable/use ansicon output colorization for ant tasks.",
 	"config.taskExplorer.enableAppPublisher": "App Publisher",
 	"config.taskExplorer.enableBash": "Bash/sh",
 	"config.taskExplorer.enableBatch": "Batch",
