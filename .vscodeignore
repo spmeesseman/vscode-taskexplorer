@@ -23,5 +23,6 @@ tsconfig.*.json
 tslint.json
 webpack.config.*
 node_modules
+!node_modules/json5
 tools
 types
