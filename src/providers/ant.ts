@@ -113,7 +113,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
                 idx = scriptOffset2;
             }
         }
-        return 0;
+        return idx;
     }
 
 

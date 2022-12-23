@@ -6,7 +6,7 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import { activate, isReady, sleep, verifyTaskCount } from "../helper";
+import { activate, executeTeCommand, isReady, sleep, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ExternalTaskProvider } from "./externalTaskProvider";
@@ -33,6 +33,12 @@ suite("API Tests", () =>
     suiteTeardown(async function()
     {
         dispose.dispose();
+    });
+
+
+    test("Get API Command", async function()
+    {
+        assert(await executeTeCommand("getApi", 200));
     });
 
 

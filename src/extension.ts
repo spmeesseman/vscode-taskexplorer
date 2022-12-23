@@ -79,10 +79,12 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     // Register the tree providers
     //
     let treeDataProvider;
+    /* istanbul ignore else */
     if (configuration.get<boolean>("enableSideBar")) {
         treeDataProvider = registerExplorer("taskExplorerSideBar", context);
     }
     let treeDataProvider2;
+    /* istanbul ignore else */
     if (configuration.get<boolean>("enableExplorerView")) {
         treeDataProvider2 = registerExplorer("taskExplorer", context);
     }
@@ -90,10 +92,12 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     //
     // Refresh tree when folders are added/removed from the workspace
     //
-    const workspaceWatcher = workspace.onDidChangeWorkspaceFolders(async(_e) =>
-    {
+    const workspaceWatcher = workspace.onDidChangeWorkspaceFolders(/* istanbul ignore next */ async(_e) =>
+    {   /* istanbul ignore next */
         await addWsFolder(_e.added);
+        /* istanbul ignore next */
         await removeWsFolder(_e.removed);
+        /* istanbul ignore next */
         await refreshTree();
     });
     context.subscriptions.push(workspaceWatcher);
@@ -146,35 +150,50 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 async function tempRemapSettingsToNewLayout()
 {
     const didSettingUpgrade = storage.get<boolean>("DID_SETTINGS_UPGRADE", false);
+    /* istanbul ignore next */
     if (didSettingUpgrade)
-    {
+    {   /* istanbul ignore next */
         const taskTypes = util.getTaskTypes();
+        /* istanbul ignore next */
         taskTypes.push("ansicon");
+        /* istanbul ignore next */
         for (const taskType of taskTypes)
-        {
+        {   /* istanbul ignore next */
             let oldEnabledSetting = util.getTaskTypeSettingName(taskType, "enable"),
                 newEnabledSetting = util.getTaskTypeEnabledSettingName(taskType);
+            /* istanbul ignore next */
             if (taskType !== "ansicon")
-            {
+            {   /* istanbul ignore next */
                 const oldSettingValue1 = configuration.get<boolean | undefined>(oldEnabledSetting, undefined);
+                /* istanbul ignore next */
                 if (oldSettingValue1 !== undefined)
-                {
+                {   /* istanbul ignore next */
                     await configuration.update(newEnabledSetting, oldSettingValue1);
+                    /* istanbul ignore next */
                     await configuration.update(oldEnabledSetting, undefined);
+                    /* istanbul ignore next */
                     await configuration.updateWs(oldEnabledSetting, undefined);
                 }
             }
 
+            /* istanbul ignore next */
             oldEnabledSetting = util.getTaskTypeSettingName(taskType, "pathTo");
+            /* istanbul ignore next */
             newEnabledSetting = util.getTaskTypeSettingName(taskType, "pathToPrograms.");
+            /* istanbul ignore next */
             const oldSettingValue2 = configuration.get<string | undefined>(oldEnabledSetting, undefined);
+            /* istanbul ignore next */
             if (oldSettingValue2 !== undefined)
             {
+                /* istanbul ignore next */
                 await configuration.update(newEnabledSetting, oldSettingValue2);
+                /* istanbul ignore next */
                 await configuration.update(oldEnabledSetting, undefined);
+                /* istanbul ignore next */
                 await configuration.updateWs(oldEnabledSetting, undefined);
             }
         }
+        /* istanbul ignore next */
         await storage.update("DID_SETTINGS_UPGRADE", true);
     }
 }
@@ -182,10 +201,11 @@ async function tempRemapSettingsToNewLayout()
 
 export async function addWsFolder(wsf: readonly WorkspaceFolder[] | undefined)
 {
+    /* istanbul ignore else */
     if (wsf)
     {
         for (const f in wsf)
-        {
+        {   /* istanbul ignore else */
             if ([].hasOwnProperty.call(wsf, f)) { // skip over properties inherited by prototype
                 log.methodStart("workspace folder added", 1, "", true, [[ "name", wsf[f].name ]]);
                 await cache.addFolderToCache(wsf[f], "   ");
@@ -216,8 +236,9 @@ export function getLicenseManager()
 }
 
 
+/* istanbul ignore next */
 function isTaskExplorerBusy()
-{
+{   /* istanbul ignore next */
     return isCachingBusy();
 }
 
@@ -236,6 +257,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     const refreshTaskTypes: string[] = [];
 
     const registerChange = (taskType: string) => {
+        /* istanbul ignore else */
         if (!refreshTaskTypes.includes(taskType)) {
             refreshTaskTypes.push(taskType);
         }
@@ -273,11 +295,12 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     // Show/hide last tasks
     //
     if (e.affectsConfiguration("taskExplorer.showLastTasks"))
-    {
+    {   /* istanbul ignore else */
         if (configuration.get<boolean>("enableSideBar") && teApi.sidebar)
         {
             await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("showLastTasks"), false, true);
         }
+        /* istanbul ignore else */
         if (configuration.get<boolean>("enableExplorerView") && teApi.explorer)
         {
             await teApi.explorer.showSpecialTasks(configuration.get<boolean>("showLastTasks"), false, true);
@@ -292,12 +315,12 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         let didSetScriptTypeForRefresh = false;
         const newEnabledTasks = configuration.get<any>("enabledTasks");
         for (const p in enabledTasks)
-        {
+        {   /* istanbul ignore else */
             if ({}.hasOwnProperty.call(enabledTasks, p))
             {
                 const taskType = util.getTaskTypeRealName(p),
                       oldValue = enabledTasks[p],
-                      newValue = newEnabledTasks[taskType];
+                      newValue = newEnabledTasks[p];
                 if (newValue !== oldValue)
                 {
                     const isScriptType = util.isScriptType(taskType);
@@ -320,16 +343,21 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     {
         if (e.affectsConfiguration("pathToPrograms"))
         {
+            let didSetScriptTypeForRefresh = false;
             const newPathToPrograms = configuration.get<any>("pathToPrograms");
             for (const p in pathToPrograms)
             {
                 if ({}.hasOwnProperty.call(pathToPrograms, p))
                 {
-                    const taskType = p,
+                    const taskType = util.getTaskTypeRealName(p),
                           oldValue = pathToPrograms[p],
-                          newValue = newPathToPrograms[taskType];
+                          newValue = newPathToPrograms[p];
                     if (newValue !== oldValue) {
-                        registerChange(taskType);
+                        const isScriptType = util.isScriptType(taskType);
+                        if (!isScriptType || !didSetScriptTypeForRefresh) {
+                            registerChange(taskType);
+                        }
+                        didSetScriptTypeForRefresh = didSetScriptTypeForRefresh || isScriptType;
                     }
                 }
             }
@@ -339,7 +367,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         // Extra Bash Globs (for extensionless script files)
         //
         if (e.affectsConfiguration("taskExplorer.globPatternsBash"))
-        {
+        {   /* istanbul ignore else */
             if (refreshTaskTypes.includes("bash") === false)
             {
                 await registerFileWatcher(context, "bash",
@@ -353,7 +381,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         // Extra Apache Globs (for non- build.xml files)s
         //
         if (e.affectsConfiguration("taskExplorer.includeAnt") || e.affectsConfiguration("taskExplorer.globPatternsAnt"))
-        {
+        {   /* istanbul ignore else */
             if (refreshTaskTypes.includes("ant") === false)
             {
                 const antGlobs = [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ];
@@ -398,7 +426,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         if (e.affectsConfiguration("taskExplorer.enableSideBar"))
         {
             if (configuration.get<boolean>("enableSideBar"))
-            {
+            {   /* istanbul ignore else */
                 if (teApi.sidebar) {
                     // TODO - remove/add view on enable/disable view
                     refresh = true;
@@ -418,7 +446,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
         {
             if (configuration.get<boolean>("enableExplorerView"))
-            {
+            {   /* istanbul ignore else */
                 if (teApi.explorer) {
                     // TODO - remove/add view on enable/disable view
                     refresh = true;
@@ -461,10 +489,13 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
 }
 
 
+/* istanbul ignore next */
 async function refreshExternalProvider(providerName: string)
 {
+    /* istanbul ignore next */
     if (providersExternal.get(providerName))
     {
+        /* istanbul ignore next */
         await refreshTree(providerName);
     }
 }
@@ -492,6 +523,7 @@ export async function refreshTree(taskType?: string, uri?: Uri)
     if (configuration.get<boolean>("enableSideBar") && teApi.sidebar) {
         await teApi.sidebar.refresh(taskType, uri);
     }
+    /* istanbul ignore else */
     if (configuration.get<boolean>("enableExplorerView") && teApi.explorer) {
         await teApi.explorer.refresh(taskType, uri);
     }
@@ -514,14 +546,16 @@ function registerExplorer(name: string, context: ExtensionContext, enabled?: boo
 {
     log.write("Register explorer view / tree provider '" + name + "'");
 
+    /* istanbul ignore else */
     if (enabled !== false)
-    {
+    {   /* istanbul ignore else */
         if (workspace.workspaceFolders)
         {
             const treeDataProvider = new TaskTreeDataProvider(name, context);
             const treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
             views.set(name, treeView);
             const view = views.get(name);
+            /* istanbul ignore else */
             if (view) {
                 context.subscriptions.push(view);
                 log.write("   Tree data provider registered'" + name + "'");
@@ -562,6 +596,7 @@ async function registerFileWatcher(context: ExtensionContext, taskType: string, 
 
     let watcher = watchers.get(taskType);
 
+    /* istanbul ignore else */
     if (workspace.workspaceFolders) {
         await cache.buildCache(taskType, fileBlob, undefined, true, "   ");
     }
@@ -641,35 +676,49 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "
     log.methodStart("process remove workspace folder", 1, logPad, true);
 
     for (const f of wsf)
-    {
+    {   /* istanbul ignore next */
         log.value("      folder", f.name, 1, logPad);
         // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
+        /* istanbul ignore next */
         for (const c of cache.filesCache)
         {
+            /* istanbul ignore next */
             const files = c[1], provider = c[0],
                   toRemove: cache.ICacheItem[] = [];
 
+            /* istanbul ignore next */
             log.value("      start remove task files from cache", provider, 2, logPad);
 
+            /* istanbul ignore next */
             for (const file of files)
             {
+                /* istanbul ignore next */
                 log.value("         checking cache file", file.uri.fsPath, 4, logPad);
+                /* istanbul ignore next */
                 if (file.folder.uri.fsPath === f.uri.fsPath) {
+                    /* istanbul ignore next */
                     log.write("            added for removal",  4, logPad);
+                    /* istanbul ignore next */
                     toRemove.push(file);
                 }
             }
 
+            /* istanbul ignore next */
             if (toRemove.length > 0)
             {
+                /* istanbul ignore next */
                 for (const tr of toRemove) {
+                    /* istanbul ignore next */
                     log.value("         remove file", tr.uri.fsPath, 2, logPad);
+                    /* istanbul ignore next */
                     files.delete(tr);
                 }
             }
 
+            /* istanbul ignore next */
             log.value("      completed remove files from cache", provider, 2, logPad);
         }
+        /* istanbul ignore next */
         log.write("   folder removed", 1, logPad);
     }
 

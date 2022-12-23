@@ -12,6 +12,7 @@ async function viewReport(uri?: Uri, logPad = "   ", logLevel = 1)
 {
     log.methodStart("view report command", logLevel, logPad, true);
     const panel = await displayParsingReport(logPad + "   ", logLevel, uri);
+    /* istanbul ignore else */
     if (panel) {
         panel.onDidDispose(() =>
         {

@@ -7,7 +7,6 @@ import { storage } from "../../common/storage";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { getLicenseManager } from "../../extension";
-import { waitForCache } from "../../cache";
 import { Task } from "vscode";
 import {
 	activate, closeActiveDocuments, isReady, overrideNextShowInfoBox,
@@ -121,7 +120,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Enter license key on startup", async function()
+	test("Enter License key on Startup", async function()
 	{
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("1111-2222-3333-4444-5555");
@@ -132,6 +131,22 @@ suite("License Manager Tests", () =>
 		overrideNextShowInputBox("");
 		await licMgr.enterLicenseKey();
 		await sleep(1000);
+	});
+
+
+	test("Enter License Key by Command Pallette", async function()
+	{
+		overrideNextShowInfoBox("Enter License Key");
+		overrideNextShowInputBox("1111-2222-3333-4444-5555");
+		await executeTeCommand("enterLicense", 1100);
+
+		overrideNextShowInfoBox("Enter License Key");
+		overrideNextShowInputBox("");
+		await executeTeCommand("enterLicense", 1100, "   ");
+
+		overrideNextShowInfoBox("Enter License Key");
+		overrideNextShowInputBox("");
+		await executeTeCommand("enterLicense", 500, "   ", 1);
 	});
 
 

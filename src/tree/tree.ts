@@ -2198,6 +2198,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
                 }
             };
 
+            taskItem.taskDetached = undefined;
             if (!args) {
                 await _run(await window.showInputBox(opts));
             }

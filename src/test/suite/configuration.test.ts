@@ -96,11 +96,31 @@ suite("Configuration / Settings Tests", () =>
         await configuration.updateVsWs("terminal.integrated.shell.linux", shellLnx);
         await sleep(100);
         await configuration.updateVsWs("terminal.integrated.shell.osx", shellOsx);
+        await configuration.updateWs("enabledTasks.nsis", false); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
+        await sleep(750);
         await configuration.updateWs("enabledTasks.nsis", true); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
         await sleep(100);
         await configuration.updateVsWs("terminal.integrated.shell.windows", shellW32);
         await sleep(100);
         await initSettings();
+    });
+
+
+    test("Path to Programs Set", async function()
+    {
+        await configuration.updateWs("pathToPrograms.bash", "c:\\unix\\sh.exe");
+        await sleep(100);
+        await configuration.updateWs("pathToPrograms.composer", "c:\\php5\\composer.exe");
+        await sleep(100);
+    });
+
+
+    test("Path to Programs Clear", async function()
+    {
+        await configuration.updateWs("pathToPrograms.bash", undefined);
+        await sleep(100);
+        await configuration.updateWs("pathToPrograms.composer", undefined);
+        await sleep(100);
     });
 
 });

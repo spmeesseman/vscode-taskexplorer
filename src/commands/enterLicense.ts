@@ -5,10 +5,10 @@ import { commands, ExtensionContext } from "vscode";
 import { getLicenseManager } from "../extension";
 
 
-async function enterLicense(logPad = "   ", timeout = 45000, logLevel = 3)
+async function enterLicense(logPad = "   ", logLevel = 3)
 {
     log.methodStart("enter license command", logLevel, logPad);
-    getLicenseManager().enterLicenseKey();
+    await getLicenseManager().enterLicenseKey();
     log.methodDone("enter license command", logLevel, logPad);
 }
 
@@ -16,7 +16,7 @@ async function enterLicense(logPad = "   ", timeout = 45000, logLevel = 3)
 function registerEnterLicenseCommand(context: ExtensionContext)
 {
 	context.subscriptions.push(
-        commands.registerCommand("taskExplorer.enterLicense", async (logPad?: string, timeout?: number, logLevel?: number) => { await enterLicense(logPad, timeout, logLevel); })
+        commands.registerCommand("taskExplorer.enterLicense", async (logPad?: string, logLevel?: number) => { await enterLicense(logPad, logLevel); })
     );
 }
 

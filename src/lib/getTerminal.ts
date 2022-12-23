@@ -47,7 +47,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
                 termName = termName.substring(0, termName.length - 5);
             }
             /* istanbul ignore else */
-            if (taskName.indexOf(termName) !== -1 || termName.indexOf(taskName) !== -1)
+            if (taskName.indexOf(termName) !== -1 || /* istanbul ignore next */ termName.indexOf(taskName) !== -1)
             {
                 term2 = t;
                 log.write("   found!", 2, logPad);

@@ -3,11 +3,10 @@
 
 import * as assert from "assert";
 import { Uri } from "vscode";
-import {  activate, closeActiveDocuments, isReady, executeTeCommand, sleep } from "../helper";
+import {  activate, closeActiveDocuments, isReady, executeTeCommand } from "../helper";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ILicenseManager } from "../../interface/licenseManager";
-import { waitForCache } from "../../cache";
 
 
 let teApi: TaskExplorerApi;
