@@ -108,11 +108,12 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             //     <project basedir="." default="test-build">
             //
             const scriptOffset2 = this.getDocumentPositionLine("name=", taskName, documentText, 6, idx + 1);
+            /* istanbul ignore if */
             if (scriptOffset2 > 0) {
                 idx = scriptOffset2;
             }
         }
-        return idx;
+        return 0;
     }
 
 

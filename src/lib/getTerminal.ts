@@ -18,12 +18,14 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
         return;
     }
 
+    /* istanbul ignore if */
     if (!window.terminals || window.terminals.length === 0)
     {
         log.write("   zero terminals alive", 2, logPad);
         return term;
     }
 
+    /* istanbul ignore if */
     if (window.terminals.length === 1)
     {
         log.write("   return only terminal alive", 2, logPad);
@@ -40,9 +42,11 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
         {
             log.value("      == terminal " + (++termNum) + " name", t.name, 2, logPad);
             let termName = t.name.toLowerCase().replace("task - ", "");
+            /* istanbul ignore if */
             if (termName.endsWith(" Task")) {
                 termName = termName.substring(0, termName.length - 5);
             }
+            /* istanbul ignore else */
             if (taskName.indexOf(termName) !== -1 || termName.indexOf(taskName) !== -1)
             {
                 term2 = t;
@@ -53,7 +57,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
         return term2;
     };
 
-    let relPath = taskItem.task.definition.path ? taskItem.task.definition.path : "";
+    let relPath = taskItem.task.definition.path ? /* istanbul ignore next */ taskItem.task.definition.path : "";
     /* istanbul ignore if */
     if (relPath[relPath.length - 1] === "/" || relPath[relPath.length - 1] === "\\")
     {
@@ -69,7 +73,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
         term = check(taskName);
 
         /* istanbul ignore if */
-        if (!term && lblString.indexOf("(") !== -1)
+        if (!term && /* istanbul ignore next */ lblString.indexOf("(") !== -1)
         {
             taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                        (relPath ? " - " : "") + taskItem.taskFile.folder.workspaceFolder.name + ")";
@@ -100,7 +104,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
         }
 
         /* istanbul ignore if */
-        if (!term && taskItem.taskSource === "Workspace")
+        if (!term && /* istanbul ignore next */ taskItem.taskSource === "Workspace")
         {
             taskName = "npm: " + lblString +
                        (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
@@ -108,7 +112,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
         }
 
         /* istanbul ignore if */
-        if (!term && lblString.indexOf("(") !== -1)
+        if (!term && /* istanbul ignore next */ lblString.indexOf("(") !== -1)
         {
             taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                        (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
@@ -116,7 +120,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
         }
 
         /* istanbul ignore if */
-        if (!term && lblString.indexOf("(") !== -1)
+        if (!term && /* istanbul ignore next */ lblString.indexOf("(") !== -1)
         {
             taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                        (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
@@ -124,7 +128,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
         }
 
         /* istanbul ignore if */
-        if (!term && relPath)
+        if (!term && /* istanbul ignore next */ relPath)
         {
             const folder = taskItem.getFolder();
             if (folder) {

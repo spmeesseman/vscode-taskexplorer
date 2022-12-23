@@ -96,7 +96,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         {
             isWinShell = true;
             const winShell = configuration.getVs<string>("terminal.integrated.shell.windows", "");
-            /* istanbul ignore if */
+            /* istanbul ignore if */ /* istanbul ignore next */
             if (winShell && winShell.includes("bash.exe")) {
                 sep = "/";
                 isWinShell = false;
@@ -109,6 +109,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         // location ("C:\Program Files\Git\bin). Otherwise, use "bash.exe" and assume the command and
         // other shell commands are in PATH
         //
+        /* istanbul ignore else */
         if (isWinShell)
         {
             if (scriptDef.type === "bash")
@@ -206,8 +207,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             type: "script",
             script: target.toLowerCase(),
             target: tgt,
-            /* istanbul ignore next */
-            scriptType: scriptDef.type || "unknown",
+            scriptType: scriptDef.type || /* istanbul ignore next */ "unknown",
             fileName,
             scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
             path: util.getRelativePath(folder, uri),

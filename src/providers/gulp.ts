@@ -196,18 +196,22 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         {
             idx1 = line.indexOf(".") + 1;
             idx2 = line.indexOf(" ", idx1);
+            /* istanbul ignore if */
             if (idx2 === -1) {
                 idx2 = line.indexOf("=", idx1);
             }
+            /* istanbul ignore else */
             if (idx1 !== -1)
             {
                 tgtName = line.substring(idx1, idx2).trim();
             }
         }
+        /* istanbul ignore else */
         else if (line.toLowerCase().trimLeft().startsWith("exports["))
         {
             idx1 = line.indexOf("[") + 2; // skip past [ and '/"
             idx2 = line.indexOf("]", idx1) - 1;  // move up to "/'
+            /* istanbul ignore else */
             if (idx1 !== -1)
             {
                 tgtName = line.substring(idx1, idx2).trim();
@@ -233,18 +237,21 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             let eol2 = eol + 1;
             eol2 = contents.indexOf("\n", eol2);
             line = contents.substring(eol + 1, eol2).trim();
+            /* istanbul ignore else */
             if (line.startsWith("'") || line.startsWith('"'))
             {
                 idx1 = line.indexOf("'");
                 if (idx1 === -1) {
                     idx1 = line.indexOf('"');
                 }
+                /* istanbul ignore else */
                 if (idx1 !== -1) {
                     eol = eol2;
                 }
             }
         }
 
+        /* istanbul ignore else */
         if (idx1 !== -1)
         {
             idx1++;
@@ -252,6 +259,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             if (idx2 === -1) {
                 idx2 = line.indexOf('"', idx1);
             }
+            /* istanbul ignore else */
             if (idx2 !== -1)
             {
                 tgtName = line.substring(idx1, idx2).trim();
