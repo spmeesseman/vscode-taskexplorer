@@ -26,7 +26,7 @@ export const filesCache: Map<string, Set<ICacheItem>> = new Map();
 
 export async function addFolderToCache(folder: WorkspaceFolder | undefined, logPad: string)
 {
-    log.methodStart("add folder to cache", 3, logPad, false, [["folder", !folder ? "entire workspace" : folder.name]]);
+    log.methodStart("add folder to cache", 3, logPad, false, [[ "folder", !folder ? "entire workspace" : folder.name ]]);
 
     //
     // Wait for caches to get done building before proceeding
@@ -37,7 +37,7 @@ export async function addFolderToCache(folder: WorkspaceFolder | undefined, logP
     folderCaching = true;  // set flag
     cacheBuilding = true;  // set flag
 
-    const taskProviders = ([ ...util.getTaskTypes(), ...providersExternal.keys()]).sort();
+    const taskProviders = ([ ...util.getTaskTypes(), ...providersExternal.keys() ]).sort();
     for (const providerName of taskProviders)
     {
         const externalProvider = providersExternal.get(providerName);

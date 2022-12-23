@@ -1007,7 +1007,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
 
                 let rmvCount = -1;
                 for (const t of toRemove) {
-                    this.tasks.splice(t - (++rmvCount), 1);
+                    const idx = t - (++rmvCount);
+                    log.write(`   removing old task '${this.tasks[idx].source}/${this.tasks[idx].name}'`, logLevel, logPad);
+                    this.tasks.splice(idx, 1);
                 }
 
                 this.tasks.push(...taskItems);
@@ -1760,7 +1762,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
         }
 
-        if (util.isString(invalidate, true))
+        if (util.isString(invalidate, true) && invalidate !== "tests")
         {
             log.write(`   invalidation is for type '${invalidate}'`, 1, logPad);
             //

@@ -135,7 +135,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 let rmvCount = -1;
                 for (const tIdx of rmvTasks) {
                     const idx = tIdx - (++rmvCount);
-                    log.write("   removing old task " + this.cachedTasks[idx].name, 2, logPad);
+                    log.write(`   removing old cached task '${this.providerName}/${this.cachedTasks[idx].name}'`, 2, logPad);
                     this.cachedTasks.splice(idx, 1);
                 }
 

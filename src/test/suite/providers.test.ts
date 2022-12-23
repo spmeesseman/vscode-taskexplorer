@@ -26,7 +26,6 @@ let dirName: string;
 let dirNameL2: string;
 let ws2DirName: string;
 let dirNameIgn: string;
-let dirNameCode: string;
 let batch: TaskItem[];
 const tempFiles: string[] = [];
 let taskMap: Map<string, TaskItem> = new Map();
@@ -48,14 +47,13 @@ suite("Provider Tests", () =>
         dirNameL2 = path.join(dirName, "subfolder");
         ws2DirName = path.join(rootPath, "ws2");
         dirNameIgn = path.join(rootPath, "tasks_test_ignore_");
-        dirNameCode = path.join(rootPath, ".vscode");
 
         //
         // Add some excludes, use both config update and task explorer addExclude command
         // for full coverage.  The 'addExclude' command will add the setting globally though,
         // so add it to the workspace setting as well
         //
-        await configuration.updateWs("exclude", ["**/tasks_test_ignore_/**", "**/ant/**"]);
+        await configuration.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
         await commands.executeCommand("taskExplorer.addToExcludes", "**/tasks_test_ignore_/**");
 
         //
@@ -129,7 +127,7 @@ suite("Provider Tests", () =>
         // Do work son
         //
         await teApi.explorer?.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
-        setupVscode(); setupAnt(); setupGradle(); setupTsc(); setupMakefile();
+        setupAnt(); setupGradle(); setupTsc(); setupMakefile();
         setupBash(); setupBatch(); setupGrunt(); setupGulp(); setupAppPublisher(); setupMaven();
 
         batch = await getTreeTasks("batch", 2);
@@ -202,7 +200,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Build tree", async function()
+    test("Build Tree", async function()
     {
         this.timeout(45000);
         await buildTree(this, 7500);
@@ -216,16 +214,16 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Open tasks for edit", async function()
+    test("Open Tasks for Edit", async function()
     {   //
         // The 3rd param `true` will open the task files and locate task positions while parsing the tree
         //
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
-        checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 7);
+        checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10);
     });
 
 
-    test("Resolve task", async function()
+    test("Resolve Task", async function()
     {
         const provider = teApi.providers.get("script");
         assert(provider);
@@ -233,7 +231,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Add to excludes", async function()
+    test("Add to Excludes", async function()
     {
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
@@ -252,7 +250,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("App Publisher delete / add", async function()
+    test("App Publisher Delete / Add", async function()
     {
         const file = path.join(rootPath, ".publishrc.json");
         removeFromArray(tempFiles, file);
@@ -260,10 +258,11 @@ suite("Provider Tests", () =>
         await sleep(1000);
         createAppPublisherFile();
         await sleep(1000);
+        await waitForCache();
     });
 
 
-    test("Ant delete / add", async function()
+    test("Ant Delete / Add", async function()
     {
         const file = path.join(dirName, "build.xml");
         removeFromArray(tempFiles, file);
@@ -274,7 +273,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Gradle delete / add", async function()
+    test("Gradle Delete / Add", async function()
     {
         const file = path.join(dirName, "build.gradle");
         removeFromArray(tempFiles, file);
@@ -285,7 +284,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Grunt delete / add", async function()
+    test("Grunt Delete / Add", async function()
     {
         const file = path.join(rootPath, "GRUNTFILE.js");
         removeFromArray(tempFiles, file);
@@ -296,7 +295,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Gulp delete / add", async function()
+    test("Gulp Delete / Add", async function()
     {
         const file = path.join(rootPath, "gulpfile.js");
         removeFromArray(tempFiles, file);
@@ -307,7 +306,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Makefile delete / add", async function()
+    test("Makefile Delete / Add", async function()
     {
         const file = path.join(rootPath, "Makefile");
         removeFromArray(tempFiles, file);
@@ -318,7 +317,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Maven delete / add", async function()
+    test("Maven Delete / Add", async function()
     {
         const file = path.join(rootPath, "pom.xml");
         removeFromArray(tempFiles, file);
@@ -326,11 +325,10 @@ suite("Provider Tests", () =>
         await sleep(1000);
         createMavenPomFile();
         await sleep(1000);
-
     });
 
 
-    test("Batch delete / add", async function()
+    test("Batch Delete / Add", async function()
     {
         const file = path.join(rootPath, "test.bat");
         removeFromArray(tempFiles, file);
@@ -338,10 +336,11 @@ suite("Provider Tests", () =>
         await sleep(1000);
         createBatchFile();
         await sleep(1000);
+        await waitForCache();
     });
 
 
-    test("Add ws folder to file cache", async function()
+    test("Add WS Folder to File Cache", async function()
     {   //
         // Cover single-if branches in cache module
         //
@@ -352,58 +351,62 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Disable all task providers", async function()
+    test("Disable All Task Providers", async function()
     {
-        await configuration.updateWs("enabledTasks.ant", false);
-        await configuration.updateWs("enabledTasks.appPublisher", false);
-        await configuration.updateWs("enabledTasks.bash", false);
-        await configuration.updateWs("enabledTasks.batch", false);
-        await configuration.updateWs("enabledTasks.gradle", false);
-        await configuration.updateWs("enabledTasks.grunt", false);
-        await configuration.updateWs("enabledTasks.gulp", false);
-        await configuration.updateWs("enabledTasks.make", false);
-        await configuration.updateWs("enabledTasks.maven", false);
-        await configuration.updateWs("enabledTasks.npm", false);
-        await configuration.updateWs("enabledTasks.nsis", false);
-        await configuration.updateWs("enabledTasks.powershell", false);
-        await configuration.updateWs("enabledTasks.perl", false);
-        await configuration.updateWs("enabledTasks.python", false);
-        await configuration.updateWs("enabledTasks.pipenv", false);
-        await configuration.updateWs("enabledTasks.ruby", false);
-        await configuration.updateWs("enabledTasks.tsc", false);
-        await configuration.updateWs("enabledTasks.workspace", false);
+        await configuration.updateWs("enabledTasks", {
+            ant: false,
+            appPublisher: false,
+            bash: false,
+            batch: false,
+            gradle: false,
+            grunt: false,
+            gulp: false,
+            make: false,
+            maven: false,
+            npm: false,
+            nsis: false,
+            powershell: false,
+            perl: false,
+            python: false,
+            pipenv: false,
+            ruby: false,
+            tsc: false,
+            workspace: false
+        });
         await sleep(5000);
         await waitForCache();
     });
 
 
-    test("Re-enable all task providers", async function()
+    test("Re-enable All Task Providers", async function()
     {
-        await configuration.updateWs("enabledTasks.ant", true);
-        await configuration.updateWs("enabledTasks.appPublisher", true);
-        await configuration.updateWs("enabledTasks.bash", true);
-        await configuration.updateWs("enabledTasks.batch", true);
-        await configuration.updateWs("enabledTasks.gradle", true);
-        await configuration.updateWs("enabledTasks.grunt", true);
-        await configuration.updateWs("enabledTasks.gulp", true);
-        await configuration.updateWs("enabledTasks.make", true);
-        await configuration.updateWs("enabledTasks.maven", true);
-        await configuration.updateWs("enabledTasks.npm", true);
-        await configuration.updateWs("enabledTasks.nsis", true);
-        await configuration.updateWs("enabledTasks.powershell", true);
-        await configuration.updateWs("enabledTasks.perl", true);
-        await configuration.updateWs("enabledTasks.python", true);
-        await configuration.updateWs("enabledTasks.pipenv", true);
-        await configuration.updateWs("enabledTasks.ruby", true);
-        await configuration.updateWs("enabledTasks.tsc", true);
-        await configuration.updateWs("enabledTasks.workspace", true);
+        await configuration.updateWs("enabledTasks", {
+            ant: true,
+            appPublisher: true,
+            bash: true,
+            batch: true,
+            gradle: true,
+            grunt: true,
+            gulp: true,
+            make: true,
+            maven: true,
+            npm: true,
+            nsis: true,
+            powershell: true,
+            perl: true,
+            python: true,
+            pipenv: true,
+            ruby: true,
+            tsc: true,
+            workspace: true
+        });
 
-        await sleep(2000); // wait for filesystem change events
+        await sleep(5000); // wait for filesystem change events
         await waitForCache();
     });
 
 
-    test("Refresh task", async function()
+    test("Run Refresh Task", async function()
     {
         await commands.executeCommand("taskExplorer.refresh");
         await sleep(5000);
@@ -411,7 +414,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Invalidate bash tasks with new bash shell setting", async function()
+    test("Invalidate Bash Tasks With New Bash Shell Setting", async function()
     {
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -424,7 +427,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Rebuild cache on workspace folder", async function()
+    test("Rebuild Cache on Workspace Folder", async function()
     {
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -433,7 +436,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Groups with separator", async function()
+    test("Groups with Separator", async function()
     {
         await configuration.updateWs("groupWithSeparator", true);
         await configuration.updateWs("groupSeparator", "-");
@@ -444,7 +447,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Add to excludes after grouping", async function()
+    test("Add to Excludes After Grouping", async function()
     {
         const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItemsB4.length;
@@ -478,7 +481,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Cancel rebuild cache", async function()
+    test("Cancel Rebuild Cache", async function()
     {
         this.timeout(45000);
         //
@@ -499,7 +502,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Enable and disable views", async function()
+    test("Enable and Disable Views", async function()
     {
         await configuration.updateWs("enableExplorerView", false);
         await configuration.updateWs("enableSideBar", false);
@@ -509,7 +512,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Add and remove a workspace folder", async function()
+    test("Add and Remove a Workspace Folder", async function()
     {
         addWsFolder(workspace.workspaceFolders);
         removeWsFolder((workspace.workspaceFolders as WorkspaceFolder[]).filter(f =>  f.index > 0));
@@ -538,7 +541,7 @@ export async function buildTree(instance: any, waitTime?: number)
     await configuration.updateWs("groupMaxLevel", 5);
 
     //
-    // A special refresh() for test suite, will open all task files and open to psition
+    // A special refresh() for test suite, will open all task files and open to position
     //
     await teApi.explorer.refresh("tests");
     await waitForCache();
@@ -612,90 +615,6 @@ function checkTasks(ant: number, ap: number, bash: number, bat: number, gradle: 
     if (taskCount !== vsc) {
         assert.fail(`Unexpected VSCode task count (Found ${taskCount} of ${vsc})`);
     }
-}
-
-
-function setupVscode()
-{
-    const file = path.join(dirNameCode, "tasks.json");
-    tempFiles.push(file);
-
-    fs.writeFileSync(
-        file,
-        "{\r\n" +
-        '    "version": "2.0.0",\r\n' +
-        '    "tasks": [\r\n' +
-        "    {\r\n" +
-        '        "label": "test1",\r\n' +
-        '        "type": "shell",\r\n' +
-        '        "command": "ant.bat",\r\n' +
-        '        "group": "build",\r\n' +
-        '        "problemMatcher": [\r\n' +
-        '            "$eslint-stylish"\r\n' +
-        "        ]\r\n" +
-        "    },\r\n" +
-        "    {\r\n" +
-        '        "type": "npm",\r\n' +
-        '        "script": "watch",\r\n' +
-        '        "problemMatcher": "$tsc-watch",\r\n' +
-        '        "isBackground": true,\r\n' +
-        '        "presentation": {\r\n' +
-        '            "reveal": "never"\r\n' +
-        "        },\r\n" +
-        '        "problemMatcher": [\r\n' +
-        '            "$tsc-watch"\r\n' +
-        "        ],\r\n" +
-        '        "group": {\r\n' +
-        '            "kind": "build",\r\n' +
-        '            "isDefault": true\r\n' +
-        "        }\r\n" +
-        "    },\r\n" +
-        "    {\r\n" +
-        '        "type": "npm",\r\n' +
-        '        "script": "build",\r\n' +
-        '        "group": "build",\r\n' +
-        '        "problemMatcher": [\r\n' +
-        '            "$tsc"\r\n' +
-        "        ]\r\n" +
-        "    },\r\n" +
-        "    {\r\n" +
-        '        "type": "shell",\r\n' +
-        '        "label": "build-dev",\r\n' +
-        '        "command": "..\\test.bat",\r\n' +
-        '        "group": "build",\r\n' +
-        '        "problemMatcher": [\r\n' +
-        '            "$eslint-stylish"\r\n' +
-        "        ]\r\n" +
-        "    },\r\n" +
-        "    {\r\n" +
-        '        "type": "shell",\r\n' +
-        '        "label": "build-prod",\r\n' +
-        '        "command": "..\\test.bat",\r\n' +
-        '        "group": "build",\r\n' +
-        '        "problemMatcher": [\r\n' +
-        '            "$eslint-stylish"\r\n' +
-        "        ]\r\n" +
-        "    },\r\n" +
-        "    {\r\n" +
-        '        "type": "shell",\r\n' +
-        '        "label": "test.bat",\r\n' +
-        '        "command": "..\\test.bat",\r\n' +
-        '        "group": "build",\r\n' +
-        '        "problemMatcher": [\r\n' +
-        '            $eslint-stylish"\r\n' +
-        "        ]\r\n" +
-        "    },\r\n" +
-        "    {\r\n" +
-        '        "type": "shell",\r\n' +
-        '        "label": "build-server",\r\n' +
-        '        "command": "..\\test.bat",\r\n' +
-        '        "group": "build",\r\n' +
-        '        "problemMatcher": [\r\n' +
-        '            "$eslint-stylish"\r\n' +
-        "        ]\r\n" +
-        "    }]\r\n" +
-        "}\r\n"
-    );
 }
 
 
