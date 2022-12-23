@@ -4,7 +4,7 @@
 
 import * as assert from "assert";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeTeCommand, initSettings, isReady, sleep, testCommand } from "../helper";
+import { activate, executeTeCommand, isReady } from "../helper";
 
 
 let teApi: TaskExplorerApi;
@@ -21,14 +21,13 @@ suite("API Init and Tests", () =>
 
     test("Show log", async function()
     {
-        await testCommand("showOutput", false);
-        await testCommand("showOutput", true);
+        await executeTeCommand("showOutput", 50, false);
+        await executeTeCommand("showOutput", 50, true);
     });
 
 
     test("Cover pre-init cases", async function()
     {
-        await initSettings();
         await teApi.explorer?.refresh("tests");
         await executeTeCommand("refresh", 100);
     });

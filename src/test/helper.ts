@@ -64,9 +64,6 @@ export async function activate(instance?: any)
         //
         const dirNameCode = getWsPath(".vscode"),
 			  settingsFile = path.join(dirNameCode, "settings.json");
-        if (!fs.existsSync(dirNameCode)) {
-            fs.mkdirSync(dirNameCode, { mode: 0o777 });
-        }
         if (!fs.existsSync(settingsFile)) {
             fs.writeFileSync(settingsFile, "{}");
         }
@@ -92,26 +89,13 @@ export async function activate(instance?: any)
 export async function cleanup()
 {
     const dirNameCode = getWsPath(".vscode"),
-          settingsFile = path.join(dirNameCode, "settings.json"),
-          tasksFile = path.join(dirNameCode, "tasks.json");
+          settingsFile = path.join(dirNameCode, "settings.json");
 
     await deactivate();
 
     if (fs.existsSync(settingsFile)) {
         try {
             fs.unlinkSync(settingsFile);
-        } catch {}
-    }
-    if (fs.existsSync(tasksFile)) {
-        try {
-            fs.unlinkSync(tasksFile);
-        } catch {}
-    }
-    if (fs.existsSync(dirNameCode)) {
-        try {
-            fs.rmdirSync(dirNameCode, {
-                recursive: true
-            });
         } catch {}
     }
 }
@@ -253,6 +237,7 @@ export async function initSettings(enable = true)
     await configuration.updateWs("keepTermOnStop", false);
     await configuration.updateWs("readUserTasks", enable);
     await configuration.updateWs("showFavoritesButton", enable);
+    await configuration.updateWs("showHiddenWsTasks", enable);
     await configuration.updateWs("showRunningTask", enable);
 }
 
