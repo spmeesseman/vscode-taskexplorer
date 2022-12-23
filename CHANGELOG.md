@@ -1,5 +1,26 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.13.0 (December 23rd, 2022)
+
+### Bug Fixes
+
+- super bug kill - 'a node named .... has already been added', after which most of the tree breaks until refreshed.
+- changing the 'show last tasks' or 'show favorites' settings have no effect until restart [Fixes #173]
+
+### Documentation
+
+- readme displays broken badge link due to space char.
+
+### Features
+
+- complete new layout, 10x easier to navigate and configure
+- add new setting 'show hidden vscode tasks', which will not include workspace tasks in the task tree that have with the 'hide' property set in the task definition.  Defaults to 'true' to resume past behavior. [Closes #182]
+
+### Refactoring
+
+- improve logging legibility, format any logged json objects.
+- add additional logging when constructing a tree file node
+
 ## Version 2.12.0 (December 21st, 2022)
 
 ### Bug Fixes

@@ -1,6 +1,6 @@
 {
     "name": "vscode-taskexplorer",
-    "version": "2.12.0",
+    "version": "2.13.0",
     "displayName": "Task Explorer",
     "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash,php composer, make, maven, python, perl, powershell, ruby, pipenv, nsis.  Supports external task providers via API.",
     "icon": "res/gears-r-colors.png",
@@ -1781,7 +1781,28 @@
                 },
                 "taskExplorer.numLastTasks": {
                     "type": "number",
-                    "enum": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ],
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        20
+                    ],
                     "default": 10,
                     "title": "%config.taskExplorer.numLastTasks%",
                     "markdownDescription": "%config.taskExplorer.numLastTasksDsc%"
@@ -1798,13 +1819,25 @@
                 },
                 "taskExplorer.debugLevel": {
                     "type": "number",
-                    "enum": [ 1, 2, 3, 4, 5 ],
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                    ],
                     "default": 1,
                     "description": "%config.taskExplorer.debugLevel%"
                 },
                 "taskExplorer.groupMaxLevel": {
                     "type": "number",
-                    "enum": [ 1, 2, 3, 4, 5 ],
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                    ],
                     "default": 1,
                     "description": "%config.taskExplorer.groupMaxLevel%"
                 },
