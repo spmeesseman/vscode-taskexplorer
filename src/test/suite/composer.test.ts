@@ -115,7 +115,7 @@ suite("Composer Tests", () =>
 
         await sleep(500);
         await teApi.explorer.invalidateTasksCache(testsName, fileUri);
-        verifyTaskCount(testsName, 5);
+        await verifyTaskCount(testsName, 5);
     });
 
 

@@ -22,7 +22,6 @@ suite("Report Tests", () =>
     {
 		teApi = await activate(this);
         assert(isReady("make") === true, "    ✘ TeApi not ready");
-		await executeTeCommand("focus", 2000);
 	});
 
 
@@ -32,24 +31,15 @@ suite("Report Tests", () =>
 	});
 
 
-    test("Refresh", async function()
-    {
-		await sleep(2000);
-        await executeTeCommand("refresh", 2000);
-		await waitForCache();
-    });
+	test("Focus Task Explorer View for Tree Population", async function()
+	{
+		await executeTeCommand("focus", 5000);
+	});
 
 
 	test("Report page single project 1", async function()
 	{
-		try {
-	    	await executeTeCommand("viewReport", 1000, projectUri);
-		}
-		catch {
-			await sleep(2000);
-			await executeTeCommand("refresh", 2000);
-			await executeTeCommand("viewReport", 1000, projectUri);
-		}
+		await executeTeCommand("viewReport", 1000, projectUri);
 		await closeActiveDocuments();
 	});
 

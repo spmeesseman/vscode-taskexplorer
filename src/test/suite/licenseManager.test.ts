@@ -38,13 +38,6 @@ suite("License Manager Tests", () =>
 	});
 
 
-    test("Refresh", async function()
-    {
-        await executeTeCommand("refresh", 1000);
-		await waitForCache();
-    });
-
-
 	test("Open License Manager", async function()
 	{
 		await sleep(1000);

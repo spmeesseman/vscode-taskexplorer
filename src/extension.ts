@@ -35,6 +35,7 @@ import { LicenseManager } from "./lib/licenseManager";
 export let teApi: TaskExplorerApi;
 let licenseManager: ILicenseManager;
 let enabledTasks: any;
+let pathToPrograms: any;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
 export const providers: Map<string, TaskExplorerProvider> = new Map();
@@ -126,6 +127,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     // the 'enabledTasks' configuration change event occurs
     //
     enabledTasks = configuration.get<any>("enabledTasks", {});
+    pathToPrograms = configuration.get<any>("pathToPrograms", {});
 
     //
     // Create license manager instance
@@ -253,15 +255,17 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     // Main excludes list changes requires global refresh
     //
-    if (e.affectsConfiguration("taskExplorer.exclude") || e.affectsConfiguration("taskExplorer.excludeTask")) {
+    if (e.affectsConfiguration("taskExplorer.exclude") || e.affectsConfiguration("taskExplorer.excludeTask"))
+    {
         refresh = true;
     }
 
     //
     // Groupings changes require global refresh
     //
-    if (e.affectsConfiguration("taskExplorer.groupWithSeparator") || e.affectsConfiguration("taskExplorer.groupSeparator") ||
-        e.affectsConfiguration("taskExplorer.groupMaxLevel") || e.affectsConfiguration("taskExplorer.groupStripTaskLabel")) {
+    if (!refresh && (e.affectsConfiguration("taskExplorer.groupWithSeparator") || e.affectsConfiguration("taskExplorer.groupSeparator") ||
+        e.affectsConfiguration("taskExplorer.groupMaxLevel") || e.affectsConfiguration("taskExplorer.groupStripTaskLabel")))
+    {
         refresh = true;
     }
 
@@ -283,8 +287,9 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     // Enable/disable task types
     //
-    if (e.affectsConfiguration("taskExplorer.enabledTasks"))
+    if (!refresh && e.affectsConfiguration("taskExplorer.enabledTasks"))
     {
+        let didSetScriptTypeForRefresh = false;
         const newEnabledTasks = configuration.get<any>("enabledTasks");
         for (const p in enabledTasks)
         {
@@ -295,9 +300,13 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
                       newValue = newEnabledTasks[taskType];
                 if (newValue !== oldValue)
                 {
-                    const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher" || taskType === "maven";
+                    const isScriptType = util.isScriptType(taskType);
+                    const ignoreModify = isScriptType || taskType === "app-publisher" || taskType === "maven";
                     await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), ignoreModify, newValue);
-                    registerChange(taskType);
+                    if (!isScriptType || !didSetScriptTypeForRefresh) {
+                        registerChange(taskType);
+                    }
+                    didSetScriptTypeForRefresh = didSetScriptTypeForRefresh || isScriptType;
                 }
             }
         }
@@ -307,124 +316,137 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     // Path changes to task programs require task executions to be re-set up
     //
-    for (const type of util.getTaskTypes().filter(t => !util.isWatchTask(t)))
+    if (!refresh)
     {
-        if (e.affectsConfiguration(util.getTaskTypeSettingName(type, "pathToPrograms."))) {
-            refreshTaskTypes.push(type);
-        }
-    }
-
-    //
-    // Extra Bash Globs (for extensionless script files)
-    //
-    if (e.affectsConfiguration("taskExplorer.globPatternsBash"))
-    {
-        if (refreshTaskTypes.includes("bash") === false)
+        if (e.affectsConfiguration("pathToPrograms"))
         {
-            await registerFileWatcher(context, "bash",
-                                      util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", [])),
-                                      false, configuration.get<boolean>("enabledTasks.bash"));
-            registerChange("bash");
+            const newPathToPrograms = configuration.get<any>("pathToPrograms");
+            for (const p in pathToPrograms)
+            {
+                if ({}.hasOwnProperty.call(pathToPrograms, p))
+                {
+                    const taskType = p,
+                          oldValue = pathToPrograms[p],
+                          newValue = newPathToPrograms[taskType];
+                    if (newValue !== oldValue) {
+                        registerChange(taskType);
+                    }
+                }
+            }
         }
-    }
 
-    //
-    // Extra Apache Globs (for non- build.xml files)s
-    //
-    if (e.affectsConfiguration("taskExplorer.includeAnt") || e.affectsConfiguration("taskExplorer.globPatternsAnt"))
-    {
-        if (refreshTaskTypes.includes("ant") === false)
+        //
+        // Extra Bash Globs (for extensionless script files)
+        //
+        if (e.affectsConfiguration("taskExplorer.globPatternsBash"))
         {
-            const antGlobs = [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ];
-            await registerFileWatcher(context, "ant", util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs),
-                                      false, configuration.get<boolean>("enabledTasks.ant"));
+            if (refreshTaskTypes.includes("bash") === false)
+            {
+                await registerFileWatcher(context, "bash",
+                                        util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", [])),
+                                        false, configuration.get<boolean>("enabledTasks.bash"));
+                registerChange("bash");
+            }
+        }
+
+        //
+        // Extra Apache Globs (for non- build.xml files)s
+        //
+        if (e.affectsConfiguration("taskExplorer.includeAnt") || e.affectsConfiguration("taskExplorer.globPatternsAnt"))
+        {
+            if (refreshTaskTypes.includes("ant") === false)
+            {
+                const antGlobs = [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ];
+                await registerFileWatcher(context, "ant", util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs),
+                                        false, configuration.get<boolean>("enabledTasks.ant"));
+                registerChange("ant");
+            }
+        }
+
+        //
+        // Whether or not to use the 'ant' program to detect ant tasks (default is xml2js parser)
+        //
+        if (e.affectsConfiguration("taskExplorer.useAnt")) {
             registerChange("ant");
         }
-    }
 
-    //
-    // Whether or not to use the 'ant' program to detect ant tasks (default is xml2js parser)
-    //
-    if (e.affectsConfiguration("taskExplorer.useAnt")) {
-        registerChange("ant");
-    }
+        //
+        // Whether or not to use the 'gulp' program to detect gulp tasks (default is custom parser)
+        //
+        if (e.affectsConfiguration("taskExplorer.useGulp")) {
+            registerChange("gulp");
+        }
 
-    //
-    // Whether or not to use the 'gulp' program to detect gulp tasks (default is custom parser)
-    //
-    if (e.affectsConfiguration("taskExplorer.useGulp")) {
-        registerChange("gulp");
-    }
+        //
+        // NPM Package Manager change (NPM / Yarn)
+        // Do a global refresh since we don't provide the npm tasks, VSCode itself does
+        //
+        if (e.affectsConfiguration("npm.packageManager", undefined)) {
+            registerChange("npm");
+        }
 
-    //
-    // NPM Package Manager change (NPM / Yarn)
-    // Do a global refresh since we don't provide the npm tasks, VSCode itself does
-    //
-    if (e.affectsConfiguration("npm.packageManager", undefined)) {
-        registerChange("npm");
-    }
+        //
+        // if the 'autoRefresh' settings if turned off, then there's nothing to do
+        //
+        if (e.affectsConfiguration("taskExplorer.showHiddenWsTasks")) {
+            registerChange("Workspace");
+        }
 
-    //
-    // if the 'autoRefresh' settings if turned off, then there's nothing to do
-    //
-    if (e.affectsConfiguration("taskExplorer.showHiddenWsTasks")) {
-        registerChange("Workspace");
-    }
-
-    //
-    // Enabled/disable sidebar view
-    //
-    if (e.affectsConfiguration("taskExplorer.enableSideBar"))
-    {
-        if (configuration.get<boolean>("enableSideBar"))
+        //
+        // Enabled/disable sidebar view
+        //
+        if (e.affectsConfiguration("taskExplorer.enableSideBar"))
         {
-            if (teApi.sidebar) {
-                // TODO - remove/add view on enable/disable view
+            if (configuration.get<boolean>("enableSideBar"))
+            {
+                if (teApi.sidebar) {
+                    // TODO - remove/add view on enable/disable view
+                    refresh = true;
+                }
+                else {
+                    teApi.sidebar = registerExplorer("taskExplorerSideBar", context);
+                }
+            }
+            // else {
+            //     teApi.sidebar = undefined;
+            // }
+        }
+
+        //
+        // Enabled/disable explorer view
+        //
+        if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
+        {
+            if (configuration.get<boolean>("enableExplorerView"))
+            {
+                if (teApi.explorer) {
+                    // TODO - remove/add view on enable/disable view
+                    refresh = true;
+                }
+                else {
+                    teApi.explorer = registerExplorer("taskExplorer", context);
+                }
+            }
+            // else {
+            //     teApi.explorer = undefined;
+            // }
+        }
+
+        //
+        // Integrated shell
+        //
+        if (e.affectsConfiguration("terminal.integrated.shell.windows") ||
+            e.affectsConfiguration("terminal.integrated.shell.linux") ||
+            e.affectsConfiguration("terminal.integrated.shell.osx")) {
+            //
+            // Script type task defs will change with terminal change
+            //
+            if (configuration.get<boolean>("enabledTasks.bash") || configuration.get<boolean>("enabledTasks.batch") ||
+                configuration.get<boolean>("enabledTasks.perl") || configuration.get<boolean>("enabledTasks.powershell") ||
+                configuration.get<boolean>("enabledTasks.python") || configuration.get<boolean>("enabledTasks.ruby") ||
+                configuration.get<boolean>("enabledTasks.nsis")) {
                 refresh = true;
             }
-            else {
-                teApi.sidebar = registerExplorer("taskExplorerSideBar", context);
-            }
-        }
-        // else {
-        //     teApi.sidebar = undefined;
-        // }
-    }
-
-    //
-    // Enabled/disable explorer view
-    //
-    if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
-    {
-        if (configuration.get<boolean>("enableExplorerView"))
-        {
-            if (teApi.explorer) {
-                // TODO - remove/add view on enable/disable view
-                refresh = true;
-            }
-            else {
-                teApi.explorer = registerExplorer("taskExplorer", context);
-            }
-        }
-        // else {
-        //     teApi.explorer = undefined;
-        // }
-    }
-
-    //
-    // Integrated shell
-    //
-    if (e.affectsConfiguration("terminal.integrated.shell.windows") ||
-        e.affectsConfiguration("terminal.integrated.shell.linux") ||
-        e.affectsConfiguration("terminal.integrated.shell.osx")) {
-        //
-        // Script type task defs will change with terminal change
-        //
-        if (configuration.get<boolean>("enabledTasks.bash") || configuration.get<boolean>("enabledTasks.batch") ||
-            configuration.get<boolean>("enabledTasks.perl") || configuration.get<boolean>("enabledTasks.powershell") ||
-            configuration.get<boolean>("enabledTasks.python") || configuration.get<boolean>("enabledTasks.ruby") ||
-            configuration.get<boolean>("enabledTasks.nsis")) {
-            refresh = true;
         }
     }
 

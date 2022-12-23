@@ -43,14 +43,35 @@ suite("Workspace / VSCode Tests", () =>
     test("Show VSCode Tasks Marked Hidden", async function()
     {
         await configuration.updateWs("showHiddenWsTasks", true);
-        verifyTaskCount("Workspace", 10);
+        await verifyTaskCount("Workspace", 10);
     });
 
 
     test("Hide VSCode Tasks Marked Hidden", async function()
     {
         await configuration.updateWs("showHiddenWsTasks", false);
-        verifyTaskCount("Workspace", 9);
+        await verifyTaskCount("Workspace", 9);
+    });
+
+
+    test("Disable Workspace Tasks", async function()
+    {
+        await configuration.updateWs("enabledTasks.workspace", false);
+        await verifyTaskCount("Workspace", 0);
+    });
+
+
+    test("HRe-enable Workspace Tasks", async function()
+    {
+        await configuration.updateWs("enabledTasks.workspace", true);
+        await verifyTaskCount("Workspace", 9);
+    });
+
+
+    test("Re-show VSCode Tasks Marked Hidden", async function()
+    {
+        await configuration.updateWs("showHiddenWsTasks", true);
+        await verifyTaskCount("Workspace", 10);
     });
 
 });

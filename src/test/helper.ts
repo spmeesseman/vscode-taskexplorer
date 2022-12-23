@@ -213,24 +213,26 @@ export async function initSettings(enable = true)
     // Enabled all options, use workspace level so that running this test from Code itself
     // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("enabledTasks.ant", enable);
-    await configuration.updateWs("enabledTasks.appPublisher", enable);
-    await configuration.updateWs("enabledTasks.bash", enable);
-    await configuration.updateWs("enabledTasks.batch", enable);
-    await configuration.updateWs("enabledTasks.gradle", enable);
-    await configuration.updateWs("enabledTasks.grunt", enable);
-    await configuration.updateWs("enabledTasks.gulp", enable);
-    await configuration.updateWs("enabledTasks.make", enable);
-    await configuration.updateWs("enabledTasks.maven", enable);
-    await configuration.updateWs("enabledTasks.npm", enable);
-    await configuration.updateWs("enabledTasks.nsis", enable);
-    await configuration.updateWs("enabledTasks.powershell", enable);
-    await configuration.updateWs("enabledTasks.perl", enable);
-    await configuration.updateWs("enabledTasks.python", enable);
-    await configuration.updateWs("enabledTasks.pipenv", enable);
-    await configuration.updateWs("enabledTasks.ruby", enable);
-    await configuration.updateWs("enabledTasks.tsc", enable);
-    await configuration.updateWs("enabledTasks.workspace", enable);
+    await configuration.updateWs("enabledTasks", {
+        ant: enable,
+        appPublisher: enable,
+        bash: enable,
+        batch: enable,
+        gradle: enable,
+        grunt: enable,
+        gulp: enable,
+        make: enable,
+        maven: enable,
+        npm: enable,
+        nsis: enable,
+        powershell: enable,
+        perl: enable,
+        python: enable,
+        pipenv: enable,
+        ruby: enable,
+        tsc: enable,
+        workspace: enable
+    });
     await configuration.updateWs("groupWithSeparator", enable);
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("showLastTasks", enable);
@@ -335,13 +337,19 @@ export async function testCommand(command: string, ...args: any[])
 export async function verifyTaskCount(taskType: string, expectedCount: number, checkTree?: boolean | number, taskMap?: Map<string, TaskItem>)
 {
     const tTasks = await tasks.fetchTasks({ type: taskType });
-    assert(tTasks && tTasks.length === expectedCount, `Unexpected ${taskType} task count (1)(Found ${tTasks.length} of ${expectedCount})`);
+    try {
+        assert(tTasks && tTasks.length === expectedCount, `Unexpected ${taskType} task count (1)(Found ${tTasks.length} of ${expectedCount})`);
+    }
+    catch (e) { throw e; }
 
     if (checkTree)
     {
         const tasksMap = taskMap || (await teApi.explorer?.getTaskItems(undefined, "   ") as Map<string, TaskItem>),
               taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
         expectedCount = (typeof checkTree === "number" ? checkTree : expectedCount);
-        assert(taskCount === expectedCount, `Unexpected ${taskType} task count (2)(Found ${taskCount} of ${expectedCount})`);
+        try {
+            assert(taskCount === expectedCount, `Unexpected ${taskType} task count (2)(Found ${taskCount} of ${expectedCount})`);
+        }
+        catch (e) { throw e; }
     }
 }
