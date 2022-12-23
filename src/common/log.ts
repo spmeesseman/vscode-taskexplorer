@@ -222,31 +222,31 @@ export function write(msg: string, level?: number, logPad = "") // , color?: Log
         // }
         const ts = new Date().toISOString().replace(/[TZ]/g, " ");
 
-        const _write = (fn: (...fnArgs: any) => void, ...args: any) =>
+        const _write = (fn: (...fnArgs: any) => void, scope: any, ...args: any) =>
         {
             const msgs = msg.split("\n");
             for (const m of msgs)
             {
                 if (args && args.length > 0) {
-                    fn(...args, ts + logPad + m.trimEnd());
+                    fn.call(scope || window, ...args, ts + logPad + m.trimEnd());
                 }
                 else {
-                    fn(ts + logPad + m.trimEnd());
+                    fn.call(scope || window, ts + logPad + m.trimEnd());
                 }
             }
         };
 
         if (logOutputChannel && (!level || level <= (configuration.get<number>("debugLevel") || -1))) {
-            _write(logOutputChannel.appendLine);
+            _write(logOutputChannel.appendLine, logOutputChannel);
         }
         if (writeToConsole) {
             if (!level || level <= writeToConsoleLevel) {
-                _write(console.log);
+                _write(console.log, console);
             }
         }
         if (writeToFile) {
             if (!level || level <= writeToFileLevel) {
-                _write(writeFileSync, "taskexplorer.log");
+                _write(writeFileSync, null, "taskexplorer.log");
             }
         }
         lastWriteWasBlank = msg === "";
