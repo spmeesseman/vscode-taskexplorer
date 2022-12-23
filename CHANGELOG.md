@@ -1,5 +1,11 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.13.1 (December 23rd, 2022)
+
+### Bug Fixes
+
+- transfer old settings to new settings in some cases did not work in the previous release
+
 ## Version 2.13.0 (December 23rd, 2022)
 
 ### Bug Fixes
