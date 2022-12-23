@@ -23,6 +23,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
         const pipenv = configuration.get<string>("pathToPrograms.pipenv");
         let pythonPath: string | null = null;
 
+        /* istanbul ignore else */
         if (pipenv === "pipenv") {
             // If the user didn't explicitly set a pathToPrograms.pipenv (meaning it is the default value),
             // then use the python path from the environment to run pipenv as a module. This way it
@@ -33,9 +34,10 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
         const def = this.getDefaultDefinition(target, folder, uri);
         const cwd = path.dirname(uri.fsPath);
         const args = [ "run", target ];
+        /* istanbul ignore else */
         if (pythonPath) {
             // If using python path, run pipenv as a module.
-            args.unshift(...["-m", "pipenv"]);
+            args.unshift(...[ "-m", "pipenv" ]);
         }
         const options: ShellExecutionOptions = { cwd };
         const execution = new ShellExecution(pythonPath ?? pipenv, args, options);
@@ -48,7 +50,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
     {
         const scripts: string[] = [];
 
-        log.methodStart("find pipenv Pipfile targets", 1, logPad, true, [["path", fsPath]]);
+        log.methodStart("find pipenv Pipfile targets", 1, logPad, true, [[ "path", fsPath ]]);
 
         const contents = util.readFileSync(fsPath);
 
@@ -56,7 +58,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
         const pipfile = new bombadil.TomlReader();
         pipfile.readToml(contents);
 
-        Object.entries(pipfile.result?.scripts ?? {}).forEach(([scriptName, _scriptCmd]) => {
+        Object.entries(/* istanbul ignore next */pipfile.result?.scripts ?? {}).forEach(([ scriptName, _scriptCmd ]) => {
             // Only need the script name, not the whole command, since it is run as `pipenv run <scriptName>`
             scripts.push(scriptName);
             log.write("   found pipenv Pipfile target", 3, logPad);
@@ -85,6 +87,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number
     {
+        /* istanbul ignore if */
         if (!taskName || !documentText) {
             return 0;
         }
@@ -97,7 +100,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read pipenv Pipfile file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read pipenv Pipfile file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
 
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)

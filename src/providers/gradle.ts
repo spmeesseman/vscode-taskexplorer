@@ -19,9 +19,11 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         const getCommand = (folder: WorkspaceFolder, cmd: string): string =>
         {
             let gradle = "gradlew";
+            /* istanbul ignore else */
             if (process.platform === "win32") {
                 gradle = "gradlew.bat";
             }
+            /* istanbul ignore else */
             if (configuration.get<string>("pathToPrograms.gradle")) {
                 gradle = configuration.get("pathToPrograms.gradle");
             }
@@ -54,17 +56,20 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("task "))
             {
                 let idx1 = line.trimLeft().indexOf(" ");
+                /* istanbul ignore else */
                 if (idx1 !== -1)
                 {
                     idx1++;
                     let idx2 = line.indexOf("(", idx1);
+                    /* istanbul ignore if */
                     if (idx2 === -1) {
                         idx2 = line.indexOf("{", idx1);
                     }
+                    /* istanbul ignore else */
                     if (idx2 !== -1)
                     {
                         const tgtName = line.substring(idx1, idx2).trim();
-
+                        /* istanbul ignore else */
                         if (tgtName)
                         {
                             scripts.push(tgtName);

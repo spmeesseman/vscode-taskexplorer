@@ -15,8 +15,9 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
     constructor() { super("app-publisher"); }
 
 
+    /* istanbul ignore next */
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task | undefined
-    {
+    {   /* istanbul ignore next */
         return undefined;
     }
 

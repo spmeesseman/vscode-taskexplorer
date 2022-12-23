@@ -84,7 +84,7 @@
         "test:dev": "rimraf c:\\code\\data\\user-data\\cacheddata && npm run test",
         "test:after": "npm run coverage-full_off",
         "test:before": "npm run rebuild_test && npm run coverage-full_on",
-        "test:openreport": "npm run coverage-open-report",
+        "test:openreport": "npm run coverage-open_report",
         "watch": "tsc -watch -p ./",
         "webpack-watch": "webpack -w --info-verbosity verbose --mode development --config ./webpack.config.js",
         "webpack-build": "npm run webpack-build:extension",

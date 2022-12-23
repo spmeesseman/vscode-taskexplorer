@@ -96,6 +96,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         {
             isWinShell = true;
             const winShell = configuration.getVs<string>("terminal.integrated.shell.windows", "");
+            /* istanbul ignore if */
             if (winShell && winShell.includes("bash.exe")) {
                 sep = "/";
                 isWinShell = false;
@@ -113,9 +114,11 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             if (scriptDef.type === "bash")
             {
                 let bash = configuration.get<string>("pathToPrograms.bash");
+                /* istanbul ignore if */
                 if (!bash) {
                     bash = "C:\\Program Files\\Git\\bin\\bash.exe";
                 }
+                /* istanbul ignore else */
                 if (!util.pathExists(bash)) {
                     bash = "bash.exe";
                 }
@@ -136,6 +139,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             //
             // Add any defined arguments to the command line exec
             //
+            /* istanbul ignore else */
             if (scriptDef.args) {
                 args.push(...scriptDef.args);
             }
@@ -166,6 +170,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         // Make sure there are no windows style slashes in any configured path to an executable
         // if this isnt running in a windows shell
         //
+        /* istanbul ignore if */
         if (!isWinShell)
         {
             exec = exec.replace(/\\/g, "/");
@@ -188,6 +193,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition | undefined
     {
+        /* istanbul ignore next */
         const tgt = target?.toLowerCase(),
               scriptDef = this.scriptTable[tgt],
               fileName = path.basename(uri.fsPath);
@@ -200,6 +206,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             type: "script",
             script: target.toLowerCase(),
             target: tgt,
+            /* istanbul ignore next */
             scriptType: scriptDef.type || "unknown",
             fileName,
             scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
@@ -279,6 +286,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         log.methodStart("read script file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
         const task = this.createTask(path.extname(uri.fsPath).substring(1), undefined, folder, uri);
         log.methodDone("read script file uri task", 1, logPad, true);
+        /* istanbul ignore next */
         return task ? [ task ] : [];
     }
 

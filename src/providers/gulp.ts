@@ -100,6 +100,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         //     [12:28:59]         └── buildJS
         //
 
+        /* istanbul ignore if */
         if (configuration.get("useGulp") === true)
         {
             let stdout: Buffer | undefined;

@@ -20,9 +20,11 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
         const getCommand = (): string =>
         {
             let composer = "composer";
+            /* istanbul ignore else */
             if (process.platform === "win32") {
                 composer = "composer.exe";
             }
+            /* istanbul ignore else */
             if (configuration.get<string>("pathToPrograms.composer")) {
                 composer = configuration.get("pathToPrograms.composer");
             }
@@ -48,7 +50,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
         try {
             const json = JSON.parse(util.readFileSync(fsPath)),
                 scripts = json.scripts;
-
+            /* istanbul ignore else */
             if (scripts) {
                 Object.keys(scripts).forEach((k) => { targets.push(k); });
             }
@@ -83,6 +85,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
             if (idx !== -1 && scriptName)
             {
                 const idx2 = documentText.indexOf(`"${scriptName}"`);
+                /* istanbul ignore next */
                 return idx2 !== -1 ? idx2 : idx;
             }
         }

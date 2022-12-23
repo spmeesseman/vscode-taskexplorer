@@ -40,14 +40,16 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad = ""): Task
     {
-        log.methodStart("create make task", 4, logPad, true, [["target", target], ["cmd", cmd]]);
+        log.methodStart("create make task", 4, logPad, true, [[ "target", target ], [ "cmd", cmd ]]);
 
         const getCommand = (): string =>
         {
             let make = "make";
+            /* istanbul ignore else */   // I don't text on anythingbut windows
             if (process.platform === "win32") {
                 make = "nmake";
             }
+            /* istanbul ignore else */
             if (configuration.get("pathToPrograms.make")) {
                 make = configuration.get("pathToPrograms.make");
                 //
@@ -62,7 +64,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         const kind = this.getDefaultDefinition(target, folder, uri);
 
         const cwd = path.dirname(uri.fsPath);
-        const args = [target];
+        const args = [ target ];
         const options: ShellExecutionOptions = {
             cwd
         };
@@ -86,6 +88,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             idx = documentText.indexOf(taskName);
             let bLine = documentText.lastIndexOf("\n", idx) + 1;
             let eLine = documentText.indexOf("\n", idx);
+            /* istanbul ignore if */
             if (eLine === -1) { eLine = documentText.length; }
             let line = documentText.substring(bLine, eLine).trim();
             while (bLine !== -1 && bLine !== idx && idx !== -1 && line.indexOf(":") === -1)
@@ -93,8 +96,9 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
                 idx = documentText.indexOf(taskName, idx + 1);
                 bLine = documentText.lastIndexOf("\n", idx) + 1;
                 eLine = documentText.indexOf("\n", idx);
+                /* istanbul ignore else */
                 if (bLine !== -1)
-                {
+                {   /* istanbul ignore if */
                     if (eLine === -1) { eLine = documentText.length; }
                     line = documentText.substring(bLine, eLine).trim();
                 }
@@ -107,7 +111,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     private findTargets(fsPath: string, logPad: string): string[]
     {
         const scripts: string[] = [];
-        log.methodStart("find makefile targets", 1, logPad, true, [["path", fsPath]]);
+        log.methodStart("find makefile targets", 1, logPad, true, [[ "path", fsPath ]]);
 
         const contents = util.readFileSync(fsPath);
         let match;
@@ -118,8 +122,9 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             {
                 continue;
             }
+            /* istanbul ignore else */
             if (!scripts.includes(tgtName)) // avoid duplicates
-            {
+            {   /* istanbul ignore else */
                 if (this.isNormalTarget(tgtName)) {
                     scripts.push(tgtName);
                     log.write(logPad + "   found makefile target");
@@ -150,14 +155,17 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     private isNormalTarget(target: string): boolean
     {
+        /* istanbul ignore if */
         if (this.specialTargets.has(target))
         {
             return false;
         }
+        /* istanbul ignore if */
         if (this.suffixRuleTargets.test(target))
         {
             return false;
         }
+        /* istanbul ignore if */
         if (this.patternRuleTargets.test(target))
         {
             return false;
@@ -172,7 +180,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read make file uri tasks", 1, logPad, true, [["path", uri?.fsPath], ["project folder", folder?.name]]);
+        log.methodStart("read make file uri tasks", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
         {

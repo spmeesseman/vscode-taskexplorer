@@ -14,8 +14,10 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
     constructor() { super("maven"); }
 
 
+    /* istanbul ignore next */
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task | undefined
     {
+        /* istanbul ignore next */
         return undefined;
     }
 
@@ -45,6 +47,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
     private getCommand(): string
     {
         let mvn = "mvn";
+        /* istanbul ignore else */
         if (configuration.get("pathToPrograms.maven"))
         {
             mvn = configuration.get("pathToPrograms.maven");
@@ -60,7 +63,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
               defaultDef = this.getDefaultDefinition(undefined, folder, uri),
               options: ShellExecutionOptions = { cwd };
 
-        log.methodStart("read maven file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read maven file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
 
         const kindClean: TaskExplorerDefinition = {
             ...defaultDef,

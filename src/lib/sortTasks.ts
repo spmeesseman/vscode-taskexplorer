@@ -12,6 +12,7 @@ export function sortTaskFolder(folder: TaskFolder, logPad: string, logLevel: num
     sortTasks(folder.taskFiles, logPad, logLevel);
     for (const each of folder.taskFiles)
     {
+        /* istanbul ignore else */
         if ((each instanceof TaskFile)) { // && each.isGroup) {
             sortTasks(each.treeNodes, logPad, logLevel);
         }
@@ -23,7 +24,7 @@ export function sortLastTasks(items: (TaskFile | TaskItem)[] | undefined, lastTa
 {
     log.methodStart("sort last tasks", logLevel, logPad);
     items?.sort((a: TaskItem | TaskFile, b: TaskItem | TaskFile) =>
-    {
+    {   /* istanbul ignore else */
         if (a.id && b.id) {
             const aIdx = lastTasks.indexOf(a.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
             const bIdx = lastTasks.indexOf(b.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
@@ -39,7 +40,7 @@ export function sortTasks(items: (TaskFile | TaskItem)[] | undefined, logPad = "
 {
     log.methodStart("sort tasks", logLevel, logPad);
     items?.sort((a: TaskFile| TaskItem, b: TaskFile| TaskItem) =>
-    {
+    {   /* istanbul ignore else */
         if (a.label && b.label)
         {
             if ((a instanceof TaskFile && b instanceof TaskFile || a instanceof TaskItem && b instanceof TaskItem)) {
@@ -48,6 +49,7 @@ export function sortTasks(items: (TaskFile | TaskItem)[] | undefined, logPad = "
             //
             // TaskFiles we keep at the  top, like a folder in Windows Explorer
             //
+            /* istanbul ignore if */
             else if (a instanceof TaskFile && b instanceof TaskItem)
             {
                 return -1;

@@ -54,11 +54,13 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
     };
 
     let relPath = taskItem.task.definition.path ? taskItem.task.definition.path : "";
+    /* istanbul ignore if */
     if (relPath[relPath.length - 1] === "/" || relPath[relPath.length - 1] === "\\")
     {
         relPath = relPath.substring(0, relPath.length - 1);
     }
 
+    /* istanbul ignore else */
     if (taskItem.taskFile.folder.workspaceFolder)
     {
         const lblString = taskItem.task.name;
@@ -66,6 +68,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
                         " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
         term = check(taskName);
 
+        /* istanbul ignore if */
         if (!term && lblString.indexOf("(") !== -1)
         {
             taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
@@ -73,6 +76,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
             term = check(taskName);
         }
 
+        /* istanbul ignore if */
         if (!term)
         {
             taskName = taskItem.taskSource + ": " + lblString +
@@ -80,12 +84,14 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
             term = check(taskName);
         }
 
+        /* istanbul ignore if */
         if (!term)
         {
             taskName = taskItem.taskSource + ": " + lblString + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
             term = check(taskName);
         }
 
+        /* istanbul ignore if */
         if (!term)
         {
             taskName = taskItem.taskSource + ": " + lblString +
@@ -93,6 +99,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
             term = check(taskName);
         }
 
+        /* istanbul ignore if */
         if (!term && taskItem.taskSource === "Workspace")
         {
             taskName = "npm: " + lblString +
@@ -100,6 +107,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
             term = check(taskName);
         }
 
+        /* istanbul ignore if */
         if (!term && lblString.indexOf("(") !== -1)
         {
             taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
@@ -107,6 +115,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
             term = check(taskName);
         }
 
+        /* istanbul ignore if */
         if (!term && lblString.indexOf("(") !== -1)
         {
             taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
@@ -114,6 +123,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
             term = check(taskName);
         }
 
+        /* istanbul ignore if */
         if (!term && relPath)
         {
             const folder = taskItem.getFolder();

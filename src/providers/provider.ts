@@ -147,6 +147,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                     // this.cachedTasks under certain circumstances via invalidation by the tree that's
                     // called into by the main VSCode thread. So ensure it's defined before the push()...
                     //
+                    /* istanbul ignore next */
                     this.cachedTasks?.push(...tasks);
                 }
                 else if (!pathExists) {

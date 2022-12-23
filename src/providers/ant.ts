@@ -249,9 +249,11 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     private getCommand(): string
     {
         let ant = "ant";
+        /* istanbul ignore else */
         if (process.platform === "win32") {
             ant = "ant.bat";
         }
+        /* istanbul ignore else */
         if (configuration.get("pathToPrograms.ant"))
         {
             ant = configuration.get("pathToPrograms.ant");

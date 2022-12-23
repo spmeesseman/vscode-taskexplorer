@@ -50,18 +50,21 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
                     let eol2 = eol + 1;
                     eol2 = contents.indexOf("\n", eol2);
                     line = contents.substring(eol + 1, eol2).trim();
+                    /* istanbul ignore else */
                     if (line.startsWith("'") || line.startsWith('"'))
                     {
                         idx1 = line.indexOf("'");
                         if (idx1 === -1) {
                             idx1 = line.indexOf('"');
                         }
+                        /* istanbul ignore else */
                         if (idx1 !== -1) {
                             eol = eol2;
                         }
                     }
                 }
 
+                /* istanbul ignore else */
                 if (idx1 !== -1)
                 {
                     idx1++;
@@ -69,9 +72,11 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
                     if (idx2 === -1) {
                         idx2 = line.indexOf('"', idx1);
                     }
+                    /* istanbul ignore else */
                     if (idx2 !== -1)
                     {
                         const tgtName = line.substring(idx1, idx2).trim();
+                        /* istanbul ignore else */
                         if (tgtName) {
                             scripts.push(tgtName);
                             log.write("   found grunt target", 3, logPad);
@@ -106,7 +111,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
 
 
     public getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number
-    {
+    {   /* istanbul ignore if */
         if (!taskName || !documentText) {
             return 0;
         }
