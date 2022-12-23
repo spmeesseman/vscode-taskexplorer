@@ -112,7 +112,7 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = ""): b
 
     //
     // Check enabled and npm install task
-    // THis will ignore tasks from other providers as well, unless it has registered
+    // This will ignore tasks from other providers as well, unless it has registered
     // as an external provider via Task Explorer API
     //
     const srcEnabled = configuration.get(util.getTaskTypeEnabledSettingName(task.source)),

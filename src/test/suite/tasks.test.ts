@@ -85,7 +85,7 @@ suite("Task Tests", () =>
 
     test("Trigger busy on run last task", async function()
     {
-        /* Don't await -> */ teApi.explorer?.invalidateTasksCache();
+        teApi.explorer?.invalidateTasksCache();// Don't await
         await executeTeCommand("runLastTask", 5000);
     });
 
@@ -139,11 +139,11 @@ suite("Task Tests", () =>
             await configuration.updateWs("keepTermOnStop", false);
             await executeTeCommand("open", 50, batchTask, true); // clickaction=execute
             await executeTeCommand("runWithArgs", 2500, batchTask, "--test --test2");
-            if (runCount % 1 === 0)
+            if (runCount % 2 === 0)
             {
                 await executeTeCommand("stop", 0, batchTask);
                 await executeTeCommand("run", 2500, batchTask);
-                executeTeCommand("pause", 1000, batchTask);
+                executeTeCommand("pause", 1000, batchTask); // ?? No await ?
                 await executeTeCommand("pause", 1000, batchTask);
                 await executeTeCommand("run", 500, batchTask);
                 await configuration.updateWs("clickAction", "Open");
@@ -183,7 +183,7 @@ async function startTask(taskItem: TaskItem)
     console.log(`    ℹ Run ${taskItem.taskSource} task: ${taskItem.label}`);
     console.log(`        Folder: ${taskItem.getFolder()?.name}`);
     await configuration.updateWs("clickAction", "Execute");
-    await configuration.updateWs("showLastTasks", ++runCount % 2 === 1);
+    await configuration.updateWs("showLastTasks", (++runCount % 2) === 1);
     let removed = await executeTeCommand("addRemoveFromFavorites", 0, taskItem);
     if (removed) {
         await executeTeCommand("addRemoveFromFavorites", 0, taskItem);

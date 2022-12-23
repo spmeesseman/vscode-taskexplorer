@@ -881,7 +881,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
             const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
             if (lastTasks.includes(util.getTaskItemId(taskItem)) !== false)
             {
-                if (this.taskTree[0].label === constants.LAST_TASKS_LABEL)
+                if (this.taskTree[0] && this.taskTree[0].label === constants.LAST_TASKS_LABEL)
                 {
                     this._onDidChangeTreeData.fire(this.taskTree[0]);
                 }
@@ -894,17 +894,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         if (favTasks.includes(util.getTaskItemId(taskItem)) !== false)
         {
-            if (this.taskTree[0].label === constants.FAV_TASKS_LABEL)
+            if (this.taskTree[0] && this.taskTree[0].label === constants.FAV_TASKS_LABEL)
             {
                 this._onDidChangeTreeData.fire(this.taskTree[0]);
             }
-            else if (this.taskTree[1].label === constants.FAV_TASKS_LABEL)
+            else if (this.taskTree[1] && this.taskTree[1].label === constants.FAV_TASKS_LABEL)
             {
                 this._onDidChangeTreeData.fire(this.taskTree[1]);
             }
         }
 
-        log.methodStart("fire task change events", logLevel, logPad);
+        log.methodDone("fire task change events", logLevel, logPad);
     }
 
 
@@ -2426,14 +2426,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         taskTimerId = setTimeout(async () =>
         {
-            log.methodStart("task started event", 1);
-            //
-            // Show status bar message (if ON in settings)
-            //
-            this.showStatusMessage(task);
-            const taskItem = await this.getTaskItems(taskId) as TaskItem;
-            this.fireTaskChangeEvents(taskItem, "   ", 1);
-            log.methodDone("task started event", 1);
+            try
+            {   log.methodStart("task started event", 1);
+                //
+                // Show status bar message (if ON in settings)
+                //
+                this.showStatusMessage(task);
+                const taskItem = await this.getTaskItems(taskId) as TaskItem;
+                this.fireTaskChangeEvents(taskItem, "   ", 1);
+                log.methodDone("task started event", 1);
+            }
+            catch (e) { console.error(e); }
         }, 50);
 
         this.taskIdStartEvents.set(taskId, taskTimerId);
@@ -2461,15 +2464,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>
         //
         taskTimerId = setTimeout(async () =>
         {
-            log.methodStart("task finished event", 1);
-            //
-            // Hide status bar message (if ON in settings)
-            //
-            this.showStatusMessage(task);
-            const taskItem = await this.getTaskItems(taskId, "   ", false, 2) as TaskItem;
-            taskItem.taskDetached = undefined;
-            this.fireTaskChangeEvents(taskItem, "   ", 1);
-            log.methodDone("task finished event", 1);
+            try
+            {   log.methodStart("task finished event", 1);
+                //
+                // Hide status bar message (if ON in settings)
+                //
+                this.showStatusMessage(task);
+                const taskItem = await this.getTaskItems(taskId, "   ", false, 2) as TaskItem;
+                this.fireTaskChangeEvents(taskItem, "   ", 1);
+                log.methodDone("task finished event", 1);
+            }
+            catch (e) { console.error(e); }
         }, 50);
 
         this.taskIdStopEvents.set(taskId, taskTimerId);

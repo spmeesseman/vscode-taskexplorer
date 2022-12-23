@@ -119,11 +119,21 @@ export default class TaskItem extends TreeItem
     }
 
 
-    isExecuting()
+    isExecuting(logPad = "   ")
     {
+        log.methodStart("is executing", 5, logPad);
         const task = this.taskDetached ?? this.task;
-        return tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
-                                         e.task.scope === task.scope && e.task.definition.path === task.definition.path);
+        const execs = tasks.taskExecutions.filter(e => e.task.name === task.name && e.task.source === task.source &&
+                                                  e.task.scope === task.scope && e.task.definition.path === task.definition.path);
+        const exec = execs.find(e => e.task.name === task.name && e.task.source === task.source &&
+                                e.task.scope === task.scope && e.task.definition.path === task.definition.path);
+        if (execs.length > 1) {
+            log.error(`More than one task execution was found for '${this.task.name}' !!`);
+        }
+        log.methodDone("is executing", 5, logPad, false, [
+            [ "is executing", !!exec ], [ "task execution count", execs.length ], [ "total execution count", tasks.taskExecutions.length ]
+        ]);
+        return exec;
     }
 
 
