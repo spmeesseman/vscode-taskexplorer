@@ -227,13 +227,14 @@ export function getTaskItemId(taskItem: TaskItem)
 
 export function getTaskTypeSettingName(taskType: string, settingPart: string)
 {
-    return settingPart + (taskType !== "app-publisher" ? properCase(taskType) : "AppPublisher");
+    return settingPart + (taskType !== "app-publisher" ?
+                         (!settingPart.endsWith(".") ? properCase(taskType) : taskType.toLowerCase()) : "appPublisher");
 }
 
 
 export function getTaskTypeEnabledSettingName(taskType: string)
 {
-    return getTaskTypeSettingName(taskType, "enable");
+    return getTaskTypeSettingName(taskType, "enabledTasks.");
 }
 
 

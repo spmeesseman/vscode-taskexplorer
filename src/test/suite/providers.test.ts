@@ -354,24 +354,24 @@ suite("Provider Tests", () =>
 
     test("Disable all task providers", async function()
     {
-        await configuration.updateWs("enableAnt", false);
-        await configuration.updateWs("enableAppPublisher", false);
-        await configuration.updateWs("enableBash", false);
-        await configuration.updateWs("enableBatch", false);
-        await configuration.updateWs("enableGradle", false);
-        await configuration.updateWs("enableGrunt", false);
-        await configuration.updateWs("enableGulp", false);
-        await configuration.updateWs("enableMake", false);
-        await configuration.updateWs("enableMaven", false);
-        await configuration.updateWs("enableNpm", false);
-        await configuration.updateWs("enableNsis", false);
-        await configuration.updateWs("enablePowershell", false);
-        await configuration.updateWs("enablePerl", false);
-        await configuration.updateWs("enablePython", false);
-        await configuration.updateWs("enablePipenv", false);
-        await configuration.updateWs("enableRuby", false);
-        await configuration.updateWs("enableTsc", false);
-        await configuration.updateWs("enableWorkspace", false);
+        await configuration.updateWs("enabledTasks.ant", false);
+        await configuration.updateWs("enabledTasks.appPublisher", false);
+        await configuration.updateWs("enabledTasks.bash", false);
+        await configuration.updateWs("enabledTasks.batch", false);
+        await configuration.updateWs("enabledTasks.gradle", false);
+        await configuration.updateWs("enabledTasks.grunt", false);
+        await configuration.updateWs("enabledTasks.gulp", false);
+        await configuration.updateWs("enabledTasks.make", false);
+        await configuration.updateWs("enabledTasks.maven", false);
+        await configuration.updateWs("enabledTasks.npm", false);
+        await configuration.updateWs("enabledTasks.nsis", false);
+        await configuration.updateWs("enabledTasks.powershell", false);
+        await configuration.updateWs("enabledTasks.perl", false);
+        await configuration.updateWs("enabledTasks.python", false);
+        await configuration.updateWs("enabledTasks.pipenv", false);
+        await configuration.updateWs("enabledTasks.ruby", false);
+        await configuration.updateWs("enabledTasks.tsc", false);
+        await configuration.updateWs("enabledTasks.workspace", false);
         await sleep(5000);
         await waitForCache();
     });
@@ -379,24 +379,24 @@ suite("Provider Tests", () =>
 
     test("Re-enable all task providers", async function()
     {
-        await configuration.updateWs("enableAnt", true);
-        await configuration.updateWs("enableAppPublisher", true);
-        await configuration.updateWs("enableBash", true);
-        await configuration.updateWs("enableBatch", true);
-        await configuration.updateWs("enableGradle", true);
-        await configuration.updateWs("enableGrunt", true);
-        await configuration.updateWs("enableGulp", true);
-        await configuration.updateWs("enableMake", true);
-        await configuration.updateWs("enableMaven", true);
-        await configuration.updateWs("enableNpm", true);
-        await configuration.updateWs("enableNsis", true);
-        await configuration.updateWs("enablePowershell", true);
-        await configuration.updateWs("enablePerl", true);
-        await configuration.updateWs("enablePython", true);
-        await configuration.updateWs("enablePipenv", true);
-        await configuration.updateWs("enableRuby", true);
-        await configuration.updateWs("enableTsc", true);
-        await configuration.updateWs("enableWorkspace", true);
+        await configuration.updateWs("enabledTasks.ant", true);
+        await configuration.updateWs("enabledTasks.appPublisher", true);
+        await configuration.updateWs("enabledTasks.bash", true);
+        await configuration.updateWs("enabledTasks.batch", true);
+        await configuration.updateWs("enabledTasks.gradle", true);
+        await configuration.updateWs("enabledTasks.grunt", true);
+        await configuration.updateWs("enabledTasks.gulp", true);
+        await configuration.updateWs("enabledTasks.make", true);
+        await configuration.updateWs("enabledTasks.maven", true);
+        await configuration.updateWs("enabledTasks.npm", true);
+        await configuration.updateWs("enabledTasks.nsis", true);
+        await configuration.updateWs("enabledTasks.powershell", true);
+        await configuration.updateWs("enabledTasks.perl", true);
+        await configuration.updateWs("enabledTasks.python", true);
+        await configuration.updateWs("enabledTasks.pipenv", true);
+        await configuration.updateWs("enabledTasks.ruby", true);
+        await configuration.updateWs("enabledTasks.tsc", true);
+        await configuration.updateWs("enabledTasks.workspace", true);
 
         await sleep(2000); // wait for filesystem change events
         await waitForCache();

@@ -25,8 +25,7 @@ let fileUri: Uri;
 
 suite("Composer Tests", () =>
 {
-    const testsName = "composer",
-          testsNameProper = properCase(testsName);
+    const testsName = "composer";
 
     suiteSetup(async function()
     {   //
@@ -39,11 +38,11 @@ suite("Composer Tests", () =>
         //
         // Store / set initial settings
         //
-        await configuration.updateWs(`pathTo${testsNameProper}`, getWsPath("ant\\bin\\ant.bat"));
-        pathToComposer = configuration.get<string>(`pathTo${testsNameProper}`);
-        enableComposer = configuration.get<boolean>(`enable${testsNameProper}`);
-        await configuration.updateWs(`pathTo${testsNameProper}`, "php\\composer.exe");
-        await configuration.updateWs(`enable${testsNameProper}`, true);
+        await configuration.updateWs("pathToPrograms.composer", getWsPath("ant\\bin\\ant.bat"));
+        pathToComposer = configuration.get<string>("pathToPrograms.composer");
+        enableComposer = configuration.get<boolean>("enabledTasks.composer");
+        await configuration.updateWs("pathToPrograms.composer", "php\\composer.exe");
+        await configuration.updateWs("enabledTasks.composer", true);
     });
 
 
@@ -51,8 +50,8 @@ suite("Composer Tests", () =>
     {   //
         // Reset settings
         //
-        await configuration.updateWs(`pathTo${testsNameProper}`, pathToComposer);
-        await configuration.updateWs(`enable${testsNameProper}`, enableComposer);
+        await configuration.updateWs("pathToPrograms.composer", pathToComposer);
+        await configuration.updateWs("enabledTasks.composer", enableComposer);
     });
 
 
@@ -75,7 +74,7 @@ suite("Composer Tests", () =>
 
     test("Disable", async function()
     {
-        await configuration.updateWs(`enable${testsNameProper}`, false);
+        await configuration.updateWs("enabledTasks.composer", false);
         await sleep(500);
         await teApi.explorer?.invalidateTasksCache(testsName);
         await sleep(500);
@@ -86,7 +85,7 @@ suite("Composer Tests", () =>
 
     test("Re-enable", async function()
     {
-        await configuration.updateWs(`enable${testsNameProper}`, true);
+        await configuration.updateWs("enabledTasks.composer", true);
         await sleep(500);
         await teApi.explorer?.invalidateTasksCache(testsName);
         const cTasks = await tasks.fetchTasks({ type: testsName });

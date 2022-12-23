@@ -22,8 +22,8 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             if (process.platform === "win32") {
                 gradle = "gradlew.bat";
             }
-            if (configuration.get<string>("pathToGradle")) {
-                gradle = configuration.get("pathToGradle");
+            if (configuration.get<string>("pathToPrograms.gradle")) {
+                gradle = configuration.get("pathToPrograms.gradle");
             }
             return gradle;
         };

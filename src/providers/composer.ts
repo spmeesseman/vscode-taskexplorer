@@ -23,8 +23,8 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
             if (process.platform === "win32") {
                 composer = "composer.exe";
             }
-            if (configuration.get<string>("pathToComposer")) {
-                composer = configuration.get("pathToComposer");
+            if (configuration.get<string>("pathToPrograms.composer")) {
+                composer = configuration.get("pathToPrograms.composer");
             }
             return composer;
         };

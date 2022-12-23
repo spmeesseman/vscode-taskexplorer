@@ -23,8 +23,7 @@ let buildFileXml: string;
 
 suite("Ant Tests", () =>
 {
-    const testsName = "ant",
-          testsNameProper = properCase(testsName);
+    const testsName = "ant";
 
 
     suiteSetup(async function()
@@ -69,7 +68,7 @@ suite("Ant Tests", () =>
 
     test("Disable", async function()
     {
-        await configuration.updateWs(`enable${testsNameProper}`, false);
+        await configuration.updateWs("enabledTasks.ant", false);
         await sleep(500);
         await teApi.explorer?.invalidateTasksCache(testsName);
         await sleep(500);
@@ -79,7 +78,7 @@ suite("Ant Tests", () =>
 
     test("Re-enable", async function()
     {
-        await configuration.updateWs(`enable${testsNameProper}`, true);
+        await configuration.updateWs("enabledTasks.ant", true);
         await sleep(500);
         await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("ant", 3);
@@ -100,38 +99,38 @@ suite("Ant Tests", () =>
         //
         // Enable Ansicon
         //
-        await configuration.updateWs("pathToAnsicon", "ansicon\\x64\\ansicon.exe");
+        await configuration.updateWs("pathToPrograms.ansicon", "ansicon\\x64\\ansicon.exe");
         await configuration.updateWs("enableAnsiconForAnt", true);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await configuration.updateWs("pathToAnsicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
+        await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await configuration.updateWs("pathToAnsicon", getWsPath("..\\tools\\ansicon\\x64") + "\\");
+        await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64") + "\\");
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await configuration.updateWs("pathToAnsicon", getWsPath("..\\tools\\ansicon\\x64"));
+        await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
 
         //
         // Disable Ansicon
         //
-        await configuration.updateWs("pathToAnsicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
+        await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
         await configuration.updateWs("enableAnsiconForAnt", false);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await configuration.updateWs("pathToAnsicon", getWsPath("..\\tools\\ansicon\\x64\\"));
+        await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
 
         //
         // Remove path
         //
-        await configuration.updateWs("pathToAnsicon", undefined);
+        await configuration.updateWs("pathToPrograms.ansicon", undefined);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
     });
 
 
     test("Win32 create task", async function()
     {
-        await configuration.updateWs("pathToAnt", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
+        await configuration.updateWs("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await configuration.updateWs("pathToAnt", getWsPath("..\\tools\\ant\\bin\\ant"));
+        await configuration.updateWs("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
     });
 
@@ -150,7 +149,7 @@ suite("Ant Tests", () =>
 
     test("Ant parser", async function()
     {
-        await configuration.updateWs("pathToAnt", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
+        await configuration.updateWs("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2);
     });
 

@@ -48,8 +48,8 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             if (process.platform === "win32") {
                 make = "nmake";
             }
-            if (configuration.get("pathToMake")) {
-                make = configuration.get("pathToMake");
+            if (configuration.get("pathToPrograms.make")) {
+                make = configuration.get("pathToPrograms.make");
                 //
                 // Ref ticket #138 - temp logging
                 //

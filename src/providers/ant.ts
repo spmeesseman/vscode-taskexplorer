@@ -34,7 +34,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         if (process.platform === "win32" && configuration.get("enableAnsiconForAnt") === true)
         {
             let ansicon = "ansicon.exe";
-            const ansiPath: string = configuration.get("pathToAnsicon");
+            const ansiPath: string = configuration.get("pathToPrograms.ansicon");
             if (ansiPath && util.pathExists(ansiPath))
             {
                 ansicon = ansiPath;
@@ -70,7 +70,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         const scripts: StringMap = {};
         const useAnt = configuration.get<boolean>("useAnt");
 
-        log.methodStart("find ant targets", 2, logPad, true, [["use ant", useAnt], ["path", path]]);
+        log.methodStart("find ant targets", 2, logPad, true, [[ "use ant", useAnt ], [ "path", path ]]);
 
         //
         // Try running 'ant' itself to get the targets.  If fail, just custom parse
@@ -124,7 +124,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
      */
     private findTasksWithAnt(path: string, taskMap: StringMap, logPad: string)
     {
-        log.methodStart("find tasks with ant", 1, logPad, true, [["path", path]]);
+        log.methodStart("find tasks with ant", 1, logPad, true, [[ "path", path ]]);
         //
         // Execute 'ant'/'ant.bat' to find defined tasks (ant targets)
         //
@@ -173,7 +173,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             taskMap[defaultTask === line ? line + " - Default" : line] = line;
         }
 
-        log.methodDone("find tasks with ant", 3, logPad, false, [["# of tasks", taskMap.size]]);
+        log.methodDone("find tasks with ant", 3, logPad, false, [[ "# of tasks", taskMap.size ]]);
     }
 
 
@@ -186,7 +186,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
     private async findTasksWithXml2Js(path: string, taskMap: StringMap, logPad: string)
     {
-        log.methodStart("find tasks with xml2js", 3, logPad, false, [["path", path]]);
+        log.methodStart("find tasks with xml2js", 3, logPad, false, [[ "path", path ]]);
 
         const buffer = util.readFileSync(path);
         //
@@ -209,7 +209,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             }
         }
 
-        log.methodDone("find tasks with xml2js", 3, logPad, false, [["# of tasks", taskMap.size]]);
+        log.methodDone("find tasks with xml2js", 3, logPad, false, [[ "# of tasks", taskMap.size ]]);
 
         // return new Promise((resolve, reject) =>
         // {
@@ -252,9 +252,9 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         if (process.platform === "win32") {
             ant = "ant.bat";
         }
-        if (configuration.get("pathToAnt"))
+        if (configuration.get("pathToPrograms.ant"))
         {
-            ant = configuration.get("pathToAnt");
+            ant = configuration.get("pathToPrograms.ant");
             if (process.platform === "win32" && ant.endsWith("\\ant")) {
                 ant += ".bat";
             }
@@ -280,8 +280,8 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     public getGlobPattern()
     {
         return util.getCombinedGlobPattern(constants.GLOB_ANT,
-                                           [...configuration.get<string[]>("includeAnt", []),
-                                            ...configuration.get<string[]>("globPatternsAnt", [])]);
+                                           [ ...configuration.get<string[]>("includeAnt", []),
+                                            ...configuration.get<string[]>("globPatternsAnt", []) ]);
     }
 
 
@@ -290,7 +290,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read ant file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read ant file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
 
         if (folder)
         {

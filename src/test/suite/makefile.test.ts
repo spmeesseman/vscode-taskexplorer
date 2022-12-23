@@ -59,15 +59,15 @@ suite("Makefile Tests", () =>
               filePath = getWsPath(path.join("make", "makefile")),
               fileUri = Uri.file(filePath);
 
-        const pathToMake = configuration.get<string>("pathToMake", "nmake");
-        await configuration.updateWs("pathToMake", "nmake");
+        const pathToMake = configuration.get<string>("pathToPrograms.make", "nmake");
+        await configuration.updateWs("pathToPrograms.make", "nmake");
         provider.createTask("test", "test", rootWorkspace, fileUri, []);
-        await configuration.updateWs("pathToMake", "make");
+        await configuration.updateWs("pathToPrograms.make", "make");
         provider.createTask("test", "test", rootWorkspace, fileUri, []);
-        await configuration.updateWs("pathToMake", undefined);
+        await configuration.updateWs("pathToPrograms.make", undefined);
         provider.createTask("test", "test", rootWorkspace, fileUri, []);
 
-        await configuration.updateWs("pathToMake", pathToMake);
+        await configuration.updateWs("pathToPrograms.make", pathToMake);
     });
 
 

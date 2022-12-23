@@ -20,7 +20,7 @@ import { GulpTaskProvider } from "./providers/gulp";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
 // import { displayInfoPage } from "./common/infoPage";
 import { configuration } from "./common/configuration";
-import { initStorage } from "./common/storage";
+import { initStorage, storage } from "./common/storage";
 import { isCachingBusy } from "./cache";
 import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";
@@ -47,6 +47,15 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
 
     log.write("");
     log.write("Init extension");
+
+    //
+    // !!! Temporary after settings layout redo / rename !!!
+    // !!! Remove sometime down the road (from 12/22/22) !!!
+    //
+    await tempRemapSettingsToNewLayout();
+    //
+    // !!! End temporary !!!
+    //
 
     //
     // Register file type watchers
@@ -117,6 +126,46 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     licenseManager = new LicenseManager(teApi, context);
 
     return teApi;
+}
+
+
+//
+// !!! Temporary after settings layout redo / rename !!!
+// !!! Remove sometime down the road (from 12/22/22) !!!
+// !!! Remove call in method activate() too          !!!
+//
+async function tempRemapSettingsToNewLayout()
+{
+    const didSettingUpgrade = storage.get<boolean>("DID_SETTINGS_UPGRADE", false);
+    if (!didSettingUpgrade)
+    {
+        const taskTypes = util.getTaskTypes();
+        for (const taskType of taskTypes)
+        {
+            let oldEnabledSetting = util.getTaskTypeSettingName(taskType, "enable"),
+                newEnabledSetting = util.getTaskTypeEnabledSettingName(taskType);
+            const oldSettingValue1 = configuration.get<boolean | undefined>(oldEnabledSetting, undefined);
+            if (oldSettingValue1 !== undefined)
+            {
+                await configuration.updateWs(newEnabledSetting, oldSettingValue1);
+                await configuration.update(newEnabledSetting, oldSettingValue1);
+                await configuration.updateWs(oldEnabledSetting, undefined);
+                await configuration.update(oldEnabledSetting, undefined);
+            }
+
+            oldEnabledSetting = util.getTaskTypeSettingName(taskType, "pathTo");
+            newEnabledSetting = util.getTaskTypeSettingName(taskType, "pathToPrograms.");
+            const oldSettingValue2 = configuration.get<string | undefined>(oldEnabledSetting, undefined);
+            if (oldSettingValue2 !== undefined)
+            {
+                await configuration.updateWs(newEnabledSetting, oldSettingValue2);
+                await configuration.update(newEnabledSetting, oldSettingValue2);
+                await configuration.updateWs(oldEnabledSetting, undefined);
+                await configuration.update(oldEnabledSetting, undefined);
+            }
+        }
+        // await storage.update("DID_SETTINGS_UPGRADE", true);
+    }
 }
 
 
@@ -242,7 +291,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
     //
     for (const type of util.getTaskTypes().filter(t => !util.isWatchTask(t)))
     {
-        if (e.affectsConfiguration(util.getTaskTypeSettingName(type, "pathTo"))) {
+        if (e.affectsConfiguration(util.getTaskTypeSettingName(type, "pathToPrograms."))) {
             refreshTaskTypes.push(type);
         }
     }
@@ -256,7 +305,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         {
             await registerFileWatcher(context, "bash",
                                       util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", [])),
-                                      false, configuration.get<boolean>("enableBash"));
+                                      false, configuration.get<boolean>("enabledTasks.bash"));
             registerChange("bash");
         }
     }
@@ -270,7 +319,7 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         {
             const antGlobs = [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ];
             await registerFileWatcher(context, "ant", util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs),
-                                      false, configuration.get<boolean>("enableAnt"));
+                                      false, configuration.get<boolean>("enabledTasks.ant"));
             registerChange("ant");
         }
     }
@@ -353,10 +402,10 @@ async function processConfigChanges(context: ExtensionContext, e: ConfigurationC
         //
         // Script type task defs will change with terminal change
         //
-        if (configuration.get<boolean>("enableBash") || configuration.get<boolean>("enableBatch") ||
-            configuration.get<boolean>("enablePerl") || configuration.get<boolean>("enablePowershell") ||
-            configuration.get<boolean>("enablePython") || configuration.get<boolean>("enableRuby") ||
-            configuration.get<boolean>("enableNsis")) {
+        if (configuration.get<boolean>("enabledTasks.bash") || configuration.get<boolean>("enabledTasks.batch") ||
+            configuration.get<boolean>("enabledTasks.perl") || configuration.get<boolean>("enabledTasks.powershell") ||
+            configuration.get<boolean>("enabledTasks.python") || configuration.get<boolean>("enabledTasks.ruby") ||
+            configuration.get<boolean>("enabledTasks.nsis")) {
             refresh = true;
         }
     }
@@ -456,11 +505,9 @@ async function registerExternalProvider(providerName: string, provider: External
 async function registerFileWatchers(context: ExtensionContext)
 {
     const taskTypes = util.getTaskTypes();
-    for (const t of taskTypes)
+    for (const taskType of taskTypes)
     {
-        const taskType = t,
-            taskTypeP = taskType !== "app-publisher" ? util.properCase(taskType) : "AppPublisher";
-        if (configuration.get<boolean>("enable" + taskTypeP))
+        if (configuration.get<boolean>(util.getTaskTypeEnabledSettingName(taskType)))
         {
             const watchModify = util.isScriptType(taskType) || taskType === "app-publisher";
             await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), watchModify);

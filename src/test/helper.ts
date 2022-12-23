@@ -229,24 +229,24 @@ export async function initSettings(enable = true)
     // Enabled all options, use workspace level so that running this test from Code itself
     // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("enableAnt", enable);
-    await configuration.updateWs("enableAppPublisher", enable);
-    await configuration.updateWs("enableBash", enable);
-    await configuration.updateWs("enableBatch", enable);
-    await configuration.updateWs("enableGradle", enable);
-    await configuration.updateWs("enableGrunt", enable);
-    await configuration.updateWs("enableGulp", enable);
-    await configuration.updateWs("enableMake", enable);
-    await configuration.updateWs("enableMaven", enable);
-    await configuration.updateWs("enableNpm", enable);
-    await configuration.updateWs("enableNsis", enable);
-    await configuration.updateWs("enablePowershell", enable);
-    await configuration.updateWs("enablePerl", enable);
-    await configuration.updateWs("enablePython", enable);
-    await configuration.updateWs("enablePipenv", enable);
-    await configuration.updateWs("enableRuby", enable);
-    await configuration.updateWs("enableTsc", enable);
-    await configuration.updateWs("enableWorkspace", enable);
+    await configuration.updateWs("enabledTasks.ant", enable);
+    await configuration.updateWs("enabledTasks.appPublisher", enable);
+    await configuration.updateWs("enabledTasks.bash", enable);
+    await configuration.updateWs("enabledTasks.batch", enable);
+    await configuration.updateWs("enabledTasks.gradle", enable);
+    await configuration.updateWs("enabledTasks.grunt", enable);
+    await configuration.updateWs("enabledTasks.gulp", enable);
+    await configuration.updateWs("enabledTasks.make", enable);
+    await configuration.updateWs("enabledTasks.maven", enable);
+    await configuration.updateWs("enabledTasks.npm", enable);
+    await configuration.updateWs("enabledTasks.nsis", enable);
+    await configuration.updateWs("enabledTasks.powershell", enable);
+    await configuration.updateWs("enabledTasks.perl", enable);
+    await configuration.updateWs("enabledTasks.python", enable);
+    await configuration.updateWs("enabledTasks.pipenv", enable);
+    await configuration.updateWs("enabledTasks.ruby", enable);
+    await configuration.updateWs("enabledTasks.tsc", enable);
+    await configuration.updateWs("enabledTasks.workspace", enable);
     await configuration.updateWs("groupWithSeparator", enable);
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("showLastTasks", enable);

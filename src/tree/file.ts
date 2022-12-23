@@ -237,7 +237,6 @@ export default class TaskFile extends TreeItem
     private static getLabel(taskDef: TaskExplorerDefinition, source: string, relativePath: string, group: boolean): string
     {
         let label = source;
-
         if (source === "Workspace")
         {
             label = "vscode";

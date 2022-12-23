@@ -45,9 +45,9 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
     private getCommand(): string
     {
         let mvn = "mvn";
-        if (configuration.get("pathToMaven"))
+        if (configuration.get("pathToPrograms.maven"))
         {
-            mvn = configuration.get("pathToMaven");
+            mvn = configuration.get("pathToPrograms.maven");
         }
         return mvn;
     }

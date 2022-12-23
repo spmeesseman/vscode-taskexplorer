@@ -21,49 +21,49 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             exec: "",
             type: "bash",
             args: [],
-            enabled: configuration.get("enableBash")
+            enabled: configuration.get("enabledTasks.bash")
         },
         py: {
-            exec: configuration.get("pathToPython"),
+            exec: configuration.get("pathToPrograms.python"),
             type: "python",
             args: [],
-            enabled: configuration.get("enablePython")
+            enabled: configuration.get("enabledTasks.python")
         },
         rb: {
-            exec: configuration.get("pathToRuby"),
+            exec: configuration.get("pathToPrograms.ruby"),
             type: "ruby",
             args: [],
-            enabled: configuration.get("enableRuby")
+            enabled: configuration.get("enabledTasks.ruby")
         },
         ps1: {
-            exec: configuration.get("pathToPowershell"),
+            exec: configuration.get("pathToPrograms.powershell"),
             type: "powershell",
             args: [],
-            enabled: configuration.get("enablePowershell")
+            enabled: configuration.get("enabledTasks.powershell")
         },
         pl: {
-            exec: configuration.get("pathToPerl"),
+            exec: configuration.get("pathToPrograms.perl"),
             type: "perl",
             args: [],
-            enabled: configuration.get("enablePerl")
+            enabled: configuration.get("enabledTasks.perl")
         },
         bat: {
             exec: "cmd",
             type: "batch",
             args: [ "/c" ],
-            enabled: configuration.get("enableBatch")
+            enabled: configuration.get("enabledTasks.batch")
         },
         cmd: {
             exec: "cmd",
             type: "batch",
             args: [ "/c" ],
-            enabled: configuration.get("enableBatch")
+            enabled: configuration.get("enabledTasks.batch")
         },
         nsi: {
-            exec: configuration.get("pathToNsis"),
+            exec: configuration.get("pathToPrograms.nsis"),
             type: "nsis",
             args: [],
-            enabled: configuration.get("enableNsis")
+            enabled: configuration.get("enabledTasks.nsis")
         }
     };
 
@@ -112,7 +112,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         {
             if (scriptDef.type === "bash")
             {
-                let bash = configuration.get<string>("pathToBash");
+                let bash = configuration.get<string>("pathToPrograms.bash");
                 if (!bash) {
                     bash = "C:\\Program Files\\Git\\bin\\bash.exe";
                 }

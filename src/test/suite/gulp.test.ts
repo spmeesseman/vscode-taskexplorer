@@ -21,8 +21,7 @@ let fileUri: Uri;
 
 suite("Gulp Tests", () =>
 {
-    const testsName = "gulp",
-          testsNameProper = properCase(testsName);
+    const testsName = "gulp";
 
     suiteSetup(async function()
     {
@@ -50,7 +49,7 @@ suite("Gulp Tests", () =>
 
     test("Disable", async function()
     {
-        await configuration.updateWs(`enable${testsNameProper}`, false);
+        await configuration.updateWs("enabledTasks.gulp", false);
         await sleep(500);
         await teApi.explorer?.invalidateTasksCache(testsName);
         await sleep(500);
@@ -60,7 +59,7 @@ suite("Gulp Tests", () =>
 
     test("Re-enable", async function()
     {
-        await configuration.updateWs(`enable${testsNameProper}`, true);
+        await configuration.updateWs("enabledTasks.gulp", true);
         await sleep(500);
         await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("gulp", 17);

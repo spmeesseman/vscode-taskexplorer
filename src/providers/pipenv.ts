@@ -20,11 +20,11 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
     {
-        const pipenv = configuration.get<string>("pathToPipenv");
+        const pipenv = configuration.get<string>("pathToPrograms.pipenv");
         let pythonPath: string | null = null;
 
         if (pipenv === "pipenv") {
-            // If the user didn't explicitly set a pathToPipenv (meaning it is the default value),
+            // If the user didn't explicitly set a pathToPrograms.pipenv (meaning it is the default value),
             // then use the python path from the environment to run pipenv as a module. This way it
             // has the best chance of using the correct Python environment (virtual, global,...).
             pythonPath = workspace.getConfiguration("python").get("pythonPath") ?? "python";

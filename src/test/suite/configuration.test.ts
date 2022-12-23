@@ -37,11 +37,11 @@ suite("Configuration / Settings Tests", () =>
     test("Ant glob", async function()
     {
         const globPatterns = configuration.get<string[]>("globPatternsAnt");
-        await configuration.updateWs("enableAnt", false);
+        await configuration.updateWs("enabledTasks.ant", false);
         globPatterns.push("**/dummy.xml");
         await configuration.updateWs("globPatternsAnt", globPatterns);
         await sleep(100);
-        await configuration.updateWs("enableAnt", true);
+        await configuration.updateWs("enabledTasks.ant", true);
         globPatterns.pop();
         await configuration.updateWs("globPatternsAnt", globPatterns);
         await sleep(100);
@@ -51,11 +51,11 @@ suite("Configuration / Settings Tests", () =>
     test("Bash glob", async function()
     {
         const globPatterns = configuration.get<string[]>("globPatternsBash");
-        await configuration.updateWs("enableBash", false);
+        await configuration.updateWs("enabledTasks.bash", false);
         globPatterns.push("**/extensionless/**");
         await configuration.updateWs("globPatternsBash", globPatterns);
         await sleep(100);
-        await configuration.updateWs("enableBash", true);
+        await configuration.updateWs("enabledTasks.bash", true);
         globPatterns.pop();
         await configuration.updateWs("globPatternsBash", globPatterns);
         await sleep(100);

@@ -26,8 +26,7 @@ let fileUri: Uri;
 
 suite("Python Tests", () =>
 {
-    const testsName = "python",
-          testsNameProper = properCase(testsName);
+    const testsName = "python";
 
 
     suiteSetup(async function()
@@ -42,11 +41,11 @@ suite("Python Tests", () =>
         //
         // Store / set initial settings
         //
-        await configuration.updateWs(`pathTo${testsNameProper}`, path.resolve(process.cwd(), "..\\..\\test-files\\ant\\bin\\ant.bat"));
-        pathToPython = configuration.get<string>(`pathTo${testsNameProper}`);
-        enablePython = configuration.get<boolean>(`enable${testsNameProper}`);
-        await configuration.updateWs(`pathTo${testsNameProper}`, "php\\composer.exe");
-        await configuration.updateWs(`enable${testsNameProper}`, true);
+        await configuration.updateWs("pathToPrograms.python", path.resolve(process.cwd(), "..\\..\\test-files\\ant\\bin\\ant.bat"));
+        pathToPython = configuration.get<string>("pathToPrograms.python");
+        enablePython = configuration.get<boolean>("enabledTasks.python");
+        await configuration.updateWs("pathToPrograms.python", "php\\composer.exe");
+        await configuration.updateWs("enabledTasks.python", true);
     });
 
 
@@ -54,8 +53,8 @@ suite("Python Tests", () =>
     {   //
         // Reset settings
         //
-        await configuration.updateWs(`pathTo${testsNameProper}`, pathToPython);
-        await configuration.updateWs(`enable${testsNameProper}`, enablePython);
+        await configuration.updateWs("pathToPrograms.python", pathToPython);
+        await configuration.updateWs("enabledTasks.python", enablePython);
     });
 
 
@@ -78,7 +77,7 @@ suite("Python Tests", () =>
     {
         let cTasks = await tasks.fetchTasks({ type: "script" });
         assert(cTasks && cTasks.filter(t => t.source === testsName).length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
-        await configuration.updateWs(`enable${testsNameProper}`, false);
+        await configuration.updateWs("enabledTasks.python", false);
         await sleep(500);
         await teApi.explorer?.invalidateTasksCache(testsName);
         await sleep(500);
@@ -89,7 +88,7 @@ suite("Python Tests", () =>
 
     test("Re-enable", async function()
     {
-        await configuration.updateWs(`enable${testsNameProper}`, true);
+        await configuration.updateWs("enabledTasks.python", true);
         await sleep(500);
         await teApi.explorer?.invalidateTasksCache(testsName);
         await sleep(500);
