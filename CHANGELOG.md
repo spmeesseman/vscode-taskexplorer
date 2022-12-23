@@ -1,5 +1,11 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 2.13.2 (December 23rd, 2022)
+
+### Bug Fixes
+
+- last two releases are inoperable due to missing json5 package
+
 ## Version 2.13.1 (December 23rd, 2022)
 
 ### Bug Fixes
