@@ -72,7 +72,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
         const paths = filesCache.get(this.providerName),
-              enabled = configuration.get<boolean>(util.getTaskTypeEnabledSettingName(this.providerName));
+              enabled = util.isTaskTypeEnabled(this.providerName);
 
         log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [[ "enabled", enabled ]]);
 

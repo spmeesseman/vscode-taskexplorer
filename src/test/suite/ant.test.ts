@@ -94,7 +94,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ansicon", async function()
+    test("Set Up ansicon", async function()
     {
         //
         // Enable Ansicon
@@ -108,19 +108,21 @@ suite("Ant Tests", () =>
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
+    });
 
-        //
-        // Disable Ansicon
-        //
+
+    test("Disable Ansicon", async function()
+    {
         await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
         await configuration.updateWs("enableAnsiconForAnt", false);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
+    });
 
-        //
-        // Remove path
-        //
+
+    test("DAnsicon Path", async function()
+    {
         await configuration.updateWs("pathToPrograms.ansicon", undefined);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
     });

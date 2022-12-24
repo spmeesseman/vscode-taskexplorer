@@ -285,7 +285,7 @@ export async function refresh()
 {
 	await executeTeCommand("refresh", 500);
     await waitForCache();
-    return teApi.explorer.getChildren();
+    return teApi.explorer?.getChildren();
 }
 
 
