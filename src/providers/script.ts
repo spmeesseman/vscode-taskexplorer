@@ -10,6 +10,18 @@ import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 
 
+/**
+ * @class ScriptTaskProvider
+ *
+ * Provides `script type` tasks of different `task types`.  A `script` type task is where the
+ * file itself is the task, differing from other task providers in that other task providers
+ * have one or more tasks defined within the file that need to be parsed.  Examples of `script
+ * type` tasks are `bat, `bash, `powershell`, `python`, etc.
+ *
+ * This provider provides several different `task types`.  Note that `script` is not in itself
+ * a `task type`.  It is a `provider type`.  The supported script types are defined in the
+ * class property `scriptTable`.
+ */
 export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
@@ -265,7 +277,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
                 {
                     visitedFiles.add(fObj.uri.fsPath);
                     const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri);
-                    if (task && configuration.get<boolean>(util.getTaskTypeEnabledSettingName(task.source)))
+                    if (task && util.isTaskTypeEnabled(task.source))
                     {
                         allTasks.push(task);
                         log.write(`   processed ${this.providerName} file`, 3, logPad);

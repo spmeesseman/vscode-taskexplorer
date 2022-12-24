@@ -41,7 +41,7 @@ export async function addFolderToCache(folder: WorkspaceFolder | undefined, logP
     for (const providerName of taskProviders)
     {
         const externalProvider = providersExternal.get(providerName);
-        if (!cancel && (externalProvider || configuration.get<boolean>(util.getTaskTypeEnabledSettingName(providerName))))
+        if (!cancel && (externalProvider || util.isTaskTypeEnabled(providerName)))
         {
             let glob;
             if (!util.isWatchTask(providerName))

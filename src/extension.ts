@@ -581,7 +581,7 @@ async function registerFileWatchers(context: ExtensionContext)
     const taskTypes = util.getTaskTypes();
     for (const taskType of taskTypes)
     {
-        if (configuration.get<boolean>(util.getTaskTypeEnabledSettingName(taskType)))
+        if (util.isTaskTypeEnabled(taskType))
         {
             const watchModify = util.isScriptType(taskType) || taskType === "app-publisher";
             await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), watchModify);

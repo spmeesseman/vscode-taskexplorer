@@ -172,6 +172,17 @@ export function getHeaderContent(title: string)
 }
 
 
+/**
+ * @param taskType Task type, e.g. `make`, `powershell`, `bash`, etc
+ * @returns The path to the specified executable program
+ */
+export function getPathToProgram(taskType: string)
+{
+    const settingName = "pathToPrograms." + taskType.replace(/\-/g, "").toLowerCase();
+    return configuration.get<string>(settingName, taskType);
+}
+
+
 export function getPortableDataPath(padding = "")
 {
     if (process.env.VSCODE_PORTABLE)
@@ -225,6 +236,13 @@ export function getTaskItemId(taskItem: TaskItem)
 }
 
 
+/**
+ * @deprecated Use `isTaskTypeEnabled` and `getPathToProgram`
+ * To be removed after the temp extension.tempRemapSettingsToNewLayout() method is removed.
+ * @param taskType Task type, e.g. `npm`, `app-publisher`, `grunt`, `bash`, etc
+ * @param settingPart String prependature for  commonly named setting name
+ * @returns The task type's unique setting name
+ */
 export function getTaskTypeSettingName(taskType: string, settingPart: string)
 {
     return settingPart + (taskType !== "app-publisher" ?
@@ -232,18 +250,24 @@ export function getTaskTypeSettingName(taskType: string, settingPart: string)
 }
 
 
+/**
+ * @deprecated Use `isTaskTypeEnabled`
+ * To be removed after the temp extension.tempRemapSettingsToNewLayout() method is removed.
+ * @param taskType Task type, e.g. `npm`, `app-publisher`, `grunt`, `bash`, etc
+ * @returns The task type's unique setting name
+ */
 export function getTaskTypeEnabledSettingName(taskType: string)
 {
     return getTaskTypeSettingName(taskType, "enabledTasks.");
 }
 
 
-export function getTaskProviderType(source: string): string
+export function getTaskProviderType(taskType: string): string
 {
-    if (isScriptType(source)) {
+    if (isScriptType(taskType)) {
         return "script";
     }
-    return source;
+    return taskType;
 }
 
 
@@ -408,6 +432,17 @@ export function isSpecial(taskItem: TaskItem)
 export function isString(value: any, notEmpty = false): value is string
 {
     return (!!value || (value === "" && !notEmpty)) && value instanceof String || typeof value === "string";
+}
+
+
+/**
+ * @param taskType Task type, e.g. `npm`, `app-publisher`, `grunt`, `bash`, etc
+ * @returns `true` if enabled, `false` if disabled
+ */
+export function isTaskTypeEnabled(taskType: string)
+{
+    const settingName = "enabledTasks." + taskType.replace(/\-/g, "").toLowerCase();
+    return configuration.get<boolean>(settingName, false);
 }
 
 

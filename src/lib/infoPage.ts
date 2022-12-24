@@ -59,11 +59,11 @@ function getBodyContent(logPad: string, logLevel: number, uri?: Uri)
 		<td style="padding-right:20px" nowrap>File</td>
 	</tr><tr><td colspan="6"><hr></td></tr>`;
 
-	const tasks = teApi.explorer.getTasks().filter((t: Task) => !project || (isWorkspaceFolder(t.scope) && 
+	const tasks = teApi.explorer?.getTasks()?.filter((t: Task) => !project || (isWorkspaceFolder(t.scope) && 
                                                     project === getWorkspaceProjectName(t.scope.uri.fsPath))),
 		  projects: string[] = [];
 
-	tasks.forEach((t: Task) =>
+	tasks?.forEach((t: Task) =>
 	{
 		let wsFolder;
 		if (isWorkspaceFolder(t.scope))
@@ -115,7 +115,7 @@ function getBodyContent(logPad: string, logLevel: number, uri?: Uri)
 
 	details += "</table>"
 
-	let summary = `# of Tasks: ${tasks.length}<br><br>Projects: ${projects.join(", ")}`;
+	let summary = `# of Tasks: ${tasks?.length}<br><br>Projects: ${projects.join(", ")}`;
 
 	log.methodDone("get body content", logLevel, logPad);
 

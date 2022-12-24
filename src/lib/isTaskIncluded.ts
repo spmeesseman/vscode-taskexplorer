@@ -115,7 +115,7 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = ""): b
     // This will ignore tasks from other providers as well, unless it has registered
     // as an external provider via Task Explorer API
     //
-    const srcEnabled = configuration.get(util.getTaskTypeEnabledSettingName(task.source)),
+    const srcEnabled = util.isTaskTypeEnabled(task.source),
           isNpmInstall = isNpmInstallTask(task);
     if ((srcEnabled || !isScopeWsFolder) && !isNpmInstall)
     {

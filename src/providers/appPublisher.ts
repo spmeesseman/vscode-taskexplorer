@@ -3,7 +3,6 @@ import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOp
 import * as path from "path";
 import * as util from "../common/utils";
 import * as log from "../common/log";
-import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { configuration } from "../common/configuration";
@@ -72,7 +71,9 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
             apLabel =  match[1];
         }
 
-        log.methodStart("read app-publisher file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read app-publisher file uri task", 1, logPad, true, [
+            [ "path", uri.fsPath ], [ "project folder", folder.name ]
+        ]);
 
         taskDefs.push({
             label: "general" + groupSeparator + "config",
