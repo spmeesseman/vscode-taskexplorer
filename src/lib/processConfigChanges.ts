@@ -112,8 +112,7 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
                 if (newValue !== oldValue)
                 {
                     const isScriptType = util.isScriptType(taskType);
-                    const ignoreModify = isScriptType || taskType === "app-publisher" || taskType === "maven";
-                    await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), ignoreModify, newValue);
+                    await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), newValue);
                     if (!isScriptType || !didSetScriptTypeForRefresh) {
                         registerChange(taskType);
                     }
@@ -160,7 +159,7 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
             {
                 await registerFileWatcher(context, "bash",
                                         util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", [])),
-                                        false, configuration.get<boolean>("enabledTasks.bash"));
+                                        configuration.get<boolean>("enabledTasks.bash"));
                 registerChange("bash");
             }
         }
@@ -174,7 +173,7 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
             {
                 const antGlobs = [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ];
                 await registerFileWatcher(context, "ant", util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs),
-                                        false, configuration.get<boolean>("enabledTasks.ant"));
+                                          configuration.get<boolean>("enabledTasks.ant"));
                 registerChange("ant");
             }
         }

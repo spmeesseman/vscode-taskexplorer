@@ -37,18 +37,18 @@ export async function registerFileWatchers(context: ExtensionContext)
     {
         if (util.isTaskTypeEnabled(taskType))
         {
-            const watchModify = util.isScriptType(taskType) || taskType === "app-publisher";
-            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), watchModify);
+            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType));
         }
     }
 }
 
 
-export async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, ignoreModify?: boolean, enabled?: boolean)
+export async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, enabled?: boolean)
 {
     log.write("Register file watcher for task type '" + taskType + "'");
 
     let watcher = watchers.get(taskType);
+    const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher" || taskType === "maven";
 
     /* istanbul ignore else */
     if (workspace.workspaceFolders) {
