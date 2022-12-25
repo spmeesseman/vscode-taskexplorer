@@ -514,7 +514,7 @@ suite("Provider Tests", () =>
         await configuration.updateVsWs("terminal.integrated.shell.windows",
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
         await sleep(1000);
-        await teApi.testsApi.fileCache.buildCache("bash", "bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
+        await teApi.testsApi.fileCache.buildCache("bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
     });
 
 
@@ -523,7 +523,7 @@ suite("Provider Tests", () =>
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        await teApi.testsApi.fileCache.buildCache("gulp", "gulp", constants.GLOB_GULP, workspace.workspaceFolders[0], true);
+        await teApi.testsApi.fileCache.buildCache("gulp",constants.GLOB_GULP, workspace.workspaceFolders[0], true);
     });
 
 

@@ -10,11 +10,14 @@ import { activate, executeTeCommand, isReady, sleep, verifyTaskCount } from "../
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ExternalTaskProvider } from "./externalTaskProvider";
+import { ExternalTaskProviderBase } from "./externalTaskProviderBase";
 
 
 let teApi: TaskExplorerApi;
 let dispose: Disposable;
+let dispose2: Disposable;
 let taskProvider: ExternalTaskProvider;
+let taskProvider2: ExternalTaskProviderBase;
 
 
 suite("API Tests", () =>
@@ -25,13 +28,15 @@ suite("API Tests", () =>
         teApi = await activate(this);
         assert(isReady("make") === true, "    ✘ TeApi not ready");
         taskProvider = new ExternalTaskProvider();
+        taskProvider2 = new ExternalTaskProviderBase();
         dispose = tasks.registerTaskProvider("external", taskProvider);
-        // teApi.log.setWriteToConsole(true, 3);
+        dispose2 = tasks.registerTaskProvider("external2", taskProvider2);
     });
 
     suiteTeardown(async function()
     {
         dispose.dispose();
+        dispose2.dispose();
     });
 
 
@@ -45,7 +50,7 @@ suite("API Tests", () =>
     {
         taskProvider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         await teApi.register("external", taskProvider);
-        await sleep(3000);
+        await sleep(50);
         await teApi.testsApi.fileCache.waitForCache();
         await verifyTaskCount("external", 2, true);
     });
@@ -61,10 +66,22 @@ suite("API Tests", () =>
     });
 
 
+    test("Access base external task provider", async function()
+    {
+        const task = taskProvider2.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
+        try {
+            taskProvider2.resolveTask(task);
+        } catch {}
+        try {
+            taskProvider2.provideTasks();
+        } catch {}
+    });
+
+
     test("Unregister external task provider", async function()
     {
         await teApi.unregister("external");
-        await sleep(3000);
+        await sleep(50);
         await teApi.testsApi.fileCache.waitForCache();
         await verifyTaskCount("external", 2, 0);
     });

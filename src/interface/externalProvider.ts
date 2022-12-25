@@ -13,12 +13,12 @@ export abstract class ExternalExplorerProvider implements TaskProvider
 
     provideTasks(): ProviderResult<Task[]>
     {
-        throw new Error("Method not implemented.");
+        return undefined;
     }
 
     resolveTask(task: Task): ProviderResult<Task>
     {
-        throw new Error("Method not implemented.");
+        return undefined;
     }
 
     async invalidate(uri?: Uri, logPad?: string): Promise<void>
