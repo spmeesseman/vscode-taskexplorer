@@ -7,10 +7,9 @@ import * as fs from "fs";
 import * as util from "../../common/utils";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, executeTeCommand, getWsPath, isReady, sleep, verifyTaskCount } from "../helper";
+import { activate, getWsPath, isReady, sleep, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
-import { waitForCache } from "../../cache";
 
 
 let teApi: TaskExplorerApi;
@@ -69,8 +68,6 @@ suite("Ant Tests", () =>
     test("Disable", async function()
     {
         await configuration.updateWs("enabledTasks.ant", false);
-        // await sleep(500);
-        // await teApi.explorer?.invalidateTasksCache(testsName);
         await sleep(100);
         await teApi.explorer?.waitForRefreshComplete();
         await verifyTaskCount("ant", 0);
@@ -82,7 +79,6 @@ suite("Ant Tests", () =>
         await configuration.updateWs("enabledTasks.ant", true);
         await sleep(100);
         await teApi.explorer?.waitForRefreshComplete();
-        // await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("ant", 3);
     });
 
