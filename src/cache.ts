@@ -78,17 +78,17 @@ export async function addFolderToCache(folder: WorkspaceFolder | undefined, logP
 
 export async function buildCache(taskType: string, fileGlob: string, wsFolder: WorkspaceFolder | undefined, setCacheBuilding: boolean, logPad: string)
 {
-    const taskAlias = util.getTaskProviderType(taskType);
+    const taskProviderType = util.getTaskProviderType(taskType);
 
     log.methodStart("build file cache", 2, logPad, true, [
         [ "folder", !wsFolder ? "entire workspace" : wsFolder.name ], [ "task type", taskType ],
-        [ "task alias", taskAlias ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
+        [ "task provider type", taskProviderType ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
     ]);
 
-    if (!filesCache.get(taskAlias)) {
-        filesCache.set(taskAlias, new Set());
+    if (!filesCache.get(taskProviderType)) {
+        filesCache.set(taskProviderType, new Set());
     }
-    const fCache = filesCache.get(taskAlias) as Set<ICacheItem>;
+    const fCache = filesCache.get(taskProviderType) as Set<ICacheItem>;
 
     if (setCacheBuilding) {
         //
@@ -111,8 +111,8 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
     // script type (batch, powershell, python, etc)
     // The `fileGlob` parameter will be undefined for external task providers
     //
-    let globChanged = !taskGlobs[taskType];
-    if (taskGlobs[taskType] && taskAlias !== "script")
+    let globChanged = !taskGlobs[taskType] || taskProviderType === "script";
+    if (taskGlobs[taskType] && taskProviderType !== "script")
     {   //
         // As of v1.31, Ant globs will be the only task types whose blobs may change
         //
@@ -212,12 +212,13 @@ async function buildFolderCaches(fCache: Set<any>, taskType: string, fileGlob: s
 }
 
 
-export async function addFileToCache(taskAlias: string, uri: Uri)
+export async function addFileToCache(taskType: string, uri: Uri)
 {
-    if (!filesCache.get(taskAlias)) {
-        filesCache.set(taskAlias, new Set());
+    const taskProviderType = util.getTaskProviderType(taskType);
+    if (!filesCache.get(taskProviderType)) {
+        filesCache.set(taskProviderType, new Set());
     }
-    const taskCache = filesCache.get(taskAlias),
+    const taskCache = filesCache.get(taskProviderType),
           wsf = workspace.getWorkspaceFolder(uri);
     if (taskCache && wsf) {
         taskCache.add({
@@ -298,13 +299,14 @@ export async function rebuildCache(logPad = "")
 }
 
 
-export async function removeFileFromCache(taskAlias: string, uri: Uri, logPad: string)
+export async function removeFileFromCache(taskType: string, uri: Uri, logPad: string)
 {
-    const itemCache = filesCache.get(taskAlias),
+    const taskProviderType = util.getTaskProviderType(taskType);
+    const itemCache = filesCache.get(taskProviderType),
           toRemove = [];
 
     log.write("remove file from cache", 1, logPad);
-    log.value("   task type", taskAlias, 2, logPad);
+    log.value("   task type", taskProviderType, 2, logPad);
     log.value("   file", uri.fsPath, 2, logPad);
 
     if (itemCache)
