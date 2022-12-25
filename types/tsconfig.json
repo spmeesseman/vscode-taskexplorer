@@ -1,21 +1,20 @@
 {
 	"compilerOptions": {
-		"target": "es5",
+		"target": "es6",
+		"lib": [ "es2015" ],
 		"module": "commonjs",
 		"sourceMap": true,
 		"strict": true,
 		"outDir": "lib",
-		"rootDir": "../src/interface",
+		"rootDir": "../src",
 		"composite": true,
         "declaration": true,
         "declarationMap": true,
-		"emitDeclarationOnly": false
+		"emitDeclarationOnly": false,
+		"downlevelIteration": true
 	},
-	"include": ["../src/interface"],
+	"include": ["../src" ],
 	"exclude": [
-		"../src/common",
-		"../src/providers",
-		"../src/test",
-		"../src/tree"
+		"../src/test"
 	]
 }

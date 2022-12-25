@@ -5,7 +5,8 @@ import * as path from "path";
 import * as assert from "assert";
 import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
-import { TaskExplorerApi } from "../interface/taskExplorerApi";
+import { TaskExplorerApi } from "../../types";
+// import { TaskExplorerApi } from "../interface/taskExplorerApi";
 import { configuration } from "../common/configuration";
 import { waitForCache } from "../cache";
 import { commands, extensions, tasks, window, workspace } from "vscode";
@@ -155,7 +156,7 @@ export async function getTreeTasks(taskType: string, expectedCount: number)
     //
     // Get the task mapped tree items
     //
-    const taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as Map<string, TaskItem>;
+    const taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
     //
     // Make sure the tasks have been mapped in the explorer tree
     // There should be one less task as the VSCode enginereturned above as the Explorer
@@ -345,7 +346,7 @@ export async function verifyTaskCount(taskType: string, expectedCount: number, c
 
     if (checkTree)
     {
-        const tasksMap = taskMap || (await teApi.explorer?.getTaskItems(undefined, "   ") as Map<string, TaskItem>),
+        const tasksMap = taskMap || (await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>),
               taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
         expectedCount = (typeof checkTree === "number" ? checkTree : expectedCount);
         try {

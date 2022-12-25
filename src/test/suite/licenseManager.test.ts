@@ -41,7 +41,7 @@ suite("License Manager Tests", () =>
 	{
 		await sleep(1000);
 		licMgr = getLicenseManager();
-		tasks = teApi.explorer.getTasks();
+		tasks = teApi.explorer?.getTasks() || [];
 	});
 
 

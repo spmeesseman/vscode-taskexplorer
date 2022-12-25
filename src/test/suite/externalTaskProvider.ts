@@ -28,7 +28,7 @@ export class ExternalTaskProvider extends ExternalExplorerProvider implements Ex
             uri
         };
 
-        const execution = new ShellExecution("cmd", [ "/c", "test.bat"]);
+        const execution = new ShellExecution("cmd", [ "/c", "test.bat" ]);
         return new Task(def, folder, target, "external", execution, "$msCompile");
     }
 
@@ -51,7 +51,7 @@ export class ExternalTaskProvider extends ExternalExplorerProvider implements Ex
               uri = Uri.file("/dummy_path"),
               folder = (workspace.workspaceFolders as WorkspaceFolder[])[0]; // for tests only!
 
-        log.methodStart("read external tasks", 1, "", true, [["path", uri.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read external tasks", 1, "", true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
 
         const task = this.createTask("test_1_task_name", "test_1_task_name", folder, uri);
         task.group = TaskGroup.Build;

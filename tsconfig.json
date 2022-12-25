@@ -5,7 +5,7 @@
         "outDir": "dist",
 		"rootDir": "src",
         "lib": [
-            "es6"
+            "ES2015"
         ],
         "sourceMap": true,
         "strict": true,   /* enable all strict type-checking options */

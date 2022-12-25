@@ -5,12 +5,13 @@
 import * as assert from "assert";
 import * as util from "../../common/utils";
 import TaskFolder from "../../tree/folder";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { TaskExplorerApi } from "../../../types";
+// import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
 import constants from "../../common/constants";
 import { storage } from "../../common/storage";
 import TaskItem from "../../tree/item";
-import { commands, tasks, TreeItem, TreeItemCollapsibleState } from "vscode";
+import { commands, tasks, TreeItem, TreeItemCollapsibleState, WorkspaceFolder } from "vscode";
 import {
     activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, refresh, sleep, verifyTaskCount
 } from "../helper";
@@ -34,7 +35,7 @@ suite("Tree Tests", () =>
         assert(isReady() === true, "    ✘ TeApi not ready");
         favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-        taskMap = await teApi.explorer.getTaskItems() as Map<string, TaskItem>;
+        taskMap = await teApi.explorer?.getTaskItems(undefined) as unknown as Map<string, TaskItem>;
     });
 
 
@@ -203,8 +204,8 @@ suite("Tree Tests", () =>
     test("Hide last tasks", async function()
     {
         await configuration.updateWs("showLastTasks", false);
-        await teApi.explorer.showSpecialTasks(false);
-        await teApi.explorer.showSpecialTasks(true);
+        await teApi.explorer?.showSpecialTasks(false);
+        await teApi.explorer?.showSpecialTasks(true);
     });
 
 
@@ -217,8 +218,8 @@ suite("Tree Tests", () =>
     test("Show last tasks", async function()
     {
         await configuration.updateWs("showLastTasks", true);
-        await teApi.explorer.showSpecialTasks(false);
-        await teApi.explorer.showSpecialTasks(true);
+        await teApi.explorer?.showSpecialTasks(false);
+        await teApi.explorer?.showSpecialTasks(true);
     });
 
 
@@ -231,9 +232,9 @@ suite("Tree Tests", () =>
     test("Show Favorite Tasks w/ Last Tasks", async function()
     {
         await configuration.updateWs("showLastTasks", false);
-        await teApi.explorer.showSpecialTasks(false, true);
+        await teApi.explorer?.showSpecialTasks(false, true);
         await configuration.updateWs("showLastTasks", true);
-        await teApi.explorer.showSpecialTasks(false, true);
+        await teApi.explorer?.showSpecialTasks(false, true);
         await refresh();
         await configuration.updateWs("showLastTasks", false);
     });
@@ -260,14 +261,14 @@ suite("Tree Tests", () =>
     test("Hide Favorite and Last Tasks", async function()
     {
         await configuration.updateWs("showLastTasks", false);
-        await teApi.explorer.showSpecialTasks(true, true);
+        await teApi.explorer?.showSpecialTasks(true, true);
     });
 
 
     test("Hide Favorite Tasks", async function()
     {
         await configuration.updateWs("showLastTasks", true);
-        await teApi.explorer.showSpecialTasks(true, true);
+        await teApi.explorer?.showSpecialTasks(true, true);
     });
 
 
@@ -312,38 +313,26 @@ suite("Tree Tests", () =>
 
     test("Invalidation", async function()
     {
-        /* Don't await */ teApi.explorer.getChildren(undefined, "", 1);
-        await teApi.explorer.invalidateTasksCache("ant");
+        /* Don't await */ teApi.explorer?.getChildren(undefined, "", 1);
+        await teApi.explorer?.invalidateTasksCache("ant");
         await refresh();
-        await teApi.explorer.invalidateTasksCache();
+        await teApi.explorer?.invalidateTasksCache();
         await refresh();
-    });
-
-
-    test("Get tree item", async function()
-    {
-        //
-        // Firing the change event for the task item itself does not cause the getTreeItem()
-        // callback to be called from VSCode Tree API.  So cover it.  In case we wnd up
-        // using it down the road.
-        //
-        await teApi.explorer.getTreeItem(batch[0]);
-        await teApi.explorer.getTreeItem(batch[0].getFolder());
     });
 
 
     test("Get tree parent", async function()
     {
-        await teApi.explorer.getParent("Invalid");
-        await teApi.explorer.getParent(new NoScripts());
-        await teApi.explorer.getParent(batch[0]);
+        teApi.explorer?.getParent("Invalid" as TreeItem);
+        teApi.explorer?.getParent(new NoScripts());
+        teApi.explorer?.getParent(batch[0]);
     });
 
 
     test("Get tree children when busy", async function()
     {
-        /* Don't await */ teApi.explorer.getChildren(undefined, "", 1);
-        await teApi.explorer.getChildren(undefined, "");
+        /* Don't await */ teApi.explorer?.getChildren(undefined, "", 1);
+        await teApi.explorer?.getChildren(undefined, "");
     });
 
 });

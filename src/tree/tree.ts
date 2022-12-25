@@ -1361,6 +1361,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
     public getTreeItem(element: TaskItem | TaskFile | TaskFolder): TreeItem
     {
+        /* istanbul ignore else */
         if (element instanceof TaskItem) {
             log.methodStart("get tree item", 3, "", true, [[ "label", element.label ]]);
             log.write("   refresh task item state", 3);

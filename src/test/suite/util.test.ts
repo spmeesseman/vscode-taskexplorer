@@ -71,7 +71,7 @@ suite("Util Tests", () =>
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
 		log.error([ "Test error 1",  new Error("Test error object") ]);
-		log.error([ "Test error 1", "Test error 2" ], [["Test param error", "Test param value"]]);
+		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
 
 		// Disabled logging
 		await configuration.updateWs("debug", false);
@@ -83,14 +83,14 @@ suite("Util Tests", () =>
 		log.value("Test3", null, 1);
 		log.value("Test4", undefined, 1);
 
-		log.values(1, "   ", [["Test5", "5"]]);
-		log.values(1, "   ", [["Test6", "6"]], true);
+		log.values(1, "   ", [[ "Test5", "5" ]]);
+		log.values(1, "   ", [[ "Test6", "6" ]], true);
 
 		log.error("Test5 error");
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
 		log.error([ "Test error 1",  new Error("Test error object") ]);
-		log.error([ "Test error 1", "Test error 2" ], [["Test param error", "Test param value"]]);
+		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
 
 		// Re-enable logging
 		await configuration.updateWs("debug", true);

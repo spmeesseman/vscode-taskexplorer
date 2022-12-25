@@ -16,7 +16,8 @@ import { workspace, tasks, commands, Uri, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../common/utils";
 import { waitForCache } from "../../cache";
 import { addWsFolder, removeWsFolder } from "../../extension";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { TaskExplorerApi } from "../../../types";
+// import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
 import { activate, findIdInTaskMap, getTreeTasks, refresh, sleep } from "../helper";
 import { storage } from "../../common/storage";
@@ -128,7 +129,10 @@ suite("Provider Tests", () =>
         //
         // Do work son
         //
-        await teApi.explorer?.getTaskItems(undefined, "         ", true) as Map<string, TaskItem>;
+        //
+        // Do work son
+        //
+        await teApi.explorer?.getTaskItems(undefined, "         ", true) as unknown as Map<string, TaskItem>;
         setupAnt(); setupGradle(); setupTsc(); setupMakefile();
         setupBash(); setupBatch(); setupGrunt(); setupGulp(); setupAppPublisher(); setupMaven();
 
@@ -226,7 +230,7 @@ suite("Provider Tests", () =>
             await storage.update(constants.LAST_TASKS_STORE, [ "hello.bat" ]);
             await configuration.updateWs("showLastTasks", true);
             await configuration.updateWs("expanded.lastTasks", false);
-            expect(await teApi.explorer.buildTaskTree([])).to.be.an("array").that.has.a.lengthOf(2);
+            expect(await teApi.explorer?.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(2);
         }
         catch (e) {
             throw e;
@@ -248,7 +252,7 @@ suite("Provider Tests", () =>
             await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
             await configuration.updateWs("showLastTasks", false);
             await configuration.updateWs("expanded.favorites", false);
-            expect(await teApi.explorer.buildTaskTree([])).to.be.an("array").that.has.a.lengthOf(1);
+            expect(await teApi.explorer?.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1);
         }
         catch (e) {
             throw e;
@@ -265,7 +269,7 @@ suite("Provider Tests", () =>
     {   //
         // The 3rd param `true` will open the task files and locate task positions while parsing the tree
         //
-        taskMap = await teApi.explorer.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
+        taskMap = await teApi.explorer?.getTaskItems(undefined, "   ", true) as unknown as Map<string, TaskItem>;
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10);
     });
 
@@ -378,8 +382,8 @@ suite("Provider Tests", () =>
     {   //
         // Cover single-if branches in cache module
         //
-        await teApi.fileCache.addFolderToCache();
-        await teApi.fileCache.addFolderToCache((workspace.workspaceFolders as WorkspaceFolder[])[0]);
+        await teApi.testsApi.fileCache.addFolderToCache();
+        await teApi.testsApi.fileCache.addFolderToCache((workspace.workspaceFolders as WorkspaceFolder[])[0]);
         await sleep(5000);
         await waitForCache();
     });
@@ -457,7 +461,7 @@ suite("Provider Tests", () =>
         await configuration.updateVsWs("terminal.integrated.shell.windows",
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
         await sleep(1000);
-        await teApi.fileCache.buildCache("bash", "bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
+        await teApi.testsApi.fileCache.buildCache("bash", "bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
     });
 
 
@@ -466,7 +470,7 @@ suite("Provider Tests", () =>
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        await teApi.fileCache.buildCache("gulp", "gulp", constants.GLOB_GULP, workspace.workspaceFolders[0], true);
+        await teApi.testsApi.fileCache.buildCache("gulp", "gulp", constants.GLOB_GULP, workspace.workspaceFolders[0], true);
     });
 
 
@@ -521,18 +525,18 @@ suite("Provider Tests", () =>
         //
         // Try a bunch of times to cover all of the hooks in the processing loops
         //
-        await teApi.fileCache.cancelBuildCache(true);
-        teApi.fileCache.rebuildCache();
-        await teApi.fileCache.cancelBuildCache(true);
-        teApi.fileCache.rebuildCache();
+        await teApi.testsApi.fileCache.cancelBuildCache(true);
+        teApi.testsApi.fileCache.rebuildCache();
+        await teApi.testsApi.fileCache.cancelBuildCache(true);
+        teApi.testsApi.fileCache.rebuildCache();
         await sleep(40);
-        await teApi.fileCache.cancelBuildCache(true);
-        teApi.fileCache.rebuildCache();
+        await teApi.testsApi.fileCache.cancelBuildCache(true);
+        teApi.testsApi.fileCache.rebuildCache();
         await sleep(75);
-        await teApi.fileCache.cancelBuildCache(true);
-        teApi.fileCache.rebuildCache();
-        await teApi.fileCache.cancelBuildCache(true);
-        await teApi.fileCache.rebuildCache();
+        await teApi.testsApi.fileCache.cancelBuildCache(true);
+        teApi.testsApi.fileCache.rebuildCache();
+        await teApi.testsApi.fileCache.cancelBuildCache(true);
+        await teApi.testsApi.fileCache.rebuildCache();
     });
 
 
@@ -577,7 +581,7 @@ export async function buildTree(instance: any, waitTime?: number)
     //
     // A special refresh() for test suite, will open all task files and open to position
     //
-    await teApi.explorer.refresh("tests");
+    await teApi.explorer?.refresh("tests");
     await waitForCache();
 
     const treeItems = await refresh();
