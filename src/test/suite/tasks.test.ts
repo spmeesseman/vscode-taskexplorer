@@ -10,7 +10,6 @@ import TaskItem from "../../tree/item";
 import { configuration } from "../../common/configuration";
 import { storage } from "../../common/storage";
 import constants from "../../common/constants";
-import { waitForCache } from "../../cache";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInputBox, sleep } from "../helper";
 
@@ -36,7 +35,7 @@ suite("Task Tests", () =>
     test("Refresh", async function()
     {
         await executeTeCommand("refresh", 1000);
-		await waitForCache();
+		await teApi.testsApi.fileCache.waitForCache();
     });
 
 

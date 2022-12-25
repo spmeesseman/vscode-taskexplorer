@@ -14,7 +14,6 @@ import constants from "../../common/constants";
 import { expect } from "chai";
 import { workspace, tasks, commands, Uri, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../common/utils";
-import { waitForCache } from "../../cache";
 import { addWsFolder, removeWsFolder } from "../../extension";
 import { TaskExplorerApi, ExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
@@ -329,7 +328,7 @@ suite("Provider Tests", () =>
             {
                 await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile);
                 await sleep(500);
-                await waitForCache();
+                await teApi.testsApi.fileCache.waitForCache();
                 break;
             }
         }
@@ -345,7 +344,7 @@ suite("Provider Tests", () =>
         await sleep(500);
         createAppPublisherFile();
         await sleep(100);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -357,7 +356,7 @@ suite("Provider Tests", () =>
         await sleep(1000);
         createAntFile();
         await sleep(100);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -369,7 +368,7 @@ suite("Provider Tests", () =>
         await sleep(1000);
         createGradleFile();
         await sleep(100);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -381,7 +380,7 @@ suite("Provider Tests", () =>
         await sleep(1000);
         createGruntFile();
         await sleep(100);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -393,7 +392,7 @@ suite("Provider Tests", () =>
         await sleep(1000);
         createGulpFile();
         await sleep(100);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -405,7 +404,7 @@ suite("Provider Tests", () =>
         await sleep(1000);
         createMakeFile();
         await sleep(100);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -417,7 +416,7 @@ suite("Provider Tests", () =>
         await sleep(1000);
         createMavenPomFile();
         await sleep(100);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -429,7 +428,7 @@ suite("Provider Tests", () =>
         await sleep(1000);
         createBatchFile();
         await sleep(100);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -440,7 +439,7 @@ suite("Provider Tests", () =>
         await teApi.testsApi.fileCache.addFolderToCache();
         await teApi.testsApi.fileCache.addFolderToCache((workspace.workspaceFolders as WorkspaceFolder[])[0]);
         await sleep(5000);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -467,7 +466,7 @@ suite("Provider Tests", () =>
             workspace: false
         });
         await sleep(5000);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -495,7 +494,7 @@ suite("Provider Tests", () =>
         });
 
         await sleep(5000); // wait for filesystem change events
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -503,7 +502,7 @@ suite("Provider Tests", () =>
     {
         await commands.executeCommand("taskExplorer.refresh");
         await sleep(5000);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -535,7 +534,7 @@ suite("Provider Tests", () =>
         await configuration.updateWs("groupMaxLevel", 5);
 
         await sleep(2000); // wait for filesystem change events
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
     });
 
 
@@ -618,7 +617,7 @@ export async function buildTree(instance: any, waitTime?: number)
     instance.timeout(60 * 1000);
 
     await sleep(waitTime || 1);
-    await waitForCache();
+    await teApi.testsApi.fileCache.waitForCache();
 
     await configuration.updateWs("groupWithSeparator", true);
     await configuration.updateWs("groupSeparator", "-");
@@ -628,7 +627,7 @@ export async function buildTree(instance: any, waitTime?: number)
     // A special refresh() for test suite, will open all task files and open to position
     //
     await explorer.refresh("tests");
-    await waitForCache();
+    await teApi.testsApi.fileCache.waitForCache();
 
     const treeItems = await refresh();
 

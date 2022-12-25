@@ -8,7 +8,6 @@ import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../common/configuration";
-import { waitForCache } from "../cache";
 import { commands, extensions, tasks, window, workspace } from "vscode";
 
 const testsControl = {
@@ -73,7 +72,7 @@ export async function activate(instance?: any)
         // Init settings
         // Note that the '*' is removed from package.json[activationEvents] before the runTest() call
         //
-        initSettings(true);
+        await initSettings(true);
         //
         // Activate extension
         //
@@ -286,7 +285,7 @@ export function overrideNextShowInfoBox(value: any)
 export async function refresh()
 {
 	await executeTeCommand("refresh", 500);
-    await waitForCache();
+    await teApi.testsApi.fileCache.waitForCache();
     return teApi.explorer?.getChildren();
 }
 

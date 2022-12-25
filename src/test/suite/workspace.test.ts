@@ -7,7 +7,6 @@ import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
 import TaskItem from "../../tree/item";
 import { activate, findIdInTaskMap, isReady, sleep } from "../helper";
-import { waitForCache } from "../../cache";
 
 let teApi: TaskExplorerApi;
 let wsEnable: boolean;
@@ -35,7 +34,7 @@ suite("Workspace / VSCode Tests", () =>
     {
         await configuration.updateWs("showHiddenWsTasks", true);
         await sleep(500);
-        await waitForCache();
+        await await teApi.testsApi.fileCache.waitForCache();
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
         const taskCount = findIdInTaskMap(":Workspace:", taskMap);
         if (taskCount !== 10) {
@@ -48,7 +47,7 @@ suite("Workspace / VSCode Tests", () =>
     {
         await configuration.updateWs("showHiddenWsTasks", false);
         await sleep(500);
-        await waitForCache();
+        await await teApi.testsApi.fileCache.waitForCache();
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
         const taskCount = findIdInTaskMap(":Workspace:", taskMap);
         if (taskCount !== 9) {
@@ -61,7 +60,7 @@ suite("Workspace / VSCode Tests", () =>
     {
         await configuration.updateWs("enabledTasks.workspace", false);
         await sleep(2000);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
         const taskCount = findIdInTaskMap(":Workspace:", taskMap);
         if (taskCount !== 0) {
@@ -74,7 +73,7 @@ suite("Workspace / VSCode Tests", () =>
     {
         await configuration.updateWs("enabledTasks.workspace", true);
         await sleep(2000);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
         const taskCount = findIdInTaskMap(":Workspace:", taskMap);
         if (taskCount !== 9) {
@@ -87,7 +86,7 @@ suite("Workspace / VSCode Tests", () =>
     {
         await configuration.updateWs("showHiddenWsTasks", true);
         await sleep(500);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
         const taskCount = findIdInTaskMap(":Workspace:", taskMap);
         if (taskCount !== 10) {

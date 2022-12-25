@@ -5,17 +5,15 @@
 import * as assert from "assert";
 import * as util from "../../common/utils";
 import TaskFolder from "../../tree/folder";
-import { TaskExplorerApi } from "../../../types";
-// import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
 import constants from "../../common/constants";
 import { storage } from "../../common/storage";
 import TaskItem from "../../tree/item";
-import { commands, tasks, TreeItem, TreeItemCollapsibleState, WorkspaceFolder } from "vscode";
+import { TreeItem, TreeItemCollapsibleState } from "vscode";
 import {
     activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, refresh, sleep, verifyTaskCount
 } from "../helper";
-import { waitForCache } from "../../cache";
 
 
 let teApi: TaskExplorerApi;
@@ -23,7 +21,6 @@ let favTasks: string[];
 let lastTasks: string[];
 let ant: TaskItem[];
 let batch: TaskItem[];
-let taskMap: Map<string, TaskItem>;
 
 
 suite("Tree Tests", () =>
@@ -35,7 +32,6 @@ suite("Tree Tests", () =>
         assert(isReady() === true, "    ✘ TeApi not ready");
         favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-        taskMap = await teApi.explorer?.getTaskItems(undefined) as unknown as Map<string, TaskItem>;
     });
 
 

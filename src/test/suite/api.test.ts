@@ -10,7 +10,6 @@ import { activate, executeTeCommand, isReady, sleep, verifyTaskCount } from "../
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ExternalTaskProvider } from "./externalTaskProvider";
-import { waitForCache } from "../../cache";
 
 
 let teApi: TaskExplorerApi;
@@ -47,7 +46,7 @@ suite("API Tests", () =>
         taskProvider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         await teApi.register("external", taskProvider);
         await sleep(3000);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
         await verifyTaskCount("external", 2, true);
     });
 
@@ -66,7 +65,7 @@ suite("API Tests", () =>
     {
         await teApi.unregister("external");
         await sleep(3000);
-        await waitForCache();
+        await teApi.testsApi.fileCache.waitForCache();
         await verifyTaskCount("external", 2, 0);
     });
 
