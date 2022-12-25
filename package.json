@@ -66,7 +66,7 @@
         "coverage-full_off": "tools\\enable-full-coverage.sh --off",
         "coverage-codecov-publish": "node_modules/.bin/codecov --disable=gcov --disable=detect",
         "test-all": "npm run clean && npm run rebuild_test && node ./dist/test/runTest.js",
-        "test-ant": "npm run clean && npm run rebuild_test && node ./dist/test/runTest.js ant xDeactivate",
+        "test-ant": "npm run clean && npm run rebuild_test && node ./dist/test/runTest.js _api ant xDeactivate",
         "test-api": "npm run clean && npm run rebuild_test && node ./dist/test/runTest.js api xDeactivate",
         "test-composer": "npm run clean && npm run rebuild_test && node ./dist/test/runTest.js composer xDeactivate",
         "test-configuration": "npm run clean && npm run rebuild_test && node ./dist/test/runTest.js configuration xDeactivate",
@@ -105,7 +105,7 @@
     },
     "devDependencies": {
         "@istanbuljs/nyc-config-typescript": "^1.0.1",
-        "@spmeesseman/vscode-taskexplorer-types": "^2.13.0",
+        "@spmeesseman/vscode-taskexplorer-types": "^2.13.1",
         "@types/chai": "^4.3.4",
         "@types/glob": "^7.1.3",
         "@types/minimatch": "^3.0.3",
@@ -1547,7 +1547,7 @@
                     "properties": {
                         "ant": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableAnsiconForAnt%"
+                            "description": "%config.taskExplorer.enableAnt%"
                         },
                         "apppublisher": {
                             "type": "boolean",
