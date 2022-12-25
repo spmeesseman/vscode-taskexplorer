@@ -2,6 +2,8 @@
 
 import * as util from "./common/utils";
 import * as log from "./common/log";
+import * as glob from "glob";
+import { join } from "path";
 import { configuration } from "./common/configuration";
 import { providers, providersExternal } from "./extension";
 import {
@@ -167,8 +169,7 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
 
     if (!providersExternal.get(taskType))
     {
-        const relativePattern = new RelativePattern(folder, fileGlob);
-        const paths = await workspace.findFiles(relativePattern, getExcludesPattern(folder));
+        const paths = glob.sync(fileGlob, { cwd: folder.uri.fsPath, ignore: getExcludesPattern()  });
         for (const fPath of paths)
         {
             if (cancel)
@@ -176,10 +177,11 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
                 cancelInternal(setCacheBuilding, statusBarSpace);
                 return;
             }
-            if (!util.isExcluded(fPath.path, "   "))
+            const uriFile = Uri.file(join(folder.uri.fsPath, fPath));
+            if (!util.isExcluded(uriFile.path, "   "))
             {
-                fCache.add({ uri: fPath, folder });
-                log.value("   Added to cache", fPath.fsPath, 3, logPad);
+                fCache.add({ uri: uriFile, folder });
+                log.value("   Added to cache", fPath, 3, logPad);
             }
         }
     }
@@ -251,11 +253,10 @@ function disposeStatusBarSpace(statusBarSpace: StatusBarItem)
 }
 
 
-function getExcludesPattern(folder: string | WorkspaceFolder): RelativePattern
+function getExcludesPattern()
 {
-    const excludes: string[] = configuration.get("exclude"),
-          multiFilePattern = util.getCombinedGlobPattern("**/node_modules/**,**/work/**", excludes);
-    return new RelativePattern(folder, multiFilePattern);
+    const excludes: string[] = configuration.get("exclude");
+    return util.getCombinedGlobPattern("**/node_modules/**,**/work/**", excludes);
 }
 
 
