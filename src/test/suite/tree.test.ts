@@ -10,10 +10,11 @@ import { configuration } from "../../common/configuration";
 import constants from "../../common/constants";
 import { storage } from "../../common/storage";
 import TaskItem from "../../tree/item";
-import { TreeItem, TreeItemCollapsibleState } from "vscode";
+import { commands, tasks, TreeItem, TreeItemCollapsibleState } from "vscode";
 import {
-    activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, refresh
+    activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, refresh, sleep, verifyTaskCount
 } from "../helper";
+import { waitForCache } from "../../cache";
 
 
 let teApi: TaskExplorerApi;
@@ -21,6 +22,7 @@ let favTasks: string[];
 let lastTasks: string[];
 let ant: TaskItem[];
 let batch: TaskItem[];
+let taskMap: Map<string, TaskItem>;
 
 
 suite("Tree Tests", () =>
@@ -32,6 +34,7 @@ suite("Tree Tests", () =>
         assert(isReady() === true, "    ✘ TeApi not ready");
         favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
+        taskMap = await teApi.explorer.getTaskItems() as Map<string, TaskItem>;
     });
 
 
@@ -63,7 +66,49 @@ suite("Tree Tests", () =>
     });
 
 
-    test("Add to favorites", async function()
+    test("Add to Excludes - TaskFile", async function()
+    {
+        const taskItems = await tasks.fetchTasks({ type: "grunt" }),
+              gruntCt = taskItems.length;
+        for (const map of taskMap)
+        {
+            const value = map[1];
+            if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
+            {
+                await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile);
+                await sleep(500);
+                await waitForCache();
+                break;
+            }
+        }
+        await verifyTaskCount("grunt", gruntCt - 2);
+    });
+
+
+    test("Add to Excludes - TaskItem", async function()
+    {
+        const taskItems = await tasks.fetchTasks({ type: "grunt" }),
+              gruntCt = taskItems.length;
+        for (const map of taskMap)
+        {
+            const value = map[1];
+            if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
+            {
+                const node = value.taskFile.treeNodes.find(n => n instanceof TaskItem);
+                if (node)
+                {
+                    await commands.executeCommand("taskExplorer.addToExcludes", node);
+                    await sleep(500);
+                    await waitForCache();
+                    break;
+                }
+            }
+        }
+        await verifyTaskCount("grunt", gruntCt - 1);
+    });
+
+
+    test("Add to Favorites", async function()
     {
         let removed = await executeTeCommand("addRemoveFromFavorites", 0, batch[0]);
         if (removed) {

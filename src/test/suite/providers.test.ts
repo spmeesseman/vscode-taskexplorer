@@ -8,17 +8,18 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { expect } from "chai";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import constants from "../../common/constants";
+import { expect } from "chai";
 import { workspace, tasks, commands, Uri, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../common/utils";
 import { waitForCache } from "../../cache";
 import { addWsFolder, removeWsFolder } from "../../extension";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
-import { activate, findIdInTaskMap, getTreeTasks, refresh, sleep, verifyTaskCount } from "../helper";
+import { activate, findIdInTaskMap, getTreeTasks, refresh, sleep } from "../helper";
+import { storage } from "../../common/storage";
 
 
 let teApi: TaskExplorerApi;
@@ -28,7 +29,6 @@ let dirNameL2: string;
 let ws2DirName: string;
 let dirNameIgn: string;
 let batch: TaskItem[];
-let nodeExpandedeMap: any;
 const tempFiles: string[] = [];
 let taskMap: Map<string, TaskItem>;
 
@@ -44,8 +44,6 @@ suite("Provider Tests", () =>
         if (!rootPath) {
             assert.fail("        ✘ Workspace folder does not exist");
         }
-
-        nodeExpandedeMap = configuration.get<any>("expanded");
 
         dirName = path.join(rootPath, "tasks_test_");
         dirNameL2 = path.join(dirName, "subfolder");
@@ -220,20 +218,46 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations  - Last Tasks Collapsed", async function()
     {
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
+        const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
         const showLasTasks = configuration.get<boolean>("showLastTasks");
-        await configuration.updateWs("showLastTasks", true);
-        await configuration.updateWs("expanded.lastTasks", false);
-        expect(teApi.explorer.buildTaskTree([])).to.be.an("array").with.length.that.is.equal(2);
-        await configuration.updateWs("expanded.lastTasks", true);
-        await configuration.updateWs("showLastTasks", showLasTasks);
+        try {
+            await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
+            await storage.update(constants.LAST_TASKS_STORE, [ "hello.bat" ]);
+            await configuration.updateWs("showLastTasks", true);
+            await configuration.updateWs("expanded.lastTasks", false);
+            expect(await teApi.explorer.buildTaskTree([])).to.be.an("array").that.has.a.lengthOf(2);
+        }
+        catch (e) {
+            throw e;
+        }
+        finally {
+            await configuration.updateWs("expanded.lastTasks", true);
+            await configuration.updateWs("showLastTasks", showLasTasks);
+            await storage.update(constants.FAV_TASKS_STORE, favTasks);
+            await storage.update(constants.LAST_TASKS_STORE, lastTasks);
+        }
     });
 
 
     test("Build Tree Variations - Favorites Collapsed", async function()
     {
-        await configuration.updateWs("expanded.favorites", false);
-        expect(teApi.explorer.buildTaskTree([])).to.be.an("array").with.length.that.is.equal(2);
-        await configuration.updateWs("expanded.favorites", true);
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
+        const showLasTasks = configuration.get<boolean>("showLastTasks");
+        try {
+            await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
+            await configuration.updateWs("showLastTasks", false);
+            await configuration.updateWs("expanded.favorites", false);
+            expect(await teApi.explorer.buildTaskTree([])).to.be.an("array").that.has.a.lengthOf(1);
+        }
+        catch (e) {
+            throw e;
+        }
+        finally {
+            await configuration.updateWs("expanded.favorites", true);
+            await configuration.updateWs("showLastTasks", showLasTasks);
+            await storage.update(constants.FAV_TASKS_STORE, favTasks);
+        }
     });
 
 
@@ -241,7 +265,7 @@ suite("Provider Tests", () =>
     {   //
         // The 3rd param `true` will open the task files and locate task positions while parsing the tree
         //
-        taskMap = await teApi.explorer?.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
+        taskMap = await teApi.explorer.getTaskItems(undefined, "   ", true) as Map<string, TaskItem>;
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10);
     });
 
@@ -254,33 +278,14 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Add to Excludes", async function()
-    {
-        const taskItems = await tasks.fetchTasks({ type: "grunt" }),
-              gruntCt = taskItems.length;
-
-        for (const map of taskMap)
-        {
-            const value = map[1];
-            if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt")) {
-                await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile);
-                await sleep(3000);
-                break;
-            }
-        }
-
-        await verifyTaskCount("grunt", gruntCt - 2);
-    });
-
-
     test("App Publisher Delete / Add", async function()
     {
         const file = path.join(rootPath, ".publishrc.json");
         removeFromArray(tempFiles, file);
         fs.unlinkSync(file);
-        await sleep(1000);
+        await sleep(500);
         createAppPublisherFile();
-        await sleep(1000);
+        await sleep(100);
         await waitForCache();
     });
 
@@ -292,7 +297,8 @@ suite("Provider Tests", () =>
         fs.unlinkSync(file);
         await sleep(1000);
         createAntFile();
-        await sleep(1000);
+        await sleep(100);
+        await waitForCache();
     });
 
 
@@ -303,7 +309,8 @@ suite("Provider Tests", () =>
         fs.unlinkSync(file);
         await sleep(1000);
         createGradleFile();
-        await sleep(1000);
+        await sleep(100);
+        await waitForCache();
     });
 
 
@@ -314,7 +321,8 @@ suite("Provider Tests", () =>
         fs.unlinkSync(file);
         await sleep(1000);
         createGruntFile();
-        await sleep(1000);
+        await sleep(100);
+        await waitForCache();
     });
 
 
@@ -325,7 +333,8 @@ suite("Provider Tests", () =>
         fs.unlinkSync(file);
         await sleep(1000);
         createGulpFile();
-        await sleep(1000);
+        await sleep(100);
+        await waitForCache();
     });
 
 
@@ -336,7 +345,8 @@ suite("Provider Tests", () =>
         fs.unlinkSync(file);
         await sleep(1000);
         createMakeFile();
-        await sleep(1000);
+        await sleep(100);
+        await waitForCache();
     });
 
 
@@ -347,7 +357,8 @@ suite("Provider Tests", () =>
         fs.unlinkSync(file);
         await sleep(1000);
         createMavenPomFile();
-        await sleep(1000);
+        await sleep(100);
+        await waitForCache();
     });
 
 
@@ -358,7 +369,7 @@ suite("Provider Tests", () =>
         fs.unlinkSync(file);
         await sleep(1000);
         createBatchFile();
-        await sleep(1000);
+        await sleep(100);
         await waitForCache();
     });
 

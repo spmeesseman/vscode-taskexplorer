@@ -8,18 +8,19 @@ import { deactivate } from "../extension";
 import { TaskExplorerApi } from "../interface/taskExplorerApi";
 import { configuration } from "../common/configuration";
 import { waitForCache } from "../cache";
-import { commands, ConfigurationTarget, extensions, tasks, TreeItem, window, workspace } from "vscode";
+import { commands, extensions, tasks, window, workspace } from "vscode";
 
+const testsControl = {
+    keepSettingsFile: false,
+    writeToConsole: false
+};
 
-const writeToConsole = false;
+let activated = false;
+let teApi: TaskExplorerApi;
 const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
 const overridesShowInputBox: any[] = [];
 const overridesShowInfoBox: any[] = [];
-
-let treeItems: TreeItem[];
-let activated = false;
-let teApi: TaskExplorerApi;
 
 window.showInputBox = (...args: any[]) =>
 {
@@ -80,7 +81,7 @@ export async function activate(instance?: any)
         //
         // For debugging
         //
-        teApi.log.setWriteToConsole(writeToConsole);
+        teApi.log.setWriteToConsole(testsControl.writeToConsole);
     }
     return teApi;
 }
@@ -93,7 +94,7 @@ export async function cleanup()
 
     await deactivate();
 
-    if (fs.existsSync(settingsFile)) {
+    if (!testsControl.keepSettingsFile && fs.existsSync(settingsFile)) {
         try {
             fs.unlinkSync(settingsFile);
         } catch {}

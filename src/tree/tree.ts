@@ -73,7 +73,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         subscriptions.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update <packagename>"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | string) => { await this.addToExcludes(taskFile); }, this));
+        subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem | string) => { await this.addToExcludes(taskFile); }, this));
         subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
         subscriptions.push(commands.registerCommand(name + ".addRemoveCustomLabel", async (taskItem: TaskItem) => this.addRemoveSpecialLabel(taskItem), this));
         subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
@@ -141,7 +141,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         log.methodStart("add/remove rename special", 1, "", false, [[ "id", id ]]);
 
         for (const i in renames)
-        {
+        {   /* istanbul ignore else */
             if ([].hasOwnProperty.call(renames, i))
             {
                 if (id === renames[i][0])
@@ -160,7 +160,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             const opts: InputBoxOptions = { prompt: "Enter favorites label" };
             await window.showInputBox(opts).then(async (str) =>
             {
-                if (id && str !== undefined)
+                if (str !== undefined)
                 {
                     addRemoved = true;
                     renames.push([ id, str ]);
@@ -436,6 +436,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         // Set scope name and create the TaskFolder, a "user" task will have a TaskScope scope, not
         // a WorkspaceFolder scope.
         //
+        /* istanbul ignore else */
         if (util.isWorkspaceFolder(each.scope))
         {
             scopeName = each.scope.name;
@@ -1060,7 +1061,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     private getGroupedId(folder: TaskFolder, file: TaskFile, label: string, treeLevel: number)
     {
         const groupSeparator = util.getGroupSeparator();
-        const labelSplit = label?.split(groupSeparator);
+        const labelSplit = label.split(groupSeparator);
         let id = "";
         for (let i = 0; i <= treeLevel; i++)
         {
@@ -1361,7 +1362,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     public getTreeItem(element: TaskItem | TaskFile | TaskFolder): TreeItem
     {
         if (element instanceof TaskItem) {
-            log.methodStart("get tree item", 3, "", true, [[ "label", element?.label ]]);
+            log.methodStart("get tree item", 3, "", true, [[ "label", element.label ]]);
             log.write("   refresh task item state", 3);
             element.refreshState(true);
             log.methodDone("get tree item", 3);
@@ -1476,6 +1477,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             }
         }
         catch (e: any) {
+            /* istanbul ignore next */
             log.error([ "Error invalidating task cache", e ]);
         }
 
@@ -1573,7 +1575,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
     private async open(selection: TaskItem, itemClick = false)
     {
-        const clickAction = configuration.get<string>("clickAction") || "Open";
+        const clickAction = configuration.get<string>("clickAction", "Open");
 
         //
         // As of v1.30.0, added option to change the entry item click to execute.  In order to avoid having
@@ -2142,16 +2144,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             await tasks.executeTask(task);
         }
         catch (e: any) {
+            /* istanbul ignore next */
             const err = e.toString();
+            /* istanbul ignore next */
             if (err.indexOf("No workspace folder") !== -1)
             {
+                /* istanbul ignore next */
                 window.showErrorMessage("Task execution failed:  No workspace folder.  NOTE: You must " +
                                         "save your workspace first before running 'User' tasks");
             }
             else {
+                /* istanbul ignore next */
                 window.showErrorMessage("Task execution failed: " + err);
             }
+            /* istanbul ignore next */
             log.write("Task execution failed: " + err);
+            /* istanbul ignore next */
             return false;
         }
         return true;
@@ -2428,7 +2436,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 this.fireTaskChangeEvents(taskItem, "   ", 1);
                 log.methodDone("task started event", 1);
             }
-            catch (e) { console.error(e); }
+            catch (e) { /* istanbul ignore next */ console.error(e); }
         }, 50);
 
         this.taskIdStartEvents.set(taskId, taskTimerId);
@@ -2466,7 +2474,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 this.fireTaskChangeEvents(taskItem, "   ", 1);
                 log.methodDone("task finished event", 1);
             }
-            catch (e) { console.error(e); }
+            catch (e) { /* istanbul ignore next */ console.error(e); }
         }, 50);
 
         this.taskIdStopEvents.set(taskId, taskTimerId);

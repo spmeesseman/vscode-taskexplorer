@@ -11,6 +11,7 @@ import { configuration } from "../../common/configuration";
 
 
 let teApi: TaskExplorerApi;
+let enabledTasks: any;
 let pathToPrograms: any;
 let shellW32: string,
     shellLnx: string,
@@ -23,6 +24,7 @@ suite("Configuration / Settings Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
+        enabledTasks = configuration.get<object>("enabledTasks");
         pathToPrograms = configuration.get<object>("pathToPrograms");
         shellW32 = configuration.getVs<string>("terminal.integrated.shell.windows");
         shellLnx = configuration.getVs<string>("terminal.integrated.shell.linux");
@@ -149,7 +151,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Reset Default Shell - Coverage Hit", async function()
     {
-        await configuration.updateWs("enabledTasks", {
+        await configuration.updateWs("enabledTasks", Object.assign(enabledTasks, {
             bash: false,
             batch: false,
             nsis: false,
@@ -157,7 +159,7 @@ suite("Configuration / Settings Tests", () =>
             powershell: false,
             python: false,
             ruby: false
-        });
+        }));
         await sleep(50);
         await configuration.updateWs("enabledTasks.nsis", true); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
         await sleep(50);
@@ -174,14 +176,14 @@ suite("Configuration / Settings Tests", () =>
 
     test("Reset Coverage Hit", async function()
     {
-        await configuration.updateWs("enabledTasks", {
+        await configuration.updateWs("enabledTasks", Object.assign(enabledTasks, {
             bash: true,
             batch: true,
             perl: true,
             powershell: true,
             python: true,
             ruby: true
-        });
+        }));
         await sleep(50);
     });
 

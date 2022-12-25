@@ -2,10 +2,11 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 "use strict";
 //
+import * as glob from "glob";
 import * as path from "path";
 import * as Mocha from "mocha";
 const NYC = require("nyc");
-import * as glob from "glob";
+const { colors } = require("mocha/lib/reporters/base");
 
 //
 // Simulates the recommended config option
@@ -31,7 +32,7 @@ if (process.platform === "linux")
     {
         tty.getWindowSize = (): number[] =>
         {
-            return [80, 75];
+            return [ 80, 75 ];
         };
     }
 }
@@ -47,15 +48,15 @@ export async function run(): Promise<void>
         // ...baseConfig,
         extends: "@istanbuljs/nyc-config-typescript",
         cwd: nycRoot,
-        reporter: ["text-summary", "html", "lcov", "cobertura" ],
+        reporter: [ "text-summary", "html", "lcov", "cobertura" ],
         all: true,
         silent: false,
         instrument: true,
         hookRequire: true,
         hookRunInContext: true,
         hookRunInThisContext: true,
-        include: ["dist/**/*.js"],
-        exclude: ["dist/test/**"],
+        include: [ "dist/**/*.js" ],
+        exclude: [ "dist/test/**" ],
     });
     await nyc.wrap();
 
@@ -88,16 +89,18 @@ export async function run(): Promise<void>
         ui: "tdd", // the TDD UI is being used in extension.test.ts (suite, test, etc.)
         color: true, // colored output from test results,
         timeout: 30000, // default timeout: 10 seconds
-        retries: 1,
-        reporter: "mocha-multi-reporters",
-        reporterOptions: {
-            reporterEnabled: "spec, mocha-junit-reporter",
-            mochaJunitReporterReporterOptions: {
-                mochaFile: __dirname + "/../../coverage/junit/extension_tests.xml",
-                suiteTitleSeparatedBy: ": "
-            }
-        }
+        retries: 0 // ,
+        // reporter: "mocha-multi-reporters",
+        // reporterOptions: {
+        //     reporterEnabled: "spec, mocha-junit-reporter",
+        //     mochaJunitReporterReporterOptions: {
+        //         mochaFile: __dirname + "/../../coverage/junit/extension_tests.xml",
+        //         suiteTitleSeparatedBy: ": "
+        //     }
+        // }
     });
+    colors.slow = 33;
+    // symbols.ok = "";
 
     let filesToTest = "**/*.test.js";
     if (process.env.testArgs)

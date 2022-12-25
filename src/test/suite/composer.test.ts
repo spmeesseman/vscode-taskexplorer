@@ -13,7 +13,6 @@ import { configuration } from "../../common/configuration";
 import { activate, getWsPath, isReady, sleep, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ComposerTaskProvider } from "../../providers/composer";
-import { properCase } from "../../common/utils";
 
 
 let teApi: TaskExplorerApi;

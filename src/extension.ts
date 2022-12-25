@@ -116,14 +116,18 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         log,
         providers,
         utilities: util,
-        fileCache: cache,
         providersExternal,
         explorer: treeDataProvider2,
         sidebar: treeDataProvider,
         isBusy: isTaskExplorerBusy,
         refresh: refreshExternalProvider,
         register: registerExternalProvider,
-        unregister: unregisterExternalProvider
+        unregister: unregisterExternalProvider,
+        testsApi: {
+            log,
+            explorer: treeDataProvider2 || treeDataProvider,
+            fileCache: cache
+        }
     };
 
     //
