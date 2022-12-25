@@ -12,7 +12,8 @@ import { commands, extensions, tasks, window, workspace } from "vscode";
 
 const testsControl = {
     keepSettingsFile: false,
-    writeToConsole: false
+    writeToConsole: false,
+    writeToOutput: false
 };
 
 let activated = false;
@@ -24,10 +25,12 @@ const overridesShowInfoBox: any[] = [];
 
 window.showInputBox = (...args: any[]) =>
 {
-    const next = overridesShowInputBox.shift();
+    let next = overridesShowInputBox.shift();
     if (typeof next === "undefined")
     {
-        return originalShowInputBox.call(null, args as any);
+        // return originalShowInputBox.call(null, args as any);
+        // overrideNextShowInputBox("");
+        next = undefined;
     }
     return new Promise((resolve, reject) =>
     {
@@ -37,12 +40,13 @@ window.showInputBox = (...args: any[]) =>
 
 window.showInformationMessage = (str: string, ...args: any[]) =>
 {
-    const next = overridesShowInfoBox.shift();
+    let next = overridesShowInfoBox.shift();
     if (typeof next === "undefined")
     {
-        return originalShowInfoBox(str, args as any);
+        next = undefined;
+        // return originalShowInfoBox(str, args as any);
     }
-    return new Promise((resolve, reject) =>
+    return new Promise<string | undefined>((resolve, reject) =>
     {
         resolve(next);
     });
@@ -81,6 +85,7 @@ export async function activate(instance?: any)
         //
         // For debugging
         //
+        await configuration.updateWs("debug", testsControl.writeToOutput);
         teApi.log.setWriteToConsole(testsControl.writeToConsole);
     }
     return teApi;
@@ -93,6 +98,9 @@ export async function cleanup()
           settingsFile = path.join(dirNameCode, "settings.json");
 
     await deactivate();
+
+    window.showInputBox = originalShowInputBox;
+    window.showInformationMessage = originalShowInfoBox;
 
     if (!testsControl.keepSettingsFile && fs.existsSync(settingsFile)) {
         try {

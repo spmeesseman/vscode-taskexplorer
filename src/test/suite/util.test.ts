@@ -31,6 +31,12 @@ suite("Util Tests", () =>
 	});
 
 
+	suiteTeardown(async function()
+	{
+		await configuration.updateWs("debug", false);
+	});
+
+
     test("General Utility methods", async function()
     {
         const uri = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined;
