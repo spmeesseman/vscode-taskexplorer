@@ -57,7 +57,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
 
 
-
     constructor(name: string, context: ExtensionContext)
     {
         const subscriptions = context.subscriptions;
@@ -267,8 +266,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         enableConfigWatcher(false);
         await configuration.updateWs(excludesList, excludes);
         // await configuration.update(excludesList, excludes);
-
-        await this.refresh(selection instanceof TaskItem || selection instanceof TaskFile ? selection.taskSource : false, uri);
+        await this.refresh(selection instanceof TaskItem || selection instanceof TaskFile ? selection.taskSource : false,
+                           !(selection instanceof TaskItem) ? uri : false);
         enableConfigWatcher(true);
 
         log.methodDone("add to excludes", 1);
@@ -1805,7 +1804,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
         }
 
-        if (opt && util.isString(invalidate, true) && invalidate !== "tests")
+        if (opt !== false && util.isString(invalidate, true) && invalidate !== "tests")
         {
             log.write(`   invalidation is for type '${invalidate}'`, 1, logPad);
             //
@@ -1830,9 +1829,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         if (this.visible) {
             this._onDidChangeTreeData.fire(null);
         }
-        // else {
-        //     this.getChildren();
-        // }
+        else {
+            // this.getChildren();
+            this.isRefreshPending = false;
+        }
         log.methodDone("refresh task tree", 1, logPad, true);
     }
 
