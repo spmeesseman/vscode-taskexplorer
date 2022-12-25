@@ -5,6 +5,7 @@ import constants from "../common/constants";
 import { configuration } from "../common/configuration";
 import { filesCache, removeFileFromCache } from "../cache";
 import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
+import { isTaskIncluded } from "../lib/isTaskIncluded";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
@@ -83,7 +84,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
                 {
                     visitedFiles.add(fObj.uri.fsPath);
-                    const tasks = await this.readUriTasks(fObj.uri, logPad + "   ");
+                    const tasks = (await this.readUriTasks(fObj.uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
                     log.write(`   processed ${this.providerName} file`, 3, logPad);
                     log.value("      file", fObj.uri.fsPath, 3, logPad);
                     log.value("      targets in file", tasks.length, 3, logPad);
@@ -126,7 +127,9 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 {
                     const cachedTask = this.cachedTasks[i];
                     const cstDef = cachedTask.definition;
-                    if (cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath)))
+                    // if (excludeTask.includes(cstDef.uri) || (cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath))))
+                    if ((cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath))) ||
+                        (cstDef.path && !isTaskIncluded(cachedTask, cstDef.path)))
                     {
                         rmvTasks.push(i);
                     }
@@ -141,7 +144,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
                 if (pathExists && !configuration.get<string[]>("exclude", []).includes(uri.path))
                 {
-                    const tasks = await this.readUriTasks(uri, logPad + "   ");
+                    const tasks = (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
                     //
                     // If the implementation of the readUri() method awaits, it can theoretically reset
                     // this.cachedTasks under certain circumstances via invalidation by the tree that's

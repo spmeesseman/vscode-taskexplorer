@@ -4,7 +4,6 @@
 import * as assert from "assert";
 import { ILicenseManager } from "../../interface/licenseManager";
 import { storage } from "../../common/storage";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import * as cp from "child_process";
 import * as fs from "fs";
@@ -5,8 +6,7 @@ import * as path from "path";
 import * as assert from "assert";
 import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
-import { TaskExplorerApi } from "../../types";
-// import { TaskExplorerApi } from "../interface/taskExplorerApi";
+import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../common/configuration";
 import { waitForCache } from "../cache";
 import { commands, extensions, tasks, window, workspace } from "vscode";

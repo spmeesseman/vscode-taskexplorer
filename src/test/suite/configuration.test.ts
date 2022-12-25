@@ -6,7 +6,7 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import * as util from "../../common/utils";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, initSettings, isReady, sleep } from "../helper";
+import { activate, isReady, sleep } from "../helper";
 import { configuration } from "../../common/configuration";
 
 

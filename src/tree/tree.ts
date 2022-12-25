@@ -23,9 +23,10 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution
+    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, TaskExecution
 } from "vscode";
 import { ExplorerApi } from "../interface/explorer";
+import { enableConfigWatcher } from "../lib/processConfigChanges";
 
 
 const isLicenseManagerActive = false;
@@ -43,13 +44,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     private static statusBarSpace: StatusBarItem;
     private tasks: Task[] | null = null;
     private treeBuilding = false;
+    private isRefreshPending = false;
+    private visible = false;
     private busy = false;
     private extensionContext: ExtensionContext;
     private name: string;
     private taskTree: TaskFolder[] | NoScripts[] | null = null;
     private currentInvalidation: string | undefined;
+    private taskIdStartEvents: Map<string, NodeJS.Timeout> = new Map();
+    private taskIdStopEvents: Map<string, NodeJS.Timeout> = new Map();
     private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
     readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
+
 
 
     constructor(name: string, context: ExtensionContext)
@@ -184,7 +190,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
     private async addToExcludes(selection: TaskFile | TaskItem | string)
     {
-        const me = this;
         let pathValue = "";
         let uri: Uri | undefined;
         let excludesList = "exclude";
@@ -196,7 +201,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             uri = selection.resourceUri;
             if (selection.isGroup)
             {
-                log.write("  file group");
+                log.write("   file group");
                 pathValue = "";
                 for (const each of selection.treeNodes)
                 {
@@ -211,7 +216,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             }
             else
             {
-                log.value("  file glob", uri.path);
+                log.value("   file glob", uri.path);
                 pathValue = uri.path;
             }
         }
@@ -220,11 +225,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             if (util.isScriptType(selection.taskSource))
             {
                 if (selection.resourceUri) {
-                    log.value("  file glob", selection.resourceUri.path);
+                    log.value("   file glob", selection.resourceUri.path);
                     pathValue = selection.resourceUri.path;
                 }
                 else if (selection.taskFile) {
-                    log.value("  file glob", selection.taskFile.resourceUri.path);
+                    log.value("   file glob", selection.taskFile.resourceUri.path);
                     pathValue = selection.taskFile.resourceUri.path;
                 }
             }
@@ -250,17 +255,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         else if (typeof excludes2 === "string") {
             excludes.push(excludes2);
         }
+
         const paths = pathValue.split(",");
         for (const s in paths) {
+            /* istanbul ignore next */
             if ({}.hasOwnProperty.call(paths, s)) { // skip properties inherited from prototype
                 util.pushIfNotExists(excludes, paths[s]);
             }
         }
 
-        configuration.updateWs(excludesList, excludes);
-        // configuration.update(excludesList, excludes);
+        enableConfigWatcher(false);
+        await configuration.updateWs(excludesList, excludes);
+        // await configuration.update(excludesList, excludes);
 
-        await me.refresh(selection instanceof TaskFile ? selection.taskSource : false, uri);
+        await this.refresh(selection instanceof TaskItem || selection instanceof TaskFile ? selection.taskSource : false, uri);
+        enableConfigWatcher(true);
 
         log.methodDone("add to excludes", 1);
     }
@@ -275,6 +284,31 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             taskItem2.label = getSpecialTaskName(taskItem2);
             folder.insertTaskFile(taskItem2, 0);
         }
+    }
+
+
+    /**
+     * Used as a check to reset node state when a task 'hangs' or whatever it does sometimes
+     * when the task fails ad the vscode engine doesnt trigger the taskexec finished event.
+     * RUns every 2 seconds for each task that is launched.
+     *
+     * @param taskItem Task item
+     */
+    private babysitRunningTask(taskItem: TaskItem)
+    {
+        setTimeout((t: TaskItem) =>
+        {
+            if (t.isRunning())
+            {
+                if (!t.isExecuting()) {
+                    // t.refreshState(false);
+                    this.fireTaskChangeEvents(t, "", 5);
+                }
+                else {
+                    this.babysitRunningTask(t);
+                }
+            }
+        }, 1000, taskItem);
     }
 
 
@@ -913,6 +947,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         let items: any = [];
         const firstRun = this.name === "taskExplorer" && !this.tasks && !this.taskTree;
 
+        this.isRefreshPending = true;
+
         log.methodStart("get tree children", logLevel, logPad, false, [
             [ "task folder", element?.label ], [ "all tasks need to be retrieved", !this.tasks ],
             [ "specific tasks need to be retrieved", !!this.currentInvalidation ],
@@ -1049,11 +1085,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             await getLicenseManager().initialize(this.tasks);
         }
 
+        this.isRefreshPending = false;
+        this.currentInvalidation = undefined; // reset file modification task type flag
+
         log.methodDone("get tree children", logLevel, logPad, false, [
             [ "# of tasks total", this.tasks?.length || "0" ], [ "# of tasks returned", items?.length || "0" ]
         ]);
 
-        this.currentInvalidation = undefined; // reset file modification task type flag
         return items;
     }
 
@@ -1487,6 +1525,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     }
 
 
+    public onVisibilityChanged(visible: boolean)
+    {
+        this.visible = visible;
+    }
+
+
     private logTask(task: Task, scopeName: string, logPad: string)
     {
         const definition = task.definition;
@@ -1753,12 +1797,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             [ "tree is null", !this.taskTree ]
         ]);
 
+        await this.waitForRefreshComplete();
+        this.isRefreshPending = true;
+
         if (invalidate !== false) // if anything but 'add to excludes'
         {
             await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
         }
 
-        if (util.isString(invalidate, true) && invalidate !== "tests")
+        if (opt && util.isString(invalidate, true) && invalidate !== "tests")
         {
             log.write(`   invalidation is for type '${invalidate}'`, 1, logPad);
             //
@@ -1771,7 +1818,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             //                                         //
             this.currentInvalidation = invalidate;     // 'invalidate' will be taskType if 'opt' is uri
             this.taskTree = null;                      // see todo above
-            this._onDidChangeTreeData.fire(null);      // see todo above // task.definition.treeItem
+            // this._onDidChangeTreeData.fire(null);      // see todo above // task.definition.treeItem
         }                                              // not sure if its even possible
         else //                                        //
         {   // Re-ask for all tasks from all providers and rebuild tree
@@ -1779,12 +1826,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             log.write("   invalidation is for all types", 1, logPad);
             this.tasks = null; // !skipAskTasks ? null : this.tasks;
             this.taskTree = null;
+        }
+        if (this.visible) {
             this._onDidChangeTreeData.fire(null);
         }
-
+        // else {
+        //     this.getChildren();
+        // }
         log.methodDone("refresh task tree", 1, logPad, true);
-
-        return;
     }
 
 
@@ -2042,8 +2091,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                     }
                 }
             }
-            if (await this.runTask(newTask, noTerminal)) {
+            if (await this.runTask(newTask, noTerminal))
+            {
                 await this.saveTask(taskItem, configuration.get<number>("numLastTasks"), false, "   ");
+                this.babysitRunningTask(taskItem);
             }
         }
 
@@ -2194,6 +2245,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                     }
                     if (await this.runTask(newTask, noTerminal)) {
                         await me.saveTask(taskItem, configuration.get<number>("numLastTasks"));
+                        this.babysitRunningTask(taskItem);
                     }
                 }
             };
@@ -2397,14 +2449,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         }
         else {
             window.showInformationMessage("Executing task not found");
+            taskItem.refreshState(false);
         }
 
         log.methodDone("stop", 1);
     }
-
-
-    private taskIdStartEvents: Map<string, NodeJS.Timeout> = new Map();
-    private taskIdStopEvents: Map<string, NodeJS.Timeout> = new Map();
 
 
     private async taskStartEvent(e: TaskStartEvent)
@@ -2479,6 +2528,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         }, 50);
 
         this.taskIdStopEvents.set(taskId, taskTimerId);
+    }
+
+
+    public async waitForRefreshComplete(maxWait = 15000, logPad = "   ")
+    {
+        let waited = 0;
+        if (this.isRefreshPending) {
+            log.write("waiting for previous refresh to complete...", 1, logPad);
+        }
+        while (this.isRefreshPending && waited < maxWait) {
+            await util.timeout(250);
+            waited += 250;
+        }
     }
 
 }

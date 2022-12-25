@@ -11,8 +11,7 @@ import { configuration } from "../../common/configuration";
 import { storage } from "../../common/storage";
 import constants from "../../common/constants";
 import { waitForCache } from "../../cache";
-import { TaskExplorerApi } from "../../../types";
-// import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInputBox, sleep } from "../helper";
 
 

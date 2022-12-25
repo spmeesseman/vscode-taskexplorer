@@ -137,13 +137,19 @@ export default class TaskItem extends TreeItem
     }
 
 
-    refreshState(doLog: boolean)
+    isRunning()
+    {
+        return !!this.contextValue?.includes("Running");
+    }
+
+
+    refreshState(doLog = true)
     {
         const isExecuting = !!this.isExecuting();
-        log.methodStart("refresh state", 5, "   ", false, [[ "is executing", isExecuting ]]);
+        if (doLog) log.methodStart("refresh state", 5, "   ", false, [[ "is executing", isExecuting ]]);
         this.setContextValue(this.task, isExecuting);
         this.setIconPath(this.task, this.context, isExecuting);
-        log.methodDone("refresh state", 5, "   ", false, [[ "is executing", isExecuting ]]);
+        if (doLog) log.methodDone("refresh state", 5, "   ", false, [[ "is executing", isExecuting ]]);
     }
 
 

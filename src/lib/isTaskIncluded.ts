@@ -70,9 +70,12 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = ""): b
     const excludeTask = configuration.get<string[]>("excludeTask");
     if (excludeTask && excludeTask.length > 0)
     {
+
         const fExcludeTasks = excludeTask.filter(et => !!et && util.isString(et) && et.length > 1);
-        for (const rgxPattern of fExcludeTasks) {
-            if ((new RegExp(rgxPattern)).test(task.name)) {
+        for (const rgxPattern of fExcludeTasks)
+        {
+            if ((new RegExp(rgxPattern)).test(task.name))
+            {
                 log.write("   skipping this task (by 'excludeTask' setting)", 2, logPad);
                 log.methodDone('Check task inclusion', 2, logPad);
                 return false;

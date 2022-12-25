@@ -17,11 +17,11 @@ export function registerExplorer(name: string, context: ExtensionContext, enable
         {
             const treeDataProvider = new TaskTreeDataProvider(name, context);
             const treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
-            treeView.onDidChangeVisibility(async _e => { treeDataProvider.onVisibilityChanged(_e.visible); }, treeDataProvider);
             views.set(name, treeView);
             const view = views.get(name);
             /* istanbul ignore else */
             if (view) {
+                view.onDidChangeVisibility(async _e => { treeDataProvider.onVisibilityChanged(_e.visible); }, treeDataProvider);
                 context.subscriptions.push(view);
                 log.write("   Tree data provider registered'" + name + "'");
             }

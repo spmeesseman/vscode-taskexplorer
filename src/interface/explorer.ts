@@ -16,4 +16,5 @@ export interface ExplorerApi
     invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad?: string): Promise<void>;
     refresh(invalidate?: any, opt?: Uri | boolean, logPad?: string): Promise<void>;
     showSpecialTasks(show: boolean, isFavorite?: boolean, forceChange?: boolean): Promise<void>;
+    waitForRefreshComplete(maxWait?: number): Promise<void>;
 }
