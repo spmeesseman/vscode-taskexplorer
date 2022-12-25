@@ -4,7 +4,6 @@ import * as path from "path";
 import * as util from "../common/utils";
 import * as log from "../common/log";
 import { configuration } from "../common/configuration";
-import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 
@@ -33,7 +32,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
 
         const def = this.getDefaultDefinition(target, folder, uri);
         const cwd = path.dirname(uri.fsPath);
-        const args = ["run-script", target];
+        const args = [ "run-script", target ];
         const options = { cwd };
         const execution = new ShellExecution(getCommand(), args, options);
 
@@ -45,7 +44,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
     {
         const targets: string[] = [];
 
-        log.methodStart("find composer targets", 1, logPad, true, [["path", fsPath]]);
+        log.methodStart("find composer targets", 1, logPad, true, [[ "path", fsPath ]]);
 
         try {
             const json = JSON.parse(util.readFileSync(fsPath)),
@@ -98,7 +97,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read composer file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read composer file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
 
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)

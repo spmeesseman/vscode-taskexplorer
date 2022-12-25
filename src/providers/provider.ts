@@ -3,7 +3,7 @@ import * as util from "../common/utils";
 import * as log from "../common/log";
 import constants from "../common/constants";
 import { configuration } from "../common/configuration";
-import { filesCache, removeFileFromCache } from "../cache";
+import { getFilesCache, removeFileFromCache } from "../cache";
 import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 
@@ -72,6 +72,8 @@ export abstract class TaskExplorerProvider implements TaskProvider
     {
         const allTasks: Task[] = [];
         const visitedFiles: Set<string> = new Set();
+        const filesCache = getFilesCache();
+
         const paths = filesCache.get(this.providerName),
               enabled = util.isTaskTypeEnabled(this.providerName);
 
@@ -79,7 +81,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
         if (enabled && paths)
         {
-            for (const fObj of paths)
+            for (const fObj of paths.values())
             {
                 if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
                 {

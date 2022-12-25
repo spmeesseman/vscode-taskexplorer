@@ -2,19 +2,20 @@
 
 import * as util from "./common/utils";
 import * as log from "./common/log";
-import * as glob from "glob";
-import { join } from "path";
 import { configuration } from "./common/configuration";
 import { providers, providersExternal } from "./extension";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
 } from "vscode";
+import * as glob from "glob";
+import { join } from "path";
 
 
 let cacheBuilding = false;
 let folderCaching = false;
 let cancel = false;
-const taskGlobs: any = {};
+let taskGlobs: any = {};
+const filesCache: Map<string, Set<ICacheItem>> = new Map();
 
 
 export interface ICacheItem
@@ -23,7 +24,7 @@ export interface ICacheItem
     folder: WorkspaceFolder;
 }
 
-export const filesCache: Map<string, Set<ICacheItem>> = new Map();
+export const getFilesCache = () => filesCache;
 
 
 export async function addFolderToCache(folder: WorkspaceFolder | undefined, logPad: string)
@@ -110,12 +111,14 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
     // script type (batch, powershell, python, etc)
     // The `fileGlob` parameter will be undefined for external task providers
     //
+    let globChanged = !taskGlobs[taskType];
     if (taskGlobs[taskType] && taskAlias !== "script")
     {   //
         // As of v1.31, Ant globs will be the only task types whose blobs may change
         //
         if (taskGlobs[taskType] !== fileGlob)
         {
+            globChanged = true;
             fCache.clear();
         }
     }
@@ -136,14 +139,17 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
     // If 'wsFolder' if falsey, build the entire cache.  If truthy, build the cache for the
     // specified folder only
     //
-    if (!wsFolder)
+    if (globChanged)
     {
-        log.blank(1);
-        log.write("   Build cache - Scan all projects for taskType '" + taskType + "' (" + taskType + ")", 1, logPad);
-        await buildFolderCaches(fCache, taskType, fileGlob, statusBarSpace, setCacheBuilding, logPad + "   ");
-    }
-    else {
-        await buildFolderCache(fCache, wsFolder, taskType, fileGlob, statusBarSpace, setCacheBuilding, logPad + "   ");
+        if (!wsFolder)
+        {
+            log.blank(1);
+            log.write("   Build cache - Scan all projects for taskType '" + taskType + "' (" + taskType + ")", 1, logPad);
+            await buildFolderCaches(fCache, taskType, fileGlob, statusBarSpace, setCacheBuilding, logPad + "   ");
+        }
+        else {
+            await buildFolderCache(fCache, wsFolder, taskType, fileGlob, statusBarSpace, setCacheBuilding, logPad + "   ");
+        }
     }
 
     //
@@ -169,7 +175,7 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
 
     if (!providersExternal.get(taskType))
     {
-        const paths = glob.sync(fileGlob, { cwd: folder.uri.fsPath, ignore: getExcludesPattern()  });
+        const paths = glob.sync(fileGlob, { cwd: folder.uri.fsPath, ignore: getExcludesPattern() });
         for (const fPath of paths)
         {
             if (cancel)
@@ -181,7 +187,8 @@ async function buildFolderCache(fCache: Set<any>, folder: WorkspaceFolder, taskT
             if (!util.isExcluded(uriFile.path, "   "))
             {
                 fCache.add({ uri: uriFile, folder });
-                log.value("   Added to cache", fPath, 3, logPad);
+                log.value("   Added to cache", uriFile.fsPath, 3, logPad);
+                log.value("      Cache size (# of files)", fCache.size, 4, logPad);
             }
         }
     }
@@ -286,6 +293,7 @@ export async function rebuildCache(logPad = "")
     log.blank(1);
     log.write("rebuild cache", 1, logPad);
     filesCache.clear();
+    taskGlobs = {};
     await addFolderToCache(undefined, logPad);
 }
 

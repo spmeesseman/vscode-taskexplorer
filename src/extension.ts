@@ -5,8 +5,6 @@ import * as cache from "./cache";
 import * as log from "./common/log";
 import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerViewReportCommand from "./commands/viewReport";
-import { views } from "./views";
-import { TaskTreeDataProvider } from "./tree/tree";
 import { AntTaskProvider } from "./providers/ant";
 import { MakeTaskProvider } from "./providers/make";
 import { MavenTaskProvider } from "./providers/maven";
@@ -17,21 +15,18 @@ import { ComposerTaskProvider } from "./providers/composer";
 import { PipenvTaskProvider } from "./providers/pipenv";
 import { GulpTaskProvider } from "./providers/gulp";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
-// import { displayInfoPage } from "./common/infoPage";
 import { configuration } from "./common/configuration";
 import { initStorage, storage } from "./common/storage";
 import { isCachingBusy } from "./cache";
 import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";
 import { ExternalExplorerProvider, TaskExplorerApi } from "./interface";
-import {
-    Disposable, ExtensionContext, Uri, tasks, commands, workspace, window, FileSystemWatcher, WorkspaceFolder
-} from "vscode";
 import { LicenseManager } from "./lib/licenseManager";
 import { processConfigChanges } from "./lib/processConfigChanges";
 import { disposeFileWatchers, registerFileWatchers } from "./lib/fileWatcher";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
+import { Disposable, ExtensionContext, tasks, commands, workspace, WorkspaceFolder } from "vscode";
 
 
 export const teApi = {} as TaskExplorerApi;
@@ -304,7 +299,7 @@ export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "
         log.value("      folder", f.name, 1, logPad);
         // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
         /* istanbul ignore next */
-        for (const c of cache.filesCache)
+        for (const c of cache.getFilesCache())
         {
             /* istanbul ignore next */
             const files = c[1], provider = c[0],

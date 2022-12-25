@@ -6,7 +6,6 @@ import * as log from "../common/log";
 import { execSync } from "child_process";
 import { parseStringPromise } from "xml2js";
 import { configuration } from "../common/configuration";
-import { filesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import constants from "../common/constants";

@@ -4,7 +4,7 @@ import * as util from "../common/utils";
 import * as log from "../common/log";
 import constants from "../common/constants";
 import { configuration } from "../common/configuration";
-import { filesCache } from "../cache";
+import { getFilesCache } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
@@ -265,7 +265,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     {
         const allTasks: Task[] = [],
               visitedFiles: Set<string> = new Set(),
-              paths = filesCache.get(this.providerName);
+              paths = getFilesCache().get(this.providerName);
 
         log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [[ "path", paths ? paths.size : 0 ]]);
 
