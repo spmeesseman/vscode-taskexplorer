@@ -3,11 +3,12 @@
 /* tslint:disable */
 
 import * as assert from "assert";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { TaskExplorerApi, ExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeTeCommand, isReady } from "../helper";
 
 
 let teApi: TaskExplorerApi;
+let explorer: ExplorerApi;
 
 
 suite("API Init and Tests", () =>
@@ -16,6 +17,10 @@ suite("API Init and Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
+        if (!teApi.explorer) {
+            assert.fail("        ✘ Workspace folder does not exist");
+        }
+        explorer = teApi.explorer;
     });
 
 
@@ -26,10 +31,18 @@ suite("API Init and Tests", () =>
     });
 
 
-    test("Cover pre-init cases", async function()
+    test("Refresh After Settings Init (TeApi)", async function()
     {
-        await teApi.explorer?.refresh("tests");
-        await executeTeCommand("refresh", 100);
+        await explorer.refresh("tests");
+        await explorer.waitForRefreshComplete();
+        // await executeTeCommand("refresh", 100);
     });
+
+
+    // test("Refresh After Settings Init (Command)", async function()
+    // {
+    //     // await teApi.explorer?.refresh("tests");
+    //     await executeTeCommand("refresh", 100);
+    // });
 
 });
