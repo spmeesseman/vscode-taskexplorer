@@ -782,7 +782,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
             log.write("   process task item", logLevel + 1, logPad);
             log.values(logLevel + 2, logPad + "      ", [
-                [ "id", each.id ], [ "label", label ], [ "node path", each.nodePath ], [ "command", each.command?.command ],
+                [ "id", each.id ], [ "label", label ], [ "node path", each.nodePath ], [ "command", each.command.command ],
                 [ "previous name [tree level]", prevName && prevNameOk ? prevName[treeLevel] : "undefined" ],
                 [ "this previous name", prevNameThis ]
             ]);
@@ -1419,7 +1419,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         if ((invalidate === true || invalidate === "tests") && !opt) {
             log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
             this.busy = true;
-            await rebuildCache(logPad + "   ");
+            await rebuildCache(undefined, logPad + "   ");
             log.write("   handling 'rebuild cache' eventcomplete", 1, logPad + "   ");
             this.busy = false;
         }
@@ -1641,7 +1641,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
 
         log.methodStart("open document at position", 1, "", true, [
-            [ "command", selection.command?.command ], [ "source", selection.taskSource ],
+            [ "command", selection.command.command ], [ "source", selection.taskSource ],
             [ "uri path", uri.path ], [ "fs path", uri.fsPath ]
         ]);
 

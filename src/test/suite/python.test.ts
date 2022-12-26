@@ -16,9 +16,9 @@ import { ScriptTaskProvider } from "../../providers/script";
 
 const testsName = "python";
 // const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
-const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
-const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
-const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
+const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent * 2;
+const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent * 2;
+const waitTimeForConfigEvent = Math.round(testsControl.waitTimeForConfigEvent * 1.5);
 
 let teApi: TaskExplorerApi;
 let pathToPython: string;
@@ -160,10 +160,36 @@ suite("Python Tests", () =>
     test("Delete file", async function()
     {
         fs.unlinkSync(fileUri.fsPath);
+        await teApi.waitForIdle(waitTimeForFsDelEvent * 2);
+        await verifyTaskCount("script", 2, testsName);
         fs.rmdirSync(dirName, {
             recursive: true
         });
-        await teApi.waitForIdle(waitTimeForFsDelEvent);
+    });
+
+
+    test("Re-create File", async function()
+    {
+        if (!fs.existsSync(dirName)) {
+            fs.mkdirSync(dirName, { mode: 0o777 });
+        }
+        fs.writeFileSync(
+            fileUri.fsPath,
+            "#!/usr/local/bin/python\n" +
+            "\n"
+        );
+        await teApi.waitForIdle(waitTimeForFsNewEvent);
+        await verifyTaskCount("script", 3, testsName);
+    });
+
+
+    test("Delete file", async function()
+    {
+        // fs.unlinkSync(fileUri.fsPath);
+        fs.rmdirSync(dirName, {
+            recursive: true
+        });
+        await teApi.waitForIdle(waitTimeForFsDelEvent * 2);
         await verifyTaskCount("script", 2, testsName);
     });
 

@@ -146,6 +146,7 @@ suite("Provider Tests", () =>
 
     suiteTeardown(async function()
     {
+        await configuration.updateWs("debug", false);
         await configuration.updateWs("expanded.test-files", false);
 
         if (tempFiles.length)
@@ -406,6 +407,7 @@ suite("Provider Tests", () =>
         createMakeFile();
         await sleep(100);
         await teApi.testsApi.fileCache.waitForCache();
+        await configuration.updateWs("debug", true); // hit tree.logTask()
     });
 
 
@@ -506,6 +508,7 @@ suite("Provider Tests", () =>
         await sleep(500);
         await teApi.testsApi.fileCache.waitForCache();
         await teApi.explorer?.waitForRefreshComplete();
+        await configuration.updateWs("debug", false); // was hitting tree.logTask()
     });
 
 

@@ -5,7 +5,7 @@ import * as util from "../common/utils";
 import TaskFile from "./file";
 import { configuration } from "../common/configuration";
 import {
-    Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks
+    Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks, Command
 }
 from "vscode";
 
@@ -33,7 +33,7 @@ export default class TaskItem extends TreeItem
     public groupLevel: number;
     public taskItemId: string | undefined;
     public id: string;
-
+    public command: Command;
 
     taskFile: TaskFile;
 

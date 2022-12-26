@@ -289,13 +289,25 @@ export function isCachingBusy()
 }
 
 
-export async function rebuildCache(logPad = "")
+export async function rebuildCache(folder: WorkspaceFolder | undefined, logPad = "")
 {
     log.blank(1);
     log.write("rebuild cache", 1, logPad);
-    filesCache.clear();
+    if (!folder)
+    {
+        filesCache.clear();
+    }
+    else {
+        filesCache.forEach(c => {
+            c.forEach(p => {
+                if (p.folder.name === folder.name && p.folder.uri.fsPath.includes(folder.uri.fsPath))  {
+                    c.delete(p);
+                }
+            });
+        });
+    }
     taskGlobs = {};
-    await addFolderToCache(undefined, logPad);
+    await addFolderToCache(folder, logPad);
 }
 
 

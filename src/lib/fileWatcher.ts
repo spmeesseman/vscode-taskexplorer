@@ -5,11 +5,20 @@ import * as cache from "../cache";
 import * as log from "../common/log";
 import { Disposable, ExtensionContext, FileSystemWatcher, workspace, Uri } from "vscode";
 import { refreshTree } from "./refreshTree";
+import { isDirectory } from "./utils/fs";
+import { extname } from "path";
+import path = require("path");
 
 
+let processingDirUri: Uri | undefined;
 let processingFsEvent = false;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
+const dirWatcher: {
+    watcher?: FileSystemWatcher | undefined;
+    onDidCreate?: Disposable;
+    onDidDelete?: Disposable;
+} = {};
 
 
 export function disposeFileWatchers()
@@ -44,6 +53,7 @@ export async function registerFileWatchers(context: ExtensionContext)
             await registerFileWatcher(context, taskType, util.getGlobPattern(taskType));
         }
     }
+    createDirWatcher(context);
 }
 
 
@@ -104,8 +114,8 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
         }));
 
         watcherDisposables.set(taskType, watcher.onDidCreate(async _e =>
-        
-            {processingFsEvent = true;
+        {
+            processingFsEvent = true;
             try
             {   logFileWatcherEvent(_e, "create");
                 await cache.addFileToCache(taskType, _e);
@@ -116,5 +126,92 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
         }));
     }
 
+}
+
+
+
+function createDirWatcher(context: ExtensionContext)
+{
+    dirWatcher.onDidCreate?.dispose();
+    dirWatcher.onDidDelete?.dispose();
+    dirWatcher.watcher?.dispose();
+
+    dirWatcher.watcher = workspace.createFileSystemWatcher(getDirWatchGlob());
+    dirWatcher.onDidCreate = dirWatcher.watcher.onDidCreate(async (e) => { await onDirCreate(e); }, null);
+    dirWatcher.onDidDelete = dirWatcher.watcher.onDidDelete(async (e) => { await onDirDelete(e); }, null);
+
+    context.subscriptions.push(dirWatcher.onDidCreate);
+    context.subscriptions.push(dirWatcher.onDidDelete);
+    context.subscriptions.push(dirWatcher.watcher);
+}
+
+
+function getDirWatchGlob()
+{
+    log.write("   Build file watcher glob", 2);
+    const watchPaths: string[] = [];
+    workspace.workspaceFolders?.forEach((wsf) =>
+    {
+        watchPaths.push(wsf.name);
+    });
+    const clsPathGlob = `**/{${watchPaths.join(",")}}/**/*`.replace("//**", "/");
+    log.write("   file watcher glob:", 2);
+    log.write(`   ${clsPathGlob}`, 2);
+    return clsPathGlob;
+}
+
+
+async function onDirCreate(uri: Uri)
+{
+    if (isDirectory(uri.fsPath))
+    {
+        processingDirUri = uri;
+        setTimeout(async () => processDirCreated(), 200, uri);
+    }
+}
+
+
+async function onDirDelete(uri: Uri)
+{
+    if (!extname(uri.fsPath)) // ouch
+    //if (isDirectory(uri.fsPath))
+    {
+        log.methodStart("dirwatcher delete", 1, "", true, [[ "dir", uri.fsPath ]]);
+        processingFsEvent = true;
+        processingDirUri = undefined;
+        try
+        {   const wsf = workspace.getWorkspaceFolder(uri);
+            await cache.rebuildCache(wsf, "   ");
+            //if (!processingDirUri) {
+                await refreshTree(undefined, wsf?.uri);
+            //}
+            //else {
+            //    await processDirCreated();
+            //}
+        }
+        catch (e) {}
+        finally { processingFsEvent = false; processingDirUri = undefined; }
+        log.methodDone("dirwatcher delete", 1, "");
+    }
+}
+
+
+async function processDirCreated()
+{
+    if (processingDirUri)
+    {
+        log.methodStart("dirwatcher create", 1, "", true, [[ "dir", processingDirUri.fsPath ]]);
+        processingFsEvent = true;
+        try
+        {   await cache.addFolderToCache(workspace.getWorkspaceFolder(processingDirUri), "   ");
+            await refreshTree(undefined, processingDirUri);
+        }
+        catch (e) {}
+        finally {
+            processingFsEvent = false;
+            processingDirUri = undefined;
+        }
+        log.methodDone("dirwatcher create", 1, "");
+    }
 }
 
