@@ -126,52 +126,56 @@ suite("Task Tests", () =>
     });
 
 
-    test("Batch", async function()
-    {
-        this.timeout(45000);
-        //
+    test("Batch 1", async function()
+    {   //
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
-        for (const batchTask of batch)
-        {
-            await startTask(batchTask);
-            await configuration.updateWs("keepTermOnStop", false);
-            await executeTeCommand("open", 50, 50, batchTask, true); // clickaction=execute
-            await executeTeCommand("runWithArgs", 2500, 2500, batchTask, "--test --test2");
-            if (runCount % 2 === 0)
-            {
-                await executeTeCommand("stop", 0, 0, batchTask);
-                await executeTeCommand("run", 2500, 2500, batchTask);
-                executeTeCommand("pause", 1000, 1000, batchTask); // ?? No await ?
-                await executeTeCommand("pause", 1000, 1000, batchTask);
-                await executeTeCommand("run", 500, 500, batchTask);
-                await configuration.updateWs("clickAction", "Open");
-                await executeTeCommand("run", 500, 500, batchTask);
-                await configuration.updateWs("clickAction", "Execute");
-                await executeTeCommand("openTerminal", 0, 0, batchTask);
-                await executeTeCommand("pause", 1000, 1000, batchTask);
-                await configuration.updateWs("keepTermOnStop", true);
-                await executeTeCommand("stop", 0, 0, batchTask);
-                await configuration.updateWs("disableAnimatedIcons", true);
-                await configuration.updateWs("showRunningTask", false);
-                await executeTeCommand("runLastTask", 1500, 1500, batchTask);
-                await configuration.updateWs("keepTermOnStop", false);
-                await executeTeCommand("restart", 2500, 2500, batchTask);
-                await executeTeCommand("stop", 500, 500, batchTask);
-                await executeTeCommand("runNoTerm", 2500, 2500, batchTask);
-                await executeTeCommand("stop", 200, 200, batchTask);
-            }
-            else {
-                await executeTeCommand("stop", 200, 200, batchTask);
-                await configuration.updateWs("disableAnimatedIcons", false);
-                overrideNextShowInputBox("--test --test2");
-                await executeTeCommand("runWithArgs", 2500, 2500, batchTask);
-                await executeTeCommand("stop", 200, 200, batchTask);
-                await configuration.updateWs("showRunningTask", true);
-                await sleep(8000);
-            }
-            await endTask(batchTask);
-        }
+        const batchTask = batch[0];
+        await startTask(batchTask);
+        await configuration.updateWs("keepTermOnStop", false);
+        await executeTeCommand("open", 50, 50, batchTask, true); // clickaction=execute
+        await executeTeCommand("runWithArgs", 2500, 2500, batchTask, "--test --test2");
+        await executeTeCommand("stop", 0, 0, batchTask);
+        await executeTeCommand("run", 2500, 2500, batchTask);
+        executeTeCommand("pause", 1000, 1000, batchTask); // ?? No await ?
+        await executeTeCommand("pause", 1000, 1000, batchTask);
+        await executeTeCommand("run", 500, 500, batchTask);
+        await configuration.updateWs("clickAction", "Open");
+        await executeTeCommand("run", 500, 500, batchTask);
+        await configuration.updateWs("clickAction", "Execute");
+        await executeTeCommand("openTerminal", 0, 0, batchTask);
+        await executeTeCommand("pause", 1000, 1000, batchTask);
+        await configuration.updateWs("keepTermOnStop", true);
+        await executeTeCommand("stop", 0, 0, batchTask);
+        await configuration.updateWs("disableAnimatedIcons", true);
+        await configuration.updateWs("showRunningTask", false);
+        await executeTeCommand("runLastTask", 1500, 1500, batchTask);
+        await configuration.updateWs("keepTermOnStop", false);
+        await executeTeCommand("restart", 2500, 2500, batchTask);
+        await executeTeCommand("stop", 500, 500, batchTask);
+        await executeTeCommand("runNoTerm", 2500, 2500, batchTask);
+        await executeTeCommand("stop", 200, 200, batchTask);
+        await endTask(batchTask);
+    });
+
+
+    test("Batch 2", async function()
+    {   //
+        // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
+        //
+        const batchTask = batch[1];
+        await startTask(batchTask);
+        await configuration.updateWs("keepTermOnStop", false);
+        await executeTeCommand("open", 50, 50, batchTask, true); // clickaction=execute
+        await executeTeCommand("runWithArgs", 2500, 2500, batchTask, "--test --test2");
+        await executeTeCommand("stop", 200, 200, batchTask);
+        await configuration.updateWs("disableAnimatedIcons", false);
+        overrideNextShowInputBox("--test --test2");
+        await executeTeCommand("runWithArgs", 2500, 2500, batchTask);
+        await executeTeCommand("stop", 200, 200, batchTask);
+        await configuration.updateWs("showRunningTask", true);
+        await sleep(8000);
+        await endTask(batchTask);
     });
 
 });
