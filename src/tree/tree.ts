@@ -26,7 +26,7 @@ import {
     ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, TaskExecution
 } from "vscode";
 import { ExplorerApi } from "../interface/explorer";
-import { enableConfigWatcher } from "../lib/processConfigChanges";
+import { enableConfigWatcher } from "../lib/configWatcher";
 
 
 const isLicenseManagerActive = false;

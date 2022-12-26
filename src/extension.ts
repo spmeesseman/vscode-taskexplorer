@@ -22,7 +22,7 @@ import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";
 import { ExternalExplorerProvider, TaskExplorerApi } from "./interface";
 import { LicenseManager } from "./lib/licenseManager";
-import { isProcessingConfigChange, processConfigChanges } from "./lib/processConfigChanges";
+import { isProcessingConfigChange, processConfigChanges } from "./lib/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
