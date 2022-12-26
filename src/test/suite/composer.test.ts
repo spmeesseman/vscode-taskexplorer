@@ -16,7 +16,10 @@ import { ComposerTaskProvider } from "../../providers/composer";
 
 
 const testsName = "composer";
-const waitTimeForFsEvent = testsControl.waitTimeForFsEvent;
+const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
+const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
+const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
+const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
 let pathToComposer: string;
@@ -107,7 +110,7 @@ suite("Composer Tests", () =>
             "}\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsNewEvent);
         await verifyTaskCount(testsName, 5);
     });
 
@@ -129,7 +132,7 @@ suite("Composer Tests", () =>
             "}\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsModEvent);
         await verifyTaskCount(testsName, 6);
     });
 
@@ -149,7 +152,7 @@ suite("Composer Tests", () =>
             "}\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsModEvent);
         await verifyTaskCount(testsName, 4);
     });
 
@@ -169,7 +172,7 @@ suite("Composer Tests", () =>
             "\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsModEvent);
         await verifyTaskCount(testsName, 2);
     });
 
@@ -182,7 +185,7 @@ suite("Composer Tests", () =>
             recursive: true
         });
 
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsDelEvent);
         await verifyTaskCount(testsName, 2);
     });
 

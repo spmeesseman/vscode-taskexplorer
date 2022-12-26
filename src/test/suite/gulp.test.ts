@@ -12,8 +12,10 @@ import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { GulpTaskProvider } from "../../providers/gulp";
 
 const testsName = "gulp";
-const waitTimeForFsEvent = testsControl.waitTimeForFsEvent;
-const waitTimeForSettingsEvent = testsControl.waitTimeForSettingsEvent;
+const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
+const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
+const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
+const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
 let provider: GulpTaskProvider;
@@ -51,7 +53,7 @@ suite("Gulp Tests", () =>
     test("Disable", async function()
     {
         await configuration.updateWs("enabledTasks.gulp", false);
-        await teApi.waitForIdle(waitTimeForSettingsEvent);
+        await teApi.waitForIdle(waitTimeForConfigEvent);
         await verifyTaskCount(testsName, 0);
     });
 
@@ -59,7 +61,7 @@ suite("Gulp Tests", () =>
     test("Re-enable", async function()
     {
         await configuration.updateWs("enabledTasks.gulp", true);
-        await teApi.waitForIdle(waitTimeForSettingsEvent);
+        await teApi.waitForIdle(waitTimeForConfigEvent);
         await verifyTaskCount(testsName, 17);
     });
 
@@ -83,7 +85,7 @@ suite("Gulp Tests", () =>
             "});\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsNewEvent);
         await verifyTaskCount(testsName, 19);
     });
 
@@ -107,7 +109,7 @@ suite("Gulp Tests", () =>
             "});\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsModEvent);
         await verifyTaskCount(testsName, 20);
     });
 
@@ -123,7 +125,7 @@ suite("Gulp Tests", () =>
             "});\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsModEvent);
         await verifyTaskCount(testsName, 18);
     });
 
@@ -135,7 +137,7 @@ suite("Gulp Tests", () =>
             recursive: true
         });
 
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsDelEvent);
         await verifyTaskCount(testsName, 17);
     });
 

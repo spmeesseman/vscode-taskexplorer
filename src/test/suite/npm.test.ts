@@ -13,7 +13,10 @@ import {
 
 
 const testsName = "npm";
-const waitTimeForFsEvent = testsControl.waitTimeForFsEvent;
+// const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
+// const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
+const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
+// const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
 let packageJsonPath: string;
@@ -27,32 +30,6 @@ suite("NPM Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
-        //
-        // Create NPM package.json
-        //
-        packageJsonPath = getWsPath("package.json");
-        fs.writeFileSync(
-            packageJsonPath,
-            "{\r\n" +
-            '    "name": "vscode-taskexplorer",\r\n' +
-            '    "version": "0.0.1",\r\n' +
-            '    "scripts":{\r\n' +
-            '        "test": "node ./node_modules/vscode/bin/test",\r\n' +
-            '        "compile": "cmd.exe /c test.bat",\r\n' +
-            '        "watch": "tsc -watch -p ./",\r\n' +
-            '        "build": "npx tsc -p ./"\r\n' +
-            "    }\r\n" +
-            "}\r\n"
-        );
-        await teApi.waitForIdle(waitTimeForFsEvent);
-        await verifyTaskCount(testsName, 5);
-        //
-        // Get the explorer tree task items (three less task than above, one of them tree
-        // does not display the 'install' task with the other tasks found, and two of them
-        // are the 'build' and 'watch' tasks are registered in tasks.json and will show in
-        // the tree under the VSCode tasks node, not the npm node)
-        //
-        npmTaskItems = await getTreeTasks(testsName, 2);
     });
 
 
@@ -91,7 +68,7 @@ suite("NPM Tests", () =>
             "    }\r\n" +
             "}\r\n"
         );
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsNewEvent);
     });
 
 

@@ -14,8 +14,10 @@ export const testsControl = {
     keepSettingsFile: false,
     writeToConsole: false,
     writeToOutput: false,
-    waitTimeForFsEvent: 150,
-    waitTimeForSettingsEvent: 75
+    waitTimeForFsCreateEvent: 175,
+    waitTimeForFsDeleteEvent: 175,
+    waitTimeForFsModifyEvent: 130,
+    waitTimeForConfigEvent: 75
 };
 
 let activated = false;
@@ -129,7 +131,7 @@ export async function closeActiveDocuments()
 export async function executeSettingsUpdate(key: string, value?: any, minWait?: number, maxWait?: number)
 {
     const rc = await configuration.updateWs(key, value);
-    await teApi.waitForIdle(minWait || testsControl.waitTimeForSettingsEvent, maxWait);
+    await teApi.waitForIdle(minWait || testsControl.waitTimeForConfigEvent, maxWait);
     return rc;
 }
 

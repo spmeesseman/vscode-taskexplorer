@@ -12,7 +12,10 @@ import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
 
 const testsName = "ant";
-const waitTimeForSettingsEvent = testsControl.waitTimeForSettingsEvent;
+const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
+const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
+const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
+const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
 let provider: AntTaskProvider;
@@ -68,7 +71,7 @@ suite("Ant Tests", () =>
     test("Disable", async function()
     {
         await configuration.updateWs("enabledTasks.ant", false);
-        await teApi.waitForIdle(waitTimeForSettingsEvent);
+        await teApi.waitForIdle(waitTimeForConfigEvent);
         await verifyTaskCount("ant", 0);
     });
 
@@ -76,7 +79,7 @@ suite("Ant Tests", () =>
     test("Re-enable", async function()
     {
         await configuration.updateWs("enabledTasks.ant", true);
-        await teApi.waitForIdle(waitTimeForSettingsEvent);
+        await teApi.waitForIdle(waitTimeForConfigEvent);
         await verifyTaskCount("ant", 3);
     });
 
@@ -117,14 +120,14 @@ suite("Ant Tests", () =>
     });
 
 
-    test("DAnsicon Path", async function()
+    test("Ansicon Path", async function()
     {
         await configuration.updateWs("pathToPrograms.ansicon", undefined);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
     });
 
 
-    test("Win32 create task", async function()
+    test("Win32 Create Task", async function()
     {
         await configuration.updateWs("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -133,7 +136,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Non-Win32 create task", async function()
+    test("Non-Win32 Create Task", async function()
     {
         // const platform = process.platform;
         // eslint-disable-next-line @typescript-eslint/dot-notation
@@ -145,14 +148,14 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant parser", async function()
+    test("Ant Parser", async function()
     {
         await configuration.updateWs("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2);
     });
 
 
-    test("Ant parser no default", async function()
+    test("Ant Parser no default", async function()
     {
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
@@ -166,7 +169,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant parser invalid target", async function()
+    test("Ant Parser invalid target", async function()
     {
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
@@ -182,7 +185,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant parser no target", async function()
+    test("Ant Parser No Target", async function()
     {
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
@@ -195,7 +198,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant parser no project", async function()
+    test("Ant Parser No Project", async function()
     {
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
@@ -208,7 +211,7 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant parser invalid xml", async function()
+    test("Ant Parser Invalid Xml", async function()
     {
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
@@ -236,9 +239,9 @@ suite("Ant Tests", () =>
  * @param withAnt1 # of tasks in fetchTasks() using ant parser
  * @param withAnt2 # of tasks in readUriTasks() using ant parser
  */
-async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAnt2: number)
+async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAnt2: number, waitTime?: number)
 {
-    await teApi.waitForIdle(testsControl.waitTimeForFsEvent);
+    await teApi.waitForIdle(waitTime || waitTimeForFsModEvent);
     //
     // Don't use Ant
     //

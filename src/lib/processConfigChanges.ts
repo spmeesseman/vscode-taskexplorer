@@ -8,9 +8,11 @@ import { registerFileWatcher } from "./fileWatcher";
 import { refreshTree } from "./refreshTree";
 import { registerExplorer } from "./registerExplorer";
 import { TaskExplorerApi } from "../interface";
+import { log } from "console";
 
 let teApi: TaskExplorerApi;
 let watcherEnabled = true;
+let processingConfigEvent = false;
 const enabledTasks = configuration.get<any>("enabledTasks", {});
 const pathToPrograms = configuration.get<any>("pathToPrograms", {});
 
@@ -21,8 +23,13 @@ export function enableConfigWatcher(enable = true)
 }
 
 
+export const isProcessingConfigChange = () => processingConfigEvent;
+
+
 export async function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
 {
+    processingConfigEvent = true;
+
     let refresh = false;
     const refreshTaskTypes: string[] = [];
     if (!teApi) {
@@ -44,6 +51,7 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
     if (!watcherEnabled) {
         teApi.log.write("   Config watcher is disabled", 1);
         teApi.log.methodDone("Process config changes", 1, "");
+        processingConfigEvent = false;
         return;
     }
 
@@ -53,6 +61,7 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
     if (configuration.get<boolean>("autoRefresh") === false) {
         teApi.log.write("   Auto refresh by config changes is disabled in settings", 1);
         teApi.log.methodDone("Process config changes", 1, "");
+        processingConfigEvent = false;
         return;
     }
 
@@ -265,14 +274,21 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
         }
     }
 
-    if (refresh) {
-        await refreshTree();
-    }
-    else if (refreshTaskTypes.length > 0) {
-        for (const t of refreshTaskTypes) {
-            await refreshTree(t);
+    try
+    {   if (refresh) {
+            await refreshTree();
+        }
+        else if (refreshTaskTypes.length > 0) {
+            for (const t of refreshTaskTypes) {
+                await refreshTree(t);
+            }
         }
     }
+    catch (e) {
+        /** istanbul-ignore-next */
+        teApi.log.error(e);
+    }
 
+    processingConfigEvent = false;
     teApi.log.methodDone("Process config changes", 1, "");
 }

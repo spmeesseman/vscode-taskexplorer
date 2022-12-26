@@ -6,18 +6,21 @@ import * as assert from "assert";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
 import TaskItem from "../../tree/item";
-import { activate, executeSettingsUpdate, findIdInTaskMap, isReady, testsControl, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, findIdInTaskMap, isReady } from "../helper";
+
+const testsName = "Workspace";
+// const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
+// const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
+// const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
+// const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
 let wsEnable: boolean;
 let taskMap: Map<string, TaskItem>;
-const waitTimeForFsEvent = testsControl.waitTimeForFsEvent;
-const waitTimeForSettingsEvent = testsControl.waitTimeForSettingsEvent;
 
 
 suite("Workspace / VSCode Tests", () =>
 {
-    const testsName = "Workspace";
 
     suiteSetup(async function()
     {
@@ -39,7 +42,7 @@ suite("Workspace / VSCode Tests", () =>
         await executeSettingsUpdate("showHiddenWsTasks", true);
         // await verifyTaskCount(testsName, 10); // a direct fetchTasks() will still retrieve the hidden task
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
-        const taskCount = findIdInTaskMap(":Workspace:", taskMap);
+        const taskCount = findIdInTaskMap(`:${testsName}:`, taskMap);
         if (taskCount !== 10) {
             assert.fail(`Unexpected VSCode task count (Found ${taskCount} of 10)`);
         }

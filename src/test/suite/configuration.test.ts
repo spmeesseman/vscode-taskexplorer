@@ -7,7 +7,9 @@ import * as util from "../../common/utils";
 import { activate, executeSettingsUpdate, isReady, sleep } from "../helper";
 import { configuration } from "../../common/configuration";
 
+let autoRefresh: boolean;
 let enabledTasks: any;
+let globPatterns: string[];
 let pathToPrograms: any;
 let shellW32: string, shellLnx: string, shellOsx: string, pkgMgr: string;
 
@@ -19,6 +21,7 @@ suite("Configuration / Settings Tests", () =>
     {
         await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
+        autoRefresh = configuration.get<boolean>("autoRefresh");
         enabledTasks = configuration.get<object>("enabledTasks");
         pathToPrograms = configuration.get<object>("pathToPrograms");
         shellW32 = configuration.getVs<string>("terminal.integrated.shell.windows");
@@ -29,43 +32,57 @@ suite("Configuration / Settings Tests", () =>
 
     suiteTeardown(async function()
     {
-        configuration.updateWs("pathToPrograms", pathToPrograms);
+        await executeSettingsUpdate("autoRefresh", autoRefresh);
+        await executeSettingsUpdate("pathToPrograms", pathToPrograms);
     });
 
 
     test("Auto Refresh", async function()
     {
-        const autoRefresh = configuration.get<boolean>("autoRefresh");
         await configuration.updateWs("autoRefresh", false);
         await vscode.commands.executeCommand("taskExplorer.showOutput", false);
+    });
+
+
+    test("Auto Refresh", async function()
+    {
         await configuration.updateWs("autoRefresh", true);
         await vscode.commands.executeCommand("taskExplorer.showOutput", true);
         await configuration.updateWs("autoRefresh", autoRefresh);
-        await configuration.update("autoRefresh", autoRefresh); // cover global
     });
 
 
     test("Ant Glob", async function()
     {
-        const globPatterns = configuration.get<string[]>("globPatternsAnt");
+        globPatterns = configuration.get<string[]>("globPatternsAnt");
         await configuration.updateWs("enabledTasks.ant", false);
         globPatterns.push("**/dummy.xml");
         await executeSettingsUpdate("globPatternsAnt", globPatterns, 50, 100);
-        await executeSettingsUpdate("enabledTasks.ant", true, 50, 100);
+    });
+
+
+    test("Ant Glob", async function()
+    {
+        await executeSettingsUpdate("enabledTasks.ant", true);
         globPatterns.pop();
-        await executeSettingsUpdate("globPatternsAnt", globPatterns, 50, 100);
+        await executeSettingsUpdate("globPatternsAnt", globPatterns);
     });
 
 
     test("Bash Glob", async function()
     {
-        const globPatterns = configuration.get<string[]>("globPatternsBash");
+        globPatterns = configuration.get<string[]>("globPatternsBash");
         await configuration.updateWs("enabledTasks.bash", false);
         globPatterns.push("**/extensionless/**");
-        await executeSettingsUpdate("globPatternsBash", globPatterns, 50, 100);
-        await executeSettingsUpdate("enabledTasks.bash", true, 50, 100);
+        await executeSettingsUpdate("globPatternsBash", globPatterns);
+    });
+
+
+    test("Bash Glob", async function()
+    {
+        await executeSettingsUpdate("enabledTasks.bash", true);
         globPatterns.pop();
-        await executeSettingsUpdate("globPatternsBash", globPatterns, 50, 100);
+        await executeSettingsUpdate("globPatternsBash", globPatterns);
     });
 
 

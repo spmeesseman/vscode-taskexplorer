@@ -15,8 +15,10 @@ import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ScriptTaskProvider } from "../../providers/script";
 
 const testsName = "python";
-const waitTimeForFsEvent = testsControl.waitTimeForFsEvent;
-const waitTimeForSettingsEvent = testsControl.waitTimeForSettingsEvent;
+// const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
+const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
+const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
+const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
 let pathToPython: string;
@@ -81,7 +83,7 @@ suite("Python Tests", () =>
     test("Disable", async function()
     {
         await configuration.updateWs("enabledTasks.python", false);
-        await teApi.waitForIdle(waitTimeForSettingsEvent);
+        await teApi.waitForIdle(waitTimeForConfigEvent);
         await verifyTaskCount("script", 0, testsName);
     });
 
@@ -89,7 +91,7 @@ suite("Python Tests", () =>
     test("Re-enable", async function()
     {
         await configuration.updateWs("enabledTasks.python", true);
-        await teApi.waitForIdle(waitTimeForSettingsEvent);
+        await teApi.waitForIdle(waitTimeForConfigEvent);
         await verifyTaskCount("script", 2, testsName);
     });
 
@@ -104,7 +106,7 @@ suite("Python Tests", () =>
             "#!/usr/local/bin/python\n" +
             "\n"
         );
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsNewEvent);
         await verifyTaskCount("script", 3, testsName);
     });
 
@@ -161,7 +163,7 @@ suite("Python Tests", () =>
         fs.rmdirSync(dirName, {
             recursive: true
         });
-        await teApi.waitForIdle(waitTimeForFsEvent);
+        await teApi.waitForIdle(waitTimeForFsDelEvent);
         await verifyTaskCount("script", 2, testsName);
     });
 

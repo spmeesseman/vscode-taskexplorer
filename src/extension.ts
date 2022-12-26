@@ -22,7 +22,7 @@ import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";
 import { ExternalExplorerProvider, TaskExplorerApi } from "./interface";
 import { LicenseManager } from "./lib/licenseManager";
-import { processConfigChanges } from "./lib/processConfigChanges";
+import { isProcessingConfigChange, processConfigChanges } from "./lib/processConfigChanges";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
@@ -223,7 +223,8 @@ export function getLicenseManager()
 /* istanbul ignore next */
 function isTaskExplorerBusy()
 {   /* istanbul ignore next */
-    return isCachingBusy() || teApi.explorer?.isRefreshPending() || teApi.sidebar?.isRefreshPending() || isProcessingFsEvent();
+    return isCachingBusy() || teApi.explorer?.isRefreshPending() || teApi.sidebar?.isRefreshPending() ||
+           isProcessingFsEvent() || isProcessingConfigChange();
 }
 
 
