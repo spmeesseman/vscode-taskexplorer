@@ -165,8 +165,12 @@ async function onDirCreate(uri: Uri)
 {
     if (isDirectory(uri.fsPath) && (await numFilesInDirectory(uri.fsPath)) > 0)
     {
-        processingDirUri = uri;
-        setTimeout(async () => processDirCreated(), 200, uri);
+        const wsf = workspace.getWorkspaceFolder(uri);
+        if (!wsf || wsf.uri.fsPath !== uri.fsPath)
+        {
+            processingDirUri = uri;
+            setTimeout(async () => processDirCreated(), 200, uri);
+        }
     }
 }
 
@@ -181,13 +185,16 @@ async function onDirDelete(uri: Uri)
         processingDirUri = undefined;
         try
         {   const wsf = workspace.getWorkspaceFolder(uri);
-            await cache.rebuildCache(wsf, "   ");
-            //if (!processingDirUri) {
-                await refreshTree(undefined, wsf?.uri);
-            //}
-            //else {
-            //    await processDirCreated();
-            //}
+            if (!wsf || wsf.uri.fsPath !== uri.fsPath)
+            {
+                await cache.rebuildCache(wsf, "   ");
+                //if (!processingDirUri) {
+                    await refreshTree(undefined, wsf?.uri);
+                //}
+                //else {
+                //    await processDirCreated();
+                //}
+            }
         }
         catch (e) {}
         finally { processingFsEvent = false; processingDirUri = undefined; }
