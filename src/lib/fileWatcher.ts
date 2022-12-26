@@ -5,7 +5,7 @@ import * as cache from "../cache";
 import * as log from "../common/log";
 import { Disposable, ExtensionContext, FileSystemWatcher, workspace, Uri } from "vscode";
 import { refreshTree } from "./refreshTree";
-import { isDirectory } from "./utils/fs";
+import { isDirectory, numFilesInDirectory } from "./utils/fs";
 import { extname } from "path";
 import path = require("path");
 
@@ -62,7 +62,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
     log.write("Register file watcher for task type '" + taskType + "'");
 
     let watcher = watchers.get(taskType);
-    const ignoreModify = util.isScriptType(taskType) || taskType === "app-publisher" || taskType === "maven";
+    const ignoreModify = util.isScriptType(taskType) || taskType === "apppublisher" || taskType === "maven";
 
     /* istanbul ignore else */
     if (workspace.workspaceFolders) {
@@ -163,7 +163,7 @@ function getDirWatchGlob()
 
 async function onDirCreate(uri: Uri)
 {
-    if (isDirectory(uri.fsPath))
+    if (isDirectory(uri.fsPath) && (await numFilesInDirectory(uri.fsPath)) > 0)
     {
         processingDirUri = uri;
         setTimeout(async () => processDirCreated(), 200, uri);

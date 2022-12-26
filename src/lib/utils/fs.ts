@@ -197,10 +197,25 @@ export function getDateModified(file: string)
 }
 */
 
+
 export function isDirectory(dirPath: string)
 {
     return fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory();
 }
+
+
+export function numFilesInDirectory(dirPath: string): Promise<number>
+{
+    return new Promise((resolve, reject) =>
+    {
+        if (fs.existsSync(dirPath))
+        {
+            fs.readdir(dirPath, (err, files) => { if (!err) resolve(files.length); else reject(err); });
+        }
+        else { reject(new Error("Invalid directory does not exist")); }
+    });
+}
+
 
 /*
 export function pathExists(file: string): Promise<boolean>
