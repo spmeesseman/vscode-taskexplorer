@@ -262,7 +262,7 @@ export default class TaskFile extends TreeItem
                 }
             }
 
-            if (source === "app-publisher")
+            if (source === "apppublisher")
             {   //
                 // For ap files in the same dir, nsamed with a tag, e.g.:
                 //    .publishrc.spm.json

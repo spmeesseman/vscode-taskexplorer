@@ -11,7 +11,7 @@ import { configuration } from "../common/configuration";
 export class AppPublisherTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
-    constructor() { super("app-publisher"); }
+    constructor() { super("apppublisher"); }
 
 
     /* istanbul ignore next */
@@ -24,7 +24,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
     private getDefaultDefinition(target: string | undefined, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
     {
         const def: TaskExplorerDefinition = {
-            type: "app-publisher",
+            type: "apppublisher",
             script: target,
             target,
             fileName: path.basename(uri.fsPath),

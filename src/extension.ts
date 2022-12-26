@@ -277,7 +277,7 @@ function registerTaskProviders(context: ExtensionContext)
     //     https://code.visualstudio.com/api/extension-guides/task-provider
     //
     registerTaskProvider("ant", new AntTaskProvider(), context);                      // Apache Ant Build Automation Tool
-    registerTaskProvider("app-publisher", new AppPublisherTaskProvider(), context);   // App Publisher (work related)
+    registerTaskProvider("apppublisher", new AppPublisherTaskProvider(), context);   // App Publisher (work related)
     registerTaskProvider("composer", new ComposerTaskProvider(), context);            // PHP / composer.json
     registerTaskProvider("gradle", new GradleTaskProvider(), context);                // Gradle multi-Language Automation Tool
     registerTaskProvider("grunt", new GruntTaskProvider(), context);                  // Gulp JavaScript Toolkit
@@ -377,9 +377,18 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
             lilWait = Math.round(lilWait / 5);
         }
     }
-    while (isTaskExplorerBusy() && waited < maxWait) {
+    let iterationsIdle = 0;
+    while ((iterationsIdle < 3 || isTaskExplorerBusy()) && waited < maxWait)
+    {
         // console.log(Date.now);
         await util.timeout(10);
         waited += 10;
+        ++iterationsIdle;
+        if (isTaskExplorerBusy()) {
+            iterationsIdle = 0;
+        }
+    }
+    if (minWait > waited) {
+        await util.timeout(minWait - waited);
     }
 }

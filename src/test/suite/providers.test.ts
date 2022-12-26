@@ -652,7 +652,7 @@ function checkTasks(ant: number, ap: number, bash: number, bat: number, gradle: 
         assert.fail(`Unexpected Ant task count (Found ${taskCount} of ${ant})`);
     }
 
-    taskCount = findIdInTaskMap(":app-publisher:", taskMap);
+    taskCount = findIdInTaskMap(":apppublisher:", taskMap);
     console.log("      App-Publisher : " + taskCount.toString());
     if (taskCount !== ap) {
         assert.fail(`Unexpected AppPublisher task count (Found ${taskCount} of ${ap})`);

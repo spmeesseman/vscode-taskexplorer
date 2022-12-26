@@ -73,7 +73,7 @@ export function getGroupSeparator()
 
 export function getPackageManager(): string
 {
-    let pkgMgr = workspace.getConfiguration("npm").get<string>("packageManager") || "npm";
+    let pkgMgr = workspace.getConfiguration("npm", null).get<string>("packageManager") || "npm";
     if (pkgMgr.match(/(npm|auto)/)) { // pnpm/auto?  only other option is yarn
         pkgMgr = "npm";
     }
@@ -240,21 +240,20 @@ export function getTaskItemId(taskItem: TaskItem)
 /**
  * @deprecated Use `isTaskTypeEnabled` and `getPathToProgram`
  * To be removed after the temp extension.tempRemapSettingsToNewLayout() method is removed.
- * @param taskType Task type, e.g. `npm`, `app-publisher`, `grunt`, `bash`, etc
+ * @param taskType Task type, e.g. `npm`, `apppublisher`, `grunt`, `bash`, etc
  * @param settingPart String prependature for  commonly named setting name
  * @returns The task type's unique setting name
  */
 export function getTaskTypeSettingName(taskType: string, settingPart: string)
 {
-    return settingPart + (taskType !== "app-publisher" ?
-                         (!settingPart.endsWith(".") ? properCase(taskType) : taskType.toLowerCase()) : "apppublisher");
+    return settingPart + (!settingPart.endsWith(".") ? properCase(taskType) : taskType.toLowerCase());
 }
 
 
 /**
  * @deprecated Use `isTaskTypeEnabled`
  * To be removed after the temp extension.tempRemapSettingsToNewLayout() method is removed.
- * @param taskType Task type, e.g. `npm`, `app-publisher`, `grunt`, `bash`, etc
+ * @param taskType Task type, e.g. `npm`, `apppublisher`, `grunt`, `bash`, etc
  * @returns The task type's unique setting name
  */
 export function getTaskTypeEnabledSettingName(taskType: string)
@@ -275,7 +274,7 @@ export function getTaskProviderType(taskType: string): string
 export function getTaskTypes(): string[]
 {
     return [
-        "ant", "app-publisher", "bash", "batch", "composer",  "gradle", "grunt", "gulp", "make",
+        "ant", "apppublisher", "bash", "batch", "composer",  "gradle", "grunt", "gulp", "make",
         "maven", "npm", "nsis", "perl", "powershell", "python", "pipenv", "ruby", "tsc",  "Workspace"
     ];
 }
@@ -285,9 +284,6 @@ export function getTaskTypeRealName(taskType: string): string
 {
     if (taskType === "workspace") {
         return "Workspace";
-    }
-    else if (taskType === "apppublisher") {
-        return "app-publisher";
     }
     return taskType.toLowerCase();
 }
@@ -437,7 +433,7 @@ export function isString(value: any, notEmpty = false): value is string
 
 
 /**
- * @param taskType Task type, e.g. `npm`, `app-publisher`, `grunt`, `bash`, etc
+ * @param taskType Task type, e.g. `npm`, `apppublisher`, `grunt`, `bash`, etc
  * @returns `true` if enabled, `false` if disabled
  */
 export function isTaskTypeEnabled(taskType: string)
