@@ -146,6 +146,8 @@ suite("Provider Tests", () =>
 
     suiteTeardown(async function()
     {
+        await configuration.updateWs("expanded.test-files", false);
+
         if (tempFiles.length)
         {
             let file: string | undefined;
@@ -212,8 +214,7 @@ suite("Provider Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-		await executeTeCommand("focus", 500);
-		await explorer.waitForRefreshComplete();
+		await executeTeCommand("focus", 50, 1000);
 	});
 
 
@@ -474,7 +475,7 @@ suite("Provider Tests", () =>
     {
         await configuration.updateWs("enabledTasks", {
             ant: true,
-            appPuplisher: true,
+            apppuplisher: true,
             bash: true,
             batch: true,
             gradle: true,
@@ -500,9 +501,11 @@ suite("Provider Tests", () =>
 
     test("Run Refresh Task", async function()
     {
+        await configuration.updateWs("expanded.test-files", true);
         await commands.executeCommand("taskExplorer.refresh");
-        await sleep(5000);
+        await sleep(500);
         await teApi.testsApi.fileCache.waitForCache();
+        await teApi.explorer?.waitForRefreshComplete();
     });
 
 
@@ -515,6 +518,7 @@ suite("Provider Tests", () =>
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
         await sleep(1000);
         await teApi.testsApi.fileCache.buildCache("bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
+        await configuration.updateWs("expanded.test-files", false);
     });
 
 

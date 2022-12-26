@@ -22,4 +22,5 @@ export interface TaskExplorerApi
     refresh(taskSource: string): Promise<void>;
     register(taskSource: string, provider: ExternalExplorerProvider): Promise<void>;
     unregister(taskSource: string): Promise<void>;
+    waitForIdle(minWait?: number, maxWait?: number, logPad?: string): Promise<void>;
 }

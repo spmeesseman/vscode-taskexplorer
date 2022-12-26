@@ -8,12 +8,15 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { tasks, Uri } from "vscode";
+import { Uri } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, getWsPath, isReady, sleep, verifyTaskCount } from "../helper";
+import { activate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ComposerTaskProvider } from "../../providers/composer";
 
+
+const testsName = "composer";
+const waitTimeForFsEvent = testsControl.waitTimeForFsEvent;
 
 let teApi: TaskExplorerApi;
 let pathToComposer: string;
@@ -24,7 +27,6 @@ let fileUri: Uri;
 
 suite("Composer Tests", () =>
 {
-    const testsName = "composer";
 
     suiteSetup(async function()
     {   //
@@ -37,7 +39,6 @@ suite("Composer Tests", () =>
         //
         // Store / set initial settings
         //
-        await configuration.updateWs("pathToPrograms.composer", getWsPath("ant\\bin\\ant.bat"));
         pathToComposer = configuration.get<string>("pathToPrograms.composer");
         enableComposer = configuration.get<boolean>("enabledTasks.composer");
         await configuration.updateWs("pathToPrograms.composer", "php\\composer.exe");
@@ -66,29 +67,23 @@ suite("Composer Tests", () =>
 
     test("Start", async function()
     {
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await verifyTaskCount(testsName, 2);
     });
 
 
     test("Disable", async function()
     {
         await configuration.updateWs("enabledTasks.composer", false);
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName);
-        await sleep(500);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(!cTasks || cTasks.length === 0, `Did not read 0 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await teApi.waitForIdle(50);
+        await verifyTaskCount(testsName, 0);
     });
 
 
     test("Re-enable", async function()
     {
         await configuration.updateWs("enabledTasks.composer", true);
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await teApi.waitForIdle(50);
+        await verifyTaskCount(testsName, 2);
     });
 
 
@@ -112,8 +107,7 @@ suite("Composer Tests", () =>
             "}\n"
         );
 
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
+        await teApi.waitForIdle(waitTimeForFsEvent);
         await verifyTaskCount(testsName, 5);
     });
 
@@ -135,10 +129,8 @@ suite("Composer Tests", () =>
             "}\n"
         );
 
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 6, `Did not read 6 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await teApi.waitForIdle(waitTimeForFsEvent);
+        await verifyTaskCount(testsName, 6);
     });
 
 
@@ -157,10 +149,8 @@ suite("Composer Tests", () =>
             "}\n"
         );
 
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 4, `Did not read 4 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await teApi.waitForIdle(waitTimeForFsEvent);
+        await verifyTaskCount(testsName, 4);
     });
 
 
@@ -179,10 +169,8 @@ suite("Composer Tests", () =>
             "\n"
         );
 
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks && cTasks.length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await teApi.waitForIdle(waitTimeForFsEvent);
+        await verifyTaskCount(testsName, 2);
     });
 
 
@@ -194,10 +182,8 @@ suite("Composer Tests", () =>
             recursive: true
         });
 
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-        const cTasks = await tasks.fetchTasks({ type: testsName });
-        assert(cTasks.length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await teApi.waitForIdle(waitTimeForFsEvent);
+        await verifyTaskCount(testsName, 2);
     });
 
 });

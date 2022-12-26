@@ -6,7 +6,7 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import { activate, executeTeCommand, isReady, sleep, verifyTaskCount } from "../helper";
+import { activate, executeTeCommand, isReady, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ExternalTaskProvider } from "./externalTaskProvider";
@@ -42,7 +42,7 @@ suite("API Tests", () =>
 
     test("Get API Command", async function()
     {
-        assert(await executeTeCommand("getApi", 200));
+        assert(await executeTeCommand("getApi", 10, 200));
     });
 
 
@@ -50,9 +50,8 @@ suite("API Tests", () =>
     {
         taskProvider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         await teApi.register("external", taskProvider);
-        await sleep(50);
-        await teApi.testsApi.fileCache.waitForCache();
-        await verifyTaskCount("external", 2, true);
+        await teApi.waitForIdle(50);
+        await verifyTaskCount("external", 2);
     });
 
 
@@ -81,9 +80,8 @@ suite("API Tests", () =>
     test("Unregister external task provider", async function()
     {
         await teApi.unregister("external");
-        await sleep(50);
-        await teApi.testsApi.fileCache.waitForCache();
-        await verifyTaskCount("external", 2, 0);
+        await teApi.waitForIdle(50);
+        await verifyTaskCount("external", 2);
     });
 
 });

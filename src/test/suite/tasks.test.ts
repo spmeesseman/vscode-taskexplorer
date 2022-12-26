@@ -74,11 +74,11 @@ suite("Task Tests", () =>
     test("Keep terminal on stop", async function()
     {
         await configuration.updateWs("keepTermOnStop", true);
-        await executeTeCommand("run", 2500, batch[0]);
-        await executeTeCommand("stop", 500, batch[0]);
+        await executeTeCommand("run", 2500, 2500, batch[0]);
+        await executeTeCommand("stop", 500, 500, batch[0]);
         await configuration.updateWs("keepTermOnStop", false);
-        await executeTeCommand("run", 2500, batch[0]);
-        await executeTeCommand("stop", 500, batch[0]);
+        await executeTeCommand("run", 2500, 2500, batch[0]);
+        await executeTeCommand("stop", 500, 500, batch[0]);
     });
 
 
@@ -92,23 +92,23 @@ suite("Task Tests", () =>
     test("Resume task no terminal", async function()
     {
         bash[0].paused = true;
-        await executeTeCommand("runLastTask", 5000, batch[0]);
+        await executeTeCommand("runLastTask", 5000, 5000, batch[0]);
         bash[0].paused = false;
     });
 
 
     test("Pause", async function()
     {
-        await executeTeCommand("run", 2500, batch[0]);
-        await executeTeCommand("pause", 1000, batch[0]);
-        await executeTeCommand("stop", 500, batch[0]);
+        await executeTeCommand("run", 2500, 2500, batch[0]);
+        await executeTeCommand("pause", 1000, 1000, batch[0]);
+        await executeTeCommand("stop", 500, 500, batch[0]);
     });
 
 
     test("Ant", async function()
     {
         const antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
-        await executeTeCommand("run", 3000, antTask);
+        await executeTeCommand("run", 3000, 3000, antTask);
         lastTask = antTask;
     });
 
@@ -119,7 +119,7 @@ suite("Task Tests", () =>
         //
         await configuration.updateWs("disableAnimatedIcons", true);
         await startTask(bash[0]);
-        await executeTeCommand("run", 7000, bash[0]);
+        await executeTeCommand("run", 7000, 7000, bash[0]);
         await endTask(bash[0]);
         await configuration.updateWs("disableAnimatedIcons", false);
         lastTask = bash[0];
@@ -136,37 +136,37 @@ suite("Task Tests", () =>
         {
             await startTask(batchTask);
             await configuration.updateWs("keepTermOnStop", false);
-            await executeTeCommand("open", 50, batchTask, true); // clickaction=execute
-            await executeTeCommand("runWithArgs", 2500, batchTask, "--test --test2");
+            await executeTeCommand("open", 50, 50, batchTask, true); // clickaction=execute
+            await executeTeCommand("runWithArgs", 2500, 2500, batchTask, "--test --test2");
             if (runCount % 2 === 0)
             {
-                await executeTeCommand("stop", 0, batchTask);
-                await executeTeCommand("run", 2500, batchTask);
-                executeTeCommand("pause", 1000, batchTask); // ?? No await ?
-                await executeTeCommand("pause", 1000, batchTask);
-                await executeTeCommand("run", 500, batchTask);
+                await executeTeCommand("stop", 0, 0, batchTask);
+                await executeTeCommand("run", 2500, 2500, batchTask);
+                executeTeCommand("pause", 1000, 1000, batchTask); // ?? No await ?
+                await executeTeCommand("pause", 1000, 1000, batchTask);
+                await executeTeCommand("run", 500, 500, batchTask);
                 await configuration.updateWs("clickAction", "Open");
-                await executeTeCommand("run", 500, batchTask);
+                await executeTeCommand("run", 500, 500, batchTask);
                 await configuration.updateWs("clickAction", "Execute");
-                await executeTeCommand("openTerminal", 0, batchTask);
-                await executeTeCommand("pause", 1000, batchTask);
+                await executeTeCommand("openTerminal", 0, 0, batchTask);
+                await executeTeCommand("pause", 1000, 1000, batchTask);
                 await configuration.updateWs("keepTermOnStop", true);
-                await executeTeCommand("stop", 0, batchTask);
+                await executeTeCommand("stop", 0, 0, batchTask);
                 await configuration.updateWs("disableAnimatedIcons", true);
                 await configuration.updateWs("showRunningTask", false);
-                await executeTeCommand("runLastTask", 1500, batchTask);
+                await executeTeCommand("runLastTask", 1500, 1500, batchTask);
                 await configuration.updateWs("keepTermOnStop", false);
-                await executeTeCommand("restart", 2500, batchTask);
-                await executeTeCommand("stop", 500, batchTask);
-                await executeTeCommand("runNoTerm", 2500, batchTask);
-                await executeTeCommand("stop", 200, batchTask);
+                await executeTeCommand("restart", 2500, 2500, batchTask);
+                await executeTeCommand("stop", 500, 500, batchTask);
+                await executeTeCommand("runNoTerm", 2500, 2500, batchTask);
+                await executeTeCommand("stop", 200, 200, batchTask);
             }
             else {
-                await executeTeCommand("stop", 200, batchTask);
+                await executeTeCommand("stop", 200, 200, batchTask);
                 await configuration.updateWs("disableAnimatedIcons", false);
                 overrideNextShowInputBox("--test --test2");
-                await executeTeCommand("runWithArgs", 2500, batchTask);
-                await executeTeCommand("stop", 200, batchTask);
+                await executeTeCommand("runWithArgs", 2500, 2500, batchTask);
+                await executeTeCommand("stop", 200, 200, batchTask);
                 await configuration.updateWs("showRunningTask", true);
                 await sleep(8000);
             }
@@ -183,24 +183,24 @@ async function startTask(taskItem: TaskItem)
     console.log(`        Folder: ${taskItem.getFolder()?.name}`);
     await configuration.updateWs("clickAction", "Execute");
     await configuration.updateWs("showLastTasks", (++runCount % 2) === 1);
-    let removed = await executeTeCommand("addRemoveFromFavorites", 0, taskItem);
+    let removed = await executeTeCommand("addRemoveFromFavorites", 0, 0, taskItem);
     if (removed) {
-        await executeTeCommand("addRemoveFromFavorites", 0, taskItem);
+        await executeTeCommand("addRemoveFromFavorites", 0, 0, taskItem);
     }
     overrideNextShowInputBox("test label");
-    removed = await executeTeCommand("addRemoveCustomLabel", 0, taskItem);
+    removed = await executeTeCommand("addRemoveCustomLabel", 0, 0, taskItem);
     if (removed) {
-        await executeTeCommand("addRemoveFromFavorites", 0, taskItem);
+        await executeTeCommand("addRemoveFromFavorites", 0, 0, taskItem);
     }
     if (lastTask) {
-        await executeTeCommand("openTerminal", 0, lastTask);
+        await executeTeCommand("openTerminal", 0, 0, lastTask);
     }
 }
 
 
 async function endTask(taskItem: TaskItem)
 {
-    await executeTeCommand("openTerminal", 0, taskItem);
+    await executeTeCommand("openTerminal", 0, 0, taskItem);
     console.log(`    ✔ Done ${taskItem.taskSource} task: ${taskItem.label}`);
     lastTask = taskItem;
 }

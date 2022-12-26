@@ -6,21 +6,25 @@ import * as assert from "assert";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
 import TaskItem from "../../tree/item";
-import { activate, findIdInTaskMap, isReady, sleep } from "../helper";
+import { activate, executeSettingsUpdate, findIdInTaskMap, isReady, testsControl, verifyTaskCount } from "../helper";
 
 let teApi: TaskExplorerApi;
 let wsEnable: boolean;
 let taskMap: Map<string, TaskItem>;
+const waitTimeForFsEvent = testsControl.waitTimeForFsEvent;
+const waitTimeForSettingsEvent = testsControl.waitTimeForSettingsEvent;
 
 
 suite("Workspace / VSCode Tests", () =>
 {
+    const testsName = "Workspace";
 
     suiteSetup(async function()
     {
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
         wsEnable = configuration.get<boolean>("showHiddenWsTasks");
+        await executeSettingsUpdate("showHiddenWsTasks", true);
     });
 
 
@@ -32,9 +36,8 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Show VSCode Tasks Marked Hidden", async function()
     {
-        await configuration.updateWs("showHiddenWsTasks", true);
-        await sleep(500);
-        await await teApi.testsApi.fileCache.waitForCache();
+        await executeSettingsUpdate("showHiddenWsTasks", true);
+        // await verifyTaskCount(testsName, 10); // a direct fetchTasks() will still retrieve the hidden task
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
         const taskCount = findIdInTaskMap(":Workspace:", taskMap);
         if (taskCount !== 10) {
@@ -45,9 +48,8 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Hide VSCode Tasks Marked Hidden", async function()
     {
-        await configuration.updateWs("showHiddenWsTasks", false);
-        await sleep(500);
-        await await teApi.testsApi.fileCache.waitForCache();
+        await executeSettingsUpdate("showHiddenWsTasks", false);
+        // await verifyTaskCount(testsName, 9); // a direct fetchTasks() will still retrieve the hidden task
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
         const taskCount = findIdInTaskMap(":Workspace:", taskMap);
         if (taskCount !== 9) {
@@ -58,9 +60,8 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Disable Workspace Tasks", async function()
     {
-        await configuration.updateWs("enabledTasks.workspace", false);
-        await sleep(2000);
-        await teApi.testsApi.fileCache.waitForCache();
+        await executeSettingsUpdate("enabledTasks.workspace", false);
+        // await verifyTaskCount(testsName, 0); // a direct fetchTasks() will still retrieve the hidden task
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
         const taskCount = findIdInTaskMap(":Workspace:", taskMap);
         if (taskCount !== 0) {
@@ -71,9 +72,8 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Re-enable Workspace Tasks", async function()
     {
-        await configuration.updateWs("enabledTasks.workspace", true);
-        await sleep(2000);
-        await teApi.testsApi.fileCache.waitForCache();
+        await executeSettingsUpdate("enabledTasks.workspace", true);
+        // await verifyTaskCount(testsName, 9); // a direct fetchTasks() will still retrieve the hidden task
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
         const taskCount = findIdInTaskMap(":Workspace:", taskMap);
         if (taskCount !== 9) {
@@ -84,9 +84,8 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Re-show VSCode Tasks Marked Hidden", async function()
     {
-        await configuration.updateWs("showHiddenWsTasks", true);
-        await sleep(500);
-        await teApi.testsApi.fileCache.waitForCache();
+        await executeSettingsUpdate("showHiddenWsTasks", true);
+        // await verifyTaskCount(testsName, 10); // a direct fetchTasks() will still retrieve the hidden task
         taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
         const taskCount = findIdInTaskMap(":Workspace:", taskMap);
         if (taskCount !== 10) {

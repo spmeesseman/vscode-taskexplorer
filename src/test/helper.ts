@@ -10,10 +10,12 @@ import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../common/configuration";
 import { commands, extensions, tasks, window, workspace } from "vscode";
 
-const testsControl = {
+export const testsControl = {
     keepSettingsFile: false,
     writeToConsole: false,
-    writeToOutput: false
+    writeToOutput: false,
+    waitTimeForFsEvent: 150,
+    waitTimeForSettingsEvent: 75
 };
 
 let activated = false;
@@ -124,20 +126,19 @@ export async function closeActiveDocuments()
 }
 
 
-export async function executeTeCommand(command: string, timeout: number, ...args: any[])
+export async function executeSettingsUpdate(key: string, value?: any, minWait?: number, maxWait?: number)
 {
-    // try {
-        const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
-        if (timeout) { await sleep(timeout); }
-        return rc;
-    // }
-    // catch (e: any) {
-    //     console.log("✘");
-    //     console.log("✘ Error running TE command");
-    //     console.log("✘    Skipping fail, continuing...");
-    //     console.log("✘ " + e.toString());
-    //     console.log("✘");
-    // }
+    const rc = await configuration.updateWs(key, value);
+    await teApi.waitForIdle(minWait || testsControl.waitTimeForSettingsEvent, maxWait);
+    return rc;
+}
+
+
+export async function executeTeCommand(command: string, minWait?: number, maxWait?: number, ...args: any[])
+{
+    const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
+    await teApi.waitForIdle(minWait, maxWait);
+    return rc;
 }
 
 
@@ -343,22 +344,17 @@ export async function testCommand(command: string, ...args: any[])
 }
 
 
-export async function verifyTaskCount(taskType: string, expectedCount: number, checkTree?: boolean | number, taskMap?: Map<string, TaskItem>)
+export async function verifyTaskCount(taskType: string, expectedCount: number, scriptType?: string)
 {
-    const tTasks = await tasks.fetchTasks({ type: taskType });
+    let tTasks = await (await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined }));
+    if (scriptType) {
+        tTasks = tTasks.filter(t => !scriptType || scriptType === t.source);
+    }
+    else if (taskType === "Workspace") {
+        tTasks = tTasks.filter(t => t.source === "Workspace");
+    }
     try {
         assert(tTasks && tTasks.length === expectedCount, `Unexpected ${taskType} task count (1)(Found ${tTasks.length} of ${expectedCount})`);
     }
     catch (e) { throw e; }
-
-    if (checkTree)
-    {
-        const tasksMap = taskMap || (await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>),
-              taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
-        expectedCount = (typeof checkTree === "number" ? checkTree : expectedCount);
-        try {
-            assert(taskCount === expectedCount, `Unexpected ${taskType} task count (2)(Found ${taskCount} of ${expectedCount})`);
-        }
-        catch (e) { throw e; }
-    }
 }

@@ -23,7 +23,7 @@ import { ILicenseManager } from "./interface/licenseManager";
 import { ExternalExplorerProvider, TaskExplorerApi } from "./interface";
 import { LicenseManager } from "./lib/licenseManager";
 import { processConfigChanges } from "./lib/processConfigChanges";
-import { disposeFileWatchers, registerFileWatchers } from "./lib/fileWatcher";
+import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
 import { Disposable, ExtensionContext, tasks, commands, workspace, WorkspaceFolder } from "vscode";
@@ -116,6 +116,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         refresh: refreshExternalProvider,
         register: registerExternalProvider,
         unregister: unregisterExternalProvider,
+        waitForIdle: waitForTaskExplorerIdle,
         testsApi: {
             log,
             explorer: treeDataProvider2 || treeDataProvider,
@@ -222,7 +223,7 @@ export function getLicenseManager()
 /* istanbul ignore next */
 function isTaskExplorerBusy()
 {   /* istanbul ignore next */
-    return isCachingBusy();
+    return isCachingBusy() || teApi.explorer?.isRefreshPending() || teApi.sidebar?.isRefreshPending() || isProcessingFsEvent();
 }
 
 
@@ -349,4 +350,33 @@ async function unregisterExternalProvider(providerName: string)
 {
     providersExternal.delete(providerName);
     await refreshTree(providerName);
+}
+
+
+async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = "   ")
+{
+    let waited = 0;
+    if (minWait > 0) {
+        await util.timeout(minWait);
+    }
+    if (isTaskExplorerBusy()) {
+        log.write("waiting for previous refresh to complete...", 1, logPad);
+    }
+    else
+    {
+        let lilWait = Math.round(minWait / 5);
+        while (lilWait > 1)
+        {
+            await util.timeout(lilWait);
+            if (isTaskExplorerBusy()) {
+                log.write("waiting for previous refresh to complete...", 1, logPad);
+                break;
+            }
+            lilWait = Math.round(lilWait / 5);
+        }
+    }
+    while (isTaskExplorerBusy() && waited < maxWait) {
+        await util.timeout(10);
+        waited += 10;
+    }
 }

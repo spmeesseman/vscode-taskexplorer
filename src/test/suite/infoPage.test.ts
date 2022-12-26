@@ -4,13 +4,7 @@
 import * as assert from "assert";
 import { Uri } from "vscode";
 import {  activate, closeActiveDocuments, isReady, executeTeCommand } from "../helper";
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { ILicenseManager } from "../../interface/licenseManager";
 
-
-let teApi: TaskExplorerApi;
-let licMgr: ILicenseManager;
 
 suite("Report Tests", () =>
 {
@@ -19,7 +13,7 @@ suite("Report Tests", () =>
 
 	suiteSetup(async function()
     {
-		teApi = await activate(this);
+		await activate(this);
         assert(isReady("make") === true, "    ✘ TeApi not ready");
 	});
 
@@ -32,34 +26,34 @@ suite("Report Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-		await executeTeCommand("focus", 5000);
+		await executeTeCommand("focus");
 	});
 
 
 	test("Report page single project 1", async function()
 	{
-		await executeTeCommand("viewReport", 1000, projectUri);
+		await executeTeCommand("viewReport", 20, 500, projectUri);
 		await closeActiveDocuments();
 	});
 
 
 	test("Report page single project 2", async function()
 	{
-	    await executeTeCommand("viewReport", 1000, projectUri, "");
+	    await executeTeCommand("viewReport", 20, 500, projectUri, "");
 		await closeActiveDocuments();
 	});
 
 
 	test("Report page single project 3", async function()
 	{
-	    await executeTeCommand("viewReport", 1000, projectUri, "", 5);
+	    await executeTeCommand("viewReport", 20, 500, projectUri, "", 5);
 		await closeActiveDocuments();
 	});
 
 
 	test("Report page all projects", async function()
 	{
-	    await executeTeCommand("viewReport", 1000);
+	    await executeTeCommand("viewReport", 20, 500);
 		await closeActiveDocuments();
 	});
 

@@ -44,7 +44,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     private static statusBarSpace: StatusBarItem;
     private tasks: Task[] | null = null;
     private treeBuilding = false;
-    private isRefreshPending = false;
+    private refreshPending = false;
     private visible = false;
     private busy = false;
     private extensionContext: ExtensionContext;
@@ -946,7 +946,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         let items: any = [];
         const firstRun = this.name === "taskExplorer" && !this.tasks && !this.taskTree;
 
-        this.isRefreshPending = true;
+        this.refreshPending = true;
 
         log.methodStart("get tree children", logLevel, logPad, false, [
             [ "task folder", element?.label ], [ "all tasks need to be retrieved", !this.tasks ],
@@ -1084,7 +1084,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             await getLicenseManager().initialize(this.tasks);
         }
 
-        this.isRefreshPending = false;
+        this.refreshPending = false;
         this.currentInvalidation = undefined; // reset file modification task type flag
 
         log.methodDone("get tree children", logLevel, logPad, false, [
@@ -1524,10 +1524,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     }
 
 
-    public onVisibilityChanged(visible: boolean)
-    {
-        this.visible = visible;
-    }
+    public isRefreshPending = () => this.refreshPending;
+
+
+    public isVisible = () => this.visible;
 
 
     private logTask(task: Task, scopeName: string, logPad: string)
@@ -1614,6 +1614,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             log.value("   icon dark", definition.iconDark, 4, logPad);
         }
         log.write("Task Details Done", 3, logPad);
+    }
+
+
+    public onVisibilityChanged(visible: boolean)
+    {
+        this.visible = visible;
     }
 
 
@@ -1797,7 +1803,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         ]);
 
         await this.waitForRefreshComplete();
-        this.isRefreshPending = true;
+        this.refreshPending = true;
 
         if (invalidate !== false) // if anything but 'add to excludes'
         {
@@ -1831,7 +1837,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         }
         else {
             // this.getChildren();
-            this.isRefreshPending = false;
+            this.refreshPending = false;
         }
         log.methodDone("refresh task tree", 1, logPad, true);
     }
@@ -2534,10 +2540,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     public async waitForRefreshComplete(maxWait = 15000, logPad = "   ")
     {
         let waited = 0;
-        if (this.isRefreshPending) {
+        if (this.refreshPending) {
             log.write("waiting for previous refresh to complete...", 1, logPad);
         }
-        while (this.isRefreshPending && waited < maxWait) {
+        while (this.refreshPending && waited < maxWait) {
             await util.timeout(250);
             waited += 250;
         }

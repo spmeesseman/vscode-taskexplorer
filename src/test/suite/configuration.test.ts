@@ -1,28 +1,23 @@
-/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
 import * as assert from "assert";
 import * as vscode from "vscode";
 import * as util from "../../common/utils";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, isReady, sleep } from "../helper";
+import { activate, executeSettingsUpdate, isReady, sleep } from "../helper";
 import { configuration } from "../../common/configuration";
 
-
-let teApi: TaskExplorerApi;
 let enabledTasks: any;
 let pathToPrograms: any;
-let shellW32: string,
-    shellLnx: string,
-    shellOsx: string,
-    pkgMgr: string;
+let shellW32: string, shellLnx: string, shellOsx: string, pkgMgr: string;
+
 
 suite("Configuration / Settings Tests", () =>
 {
+
     suiteSetup(async function()
     {
-        teApi = await activate(this);
+        await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
         enabledTasks = configuration.get<object>("enabledTasks");
         pathToPrograms = configuration.get<object>("pathToPrograms");
@@ -30,6 +25,7 @@ suite("Configuration / Settings Tests", () =>
         shellLnx = configuration.getVs<string>("terminal.integrated.shell.linux");
         shellOsx = configuration.getVs<string>("terminal.integrated.shell.osx");
     });
+
 
     suiteTeardown(async function()
     {
@@ -54,12 +50,10 @@ suite("Configuration / Settings Tests", () =>
         const globPatterns = configuration.get<string[]>("globPatternsAnt");
         await configuration.updateWs("enabledTasks.ant", false);
         globPatterns.push("**/dummy.xml");
-        await configuration.updateWs("globPatternsAnt", globPatterns);
-        await sleep(100);
-        await configuration.updateWs("enabledTasks.ant", true);
+        await executeSettingsUpdate("globPatternsAnt", globPatterns, 50, 100);
+        await executeSettingsUpdate("enabledTasks.ant", true, 50, 100);
         globPatterns.pop();
-        await configuration.updateWs("globPatternsAnt", globPatterns);
-        await sleep(100);
+        await executeSettingsUpdate("globPatternsAnt", globPatterns, 50, 100);
     });
 
 
@@ -68,12 +62,10 @@ suite("Configuration / Settings Tests", () =>
         const globPatterns = configuration.get<string[]>("globPatternsBash");
         await configuration.updateWs("enabledTasks.bash", false);
         globPatterns.push("**/extensionless/**");
-        await configuration.updateWs("globPatternsBash", globPatterns);
-        await sleep(100);
-        await configuration.updateWs("enabledTasks.bash", true);
+        await executeSettingsUpdate("globPatternsBash", globPatterns, 50, 100);
+        await executeSettingsUpdate("enabledTasks.bash", true, 50, 100);
         globPatterns.pop();
-        await configuration.updateWs("globPatternsBash", globPatterns);
-        await sleep(100);
+        await executeSettingsUpdate("globPatternsBash", globPatterns, 50, 100);
     });
 
 
@@ -151,7 +143,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Reset Default Shell - Coverage Hit", async function()
     {
-        await configuration.updateWs("enabledTasks", Object.assign(enabledTasks, {
+        await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: false,
             batch: false,
             nsis: false,
@@ -159,10 +151,8 @@ suite("Configuration / Settings Tests", () =>
             powershell: false,
             python: false,
             ruby: false
-        }));
-        await sleep(50);
-        await configuration.updateWs("enabledTasks.nsis", true); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
-        await sleep(50);
+        }), 25, 50);
+        await executeSettingsUpdate("enabledTasks.nsis", true, 25, 50); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
     });
 
 
@@ -176,58 +166,51 @@ suite("Configuration / Settings Tests", () =>
 
     test("Reset Coverage Hit", async function()
     {
-        await configuration.updateWs("enabledTasks", Object.assign(enabledTasks, {
+        await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: true,
             batch: true,
             perl: true,
             powershell: true,
             python: true,
             ruby: true
-        }));
-        await sleep(50);
+        }), 25, 50);
     });
 
 
 
     test("Path to Programs Set Bash", async function()
     {
-        await configuration.updateWs("pathToPrograms.bash", "c:\\unix\\sh.exe");
-        await sleep(50);
+        await executeSettingsUpdate("pathToPrograms.bash", "c:\\unix\\sh.exe", 20, 50);
     });
 
 
     test("Path to Programs Set Composer", async function()
     {
-        await configuration.updateWs("pathToPrograms.composer", "c:\\php5\\composer.exe");
-        await sleep(50);
+        await executeSettingsUpdate("pathToPrograms.composer", "c:\\php5\\composer.exe", 20, 50);
     });
 
 
     test("Path to Programs Clear Bash", async function()
     {
-        await configuration.updateWs("pathToPrograms.bash", undefined);
-        await sleep(50);
+        await executeSettingsUpdate("pathToPrograms.bash", undefined, 20, 50);
     });
 
 
     test("Path to Programs Clear Composer", async function()
     {
-        await configuration.updateWs("pathToPrograms.composer", undefined);
-        await sleep(50);
+        await executeSettingsUpdate("pathToPrograms.composer", undefined, 20, 50);
     });
 
 
     test("Path to Programs Restore Bash", async function()
     {
-        configuration.updateWs("pathToPrograms.bash", pathToPrograms.bash);
-        await sleep(50);
+        executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash, 20, 50);
     });
 
 
     test("Path to Programs Restore Composer", async function()
     {
-        await configuration.updateWs("pathToPrograms.composer", pathToPrograms.composer);
-        await sleep(50);
+        executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer, 20, 50);
     });
 
 });

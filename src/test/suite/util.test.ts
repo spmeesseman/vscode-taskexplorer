@@ -5,7 +5,7 @@ import * as assert from "assert";
 import * as log from "../../common/log";
 import * as util from "../../common/utils";
 import { workspace } from "vscode";
-import { activate, isReady, sleep } from "../helper";
+import { activate, isReady, sleep, testsControl } from "../helper";
 import { storage } from "../../common/storage";
 import { getUserDataPath } from "../../common/utils";
 import { configuration } from "../../common/configuration";
@@ -33,7 +33,7 @@ suite("Util Tests", () =>
 
 	suiteTeardown(async function()
 	{
-		await configuration.updateWs("debug", false);
+		await configuration.updateWs("debug", testsControl.writeToOutput);
 	});
 
 

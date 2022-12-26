@@ -112,14 +112,14 @@ suite("Tree Tests", () =>
 
     test("Add to Favorites", async function()
     {
-        let removed = await executeTeCommand("addRemoveFromFavorites", 0, batch[0]);
+        let removed = await executeTeCommand("addRemoveFromFavorites", 0, 0, batch[0]);
         if (removed) {
-            await executeTeCommand("addRemoveFromFavorites", 0, batch[0]);
+            await executeTeCommand("addRemoveFromFavorites", 0, 0, batch[0]);
         }
 
-        removed = await executeTeCommand("addRemoveFromFavorites", 0, batch[1]);
+        removed = await executeTeCommand("addRemoveFromFavorites", 0, 0, batch[1]);
         if (removed) {
-            await executeTeCommand("addRemoveFromFavorites", 0, batch[1]);
+            await executeTeCommand("addRemoveFromFavorites", 0, 0, batch[1]);
         }
     });
 
@@ -127,78 +127,78 @@ suite("Tree Tests", () =>
     test("Add Custom Label 1", async function()
     {
         overrideNextShowInputBox("Label 1");
-        await executeTeCommand("addRemoveCustomLabel", 50, batch[0]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[0]);
     });
 
 
     test("Add Custom Label 2", async function()
     {
         overrideNextShowInputBox("Label 2");
-        await executeTeCommand("addRemoveCustomLabel", 50, batch[0]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[0]);
     });
 
 
     test("Add Custom Label 3", async function()
     {
         overrideNextShowInputBox("Label 3");
-        await executeTeCommand("addRemoveCustomLabel", 50, batch[1]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[1]);
     });
 
 
     test("Add Custom Label 4", async function()
     {
         overrideNextShowInputBox("Label 4");
-        await executeTeCommand("addRemoveCustomLabel", 50, batch[1]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[1]);
     });
 
 
     test("Add Custom Label 5", async function()
     {
         overrideNextShowInputBox("Label 5");
-        await executeTeCommand("addRemoveCustomLabel", 50, ant[0]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, ant[0]);
     });
 
 
     test("Add Custom Label 6", async function()
     {
         overrideNextShowInputBox("Label 6");
-        await executeTeCommand("addRemoveCustomLabel", 50, ant[0]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, ant[0]);
     });
 
 
     test("Remove Custom Label 1", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, batch[0]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[0]);
     });
 
 
     test("Remove Custom Label 2", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, batch[0]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[0]);
     });
 
 
     test("Remove Custom Label 3", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, batch[1]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[1]);
     });
 
 
     test("Remove Custom Label 4", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, batch[1]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[1]);
     });
 
 
     test("Remove Custom Label 5", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, ant[0]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, ant[0]);
     });
 
 
     test("Remove Custom Label 6", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, ant[0]);
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, ant[0]);
     });
 
 
@@ -287,11 +287,11 @@ suite("Tree Tests", () =>
 
     test("Clear Special Folders", async function()
     {
-        await executeTeCommand("clearSpecialFolder", 1000, constants.LAST_TASKS_LABEL);
-        await executeTeCommand("clearSpecialFolder", 1000, constants.FAV_TASKS_LABEL);
-        await executeTeCommand("clearSpecialFolder", 1000, "Invalid");
+        await executeTeCommand("clearSpecialFolder", 1000, 1000, constants.LAST_TASKS_LABEL);
+        await executeTeCommand("clearSpecialFolder", 1000, 1000, constants.FAV_TASKS_LABEL);
+        await executeTeCommand("clearSpecialFolder", 1000, 1000, "Invalid");
         overrideNextShowInfoBox("test ask");
-        await executeTeCommand("clearSpecialFolder", 1000, batch[0].getFolder());
+        await executeTeCommand("clearSpecialFolder", 1000, 1000, batch[0].getFolder());
     });
 
 

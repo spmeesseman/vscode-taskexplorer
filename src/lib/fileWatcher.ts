@@ -7,6 +7,7 @@ import { Disposable, ExtensionContext, FileSystemWatcher, workspace, Uri } from 
 import { refreshTree } from "./refreshTree";
 
 
+let processingFsEvent = false;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
 
@@ -20,6 +21,9 @@ export function disposeFileWatchers()
         w.dispose();
     }
 }
+
+
+export const isProcessingFsEvent = () => processingFsEvent;
 
 
 function logFileWatcherEvent(uri: Uri, type: string)
@@ -72,22 +76,45 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
             watchers.set(taskType, watcher);
             context.subscriptions.push(watcher);
         }
-        if (!ignoreModify) {
-            watcherDisposables.set(taskType, watcher.onDidChange(async _e => {
-                logFileWatcherEvent(_e, "change");
-                await refreshTree(taskType, _e);
+
+        if (!ignoreModify)
+        {
+            watcherDisposables.set(taskType, watcher.onDidChange(async _e =>
+            {
+                processingFsEvent = true;
+                try
+                {   logFileWatcherEvent(_e, "change");
+                    await refreshTree(taskType, _e);
+                }
+                catch (e) {}
+                finally { processingFsEvent = false; }
             }));
         }
-        watcherDisposables.set(taskType, watcher.onDidDelete(async _e => {
-            logFileWatcherEvent(_e, "delete");
-            await cache.removeFileFromCache(taskType, _e, "");
-            await refreshTree(taskType, _e);
+
+        watcherDisposables.set(taskType, watcher.onDidDelete(async _e =>
+        {
+            processingFsEvent = true;
+            try
+            {   logFileWatcherEvent(_e, "delete");
+                await cache.removeFileFromCache(taskType, _e, "");
+                await refreshTree(taskType, _e);
+            }
+            catch (e) {}
+            finally { processingFsEvent = false; }
         }));
-        watcherDisposables.set(taskType, watcher.onDidCreate(async _e => {
-            logFileWatcherEvent(_e, "create");
-            await cache.addFileToCache(taskType, _e);
-            await refreshTree(taskType, _e);
+
+        watcherDisposables.set(taskType, watcher.onDidCreate(async _e =>
+        
+            {processingFsEvent = true;
+            try
+            {   logFileWatcherEvent(_e, "create");
+                await cache.addFileToCache(taskType, _e);
+                await refreshTree(taskType, _e);
+            }
+            catch (e) {}
+            finally { processingFsEvent = false; }
         }));
     }
+
 }
 

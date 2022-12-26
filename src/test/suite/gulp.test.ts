@@ -5,13 +5,15 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
+import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, getWsPath, isReady, sleep, verifyTaskCount } from "../helper";
+import { activate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { GulpTaskProvider } from "../../providers/gulp";
-import { properCase } from "../../common/utils";
 
+const testsName = "gulp";
+const waitTimeForFsEvent = testsControl.waitTimeForFsEvent;
+const waitTimeForSettingsEvent = testsControl.waitTimeForSettingsEvent;
 
 let teApi: TaskExplorerApi;
 let provider: GulpTaskProvider;
@@ -21,7 +23,6 @@ let fileUri: Uri;
 
 suite("Gulp Tests", () =>
 {
-    const testsName = "gulp";
 
     suiteSetup(async function()
     {
@@ -43,26 +44,23 @@ suite("Gulp Tests", () =>
 
     test("Start", async function()
     {
-        await verifyTaskCount("gulp", 17);
+        await verifyTaskCount(testsName, 17);
     });
 
 
     test("Disable", async function()
     {
         await configuration.updateWs("enabledTasks.gulp", false);
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName);
-        await sleep(500);
-        await verifyTaskCount("gulp", 0);
+        await teApi.waitForIdle(waitTimeForSettingsEvent);
+        await verifyTaskCount(testsName, 0);
     });
 
 
     test("Re-enable", async function()
     {
         await configuration.updateWs("enabledTasks.gulp", true);
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName);
-        await verifyTaskCount("gulp", 17);
+        await teApi.waitForIdle(waitTimeForSettingsEvent);
+        await verifyTaskCount(testsName, 17);
     });
 
 
@@ -85,9 +83,8 @@ suite("Gulp Tests", () =>
             "});\n"
         );
 
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-        await verifyTaskCount("gulp", 19);
+        await teApi.waitForIdle(waitTimeForFsEvent);
+        await verifyTaskCount(testsName, 19);
     });
 
 
@@ -110,9 +107,8 @@ suite("Gulp Tests", () =>
             "});\n"
         );
 
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-        await verifyTaskCount("gulp", 20);
+        await teApi.waitForIdle(waitTimeForFsEvent);
+        await verifyTaskCount(testsName, 20);
     });
 
 
@@ -127,9 +123,8 @@ suite("Gulp Tests", () =>
             "});\n"
         );
 
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-        await verifyTaskCount("gulp", 18);
+        await teApi.waitForIdle(waitTimeForFsEvent);
+        await verifyTaskCount(testsName, 18);
     });
 
 
@@ -139,9 +134,9 @@ suite("Gulp Tests", () =>
         fs.rmdirSync(dirName, {
             recursive: true
         });
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-        await verifyTaskCount("gulp", 17);
+
+        await teApi.waitForIdle(waitTimeForFsEvent);
+        await verifyTaskCount(testsName, 17);
     });
 
 
@@ -154,8 +149,8 @@ suite("Gulp Tests", () =>
         //
         await configuration.updateWs("useGulp", true);
 
-        // await teApi.explorer?.invalidateTasksCache("gulp");
-        // await tasks.fetchTasks({ type: "gulp" });
+        // await teApi.explorer?.invalidateTasksCache(testsName);
+        // await tasks.fetchTasks({ type: testsName });
         // gulpTasks = await provider.readUriTasks(Uri.file(buildXmlFile));
         // assert(gulpTasks.length === 2, "# of Gulp tasks should be 2");
         // gulpTasks = await provider.readUriTasks(Uri.file(buildXmlFile), rootWorkspace);

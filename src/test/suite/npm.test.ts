@@ -6,11 +6,16 @@ import * as assert from "assert";
 import * as fs from "fs";
 import TaskItem from "../../tree/item";
 import { getPackageManager } from "../../common/utils";
+import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeTeCommand, getTreeTasks, getWsPath, isReady, overrideNextShowInputBox, sleep, verifyTaskCount
+    activate, executeTeCommand, getTreeTasks, getWsPath, isReady, overrideNextShowInputBox, testsControl, verifyTaskCount
 } from "../helper";
 
 
+const testsName = "npm";
+const waitTimeForFsEvent = testsControl.waitTimeForFsEvent;
+
+let teApi: TaskExplorerApi;
 let packageJsonPath: string;
 let npmTaskItems: TaskItem[];
 
@@ -20,7 +25,7 @@ suite("NPM Tests", () =>
 
     suiteSetup(async function()
     {
-        await activate(this);
+        teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
         //
         // Create NPM package.json
@@ -39,18 +44,15 @@ suite("NPM Tests", () =>
             "    }\r\n" +
             "}\r\n"
         );
-        await sleep(1500);
-        //
-        // Verify npm tasks
-        //
-        await verifyTaskCount("npm", 5);
+        await teApi.waitForIdle(waitTimeForFsEvent);
+        await verifyTaskCount(testsName, 5);
         //
         // Get the explorer tree task items (three less task than above, one of them tree
         // does not display the 'install' task with the other tasks found, and two of them
         // are the 'build' and 'watch' tasks are registered in tasks.json and will show in
         // the tree under the VSCode tasks node, not the npm node)
         //
-        npmTaskItems = await getTreeTasks("npm", 2);
+        npmTaskItems = await getTreeTasks(testsName, 2);
     });
 
 
@@ -69,7 +71,49 @@ suite("NPM Tests", () =>
     });
 
 
-    test("Get package manager", function()
+    test("Create Package File (package.json)", async function()
+    {
+        this.slow(500);
+        //
+        // Create NPM package.json
+        //
+        packageJsonPath = getWsPath("package.json");
+        fs.writeFileSync(
+            packageJsonPath,
+            "{\r\n" +
+            '    "name": "vscode-taskexplorer",\r\n' +
+            '    "version": "0.0.1",\r\n' +
+            '    "scripts":{\r\n' +
+            '        "test": "node ./node_modules/vscode/bin/test",\r\n' +
+            '        "compile": "cmd.exe /c test.bat",\r\n' +
+            '        "watch": "tsc -watch -p ./",\r\n' +
+            '        "build": "npx tsc -p ./"\r\n' +
+            "    }\r\n" +
+            "}\r\n"
+        );
+        await teApi.waitForIdle(waitTimeForFsEvent);
+    });
+
+
+    test("Verify NPM Task Count", async function()
+    {
+        await verifyTaskCount(testsName, 5);
+    });
+
+
+    test("Get NPM Task Items", async function()
+    {   //
+        // Get the explorer tree task items (three less task than above, one of them tree
+        // does not display the 'install' task with the other tasks found, and two of them
+        // are the 'build' and 'watch' tasks are registered in tasks.json and will show in
+        // the tree under the VSCode tasks node, not the npm node)
+        //
+        npmTaskItems = await getTreeTasks(testsName, 2);
+    });
+
+
+
+    test("Get Package Manager", function()
     {
         getPackageManager();
     });
@@ -78,39 +122,39 @@ suite("NPM Tests", () =>
     test("Document Position", async function()
     {
         for (const taskItem of npmTaskItems) {
-            await executeTeCommand("open", 500, taskItem);
+            await executeTeCommand("open", 25, 500, taskItem);
         }
     });
 
 
     test("Install", async function()
     {
-        await executeTeCommand("runInstall", 8500, npmTaskItems[0].taskFile);
+        await executeTeCommand("runInstall", 4000, 8500, npmTaskItems[0].taskFile);
     });
 
 
     test("Update", async function()
     {
-        await executeTeCommand("runUpdate", 7500, npmTaskItems[0].taskFile);
+        await executeTeCommand("runUpdate", 3500, 7500, npmTaskItems[0].taskFile);
     });
 
 
-    test("Update specified package", async function()
+    test("Update Specified Package", async function()
     {
         overrideNextShowInputBox("@spmeesseman/app-publisher");
-        await executeTeCommand("runUpdatePackage", 7500, npmTaskItems[0].taskFile);
+        await executeTeCommand("runUpdatePackage", 3500, 7500, npmTaskItems[0].taskFile);
     });
 
 
     test("Audit", async function()
     {
-        await executeTeCommand("runAudit", 7500, npmTaskItems[0].taskFile);
+        await executeTeCommand("runAudit", 3500, 7500, npmTaskItems[0].taskFile);
     });
 
 
     test("Audit Fix", async function()
     {
-        await executeTeCommand("runAuditFix", 7500, npmTaskItems[0].taskFile);
+        await executeTeCommand("runAuditFix", 3500, 7500, npmTaskItems[0].taskFile);
     });
 
 });

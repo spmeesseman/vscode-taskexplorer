@@ -8,12 +8,15 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
+import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, getWsPath, isReady, sleep } from "../helper";
+import { activate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ScriptTaskProvider } from "../../providers/script";
 
+const testsName = "python";
+const waitTimeForFsEvent = testsControl.waitTimeForFsEvent;
+const waitTimeForSettingsEvent = testsControl.waitTimeForSettingsEvent;
 
 let teApi: TaskExplorerApi;
 let pathToPython: string;
@@ -25,8 +28,6 @@ let fileUri: Uri;
 
 suite("Python Tests", () =>
 {
-    const testsName = "python";
-
 
     suiteSetup(async function()
     {   //
@@ -40,7 +41,6 @@ suite("Python Tests", () =>
         //
         // Store / set initial settings
         //
-        await configuration.updateWs("pathToPrograms.python", path.resolve(process.cwd(), "..\\..\\test-files\\ant\\bin\\ant.bat"));
         pathToPython = configuration.get<string>("pathToPrograms.python");
         enablePython = configuration.get<boolean>("enabledTasks.python");
         await configuration.updateWs("pathToPrograms.python", "php\\composer.exe");
@@ -72,27 +72,25 @@ suite("Python Tests", () =>
     });
 
 
+    test("Start", async function()
+    {
+        await verifyTaskCount("script", 2, testsName);
+    });
+
+
     test("Disable", async function()
     {
-        let cTasks = await tasks.fetchTasks({ type: "script" });
-        assert(cTasks && cTasks.filter(t => t.source === testsName).length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
         await configuration.updateWs("enabledTasks.python", false);
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName);
-        await sleep(500);
-        cTasks = await tasks.fetchTasks({ type: "script" });
-        assert(!cTasks || cTasks.filter(t => t.source === testsName).length === 0, `Did not read 0 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await teApi.waitForIdle(waitTimeForSettingsEvent);
+        await verifyTaskCount("script", 0, testsName);
     });
 
 
     test("Re-enable", async function()
     {
         await configuration.updateWs("enabledTasks.python", true);
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName);
-        await sleep(500);
-        const cTasks = await tasks.fetchTasks({ type: "script" });
-        assert(cTasks && cTasks.filter(t => t.source === testsName).length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await teApi.waitForIdle(waitTimeForSettingsEvent);
+        await verifyTaskCount("script", 2, testsName);
     });
 
 
@@ -101,17 +99,13 @@ suite("Python Tests", () =>
         if (!fs.existsSync(dirName)) {
             fs.mkdirSync(dirName, { mode: 0o777 });
         }
-
         fs.writeFileSync(
             fileUri.fsPath,
             "#!/usr/local/bin/python\n" +
             "\n"
         );
-
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-        const cTasks = await tasks.fetchTasks({ type: "script" });
-        assert(cTasks && cTasks.filter(t => t.source === testsName).length === 3, `Did not read 3 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await teApi.waitForIdle(waitTimeForFsEvent);
+        await verifyTaskCount("script", 3, testsName);
     });
 
 
@@ -167,11 +161,8 @@ suite("Python Tests", () =>
         fs.rmdirSync(dirName, {
             recursive: true
         });
-
-        await sleep(500);
-        await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-        const cTasks = await tasks.fetchTasks({ type: "script" });
-        assert(cTasks && cTasks.filter(t => t.source === testsName).length === 2, `Did not read 2 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
+        await teApi.waitForIdle(waitTimeForFsEvent);
+        await verifyTaskCount("script", 2, testsName);
     });
 
 });

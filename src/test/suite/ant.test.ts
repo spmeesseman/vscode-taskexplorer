@@ -7,10 +7,12 @@ import * as fs from "fs";
 import * as util from "../../common/utils";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, getWsPath, isReady, sleep, verifyTaskCount } from "../helper";
+import { activate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
 
+const testsName = "ant";
+const waitTimeForSettingsEvent = testsControl.waitTimeForSettingsEvent;
 
 let teApi: TaskExplorerApi;
 let provider: AntTaskProvider;
@@ -22,8 +24,6 @@ let buildFileXml: string;
 
 suite("Ant Tests", () =>
 {
-    const testsName = "ant";
-
 
     suiteSetup(async function()
     {
@@ -68,8 +68,7 @@ suite("Ant Tests", () =>
     test("Disable", async function()
     {
         await configuration.updateWs("enabledTasks.ant", false);
-        await sleep(100);
-        await teApi.explorer?.waitForRefreshComplete();
+        await teApi.waitForIdle(waitTimeForSettingsEvent);
         await verifyTaskCount("ant", 0);
     });
 
@@ -77,8 +76,7 @@ suite("Ant Tests", () =>
     test("Re-enable", async function()
     {
         await configuration.updateWs("enabledTasks.ant", true);
-        await sleep(100);
-        await teApi.explorer?.waitForRefreshComplete();
+        await teApi.waitForIdle(waitTimeForSettingsEvent);
         await verifyTaskCount("ant", 3);
     });
 
@@ -240,7 +238,7 @@ suite("Ant Tests", () =>
  */
 async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAnt2: number)
 {
-    await sleep(500);
+    await teApi.waitForIdle(testsControl.waitTimeForFsEvent);
     //
     // Don't use Ant
     //

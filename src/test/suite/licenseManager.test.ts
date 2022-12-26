@@ -9,7 +9,7 @@ import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import {
 	activate, closeActiveDocuments, isReady, overrideNextShowInfoBox,
-	overrideNextShowInputBox, sleep, testCommand, executeTeCommand
+	overrideNextShowInputBox, sleep, executeTeCommand
 } from "../helper";
 
 
@@ -26,7 +26,6 @@ suite("License Manager Tests", () =>
 	{
 		teApi = await activate(this);
         assert(isReady("make") === true, "    ✘ TeApi not ready");
-		await executeTeCommand("focus", 1000);
 	});
 
 
@@ -36,9 +35,14 @@ suite("License Manager Tests", () =>
 	});
 
 
+	test("Focus Task Explorer View for Tree Population", async function()
+	{
+		await executeTeCommand("focus", 250, 1000);
+	});
+
+
 	test("Open License Manager", async function()
 	{
-		await sleep(1000);
 		licMgr = getLicenseManager();
 		tasks = teApi.explorer?.getTasks() || [];
 	});
@@ -137,15 +141,15 @@ suite("License Manager Tests", () =>
 	{
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("1111-2222-3333-4444-5555");
-		await executeTeCommand("enterLicense", 1100);
+		await executeTeCommand("enterLicense", 500, 1100);
 
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("");
-		await executeTeCommand("enterLicense", 1100, "   ");
+		await executeTeCommand("enterLicense", 500, 1100, "   ");
 
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("");
-		await executeTeCommand("enterLicense", 500, "   ", 1);
+		await executeTeCommand("enterLicense", 250, 500, "   ", 1);
 	});
 
 
