@@ -80,6 +80,23 @@ export async function addFolderToCache(folder: WorkspaceFolder | undefined, logP
 }
 
 
+export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined)
+{
+    /* istanbul ignore else */
+    if (wsf)
+    {
+        for (const f in wsf)
+        {   /* istanbul ignore else */
+            if ([].hasOwnProperty.call(wsf, f)) { // skip over properties inherited by prototype
+                log.methodStart("workspace folder added", 1, "", true, [[ "name", wsf[f].name ]]);
+                await addFolderToCache(wsf[f], "   ");
+                log.methodDone("workspace folder added", 1, "");
+            }
+        }
+    }
+}
+
+
 function addItemToMappings(taskType: string, item: ICacheItem)
 {
     if (!projectFilesMap[item.folder.name]) {
@@ -387,7 +404,7 @@ export async function removeFileFromCache(taskType: string, uri: Uri, logPad: st
 
         for (const item of itemCache)
         {
-            if (item.uri.fsPath.includes(uri.fsPath))
+            if (item.uri.fsPath === uri.fsPath)
             {
                 toRemove.push(item);
             }
@@ -406,6 +423,61 @@ export async function removeFileFromCache(taskType: string, uri: Uri, logPad: st
         }
     }
 }
+
+
+export async function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
+{
+    log.methodStart("process remove workspace folder", 1, logPad, true);
+
+    for (const f of wsf)
+    {   /* istanbul ignore next */
+        log.value("      folder", f.name, 1, logPad);
+        // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
+        /* istanbul ignore next */
+        for (const c of filesCache)
+        {   /* istanbul ignore next */
+            const files = c[1], provider = c[0],
+                  toRemove: ICacheItem[] = [];
+            /* istanbul ignore next */
+            log.value("      start remove task files from cache", provider, 2, logPad);
+            /* istanbul ignore next */
+            for (const file of files)
+            {   /* istanbul ignore next */
+                log.value("         checking cache file", file.uri.fsPath, 4, logPad);
+                /* istanbul ignore next */
+                if (file.folder.uri.fsPath === f.uri.fsPath)
+                {   /* istanbul ignore next */
+                    log.write("            added for removal",  4, logPad);
+                    /* istanbul ignore next */
+                    toRemove.push(file);
+                }
+            }
+            /* istanbul ignore next */
+            if (toRemove.length > 0)
+            {   /* istanbul ignore next */
+                for (const tr of toRemove)
+                {   /* istanbul ignore next */
+                    log.value("         remove file", tr.uri.fsPath, 2, logPad);
+                    /* istanbul ignore next */
+                    files.delete(tr);
+                    /* istanbul ignore next */
+                    delete projectToFileCountMap[f.name];
+                    /* istanbul ignore next */
+                    if (f && projectFilesMap[f.name])
+                    {   /* istanbul ignore next */
+                        delete projectFilesMap[f.name];
+                    }
+                }
+            }
+            /* istanbul ignore next */
+            log.value("      completed remove files from cache", provider, 2, logPad);
+        }
+        /* istanbul ignore next */
+        log.write("   folder removed", 1, logPad);
+    }
+    log.methodDone("process remove workspace folder", 1, logPad, true);
+}
+
 
 
 export async function waitForCache()

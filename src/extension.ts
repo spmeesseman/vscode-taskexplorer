@@ -17,7 +17,7 @@ import { GulpTaskProvider } from "./providers/gulp";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
 import { configuration } from "./common/configuration";
 import { initStorage, storage } from "./common/storage";
-import { isCachingBusy } from "./cache";
+import { isCachingBusy, addWsFolders, removeWsFolders } from "./cache";
 import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";
 import { ExternalExplorerProvider, TaskExplorerApi } from "./interface";
@@ -87,9 +87,9 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     //
     const workspaceWatcher = workspace.onDidChangeWorkspaceFolders(/* istanbul ignore next */ async(_e) =>
     {   /* istanbul ignore next */
-        await addWsFolder(_e.added);
+        await addWsFolders(_e.added);
         /* istanbul ignore next */
-        await removeWsFolder(_e.removed);
+        await removeWsFolders(_e.removed);
         /* istanbul ignore next */
         await refreshTree();
     });
@@ -190,23 +190,6 @@ async function tempRemapSettingsToNewLayout()
 }
 
 
-export async function addWsFolder(wsf: readonly WorkspaceFolder[] | undefined)
-{
-    /* istanbul ignore else */
-    if (wsf)
-    {
-        for (const f in wsf)
-        {   /* istanbul ignore else */
-            if ([].hasOwnProperty.call(wsf, f)) { // skip over properties inherited by prototype
-                log.methodStart("workspace folder added", 1, "", true, [[ "name", wsf[f].name ]]);
-                await cache.addFolderToCache(wsf[f], "   ");
-                log.methodDone("workspace folder added", 1, "");
-            }
-        }
-    }
-}
-
-
 export async function deactivate()
 {
     disposeFileWatchers();
@@ -289,61 +272,6 @@ function registerTaskProviders(context: ExtensionContext)
     // The 'script' provider handles all file based 'scripts', e.g. batch files, bash, powershell, etc
     //
     registerTaskProvider("script", new ScriptTaskProvider(), context);
-}
-
-
-export async function removeWsFolder(wsf: readonly WorkspaceFolder[], logPad = "")
-{
-    log.methodStart("process remove workspace folder", 1, logPad, true);
-
-    for (const f of wsf)
-    {   /* istanbul ignore next */
-        log.value("      folder", f.name, 1, logPad);
-        // window.setStatusBarMessage("$(loading) Task Explorer - Removing projects...");
-        /* istanbul ignore next */
-        for (const c of cache.getFilesCache())
-        {
-            /* istanbul ignore next */
-            const files = c[1], provider = c[0],
-                  toRemove: cache.ICacheItem[] = [];
-
-            /* istanbul ignore next */
-            log.value("      start remove task files from cache", provider, 2, logPad);
-
-            /* istanbul ignore next */
-            for (const file of files)
-            {
-                /* istanbul ignore next */
-                log.value("         checking cache file", file.uri.fsPath, 4, logPad);
-                /* istanbul ignore next */
-                if (file.folder.uri.fsPath === f.uri.fsPath) {
-                    /* istanbul ignore next */
-                    log.write("            added for removal",  4, logPad);
-                    /* istanbul ignore next */
-                    toRemove.push(file);
-                }
-            }
-
-            /* istanbul ignore next */
-            if (toRemove.length > 0)
-            {
-                /* istanbul ignore next */
-                for (const tr of toRemove) {
-                    /* istanbul ignore next */
-                    log.value("         remove file", tr.uri.fsPath, 2, logPad);
-                    /* istanbul ignore next */
-                    files.delete(tr);
-                }
-            }
-
-            /* istanbul ignore next */
-            log.value("      completed remove files from cache", provider, 2, logPad);
-        }
-        /* istanbul ignore next */
-        log.write("   folder removed", 1, logPad);
-    }
-
-    log.methodDone("process remove workspace folder", 1, logPad, true);
 }
 
 

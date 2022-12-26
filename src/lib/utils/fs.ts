@@ -210,7 +210,11 @@ export function numFilesInDirectory(dirPath: string): Promise<number>
     {
         if (fs.existsSync(dirPath))
         {
-            fs.readdir(dirPath, (err, files) => { if (!err) resolve(files.length); else reject(err); });
+            fs.readdir(dirPath, (err, files) =>
+            {   /* istanbul ignore else */
+                if (!err) resolve(files.length);
+                else reject(err); 
+            });
         }
         else { reject(new Error("Invalid directory does not exist")); }
     });
