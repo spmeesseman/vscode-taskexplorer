@@ -1,24 +1,25 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
 import * as assert from "assert";
 import * as log from "../../common/log";
 import * as util from "../../common/utils";
-import { workspace } from "vscode";
-import { activate, isReady, sleep, testsControl } from "../helper";
+import { workspace, WorkspaceFolder } from "vscode";
+import { activate, isReady, testsControl } from "../helper";
 import { storage } from "../../common/storage";
 import { getUserDataPath } from "../../common/utils";
 import { configuration } from "../../common/configuration";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-// import { displayInfoPage, getLicenseKey, setLicenseKey } from "../../common/infoPage";
-// import { getVersion } from "../../extension";
+import { numFilesInDirectory } from "../../lib/utils/fs";
+import { join } from "path";
 
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
 
 let teApi: TaskExplorerApi;
+let rootPath: string;
 
 
 suite("Util Tests", () =>
@@ -28,6 +29,10 @@ suite("Util Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
+		rootPath = (workspace.workspaceFolders as WorkspaceFolder[])[0].uri.fsPath;
+        if (!rootPath) {
+            assert.fail("        ✘ Workspace folder does not exist");
+        }
 	});
 
 
@@ -366,11 +371,21 @@ suite("Util Tests", () =>
         {
             await storage.update("TEST_KEY", "This is a test");
             assert(storage.get<string>("TEST_KEY") === "This is a test");
-            assert(storage.get<string>("TEST_KEY_DONT_EXIST", "defValue") === "defValue");
+            assert(storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue") === "defValue");
             await storage.update("TEST_KEY", "");
-            assert(storage.get<string>("TEST_KEY_DONT_EXIST", "defValue") === "defValue");
+            assert(storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue") === "defValue");
             await storage.update("TEST_KEY", undefined);
         }
     });
+
+
+    test("File System", function()
+    {
+		let dirName = join(rootPath, "tasks_test_");
+        let n = numFilesInDirectory(dirName);
+		dirName = join(rootPath, "tasks_test_");
+        n = numFilesInDirectory(dirName);
+    });
+
 
 });

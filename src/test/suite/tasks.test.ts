@@ -127,7 +127,9 @@ suite("Task Tests", () =>
 
 
     test("Batch 1", async function()
-    {   //
+    {
+        this.timeout(45000);
+        //
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
         const batchTask = batch[0];

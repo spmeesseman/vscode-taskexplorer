@@ -10,7 +10,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ScriptTaskProvider } from "../../providers/script";
 
@@ -45,8 +45,8 @@ suite("Python Tests", () =>
         //
         pathToPython = configuration.get<string>("pathToPrograms.python");
         enablePython = configuration.get<boolean>("enabledTasks.python");
-        await configuration.updateWs("pathToPrograms.python", "php\\composer.exe");
-        await configuration.updateWs("enabledTasks.python", true);
+        await executeSettingsUpdate("pathToPrograms.python", "php\\composer.exe");
+        await executeSettingsUpdate("enabledTasks.python", true);
     });
 
 
@@ -54,8 +54,8 @@ suite("Python Tests", () =>
     {   //
         // Reset settings
         //
-        await configuration.updateWs("pathToPrograms.python", pathToPython);
-        await configuration.updateWs("enabledTasks.python", enablePython);
+        await executeSettingsUpdate("pathToPrograms.python", pathToPython);
+        await executeSettingsUpdate("enabledTasks.python", enablePython);
     });
 
 
@@ -157,7 +157,7 @@ suite("Python Tests", () =>
     // });
 
 
-    test("Delete file", async function()
+    test("Delete File", async function()
     {
         fs.unlinkSync(fileUri.fsPath);
         await teApi.waitForIdle(waitTimeForFsDelEvent * 2);
@@ -183,7 +183,7 @@ suite("Python Tests", () =>
     });
 
 
-    test("Delete file", async function()
+    test("Delete Folder", async function()
     {
         // fs.unlinkSync(fileUri.fsPath);
         fs.rmdirSync(dirName, {
