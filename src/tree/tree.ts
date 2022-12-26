@@ -1459,7 +1459,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
      *
      * @param opt1 Task provider type.  Can be one of:
      *     "ant"
-     *     "app-publisher"
+     *     "apppublisher"
      *     "bash"
      *     "batch"
      *     "gradle"
@@ -1757,7 +1757,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
      * Can also be one of the task types FileSystemWatcher event):
      *
      *     "ant"
-     *     "app-publisher"
+     *     "apppublisher"
      *     "bash"
      *     "batch"
      *     "gradle"

@@ -123,14 +123,15 @@ export abstract class TaskExplorerProvider implements TaskProvider
             if (uri)
             {
                 const pathExists = util.pathExists(uri.fsPath),
-                      rmvTasks: number[] = [];
+                      rmvTasks: number[] = [],
+                      enabled = util.isTaskTypeEnabled(this.providerName);
 
                 for (let i = 0; i < this.cachedTasks.length; i++)
                 {
                     const cachedTask = this.cachedTasks[i];
                     const cstDef = cachedTask.definition;
                     // if (excludeTask.includes(cstDef.uri) || (cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath))))
-                    if ((cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath))) ||
+                    if (!enabled || (cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath))) ||
                         (cstDef.path && !isTaskIncluded(cachedTask, cstDef.path)))
                     {
                         rmvTasks.push(i);
@@ -146,7 +147,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
                 if (pathExists && !configuration.get<string[]>("exclude", []).includes(uri.path))
                 {
-                    const tasks = (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
+                    const tasks = enabled ? (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path)) : [];
                     //
                     // If the implementation of the readUri() method awaits, it can theoretically reset
                     // this.cachedTasks under certain circumstances via invalidation by the tree that's

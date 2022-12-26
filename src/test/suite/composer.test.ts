@@ -68,6 +68,12 @@ suite("Composer Tests", () =>
     });
 
 
+    test("Enable (Off by Default)", async function()
+    {
+        await executeSettingsUpdate("enabledTasks.composer", true);
+    });
+
+
     test("Start", async function()
     {
         await verifyTaskCount(testsName, 2);

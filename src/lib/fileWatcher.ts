@@ -178,7 +178,7 @@ async function onDirCreate(uri: Uri)
 async function onDirDelete(uri: Uri)
 {
     if (!extname(uri.fsPath)) // ouch
-    //if (isDirectory(uri.fsPath))
+    //if (isDirectory(uri.fsPath)) // it's gone, so we can't lstat it
     {
         log.methodStart("dirwatcher delete", 1, "", true, [[ "dir", uri.fsPath ]]);
         processingFsEvent = true;

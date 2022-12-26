@@ -265,12 +265,14 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     {
         const allTasks: Task[] = [],
               visitedFiles: Set<string> = new Set(),
-              paths = getFilesCache().get(this.providerName);
+              scriptTypes = util.getScriptTaskTypes();
 
-        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [[ "path", paths ? paths.size : 0 ]]);
+        log.methodStart(`detect ${this.providerName} type task files`, 1, logPad, true);
 
-        if (paths)
+        for (const taskType of scriptTypes)
         {
+            log.write("   detect script type " + taskType, 1, logPad);
+            const paths = getFilesCache().get(taskType) || [];
             for (const fObj of paths)
             {
                 if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))

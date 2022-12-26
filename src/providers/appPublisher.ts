@@ -191,7 +191,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
             }
             const exec = new ShellExecution(def.cmdLine, options);
             tasks.push(new Task(this._getKind(def.cmdLine, defaultDef), folder,
-                                `${def.label}${apFmtLabel}`, "app-publisher", exec, undefined));
+                                `${def.label}${apFmtLabel}`, "apppublisher", exec, undefined));
         });
 
         log.methodDone("read app-publisher file uri tasks", 1, logPad, true);

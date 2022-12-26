@@ -10,6 +10,7 @@ import { registerExplorer } from "./registerExplorer";
 import { TaskExplorerApi } from "../interface";
 import { log } from "console";
 
+// let context: ExtensionContext;
 let teApi: TaskExplorerApi;
 let watcherEnabled = true;
 let processingConfigEvent = false;
@@ -26,8 +27,9 @@ export function enableConfigWatcher(enable = true)
 export const isProcessingConfigChange = () => processingConfigEvent;
 
 
-export async function processConfigChanges(context: ExtensionContext, e: ConfigurationChangeEvent)
+export async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChangeEvent)
 {
+    // context = ctx;
     processingConfigEvent = true;
 
     let refresh = false;
@@ -109,7 +111,6 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
     //
     if (!refresh && e.affectsConfiguration("taskExplorer.enabledTasks"))
     {
-        let didSetScriptTypeForRefresh = false;
         const newEnabledTasks = configuration.get<any>("enabledTasks");
         for (const p in enabledTasks)
         {   /* istanbul ignore else */
@@ -120,12 +121,8 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
                       newValue = newEnabledTasks[p];
                 if (newValue !== oldValue)
                 {
-                    const isScriptType = util.isScriptType(taskType);
-                    await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), newValue);
-                    if (!isScriptType || !didSetScriptTypeForRefresh) {
-                        registerChange(taskType);
-                    }
-                    didSetScriptTypeForRefresh = didSetScriptTypeForRefresh || isScriptType;
+                    await registerFileWatcher(ctx, taskType, util.getGlobPattern(taskType), newValue);
+                    registerChange(taskType);
                 }
             }
         }
@@ -139,7 +136,6 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
     {
         if (e.affectsConfiguration("taskExplorer.pathToPrograms"))
         {
-            let didSetScriptTypeForRefresh = false;
             const newPathToPrograms = configuration.get<any>("pathToPrograms");
             for (const p in pathToPrograms)
             {
@@ -149,11 +145,7 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
                           oldValue = pathToPrograms[p],
                           newValue = newPathToPrograms[p];
                     if (newValue !== oldValue) {
-                        const isScriptType = util.isScriptType(taskType);
-                        if (!isScriptType || !didSetScriptTypeForRefresh) {
-                            registerChange(taskType);
-                        }
-                        didSetScriptTypeForRefresh = didSetScriptTypeForRefresh || isScriptType;
+                        registerChange(taskType);
                     }
                 }
             }
@@ -166,7 +158,7 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
         {   /* istanbul ignore else */
             if (refreshTaskTypes.includes("bash") === false)
             {
-                await registerFileWatcher(context, "bash",
+                await registerFileWatcher(ctx, "bash",
                                         util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", [])),
                                         configuration.get<boolean>("enabledTasks.bash"));
                 registerChange("bash");
@@ -181,7 +173,7 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
             if (refreshTaskTypes.includes("ant") === false)
             {
                 const antGlobs = [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ];
-                await registerFileWatcher(context, "ant", util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs),
+                await registerFileWatcher(ctx, "ant", util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs),
                                           configuration.get<boolean>("enabledTasks.ant"));
                 registerChange("ant");
             }
@@ -228,7 +220,7 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
                     refresh = true;
                 }
                 else {
-                    teApi.sidebar = registerExplorer("taskExplorerSideBar", context);
+                    teApi.sidebar = registerExplorer("taskExplorerSideBar", ctx);
                 }
             }
             // else {
@@ -248,7 +240,7 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
                     refresh = true;
                 }
                 else {
-                    teApi.explorer = registerExplorer("taskExplorer", context);
+                    teApi.explorer = registerExplorer("taskExplorer", ctx);
                 }
             }
             // else {
@@ -275,7 +267,7 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
     }
 
     try
-    {   if (refresh) {
+    {   if (refresh || refreshTaskTypes.length > 5) {
             await refreshTree();
         }
         else if (refreshTaskTypes.length > 0) {
@@ -292,3 +284,13 @@ export async function processConfigChanges(context: ExtensionContext, e: Configu
     processingConfigEvent = false;
     teApi.log.methodDone("Process config changes", 1, "");
 }
+
+
+// const queue: ConfigurationChangeEvent[] = [];
+// async function processQueue()
+// {
+//     const next= queue.shift();
+//     if (next) {
+//         await processConfigChanges(context, next);
+//     }
+// }
