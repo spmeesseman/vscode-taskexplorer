@@ -369,6 +369,7 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
         while (lilWait > 1)
         {
             await util.timeout(lilWait);
+            // waited += lilWait;
             if (isTaskExplorerBusy()) {
                 log.write("waiting for previous refresh to complete...", 1, logPad);
                 break;
@@ -377,6 +378,7 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
         }
     }
     while (isTaskExplorerBusy() && waited < maxWait) {
+        // console.log(Date.now);
         await util.timeout(10);
         waited += 10;
     }
