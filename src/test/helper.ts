@@ -277,7 +277,7 @@ export function overrideNextShowInfoBox(value: any)
 export async function refresh()
 {
 	await executeTeCommand("refresh", 500);
-    await teApi.testsApi.fileCache.waitForCache();
+    await teApi.waitForIdle(500);
     return teApi.explorer?.getChildren();
 }
 

@@ -22,6 +22,7 @@ import { storage } from "../../common/storage";
 
 
 let teApi: TaskExplorerApi;
+let enabledTasks: object;
 let explorer: ExplorerApi;
 let rootPath: string;
 let dirName: string;
@@ -44,6 +45,8 @@ suite("Provider Tests", () =>
             assert.fail("        ✘ Workspace folder does not exist");
         }
         explorer = teApi.explorer;
+
+        enabledTasks = configuration.get<object>("enabledTasks");
 
         rootPath = (workspace.workspaceFolders as WorkspaceFolder[])[0].uri.fsPath;
         if (!rootPath) {
@@ -148,6 +151,7 @@ suite("Provider Tests", () =>
     {
         await configuration.updateWs("debug", false);
         await configuration.updateWs("expanded.test-files", false);
+        await configuration.updateWs("enabledTasks", enabledTasks);
 
         if (tempFiles.length)
         {
@@ -210,6 +214,58 @@ suite("Provider Tests", () =>
         }
 
         await sleep(3000); // wait for filesystem change events
+    });
+
+
+    test("Disable All Task Providers", async function()
+    {
+        await configuration.updateWs("enabledTasks", {
+            ant: false,
+            apppublisher: false,
+            bash: false,
+            batch: false,
+            gradle: false,
+            grunt: false,
+            gulp: false,
+            make: false,
+            maven: false,
+            npm: false,
+            nsis: false,
+            perl: false,
+            pipenv: false,
+            powershell: false,
+            python: false,
+            ruby: false,
+            tsc: false,
+            workspace: false
+        });
+        await teApi.waitForIdle(3000);
+    });
+
+
+    test("Enable All Task Providers", async function()
+    {
+        await configuration.updateWs("enabledTasks", {
+            ant: true,
+            apppuplisher: true,
+            bash: true,
+            batch: true,
+            gradle: true,
+            grunt: true,
+            gulp: true,
+            make: true,
+            maven: true,
+            npm: true,
+            nsis: true,
+            perl: true,
+            pipenv: true,
+            powershell: true,
+            python: true,
+            ruby: true,
+            tsc: true,
+            workspace: true
+        });
+        await teApi.waitForIdle(3000);
     });
 
 
@@ -446,61 +502,6 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Disable All Task Providers", async function()
-    {
-        await configuration.updateWs("enabledTasks", {
-            ant: false,
-            apppublisher: false,
-            bash: false,
-            batch: false,
-            gradle: false,
-            grunt: false,
-            gulp: false,
-            make: false,
-            maven: false,
-            npm: false,
-            nsis: false,
-            perl: false,
-            pipenv: false,
-            powershell: false,
-            python: false,
-            ruby: false,
-            tsc: false,
-            workspace: false
-        });
-        await sleep(5000);
-        await teApi.testsApi.fileCache.waitForCache();
-    });
-
-
-    test("Re-enable All Task Providers", async function()
-    {
-        await configuration.updateWs("enabledTasks", {
-            ant: true,
-            apppuplisher: true,
-            bash: true,
-            batch: true,
-            gradle: true,
-            grunt: true,
-            gulp: true,
-            make: true,
-            maven: true,
-            npm: true,
-            nsis: true,
-            perl: true,
-            pipenv: true,
-            powershell: true,
-            python: true,
-            ruby: true,
-            tsc: true,
-            workspace: true
-        });
-
-        await sleep(5000); // wait for filesystem change events
-        await teApi.testsApi.fileCache.waitForCache();
-    });
-
-
     test("Run Refresh Task", async function()
     {
         await configuration.updateWs("expanded.test-files", true);
@@ -634,9 +635,10 @@ export async function buildTree(instance: any, waitTime?: number)
     // A special refresh() for test suite, will open all task files and open to position
     //
     await explorer.refresh("tests");
-    await teApi.testsApi.fileCache.waitForCache();
+    await teApi.waitForIdle(1000);
 
     const treeItems = await refresh();
+    await teApi.waitForIdle(500);
 
     return treeItems;
 }
