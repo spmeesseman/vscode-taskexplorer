@@ -604,7 +604,7 @@
                 },
                 {
                     "command": "taskExplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileApp-publisher"
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileApppublisher"
                 },
                 {
                     "command": "taskExplorer.addToExcludes",
@@ -664,7 +664,7 @@
                 },
                 {
                     "command": "taskExplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupApp-publisher"
+                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupApppublisher"
                 },
                 {
                     "command": "taskExplorer.addToExcludes",
@@ -1034,7 +1034,7 @@
                 },
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileApp-publisher"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileApppublisher"
                 },
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
@@ -1094,7 +1094,7 @@
                 },
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupApp-publisher"
+                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupApppublisher"
                 },
                 {
                     "command": "taskExplorerSideBar.addToExcludes",
@@ -2098,7 +2098,7 @@
                 }
             },
             {
-                "type": "app-publisher",
+                "type": "apppublisher",
                 "required": [
                     "cmdLine"
                 ],

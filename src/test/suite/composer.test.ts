@@ -10,7 +10,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ComposerTaskProvider } from "../../providers/composer";
 
@@ -76,16 +76,14 @@ suite("Composer Tests", () =>
 
     test("Disable", async function()
     {
-        await configuration.updateWs("enabledTasks.composer", false);
-        await teApi.waitForIdle(50);
+        await executeSettingsUpdate("enabledTasks.composer", false);
         await verifyTaskCount(testsName, 0);
     });
 
 
     test("Re-enable", async function()
     {
-        await configuration.updateWs("enabledTasks.composer", true);
-        await teApi.waitForIdle(50);
+        await executeSettingsUpdate("enabledTasks.composer", true);
         await verifyTaskCount(testsName, 2);
     });
 

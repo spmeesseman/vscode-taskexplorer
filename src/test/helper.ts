@@ -14,10 +14,10 @@ export const testsControl = {
     keepSettingsFile: false,
     writeToConsole: false,
     writeToOutput: false,
-    waitTimeForFsCreateEvent: 175,
-    waitTimeForFsDeleteEvent: 175,
-    waitTimeForFsModifyEvent: 130,
-    waitTimeForConfigEvent: 75
+    waitTimeForFsCreateEvent: 200,
+    waitTimeForFsDeleteEvent: 200,
+    waitTimeForFsModifyEvent: 150,
+    waitTimeForConfigEvent: 125
 };
 
 let activated = false;
@@ -225,26 +225,7 @@ export async function initSettings(enable = true)
     // Enabled all options, use workspace level so that running this test from Code itself
     // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("enabledTasks", {
-        ant: enable,
-        apppublisher: enable,
-        bash: enable,
-        batch: enable,
-        gradle: enable,
-        grunt: enable,
-        gulp: enable,
-        make: enable,
-        maven: enable,
-        npm: enable,
-        nsis: enable,
-        perl: enable,
-        powershell: enable,
-        python: enable,
-        pipenv: enable,
-        ruby: enable,
-        tsc: enable,
-        workspace: enable
-    });
+    await configuration.updateWs("enabledTasks", configuration.get<object>("enabledTasks"));
     await configuration.updateWs("groupWithSeparator", enable);
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("showLastTasks", enable);
