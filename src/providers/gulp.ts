@@ -48,7 +48,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     {
         let scripts: string[] = [];
 
-        log.methodStart("find gulp targets", 1, logPad, true, [[ "path", fsPath ]]);
+        log.methodStart("find gulp targets", 1, logPad, true, [["path", fsPath]]);
         //
         // Try running 'gulp' itself to get the targets.  If fail, just custom parse
         //
@@ -270,12 +270,12 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    public readUriTasks(uri: Uri, logPad: string)
+    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read gulp file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+        log.methodStart("read gulp file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
 
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)

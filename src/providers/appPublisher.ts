@@ -50,7 +50,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
     }
 
 
-    public readUriTasks(uri: Uri, logPad: string)
+    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const cwd = path.dirname(uri.fsPath),
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
@@ -60,17 +60,11 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ]);
 
-        //
-        // Validate JSON
-        //
-        try {
-            const json = util.readFileSync(uri.fsPath);
-            JSON.parse(json);
+        try { // Validate JSON
+            await readJsonAsync(uri.fsPath);
         }
-        catch (e: any) {
-            log.write("   " + e.message);
-console.log("!!!!!!!!!!!!!!!");
-console.log(e.message);
+        catch (e: any)
+        {   log.write("   " + e.message);
             log.methodDone("read app-publisher file uri tasks", 1, logPad, true);
             return [];
         }

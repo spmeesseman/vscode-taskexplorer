@@ -175,7 +175,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    public readUriTasks(uri: Uri, logPad: string)
+    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;

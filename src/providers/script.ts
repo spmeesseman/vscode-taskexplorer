@@ -298,7 +298,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public readUriTasks(uri: Uri, logPad: string)
+    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
         log.methodStart("read script file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);

@@ -6,7 +6,7 @@ import { configuration } from "../common/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
-import { parseString } from "xml2js";
+import { parseStringPromise } from "xml2js";
 
 
 export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -57,7 +57,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
     }
 
 
-    public readUriTasks(uri: Uri, logPad: string)
+    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const cwd = path.dirname(uri.fsPath),
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
@@ -71,7 +71,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
         //
         try {
             const buffer = util.readFileSync(uri.fsPath);
-            parseString(buffer, () => {});
+            await parseStringPromise(buffer);
         }
         catch (e: any) {
             log.write("   " + e.message);

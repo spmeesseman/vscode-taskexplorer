@@ -92,7 +92,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
     }
 
 
-    public readUriTasks(uri: Uri, logPad: string)
+    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;

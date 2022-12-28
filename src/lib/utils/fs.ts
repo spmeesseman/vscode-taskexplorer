@@ -1,9 +1,9 @@
 
 import * as fs from "fs";
-//import * as path from "path";
+import * as path from "path";
 //import { isString } from "../../common/utils";
 
-//let cwd = process.cwd();
+let cwd = process.cwd();
 
 /*
 export function appendFile(file: string, data: string): Promise<void>
@@ -235,30 +235,32 @@ export function pathExists(file: string): Promise<boolean>
         });
     });
 }
+*/
 
-
-export function readFile(file: string): Promise<string>
+export function readFileAsync(file: string): Promise<string>
 {
     return new Promise<string>(async (resolve, reject) =>
     {
         try {
-            const buf = await readFileBuf(file);
+            const buf = await readFileBufAsync(file);
+            /* istanbul ignore else */
             if (buf) {
                 resolve(buf.toString("utf8"));
             }
+            /* istanbul ignore next */
             resolve("");
         }
-        catch (e) { reject(e); }
+        catch (e) { /* istanbul ignore next */ reject(e); }
     });
 }
 
 
-export function readJson<T>(file: string): Promise<T>
+export function readJsonAsync<T>(file: string): Promise<T>
 {
     return new Promise<T>(async (resolve, reject) =>
     {
         try {
-            const json = await readFile(file),
+            const json = await readFileAsync(file),
                   jso = JSON.parse(json) as T;
             resolve(jso);
         }
@@ -267,12 +269,12 @@ export function readJson<T>(file: string): Promise<T>
 }
 
 
-function readFileBuf(file: string): Promise<Buffer>
+function readFileBufAsync(file: string): Promise<Buffer>
 {
     return new Promise<Buffer>(async (resolve, reject) =>
     {
         fs.readFile(path.resolve(cwd, file), (e, data) =>
-        {
+        {   /* istanbul ignore if */
             if (e) {
                 reject(e);
             }
@@ -281,7 +283,7 @@ function readFileBuf(file: string): Promise<Buffer>
     });
 }
 
-
+/*
 export function renameFile(fileCurrent: string, fileNew: string): Promise<void>
 {
     return new Promise<void>(async (resolve, reject) =>
