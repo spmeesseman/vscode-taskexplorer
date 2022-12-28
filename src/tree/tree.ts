@@ -2,12 +2,12 @@
 import * as path from "path";
 import * as util from "../common/utils";
 import * as assert from "assert";
-import constants from "../common/constants";
-import TaskItem from "./item";
 import * as log from "../common/log";
 import * as sortTasks from "../lib/sortTasks";
+import TaskItem from "./item";
 import TaskFile from "./file";
 import TaskFolder from "./folder";
+import constants from "../common/constants";
 import { storage } from "../common/storage";
 import { rebuildCache } from "../cache";
 import { NoScripts } from "../lib/noScripts";
@@ -23,7 +23,7 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, TaskExecution
+    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution
 } from "vscode";
 import { ExplorerApi } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";

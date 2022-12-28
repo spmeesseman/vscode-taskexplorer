@@ -7,13 +7,17 @@
 //
 import * as assert from "assert";
 import TaskItem from "../../tree/item";
-import { configuration } from "../../common/configuration";
 import { storage } from "../../common/storage";
 import constants from "../../common/constants";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInputBox, sleep } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks, isReady, overrideNextShowInputBox, sleep, testCommand, testsControl } from "../helper";
 
-
+const waitTimeMax = testsControl.waitTimeMax;
+const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
+const waitTimeForFsCreateEvent = testsControl.waitTimeForFsCreateEvent;
+const slowTimeForCommand = testsControl.slowTimeForCommand;
+const slowTimeForConfigEvent = testsControl.slowTimeForConfigEvent;
+const waitTimeForRunCommand = testsControl.waitTimeForRunCommand;
 let runCount = 0;
 let lastTask: TaskItem | null = null;
 let teApi: TaskExplorerApi;
@@ -34,36 +38,51 @@ suite("Task Tests", () =>
 
     test("Refresh", async function()
     {
+        this.slow(testsControl.slowTimeForRefreshCommand);
         await executeTeCommand("refresh", 1000);
-		await teApi.testsApi.fileCache.waitForCache();
     });
 
 
     test("Check task counts", async function()
     {
+        this.slow(1750);
         bash = await getTreeTasks("bash", 1);
         batch = await getTreeTasks("batch", 2);
         ant = await getTreeTasks("ant", 3);
     });
 
 
-    test("Empty taskitem parameter", async function()
+    test("Empty TaskItem Parameter - Run", async function()
     {
-        await executeTeCommand("run", 500);
+        this.slow(waitTimeForRunCommand + 1000);
+        await executeTeCommand("run", waitTimeForRunCommand);
+    });
+
+
+    test("Empty TaskItem Parameter - Pause", async function()
+    {
+        this.slow(1000);
         await executeTeCommand("pause", 500);
+    });
+
+
+    test("Empty TaskItem Parameter - Restart", async function()
+    {
+        this.slow(1000);
         await executeTeCommand("restart", 500);
     });
 
 
     test("Run non-existent last task", async function()
     {
+        this.slow(1200);
         const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []),
               hasLastTasks = lastTasks && lastTasks.length > 0;
         if (hasLastTasks)
         {
             await storage.update(constants.LAST_TASKS_STORE, undefined);
         }
-        await executeTeCommand("runLastTask", 500);
+        await executeTeCommand("runLastTask", waitTimeForRunCommand);
         if (hasLastTasks)
         {
             await storage.update(constants.LAST_TASKS_STORE, lastTasks);
@@ -71,44 +90,55 @@ suite("Task Tests", () =>
     });
 
 
-    test("Keep terminal on stop", async function()
+    test("Keep Terminal on Stop (OFF)", async function()
     {
-        await configuration.updateWs("keepTermOnStop", true);
-        await executeTeCommand("run", 2500, 2500, batch[0]);
-        await executeTeCommand("stop", 500, 500, batch[0]);
-        await configuration.updateWs("keepTermOnStop", false);
-        await executeTeCommand("run", 2500, 2500, batch[0]);
-        await executeTeCommand("stop", 500, 500, batch[0]);
+        this.slow(1500 + waitTimeForRunCommand + waitTimeForConfigEvent);
+        await executeSettingsUpdate("keepTermOnStop", false);
+        await executeTeCommand("run", waitTimeForRunCommand, 5000, batch[0]);
+        await executeTeCommand("stop", 1000, 1500, batch[0]);
+    });
+
+
+    test("Keep Terminal on Stop (ON)", async function()
+    {
+        this.slow(1500 + waitTimeForRunCommand + waitTimeForConfigEvent);
+        await executeSettingsUpdate("keepTermOnStop", true);
+        await executeTeCommand("run", waitTimeForRunCommand, 5000, batch[0]);
+        await executeTeCommand("stop", 1000, 1500, batch[0]);
     });
 
 
     test("Trigger busy on run last task", async function()
     {
+        this.slow(waitTimeForRunCommand + 1000 + waitTimeForFsCreateEvent);
         teApi.explorer?.invalidateTasksCache();// Don't await
-        await executeTeCommand("runLastTask", 5000);
+        await executeTeCommand("runLastTask", waitTimeForRunCommand, 5000);
     });
 
 
     test("Resume task no terminal", async function()
     {
+        this.slow(waitTimeForRunCommand + 1000);
         bash[0].paused = true;
-        await executeTeCommand("runLastTask", 5000, 5000, batch[0]);
+        await executeTeCommand2("runLastTask", [ batch[0] ], waitTimeForRunCommand);
         bash[0].paused = false;
     });
 
 
     test("Pause", async function()
     {
-        await executeTeCommand("run", 2500, 2500, batch[0]);
-        await executeTeCommand("pause", 1000, 1000, batch[0]);
-        await executeTeCommand("stop", 500, 500, batch[0]);
+        this.slow(waitTimeForRunCommand + 2500);
+        await executeTeCommand2("run", [ batch[0] ], waitTimeForRunCommand);
+        await executeTeCommand2("pause", [ batch[0] ], 1000);
+        await executeTeCommand2("stop", [ batch[0] ], 500);
     });
 
 
     test("Ant", async function()
     {
+        this.slow(waitTimeForRunCommand + 1500);
         const antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
-        await executeTeCommand("run", 3000, 3000, antTask);
+        await executeTeCommand2("run", [ antTask ], waitTimeForRunCommand);
         lastTask = antTask;
     });
 
@@ -117,46 +147,48 @@ suite("Task Tests", () =>
     {   //
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
         //
-        await configuration.updateWs("disableAnimatedIcons", true);
+        this.slow(5000 + (slowTimeForConfigEvent * 4) + (slowTimeForCommand * 4));
+        await executeSettingsUpdate("disableAnimatedIcons", true);
         await startTask(bash[0]);
-        await executeTeCommand("run", 7000, 7000, bash[0]);
+        await executeTeCommand2("run", [ bash[0] ], waitTimeForRunCommand);
         await endTask(bash[0]);
-        await configuration.updateWs("disableAnimatedIcons", false);
+        await executeSettingsUpdate("disableAnimatedIcons", false);
         lastTask = bash[0];
     });
 
 
     test("Batch 1", async function()
     {
-        this.timeout(45000);
+        this.slow(30000);
+        this.timeout(40000);
         //
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
         const batchTask = batch[0];
         await startTask(batchTask);
-        await configuration.updateWs("keepTermOnStop", false);
-        await executeTeCommand("open", 50, 50, batchTask, true); // clickaction=execute
-        await executeTeCommand("runWithArgs", 2500, 2500, batchTask, "--test --test2");
+        await executeSettingsUpdate("keepTermOnStop", false);
+        await executeTeCommand2("open", [ batchTask, true ], 100); // clickaction=execute
+        await executeTeCommand("runWithArgs", waitTimeForRunCommand, waitTimeMax, batchTask, "--test --test2");
         await executeTeCommand("stop", 0, 0, batchTask);
-        await executeTeCommand("run", 2500, 2500, batchTask);
-        executeTeCommand("pause", 1000, 1000, batchTask); // ?? No await ?
-        await executeTeCommand("pause", 1000, 1000, batchTask);
-        await executeTeCommand("run", 500, 500, batchTask);
-        await configuration.updateWs("clickAction", "Open");
-        await executeTeCommand("run", 500, 500, batchTask);
-        await configuration.updateWs("clickAction", "Execute");
-        await executeTeCommand("openTerminal", 0, 0, batchTask);
-        await executeTeCommand("pause", 1000, 1000, batchTask);
-        await configuration.updateWs("keepTermOnStop", true);
-        await executeTeCommand("stop", 0, 0, batchTask);
-        await configuration.updateWs("disableAnimatedIcons", true);
-        await configuration.updateWs("showRunningTask", false);
-        await executeTeCommand("runLastTask", 1500, 1500, batchTask);
-        await configuration.updateWs("keepTermOnStop", false);
-        await executeTeCommand("restart", 2500, 2500, batchTask);
-        await executeTeCommand("stop", 500, 500, batchTask);
-        await executeTeCommand("runNoTerm", 2500, 2500, batchTask);
-        await executeTeCommand("stop", 200, 200, batchTask);
+        await executeTeCommand("run", waitTimeForRunCommand, waitTimeMax, batchTask);
+        executeTeCommand("pause", 1000, waitTimeMax, batchTask); // ?? No await ?
+        await executeTeCommand("pause", 1000, waitTimeMax, batchTask);
+        await executeTeCommand("run", waitTimeForRunCommand, waitTimeMax, batchTask);
+        await executeSettingsUpdate("clickAction", "Open");
+        await executeTeCommand("run", waitTimeForRunCommand, waitTimeMax, batchTask);
+        await executeSettingsUpdate("clickAction", "Execute");
+        await executeTeCommand("openTerminal", 50, waitTimeMax, batchTask);
+        await executeTeCommand("pause", 1000, waitTimeMax, batchTask);
+        await executeSettingsUpdate("keepTermOnStop", true);
+        await executeTeCommand("stop", 50, waitTimeMax, batchTask);
+        await executeSettingsUpdate("disableAnimatedIcons", true);
+        await executeSettingsUpdate("showRunningTask", false);
+        await executeTeCommand("runLastTask", 1500, waitTimeMax, batchTask);
+        await executeSettingsUpdate("keepTermOnStop", false);
+        await executeTeCommand("restart", 2500, waitTimeMax, batchTask);
+        await executeTeCommand("stop", 500, waitTimeMax, batchTask);
+        await executeTeCommand("runNoTerm", 2500, waitTimeMax, batchTask);
+        await executeTeCommand("stop", 200, waitTimeMax, batchTask);
         await endTask(batchTask);
     });
 
@@ -165,18 +197,19 @@ suite("Task Tests", () =>
     {   //
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
+        this.slow(20000);
         const batchTask = batch[1];
         await startTask(batchTask);
-        await configuration.updateWs("keepTermOnStop", false);
-        await executeTeCommand("open", 50, 50, batchTask, true); // clickaction=execute
-        await executeTeCommand("runWithArgs", 2500, 2500, batchTask, "--test --test2");
-        await executeTeCommand("stop", 200, 200, batchTask);
-        await configuration.updateWs("disableAnimatedIcons", false);
+        await executeSettingsUpdate("keepTermOnStop", false);
+        await executeTeCommand("open", 50, waitTimeMax, batchTask, true); // clickaction=execute
+        await executeTeCommand("runWithArgs", waitTimeForRunCommand, waitTimeMax, batchTask, "--test --test2");
+        await executeTeCommand("stop", 200, waitTimeMax, batchTask);
+        await executeSettingsUpdate("disableAnimatedIcons", false);
         overrideNextShowInputBox("--test --test2");
-        await executeTeCommand("runWithArgs", 2500, 2500, batchTask);
-        await executeTeCommand("stop", 200, 200, batchTask);
-        await configuration.updateWs("showRunningTask", true);
-        await sleep(8000);
+        await executeTeCommand("runWithArgs", waitTimeForRunCommand, waitTimeMax, batchTask);
+        // await executeTeCommand("stop", 200, waitTimeMax, batchTask);
+        await executeSettingsUpdate("showRunningTask", true);
+        await teApi.waitForIdle(8000);
         await endTask(batchTask);
     });
 
@@ -187,26 +220,26 @@ async function startTask(taskItem: TaskItem)
 {
     console.log(`    ℹ Run ${taskItem.taskSource} task: ${taskItem.label}`);
     console.log(`        Folder: ${taskItem.getFolder()?.name}`);
-    await configuration.updateWs("clickAction", "Execute");
-    await configuration.updateWs("showLastTasks", (++runCount % 2) === 1);
-    let removed = await executeTeCommand("addRemoveFromFavorites", 0, 0, taskItem);
+    await executeSettingsUpdate("clickAction", "Execute");
+    await executeSettingsUpdate("showLastTasks", (++runCount % 2) === 1);
+    let removed = await executeTeCommand2("addRemoveFromFavorites", [ taskItem ]);
     if (removed) {
-        await executeTeCommand("addRemoveFromFavorites", 0, 0, taskItem);
+        await executeTeCommand2("addRemoveFromFavorites", [ taskItem ]);
     }
     overrideNextShowInputBox("test label");
-    removed = await executeTeCommand("addRemoveCustomLabel", 0, 0, taskItem);
+    removed = await executeTeCommand2("addRemoveCustomLabel", [ taskItem ]);
     if (removed) {
-        await executeTeCommand("addRemoveCustomLabel", 0, 0, taskItem);
+        await executeTeCommand2("addRemoveCustomLabel", [ taskItem ]);
     }
     if (lastTask) {
-        await executeTeCommand("openTerminal", 0, 0, lastTask);
+        await executeTeCommand2("openTerminal", [ lastTask ]);
     }
 }
 
 
 async function endTask(taskItem: TaskItem)
 {
-    await executeTeCommand("openTerminal", 0, 0, taskItem);
+    await executeTeCommand2("openTerminal", [ taskItem ]);
     console.log(`    ✔ Done ${taskItem.taskSource} task: ${taskItem.label}`);
     lastTask = taskItem;
 }

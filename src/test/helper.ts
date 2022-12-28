@@ -15,11 +15,18 @@ export const testsControl = {
     logLevel: 3,
     writeToConsole: false,
     writeToOutput: true,
+    slowTimeForCommand: 1000,
+    slowTimeForConfigEvent: 200,
+    slowTimeForFsCreateEvent: 1000,
+    slowTimeForRefreshCommand: 7500,
     waitTimeForFsCreateEvent: 200,
     waitTimeForFsDeleteEvent: 200,
     waitTimeForFsModifyEvent: 150,
     waitTimeForConfigEvent: 125,
-    waitTimeForCommand: 500
+    waitTimeForCommand: 150,
+    waitTimeForCommandFast: 50,
+    waitTimeForRunCommand: 3000,
+    waitTimeMax: 15000
 };
 
 let activated = false;
@@ -132,7 +139,7 @@ export async function closeActiveDocuments()
 export async function executeSettingsUpdate(key: string, value?: any, minWait?: number, maxWait?: number)
 {
     const rc = await configuration.updateWs(key, value);
-    await teApi.waitForIdle(minWait || testsControl.waitTimeForConfigEvent, maxWait);
+    await teApi.waitForIdle(minWait || testsControl.waitTimeForConfigEvent, maxWait || testsControl.waitTimeMax);
     return rc;
 }
 
@@ -140,8 +147,14 @@ export async function executeSettingsUpdate(key: string, value?: any, minWait?: 
 export async function executeTeCommand(command: string, minWait?: number, maxWait?: number, ...args: any[])
 {
     const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
-    await teApi.waitForIdle(minWait || testsControl.waitTimeForCommand, maxWait);
+    await teApi.waitForIdle(minWait || testsControl.waitTimeForCommand, maxWait || testsControl.waitTimeMax);
     return rc;
+}
+
+
+export function executeTeCommand2(command: string, args: any[], minWait?: number, maxWait?: number)
+{
+    return executeTeCommand(command, minWait, maxWait, ...args);
 }
 
 

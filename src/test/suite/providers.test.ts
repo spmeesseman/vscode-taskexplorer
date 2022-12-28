@@ -24,6 +24,7 @@ import {
 
 
 const tempFiles: string[] = [];
+const slowTimeForFsCreateEvent = testsControl.slowTimeForFsCreateEvent;
 const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
 const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
 const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
@@ -224,70 +225,70 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - App Publisher", async function()
     {
-        this.slow(1000);
+        this.slow(slowTimeForFsCreateEvent);
         await setupAppPublisher();
     });
 
 
     test("Create Temporary Task Files - Ant", async function()
     {
-        this.slow(1000);
+        this.slow(slowTimeForFsCreateEvent);
         await setupAnt();
     });
 
 
     test("Create Temporary Task Files - Bash", async function()
     {
-        this.slow(1000);
+        this.slow(slowTimeForFsCreateEvent);
         await setupBash();
     });
 
 
     test("Create Temporary Task Files - Batch", async function()
     {
-        this.slow(1000);
+        this.slow(slowTimeForFsCreateEvent);
         await setupBatch();
     });
 
 
     test("Create Temporary Task Files - Gradle", async function()
     {
-        this.slow(1000);
+        this.slow(slowTimeForFsCreateEvent);
         await setupGradle();
     });
 
 
     test("Create Temporary Task Files - Grunt", async function()
     {
-        this.slow(1000);
+        this.slow(slowTimeForFsCreateEvent);
         await setupGrunt();
     });
 
 
     test("Create Temporary Task Files - Gulp", async function()
     {
-        this.slow(1000);
+        this.slow(slowTimeForFsCreateEvent);
         await setupGulp();
     });
 
 
     test("Create Temporary Task Files - Makefile", async function()
     {
-        this.slow(1000);
+        this.slow(slowTimeForFsCreateEvent);
         await setupMakefile();
     });
 
 
     test("Create Temporary Task Files - Maven", async function()
     {
-        this.slow(1000);
+        this.slow(slowTimeForFsCreateEvent);
         await setupMaven();
     });
 
 
     test("Create Temporary Task Files - Typescript", async function()
     {
-        this.slow(1000);
+        this.slow(slowTimeForFsCreateEvent);
         await setupTsc();
     });
 
@@ -295,8 +296,7 @@ suite("Provider Tests", () =>
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
         this.slow(1000);
-		await executeTeCommand("focus", 50, 1000);
-        batch = await getTreeTasks("batch", 4);
+		await executeTeCommand("focus", 50, 3000);
 	});
 
 
@@ -319,6 +319,7 @@ suite("Provider Tests", () =>
         assert(nTasks.length > 0, "No grunt tasks registered");
         nTasks = await tasks.fetchTasks({ type: "gulp" });
         assert(nTasks.length > 0, "No gulp tasks registered");
+        batch = await getTreeTasks("batch", 4);
     });
 
 
@@ -561,7 +562,7 @@ suite("Provider Tests", () =>
 
     test("Run Refresh Task", async function()
     {
-        this.slow(7500);
+        this.slow(testsControl.slowTimeForRefreshCommand);
         await executeSettingsUpdate("expanded.test-files", true);
         await executeTeCommand("refresh");
         await executeSettingsUpdate("debug", false); // was hitting tree.logTask()

@@ -8,15 +8,17 @@ import TaskItem from "../../tree/item";
 import { getPackageManager } from "../../common/utils";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeTeCommand, getTreeTasks, getWsPath, isReady, overrideNextShowInputBox, testsControl, verifyTaskCount
+    activate, executeTeCommand2, getTreeTasks, getWsPath, isReady, overrideNextShowInputBox, testsControl, verifyTaskCount
 } from "../helper";
 
 
 const testsName = "npm";
-// const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
-// const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
-const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
+const waitTimeForCommandFast = testsControl.waitTimeForCommandFast;
 // const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
+const slowTimeForFsCreateEvent = testsControl.slowTimeForFsCreateEvent;
+// const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
+// const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
+const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 
 let teApi: TaskExplorerApi;
 let packageJsonPath: string;
@@ -50,7 +52,7 @@ suite("NPM Tests", () =>
 
     test("Create Package File (package.json)", async function()
     {
-        this.slow(500);
+        this.slow(slowTimeForFsCreateEvent);
         //
         // Create NPM package.json
         //
@@ -98,40 +100,46 @@ suite("NPM Tests", () =>
 
     test("Document Position", async function()
     {
+        this.slow(waitTimeForCommandFast * npmTaskItems.length);
         for (const taskItem of npmTaskItems) {
-            await executeTeCommand("open", 25, 500, taskItem);
+            await executeTeCommand2("open", [ taskItem ], waitTimeForCommandFast, 500);
         }
     });
 
 
     test("Install", async function()
     {
-        await executeTeCommand("runInstall", 4000, 8500, npmTaskItems[0].taskFile);
+        this.slow(7500);
+        await executeTeCommand2("runInstall", [ npmTaskItems[0].taskFile ], 5000);
     });
 
 
     test("Update", async function()
     {
-        await executeTeCommand("runUpdate", 3500, 7500, npmTaskItems[0].taskFile);
+        this.slow(7500);
+        await executeTeCommand2("runUpdate", [ npmTaskItems[0].taskFile ], 3500);
     });
 
 
     test("Update Specified Package", async function()
     {
+        this.slow(7500);
         overrideNextShowInputBox("@spmeesseman/app-publisher");
-        await executeTeCommand("runUpdatePackage", 3500, 7500, npmTaskItems[0].taskFile);
+        await executeTeCommand2("runUpdatePackage", [ npmTaskItems[0].taskFile ], 3500);
     });
 
 
     test("Audit", async function()
     {
-        await executeTeCommand("runAudit", 3500, 7500, npmTaskItems[0].taskFile);
+        this.slow(7500);
+        await executeTeCommand2("runAudit", [ npmTaskItems[0].taskFile ], 3500);
     });
 
 
     test("Audit Fix", async function()
     {
-        await executeTeCommand("runAuditFix", 3500, 7500, npmTaskItems[0].taskFile);
+        this.slow(7500);
+        await executeTeCommand2("runAuditFix", [ npmTaskItems[0].taskFile ], 3500);
     });
 
 });

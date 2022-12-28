@@ -274,21 +274,24 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
     let waited = 0;
     if (minWait > 0) {
         await util.timeout(minWait);
+        waited += minWait;
     }
     if (isTaskExplorerBusy()) {
-        log.write("waiting for previous refresh to complete...", 1, logPad);
+        log.write("waiting for task explorer extension idle state...", 3, logPad);
     }
     else
     {
+        let lilWaitCt = 0;
         let lilWait = Math.round(minWait / 5);
-        while (lilWait > 1)
+        while (lilWait > 1 && lilWaitCt < 3)
         {
             await util.timeout(lilWait);
-            // waited += lilWait;
+            waited += lilWait;
             if (isTaskExplorerBusy()) {
-                log.write("waiting for previous refresh to complete...", 1, logPad);
+                log.write("waiting for task explorer extension idle state...", 3, logPad);
                 break;
             }
+            ++lilWaitCt;
             lilWait = Math.round(lilWait / 5);
         }
     }
@@ -305,5 +308,8 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
     }
     if (minWait > waited) {
         await util.timeout(minWait - waited);
+    }
+    if (waited > 0) {
+        log.write(`waited ${waited} milliseconds for idle state`, 3, logPad);
     }
 }
