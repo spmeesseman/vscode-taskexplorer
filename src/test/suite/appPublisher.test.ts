@@ -25,7 +25,6 @@ let teApi: TaskExplorerApi;
 let explorer: ExplorerApi;
 let pathToProgram: string;
 let enableTaskType: boolean;
-let dirName: string;
 let rootPath: string;
 let fileUri: Uri;
 
@@ -44,7 +43,6 @@ suite("App-Publisher Tests", () =>
         }
         explorer = teApi.explorer;
         rootPath = getWsPath(".");
-        dirName = path.join(rootPath, "tasks_test_");
         fileUri = Uri.file(path.join(rootPath, ".publishrc.json"));
         //
         // Store / set initial settings
@@ -52,7 +50,6 @@ suite("App-Publisher Tests", () =>
         pathToProgram = configuration.get<string>(`pathToPrograms.${testsName}`);
         enableTaskType = configuration.get<boolean>(`enabledTasks.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "app-publisher");
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true);
     });
 
 
@@ -61,7 +58,6 @@ suite("App-Publisher Tests", () =>
         // Reset settings
         //
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, enableTaskType);
     });
 
 
@@ -176,6 +172,14 @@ suite("App-Publisher Tests", () =>
         fs.unlinkSync(fileUri.fsPath);
         await teApi.waitForIdle(waitTimeForFsDelEvent);
         await verifyTaskCount(testsName, 21);
+    });
+
+
+    test("Disable (Default is OFF)", async function()
+    {
+        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false);
+        await verifyTaskCount(testsName, 0);
     });
 
 });

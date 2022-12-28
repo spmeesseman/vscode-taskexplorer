@@ -341,7 +341,7 @@ suite("Tree Tests", () =>
     {
         /* Don't await */ teApi.explorer?.getChildren(undefined, "", 1);
         await explorer.invalidateTasksCache("ant");
-        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
+        await executeTeCommand2("refresh", [ "ant" ], testsControl.waitTimeForRefreshTaskTypeCommand);
         await explorer.invalidateTasksCache();
         await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
     });

@@ -47,7 +47,6 @@ suite("Maven Tests", () =>
         pathToProgram = configuration.get<string>(`pathToPrograms.${testsName}`);
         enableTaskType = configuration.get<boolean>(`enabledTasks.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "java\\maven\\mvn.exe");
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true);
     });
 
 
@@ -56,7 +55,6 @@ suite("Maven Tests", () =>
         // Reset settings
         //
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, enableTaskType);
     });
 
 
@@ -152,6 +150,14 @@ suite("Maven Tests", () =>
         this.slow(testsControl.slowTimeForFsDeleteEvent);
         fs.unlinkSync(fileUri.fsPath);
         await teApi.waitForIdle(waitTimeForFsDelEvent);
+        await verifyTaskCount(testsName, 0);
+    });
+
+
+    test("Disable (Default is OFF)", async function()
+    {
+        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false);
         await verifyTaskCount(testsName, 0);
     });
 

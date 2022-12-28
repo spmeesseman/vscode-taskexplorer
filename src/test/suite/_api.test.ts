@@ -26,7 +26,7 @@ suite("API Init and Tests", () =>
     });
 
 
-    test("Show log", async function()
+    test("Hide / Show Log", async function()
     {
         await executeTeCommand("showOutput", 10, 50, false);
         await executeTeCommand("showOutput", 10, 50, true);

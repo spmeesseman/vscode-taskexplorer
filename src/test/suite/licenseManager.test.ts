@@ -9,7 +9,7 @@ import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import {
 	activate, closeActiveDocuments, isReady, overrideNextShowInfoBox,
-	overrideNextShowInputBox, sleep, executeTeCommand
+	overrideNextShowInputBox, sleep, executeTeCommand, testsControl
 } from "../helper";
 
 
@@ -20,7 +20,8 @@ let licMgr: ILicenseManager;
 suite("License Manager Tests", () =>
 {
 	let tasks: Task[] = [];
-
+	let licenseKey: string | undefined;
+	let version: string;
 
 	suiteSetup(async function()
 	{
@@ -37,59 +38,87 @@ suite("License Manager Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
+		this.slow(testsControl.slowTimeForFocusCommand);
 		await executeTeCommand("focus", 250, 1000);
 	});
 
 
-	test("Open License Manager", async function()
+	test("Get License Manager", async function()
 	{
 		licMgr = getLicenseManager();
 		tasks = teApi.explorer?.getTasks() || [];
 	});
 
 
-	test("Open welcome page", async function()
+	test("Clear License Key", async function()
 	{
-		const licenseKey = licMgr.getLicenseKey(),
-			  version = licMgr.getVersion(); // will be set on ext. startup
-		//
-		// Remove ex. key
-		//
+		licenseKey = licMgr.getLicenseKey();
+		version = licMgr.getVersion(); // will be set on ext. startup
 		licMgr.setLicenseKey(undefined);
-		//
+	});
+
+
+	test("Has License", async function()
+	{   //
 		// Has license
 		// 1111-2222-3333-4444-5555 for now.  When lic server is done, it will fail
 		//
+		this.slow(500);
 		await licMgr.initialize(tasks);
-		await sleep(1000);
+		await sleep(400);
 		await closeActiveDocuments();
-		//
+	});
+
+
+	test("License Prompt", async function()
+	{   //
 		// If version is set, the prompt will show
 		//
+		this.slow(500);
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("1111-2222-3333-4444-5555");
 		await storage.update("version", undefined);
 		await licMgr.initialize(tasks);
-		await sleep(1000);
+		await sleep(400);
 		await closeActiveDocuments();
-		//
+	});
+
+
+	test("License Page w/ No License Key", async function()
+	{   //
 		// If version is 'not' set, the lic page will show
 		//
+		this.slow(500);
 		await storage.update("version", undefined);
 		await licMgr.initialize(tasks);
-		await sleep(1000);
+		await sleep(400);
 		await closeActiveDocuments();
+	});
+
+
+	test("License Page w/ Set License Key", async function()
+	{
+		this.slow(500);
+		const licenseKey = licMgr.getLicenseKey();
 		//
-		// If  license is set, diff info page
+		// If license is set, diff info page
 		//
 		licMgr.setLicenseKey(licenseKey);
 		await licMgr.initialize(tasks);
-		await sleep(1000);
+		await sleep(400);
 		await closeActiveDocuments();
+	});
+
+
+	test("License Page w/ Set License Key", async function()
+	{
+		this.slow(500);
+		const licenseKey = licMgr.getLicenseKey(),
+			  version = licMgr.getVersion(); // will be set on ext. startup
 		//
 		await storage.update("version", version);
 		await licMgr.initialize(tasks);
-		await sleep(1000);
+		await sleep(400);
 		await closeActiveDocuments();
 		//
 		// Reset
@@ -99,13 +128,44 @@ suite("License Manager Tests", () =>
 	});
 
 
+	test("License Page w/ Set License Key", async function()
+	{
+		this.slow(500);
+		const licenseKey = licMgr.getLicenseKey(),
+			  version = licMgr.getVersion(); // will be set on ext. startup
+		//
+		await storage.update("version", version);
+		await licMgr.initialize(tasks);
+		await sleep(400);
+		await closeActiveDocuments();
+		//
+		// Reset
+		//
+		licMgr.setLicenseKey(licenseKey);
+		await storage.update("version", version);
+	});
+
+
+	test("Reset License Manager", async function()
+	{
+		//
+		// Reset
+		//
+		licMgr.setLicenseKey(licenseKey);
+		await storage.update("version", version);
+	});
+
+
+
 	test("License info", async function()
 	{
+		this.slow(500);
 		const licenseKey = licMgr.getLicenseKey(); // will be set on ext. startup
 		licMgr.setLicenseKey(undefined);
 		overrideNextShowInfoBox("Info");
+		overrideNextShowInfoBox("");
 		await licMgr.initialize(tasks);
-		await sleep(1000);
+		await sleep(400);
 		await closeActiveDocuments();
 		licMgr.setLicenseKey(licenseKey);
 	});
@@ -113,11 +173,12 @@ suite("License Manager Tests", () =>
 
 	test("License not now", async function()
 	{
+		this.slow(500);
 		const licenseKey = licMgr.getLicenseKey(); // will be set on ext. startup
 		licMgr.setLicenseKey(undefined);
 		overrideNextShowInfoBox("Not Now");
 		await licMgr.initialize(tasks);
-		await sleep(1000);
+		await sleep(400);
 		await closeActiveDocuments();
 		licMgr.setLicenseKey(licenseKey);
 	});
@@ -125,31 +186,32 @@ suite("License Manager Tests", () =>
 
 	test("Enter License key on Startup", async function()
 	{
+		this.slow(1000);
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("1111-2222-3333-4444-5555");
 		await licMgr.enterLicenseKey();
-		await sleep(1000);
-
+		await sleep(400);
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("");
 		await licMgr.enterLicenseKey();
-		await sleep(1000);
+		await sleep(400);
 	});
 
 
 	test("Enter License Key by Command Pallette", async function()
 	{
+		this.slow(1500);
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("1111-2222-3333-4444-5555");
-		await executeTeCommand("enterLicense", 500, 1100);
+		await executeTeCommand("enterLicense", 400, 1100);
 
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("");
-		await executeTeCommand("enterLicense", 500, 1100, "   ");
+		await executeTeCommand("enterLicense", 400, 1100, "   ");
 
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("");
-		await executeTeCommand("enterLicense", 250, 500, "   ", 1);
+		await executeTeCommand("enterLicense", 400, 1100, "   ", 1);
 	});
 
 

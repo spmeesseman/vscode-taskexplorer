@@ -45,7 +45,6 @@ suite("Composer Tests", () =>
         pathToProgram = configuration.get<string>(`pathToPrograms.${testsName}`);
         enableTaskType = configuration.get<boolean>(`enabledTasks.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "php\\composer.exe");
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true);
     });
 
 
@@ -54,7 +53,6 @@ suite("Composer Tests", () =>
         // Reset settings
         //
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, enableTaskType);
     });
 
 
@@ -200,6 +198,14 @@ suite("Composer Tests", () =>
         });
         await teApi.waitForIdle(waitTimeForFsDelEvent);
         await verifyTaskCount(testsName, 2);
+    });
+
+
+    test("Disable (Default is OFF)", async function()
+    {
+        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false);
+        await verifyTaskCount(testsName, 0);
     });
 
 });

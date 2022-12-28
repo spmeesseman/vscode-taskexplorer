@@ -97,12 +97,12 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
     {   /* istanbul ignore else */
         if (configuration.get<boolean>("enableSideBar") && teApi.sidebar)
         {
-            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("showLastTasks"), false, true);
+            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("showLastTasks"), false, true, undefined, "   ");
         }
         /* istanbul ignore else */
         if (configuration.get<boolean>("enableExplorerView") && teApi.explorer)
         {
-            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("showLastTasks"), false, true);
+            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("showLastTasks"), false, true, undefined, "   ");
         }
     }
 
@@ -121,7 +121,7 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
                       newValue = newEnabledTasks[p];
                 if (newValue !== oldValue)
                 {
-                    await registerFileWatcher(ctx, taskType, util.getGlobPattern(taskType), newValue);
+                    await registerFileWatcher(ctx, taskType, util.getGlobPattern(taskType), newValue, "   ");
                     registerChange(taskType);
                 }
             }
@@ -138,7 +138,7 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
         {
             const newPathToPrograms = configuration.get<any>("pathToPrograms");
             for (const p in pathToPrograms)
-            {
+            {   /** istanbul ignore else */
                 if ({}.hasOwnProperty.call(pathToPrograms, p))
                 {
                     const taskType = util.getTaskTypeRealName(p),
@@ -161,7 +161,7 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
             {
                 await registerFileWatcher(ctx, "bash",
                                         util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", [])),
-                                        configuration.get<boolean>("enabledTasks.bash"));
+                                        configuration.get<boolean>("enabledTasks.bash"), "   ");
                 registerChange("bash");
             }
         }
@@ -175,7 +175,7 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
             {
                 const antGlobs = [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ];
                 await registerFileWatcher(ctx, "ant", util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs),
-                                          configuration.get<boolean>("enabledTasks.ant"));
+                                          configuration.get<boolean>("enabledTasks.ant"), "   ");
                 registerChange("ant");
             }
         }

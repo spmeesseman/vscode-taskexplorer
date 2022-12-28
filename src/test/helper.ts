@@ -18,6 +18,7 @@ export const testsControl = {
     slowTimeForCommand: 1000,
     slowTimeForConfigEvent: 200,
     slowTimeForConfigEnableEvent: 750,
+    slowTimeForFocusCommand: 2000,
     slowTimeForFsCreateEvent: 1000,
     slowTimeForFsDeleteEvent: 750,
     slowTimeForRefreshCommand: 7500,
@@ -27,9 +28,11 @@ export const testsControl = {
     waitTimeForFsDeleteEvent: 200,
     waitTimeForFsModifyEvent: 150,
     waitTimeForConfigEvent: 125,
+    waitTimeForConfigEnableEvent: 175,
     waitTimeForCommand: 150,
     waitTimeForCommandFast: 50,
     waitTimeForRefreshCommand: 5000,
+    waitTimeForRefreshTaskTypeCommand: 1000,
     waitTimeForRunCommand: 3000,
     waitTimeMax: 15000
 };
@@ -109,10 +112,18 @@ export async function activate(instance?: any)
 }
 
 
+/**
+ * Pretty much mimics the tree construction in cases when we want to construct it
+ * when the tree view is collapsed and not updating automatically via GUI events.
+ * Once the view/shelf is focused/opened somewhere within the running tests, there'd
+ * be no need to call this function anymore.
+ *
+ * @param instance The test instance to set the timeout and slow time on.
+ */
 export async function buildTree(instance: any)
 {
-    instance.slow(30000);
-    instance.timeout(45000);
+    instance.slow(20000);
+    instance.timeout(30000);
 
     if (!teApi.explorer) {
         return [];
@@ -127,7 +138,6 @@ export async function buildTree(instance: any)
     //
     await teApi.explorer.refresh("tests");
     await teApi.waitForIdle(testsControl.waitTimeForRefreshCommand, 40000);
-
     return teApi.explorer.getChildren();
 }
 
