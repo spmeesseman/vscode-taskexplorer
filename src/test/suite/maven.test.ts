@@ -10,12 +10,12 @@ import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { ComposerTaskProvider } from "../../providers/composer";
+import { MavenTaskProvider } from "../../providers/maven";
 
 
-const testsName = "composer";
+const testsName = "maven";
 const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
 const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
 const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
@@ -25,10 +25,11 @@ let teApi: TaskExplorerApi;
 let pathToProgram: string;
 let enableTaskType: boolean;
 let dirName: string;
+let rootPath: string;
 let fileUri: Uri;
 
 
-suite("Composer Tests", () =>
+suite("Maven Tests", () =>
 {
 
     suiteSetup(async function()
@@ -37,14 +38,15 @@ suite("Composer Tests", () =>
         //
         teApi = await activate(this);
         assert(isReady(testsName) === true, "    ✘ TeApi not ready");
-        dirName = getWsPath("tasks_test_");
-        fileUri = Uri.file(path.join(dirName, "composer.json"));
+        rootPath = getWsPath(".");
+        dirName = path.join(rootPath, "tasks_test_");
+        fileUri = Uri.file(path.join(rootPath, "pom.xml"));
         //
         // Store / set initial settings
         //
         pathToProgram = configuration.get<string>(`pathToPrograms.${testsName}`);
         enableTaskType = configuration.get<boolean>(`enabledTasks.${testsName}`);
-        await executeSettingsUpdate(`pathToPrograms.${testsName}`, "php\\composer.exe");
+        await executeSettingsUpdate(`pathToPrograms.${testsName}`, "java\\maven\\mvn.exe");
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true);
     });
 
@@ -58,6 +60,26 @@ suite("Composer Tests", () =>
     });
 
 
+	test("Focus Task Explorer View for Tree Population", async function()
+	{
+        this.slow(1000);
+		await executeTeCommand("focus", 50, 3000);
+	});
+
+
+    test("Create file", async function()
+    {
+        this.slow(testsControl.slowTimeForFsCreateEvent);
+        fs.writeFileSync(
+            fileUri.fsPath,
+            "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "</project>\n"
+        );
+        await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+    });
+
+
     test("Enable (Off by Default)", async function()
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent);
@@ -67,13 +89,13 @@ suite("Composer Tests", () =>
 
     test("Start", async function()
     {
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, 8);
     });
 
 
     test("Document Position", async function()
     {
-        const provider = teApi.providers.get(testsName) as ComposerTaskProvider;
+        const provider = teApi.providers.get(testsName) as MavenTaskProvider;
         // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
@@ -93,113 +115,44 @@ suite("Composer Tests", () =>
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, 8);
     });
 
 
-    test("Create file", async function()
+    test("Invalid XML", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
-
-        if (!fs.existsSync(dirName)) {
-            fs.mkdirSync(dirName, { mode: 0o777 });
-        }
-
         fs.writeFileSync(
             fileUri.fsPath,
-            "{\n" +
-            '  "scripts":\n' +
-            "  {\n" +
-            '    "test1": "run -r test",\n' +
-            '    "test2": "open -p tmp.txt",\n' +
-            '    "test3": "start -x 1 -y 2"\n' +
-            "  },\n" +
-            '  "include": ["**/*"],\n' +
-            '  "exclude": ["node_modules"]\n' +
-            "}\n"
+            "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "</project\n"
         );
-
-        await teApi.waitForIdle(waitTimeForFsNewEvent);
-        await verifyTaskCount(testsName, 5);
+        await teApi.waitForIdle(waitTimeForFsModEvent, 3000);
+        await verifyTaskCount(testsName, 0);
     });
 
 
-    test("Add task to file", async function()
+    test("Fix Invalid XML", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
-
         fs.writeFileSync(
             fileUri.fsPath,
-            "{\n" +
-            '  "scripts":\n' +
-            "  {\n" +
-            '    "test1": "run -r test",\n' +
-            '    "test2": "open -p tmp.txt",\n' +
-            '    "test3": "start -x 1 -y 2",\n' +
-            '    "test4": "start -x 2 -y 3"\n' +
-            "  },\n" +
-            '  "include": ["**/*"],\n' +
-            '  "exclude": ["node_modules"]\n' +
-            "}\n"
+            "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "</project>\n"
         );
-
-        await teApi.waitForIdle(waitTimeForFsModEvent);
-        await verifyTaskCount(testsName, 6);
+        await teApi.waitForIdle(waitTimeForFsModEvent, 3000);
+        await verifyTaskCount(testsName, 8);
     });
-
-
-    test("Remove task from file", async function()
-    {
-        this.slow(testsControl.slowTimeForFsCreateEvent);
-
-        fs.writeFileSync(
-            fileUri.fsPath,
-            "{\n" +
-            '  "scripts":\n' +
-            "  {\n" +
-            '    "test1": "run -r test",\n' +
-            '    "test2": "open -p tmp.txt"\n' +
-            "  },\n" +
-            '  "include": ["**/*"],\n' +
-            '  "exclude": ["node_modules"]\n' +
-            "}\n"
-        );
-
-        await teApi.waitForIdle(waitTimeForFsModEvent);
-        await verifyTaskCount(testsName, 4);
-    });
-
-
-    test("Invalid JSON", async function()
-    {
-        fs.writeFileSync(
-            fileUri.fsPath,
-            "{\n" +
-            '  "scripts":\n' +
-            "  {\n" +
-            '    "test1": "run -r test",\n' +
-            '    "test2" "open -p tmp.txt",,\n' +
-            "  },\n" +
-            '  "include": ["**/*"],\n' +
-            '  "exclude": ["node_modules"]\n' +
-            "\n"
-        );
-
-        await teApi.waitForIdle(waitTimeForFsModEvent);
-        await verifyTaskCount(testsName, 2);
-    });
-
 
 
     test("Delete file", async function()
     {
         this.slow(testsControl.slowTimeForFsDeleteEvent);
         fs.unlinkSync(fileUri.fsPath);
-        fs.rmdirSync(dirName, {
-            recursive: true
-        });
         await teApi.waitForIdle(waitTimeForFsDelEvent);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, 0);
     });
 
 });

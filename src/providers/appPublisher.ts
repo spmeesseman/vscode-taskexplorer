@@ -55,6 +55,22 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
               groupSeparator = configuration.get<string>("groupSeparator");
 
+        log.methodStart("read app-publisher file uri task", 1, logPad, true, [
+            [ "path", uri.fsPath ], [ "project folder", folder.name ]
+        ]);
+
+        //
+        // Validate JSON
+        //
+        try {
+            JSON.parse(util.readFileSync(uri.fsPath));
+        }
+        catch (e: any) {
+            log.write("   " + e.message);
+            log.methodDone("read app-publisher file uri tasks", 1, logPad, true);
+            return [];
+        }
+
         const defaultDef = this.getDefaultDefinition(undefined, folder, uri),
               options: ShellExecutionOptions = { cwd },
               tasks: Task[] = [],
@@ -70,10 +86,6 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         {
             apLabel =  match[1];
         }
-
-        log.methodStart("read app-publisher file uri task", 1, logPad, true, [
-            [ "path", uri.fsPath ], [ "project folder", folder.name ]
-        ]);
 
         taskDefs.push({
             label: "general" + groupSeparator + "config",

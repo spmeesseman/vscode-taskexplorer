@@ -75,7 +75,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
               paths = getTaskFiles(this.providerName),
               enabled = util.isTaskTypeEnabled(this.providerName);
 
-        log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [[ "enabled", enabled ]]);
+        log.methodStart(`read tasks - detect ${this.providerName} files`, 1, logPad, true, [[ "enabled", enabled ]]);
 
         if (enabled && paths)
         {
@@ -93,7 +93,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             }
         }
 
-        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [[ "# of tasks", allTasks.length ]]);
+        log.methodDone(`read tasks - detect ${this.providerName} files`, 1, logPad, true, [[ "# of tasks", allTasks.length ]]);
         return allTasks;
     }
 

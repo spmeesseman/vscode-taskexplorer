@@ -21,12 +21,15 @@ export const testsControl = {
     slowTimeForFsCreateEvent: 1000,
     slowTimeForFsDeleteEvent: 750,
     slowTimeForRefreshCommand: 7500,
+    userLogLevel: configuration.get<number>("debugLevel"),
+    userPathToAnt: configuration.get<string>("pathToPrograms.ant"),
     waitTimeForFsCreateEvent: 200,
     waitTimeForFsDeleteEvent: 200,
     waitTimeForFsModifyEvent: 150,
     waitTimeForConfigEvent: 125,
     waitTimeForCommand: 150,
     waitTimeForCommandFast: 50,
+    waitTimeForRefreshCommand: 5000,
     waitTimeForRunCommand: 3000,
     waitTimeMax: 15000
 };
@@ -106,9 +109,33 @@ export async function activate(instance?: any)
 }
 
 
+export async function buildTree(instance: any)
+{
+    instance.slow(30000);
+    instance.timeout(45000);
+
+    if (!teApi.explorer) {
+        return [];
+    }
+
+    await executeSettingsUpdate("groupWithSeparator", true);
+    await executeSettingsUpdate("groupSeparator", "-");
+    await executeSettingsUpdate("groupMaxLevel", 5);
+
+    //
+    // A special refresh() for test suite, will open all task files and open to position
+    //
+    await teApi.explorer.refresh("tests");
+    await teApi.waitForIdle(testsControl.waitTimeForRefreshCommand, 40000);
+
+    return teApi.explorer.getChildren();
+}
+
+
 export async function cleanup()
 {
-    const dirNameCode = getWsPath(".vscode"),
+    const rootPath = getWsPath("."),
+          dirNameCode = getWsPath(".vscode"),
           settingsFile = path.join(dirNameCode, "settings.json");
 
     await deactivate();
@@ -121,6 +148,13 @@ export async function cleanup()
             fs.unlinkSync(settingsFile);
         } catch {}
     }
+
+    try {
+        const packageLockFile = path.join(rootPath, "package.lock.json");
+        if (fs.existsSync(packageLockFile)) {
+            fs.unlinkSync(settingsFile);
+        }
+    } catch {}
 }
 
 
@@ -288,14 +322,6 @@ export function overrideNextShowInputBox(value: any)
 export function overrideNextShowInfoBox(value: any)
 {
     overridesShowInfoBox.push(value);
-}
-
-
-export async function refresh()
-{
-	await executeTeCommand("refresh", 500);
-    await teApi.waitForIdle(500);
-    return teApi.explorer?.getChildren();
 }
 
 

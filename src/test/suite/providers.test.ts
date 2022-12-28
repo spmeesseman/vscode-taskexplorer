@@ -18,8 +18,8 @@ import { TaskExplorerApi, ExplorerApi } from "@spmeesseman/vscode-taskexplorer-t
 import { configuration } from "../../common/configuration";
 import { storage } from "../../common/storage";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, findIdInTaskMap,
-    getTreeTasks, isReady, refresh, sleep, testsControl, verifyTaskCount
+    activate, buildTree, executeSettingsUpdate, executeTeCommand, findIdInTaskMap,
+    getTreeTasks, getWsPath, isReady, sleep, testsControl, verifyTaskCount
 } from "../helper";
 
 
@@ -49,15 +49,11 @@ suite("Provider Tests", () =>
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
         if (!teApi.explorer) {
-            assert.fail("        ✘ Workspace folder does not exist");
+            assert.fail("        ✘ Explorer instance does not exist");
         }
         explorer = teApi.explorer;
 
-        rootPath = (workspace.workspaceFolders as WorkspaceFolder[])[0].uri.fsPath;
-        if (!rootPath) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
-
+        rootPath = getWsPath(".");
         dirName = path.join(rootPath, "tasks_test_");
         dirNameL2 = path.join(dirName, "subfolder");
         ws2DirName = path.join(rootPath, "ws2");
@@ -307,11 +303,23 @@ suite("Provider Tests", () =>
     });
 
 
+    test("Enable Pipenv Tasks (Off by Default)", async function()
+    {
+        this.slow(1000);
+        await executeSettingsUpdate("enabledTasks.pipenv", true);
+    });
+
+
+    test("Enable Maven Tasks (Off by Default)", async function()
+    {
+        this.slow(1000);
+        await executeSettingsUpdate("enabledTasks.maven", true);
+    });
+
+
     test("Build Tree", async function()
     {
-        this.slow(30000);
-        this.timeout(45000);
-        await buildTree(this, 7500);
+        await buildTree(this);
         //
         // Check VSCode provided task types for the hell of it
         //
@@ -467,7 +475,48 @@ suite("Provider Tests", () =>
         removeFromArray(tempFiles, file);
         fs.unlinkSync(file);
         await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
+        await verifyTaskCount("apppublisher", 21);
         await createAppPublisherFile();
+        await verifyTaskCount("apppublisher", 42);
+    });
+
+
+    test("App Publisher Invalid JSON", async function()
+    {
+        this.slow(testsControl.slowTimeForFsCreateEvent);
+        fs.writeFileSync(
+            path.join(rootPath, ".publishrc.json"),
+            "{\n" +
+            '    "version": "1.0.0",\n' +
+            '    "branch": "trunk",\n' +
+            '    "buildCommand": [],\n' +
+            '    "mantisbtRelease": "Y",\n' +
+            '    "mantisbtChglogEdit": "N",\n' +
+            '    "mantisbtProject": "",\n' +
+            '    "repoType": "svn"\n' +
+            "\n"
+        );
+        await teApi.waitForIdle(waitTimeForFsModEvent, 3000);
+        await verifyTaskCount("apppublisher", 21);
+    });
+
+
+    test("App Publisher Fix Invalid JSON", async function()
+    {
+        fs.writeFileSync(
+            path.join(rootPath, ".publishrc.json"),
+            "{\n" +
+            '    "version": "1.0.0",\n' +
+            '    "branch": "trunk",\n' +
+            '    "buildCommand": [],\n' +
+            '    "mantisbtRelease": "Y",\n' +
+            '    "mantisbtChglogEdit": "N",\n' +
+            '    "mantisbtProject": "",\n' +
+            '    "repoType": "svn"\n' +
+            "}\n"
+        );
+        await teApi.waitForIdle(waitTimeForFsModEvent, 3000);
+        await verifyTaskCount("apppublisher", 42);
     });
 
 
@@ -668,30 +717,6 @@ suite("Provider Tests", () =>
     });
 
 });
-
-
-export async function buildTree(instance: any, waitTime?: number)
-{
-    instance.timeout(60 * 1000);
-
-    await sleep(waitTime || 1);
-    await teApi.testsApi.fileCache.waitForCache();
-
-    await configuration.updateWs("groupWithSeparator", true);
-    await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("groupMaxLevel", 5);
-
-    //
-    // A special refresh() for test suite, will open all task files and open to position
-    //
-    await explorer.refresh("tests");
-    await teApi.waitForIdle(1000);
-
-    const treeItems = await refresh();
-    await teApi.waitForIdle(500);
-
-    return treeItems;
-}
 
 
 function checkTasks(ant: number, ap: number, bash: number, bat: number, gradle: number, grunt: number, gulp: number, python: number, tsc: number, vsc: number)
@@ -1189,13 +1214,13 @@ async function createAppPublisherFile()
             fs.writeFileSync(
                 file,
                 "{\n" +
-                '    "version": "1.0.0"\n' +
+                '    "version": "1.0.0",\n' +
                 '    "branch": "trunk",\n' +
                 '    "buildCommand": [],\n' +
                 '    "mantisbtRelease": "Y",\n' +
                 '    "mantisbtChglogEdit": "N",\n' +
                 '    "mantisbtProject": "",\n' +
-                '    "repoType": "svn""\n' +
+                '    "repoType": "svn"\n' +
                 "}\n"
             );
             await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);

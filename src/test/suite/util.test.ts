@@ -375,6 +375,7 @@ suite("Util Tests", () =>
             await storage.update("TEST_KEY", "");
             assert(storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue") === "defValue");
             await storage.update("TEST_KEY", undefined);
+			assert(storage.get<string>("TEST_KEY2_DOESNT_EXIST") === undefined);
         }
     });
 

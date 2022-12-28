@@ -5,18 +5,19 @@
 import * as assert from "assert";
 import * as util from "../../common/utils";
 import TaskFolder from "../../tree/folder";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
 import constants from "../../common/constants";
 import { storage } from "../../common/storage";
 import TaskItem from "../../tree/item";
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
 import {
-    activate, executeTeCommand, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, refresh, sleep, verifyTaskCount
+    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
 } from "../helper";
 
 
 let teApi: TaskExplorerApi;
+let explorer: ExplorerApi;
 let favTasks: string[];
 let lastTasks: string[];
 let ant: TaskItem[];
@@ -30,6 +31,10 @@ suite("Tree Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
+        if (!teApi.explorer) {
+            assert.fail("        ✘ Explorer instance does not exist");
+        }
+        explorer = teApi.explorer;
         favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
     });
@@ -219,77 +224,83 @@ suite("Tree Tests", () =>
     test("Hide last tasks", async function()
     {
         await configuration.updateWs("showLastTasks", false);
-        await teApi.explorer?.showSpecialTasks(false);
-        await teApi.explorer?.showSpecialTasks(true);
+        await explorer.showSpecialTasks(false);
+        await explorer.showSpecialTasks(true);
     });
 
 
     test("Refresh", async function()
     {
-        await refresh();
+        this.slow(testsControl.slowTimeForRefreshCommand);
+        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
     });
 
 
     test("Show last tasks", async function()
     {
         await configuration.updateWs("showLastTasks", true);
-        await teApi.explorer?.showSpecialTasks(false);
-        await teApi.explorer?.showSpecialTasks(true);
+        await explorer.showSpecialTasks(false);
+        await explorer.showSpecialTasks(true);
     });
 
 
     test("Refresh", async function()
     {
-        await refresh();
+        this.slow(testsControl.slowTimeForRefreshCommand);
+        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
     });
 
 
     test("Show Favorite Tasks w/ Last Tasks", async function()
     {
-        await configuration.updateWs("showLastTasks", false);
-        await teApi.explorer?.showSpecialTasks(false, true);
-        await configuration.updateWs("showLastTasks", true);
-        await teApi.explorer?.showSpecialTasks(false, true);
-        await refresh();
-        await configuration.updateWs("showLastTasks", false);
+        this.slow(testsControl.slowTimeForRefreshCommand + (testsControl.waitTimeForConfigEvent * 3) + (testsControl.waitTimeForCommand * 2));
+        await executeSettingsUpdate("showLastTasks", false);
+        await explorer.showSpecialTasks(false, true);
+        await executeSettingsUpdate("showLastTasks", true);
+        await explorer.showSpecialTasks(false, true);
+        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
+        await executeSettingsUpdate("showLastTasks", false);
     });
 
 
     test("Refresh", async function()
     {
-        await refresh();
+        this.slow(testsControl.slowTimeForRefreshCommand);
+        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
     });
 
 
     test("Show Favorite Tasks Only", async function()
     {
-        await configuration.updateWs("showLastTasks", false);
+        await executeSettingsUpdate("showLastTasks", false);
     });
 
 
     test("Refresh", async function()
     {
-        await refresh();
+        this.slow(testsControl.slowTimeForRefreshCommand);
+        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
     });
 
 
     test("Hide Favorite and Last Tasks", async function()
     {
         await configuration.updateWs("showLastTasks", false);
-        await teApi.explorer?.showSpecialTasks(true, true);
+        await explorer.showSpecialTasks(true, true);
     });
 
 
     test("Hide Favorite Tasks", async function()
     {
         await configuration.updateWs("showLastTasks", true);
-        await teApi.explorer?.showSpecialTasks(true, true);
+        await explorer.showSpecialTasks(true, true);
     });
 
 
     test("Refresh", async function()
     {
-        await refresh();
+        this.slow(testsControl.slowTimeForRefreshCommand);
+        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
     });
 
 
@@ -329,25 +340,25 @@ suite("Tree Tests", () =>
     test("Invalidation", async function()
     {
         /* Don't await */ teApi.explorer?.getChildren(undefined, "", 1);
-        await teApi.explorer?.invalidateTasksCache("ant");
-        await refresh();
-        await teApi.explorer?.invalidateTasksCache();
-        await refresh();
+        await explorer.invalidateTasksCache("ant");
+        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
+        await explorer.invalidateTasksCache();
+        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
     });
 
 
     test("Get tree parent", async function()
     {
-        teApi.explorer?.getParent("Invalid" as TreeItem);
-        teApi.explorer?.getParent(new NoScripts());
-        teApi.explorer?.getParent(batch[0]);
+        explorer.getParent("Invalid" as TreeItem);
+        explorer.getParent(new NoScripts());
+        explorer.getParent(batch[0]);
     });
 
 
     test("Get tree children when busy", async function()
     {
-        /* Don't await */ teApi.explorer?.getChildren(undefined, "", 1);
-        await teApi.explorer?.getChildren(undefined, "");
+        /* Don't await */ explorer.getChildren(undefined, "", 1);
+        await explorer.getChildren(undefined, "");
     });
 
 });

@@ -31,18 +31,6 @@ export function camelCase(name: string | undefined, indexUpper: number)
 }
 
 
-
-export async function forEachAsync(array: any, callback: any)
-{
-    for (let index = 0; index < array.length; index++) {
-        const result = await callback(array[index], index, array);
-        if (result === false) {
-            break;
-        }
-    }
-}
-
-
 export function getCombinedGlobPattern(defaultPattern: string, globs: string[]): string
 {
     if (globs && globs.length > 0)
@@ -173,17 +161,6 @@ export function getHeaderContent(title: string)
 }
 
 
-/**
- * @param taskType Task type, e.g. `make`, `powershell`, `bash`, etc
- * @returns The path to the specified executable program
- */
-export function getPathToProgram(taskType: string)
-{
-    const settingName = "pathToPrograms." + taskType.replace(/\-/g, "").toLowerCase();
-    return configuration.get<string>(settingName, taskType);
-}
-
-
 export function getPortableDataPath(padding = "")
 {
     if (process.env.VSCODE_PORTABLE)
@@ -198,9 +175,9 @@ export function getPortableDataPath(padding = "")
                     log.value(padding + "found portable user data path", fullPath, 1);
                     return fullPath;
                 }
-                catch (e: any) {
+                catch (e: any)
+                {   /** istanbul ignore next */
                     log.error(e);
-                    return;
                 }
             }
         }
@@ -244,8 +221,9 @@ export function getTaskItemId(taskItem: TaskItem)
  * @param settingPart String prependature for  commonly named setting name
  * @returns The task type's unique setting name
  */
+/** istanbul ignore next */
 export function getTaskTypeSettingName(taskType: string, settingPart: string)
-{
+{   /** istanbul ignore next */
     return settingPart + (!settingPart.endsWith(".") ? properCase(taskType) : taskType.toLowerCase());
 }
 
@@ -256,8 +234,9 @@ export function getTaskTypeSettingName(taskType: string, settingPart: string)
  * @param taskType Task type, e.g. `npm`, `apppublisher`, `grunt`, `bash`, etc
  * @returns The task type's unique setting name
  */
+/** istanbul ignore next */
 export function getTaskTypeEnabledSettingName(taskType: string)
-{
+{   /** istanbul ignore next */
     return getTaskTypeSettingName(taskType, "enabledTasks.");
 }
 
@@ -298,9 +277,11 @@ export function getUserDataPath(platform?: string, padding = "")
     //
     // Check if data path was passed on the command line
     //
+    /** istanbul ignore else */
     if (process.argv)
     {
         let argvIdx = process.argv.includes("--user-data-dir");
+        /** istanbul ignore if */
         if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
             userPath = path.resolve(process.argv[++argvIdx]);
             log.value(padding + "user path is", userPath, 1);
@@ -333,7 +314,7 @@ function getDefaultUserDataPath(platform?: string)
     // Otherwise check per platform
     //
     if (!appDataPath) {
-        switch (platform || process.platform) {
+        switch (platform /** istanbul ignore next */ || process.platform) {
             case "win32":
                 appDataPath = process.env.APPDATA;
                 if (!appDataPath) {
@@ -372,10 +353,10 @@ export function isArray<T>(value: any): value is T[]
 }
 
 
-export function isBoolean(value: any): value is boolean
-{
-    return !!value && typeof value === "boolean";
-}
+// export function isBoolean(value: any): value is boolean
+// {
+//     return !!value && typeof value === "boolean";
+// }
 
 
 export function isExcluded(uriPath: string, logPad = "")
@@ -464,6 +445,7 @@ function logUserDataEnv(padding: string)
         log.value(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
         log.value(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 1);
         log.value(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
+        /** istanbul ignore if */
         if (process.platform === "linux") {
             log.value("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
         }
@@ -471,17 +453,18 @@ function logUserDataEnv(padding: string)
 }
 
 
-export function lowerCaseFirstChar(s: string, removeSpaces = false)
+export function lowerCaseFirstChar(s: string, removeSpaces: boolean)
 {
     let fs = "";
-    if (s && s.length > 1) {
-        fs = s[0].toString().toLowerCase() + s.substring(1);
-    }
-    else if (s) {
-        fs = s[0].toString();
-    }
-    if (fs && removeSpaces) {
-        fs = fs.replace(/ /g, "");
+    if (s)
+    {
+        fs = s[0].toString().toLowerCase();
+        if (s.length > 1) {
+            fs += s.substring(1);
+        }
+        if (removeSpaces) {
+            fs = fs.replace(/ /g, "");
+        }
     }
     return fs;
 }
@@ -509,12 +492,7 @@ export function properCase(name: string | undefined)
     if (!name) {
       return name;
     }
-
-    return name
-        .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
-            return index !== 0 ? letter.toLowerCase() : letter.toUpperCase();
-        })
-        .replace(/[\s]+/g, "");
+    return name.replace(/(?:^\w|[A-Z]|\b\w)/g, (ltr) => ltr.toUpperCase()).replace(/[ ]+/g, " ");
 }
 
 
@@ -543,6 +521,7 @@ export function removeFromArray(arr: any[], item: any)
         }
     }
 
+    /** istanbul ignore else */
     if (idx2 !== -1 && idx2 < arr.length) {
         arr.splice(idx2, 1);
     }

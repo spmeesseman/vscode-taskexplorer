@@ -67,7 +67,11 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
     log.write("Register file watcher for task type '" + taskType + "'");
 
     let watcher = watchers.get(taskType);
-    const ignoreModify = util.isScriptType(taskType) || taskType === "apppublisher" || taskType === "maven";
+    //
+    // Ignore modification events for some task types (script type, e.g. 'bash', 'python' etc)
+    // app-publisher and maven only get watched for invalid syntax.  they always have same # of tasks for a file.
+    //
+    const ignoreModify = util.isScriptType(taskType); // || taskType === "apppublisher" || taskType === "maven";
 
     /* istanbul ignore else */
     if (workspace.workspaceFolders) {

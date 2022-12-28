@@ -6,6 +6,7 @@ import { configuration } from "../common/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
+import { parseStringPromise } from "xml2js";
 
 
 export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -64,6 +65,19 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
               options: ShellExecutionOptions = { cwd };
 
         log.methodStart("read maven file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+
+        //
+        // Validate XML with xml2js
+        //
+        try {
+            const buffer = util.readFileSync(uri.fsPath);
+            await parseStringPromise(buffer);
+        }
+        catch (e: any) {
+            log.write("   " + e.message);
+            log.methodDone("read maven file uri tasks", 1, logPad, true);
+            return [];
+        }
 
         const kindClean: TaskExplorerDefinition = {
             ...defaultDef,

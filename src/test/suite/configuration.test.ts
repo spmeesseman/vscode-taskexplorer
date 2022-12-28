@@ -4,8 +4,9 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import * as util from "../../common/utils";
-import { activate, executeSettingsUpdate, isReady, sleep } from "../helper";
+import { activate, executeSettingsUpdate, isReady, sleep, testsControl } from "../helper";
 import { configuration } from "../../common/configuration";
+import { teApi } from "../../extension";
 
 let autoRefresh: boolean;
 let enabledTasks: any;
@@ -228,6 +229,20 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Restore Composer", async function()
     {
         executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer, 20, 50);
+    });
+
+
+    test("User Level Setting Update", async function()
+    {
+        this.slow(testsControl.slowTimeForConfigEvent * 4);
+        await configuration.update("debugLevel", testsControl.userLogLevel !== 3 ? 3 : 2);
+        await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
+        await configuration.update("debugLevel", testsControl.userLogLevel);
+        await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
+        await configuration.update("pathToPrograms.ant", testsControl.userPathToAnt !== "ant" ? "ant" : "ant.bat");
+        await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
+        await configuration.update("pathToPrograms.ant", testsControl.userPathToAnt);
+        await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
     });
 
 });
