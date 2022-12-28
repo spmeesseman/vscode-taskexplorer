@@ -6,12 +6,13 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as util from "../../common/utils";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
-import { configuration } from "../../common/configuration";
-import { activate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
 
 const testsName = "ant";
+const slowTimeForConfigEvent = testsControl.slowTimeForConfigEvent;
+const slowTimeForConfigEnableEvent = testsControl.slowTimeForConfigEnableEvent;
 const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
 const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
 const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
@@ -39,7 +40,7 @@ suite("Ant Tests", () =>
         buildXmlFileUri = Uri.file(buildXmlFile);
         buildFileXml = util.readFileSync(buildXmlFileUri.fsPath);
 
-        await configuration.updateWs("useAnt", false);
+        await executeSettingsUpdate("useAnt", false);
     });
 
 
@@ -63,6 +64,7 @@ suite("Ant Tests", () =>
 
     test("Start", async function()
     {
+        this.slow(slowTimeForConfigEnableEvent);
         // await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("ant", 3);
     });
@@ -70,7 +72,8 @@ suite("Ant Tests", () =>
 
     test("Disable", async function()
     {
-        await configuration.updateWs("enabledTasks.ant", false);
+        this.slow(slowTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks.ant", false);
         await teApi.waitForIdle(waitTimeForConfigEvent);
         await verifyTaskCount("ant", 0);
     });
@@ -78,7 +81,8 @@ suite("Ant Tests", () =>
 
     test("Re-enable", async function()
     {
-        await configuration.updateWs("enabledTasks.ant", true);
+        this.slow(slowTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks.ant", true);
         await teApi.waitForIdle(waitTimeForConfigEvent);
         await verifyTaskCount("ant", 3);
     });
@@ -86,52 +90,54 @@ suite("Ant Tests", () =>
 
     test("Non-existent file", async function()
     {
+        this.slow(500 + (slowTimeForConfigEvent * 2));
         await provider.readUriTasks(Uri.file(getWsPath("build2.xml")), "");
-        await configuration.updateWs("useAnt", true);
+        await executeSettingsUpdate("useAnt", true);
         await provider.readUriTasks(Uri.file(getWsPath("build2.xml")), "");
-        await configuration.updateWs("useAnt", false);
+        await executeSettingsUpdate("useAnt", false);
     });
 
 
-    test("Set Up ansicon", async function()
+    test("Enable Ansicon", async function()
     {
         //
         // Enable Ansicon
         //
-        await configuration.updateWs("pathToPrograms.ansicon", "ansicon\\x64\\ansicon.exe");
-        await configuration.updateWs("enableAnsiconForAnt", true);
+        this.slow((slowTimeForConfigEvent * 5) + 200);
+        await executeSettingsUpdate("pathToPrograms.ansicon", "ansicon\\x64\\ansicon.exe");
+        await executeSettingsUpdate("enableAnsiconForAnt", true);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
+        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64") + "\\");
+        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64") + "\\");
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64"));
+        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
     });
 
 
     test("Disable Ansicon", async function()
     {
-        await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
-        await configuration.updateWs("enableAnsiconForAnt", false);
+        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
+        await executeSettingsUpdate("enableAnsiconForAnt", false);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await configuration.updateWs("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\"));
+        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
     });
 
 
     test("Ansicon Path", async function()
     {
-        await configuration.updateWs("pathToPrograms.ansicon", undefined);
+        await executeSettingsUpdate("pathToPrograms.ansicon", undefined);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
     });
 
 
     test("Win32 Create Task", async function()
     {
-        await configuration.updateWs("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
+        await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await configuration.updateWs("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant"));
+        await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
     });
 
@@ -150,13 +156,15 @@ suite("Ant Tests", () =>
 
     test("Ant Parser", async function()
     {
-        await configuration.updateWs("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
+        this.slow(3500);
+        await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2);
     });
 
 
     test("Ant Parser no default", async function()
     {
+        this.slow(3500);
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -171,6 +179,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser invalid target", async function()
     {
+        this.slow(3500);
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -187,6 +196,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Target", async function()
     {
+        this.slow(3500);
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -200,6 +210,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Project", async function()
     {
+        this.slow(3500);
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -213,6 +224,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser Invalid Xml", async function()
     {
+        this.slow(3500);
         fs.writeFileSync(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -245,7 +257,7 @@ async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAn
     //
     // Don't use Ant
     //
-    await configuration.updateWs("useAnt", false);
+    await executeSettingsUpdate("useAnt", false);
     let antTasks = await tasks.fetchTasks({ type: "ant" });
     assert(antTasks.length === noAnt1, `Did not read ${noAnt1} ant tasks(1)(actual ${antTasks ? antTasks.length : 0})`);
     antTasks = await provider.readUriTasks(buildXmlFileUri, "");
@@ -253,7 +265,7 @@ async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAn
     //
     // Use Ant
     //
-    await configuration.updateWs("useAnt", true);
+    await executeSettingsUpdate("useAnt", true);
     antTasks = await tasks.fetchTasks({ type: "ant" });
     assert(antTasks.length === withAnt1, `Did not read ${withAnt1} ant tasks (3)(actual ${antTasks ? antTasks.length : 0})`);
     antTasks = await provider.readUriTasks(buildXmlFileUri, "");
@@ -261,5 +273,5 @@ async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAn
     //
     // Reset
     //
-    await configuration.updateWs("useAnt", false);
+    await executeSettingsUpdate("useAnt", false);
 }
