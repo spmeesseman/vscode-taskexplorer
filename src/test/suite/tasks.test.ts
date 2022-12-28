@@ -168,27 +168,27 @@ suite("Task Tests", () =>
         await startTask(batchTask);
         await executeSettingsUpdate("keepTermOnStop", false);
         await executeTeCommand2("open", [ batchTask, true ], 100); // clickaction=execute
-        await executeTeCommand("runWithArgs", waitTimeForRunCommand, waitTimeMax, batchTask, "--test --test2");
-        await executeTeCommand("stop", 0, 0, batchTask);
-        await executeTeCommand("run", waitTimeForRunCommand, waitTimeMax, batchTask);
+        await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], waitTimeForRunCommand);
+        await executeTeCommand2("stop", [ batchTask ], 0, 0);
+        await executeTeCommand2("run", [ batchTask ], waitTimeForRunCommand);
         executeTeCommand("pause", 1000, waitTimeMax, batchTask); // ?? No await ?
-        await executeTeCommand("pause", 1000, waitTimeMax, batchTask);
-        await executeTeCommand("run", waitTimeForRunCommand, waitTimeMax, batchTask);
+        await executeTeCommand2("pause", [ batchTask ], 500);
+        await executeTeCommand2("run", [ batchTask ], waitTimeForRunCommand);
         await executeSettingsUpdate("clickAction", "Open");
-        await executeTeCommand("run", waitTimeForRunCommand, waitTimeMax, batchTask);
+        await executeTeCommand2("run", [ batchTask ], 1000);
         await executeSettingsUpdate("clickAction", "Execute");
-        await executeTeCommand("openTerminal", 50, waitTimeMax, batchTask);
-        await executeTeCommand("pause", 1000, waitTimeMax, batchTask);
+        await executeTeCommand2("openTerminal", [ batchTask ], 50);
+        await executeTeCommand2("pause", [ batchTask ], 500);
         await executeSettingsUpdate("keepTermOnStop", true);
-        await executeTeCommand("stop", 50, waitTimeMax, batchTask);
+        await executeTeCommand2("stop", [ batchTask ], 50);
         await executeSettingsUpdate("disableAnimatedIcons", true);
         await executeSettingsUpdate("showRunningTask", false);
         await executeTeCommand("runLastTask", 1500, waitTimeMax, batchTask);
         await executeSettingsUpdate("keepTermOnStop", false);
-        await executeTeCommand("restart", 2500, waitTimeMax, batchTask);
-        await executeTeCommand("stop", 500, waitTimeMax, batchTask);
-        await executeTeCommand("runNoTerm", 2500, waitTimeMax, batchTask);
-        await executeTeCommand("stop", 200, waitTimeMax, batchTask);
+        await executeTeCommand2("restart", [ batchTask ], 1500);
+        await executeTeCommand2("stop", [ batchTask ], 400);
+        await executeTeCommand("runNoTerm", 1500, waitTimeMax, batchTask);
+        await executeTeCommand2("stop", [ batchTask ], 200);
         await endTask(batchTask);
     });
 
@@ -201,12 +201,12 @@ suite("Task Tests", () =>
         const batchTask = batch[1];
         await startTask(batchTask);
         await executeSettingsUpdate("keepTermOnStop", false);
-        await executeTeCommand("open", 50, waitTimeMax, batchTask, true); // clickaction=execute
-        await executeTeCommand("runWithArgs", waitTimeForRunCommand, waitTimeMax, batchTask, "--test --test2");
-        await executeTeCommand("stop", 200, waitTimeMax, batchTask);
+        await executeTeCommand2("open", [ batchTask, true ], 100); // clickaction=execute
+        await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], waitTimeForRunCommand);
+        await executeTeCommand2("stop", [ batchTask ], 200);
         await executeSettingsUpdate("disableAnimatedIcons", false);
         overrideNextShowInputBox("--test --test2");
-        await executeTeCommand("runWithArgs", waitTimeForRunCommand, waitTimeMax, batchTask);
+        await executeTeCommand2("runWithArgs", [ batchTask ], waitTimeForRunCommand);
         // await executeTeCommand("stop", 200, waitTimeMax, batchTask);
         await executeSettingsUpdate("showRunningTask", true);
         await teApi.waitForIdle(8000);

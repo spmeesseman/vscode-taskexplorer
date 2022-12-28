@@ -72,11 +72,11 @@ export class LicenseManager implements ILicenseManager
 
 			if (action === "Enter License Key")
 			{
-				this.enterLicenseKey();
+				await this.enterLicenseKey();
 			}
 			else if (action === "Info")
 			{
-				window.showInformationMessage("License Info page not implemented yet");
+				await window.showInformationMessage("License Info page not implemented yet");
 			}
 		}
 

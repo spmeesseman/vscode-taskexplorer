@@ -18,7 +18,7 @@ import { TaskExplorerApi, ExplorerApi } from "@spmeesseman/vscode-taskexplorer-t
 import { configuration } from "../../common/configuration";
 import { storage } from "../../common/storage";
 import {
-    activate, buildTree, executeSettingsUpdate, executeTeCommand, findIdInTaskMap,
+    activate, buildTree, executeSettingsUpdate, executeTeCommand, executeTeCommand2, findIdInTaskMap,
     getTreeTasks, getWsPath, isReady, sleep, testsControl, verifyTaskCount
 } from "../helper";
 
@@ -52,22 +52,33 @@ suite("Provider Tests", () =>
             assert.fail("        ✘ Explorer instance does not exist");
         }
         explorer = teApi.explorer;
-
         rootPath = getWsPath(".");
         dirName = path.join(rootPath, "tasks_test_");
         dirNameL2 = path.join(dirName, "subfolder");
         ws2DirName = path.join(rootPath, "ws2");
         dirNameIgn = path.join(rootPath, "tasks_test_ignore_");
-
         //
         // Add some excludes, use both config update and task explorer addExclude command
         // for full coverage.  The 'addExclude' command will add the setting globally though,
         // so add it to the workspace setting as well
         //
-        await configuration.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
-        await commands.executeCommand("taskExplorer.addToExcludes", "**/tasks_test_ignore_/**");
+        await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
+        await executeTeCommand2("addToExcludes", [ "**/tasks_test_ignore_/**" ]);
 
-        //
+    });
+
+
+    suiteTeardown(async function()
+    {
+        await executeSettingsUpdate("debug", testsControl.writeToOutput || testsControl.writeToConsole);
+        await executeSettingsUpdate("expanded.test-files", false);
+    });
+
+
+    test("Create Temporary Directories", async function()
+    {
+        this.slow(10000);
+         //
         // Create the temporary project dirs
         //
         if (!fs.existsSync(dirName)) {
@@ -129,93 +140,27 @@ suite("Provider Tests", () =>
             name: "D Test Workspace",
             index: 5
         }];
+
         //
         // Merge VSCode ws folders
         //
         (workspace.workspaceFolders as WorkspaceFolder[]).concat(wsf);
+
+        await teApi.waitForIdle(2500);
     });
 
 
-    suiteTeardown(async function()
+    test("Check Existing Bash Task Counts", async function()
     {
-        await executeSettingsUpdate("debug", testsControl.writeToOutput || testsControl.writeToConsole);
-        await executeSettingsUpdate("expanded.test-files", false);
-
-        if (tempFiles.length)
-        {
-            let file: string | undefined;
-            while ((file = tempFiles.shift()))
-            {
-                try {
-                    fs.unlinkSync(file);
-                }
-                catch (error) {
-                    console.log(error);
-                }
-            }
-        }
-
-        if (dirName && ws2DirName && dirNameIgn && dirNameL2)
-        {
-            try {
-                fs.rmdirSync(ws2DirName, {
-                    recursive: true
-                });
-                fs.rmdirSync(dirNameL2, {
-                    recursive: true
-                });
-                fs.rmdirSync(dirName, {
-                    recursive: true
-                });
-                fs.rmdirSync(dirNameIgn, {
-                    recursive: true
-                });
-            }
-            catch (error) {
-                console.log(error);
-            }
-        }
-
-        //
-        // Workspace folders
-        //
-        try {
-            let wsDirName = path.join(rootPath, "newA");
-            if (fs.existsSync(wsDirName)) {
-                fs.rmdirSync(wsDirName);
-            }
-            wsDirName = path.join(rootPath, "newB");
-            if (fs.existsSync(wsDirName)) {
-                fs.rmdirSync(wsDirName);
-            }
-            wsDirName = path.join(rootPath, "newC");
-            if (fs.existsSync(wsDirName)) {
-                fs.rmdirSync(wsDirName);
-            }
-            wsDirName = path.join(rootPath, "newD");
-            if (fs.existsSync(wsDirName)) {
-                fs.rmdirSync(wsDirName);
-            }
-        }
-        catch(error) {
-            console.log(error);
-        }
-
-        await teApi.waitForIdle(3000);
+        this.slow(1000);
+        batch = await getTreeTasks("bash", 1);
     });
 
 
-    test("Check Existing Task Counts", async function()
+    test("Check Existing Batch Task Counts", async function()
     {
-        this.slow(2500);
+        this.slow(1000);
         batch = await getTreeTasks("batch", 2);
-    });
-
-
-    test("Open Existing Task Files", async function()
-    {
-        this.slow(20000);
-        await explorer.getTaskItems(undefined, "         ", true) as unknown as Map<string, TaskItem>;
     });
 
 
@@ -675,6 +620,72 @@ suite("Provider Tests", () =>
     {
         teApi.testsApi.fileCache.addWsFolders(workspace.workspaceFolders);
         teApi.testsApi.fileCache.removeWsFolders((workspace.workspaceFolders as WorkspaceFolder[]).filter(f =>  f.index > 0));
+    });
+
+
+    test("Remove Temporary Directories", async function()
+    {
+        if (tempFiles.length)
+        {
+            let file: string | undefined;
+            while ((file = tempFiles.shift()))
+            {
+                try {
+                    fs.unlinkSync(file);
+                }
+                catch (error) {
+                    console.log(error);
+                }
+            }
+        }
+
+        if (dirName && ws2DirName && dirNameIgn && dirNameL2)
+        {
+            try {
+                fs.rmdirSync(ws2DirName, {
+                    recursive: true
+                });
+                fs.rmdirSync(dirNameL2, {
+                    recursive: true
+                });
+                fs.rmdirSync(dirName, {
+                    recursive: true
+                });
+                fs.rmdirSync(dirNameIgn, {
+                    recursive: true
+                });
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
+
+        //
+        // Workspace folders
+        //
+        try {
+            let wsDirName = path.join(rootPath, "newA");
+            if (fs.existsSync(wsDirName)) {
+                fs.rmdirSync(wsDirName);
+            }
+            wsDirName = path.join(rootPath, "newB");
+            if (fs.existsSync(wsDirName)) {
+                fs.rmdirSync(wsDirName);
+            }
+            wsDirName = path.join(rootPath, "newC");
+            if (fs.existsSync(wsDirName)) {
+                fs.rmdirSync(wsDirName);
+            }
+            wsDirName = path.join(rootPath, "newD");
+            if (fs.existsSync(wsDirName)) {
+                fs.rmdirSync(wsDirName);
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
+
+        await teApi.waitForIdle(3000);
     });
 
 });

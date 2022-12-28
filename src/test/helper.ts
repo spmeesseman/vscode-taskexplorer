@@ -145,8 +145,7 @@ export async function buildTree(instance: any)
 export async function cleanup()
 {
     const rootPath = getWsPath("."),
-          dirNameCode = getWsPath(".vscode"),
-          settingsFile = path.join(dirNameCode, "settings.json");
+          settingsFile = path.join(rootPath, ".vscode", "settings.json");
 
     await deactivate();
 
@@ -156,15 +155,15 @@ export async function cleanup()
     if (!testsControl.keepSettingsFile && fs.existsSync(settingsFile)) {
         try {
             fs.unlinkSync(settingsFile);
-        } catch {}
+        } catch (e: any) { console.error(e.message); }
     }
 
     try {
         const packageLockFile = path.join(rootPath, "package-lock.json");
         if (fs.existsSync(packageLockFile)) {
-            fs.unlinkSync(settingsFile);
+            fs.unlinkSync(packageLockFile);
         }
-    } catch {}
+    } catch (e: any) { console.error(e.message); }
 }
 
 

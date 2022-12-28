@@ -1331,12 +1331,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             if (item instanceof TaskFolder)
             {
                 let isFav = false, isLast = false, isUser = false;
-                if (item.label)
-                {
-                    isFav = item.label.toString().includes(constants.FAV_TASKS_LABEL);
-                    isLast = item.label.toString().includes(constants.LAST_TASKS_LABEL);
-                    isUser = item.label.toString().includes(constants.USER_TASKS_LABEL);
-                }
+                isFav = (item.label as string).includes(constants.FAV_TASKS_LABEL);
+                isLast = (item.label as string).includes(constants.LAST_TASKS_LABEL);
+                isUser = (item.label as string).includes(constants.USER_TASKS_LABEL);
                 const tmp: any = me.getParent(item);
                 assert(tmp === null, "Invalid parent type, should be null for TaskFolder");
                 log.write("   Task Folder " + item.label + ":  " + (!isFav && !isLast && !isUser ?
