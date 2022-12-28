@@ -84,15 +84,9 @@ suite("Python Tests", () =>
     {
         await executeSettingsUpdate("enabledTasks.python", false);
         await verifyTaskCount("script", 0, testsName);
-        console.log("DONE");
     });
 
-    test("Re-enable", async function()
-    {
-        await sleep(15000);
-    });
 
-/*
     test("Re-enable", async function()
     {
         await executeSettingsUpdate("enabledTasks.python", true);
@@ -113,52 +107,6 @@ suite("Python Tests", () =>
         await teApi.waitForIdle(waitTimeForFsNewEvent);
         await verifyTaskCount("script", 3, testsName);
     });
-
-
-    // test("Add task to file", async () =>
-    // {
-    //     fs.writeFileSync(
-    //         fileUri.fsPath,
-    //         "{\n" +
-    //         '  "scripts":\n' +
-    //         "  {\n" +
-    //         '    "test1": "run -r test",\n' +
-    //         '    "test2": "open -p tmp.txt",\n' +
-    //         '    "test3": "start -x 1 -y 2"\n' +
-    //         '    "test4": "start -x 2 -y 3"\n' +
-    //         "  },\n" +
-    //         '  "include": [""]
-    //         '  "exclude": ["node_modules"]\n' +
-    //         "}\n"
-    //     );
-    //
-    //     await sleep(500);
-    //     await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-    //     const cTasks = await tasks.fetchTasks({ type: testsName });
-    //     assert(cTasks && cTasks.length === 6, `Did not read 6 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
-    // });
-
-
-    // test("Remove task from file", async () =>
-    // {
-    //     fs.writeFileSync(
-    //         fileUri.fsPath,
-    //         "{\n" +
-    //         '  "scripts":\n' +
-    //         "  {\n" +
-    //         '    "test1": "run -r test",\n' +
-    //         '    "test2": "open -p tmp.txt",\n' +
-    //         "  },\n" +
-    //         '  "include": [""] +
-    //         '  "exclude": ["node_modules"]\n' +
-    //         "}\n"
-    //     );
-    //
-    //     await sleep(500);
-    //     await teApi.explorer?.invalidateTasksCache(testsName, fileUri);
-    //     const cTasks = await tasks.fetchTasks({ type: testsName });
-    //     assert(cTasks && cTasks.length === 4, `Did not read 4 ${testsName} tasks (actual ${cTasks ? cTasks.length : 0})`);
-    // });
 
 
     test("Delete File", async function()
@@ -196,5 +144,5 @@ suite("Python Tests", () =>
         await teApi.waitForIdle(waitTimeForFsDelEvent * 2);
         await verifyTaskCount("script", 2, testsName);
     });
-*/
+
 });

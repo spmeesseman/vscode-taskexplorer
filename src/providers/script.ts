@@ -4,7 +4,7 @@ import * as util from "../common/utils";
 import * as log from "../common/log";
 import constants from "../common/constants";
 import { configuration } from "../common/configuration";
-import { getFilesCache } from "../cache";
+import { getTaskFiles } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
@@ -264,26 +264,30 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     protected async readTasks(logPad: string): Promise<Task[]>
     {
         const allTasks: Task[] = [],
-              visitedFiles: Set<string> = new Set(),
+              visitedFiles: string[] = [],
               scriptTypes = util.getScriptTaskTypes();
 
         log.methodStart(`detect ${this.providerName} type task files`, 1, logPad, true);
 
         for (const taskType of scriptTypes)
         {
-            log.write("   detect script type " + taskType, 1, logPad);
-            const paths = getFilesCache().get(taskType) || [];
-            for (const fObj of paths)
+            const paths = getTaskFiles(taskType),
+                  enabled = util.isTaskTypeEnabled(taskType);
+            if (enabled && paths)
             {
-                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
+                log.write("   detect script type " + taskType, 1, logPad);
+                for (const fObj of paths)
                 {
-                    visitedFiles.add(fObj.uri.fsPath);
-                    const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri);
-                    if (task && util.isTaskTypeEnabled(task.source))
+                    if (!util.isExcluded(fObj.uri.path) && !visitedFiles.includes(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
                     {
-                        allTasks.push(task);
-                        log.write(`   processed ${this.providerName} file`, 3, logPad);
-                        log.value("      script file", fObj.uri.fsPath, 3, logPad);
+                        visitedFiles.push(fObj.uri.fsPath);
+                        const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri);
+                        if (task)
+                        {
+                            allTasks.push(task);
+                            log.write(`   processed ${this.providerName} file`, 3, logPad);
+                            log.value("      script file", fObj.uri.fsPath, 3, logPad);
+                        }
                     }
                 }
             }

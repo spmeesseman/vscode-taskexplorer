@@ -268,14 +268,14 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
     }
 
     try
-    {   if (refresh || refreshTaskTypes.length > 5)
+    {   if (refresh || refreshTaskTypes.length > 3)
         {
-            await refreshTree();
+            await refreshTree(undefined, undefined, "   ");
         }
         else if (refreshTaskTypes.length > 0)
         {
             for (const t of refreshTaskTypes) {
-                await refreshTree(t);
+                await refreshTree(t, undefined, "   ");
             }
         }
     }

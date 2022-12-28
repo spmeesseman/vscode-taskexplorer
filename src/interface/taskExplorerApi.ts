@@ -10,7 +10,7 @@ export interface TaskExplorerApi
     log: any;
     utilities: any;
     explorer: ExplorerApi | undefined;
-    sidebar: any | undefined;
+    sidebar: ExplorerApi | undefined;
     providers: Map<string, any>;
     // explorer: TaskTreeDataProvider | undefined;
     // sidebar: TaskTreeDataProvider | undefined;

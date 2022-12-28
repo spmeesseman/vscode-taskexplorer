@@ -6,7 +6,7 @@ import { TaskExplorerApi } from "../interface";
 let teApi: TaskExplorerApi;
 
 
-export async function refreshTree(taskType?: string, uri?: Uri)
+export async function refreshTree(taskType?: string, uri?: Uri, logPad?: string)
 {
     if (!teApi) {
         teApi = await commands.executeCommand("taskExplorer.getApi")  as TaskExplorerApi;
@@ -29,10 +29,10 @@ export async function refreshTree(taskType?: string, uri?: Uri)
     // and the sidebar view are being used and/or enabled
     //
     if (configuration.get<boolean>("enableSideBar") && teApi.sidebar) {
-        await teApi.sidebar.refresh(taskType, uri);
+        await teApi.sidebar.refresh(taskType, uri, logPad);
     }
     /* istanbul ignore else */
     if (configuration.get<boolean>("enableExplorerView") && teApi.explorer) {
-        await teApi.explorer.refresh(taskType, uri);
+        await teApi.explorer.refresh(taskType, uri, logPad);
     }
 }

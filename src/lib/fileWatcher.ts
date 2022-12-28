@@ -12,6 +12,7 @@ import path = require("path");
 let processingFsEvent = false;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
+let workspaceWatcher: Disposable | undefined;
 const dirWatcher: {
     watcher?: FileSystemWatcher | undefined;
     onDidCreate?: Disposable;
@@ -45,17 +46,19 @@ function logFileWatcherEvent(uri: Uri, type: string)
 }
 
 
-export async function registerFileWatchers(context: ExtensionContext)
-{
-    const taskTypes = util.getTaskTypes();
-    for (const taskType of taskTypes)
-    {
-        if (util.isTaskTypeEnabled(taskType))
-        {
-            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType));
-        }
-    }
+export async function initFileWatchers(context: ExtensionContext)
+{   //
+    // Watch individual task type files within the project folder
+    //
+    await createFileWatchers(context);
+    //
+    // Watch for folder adds and deletes within the project folder
+    //
     createDirWatcher(context);
+    //
+    // Refresh tree when folders/projects are added/removed from the workspace, in a multi-root ws
+    //
+    createWorkspaceWatcher(context);
 }
 
 
@@ -96,7 +99,8 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
                 processingFsEvent = true;
                 try
                 {   logFileWatcherEvent(_e, "change");
-                    await refreshTree(taskType, _e);
+                    await refreshTree(taskType, _e, "   ");
+                    log.write("file 'change' event complete", 1);
                 }
                 catch (e) {}
                 finally { processingFsEvent = false; }
@@ -108,8 +112,9 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
             processingFsEvent = true;
             try
             {   logFileWatcherEvent(_e, "delete");
-                await cache.removeFileFromCache(taskType, _e, "");
+                await cache.removeFileFromCache(taskType, _e, "   ");
                 await refreshTree(taskType, _e);
+                log.write("file 'delete' event complete", 1);
             }
             catch (e) {}
             finally { processingFsEvent = false; }
@@ -120,8 +125,9 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
             processingFsEvent = true;
             try
             {   logFileWatcherEvent(_e, "create");
-                await cache.addFileToCache(taskType, _e);
+                await cache.addFileToCache(taskType, _e, "   ");
                 await refreshTree(taskType, _e);
+                log.write("file 'create' event complete", 1);
             }
             catch (e) {}
             finally { processingFsEvent = false; }
@@ -134,25 +140,62 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
 
 function createDirWatcher(context: ExtensionContext)
 {
+    /* istanbul ignore next */
     dirWatcher.onDidCreate?.dispose();
+    /* istanbul ignore next */
     dirWatcher.onDidDelete?.dispose();
+    /* istanbul ignore next */
     dirWatcher.watcher?.dispose();
 
-    dirWatcher.watcher = workspace.createFileSystemWatcher(getDirWatchGlob());
-    dirWatcher.onDidCreate = dirWatcher.watcher.onDidCreate(async (e) => { await onDirCreate(e); }, null);
-    dirWatcher.onDidDelete = dirWatcher.watcher.onDidDelete(async (e) => { await onDirDelete(e); }, null);
+    if (workspace.workspaceFolders)
+    {
+        dirWatcher.watcher = workspace.createFileSystemWatcher(getDirWatchGlob(workspace.workspaceFolders));
+        dirWatcher.onDidCreate = dirWatcher.watcher.onDidCreate(async (e) => { await onDirCreate(e); }, null);
+        dirWatcher.onDidDelete = dirWatcher.watcher.onDidDelete(async (e) => { await onDirDelete(e); }, null);
 
-    context.subscriptions.push(dirWatcher.onDidCreate);
-    context.subscriptions.push(dirWatcher.onDidDelete);
-    context.subscriptions.push(dirWatcher.watcher);
+        context.subscriptions.push(dirWatcher.onDidCreate);
+        context.subscriptions.push(dirWatcher.onDidDelete);
+        context.subscriptions.push(dirWatcher.watcher);
+    }
 }
 
 
-function getDirWatchGlob()
+async function createFileWatchers(context: ExtensionContext)
+{
+    const taskTypes = util.getTaskTypes();
+    for (const taskType of taskTypes)
+    {
+        if (util.isTaskTypeEnabled(taskType))
+        {
+            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType));
+        }
+    }
+}
+
+
+function createWorkspaceWatcher(context: ExtensionContext)
+{
+    // workspaceWatcher?.dispose(); // should only get called once
+    /* istanbul ignore next */
+    workspaceWatcher = workspace.onDidChangeWorkspaceFolders(/* istanbul ignore next */ async(_e) =>
+    {   /* istanbul ignore next */
+        await cache.addWsFolders(_e.added);
+        /* istanbul ignore next */
+        await cache.removeWsFolders(_e.removed);
+        /* istanbul ignore next */
+        createDirWatcher(context);
+        /* istanbul ignore next */
+        await refreshTree();
+    });
+    context.subscriptions.push(workspaceWatcher);
+}
+
+
+function getDirWatchGlob(wsFolders: readonly WorkspaceFolder[])
 {
     log.write("   Build file watcher glob", 2);
     const watchPaths: string[] = [];
-    workspace.workspaceFolders?.forEach((wsf) =>
+    wsFolders.forEach((wsf) =>
     {
         watchPaths.push(wsf.name);
     });
@@ -185,7 +228,6 @@ async function onDirDelete(uri: Uri)
     if (!extname(uri.fsPath)) // ouch
     //if (isDirectory(uri.fsPath)) // it's gone, so we can't lstat it
     {
-        log.methodStart("dirwatcher delete", 1, "", true, [[ "dir", uri.fsPath ]]);
         processingFsEvent = true;
         try
         {   const wsf = workspace.getWorkspaceFolder(uri);
@@ -201,6 +243,7 @@ async function onDirDelete(uri: Uri)
                 pendingDeleteFolders.push(uri);
                 deleteTaskTimerId = setTimeout(async () =>
                 {
+                    log.methodStart("dirwatcher delete", 1, "", true, [[ "dir", uri.fsPath ]]);
                     const wfs: WorkspaceFolder[] = [];
                     for (const u of pendingDeleteFolders)
                     {
@@ -218,12 +261,12 @@ async function onDirDelete(uri: Uri)
                     }
                     pendingDeleteFolders = [];
                     deleteTaskTimerId = undefined;
+                    log.methodDone("dirwatcher delete", 1, "");
                 }, 20);
             }
         }
         catch (e) {}
         finally { processingFsEvent = false; }
-        log.methodDone("dirwatcher delete", 1, "");
     }
 }
 

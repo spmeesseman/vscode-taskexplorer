@@ -17,16 +17,16 @@ import { GulpTaskProvider } from "./providers/gulp";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
 import { configuration } from "./common/configuration";
 import { initStorage, storage } from "./common/storage";
-import { isCachingBusy, addWsFolders, removeWsFolders } from "./cache";
+import { isCachingBusy } from "./cache";
 import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";
 import { ExternalExplorerProvider, TaskExplorerApi } from "./interface";
 import { LicenseManager } from "./lib/licenseManager";
 import { isProcessingConfigChange, processConfigChanges } from "./lib/configWatcher";
-import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
+import { disposeFileWatchers, initFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
-import { Disposable, ExtensionContext, tasks, commands, workspace, WorkspaceFolder } from "vscode";
+import { Disposable, ExtensionContext, tasks, commands, workspace } from "vscode";
 
 
 export const teApi = {} as TaskExplorerApi;
@@ -55,7 +55,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     //
     // Register file type watchers
     //
-    await registerFileWatchers(context);
+    await initFileWatchers(context);
 
     //
     // Register internal task providers.  Npm, VScode type tasks are provided
@@ -81,19 +81,6 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     if (configuration.get<boolean>("enableExplorerView")) {
         treeDataProvider2 = registerExplorer("taskExplorer", context);
     }
-
-    //
-    // Refresh tree when folders are added/removed from the workspace
-    //
-    const workspaceWatcher = workspace.onDidChangeWorkspaceFolders(/* istanbul ignore next */ async(_e) =>
-    {   /* istanbul ignore next */
-        await addWsFolders(_e.added);
-        /* istanbul ignore next */
-        await removeWsFolders(_e.removed);
-        /* istanbul ignore next */
-        await refreshTree();
-    });
-    context.subscriptions.push(workspaceWatcher);
 
     //
     // Register configurations/settings change watcher

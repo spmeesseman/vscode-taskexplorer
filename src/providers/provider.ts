@@ -3,7 +3,7 @@ import * as util from "../common/utils";
 import * as log from "../common/log";
 import constants from "../common/constants";
 import { configuration } from "../common/configuration";
-import { getFilesCache, removeFileFromCache } from "../cache";
+import { getTaskFiles, removeFileFromCache } from "../cache";
 import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 
@@ -70,11 +70,9 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
     protected async readTasks(logPad: string): Promise<Task[]>
     {
-        const allTasks: Task[] = [];
-        const visitedFiles: Set<string> = new Set();
-        const filesCache = getFilesCache();
-
-        const paths = filesCache.get(this.providerName),
+        const allTasks: Task[] = [],
+              visitedFiles: string[] = [],
+              paths = getTaskFiles(this.providerName),
               enabled = util.isTaskTypeEnabled(this.providerName);
 
         log.methodStart(`detect ${this.providerName} files`, 1, logPad, true, [[ "enabled", enabled ]]);
@@ -83,9 +81,9 @@ export abstract class TaskExplorerProvider implements TaskProvider
         {
             for (const fObj of paths.values())
             {
-                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.has(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
+                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.includes(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
                 {
-                    visitedFiles.add(fObj.uri.fsPath);
+                    visitedFiles.push(fObj.uri.fsPath);
                     const tasks = (await this.readUriTasks(fObj.uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
                     log.write(`   processed ${this.providerName} file`, 3, logPad);
                     log.value("      file", fObj.uri.fsPath, 3, logPad);
