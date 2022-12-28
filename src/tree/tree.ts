@@ -246,19 +246,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         }
         log.value("   path value", pathValue, 2);
 
-        let excludes: string[] = [];
-        const excludes2 = configuration.get<string[]>(excludesList);
-        if (excludes2 && excludes2 instanceof Array) {
-            excludes = excludes2;
-        }
-        else if (typeof excludes2 === "string") {
-            excludes.push(excludes2);
-        }
-
-        const paths = pathValue.split(",");
+        const excludes = configuration.get<string[]>(excludesList),
+              paths = pathValue.split(",");
         for (const s in paths) {
             /* istanbul ignore next */
-            if ({}.hasOwnProperty.call(paths, s)) { // skip properties inherited from prototype
+            if ({}.hasOwnProperty.call(paths, s)) {
                 util.pushIfNotExists(excludes, paths[s]);
             }
         }
@@ -1419,7 +1411,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         if ((invalidate === true || invalidate === "tests") && !opt) {
             log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
             this.busy = true;
-            await rebuildCache(undefined, logPad + "   ");
+            await rebuildCache(logPad + "   ");
             log.write("   handling 'rebuild cache' eventcomplete", 1, logPad + "   ");
             this.busy = false;
         }

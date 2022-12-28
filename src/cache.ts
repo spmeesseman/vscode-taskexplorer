@@ -24,30 +24,24 @@ let cancel = false;
 let projectFilesMap: { [project: string]:  { [taskType: string]: Uri[] }} = {};
 let projectToFileCountMap: { [project: string]:  { [taskType: string]: number }} = {};
 let taskGlobs: any = {};
+let taskFilesMap: { [taskType: string]:  ICacheItem[] } = {};  // will replace filesCache with this at some point
 const filesCache: Map<string, Set<ICacheItem>> = new Map<string, Set<ICacheItem>>();
-const taskFilesMap: { [taskType: string]:  ICacheItem[] } = {};  // will replacefilesCache with this at some point
 
 
 export async function addFileToCache(taskType: string, uri: Uri, logPad: string)
 {
     log.methodStart("add file to cache", 1, logPad, true);
-    const wsf = workspace.getWorkspaceFolder(uri);
-    if (wsf) {
-        const item = { uri, folder: wsf };
-        addToMappings(taskType, item, logPad + "   ");
-    }
+    const wsf = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
+          item = { uri, folder: wsf };
+    addToMappings(taskType, item, logPad + "   ");
     log.methodDone("add file to cache", 1, logPad, true);
 }
 
 
 export async function addFolderToCache(folder: Uri, logPad: string)
 {
-    const wsFolder = workspace.getWorkspaceFolder(folder);
-    if (!wsFolder) {
-        return;
-    }
-
     log.methodStart("add folder to cache", 1, logPad, false, [[ "folder", folder.fsPath ]]);
+    const wsFolder = workspace.getWorkspaceFolder(folder) as WorkspaceFolder;
 
     //
     // Wait for caches to get done building before proceeding
@@ -75,6 +69,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
         if (!cancel && (externalProvider || util.isTaskTypeEnabled(providerName)))
         {
             if (!filesCache.get(providerName)) {
+                /** istanbul ignore next */
                 throw new Error("Workspace project folder has not yet been scanned");
             }
 
@@ -139,7 +134,9 @@ export async function addFolderToCache(folder: Uri, logPad: string)
 
 async function addWsFolderToCache(folder: WorkspaceFolder | undefined, setCacheBuilding: boolean, logPad: string)
 {
-    log.methodStart("add workspace project folder to cache", 3, logPad, false, [[ "folder", !folder ? "entire workspace" : folder.name ]]);
+    log.methodStart("add workspace project folder to cache", 3, logPad, logPad === "", [
+        [ "folder", !folder ? "entire workspace" : folder.name ]
+    ]);
 
     if (setCacheBuilding)
     {   //
@@ -209,6 +206,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
     /* istanbul ignore else */
     if (wsf)
     {
+        log.methodStart("add workspace project folders", 1, logPad, logPad === "");
         //
         // Wait for caches to get done building before proceeding
         //
@@ -228,9 +226,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         for (const f in wsf)
         {   /* istanbul ignore else */
             if ([].hasOwnProperty.call(wsf, f)) { // skip over properties inherited by prototype
-                log.methodStart("add workspace project folder", 1, logPad, true, [[ "name", wsf[f].name ]]);
                 await addWsFolderToCache(wsf[f], false, logPad + "   ");
-                log.methodDone("add workspace project folder", 1, logPad);
             }
         }
 
@@ -241,6 +237,8 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
 
         cacheBuilding = false;   // un-set flag
         folderCaching = false;   // un-set flag
+
+        log.methodDone("add workspace project folders", 1, logPad);
     }
 }
 
@@ -249,14 +247,15 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
 {
     log.methodStart("add item to mappings", 4, logPad, false, [[ "task type", taskType ], [ "file", item.uri.fsPath ]]);
 
-    if (!util.isExcluded(item.uri.path, "   "))
-    {
+    // if (!util.isExcluded(item.uri.path, "   "))
+    // {
         initMaps(taskType, item.folder.name);
         const added = {
             c1: 0, c2: 0, c3: 0
         };
         const fCache = filesCache.get(taskType) as Set<ICacheItem>;
 
+        /* istanbul ignore else */
         if (!fCache.has(item))
         {
             fCache.add(item);
@@ -279,6 +278,7 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
             [ "cache1 count", added.c1 ], [ "cache2 count", added.c2 ], [ "cache3 count", added.c3 ]
         ]);
 
+        /* istanbul ignore else */
         if (added.c1 > 0)
         {
             log.value("   added to cache", item.uri.fsPath, 4, logPad);
@@ -286,10 +286,10 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
         else {
             log.write("   already exists in cache", 4, logPad);
         }
-    }
-    else {
-        log.write("   ignored by 'excludes'", 4, logPad);
-    }
+    // }
+    // else {
+    //     log.write("   ignored by 'excludes'", 4, logPad);
+    // }
 
     log.methodDone("add item to mappings", 4, logPad);
 }
@@ -354,27 +354,10 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
     log.methodStart(logMsg, 1, logPad, true);
     statusBarSpace.text = getStatusString(`Scanning for ${dspTaskType} tasks in project ${folder.name}`, 65);
 
-    //
-    // Handle glob changes
-    // For 'script' alias, to support this, we'd need to keep separate cache maps for each
-    // script type (batch, powershell, python, etc)
-    // The `fileGlob` parameter will be undefined for external task providers
-    //
-    let globChanged = !taskGlobs[taskType];
-    if (taskGlobs[taskType] && taskGlobs[taskType] !== fileGlob)
-    {
-        globChanged = true;
-        // fCache.clear();
-    }
-    taskGlobs[taskType] = fileGlob;
-
-    //
-    // Handle filesystem changes. Glob changes and fs changes are really the only reasons to
-    // rescan the projects again for tasks.
-    //
     initMaps(taskType, folder.name);
-    const fsChanged = isFsChanged(taskType, folder.name);
 
+    const fsChanged = isFsChanged(taskType, folder.name);
+    const globChanged = isGlobChanged(taskType, fileGlob);
     log.value("   glob changed", globChanged, 3, logPad);
     log.value("   fIlesystem changed", fsChanged, 3, logPad);
 
@@ -395,7 +378,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
             projectToFileCountMap[folder.name][taskType] = paths.length;
             log.write(`   Workspace scan complete, found '${paths.length}' files`, 3, logPad);
         }
-        catch (e: any) { log.error(e); }
+        catch (e: any) { /* istanbul ignore next */ log.error(e); }
         /*
         const paths = await globAsync(fileGlob, { cwd: folder.uri.fsPath, ignore: getExcludesPattern() });
         for (const fPath of paths)
@@ -425,6 +408,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
 
 async function buildFolderCaches(taskType: string, fileGlob: string, setCacheBuilding: boolean, logPad: string)
 {
+    /* istanbul ignore else */
     if (workspace.workspaceFolders) // ensure workspace folders exist
     {
         for (const folder of workspace.workspaceFolders)
@@ -483,7 +467,7 @@ function getExcludesPatternVsc(folder: string | WorkspaceFolder): RelativePatter
 
 
 function getStatusString(msg: string, statusLength: number)
-{
+{   /* istanbul ignore else */
     if (msg.length < statusLength)
     {
         for (let i = msg.length; i < statusLength; i++) {
@@ -531,7 +515,7 @@ function initMaps(taskType: string, project: string)
     if (!projectToFileCountMap[project]) {
         projectToFileCountMap[project] = {};
     }
-    if (!projectToFileCountMap[project]) {
+    if (!projectToFileCountMap[project][taskType]) {
         projectToFileCountMap[project][taskType] = 0;
     }
     if (!projectFilesMap[project]) {
@@ -551,55 +535,40 @@ export function isCachingBusy()
 
 function isFsChanged(taskType: string, project: string)
 {
-    let fsChanged = false;
+    let fsChanged = true;
     if (projectFilesMap[project] && projectFilesMap[project][taskType])
     {
         fsChanged = projectToFileCountMap[project][taskType] !== projectFilesMap[project][taskType].length;
     }
-    else if (taskFilesMap[taskType])
-    {
-        fsChanged = projectToFileCountMap[project][taskType] !== taskFilesMap[taskType].filter(f => f.folder.name === project).length;
-    }
-    else {
-        fsChanged = true;
-    }
+    // else if (taskFilesMap[taskType])
+    // {
+    //     fsChanged = projectToFileCountMap[project][taskType] !== taskFilesMap[taskType].filter(f => f.folder.name === project).length;
+    // }
     return fsChanged;
 }
 
 
-export async function rebuildCache(folder: WorkspaceFolder | undefined, logPad = "")
+function isGlobChanged(taskType: string, fileGlob: string)
 {
-    log.blank(1);
-    log.write("rebuild cache", 1, logPad);
-    if (!folder)
-    {
-        filesCache.clear();
-        projectFilesMap = {};
-        projectToFileCountMap = {};
-        taskGlobs = {};
+    let globChanged = !taskGlobs[taskType];
+    if (taskGlobs[taskType] && taskGlobs[taskType] !== fileGlob) {
+        globChanged = true;
     }
-    else
-    {
-        for (const item of filesCache.entries())
-        {
-            const taskType = item[0],
-                  cache = item[1];
-            cache.forEach(p =>
-            {
-                if (p.folder.name === folder.name)  {
-                    cache.delete(p);
-                }
-            });
-            taskFilesMap[taskType].slice().reverse().forEach((item, index, object) =>
-            {
-                if (item.folder.name === folder.name) {
-                    taskFilesMap[taskType].splice(object.length - 1 - index, 1);
-                }
-            });
-            projectFilesMap[folder.name] = {};
-        }
-    }
-    await addWsFolderToCache(folder, true, logPad);
+    taskGlobs[taskType] = fileGlob;
+    return globChanged;
+}
+
+
+export async function rebuildCache(logPad = "")
+{
+    log.methodStart("rebuild cache", 1, logPad, logPad === "");
+    filesCache.clear();
+    taskFilesMap = {};
+    projectFilesMap = {};
+    projectToFileCountMap = {};
+    taskGlobs = {};
+    await addWsFolderToCache(undefined, true, logPad + "   ");
+    log.methodDone("rebuild cache", 1, logPad);
 }
 
 
@@ -627,10 +596,7 @@ function removeFromMappings(taskType: string, uri: Uri, isFolder: boolean, logPa
 {
     log.methodStart("remove item from mappings", 2, logPad, false, [[ "task type", taskType ], [ "path", uri.fsPath ]]);
 
-    const wsf = workspace.getWorkspaceFolder(uri);
-    if (!wsf) {
-        return;
-    }
+    const wsf = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
     const removed = {
         c1: 0, c2: 0, c3: 0
     };
@@ -655,6 +621,7 @@ function removeFromMappings(taskType: string, uri: Uri, isFolder: boolean, logPa
         ++removed.c1;
     }
 
+    /* istanbul ignore else */
     if (projectFilesMap[wsf.name] && projectFilesMap[wsf.name][taskType])
     {
         projectFilesMap[wsf.name][taskType].slice().reverse().forEach((item, index, object) =>
@@ -668,6 +635,7 @@ function removeFromMappings(taskType: string, uri: Uri, isFolder: boolean, logPa
         });
     }
 
+    /* istanbul ignore else */
     if (taskFilesMap[taskType])
     {
         taskFilesMap[taskType].slice().reverse().forEach((item, index, object) =>
