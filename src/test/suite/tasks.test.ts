@@ -196,7 +196,7 @@ async function startTask(taskItem: TaskItem)
     overrideNextShowInputBox("test label");
     removed = await executeTeCommand("addRemoveCustomLabel", 0, 0, taskItem);
     if (removed) {
-        await executeTeCommand("addRemoveFromFavorites", 0, 0, taskItem);
+        await executeTeCommand("addRemoveCustomLabel", 0, 0, taskItem);
     }
     if (lastTask) {
         await executeTeCommand("openTerminal", 0, 0, lastTask);

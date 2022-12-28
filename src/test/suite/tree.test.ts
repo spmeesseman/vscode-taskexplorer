@@ -112,15 +112,22 @@ suite("Tree Tests", () =>
 
     test("Add to Favorites", async function()
     {
-        let removed = await executeTeCommand("addRemoveFromFavorites", 0, 0, batch[0]);
+        let removed = await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[0]);
         if (removed) {
-            await executeTeCommand("addRemoveFromFavorites", 0, 0, batch[0]);
+            await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[0]);
         }
 
-        removed = await executeTeCommand("addRemoveFromFavorites", 0, 0, batch[1]);
+        removed = await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[1]);
         if (removed) {
-            await executeTeCommand("addRemoveFromFavorites", 0, 0, batch[1]);
+            await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[1]);
         }
+    });
+
+
+    test("Remove from Favorites", async function()
+    {
+        await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[0]);
+        await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[1]);
     });
 
 
@@ -198,6 +205,13 @@ suite("Tree Tests", () =>
 
     test("Remove Custom Label 6", async function()
     {
+        await executeTeCommand("addRemoveCustomLabel", 50, 50, ant[0]);
+    });
+
+
+    test("Cancel Add Custom Label", async function()
+    {
+        overrideNextShowInputBox(undefined);
         await executeTeCommand("addRemoveCustomLabel", 50, 50, ant[0]);
     });
 

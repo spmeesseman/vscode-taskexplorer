@@ -379,12 +379,13 @@ suite("Util Tests", () =>
     });
 
 
-    test("File System", function()
+    test("File System", async function()
     {
-		let dirName = join(rootPath, "tasks_test_");
-        let n = numFilesInDirectory(dirName);
-		dirName = join(rootPath, "tasks_test_");
-        n = numFilesInDirectory(dirName);
+		await numFilesInDirectory(rootPath);
+		try {
+			await numFilesInDirectory(join(rootPath, "tasks_test_"));
+		}
+		catch {}
     });
 
 

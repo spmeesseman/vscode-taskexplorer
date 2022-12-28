@@ -18,7 +18,8 @@ export const testsControl = {
     waitTimeForFsCreateEvent: 200,
     waitTimeForFsDeleteEvent: 200,
     waitTimeForFsModifyEvent: 150,
-    waitTimeForConfigEvent: 125
+    waitTimeForConfigEvent: 125,
+    waitTimeForCommand: 500
 };
 
 let activated = false;
@@ -139,7 +140,7 @@ export async function executeSettingsUpdate(key: string, value?: any, minWait?: 
 export async function executeTeCommand(command: string, minWait?: number, maxWait?: number, ...args: any[])
 {
     const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
-    await teApi.waitForIdle(minWait, maxWait);
+    await teApi.waitForIdle(minWait || testsControl.waitTimeForCommand, maxWait);
     return rc;
 }
 
