@@ -267,6 +267,7 @@ export default class TaskFile extends TreeItem
                 // For ap files in the same dir, nsamed with a tag, e.g.:
                 //    .publishrc.spm.json
                 //
+                label = label.replace("ppp", "pp-p"); // `ppp -> pp-p` my app-publisher;
                 const match = (taskDef.fileName as string).match(/\.publishrc\.(.+)\.(?:js(?:on)?|ya?ml)$/i);
                 if (match && match.length > 1 && match[1])
                 {

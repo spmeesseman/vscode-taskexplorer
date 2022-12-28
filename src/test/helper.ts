@@ -12,8 +12,9 @@ import { commands, extensions, tasks, window, workspace } from "vscode";
 
 export const testsControl = {
     keepSettingsFile: false,
+    logLevel: 3,
     writeToConsole: false,
-    writeToOutput: false,
+    writeToOutput: true,
     waitTimeForFsCreateEvent: 200,
     waitTimeForFsDeleteEvent: 200,
     waitTimeForFsModifyEvent: 150,
@@ -89,8 +90,7 @@ export async function activate(instance?: any)
         //
         // For debugging
         //
-        await configuration.updateWs("debug", testsControl.writeToOutput);
-        teApi.log.setWriteToConsole(testsControl.writeToConsole);
+        teApi.log.setWriteToConsole(testsControl.writeToConsole, testsControl.logLevel);
     }
     return teApi;
 }
@@ -212,8 +212,8 @@ export async function initSettings(enable = true)
     //
     await configuration.updateWs("includeAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
     // Use update() here for coverage, since these two settings wont trigger any processing
-    await configuration.updateWs("debug", true);
-    await configuration.updateWs("debugLevel", 3);
+    await configuration.updateWs("debug", testsControl.writeToOutput);
+    await configuration.updateWs("debugLevel", testsControl.logLevel);
     await configuration.updateWs("autoRefresh", enable);
     await configuration.updateWs("useGulp", false);
     await configuration.updateWs("useAnt", false);
@@ -225,7 +225,6 @@ export async function initSettings(enable = true)
     // Enabled all options, use workspace level so that running this test from Code itself
     // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("enabledTasks", configuration.get<object>("enabledTasks"));
     await configuration.updateWs("groupWithSeparator", enable);
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("showLastTasks", enable);
@@ -234,6 +233,8 @@ export async function initSettings(enable = true)
     await configuration.updateWs("showFavoritesButton", enable);
     await configuration.updateWs("showHiddenWsTasks", enable);
     await configuration.updateWs("showRunningTask", enable);
+    await configuration.updateWs("enabledTasks", configuration.get<object>("enabledTasks"));
+    await configuration.updateWs("pathToPrograms", configuration.get<object>("pathToPrograms"));
 }
 
 

@@ -3,14 +3,12 @@
 import * as util from "../common/utils";
 import * as cache from "../cache";
 import * as log from "../common/log";
-import { Disposable, ExtensionContext, FileSystemWatcher, workspace, Uri } from "vscode";
+import { Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri } from "vscode";
 import { refreshTree } from "./refreshTree";
 import { isDirectory, numFilesInDirectory } from "./utils/fs";
 import { extname } from "path";
 import path = require("path");
 
-
-let processingDirUri: Uri | undefined;
 let processingFsEvent = false;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
@@ -19,6 +17,10 @@ const dirWatcher: {
     onDidCreate?: Disposable;
     onDidDelete?: Disposable;
 } = {};
+let createTaskTimerId: NodeJS.Timeout | undefined;
+let deleteTaskTimerId: NodeJS.Timeout | undefined;
+let pendingCreateFolders: Uri[] = [];
+let pendingDeleteFolders: Uri[] = [];
 
 
 export function disposeFileWatchers()
@@ -168,8 +170,11 @@ async function onDirCreate(uri: Uri)
         const wsf = workspace.getWorkspaceFolder(uri);
         if (!wsf || wsf.uri.fsPath !== uri.fsPath)
         {
-            processingDirUri = uri;
-            setTimeout(async () => processDirCreated(), 200, uri);
+            if (createTaskTimerId) {
+                clearTimeout(createTaskTimerId);
+            }
+            pendingCreateFolders.push(uri);
+            createTaskTimerId = setTimeout(async () => processDirCreated(), 50, uri);
         }
     }
 }
@@ -182,22 +187,42 @@ async function onDirDelete(uri: Uri)
     {
         log.methodStart("dirwatcher delete", 1, "", true, [[ "dir", uri.fsPath ]]);
         processingFsEvent = true;
-        processingDirUri = undefined;
         try
         {   const wsf = workspace.getWorkspaceFolder(uri);
-            if (!wsf || wsf.uri.fsPath !== uri.fsPath)
+            if (wsf && wsf.uri.fsPath !== uri.fsPath)
             {
-                await cache.rebuildCache(wsf, "   ");
-                //if (!processingDirUri) {
-                    await refreshTree(undefined, wsf?.uri);
-                //}
-                //else {
-                //    await processDirCreated();
-                //}
+                if (createTaskTimerId) {
+                    clearTimeout(createTaskTimerId);
+                    createTaskTimerId = setTimeout(async () => processDirCreated(), 50, uri);
+                }
+                if (deleteTaskTimerId) {
+                    clearTimeout(deleteTaskTimerId);
+                }
+                pendingDeleteFolders.push(uri);
+                deleteTaskTimerId = setTimeout(async () =>
+                {
+                    const wfs: WorkspaceFolder[] = [];
+                    for (const u of pendingDeleteFolders)
+                    {
+                        const wf = workspace.getWorkspaceFolder(u) as WorkspaceFolder;
+                        if (!wfs.find(w => w.uri.fsPath === u.fsPath)) {
+                            wfs.push(wf);
+                        }
+                        await cache.removeFolderFromCache(u, "   ");
+                    }
+                    if (wfs.length === 1) {
+                        await refreshTree(undefined, pendingDeleteFolders.length > 1 ? wfs[0].uri: uri);
+                    }
+                    else {
+                        await refreshTree(undefined, undefined);
+                    }
+                    pendingDeleteFolders = [];
+                    deleteTaskTimerId = undefined;
+                }, 20);
             }
         }
         catch (e) {}
-        finally { processingFsEvent = false; processingDirUri = undefined; }
+        finally { processingFsEvent = false; }
         log.methodDone("dirwatcher delete", 1, "");
     }
 }
@@ -205,19 +230,24 @@ async function onDirDelete(uri: Uri)
 
 async function processDirCreated()
 {
-    if (processingDirUri)
+    if (pendingCreateFolders.length > 0)
     {
-        log.methodStart("dirwatcher create", 1, "", true, [[ "dir", processingDirUri.fsPath ]]);
-        processingFsEvent = true;
-        try
-        {   await cache.addFolderToCache(workspace.getWorkspaceFolder(processingDirUri), "   ");
-            await refreshTree(undefined, processingDirUri);
+        log.methodStart("dirwatcher create", 1, "", true, [[ "dir count", pendingCreateFolders.length ]]);
+        for (const processingDirUri of pendingCreateFolders)
+        {
+            log.value("   dir", processingDirUri.fsPath, 1, "");
+            processingFsEvent = true;
+            try
+            {   await cache.addFolderToCache(processingDirUri, "   ");
+                await refreshTree(undefined, processingDirUri);
+            }
+            catch (e) {}
+            finally {
+                processingFsEvent = false;
+            }
         }
-        catch (e) {}
-        finally {
-            processingFsEvent = false;
-            processingDirUri = undefined;
-        }
+        pendingCreateFolders = [];
+        createTaskTimerId = undefined;
         log.methodDone("dirwatcher create", 1, "");
     }
 }

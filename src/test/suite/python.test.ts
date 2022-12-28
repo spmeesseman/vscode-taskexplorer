@@ -10,7 +10,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../common/configuration";
-import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, getWsPath, isReady, sleep, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ScriptTaskProvider } from "../../providers/script";
 
@@ -82,16 +82,20 @@ suite("Python Tests", () =>
 
     test("Disable", async function()
     {
-        await configuration.updateWs("enabledTasks.python", false);
-        await teApi.waitForIdle(waitTimeForConfigEvent);
+        await executeSettingsUpdate("enabledTasks.python", false);
         await verifyTaskCount("script", 0, testsName);
+        console.log("DONE");
     });
-
 
     test("Re-enable", async function()
     {
-        await configuration.updateWs("enabledTasks.python", true);
-        await teApi.waitForIdle(waitTimeForConfigEvent);
+        await sleep(15000);
+    });
+
+/*
+    test("Re-enable", async function()
+    {
+        await executeSettingsUpdate("enabledTasks.python", true);
         await verifyTaskCount("script", 2, testsName);
     });
 
@@ -123,7 +127,7 @@ suite("Python Tests", () =>
     //         '    "test3": "start -x 1 -y 2"\n' +
     //         '    "test4": "start -x 2 -y 3"\n' +
     //         "  },\n" +
-    //         '  "include": ["**/*"],\n' +
+    //         '  "include": [""]
     //         '  "exclude": ["node_modules"]\n' +
     //         "}\n"
     //     );
@@ -145,7 +149,7 @@ suite("Python Tests", () =>
     //         '    "test1": "run -r test",\n' +
     //         '    "test2": "open -p tmp.txt",\n' +
     //         "  },\n" +
-    //         '  "include": ["**/*"],\n' +
+    //         '  "include": [""] +
     //         '  "exclude": ["node_modules"]\n' +
     //         "}\n"
     //     );
@@ -192,5 +196,5 @@ suite("Python Tests", () =>
         await teApi.waitForIdle(waitTimeForFsDelEvent * 2);
         await verifyTaskCount("script", 2, testsName);
     });
-
+*/
 });

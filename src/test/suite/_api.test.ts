@@ -5,6 +5,7 @@ import * as assert from "assert";
 import { configuration } from "../../common/configuration";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeSettingsUpdate, executeTeCommand, isReady, testsControl } from "../helper";
+import { refreshTree } from "../../lib/refreshTree";
 
 let teApi: TaskExplorerApi;
 const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
@@ -33,10 +34,39 @@ suite("API Init and Tests", () =>
     });
 
 
-    test("Disable SideBar Explorer", async function()
+    test("Enabled SideBar View", async function()
     {
-        await configuration.update("enableSideBar", false);
-        await teApi.waitForIdle(waitTimeForFsNewEvent * 2);
+        await executeSettingsUpdate("enableSideBar", true);
+    });
+
+
+    test("Refresh for SideBar Coverage", async function()
+    {
+        await refreshTree();
+    });
+
+
+    test("Disable Explorer Views", async function()
+    {
+        await executeSettingsUpdate("enableExplorerView", false);
+    });
+
+
+    test("Disable SideBar View", async function()
+    {
+        await executeSettingsUpdate("enableSideBar", false);
+    });
+
+
+    test("Re-enable Explorer View", async function()
+    {
+        await executeSettingsUpdate("enableExplorerView", true);
+    });
+
+
+    test("Refresh", async function()
+    {
+        await executeTeCommand("refresh");
     });
 
 });

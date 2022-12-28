@@ -149,6 +149,7 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
                     }
                 }
             }
+            Object.assign(pathToPrograms, newPathToPrograms);
         }
 
         //
@@ -209,46 +210,6 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
         }
 
         //
-        // Enabled/disable sidebar view
-        //
-        if (e.affectsConfiguration("taskExplorer.enableSideBar"))
-        {
-            if (configuration.get<boolean>("enableSideBar"))
-            {   /* istanbul ignore else */
-                if (teApi.sidebar) {
-                    // TODO - remove/add view on enable/disable view
-                    refresh = true;
-                }
-                else {
-                    teApi.sidebar = registerExplorer("taskExplorerSideBar", ctx);
-                }
-            }
-            // else {
-            //     teApi.sidebar = undefined;
-            // }
-        }
-
-        //
-        // Enabled/disable explorer view
-        //
-        if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
-        {
-            if (configuration.get<boolean>("enableExplorerView"))
-            {   /* istanbul ignore else */
-                if (teApi.explorer) {
-                    // TODO - remove/add view on enable/disable view
-                    refresh = true;
-                }
-                else {
-                    teApi.explorer = registerExplorer("taskExplorer", ctx);
-                }
-            }
-            // else {
-            //     teApi.explorer = undefined;
-            // }
-        }
-
-        //
         // Integrated shell
         //
         if (e.affectsConfiguration("terminal.integrated.shell.windows") ||
@@ -264,13 +225,55 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
                 refresh = true;
             }
         }
+    } 
+    
+    //
+    // Enabled/disable sidebar view
+    //
+    if (e.affectsConfiguration("taskExplorer.enableSideBar"))
+    {
+        if (configuration.get<boolean>("enableSideBar"))
+        {   /* istanbul ignore else */
+            if (teApi.sidebar) {
+                // TODO - remove/add view on enable/disable view
+                refresh = true;
+            }
+            else {
+                teApi.sidebar = registerExplorer("taskExplorerSideBar", ctx);
+            }
+        }
+        // else {
+        //     teApi.sidebar = undefined;
+        // }
+    }
+
+    //
+    // Enabled/disable explorer view
+    //
+    if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
+    {
+        if (configuration.get<boolean>("enableExplorerView"))
+        {   /* istanbul ignore else */
+            if (teApi.explorer) {
+                // TODO - remove/add view on enable/disable view
+                refresh = true;
+            }
+            else {
+                teApi.explorer = registerExplorer("taskExplorer", ctx);
+            }
+        }
+        // else {
+        //     teApi.explorer = undefined;
+        // }
     }
 
     try
-    {   if (refresh || refreshTaskTypes.length > 5) {
+    {   if (refresh || refreshTaskTypes.length > 5)
+        {
             await refreshTree();
         }
-        else if (refreshTaskTypes.length > 0) {
+        else if (refreshTaskTypes.length > 0)
+        {
             for (const t of refreshTaskTypes) {
                 await refreshTree(t);
             }

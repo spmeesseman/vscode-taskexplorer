@@ -19,7 +19,7 @@ import { configuration } from "../../common/configuration";
 import { storage } from "../../common/storage";
 import {
     activate, executeSettingsUpdate, executeTeCommand, findIdInTaskMap,
-    getTreeTasks, isReady, refresh, sleep, verifyTaskCount
+    getTreeTasks, isReady, refresh, sleep, testsControl, verifyTaskCount
 } from "../helper";
 
 
@@ -148,7 +148,7 @@ suite("Provider Tests", () =>
 
     suiteTeardown(async function()
     {
-        await configuration.updateWs("debug", false);
+        await configuration.updateWs("debug", testsControl.writeToOutput || testsControl.writeToConsole);
         await configuration.updateWs("expanded.test-files", false);
 
         if (tempFiles.length)
@@ -447,8 +447,8 @@ suite("Provider Tests", () =>
     {   //
         // Cover single-if branches in cache module
         //
-        await teApi.testsApi.fileCache.addFolderToCache();
-        await teApi.testsApi.fileCache.addFolderToCache((workspace.workspaceFolders as WorkspaceFolder[])[0]);
+        await teApi.testsApi.fileCache.addWsFolders();
+        await teApi.testsApi.fileCache.addWsFolders(workspace.workspaceFolders as WorkspaceFolder[]);
         await sleep(5000);
         await teApi.testsApi.fileCache.waitForCache();
     });
@@ -550,16 +550,6 @@ suite("Provider Tests", () =>
         teApi.testsApi.fileCache.rebuildCache();
         await teApi.testsApi.fileCache.cancelBuildCache(true);
         await teApi.testsApi.fileCache.rebuildCache();
-    });
-
-
-    test("Enable and Disable Views", async function()
-    {
-        await configuration.updateWs("enableExplorerView", false);
-        await configuration.updateWs("enableSideBar", false);
-        await configuration.updateWs("enableExplorerView", true);
-        await configuration.updateWs("enableSideBar", true);
-        await sleep(5000); // wait for refresh
     });
 
 
