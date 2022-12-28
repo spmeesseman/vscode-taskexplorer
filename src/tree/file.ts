@@ -26,7 +26,7 @@ export default class TaskFile extends TreeItem
     /**
      * @property folder
      *
-     * The owner TaskFolder representng a workspace or special (Last Tasks / Favorites)
+     * The owner TaskFolder representing a workspace or special (Last Tasks / Favorites)
      * folder.
      */
     public folder: TaskFolder;

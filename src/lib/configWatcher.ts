@@ -138,7 +138,7 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
         {
             const newPathToPrograms = configuration.get<any>("pathToPrograms");
             for (const p in pathToPrograms)
-            {   /** istanbul ignore else */
+            {   /* istanbul ignore else */
                 if ({}.hasOwnProperty.call(pathToPrograms, p))
                 {
                     const taskType = util.getTaskTypeRealName(p),

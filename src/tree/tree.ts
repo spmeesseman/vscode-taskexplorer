@@ -227,7 +227,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                     log.value("   file glob", selection.resourceUri.path);
                     pathValue = selection.resourceUri.path;
                 }
-                /** istanbul ignore else */
+                /* istanbul ignore else */
                 else if (selection.taskFile) {
                     log.value("   file glob", selection.taskFile.resourceUri.path);
                     pathValue = selection.taskFile.resourceUri.path;
@@ -291,7 +291,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         setTimeout((t: TaskItem) =>
         {
             if (t.isRunning())
-            {
+            {   /* istanbul ignore if */
                 if (!t.isExecuting()) {
                     // t.refreshState(false);
                     this.fireTaskChangeEvents(t, "", 5);
@@ -618,7 +618,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         {   //
             // Only processitems of type 'TaskFile'
             //
-            /** istanbul ignore if */
+            /* istanbul ignore if */
             if (!(each instanceof TaskFile)) {
                 continue;
             }
@@ -636,7 +636,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                         [ "      id", id ]
                     ], true);
                     const node = each.treeNodes[0];
-                    /** istanbul ignore else */
+                    /* istanbul ignore else */
                     if (node instanceof TaskItem)
                     {
                         subfolder = new TaskFile(this.extensionContext, folder, node.task.definition,
@@ -743,12 +743,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         ]);
 
         const _setNodePath = (t: TaskItem | undefined, cPath: string) =>
-        {
+        {   /* istanbul ignore else */
             if (t && !atMaxLevel && prevName)
             {
                 log.write("   setting node path", logLevel + 2, logPad);
                 log.value("      current", t.nodePath, logLevel + 2, logPad);
-                if (!t.nodePath && taskFile.taskSource === "Workspace") {
+                /* istanbul ignore if */
+                if (!t.nodePath && taskFile.taskSource === "Workspace")
+                {   //
+                    // Reference Ticket #?. Fixes never ending loop with specific case VSCode tasks.
+                    //
                     t.nodePath = path.join(".vscode", prevName[treeLevel]);
                 }
                 else if (!t.nodePath) {
@@ -860,6 +864,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             for (const n of newNodes)
             {
                 taskFile.insertTreeNode(n, numGrouped++);
+                /* istanbul ignore else */
                 if (!atMaxLevel)
                 {
                     await this.createTaskGroupingsBySep(folder, n, subfolders, treeLevel + 1, logPad + "   ", logLevel + 1);
@@ -873,9 +878,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
     private fireTaskChangeEvents(taskItem: TaskItem, logPad: string, logLevel: number)
     {
-        /** istanbul ignore if */
+        /* istanbul ignore next */
         if (!this.taskTree || !taskItem) {
+            /* istanbul ignore next */
             log.error("task change event fire, invalid argument");
+            /* istanbul ignore next */
             return;
         }
 
@@ -935,7 +942,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     async getChildren(element?: TreeItem, logPad = "", logLevel = 1): Promise<TreeItem[]>
     {
         let waited = 0;
-        let items: any = [];
+        let items: TaskFolder[] | NoScripts[] | TaskFile[] | TaskItem[] = [];
         const firstRun = this.name === "taskExplorer" && !this.tasks && !this.taskTree;
 
         this.refreshPending = true;
@@ -956,14 +963,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         // have 'LastTasks' and 'Favorites', we need to load everything.  Oh well.
         //
         while (this.treeBuilding) {
-            /** istanbul ignore next */
+            /* istanbul ignore next */
             log.write("   waiting...", logLevel, logPad);
-            /** istanbul ignore next */
+            /* istanbul ignore next */
             await util.timeout(100);
-            /** istanbul ignore next */
+            /* istanbul ignore next */
             waited += 100;
         }
-        /** istanbul ignore if */
+        /* istanbul ignore if */
         if (waited) {
             log.write("   waited " + waited + " ms", logLevel, logPad);
         }
@@ -986,11 +993,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             // (including providers implemented in this extension).  In this case, we have to ask
             // for all tasks.  Same goes for typescript tasks.
             //
+            /* istanbul ignore else */
             if (!this.tasks || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
             {
                 this.tasks = await tasks.fetchTasks();
             }
-            /** istanbul ignore else */
             else if (this.tasks && this.currentInvalidation)
             {
                 const isScriptType = util.isScriptType(this.currentInvalidation);
@@ -1039,7 +1046,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 this.tasks.push(...taskItems);
             }
 
-            /** istanbul ignore else */
+            /* istanbul ignore else */
             if (this.tasks)
             {   //
                 // Build the entire task tree
@@ -1047,8 +1054,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 try {
                     this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel);
                 }
-                catch (e: any) { log.error(e); }
-                log.blank(1);
+                catch (e: any) { /* istanbul ignore next */ log.error(e); }
+                /* istanbul ignore if */
                 if (!this.taskTree || this.taskTree.length === 0)
                 {
                     this.taskTree = [ noScripts ];
@@ -1072,13 +1079,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         else if (!element)
         {
             log.write(logPad + "   Get task tree", logLevel);
-            if (this.taskTree)
-            {
-                items = this.taskTree;
-            }
+            items = this.taskTree;
         }
 
-        /** istanbul ignore if */
+        /* istanbul ignore if */
         if (firstRun && this.tasks && isLicenseManagerActive)
         {   //
             // Initialize license manager
@@ -1090,7 +1094,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         this.currentInvalidation = undefined; // reset file modification task type flag
 
         log.methodDone("get tree children", logLevel, logPad, false, [
-            [ "# of tasks total", this.tasks?.length || "0" ], [ "# of tasks returned", items?.length || "0" ]
+            [ "# of tasks total", this.tasks!.length ], [ "# of tasks returned", items.length ]
         ]);
 
         return items;
@@ -1107,7 +1111,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             id += labelSplit[i];
         }
         id += file.resourceUri.fsPath.replace(/\W/gi, "");
-        return folder.label + file.taskSource + id + (treeLevel || treeLevel === 0 ? treeLevel.toString() : "");
+        return folder.label + file.taskSource + id + treeLevel.toString();
     }
 
 
@@ -1125,6 +1129,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         {
             return element.taskFile;
         }
+        /* istanbul ignore if */
         if (element instanceof NoScripts)
         {
             return null;
@@ -1543,6 +1548,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         log.value("   name", task.name, 3, logPad);
         log.value("   source", task.source, 3, logPad);
         log.value("   scope name", scopeName, 4, logPad);
+        /* istanbul ignore else */
         if (util.isWorkspaceFolder(task.scope))
         {
             log.value("   scope.name", task.scope.name, 4, logPad);
@@ -1646,6 +1652,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             [ "uri path", uri.path ], [ "fs path", uri.fsPath ]
         ]);
 
+        /* istanbul ignore else */
         if (util.pathExists(uri.fsPath))
         {
             const document: TextDocument = await workspace.openTextDocument(uri);
@@ -1711,6 +1718,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         const ltFolder = this.taskTree ? this.taskTree[treeIndex] as TaskFolder : undefined;
         const taskId = label + ":" + util.getTaskItemId(taskItem);
 
+        /* istanbul ignore if */
         if (!ltFolder || !taskItem.task) {
             return;
         }
@@ -1852,6 +1860,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
         for (const each of folder.taskFiles)
         {
+            /* istanbul ignore if */
             if (!(each instanceof TaskFile) || !each.label) {
                 continue;
             }
@@ -1915,7 +1924,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         log.methodStart("remove scripts", logLevel, logPad, false);
 
         for (const each of taskFile.treeNodes)
-        {
+        {   /* istanbul ignore if */
             if (!each.label) {
                 continue;
             }
@@ -1966,6 +1975,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
     private async renameGroupedTasks(taskFile: TaskFile)
     {
+        /* istanbul ignore if */
         if (!configuration.get<boolean>("groupStripTaskLabel", true) || !taskFile.label) {
             return;
         }
@@ -1975,17 +1985,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         rmvLbl = rmvLbl.replace(/\(/gi, "\\(").replace(/\[/gi, "\\[");
         rmvLbl = rmvLbl.replace(/\)/gi, "\\)").replace(/\]/gi, "\\]");
 
-        for (const each2 of taskFile.treeNodes)
+        for (const each2 of taskFile.treeNodes.filter(n => !!n.label))
         {
             if (each2 instanceof TaskItem)
             {
                 const rgx = new RegExp(rmvLbl + groupSeparator, "i");
-                each2.label = each2.label?.toString().replace(rgx, "");
+                each2.label = (each2.label as string).toString().replace(rgx, "");
 
                 if (each2.groupLevel > 0)
                 {
                     let label = "";
-                    const labelParts = each2.label?.split(groupSeparator);
+                    const labelParts = each2.label.split(groupSeparator);
+                    /* istanbul ignore else */
                     if (labelParts)
                     {
                         for (let i = each2.groupLevel; i < labelParts.length; i++)
@@ -2080,8 +2091,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 //
                 const def = newTask.definition,
                       folder = taskItem.getFolder(),
-                      p = providers.get(util.getTaskProviderType(def.type)) ||
-                          providersExternal.get(def.type);
+                      p = providers.get(util.getTaskProviderType(def.type))
+                          /* istanbul ignore next */ || providersExternal.get(def.type);
+                /* istanbul ignore else */
                 if (folder && p)
                 {
                     newTask = p.createTask(def.target, undefined, folder, def.uri, undefined, "   ") as Task;
@@ -2089,6 +2101,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                     // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
                     // an instance of this task.
                     //
+                    /* istanbul ignore else */
                     if (newTask) {
                         newTask.definition.taskItemId = def.taskItemId;
                         taskItem.taskDetached = newTask;
@@ -2134,6 +2147,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
         const taskItem = await this.getTaskItems(lastTaskId, "   ");
 
+        /* istanbul ignore else */
         if (taskItem && taskItem instanceof TaskItem)
         {
             await this.run(taskItem);
@@ -2166,7 +2180,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         };
 
         if (command.indexOf("<packagename>") === -1)
-        {
+        {   /* istanbul ignore else */
             if (taskFile.folder.workspaceFolder)
             {
                 const execution = new ShellExecution(pkgMgr + " " + command, options);
@@ -2234,6 +2248,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
      */
     public async runWithArgs(taskItem: TaskItem, args?: string, noTerminal?: boolean)
     {
+        /* istanbul ignore else */
         if (taskItem.task && !(taskItem.task.execution instanceof CustomExecution))
         {
             const me = this;
@@ -2246,10 +2261,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                     let newTask = taskItem.task;
                     const def = taskItem.task.definition,
                           folder = taskItem.getFolder();
+                    /* istanbul ignore else */
                     if (folder) {
                         newTask = (providers.get("script") as ScriptTaskProvider).createTask(def.script, undefined, folder, def.uri, _args.trim().split(" ")) as Task;
                         newTask.definition.taskItemId = def.taskItemId;
                     }
+                    /* istanbul ignore else */
                     if (await this.runTask(newTask, noTerminal)) {
                         await me.saveTask(taskItem, configuration.get<number>("numLastTasks"));
                         this.babysitRunningTask(taskItem);
@@ -2326,8 +2343,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             return;
         }
 
-        if (!tree || tree.length === 0 ||
-            (tree.length === 1 && tree[0].contextValue === "noscripts")) {
+        if (!tree || tree.length === 0 || (tree.length === 1 && tree[0].contextValue === "noscripts"))
+        {
             log.write(logPad + "   no tasks found in tree", 1);
             return;
         }
@@ -2337,19 +2354,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             if (!taskItem || isFavorite) // refresh
             {
                 taskItem = undefined;
-                if (tree[treeIdx]?.label === label) {
+                if (tree[treeIdx].label === label) {
                     // file deepcode ignore AttrAccessOnNull: whatever
                     tree.splice(treeIdx, 1);
                 }
                 changed = true;
             }
 
-            if (!isFavorite && tree[0]?.label !== label)
+            /* istanbul ignore else */
+            if (!isFavorite && tree[0].label !== label)
             {
                 await this.createSpecialFolder(storeName, label, 0, false, "   ");
                 changed = true;
             }
-            else if (isFavorite && tree[favIdx]?.label !== label)
+            else if (isFavorite && tree[favIdx].label !== label)
             {
                 await this.createSpecialFolder(storeName, label, favIdx, true, "   ");
                 changed = true;
@@ -2373,6 +2391,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             }
         }
 
+        /* istanbul ignore else */
         if (changed) {
             this._onDidChangeTreeData.fire(taskItem || null);
         }
@@ -2392,6 +2411,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                     TaskTreeDataProvider.statusBarSpace.tooltip = "Task Explorer running task";
                 }
                 let statusMsg = task.name;
+                /* istanbul ignore else */
                 if ((task.scope as WorkspaceFolder).name) {
                     statusMsg += " (" + (task.scope as WorkspaceFolder).name + ")";
                 }
@@ -2399,6 +2419,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 TaskTreeDataProvider.statusBarSpace.show();
             }
             else {
+                /* istanbul ignore else */
                 if (TaskTreeDataProvider.statusBarSpace) {
                     TaskTreeDataProvider.statusBarSpace.dispose();
                 }
@@ -2411,6 +2432,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     {
         log.methodStart("stop", 1, "", true);
 
+        /* istanbul ignore if */
         if (this.busy || !taskItem)
         {
             window.showInformationMessage("Busy, please wait...");

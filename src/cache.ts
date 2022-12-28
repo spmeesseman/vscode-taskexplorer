@@ -69,7 +69,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
         if (!cancel && (externalProvider || util.isTaskTypeEnabled(providerName)))
         {
             if (!filesCache.get(providerName)) {
-                /** istanbul ignore next */
+                /* istanbul ignore next */
                 throw new Error("Workspace project folder has not yet been scanned");
             }
 

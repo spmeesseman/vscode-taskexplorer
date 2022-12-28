@@ -160,7 +160,7 @@ export async function cleanup()
     }
 
     try {
-        const packageLockFile = path.join(rootPath, "package.lock.json");
+        const packageLockFile = path.join(rootPath, "package-lock.json");
         if (fs.existsSync(packageLockFile)) {
             fs.unlinkSync(settingsFile);
         }
