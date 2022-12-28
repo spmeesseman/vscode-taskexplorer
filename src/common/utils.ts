@@ -176,7 +176,7 @@ export function getPortableDataPath(padding = "")
                     return fullPath;
                 }
                 catch (e: any)
-                {   /** istanbul ignore next */
+                {   /* istanbul ignore next */
                     log.error(e);
                 }
             }
@@ -221,9 +221,9 @@ export function getTaskItemId(taskItem: TaskItem)
  * @param settingPart String prependature for  commonly named setting name
  * @returns The task type's unique setting name
  */
-/** istanbul ignore next */
+/* istanbul ignore next */
 export function getTaskTypeSettingName(taskType: string, settingPart: string)
-{   /** istanbul ignore next */
+{   /* istanbul ignore next */
     return settingPart + (!settingPart.endsWith(".") ? properCase(taskType) : taskType.toLowerCase());
 }
 
@@ -234,9 +234,9 @@ export function getTaskTypeSettingName(taskType: string, settingPart: string)
  * @param taskType Task type, e.g. `npm`, `apppublisher`, `grunt`, `bash`, etc
  * @returns The task type's unique setting name
  */
-/** istanbul ignore next */
+/* istanbul ignore next */
 export function getTaskTypeEnabledSettingName(taskType: string)
-{   /** istanbul ignore next */
+{   /* istanbul ignore next */
     return getTaskTypeSettingName(taskType, "enabledTasks.");
 }
 
@@ -277,11 +277,11 @@ export function getUserDataPath(platform?: string, padding = "")
     //
     // Check if data path was passed on the command line
     //
-    /** istanbul ignore else */
+    /* istanbul ignore else */
     if (process.argv)
     {
         let argvIdx = process.argv.includes("--user-data-dir");
-        /** istanbul ignore if */
+        /* istanbul ignore if */
         if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
             userPath = path.resolve(process.argv[++argvIdx]);
             log.value(padding + "user path is", userPath, 1);
@@ -314,7 +314,7 @@ function getDefaultUserDataPath(platform?: string)
     // Otherwise check per platform
     //
     if (!appDataPath) {
-        switch (platform /** istanbul ignore next */ || process.platform) {
+        switch (platform /* istanbul ignore next */ || process.platform) {
             case "win32":
                 appDataPath = process.env.APPDATA;
                 if (!appDataPath) {
@@ -445,7 +445,7 @@ function logUserDataEnv(padding: string)
         log.value(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
         log.value(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 1);
         log.value(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
-        /** istanbul ignore if */
+        /* istanbul ignore if */
         if (process.platform === "linux") {
             log.value("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
         }
@@ -521,7 +521,7 @@ export function removeFromArray(arr: any[], item: any)
         }
     }
 
-    /** istanbul ignore else */
+    /* istanbul ignore else */
     if (idx2 !== -1 && idx2 < arr.length) {
         arr.splice(idx2, 1);
     }
