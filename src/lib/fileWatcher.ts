@@ -62,9 +62,9 @@ export async function initFileWatchers(context: ExtensionContext)
 }
 
 
-export async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, enabled?: boolean)
+export async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, enabled?: boolean, logPad = "")
 {
-    log.write("Register file watcher for task type '" + taskType + "'");
+    log.methodStart("Register file watcher for task type '" + taskType + "'", 1, logPad);
 
     let watcher = watchers.get(taskType);
     //
@@ -75,7 +75,12 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
 
     /* istanbul ignore else */
     if (workspace.workspaceFolders) {
-        await cache.buildCache(taskType, fileBlob, undefined, true, "   ");
+        if (enabled !== false){
+            await cache.buildCache(taskType, fileBlob, undefined, true, "   ");
+        }
+        else {
+            await cache.removeTaskTypeFromCache(taskType, logPad + "   ");
+        }
     }
 
     if (watcher)
@@ -138,6 +143,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
         }));
     }
 
+    log.methodDone("Register file watcher for task type '" + taskType + "'", 1, logPad);
 }
 
 
@@ -166,14 +172,20 @@ function createDirWatcher(context: ExtensionContext)
 
 async function createFileWatchers(context: ExtensionContext)
 {
+    log.methodStart("Create file watchers", 1);
     const taskTypes = util.getTaskTypes();
     for (const taskType of taskTypes)
     {
+        log.value("   task type", taskType, 1);
         if (util.isTaskTypeEnabled(taskType))
         {
-            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType));
+            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), true, "   ");
+        }
+        else {
+            log.write(`   task type '${taskType}' is disabled in settings`, 1);
         }
     }
+    log.methodDone("Create file watchers", 1);
 }
 
 

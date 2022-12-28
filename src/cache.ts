@@ -592,63 +592,123 @@ export async function removeFolderFromCache(uri: Uri, logPad: string)
 }
 
 
-function removeFromMappings(taskType: string, uri: Uri, isFolder: boolean, logPad: string)
+export async function removeTaskTypeFromCache(taskType: string, logPad: string)
 {
-    log.methodStart("remove item from mappings", 2, logPad, false, [[ "task type", taskType ], [ "path", uri.fsPath ]]);
+    log.methodStart("remove task type from cache", 1, logPad, false, [[ "task type", taskType ]]);
+    removeFromMappings(taskType, undefined, true, logPad + "   ");
+    log.methodDone("remove task type from cache", 1, logPad);
+}
 
-    const wsf = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
+
+function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: boolean, logPad: string)
+{
+    let wsFolders: readonly WorkspaceFolder[];
+    log.methodStart("remove item from mappings", 2, logPad, false, [[ "task type", taskType ], [ "path", uri?.fsPath ]]);
+
+    if (uri === undefined) {
+        wsFolders = workspace.workspaceFolders as readonly WorkspaceFolder[];
+    }
+    else {
+        const wsf = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
+        wsFolders = [ wsf ];
+    }
     const removed = {
         c1: 0, c2: 0, c3: 0
     };
 
-    initMaps(taskType, wsf.name);
-    const fCache = filesCache.get(taskType) as Set<ICacheItem>;
-
-    const toRemove = [];
-    for (const item of fCache)
+    for (const wsf of wsFolders)
     {
-        if (item.uri.fsPath === uri.fsPath || (isFolder && item.uri.fsPath.startsWith(uri.fsPath)))
+        initMaps(taskType, wsf.name);
+        const fCache = filesCache.get(taskType) as Set<ICacheItem>;
+
+        const toRemove = [];
+        for (const item of fCache)
         {
-            toRemove.push(item);
-            if (!isFolder) {
-                break;
+            if (uri !== undefined)
+            {
+                if (item.uri.fsPath === uri.fsPath || (isFolder && item.uri.fsPath.startsWith(uri.fsPath)))
+                {
+                    toRemove.push(item);
+                    if (!isFolder) {
+                        break;
+                    }
+                }
+            }
+            else {
+                if (item.folder.name === wsf.name)
+                {
+                    toRemove.push(item);
+                    if (!isFolder) {
+                        break;
+                    }
+                }
             }
         }
-    }
-    for (const tr of toRemove)
-    {
-        fCache.delete(tr);
-        ++removed.c1;
-    }
-
-    /* istanbul ignore else */
-    if (projectFilesMap[wsf.name] && projectFilesMap[wsf.name][taskType])
-    {
-        projectFilesMap[wsf.name][taskType].slice().reverse().forEach((item, index, object) =>
+        for (const tr of toRemove)
         {
-            if (item.fsPath === uri.fsPath || (isFolder && item.fsPath.startsWith(uri.fsPath)))
-            {
-                log.value(`      remove file index ${index}`, item.fsPath, 2, logPad);
-                projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
-                ++removed.c2;
-            }
-        });
-    }
+            log.value("   remove from files map", tr.uri.fsPath, 2, logPad);
+            fCache.delete(tr);
+            ++removed.c1;
+        }
 
-    /* istanbul ignore else */
-    if (taskFilesMap[taskType])
-    {
-        taskFilesMap[taskType].slice().reverse().forEach((item, index, object) =>
+        /* istanbul ignore else */
+        if (projectFilesMap[wsf.name] && projectFilesMap[wsf.name][taskType])
         {
-            if (item.uri.fsPath === uri.fsPath || (isFolder && item.uri.fsPath.startsWith(uri.fsPath)))
+            projectFilesMap[wsf.name][taskType].slice().reverse().forEach((item, index, object) =>
             {
-                taskFilesMap[taskType].splice(object.length - 1 - index, 1);
-                ++removed.c3;
-            }
-        });
+                if (uri !== undefined)
+                {
+                    if (item.fsPath === uri.fsPath || (isFolder && item.fsPath.startsWith(uri.fsPath)))
+                    {
+                        log.value(`   remove from project files map (${index})`, item.fsPath, 3, logPad);
+                        projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
+                        ++removed.c2;
+                    }
+                }
+                else
+                {   if (item.fsPath.startsWith(wsf.uri.fsPath))
+                    {
+                        log.value(`   remove from project files map (${index})`, item.fsPath, 3, logPad);
+                        projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
+                        ++removed.c2;
+                    }
+                }
+            });
+        }
+
+        /* istanbul ignore else */
+        if (taskFilesMap[taskType])
+        {
+            taskFilesMap[taskType].slice().reverse().forEach((item, index, object) =>
+            {
+                if (uri !== undefined)
+                {
+                    if (item.uri.fsPath === uri.fsPath || (isFolder && item.uri.fsPath.startsWith(uri.fsPath)))
+                    {
+                        log.value(`   remove from task files map (${index})`, item.uri.fsPath, 3, logPad);
+                        taskFilesMap[taskType].splice(object.length - 1 - index, 1);
+                        ++removed.c3;
+                    }
+                }
+                else
+                {   if (item.folder.name === wsf.name)
+                    {
+                        log.value(`   remove from task files map (${index})`, item.uri.fsPath, 3, logPad);
+                        projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
+                        ++removed.c2;
+                    }
+                }
+            });
+        }
     }
 
-    log.values(3, logPad + "      ", [
+    if (uri === undefined && taskFilesMap[taskType])
+    {
+        log.write("   clear task files map", 3, logPad);
+        taskFilesMap[taskType] = [];
+    }
+
+    log.values(3, logPad + "   ", [
         [ "cache1 count", removed.c1 ], [ "cache2 count", removed.c2 ], [ "cache3 count", removed.c3 ]
     ]);
 
