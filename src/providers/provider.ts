@@ -12,7 +12,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 {
     abstract createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined;
     abstract getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number;
-    abstract readUriTasks(uri: Uri, logPad: string): Promise<Task[]>;
+    abstract readUriTasks(uri: Uri, logPad: string): Task[];
 
 
     public cachedTasks: Task[] | undefined;
@@ -57,13 +57,18 @@ export abstract class TaskExplorerProvider implements TaskProvider
     }
 
 
+    /**
+     * Main VSCode TaskProvider callback.  Calls to tasks.fetchTasks() trigger this
+     * callback in each registered task provider.
+     */
     public async provideTasks()
     {
-        log.methodStart(`provide ${this.providerName} tasks`, 1, "", true);
-        if (!this.cachedTasks) {
-            this.cachedTasks = await this.readTasks("   ");
+        log.methodStart(`provide ${this.providerName} tasks`, 1, "   ");
+        if (!this.cachedTasks)
+        {
+            this.cachedTasks = await this.readTasks("      ");
         }
-        log.methodDone(`provide ${this.providerName} tasks`, 1, "", true);
+        log.methodDone(`provide ${this.providerName} tasks`, 1, "   ");
         return this.cachedTasks;
     }
 
@@ -75,25 +80,26 @@ export abstract class TaskExplorerProvider implements TaskProvider
               paths = getTaskFiles(this.providerName),
               enabled = util.isTaskTypeEnabled(this.providerName);
 
-        log.methodStart(`read tasks - detect ${this.providerName} files`, 1, logPad, true, [[ "enabled", enabled ]]);
+        log.methodStart(`read ${this.providerName} tasks`, 2, logPad, true, [[ "enabled", enabled ]]);
 
         if (enabled && paths)
         {
-            for (const fObj of paths.values())
+            for (const fObj of paths)
             {
                 if (!util.isExcluded(fObj.uri.path) && !visitedFiles.includes(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
                 {
                     visitedFiles.push(fObj.uri.fsPath);
-                    const tasks = (await this.readUriTasks(fObj.uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
+                    const tasks = this.readUriTasks(fObj.uri, logPad + "   ");
+                    const fTasks = tasks.filter(t => isTaskIncluded(t, t.definition.path));
                     log.write(`   processed ${this.providerName} file`, 3, logPad);
                     log.value("      file", fObj.uri.fsPath, 3, logPad);
-                    log.value("      targets in file", tasks.length, 3, logPad);
+                    log.value("      targets in file", fTasks.length, 3, logPad);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        log.methodDone(`read tasks - detect ${this.providerName} files`, 1, logPad, true, [[ "# of tasks", allTasks.length ]]);
+        log.methodDone(`read ${this.providerName} tasks`, 2, logPad, true, [[ "# of tasks", allTasks.length ]]);
         return allTasks;
     }
 

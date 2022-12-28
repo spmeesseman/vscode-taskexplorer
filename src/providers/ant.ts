@@ -4,7 +4,7 @@ import * as path from "path";
 import * as util from "../common/utils";
 import * as log from "../common/log";
 import { execSync } from "child_process";
-import { parseStringPromise } from "xml2js";
+import { parseString, parseStringPromise } from "xml2js";
 import { configuration } from "../common/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
@@ -64,7 +64,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
-    private async findAllAntScripts(path: string, logPad: string): Promise<StringMap>
+    private findAllAntScripts(path: string, logPad: string)
     {
         const scripts: StringMap = {};
         const useAnt = configuration.get<boolean>("useAnt");
@@ -80,7 +80,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
                 this.findTasksWithAnt(path, scripts, logPad + "   ");
             }
             else {
-                await this.findTasksWithXml2Js(path, scripts, logPad + "   ");
+                this.findTasksWithXml2Js(path, scripts, logPad + "   ");
             }
         }
         catch (ex) {
@@ -184,7 +184,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
-    private async findTasksWithXml2Js(path: string, taskMap: StringMap, logPad: string)
+    private findTasksWithXml2Js(path: string, taskMap: StringMap, logPad: string)
     {
         log.methodStart("find tasks with xml2js", 3, logPad, false, [[ "path", path ]]);
 
@@ -192,22 +192,29 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         //
         // Convert to JSON with Xml2Js parseString()
         //
-        const text = await parseStringPromise(buffer);
-        //
-        // We should have a main 'project' object and a 'project.target' array
-        //
-        if (text && text.project && text.project.target)
+        parseString(buffer, (err, text) =>
         {
-            const defaultTask = text.project.$.default; // Is default task?  It's always defined on the main project node
-            const targets = text.project.target;
-            for (const tgt of targets)                  // Check .$ and .$.name (xml2js output format)
-            {
-                if (tgt.$ && tgt.$.name) {
-                    log.value("   Found target (cst.)", tgt.$.name);
-                    taskMap[defaultTask === tgt.$.name ? tgt.$.name + " - Default" : tgt.$.name] = tgt.$.name;
+            if (!err)
+            {   //
+                // We should have a main 'project' object and a 'project.target' array
+                //
+                if (text && text.project && text.project.target)
+                {
+                    const defaultTask = text.project.$.default; // Is default task?  It's always defined on the main project node
+                    const targets = text.project.target;
+                    for (const tgt of targets)                  // Check .$ and .$.name (xml2js output format)
+                    {
+                        if (tgt.$ && tgt.$.name) {
+                            log.value("   Found target (cst.)", tgt.$.name);
+                            taskMap[defaultTask === tgt.$.name ? tgt.$.name + " - Default" : tgt.$.name] = tgt.$.name;
+                        }
+                    }
                 }
             }
-        }
+            else {
+                log.write(err.message);
+            }
+        });
 
         log.methodDone("find tasks with xml2js", 3, logPad, false, [[ "# of tasks", taskMap.size ]]);
 
@@ -287,7 +294,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
-    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
+    public readUriTasks(uri: Uri, logPad: string)
     {
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
@@ -296,7 +303,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
         if (folder)
         {
-            const scripts = await this.findAllAntScripts(uri.fsPath, logPad + "   ");
+            const scripts = this.findAllAntScripts(uri.fsPath, logPad + "   ");
             for (const s of Object.keys(scripts))
             {
                 const task = this.createTask(scripts[s], s, folder, uri);

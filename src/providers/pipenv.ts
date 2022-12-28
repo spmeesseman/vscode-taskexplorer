@@ -95,7 +95,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
+    public readUriTasks(uri: Uri, logPad: string)
     {
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;

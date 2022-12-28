@@ -32,7 +32,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
 
         const def = this.getDefaultDefinition(target, folder, uri);
         const cwd = path.dirname(uri.fsPath);
-        const args = [target];
+        const args = [ target ];
         const options = { cwd };
         const execution = new ShellExecution(getCommand(folder, cmd), args, options);
 
@@ -44,7 +44,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
     {
         const scripts: string[] = [];
 
-        log.methodStart("find gradle targets", 1, logPad, true, [["path", fsPath]]);
+        log.methodStart("find gradle targets", 1, logPad, true, [[ "path", fsPath ]]);
 
         const contents = util.readFileSync(fsPath);
         let idx = 0;
@@ -109,12 +109,12 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
+    public readUriTasks(uri: Uri, logPad: string)
     {
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read gradle file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read gradle file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
 
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
