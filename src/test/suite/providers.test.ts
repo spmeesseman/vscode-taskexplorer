@@ -481,45 +481,6 @@ suite("Provider Tests", () =>
     });
 
 
-    test("App Publisher Invalid JSON", async function()
-    {
-        this.slow(testsControl.slowTimeForFsCreateEvent);
-        fs.writeFileSync(
-            path.join(rootPath, ".publishrc.json"),
-            "{\n" +
-            '    "version": "1.0.0",\n' +
-            '    "branch": "trunk",\n' +
-            '    "buildCommand": [],\n' +
-            '    "mantisbtRelease": "Y",\n' +
-            '    "mantisbtChglogEdit": "N",\n' +
-            '    "mantisbtProject": "",\n' +
-            '    "repoType": "svn"\n' +
-            "\n"
-        );
-        await teApi.waitForIdle(waitTimeForFsModEvent, 3000);
-        await verifyTaskCount("apppublisher", 21);
-    });
-
-
-    test("App Publisher Fix Invalid JSON", async function()
-    {
-        fs.writeFileSync(
-            path.join(rootPath, ".publishrc.json"),
-            "{\n" +
-            '    "version": "1.0.0",\n' +
-            '    "branch": "trunk",\n' +
-            '    "buildCommand": [],\n' +
-            '    "mantisbtRelease": "Y",\n' +
-            '    "mantisbtChglogEdit": "N",\n' +
-            '    "mantisbtProject": "",\n' +
-            '    "repoType": "svn"\n' +
-            "}\n"
-        );
-        await teApi.waitForIdle(waitTimeForFsModEvent, 3000);
-        await verifyTaskCount("apppublisher", 42);
-    });
-
-
     test("Ant Delete / Add", async function()
     {
         this.slow(1000);

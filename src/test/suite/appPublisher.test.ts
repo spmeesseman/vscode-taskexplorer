@@ -11,17 +11,18 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { configuration } from "../../common/configuration";
 import { activate, buildTree, executeSettingsUpdate, executeTeCommand, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { MavenTaskProvider } from "../../providers/maven";
+import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 
 
-const testsName = "maven";
+const testsName = "apppublisher";
 const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
 const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
 const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
+let explorer: ExplorerApi;
 let pathToProgram: string;
 let enableTaskType: boolean;
 let dirName: string;
@@ -38,6 +39,10 @@ suite("App-Publisher Tests", () =>
         //
         teApi = await activate(this);
         assert(isReady(testsName) === true, "    ✘ TeApi not ready");
+        if (!teApi.explorer) {
+            assert.fail("        ✘ Explorer instance does not exist");
+        }
+        explorer = teApi.explorer;
         rootPath = getWsPath(".");
         dirName = path.join(rootPath, "tasks_test_");
         fileUri = Uri.file(path.join(rootPath, ".publishrc.json"));
@@ -81,7 +86,7 @@ suite("App-Publisher Tests", () =>
 
     test("Document Position", async function()
     {
-        const provider = teApi.providers.get(testsName) as MavenTaskProvider;
+        const provider = teApi.providers.get(testsName) as AppPublisherTaskProvider;
         // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
