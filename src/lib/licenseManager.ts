@@ -2,9 +2,9 @@
 
 import * as log from "../common/log";
 import { storage } from "../common/storage";
-import { commands, ExtensionContext, InputBoxOptions, Task, ViewColumn, WebviewPanel, window, workspace } from "vscode";
+import { commands, ExtensionContext, InputBoxOptions, Task, ViewColumn, WebviewPanel,  window, workspace } from "vscode";
 import { ILicenseManager } from "../interface/licenseManager";
-import { getHeaderContent, pushIfNotExists } from "../common/utils";
+import { getHeaderContent, getBodyContent } from "../common/utils";
 import { TaskExplorerApi } from "../interface";
 
 
@@ -15,10 +15,12 @@ export class LicenseManager implements ILicenseManager
 	private version: string;;
 	private panel: WebviewPanel | undefined;
 	private teApi: TaskExplorerApi;
+	private context: ExtensionContext;
 
 
 	constructor(teApi: TaskExplorerApi, context: ExtensionContext)
     {
+		this.context = context;
 		this.teApi = teApi;
         //
         // Store extension version
@@ -35,21 +37,27 @@ export class LicenseManager implements ILicenseManager
 
 		log.methodStart("display info startup page", 1, "", false, [["stored version", storedVersion]]);
 
-		let content = getHeaderContent("Welcome to Task Explorer");
+		let content = getHeaderContent();
 
-		if (this.version !== storedVersion)
+		content += "<table align=\"center\" width=\"900\">";
+
+		content += ("<tr><td>" + getBodyContent("Welcome to Task Explorer") + "</td></tr>");
+
+		if (this.version === storedVersion)
 		{
-			content += this.getInfoContent(components);
+			content += ("<tr><td>" + this.getInfoContent(components) + "</td></tr>");
 			displayInfo = true;
 		}
 
 		const hasLicense = await this.checkLicenseKey();
 		if (!hasLicense)
 		{
-			content += this.getLicenseContent();
+			content += ("<tr><td>" + this.getLicenseContent() + "</td></tr>");
 			displayPopup = !displayInfo;
 			// displayInfo = true; // temp
 		}
+
+		content + "</table>";
 
 		content += this.getFooterContent();
 
@@ -59,24 +67,44 @@ export class LicenseManager implements ILicenseManager
 				"taskExplorer",   // Identifies the type of the webview. Used internally
 				"Task Explorer",  // Title of the panel displayed to the users
 				ViewColumn.One,   // Editor column to show the new webview panel in.
-				{}                // Webview options.
+				{
+					enableScripts: true
+				}
 			);
 			this.panel.webview.html = content;
 			this.panel.reveal();
 			await storage.update("version", this.version);
+
+			this.panel.webview.onDidReceiveMessage
+			(
+				message =>
+				{
+					switch (message.command)
+					{
+						case 'enterLicense':
+							commands.executeCommand("taskExplorer.enterLicense");
+							return;
+						case 'viewReport':
+							commands.executeCommand("taskExplorer.viewReport");
+							return;
+						default:
+							return;
+					}
+				}, undefined, this.context.subscriptions
+			);
 		}
 		else if (displayPopup)
 		{
 			const msg = "Purchase a license to unlock unlimited parsed tasks.",
-				  action = await window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now");
+				  action = await window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now"); // don't await
 
 			if (action === "Enter License Key")
 			{
-				await this.enterLicenseKey();
+				this.enterLicenseKey(); // don't await
 			}
 			else if (action === "Info")
 			{
-				await window.showInformationMessage("License Info page not implemented yet");
+				window.showInformationMessage("License Info page not implemented yet"); // don't await
 			}
 		}
 
@@ -135,32 +163,50 @@ export class LicenseManager implements ILicenseManager
 
 	private getLicenseContent()
 	{
-		return `<table style="margin-top:15px">
-			<tr><td style="font-weight:bold;font-size:14px">
-				Licensing Note
-			</td></tr>
+		return `<table style="margin-top:15px;width:inherit">
+		<tr><td style="font-weight:bold;font-size:14px">
+			Licensing Note
+		</td></tr>
+		<tr><td>
+			This extension is free to use but am considering a small license for an
+			unlimited parsed component type of thing (e.g $10 - $20), as the time spent
+			and functionality have went way beyond what was at first intended.
+			<br><br>Hey Sencha, you can buy it and replace your own product if you want ;).
+		</td></tr></table>
+		<table style="margin-top:30px">
+			<tr><td>You can view a detailed parsing report using the "<i>Task Explorer: View Parsing Report</i>"
+			command in the Explorer context menu for any project.  It can alternatively be ran from the
+			command pallette for "all projects".
+			<tr><td height="20"></td></tr>
 			<tr><td>
-				This extension is free to use but am considering a small license for an
-				unlimited parsed component type of thing (e.g $10 - $20), as the time spent
-				and functionality have went way beyond what was at first intended.
-				<br><br>Hey Sencha, you can buy it and replace your own product if you want ;).
-			</td></tr></table>
-			<table style="margin-top:30px">
-				<tr><td>You can view a detailed parsing report using the "<i>Task Explorer: View Parsing Report</i>"
-				command in the Explorer context menu for any project.  It can alternatively be ran from the
-				command pallette for "all projects".
-				<tr><td height="20"></td></tr>
-				<tr><td>
-					<img src="https://raw.githubusercontent.com/spmeesseman/vscode-extjs/master/res/readme/ast-report.png">
-				</td></tr>
-			</table>`;
+				<img src="https://raw.githubusercontent.com/spmeesseman/vscode-extjs/master/res/readme/ast-report.png">
+			</td></tr>
+		</table>`;
 	}
 
 
 	private getInfoContent(tasks: Task[])
 	{
-		let taskCounts: any = {},
-			projects: string[] = [];
+		const projects: string[] = [];
+		const taskCounts: any = {
+			ant: 0,
+			apppublisher: 0,
+			bash: 0,
+			batch: 0,
+			composer: 0,
+			gradle: 0,
+			grunt: 0,
+			gulp: 0,
+			make: 0,
+			maven: 0,
+			npm: 0,
+			nsis: 0,
+			powershell: 0,
+			python: 0,
+			ruby: 0,
+			tsc: 0,
+			Workspace: 0
+		};
 
 		tasks.forEach((t) =>
 		{
@@ -179,28 +225,51 @@ export class LicenseManager implements ILicenseManager
 			}
 		}
 
-		return `<table style="margin-top:15px">
+		return `<table style="margin-top:15px;display:flexbox;width:-webkit-fill-available">
+		<tr>
+		<td>
+			<table>
 			<tr>
-				<td style="font-size:16px;font-weight:bold">
-					ExtJs Intellisense has parsed ${taskCounts.length} components in
+				<td style="font-size:16px;font-weight:bold" nowrap>
+					Task Explorer has parsed ${taskCounts.length} components in
 					${projects.length} project${ /** istanbul ignore next */ projects.length > 1 ? "s" : ""}.
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td nowrap>
 					<ul>
-						<li>${taskCounts.length} tasks</li>
-						<li>${taskCounts.npm} NPM tasks</li>
-						<li>${taskCounts.Workspace} VSCode tasks</li>
+						<li>${tasks.length} Total tasks</li>
 						<li>${taskCounts.ant} Ant tasks</li>
+						<li>${taskCounts.apppublisher} App-Publisher tasks</li>
 						<li>${taskCounts.bash} Bash scripts</li>
 						<li>${taskCounts.batch} Batch scripts</li>
-						<li>${taskCounts.python} Python tasks</li>
+						<li>${taskCounts.composer} Composer tasks</li>
+						<li>${taskCounts.gradle} Gradle tasks</li>
+						<li>${taskCounts.grunt} Grunt tasks</li>
+						<li>${taskCounts.gulp} Gulp tasks</li>
+						<li>${taskCounts.make} Make tasks</li>
+						<li>${taskCounts.maven} Maven tasks</li>
+						<li>${taskCounts.npm} NPM tasks</li>
+						<li>${taskCounts.nsis} NSIS tasks</li>
+						<li>${taskCounts.powershell} Powershell scripts</li>
+						<li>${taskCounts.python} Python scripts</li>
+						<li>${taskCounts.ruby} Ruby scripts</li>
+						<li>${taskCounts.tsc} Typescript tasks</li>
+						<li>${taskCounts.Workspace} VSCode tasks</li>
 					</ul>
 				</td>
 			</tr>
-			</tr>
-		</table>`;
+			</table>
+		</td>
+		<td valign="top" align="right" style="padding-left:100px;padding-top:7px;width:-webkit-fill-available">
+			<div>
+				<button style="cursor:pointer;width:150px" onclick="getLicense();">Get License Now</button>
+			</div>
+			<div  style="margin-top:10px">
+				<button style="cursor:pointer;width:150px" onclick="viewReport();">View Parsing Report</button>
+			</div>
+		</td></tr>
+	</table>`;
 	}
 
 

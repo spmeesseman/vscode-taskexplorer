@@ -84,80 +84,122 @@ export function getGlobPattern(taskType: string): string
     }
 }
 
-
-export function getHeaderContent(title: string)
+export function getHeaderContent()
 {
     return `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Explorer</title>
-  </head>
-  <body style="padding:20px">
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <!--
+        <meta
+            http-equiv="Content-Security-Policy" content="default-src 'self'; img-src \${webview.cspSource} https:; 
+            script-src \${webview.cspSource} 'self' 'unsafe-inline'; script-src-elem 'self' 'unsafe-inline';
+            style-src \${webview.cspSource}  'unsafe-inline' 'self';"
+        />
+        -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Task Explorer</title>
+        <style>
+            button {
+                background-color: var(--vscode-button-background);
+                color: var(--vscode-button-foreground);
+                padding: 8px 12px;
+            }
+            button:hover {
+                background-color: var(--vscode-button-hoverBackground)
+            }
+        </style>
+        <script type="text/javascript">
+            let vscode;
+            function getLicense()
+            {
+                vscode = vscode || acquireVsCodeApi();
+                vscode.postMessage({
+                    command: 'enterLicense',
+                    text: ''
+                });
+            }
+            function viewReport()
+            {
+                vscode = vscode || acquireVsCodeApi();
+                vscode.postMessage({
+                    command: 'viewReport',
+                    text: ''
+                });
+            }
+        </script>
+    </head>
+    <body style="padding:20px">`;
+}
+
+export function getBodyContent(title: string)
+{
+    return `
     <table>
-        <tr>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/gears-r-colors.png" height="50" />
-            </td>
-            <td valign="middle" style="font-size:40px;font-weight:bold"> &nbsp;${title}</td>
-        </tr>
-        </table>
-        <table style="margin-top:15px">
-        <tr>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/npm.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ant.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/yarn.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/grunt.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/gulp.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/php.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/workspace.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/make.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ts.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bat.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ruby.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/powershell.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bash.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/python.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/nsis.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/perl.png" />
-            </td>
-            <td>
-                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/maven.png" />
-            </td>
-        </tr>
-    </table>`;
+            <tr><td>
+                <table><tr>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/gears-r-colors.png" height="50" />
+                    </td>
+                    <td valign="middle" style="font-size:40px;font-weight:bold"> &nbsp;${title}</td>
+                </tr></table>
+            </td></tr>
+            <tr><td>
+                <table style="margin-top:15px"><tr>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/npm.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ant.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/yarn.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/grunt.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/gulp.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/composer.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/workspace.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/make.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ts.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bat.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ruby.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/powershell.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bash.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/python.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/nsis.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/perl.png" />
+                    </td>
+                    <td>
+                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/maven.png" />
+                    </td>
+                </tr></table>
+            </td></tr>
+        </table>`;
 }
 
 

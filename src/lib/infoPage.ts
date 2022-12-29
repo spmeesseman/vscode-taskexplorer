@@ -3,7 +3,7 @@ import * as path from "path";
 import * as log  from "../common/log";
 import { teApi } from "../extension";
 import { Task, Uri, ViewColumn, WebviewPanel, window, workspace, WorkspaceFolder } from "vscode";
-import { getHeaderContent, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../common/utils";
+import { getHeaderContent, getBodyContent, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../common/utils";
 
 
 let panel: WebviewPanel | undefined;
@@ -13,15 +13,21 @@ export async function displayParsingReport(logPad: string, logLevel: number, uri
 {
     log.methodStart("display parsing report", logLevel, logPad);
 
-    let content = getHeaderContent("Task Explorer Parsing Report");
-	content += getBodyContent(logPad + "   ", logLevel + 1, uri);
+    let content = getHeaderContent();
+
+	content += "<table align=\"center\">";
+	content += ("<tr><td>" + getBodyContent("Welcome to Task Explorer") + "</td></tr>");
+	content += ("<tr><td>" + getInfoContent(logPad + "   ", logLevel + 1, uri) + "</td></tr>");
+	content + "</table>";
     content += getFooterContent();
 
 	panel = window.createWebviewPanel(
 		"taskExplorer",                 // Identifies the type of the webview. Used internally
 		"Task Explorer Parsing Report", // Title of the panel displayed to the users
 		ViewColumn.One,                 // Editor column to show the new webview panel in.
-		{}                              // Webview options.
+		{
+			enableScripts: true
+		}
 	);
 	panel.webview.html = content;
 	panel.reveal();
@@ -43,7 +49,7 @@ function getFooterContent()
 }
 
 
-function getBodyContent(logPad: string, logLevel: number, uri?: Uri)
+function getInfoContent(logPad: string, logLevel: number, uri?: Uri)
 {
     log.methodStart("get body content", logLevel, logPad);
 

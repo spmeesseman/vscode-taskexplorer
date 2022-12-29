@@ -29,7 +29,7 @@ import { ExplorerApi } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
 
 
-const isLicenseManagerActive = false;
+const isLicenseManagerActive = true;
 
 const noScripts = new NoScripts();
 
