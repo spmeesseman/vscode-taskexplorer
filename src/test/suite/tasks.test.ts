@@ -145,6 +145,14 @@ suite("Task Tests", () =>
     });
 
 
+    test("Resume (No Task)", async function()
+    {
+        overrideNextShowInfoBox(undefined);
+        this.slow(testsControl.slowTimeForCommandFast);
+        await executeTeCommand2("pause", [ batch[0] ], 50);
+    });
+
+
     test("Ant", async function()
     {
         this.slow(waitTimeForRunCommand * 2);

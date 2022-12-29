@@ -25,7 +25,6 @@ import {
 
 const tempFiles: string[] = [];
 const slowTimeForFsCreateEvent = testsControl.slowTimeForFsCreateEvent;
-const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
 const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
 const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
@@ -152,14 +151,14 @@ suite("Provider Tests", () =>
 
     test("Check Existing Bash Task Counts", async function()
     {
-        this.slow(1000);
+        this.slow(testsControl.slowTimeForCommand);
         batch = await getTreeTasks("bash", 1);
     });
 
 
     test("Check Existing Batch Task Counts", async function()
     {
-        this.slow(1000);
+        this.slow(testsControl.slowTimeForCommand);
         batch = await getTreeTasks("batch", 2);
     });
 
@@ -237,29 +236,29 @@ suite("Provider Tests", () =>
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
         if (!explorer.isVisible()) {
-            this.slow(1000);
-		    await executeTeCommand("focus", testsControl.slowTimeForFocusCommand, 3000);
+            this.slow(testsControl.slowTimeForFocusCommand);
+		    await executeTeCommand("focus", testsControl.waitTimeForCommand);
         }
 	});
 
 
     test("Enable App-Publisher Tasks (Off by Default)", async function()
     {
-        this.slow(1000);
+        this.slow(testsControl.slowTimeForConfigEnableEvent);
         await executeSettingsUpdate("enabledTasks.apppublisher", true);
     });
 
 
     test("Enable Pipenv Tasks (Off by Default)", async function()
     {
-        this.slow(1000);
+        this.slow(testsControl.slowTimeForConfigEnableEvent);
         await executeSettingsUpdate("enabledTasks.pipenv", true);
     });
 
 
     test("Enable Maven Tasks (Off by Default)", async function()
     {
-        this.slow(1000);
+        this.slow(testsControl.slowTimeForConfigEnableEvent);
         await executeSettingsUpdate("enabledTasks.maven", true);
     });
 
@@ -286,16 +285,16 @@ suite("Provider Tests", () =>
         try {
             await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
             await storage.update(constants.LAST_TASKS_STORE, [ "hello.bat" ]);
-            await configuration.updateWs("showLastTasks", true);
-            await configuration.updateWs("expanded.lastTasks", false);
+            await executeSettingsUpdate("showLastTasks", true);
+            await executeSettingsUpdate("expanded.lastTasks", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(2);
         }
         catch (e) {
             throw e;
         }
         finally {
-            await configuration.updateWs("expanded.lastTasks", true);
-            await configuration.updateWs("showLastTasks", showLasTasks);
+            await executeSettingsUpdate("expanded.lastTasks", true);
+            await executeSettingsUpdate("showLastTasks", showLasTasks);
             await storage.update(constants.FAV_TASKS_STORE, favTasks);
             await storage.update(constants.LAST_TASKS_STORE, lastTasks);
         }
@@ -308,16 +307,16 @@ suite("Provider Tests", () =>
         const showLasTasks = configuration.get<boolean>("showLastTasks");
         try {
             await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
-            await configuration.updateWs("showLastTasks", false);
-            await configuration.updateWs("expanded.favorites", false);
+            await executeSettingsUpdate("showLastTasks", false);
+            await executeSettingsUpdate("expanded.favorites", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1);
         }
         catch (e) {
             throw e;
         }
         finally {
-            await configuration.updateWs("expanded.favorites", true);
-            await configuration.updateWs("showLastTasks", showLasTasks);
+            await executeSettingsUpdate("expanded.favorites", true);
+            await executeSettingsUpdate("showLastTasks", showLasTasks);
             await storage.update(constants.FAV_TASKS_STORE, favTasks);
         }
     });
@@ -343,7 +342,7 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes - TaskItem", async function()
     {
-        this.slow(1000);
+        this.slow(testsControl.slowTimeForFetchTasksCommand + testsControl.slowTimeForCommand);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
         for (const map of taskMap)
@@ -391,7 +390,7 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes - TaskFile", async function()
     {
-        this.slow(1000);
+        this.slow(testsControl.slowTimeForFetchTasksCommand + (testsControl.slowTimeForCommand * 2));
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
         for (const map of taskMap)
@@ -399,7 +398,7 @@ suite("Provider Tests", () =>
             const value = map[1];
             if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
             {
-                await executeTeCommand("addToExcludes", 500, 3000, value.taskFile);
+                await executeTeCommand2("addToExcludes", [ value.taskFile ], testsControl.waitTimeForCommand);
                 break;
             }
         }
@@ -409,19 +408,18 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes - Bad Call", async function()
     {
-        this.slow(1000);
-        await commands.executeCommand("taskExplorer.addToExcludes");
-        await teApi.waitForIdle(500, 1500);
+        this.slow(testsControl.slowTimeForCommand);
+        await executeTeCommand("addToExcludes", testsControl.waitTimeForCommand);
     });
 
 
     test("App Publisher Delete / Add", async function()
     {
-        this.slow(1000);
+        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForFsDeleteEvent + (testsControl.slowTimeForFetchTasksCommand * 2));
         const file = path.join(rootPath, ".publishrc.json");
         removeFromArray(tempFiles, file);
         fs.unlinkSync(file);
-        await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
+        await teApi.waitForIdle(waitTimeForFsDelEvent);
         await verifyTaskCount("apppublisher", 21);
         await createAppPublisherFile();
         await verifyTaskCount("apppublisher", 42);

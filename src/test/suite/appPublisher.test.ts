@@ -105,7 +105,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+        await teApi.waitForIdle(waitTimeForFsNewEvent);
         await verifyTaskCount(testsName, 42);
     });
 
@@ -141,7 +141,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn""\n' +
             "\n"
         );
-        await teApi.waitForIdle(waitTimeForFsModEvent, 3000);
+        await teApi.waitForIdle(waitTimeForFsModEvent);
         await verifyTaskCount(testsName, 21);
     });
 
@@ -161,7 +161,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(waitTimeForFsModEvent, 3000);
+        await teApi.waitForIdle(waitTimeForFsModEvent);
         await verifyTaskCount(testsName, 42);
     });
 

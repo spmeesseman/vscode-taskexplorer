@@ -113,7 +113,7 @@ export async function buildTree(instance: any)
     // A special refresh() for test suite, will open all task files and open to position
     //
     await teApi.explorer.refresh("tests");
-    await teApi.waitForIdle(testsControl.waitTimeForRefreshCommand, 40000);
+    await teApi.waitForIdle(testsControl.waitTimeForBuildTree, 22500);
     return teApi.explorer.getChildren();
 }
 

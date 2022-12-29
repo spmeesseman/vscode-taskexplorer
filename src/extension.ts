@@ -194,7 +194,7 @@ export function getLicenseManager()
 /* istanbul ignore next */
 function isTaskExplorerBusy()
 {   /* istanbul ignore next */
-    return isCachingBusy() || teApi.explorer?.isRefreshPending() || teApi.sidebar?.isRefreshPending() ||
+    return isCachingBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
            isProcessingFsEvent() || isProcessingConfigChange();
 }
 
@@ -273,33 +273,10 @@ async function unregisterExternalProvider(providerName: string)
 async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = "   ")
 {
     let waited = 0;
-    if (minWait > 0) {
-        await util.timeout(minWait);
-        waited += minWait;
-    }
+    let iterationsIdle = 0;
     if (isTaskExplorerBusy()) {
         log.write("waiting for task explorer extension idle state...", 3, logPad);
     }
-    else
-    {
-        let lilWaitCt = 0;
-        let lilWait = Math.round(minWait / 5);
-        while (lilWait > 1 && lilWaitCt < 3)
-        {
-            await util.timeout(lilWait);
-            waited += lilWait;
-            /* istanbul ignore next */
-            if (isTaskExplorerBusy()) {
-                /* istanbul ignore next */
-                log.write("waiting for task explorer extension idle state...", 3, logPad);
-                /* istanbul ignore next */
-                break;
-            }
-            ++lilWaitCt;
-            lilWait = Math.round(lilWait / 5);
-        }
-    }
-    let iterationsIdle = 0;
     while ((iterationsIdle < 3 || isTaskExplorerBusy()) && waited < maxWait)
     {
         await util.timeout(10);

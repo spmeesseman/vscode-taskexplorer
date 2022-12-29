@@ -49,6 +49,15 @@ suite("Tree Tests", () =>
     });
 
 
+	test("Focus Task Explorer View for Tree Population", async function()
+	{
+        if (!explorer.isVisible()) {
+            this.slow(testsControl.slowTimeForFocusCommand);
+		    await executeTeCommand("focus", testsControl.waitTimeForCommand);
+        }
+	});
+
+
     test("Refresh", async function()
     {
         this.slow(testsControl.slowTimeForRefreshCommand);
@@ -341,11 +350,11 @@ suite("Tree Tests", () =>
     test("Clear Special Folders", async function()
     {
         this.slow(testsControl.slowTimeForCommand * 4);
-        await executeTeCommand2("clearSpecialFolder", [ constants.LAST_TASKS_LABEL ]);
-        await executeTeCommand2("clearSpecialFolder", [ constants.FAV_TASKS_LABEL ]);
-        await executeTeCommand2("clearSpecialFolder", [ "Invalid" ]);
+        await executeTeCommand2("clearSpecialFolder", [ constants.LAST_TASKS_LABEL ], 1000);
+        await executeTeCommand2("clearSpecialFolder", [ constants.FAV_TASKS_LABEL ], 1000);
+        await executeTeCommand2("clearSpecialFolder", [ "Invalid" ], 1000);
         overrideNextShowInfoBox("test ask");
-        await executeTeCommand2("clearSpecialFolder", [ batch[0].getFolder() ]);
+        await executeTeCommand2("clearSpecialFolder", [ batch[0].getFolder() ], 1000);
     });
 
 

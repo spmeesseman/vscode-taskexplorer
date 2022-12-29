@@ -13,7 +13,7 @@ export interface ExplorerApi
     getTasks(): Task[] | null;
     getTaskItems(taskId: string | undefined, logPad?: string, executeOpenForTests?: boolean, logLevel?: number): Promise<Map<string, TaskItem> | TaskItem | undefined>;
     getTreeItem(element: TaskItem | TaskFile | TaskFolder): TreeItem;
-    isRefreshPending (): boolean;
+    isBusy (): boolean;
     isVisible(): boolean;
     invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad?: string): Promise<void>;
     refresh(invalidate?: any, opt?: Uri | boolean, logPad?: string): Promise<void>;

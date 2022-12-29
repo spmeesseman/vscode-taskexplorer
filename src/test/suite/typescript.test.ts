@@ -61,8 +61,8 @@ suite("Typescript Tests", () =>
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
         if (!explorer.isVisible()) {
-            this.slow(1000);
-		    await executeTeCommand("focus", testsControl.slowTimeForFocusCommand, 3000);
+            this.slow(testsControl.slowTimeForFocusCommand);
+		    await executeTeCommand("focus", testsControl.waitTimeForCommand, 3000);
         }
 	});
 

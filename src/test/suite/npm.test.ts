@@ -98,7 +98,7 @@ suite("NPM Tests", () =>
     {
         this.slow(testsControl.slowTimeForCommandFast * npmTaskItems.length);
         for (const taskItem of npmTaskItems) {
-            await executeTeCommand2("open", [ taskItem ], testsControl.waitTimeForCommandFast, 500);
+            await executeTeCommand2("open", [ taskItem ], testsControl.waitTimeForCommandFast);
         }
     });
 
@@ -106,14 +106,14 @@ suite("NPM Tests", () =>
     test("Install", async function()
     {
         this.slow(testsControl.slowTimeForNpmCommand);
-        await executeTeCommand2("runInstall", [ npmTaskItems[0].taskFile ], 5000);
+        await executeTeCommand2("runInstall", [ npmTaskItems[0].taskFile ], testsControl.waitTimeForNpmCommand);
     });
 
 
     test("Update", async function()
     {
         this.slow(testsControl.slowTimeForNpmCommand);
-        await executeTeCommand2("runUpdate", [ npmTaskItems[0].taskFile ], 3500);
+        await executeTeCommand2("runUpdate", [ npmTaskItems[0].taskFile ], testsControl.waitTimeForNpmCommand);
     });
 
 
@@ -121,21 +121,21 @@ suite("NPM Tests", () =>
     {
         this.slow(testsControl.slowTimeForNpmCommand);
         overrideNextShowInputBox("@spmeesseman/app-publisher");
-        await executeTeCommand2("runUpdatePackage", [ npmTaskItems[0].taskFile ], 3500);
+        await executeTeCommand2("runUpdatePackage", [ npmTaskItems[0].taskFile ], testsControl.waitTimeForNpmCommand);
     });
 
 
     test("Audit", async function()
     {
         this.slow(testsControl.slowTimeForNpmCommand);
-        await executeTeCommand2("runAudit", [ npmTaskItems[0].taskFile ], 3500);
+        await executeTeCommand2("runAudit", [ npmTaskItems[0].taskFile ], testsControl.waitTimeForNpmCommand);
     });
 
 
     test("Audit Fix", async function()
     {
         this.slow(testsControl.slowTimeForNpmCommand);
-        await executeTeCommand2("runAuditFix", [ npmTaskItems[0].taskFile ], 3500);
+        await executeTeCommand2("runAuditFix", [ npmTaskItems[0].taskFile ], testsControl.waitTimeForNpmCommand);
     });
 
 });
