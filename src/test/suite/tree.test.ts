@@ -15,6 +15,7 @@ import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks,
     isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
 } from "../helper";
+import { NoScripts } from "@spmeesseman/vscode-taskexplorer-types/lib/lib/noScripts";
 
 
 let teApi: TaskExplorerApi;
@@ -381,12 +382,12 @@ suite("Tree Tests", () =>
         map = new Map<string, TaskFolder>();
         map.set("Zoo", new TaskFolder("onetwothree"));
         map.set("OMG", new TaskFolder("if i was"));
+        map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
         map.set(constants.LAST_TASKS_LABEL, new TaskFolder(constants.LAST_TASKS_LABEL));
         map.set("Andrew was here", new TaskFolder("tasks4"));
         map.set("maya and sierra", new TaskFolder("tasks5"));
         map.set("front DOOR", new TaskFolder("Christmas"));
         map.set("change folder", new TaskFolder("what"));
-        map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
         map.set("extremely tired", new TaskFolder("tired1"));
         map.set("tired", new TaskFolder("tired2"));
         map.set("dozing off", new TaskFolder("doze"));
@@ -395,6 +396,7 @@ suite("Tree Tests", () =>
         map = new Map<string, TaskFolder>();
         map.set("Zoo", new TaskFolder("onetwothree"));
         map.set("OMG", new TaskFolder("if i was"));
+        map.set(constants.USER_TASKS_LABEL, new TaskFolder(constants.USER_TASKS_LABEL));
         map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
         map.set(constants.LAST_TASKS_LABEL, new TaskFolder(constants.LAST_TASKS_LABEL));
         map.set("Andrew was here", new TaskFolder("tasks4"));
@@ -404,7 +406,76 @@ suite("Tree Tests", () =>
         map.set("extremely tired", new TaskFolder("tired1"));
         map.set("tired", new TaskFolder("tired2"));
         map.set("dozing off", new TaskFolder("doze"));
+        sortFolders(map);
+        map = new Map<string, TaskFolder>();
+        map.set("Zoo", new TaskFolder("onetwothree"));
+        map.set("OMG", new TaskFolder("if i was"));
+        map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
         map.set(constants.USER_TASKS_LABEL, new TaskFolder(constants.USER_TASKS_LABEL));
+        map.set(constants.LAST_TASKS_LABEL, new TaskFolder(constants.LAST_TASKS_LABEL));
+        map.set("Andrew was here", new TaskFolder("tasks4"));
+        map.set("maya and sierra", new TaskFolder("tasks5"));
+        map.set("front DOOR", new TaskFolder("Christmas"));
+        map.set("change folder", new TaskFolder("what"));
+        map.set("extremely tired", new TaskFolder("tired1"));
+        map.set("tired", new TaskFolder("tired2"));
+        map.set("dozing off", new TaskFolder("doze"));
+        sortFolders(map);
+        map = new Map<string, TaskFolder>();
+        map.set("Zoo", new TaskFolder("onetwothree"));
+        map.set("OMG", new TaskFolder("if i was"));
+        map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
+        map.set(constants.LAST_TASKS_LABEL, new TaskFolder(constants.LAST_TASKS_LABEL));
+        map.set(constants.USER_TASKS_LABEL, new TaskFolder(constants.USER_TASKS_LABEL));
+        map.set("Andrew was here", new TaskFolder("tasks4"));
+        map.set("maya and sierra", new TaskFolder("tasks5"));
+        map.set("front DOOR", new TaskFolder("Christmas"));
+        map.set("change folder", new TaskFolder("what"));
+        map.set("extremely tired", new TaskFolder("tired1"));
+        map.set("tired", new TaskFolder("tired2"));
+        map.set("dozing off", new TaskFolder("doze"));
+        sortFolders(map);
+        map = new Map<string, TaskFolder>();
+        map.set("Zoo", new TaskFolder("onetwothree"));
+        map.set("OMG", new TaskFolder("if i was"));
+        map.set(constants.LAST_TASKS_LABEL, new TaskFolder(constants.LAST_TASKS_LABEL));
+        map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
+        map.set(constants.USER_TASKS_LABEL, new TaskFolder(constants.USER_TASKS_LABEL));
+        map.set("Andrew was here", new TaskFolder("tasks4"));
+        map.set("maya and sierra", new TaskFolder("tasks5"));
+        map.set("front DOOR", new TaskFolder("Christmas"));
+        map.set("change folder", new TaskFolder("what"));
+        map.set("extremely tired", new TaskFolder("tired1"));
+        map.set("tired", new TaskFolder("tired2"));
+        map.set("dozing off", new TaskFolder("doze"));
+        sortFolders(map);
+        map = new Map<string, TaskFolder>();
+        map.set("Zoo", new TaskFolder("onetwothree"));
+        map.set("OMG", new TaskFolder("if i was"));
+        map.set(constants.USER_TASKS_LABEL, new TaskFolder(constants.USER_TASKS_LABEL));
+        map.set(constants.LAST_TASKS_LABEL, new TaskFolder(constants.LAST_TASKS_LABEL));
+        map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
+        map.set("Andrew was here", new TaskFolder("tasks4"));
+        map.set("maya and sierra", new TaskFolder("tasks5"));
+        map.set("front DOOR", new TaskFolder("Christmas"));
+        map.set("change folder", new TaskFolder("what"));
+        map.set("extremely tired", new TaskFolder("tired1"));
+        map.set("tired", new TaskFolder("tired2"));
+        map.set("dozing off", new TaskFolder("doze"));
+        sortFolders(map);
+        map = new Map<string, TaskFolder>();
+        map.set(constants.LAST_TASKS_LABEL, new TaskFolder(constants.LAST_TASKS_LABEL));
+        map.set("", new TaskFolder("onetwothree"));
+        map.set("OMG", new TaskFolder("if i was"));
+        map.set("Andrew was here", new TaskFolder(""));
+        map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
+        map.set("maya and sierra", new TaskFolder("tasks5"));
+        map.set("front DOOR", new TaskFolder(""));
+        map.set(constants.USER_TASKS_LABEL, new TaskFolder(constants.USER_TASKS_LABEL));
+        map.set("", new TaskFolder("what"));
+        map.set("extremely tired", new TaskFolder("tired1"));
+        map.set("tired", new TaskFolder("tired2"));
+        map.set("dozing off", new TaskFolder("doze"));
         sortFolders(map);
     });
 
@@ -412,7 +483,7 @@ suite("Tree Tests", () =>
     test("Invalidation (Task)", async function()
     {
         this.slow(7500);
-        /* Don't await */ teApi.explorer?.getChildren(undefined, "", 1);
+        teApi.explorer?.getChildren(undefined, "", 1); // don't wait
         await explorer.invalidateTasksCache("ant");
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await executeTeCommand2("refresh", [ "ant" ], testsControl.waitTimeForRefreshTaskTypeCommand);
@@ -438,18 +509,8 @@ suite("Tree Tests", () =>
 
     test("Get tree children when busy", async function()
     {
-        /* Don't await */ explorer.getChildren(undefined, "", 1);
+        explorer.getChildren(undefined, "", 1); // don't wait
         await explorer.getChildren(undefined, "");
     });
 
 });
-
-
-class NoScripts extends TreeItem
-{
-    constructor()
-    {
-        super("No scripts found", TreeItemCollapsibleState.None);
-        this.contextValue = "noscripts";
-    }
-}

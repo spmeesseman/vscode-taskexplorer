@@ -294,6 +294,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
         log.methodStart("read ant file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
 
+        /* istanbul ignore else */
         if (folder)
         {
             const scripts = await this.findAllAntScripts(uri.fsPath, logPad + "   ");

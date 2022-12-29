@@ -10,7 +10,10 @@ import TaskItem from "../../tree/item";
 import { storage } from "../../common/storage";
 import constants from "../../common/constants";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks, isReady, overrideNextShowInputBox, sleep, testCommand, testsControl } from "../helper";
+import {
+    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks,
+    isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
+} from "../helper";
 
 const waitTimeMax = testsControl.waitTimeMax;
 const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
@@ -131,6 +134,14 @@ suite("Task Tests", () =>
         await executeTeCommand2("run", [ batch[0] ], waitTimeForRunCommand);
         await executeTeCommand2("pause", [ batch[0] ], 500);
         await executeTeCommand2("stop", [ batch[0] ], 400);
+    });
+
+
+    test("Pause (No Task)", async function()
+    {
+        overrideNextShowInfoBox(undefined);
+        this.slow(testsControl.slowTimeForCommandFast);
+        await executeTeCommand2("pause", [ batch[0] ], 50);
     });
 
 

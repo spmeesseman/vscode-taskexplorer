@@ -8,7 +8,7 @@ import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-t
 import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import {
-	activate, closeActiveDocuments, isReady, overrideNextShowInfoBox,
+	activate, closeActiveDocument, isReady, overrideNextShowInfoBox,
 	overrideNextShowInputBox, sleep, executeTeCommand, testsControl
 } from "../helper";
 
@@ -37,7 +37,7 @@ suite("License Manager Tests", () =>
 
 	suiteTeardown(async function()
     {
-		await closeActiveDocuments();
+		await closeActiveDocument();
 	});
 
 
@@ -73,7 +73,7 @@ suite("License Manager Tests", () =>
 		this.slow(500);
 		await licMgr.initialize(tasks);
 		await sleep(400);
-		await closeActiveDocuments();
+		await closeActiveDocument();
 	});
 
 
@@ -87,7 +87,7 @@ suite("License Manager Tests", () =>
 		await storage.update("version", undefined);
 		await licMgr.initialize(tasks);
 		await sleep(400);
-		await closeActiveDocuments();
+		await closeActiveDocument();
 	});
 
 
@@ -99,7 +99,7 @@ suite("License Manager Tests", () =>
 		await storage.update("version", undefined);
 		await licMgr.initialize(tasks);
 		await sleep(400);
-		await closeActiveDocuments();
+		await closeActiveDocument();
 	});
 
 
@@ -113,7 +113,7 @@ suite("License Manager Tests", () =>
 		licMgr.setLicenseKey(licenseKey);
 		await licMgr.initialize(tasks);
 		await sleep(400);
-		await closeActiveDocuments();
+		await closeActiveDocument();
 	});
 
 
@@ -126,7 +126,7 @@ suite("License Manager Tests", () =>
 		await storage.update("version", version);
 		await licMgr.initialize(tasks);
 		await sleep(400);
-		await closeActiveDocuments();
+		await closeActiveDocument();
 		//
 		// Reset
 		//
@@ -144,7 +144,7 @@ suite("License Manager Tests", () =>
 		await storage.update("version", version);
 		await licMgr.initialize(tasks);
 		await sleep(400);
-		await closeActiveDocuments();
+		await closeActiveDocument();
 		//
 		// Reset
 		//
@@ -173,7 +173,7 @@ suite("License Manager Tests", () =>
 		overrideNextShowInfoBox("");
 		await licMgr.initialize(tasks);
 		await sleep(400);
-		await closeActiveDocuments();
+		await closeActiveDocument();
 		licMgr.setLicenseKey(licenseKey);
 	});
 
@@ -186,7 +186,7 @@ suite("License Manager Tests", () =>
 		overrideNextShowInfoBox("Not Now");
 		await licMgr.initialize(tasks);
 		await sleep(400);
-		await closeActiveDocuments();
+		await closeActiveDocument();
 		licMgr.setLicenseKey(licenseKey);
 	});
 
@@ -240,7 +240,7 @@ suite("License Manager Tests", () =>
 			// await storage.update("version", undefined);
 			// await licMgr.initialize(tasks);
 			// await sleep(1000);
-			// await closeActiveDocuments();
+			// await closeActiveDocument();
 			// licMgr.setLicenseKey(licenseKey);
 			// await storage.update("version", version);
 			// tasks.pop();

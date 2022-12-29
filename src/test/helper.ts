@@ -1,6 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import * as cp from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as assert from "assert";
@@ -144,7 +143,7 @@ export async function cleanup()
 }
 
 
-export async function closeActiveDocuments()
+export async function closeActiveDocument()
 {
 	try {
 		// while (window.activeTextEditor) {
@@ -233,7 +232,7 @@ export const getWsPath = (p: string) =>
 };
 
 
-export async function initSettings(enable = true)
+async function initSettings(enable = true)
 {
     await configuration.updateVsWs("terminal.integrated.shell.windows",
                                  "C:\\Windows\\System32\\cmd.exe");
@@ -316,45 +315,6 @@ export function overrideNextShowInfoBox(value: any)
 export async function sleep(ms: number)
 {
 	return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-
-export function spawn(command: string, args?: string[], options?: cp.SpawnOptions): cp.ChildProcess
-{
-    let proc: cp.ChildProcess;
-    if (options) {
-        proc = cp.spawn(command, args || [], options);
-    }
-    else {
-        proc = cp.spawn(command, args || []);
-    }
-
-    // let fullCommand = "command: " + command;
-
-    // if (args) {
-    //   fullCommand += ' "' + args.join('" "') + '"';
-    // }
-    // console.log(fullCommand);
-
-    // proc.stdout.on("data", function(data) {
-    //   console.log("stdout: " + data.toString());
-    // });
-
-    // proc.stderr.on("data", function(data) {
-    //   console.log("stderr: " + data.toString());
-    // });
-
-    // proc.on("exit", function(code) {
-    //   console.log("child process exited with code " + code.toString());
-    // });
-
-    return proc;
-}
-
-
-export async function testCommand(command: string, ...args: any[])
-{
-	return commands.executeCommand("taskExplorer." + command, ...args);
 }
 
 

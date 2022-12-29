@@ -13,6 +13,7 @@ import { configuration } from "../../common/configuration";
 import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ComposerTaskProvider } from "../../providers/composer";
+import { readFileAsync } from "../../lib/utils/fs";
 
 
 const testsName = "composer";
@@ -73,9 +74,10 @@ suite("Composer Tests", () =>
     {
         const provider = teApi.providers.get(testsName) as ComposerTaskProvider;
         // provider.readTasks();
-        provider.getDocumentPosition(undefined, undefined);
-        provider.getDocumentPosition("test", undefined);
-        provider.getDocumentPosition(undefined, "test");
+        assert (provider.getDocumentPosition(undefined, undefined) === 0);
+        assert (provider.getDocumentPosition("test", undefined) === 0);
+        assert (provider.getDocumentPosition(undefined, "test") === 0);
+        assert (provider.getDocumentPosition("doc", await readFileAsync(path.join(getWsPath("."), "composer.json"))) > 0);
     });
 
 
@@ -95,7 +97,7 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Create file", async function()
+    test("Create File", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
 
@@ -122,7 +124,7 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Add task to file", async function()
+    test("Add Task to File", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
 
@@ -146,7 +148,7 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Remove task from file", async function()
+    test("Remove Task from File", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
 
@@ -189,7 +191,7 @@ suite("Composer Tests", () =>
 
 
 
-    test("Delete file", async function()
+    test("Delete File", async function()
     {
         this.slow(testsControl.slowTimeForFsDeleteEvent);
         fs.unlinkSync(fileUri.fsPath);

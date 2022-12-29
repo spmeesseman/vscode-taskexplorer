@@ -4,7 +4,7 @@
 import * as assert from "assert";
 import { Uri } from "vscode";
 import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {  activate, closeActiveDocuments, isReady, executeTeCommand, testsControl } from "../helper";
+import {  activate, closeActiveDocument, isReady, executeTeCommand, testsControl } from "../helper";
 
 let teApi: TaskExplorerApi;
 let explorer: ExplorerApi;
@@ -27,7 +27,7 @@ suite("Report Tests", () =>
 
 	suiteTeardown(async function()
     {
-		await closeActiveDocuments();
+		await closeActiveDocument();
 	});
 
 
@@ -43,28 +43,28 @@ suite("Report Tests", () =>
 	test("Report page single project 1", async function()
 	{
 		await executeTeCommand("viewReport", 20, 500, projectUri);
-		await closeActiveDocuments();
+		await closeActiveDocument();
 	});
 
 
 	test("Report page single project 2", async function()
 	{
 	    await executeTeCommand("viewReport", 20, 500, projectUri, "");
-		await closeActiveDocuments();
+		await closeActiveDocument();
 	});
 
 
 	test("Report page single project 3", async function()
 	{
 	    await executeTeCommand("viewReport", 20, 500, projectUri, "", 5);
-		await closeActiveDocuments();
+		await closeActiveDocument();
 	});
 
 
 	test("Report page all projects", async function()
 	{
 	    await executeTeCommand("viewReport", 20, 500);
-		await closeActiveDocuments();
+		await closeActiveDocument();
 	});
 
 });

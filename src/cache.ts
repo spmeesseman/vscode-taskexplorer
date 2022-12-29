@@ -174,6 +174,9 @@ async function addWsFolderToCache(folder: WorkspaceFolder | undefined, setCacheB
 
             log.value("   building workspace project cache for provider", providerName, 3, logPad);
             await buildCache(providerName, glob, folder, false, logPad + "   ");
+            if (cancel) {
+                cancelInternal(setCacheBuilding);
+            }
         }
     }
 
@@ -186,11 +189,7 @@ async function addWsFolderToCache(folder: WorkspaceFolder | undefined, setCacheB
 
     if (setCacheBuilding)
     {
-        //
-        // Release status bar reserved space
-        //
         disposeStatusBarSpace(statusBarSpace);
-
         cacheBuilding = false;   // un-set flag
         folderCaching = false;   // un-set flag
     }
@@ -227,16 +226,15 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         {   /* istanbul ignore else */
             if ([].hasOwnProperty.call(wsf, f)) { // skip over properties inherited by prototype
                 await addWsFolderToCache(wsf[f], false, logPad + "   ");
+                if (cancel) {
+                    cancelInternal(true);
+                }
             }
         }
 
-        //
-        // Release status bar reserved space
-        //
         disposeStatusBarSpace(statusBarSpace);
-
-        cacheBuilding = false;   // un-set flag
-        folderCaching = false;   // un-set flag
+        cacheBuilding = false;
+        folderCaching = false;
 
         log.methodDone("add workspace project folders", 1, logPad);
     }
@@ -304,10 +302,8 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
         [ "task provider type", taskProviderType ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
     ]);
 
-    if (setCacheBuilding) {
-        //
-        // If buildCache is already running in another scope, then wait before proceeding
-        //
+    if (setCacheBuilding)
+    {
         await waitForCache();
         cacheBuilding = true;
         //
@@ -333,9 +329,7 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
     }
 
     if (setCacheBuilding)
-    {   //
-        // Release status bar reserved space
-        //
+    {
         disposeStatusBarSpace(statusBarSpace);
         cancel = false;           // reset flag
         cacheBuilding = false;    // reset flag
@@ -414,6 +408,9 @@ async function buildFolderCaches(taskType: string, fileGlob: string, setCacheBui
         for (const folder of workspace.workspaceFolders)
         {
             await buildFolderCache(folder, taskType, fileGlob, setCacheBuilding, logPad);
+            if (cancel) {
+                cancelInternal(setCacheBuilding);
+            }
         }
     }
 }
@@ -421,7 +418,13 @@ async function buildFolderCaches(taskType: string, fileGlob: string, setCacheBui
 
 function cancelInternal(setCacheBuilding: boolean)
 {
-    if (setCacheBuilding) {
+    if (setCacheBuilding)
+    {
+        // filesCache.clear();
+        // taskFilesMap = {};
+        // projectFilesMap = {};
+        // projectToFileCountMap = {};
+        // taskGlobs = {};
         cacheBuilding = false;
         cancel = false;
     }
@@ -467,7 +470,8 @@ function getExcludesPatternVsc(folder: string | WorkspaceFolder): RelativePatter
 
 
 function getStatusString(msg: string, statusLength: number)
-{   /* istanbul ignore else */
+{
+    /* istanbul ignore else */
     if (msg.length < statusLength)
     {
         for (let i = msg.length; i < statusLength; i++) {
@@ -536,6 +540,7 @@ export function isCachingBusy()
 function isFsChanged(taskType: string, project: string)
 {
     let fsChanged = true;
+    /* istanbul ignore else */
     if (projectFilesMap[project] && projectFilesMap[project][taskType])
     {
         fsChanged = projectToFileCountMap[project][taskType] !== projectFilesMap[project][taskType].length;

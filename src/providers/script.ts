@@ -104,6 +104,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         //
         // If the default terminal cmd/powershell?  On linux and darwin, no, on windows, maybe...
         //
+        /* istanbul ignore else */
         if (process.platform === "win32")
         {
             isWinShell = true;
@@ -282,6 +283,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
                     {
                         visitedFiles.push(fObj.uri.fsPath);
                         const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri);
+                        /* istanbul ignore else */
                         if (task)
                         {
                             allTasks.push(task);
@@ -297,15 +299,14 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         return allTasks;
     }
 
-
+    //
+    // readUriTasks's isn't necessary for script type tasks, the file itself is the task.
+    //
+    /* istanbul ignore next */
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
-        const folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
-        log.methodStart("read script file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
-        const task = this.createTask(path.extname(uri.fsPath).substring(1), undefined, folder, uri);
-        log.methodDone("read script file uri task", 1, logPad, true);
         /* istanbul ignore next */
-        return task ? [ task ] : [];
+        throw new Error("No implemented");
     }
 
 }

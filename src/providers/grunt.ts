@@ -29,7 +29,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     {
         const scripts: string[] = [];
 
-        log.methodStart("find grunt targets", 1, logPad, true, [["path", fsPath]]);
+        log.methodStart("find grunt targets", 1, logPad, true, [[ "path", fsPath ]]);
 
         const contents = util.readFileSync(fsPath);
         let idx = 0;
@@ -111,7 +111,8 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
 
 
     public getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number
-    {   /* istanbul ignore next */
+    {
+        /* istanbul ignore next */
         if (!taskName || !documentText)
         {   /* istanbul ignore next */
             return 0;
@@ -125,7 +126,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read grunt file uri task", 1, logPad, true, [["path", uri.fsPath], ["project folder", folder.name]]);
+        log.methodStart("read grunt file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
 
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)

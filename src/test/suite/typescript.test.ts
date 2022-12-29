@@ -9,10 +9,11 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { configuration } from "../../common/configuration";
-import { activate, buildTree, closeActiveDocuments, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks, getWsPath, isReady, testsControl, verifyTaskCount, verifyTaskCountByTree } from "../helper";
 import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { AppPublisherTaskProvider } from "../../providers/appPublisher";
+import {
+    activate, buildTree, closeActiveDocument, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
+    getTreeTasks, getWsPath, isReady, testsControl, verifyTaskCount, verifyTaskCountByTree
+} from "../helper";
 
 
 const testsName = "tsc";
@@ -48,7 +49,7 @@ suite("Typescript Tests", () =>
 
     suiteTeardown(async function()
     {
-        await closeActiveDocuments();
+        await closeActiveDocument();
         try {
             fs.rmdirSync(dirName, {
                 recursive: true
@@ -99,9 +100,9 @@ suite("Typescript Tests", () =>
         //
         const tscItems = await getTreeTasks("tsc", 2);
         await executeTeCommand2("open", [ tscItems[0] ]);
-        await closeActiveDocuments();
+        await closeActiveDocument();
         await executeTeCommand2("open", [ tscItems[1] ]);
-        await closeActiveDocuments();
+        await closeActiveDocument();
     });
 
 

@@ -223,11 +223,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         {
             if (util.isScriptType(selection.taskSource))
             {
+                /* istanbul ignore else */ /* istanbul ignore next */
                 if (selection.resourceUri) {
+                    /* istanbul ignore next */
                     log.value("   file glob", selection.resourceUri.path);
+                    /* istanbul ignore next */
                     pathValue = selection.resourceUri.path;
                 }
-                /* istanbul ignore else */
                 else if (selection.taskFile) {
                     log.value("   file glob", selection.taskFile.resourceUri.path);
                     pathValue = selection.taskFile.resourceUri.path;
@@ -325,6 +327,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             //
             // Create groupings by task type
             //
+            /* istanbul ignore else */
             if (configuration.get("groupWithSeparator")) // && key !== constants.USER_TASKS_LABEL)
             {
                 await this.createTaskGroupings(folder, logPad + "   ", logLevel + 1);
@@ -582,6 +585,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         for (const tId of lTasks)
         {
             const taskItem2 = await this.getTaskItems(tId, logPad + "   ");
+            /* istanbul ignore else */
             if (taskItem2 && taskItem2 instanceof TaskItem && taskItem2.task)
             {
                 const taskItem3 = new TaskItem(this.extensionContext, taskItem2.taskFile, taskItem2.task);
@@ -651,6 +655,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                         subfolder.addTreeNode(prevTaskFile); // addScript will set the group level on the TaskItem
                     }
                 }
+                /* istanbul ignore else */
                 if (subfolder && subfolder.nodePath !== each.nodePath) {
                     subfolder.addTreeNode(each); // addScript will set the group level on the TaskItem
                 }
@@ -743,7 +748,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         ]);
 
         const _setNodePath = (t: TaskItem | undefined, cPath: string) =>
-        {   /* istanbul ignore else */
+        {
+            /* istanbul ignore else */
             if (t && !atMaxLevel && prevName)
             {
                 log.write("   setting node path", logLevel + 2, logPad);
@@ -1129,11 +1135,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         {
             return element.taskFile;
         }
-        /* istanbul ignore if */
+        /* istanbul ignore next */
         if (element instanceof NoScripts)
         {
+            /* istanbul ignore next */
             return null;
         }
+        /* istanbul ignore next */
         return null;
     }
 
@@ -1670,6 +1678,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     private pushToTopOfSpecialFolder(taskItem: TaskItem, label: string, treeIndex: number, logPad = "")
     {
         let taskItem2: TaskItem | undefined;
+        /* istanbul ignore next */
         const ltFolder = this.taskTree ? this.taskTree[treeIndex] as TaskFolder : undefined;
         const taskId = label + ":" + util.getTaskItemId(taskItem);
 
@@ -1686,6 +1695,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             }
         }
 
+        /* istanbul ignore else */
         if (taskItem2)
         {
             ltFolder.removeTaskFile(taskItem2);

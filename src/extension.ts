@@ -106,7 +106,8 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         waitForIdle: waitForTaskExplorerIdle,
         testsApi: {
             log,
-            explorer: treeDataProvider2 /* istanbul ignore next */ || treeDataProvider,
+            /* istanbul ignore next */
+            explorer: treeDataProvider2 || treeDataProvider,
             fileCache: cache
         }
     });
@@ -301,7 +302,6 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
     let iterationsIdle = 0;
     while ((iterationsIdle < 3 || isTaskExplorerBusy()) && waited < maxWait)
     {
-        // console.log(Date.now);
         await util.timeout(10);
         waited += 10;
         ++iterationsIdle;
