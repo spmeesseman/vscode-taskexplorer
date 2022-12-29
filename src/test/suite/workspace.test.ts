@@ -6,7 +6,7 @@ import * as assert from "assert";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../common/configuration";
 import TaskItem from "../../tree/item";
-import { activate, executeSettingsUpdate, findIdInTaskMap, isReady } from "../helper";
+import { activate, executeSettingsUpdate, findIdInTaskMap, isReady, verifyTaskCountByTree } from "../helper";
 
 const testsName = "Workspace";
 // const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
@@ -40,60 +40,35 @@ suite("Workspace / VSCode Tests", () =>
     test("Show VSCode Tasks Marked Hidden", async function()
     {
         await executeSettingsUpdate("showHiddenWsTasks", true);
-        // await verifyTaskCount(testsName, 10); // a direct fetchTasks() will still retrieve the hidden task
-        taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
-        const taskCount = findIdInTaskMap(`:${testsName}:`, taskMap);
-        if (taskCount !== 10) {
-            assert.fail(`Unexpected VSCode task count (Found ${taskCount} of 10)`);
-        }
+        await verifyTaskCountByTree(testsName, 10);
     });
 
 
     test("Hide VSCode Tasks Marked Hidden", async function()
     {
         await executeSettingsUpdate("showHiddenWsTasks", false);
-        // await verifyTaskCount(testsName, 9); // a direct fetchTasks() will still retrieve the hidden task
-        taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
-        const taskCount = findIdInTaskMap(":Workspace:", taskMap);
-        if (taskCount !== 9) {
-            assert.fail(`Unexpected VSCode task count (Found ${taskCount} of 9)`);
-        }
+        await verifyTaskCountByTree(testsName, 9);
     });
 
 
     test("Disable Workspace Tasks", async function()
     {
         await executeSettingsUpdate("enabledTasks.workspace", false);
-        // await verifyTaskCount(testsName, 0); // a direct fetchTasks() will still retrieve the hidden task
-        taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
-        const taskCount = findIdInTaskMap(":Workspace:", taskMap);
-        if (taskCount !== 0) {
-            assert.fail(`Unexpected VSCode task count (Found ${taskCount} of 0)`);
-        }
+        await verifyTaskCountByTree(testsName, 0);
     });
 
 
     test("Re-enable Workspace Tasks", async function()
     {
         await executeSettingsUpdate("enabledTasks.workspace", true);
-        // await verifyTaskCount(testsName, 9); // a direct fetchTasks() will still retrieve the hidden task
-        taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
-        const taskCount = findIdInTaskMap(":Workspace:", taskMap);
-        if (taskCount !== 9) {
-            assert.fail(`Unexpected VSCode task count (Found ${taskCount} of 9)`);
-        }
+        await verifyTaskCountByTree(testsName, 9);
     });
 
 
     test("Re-show VSCode Tasks Marked Hidden", async function()
     {
         await executeSettingsUpdate("showHiddenWsTasks", true);
-        // await verifyTaskCount(testsName, 10); // a direct fetchTasks() will still retrieve the hidden task
-        taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
-        const taskCount = findIdInTaskMap(":Workspace:", taskMap);
-        if (taskCount !== 10) {
-            assert.fail(`Unexpected VSCode task count (Found ${taskCount} of 10)`);
-        }
+        await verifyTaskCountByTree(testsName, 10);
     });
 
 });
