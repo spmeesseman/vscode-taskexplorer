@@ -20,7 +20,7 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = ""): b
 {
     const isScopeWsFolder = util.isWorkspaceFolder(task.scope);
 
-    log.methodStart(`Check task inclusion for '${task.source}/${task.name}'`, 2, logPad, false, [
+    log.methodStart(`Check task inclusion for '${task.source}/${task.name}'`, 3, logPad, false, [
         [ "scope is ws folder", isScopeWsFolder ], [ "relative path", relativePath ]
     ]);
 
@@ -32,8 +32,40 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = ""): b
     //
     if (!task.definition.uri && (task.source === "gulp" || task.source === "grunt"))
     {
-        log.write(`   skipping vscode provided ${task.source} task`, 2, logPad);
+        log.write(`   skipping vscode provided ${task.source} task`, 3, logPad);
         return false;
+    }
+
+    //
+    // Check enabled and npm install task
+    // This will ignore tasks from other providers as well, unless it has registered
+    // as an external provider via Task Explorer API
+    //
+    const srcEnabled = util.isTaskTypeEnabled(task.source);
+    log.value("   enabled in settings", srcEnabled, 3, logPad);
+    if (!srcEnabled)
+    {
+        log.write(`   skipping this task (${task.source} disabled in settings)`, 3, logPad);
+        return false;
+    }
+
+    //
+    // Check task excludes array
+    //
+    const excludeTask = configuration.get<string[]>("excludeTask");
+    if (excludeTask && excludeTask.length > 0)
+    {
+
+        const fExcludeTasks = excludeTask.filter(et => !!et && util.isString(et) && et.length > 1);
+        for (const rgxPattern of fExcludeTasks)
+        {
+            if ((new RegExp(rgxPattern)).test(task.name))
+            {
+                log.write("   skipping this task (by 'excludeTask' setting)", 3, logPad);
+                log.methodDone('Check task inclusion', 3, logPad);
+                return false;
+            }
+        }
     }
 
     //
@@ -49,8 +81,8 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = ""): b
             relativePath = path.dirname(task.name.substring(task.name.indexOf(" - ") + 3));
             if (util.isExcluded(path.join(task.scope.uri.path, relativePath)))
             {
-                log.write("   skipping this tsc task (remapped subfolder)", 2, logPad);
-                log.methodDone('Check task inclusion', 2, logPad);
+                log.write("   skipping this tsc task (remapped subfolder)", 3, logPad);
+                log.methodDone('Check task inclusion', 3, logPad);
                 return false;
             }
             return relativePath;
@@ -62,25 +94,6 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = ""): b
     //
     if (providersExternal.get(task.source)) {
         return !!task.definition && !!task.name && !!task.execution;
-    }
-
-    //
-    // Check task excludes array
-    //
-    const excludeTask = configuration.get<string[]>("excludeTask");
-    if (excludeTask && excludeTask.length > 0)
-    {
-
-        const fExcludeTasks = excludeTask.filter(et => !!et && util.isString(et) && et.length > 1);
-        for (const rgxPattern of fExcludeTasks)
-        {
-            if ((new RegExp(rgxPattern)).test(task.name))
-            {
-                log.write("   skipping this task (by 'excludeTask' setting)", 2, logPad);
-                log.methodDone('Check task inclusion', 2, logPad);
-                return false;
-            }
-        }
     }
 
     //
@@ -118,23 +131,20 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = ""): b
     // This will ignore tasks from other providers as well, unless it has registered
     // as an external provider via Task Explorer API
     //
-    const srcEnabled = util.isTaskTypeEnabled(task.source),
-          isNpmInstall = isNpmInstallTask(task);
+    const isNpmInstall = isNpmInstallTask(task);
+    log.value("   is npm install task", isNpmInstall, 3, logPad);
     if ((srcEnabled || !isScopeWsFolder) && !isNpmInstall)
     {
-        log.write('   Task is included', 2, logPad);
-        log.methodDone('Check task inclusion', 2, logPad);
+        log.write('   Task is included', 3, logPad);
+        log.methodDone('Check task inclusion', 3, logPad);
         return true;
     }
-
-    log.value("   enabled in settings", srcEnabled, 2, logPad);
-    log.value("   is npm install task", isNpmInstall, 2, logPad);
     if (isNpmInstall && srcEnabled) {
-        log.methodDone('Check task inclusion', 2, logPad);
+        log.methodDone('Check task inclusion', 3, logPad);
         return "npm-install";
     }
-    log.write("   skipping this task", 2, logPad);
-    log.methodDone('Check task inclusion', 2, logPad);
 
+    log.write("   skipping this task", 3, logPad);
+    log.methodDone('Check task inclusion', 3, logPad);
     return false;
 }
