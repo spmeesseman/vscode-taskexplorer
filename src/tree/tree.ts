@@ -1385,17 +1385,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         // invalidate=true means the refresh button was clicked (opt will be false)
         // invalidate="tests" means this is being called from unit tests (opt will be undefined)
         //
-        if ((invalidate === true || invalidate === "tests") && !opt) {
+        if ((invalidate === true || invalidate === "tests") && !opt)
+        {
             log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
             this.busy = true;
             await rebuildCache(logPad + "   ");
             log.write("   handling 'rebuild cache' eventcomplete", 1, logPad + "   ");
-            this.busy = false;
+            this.busy = invalidate !== "tests";
         }
         //
         // If this is not from unit testing, then invalidate the appropriate task cache/file
         //
-        if (invalidate !== "tests") {
+        if (invalidate !== "tests")
+        {
             log.write("   handling 'invalidate tasks cache' event", 1, logPad);
             await this.invalidateTasksCache(invalidate !== true ? invalidate : undefined, opt, logPad + "   ");
         }
@@ -1493,7 +1495,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     }
 
 
-    public isRefreshPending = () => this.refreshPending;
+    public isBusy = () => this.refreshPending || this.busy;
 
 
     public isVisible = () => this.visible;
@@ -1637,7 +1639,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
     private pause(taskItem: TaskItem)
     {
-        if (this.busy || !taskItem)
+        if (this.isBusy() || !taskItem)
         {
             window.showInformationMessage("Busy, please wait...");
             return;
@@ -1982,7 +1984,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     private async restart(taskItem: TaskItem)
     {
         log.methodStart("restart task", 1, "", true);
-        if (this.busy || !taskItem)
+        if (this.isBusy() || !taskItem)
         {
             window.showInformationMessage("Busy, please wait...");
         }
@@ -2023,7 +2025,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
      */
     private async run(taskItem: TaskItem, noTerminal = false, withArgs = false, args?: string)
     {
-        if (this.busy || !taskItem)
+        if (this.isBusy() || !taskItem)
         {
             window.showInformationMessage("Busy, please wait...");
             return;
@@ -2089,7 +2091,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
     private async runLastTask()
     {
-        if (this.busy)
+        if (this.isBusy())
         {
             window.showInformationMessage("Busy, please wait...");
             return;
@@ -2398,7 +2400,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         log.methodStart("stop", 1, "", true);
 
         /* istanbul ignore if */
-        if (this.busy || !taskItem)
+        if (this.isBusy() || !taskItem)
         {
             window.showInformationMessage("Busy, please wait...");
             return;
@@ -2485,7 +2487,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
         this.taskIdStartEvents.set(taskId, taskTimerId);
     }
-
 
 
     private async taskFinishedEvent(e: TaskEndEvent)
