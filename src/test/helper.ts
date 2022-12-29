@@ -6,36 +6,10 @@ import * as path from "path";
 import * as assert from "assert";
 import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
+import { testControl } from "./control";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../common/configuration";
 import { commands, extensions, tasks, window, workspace } from "vscode";
-
-export const testsControl = {
-    keepSettingsFile: false,
-    logLevel: 3,
-    writeToConsole: false,
-    writeToOutput: true,
-    slowTimeForCommand: 1000,
-    slowTimeForConfigEvent: 200,
-    slowTimeForConfigEnableEvent: 750,
-    slowTimeForFocusCommand: 2000,
-    slowTimeForFsCreateEvent: 1000,
-    slowTimeForFsDeleteEvent: 750,
-    slowTimeForRefreshCommand: 7500,
-    userLogLevel: configuration.get<number>("debugLevel"),
-    userPathToAnt: configuration.get<string>("pathToPrograms.ant"),
-    waitTimeForFsCreateEvent: 200,
-    waitTimeForFsDeleteEvent: 200,
-    waitTimeForFsModifyEvent: 150,
-    waitTimeForConfigEvent: 125,
-    waitTimeForConfigEnableEvent: 175,
-    waitTimeForCommand: 150,
-    waitTimeForCommandFast: 50,
-    waitTimeForRefreshCommand: 5000,
-    waitTimeForRefreshTaskTypeCommand: 1000,
-    waitTimeForRunCommand: 3000,
-    waitTimeMax: 15000
-};
 
 let activated = false;
 let teApi: TaskExplorerApi;
@@ -43,6 +17,9 @@ const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
 const overridesShowInputBox: any[] = [];
 const overridesShowInfoBox: any[] = [];
+
+export const testsControl = testControl;
+
 
 window.showInputBox = (...args: any[]) =>
 {

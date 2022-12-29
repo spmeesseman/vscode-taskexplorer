@@ -13,11 +13,7 @@ import {
 
 
 const testsName = "npm";
-const waitTimeForCommandFast = testsControl.waitTimeForCommandFast;
-// const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 const slowTimeForFsCreateEvent = testsControl.slowTimeForFsCreateEvent;
-// const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
-// const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
 const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 
 let teApi: TaskExplorerApi;
@@ -100,30 +96,30 @@ suite("NPM Tests", () =>
 
     test("Document Position", async function()
     {
-        this.slow(waitTimeForCommandFast * npmTaskItems.length);
+        this.slow(testsControl.slowTimeForCommandFast * npmTaskItems.length);
         for (const taskItem of npmTaskItems) {
-            await executeTeCommand2("open", [ taskItem ], waitTimeForCommandFast, 500);
+            await executeTeCommand2("open", [ taskItem ], testsControl.waitTimeForCommandFast, 500);
         }
     });
 
 
     test("Install", async function()
     {
-        this.slow(7500);
+        this.slow(testsControl.slowTimeForNpmCommand);
         await executeTeCommand2("runInstall", [ npmTaskItems[0].taskFile ], 5000);
     });
 
 
     test("Update", async function()
     {
-        this.slow(7500);
+        this.slow(testsControl.slowTimeForNpmCommand);
         await executeTeCommand2("runUpdate", [ npmTaskItems[0].taskFile ], 3500);
     });
 
 
     test("Update Specified Package", async function()
     {
-        this.slow(7500);
+        this.slow(testsControl.slowTimeForNpmCommand);
         overrideNextShowInputBox("@spmeesseman/app-publisher");
         await executeTeCommand2("runUpdatePackage", [ npmTaskItems[0].taskFile ], 3500);
     });
@@ -131,14 +127,14 @@ suite("NPM Tests", () =>
 
     test("Audit", async function()
     {
-        this.slow(7500);
+        this.slow(testsControl.slowTimeForNpmCommand);
         await executeTeCommand2("runAudit", [ npmTaskItems[0].taskFile ], 3500);
     });
 
 
     test("Audit Fix", async function()
     {
-        this.slow(7500);
+        this.slow(testsControl.slowTimeForNpmCommand);
         await executeTeCommand2("runAuditFix", [ npmTaskItems[0].taskFile ], 3500);
     });
 

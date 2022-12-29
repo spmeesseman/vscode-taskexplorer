@@ -127,16 +127,16 @@ suite("Task Tests", () =>
 
     test("Pause", async function()
     {
-        this.slow(waitTimeForRunCommand + 2500);
+        this.slow(waitTimeForRunCommand * 2);
         await executeTeCommand2("run", [ batch[0] ], waitTimeForRunCommand);
-        await executeTeCommand2("pause", [ batch[0] ], 1000);
-        await executeTeCommand2("stop", [ batch[0] ], 500);
+        await executeTeCommand2("pause", [ batch[0] ], 500);
+        await executeTeCommand2("stop", [ batch[0] ], 400);
     });
 
 
     test("Ant", async function()
     {
-        this.slow(waitTimeForRunCommand + 1500);
+        this.slow(waitTimeForRunCommand * 2);
         const antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
         await executeTeCommand2("run", [ antTask ], waitTimeForRunCommand);
         lastTask = antTask;
@@ -147,7 +147,7 @@ suite("Task Tests", () =>
     {   //
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
         //
-        this.slow(5000 + (slowTimeForConfigEvent * 4) + (slowTimeForCommand * 4));
+        this.slow((waitTimeForRunCommand * 2) + (slowTimeForConfigEvent * 4) + (slowTimeForCommand * 4));
         await executeSettingsUpdate("disableAnimatedIcons", true);
         await startTask(bash[0]);
         await executeTeCommand2("run", [ bash[0] ], waitTimeForRunCommand);
@@ -159,8 +159,8 @@ suite("Task Tests", () =>
 
     test("Batch 1", async function()
     {
-        this.slow(30000);
-        this.timeout(40000);
+        this.slow(35000);
+        this.timeout(45000);
         //
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
@@ -197,7 +197,8 @@ suite("Task Tests", () =>
     {   //
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
-        this.slow(20000);
+        this.slow(25000);
+        this.timeout(35000);
         const batchTask = batch[1];
         await startTask(batchTask);
         await executeSettingsUpdate("keepTermOnStop", false);

@@ -7,6 +7,48 @@ import constants from "../common/constants";
 
 
 
+export function sortFolders(folders: Map<string, TaskFolder>): TaskFolder[]
+{
+    return [ ...folders.values() ].sort((a: TaskFolder, b: TaskFolder) =>
+    {
+        if (a.label === constants.LAST_TASKS_LABEL) {
+            return -1;
+        }
+        else if (b.label === constants.LAST_TASKS_LABEL) {
+            return 1;
+        }
+        else if (a.label === constants.FAV_TASKS_LABEL) {
+            if (b.label !== constants.LAST_TASKS_LABEL) {
+                return -1;
+            }
+            return 1;
+        }
+        else if (b.label === constants.FAV_TASKS_LABEL) {
+            if (a.label !== constants.LAST_TASKS_LABEL) {
+                return 1;
+            }
+            return -1;
+        }
+        else if (a.label === constants.USER_TASKS_LABEL) {
+            if (b.label !== constants.LAST_TASKS_LABEL && b.label !== constants.FAV_TASKS_LABEL) {
+                return -1;
+            }
+            return 1;
+        }
+        else if (b.label === constants.USER_TASKS_LABEL) {
+            if (a.label !== constants.LAST_TASKS_LABEL && a.label !== constants.FAV_TASKS_LABEL) {
+                return 1;
+            }
+            return -1;
+        }
+        if (a.label && b.label) {
+            return a.label.toString().localeCompare(b.label?.toString());
+        }
+        return 0;
+    });
+}
+
+
 export function sortTaskFolder(folder: TaskFolder, logPad: string, logLevel: number)
 {
     sortTasks(folder.taskFiles, logPad, logLevel);

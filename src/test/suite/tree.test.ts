@@ -3,16 +3,17 @@
 /* tslint:disable */
 
 import * as assert from "assert";
+import { sortFolders } from "../../lib/sortTasks";
 import * as util from "../../common/utils";
 import TaskFolder from "../../tree/folder";
 import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { configuration } from "../../common/configuration";
 import constants from "../../common/constants";
 import { storage } from "../../common/storage";
 import TaskItem from "../../tree/item";
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks, isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
+    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks,
+    isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
 } from "../helper";
 
 
@@ -149,6 +150,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 2", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 2");
         await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
@@ -156,6 +158,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 3", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 3");
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
@@ -163,6 +166,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 4", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 4");
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
@@ -170,6 +174,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 5", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 5");
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
@@ -177,6 +182,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 6", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 6");
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
@@ -184,42 +190,49 @@ suite("Tree Tests", () =>
 
     test("Remove Custom Label 1", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
 
 
     test("Remove Custom Label 2", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
 
 
     test("Remove Custom Label 3", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
 
 
     test("Remove Custom Label 4", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
 
 
     test("Remove Custom Label 5", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
 
 
     test("Remove Custom Label 6", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
 
 
     test("Cancel Add Custom Label", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         overrideNextShowInputBox(undefined);
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
@@ -227,7 +240,8 @@ suite("Tree Tests", () =>
 
     test("Hide last tasks", async function()
     {
-        await configuration.updateWs("showLastTasks", false);
+        this.slow(testsControl.slowTimeForConfigEvent * 3);
+        await executeSettingsUpdate("showLastTasks", false);
         await explorer.showSpecialTasks(false);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await explorer.showSpecialTasks(true);
@@ -244,9 +258,12 @@ suite("Tree Tests", () =>
 
     test("Show last tasks", async function()
     {
-        await configuration.updateWs("showLastTasks", true);
+        this.slow(testsControl.slowTimeForConfigEvent * 3);
+        await executeSettingsUpdate("showLastTasks", true);
         await explorer.showSpecialTasks(false);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await explorer.showSpecialTasks(true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
 
 
@@ -262,8 +279,10 @@ suite("Tree Tests", () =>
         this.slow(testsControl.slowTimeForRefreshCommand + (testsControl.waitTimeForConfigEvent * 3) + (testsControl.waitTimeForCommand * 2));
         await executeSettingsUpdate("showLastTasks", false);
         await explorer.showSpecialTasks(false, true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await executeSettingsUpdate("showLastTasks", true);
         await explorer.showSpecialTasks(false, true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
         await executeSettingsUpdate("showLastTasks", false);
     });
@@ -291,15 +310,17 @@ suite("Tree Tests", () =>
 
     test("Hide Favorite and Last Tasks", async function()
     {
-        await configuration.updateWs("showLastTasks", false);
+        await executeSettingsUpdate("showLastTasks", false);
         await explorer.showSpecialTasks(true, true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
 
 
     test("Hide Favorite Tasks", async function()
     {
-        await configuration.updateWs("showLastTasks", true);
+        await executeSettingsUpdate("showLastTasks", true);
         await explorer.showSpecialTasks(true, true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
 
 
@@ -318,17 +339,18 @@ suite("Tree Tests", () =>
 
     test("Clear Special Folders", async function()
     {
-        await executeTeCommand("clearSpecialFolder", 1000, 1000, constants.LAST_TASKS_LABEL);
-        await executeTeCommand("clearSpecialFolder", 1000, 1000, constants.FAV_TASKS_LABEL);
-        await executeTeCommand("clearSpecialFolder", 1000, 1000, "Invalid");
+        this.slow(testsControl.slowTimeForCommand * 4);
+        await executeTeCommand2("clearSpecialFolder", [ constants.LAST_TASKS_LABEL ]);
+        await executeTeCommand2("clearSpecialFolder", [ constants.FAV_TASKS_LABEL ]);
+        await executeTeCommand2("clearSpecialFolder", [ "Invalid" ]);
         overrideNextShowInfoBox("test ask");
-        await executeTeCommand("clearSpecialFolder", 1000, 1000, batch[0].getFolder());
+        await executeTeCommand2("clearSpecialFolder", [ batch[0].getFolder() ]);
     });
 
 
-    test("Sort folders", async function()
+    test("Sort folders", function()
     {
-        const map: Map<string, TaskFolder> = new Map<string, TaskFolder>();
+        let map: Map<string, TaskFolder> = new Map<string, TaskFolder>();
         map.set("frank", new TaskFolder("frank"));
         map.set("richard face", new TaskFolder("richard face"));
         map.set("bob", new TaskFolder("bob"));
@@ -336,19 +358,72 @@ suite("Tree Tests", () =>
         map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
         map.set("chris", new TaskFolder("chris"));
         map.set("maurice", new TaskFolder("maurice"));
-        map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
+        map.set(constants.USER_TASKS_LABEL, new TaskFolder(constants.USER_TASKS_LABEL));
+        map.set(constants.LAST_TASKS_LABEL, new TaskFolder(constants.LAST_TASKS_LABEL));
         map.set("peter", new TaskFolder("peter"));
         map.set("larry", new TaskFolder("larry"));
         map.set("mike", new TaskFolder("maurice"));
+        sortFolders(map);
+        map = new Map<string, TaskFolder>();
+        map.set("Zoo", new TaskFolder("onetwothree"));
+        map.set(constants.USER_TASKS_LABEL, new TaskFolder(constants.USER_TASKS_LABEL));
+        map.set("OMG", new TaskFolder("if i was"));
+        map.set(constants.LAST_TASKS_LABEL, new TaskFolder(constants.LAST_TASKS_LABEL));
+        map.set("Andrew was here", new TaskFolder("tasks4"));
+        map.set("maya and sierra", new TaskFolder("tasks5"));
+        map.set("front DOOR", new TaskFolder("Christmas"));
+        map.set("change folder", new TaskFolder("what"));
+        map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
+        map.set("extremely tired", new TaskFolder("tired1"));
+        map.set("tired", new TaskFolder("tired2"));
+        map.set("dozing off", new TaskFolder("doze"));
+        sortFolders(map);
+        map = new Map<string, TaskFolder>();
+        map.set("Zoo", new TaskFolder("onetwothree"));
+        map.set("OMG", new TaskFolder("if i was"));
+        map.set(constants.LAST_TASKS_LABEL, new TaskFolder(constants.LAST_TASKS_LABEL));
+        map.set("Andrew was here", new TaskFolder("tasks4"));
+        map.set("maya and sierra", new TaskFolder("tasks5"));
+        map.set("front DOOR", new TaskFolder("Christmas"));
+        map.set("change folder", new TaskFolder("what"));
+        map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
+        map.set("extremely tired", new TaskFolder("tired1"));
+        map.set("tired", new TaskFolder("tired2"));
+        map.set("dozing off", new TaskFolder("doze"));
+        map.set(constants.USER_TASKS_LABEL, new TaskFolder(constants.USER_TASKS_LABEL));
+        sortFolders(map);
+        map = new Map<string, TaskFolder>();
+        map.set("Zoo", new TaskFolder("onetwothree"));
+        map.set("OMG", new TaskFolder("if i was"));
+        map.set(constants.FAV_TASKS_LABEL, new TaskFolder(constants.FAV_TASKS_LABEL));
+        map.set(constants.LAST_TASKS_LABEL, new TaskFolder(constants.LAST_TASKS_LABEL));
+        map.set("Andrew was here", new TaskFolder("tasks4"));
+        map.set("maya and sierra", new TaskFolder("tasks5"));
+        map.set("front DOOR", new TaskFolder("Christmas"));
+        map.set("change folder", new TaskFolder("what"));
+        map.set("extremely tired", new TaskFolder("tired1"));
+        map.set("tired", new TaskFolder("tired2"));
+        map.set("dozing off", new TaskFolder("doze"));
+        map.set(constants.USER_TASKS_LABEL, new TaskFolder(constants.USER_TASKS_LABEL));
+        sortFolders(map);
     });
 
 
-    test("Invalidation", async function()
+    test("Invalidation (Task)", async function()
     {
+        this.slow(7500);
         /* Don't await */ teApi.explorer?.getChildren(undefined, "", 1);
         await explorer.invalidateTasksCache("ant");
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await executeTeCommand2("refresh", [ "ant" ], testsControl.waitTimeForRefreshTaskTypeCommand);
+    });
+
+
+    test("Invalidation (Workspace)", async function()
+    {
+        this.slow(15000);
         await explorer.invalidateTasksCache();
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
     });
 

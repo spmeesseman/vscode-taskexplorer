@@ -402,7 +402,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         // Get sorted root project folders (only project folders are sorted, special folders 'Favorites',
         // 'User Tasks' and 'Last Tasks' are kept at the top of the list.
         //
-        const sortedFolders = this.getSortedRoot(folders);
+        const sortedFolders = sortTasks.sortFolders(folders);
 
         //
         // Done!
@@ -1135,48 +1135,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             return null;
         }
         return null;
-    }
-
-
-    private getSortedRoot(folders: Map<string, TaskFolder>): TaskFolder[]
-    {
-        return [ ...folders.values() ].sort((a: TaskFolder, b: TaskFolder) =>
-        {
-            if (a.label === constants.LAST_TASKS_LABEL) {
-                return -1;
-            }
-            else if (b.label === constants.LAST_TASKS_LABEL) {
-                return 1;
-            }
-            else if (a.label === constants.FAV_TASKS_LABEL) {
-                if (b.label !== constants.LAST_TASKS_LABEL) {
-                    return -1;
-                }
-                return 1;
-            }
-            else if (b.label === constants.FAV_TASKS_LABEL) {
-                if (a.label !== constants.LAST_TASKS_LABEL) {
-                    return 1;
-                }
-                return -1;
-            }
-            else if (a.label === constants.USER_TASKS_LABEL) {
-                if (b.label !== constants.LAST_TASKS_LABEL && b.label !== constants.FAV_TASKS_LABEL) {
-                    return -1;
-                }
-                return 1;
-            }
-            else if (b.label === constants.USER_TASKS_LABEL) {
-                if (a.label !== constants.LAST_TASKS_LABEL && a.label !== constants.FAV_TASKS_LABEL) {
-                    return 1;
-                }
-                return -1;
-            }
-            if (a.label && b.label) {
-                return a.label.toString().localeCompare(b.label?.toString());
-            }
-            return 0;
-        });
     }
 
 

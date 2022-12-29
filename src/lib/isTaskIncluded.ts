@@ -125,7 +125,19 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = ""): b
             }
         }
     }
+/*
+    Hmmmmmm....  Do we need?  Put it here just in case, while I was in here fixing s***
 
+    if (isScopeWsFolder && task.source !== "Workspace" && task.source !== "tsc")
+    {
+        if (util.isExcluded(path.join(task.scope.uri.path, relativePath)))
+        {
+            log.write("   skipping this task (by 'exclude' setting)", 3, logPad);
+            log.methodDone('Check task inclusion', 3, logPad);
+            return false;
+        }
+    }
+*/
     //
     // Check enabled and npm install task
     // This will ignore tasks from other providers as well, unless it has registered
