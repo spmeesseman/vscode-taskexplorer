@@ -184,7 +184,8 @@ export async function closeActiveDocuments()
 export async function executeSettingsUpdate(key: string, value?: any, minWait?: number, maxWait?: number)
 {
     const rc = await configuration.updateWs(key, value);
-    await teApi.waitForIdle(minWait || testsControl.waitTimeForConfigEvent, maxWait || testsControl.waitTimeMax);
+    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testsControl.waitTimeForConfigEvent),
+                            maxWait === 0 ? maxWait : (maxWait || testsControl.waitTimeMax));
     return rc;
 }
 
@@ -192,7 +193,8 @@ export async function executeSettingsUpdate(key: string, value?: any, minWait?: 
 export async function executeTeCommand(command: string, minWait?: number, maxWait?: number, ...args: any[])
 {
     const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
-    await teApi.waitForIdle(minWait || testsControl.waitTimeForCommand, maxWait || testsControl.waitTimeMax);
+    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testsControl.waitTimeForCommand),
+                            maxWait === 0 ? maxWait : (maxWait || testsControl.waitTimeMax));
     return rc;
 }
 
@@ -381,7 +383,7 @@ export async function testCommand(command: string, ...args: any[])
 
 export async function verifyTaskCount(taskType: string, expectedCount: number, scriptType?: string)
 {
-    let tTasks = await (await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined }));
+    let tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
     if (scriptType) {
         tTasks = tTasks.filter(t => !scriptType || scriptType === t.source);
     }
@@ -389,7 +391,15 @@ export async function verifyTaskCount(taskType: string, expectedCount: number, s
         tTasks = tTasks.filter(t => t.source === "Workspace");
     }
     try {
-        assert(tTasks && tTasks.length === expectedCount, `Unexpected ${taskType} task count (1)(Found ${tTasks.length} of ${expectedCount})`);
+        assert(tTasks && tTasks.length === expectedCount, `Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
     }
     catch (e) { throw e; }
+}
+
+
+export async function verifyTaskCountByTree(taskType: string, expectedCount: number, taskMap?: Map<string, TaskItem>)
+{
+    const tasksMap = (taskMap || (await teApi.explorer?.getTaskItems(undefined, "   "))) as Map<string, TaskItem>,
+            taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
+    assert(taskCount === expectedCount, `Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 }

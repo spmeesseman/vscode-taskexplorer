@@ -122,7 +122,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
             try
             {   logFileWatcherEvent(_e, "delete");
                 await cache.removeFileFromCache(taskType, _e, "   ");
-                await refreshTree(taskType, _e);
+                await refreshTree(taskType, _e, "   ");
                 log.write("file 'delete' event complete", 1);
             }
             catch (e) {}
@@ -135,7 +135,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
             try
             {   logFileWatcherEvent(_e, "create");
                 await cache.addFileToCache(taskType, _e, "   ");
-                await refreshTree(taskType, _e);
+                await refreshTree(taskType, _e, "   ");
                 log.write("file 'create' event complete", 1);
             }
             catch (e) {}

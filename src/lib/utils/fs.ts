@@ -211,8 +211,11 @@ export function numFilesInDirectory(dirPath: string): Promise<number>
         if (fs.existsSync(dirPath))
         {
             fs.readdir(dirPath, (err, files) =>
-            {   /* istanbul ignore else */
-                if (!err) resolve(files.length);
+            {
+                /* istanbul ignore else */
+                if (!err) {
+                    resolve(files.length);
+                }
                 else reject(err); 
             });
         }
@@ -247,8 +250,9 @@ export function readFileAsync(file: string): Promise<string>
             if (buf) {
                 resolve(buf.toString("utf8"));
             }
-            /* istanbul ignore next */
-            resolve("");
+            else {
+                resolve("");
+            }
         }
         catch (e) { /* istanbul ignore next */ reject(e); }
     });
@@ -274,11 +278,14 @@ function readFileBufAsync(file: string): Promise<Buffer>
     return new Promise<Buffer>(async (resolve, reject) =>
     {
         fs.readFile(path.resolve(cwd, file), (e, data) =>
-        {   /* istanbul ignore if */
-            if (e) {
+        {
+            /* istanbul ignore else */
+            if (!e) {
+                resolve(data);
+            }
+            else {
                 reject(e);
             }
-            resolve(data);
         });
     });
 }

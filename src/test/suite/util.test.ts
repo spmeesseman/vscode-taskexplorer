@@ -127,6 +127,16 @@ suite("Util Tests", () =>
         assert(util.timeout(10));
 
         assert (util.getGroupSeparator() === "-");
+
+		util.lowerCaseFirstChar("s", true);
+		util.lowerCaseFirstChar("s", false);
+		util.lowerCaseFirstChar("S", true);
+		util.lowerCaseFirstChar("S", false);
+		util.lowerCaseFirstChar("scott meesseman", true);
+		util.lowerCaseFirstChar("scott meesseman", false);
+		util.lowerCaseFirstChar("TestApp", true);
+		util.lowerCaseFirstChar("testApp", false);
+		util.lowerCaseFirstChar("test App", true);
     });
 
 

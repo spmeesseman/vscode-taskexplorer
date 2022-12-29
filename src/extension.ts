@@ -106,7 +106,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
         waitForIdle: waitForTaskExplorerIdle,
         testsApi: {
             log,
-            explorer: treeDataProvider2 || treeDataProvider,
+            explorer: treeDataProvider2 /* istanbul ignore next */ || treeDataProvider,
             fileCache: cache
         }
     });
@@ -287,8 +287,11 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
         {
             await util.timeout(lilWait);
             waited += lilWait;
+            /* istanbul ignore next */
             if (isTaskExplorerBusy()) {
+                /* istanbul ignore next */
                 log.write("waiting for task explorer extension idle state...", 3, logPad);
+                /* istanbul ignore next */
                 break;
             }
             ++lilWaitCt;
@@ -306,7 +309,9 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
             iterationsIdle = 0;
         }
     }
+    /* istanbul ignore next */
     if (minWait > waited) {
+        /* istanbul ignore next */
         await util.timeout(minWait - waited);
     }
     if (waited > 0) {

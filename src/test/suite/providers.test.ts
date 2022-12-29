@@ -236,8 +236,10 @@ suite("Provider Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-        this.slow(1000);
-		await executeTeCommand("focus", 50, 3000);
+        if (!explorer.isVisible()) {
+            this.slow(1000);
+		    await executeTeCommand("focus", testsControl.slowTimeForFocusCommand, 3000);
+        }
 	});
 
 

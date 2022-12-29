@@ -64,7 +64,7 @@ suite("App-Publisher Tests", () =>
     test("Enable (Off by Default)", async function()
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testsControl.waitTimeForConfigEnableEvent);
     });
 
 
@@ -113,7 +113,7 @@ suite("App-Publisher Tests", () =>
     test("Disable", async function()
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 
@@ -121,7 +121,7 @@ suite("App-Publisher Tests", () =>
     test("Re-enable", async function()
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 42);
     });
 
@@ -178,7 +178,7 @@ suite("App-Publisher Tests", () =>
     test("Disable (Default is OFF)", async function()
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 

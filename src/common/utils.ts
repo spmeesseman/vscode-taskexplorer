@@ -163,9 +163,11 @@ export function getHeaderContent(title: string)
 
 export function getPortableDataPath(padding = "")
 {
+    /* istanbul ignore else */
     if (process.env.VSCODE_PORTABLE)
     {
         const uri = Uri.parse(process.env.VSCODE_PORTABLE);
+        /* istanbul ignore else */
         if (uri)
         {
             if (fs.existsSync(uri.fsPath))
@@ -188,13 +190,9 @@ export function getPortableDataPath(padding = "")
 
 export function getRelativePath(folder: WorkspaceFolder, uri: Uri): string
 {
-    let rtn = "";
-    if (folder) {
-        const rootUri = folder.uri;
-        const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
-        rtn = absolutePath.substring(rootUri.path.length + 1);
-    }
-    return rtn;
+    const rootUri = folder.uri;
+    const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
+    return absolutePath.substring(rootUri.path.length + 1);
 }
 
 
@@ -281,7 +279,7 @@ export function getUserDataPath(platform?: string, padding = "")
     if (process.argv)
     {
         let argvIdx = process.argv.includes("--user-data-dir");
-        /* istanbul ignore if */
+        /* istanbul ignore next */
         if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
             userPath = path.resolve(process.argv[++argvIdx]);
             log.value(padding + "user path is", userPath, 1);
@@ -313,8 +311,11 @@ function getDefaultUserDataPath(platform?: string)
     //
     // Otherwise check per platform
     //
-    if (!appDataPath) {
-        switch (platform /* istanbul ignore next */ || process.platform) {
+    if (!appDataPath)
+    {
+        /* istanbul ignore next */
+        switch (platform || process.platform)
+        {
             case "win32":
                 appDataPath = process.env.APPDATA;
                 if (!appDataPath) {
@@ -338,12 +339,13 @@ function getDefaultUserDataPath(platform?: string)
 
 export function getWorkspaceProjectName(fsPath: string)
 {
-     let project = path.basename(fsPath);
-     const wsf = workspace.getWorkspaceFolder(Uri.file(fsPath));
-     if (wsf) {
-         project = path.basename(wsf.uri.fsPath);
-     }
-     return project;
+    let project = path.basename(fsPath);
+    const wsf = workspace.getWorkspaceFolder(Uri.file(fsPath));
+    /* istanbul ignore else */
+    if (wsf) {
+        project = path.basename(wsf.uri.fsPath);
+    }
+    return project;
 }
 
 
@@ -438,6 +440,7 @@ export function isWorkspaceFolder(value: any): value is WorkspaceFolder
 
 function logUserDataEnv(padding: string)
 {
+    /* istanbul ignore else */
     if (log.isLoggingEnabled())
     {
         log.value(padding + "os", process.platform, 1);
@@ -456,6 +459,7 @@ function logUserDataEnv(padding: string)
 export function lowerCaseFirstChar(s: string, removeSpaces: boolean)
 {
     let fs = "";
+    /* istanbul ignore else */
     if (s)
     {
         fs = s[0].toString().toLowerCase();

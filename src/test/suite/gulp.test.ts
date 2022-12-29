@@ -53,7 +53,7 @@ suite("Gulp Tests", () =>
     test("Disable", async function()
     {
         await configuration.updateWs("enabledTasks.gulp", false);
-        await teApi.waitForIdle(waitTimeForConfigEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 
@@ -61,7 +61,7 @@ suite("Gulp Tests", () =>
     test("Re-enable", async function()
     {
         await configuration.updateWs("enabledTasks.gulp", true);
-        await teApi.waitForIdle(waitTimeForConfigEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 17);
     });
 

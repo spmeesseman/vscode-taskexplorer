@@ -4,7 +4,7 @@
 import * as assert from "assert";
 import { ILicenseManager } from "../../interface/licenseManager";
 import { storage } from "../../common/storage";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import {
@@ -14,6 +14,7 @@ import {
 
 
 let teApi: TaskExplorerApi;
+let explorer: ExplorerApi;
 let licMgr: ILicenseManager;
 
 
@@ -27,6 +28,10 @@ suite("License Manager Tests", () =>
 	{
 		teApi = await activate(this);
         assert(isReady("make") === true, "    ✘ TeApi not ready");
+        if (!teApi.explorer) {
+            assert.fail("        ✘ Explorer instance does not exist");
+        }
+        explorer = teApi.explorer;
 	});
 
 
@@ -38,8 +43,10 @@ suite("License Manager Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-		this.slow(testsControl.slowTimeForFocusCommand);
-		await executeTeCommand("focus", 250, 1000);
+		if (!explorer.isVisible()) {
+            this.slow(1000);
+		    await executeTeCommand("focus", testsControl.slowTimeForFocusCommand, 3000);
+        }
 	});
 
 

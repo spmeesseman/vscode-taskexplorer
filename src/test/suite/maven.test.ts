@@ -11,7 +11,7 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { configuration } from "../../common/configuration";
 import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
 
 
@@ -22,6 +22,7 @@ const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
+let explorer: ExplorerApi;
 let pathToProgram: string;
 let enableTaskType: boolean;
 let dirName: string;
@@ -38,6 +39,10 @@ suite("Maven Tests", () =>
         //
         teApi = await activate(this);
         assert(isReady(testsName) === true, "    ✘ TeApi not ready");
+        if (!teApi.explorer) {
+            assert.fail("        ✘ Explorer instance does not exist");
+        }
+        explorer = teApi.explorer;
         rootPath = getWsPath(".");
         dirName = path.join(rootPath, "tasks_test_");
         fileUri = Uri.file(path.join(rootPath, "pom.xml"));
@@ -60,8 +65,10 @@ suite("Maven Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-        this.slow(1000);
-		await executeTeCommand("focus", 50, 3000);
+        if (!explorer.isVisible()) {
+            this.slow(1000);
+		    await executeTeCommand("focus", testsControl.slowTimeForFocusCommand, 3000);
+        }
 	});
 
 

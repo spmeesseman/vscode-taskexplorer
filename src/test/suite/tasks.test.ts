@@ -175,7 +175,7 @@ suite("Task Tests", () =>
         await executeTeCommand2("pause", [ batchTask ], 500);
         await executeTeCommand2("run", [ batchTask ], waitTimeForRunCommand);
         await executeSettingsUpdate("clickAction", "Open");
-        await executeTeCommand2("run", [ batchTask ], 1000);
+        await executeTeCommand2("run", [ batchTask ], waitTimeForRunCommand / 3);
         await executeSettingsUpdate("clickAction", "Execute");
         await executeTeCommand2("openTerminal", [ batchTask ], 50);
         await executeTeCommand2("pause", [ batchTask ], 500);
@@ -206,7 +206,7 @@ suite("Task Tests", () =>
         await executeTeCommand2("stop", [ batchTask ], 200);
         await executeSettingsUpdate("disableAnimatedIcons", false);
         overrideNextShowInputBox("--test --test2");
-        await executeTeCommand2("runWithArgs", [ batchTask ], waitTimeForRunCommand);
+        await executeTeCommand2("runWithArgs", [ batchTask ], waitTimeForRunCommand / 3);
         // await executeTeCommand("stop", 200, waitTimeMax, batchTask);
         await executeSettingsUpdate("showRunningTask", true);
         await teApi.waitForIdle(8000);

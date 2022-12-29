@@ -49,7 +49,8 @@ suite("Tree Tests", () =>
 
     test("Refresh", async function()
     {
-        await executeTeCommand("refresh", 1000);
+        this.slow(testsControl.slowTimeForRefreshCommand);
+        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
     });
 
 
@@ -63,8 +64,8 @@ suite("Tree Tests", () =>
                 util.getTaskItemId(batch[0]), util.getTaskItemId(batch[1]), util.getTaskItemId(ant[0])
             ]);
         }
-        await configuration.updateWs("showLastTasks", false);
-        await configuration.updateWs("showLastTasks", true);
+        await executeSettingsUpdate("showLastTasks", false);
+        await executeSettingsUpdate("showLastTasks", true);
     });
 
 
@@ -117,107 +118,110 @@ suite("Tree Tests", () =>
 
     test("Add to Favorites", async function()
     {
-        let removed = await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[0]);
+        this.slow(testsControl.slowTimeForCommand * 4);
+        let removed = await executeTeCommand2("addRemoveFromFavorites", [ batch[0] ]);
         if (removed) {
-            await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[0]);
+            await executeTeCommand2("addRemoveFromFavorites", [ batch[0] ]);
         }
 
-        removed = await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[1]);
+        removed = await executeTeCommand2("addRemoveFromFavorites", [ batch[1] ]);
         if (removed) {
-            await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[1]);
+            await executeTeCommand2("addRemoveFromFavorites", [ batch[1] ]);
         }
     });
 
 
     test("Remove from Favorites", async function()
     {
-        await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[0]);
-        await executeTeCommand("addRemoveFromFavorites", 10, 100, batch[1]);
+        this.slow(testsControl.slowTimeForCommand * 2);
+        await executeTeCommand2("addRemoveFromFavorites", [ batch[0] ]);
+        await executeTeCommand2("addRemoveFromFavorites", [ batch[1] ]);
     });
 
 
     test("Add Custom Label 1", async function()
     {
+        this.slow(testsControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 1");
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[0]);
+        await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
 
 
     test("Add Custom Label 2", async function()
     {
         overrideNextShowInputBox("Label 2");
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[0]);
+        await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
 
 
     test("Add Custom Label 3", async function()
     {
         overrideNextShowInputBox("Label 3");
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[1]);
+        await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
 
 
     test("Add Custom Label 4", async function()
     {
         overrideNextShowInputBox("Label 4");
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[1]);
+        await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
 
 
     test("Add Custom Label 5", async function()
     {
         overrideNextShowInputBox("Label 5");
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, ant[0]);
+        await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
 
 
     test("Add Custom Label 6", async function()
     {
         overrideNextShowInputBox("Label 6");
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, ant[0]);
+        await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
 
 
     test("Remove Custom Label 1", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[0]);
+        await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
 
 
     test("Remove Custom Label 2", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[0]);
+        await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
 
 
     test("Remove Custom Label 3", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[1]);
+        await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
 
 
     test("Remove Custom Label 4", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, batch[1]);
+        await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
 
 
     test("Remove Custom Label 5", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, ant[0]);
+        await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
 
 
     test("Remove Custom Label 6", async function()
     {
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, ant[0]);
+        await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
 
 
     test("Cancel Add Custom Label", async function()
     {
         overrideNextShowInputBox(undefined);
-        await executeTeCommand("addRemoveCustomLabel", 50, 50, ant[0]);
+        await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
 
 
@@ -225,7 +229,9 @@ suite("Tree Tests", () =>
     {
         await configuration.updateWs("showLastTasks", false);
         await explorer.showSpecialTasks(false);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await explorer.showSpecialTasks(true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
 
 

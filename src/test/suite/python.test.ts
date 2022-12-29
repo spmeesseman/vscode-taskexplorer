@@ -46,7 +46,7 @@ suite("Python Tests", () =>
         pathToPython = configuration.get<string>("pathToPrograms.python");
         enablePython = configuration.get<boolean>("enabledTasks.python");
         await executeSettingsUpdate("pathToPrograms.python", "php\\composer.exe");
-        await executeSettingsUpdate("enabledTasks.python", true);
+        await executeSettingsUpdate("enabledTasks.python", true, testsControl.waitTimeForConfigEnableEvent);
     });
 
 
@@ -55,7 +55,7 @@ suite("Python Tests", () =>
         // Reset settings
         //
         await executeSettingsUpdate("pathToPrograms.python", pathToPython);
-        await executeSettingsUpdate("enabledTasks.python", enablePython);
+        await executeSettingsUpdate("enabledTasks.python", enablePython, testsControl.waitTimeForConfigEnableEvent);
     });
 
 
@@ -82,14 +82,14 @@ suite("Python Tests", () =>
 
     test("Disable", async function()
     {
-        await executeSettingsUpdate("enabledTasks.python", false);
+        await executeSettingsUpdate("enabledTasks.python", false, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount("script", 0, testsName);
     });
 
 
     test("Re-enable", async function()
     {
-        await executeSettingsUpdate("enabledTasks.python", true);
+        await executeSettingsUpdate("enabledTasks.python", true, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount("script", 2, testsName);
     });
 
