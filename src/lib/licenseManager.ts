@@ -170,6 +170,7 @@ export class LicenseManager implements ILicenseManager
 			taskCounts[t.source]++;
 		});
 
+		/** istanbul ignore else */
 		if (workspace.workspaceFolders)
 		{
 			for (const wf of workspace.workspaceFolders)
@@ -182,19 +183,19 @@ export class LicenseManager implements ILicenseManager
 			<tr>
 				<td style="font-size:16px;font-weight:bold">
 					ExtJs Intellisense has parsed ${taskCounts.length} components in
-					${projects.length} project${projects.length > 1 ? "s" : ""}.
+					${projects.length} project${ /** istanbul ignore next */ projects.length > 1 ? "s" : ""}.
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<ul>
 						<li>${taskCounts.length} tasks</li>
-						<li>${taskCounts.npm || "0"} NPM tasks</li>
-						<li>${taskCounts.Workspace || "0"} VSCode tasks</li>
-						<li>${taskCounts.ant || "0"} Ant tasks</li>
-						<li>${taskCounts.bash || "0"} Bash scripts</li>
-						<li>${taskCounts.batch || "0"} Batch scripts</li>
-						<li>${taskCounts.python || "0"} Python tasks</li>
+						<li>${taskCounts.npm} NPM tasks</li>
+						<li>${taskCounts.Workspace} VSCode tasks</li>
+						<li>${taskCounts.ant} Ant tasks</li>
+						<li>${taskCounts.bash} Bash scripts</li>
+						<li>${taskCounts.batch} Batch scripts</li>
+						<li>${taskCounts.python} Python tasks</li>
 					</ul>
 				</td>
 			</tr>
@@ -218,6 +219,7 @@ export class LicenseManager implements ILicenseManager
 	private async validateLicense(licenseKey: string)
 	{
 		this.licensed = !!licenseKey;
+		/** istanbul ignore else */
 		if (this.licensed) {
 			await this.setLicenseKey(licenseKey);
 		}

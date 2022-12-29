@@ -144,6 +144,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 }
 
                 if (pathExists && !configuration.get<string[]>("exclude", []).includes(uri.path))
+                // if (pathExists && !util.isExcluded(uri.path))
                 {
                     const tasks = enabled ? (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path)) : [];
                     //

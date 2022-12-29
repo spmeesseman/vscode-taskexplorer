@@ -47,6 +47,7 @@ function getBodyContent(logPad: string, logLevel: number, uri?: Uri)
 {
     log.methodStart("get body content", logLevel, logPad);
 
+	/** istanbul ignore next */
 	let project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 
 	let details = `<table style="margin-top:15px" width="97%" align="center">
@@ -66,6 +67,7 @@ function getBodyContent(logPad: string, logLevel: number, uri?: Uri)
 	tasks?.forEach((t: Task) =>
 	{
 		let wsFolder;
+		/** istanbul ignore else */
 		if (isWorkspaceFolder(t.scope))
 		{
 			wsFolder = t.scope as WorkspaceFolder;
@@ -76,8 +78,10 @@ function getBodyContent(logPad: string, logLevel: number, uri?: Uri)
 		}
 
 		let filePath = "N/A";
+		/** istanbul ignore else */
 		if (t.definition.uri)
 		{
+			/** istanbul ignore else */
 			if (wsFolder) {
 				filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.definition.uri.fsPath)
 			}
@@ -105,8 +109,9 @@ function getBodyContent(logPad: string, logLevel: number, uri?: Uri)
 	</tr>
 	<tr><td height="10"></td></tr>`;
 
+		/** istanbul ignore else */
 		if (wsFolder) {
-			pushIfNotExists(projects, wsFolder?.name);
+			pushIfNotExists(projects, wsFolder.name);
 		}
 		else {
 			pushIfNotExists(projects, "User");
