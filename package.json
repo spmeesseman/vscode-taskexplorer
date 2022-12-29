@@ -1560,10 +1560,6 @@
                             "type": "boolean",
                             "description": "%config.taskExplorer.enableBash%"
                         },
-                        "batch": {
-                            "type": "boolean",
-                            "description": "%config.taskExplorer.enableBatch%"
-                        },
                         "composer": {
                             "type": "boolean",
                             "description": "%config.taskExplorer.enableComposer%"
