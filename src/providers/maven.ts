@@ -64,7 +64,9 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
               defaultDef = this.getDefaultDefinition(undefined, folder, uri),
               options: ShellExecutionOptions = { cwd };
 
-        log.methodStart("read maven file uri task", 1, logPad, false, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+        log.methodStart("read maven file uri task", 1, logPad, false, [
+            [ "path", uri.fsPath ], [ "project folder", folder.name ]
+        ], this.logQueueId);
 
         //
         // Validate XML with xml2js
@@ -74,8 +76,8 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
             await parseStringPromise(buffer);
         }
         catch (e: any) {
-            log.write("   " + e.message);
-            log.methodDone("read maven file uri tasks", 1, logPad);
+            log.error(e, undefined, this.logQueueId);
+            log.methodDone("read maven file uri tasks", 1, logPad, false, undefined, this.logQueueId);
             return [];
         }
 
@@ -147,7 +149,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
         const executionValidate = new ShellExecution(kindValidate.cmdLine as string, options);
         const executionVerify = new ShellExecution(kindVerify.cmdLine as string, options);
 
-        log.methodDone("read maven file uri tasks", 1, logPad);
+        log.methodDone("read maven file uri tasks", 1, logPad, false, undefined, this.logQueueId);
 
         return [ new Task(kindClean, folder, "Clean", "maven", executionClean, undefined),
                  new Task(kindCompile, folder, "Compile", "maven", executionCompile, undefined),

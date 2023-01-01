@@ -40,7 +40,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad = ""): Task
     {
-        log.methodStart("create make task", 4, logPad, false, [[ "target", target ], [ "cmd", cmd ]]);
+        log.methodStart("create make task", 4, logPad, false, [[ "target", target ], [ "cmd", cmd ]], this.logQueueId);
 
         const getCommand = (): string =>
         {
@@ -55,9 +55,9 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
                 //
                 // Ref ticket #138 - temp logging
                 //
-                log.value("   set make program from settings", make, 5, logPad);
+                log.value("   set make program from settings", make, 5, logPad, this.logQueueId);
             }
-            log.value("   make program", make, 5, logPad);
+            log.value("   make program", make, 5, logPad, this.logQueueId);
             return make;
         };
 
@@ -73,7 +73,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         /* istanbul ignore next */
         const problemMatcher = extensions.getExtension("ms-vscode.cpptools") ? "$gcc" : "$gccte";
 
-        log.methodDone("create make task", 4, logPad);
+        log.methodDone("create make task", 4, logPad, false, undefined, this.logQueueId);
         return new Task(kind, folder, target, "make", execution, problemMatcher);
     }
 
@@ -112,7 +112,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     private findTargets(fsPath: string, logPad: string): string[]
     {
         const scripts: string[] = [];
-        log.methodStart("find makefile targets", 2, logPad, false, [[ "path", fsPath ]]);
+        log.methodStart("find makefile targets", 2, logPad, false, [[ "path", fsPath ]], this.logQueueId);
 
         const contents = util.readFileSync(fsPath);
         let match;
@@ -128,13 +128,13 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             {   /* istanbul ignore else */
                 if (this.isNormalTarget(tgtName)) {
                     scripts.push(tgtName);
-                    log.write("   found makefile target", 3, logPad);
-                    log.value("      name", tgtName, 3, logPad);
+                    log.write("   found makefile target", 3, logPad, this.logQueueId);
+                    log.value("      name", tgtName, 3, logPad, this.logQueueId);
                 }
             }
         }
 
-        log.methodDone("find makefile targets", 2, logPad);
+        log.methodDone("find makefile targets", 2, logPad, false, undefined, this.logQueueId);
         return scripts;
     }
 
@@ -181,7 +181,9 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read make file uri tasks", 1, logPad, false, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+        log.methodStart("read make file uri tasks", 1, logPad, false, [
+            [ "path", uri.fsPath ], [ "project folder", folder.name ]
+        ], this.logQueueId);
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
         {
@@ -190,7 +192,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             result.push(task);
         }
 
-        log.methodDone("read make file uri tasks", 1, logPad);
+        log.methodDone("read make file uri tasks", 1, logPad, false, undefined, this.logQueueId);
         return result;
     }
 

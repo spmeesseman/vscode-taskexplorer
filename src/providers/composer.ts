@@ -44,7 +44,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
     {
         const targets: string[] = [];
 
-        log.methodStart("find composer targets", 2, logPad, false, [[ "path", fsPath ]]);
+        log.methodStart("find composer targets", 2, logPad, false, [[ "path", fsPath ]], this.logQueueId);
 
         try {
             const json = JSON.parse(util.readFileSync(fsPath)),
@@ -54,10 +54,10 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
                 Object.keys(scripts).forEach((k) => { targets.push(k); });
             }
         } catch {
-            log.error("Invalid JSON found in " + fsPath);
+            log.error("Invalid JSON found in " + fsPath, undefined, this.logQueueId);
         }
 
-        log.methodDone("Find composer targets", 2, logPad);
+        log.methodDone("Find composer targets", 2, logPad, false, undefined, this.logQueueId);
         return targets;
     }
 
@@ -97,7 +97,9 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read composer file uri task", 1, logPad, false, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+        log.methodStart("read composer file uri task", 1, logPad, false, [
+            [ "path", uri.fsPath ], [ "project folder", folder.name ]
+        ], this.logQueueId);
 
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
@@ -107,7 +109,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
             result.push(task);
         }
 
-        log.methodDone("read composer file uri task", 1, logPad);
+        log.methodDone("read composer file uri task", 1, logPad, false, undefined, this.logQueueId);
         return result;
     }
 

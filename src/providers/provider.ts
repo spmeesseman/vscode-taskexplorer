@@ -19,8 +19,9 @@ export abstract class TaskExplorerProvider implements TaskProvider
     public cachedTasks: Task[] | undefined;
     public invalidating = false;
     public providerName = "***";
-
     private queue: Uri[];
+    protected callCount = 0;
+    protected logQueueId: string | undefined;
 
 
     constructor(name: string) {
@@ -60,7 +61,8 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
     public async provideTasks()
     {
-        log.methodStart(`provide ${this.providerName} tasks`, 1, "   ");
+        this.logQueueId = this.providerName + (++this.callCount);
+        log.methodStart(`provide ${this.providerName} tasks`, 1, "   ", false, [[ "call count", ++this.callCount ]], this.logQueueId);
         if (!this.cachedTasks)
         {
             const licMgr = getLicenseManager();
@@ -71,12 +73,14 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 if (this.cachedTasks.length > maxTasks)
                 {
                     const rmvCount = this.cachedTasks.length - maxTasks;
-                    log.write(`   removing ${rmvCount} tasks, max ${this.providerName} task count reached (no license)`, 1);
+                    log.write(`   removing ${rmvCount} tasks, max ${this.providerName} task count reached (no license)`, 1, "   ", this.logQueueId);
                     this.cachedTasks.splice(maxTasks, rmvCount);
                 }
             }
         }
-        log.methodDone(`provide ${this.providerName} tasks`, 1, "   ");
+        log.methodDone(`provide ${this.providerName} tasks`, 1, "   ", false, undefined, this.logQueueId);
+        log.dequeue(this.logQueueId);
+        this.logQueueId = undefined;
         return this.cachedTasks;
     }
 
@@ -88,7 +92,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
               paths = getTaskFiles(this.providerName),
               enabled = util.isTaskTypeEnabled(this.providerName);
 
-        log.methodStart(`read ${this.providerName} tasks`, 1, logPad, false, [[ "enabled", enabled ]]);
+        log.methodStart(`read ${this.providerName} tasks`, 1, logPad, false, [[ "enabled", enabled ]], this.logQueueId);
 
         if (enabled && paths)
         {
@@ -98,15 +102,16 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 {
                     visitedFiles.push(fObj.uri.fsPath);
                     const tasks = (await this.readUriTasks(fObj.uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
-                    log.write(`   processed ${this.providerName} file`, 3, logPad);
-                    log.value("      file", fObj.uri.fsPath, 3, logPad);
-                    log.value("      targets in file", tasks.length, 3, logPad);
+                    log.write(`   processed ${this.providerName} file`, 3, logPad, this.logQueueId);
+                    log.value("      file", fObj.uri.fsPath, 3, logPad, this.logQueueId);
+                    log.value("      targets in file", tasks.length, 3, logPad, this.logQueueId);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        log.methodDone(`read ${this.providerName} tasks`, 1, logPad, false, [[ "# of tasks", allTasks.length ]]);
+        log.methodDone(`read ${this.providerName} tasks`, 1, logPad, false, [[ "# of tasks", allTasks.length ]], this.logQueueId);
+
         return allTasks;
     }
 

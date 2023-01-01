@@ -4,6 +4,7 @@ import { configuration } from "./configuration";
 import { OutputChannel, ExtensionContext, commands, window } from "vscode";
 import { writeFileSync } from "fs";
 import { isArray, isError, isObject, isString } from "./utils";
+import { log } from "console";
 
 
 // export enum LogColor
@@ -18,7 +19,16 @@ import { isArray, isError, isObject, isString } from "./utils";
 //     white = "\\u001b[37m"
 // }
 
+export interface IMsgQueueItem
+{
+    fn: any;
+    args: any[];
+    scope: any;
+}
+
 const logValueWhiteSpace = 45;
+const msgQueue: { [queueId: string]:  IMsgQueueItem[] } = {};
+
 let writeToConsole = false;
 let writeToConsoleLevel = 2;
 let writeToFile = false;
@@ -27,38 +37,37 @@ let lastWriteWasBlank = false;
 let logOutputChannel: OutputChannel | undefined;
 
 
-export function blank(level?: number)
+export function blank(level?: number, queueId?: string)
 {
-    write("", level);
+    write("", level, "", queueId);
 }
 
 
-function writeError(e: Error)
+export function dequeue(queueId: string)
 {
-    const currentWriteToConsole = writeToConsole;
-    writeToConsole = true;
-    write("✘ " + e.name);
-    write("✘ " + e.message);
-    if (e.stack) {
-        const stackFmt = e.stack.replace(/\n/g, "\n                        ✘ ");
-        write("✘ " + stackFmt);
+    if (msgQueue[queueId])
+    {
+        msgQueue[queueId].forEach((l) =>
+        {
+            l.fn.call(l.scope, ...l.args);
+        });
+        delete msgQueue[queueId];
     }
-    writeToConsole = currentWriteToConsole;
 }
 
 
-export function error(msg: any, params?: (string|any)[][])
+export function error(msg: any, params?: (string|any)[][], queueId?: string)
 {
     if (msg)
     {
-        write("✘");
+        write("✘", 0, "", queueId);
         const _writeErr = (err: any) =>
         {
             if (isString(err)) {
-                write("✘ " + err);
+                write("✘ " + err, 0, "", queueId);
             }
             else if (isError(err)) {
-                writeError(err);
+                writeError(err, queueId);
             }
             else if (isArray(err)) {
                 err.forEach((m: any) => _writeErr(m));
@@ -66,27 +75,27 @@ export function error(msg: any, params?: (string|any)[][])
             else if (isObject(err)) {
                 writeError(err);
                 if (err.message) {
-                    writeError(err.message);
+                    writeError(err.message, queueId);
                 }
                 if (err.messageX) {
-                    writeError(err.messageX);
+                    writeError(err.messageX, queueId);
                 }
-                if (err.messageX) {
-                    writeError(err.messageX);
+                else {
+                    writeError(err.toString(), queueId);
                 }
             }
             else {
-                writeError(err.toString());
+                writeError(err.toString(), queueId);
             }
         };
         _writeErr(msg);
         if (params)
         {
             for (const [ n, v, l ] of params) {
-                value("✘   " + n, v);
+                value("✘   " + n, v, 0, "", queueId);
             }
         }
-        write("✘");
+        write("✘", 0, "", queueId);
     }
 }
 
@@ -117,27 +126,27 @@ export function isLoggingEnabled()
 }
 
 
-export function methodStart(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][]) // , color?: LogColor)
+export function methodStart(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][], queueId?: string) // , color?: LogColor)
 {
     if (isLoggingEnabled())
     {
         const lLevel = level || 1;
         if (doLogBlank === true) {
-            blank(lLevel);
+            blank(lLevel, queueId);
         }
-        write(logPad + "*start* " + msg, lLevel); // , color);
-        values(lLevel, logPad + "   ", params);
+        write("*start* " + msg, lLevel, logPad, queueId); // , color);
+        values(lLevel, logPad + "   ", params, false, queueId);
     }
 }
 
 
-export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][])
+export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][], queueId?: string)
 {
     if (isLoggingEnabled())
     {
         const lLevel = level || 1;
-        values(lLevel, logPad + "   ", params, doLogBlank);
-        write("*done* " + msg, lLevel, logPad); // , LogColor.cyan);
+        values(lLevel, logPad + "   ", params, doLogBlank, queueId);
+        write("*done* " + msg, lLevel, logPad, queueId); // , LogColor.cyan);
     }
 }
 
@@ -148,6 +157,7 @@ export function setWriteToFile(set: boolean, level = 2)
     writeToFileLevel = level;
 }
 
+
 export function setWriteToConsole(set: boolean, level = 2)
 {
     writeToConsole = set;
@@ -155,7 +165,7 @@ export function setWriteToConsole(set: boolean, level = 2)
 }
 
 
-export function value(msg: string, value: any, level?: number, logPad = "")
+export function value(msg: string, value: any, level?: number, logPad = "", queueId?: string)
 {
     if (isLoggingEnabled())
     {
@@ -201,28 +211,28 @@ export function value(msg: string, value: any, level?: number, logPad = "")
         if (logMsg.includes("\n")) {
             logMsg = logMsg.replace(/\n/g, `\n${valuePad}  ` + msg.replace(/\W\w/g, " "));
         }
-        write(logMsg, level, logPad);
+        write(logMsg, level, logPad, queueId);
     }
 }
 
 
-export function values(level: number, logPad: string, params: any | (string|any)[][], doLogBlank?: boolean)
+export function values(level: number, logPad: string, params: any | (string|any)[][], doLogBlank?: boolean, queueId?: string)
 {
     if (isLoggingEnabled())
     {
         if (doLogBlank === true) {
-            blank(level);
+            blank(level, queueId);
         }
         if (params) {
             for (const [ n, v ] of params) {
-                value(n, v, level, logPad);
+                value(n, v, level, logPad, queueId);
             }
         }
     }
 }
 
 
-export function write(msg: string, level?: number, logPad = "") // , color?: LogColor)
+export function write(msg: string, level?: number, logPad = "", queueId?: string) // , color?: LogColor)
 {
     if (msg === null || msg === undefined || (lastWriteWasBlank && msg === "")) {
         return;
@@ -241,10 +251,29 @@ export function write(msg: string, level?: number, logPad = "") // , color?: Log
             for (const m of msgs)
             {
                 if (args && args.length > 0) {
-                    fn.call(scope || window, ...args, ts + logPad + m.trimEnd());
+                    if (!queueId) {
+                        fn.call(scope || window, ...args, ts + logPad + m.trimEnd());
+                    }
+                    else {
+                        msgQueue[queueId].push({
+                            fn,
+                            scope: scope || window,
+                            args: [ ...args, ts + logPad + m.trimEnd() ]
+                        });
+                    }
                 }
                 else {
-                    fn.call(scope || window, ts + logPad + m.trimEnd());
+                    if (!queueId) {
+                        fn.call(scope || window, ts + logPad + m.trimEnd());
+                    }
+                    else {
+                        if (!msgQueue[queueId]) msgQueue[queueId] = [];
+                        msgQueue[queueId].push({
+                            fn,
+                            scope: scope || window,
+                            args: [ ts + logPad + m.trimEnd() ]
+                        });
+                    }
                 }
             }
         };
@@ -264,4 +293,18 @@ export function write(msg: string, level?: number, logPad = "") // , color?: Log
         }
         lastWriteWasBlank = msg === "";
     }
+}
+
+
+function writeError(e: Error, queueId?: string)
+{
+    const currentWriteToConsole = writeToConsole;
+    writeToConsole = true;
+    write("✘ " + e.name, 0, "", queueId);
+    write("✘ " + e.message, 0, "", queueId);
+    if (e.stack) {
+        const stackFmt = e.stack.replace(/\n/g, "\n                        ✘ ");
+        write("✘ " + stackFmt, 0, "", queueId);
+    }
+    writeToConsole = currentWriteToConsole;
 }

@@ -69,7 +69,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         const scripts: StringMap = {};
         const useAnt = configuration.get<boolean>("useAnt");
 
-        log.methodStart("find ant targets", 2, logPad, false, [[ "use ant", useAnt ], [ "path", path ]]);
+        log.methodStart("find ant targets", 2, logPad, false, [[ "use ant", useAnt ], [ "path", path ]], this.logQueueId);
 
         //
         // Try running 'ant' itself to get the targets.  If fail, just custom parse
@@ -88,7 +88,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         }
 
 
-        log.methodDone("find ant targets complete", 2, logPad);
+        log.methodDone("find ant targets complete", 2, logPad, false, undefined, this.logQueueId);
         return scripts;
     }
 
@@ -124,7 +124,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
      */
     private findTasksWithAnt(path: string, taskMap: StringMap, logPad: string)
     {
-        log.methodStart("find tasks with ant", 2, logPad, false, [[ "path", path ]]);
+        log.methodStart("find tasks with ant", 2, logPad, false, [[ "path", path ]], this.logQueueId);
         //
         // Execute 'ant'/'ant.bat' to find defined tasks (ant targets)
         //
@@ -173,20 +173,20 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             taskMap[defaultTask === line ? line + " - Default" : line] = line;
         }
 
-        log.methodDone("find tasks with ant", 2, logPad, false, [[ "# of tasks", taskMap.size ]]);
+        log.methodDone("find tasks with ant", 2, logPad, false, [[ "# of tasks", taskMap.size ]], this.logQueueId);
     }
 
 
     private logException(ex: any)
     {
-        log.error([ "*** Error running/executing ant!!", "Check to ensure the path to ant/ant.bat is correct", ex.toString() ]);
+        log.error([ "*** Error running/executing ant!!", "Check to ensure the path to ant/ant.bat is correct", ex.toString() ], undefined, this.logQueueId);
         window.showInformationMessage("Error running/executing ant!! Check to ensure the path to ant/ant.bat is correct and your xml is valid<br><br>" + ex.toString());
     }
 
 
     private async findTasksWithXml2Js(path: string, taskMap: StringMap, logPad: string)
     {
-        log.methodStart("find tasks with xml2js", 2, logPad, false, [[ "path", path ]]);
+        log.methodStart("find tasks with xml2js", 2, logPad, false, [[ "path", path ]], this.logQueueId);
 
         const buffer = util.readFileSync(path);
         //
@@ -203,13 +203,13 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             for (const tgt of targets)                  // Check .$ and .$.name (xml2js output format)
             {
                 if (tgt.$ && tgt.$.name) {
-                    log.value("   Found target (cst.)", tgt.$.name, 3, logPad);
+                    log.value("   Found target (cst.)", tgt.$.name, 3, logPad, this.logQueueId);
                     taskMap[defaultTask === tgt.$.name ? tgt.$.name + " - Default" : tgt.$.name] = tgt.$.name;
                 }
             }
         }
 
-        log.methodDone("find tasks with xml2js", 2, logPad, false, [[ "# of tasks", taskMap.size ]]);
+        log.methodDone("find tasks with xml2js", 2, logPad, false, [[ "# of tasks", taskMap.size ]], this.logQueueId);
 
         // return new Promise((resolve, reject) =>
         // {
@@ -292,7 +292,9 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read ant file uri tasks", 1, logPad, false, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+        log.methodStart("read ant file uri tasks", 1, logPad, false, [
+            [ "path", uri.fsPath ], [ "project folder", folder.name ]
+        ], this.logQueueId);
 
         /* istanbul ignore else */
         if (folder)
@@ -306,7 +308,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             }
         }
 
-        log.methodDone("read ant file uri tasks", 1, logPad);
+        log.methodDone("read ant file uri tasks", 1, logPad, false, undefined, this.logQueueId);
         return result;
     }
 

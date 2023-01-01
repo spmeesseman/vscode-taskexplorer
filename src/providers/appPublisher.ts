@@ -58,14 +58,14 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
 
         log.methodStart("read app-publisher file uri task", 1, logPad, false, [
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
-        ]);
+        ], this.logQueueId);
 
         try { // Validate JSON
             await readJsonAsync(uri.fsPath);
         }
         catch (e: any)
-        {   log.write("   " + e.message);
-            log.methodDone("read app-publisher file uri tasks", 1, logPad);
+        {   log.error(e, undefined, this.logQueueId);
+            log.methodDone("read app-publisher file uri tasks", 1, logPad, false, undefined, this.logQueueId);
             return [];
         }
 
@@ -204,7 +204,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
                                 `${def.label}${apFmtLabel}`, "apppublisher", exec, undefined));
         });
 
-        log.methodDone("read app-publisher file uri tasks", 1, logPad);
+        log.methodDone("read app-publisher file uri tasks", 1, logPad, false, undefined, this.logQueueId);
 
         return tasks;
     }

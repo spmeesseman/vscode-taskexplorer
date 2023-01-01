@@ -50,7 +50,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
     {
         const scripts: string[] = [];
 
-        log.methodStart("find pipenv Pipfile targets", 2, logPad, false, [[ "path", fsPath ]]);
+        log.methodStart("find pipenv Pipfile targets", 2, logPad, false, [[ "path", fsPath ]], this.logQueueId);
 
         const contents = util.readFileSync(fsPath);
 
@@ -61,11 +61,11 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
         Object.entries(/* istanbul ignore next */pipfile.result?.scripts ?? {}).forEach(([ scriptName, _scriptCmd ]) => {
             // Only need the script name, not the whole command, since it is run as `pipenv run <scriptName>`
             scripts.push(scriptName);
-            log.write("   found pipenv Pipfile target", 3, logPad);
-            log.value("      name", scriptName, 3, logPad);
+            log.write("   found pipenv Pipfile target", 3, logPad, this.logQueueId);
+            log.value("      name", scriptName, 3, logPad, this.logQueueId);
         });
 
-        log.methodDone("find pipenv Pipfile targets", 2, logPad);
+        log.methodDone("find pipenv Pipfile targets", 2, logPad, false, undefined, this.logQueueId);
 
         return scripts;
     }
@@ -100,7 +100,9 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read pipenv Pipfile file uri tasks", 1, logPad, false, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+        log.methodStart("read pipenv Pipfile file uri tasks", 1, logPad, false, [
+            [ "path", uri.fsPath ], [ "project folder", folder.name ]
+        ], this.logQueueId);
 
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
@@ -110,7 +112,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
             result.push(task);
         }
 
-        log.methodDone("read pipenv Pipfile file uri tasks", 1, logPad);
+        log.methodDone("read pipenv Pipfile file uri tasks", 1, logPad, false, undefined, this.logQueueId);
         return result;
     }
 }

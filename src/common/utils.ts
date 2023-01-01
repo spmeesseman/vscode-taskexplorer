@@ -491,14 +491,14 @@ function logUserDataEnv(padding: string)
     /* istanbul ignore else */
     if (log.isLoggingEnabled())
     {
-        log.value(padding + "os", process.platform, 1);
-        log.value(padding + "portable", process.env.VSCODE_PORTABLE, 1);
-        log.value(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 1);
-        log.value(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 1);
-        log.value(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 1);
+        log.value(padding + "os", process.platform, 4);
+        log.value(padding + "portable", process.env.VSCODE_PORTABLE, 4);
+        log.value(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 4);
+        log.value(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 4);
+        log.value(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 4);
         /* istanbul ignore if */
         if (process.platform === "linux") {
-            log.value("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 1);
+            log.value("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 4);
         }
     }
 }
