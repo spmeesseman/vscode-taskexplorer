@@ -184,7 +184,7 @@ async function createFileWatchers(context: ExtensionContext)
     const taskTypes = util.getTaskTypes();
     for (const taskType of taskTypes)
     {
-        log.write(`   create for task type '${taskType}'`, 1, "   ");
+        log.write(`   create file watchers for task type '${taskType}'`, 1, "   ");
         if (util.isTaskTypeEnabled(taskType))
         {
             await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), true, "      ");

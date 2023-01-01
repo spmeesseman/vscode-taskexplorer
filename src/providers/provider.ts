@@ -67,7 +67,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
         {
             const licMgr = getLicenseManager();
             this.cachedTasks = await this.readTasks("      ");
-            if (licMgr)
+            if (licMgr && !licMgr.isLicensed())
             {
                 const maxTasks = licMgr.getMaxNumberOfTasksByType(this.providerName);
                 if (this.cachedTasks.length > maxTasks)
@@ -75,7 +75,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                     const rmvCount = this.cachedTasks.length - maxTasks;
                     log.write(`   removing ${rmvCount} tasks, max ${ this.providerName} task count reached (no license)`, 1, "   ", this.logQueueId);
                     this.cachedTasks.splice(maxTasks, rmvCount);
-                    util.showMaxTasksReachedMessage(util.getTaskTypeFriendlyName(this.providerName));
+                    util.showMaxTasksReachedMessage(util.getTaskTypeFriendlyName(this.providerName, true));
                 }
             }
         }

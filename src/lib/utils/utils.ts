@@ -216,7 +216,7 @@ export function getPortableDataPath(padding = "")
             {
                 try {
                     const fullPath = path.join(uri.fsPath, "user-data", "User");
-                    log.value(padding + "found portable user data path", fullPath, 1);
+                    log.value(padding + "found portable user data path", fullPath, 4);
                     return fullPath;
                 }
                 catch (e: any)
@@ -290,7 +290,7 @@ export function getTaskProviderType(taskType: string): string
 }
 
 
-export function getTaskTypes(): string[]
+export function getTaskTypes()
 {
     return [
         "ant", "apppublisher", "bash", "batch", "composer",  "gradle", "grunt", "gulp", "make",
@@ -299,23 +299,23 @@ export function getTaskTypes(): string[]
 }
 
 
-export function getTaskTypeFriendlyName(taskType: string): string
+export function getTaskTypeFriendlyName(taskType: string, lowerCase = false)
 {
     taskType = taskType.toLowerCase();
     if (taskType === "workspace") {
-        return "vscode";
+        return lowerCase ? "vscode" : "VSCode";
     }
     else if (taskType === "apppublisher") {
-        return "app-publisher";
+        return lowerCase ? "app-publisher" : "App-Publisher";
     }
     else if (taskType === "tsc") {
-        return "typescript";
+        return lowerCase ? "typescript" : "Typescript";
     }
-    return taskType;
+    return lowerCase ? taskType : properCase(taskType) as string;
 }
 
 
-export function getTaskTypeRealName(taskType: string): string
+export function getTaskTypeRealName(taskType: string)
 {
     taskType = taskType.toLowerCase();
     if (taskType === "workspace") {
@@ -341,7 +341,7 @@ export function getUserDataPath(platform?: string, padding = "")
         /* istanbul ignore next */
         if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
             userPath = path.resolve(process.argv[++argvIdx]);
-            log.value(padding + "user path is", userPath, 1);
+            log.value(padding + "user path is", userPath, 4);
             return userPath;
         }
     }
@@ -357,7 +357,7 @@ export function getUserDataPath(platform?: string, padding = "")
         userPath = getDefaultUserDataPath(platform);
     }
     userPath = path.resolve(userPath);
-    log.value(padding + "user path is", userPath, 1);
+    log.value(padding + "user path is", userPath, 4);
     return userPath;
 }
 
