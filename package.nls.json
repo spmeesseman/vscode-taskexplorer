@@ -4,21 +4,16 @@
 	"displayName": "Task support for VSCode",
 
 	"config.taskExplorer.autoRefresh": "Auto refresh the task trees when a task file is modified.",
-	"config.taskExplorer.clickAction": "Action to perform when clicking on the main body of a task tree entry",
+	"config.taskExplorer.autoRefreshDeprecated": "Why did it exist in the first place",
 
 	"config.taskExplorer.debug": "Turn on logging.",
 	"config.taskExplorer.debugLevel": "Set debug verbosity (1 - Low / 5 - High).",
-
-	"config.taskExplorer.disableAnimatedIcons": "Disable animated icons",
-	"config.taskExplorer.disableAnimatedIconsDsc": "Use static non-animated icons for running tasks as opposed to the spinning icons.",
 
 	"config.taskExplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
 	"config.taskExplorer.enableSideBar": "Add a task explorer to the the sidebar.",
 
 	"config.taskExplorer.enabledTaskTypes": "Enabled task types to display in the task tree",
 	"config.taskExplorer.enableAnt": "Ant",
-	"config.taskExplorer.enableAnsiconForAnt": "Ant - Use Ansicon",
-	"config.taskExplorer.enableAnsiconForAntDsc": "Enable/use ansicon output colorization for ant tasks.",
 	"config.taskExplorer.enableAppPublisher": "App Publisher",
 	"config.taskExplorer.enableBash": "Bash/sh",
 	"config.taskExplorer.enableBatch": "Batch",
@@ -42,28 +37,22 @@
 	"config.taskExplorer.excludeTask": "Configure `regex` patterns for individual tasks that should be excluded from task tree inclusion.",
 
 	"config.taskExplorer.expanded": "Specify individual (main) tree folders to be either expanded or collapses on startup",
-	"config.taskExplorer.expandedDsc": "Specify tree node expansion states on startup for special folders and project folders.  Property names of new items should be **camel cased** with **no spaces**.  A value of `true` indicates the folder should be expanded on startup, `false` indicates the folder should be collapsed.",
 	"config.taskExplorer.expandedLastTasks": "`Last Tasks` folder",
 	"config.taskExplorer.expandedFavorites": "`Favorites` folder",
 	"config.taskExplorer.expandedUserTasks": "`User Tasks` folder",
 
-	"config.taskExplorer.globPatternsAnt": "Ant - Glob Patterns",
-	"config.taskExplorer.globPatternsAntDsc": "Configure glob patterns for locating Apache Ant files not named b(B)uild.xml.",
-	"config.taskExplorer.globPatternsBash": "Bash - Glob Patterns",
-	"config.taskExplorer.globPatternsBashDsc": "Configure the glob patterns for locating bash scripts, can be used to locate scripts with no extension.",
+	"config.taskExplorer.globPatternsAnt": "Configure glob patterns for locating Apache Ant files not named b(B)uild.xml.",
+	"config.taskExplorer.globPatternsBash": "Configure the glob patterns for locating bash scripts, can be used to locate scripts with no extension.",
 	
 	"config.taskExplorer.groupWithSeparator": "If script names contain the configured separator, break them into grouped nodes according to similar fist parts.",
 	"config.taskExplorer.groupSeparator": "The separator to use when grouping tasks.",
 	"config.taskExplorer.groupMaxLevel": "Maximum grouping level (tree node depth) of grouped tasks",
 	"config.taskExplorer.groupStripTaskLabel": "Strip extracted grouping labels from the task name displayed in the tree",
 
-	"config.taskExplorer.includeAnt": "Ant - Extra Files",
-	"config.taskExplorer.includeAntDsc": "Configure glob patterns for locating Apache Ant files not named b(B)uild.xml. **(Deprecated - Use 'globPatternsAnt')**",
+	"config.taskExplorer.includeAntDsc": "Configure glob patterns for locating Apache Ant files not named b(B)uild.xml.",
+	"config.taskExplorer.includeAntDeprecated": "Deprecated - Use `#globPatternsAnt#`",
 
 	"config.taskExplorer.keepTermOnStop": "Keep terminal open when stopping a task.",
-	
-	"config.taskExplorer.numLastTasks": "# of Tasks to Remember",
-	"config.taskExplorer.numLastTasksDsc": "The number of tasks to store in the `Last Tasks` tree folder node",
 	
 	"config.taskExplorer.pathToPrograms": "Paths to programs, if not registered in system path",
 	"config.taskExplorer.pathToAnsicon": "Ansicon",
@@ -81,24 +70,27 @@
 	"config.taskExplorer.pathToPython": "Python",
 	"config.taskExplorer.pathToRuby": "Ruby",
 
-	"config.taskExplorer.showUserTasks": "Display user workspace tasks from data directory.",
+	"config.taskExplorer.showHiddenWsTasks": "Include VSCode tasks in the explorer tree that have the `hide` property set to `true`.  Has no effect if `workspace` tasks are disabled in `#enabledTasks#`",
+	"config.taskExplorer.showRunningTask": "Show the most recently started running task in the status bar",
 
-	"config.taskExplorer.showExecuteWithNoTerminalButton": "Show the `Execute with No Terminal` button inline with the Execute button",
-	"config.taskExplorer.showExecuteWithArgumentsButton": "Show the `Execute with Arguments` button inline with the Execute button",
+	"config.taskExplorer.sortProjectFoldersAlpha": "Sort project folders alphabetically.  If not set, folders appear in the same order as the File Explorer View.",
 
-	"config.taskExplorer.showFavorites": "Show a `Favorites` main folder in the task tree to group frequently ran tasks in",
-	"config.taskExplorer.showFavoritesButton": "Show the `Favorites` button inline with the Execute button, ignored if *Show Favorites* is disabled.",
+	"config.taskExplorer.useAnt": "Use the `ant` program itself to find it's tasks.",
+	"config.taskExplorer.useGulp": "Use the `gulp` program itself to find it's tasks.",
 
-	"config.taskExplorer.showHiddenWsTasks": "Include VSCode tasks in the explorer tree that have the `hide` property set to `true`",
+	"config.taskExplorer.specialFolders.expanded": "Specify tree node expansion states on startup for special folders and project folders.  Property names of new items should be **camel cased** with **no spaces**.  A value of `true` indicates the folder should be expanded on startup, `false` indicates the folder should be collapsed.",
+	"config.taskExplorer.specialFolders.numLastTasks": "The number of tasks to store in the `Last Tasks` tree folder node",
+	"config.taskExplorer.specialFolders.showFavorites": "Show a `Favorites` main folder in the task tree to group frequently ran tasks in.",
+	"config.taskExplorer.specialFolders.showLastTasks": "Show `Last Tasks` as a main folder in the task tree.",
+	"config.taskExplorer.specialFolders.showUserTasks": "Display user workspace tasks from data directory.",
+	
+	"config.taskExplorer.taskButtons.clickAction": "Action to perform when clicking on the main body of a task tree entry",
+	"config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton": "Show the `Execute with No Terminal` button inline with the Execute button.",
+	"config.taskExplorer.taskButtons.showExecuteWithArgumentsButton": "Show the `Execute with Arguments` button inline with the Execute button.",
+	"config.taskExplorer.taskButtons.showFavoritesButton": "Show the `Favorites` button inline with the Execute button. Has no effect if `#specialFolders.showFavorites#` is disabled.",
 
-	"config.taskExplorer.showLastTasks": "Show `Last Tasks` as a main folder in the task tree",
-
-	"config.taskExplorer.showRunningTask": "Show the most recently started running task in the status bar.",
-
-	"config.taskExplorer.useAnt": "Ant - Use Ant",
-	"config.taskExplorer.useAntDsc": "Use the `ant` program itself to find it's tasks",
-	"config.taskExplorer.useGulp": "Gulp - Use Ant",
-	"config.taskExplorer.useGulpDsc": "Use the `gulp` program itself to find it's tasks.",
+	"config.taskExplorer.visual.disableAnimatedIcons": "Use static non-animated icons for running tasks as opposed to the spinning icons.",
+	"config.taskExplorer.visual.enableAnsiconForAnt": "Enable/use ansicon output colorization for ant tasks.",
 
 	"taskExplorer.parseError": "Task Explorer task detection: failed to parse the file {0}",
 

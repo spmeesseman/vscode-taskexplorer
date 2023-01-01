@@ -75,8 +75,8 @@ suite("Tree Tests", () =>
                 util.getTaskItemId(batch[0]), util.getTaskItemId(batch[1]), util.getTaskItemId(ant[0])
             ]);
         }
-        await executeSettingsUpdate("showLastTasks", false);
-        await executeSettingsUpdate("showLastTasks", true);
+        await executeSettingsUpdate("specialFolders.showLastTasks", false);
+        await executeSettingsUpdate("specialFolders.showLastTasks", true);
     });
 
 
@@ -251,7 +251,7 @@ suite("Tree Tests", () =>
     test("Hide last tasks", async function()
     {
         this.slow(testsControl.slowTimeForConfigEvent * 3);
-        await executeSettingsUpdate("showLastTasks", false);
+        await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await explorer.showSpecialTasks(false);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await explorer.showSpecialTasks(true);
@@ -269,7 +269,7 @@ suite("Tree Tests", () =>
     test("Show last tasks", async function()
     {
         this.slow(testsControl.slowTimeForConfigEvent * 3);
-        await executeSettingsUpdate("showLastTasks", true);
+        await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await explorer.showSpecialTasks(false);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await explorer.showSpecialTasks(true);
@@ -287,14 +287,14 @@ suite("Tree Tests", () =>
     test("Show Favorite Tasks w/ Last Tasks", async function()
     {
         this.slow(testsControl.slowTimeForRefreshCommand + (testsControl.waitTimeForConfigEvent * 3) + (testsControl.waitTimeForCommand * 2));
-        await executeSettingsUpdate("showLastTasks", false);
+        await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await explorer.showSpecialTasks(false, true);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
-        await executeSettingsUpdate("showLastTasks", true);
+        await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await explorer.showSpecialTasks(false, true);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
-        await executeSettingsUpdate("showLastTasks", false);
+        await executeSettingsUpdate("specialFolders.showLastTasks", false);
     });
 
 
@@ -307,7 +307,7 @@ suite("Tree Tests", () =>
 
     test("Show Favorite Tasks Only", async function()
     {
-        await executeSettingsUpdate("showLastTasks", false);
+        await executeSettingsUpdate("specialFolders.showLastTasks", false);
     });
 
 
@@ -320,7 +320,7 @@ suite("Tree Tests", () =>
 
     test("Hide Favorite and Last Tasks", async function()
     {
-        await executeSettingsUpdate("showLastTasks", false);
+        await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await explorer.showSpecialTasks(true, true);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
@@ -328,7 +328,7 @@ suite("Tree Tests", () =>
 
     test("Hide Favorite Tasks", async function()
     {
-        await executeSettingsUpdate("showLastTasks", true);
+        await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await explorer.showSpecialTasks(true, true);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });

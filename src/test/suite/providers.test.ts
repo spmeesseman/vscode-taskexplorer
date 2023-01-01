@@ -281,11 +281,11 @@ suite("Provider Tests", () =>
     {
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-        const showLasTasks = configuration.get<boolean>("showLastTasks");
+        const showLasTasks = configuration.get<boolean>("specialFolders.showLastTasks");
         try {
             await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
             await storage.update(constants.LAST_TASKS_STORE, [ "hello.bat" ]);
-            await executeSettingsUpdate("showLastTasks", true);
+            await executeSettingsUpdate("specialFolders.showLastTasks", true);
             await executeSettingsUpdate("expanded.lastTasks", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(2);
         }
@@ -294,7 +294,7 @@ suite("Provider Tests", () =>
         }
         finally {
             await executeSettingsUpdate("expanded.lastTasks", true);
-            await executeSettingsUpdate("showLastTasks", showLasTasks);
+            await executeSettingsUpdate("specialFolders.showLastTasks", showLasTasks);
             await storage.update(constants.FAV_TASKS_STORE, favTasks);
             await storage.update(constants.LAST_TASKS_STORE, lastTasks);
         }
@@ -304,10 +304,10 @@ suite("Provider Tests", () =>
     test("Build Tree Variations - Favorites Collapsed", async function()
     {
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        const showLasTasks = configuration.get<boolean>("showLastTasks");
+        const showLasTasks = configuration.get<boolean>("specialFolders.showLastTasks");
         try {
             await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
-            await executeSettingsUpdate("showLastTasks", false);
+            await executeSettingsUpdate("specialFolders.showLastTasks", false);
             await executeSettingsUpdate("expanded.favorites", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1);
         }
@@ -316,7 +316,7 @@ suite("Provider Tests", () =>
         }
         finally {
             await executeSettingsUpdate("expanded.favorites", true);
-            await executeSettingsUpdate("showLastTasks", showLasTasks);
+            await executeSettingsUpdate("specialFolders.showLastTasks", showLasTasks);
             await storage.update(constants.FAV_TASKS_STORE, favTasks);
         }
     });

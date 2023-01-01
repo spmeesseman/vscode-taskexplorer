@@ -4,7 +4,7 @@
 
 import * as assert from "assert";
 import * as fs from "fs";
-import * as util from "../../common/utils";
+import * as util from "../../lib/utils/utils";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
@@ -105,7 +105,7 @@ suite("Ant Tests", () =>
         //
         this.slow((testsControl.slowTimeForConfigEvent * 5) + (testsControl.slowTimeForCommandFast * 4));
         await executeSettingsUpdate("pathToPrograms.ansicon", "ansicon\\x64\\ansicon.exe");
-        await executeSettingsUpdate("enableAnsiconForAnt", true);
+        await executeSettingsUpdate("visual.enableAnsiconForAnt", true);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -120,7 +120,7 @@ suite("Ant Tests", () =>
     {
         this.slow((testsControl.slowTimeForConfigEvent * 3) + (testsControl.slowTimeForCommandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
-        await executeSettingsUpdate("enableAnsiconForAnt", false);
+        await executeSettingsUpdate("visual.enableAnsiconForAnt", false);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);

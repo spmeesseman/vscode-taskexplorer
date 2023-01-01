@@ -88,7 +88,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     // User Tasks
     //
-    if (e.affectsConfiguration("taskExplorer.showUserTasks"))
+    if (e.affectsConfiguration("taskExplorer.specialFolders.showUserTasks"))
     {
         refresh= true;
     }
@@ -96,32 +96,32 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     // Last Tasks
     //
-    if (e.affectsConfiguration("taskExplorer.showLastTasks"))
+    if (e.affectsConfiguration("taskExplorer.specialFolders.showLastTasks"))
     {   /* istanbul ignore else */
         if (configuration.get<boolean>("enableSideBar") && teApi.sidebar)
         {
-            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("showLastTasks"), false, true, undefined, "   ");
+            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("specialFolders.showLastTasks"), false, true, undefined, "   ");
         }
         /* istanbul ignore else */
         if (configuration.get<boolean>("enableExplorerView") && teApi.explorer)
         {
-            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("showLastTasks"), false, true, undefined, "   ");
+            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("specialFolders.showLastTasks"), false, true, undefined, "   ");
         }
     }
 
     //
     // Favorites
     //
-    if (e.affectsConfiguration("taskExplorer.showFavorites"))
+    if (e.affectsConfiguration("taskExplorer.specialFolders.showFavorites"))
     {   /* istanbul ignore else */
         if (configuration.get<boolean>("enableSideBar") && teApi.sidebar)
         {
-            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("showFavorites"), true, true, undefined, "   ");
+            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("specialFolders.showFavorites"), true, true, undefined, "   ");
         }
         /* istanbul ignore else */
         if (configuration.get<boolean>("enableExplorerView") && teApi.explorer)
         {
-            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("showFavorites"), true, true, undefined, "   ");
+            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("specialFolders.showFavorites"), true, true, undefined, "   ");
         }
     }
 

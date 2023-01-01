@@ -785,42 +785,42 @@
                 },
                 {
                     "command": "taskExplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == script",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptFile",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptS",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptFileS",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFile",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFile",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFileS",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFileS",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
@@ -915,32 +915,32 @@
                 },
                 {
                     "command": "taskExplorer.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorer && viewItem == script",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorer && viewItem == scriptFile",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorer && viewItem == scriptRunning",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorer && viewItem == scriptS",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorer && viewItem == scriptFileS",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorer && viewItem == scriptRunningS",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
@@ -1227,32 +1227,32 @@
                 },
                 {
                     "command": "taskExplorerSideBar.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == script",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptS",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.runWithArgs",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showExecuteWithArgumentsButton && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorerSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.runWithArgs",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showExecuteWithArgumentsButton && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorerSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
@@ -1327,32 +1327,32 @@
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorerSideBar && viewItem == script",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptS",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFromFavorites",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
@@ -1529,24 +1529,34 @@
             "type": "object",
             "title": "Task Explorer",
             "properties": {
-                "taskExplorer.disableAnimatedIcons": {
-                    "type": "boolean",
-                    "default": false,
-                    "title": "%config.taskExplorer.disableAnimatedIcons%",
-                    "description": "%config.taskExplorer.disableAnimatedIconsDsc%"
-                },
                 "taskExplorer.enableExplorerView": {
                     "type": "boolean",
                     "default": true,
+                    "order": 0,
                     "description": "%config.taskExplorer.enableExplorerView%"
                 },
                 "taskExplorer.enableSideBar": {
                     "type": "boolean",
                     "default": false,
+                    "order": 1,
                     "description": "%config.taskExplorer.enableSideBar%"
+                },
+                "taskExplorer.debug": {
+                    "type": "boolean",
+                    "default": false,
+                    "order": 5,
+                    "description": "%config.taskExplorer.debug%"
+                },
+                "taskExplorer.debugLevel": {
+                    "type": "number",
+                    "enum": [ 1, 2,  3, 4, 5 ],
+                    "default": 1,
+                    "order": 10,
+                    "description": "%config.taskExplorer.debugLevel%"
                 },
                 "taskExplorer.enabledTasks": {
                     "type": "object",
+                    "order": 15,
                     "additionalProperties": false,
                     "description": "%config.taskExplorer.enabledTaskTypes%",
                     "properties": {
@@ -1649,11 +1659,89 @@
                         "workspace": true
                     }
                 },
-                "taskExplorer.enableAnsiconForAnt": {
-                    "type": "boolean",
-                    "default": true,
-                    "title": "%config.taskExplorer.enableAnsiconForAnt%",
-                    "markdownDescription": "%config.taskExplorer.enableAnsiconForAntDsc%"
+                "taskExplorer.exclude": {
+                    "type": "array",
+                    "order": 20,
+                    "items": {
+                        "type": "string"
+                    },
+                    "markdownDescription": "%config.taskExplorer.exclude%",
+                    "default": [
+                        "**/.nuget/**",
+                        "**/.vscode-test/**",
+                        "**/Assets/**",
+                        "**/bin/**",
+                        "**/build/**",
+                        "**/dep/**",
+                        "**/dependency/**",
+                        "**/dist/**",
+                        "**/doc/**",
+                        "**/example/**",
+                        "**/examples/**",
+                        "**/ext/**",
+                        "**/obj/**",
+                        "**/out/**",
+                        "**/output/**",
+                        "**/packages/**",
+                        "**/release/**",
+                        "**/releases/**",
+                        "**/samples/**",
+                        "**/sdks/**",
+                        "**/static/**",
+                        "**/target/**",
+                        "**/test/**",
+                        "**/third_party/**",
+                        "**/vendor/**",
+                        "**/work/**"
+                    ]
+                },
+                "taskExplorer.excludeTask": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [
+                        "pre-launch[0-9]{2}\\.r(?:b|c)"
+                    ],
+                    "order": 25,
+                    "markdownDescription": "%config.taskExplorer.excludeTask%"
+                },
+                "taskExplorer.includeAnt": {
+                    "type": [
+                        "string",
+                        "array"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "order": 30,
+                    "markdownDeprecationMessage": "%config.taskExplorer.includeAntDeprecated%",
+                    "markdownDescription": "%config.taskExplorer.includeAntDsc%"
+                },
+                "taskExplorer.globPatternsAnt": {
+                    "type": [
+                        "array"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "order": 35,
+                    "title": "%config.taskExplorer.title.includeExclude%",
+                    "markdownDescription": "%config.taskExplorer.globPatternsAnt%"
+                },
+                "taskExplorer.globPatternsBash": {
+                    "type": [
+                        "array"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "order": 40,
+                    "title": "%config.taskExplorer.title.includeExclude%",
+                    "markdownDescription": "%config.taskExplorer.globPatternsBash%"
                 },
                 "taskExplorer.keepTermOnStop": {
                     "type": "boolean",
@@ -1754,213 +1842,66 @@
                         "ruby": "ruby"
                     }
                 },
-                "taskExplorer.showExecuteWithArgumentsButton": {
-                    "type": "boolean",
-                    "default": false,
-                    "markdownDescription": "%config.taskExplorer.showExecuteWithArgumentsButton%"
-                },
-                "taskExplorer.showFavoritesButton": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "%config.taskExplorer.showFavoritesButton%"
-                },
-                "taskExplorer.showFavorites": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "%config.taskExplorer.showFavorites%"
-                },
-                "taskExplorer.showExecuteWithNoTerminalButton": {
-                    "type": "boolean",
-                    "default": false,
-                    "markdownDescription": "%config.taskExplorer.showExecuteWithNoTerminalButton%"
-                },
                 "taskExplorer.showHiddenWsTasks": {
                     "type": "boolean",
                     "default": true,
-                    "title": "Show Hidden VSCode Workspace Tasks",
                     "markdownDescription": "%config.taskExplorer.showHiddenWsTasks%"
-                },
-                "taskExplorer.showLastTasks": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "%config.taskExplorer.showLastTasks%"
                 },
                 "taskExplorer.showRunningTask": {
                     "type": "boolean",
                     "default": true,
                     "description": "%config.taskExplorer.showRunningTask%"
                 },
-                "taskExplorer.showUserTasks": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "%config.taskExplorer.showUserTasks%"
-                },
-                "taskExplorer.numLastTasks": {
-                    "type": "number",
-                    "enum": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        14,
-                        15,
-                        16,
-                        17,
-                        18,
-                        19,
-                        20
-                    ],
-                    "default": 10,
-                    "title": "%config.taskExplorer.numLastTasks%",
-                    "markdownDescription": "%config.taskExplorer.numLastTasksDsc%"
-                },
-                "taskExplorer.autoRefresh": {
+                "taskExplorer.sortProjectFoldersAlpha": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.autoRefresh%"
+                    "description": "%config.taskExplorer.sortProjectFoldersAlpha%"
                 },
-                "taskExplorer.debug": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "%config.taskExplorer.debug%"
-                },
-                "taskExplorer.debugLevel": {
-                    "type": "number",
-                    "enum": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5
-                    ],
-                    "default": 1,
-                    "description": "%config.taskExplorer.debugLevel%"
-                },
-                "taskExplorer.groupMaxLevel": {
-                    "type": "number",
-                    "enum": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5
-                    ],
-                    "default": 1,
-                    "description": "%config.taskExplorer.groupMaxLevel%"
-                },
-                "taskExplorer.clickAction": {
+                "taskExplorer.taskButtons.clickAction": {
                     "type": "string",
-                    "enum": [
-                        "Execute",
-                        "Open"
-                    ],
+                    "enum": [ "Execute","Open" ],
                     "default": "Open",
-                    "description": "%config.taskExplorer.clickAction%"
+                    "description": "%config.taskExplorer.taskButtons.clickAction%"
                 },
-                "taskExplorer.excludeTask": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [
-                        "pre-launch[0-9]{2}\\.r(?:b|c)"
-                    ],
-                    "markdownDescription": "%config.taskExplorer.excludeTask%"
-                },
-                "taskExplorer.exclude": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "markdownDescription": "%config.taskExplorer.exclude%",
-                    "default": [
-                        "**/.nuget/**",
-                        "**/.vscode-test/**",
-                        "**/Assets/**",
-                        "**/bin/**",
-                        "**/build/**",
-                        "**/dep/**",
-                        "**/dependency/**",
-                        "**/dist/**",
-                        "**/doc/**",
-                        "**/example/**",
-                        "**/examples/**",
-                        "**/ext/**",
-                        "**/obj/**",
-                        "**/out/**",
-                        "**/output/**",
-                        "**/packages/**",
-                        "**/release/**",
-                        "**/releases/**",
-                        "**/samples/**",
-                        "**/sdks/**",
-                        "**/static/**",
-                        "**/target/**",
-                        "**/test/**",
-                        "**/third_party/**",
-                        "**/vendor/**",
-                        "**/work/**"
-                    ]
-                },
-                "taskExplorer.useAnt": {
+                "taskExplorer.taskButtons.showExecuteWithArgumentsButton": {
                     "type": "boolean",
                     "default": false,
-                    "title": "%config.taskExplorer.useAnt%",
-                    "markdownDescription": "%config.taskExplorer.useAntDsc%"
+                    "markdownDescription": "%config.taskExplorer.taskButtons.showExecuteWithArgumentsButton%"
                 },
-                "taskExplorer.useGulp": {
+                "taskExplorer.taskButtons.showFavoritesButton": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.taskButtons.showFavoritesButton%"
+                },
+                "taskExplorer.taskButtons.showExecuteWithNoTerminalButton": {
                     "type": "boolean",
                     "default": false,
-                    "title": "%config.taskExplorer.useGulp%",
-                    "markdownDescription": "%config.taskExplorer.useGulpDsc%"
+                    "markdownDescription": "%config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton%"
                 },
-                "taskExplorer.includeAnt": {
-                    "type": [
-                        "string",
-                        "array"
-                    ],
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [],
-                    "title": "%config.taskExplorer.includeAnt%",
-                    "markdownDescription": "%config.taskExplorer.includeAntDsc%"
+                "taskExplorer.visual.disableAnimatedIcons": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%config.taskExplorer.visual.disableAnimatedIcons%"
                 },
-                "taskExplorer.globPatternsAnt": {
-                    "type": [
-                        "array"
-                    ],
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [],
-                    "title": "%config.taskExplorer.globPatternsAnt%",
-                    "markdownDescription": "%config.taskExplorer.globPatternsAntDsc%"
+                "taskExplorer.visual.enableAnsiconForAnt": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.visual.enableAnsiconForAnt%"
                 },
-                "taskExplorer.globPatternsBash": {
-                    "type": [
-                        "array"
-                    ],
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [],
-                    "title": "%config.taskExplorer.globPatternsBash%",
-                    "markdownDescription": "%config.taskExplorer.globPatternsBashDsc%"
+                "taskExplorer.specialFolders.showLastTasks": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.specialFolders.showLastTasks%"
                 },
-                "taskExplorer.expanded": {
+                "taskExplorer.specialFolders.numLastTasks": {
+                    "type": "number",
+                    "enum": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ],
+                    "default": 10,
+                    "markdownDescription": "%config.taskExplorer.specialFolders.numLastTasks%"
+                },
+                "taskExplorer.specialFolders.expanded": {
                     "type": "object",
-                    "title": "%config.taskExplorer.expanded%",
-                    "markdownDescription": "%config.taskExplorer.expandedDsc%",
+                    "markdownDescription": "%config.taskExplorer.specialFolders.expanded%",
                     "additionalProperties": {
                         "type": "boolean",
                         "description": ""
@@ -1984,6 +1925,38 @@
                         "favorites": true,
                         "userTasks": true
                     }
+                },
+                "taskExplorer.specialFolders.showFavorites": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.specialFolders.showFavorites%"
+                },
+                "taskExplorer.specialFolders.showUserTasks": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%config.taskExplorer.specialFolders.showUserTasks%"
+                },
+                "taskExplorer.autoRefresh": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%config.taskExplorer.autoRefresh%",
+                    "markdownDeprecationMessage": "%config.taskExplorer.autoRefreshDeprecated%"
+                },
+                "taskExplorer.groupMaxLevel": {
+                    "type": "number",
+                    "enum": [ 1, 2,  3, 4, 5 ],
+                    "default": 1,
+                    "description": "%config.taskExplorer.groupMaxLevel%"
+                },
+                "taskExplorer.useAnt": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "%config.taskExplorer.useAnt%"
+                },
+                "taskExplorer.useGulp": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "%config.taskExplorer.useGulp%"
                 }
             }
         },

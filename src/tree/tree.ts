@@ -351,13 +351,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         }
 
         this.treeBuilding = true;
-        const nodeExpandedeMap: any = configuration.get<any>("expanded");
+        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
 
         //
         // The 'Last Tasks' folder will be 1st in the tree
         //
         const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-        if (configuration.get<boolean>("showLastTasks") === true)
+        if (configuration.get<boolean>("specialFolders.showLastTasks") === true)
         {
             if (lastTasks && lastTasks.length > 0)
             {
@@ -372,7 +372,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         // the 'Last Tasks' folder)
         //
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        if (configuration.get<boolean>("showFavorites"))
+        if (configuration.get<boolean>("specialFolders.showFavorites"))
         {
             if (favTasks && favTasks.length > 0)
             {
@@ -447,7 +447,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
         const definition: TaskExplorerDefinition | TaskDefinition = each.definition;
         let relativePath = definition.path ?? "";
-        const nodeExpandedeMap: any = configuration.get<any>("expanded");
+        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
 
         //
         // Make sure this task shouldn't be ignored based on various criteria...
@@ -577,7 +577,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
      */
     private async createSpecialFolder(storeName: string, label: string, treeIndex: number, sort: boolean, logPad: string)
     {
-        const nodeExpandedeMap: any = configuration.get<any>("expanded");
+        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
         const lTasks = storage.get<string[]>(storeName, []);
         const folder = new TaskFolder(label, nodeExpandedeMap[util.lowerCaseFirstChar(storeName, true)] !== false ?
                                              TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
@@ -912,7 +912,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         //
         // Fire change event for the 'Last Tasks' folder if the task exists there
         //
-        if (configuration.get<boolean>("showLastTasks") === true)
+        if (configuration.get<boolean>("specialFolders.showLastTasks") === true)
         {
             const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
             if (lastTasks.includes(util.getTaskItemId(taskItem)) !== false)
@@ -953,7 +953,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
      */
     async getChildren(element?: TreeItem, logPad = "", logLevel = 1): Promise<TreeItem[]>
     {
-        if (!workspace.workspaceFolders && !configuration.get<boolean>("showUserTasks"))
+        if (!workspace.workspaceFolders && !configuration.get<boolean>("specialFolders.showUserTasks"))
         {
             return [ new NoWorkspace() ];
         }
@@ -1093,11 +1093,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             {   //
                 // Remove User tasks if they're not enabled
                 //
-                if (!configuration.get<boolean>("showUserTasks")) // && util.isTaskTypeEnabled("workspace"))
+                if (!configuration.get<boolean>("specialFolders.showUserTasks")) // && util.isTaskTypeEnabled("workspace"))
                 {
-                    this.tasks.slice().filter(t => t.source === "Workspace").reverse().forEach((item, index, object) =>
+                    this.tasks.slice().reverse().forEach((item, index, object) =>
                     {
-                        (this.tasks as Task[]).splice(object.length - 1 - index, 1);
+                        if (item.source === "Workspace" && !util.isWorkspaceFolder(item.scope)) {
+                            (this.tasks as Task[]).splice(object.length - 1 - index, 1);
+                        }
                     });
                 }
 
@@ -1662,7 +1664,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
     private async open(selection: TaskItem, itemClick = false)
     {
-        const clickAction = configuration.get<string>("clickAction", "Open");
+        const clickAction = configuration.get<string>("taskButtons.clickAction", "Open");
 
         //
         // As of v1.30.0, added option to change the entry item click to execute.  In order to avoid having
@@ -1767,7 +1769,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         {
             ltFolder.removeTaskFile(taskItem2);
         }
-        else if (ltFolder.taskFiles.length >= configuration.get<number>("numLastTasks"))
+        else if (ltFolder.taskFiles.length >= configuration.get<number>("specialFolders.numLastTasks"))
         {
             ltFolder.removeTaskFile(ltFolder.taskFiles[ltFolder.taskFiles.length - 1]);
         }
@@ -2145,7 +2147,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             }
             if (await this.runTask(newTask, noTerminal))
             {
-                await this.saveTask(taskItem, configuration.get<number>("numLastTasks"), false, "   ");
+                await this.saveTask(taskItem, configuration.get<number>("specialFolders.numLastTasks"), false, "   ");
                 this.babysitRunningTask(taskItem);
             }
         }
@@ -2310,7 +2312,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                     /* istanbul ignore else */
                     if (await this.runTask(newTask, noTerminal, logPad + "   "))
                     {
-                        await me.saveTask(taskItem, configuration.get<number>("numLastTasks"), false, logPad + "   ");
+                        await me.saveTask(taskItem, configuration.get<number>("specialFolders.numLastTasks"), false, logPad + "   ");
                         this.babysitRunningTask(taskItem);
                     }
                 }
@@ -2386,7 +2388,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         const tree = this.taskTree;
         const storeName: string = !isFavorite ? constants.LAST_TASKS_STORE : constants.FAV_TASKS_STORE;
         const label: string = !isFavorite ? constants.LAST_TASKS_LABEL : constants.FAV_TASKS_LABEL;
-        const showLastTasks = configuration.get<boolean>("showLastTasks");
+        const showLastTasks = configuration.get<boolean>("specialFolders.showLastTasks");
         const favIdx = showLastTasks ? 1 : 0;
         const treeIdx = !isFavorite ? 0 : favIdx;
 

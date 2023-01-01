@@ -195,7 +195,7 @@ export default class TaskItem extends TreeItem
         //
         if (running) // && task.definition.type !== "$empty")
         {
-            const disableAnimated = configuration.get<boolean>("disableAnimatedIcons");
+            const disableAnimated = configuration.get<boolean>("visual.disableAnimatedIcons");
             this.iconPath = {
                 light: context.asAbsolutePath(path.join("res", "light", !disableAnimated ? "loading.svg" : "loadingna.svg")),
                 dark: context.asAbsolutePath(path.join("res", "dark", !disableAnimated ? "loading.svg" : "loadingna.svg"))

@@ -7,7 +7,7 @@ import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
 import { testControl } from "./control";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { configuration } from "../common/configuration";
+import { configuration } from "../lib/utils/configuration";
 import { commands, extensions, tasks, window, workspace } from "vscode";
 
 let activated = false;
@@ -255,19 +255,19 @@ async function initSettings(enable = true)
     await configuration.updateWs("useGulp", false);
     await configuration.updateWs("useAnt", false);
     await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("numLastTasks", 10);
+    await configuration.updateWs("specialFolders.numLastTasks", 10);
     await configuration.updateWs("groupMaxLevel", 1);
-    await configuration.updateWs("clickAction", "Open");
+    await configuration.updateWs("taskButtons.clickAction", "Open");
     //
     // Enabled all options, use workspace level so that running this test from Code itself
     // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
     //
     await configuration.updateWs("groupWithSeparator", enable);
     await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("showLastTasks", enable);
+    await configuration.updateWs("specialFolders.showLastTasks", enable);
     await configuration.updateWs("keepTermOnStop", false);
-    await configuration.updateWs("showUserTasks", enable);
-    await configuration.updateWs("showFavoritesButton", enable);
+    await configuration.updateWs("specialFolders.showUserTasks", enable);
+    await configuration.updateWs("taskButtons.showFavoritesButton", enable);
     await configuration.updateWs("showHiddenWsTasks", enable);
     await configuration.updateWs("showRunningTask", enable);
     await configuration.updateWs("enabledTasks", configuration.get<object>("enabledTasks"));

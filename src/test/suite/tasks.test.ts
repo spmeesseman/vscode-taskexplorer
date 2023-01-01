@@ -7,8 +7,8 @@
 //
 import * as assert from "assert";
 import TaskItem from "../../tree/item";
-import { storage } from "../../common/storage";
-import constants from "../../common/constants";
+import { storage } from "../../lib/utils/storage";
+import constants from "../../lib/constants";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks,
@@ -167,11 +167,11 @@ suite("Task Tests", () =>
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
         //
         this.slow((waitTimeForRunCommand * 2) + (slowTimeForConfigEvent * 4) + (slowTimeForCommand * 4));
-        await executeSettingsUpdate("disableAnimatedIcons", true);
+        await executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await startTask(bash[0]);
         await executeTeCommand2("run", [ bash[0] ], waitTimeForRunCommand);
         await endTask(bash[0]);
-        await executeSettingsUpdate("disableAnimatedIcons", false);
+        await executeSettingsUpdate("visual.disableAnimatedIcons", false);
         lastTask = bash[0];
     });
 
@@ -193,14 +193,14 @@ suite("Task Tests", () =>
         executeTeCommand("pause", 1000, waitTimeMax, batchTask); // ?? No await ?
         await executeTeCommand2("pause", [ batchTask ], 500);
         await executeTeCommand2("run", [ batchTask ], waitTimeForRunCommand);
-        await executeSettingsUpdate("clickAction", "Open");
+        await executeSettingsUpdate("taskButtons.clickAction", "Open");
         await executeTeCommand2("run", [ batchTask ], waitTimeForRunCommand / 3);
-        await executeSettingsUpdate("clickAction", "Execute");
+        await executeSettingsUpdate("taskButtons.clickAction", "Execute");
         await executeTeCommand2("openTerminal", [ batchTask ], 50);
         await executeTeCommand2("pause", [ batchTask ], 500);
         await executeSettingsUpdate("keepTermOnStop", true);
         await executeTeCommand2("stop", [ batchTask ], 50);
-        await executeSettingsUpdate("disableAnimatedIcons", true);
+        await executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await executeSettingsUpdate("showRunningTask", false);
         await executeTeCommand("runLastTask", 1500, waitTimeMax, batchTask);
         await executeSettingsUpdate("keepTermOnStop", false);
@@ -224,7 +224,7 @@ suite("Task Tests", () =>
         await executeTeCommand2("open", [ batchTask, true ], 100); // clickaction=execute
         await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], waitTimeForRunCommand);
         await executeTeCommand2("stop", [ batchTask ], 200);
-        await executeSettingsUpdate("disableAnimatedIcons", false);
+        await executeSettingsUpdate("visual.disableAnimatedIcons", false);
         overrideNextShowInputBox("--test --test2");
         await executeTeCommand2("runWithArgs", [ batchTask ], waitTimeForRunCommand / 3);
         // await executeTeCommand("stop", 200, waitTimeMax, batchTask);
@@ -240,8 +240,8 @@ async function startTask(taskItem: TaskItem)
 {
     console.log(`    ℹ Run ${taskItem.taskSource} task: ${taskItem.label}`);
     console.log(`        Folder: ${taskItem.getFolder()?.name}`);
-    await executeSettingsUpdate("clickAction", "Execute");
-    await executeSettingsUpdate("showLastTasks", (++runCount % 2) === 1);
+    await executeSettingsUpdate("taskButtons.clickAction", "Execute");
+    await executeSettingsUpdate("specialFolders.showLastTasks", (++runCount % 2) === 1);
     let removed = await executeTeCommand2("addRemoveFromFavorites", [ taskItem ]);
     if (removed) {
         await executeTeCommand2("addRemoveFromFavorites", [ taskItem ]);
