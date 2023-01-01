@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as log from "../common/log";
+import * as log from "./utils/log";
 import { views } from "../views";
 import { TaskTreeDataProvider } from "../tree/tree";
 import { ExtensionContext, workspace, window } from "vscode";

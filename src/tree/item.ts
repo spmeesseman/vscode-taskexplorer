@@ -1,9 +1,9 @@
 
-import * as log from "../common/log";
+import * as log from "../lib/utils/log";
 import * as path from "path";
-import * as util from "../common/utils";
+import * as util from "../lib/utils/utils";
 import TaskFile from "./file";
-import { configuration } from "../common/configuration";
+import { configuration } from "../lib/utils/configuration";
 import {
     Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks, Command
 }

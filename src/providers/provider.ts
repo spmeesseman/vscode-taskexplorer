@@ -1,8 +1,8 @@
 
-import * as util from "../common/utils";
-import * as log from "../common/log";
-import constants from "../common/constants";
-import { configuration } from "../common/configuration";
+import * as util from "../lib/utils/utils";
+import * as log from "../lib/utils/log";
+import constants from "../lib/constants";
+import { configuration } from "../lib/utils/configuration";
 import { getTaskFiles, removeFileFromCache } from "../cache";
 import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { isTaskIncluded } from "../lib/isTaskIncluded";

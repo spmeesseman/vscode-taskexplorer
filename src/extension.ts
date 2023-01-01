@@ -1,8 +1,8 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as util from "./common/utils";
+import * as util from "./lib/utils/utils";
 import * as cache from "./cache";
-import * as log from "./common/log";
+import * as log from "./lib/utils/log";
 import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerViewReportCommand from "./commands/viewReport";
 import { AntTaskProvider } from "./providers/ant";
@@ -15,8 +15,8 @@ import { ComposerTaskProvider } from "./providers/composer";
 import { PipenvTaskProvider } from "./providers/pipenv";
 import { GulpTaskProvider } from "./providers/gulp";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
-import { configuration } from "./common/configuration";
-import { initStorage, storage } from "./common/storage";
+import { configuration } from "./lib/utils/configuration";
+import { initStorage, storage } from "./lib/utils/storage";
 import { isCachingBusy } from "./cache";
 import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";

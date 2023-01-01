@@ -1,8 +1,8 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as util from "../common/utils";
+import * as util from "./utils/utils";
 import * as cache from "../cache";
-import * as log from "../common/log";
+import * as log from "./utils/log";
 import { Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri } from "vscode";
 import { refreshTree } from "./refreshTree";
 import { isDirectory, numFilesInDirectory } from "./utils/fs";

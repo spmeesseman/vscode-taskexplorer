@@ -1,11 +1,11 @@
 
 import * as https from "http";
 //import * as https from "https";
-import * as log from "../common/log";
-import { storage } from "../common/storage";
+import * as log from "./utils/log";
+import { storage } from "./utils/storage";
 import { commands, ExtensionContext, InputBoxOptions, Task, ViewColumn, WebviewPanel,  window, workspace } from "vscode";
 import { ILicenseManager } from "../interface/licenseManager";
-import { getHeaderContent, getBodyContent, isScriptType } from "../common/utils";
+import { getHeaderContent, getBodyContent, isScriptType } from "./utils/utils";
 
 
 export class LicenseManager implements ILicenseManager

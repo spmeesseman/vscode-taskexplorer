@@ -4,11 +4,11 @@ import { RelativePattern, WorkspaceFolder, Uri, workspace, window } from "vscode
 import * as fs from "fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./configuration";
-import constants from "./constants";
+import constants from "../constants";
 import * as path from "path";
 import * as os from "os";
 import * as log from "./log";
-import TaskItem from "../tree/item";
+import TaskItem from "../../tree/item";
 
 
 /**

@@ -1,8 +1,8 @@
 
-import { getTaskItemId } from "../common/utils";
-import { storage } from "../common/storage";
+import { getTaskItemId } from "./utils/utils";
+import { storage } from "./utils/storage";
 import TaskItem from "../tree/item";
-import constants from "../common/constants";
+import constants from "./constants";
 
 
 export function getTaskName(script: string, relativePath: string | undefined)

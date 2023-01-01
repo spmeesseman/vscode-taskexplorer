@@ -1,9 +1,9 @@
 
 import * as path from "path";
-import * as log  from "../common/log";
+import * as log  from "./utils/log";
 import { teApi } from "../extension";
 import { Task, Uri, ViewColumn, WebviewPanel, window, workspace, WorkspaceFolder } from "vscode";
-import { getHeaderContent, getBodyContent, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../common/utils";
+import { getHeaderContent, getBodyContent, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "./utils/utils";
 
 
 let panel: WebviewPanel | undefined;

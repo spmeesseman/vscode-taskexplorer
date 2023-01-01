@@ -1,14 +1,14 @@
 
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace } from "vscode";
 import * as path from "path";
-import * as util from "../common/utils";
-import * as log from "../common/log";
+import * as util from "../lib/utils/utils";
+import * as log from "../lib/utils/log";
 import { execSync } from "child_process";
 import { parseStringPromise } from "xml2js";
-import { configuration } from "../common/configuration";
+import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
-import constants from "../common/constants";
+import constants from "../lib/constants";
 
 
 interface StringMap { [s: string]: string }

@@ -2,10 +2,10 @@
 import { Task} from "vscode";
 import * as path from "path";
 import * as json5 from "json5";
-import * as log from "../common/log";
-import * as util from "../common/utils";
+import * as log from "./utils/log";
+import * as util from "./utils/utils";
 import { providersExternal } from "../extension";
-import { configuration } from "../common/configuration";
+import { configuration } from "./utils/configuration";
 import { getTaskName } from "./getTaskName";
 import { existsSync, readFileSync } from "fs";
 

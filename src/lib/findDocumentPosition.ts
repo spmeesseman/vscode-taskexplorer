@@ -4,9 +4,9 @@ import { visit, JSONVisitor } from "jsonc-parser";
 import { TextDocument } from "vscode";
 import { getTaskName } from "./getTaskName";
 import TaskItem from "../tree/item";
-import * as log from "../common/log";
+import * as log from "./utils/log";
 import { providers, providersExternal } from "../extension";
-import { getTaskProviderType, isWatchTask } from "../common/utils";
+import { getTaskProviderType, isWatchTask } from "./utils/utils";
 
 
 function findJsonDocumentPosition(documentText: string, taskItem: TaskItem)

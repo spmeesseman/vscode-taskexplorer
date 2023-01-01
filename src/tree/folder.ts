@@ -1,6 +1,6 @@
 
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder } from "vscode";
-import constants from "../common/constants";
+import constants from "../lib/constants";
 import TaskItem from "./item";
 import TaskFile from "./file";
 

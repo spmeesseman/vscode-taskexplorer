@@ -1,17 +1,17 @@
 
 import * as path from "path";
-import * as util from "../common/utils";
+import * as util from "../lib/utils/utils";
 import * as assert from "assert";
-import * as log from "../common/log";
+import * as log from "../lib/utils/log";
 import * as sortTasks from "../lib/sortTasks";
 import TaskItem from "./item";
 import TaskFile from "./file";
 import TaskFolder from "./folder";
-import constants from "../common/constants";
-import { storage } from "../common/storage";
+import constants from "../lib/constants";
+import { storage } from "../lib/utils/storage";
 import { rebuildCache } from "../cache";
 import { InitScripts, NoScripts, NoWorkspace } from "../lib/noScripts";
-import { configuration } from "../common/configuration";
+import { configuration } from "../lib/utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
 import { TaskExplorerDefinition } from "../interface";

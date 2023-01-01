@@ -1,11 +1,11 @@
 
 import * as bombadil from "@sgarciac/bombadil";
-import * as log from "../common/log";
+import * as log from "../lib/utils/log";
 import * as path from "path";
-import * as util from "../common/utils";
+import * as util from "../lib/utils/utils";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
-import { configuration } from "../common/configuration";
+import { configuration } from "../lib/utils/configuration";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 
 

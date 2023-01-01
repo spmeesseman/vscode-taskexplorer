@@ -1,9 +1,9 @@
 
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 import * as path from "path";
-import * as util from "../common/utils";
-import * as log from "../common/log";
-import { configuration } from "../common/configuration";
+import * as util from "../lib/utils/utils";
+import * as log from "../lib/utils/log";
+import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 

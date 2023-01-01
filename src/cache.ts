@@ -1,8 +1,8 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as util from "./common/utils";
-import * as log from "./common/log";
-import { configuration } from "./common/configuration";
+import * as util from "./lib/utils/utils";
+import * as log from "./lib/utils/log";
+import { configuration } from "./lib/utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "./extension";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem

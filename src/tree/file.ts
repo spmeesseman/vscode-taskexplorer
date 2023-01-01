@@ -1,9 +1,9 @@
 
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } from "vscode";
-import * as log from "../common/log";
+import * as log from "../lib/utils/log";
 import * as path from "path";
-import * as util from "../common/utils";
-import { configuration } from "../common/configuration";
+import * as util from "../lib/utils/utils";
+import { configuration } from "../lib/utils/configuration";
 import TaskItem from "./item";
 import TaskFolder  from "./folder";
 import { TaskExplorerDefinition } from "../interface";

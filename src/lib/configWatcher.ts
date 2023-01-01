@@ -1,8 +1,8 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as util from "../common/utils";
-import constants from "../common/constants";
-import { configuration } from "../common/configuration";
+import * as util from "./utils/utils";
+import constants from "./constants";
+import { configuration } from "./utils/configuration";
 import { ExtensionContext, ConfigurationChangeEvent, commands, workspace } from "vscode";
 import { registerFileWatcher } from "./fileWatcher";
 import { refreshTree } from "./refreshTree";

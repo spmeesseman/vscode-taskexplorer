@@ -1,9 +1,9 @@
 
-import * as log from "../common/log";
+import * as log from "./utils/log";
 import TaskItem from "../tree/item";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
-import constants from "../common/constants";
+import constants from "./constants";
 
 
 
