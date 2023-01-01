@@ -81,11 +81,13 @@
 	"config.taskExplorer.pathToPython": "Python",
 	"config.taskExplorer.pathToRuby": "Ruby",
 
-	"config.taskExplorer.readUserTasks": "Display user workspace tasks from data directory.",
+	"config.taskExplorer.showUserTasks": "Display user workspace tasks from data directory.",
 
 	"config.taskExplorer.showExecuteWithNoTerminalButton": "Show the `Execute with No Terminal` button inline with the Execute button",
 	"config.taskExplorer.showExecuteWithArgumentsButton": "Show the `Execute with Arguments` button inline with the Execute button",
-	"config.taskExplorer.showFavoritesButton": "Show the `Favorites` button inline with the Execute button",
+
+	"config.taskExplorer.showFavorites": "Show a `Favorites` main folder in the task tree to group frequently ran tasks in",
+	"config.taskExplorer.showFavoritesButton": "Show the `Favorites` button inline with the Execute button, ignored if *Show Favorites* is disabled.",
 
 	"config.taskExplorer.showHiddenWsTasks": "Include VSCode tasks in the explorer tree that have the `hide` property set to `true`",
 

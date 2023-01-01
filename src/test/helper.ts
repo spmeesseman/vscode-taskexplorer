@@ -266,7 +266,7 @@ async function initSettings(enable = true)
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("showLastTasks", enable);
     await configuration.updateWs("keepTermOnStop", false);
-    await configuration.updateWs("readUserTasks", enable);
+    await configuration.updateWs("showUserTasks", enable);
     await configuration.updateWs("showFavoritesButton", enable);
     await configuration.updateWs("showHiddenWsTasks", enable);
     await configuration.updateWs("showRunningTask", enable);

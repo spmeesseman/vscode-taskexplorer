@@ -347,6 +347,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             favFolder: TaskFolder | undefined;
 
         log.methodStart("build task tree", logLevel, logPad);
+
+        if (tasksList.length === 0)
+        {
+            log.methodDone("build task tree", logLevel, logPad);
+            return [ noScripts ];
+        }
+
         this.treeBuilding = true;
         const nodeExpandedeMap: any = configuration.get<any>("expanded");
 
@@ -369,11 +376,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         // the 'Last Tasks' folder)
         //
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        if (favTasks && favTasks.length > 0)
+        if (configuration.get<boolean>("showFavorites"))
         {
-            favFolder = new TaskFolder(constants.FAV_TASKS_LABEL, nodeExpandedeMap.favorites !== false ?
-                                                                  TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
-            folders.set(constants.FAV_TASKS_LABEL, favFolder);
+            if (favTasks && favTasks.length > 0)
+            {
+                favFolder = new TaskFolder(constants.FAV_TASKS_LABEL, nodeExpandedeMap.favorites !== false ?
+                                                                    TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
+                folders.set(constants.FAV_TASKS_LABEL, favFolder);
+            }
         }
 
         //
@@ -484,7 +494,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             if (!folder)
             {
                 folder = new TaskFolder(scopeName, nodeExpandedeMap[util.lowerCaseFirstChar(scopeName, true)] !== false ?
-                                                   TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
+                                                TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
                 folders.set(scopeName, folder);
             }
         }
@@ -1056,7 +1066,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
             /* istanbul ignore else */
             if (this.tasks)
-            {
+            {   //
+                // Remove User tasks if they're not enabled
+                //
+                if (!configuration.get<boolean>("showUserTasks")) // && util.isTaskTypeEnabled("workspace"))
+                {
+                    this.tasks.slice().filter(t => t.source === "Workspace").reverse().forEach((item, index, object) =>
+                    {
+                        (this.tasks as Task[]).splice(object.length - 1 - index, 1);
+                    });
+                }
+
                 if (licMgr)
                 {
                     const maxTasks = licMgr.getMaxNumberOfTasks();

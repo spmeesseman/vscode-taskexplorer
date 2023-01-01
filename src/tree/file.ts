@@ -145,7 +145,7 @@ export default class TaskFile extends TreeItem
         } //
          // No resource uri means this file is 'user tasks', and not associated to a workspace folder
         //
-        else if (configuration.get<boolean>("readUserTasks")) {
+        else {
             this.resourceUri = Uri.file(path.join(util.getUserDataPath(undefined, logPad), this.fileName));
             this.isUser = true;
         }

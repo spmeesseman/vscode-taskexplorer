@@ -86,7 +86,15 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     }
 
     //
-    // Show/hide last tasks
+    // User Tasks
+    //
+    if (e.affectsConfiguration("taskExplorer.showUserTasks"))
+    {
+        refresh= true;
+    }
+
+    //
+    // Last Tasks
     //
     if (e.affectsConfiguration("taskExplorer.showLastTasks"))
     {   /* istanbul ignore else */
@@ -102,7 +110,23 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     }
 
     //
-    // Enable/disable task types
+    // Favorites
+    //
+    if (e.affectsConfiguration("taskExplorer.showFavorites"))
+    {   /* istanbul ignore else */
+        if (configuration.get<boolean>("enableSideBar") && teApi.sidebar)
+        {
+            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("showFavorites"), true, true, undefined, "   ");
+        }
+        /* istanbul ignore else */
+        if (configuration.get<boolean>("enableExplorerView") && teApi.explorer)
+        {
+            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("showFavorites"), true, true, undefined, "   ");
+        }
+    }
+
+    //
+    // Task Types
     //
     if (!refresh && e.affectsConfiguration("taskExplorer.enabledTasks"))
     {
@@ -227,21 +251,11 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
     {
-        const enabled = configuration.get<boolean>("enableSideBar");
-        registerExplorer("taskExplorer", ctx, enabled, teApi);
-        if (!enabled) {
-            refresh = false;
-            refreshTaskTypes.splice(0, refreshTaskTypes.length);
-        }
+        registerExplorer("taskExplorer", ctx, configuration.get<boolean>("enableSideBar"), teApi);
     }
     if (e.affectsConfiguration("taskExplorer.enableSideBar"))
     {
-        const enabled = configuration.get<boolean>("enableSideBar");
-        registerExplorer("taskExplorerSideBar", ctx, enabled, teApi);
-        if (!enabled) {
-            refresh = false;
-            refreshTaskTypes.splice(0, refreshTaskTypes.length);
-        }
+        registerExplorer("taskExplorerSideBar", ctx, configuration.get<boolean>("enableSideBar"), teApi);
     }
 
     //
