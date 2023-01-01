@@ -958,11 +958,34 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             return [ new NoWorkspace() ];
         }
 
+        if (!this.enabled)
+        {
+            const firstRun = this.name === "taskExplorer" && !this.tasks && !this.taskTree;
+            if (firstRun)
+            {
+                return [ new InitScripts() ];
+            }
+            return [ new NoScripts() ];
+        }
+
+        if (element instanceof TaskFile)
+        {
+            if (!util.isTaskTypeEnabled(element.taskSource)) {
+                return [];
+            }
+        }
+        else if (!element || element instanceof TaskFolder)
+        {
+            if (util.getTaskTypes().filter(taskType => util.isTaskTypeEnabled(taskType)).length === 0) {
+                return [ new NoScripts() ];
+            }
+        }
+
         let waited = 0;
         let items: TaskFolder[]|NoScripts[]|InitScripts[]|NoWorkspace[]|TaskFile[]|TaskItem[] = [];
         const licMgr = getLicenseManager();
         const firstRun = this.name === "taskExplorer" && !this.tasks && this.enabled &&
-                         (!this.taskTree || this.taskTree[0].contextValue === "initscripts");
+                          (!this.taskTree || this.taskTree[0].contextValue === "initscripts");
 
         this.refreshPending = true;
 
@@ -1013,11 +1036,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             // for all tasks.  Same goes for typescript tasks.
             //
             /* istanbul ignore else */
-            if (this.enabled && !this.tasks || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
+            if (!this.tasks || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
             {
                 this.tasks = await tasks.fetchTasks();
             }
-            else if (this.enabled && this.tasks && this.currentInvalidation)
+            else if (this.tasks && this.currentInvalidation)
             {
                 const isScriptType = util.isScriptType(this.currentInvalidation);
                 //
@@ -1102,7 +1125,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 }
             }
             else {
-                this.taskTree = [ this.enabled ? new NoScripts() : new InitScripts() ];
+                this.taskTree = [ new NoScripts() ];
             }
         }
 
