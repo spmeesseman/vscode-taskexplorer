@@ -299,12 +299,29 @@ export function getTaskTypes(): string[]
 }
 
 
+export function getTaskTypeFriendlyName(taskType: string): string
+{
+    taskType = taskType.toLowerCase();
+    if (taskType === "workspace") {
+        return "vscode";
+    }
+    else if (taskType === "apppublisher") {
+        return "app-publisher";
+    }
+    else if (taskType === "tsc") {
+        return "typescript";
+    }
+    return taskType;
+}
+
+
 export function getTaskTypeRealName(taskType: string): string
 {
+    taskType = taskType.toLowerCase();
     if (taskType === "workspace") {
         return "Workspace";
     }
-    return taskType.toLowerCase();
+    return taskType;
 }
 
 

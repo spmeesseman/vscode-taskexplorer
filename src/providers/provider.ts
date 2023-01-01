@@ -73,9 +73,9 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 if (this.cachedTasks.length > maxTasks)
                 {
                     const rmvCount = this.cachedTasks.length - maxTasks;
-                    log.write(`   removing ${rmvCount} tasks, max ${this.providerName} task count reached (no license)`, 1, "   ", this.logQueueId);
+                    log.write(`   removing ${rmvCount} tasks, max ${ this.providerName} task count reached (no license)`, 1, "   ", this.logQueueId);
                     this.cachedTasks.splice(maxTasks, rmvCount);
-                    util.showMaxTasksReachedMessage(this.providerName);
+                    util.showMaxTasksReachedMessage(util.getTaskTypeFriendlyName(this.providerName));
                 }
             }
         }

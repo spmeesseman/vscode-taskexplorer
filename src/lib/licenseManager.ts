@@ -11,11 +11,11 @@ import { getHeaderContent, getBodyContent, isScriptType } from "../common/utils"
 export class LicenseManager implements ILicenseManager
 {
 
-	private useFakeLicense = true;
-	private maxFreeTasks = 50;
-	private maxFreeTaskFiles = 10;
-	private maxFreeTasksForTaskType = 20;
-	private maxFreeTasksForScriptType = 10;
+	private useFakeLicense = true; // Temp
+	private maxFreeTasks = 500;
+	private maxFreeTaskFiles = 100;
+	private maxFreeTasksForTaskType = 100;
+	private maxFreeTasksForScriptType = 50;
 	private licensed = false;
 	private version: string;
 	private numTasks: number | undefined;
