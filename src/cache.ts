@@ -97,6 +97,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                         const cachedFileCount = getTaskFileCount();
                         maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
                         if (maxFiles <= 0) {
+                            util.showMaxTasksReachedMessage();
                             return;
                         }
                         log.write(`   Set max files to scan at ${maxFiles} files (no license)`, 2, logPad);
@@ -375,6 +376,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
                 const cachedFileCount = getTaskFileCount();
                 maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
                 if (maxFiles <= 0) {
+                    util.showMaxTasksReachedMessage();
                     return;
                 }
                 log.write(`   Set max files to scan at ${maxFiles} files (no license)`, 3, logPad);

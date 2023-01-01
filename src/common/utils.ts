@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { RelativePattern, WorkspaceFolder, Uri, workspace } from "vscode";
+import { RelativePattern, WorkspaceFolder, Uri, workspace, window } from "vscode";
 import * as fs from "fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./configuration";
@@ -577,6 +577,21 @@ export function removeFromArray(arr: any[], item: any)
     if (idx2 !== -1 && idx2 < arr.length) {
         arr.splice(idx2, 1);
     }
+}
+
+
+let maxTasksMessageShown = false;
+const maxTaskTypeMessageShown: any = {};
+export function showMaxTasksReachedMessage(taskType?: string)
+{
+    if ((!maxTasksMessageShown && !taskType) || (taskType && !maxTaskTypeMessageShown[taskType] && Object.keys(maxTaskTypeMessageShown).length < 3))
+    {
+        window.showInformationMessage(`The max # of parsed ${taskType ?? ""} tasks in un-licensed mode has been reached`);
+        if (taskType) {
+            maxTaskTypeMessageShown[taskType] = true;
+        }
+    }
+    maxTasksMessageShown = true;
 }
 
 

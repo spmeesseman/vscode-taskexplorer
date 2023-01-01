@@ -42,7 +42,7 @@ export class LicenseManager implements ILicenseManager
 			try {
 				this.licensed = await this.validateLicense(storedLicenseKey, logPad + "   ");
 			}
-			catch{ /* istanbul ignore next */this.licensed = false; }
+			catch{}
 		}
 		log.methodDone("Check license", 1, logPad, false, [["is valid license", this.licensed]]);
 	}
@@ -325,7 +325,7 @@ export class LicenseManager implements ILicenseManager
 
 	private async validateLicense(licenseKey: string, logPad = "   ")
 	{
-		return new Promise<boolean>((resolve, reject) =>
+		return new Promise<boolean>((resolve) =>
 		{
 			log.methodStart("validate license", 1, logPad, false, [["license key", licenseKey]]);
 
@@ -344,31 +344,34 @@ export class LicenseManager implements ILicenseManager
 
 			const _onError = (e: any)  =>
 			{
-				window.showInformationMessage("License validation failed");
-				log.error(e); 
+				log.error(e);
+				if (e.message && e.message.includes("ECONNREFUSED")) {
+					log.write("   it appears that the license server is down or offline", 1, logPad);
+					log.write("      licensed mode will be automatically enabled.");
+				}
 				log.methodDone("validate license", 1, logPad, false, [["licensed", this.licensed]]);
-				reject(e);
+				resolve(true);
 			};
 			
-			log.write("   Send validation request", 1, logPad);
+			log.write("   send validation request", 1, logPad);
 
 			var req = https.request(options, (res) =>
 			{
-				log.write("   Response received", 1, logPad);
-				log.value("      Status code", res.statusCode, 2, logPad);
+				log.write("   response received", 1, logPad);
+				log.value("      status code", res.statusCode, 2, logPad);
 				res.on("data", (chunk) => { rspData += chunk; });
 				res.on("end", async() =>
 				{
 					try
 					{   const jso = JSON.parse(rspData);
 						const licensed = res.statusCode === 200 && jso.success && jso.message === "Success";
-						log.value("      Success", jso.success, 3, logPad);
-						log.value("      Message", jso.message, 3, logPad);
+						log.value("      success", jso.success, 3, logPad);
+						log.value("      message", jso.message, 3, logPad);
 						/** istanbul ignore else */
 						if (licensed) {
 							await this.setLicenseKey(licenseKey);
 						}
-						log.methodDone("validate license", 1, logPad, false, [["Is valid license", licensed]]);
+						log.methodDone("validate license", 1, logPad, false, [["is valid license", licensed]]);
 						resolve(licensed);
 					}
 					catch (e) { _onError(e); }

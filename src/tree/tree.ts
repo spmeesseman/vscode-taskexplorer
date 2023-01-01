@@ -1109,6 +1109,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                         const rmvCount = this.tasks.length - maxTasks;
                         log.write(`   removing ${rmvCount} tasks, max count reached (no license)`, logLevel, logPad);
                         this.tasks.splice(maxTasks, rmvCount);
+                        util.showMaxTasksReachedMessage();
                     }
                 }
                 //
@@ -1442,12 +1443,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         // invalidate="tests" means this is being called from unit tests (opt will be undefined)
         //
         if ((invalidate === true || invalidate === "tests") && !opt)
-        {
-            log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
-            this.busy = true;
-            await rebuildCache(logPad + "   ");
-            log.write("   handling 'rebuild cache' eventcomplete", 1, logPad + "   ");
-            this.busy = invalidate !== "tests";
+        {   //
+            // The file cache oly needs to update once on any change, since this will get called through
+            // twice if both the Explorer and Sidebar Views are enabled, do a lil check here to make sure
+            // we don't double scan for nothing.
+            //
+            const explorerViewEnabled = configuration.get<boolean>("enableExplorerView");
+            if ((explorerViewEnabled && this.name === "taskExplorer") || (!explorerViewEnabled && this.name === "taskExplorerSideBar"))
+            {
+                log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
+                this.busy = true;
+                await rebuildCache(logPad + "   ");
+                log.write("   handling 'rebuild cache' eventcomplete", 1, logPad + "   ");
+                this.busy = invalidate !== "tests";
+            }
         }
         //
         // If this is not from unit testing, then invalidate the appropriate task cache/file

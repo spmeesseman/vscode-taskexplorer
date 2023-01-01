@@ -303,7 +303,7 @@ function writeError(e: Error, queueId?: string)
     write("✘ " + e.name, 0, "", queueId);
     write("✘ " + e.message, 0, "", queueId);
     if (e.stack) {
-        const stackFmt = e.stack.replace(/\n/g, "\n                        ✘ ");
+        const stackFmt = e.stack.replace(/\n/g, "\n✘ ");
         write("✘ " + stackFmt, 0, "", queueId);
     }
     writeToConsole = currentWriteToConsole;

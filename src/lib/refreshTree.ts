@@ -1,5 +1,4 @@
 import { Uri } from "vscode";
-import { configuration } from "../common/configuration";
 import { isExcluded } from "../common/utils";
 import { TaskExplorerApi } from "../interface";
 
@@ -19,11 +18,10 @@ export async function refreshTree(teApi: TaskExplorerApi, taskType?: string, uri
     // Note the static task cache only needs to be refreshed once if both the explorer view
     // and the sidebar view are being used and/or enabled
     //
-    if (configuration.get<boolean>("enableSideBar") && teApi.sidebar) {
-        await teApi.sidebar.refresh(taskType, uri, logPad);
-    }
-    /* istanbul ignore else */
-    if (configuration.get<boolean>("enableExplorerView") && teApi.explorer) {
+    if (teApi.explorer) {
         await teApi.explorer.refresh(taskType, uri, logPad);
+    }
+    if (teApi.sidebar) {
+        await teApi.sidebar.refresh(taskType, uri, logPad);
     }
 }
