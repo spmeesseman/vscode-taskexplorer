@@ -10,7 +10,7 @@ import TaskFolder from "./folder";
 import constants from "../common/constants";
 import { storage } from "../common/storage";
 import { rebuildCache } from "../cache";
-import { InitScripts, NoScripts } from "../lib/noScripts";
+import { InitScripts, NoScripts, NoWorkspace } from "../lib/noScripts";
 import { configuration } from "../common/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
@@ -29,10 +29,6 @@ import { ExplorerApi } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
 
 
-const initScripts = new InitScripts();
-const noScripts = new NoScripts();
-
-
 /**
  * @class TaskTreeDataProvider
  *
@@ -49,7 +45,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     private busy = false;
     private extensionContext: ExtensionContext;
     private name: string;
-    private taskTree: TaskFolder[] | NoScripts[] | null = null;
+    private taskTree: TaskFolder[] | NoScripts[] | InitScripts[] | NoWorkspace[] | null = null;
     private currentInvalidation: string | undefined;
     private taskIdStartEvents: Map<string, NodeJS.Timeout> = new Map();
     private taskIdStopEvents: Map<string, NodeJS.Timeout> = new Map();
@@ -351,7 +347,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         if (tasksList.length === 0)
         {
             log.methodDone("build task tree", logLevel, logPad);
-            return [ noScripts ];
+            return [ new NoScripts() ];
         }
 
         this.treeBuilding = true;
@@ -590,7 +586,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             [ "store",  storeName ], [ "name",  label ]
         ]);
 
-        (this.taskTree as TaskFolder[]|NoScripts[]|InitScripts[]).splice(treeIndex, 0, folder);
+        (this.taskTree as TaskFolder[]|NoScripts[]|InitScripts[]|NoWorkspace[]).splice(treeIndex, 0, folder);
 
         for (const tId of lTasks)
         {
@@ -957,8 +953,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
      */
     async getChildren(element?: TreeItem, logPad = "", logLevel = 1): Promise<TreeItem[]>
     {
+        if (!workspace.workspaceFolders && !configuration.get<boolean>("showUserTasks"))
+        {
+            return [ new NoWorkspace() ];
+        }
+
         let waited = 0;
-        let items: TaskFolder[] | NoScripts[] | InitScripts[] | TaskFile[] | TaskItem[] = [];
+        let items: TaskFolder[]|NoScripts[]|InitScripts[]|NoWorkspace[]|TaskFile[]|TaskItem[] = [];
         const licMgr = getLicenseManager();
         const firstRun = this.name === "taskExplorer" && !this.tasks && this.enabled &&
                          (!this.taskTree || this.taskTree[0].contextValue === "initscripts");
@@ -1097,11 +1098,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 /* istanbul ignore if */
                 if (!this.taskTree || this.taskTree.length === 0)
                 {
-                    this.taskTree = [ noScripts ];
+                    this.taskTree = [ new NoScripts() ];
                 }
             }
             else {
-                this.taskTree = [ this.enabled ? noScripts : initScripts ];
+                this.taskTree = [ this.enabled ? new NoScripts() : new InitScripts() ];
             }
         }
 
@@ -1168,7 +1169,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             return element.taskFile;
         }
         /* istanbul ignore next */
-        if (element instanceof NoScripts)
+        if (element instanceof NoScripts || element instanceof InitScripts || element instanceof NoWorkspace)
         {
             /* istanbul ignore next */
             return null;
@@ -2366,7 +2367,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             return;
         }
 
-        if (!tree || tree.length === 0 || (tree.length === 1 && tree[0].contextValue === "noscripts"))
+        if (!tree || tree.length === 0 || (tree.length === 1 &&
+            (tree[0].contextValue === "noscripts" || tree[0].contextValue === "noworkspace") || tree[0].contextValue === "initscripts"))
         {
             log.write(logPad + "   no tasks found in tree", 1);
             return;

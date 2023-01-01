@@ -21,3 +21,12 @@ export class InitScripts extends TreeItem
         this.contextValue = "initscripts";
     }
 }
+
+export class NoWorkspace extends TreeItem
+{
+    constructor()
+    {
+        super(localize("noWorkspace", "No workspace found"), TreeItemCollapsibleState.None);
+        this.contextValue = "noworkspace";
+    }
+}

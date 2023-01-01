@@ -38,6 +38,7 @@
         "namee",
         "nocase",
         "noscripts",
+        "noworkspace",
         "Pipenv",
         "pkief",
         "testv",
