@@ -17,6 +17,7 @@ export interface ExplorerApi
     isVisible(): boolean;
     invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad?: string): Promise<void>;
     refresh(invalidate?: any, opt?: Uri | boolean, logPad?: string): Promise<void>;
+    setEnabled(enable: boolean): void;
     showSpecialTasks(show: boolean, isFavorite?: boolean, forceChange?: boolean, taskItem?: TaskItem, logPad?: string): Promise<void>;
     waitForRefreshComplete(maxWait?: number): Promise<void>;
 }

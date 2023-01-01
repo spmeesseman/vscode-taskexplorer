@@ -10,7 +10,7 @@ import TaskFolder from "./folder";
 import constants from "../common/constants";
 import { storage } from "../common/storage";
 import { rebuildCache } from "../cache";
-import { NoScripts } from "../lib/noScripts";
+import { InitScripts, NoScripts } from "../lib/noScripts";
 import { configuration } from "../common/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
@@ -29,6 +29,7 @@ import { ExplorerApi } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
 
 
+const initScripts = new InitScripts();
 const noScripts = new NoScripts();
 
 
@@ -44,6 +45,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     private treeBuilding = false;
     private refreshPending = false;
     private visible = false;
+    private enabled = false;
     private busy = false;
     private extensionContext: ExtensionContext;
     private name: string;
@@ -336,7 +338,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     }
 
 
-    public async buildTaskTree(tasksList: Task[], logPad: string, logLevel: number): Promise<TaskFolder[] | NoScripts[]>
+    public async buildTaskTree(tasksList: Task[], logPad: string, logLevel: number)
     {
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
@@ -578,7 +580,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             [ "store",  storeName ], [ "name",  label ]
         ]);
 
-        (this.taskTree as TaskFolder[]|NoScripts[]).splice(treeIndex, 0, folder);
+        (this.taskTree as TaskFolder[]|NoScripts[]|InitScripts[]).splice(treeIndex, 0, folder);
 
         for (const tId of lTasks)
         {
@@ -946,17 +948,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     async getChildren(element?: TreeItem, logPad = "", logLevel = 1): Promise<TreeItem[]>
     {
         let waited = 0;
-        let items: TaskFolder[] | NoScripts[] | TaskFile[] | TaskItem[] = [];
-        const firstRun = this.name === "taskExplorer" && !this.tasks && !this.taskTree;
+        let items: TaskFolder[] | NoScripts[] | InitScripts[] | TaskFile[] | TaskItem[] = [];
         const licMgr = getLicenseManager();
+        const firstRun = this.name === "taskExplorer" && !this.tasks && this.enabled &&
+                         (!this.taskTree || this.taskTree[0].contextValue === "initscripts");
 
         this.refreshPending = true;
 
         log.methodStart("get tree children", logLevel, logPad, false, [
             [ "task folder", element?.label ], [ "all tasks need to be retrieved", !this.tasks ],
-            [ "specific tasks need to be retrieved", !!this.currentInvalidation ],
-            [ "current invalidation", this.currentInvalidation ],
-            [ "task tree needs to be built", !this.taskTree ], [ "first run", firstRun ]
+            [ "specific task type need to be retrieved", !!this.currentInvalidation ],
+            [ "current invalidation", this.currentInvalidation ], [ "tree needs rebuild", !this.taskTree ],
+            [ "first run", firstRun ]
         ]);
 
         //
@@ -983,7 +986,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         //
         // Build task tree if not built already.
         //
-        if (!this.taskTree)
+        if (!this.taskTree || (this.taskTree.length === 1 && (this.taskTree[0].contextValue === "noscripts" || this.taskTree[0].contextValue === "initscripts")))
         {   //
             // If 'tasks' is empty, then ask for all tasks.
             // If 'tasks' is non-empty, and 'currentInvalidation' is set, then only ask for tasks
@@ -999,11 +1002,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             // for all tasks.  Same goes for typescript tasks.
             //
             /* istanbul ignore else */
-            if (!this.tasks || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
+            if (this.enabled && !this.tasks || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
             {
                 this.tasks = await tasks.fetchTasks();
             }
-            else if (this.tasks && this.currentInvalidation)
+            else if (this.enabled && this.tasks && this.currentInvalidation)
             {
                 const isScriptType = util.isScriptType(this.currentInvalidation);
                 //
@@ -1078,7 +1081,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 }
             }
             else {
-                this.taskTree = [ noScripts ];
+                this.taskTree = [ this.enabled ? noScripts : initScripts ];
             }
         }
 
@@ -1109,7 +1112,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         this.currentInvalidation = undefined; // reset file modification task type flag
 
         log.methodDone("get tree children", logLevel, logPad, false, [
-            [ "# of tasks total", this.tasks!.length ], [ "# of tasks returned", items.length ]
+            [ "# of tasks total", this.tasks?.length ], [ "# of tasks returned", items.length ]
         ]);
 
         return items;
@@ -2308,6 +2311,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         ]);
 
         await this.showSpecialTasks(true, isFavorite, false, taskItem, logPad);
+    }
+
+
+    //
+    // Tired of VSCode complaining that the the expension was a startup hog. Performing the
+    // initial scan after the extension has been instantiated stops it from getting all up
+    // in stdout's business.  Displaying an 'Initializing...' message in the tree now on
+    // startup resulting from this, looks kinda nice I guess, so oh well.
+    //
+    public setEnabled(enable: boolean)
+    {
+        this.enabled = enable;
+        this._onDidChangeTreeData.fire(null);
     }
 
 

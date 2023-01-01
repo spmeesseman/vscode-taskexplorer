@@ -110,7 +110,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             }
         }
 
-        log.methodDone(`read ${this.providerName} tasks`, 1, logPad, false, [[ "# of tasks", allTasks.length ]], this.logQueueId);
+        log.methodDone(`read ${this.providerName} tasks`, 1, logPad, false, [[ "# of tasks parsed", allTasks.length ]], this.logQueueId);
 
         return allTasks;
     }

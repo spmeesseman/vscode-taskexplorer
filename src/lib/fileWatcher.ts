@@ -7,8 +7,9 @@ import { Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFo
 import { refreshTree } from "./refreshTree";
 import { isDirectory, numFilesInDirectory } from "./utils/fs";
 import { extname } from "path";
-import path = require("path");
+import { TaskExplorerApi } from "../interface";
 
+let teApi: TaskExplorerApi;
 let processingFsEvent = false;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
@@ -46,8 +47,10 @@ function logFileWatcherEvent(uri: Uri, type: string)
 }
 
 
-export async function initFileWatchers(context: ExtensionContext)
-{   //
+export async function registerFileWatchers(context: ExtensionContext, api: TaskExplorerApi)
+{   
+    teApi = api;
+    //
     // Watch individual task type files within the project folder
     //
     await createFileWatchers(context);
@@ -59,6 +62,11 @@ export async function initFileWatchers(context: ExtensionContext)
     // Refresh tree when folders/projects are added/removed from the workspace, in a multi-root ws
     //
     createWorkspaceWatcher(context);
+    //
+    // TaskTreeDataProvider fires event for engine to make tree provider to refresh on setEnabled()
+    //
+    teApi.explorer?.setEnabled(!!teApi.explorer);
+    teApi.sidebar?.setEnabled(!!teApi.sidebar);
 }
 
 
@@ -108,7 +116,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
                 processingFsEvent = true;
                 try
                 {   logFileWatcherEvent(_e, "change");
-                    await refreshTree(taskType, _e, "   ");
+                    await refreshTree(teApi, taskType, _e, "   ");
                     log.write("file 'change' event complete", 1);
                 }
                 catch (e) {}
@@ -122,7 +130,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
             try
             {   logFileWatcherEvent(_e, "delete");
                 await cache.removeFileFromCache(taskType, _e, "   ");
-                await refreshTree(taskType, _e, "   ");
+                await refreshTree(teApi, taskType, _e, "   ");
                 log.write("file 'delete' event complete", 1);
             }
             catch (e) {}
@@ -135,7 +143,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
             try
             {   logFileWatcherEvent(_e, "create");
                 await cache.addFileToCache(taskType, _e, "   ");
-                await refreshTree(taskType, _e, "   ");
+                await refreshTree(teApi, taskType, _e, "   ");
                 log.write("file 'create' event complete", 1);
             }
             catch (e) {}
@@ -201,7 +209,7 @@ function createWorkspaceWatcher(context: ExtensionContext)
         /* istanbul ignore next */
         createDirWatcher(context);
         /* istanbul ignore next */
-        await refreshTree();
+        await refreshTree(teApi);
     });
     context.subscriptions.push(workspaceWatcher);
 }
@@ -270,10 +278,10 @@ async function onDirDelete(uri: Uri)
                         await cache.removeFolderFromCache(u, "   ");
                     }
                     if (wfs.length === 1) {
-                        await refreshTree(undefined, pendingDeleteFolders.length > 1 ? wfs[0].uri: uri);
+                        await refreshTree(teApi, undefined, pendingDeleteFolders.length > 1 ? wfs[0].uri: uri);
                     }
                     else {
-                        await refreshTree(undefined, undefined);
+                        await refreshTree(teApi, undefined, undefined);
                     }
                     pendingDeleteFolders = [];
                     deleteTaskTimerId = undefined;
@@ -298,7 +306,7 @@ async function processDirCreated()
             processingFsEvent = true;
             try
             {   await cache.addFolderToCache(processingDirUri, "   ");
-                await refreshTree(undefined, processingDirUri);
+                await refreshTree(teApi, undefined, processingDirUri);
             }
             catch (e) {}
             finally {

@@ -22,11 +22,12 @@ import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";
 import { ExternalExplorerProvider, TaskExplorerApi } from "./interface";
 import { LicenseManager } from "./lib/licenseManager";
-import { isProcessingConfigChange, processConfigChanges } from "./lib/configWatcher";
-import { disposeFileWatchers, initFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
+import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
+import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
-import { Disposable, ExtensionContext, tasks, commands, workspace } from "vscode";
+import { Disposable, ExtensionContext, tasks, commands } from "vscode";
+import { views } from "./views";
 
 
 const isLicenseManagerActive = true;
@@ -43,7 +44,7 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     initStorage(context);
 
     log.write("");
-    log.write("Init extension");
+    log.write("Activate extension");
 
     //
     // !!! Temporary after settings layout redo / rename !!!
@@ -53,17 +54,6 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     //
     // !!! End temporary !!!
     //
-
-    //
-    // Create license manager instance
-    //
-    await initLicenseManager(context);
-
-    //
-    // Register file type watchers
-    // This also starts the file scan to build the file task file cache
-    //
-    await initFileWatchers(context);
 
     //
     // Register internal task providers.  Npm, VScode type tasks are provided
@@ -79,46 +69,54 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     //
     // Register the tree providers
     //
-    let treeDataProvider;
-    /* istanbul ignore else */
-    if (configuration.get<boolean>("enableSideBar")) {
-        treeDataProvider = registerExplorer("taskExplorerSideBar", context);
-    }
-    let treeDataProvider2;
-    /* istanbul ignore else */
-    if (configuration.get<boolean>("enableExplorerView")) {
-        treeDataProvider2 = registerExplorer("taskExplorer", context);
-    }
+    registerExplorer("taskExplorer", context, configuration.get<boolean>("enableExplorerView", true), teApi);
+    registerExplorer("taskExplorerSideBar", context, configuration.get<boolean>("enableSideBar", false), teApi);
 
     //
     // Register configurations/settings change watcher
     //
-    const d = workspace.onDidChangeConfiguration(async e => {
-        await processConfigChanges(context, e);
-    });
-    context.subscriptions.push(d);
+    registerConfigWatcher(context, teApi);
 
-    log.write("   Task Explorer activated");
-
+    //
+    // Construct the API export
+    //
     Object.assign(teApi, {
+        isBusy: isTaskExplorerBusy,
         log,
         providers,
-        utilities: util,
         providersExternal,
-        explorer: treeDataProvider2,
-        sidebar: treeDataProvider,
-        isBusy: isTaskExplorerBusy,
         refresh: refreshExternalProvider,
         register: registerExternalProvider,
         unregister: unregisterExternalProvider,
+        utilities: util,
         waitForIdle: waitForTaskExplorerIdle,
         testsApi: {
             log,
             /* istanbul ignore next */
-            explorer: treeDataProvider2 || treeDataProvider,
+            explorer: teApi.explorer || teApi.sidebar,
             fileCache: cache
         }
     });
+
+    //
+    // Tired of VSCode complaining that the the expension was a startup hog. Performing the
+    // initial scan after the extension has been instantiated stops it from getting all up
+    // in stdout's business.  Displaying an 'Initializing...' message in the tree now on
+    // startup resulting from this, looks kinda nice I guess, so oh well.
+    //
+    setTimeout(async(api) =>
+    {   //
+        // Create license manager instance
+        //
+        await initLicenseManager(context);
+        //
+        // Register file type watchers
+        // This also starts the file scan to build the file task file cache
+        //
+        await registerFileWatchers(context, api);
+    }, 500, teApi);
+
+    log.write("Task Explorer activated, tree construction pending");
 
     return teApi;
 }
@@ -217,7 +215,7 @@ async function refreshExternalProvider(providerName: string)
     if (providersExternal.get(providerName))
     {
         /* istanbul ignore next */
-        await refreshTree(providerName);
+        await refreshTree(teApi, providerName);
     }
 }
 
@@ -236,7 +234,7 @@ function registerCommands(context: ExtensionContext)
 async function registerExternalProvider(providerName: string, provider: ExternalExplorerProvider)
 {
     providersExternal.set(providerName, provider);
-    await refreshTree(providerName);
+    await refreshTree(teApi, providerName);
 }
 
 
@@ -277,7 +275,7 @@ function registerTaskProviders(context: ExtensionContext)
 async function unregisterExternalProvider(providerName: string)
 {
     providersExternal.delete(providerName);
-    await refreshTree(providerName);
+    await refreshTree(teApi, providerName);
 }
 
 

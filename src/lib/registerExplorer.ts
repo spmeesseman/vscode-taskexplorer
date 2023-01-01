@@ -4,31 +4,56 @@ import * as log from "../common/log";
 import { views } from "../views";
 import { TaskTreeDataProvider } from "../tree/tree";
 import { ExtensionContext, workspace, window } from "vscode";
+import { TaskExplorerApi } from "../interface";
 
 
-export function registerExplorer(name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined
+export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext, enabled: boolean, teApi: TaskExplorerApi)
 {
+    let view = views.get(name);
     log.write("Register explorer view / tree provider '" + name + "'", 1, "   ");
 
-    /* istanbul ignore else */
-    if (enabled !== false)
-    {   /* istanbul ignore else */
-        if (workspace.workspaceFolders)
+    if (enabled)
+    {   
+        if (!view)
         {
-            const treeDataProvider = new TaskTreeDataProvider(name, context);
-            const treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
+            const treeDataProvider = new TaskTreeDataProvider(name, context),
+                    treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
             views.set(name, treeView);
-            const view = views.get(name);
+            view = views.get(name);
             /* istanbul ignore else */
             if (view) {
-                view.onDidChangeVisibility(async _e => { treeDataProvider.onVisibilityChanged(_e.visible); }, treeDataProvider);
+                view.onDidChangeVisibility(e => { treeDataProvider.onVisibilityChanged(e.visible); }, treeDataProvider);
                 context.subscriptions.push(view);
                 log.write("   Tree data provider registered'" + name + "'", 1, "   ");
             }
-            return treeDataProvider;
+            if (name === "taskExplorer")
+            {
+                teApi.explorer = treeDataProvider;
+                teApi.explorerView = view;
+            }
+            else // name === "taskExplorerSideBar"
+            {
+                teApi.sidebar = treeDataProvider;
+                teApi.sidebarView = view;
+            }
         }
-        else {
-            log.write("✘ No workspace folders!!!", 1, "   ");
+    }
+    else
+    {
+        if (view)
+        {
+            views.delete(name);
+            view.dispose();
+            if (name === "taskExplorer")
+            {
+                teApi.explorer = undefined;
+                teApi.explorerView = undefined;
+            }
+            else // name === "taskExplorerSideBar"
+            {
+                teApi.sidebar = undefined;
+                teApi.sidebarView = undefined;
+            }
         }
     }
 }

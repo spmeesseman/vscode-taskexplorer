@@ -1,4 +1,5 @@
 
+import { TreeItem, TreeView } from "vscode";
 import { ExplorerApi } from "./explorer";
 import { ExternalExplorerProvider } from "./externalProvider";
 import { TaskExplorerTestsApi } from "./testsApi";
@@ -10,7 +11,9 @@ export interface TaskExplorerApi
     log: any;
     utilities: any;
     explorer: ExplorerApi | undefined;
+    explorerView: TreeView<TreeItem> | undefined;
     sidebar: ExplorerApi | undefined;
+    sidebarView: TreeView<TreeItem> | undefined;
     providers: Map<string, any>;
     // explorer: TaskTreeDataProvider | undefined;
     // sidebar: TaskTreeDataProvider | undefined;

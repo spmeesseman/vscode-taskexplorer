@@ -3,14 +3,12 @@
 import * as util from "../common/utils";
 import constants from "../common/constants";
 import { configuration } from "../common/configuration";
-import { ExtensionContext, ConfigurationChangeEvent, commands } from "vscode";
+import { ExtensionContext, ConfigurationChangeEvent, commands, workspace } from "vscode";
 import { registerFileWatcher } from "./fileWatcher";
 import { refreshTree } from "./refreshTree";
 import { registerExplorer } from "./registerExplorer";
 import { TaskExplorerApi } from "../interface";
-import { log } from "console";
 
-// let context: ExtensionContext;
 let teApi: TaskExplorerApi;
 let watcherEnabled = true;
 let processingConfigEvent = false;
@@ -27,16 +25,13 @@ export function enableConfigWatcher(enable = true)
 export const isProcessingConfigChange = () => processingConfigEvent;
 
 
-export async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChangeEvent)
+async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChangeEvent)
 {
     // context = ctx;
     processingConfigEvent = true;
 
     let refresh = false;
     const refreshTaskTypes: string[] = [];
-    if (!teApi) {
-        teApi = await commands.executeCommand("taskExplorer.getApi")  as TaskExplorerApi;
-    }
 
     const registerChange = (taskType: string) => {
         /* istanbul ignore else */
@@ -225,57 +220,42 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
                 refresh = true;
             }
         }
-    } 
-    
-    //
-    // Enabled/disable sidebar view
-    //
-    if (e.affectsConfiguration("taskExplorer.enableSideBar"))
-    {
-        if (configuration.get<boolean>("enableSideBar"))
-        {   /* istanbul ignore else */
-            if (teApi.sidebar) {
-                // TODO - remove/add view on enable/disable view
-                refresh = true;
-            }
-            else {
-                teApi.sidebar = registerExplorer("taskExplorerSideBar", ctx);
-            }
-        }
-        // else {
-        //     teApi.sidebar = undefined;
-        // }
     }
 
     //
-    // Enabled/disable explorer view
+    // Explorer / sidebar view
     //
     if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
     {
-        if (configuration.get<boolean>("enableExplorerView"))
-        {   /* istanbul ignore else */
-            if (teApi.explorer) {
-                // TODO - remove/add view on enable/disable view
-                refresh = true;
-            }
-            else {
-                teApi.explorer = registerExplorer("taskExplorer", ctx);
-            }
+        const enabled = configuration.get<boolean>("enableSideBar");
+        registerExplorer("taskExplorer", ctx, enabled, teApi);
+        if (!enabled) {
+            refresh = false;
+            refreshTaskTypes.splice(0, refreshTaskTypes.length);
         }
-        // else {
-        //     teApi.explorer = undefined;
-        // }
+    }
+    if (e.affectsConfiguration("taskExplorer.enableSideBar"))
+    {
+        const enabled = configuration.get<boolean>("enableSideBar");
+        registerExplorer("taskExplorerSideBar", ctx, enabled, teApi);
+        if (!enabled) {
+            refresh = false;
+            refreshTaskTypes.splice(0, refreshTaskTypes.length);
+        }
     }
 
+    //
+    // Refresh tree depending on specific settings changes
+    //
     try
     {   if (refresh || refreshTaskTypes.length > 3)
         {
-            await refreshTree(undefined, undefined, "   ");
+            await refreshTree(teApi, undefined, undefined, "   ");
         }
         else if (refreshTaskTypes.length > 0)
         {
             for (const t of refreshTaskTypes) {
-                await refreshTree(t, undefined, "   ");
+                await refreshTree(teApi, t, undefined, "   ");
             }
         }
     }
@@ -285,8 +265,18 @@ export async function processConfigChanges(ctx: ExtensionContext, e: Configurati
     }
 
     processingConfigEvent = false;
-    teApi.log.methodDone("Process config changes", 1, "");
+    teApi.log.methodDone("Process config changes", 1);
 }
+
+
+export const registerConfigWatcher = (context: ExtensionContext, api: TaskExplorerApi) =>
+{
+    teApi = api;
+    const d = workspace.onDidChangeConfiguration(async e => {
+        await processConfigChanges(context, e);
+    });
+    context.subscriptions.push(d);
+};
 
 
 // const queue: ConfigurationChangeEvent[] = [];

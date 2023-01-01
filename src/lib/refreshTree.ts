@@ -1,19 +1,11 @@
-import { commands, Uri } from "vscode";
+import { Uri } from "vscode";
 import { configuration } from "../common/configuration";
 import { isExcluded } from "../common/utils";
 import { TaskExplorerApi } from "../interface";
 
-let teApi: TaskExplorerApi;
 
-
-export async function refreshTree(taskType?: string, uri?: Uri, logPad?: string)
+export async function refreshTree(teApi: TaskExplorerApi, taskType?: string, uri?: Uri, logPad?: string)
 {
-    if (!teApi) {
-        teApi = await commands.executeCommand("taskExplorer.getApi")  as TaskExplorerApi;
-    }
-    // let refreshedTasks = false;
-    // window.setStatusBarMessage("$(loading) Task Explorer - Refreshing tasks...");
-
     //
     // If this request is from a filesystem event for a file that exists in an ignored path,
     // then get out of here
@@ -21,7 +13,6 @@ export async function refreshTree(taskType?: string, uri?: Uri, logPad?: string)
     if (uri && isExcluded(uri.path)) {
         return;
     }
-
     //
     // Refresh tree(s)
     //

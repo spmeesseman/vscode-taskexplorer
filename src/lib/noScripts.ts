@@ -12,3 +12,12 @@ export class NoScripts extends TreeItem
         this.contextValue = "noscripts";
     }
 }
+
+export class InitScripts extends TreeItem
+{
+    constructor()
+    {
+        super(localize("initScripts", "Initializing..."), TreeItemCollapsibleState.None);
+        this.contextValue = "initscripts";
+    }
+}
