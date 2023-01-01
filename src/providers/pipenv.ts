@@ -50,7 +50,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
     {
         const scripts: string[] = [];
 
-        log.methodStart("find pipenv Pipfile targets", 1, logPad, true, [[ "path", fsPath ]]);
+        log.methodStart("find pipenv Pipfile targets", 2, logPad, false, [[ "path", fsPath ]]);
 
         const contents = util.readFileSync(fsPath);
 
@@ -65,7 +65,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
             log.value("      name", scriptName, 3, logPad);
         });
 
-        log.methodDone("find pipenv Pipfile targets", 1, logPad, true);
+        log.methodDone("find pipenv Pipfile targets", 2, logPad);
 
         return scripts;
     }
@@ -100,7 +100,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read pipenv Pipfile file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+        log.methodStart("read pipenv Pipfile file uri tasks", 1, logPad, false, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
 
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
@@ -110,7 +110,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
             result.push(task);
         }
 
-        log.methodDone("read pipenv Pipfile file uri tasks", 1, logPad, true);
+        log.methodDone("read pipenv Pipfile file uri tasks", 1, logPad);
         return result;
     }
 }

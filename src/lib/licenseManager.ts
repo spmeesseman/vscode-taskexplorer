@@ -1,41 +1,71 @@
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
+import * as https from "http";
+//import * as https from "https";
 import * as log from "../common/log";
 import { storage } from "../common/storage";
 import { commands, ExtensionContext, InputBoxOptions, Task, ViewColumn, WebviewPanel,  window, workspace } from "vscode";
 import { ILicenseManager } from "../interface/licenseManager";
-import { getHeaderContent, getBodyContent } from "../common/utils";
-import { TaskExplorerApi } from "../interface";
+import { getHeaderContent, getBodyContent, isScriptType } from "../common/utils";
 
 
 export class LicenseManager implements ILicenseManager
 {
 
+	private useFakeLicense = true;
+	private maxFreeTasks = 50;
+	private maxFreeTaskFiles = 10;
+	private maxFreeTasksForTaskType = 20;
+	private maxFreeTasksForScriptType = 10;
 	private licensed = false;
-	private version: string;;
+	private version: string;
+	private numTasks: number | undefined;
 	private panel: WebviewPanel | undefined;
-	private teApi: TaskExplorerApi;
 	private context: ExtensionContext;
 
 
-	constructor(teApi: TaskExplorerApi, context: ExtensionContext)
+	constructor(context: ExtensionContext)
     {
 		this.context = context;
-		this.teApi = teApi;
         //
         // Store extension version
-		// Note context.extension depends on VSCode 1.55+
+		// Note context.extension is only in VSCode 1.55+
         //
         this.version = context.extension.packageJSON.version;
     }
 
 
-	async initialize(components: Task[])
+	async checkLicense(logPad: string)
+	{
+		const storedLicenseKey = this.getLicenseKey();
+		log.methodStart("Check license", 1, logPad, false, [["stored license key", storedLicenseKey]]);
+		if (storedLicenseKey) {
+			try {
+				this.licensed = await this.validateLicense(storedLicenseKey, logPad + "   ");
+			}
+			catch{ /* istanbul ignore next */this.licensed = false; }
+		}
+		log.methodDone("Check license", 1, logPad, false, [["is valid license", this.licensed]]);
+	}
+
+
+	async setTasks(components: Task[], logPad: string)
 	{
 		let displayInfo = false, displayPopup = false;
 		const storedVersion = storage.get<string>("version");
 
-		log.methodStart("display info startup page", 1, "", false, [["stored version", storedVersion]]);
+		if (this.numTasks === components.length) {
+			return;
+		}
+
+		this.numTasks = components.length;
+
+		// if (this.numTasks < this.maxFreeTasks) {
+		// 	return;
+		// }
+
+		log.methodStart("display info startup page", 1, logPad, false, [
+			["stored version", storedVersion], ["is licensed", this.licensed]
+		]);
 
 		let content = getHeaderContent();
 
@@ -43,14 +73,13 @@ export class LicenseManager implements ILicenseManager
 
 		content += ("<tr><td>" + getBodyContent("Welcome to Task Explorer") + "</td></tr>");
 
-		if (this.version === storedVersion)
+		if (this.version !== storedVersion)
 		{
 			content += ("<tr><td>" + this.getInfoContent(components) + "</td></tr>");
 			displayInfo = true;
 		}
 
-		const hasLicense = await this.checkLicenseKey();
-		if (!hasLicense)
+		if (!this.licensed)
 		{
 			content += ("<tr><td>" + this.getLicenseContent() + "</td></tr>");
 			displayPopup = !displayInfo;
@@ -81,10 +110,10 @@ export class LicenseManager implements ILicenseManager
 				{
 					switch (message.command)
 					{
-						case 'enterLicense':
+						case "enterLicense":
 							commands.executeCommand("taskExplorer.enterLicense");
 							return;
-						case 'viewReport':
+						case "viewReport":
 							commands.executeCommand("taskExplorer.viewReport");
 							return;
 						default:
@@ -95,37 +124,22 @@ export class LicenseManager implements ILicenseManager
 		}
 		else if (displayPopup)
 		{
-			const msg = "Purchase a license to unlock unlimited parsed tasks.",
-				  action = await window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now"); // don't await
-
-			if (action === "Enter License Key")
+			const msg = "Purchase a license to unlock unlimited parsed tasks.";
+			window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now")
+			.then((action) =>
 			{
-				this.enterLicenseKey(); // don't await
-			}
-			else if (action === "Info")
-			{
-				window.showInformationMessage("License Info page not implemented yet"); // don't await
-			}
+				if (action === "Enter License Key")
+				{
+					this.enterLicenseKey(); // don't await
+				}
+				else if (action === "Info")
+				{
+					commands.executeCommand("taskExplorer.viewReport");
+				}
+			});
 		}
 
-		log.methodDone("display info startup page", 1, "", false, [["has license", hasLicense]]);
-	}
-
-
-	private async checkLicenseKey()
-	{
-		let validLicense = false;
-		const storedLicenseKey = this.getLicenseKey();
-
-		log.methodStart("check license", 1, "   ", false, [["stored license key", storedLicenseKey]]);
-
-		if (storedLicenseKey)
-		{
-			validLicense = await this.validateLicense(storedLicenseKey);
-		}
-
-		log.methodDone("check license", 1, "   ", false, [["valid license", validLicense]]);
-		return validLicense;
+		log.methodDone("display info startup page", 1, logPad);
 	}
 
 
@@ -135,11 +149,10 @@ export class LicenseManager implements ILicenseManager
 		try {
 			const input = await window.showInputBox(opts);
 			if (input) {
-				return this.validateLicense(input);
+				this.licensed = await this.validateLicense(input);
 			}
 		}
 		catch (e) {}
-		return false;
 	}
 
 
@@ -151,7 +164,7 @@ export class LicenseManager implements ILicenseManager
 
 	getLicenseKey()
 	{
-		return storage.get<string>("license_key");
+		return !this.useFakeLicense ? storage.get<string>("license_key") : "1234-5678-9098-7654321";
 	}
 
 
@@ -273,9 +286,34 @@ export class LicenseManager implements ILicenseManager
 	}
 
 
+	getMaxNumberOfTasks()
+	{
+		return this.licensed ? Infinity : this.maxFreeTasks;
+	}
+
+
+	getMaxNumberOfTaskFiles()
+	{
+		return this.licensed ? Infinity : this.maxFreeTaskFiles;
+	}
+
+
+	getMaxNumberOfTasksByType(taskType: string)
+	{
+		return this.licensed ? Infinity :
+			(taskType === "script" || isScriptType(taskType) ? this.maxFreeTasksForScriptType : this.maxFreeTasksForTaskType);
+	}
+
+
 	getVersion()
 	{
 		return this.version;
+	}
+
+
+	isLicensed()
+	{
+		return this.licensed;
 	}
 
 
@@ -285,13 +323,66 @@ export class LicenseManager implements ILicenseManager
 	}
 
 
-	private async validateLicense(licenseKey: string)
+	private async validateLicense(licenseKey: string, logPad = "   ")
 	{
-		this.licensed = !!licenseKey;
-		/** istanbul ignore else */
-		if (this.licensed) {
-			await this.setLicenseKey(licenseKey);
-		}
-		return this.licensed;
+		return new Promise<boolean>((resolve, reject) =>
+		{
+			log.methodStart("validate license", 1, logPad, false, [["license key", licenseKey]]);
+
+			let rspData = "";
+			const options = {
+				hostname: "localhost",
+				port: 1924,
+				path: "/api/license/validate/v1",
+				method: "POST",
+				timeout: 5000,
+				headers: {
+					"token": "HjkSgsR55WepsaWYtFoNmRMLiTJS4nKOhgXoPIuhd8zL3CVK694UXNw/n9e1GXiG9U5WiAmjGxAoETapHCjB67G0DkDZnXbbzYICr/tfpVc4NKNy1uM3GHuAVXLeKJQLtUMLfxgXYTJFNMU7H/vTaw==",
+					"Content-Type": "application/json"
+				}
+			};
+
+			const _onError = (e: any)  =>
+			{
+				window.showInformationMessage("License validation failed");
+				log.error(e); 
+				log.methodDone("validate license", 1, logPad, false, [["licensed", this.licensed]]);
+				reject(e);
+			};
+			
+			log.write("   Send validation request", 1, logPad);
+
+			var req = https.request(options, (res) =>
+			{
+				log.write("   Response received", 1, logPad);
+				log.value("      Status code", res.statusCode, 2, logPad);
+				res.on("data", (chunk) => { rspData += chunk; });
+				res.on("end", async() =>
+				{
+					try
+					{   const jso = JSON.parse(rspData);
+						const licensed = res.statusCode === 200 && jso.success && jso.message === "Success";
+						log.value("      Success", jso.success, 3, logPad);
+						log.value("      Message", jso.message, 3, logPad);
+						/** istanbul ignore else */
+						if (licensed) {
+							await this.setLicenseKey(licenseKey);
+						}
+						log.methodDone("validate license", 1, logPad, false, [["Is valid license", licensed]]);
+						resolve(licensed);
+					}
+					catch (e) { _onError(e); }
+				});
+			});
+
+			req.on("error", (e) => { _onError(e); });
+
+			req.write(JSON.stringify({
+				licensekey: "1234-5678-9098-7654321"
+			}));
+
+			req.end();
+		});
 	}
+
 }

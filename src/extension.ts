@@ -29,6 +29,8 @@ import { registerExplorer } from "./lib/registerExplorer";
 import { Disposable, ExtensionContext, tasks, commands, workspace } from "vscode";
 
 
+const isLicenseManagerActive = true;
+
 export const teApi = {} as TaskExplorerApi;
 let licenseManager: ILicenseManager;
 export const providers: Map<string, TaskExplorerProvider> = new Map();
@@ -53,7 +55,13 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
     //
 
     //
+    // Create license manager instance
+    //
+    await initLicenseManager(context);
+
+    //
     // Register file type watchers
+    // This also starts the file scan to build the file task file cache
     //
     await initFileWatchers(context);
 
@@ -111,11 +119,6 @@ export async function activate(context: ExtensionContext, disposables: Disposabl
             fileCache: cache
         }
     });
-
-    //
-    // Create license manager instance
-    //
-    licenseManager = new LicenseManager(teApi, context);
 
     return teApi;
 }
@@ -190,6 +193,14 @@ export function getLicenseManager()
     return licenseManager;
 }
 
+
+async function initLicenseManager(context: ExtensionContext)
+{
+    licenseManager = new LicenseManager(context);
+    if (isLicenseManagerActive) {
+        await licenseManager.checkLicense("   ");
+    }
+}
 
 /* istanbul ignore next */
 function isTaskExplorerBusy()

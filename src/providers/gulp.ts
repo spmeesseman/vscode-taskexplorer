@@ -48,7 +48,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     {
         let scripts: string[] = [];
 
-        log.methodStart("find gulp targets", 1, logPad, true, [[ "path", fsPath ]]);
+        log.methodStart("find gulp targets", 2, logPad, false, [[ "path", fsPath ]]);
         //
         // Try running 'gulp' itself to get the targets.  If fail, just custom parse
         //
@@ -127,10 +127,10 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             }
         }
         else {
-            scripts = this.parseGulpTasks(fsPath);
+            scripts = this.parseGulpTasks(fsPath, logPad + "   ");
         }
 
-        log.methodDone("find gulp targets", 1, logPad, true);
+        log.methodDone("find gulp targets", 2, logPad);
 
         return scripts;
     }
@@ -150,7 +150,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    private parseGulpTasks(fsPath: string): string[]
+    private parseGulpTasks(fsPath: string, logPad: string): string[]
     {
         const scripts: string[] = [];
         const contents = util.readFileSync(fsPath);
@@ -174,8 +174,8 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                 }
                 if (tgtName) {
                     scripts.push(tgtName);
-                    log.write("   found gulp target");
-                    log.value("      name", tgtName);
+                    log.write("found gulp target", 3, logPad);
+                    log.value("      name", tgtName, 3, logPad);
                 }
             }
 
@@ -276,7 +276,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read gulp file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+        log.methodStart("read gulp file uri task", 1, logPad, false, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
 
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
@@ -286,7 +286,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             result.push(task);
         }
 
-        log.methodDone("read gulp file uri tasks", 1, logPad, true);
+        log.methodDone("read gulp file uri tasks", 1, logPad);
         return result;
     }
 

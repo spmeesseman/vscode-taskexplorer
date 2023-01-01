@@ -29,8 +29,6 @@ import { ExplorerApi } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
 
 
-const isLicenseManagerActive = true;
-
 const noScripts = new NoScripts();
 
 
@@ -381,8 +379,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         //
         for (const each of tasksList)
         {
-            log.blank(1);
-            log.write("   Processing task " + (++taskCt).toString() + " of " + tasksList.length.toString(), logLevel, logPad);
+            log.blank(2);
+            log.write(`   Processing task ${++taskCt} of ${tasksList.length} (${each.source})`, logLevel, logPad);
             this.buildTaskTreeList(each, folders, files, ltFolder, favFolder, lastTasks, favTasks, logPad + "   ");
         }
 
@@ -950,6 +948,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         let waited = 0;
         let items: TaskFolder[] | NoScripts[] | TaskFile[] | TaskItem[] = [];
         const firstRun = this.name === "taskExplorer" && !this.tasks && !this.taskTree;
+        const licMgr = getLicenseManager();
 
         this.refreshPending = true;
 
@@ -1054,7 +1053,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
 
             /* istanbul ignore else */
             if (this.tasks)
-            {   //
+            {
+                if (licMgr)
+                {
+                    const maxTasks = licMgr.getMaxNumberOfTasks();
+                    if (this.tasks.length > maxTasks)
+                    {
+                        const rmvCount = this.tasks.length - maxTasks;
+                        log.write(`   removing ${rmvCount} tasks, max count reached (no license)`, logLevel, logPad);
+                        this.tasks.splice(maxTasks, rmvCount);
+                    }
+                }
+                //
                 // Build the entire task tree
                 //
                 try {
@@ -1088,12 +1098,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             items = this.taskTree;
         }
 
-        /* istanbul ignore if */
-        if (firstRun && this.tasks && isLicenseManagerActive)
+        if (firstRun && licMgr)
         {   //
-            // Initialize license manager
+            // Update license manager w/ tasks, display info / license page if needed
             //
-            await getLicenseManager().initialize(this.tasks);
+            await licMgr.setTasks(this.tasks || [], logPad + "   ");
         }
 
         this.refreshPending = false;
@@ -2171,8 +2180,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     }
 
 
-    private async runTask(task: Task, noTerminal?: boolean): Promise<boolean>
+    private async runTask(task: Task, noTerminal?: boolean, logPad = "   "): Promise<boolean>
     {
+        let result = true;
+        log.methodStart("run task", 1, logPad, false, [[ "no terminal", noTerminal ]]);
+
         if (noTerminal === true) {
             task.presentationOptions.reveal = TaskRevealKind.Silent;
         }
@@ -2198,11 +2210,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 window.showErrorMessage("Task execution failed: " + err);
             }
             /* istanbul ignore next */
-            log.write("Task execution failed: " + err);
+            log.write("Task execution failed: " + err, 1, logPad);
             /* istanbul ignore next */
-            return false;
+            result = false;
         }
-        return true;
+
+        log.methodDone("run task", 1, logPad, false, [[ "result", result ]]);
+        return result;
     }
 
 
@@ -2213,8 +2227,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
      * @param noTerminal Whether or not to show the terminal
      * Note that the terminal will be shown if there is an error
      */
-    public async runWithArgs(taskItem: TaskItem, args?: string, noTerminal?: boolean)
+    public async runWithArgs(taskItem: TaskItem, args?: string, noTerminal?: boolean, logPad = "   ")
     {
+        log.methodStart("run task with arguments", 1, logPad, false, [[ "no terminal", noTerminal ]]);
         /* istanbul ignore else */
         if (taskItem.task && !(taskItem.task.execution instanceof CustomExecution))
         {
@@ -2229,13 +2244,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                     const def = taskItem.task.definition,
                           folder = taskItem.getFolder();
                     /* istanbul ignore else */
-                    if (folder) {
-                        newTask = (providers.get("script") as ScriptTaskProvider).createTask(def.script, undefined, folder, def.uri, _args.trim().split(" ")) as Task;
+                    if (folder)
+                    {
+                        newTask = (providers.get("script") as ScriptTaskProvider).createTask(
+                            def.script, undefined, folder, def.uri, _args.trim().split(" "), logPad + "   "
+                        ) as Task;
                         newTask.definition.taskItemId = def.taskItemId;
                     }
                     /* istanbul ignore else */
-                    if (await this.runTask(newTask, noTerminal)) {
-                        await me.saveTask(taskItem, configuration.get<number>("numLastTasks"));
+                    if (await this.runTask(newTask, noTerminal, logPad + "   "))
+                    {
+                        await me.saveTask(taskItem, configuration.get<number>("numLastTasks"), false, logPad + "   ");
                         this.babysitRunningTask(taskItem);
                     }
                 }
@@ -2252,6 +2271,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         else {
             window.showInformationMessage("Custom execution tasks cannot have the cmd line altered");
         }
+        log.methodDone("run task with arguments", 1, logPad);
     }
 
 

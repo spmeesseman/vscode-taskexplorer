@@ -8,7 +8,7 @@ import { ExtensionContext, workspace, window } from "vscode";
 
 export function registerExplorer(name: string, context: ExtensionContext, enabled?: boolean): TaskTreeDataProvider | undefined
 {
-    log.write("Register explorer view / tree provider '" + name + "'");
+    log.write("Register explorer view / tree provider '" + name + "'", 1, "   ");
 
     /* istanbul ignore else */
     if (enabled !== false)
@@ -23,12 +23,12 @@ export function registerExplorer(name: string, context: ExtensionContext, enable
             if (view) {
                 view.onDidChangeVisibility(async _e => { treeDataProvider.onVisibilityChanged(_e.visible); }, treeDataProvider);
                 context.subscriptions.push(view);
-                log.write("   Tree data provider registered'" + name + "'");
+                log.write("   Tree data provider registered'" + name + "'", 1, "   ");
             }
             return treeDataProvider;
         }
         else {
-            log.write("✘ No workspace folders!!!");
+            log.write("✘ No workspace folders!!!", 1, "   ");
         }
     }
 }

@@ -6,6 +6,7 @@ import { configuration } from "../common/configuration";
 import { getTaskFiles, removeFileFromCache } from "../cache";
 import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
+import { getLicenseManager } from "../extension";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
@@ -59,11 +60,23 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
     public async provideTasks()
     {
-        log.methodStart(`provide ${this.providerName} tasks`, 1, "", true);
-        if (!this.cachedTasks) {
-            this.cachedTasks = await this.readTasks("   ");
+        log.methodStart(`provide ${this.providerName} tasks`, 1, "   ");
+        if (!this.cachedTasks)
+        {
+            const licMgr = getLicenseManager();
+            this.cachedTasks = await this.readTasks("      ");
+            if (licMgr)
+            {
+                const maxTasks = licMgr.getMaxNumberOfTasksByType(this.providerName);
+                if (this.cachedTasks.length > maxTasks)
+                {
+                    const rmvCount = this.cachedTasks.length - maxTasks;
+                    log.write(`   removing ${rmvCount} tasks, max ${this.providerName} task count reached (no license)`, 1);
+                    this.cachedTasks.splice(maxTasks, rmvCount);
+                }
+            }
         }
-        log.methodDone(`provide ${this.providerName} tasks`, 1, "", true);
+        log.methodDone(`provide ${this.providerName} tasks`, 1, "   ");
         return this.cachedTasks;
     }
 
@@ -75,7 +88,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
               paths = getTaskFiles(this.providerName),
               enabled = util.isTaskTypeEnabled(this.providerName);
 
-        log.methodStart(`read ${this.providerName} tasks`, 1, logPad, true, [[ "enabled", enabled ]]);
+        log.methodStart(`read ${this.providerName} tasks`, 1, logPad, false, [[ "enabled", enabled ]]);
 
         if (enabled && paths)
         {
@@ -93,7 +106,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             }
         }
 
-        log.methodDone(`read ${this.providerName} tasks`, 1, logPad, true, [[ "# of tasks", allTasks.length ]]);
+        log.methodDone(`read ${this.providerName} tasks`, 1, logPad, false, [[ "# of tasks", allTasks.length ]]);
         return allTasks;
     }
 
@@ -106,7 +119,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
     public async invalidate(uri?: Uri, logPad = ""): Promise<void>
     {
-        log.methodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, true,
+        log.methodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, false,
             [[ "uri", uri?.path ], [ "has cached tasks", !!this.cachedTasks ]]
         );
 

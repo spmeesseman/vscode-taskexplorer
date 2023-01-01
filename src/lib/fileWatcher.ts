@@ -172,20 +172,20 @@ function createDirWatcher(context: ExtensionContext)
 
 async function createFileWatchers(context: ExtensionContext)
 {
-    log.methodStart("Create file watchers", 1);
+    log.methodStart("Create file watchers", 1, "   ");
     const taskTypes = util.getTaskTypes();
     for (const taskType of taskTypes)
     {
-        log.value("   task type", taskType, 1);
+        log.value(`   create for task type '${taskType}'`, taskType, 1, "   ");
         if (util.isTaskTypeEnabled(taskType))
         {
-            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), true, "   ");
+            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), true, "      ");
         }
         else {
-            log.write(`   task type '${taskType}' is disabled in settings`, 1);
+            log.write(`   skip for task type '${taskType}' (disabled in settings)`, 1, "   ");
         }
     }
-    log.methodDone("Create file watchers", 1);
+    log.methodDone("Create file watchers", 1, "   ");
 }
 
 

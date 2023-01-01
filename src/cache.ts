@@ -3,7 +3,7 @@
 import * as util from "./common/utils";
 import * as log from "./common/log";
 import { configuration } from "./common/configuration";
-import { providers, providersExternal } from "./extension";
+import { getLicenseManager, providers, providersExternal } from "./extension";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
 } from "vscode";
@@ -30,27 +30,28 @@ const filesCache: Map<string, Set<ICacheItem>> = new Map<string, Set<ICacheItem>
 
 export async function addFileToCache(taskType: string, uri: Uri, logPad: string)
 {
-    log.methodStart("add file to cache", 1, logPad, true);
+    log.methodStart("add file to cache", 1, logPad);
     const wsf = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
           item = { uri, folder: wsf };
     addToMappings(taskType, item, logPad + "   ");
-    log.methodDone("add file to cache", 1, logPad, true);
+    log.methodDone("add file to cache", 1, logPad);
 }
 
 
 export async function addFolderToCache(folder: Uri, logPad: string)
 {
-    log.methodStart("add folder to cache", 1, logPad, false, [[ "folder", folder.fsPath ]]);
+    const licMgr = getLicenseManager();
     const wsFolder = workspace.getWorkspaceFolder(folder) as WorkspaceFolder;
+
+    log.methodStart("add folder to cache", 1, logPad, false, [[ "folder", folder.fsPath ]]);
 
     //
     // Wait for caches to get done building before proceeding
     //
     await waitForCache();            // If the global cache is still building, wait
     await waitForFolderCaching();    // If the folder cache is still building, wait
-
-    folderCaching = true;  // set flag
-    cacheBuilding = true;  // set flag
+    folderCaching = true;
+    cacheBuilding = true;
 
     //
     // Status bar
@@ -89,10 +90,19 @@ export async function addFolderToCache(folder: Uri, logPad: string)
             if (!providersExternal.get(providerName))
             {
                 try
-                {
+                {   let maxFiles = Infinity;
                     log.write("   Start folder scan", 2, logPad);
+                    if (licMgr)
+                    {
+                        const cachedFileCount = getTaskFileCount();
+                        maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
+                        if (maxFiles <= 0) {
+                            return;
+                        }
+                        log.write(`   Set max files to scan at ${maxFiles} files (no license)`, 2, logPad);
+                    }
                     const relativePattern = new RelativePattern(folder, glob),
-                          paths = await workspace.findFiles(relativePattern, getExcludesPatternVsc(folder.fsPath));
+                          paths = await workspace.findFiles(relativePattern, getExcludesPatternVsc(folder.fsPath), maxFiles);
                     for (const fPath of paths)
                     {
                         if (cancel) {
@@ -124,9 +134,9 @@ export async function addFolderToCache(folder: Uri, logPad: string)
         log.write("Add folder to cache complete", 3, logPad);
     }
 
-    cacheBuilding = false;   // un-set flag
-    folderCaching = false;   // un-set flag
-    cancel = false;          // un-set flag
+    cacheBuilding = false;
+    folderCaching = false;
+    cancel = false;
 
     log.methodDone("add folder to cache", 1, logPad);
 }
@@ -297,7 +307,7 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
 {
     const taskProviderType = util.getTaskProviderType(taskType);
 
-    log.methodStart("build file cache", 2, logPad, true, [
+    log.methodStart("build file cache", 2, logPad, false, [
         [ "folder", !wsFolder ? "entire workspace" : wsFolder.name ], [ "task type", taskType ],
         [ "task provider type", taskProviderType ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
     ]);
@@ -320,7 +330,6 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
     //
     if (!wsFolder)
     {
-        log.blank(1);
         log.write("   Build cache - Scan all projects for taskType '" + taskType + "' (" + taskType + ")", 1, logPad);
         await buildFolderCaches(taskType, fileGlob, setCacheBuilding, logPad + "   ");
     }
@@ -335,17 +344,18 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
         cacheBuilding = false;    // reset flag
     }
 
-    log.methodDone("build file cache", 2, logPad, true);
+    log.methodDone("build file cache", 2, logPad);
 }
 
 
 async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileGlob: string, setCacheBuilding: boolean, logPad: string)
 {
+    const licMgr = getLicenseManager();
     const logMsg = "Scan project " + folder.name + " for " + taskType + " tasks",
           dspTaskType = taskType !== "tsc" && taskType !== "apppublisher" ?
                         util.properCase(taskType) : (taskType === "tsc" ? "Typescript" : "App-Publisher");
 
-    log.methodStart(logMsg, 1, logPad, true);
+    log.methodStart(logMsg, 1, logPad);
     statusBarSpace.text = getStatusString(`Scanning for ${dspTaskType} tasks in project ${folder.name}`, 65);
 
     initMaps(taskType, folder.name);
@@ -358,19 +368,29 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
     if (!providersExternal.get(taskType) && (globChanged || fsChanged))
     {
         try {
-            log.write("   Start workspace scan", 3, logPad);
+            let maxFiles = Infinity;
+            log.write("   Start workspace folder scan", 3, logPad);
+            if (licMgr)
+            {
+                const cachedFileCount = getTaskFileCount();
+                maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
+                if (maxFiles <= 0) {
+                    return;
+                }
+                log.write(`   Set max files to scan at ${maxFiles} files (no license)`, 3, logPad);
+            }
             const relativePattern = new RelativePattern(folder, fileGlob),
-                  paths = await workspace.findFiles(relativePattern, getExcludesPatternVsc(folder));
+                  paths = await workspace.findFiles(relativePattern, getExcludesPatternVsc(folder), maxFiles);
             for (const fPath of paths)
             {
                 if (cancel) {
                     cancelInternal(setCacheBuilding);
-                    return [];
+                    return;
                 }
                 addToMappings(taskType, { uri: fPath, folder }, logPad + "   ");
             }
             projectToFileCountMap[folder.name][taskType] = paths.length;
-            log.write(`   Workspace scan complete, found '${paths.length}' files`, 3, logPad);
+            log.write(`   Workspace folder scan complete, found '${paths.length}' files`, 3, logPad);
         }
         catch (e: any) { /* istanbul ignore next */ log.error(e); }
         /*
@@ -396,23 +416,25 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
         await util.timeout(250);
     }
 
-    log.methodDone(logMsg, 1, logPad, true);
+    log.methodDone(logMsg, 1, logPad);
 }
 
 
 async function buildFolderCaches(taskType: string, fileGlob: string, setCacheBuilding: boolean, logPad: string)
 {
+    log.methodStart("Workspace scan", 1, logPad);
     /* istanbul ignore else */
     if (workspace.workspaceFolders) // ensure workspace folders exist
     {
         for (const folder of workspace.workspaceFolders)
         {
-            await buildFolderCache(folder, taskType, fileGlob, setCacheBuilding, logPad);
+            await buildFolderCache(folder, taskType, fileGlob, setCacheBuilding, logPad + "   ");
             if (cancel) {
                 cancelInternal(setCacheBuilding);
             }
         }
     }
+    log.methodDone("Workspace scan", 1, logPad);
 }
 
 
@@ -488,6 +510,24 @@ function getStatusString(msg: string, statusLength: number)
 export const getTaskFiles = (taskType: string) =>
 {
     return filesCache.get(taskType) || new Set();
+};
+
+
+const getTaskFileCount = (taskType?: string) =>
+{
+    let count = 0;
+    filesCache.forEach((value, key) =>
+    {
+        if (!taskType || taskType === key) {
+            count += value.size;
+        }
+    });
+console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+console.log(count.toString());
+console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    return count;
 };
 
 
@@ -723,7 +763,7 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
 
 export async function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
 {
-    log.methodStart("remove workspace folder", 1, logPad, true);
+    log.methodStart("remove workspace folder", 1, logPad);
     for (const f of wsf)
     {   /* istanbul ignore next */
         log.value("   workspace folder", f.name, 1, logPad);
@@ -746,7 +786,7 @@ export async function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = 
         /* istanbul ignore next */
         log.write("   workspace folder removed", 1, logPad);
     }
-    log.methodDone("remove workspace folder", 1, logPad, true);
+    log.methodDone("remove workspace folder", 1, logPad);
 }
 
 

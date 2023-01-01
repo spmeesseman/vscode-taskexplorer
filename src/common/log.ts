@@ -3,8 +3,7 @@
 import { configuration } from "./configuration";
 import { OutputChannel, ExtensionContext, commands, window } from "vscode";
 import { writeFileSync } from "fs";
-import { isArray, isObject, isString } from "./utils";
-import G = require("glob");
+import { isArray, isError, isObject, isString } from "./utils";
 
 
 // export enum LogColor
@@ -19,8 +18,7 @@ import G = require("glob");
 //     white = "\\u001b[37m"
 // }
 
-
-const logValueWhiteSpace = 40;
+const logValueWhiteSpace = 45;
 let writeToConsole = false;
 let writeToConsoleLevel = 2;
 let writeToFile = false;
@@ -49,32 +47,47 @@ function writeError(e: Error)
 }
 
 
-export function error(msg: string | (string|Error)[] | Error, params?: (string|any)[][])
+export function error(msg: any, params?: (string|any)[][])
 {
-    write("✘");
-    if (typeof msg === "string") {
-        write("✘ " + msg);
-    }
-    else if (msg instanceof Error) {
-        writeError(msg);
-    }
-    else {
-        msg.forEach((m: string | Error) => {
-            if (m instanceof Error) {
-                writeError(m);
+    if (msg)
+    {
+        write("✘");
+        const _writeErr = (err: any) =>
+        {
+            if (isString(err)) {
+                write("✘ " + err);
+            }
+            else if (isError(err)) {
+                writeError(err);
+            }
+            else if (isArray(err)) {
+                err.forEach((m: any) => _writeErr(m));
+            }
+            else if (isObject(err)) {
+                writeError(err);
+                if (err.message) {
+                    writeError(err.message);
+                }
+                if (err.messageX) {
+                    writeError(err.messageX);
+                }
+                if (err.messageX) {
+                    writeError(err.messageX);
+                }
             }
             else {
-                write("✘ " + m);
+                writeError(err.toString());
             }
-        });
-    }
-    if (params)
-    {
-        for (const [ n, v, l ] of params) {
-            value("✘   " + n, v);
+        };
+        _writeErr(msg);
+        if (params)
+        {
+            for (const [ n, v, l ] of params) {
+                value("✘   " + n, v);
+            }
         }
+        write("✘");
     }
-    write("✘");
 }
 
 
@@ -148,7 +161,7 @@ export function value(msg: string, value: any, level?: number, logPad = "")
     {
         let logMsg = msg,
             valuePad = "";
-        const spaces = msg && msg.length ? msg.length : (value === undefined ? 9 : 4);
+        const spaces = msg && msg.length ? msg.length + logPad.length : (value === undefined ? 9 : 4);
         for (let i = spaces; i < logValueWhiteSpace; i++) {
             valuePad += " ";
         }

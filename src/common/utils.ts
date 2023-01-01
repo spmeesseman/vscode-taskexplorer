@@ -312,7 +312,7 @@ export function getUserDataPath(platform?: string, padding = "")
 {
     let userPath: string | undefined = "";
 
-    log.write(padding + "get user data path", 1);
+    log.write(padding + "get user data path", 4);
     logUserDataEnv(padding + "   ");
     //
     // Check if data path was passed on the command line
@@ -397,6 +397,12 @@ export function isArray<T>(value: any): value is T[]
 }
 
 
+export function isError(e: any): e is Error
+{
+    return e instanceof Error;
+}
+
+
 // export function isBoolean(value: any): value is boolean
 // {
 //     return !!value && typeof value === "boolean";
@@ -438,7 +444,7 @@ export function isObject(value: any)
 
 export function isScriptType(source: string)
 {
-    return getScriptTaskTypes().includes(source);
+    return source === "script" || getScriptTaskTypes().includes(source);
 }
 
 

@@ -80,9 +80,9 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     };
 
 
-    public createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task | undefined
+    public createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined
     {
-        log.methodStart("create script task", 2, "   ", false, [[ "target", target ], [ "cmd", cmd ], [ "path", uri.fsPath ]]);
+        log.methodStart("create script task", 2, logPad, false, [[ "target", target ], [ "cmd", cmd ], [ "path", uri.fsPath ]]);
 
         const extension = target.toLowerCase(),
               scriptDef = this.scriptTable[extension],
@@ -196,7 +196,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         const problemMatcher = "$msCompile";
 
 
-        log.methodDone("create script task", 2, "   ");
+        log.methodDone("create script task", 2, logPad);
         //
         // Create the shell execution object and task
         //
@@ -268,7 +268,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
               visitedFiles: string[] = [],
               scriptTypes = util.getScriptTaskTypes();
 
-        log.methodStart(`detect ${this.providerName} type task files`, 1, logPad, true);
+        log.methodStart(`read ${this.providerName} task files`, 1, logPad);
 
         for (const taskType of scriptTypes)
         {
@@ -276,13 +276,13 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
                   enabled = util.isTaskTypeEnabled(taskType);
             if (enabled && paths)
             {
-                log.write("   detect script type " + taskType, 1, logPad);
+                log.write("   detect script type " + taskType, 2, logPad);
                 for (const fObj of paths)
                 {
                     if (!util.isExcluded(fObj.uri.path) && !visitedFiles.includes(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
                     {
                         visitedFiles.push(fObj.uri.fsPath);
-                        const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri);
+                        const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri, undefined, logPad + "   ");
                         /* istanbul ignore else */
                         if (task)
                         {
@@ -295,7 +295,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             }
         }
 
-        log.methodDone(`detect ${this.providerName} files`, 1, logPad, true, [[ "# of tasks", allTasks.length ]]);
+        log.methodDone(`read ${this.providerName} task files`, 1, logPad, false, [[ "# of tasks", allTasks.length ]]);
         return allTasks;
     }
 
@@ -303,9 +303,9 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
-        log.methodStart("read script file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
-        const task = this.createTask(path.extname(uri.fsPath).substring(1), undefined, folder, uri);
-        log.methodDone("read script file uri task", 1, logPad, true);
+        log.methodStart("read script file uri task", 1, logPad, false, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+        const task = this.createTask(path.extname(uri.fsPath).substring(1), undefined, folder, uri, undefined, logPad + "   ");
+        log.methodDone("read script file uri task", 1, logPad);
         /* istanbul ignore next */
         return task ? [ task ] : [];
     }

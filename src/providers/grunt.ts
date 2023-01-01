@@ -29,7 +29,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     {
         const scripts: string[] = [];
 
-        log.methodStart("find grunt targets", 1, logPad, true, [[ "path", fsPath ]]);
+        log.methodStart("find grunt targets", 2, logPad, false, [[ "path", fsPath ]]);
 
         const contents = util.readFileSync(fsPath);
         let idx = 0;
@@ -90,7 +90,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
             eol = contents.indexOf("\n", idx);
         }
 
-        log.methodDone("find grunt targets", 1, logPad, true);
+        log.methodDone("find grunt targets", 2, logPad);
 
         return scripts;
     }
@@ -126,7 +126,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read grunt file uri task", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+        log.methodStart("read grunt file uri task", 1, logPad, false, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
 
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
@@ -136,7 +136,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
             result.push(task);
         }
 
-        log.methodDone("read grunt file uri tasks", 1, logPad, true);
+        log.methodDone("read grunt file uri tasks", 1, logPad);
         return result;
     }
 

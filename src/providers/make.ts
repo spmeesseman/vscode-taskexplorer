@@ -40,7 +40,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad = ""): Task
     {
-        log.methodStart("create make task", 4, logPad, true, [[ "target", target ], [ "cmd", cmd ]]);
+        log.methodStart("create make task", 4, logPad, false, [[ "target", target ], [ "cmd", cmd ]]);
 
         const getCommand = (): string =>
         {
@@ -73,7 +73,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         /* istanbul ignore next */
         const problemMatcher = extensions.getExtension("ms-vscode.cpptools") ? "$gcc" : "$gccte";
 
-        log.methodDone("create make task", 4, logPad, true);
+        log.methodDone("create make task", 4, logPad);
         return new Task(kind, folder, target, "make", execution, problemMatcher);
     }
 
@@ -112,7 +112,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     private findTargets(fsPath: string, logPad: string): string[]
     {
         const scripts: string[] = [];
-        log.methodStart("find makefile targets", 1, logPad, true, [[ "path", fsPath ]]);
+        log.methodStart("find makefile targets", 2, logPad, false, [[ "path", fsPath ]]);
 
         const contents = util.readFileSync(fsPath);
         let match;
@@ -128,13 +128,13 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             {   /* istanbul ignore else */
                 if (this.isNormalTarget(tgtName)) {
                     scripts.push(tgtName);
-                    log.write(logPad + "   found makefile target");
-                    log.value(logPad + "      name", tgtName);
+                    log.write("   found makefile target", 3, logPad);
+                    log.value("      name", tgtName, 3, logPad);
                 }
             }
         }
 
-        log.methodDone("find makefile targets", 1, logPad, true);
+        log.methodDone("find makefile targets", 2, logPad);
         return scripts;
     }
 
@@ -181,7 +181,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read make file uri tasks", 1, logPad, true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
+        log.methodStart("read make file uri tasks", 1, logPad, false, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
         const scripts = this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
         {
