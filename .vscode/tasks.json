@@ -29,9 +29,9 @@
             ],
             "background": {
                 "activeOnStart": true,
-                // Webpack 
-                "beginsPattern": "Compilation \\w+ starting…",
-                "endsPattern": "Compilation\\s+finished"
+                // Webpack watch output, or we hang
+                "beginsPattern": "Entrypoint\\s+extension",
+                "endsPattern": "compiled\\s+successfully\\s+in\\s+[0-9]+\\s+ms"
             }
         },
         "isBackground": true,

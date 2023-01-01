@@ -27,7 +27,6 @@ import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
 import { Disposable, ExtensionContext, tasks, commands } from "vscode";
-import { views } from "./views";
 
 
 const isLicenseManagerActive = true;

@@ -10,7 +10,6 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "npm: watch",
             "outFiles": [
@@ -27,7 +26,6 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "npm: watch",
             "outFiles": [
@@ -45,7 +43,6 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "npm: watch",
             "outFiles": [
@@ -63,7 +60,6 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "npm: watch",
             "outFiles": [
@@ -81,14 +77,16 @@
 			"request": "launch",
 			"name": "Launch (Webpack)(TestFixture Root)",
 			"runtimeExecutable": "${execPath}",
-			"outFiles": ["${workspaceRoot}/dist/client/**/*.js"],
-			"stopOnEntry": false,
+			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
             "sourceMaps": true,
+            "stopOnEntry": false,
+            "autoAttachChildProcesses": true,
 			"preLaunchTask": "npm: webpack-watch",
+            "cwd": "${workspaceFolder}/dist",
 			"args": [
 				"--disable-extensions",
                 "--disable-workspace-trust",
-				"--extensionDevelopmentPath=${workspaceRoot}",
+				"--extensionDevelopmentPath=${workspaceFolder}",
 				"${workspaceFolder}/test-files"
 			]
 		},
@@ -97,7 +95,6 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "npm: test:before",
             "postDebugTask": "npm: test:after",

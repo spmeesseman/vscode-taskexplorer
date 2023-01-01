@@ -75,8 +75,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         subscriptions.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit"); }, this));
         subscriptions.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
         subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem | string) => { await this.addToExcludes(taskFile); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", async (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
-        subscriptions.push(commands.registerCommand(name + ".addRemoveCustomLabel", async (taskItem: TaskItem) => this.addRemoveSpecialLabel(taskItem), this));
+        subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
+        subscriptions.push(commands.registerCommand(name + ".addRemoveCustomLabel", (taskItem: TaskItem) => this.addRemoveSpecialLabel(taskItem), this));
         subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
 
         tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e));

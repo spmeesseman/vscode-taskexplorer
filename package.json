@@ -89,12 +89,14 @@
         "test:before": "npm run rebuild_test && npm run coverage-full_on",
         "test:openreport": "npm run coverage-open_report",
         "watch": "tsc -watch -p ./",
-        "webpack-watch": "webpack -w --info-verbosity verbose --mode development --config ./webpack.config.js",
+        "webpack-watch": "webpack -w --env environment=dev --config ./webpack.config.js",
         "webpack-build": "npm run webpack-build:extension",
         "webpack-rebuild": "rimraf dist && npm run webpack-build:extension",
         "webpack-rebuild:extension": "rimraf dist && npm run webpack-build:extension --config ./webpack.config.js",
         "webpack-build:extension": "webpack --mode production --config ./webpack.config.js",
-        "webpack-build:test": "webpack --mode production --config ./webpack.config.test.js"
+        "webpack-build:dev": "webpack --env environment=dev --config ./webpack.config.js",
+        "webpack-rebuild:dev": "rimraf dist && npm run webpack-build:dev --config ./webpack.config.js",
+        "webpack-build:test": "webpack --env environment=test --config ./webpack.config.test.js"
     },
     "dependencies": {
         "@sgarciac/bombadil": "^2.3.0",
