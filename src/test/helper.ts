@@ -6,7 +6,7 @@ import * as assert from "assert";
 import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
 import { testControl } from "./control";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ExplorerApi, TaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../lib/utils/configuration";
 import { commands, extensions, tasks, window, workspace } from "vscode";
 
@@ -181,18 +181,18 @@ export function executeTeCommand2(command: string, args: any[], minWait?: number
 }
 
 
-export function findIdInTaskMap(id: string, taskMap: Map<string, TaskItem>)
+export function findIdInTaskMap(id: string, taskMap: TaskMap)
 {
     let found = 0;
-    for (const [ k, task ] of taskMap)
+    Object.values(taskMap).forEach((taskItem) =>
     {
-        if (task.id?.includes(id) && !task.isUser) {
-            if (task.id === ":ant") {
-                console.error("ant: " + task.resourceUri?.fsPath);
+        if (taskItem.id?.includes(id) && !taskItem.isUser) {
+            if (taskItem.id === ":ant") {
+                console.error("ant: " + taskItem.resourceUri?.fsPath);
             }
             found++;
         }
-    }
+    });
     return found;
 }
 
@@ -203,7 +203,7 @@ export async function getTreeTasks(taskType: string, expectedCount: number)
     //
     // Get the task mapped tree items
     //
-    const taskMap = await teApi.explorer?.getTaskItems(undefined, "   ") as unknown as Map<string, TaskItem>;
+    const taskMap = await (teApi.explorer as ExplorerApi).getTaskItems(undefined, "   ");
     //
     // Make sure the tasks have been mapped in the explorer tree
     // There should be one less task as the VSCode enginereturned above as the Explorer
@@ -216,12 +216,12 @@ export async function getTreeTasks(taskType: string, expectedCount: number)
     //
     // Get the NPM tasks from the tree mappings
     //
-    for (const map of taskMap)
+    Object.values(taskMap).forEach((taskItem) =>
     {
-        if (map[1] && map[1].taskSource === taskType) {
-            taskItems.push(map[1]);
+        if (taskItem.taskSource === taskType) {
+            taskItems.push(taskItem);
         }
-    }
+    });
     return taskItems;
 }
 
@@ -334,9 +334,9 @@ export async function verifyTaskCount(taskType: string, expectedCount: number, s
 }
 
 
-export async function verifyTaskCountByTree(taskType: string, expectedCount: number, taskMap?: Map<string, TaskItem>)
+export async function verifyTaskCountByTree(taskType: string, expectedCount: number, taskMap?: TaskMap)
 {
-    const tasksMap = (taskMap || (await teApi.explorer?.getTaskItems(undefined, "   "))) as Map<string, TaskItem>,
+    const tasksMap = (taskMap || (await teApi.explorer?.getTaskItems(undefined, "   "))) as TaskMap,
             taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
     assert(taskCount === expectedCount, `Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 }
