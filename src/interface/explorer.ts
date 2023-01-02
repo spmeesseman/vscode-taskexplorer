@@ -5,13 +5,16 @@ import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import TaskItem from "../tree/item";
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type TaskMap = { [id: string]: TaskItem };
+
 export interface ExplorerApi
 {
     buildTaskTree(tasksList: Task[], logPad: string, logLevel: number): Promise<TaskFolder[] | NoScripts[]>;
     getChildren(element?: TreeItem, logPad?: string, logLevel?: number): Promise<TreeItem[]>;
     getParent(element: TreeItem): TreeItem | null;
     getTasks(): Task[] | null;
-    getTaskItems(taskId: string | undefined, logPad?: string, executeOpenForTests?: boolean, logLevel?: number): Promise<Map<string, TaskItem> | TaskItem | undefined>;
+    getTaskItems(taskId: string | undefined, logPad?: string, executeOpenForTests?: boolean, logLevel?: number): Promise<TaskMap>;
     getTreeItem(element: TaskItem | TaskFile | TaskFolder): TreeItem;
     isBusy (): boolean;
     isVisible(): boolean;

@@ -25,7 +25,7 @@ import {
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
     ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution
 } from "vscode";
-import { ExplorerApi } from "../interface/explorer";
+import { ExplorerApi, TaskMap } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
 
 
@@ -1205,6 +1205,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
     }
 
 
+    public async getTaskItem(taskId: string, logPad = "", logLevel = 1): Promise<TaskItem | undefined>
+    {
+        log.methodStart("Get task item from tree", logLevel, logPad, false, [[ "task id", taskId ?? "all tasks" ]]);
+        const taskItems = await this.getTaskItems(taskId, logPad + "   ", false, logLevel);
+        log.methodDone("Get task item(s) from tree", logLevel, logPad);
+        return taskItems[taskId];
+    }
+
+
     /**
      * @method getTaskItems
      *
@@ -1214,15 +1223,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      * @param executeOpenForTests For running mocha tests only.
      */
-    public async getTaskItems(taskId: string | undefined, logPad = "", executeOpenForTests = false, logLevel = 1): Promise<Map<string, TaskItem> | TaskItem | undefined>
+    public async getTaskItems(taskId: string | undefined, logPad = "", executeOpenForTests = false, logLevel = 1): Promise<TaskMap>
     {
         const me = this;
-        const taskMap: Map<string, TaskItem> = new Map();
+        const taskMap: { [id: string]:  TaskItem } = {};
         let done = false;
 
-        log.methodStart("Get task item(s) from tree", logLevel, logPad, false, [
-            [ "task id", taskId ?? "all tasks" ], [ "execute open", executeOpenForTests ]
-        ]);
+        log.methodStart("Get task items from tree", logLevel, logPad, false, [[ "execute open", executeOpenForTests ]]);
 
         const treeItems = await me.getChildren(undefined, "   ", logLevel + 1);
         if (!treeItems || treeItems.length === 0)
@@ -1230,7 +1237,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
             window.showInformationMessage("No tasks found!");
             await storage.update(constants.FAV_TASKS_STORE, []);
             await storage.update(constants.LAST_TASKS_STORE, []);
-            return;
+            return taskMap;
         }
 
         const processItem2g = async (pItem2: TaskFile) =>
@@ -1303,7 +1310,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                             log.value(logPad + "        id", item3.id, logLevel + 2);
                             log.value(logPad + "        type", item3.taskSource + " @ " + tPath, logLevel + 2);
                             if (item3.id) {
-                                taskMap.set(item3.id, item3);
+                                taskMap[item3.id] = item3;
                                 if (taskId && taskId === item3.id) {
                                     done = true;
                                 }
@@ -1369,12 +1376,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
         }
 
         log.methodDone("Get task item(s) from tree", logLevel, logPad, false, [
-            [ "# of items found", taskMap.keys.length ]
+            [ "# of items found", Object.keys(taskMap).length ]
         ]);
 
-        if (taskId) {
-            return taskMap.get(taskId);
-        }
         return taskMap;
     }
 
@@ -2570,7 +2574,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 // Show status bar message (if ON in settings)
                 //
                 this.showStatusMessage(task);
-                const taskItem = await this.getTaskItems(taskId) as TaskItem;
+                const taskItem = await this.getTaskItem(taskId, "   ", 3) as TaskItem;
                 this.fireTaskChangeEvents(taskItem, "   ", 1);
                 log.methodDone("task started event", 1);
             }
@@ -2607,7 +2611,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, Explore
                 // Hide status bar message (if ON in settings)
                 //
                 this.showStatusMessage(task);
-                const taskItem = await this.getTaskItems(taskId, "   ", false, 2) as TaskItem;
+                const taskItem = await this.getTaskItem(taskId, "   ", 3) as TaskItem;
                 this.fireTaskChangeEvents(taskItem, "   ", 1);
                 log.methodDone("task finished event", 1);
             }
