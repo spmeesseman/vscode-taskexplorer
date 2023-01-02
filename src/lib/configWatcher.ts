@@ -251,7 +251,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
     {
-        registerExplorer("taskExplorer", ctx, configuration.get<boolean>("enableSideBar"), teApi);
+        registerExplorer("taskExplorer", ctx, configuration.get<boolean>("enableExplorerView"), teApi);
     }
     if (e.affectsConfiguration("taskExplorer.enableSideBar"))
     {
