@@ -430,7 +430,7 @@ export function isArray<T>(value: any): value is T[]
 
 export function isBoolean(value: any): value is boolean
 {
-    return !!value && typeof value === "boolean";
+    return (value === false || value === true) && typeof value === "boolean";
 }
 
 
@@ -496,7 +496,7 @@ export function isSpecial(taskItem: TaskItem)
 
 export function isString(value: any, notEmpty = false): value is string
 {
-    return (!!value || (value === "" && !notEmpty)) && value instanceof String || typeof value === "string";
+    return (!!value || (value === "" && !notEmpty)) && (value instanceof String || typeof value === "string");
 }
 
 

@@ -3,10 +3,10 @@
 
 import * as assert from "assert";
 import { Uri } from "vscode";
-import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {  activate, closeActiveDocument, isReady, executeTeCommand, testsControl } from "../helper";
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let explorer: ExplorerApi;
 
 

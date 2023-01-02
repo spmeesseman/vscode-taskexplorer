@@ -11,13 +11,13 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { configuration } from "../../lib/utils/configuration";
 import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ComposerTaskProvider } from "../../providers/composer";
 import { readFileAsync } from "../../lib/utils/fs";
 
 const testsName = "composer";
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let pathToProgram: string;
 let dirName: string;
 let fileUri: Uri;

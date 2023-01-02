@@ -11,13 +11,13 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { configuration } from "../../lib/utils/configuration";
 import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
 
 
 const testsName = "maven";
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let explorer: ExplorerApi;
 let pathToProgram: string;
 let rootPath: string;

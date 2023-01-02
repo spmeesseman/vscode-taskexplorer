@@ -3,13 +3,13 @@
 /* tslint:disable */
 
 import * as assert from "assert";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../lib/utils/configuration";
 import { activate, executeSettingsUpdate, isReady, verifyTaskCountByTree } from "../helper";
 
 const testsName = "Workspace";
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let wsEnable: boolean;
 
 

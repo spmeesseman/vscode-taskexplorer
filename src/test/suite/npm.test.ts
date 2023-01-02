@@ -6,14 +6,14 @@ import * as assert from "assert";
 import * as fs from "fs";
 import TaskItem from "../../tree/item";
 import { getPackageManager } from "../../lib/utils/utils";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeTeCommand2, getTreeTasks, getWsPath, isReady, overrideNextShowInputBox, testsControl, verifyTaskCount
 } from "../helper";
 
 const testsName = "npm";
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let packageJsonPath: string;
 let npmTaskItems: TaskItem[];
 

@@ -1,9 +1,9 @@
 
-import { ExplorerApi } from "./explorer";
+import { IExplorerApi } from "./explorer";
 
 export interface TaskExplorerTestsApi
 {
-    explorer: ExplorerApi | undefined;
+    explorer: IExplorerApi | undefined;
     fileCache: any; // for tests use only
     log: any;
 }

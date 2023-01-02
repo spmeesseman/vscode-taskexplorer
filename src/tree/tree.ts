@@ -25,7 +25,7 @@ import {
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
     ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution
 } from "vscode";
-import { ExplorerApi, TaskMap } from "../interface/explorer";
+import { IExplorerApi, TaskMap } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
 
 
@@ -34,7 +34,7 @@ import { enableConfigWatcher } from "../lib/configWatcher";
  *
  * Implements the VSCode TreeDataProvider API to build a tree of tasks to display within a view.
  */
-export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ExplorerApi
+export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplorerApi
 {
     private static statusBarSpace: StatusBarItem;
     private tasks: Task[] | null = null;

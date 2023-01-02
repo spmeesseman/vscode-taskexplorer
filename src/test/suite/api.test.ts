@@ -7,13 +7,13 @@
 //
 import * as assert from "assert";
 import { activate, executeTeCommand, isReady, verifyTaskCount } from "../helper";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ExternalTaskProvider } from "./externalTaskProvider";
 import { ExternalTaskProviderBase } from "./externalTaskProviderBase";
 
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let dispose: Disposable;
 let dispose2: Disposable;
 let taskProvider: ExternalTaskProvider;

@@ -9,7 +9,7 @@ import * as assert from "assert";
 import TaskItem from "../../tree/item";
 import { storage } from "../../lib/utils/storage";
 import constants from "../../lib/constants";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks,
     isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
@@ -17,7 +17,7 @@ import {
 
 let runCount = 0;
 let lastTask: TaskItem | null = null;
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let ant: TaskItem[];
 let bash: TaskItem[];
 let batch: TaskItem[];

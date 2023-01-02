@@ -6,12 +6,12 @@ import * as assert from "assert";
 import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
 import { testControl } from "./control";
-import { ExplorerApi, TaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, ITaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../lib/utils/configuration";
 import { commands, extensions, tasks, window, workspace } from "vscode";
 
 let activated = false;
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
 const overridesShowInputBox: any[] = [];
@@ -203,7 +203,7 @@ export async function getTreeTasks(taskType: string, expectedCount: number)
     //
     // Get the task mapped tree items
     //
-    const taskMap = await (teApi.explorer as ExplorerApi).getTaskItems(undefined, "   ");
+    const taskMap = await (teApi.explorer as IExplorerApi).getTaskItems(undefined, "   ");
     //
     // Make sure the tasks have been mapped in the explorer tree
     // There should be one less task as the VSCode enginereturned above as the Explorer

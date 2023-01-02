@@ -7,9 +7,9 @@ import { Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFo
 import { refreshTree } from "./refreshTree";
 import { isDirectory, numFilesInDirectory } from "./utils/fs";
 import { extname } from "path";
-import { TaskExplorerApi } from "../interface";
+import { ITaskExplorerApi } from "../interface";
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let processingFsEvent = false;
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
@@ -47,7 +47,7 @@ function logFileWatcherEvent(uri: Uri, type: string)
 }
 
 
-export async function registerFileWatchers(context: ExtensionContext, api: TaskExplorerApi)
+export async function registerFileWatchers(context: ExtensionContext, api: ITaskExplorerApi)
 {   
     teApi = api;
     //

@@ -7,9 +7,9 @@ import { ExtensionContext, ConfigurationChangeEvent, commands, workspace } from 
 import { registerFileWatcher } from "./fileWatcher";
 import { refreshTree } from "./refreshTree";
 import { registerExplorer } from "./registerExplorer";
-import { TaskExplorerApi } from "../interface";
+import { ITaskExplorerApi } from "../interface";
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let watcherEnabled = true;
 let processingConfigEvent = false;
 const enabledTasks = configuration.get<any>("enabledTasks", {});
@@ -283,7 +283,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
 }
 
 
-export const registerConfigWatcher = (context: ExtensionContext, api: TaskExplorerApi) =>
+export const registerConfigWatcher = (context: ExtensionContext, api: ITaskExplorerApi) =>
 {
     teApi = api;
     const d = workspace.onDidChangeConfiguration(async e => {

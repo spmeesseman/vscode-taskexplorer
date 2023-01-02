@@ -7,7 +7,7 @@ import * as fs from "fs";
 import * as util from "../../lib/utils/utils";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
 
 const testsName = "ant";
@@ -18,7 +18,7 @@ const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
 const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let provider: AntTaskProvider;
 let rootWorkspace: WorkspaceFolder;
 let buildXmlFile: string;

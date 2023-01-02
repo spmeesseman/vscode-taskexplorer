@@ -20,7 +20,7 @@ import { initStorage, storage } from "./lib/utils/storage";
 import { isCachingBusy } from "./cache";
 import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";
-import { ExternalExplorerProvider, TaskExplorerApi } from "./interface";
+import { ExternalExplorerProvider, ITaskExplorerApi } from "./interface";
 import { LicenseManager } from "./lib/licenseManager";
 import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
@@ -31,13 +31,13 @@ import { Disposable, ExtensionContext, tasks, commands } from "vscode";
 
 const isLicenseManagerActive = true;
 
-export const teApi = {} as TaskExplorerApi;
+export const teApi = {} as ITaskExplorerApi;
 let licenseManager: ILicenseManager;
 export const providers: Map<string, TaskExplorerProvider> = new Map();
 export const providersExternal: Map<string, ExternalExplorerProvider> = new Map();
 
 
-export async function activate(context: ExtensionContext, disposables: Disposable[]): Promise<TaskExplorerApi>
+export async function activate(context: ExtensionContext, disposables: Disposable[]): Promise<ITaskExplorerApi>
 {
     log.initLog("taskExplorer", "Task Explorer", context);
     initStorage(context);

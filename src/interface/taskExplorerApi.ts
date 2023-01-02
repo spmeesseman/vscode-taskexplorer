@@ -1,18 +1,20 @@
 
 import { TreeItem, TreeView } from "vscode";
-import { ExplorerApi } from "./explorer";
+import { IConfigurationApi } from "./configurationApi";
+import { IExplorerApi } from "./explorer";
 import { ExternalExplorerProvider } from "./externalProvider";
 import { TaskExplorerTestsApi } from "./testsApi";
 // import { TaskExplorerProvider } from "../providers/provider";
 // import { TaskTreeDataProvider } from "../tree/tree";
 
-export interface TaskExplorerApi
+export interface ITaskExplorerApi
 {
+    config: IConfigurationApi;
     log: any;
     utilities: any;
-    explorer: ExplorerApi | undefined;
+    explorer: IExplorerApi | undefined;
     explorerView: TreeView<TreeItem> | undefined;
-    sidebar: ExplorerApi | undefined;
+    sidebar: IExplorerApi | undefined;
     sidebarView: TreeView<TreeItem> | undefined;
     providers: Map<string, any>;
     // explorer: TaskTreeDataProvider | undefined;

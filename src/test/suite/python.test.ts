@@ -11,12 +11,12 @@ import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../lib/utils/configuration";
 import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ScriptTaskProvider } from "../../providers/script";
 
 const testsName = "python";
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let pathToPython: string;
 let enablePython: boolean;
 let wsFolder: WorkspaceFolder;

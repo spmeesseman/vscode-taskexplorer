@@ -11,7 +11,7 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { configuration } from "../../lib/utils/configuration";
 import { activate, buildTree, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 
 
@@ -21,7 +21,7 @@ const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
 const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let explorer: ExplorerApi;
 let pathToProgram: string;
 let enableTaskType: boolean;

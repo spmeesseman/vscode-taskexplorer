@@ -8,12 +8,12 @@ import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "../../lib/utils/configuration";
 import { activate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { GulpTaskProvider } from "../../providers/gulp";
 
 const testsName = "gulp";
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let provider: GulpTaskProvider;
 let dirName: string;
 let fileUri: Uri;

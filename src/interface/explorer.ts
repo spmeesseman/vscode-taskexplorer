@@ -8,7 +8,7 @@ import TaskItem from "../tree/item";
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type TaskMap = { [id: string]: TaskItem };
 
-export interface ExplorerApi
+export interface IExplorerApi
 {
     buildTaskTree(tasksList: Task[], logPad: string, logLevel: number): Promise<TaskFolder[] | NoScripts[]>;
     getChildren(element?: TreeItem, logPad?: string, logLevel?: number): Promise<TreeItem[]>;

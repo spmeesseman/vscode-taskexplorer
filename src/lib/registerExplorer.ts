@@ -4,10 +4,10 @@ import * as log from "./utils/log";
 import { views } from "../views";
 import { TaskTreeDataProvider } from "../tree/tree";
 import { ExtensionContext, workspace, window } from "vscode";
-import { TaskExplorerApi } from "../interface";
+import { ITaskExplorerApi } from "../interface";
 
 
-export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext, enabled: boolean, teApi: TaskExplorerApi)
+export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext, enabled: boolean, teApi: ITaskExplorerApi)
 {
     let view = views.get(name);
     log.write("Register explorer view / tree provider '" + name + "'", 1, "   ");

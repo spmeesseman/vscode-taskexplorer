@@ -9,14 +9,14 @@ import { workspace, WorkspaceFolder } from "vscode";
 import { activate, isReady, testsControl } from "../helper";
 import { storage } from "../../lib/utils/storage";
 import { configuration } from "../../lib/utils/configuration";
-import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { numFilesInDirectory } from "../../lib/utils/fs";
 import { join } from "path";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
 
-let teApi: TaskExplorerApi;
+let teApi: ITaskExplorerApi;
 let rootPath: string;
 
 

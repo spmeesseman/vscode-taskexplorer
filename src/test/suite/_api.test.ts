@@ -3,14 +3,14 @@
 
 import * as assert from "assert";
 import { configuration } from "../../lib/utils/configuration";
-import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeSettingsUpdate, executeTeCommand, isReady, testsControl } from "../helper";
 import { refreshTree } from "../../lib/refreshTree";
 import { getInstallPath, isBoolean, isObject, isString } from "../../lib/utils/utils";
 import { enableConfigWatcher } from "../../lib/configWatcher";
 
-let teApi: TaskExplorerApi;
-let explorer: ExplorerApi;
+let teApi: ITaskExplorerApi;
+let explorer: IExplorerApi;
 
 
 suite("API Init and Tests", () =>
@@ -26,9 +26,11 @@ suite("API Init and Tests", () =>
         await executeSettingsUpdate("debug", true);
     });
 
+
     suiteTeardown(async function()
     {
         await executeSettingsUpdate("debug", testsControl.writeToOutput || testsControl.writeToConsole);
+        enableConfigWatcher(true); // in case misc test fails after setting to `false`.
     });
 
 
@@ -71,7 +73,7 @@ suite("API Init and Tests", () =>
     });
 
 
-    test("Enabled SideBar View", async function()
+    test("Enable SideBar View", async function()
     {
         await executeSettingsUpdate("enableSideBar", true);
     });

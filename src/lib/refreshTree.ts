@@ -1,9 +1,9 @@
 import { Uri } from "vscode";
 import { isExcluded } from "./utils/utils";
-import { TaskExplorerApi } from "../interface";
+import { ITaskExplorerApi } from "../interface";
 
 
-export async function refreshTree(teApi: TaskExplorerApi, taskType?: string, uri?: Uri, logPad?: string)
+export async function refreshTree(teApi: ITaskExplorerApi, taskType?: string, uri?: Uri, logPad?: string)
 {
     //
     // If this request is from a filesystem event for a file that exists in an ignored path,
