@@ -93,7 +93,7 @@ suite("Configuration / Settings Tests", () =>
         v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
         assert(util.isBoolean(v) && v === true);
         cv.lastTasks = cv2;
-        await teApi.config.updateWs("specialFolders.expanded", cv2);
+        await teApi.config.updateWs("specialFolders.expanded.lastTasks", cv2);
         v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
         assert(util.isBoolean(v) && v === cv2);
         //

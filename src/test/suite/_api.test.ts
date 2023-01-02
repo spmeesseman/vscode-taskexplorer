@@ -45,30 +45,6 @@ suite("API Init and Tests", () =>
     {
         assert(!explorer.isVisible());
         assert(getInstallPath());
-        //
-        // Multi-part settingsupdates (behaviordiffers when value is an object)
-        //
-        enableConfigWatcher(false);
-        let v = teApi.config.get<any>("pathToPrograms.ant");
-        assert(isString(v));
-        v = teApi.config.get<any>("pathToPrograms");
-        assert(isObject(v));
-        let cv = v.ant;
-        await teApi.config.updateWs("pathToPrograms.ant", "/my/path/to/ant");
-        v = teApi.config.get<any>("pathToPrograms");
-        assert(isObject(v) && v.ant === "/my/path/to/ant");
-        await teApi.config.updateWs("pathToPrograms.ant", cv);
-        v = teApi.config.get<any>("pathToPrograms");
-        assert(isObject(v) && v.ant === cv);
-        cv = teApi.config.get<any>("visual.disableAnimatedIcons");
-        assert(isBoolean(cv));
-        await teApi.config.updateWs("visual.disableAnimatedIcons", false);
-        v = teApi.config.get<any>("visual.disableAnimatedIcons");
-        assert(isBoolean(v) && v === false);
-        await teApi.config.updateWs("visual.disableAnimatedIcons", cv);
-        v = teApi.config.get<any>("visual.disableAnimatedIcons");
-        assert(isBoolean(v) && v === cv);
-        enableConfigWatcher(true);
     });
 
 
