@@ -4,18 +4,18 @@
 
 import * as assert from "assert";
 import { sortFolders } from "../../lib/sortTasks";
-import * as util from "../../common/utils";
+import * as util from "../../lib/utils/utils";
 import TaskFolder from "../../tree/folder";
 import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import constants from "../../common/constants";
-import { storage } from "../../common/storage";
+import { NoScripts } from "@spmeesseman/vscode-taskexplorer-types/lib/lib/noScripts";
+import constants from "../../lib/constants";
+import { storage } from "../../lib/utils/storage";
 import TaskItem from "../../tree/item";
-import { TreeItem, TreeItemCollapsibleState } from "vscode";
+import { TreeItem } from "vscode";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks,
     isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
 } from "../helper";
-import { NoScripts } from "@spmeesseman/vscode-taskexplorer-types/lib/lib/noScripts";
 
 
 let teApi: TaskExplorerApi;

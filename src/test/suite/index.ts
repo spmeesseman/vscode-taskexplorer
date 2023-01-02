@@ -6,7 +6,6 @@ import * as glob from "glob";
 import * as path from "path";
 import * as Mocha from "mocha";
 const NYC = require("nyc");
-const { colors } = require("mocha/lib/reporters/base");
 
 //
 // Simulates the recommended config option

@@ -10,9 +10,9 @@ import * as path from "path";
 import { activate, getWsPath, isReady } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MakeTaskProvider } from "../../providers/make";
-import { readFileSync } from "../../common/utils";
+import { readFileSync } from "../../lib/utils/utils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { configuration } from "../../common/configuration";
+import { configuration } from "../../lib/utils/configuration";
 
 
 let teApi: TaskExplorerApi;

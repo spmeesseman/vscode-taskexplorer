@@ -5,16 +5,13 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import TaskItem from "../../tree/item";
-import { getPackageManager } from "../../common/utils";
+import { getPackageManager } from "../../lib/utils/utils";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeTeCommand2, getTreeTasks, getWsPath, isReady, overrideNextShowInputBox, testsControl, verifyTaskCount
 } from "../helper";
 
-
 const testsName = "npm";
-const slowTimeForFsCreateEvent = testsControl.slowTimeForFsCreateEvent;
-const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 
 let teApi: TaskExplorerApi;
 let packageJsonPath: string;
@@ -48,7 +45,7 @@ suite("NPM Tests", () =>
 
     test("Create Package File (package.json)", async function()
     {
-        this.slow(slowTimeForFsCreateEvent);
+        this.slow(testsControl.slowTimeForFsCreateEvent);
         //
         // Create NPM package.json
         //
@@ -66,7 +63,7 @@ suite("NPM Tests", () =>
             "    }\r\n" +
             "}\r\n"
         );
-        await teApi.waitForIdle(waitTimeForFsNewEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
     });
 
 

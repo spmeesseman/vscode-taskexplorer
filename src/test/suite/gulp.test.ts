@@ -6,16 +6,12 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { configuration } from "../../common/configuration";
+import { configuration } from "../../lib/utils/configuration";
 import { activate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { GulpTaskProvider } from "../../providers/gulp";
 
 const testsName = "gulp";
-const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
-const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
-const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
-const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
 let provider: GulpTaskProvider;
@@ -85,7 +81,7 @@ suite("Gulp Tests", () =>
             "});\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsNewEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, 19);
     });
 
@@ -109,7 +105,7 @@ suite("Gulp Tests", () =>
             "});\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsModEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
         await verifyTaskCount(testsName, 20);
     });
 
@@ -125,7 +121,7 @@ suite("Gulp Tests", () =>
             "});\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsModEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
         await verifyTaskCount(testsName, 18);
     });
 
@@ -137,7 +133,7 @@ suite("Gulp Tests", () =>
             recursive: true
         });
 
-        await teApi.waitForIdle(waitTimeForFsDelEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, 17);
     });
 

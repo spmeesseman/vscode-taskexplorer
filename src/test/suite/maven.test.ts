@@ -9,23 +9,17 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { configuration } from "../../common/configuration";
+import { configuration } from "../../lib/utils/configuration";
 import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
 
 
 const testsName = "maven";
-const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
-const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
-const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
-const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
 let explorer: ExplorerApi;
 let pathToProgram: string;
-let enableTaskType: boolean;
-let dirName: string;
 let rootPath: string;
 let fileUri: Uri;
 
@@ -44,13 +38,11 @@ suite("Maven Tests", () =>
         }
         explorer = teApi.explorer;
         rootPath = getWsPath(".");
-        dirName = path.join(rootPath, "tasks_test_");
         fileUri = Uri.file(path.join(rootPath, "pom.xml"));
         //
         // Store / set initial settings
         //
         pathToProgram = configuration.get<string>(`pathToPrograms.${testsName}`);
-        enableTaskType = configuration.get<boolean>(`enabledTasks.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "java\\maven\\mvn.exe");
     });
 
@@ -81,7 +73,7 @@ suite("Maven Tests", () =>
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project>\n"
         );
-        await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent, 3000);
     });
 
 
@@ -133,7 +125,7 @@ suite("Maven Tests", () =>
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project\n"
         );
-        await teApi.waitForIdle(waitTimeForFsModEvent, 3000);
+        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent, 3000);
         await verifyTaskCount(testsName, 0);
     });
 
@@ -147,7 +139,7 @@ suite("Maven Tests", () =>
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project>\n"
         );
-        await teApi.waitForIdle(waitTimeForFsModEvent, 3000);
+        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent, 3000);
         await verifyTaskCount(testsName, 8);
     });
 
@@ -156,7 +148,7 @@ suite("Maven Tests", () =>
     {
         this.slow(testsControl.slowTimeForFsDeleteEvent);
         fs.unlinkSync(fileUri.fsPath);
-        await teApi.waitForIdle(waitTimeForFsDelEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, 0);
     });
 

@@ -9,8 +9,8 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { configuration } from "../../common/configuration";
-import { activate, buildTree, executeSettingsUpdate, executeTeCommand, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
+import { configuration } from "../../lib/utils/configuration";
+import { activate, buildTree, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 

@@ -3,17 +3,15 @@
 /* tslint:disable */
 
 import * as assert from "assert";
-import * as log from "../../common/log";
-import * as util from "../../common/utils";
+import * as log from "../../lib/utils/log";
+import * as util from "../../lib/utils/utils";
 import { workspace, WorkspaceFolder } from "vscode";
 import { activate, isReady, testsControl } from "../helper";
-import { storage } from "../../common/storage";
-import { getUserDataPath } from "../../common/utils";
-import { configuration } from "../../common/configuration";
+import { storage } from "../../lib/utils/storage";
+import { configuration } from "../../lib/utils/configuration";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { numFilesInDirectory } from "../../lib/utils/fs";
 import { join } from "path";
-
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
@@ -238,24 +236,24 @@ suite("Util Tests", () =>
 		// path get here for linux and mac for increased coverage since we're only
 		// running the tests in a windows machine for release right now with ap.
 		//
-		let dataPath: string | undefined = getUserDataPath("darwin");
-		dataPath = getUserDataPath("linux");
+		let dataPath: string | undefined = util.getUserDataPath("darwin");
+		dataPath = util.getUserDataPath("linux");
 
 		//
 		// Simulate --user-data-dir vscode command line option
 		//
 		const oArgv = process.argv;
 		process.argv = [ "--user-data-dir", dataPath ];
-		dataPath = getUserDataPath("linux");
-		dataPath = getUserDataPath("win32");
-		dataPath = getUserDataPath("darwin");
+		dataPath = util.getUserDataPath("linux");
+		dataPath = util.getUserDataPath("win32");
+		dataPath = util.getUserDataPath("darwin");
 
 		//
-		// 0 args, which would probably never happen but the getUserDataPath() call
+		// 0 args, which would probably never happen but the util.getUserDataPath() call
 		// handles it an ;et's cover it
 		//
 		process.argv = [];
-		dataPath = getUserDataPath("win32");
+		dataPath = util.getUserDataPath("win32");
 
 		//
 		// Save current environment
@@ -268,10 +266,10 @@ suite("Util Tests", () =>
 		//
 		// Set environment variables for specific test
 		//
-		process.env.VSCODE_PORTABLE = getUserDataPath("win32");
+		process.env.VSCODE_PORTABLE = util.getUserDataPath("win32");
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "test";
-		dataPath = getUserDataPath("win32");
+		dataPath = util.getUserDataPath("win32");
 		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\test\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
@@ -280,7 +278,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = dataPath;
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
-		dataPath = getUserDataPath("nothing");
+		dataPath = util.getUserDataPath("nothing");
 		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1`);
 		//
 		// Set environment variables for specific test
@@ -288,7 +286,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = undefined;
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
-		dataPath = getUserDataPath("win32");
+		dataPath = util.getUserDataPath("win32");
 		assert.strictEqual(dataPath, "C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
 		//
 		// Set environment variables for specific test
@@ -296,7 +294,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = "c:\\some\\invalid\\path";
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
-		dataPath = getUserDataPath("win32");
+		dataPath = util.getUserDataPath("win32");
 		assert.strictEqual(dataPath, "C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
 		//
 		// Set environment variables for specific test
@@ -304,7 +302,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
-		dataPath = getUserDataPath("win32");
+		dataPath = util.getUserDataPath("win32");
 		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
 		//
 		// Set environment variables for specific test
@@ -312,7 +310,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = "";
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
-		dataPath = getUserDataPath("win32");
+		dataPath = util.getUserDataPath("win32");
 		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
@@ -321,38 +319,38 @@ suite("Util Tests", () =>
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
 		process.env.VSCODE_APPDATA = "";
-		dataPath = getUserDataPath("linux");
+		dataPath = util.getUserDataPath("linux");
 		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\.config\\vscode`);
-		dataPath = getUserDataPath("win32");
+		dataPath = util.getUserDataPath("win32");
 		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode`);
-		dataPath = getUserDataPath("darwin");
+		dataPath = util.getUserDataPath("darwin");
 		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\Library\\Application Support\\vscode`);
-		dataPath = getUserDataPath("invalid_platform");
+		dataPath = util.getUserDataPath("invalid_platform");
 		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1`);
 		//
 		// Set environment variables for specific test
 		//
 		process.env.VSCODE_APPDATA = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
-		dataPath = getUserDataPath("linux");
+		dataPath = util.getUserDataPath("linux");
 		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
-		dataPath = getUserDataPath("win32");
+		dataPath = util.getUserDataPath("win32");
 		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
-		dataPath = getUserDataPath("darwin");
+		dataPath = util.getUserDataPath("darwin");
 		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
-		dataPath = getUserDataPath("invalid_platform");
+		dataPath = util.getUserDataPath("invalid_platform");
 		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
 		//
 		// Set portable / invalid platform
 		//
 		process.env.VSCODE_PORTABLE = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
-		dataPath = getUserDataPath("invalid_platform");
+		dataPath = util.getUserDataPath("invalid_platform");
 		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
 		//
 		// Empty platform
 		//
-		dataPath = getUserDataPath("");
+		dataPath = util.getUserDataPath("");
 		process.env.VSCODE_PORTABLE = "";
-		dataPath = getUserDataPath("");
+		dataPath = util.getUserDataPath("");
 		//
 		//
 		// Restore process argv

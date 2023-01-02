@@ -34,7 +34,7 @@ export class LicenseManager implements ILicenseManager
     }
 
 
-	async checkLicense(logPad: string)
+	async checkLicense(logPad = "   ")
 	{
 		const storedLicenseKey = this.getLicenseKey();
 		log.methodStart("Check license", 1, logPad, false, [["stored license key", storedLicenseKey]]);
@@ -48,7 +48,7 @@ export class LicenseManager implements ILicenseManager
 	}
 
 
-	async setTasks(components: Task[], logPad: string)
+	async setTasks(components: Task[], logPad = "   ")
 	{
 		let displayInfo = false, displayPopup = false;
 		const storedVersion = storage.get<string>("version");

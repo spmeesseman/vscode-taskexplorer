@@ -2,7 +2,7 @@ import { Task } from "vscode";
 
 export interface ILicenseManager
 {
-    checkLicense: (logPad: string) => Promise<void>;
+    checkLicense: (logPad?: string) => Promise<void>;
     enterLicenseKey: () => Promise<void>;
     getLicenseKey: () => string | undefined;
     getMaxNumberOfTasks: () => number;
@@ -11,5 +11,5 @@ export interface ILicenseManager
     getVersion: () => string;
     isLicensed: () => boolean;
     setLicenseKey: (licenseKey: string | undefined) => Promise<void>;
-    setTasks: (tasks: Task[], logPad: string) => Promise<void>;
+    setTasks: (tasks: Task[], logPad?: string) => Promise<void>;
 }

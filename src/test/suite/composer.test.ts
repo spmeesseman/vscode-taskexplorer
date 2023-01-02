@@ -9,22 +9,16 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { configuration } from "../../common/configuration";
+import { configuration } from "../../lib/utils/configuration";
 import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ComposerTaskProvider } from "../../providers/composer";
 import { readFileAsync } from "../../lib/utils/fs";
 
-
 const testsName = "composer";
-const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
-const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
-const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
-const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
 let pathToProgram: string;
-let enableTaskType: boolean;
 let dirName: string;
 let fileUri: Uri;
 
@@ -44,7 +38,6 @@ suite("Composer Tests", () =>
         // Store / set initial settings
         //
         pathToProgram = configuration.get<string>(`pathToPrograms.${testsName}`);
-        enableTaskType = configuration.get<boolean>(`enabledTasks.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "php\\composer.exe");
     });
 
@@ -119,7 +112,7 @@ suite("Composer Tests", () =>
             "}\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsNewEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, 5);
     });
 
@@ -143,7 +136,7 @@ suite("Composer Tests", () =>
             "}\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsModEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
         await verifyTaskCount(testsName, 6);
     });
 
@@ -165,7 +158,7 @@ suite("Composer Tests", () =>
             "}\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsModEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
         await verifyTaskCount(testsName, 4);
     });
 
@@ -185,7 +178,7 @@ suite("Composer Tests", () =>
             "\n"
         );
 
-        await teApi.waitForIdle(waitTimeForFsModEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
         await verifyTaskCount(testsName, 2);
     });
 
@@ -198,7 +191,7 @@ suite("Composer Tests", () =>
         fs.rmdirSync(dirName, {
             recursive: true
         });
-        await teApi.waitForIdle(waitTimeForFsDelEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, 2);
     });
 

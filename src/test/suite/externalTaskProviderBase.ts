@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as path from "path";
-import * as util from "../../common/utils";
-import constants from "../../common/constants";
+import * as util from "../../lib/utils/utils";
+import constants from "../../lib/constants";
 import { Task, WorkspaceFolder, ShellExecution, Uri } from "vscode";
 import { ExternalExplorerProvider, TaskExplorerDefinition } from "../../interface";
 

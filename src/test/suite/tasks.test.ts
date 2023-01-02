@@ -15,18 +15,19 @@ import {
     isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
 } from "../helper";
 
-const waitTimeMax = testsControl.waitTimeMax;
-const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
-const waitTimeForFsCreateEvent = testsControl.waitTimeForFsCreateEvent;
-const slowTimeForCommand = testsControl.slowTimeForCommand;
-const slowTimeForConfigEvent = testsControl.slowTimeForConfigEvent;
-const waitTimeForRunCommand = testsControl.waitTimeForRunCommand;
 let runCount = 0;
 let lastTask: TaskItem | null = null;
 let teApi: TaskExplorerApi;
 let ant: TaskItem[];
 let bash: TaskItem[];
 let batch: TaskItem[];
+
+const waitTimeMax = testsControl.waitTimeMax;
+const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
+const waitTimeForFsCreateEvent = testsControl.waitTimeForFsCreateEvent;
+const slowTimeForCommand = testsControl.slowTimeForCommand;
+const slowTimeForConfigEvent = testsControl.slowTimeForConfigEvent;
+const waitTimeForRunCommand = testsControl.waitTimeForRunCommand;
 
 
 suite("Task Tests", () =>

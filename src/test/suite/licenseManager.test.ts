@@ -3,7 +3,7 @@
 
 import * as assert from "assert";
 import { ILicenseManager } from "../../interface/licenseManager";
-import { storage } from "../../common/storage";
+import { storage } from "../../lib/utils/storage";
 import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
@@ -54,6 +54,7 @@ suite("License Manager Tests", () =>
 	{
 		licMgr = getLicenseManager();
 		tasks = teApi.explorer?.getTasks() || [];
+		await licMgr.setTasks(tasks, "");
 	});
 
 
@@ -71,7 +72,7 @@ suite("License Manager Tests", () =>
 		// 1111-2222-3333-4444-5555 for now.  When lic server is done, it will fail
 		//
 		this.slow(500);
-		await licMgr.initialize(tasks);
+		await licMgr.checkLicense();
 		await sleep(400);
 		await closeActiveDocument();
 	});
@@ -85,7 +86,7 @@ suite("License Manager Tests", () =>
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("1111-2222-3333-4444-5555");
 		await storage.update("version", undefined);
-		await licMgr.initialize(tasks);
+		await licMgr.checkLicense();
 		await sleep(400);
 		await closeActiveDocument();
 	});
@@ -97,7 +98,7 @@ suite("License Manager Tests", () =>
 		//
 		this.slow(500);
 		await storage.update("version", undefined);
-		await licMgr.initialize(tasks);
+		await licMgr.checkLicense();
 		await sleep(400);
 		await closeActiveDocument();
 	});
@@ -111,7 +112,7 @@ suite("License Manager Tests", () =>
 		// If license is set, diff info page
 		//
 		licMgr.setLicenseKey(licenseKey);
-		await licMgr.initialize(tasks);
+		await licMgr.checkLicense();
 		await sleep(400);
 		await closeActiveDocument();
 	});
@@ -124,7 +125,7 @@ suite("License Manager Tests", () =>
 			  version = licMgr.getVersion(); // will be set on ext. startup
 		//
 		await storage.update("version", version);
-		await licMgr.initialize(tasks);
+		await licMgr.checkLicense();
 		await sleep(400);
 		await closeActiveDocument();
 		//
@@ -142,7 +143,7 @@ suite("License Manager Tests", () =>
 			  version = licMgr.getVersion(); // will be set on ext. startup
 		//
 		await storage.update("version", version);
-		await licMgr.initialize(tasks);
+		await licMgr.checkLicense();
 		await sleep(400);
 		await closeActiveDocument();
 		//
@@ -171,7 +172,7 @@ suite("License Manager Tests", () =>
 		licMgr.setLicenseKey(undefined);
 		overrideNextShowInfoBox("Info");
 		overrideNextShowInfoBox("");
-		await licMgr.initialize(tasks);
+		await licMgr.checkLicense();
 		await sleep(400);
 		await closeActiveDocument();
 		licMgr.setLicenseKey(licenseKey);
@@ -184,7 +185,7 @@ suite("License Manager Tests", () =>
 		const licenseKey = licMgr.getLicenseKey(); // will be set on ext. startup
 		licMgr.setLicenseKey(undefined);
 		overrideNextShowInfoBox("Not Now");
-		await licMgr.initialize(tasks);
+		await licMgr.checkLicense();
 		await sleep(400);
 		await closeActiveDocument();
 		licMgr.setLicenseKey(licenseKey);
@@ -238,7 +239,7 @@ suite("License Manager Tests", () =>
 
 			// licMgr.setLicenseKey(undefined);
 			// await storage.update("version", undefined);
-			// await licMgr.initialize(tasks);
+			// await licMgr.checkLicense();
 			// await sleep(1000);
 			// await closeActiveDocument();
 			// licMgr.setLicenseKey(licenseKey);

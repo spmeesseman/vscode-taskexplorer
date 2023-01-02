@@ -9,9 +9,9 @@ import {  activate, closeActiveDocument, isReady, executeTeCommand, testsControl
 let teApi: TaskExplorerApi;
 let explorer: ExplorerApi;
 
+
 suite("Report Tests", () =>
 {
-
 	let projectUri: Uri;
 
 	suiteSetup(async function()

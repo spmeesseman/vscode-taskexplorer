@@ -9,16 +9,12 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { configuration } from "../../common/configuration";
-import { activate, executeSettingsUpdate, getWsPath, isReady, sleep, testsControl, verifyTaskCount } from "../helper";
+import { configuration } from "../../lib/utils/configuration";
+import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ScriptTaskProvider } from "../../providers/script";
 
 const testsName = "python";
-// const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
-const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent * 2;
-const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent * 2;
-const waitTimeForConfigEvent = Math.round(testsControl.waitTimeForConfigEvent * 1.5);
 
 let teApi: TaskExplorerApi;
 let pathToPython: string;
@@ -104,7 +100,7 @@ suite("Python Tests", () =>
             "#!/usr/local/bin/python\n" +
             "\n"
         );
-        await teApi.waitForIdle(waitTimeForFsNewEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
         await verifyTaskCount("script", 3, testsName);
     });
 
@@ -112,7 +108,7 @@ suite("Python Tests", () =>
     test("Delete File", async function()
     {
         fs.unlinkSync(fileUri.fsPath);
-        await teApi.waitForIdle(waitTimeForFsDelEvent * 2);
+        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
         await verifyTaskCount("script", 2, testsName);
         fs.rmdirSync(dirName, {
             recursive: true
@@ -130,7 +126,7 @@ suite("Python Tests", () =>
             "#!/usr/local/bin/python\n" +
             "\n"
         );
-        await teApi.waitForIdle(waitTimeForFsNewEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
         await verifyTaskCount("script", 3, testsName);
     });
 
@@ -141,7 +137,7 @@ suite("Python Tests", () =>
         fs.rmdirSync(dirName, {
             recursive: true
         });
-        await teApi.waitForIdle(waitTimeForFsDelEvent * 2);
+        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
         await verifyTaskCount("script", 2, testsName);
     });
 

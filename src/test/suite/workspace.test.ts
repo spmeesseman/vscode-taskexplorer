@@ -4,19 +4,13 @@
 
 import * as assert from "assert";
 import { TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { configuration } from "../../common/configuration";
-import TaskItem from "../../tree/item";
-import { activate, executeSettingsUpdate, findIdInTaskMap, isReady, verifyTaskCountByTree } from "../helper";
+import { configuration } from "../../lib/utils/configuration";
+import { activate, executeSettingsUpdate, isReady, verifyTaskCountByTree } from "../helper";
 
 const testsName = "Workspace";
-// const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
-// const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
-// const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
-// const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: TaskExplorerApi;
 let wsEnable: boolean;
-let taskMap: Map<string, TaskItem>;
 
 
 suite("Workspace / VSCode Tests", () =>

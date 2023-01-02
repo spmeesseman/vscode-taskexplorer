@@ -11,8 +11,8 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, buildTree, closeActiveDocument, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
-    getTreeTasks, getWsPath, isReady, testsControl, verifyTaskCount, verifyTaskCountByTree
+    activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
+    getTreeTasks, getWsPath, isReady, testsControl, verifyTaskCountByTree
 } from "../helper";
 
 

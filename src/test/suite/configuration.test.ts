@@ -3,9 +3,9 @@
 
 import * as assert from "assert";
 import * as vscode from "vscode";
-import * as util from "../../common/utils";
+import * as util from "../../lib/utils/utils";
 import { activate, executeSettingsUpdate, isReady, sleep, testsControl } from "../helper";
-import { configuration } from "../../common/configuration";
+import { configuration } from "../../lib/utils/configuration";
 import { teApi } from "../../extension";
 
 let autoRefresh: boolean;

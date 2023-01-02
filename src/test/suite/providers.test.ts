@@ -10,13 +10,13 @@ import * as fs from "fs";
 import * as path from "path";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
-import constants from "../../common/constants";
+import constants from "../../lib/constants";
 import { expect } from "chai";
 import { workspace, tasks, commands, Uri, WorkspaceFolder } from "vscode";
-import { removeFromArray } from "../../common/utils";
-import { TaskExplorerApi, ExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { configuration } from "../../common/configuration";
-import { storage } from "../../common/storage";
+import { removeFromArray } from "../../lib/utils/utils";
+import { TaskExplorerApi, ExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { configuration } from "../../lib/utils/configuration";
+import { storage } from "../../lib/utils/storage";
 import {
     activate, buildTree, executeSettingsUpdate, executeTeCommand, executeTeCommand2, findIdInTaskMap,
     getTreeTasks, getWsPath, isReady, sleep, testsControl, verifyTaskCount
@@ -37,7 +37,7 @@ let dirNameL2: string;
 let ws2DirName: string;
 let dirNameIgn: string;
 let batch: TaskItem[];
-let taskMap: Map<string, TaskItem>;
+let taskMap: TaskMap;
 
 
 suite("Provider Tests", () =>
@@ -327,7 +327,7 @@ suite("Provider Tests", () =>
         // The 3rd param `true` will open the task files and locate task positions while parsing the tree
         //
         this.slow(3000);
-        taskMap = await explorer.getTaskItems(undefined, "   ", true) as unknown as Map<string, TaskItem>;
+        taskMap = await explorer.getTaskItems(undefined, "   ", true) as TaskMap;
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10);
     });
 
@@ -345,18 +345,21 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForFetchTasksCommand + testsControl.slowTimeForCommand);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
-        for (const map of taskMap)
+        for (const property in taskMap)
         {
-            const value = map[1];
-            if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
+            if ({}.hasOwnProperty.call(taskMap, property))
             {
-                const node = value.taskFile.treeNodes.find(
-                    n => n instanceof TaskItem && n.task.name && n.task.name.includes("upload2")
-                ) as TaskItem;
-                if (node)
+                const value= taskMap[property];
+                if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
                 {
-                    await executeTeCommand("addToExcludes", waitTimeForConfigEvent, 3000, node);
-                    break;
+                    const node = value.taskFile.treeNodes.find(
+                        n => n instanceof TaskItem && n.task.name && n.task.name.includes("upload2")
+                    ) as TaskItem;
+                    if (node)
+                    {
+                        await executeTeCommand("addToExcludes", waitTimeForConfigEvent, 3000, node);
+                        break;
+                    }
                 }
             }
         }
@@ -369,18 +372,21 @@ suite("Provider Tests", () =>
         this.slow(1000);
         const taskItems = await tasks.fetchTasks({ type: "script" }),
               scriptCt = taskItems.length;
-        for (const map of taskMap)
+        for (const property in taskMap)
         {
-            const value = map[1];
-            if (value && value.taskSource === "batch" && value.taskFile.fileName.toLowerCase().includes("test2.bat"))
+            if ({}.hasOwnProperty.call(taskMap, property))
             {
-                const node = value.taskFile.treeNodes.find(
-                    n => n instanceof TaskItem && n.task.name && n.task.name.toLowerCase().includes("test2.bat")
-                ) as TaskItem;
-                if (node)
+                const value= taskMap[property];
+                if (value && value.taskSource === "batch" && value.taskFile.fileName.toLowerCase().includes("test2.bat"))
                 {
-                    await executeTeCommand("addToExcludes", 500, 3000, node);
-                    break;
+                    const node = value.taskFile.treeNodes.find(
+                        n => n instanceof TaskItem && n.task.name && n.task.name.toLowerCase().includes("test2.bat")
+                    ) as TaskItem;
+                    if (node)
+                    {
+                        await executeTeCommand("addToExcludes", 500, 3000, node);
+                        break;
+                    }
                 }
             }
         }
@@ -393,13 +399,16 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForFetchTasksCommand + (testsControl.slowTimeForCommand * 2));
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
-        for (const map of taskMap)
+        for (const property in taskMap)
         {
-            const value = map[1];
-            if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
+            if ({}.hasOwnProperty.call(taskMap, property))
             {
-                await executeTeCommand2("addToExcludes", [ value.taskFile ], testsControl.waitTimeForCommand);
-                break;
+                const value= taskMap[property];
+                if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
+                {
+                    await executeTeCommand2("addToExcludes", [ value.taskFile ], testsControl.waitTimeForCommand);
+                    break;
+                }
             }
         }
         await verifyTaskCount("grunt", gruntCt - 2);
@@ -566,21 +575,24 @@ suite("Provider Tests", () =>
         const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItemsB4.length;
 
-        for (const map of taskMap)
+        for (const property in taskMap)
         {
-            const value = map[1];
-            if (value && value.taskSource === "grunt")
+            if ({}.hasOwnProperty.call(taskMap, property))
             {
-                let taskFile = value.taskFile;
-                while (taskFile.treeNodes.length === 1 && taskFile.treeNodes[0] instanceof TaskFile && !taskFile.isGroup)
+                const value= taskMap[property];
+                if (value && value.taskSource === "grunt")
                 {
-                    taskFile = taskFile.treeNodes[0];
-                }
-                if (taskFile && taskFile.isGroup && !value.taskFile.path.startsWith("grunt"))
-                {
-                    await commands.executeCommand("taskExplorer.addToExcludes", taskFile);
-                    await sleep(1000);
-                    break;
+                    let taskFile = value.taskFile;
+                    while (taskFile.treeNodes.length === 1 && taskFile.treeNodes[0] instanceof TaskFile && !taskFile.isGroup)
+                    {
+                        taskFile = taskFile.treeNodes[0];
+                    }
+                    if (taskFile && taskFile.isGroup && !value.taskFile.path.startsWith("grunt"))
+                    {
+                        await commands.executeCommand("taskExplorer.addToExcludes", taskFile);
+                        await sleep(1000);
+                        break;
+                    }
                 }
             }
         }
