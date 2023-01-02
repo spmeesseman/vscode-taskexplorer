@@ -242,7 +242,7 @@ async function initSettings(enable = true)
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
     await configuration.updateWs("enableExplorerView", true);
-    await configuration.updateWs("enableSideBar", true);
+    await configuration.updateWs("enableSideBar", false);
     //
     // Set misc settings, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
@@ -280,12 +280,12 @@ export function isReady(taskType?: string)
     let err: string | undefined;
     if (!teApi)                                 err = "        ✘ TeApi null";
     else {
-        if (!teApi.explorer)                    err = "        ✘ TeApi Explorer provider null";
-        else if (!teApi.sidebar)                err = "        ✘ TeApi Sidebar Provider null";
+        if (!teApi.explorer)                    err = "        ✘ TeApi Explorer provider == null";
+        else if (teApi.sidebar)                err = "         ✘ TeApi Sidebar Provider != null";
         else if (!teApi.providers)              err = "        ✘ Providers null";
     }
     if (!err && taskType) {
-        if (!teApi.providers.get(taskType))     err = `        ✘ ${taskType} Provider null`;
+        if (!teApi.providers.get(taskType))     err = `        ✘ ${taskType} Provider == null`;
     }
     if (!err && !(workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined)) {
                                                 err = "        ✘ Workspace folder does not exist";
