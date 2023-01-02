@@ -49,6 +49,33 @@ class Configuration implements IConfigurationApi
     }
 
 
+    private getSettingKeys(key: string)
+    {
+        let propertyKey = key,
+            valueKey = key,
+            isObject = false;;
+        if (!pkgJsonCfgProps[propertyKey] && key.includes("."))
+        {
+            let propsKey = "";
+            const keys = key.split(".");
+            for (let i = 0; i < keys.length - 1; i++) {
+                propsKey += ((i > 0 ? "." : "") + keys[i]);
+            }
+            const pkgJsonPropsKey = extensionName + "." + propsKey;
+            if (pkgJsonCfgProps[pkgJsonPropsKey] && pkgJsonCfgProps[pkgJsonPropsKey].type === "object")
+            {
+                isObject = true;
+                propertyKey = propsKey;
+            }
+        }
+        return {
+            isObject,
+            pKey: propertyKey,
+            vKey: valueKey
+        };
+    }
+
+
     /**
      * Include entire settings key.  This is just workspace.getConfiguration().
      * Example:
@@ -74,37 +101,27 @@ class Configuration implements IConfigurationApi
 
     public update(key: string, value: any): Thenable<void>
     {
-        if (key.includes("."))
+        const settingKeys = this.getSettingKeys(key);
+        if (settingKeys.isObject)
         {
-            const keys = key.split("."),
-                  propsKey = `${extensionName}.${keys[0]}`;
-            if (pkgJsonCfgProps[propsKey] && pkgJsonCfgProps[propsKey].type === "object")
-            {
-                key = keys[0];
-                const v = this.get<any>(key);
-                v[keys[1]] = value;
-                value = v;
-            }
+            const v = this.get<any>(key);
+            v[settingKeys.vKey] = value;
+            value = v;
         }
-        return this.configuration.update(key, value, ConfigurationTarget.Global);
+        return this.configuration.update(settingKeys.pKey, value, ConfigurationTarget.Global);
     }
 
 
     public updateWs(key: string, value: any): Thenable<void>
     {
-        if (key.includes("."))
+        const settingKeys = this.getSettingKeys(key);
+        if (settingKeys.isObject)
         {
-            const keys = key.split("."),
-                  propsKey = `${extensionName}.${keys[0]}`;
-            if (pkgJsonCfgProps[propsKey] && pkgJsonCfgProps[propsKey].type === "object")
-            {
-                key = keys[0];
-                const v = this.get<any>(key);
-                v[keys[1]] = value;
-                value = v;
-            }
+            const v = this.get<any>(key);
+            v[settingKeys.vKey] = value;
+            value = v;
         }
-        return this.configuration.update(key, value, ConfigurationTarget.Workspace);
+        return this.configuration.update(settingKeys.pKey, value, ConfigurationTarget.Workspace);
     }
 
 
