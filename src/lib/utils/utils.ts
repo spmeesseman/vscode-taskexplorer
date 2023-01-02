@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { RelativePattern, WorkspaceFolder, Uri, workspace, window } from "vscode";
+import { WorkspaceFolder, Uri, workspace, window } from "vscode";
 import * as fs from "fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./configuration";
@@ -131,6 +131,20 @@ export function getHeaderContent()
     </head>
     <body style="padding:20px">`;
 }
+
+
+/**
+ * Gets the base/root/install path of the extension
+ */
+export function getInstallPath()
+{
+    let dir = __dirname;
+    while (dir.length > 3 && !pathExists(path.join(dir, "package.json"))) {
+        dir = path.dirname(dir);
+    }
+    return dir;
+}
+
 
 export function getBodyContent(title: string)
 {

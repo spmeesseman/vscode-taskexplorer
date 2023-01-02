@@ -6,7 +6,7 @@ import { configuration } from "../../lib/utils/configuration";
 import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeSettingsUpdate, executeTeCommand, isReady, testsControl } from "../helper";
 import { refreshTree } from "../../lib/refreshTree";
-import { isBoolean, isObject, isString } from "../../lib/utils/utils";
+import { getInstallPath, isBoolean, isObject, isString } from "../../lib/utils/utils";
 import { enableConfigWatcher } from "../../lib/configWatcher";
 
 let teApi: TaskExplorerApi;
@@ -43,6 +43,7 @@ suite("API Init and Tests", () =>
     test("Misc Coverage", async function()
     {
         assert(!explorer.isVisible());
+        assert(getInstallPath());
         //
         // Multi-part settingsupdates (behaviordiffers when value is an object)
         //

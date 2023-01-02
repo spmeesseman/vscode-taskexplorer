@@ -9,7 +9,7 @@ const extensionName = "taskExplorer";
 
 class Configuration
 {
-    private pkgJsonCfgProps: any;
+    // private pkgJsonCfgProps: any;
     private configuration: WorkspaceConfiguration;
     private configurationWs: WorkspaceConfiguration;
     private _onDidChange = new EventEmitter<ConfigurationChangeEvent>();
@@ -23,10 +23,9 @@ class Configuration
 
     constructor()
     {
-        // pkgJsonCfgProps = require("../../../package.json").contributes.configuration.properties;
-        // const pkgJsonFile = dirname(require.main.filename);
+        // const pkgJsonFile = join(getInstallPath(), "package.json");
         // const pkgJson = JSON.parse(readFileSync(pkgJsonFile));
-        // const pkgJsonCfgProps = pkgJson.contributes.configuration.properties;
+        // this.pkgJsonCfgProps = pkgJson.contributes.configuration.properties;
         this.configuration = workspace.getConfiguration(extensionName);
         this.configurationWs = workspace.getConfiguration();
         workspace.onDidChangeConfiguration(this.onConfigurationChanged, this);
