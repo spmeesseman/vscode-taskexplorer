@@ -9,7 +9,6 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { configuration } from "../../lib/utils/configuration";
 import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
@@ -42,7 +41,7 @@ suite("Maven Tests", () =>
         //
         // Store / set initial settings
         //
-        pathToProgram = configuration.get<string>(`pathToPrograms.${testsName}`);
+        pathToProgram = teApi.config.get<string>(`pathToPrograms.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "java\\maven\\mvn.exe");
     });
 

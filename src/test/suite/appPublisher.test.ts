@@ -9,9 +9,8 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { configuration } from "../../lib/utils/configuration";
 import { activate, buildTree, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 
 
@@ -43,7 +42,7 @@ suite("App-Publisher Tests", () =>
         //
         // Store / set initial settings
         //
-        pathToProgram = configuration.get<string>(`pathToPrograms.${testsName}`);
+        pathToProgram = teApi.config.get<string>(`pathToPrograms.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "app-publisher");
     });
 

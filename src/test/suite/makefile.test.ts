@@ -12,7 +12,6 @@ import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MakeTaskProvider } from "../../providers/make";
 import { readFileSync } from "../../lib/utils/utils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { configuration } from "../../lib/utils/configuration";
 
 
 let teApi: ITaskExplorerApi;
@@ -59,15 +58,15 @@ suite("Makefile Tests", () =>
               filePath = getWsPath(path.join("make", "makefile")),
               fileUri = Uri.file(filePath);
 
-        const pathToMake = configuration.get<string>("pathToPrograms.make", "nmake");
-        await configuration.updateWs("pathToPrograms.make", "nmake");
+        const pathToMake = teApi.config.get<string>("pathToPrograms.make", "nmake");
+        await teApi.config.updateWs("pathToPrograms.make", "nmake");
         provider.createTask("test", "test", rootWorkspace, fileUri, []);
-        await configuration.updateWs("pathToPrograms.make", "make");
+        await teApi.config.updateWs("pathToPrograms.make", "make");
         provider.createTask("test", "test", rootWorkspace, fileUri, []);
-        await configuration.updateWs("pathToPrograms.make", undefined);
+        await teApi.config.updateWs("pathToPrograms.make", undefined);
         provider.createTask("test", "test", rootWorkspace, fileUri, []);
 
-        await configuration.updateWs("pathToPrograms.make", pathToMake);
+        await teApi.config.updateWs("pathToPrograms.make", pathToMake);
     });
 
 

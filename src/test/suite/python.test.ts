@@ -9,7 +9,6 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { configuration } from "../../lib/utils/configuration";
 import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ScriptTaskProvider } from "../../providers/script";
@@ -39,8 +38,8 @@ suite("Python Tests", () =>
         //
         // Store / set initial settings
         //
-        pathToPython = configuration.get<string>("pathToPrograms.python");
-        enablePython = configuration.get<boolean>("enabledTasks.python");
+        pathToPython = teApi.config.get<string>("pathToPrograms.python");
+        enablePython = teApi.config.get<boolean>("enabledTasks.python");
         await executeSettingsUpdate("pathToPrograms.python", "php\\composer.exe");
         await executeSettingsUpdate("enabledTasks.python", true, testsControl.waitTimeForConfigEnableEvent);
     });

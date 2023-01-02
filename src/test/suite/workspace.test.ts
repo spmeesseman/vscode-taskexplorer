@@ -4,7 +4,6 @@
 
 import * as assert from "assert";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { configuration } from "../../lib/utils/configuration";
 import { activate, executeSettingsUpdate, isReady, verifyTaskCountByTree } from "../helper";
 
 const testsName = "Workspace";
@@ -20,14 +19,14 @@ suite("Workspace / VSCode Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
-        wsEnable = configuration.get<boolean>("showHiddenWsTasks");
+        wsEnable = teApi.config.get<boolean>("showHiddenWsTasks");
         await executeSettingsUpdate("showHiddenWsTasks", true);
     });
 
 
     suiteTeardown(async function()
     {
-        await configuration.updateWs("showHiddenWsTasks", wsEnable);
+        await teApi.config.updateWs("showHiddenWsTasks", wsEnable);
     });
 
 

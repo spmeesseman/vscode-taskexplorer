@@ -81,6 +81,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     Object.assign(teApi, {
         isBusy: isTaskExplorerBusy,
+        config: configuration,
         log,
         providers,
         providersExternal,

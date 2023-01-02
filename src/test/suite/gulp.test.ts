@@ -6,7 +6,6 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { configuration } from "../../lib/utils/configuration";
 import { activate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { GulpTaskProvider } from "../../providers/gulp";
@@ -48,7 +47,7 @@ suite("Gulp Tests", () =>
 
     test("Disable", async function()
     {
-        await configuration.updateWs("enabledTasks.gulp", false);
+        await teApi.config.updateWs("enabledTasks.gulp", false);
         await teApi.waitForIdle(testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
@@ -56,7 +55,7 @@ suite("Gulp Tests", () =>
 
     test("Re-enable", async function()
     {
-        await configuration.updateWs("enabledTasks.gulp", true);
+        await teApi.config.updateWs("enabledTasks.gulp", true);
         await teApi.waitForIdle(testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 17);
     });
@@ -145,7 +144,7 @@ suite("Gulp Tests", () =>
         //
         // Use Gulp
         //
-        await configuration.updateWs("useGulp", true);
+        await teApi.config.updateWs("useGulp", true);
 
         // await teApi.explorer?.invalidateTasksCache(testsName);
         // await tasks.fetchTasks({ type: testsName });
@@ -157,7 +156,7 @@ suite("Gulp Tests", () =>
         //
         // Reset
         //
-        await configuration.updateWs("useGulp", false);
+        await teApi.config.updateWs("useGulp", false);
     });
 
 });

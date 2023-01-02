@@ -11,12 +11,6 @@ import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
 
 const testsName = "ant";
-const slowTimeForConfigEvent = testsControl.slowTimeForConfigEvent;
-const slowTimeForConfigEnableEvent = testsControl.slowTimeForConfigEnableEvent;
-const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
-const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
-const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
-const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: ITaskExplorerApi;
 let provider: AntTaskProvider;
@@ -64,7 +58,7 @@ suite("Ant Tests", () =>
 
     test("Start", async function()
     {
-        this.slow(slowTimeForConfigEnableEvent);
+        this.slow(testsControl.slowTimeForConfigEnableEvent);
         // await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("ant", 3);
     });
@@ -74,7 +68,7 @@ suite("Ant Tests", () =>
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForCommandFast);
         await executeSettingsUpdate("enabledTasks.ant", false);
-        await teApi.waitForIdle(waitTimeForConfigEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
         await verifyTaskCount("ant", 0);
     });
 
@@ -83,7 +77,7 @@ suite("Ant Tests", () =>
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForCommandFast);
         await executeSettingsUpdate("enabledTasks.ant", true);
-        await teApi.waitForIdle(waitTimeForConfigEvent);
+        await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
         await verifyTaskCount("ant", 3);
     });
 
@@ -256,7 +250,7 @@ suite("Ant Tests", () =>
  */
 async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAnt2: number, waitTime?: number)
 {
-    await teApi.waitForIdle(waitTime || waitTimeForFsModEvent);
+    await teApi.waitForIdle(waitTime || testsControl.waitTimeForFsModifyEvent);
     //
     // Don't use Ant
     //

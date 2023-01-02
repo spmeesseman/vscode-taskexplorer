@@ -7,7 +7,6 @@ import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
 import { testControl } from "./control";
 import { IExplorerApi, ITaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
-import { configuration } from "../lib/utils/configuration";
 import { commands, extensions, tasks, window, workspace } from "vscode";
 
 let activated = false;
@@ -159,7 +158,7 @@ export async function closeActiveDocument()
 
 export async function executeSettingsUpdate(key: string, value?: any, minWait?: number, maxWait?: number)
 {
-    const rc = await configuration.updateWs(key, value);
+    const rc = await teApi.config.updateWs(key, value);
     await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testsControl.waitTimeForConfigEvent),
                             maxWait === 0 ? maxWait : (maxWait || testsControl.waitTimeMax));
     return rc;
@@ -234,44 +233,44 @@ export const getWsPath = (p: string) =>
 
 async function initSettings(enable = true)
 {
-    await configuration.updateVsWs("terminal.integrated.shell.windows",
+    await teApi.config.updateVsWs("terminal.integrated.shell.windows",
                                  "C:\\Windows\\System32\\cmd.exe");
-    await configuration.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
+    await teApi.config.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
     //
     // Enable views, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("enableExplorerView", true);
-    await configuration.updateWs("enableSideBar", true);
+    await teApi.config.updateWs("enableExplorerView", true);
+    await teApi.config.updateWs("enableSideBar", true);
     //
     // Set misc settings, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("includeAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
+    await teApi.config.updateWs("includeAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
     // Use update() here for coverage, since these two settings wont trigger any processing
-    await configuration.updateWs("debug", testsControl.writeToOutput);
-    await configuration.updateWs("debugLevel", testsControl.logLevel);
-    await configuration.updateWs("autoRefresh", enable);
-    await configuration.updateWs("useGulp", false);
-    await configuration.updateWs("useAnt", false);
-    await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("specialFolders.numLastTasks", 10);
-    await configuration.updateWs("groupMaxLevel", 1);
-    await configuration.updateWs("taskButtons.clickAction", "Open");
+    await teApi.config.updateWs("debug", testsControl.writeToOutput);
+    await teApi.config.updateWs("debugLevel", testsControl.logLevel);
+    await teApi.config.updateWs("autoRefresh", enable);
+    await teApi.config.updateWs("useGulp", false);
+    await teApi.config.updateWs("useAnt", false);
+    await teApi.config.updateWs("groupSeparator", "-");
+    await teApi.config.updateWs("specialFolders.numLastTasks", 10);
+    await teApi.config.updateWs("groupMaxLevel", 1);
+    await teApi.config.updateWs("taskButtons.clickAction", "Open");
     //
     // Enabled all options, use workspace level so that running this test from Code itself
     // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("groupWithSeparator", enable);
-    await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("specialFolders.showLastTasks", enable);
-    await configuration.updateWs("keepTermOnStop", false);
-    await configuration.updateWs("specialFolders.showUserTasks", enable);
-    await configuration.updateWs("taskButtons.showFavoritesButton", enable);
-    await configuration.updateWs("showHiddenWsTasks", enable);
-    await configuration.updateWs("showRunningTask", enable);
-    await configuration.updateWs("enabledTasks", configuration.get<object>("enabledTasks"));
-    await configuration.updateWs("pathToPrograms", configuration.get<object>("pathToPrograms"));
+    await teApi.config.updateWs("groupWithSeparator", enable);
+    await teApi.config.updateWs("groupSeparator", "-");
+    await teApi.config.updateWs("specialFolders.showLastTasks", enable);
+    await teApi.config.updateWs("keepTermOnStop", false);
+    await teApi.config.updateWs("specialFolders.showUserTasks", enable);
+    await teApi.config.updateWs("taskButtons.showFavoritesButton", enable);
+    await teApi.config.updateWs("showHiddenWsTasks", enable);
+    await teApi.config.updateWs("showRunningTask", enable);
+    await teApi.config.updateWs("enabledTasks", teApi.config.get<object>("enabledTasks"));
+    await teApi.config.updateWs("pathToPrograms", teApi.config.get<object>("pathToPrograms"));
 }
 
 

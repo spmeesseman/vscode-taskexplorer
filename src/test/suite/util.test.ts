@@ -8,7 +8,6 @@ import * as util from "../../lib/utils/utils";
 import { workspace, WorkspaceFolder } from "vscode";
 import { activate, isReady, testsControl } from "../helper";
 import { storage } from "../../lib/utils/storage";
-import { configuration } from "../../lib/utils/configuration";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { numFilesInDirectory } from "../../lib/utils/fs";
 import { join } from "path";
@@ -36,7 +35,7 @@ suite("Util Tests", () =>
 
 	suiteTeardown(async function()
 	{
-		await configuration.updateWs("debug", testsControl.writeToOutput);
+		await teApi.config.updateWs("debug", testsControl.writeToOutput);
 	});
 
 
@@ -47,7 +46,7 @@ suite("Util Tests", () =>
             assert.fail("         ✘ Workspace folder does not exist");
         }
 
-        await configuration.updateWs("debug", true);
+        await teApi.config.updateWs("debug", true);
 
         log.blank();
         log.write(`        ${creator}.${extension}`);
@@ -83,7 +82,7 @@ suite("Util Tests", () =>
 		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
 
 		// Disabled logging
-		await configuration.updateWs("debug", false);
+		await teApi.config.updateWs("debug", false);
 		log.write("test");
 		log.value("test", "1");
 
@@ -102,7 +101,7 @@ suite("Util Tests", () =>
 		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
 
 		// Re-enable logging
-		await configuration.updateWs("debug", true);
+		await teApi.config.updateWs("debug", true);
 
         assert(util.camelCase("taskexplorer", 4) === "taskExplorer");
         assert(util.camelCase(undefined, 4) === undefined);

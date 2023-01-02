@@ -15,7 +15,6 @@ import { expect } from "chai";
 import { workspace, tasks, commands, Uri, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../lib/utils/utils";
 import { ITaskExplorerApi, IExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
-import { configuration } from "../../lib/utils/configuration";
 import { storage } from "../../lib/utils/storage";
 import {
     activate, buildTree, executeSettingsUpdate, executeTeCommand, executeTeCommand2, findIdInTaskMap,
@@ -281,7 +280,7 @@ suite("Provider Tests", () =>
     {
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-        const showLasTasks = configuration.get<boolean>("specialFolders.showLastTasks");
+        const showLasTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
             await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
             await storage.update(constants.LAST_TASKS_STORE, [ "hello.bat" ]);
@@ -304,7 +303,7 @@ suite("Provider Tests", () =>
     test("Build Tree Variations - Favorites Collapsed", async function()
     {
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        const showLasTasks = configuration.get<boolean>("specialFolders.showLastTasks");
+        const showLasTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
             await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
             await executeSettingsUpdate("specialFolders.showLastTasks", false);
@@ -487,7 +486,7 @@ suite("Provider Tests", () =>
         fs.unlinkSync(file);
         await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
         await createMakeFile();
-        await configuration.updateWs("debug", true); // hit tree.logTask()
+        await teApi.config.updateWs("debug", true); // hit tree.logTask()
     });
 
 
@@ -539,7 +538,7 @@ suite("Provider Tests", () =>
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        await configuration.updateVsWs("terminal.integrated.shell.windows",
+        await teApi.config.updateVsWs("terminal.integrated.shell.windows",
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
         await teApi.waitForIdle(waitTimeForConfigEvent, 1000);
         await teApi.testsApi.fileCache.buildCache("bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
