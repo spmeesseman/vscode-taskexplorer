@@ -2,7 +2,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as assert from "assert";
-import { configuration } from "../../lib/utils/configuration";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeSettingsUpdate, executeTeCommand, isReady, testsControl } from "../helper";
 import { refreshTree } from "../../lib/refreshTree";
@@ -50,24 +49,24 @@ suite("API Init and Tests", () =>
         // Multi-part settingsupdates (behaviordiffers when value is an object)
         //
         enableConfigWatcher(false);
-        let v = configuration.get<any>("pathToPrograms.ant");
+        let v = teApi.config.get<any>("pathToPrograms.ant");
         assert(isString(v));
-        v = configuration.get<any>("pathToPrograms");
+        v = teApi.config.get<any>("pathToPrograms");
         assert(isObject(v));
         let cv = v.ant;
-        await configuration.updateWs("pathToPrograms.ant", "/my/path/to/ant");
-        v = configuration.get<any>("pathToPrograms");
+        await teApi.config.updateWs("pathToPrograms.ant", "/my/path/to/ant");
+        v = teApi.config.get<any>("pathToPrograms");
         assert(isObject(v) && v.ant === "/my/path/to/ant");
-        await configuration.updateWs("pathToPrograms.ant", cv);
-        v = configuration.get<any>("pathToPrograms");
+        await teApi.config.updateWs("pathToPrograms.ant", cv);
+        v = teApi.config.get<any>("pathToPrograms");
         assert(isObject(v) && v.ant === cv);
-        cv = configuration.get<any>("visual.disableAnimatedIcons");
+        cv = teApi.config.get<any>("visual.disableAnimatedIcons");
         assert(isBoolean(cv));
-        await configuration.updateWs("visual.disableAnimatedIcons", false);
-        v = configuration.get<any>("visual.disableAnimatedIcons");
+        await teApi.config.updateWs("visual.disableAnimatedIcons", false);
+        v = teApi.config.get<any>("visual.disableAnimatedIcons");
         assert(isBoolean(v) && v === false);
-        await configuration.updateWs("visual.disableAnimatedIcons", cv);
-        v = configuration.get<any>("visual.disableAnimatedIcons");
+        await teApi.config.updateWs("visual.disableAnimatedIcons", cv);
+        v = teApi.config.get<any>("visual.disableAnimatedIcons");
         assert(isBoolean(v) && v === cv);
         enableConfigWatcher(true);
     });
@@ -82,30 +81,31 @@ suite("API Init and Tests", () =>
     test("Refresh for SideBar Coverage", async function()
     {
         await refreshTree(teApi);
+        await teApi.waitForIdle(testsControl.waitTimeForConfigEnableEvent);
     });
 
 
     test("Disable Explorer Views", async function()
     {
-        await executeSettingsUpdate("enableExplorerView", false);
+        await executeSettingsUpdate("enableExplorerView", false, testsControl.waitTimeForConfigEnableEvent);
     });
 
 
     test("Disable SideBar View", async function()
     {
-        await executeSettingsUpdate("enableSideBar", false);
+        await executeSettingsUpdate("enableSideBar", false, testsControl.waitTimeForConfigEnableEvent);
     });
 
 
     test("Re-enable Explorer View", async function()
     {
-        await executeSettingsUpdate("enableExplorerView", true);
+        await executeSettingsUpdate("enableExplorerView", true, testsControl.waitTimeForConfigEnableEvent);
     });
 
 
     test("Refresh", async function()
     {
-        await executeTeCommand("refresh");
+        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
     });
 
 });
