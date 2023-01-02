@@ -18,7 +18,7 @@ from "vscode";
  */
 export default class TaskItem extends TreeItem
 {
-    private readonly context: ExtensionContext;
+    public readonly context: ExtensionContext; // Note:  Making this field private bombs the types
     public readonly taskSource: string;
     public readonly taskGroup: string;
     public readonly isUser: boolean;
@@ -195,7 +195,7 @@ export default class TaskItem extends TreeItem
         //
         if (running) // && task.definition.type !== "$empty")
         {
-            const disableAnimated = configuration.get<boolean>("visual.disableAnimatedIcons");
+            const disableAnimated = configuration.get<boolean>("disableAnimatedIcons");
             this.iconPath = {
                 light: context.asAbsolutePath(path.join("res", "light", !disableAnimated ? "loading.svg" : "loadingna.svg")),
                 dark: context.asAbsolutePath(path.join("res", "dark", !disableAnimated ? "loading.svg" : "loadingna.svg"))

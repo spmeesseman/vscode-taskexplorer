@@ -3,7 +3,6 @@ import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } 
 import * as log from "../lib/utils/log";
 import * as path from "path";
 import * as util from "../lib/utils/utils";
-import { configuration } from "../lib/utils/configuration";
 import TaskItem from "./item";
 import TaskFolder  from "./folder";
 import { TaskExplorerDefinition } from "../interface";
@@ -307,7 +306,8 @@ export default class TaskFile extends TreeItem
      *
      * @returns File name
      */
-    private getFileNameFromSource(source: string, folder: TaskFolder, taskDef: TaskExplorerDefinition, incRelPathForCode?: boolean): string
+    // Note:  Making this function private bombs the types
+    public getFileNameFromSource(source: string, folder: TaskFolder, taskDef: TaskExplorerDefinition, incRelPathForCode?: boolean): string
     {
         //
         // Ant tasks or any tasks provided by this extension will have a "fileName" definition
