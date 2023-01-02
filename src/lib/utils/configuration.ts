@@ -1,14 +1,15 @@
-"use strict";
 
+const pkgJsonCfgProps = require("../../../package.json").contributes.configuration.properties;
 import {
-    ConfigurationChangeEvent, Event, EventEmitter, workspace,
-    WorkspaceConfiguration, ConfigurationTarget
+    ConfigurationChangeEvent, EventEmitter, workspace, WorkspaceConfiguration, ConfigurationTarget
 } from "vscode";
 
 const extensionName = "taskExplorer";
 
+
 class Configuration
 {
+    private pkgJsonCfgProps: any;
     private configuration: WorkspaceConfiguration;
     private configurationWs: WorkspaceConfiguration;
     private _onDidChange = new EventEmitter<ConfigurationChangeEvent>();
@@ -22,6 +23,10 @@ class Configuration
 
     constructor()
     {
+        // pkgJsonCfgProps = require("../../../package.json").contributes.configuration.properties;
+        // const pkgJsonFile = dirname(require.main.filename);
+        // const pkgJson = JSON.parse(readFileSync(pkgJsonFile));
+        // const pkgJsonCfgProps = pkgJson.contributes.configuration.properties;
         this.configuration = workspace.getConfiguration(extensionName);
         this.configurationWs = workspace.getConfiguration();
         workspace.onDidChangeConfiguration(this.onConfigurationChanged, this);
@@ -71,11 +76,15 @@ class Configuration
     {
         if (key.includes("."))
         {
-            const keys = key.split(".");
-            key = keys[0];
-            const v = this.get<any>(key);
-            v[keys[1]] = value;
-            value = v;
+            const keys = key.split("."),
+                  propsKey = `${extensionName}.${keys[0]}`;
+            if (pkgJsonCfgProps[propsKey] && pkgJsonCfgProps[propsKey].type === "object")
+            {
+                key = keys[0];
+                const v = this.get<any>(key);
+                v[keys[1]] = value;
+                value = v;
+            }
         }
         return this.configuration.update(key, value, ConfigurationTarget.Global);
     }
@@ -85,11 +94,15 @@ class Configuration
     {
         if (key.includes("."))
         {
-            const keys = key.split(".");
-            key = keys[0];
-            const v = this.get<any>(key);
-            v[keys[1]] = value;
-            value = v;
+            const keys = key.split("."),
+                  propsKey = `${extensionName}.${keys[0]}`;
+            if (pkgJsonCfgProps[propsKey] && pkgJsonCfgProps[propsKey].type === "object")
+            {
+                key = keys[0];
+                const v = this.get<any>(key);
+                v[keys[1]] = value;
+                value = v;
+            }
         }
         return this.configuration.update(key, value, ConfigurationTarget.Workspace);
     }

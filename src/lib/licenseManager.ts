@@ -344,11 +344,11 @@ export class LicenseManager implements ILicenseManager
 
 			const _onError = (e: any)  =>
 			{
-				log.error(e);
 				if (e.message && e.message.includes("ECONNREFUSED")) {
 					log.write("   it appears that the license server is down or offline", 1, logPad);
 					log.write("      licensed mode will be automatically enabled.");
 				}
+				else { log.error(e); }
 				log.methodDone("validate license", 1, logPad, false, [["licensed", this.licensed]]);
 				resolve(true);
 			};

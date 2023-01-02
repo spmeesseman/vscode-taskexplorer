@@ -2,14 +2,15 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as assert from "assert";
-import { configuration } from "../../common/configuration";
+import { configuration } from "../../lib/utils/configuration";
 import { ExplorerApi, TaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeSettingsUpdate, executeTeCommand, isReady, testsControl } from "../helper";
 import { refreshTree } from "../../lib/refreshTree";
+import { isBoolean, isObject, isString } from "../../lib/utils/utils";
+import { enableConfigWatcher } from "../../lib/configWatcher";
 
 let teApi: TaskExplorerApi;
 let explorer: ExplorerApi;
-const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 
 
 suite("API Init and Tests", () =>
@@ -42,6 +43,30 @@ suite("API Init and Tests", () =>
     test("Misc Coverage", async function()
     {
         assert(!explorer.isVisible());
+        //
+        // Multi-part settingsupdates (behaviordiffers when value is an object)
+        //
+        enableConfigWatcher(false);
+        let v = configuration.get<any>("pathToPrograms.ant");
+        assert(isString(v));
+        v = configuration.get<any>("pathToPrograms");
+        assert(isObject(v));
+        let cv = v.ant;
+        await configuration.updateWs("pathToPrograms.ant", "/my/path/to/ant");
+        v = configuration.get<any>("pathToPrograms");
+        assert(isObject(v) && v.ant === "/my/path/to/ant");
+        await configuration.updateWs("pathToPrograms.ant", cv);
+        v = configuration.get<any>("pathToPrograms");
+        assert(isObject(v) && v.ant === cv);
+        cv = configuration.get<any>("visual.disableAnimatedIcons");
+        assert(isBoolean(cv));
+        await configuration.updateWs("visual.disableAnimatedIcons", false);
+        v = configuration.get<any>("visual.disableAnimatedIcons");
+        assert(isBoolean(v) && v === false);
+        await configuration.updateWs("visual.disableAnimatedIcons", cv);
+        v = configuration.get<any>("visual.disableAnimatedIcons");
+        assert(isBoolean(v) && v === cv);
+        enableConfigWatcher(true);
     });
 
 
@@ -53,7 +78,7 @@ suite("API Init and Tests", () =>
 
     test("Refresh for SideBar Coverage", async function()
     {
-        await refreshTree();
+        await refreshTree(teApi);
     });
 
 
