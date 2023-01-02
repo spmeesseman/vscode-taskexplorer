@@ -1728,7 +1728,6 @@
                     },
                     "default": [],
                     "order": 35,
-                    "title": "%config.taskExplorer.title.includeExclude%",
                     "markdownDescription": "%config.taskExplorer.globPatternsAnt%"
                 },
                 "taskExplorer.globPatternsBash": {
@@ -1740,7 +1739,6 @@
                     },
                     "default": [],
                     "order": 40,
-                    "title": "%config.taskExplorer.title.includeExclude%",
                     "markdownDescription": "%config.taskExplorer.globPatternsBash%"
                 },
                 "taskExplorer.keepTermOnStop": {
