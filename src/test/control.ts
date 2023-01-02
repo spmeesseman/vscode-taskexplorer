@@ -1,5 +1,5 @@
 
-import { configuration } from "../common/configuration";
+import { configuration } from "../lib/utils/configuration";
 
 export const testControl = {
     keepSettingsFile: false,
