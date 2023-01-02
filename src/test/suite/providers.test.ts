@@ -14,7 +14,7 @@ import constants from "../../lib/constants";
 import { expect } from "chai";
 import { workspace, tasks, commands, Uri, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../lib/utils/utils";
-import { ITaskExplorerApi, ExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, IExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../../lib/utils/configuration";
 import { storage } from "../../lib/utils/storage";
 import {
@@ -30,7 +30,7 @@ const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: ITaskExplorerApi;
-let explorer: ExplorerApi;
+let explorer: IExplorerApi;
 let rootPath: string;
 let dirName: string;
 let dirNameL2: string;

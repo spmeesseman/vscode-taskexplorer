@@ -6,7 +6,7 @@ import * as assert from "assert";
 import { sortFolders } from "../../lib/sortTasks";
 import * as util from "../../lib/utils/utils";
 import TaskFolder from "../../tree/folder";
-import { ExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { NoScripts } from "@spmeesseman/vscode-taskexplorer-types/lib/lib/noScripts";
 import constants from "../../lib/constants";
 import { storage } from "../../lib/utils/storage";
@@ -19,7 +19,7 @@ import {
 
 
 let teApi: ITaskExplorerApi;
-let explorer: ExplorerApi;
+let explorer: IExplorerApi;
 let favTasks: string[];
 let lastTasks: string[];
 let ant: TaskItem[];

@@ -9,7 +9,7 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { ExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
     getTreeTasks, getWsPath, isReady, testsControl, verifyTaskCountByTree
@@ -19,7 +19,7 @@ import {
 const testsName = "tsc";
 
 let teApi: ITaskExplorerApi;
-let explorer: ExplorerApi;
+let explorer: IExplorerApi;
 let rootPath: string;
 let dirName: string;
 let fileUri: Uri;

@@ -11,7 +11,7 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { configuration } from "../../lib/utils/configuration";
 import { activate, buildTree, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { ExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 
 
@@ -19,12 +19,9 @@ const testsName = "apppublisher";
 const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
 const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
 const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
-const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: ITaskExplorerApi;
-let explorer: ExplorerApi;
 let pathToProgram: string;
-let enableTaskType: boolean;
 let rootPath: string;
 let fileUri: Uri;
 
@@ -41,14 +38,12 @@ suite("App-Publisher Tests", () =>
         if (!teApi.explorer) {
             assert.fail("        ✘ Explorer instance does not exist");
         }
-        explorer = teApi.explorer;
         rootPath = getWsPath(".");
         fileUri = Uri.file(path.join(rootPath, ".publishrc.json"));
         //
         // Store / set initial settings
         //
         pathToProgram = configuration.get<string>(`pathToPrograms.${testsName}`);
-        enableTaskType = configuration.get<boolean>(`enabledTasks.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "app-publisher");
     });
 

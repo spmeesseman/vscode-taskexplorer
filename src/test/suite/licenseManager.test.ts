@@ -4,7 +4,7 @@
 import * as assert from "assert";
 import { ILicenseManager } from "../../interface/licenseManager";
 import { storage } from "../../lib/utils/storage";
-import { ExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import {
@@ -14,7 +14,7 @@ import {
 
 
 let teApi: ITaskExplorerApi;
-let explorer: ExplorerApi;
+let explorer: IExplorerApi;
 let licMgr: ILicenseManager;
 
 
