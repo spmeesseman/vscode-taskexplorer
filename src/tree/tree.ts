@@ -23,7 +23,7 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution
+    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, Disposable
 } from "vscode";
 import { IExplorerApi, TaskMap } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
@@ -37,6 +37,8 @@ import { enableConfigWatcher } from "../lib/configWatcher";
 export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplorerApi
 {
     private static statusBarSpace: StatusBarItem;
+    private disposables: Disposable[] = [];
+    private subscriptionStartIndex = -1;
     private tasks: Task[] | null = null;
     private treeBuilding = false;
     private refreshPending = false;
@@ -55,32 +57,42 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
     constructor(name: string, context: ExtensionContext)
     {
-        const subscriptions = context.subscriptions;
         this.extensionContext = context;
         this.name = name;
 
-        subscriptions.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => { await this.run(item); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => { await this.run(item, true, false); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args: string) => { await this.run(item, false, true, args); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runLastTask",  async () => { await this.runLastTask(); }, this));
-        subscriptions.push(commands.registerCommand(name + ".stop",  (item: TaskItem) => { this.stop(item); }, this));
-        subscriptions.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
-        subscriptions.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => { this.pause(item); }, this));
-        subscriptions.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick: boolean) => { await this.open(item, itemClick); }, this));
-        subscriptions.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => { this.openTerminal(item); }, this));
-        subscriptions.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "install"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update <packagename>"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem | string) => { await this.addToExcludes(taskFile); }, this));
-        subscriptions.push(commands.registerCommand(name + ".addRemoveFromFavorites", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
-        subscriptions.push(commands.registerCommand(name + ".addRemoveCustomLabel", (taskItem: TaskItem) => this.addRemoveSpecialLabel(taskItem), this));
-        subscriptions.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
-
+        this.disposables.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => { await this.run(item); }, this));
+        this.disposables.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => { await this.run(item, true, false); }, this));
+        this.disposables.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args: string) => { await this.run(item, false, true, args); }, this));
+        this.disposables.push(commands.registerCommand(name + ".runLastTask",  async () => { await this.runLastTask(); }, this));
+        this.disposables.push(commands.registerCommand(name + ".stop",  (item: TaskItem) => { this.stop(item); }, this));
+        this.disposables.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
+        this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => { this.pause(item); }, this));
+        this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick: boolean) => { await this.open(item, itemClick); }, this));
+        this.disposables.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => { this.openTerminal(item); }, this));
+        this.disposables.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
+        this.disposables.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "install"); }, this));
+        this.disposables.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update"); }, this));
+        this.disposables.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update <packagename>"); }, this));
+        this.disposables.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit"); }, this));
+        this.disposables.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
+        this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem | string) => { await this.addToExcludes(taskFile); }, this));
+        this.disposables.push(commands.registerCommand(name + ".addRemoveFromFavorites", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
+        this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", (taskItem: TaskItem) => this.addRemoveSpecialLabel(taskItem), this));
+        this.disposables.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: TaskFolder) => { await this.clearSpecialFolder(taskFolder); }, this));
+        context.subscriptions.push(...this.disposables);
+        this.subscriptionStartIndex = context.subscriptions.length - 20;
         tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e));
         tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e));
+    }
+
+
+    public dispose(context: ExtensionContext)
+    {
+        this.disposables.forEach((d) => {
+            d.dispose();
+        });
+        context.subscriptions.splice(this.subscriptionStartIndex, 19);
+        this.disposables = [];
     }
 
 

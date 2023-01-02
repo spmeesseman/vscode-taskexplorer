@@ -1,5 +1,5 @@
 
-import { Task, TreeItem, Uri } from "vscode";
+import { ExtensionContext, Task, TreeItem, Uri } from "vscode";
 import { NoScripts } from "../lib/noScripts";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
@@ -11,6 +11,7 @@ export type TaskMap = { [id: string]: TaskItem };
 export interface IExplorerApi
 {
     buildTaskTree(tasksList: Task[], logPad: string, logLevel: number): Promise<TaskFolder[] | NoScripts[]>;
+    dispose(context: ExtensionContext): void;
     getChildren(element?: TreeItem, logPad?: string, logLevel?: number): Promise<TreeItem[]>;
     getParent(element: TreeItem): TreeItem | null;
     getTasks(): Task[] | null;

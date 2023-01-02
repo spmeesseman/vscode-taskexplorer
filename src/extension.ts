@@ -26,7 +26,7 @@ import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWat
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
-import { Disposable, ExtensionContext, tasks, commands } from "vscode";
+import { ExtensionContext, tasks, commands } from "vscode";
 
 
 const isLicenseManagerActive = true;
@@ -37,7 +37,7 @@ export const providers: Map<string, TaskExplorerProvider> = new Map();
 export const providersExternal: Map<string, ExternalExplorerProvider> = new Map();
 
 
-export async function activate(context: ExtensionContext, disposables: Disposable[]): Promise<ITaskExplorerApi>
+export async function activate(context: ExtensionContext) // , disposables: Disposable[]): Promise<ITaskExplorerApi>
 {
     log.initLog("taskExplorer", "Task Explorer", context);
     initStorage(context);

@@ -17,7 +17,7 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
         if (!view)
         {
             const treeDataProvider = new TaskTreeDataProvider(name, context),
-                    treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
+                  treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
             views.set(name, treeView);
             view = views.get(name);
             /* istanbul ignore else */
@@ -42,18 +42,20 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
     {
         if (view)
         {
-            views.delete(name);
-            view.dispose();
-            if (name === "taskExplorer")
+            if (name === "taskExplorer" && teApi.explorer)
             {
+                teApi.explorer.dispose(context);
                 teApi.explorer = undefined;
                 teApi.explorerView = undefined;
             }
-            else // name === "taskExplorerSideBar"
+            else if (teApi.sidebar) // name === "taskExplorerSideBar"
             {
+                teApi.sidebar.dispose(context);
                 teApi.sidebar = undefined;
                 teApi.sidebarView = undefined;
             }
+            views.delete(name);
+            view.dispose();
         }
     }
 }
