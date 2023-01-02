@@ -66,6 +66,7 @@ class Configuration implements IConfigurationApi
             {
                 isObject = true;
                 propertyKey = propsKey;
+                valueKey = keys[keys.length - 1];
             }
         }
         return {
@@ -104,7 +105,7 @@ class Configuration implements IConfigurationApi
         const settingKeys = this.getSettingKeys(key);
         if (settingKeys.isObject)
         {
-            const v = this.get<any>(key);
+            const v = this.get<any>(settingKeys.pKey);
             v[settingKeys.vKey] = value;
             value = v;
         }
@@ -117,7 +118,7 @@ class Configuration implements IConfigurationApi
         const settingKeys = this.getSettingKeys(key);
         if (settingKeys.isObject)
         {
-            const v = this.get<any>(key);
+            const v = this.get<any>(settingKeys.pKey);
             v[settingKeys.vKey] = value;
             value = v;
         }
