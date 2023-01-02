@@ -14,7 +14,6 @@ import TaskFile from "./file";
 export default class TaskFolder extends TreeItem
 {
     public taskFiles: (TaskFile|TaskItem)[] = [];
-    public taskFolders: TaskFolder[] = [];
     public workspaceFolder: WorkspaceFolder | undefined;
 
 

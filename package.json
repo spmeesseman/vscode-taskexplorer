@@ -1878,16 +1878,6 @@
                     "default": false,
                     "markdownDescription": "%config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton%"
                 },
-                "taskExplorer.visual.disableAnimatedIcons": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "%config.taskExplorer.visual.disableAnimatedIcons%"
-                },
-                "taskExplorer.visual.enableAnsiconForAnt": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "%config.taskExplorer.visual.enableAnsiconForAnt%"
-                },
                 "taskExplorer.specialFolders.showLastTasks": {
                     "type": "boolean",
                     "default": true,
@@ -1935,6 +1925,16 @@
                     "type": "boolean",
                     "default": false,
                     "description": "%config.taskExplorer.specialFolders.showUserTasks%"
+                },
+                "taskExplorer.visual.disableAnimatedIcons": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%config.taskExplorer.visual.disableAnimatedIcons%"
+                },
+                "taskExplorer.visual.enableAnsiconForAnt": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.visual.enableAnsiconForAnt%"
                 },
                 "taskExplorer.autoRefresh": {
                     "type": "boolean",

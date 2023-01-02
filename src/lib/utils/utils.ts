@@ -414,16 +414,16 @@ export function isArray<T>(value: any): value is T[]
 }
 
 
+export function isBoolean(value: any): value is boolean
+{
+    return !!value && typeof value === "boolean";
+}
+
+
 export function isError(e: any): e is Error
 {
     return e instanceof Error;
 }
-
-
-// export function isBoolean(value: any): value is boolean
-// {
-//     return !!value && typeof value === "boolean";
-// }
 
 
 export function isExcluded(uriPath: string, logPad = "")
@@ -451,6 +451,12 @@ export function isExcluded(uriPath: string, logPad = "")
     log.write(logPad + "   Not excluded", 4);
     return false;
 }
+
+
+// export function isFunction(value: any)
+// {
+//     return !!value && typeof value === "function";
+// }
 
 
 export function isObject(value: any)
