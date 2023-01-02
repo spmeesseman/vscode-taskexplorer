@@ -7,6 +7,7 @@ import * as util from "../../lib/utils/utils";
 import { activate, executeSettingsUpdate, isReady, sleep, testsControl } from "../helper";
 import { configuration } from "../../lib/utils/configuration";
 import { teApi } from "../../extension";
+import { enableConfigWatcher } from "../../lib/configWatcher";
 
 let autoRefresh: boolean;
 let enabledTasks: any;
@@ -36,6 +37,71 @@ suite("Configuration / Settings Tests", () =>
         await executeSettingsUpdate("autoRefresh", autoRefresh);
         await executeSettingsUpdate("pathToPrograms", pathToPrograms);
     });
+
+
+    test("Multi-Part", async function()
+    {   //
+        // Multi-part settings updates (behavior differs when value is an object)
+        // Disable config watcher
+        //
+        enableConfigWatcher(false);
+        //
+        // 3-part i.e. taskExplorer.pathToPrograms.ant
+        //
+        let v = teApi.config.get<any>("pathToPrograms.ant");
+        assert(util.isString(v));
+        v = teApi.config.get<any>("pathToPrograms");
+        assert(util.isObject(v));
+        let cv = v.ant;
+        await teApi.config.updateWs("pathToPrograms.ant", "/my/path/to/ant");
+        v = teApi.config.get<any>("pathToPrograms");
+        assert(util.isObject(v) && v.ant === "/my/path/to/ant");
+        await teApi.config.updateWs("pathToPrograms.ant", cv);
+        v = teApi.config.get<any>("pathToPrograms");
+        assert(util.isObject(v) && v.ant === cv);
+        cv = teApi.config.get<any>("visual.disableAnimatedIcons");
+        assert(util.isBoolean(cv));
+        await teApi.config.updateWs("visual.disableAnimatedIcons", false);
+        v = teApi.config.get<any>("visual.disableAnimatedIcons");
+        assert(util.isBoolean(v) && v === false);
+        await teApi.config.updateWs("visual.disableAnimatedIcons", cv);
+        v = teApi.config.get<any>("visual.disableAnimatedIcons");
+        assert(util.isBoolean(v) && v === cv);
+        //
+        // 4-part i.e. taskExplorer.specialFolders.expanded.lastTasks
+        //
+        const cv2 = cv = teApi.config.get<any>("specialFolders.expanded.lastTasks");
+        assert(util.isBoolean(cv) && util.isBoolean(cv2));
+        await teApi.config.updateWs("specialFolders.expanded.lastTasks", false);
+        v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
+        assert(util.isBoolean(v) && v === false);
+        await teApi.config.updateWs("specialFolders.expanded.lastTasks", true);
+        v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
+        assert(util.isBoolean(v) && v === true);
+        await teApi.config.updateWs("specialFolders.expanded.lastTasks", cv);
+        v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
+        assert(util.isBoolean(v) && v === cv);
+        cv = teApi.config.get<any>("specialFolders.expanded");
+        assert(util.isObject(cv));
+        cv.lastTasks = false;
+        await teApi.config.updateWs("specialFolders.expanded", cv);
+        v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
+        assert(util.isBoolean(v) && v === false);
+        assert(util.isObject(cv));
+        cv.lastTasks = true;
+        await teApi.config.updateWs("specialFolders.expanded", cv);
+        v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
+        assert(util.isBoolean(v) && v === true);
+        cv.lastTasks = cv2;
+        await teApi.config.updateWs("specialFolders.expanded", cv2);
+        v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
+        assert(util.isBoolean(v) && v === cv2);
+        //
+        // Re-enable config watcher
+        //
+        enableConfigWatcher(true);
+    });
+
 
 
     test("Auto Refresh", async function()
@@ -174,7 +240,6 @@ suite("Configuration / Settings Tests", () =>
     });
 
 
-
     test("Reset Default Shell - Windows", async function()
     {
         await configuration.updateVsWs("terminal.integrated.shell.windows", shellW32);
@@ -193,7 +258,6 @@ suite("Configuration / Settings Tests", () =>
             ruby: true
         }), 25, 50);
     });
-
 
 
     test("Path to Programs Set Bash", async function()

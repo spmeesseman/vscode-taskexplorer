@@ -69,7 +69,7 @@ suite("Provider Tests", () =>
     suiteTeardown(async function()
     {
         await executeSettingsUpdate("debug", testsControl.writeToOutput || testsControl.writeToConsole);
-        await executeSettingsUpdate("expanded.test-files", false);
+        await executeSettingsUpdate("specialFolders.expanded.test-files", false);
     });
 
 
@@ -285,14 +285,14 @@ suite("Provider Tests", () =>
             await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
             await storage.update(constants.LAST_TASKS_STORE, [ "hello.bat" ]);
             await executeSettingsUpdate("specialFolders.showLastTasks", true);
-            await executeSettingsUpdate("expanded.lastTasks", false);
+            await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(2);
         }
         catch (e) {
             throw e;
         }
         finally {
-            await executeSettingsUpdate("expanded.lastTasks", true);
+            await executeSettingsUpdate("specialFolders.expanded.lastTasks", true);
             await executeSettingsUpdate("specialFolders.showLastTasks", showLasTasks);
             await storage.update(constants.FAV_TASKS_STORE, favTasks);
             await storage.update(constants.LAST_TASKS_STORE, lastTasks);
@@ -307,14 +307,14 @@ suite("Provider Tests", () =>
         try {
             await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
             await executeSettingsUpdate("specialFolders.showLastTasks", false);
-            await executeSettingsUpdate("expanded.favorites", false);
+            await executeSettingsUpdate("specialFolders.expanded.favorites", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1);
         }
         catch (e) {
             throw e;
         }
         finally {
-            await executeSettingsUpdate("expanded.favorites", true);
+            await executeSettingsUpdate("specialFolders.expanded.favorites", true);
             await executeSettingsUpdate("specialFolders.showLastTasks", showLasTasks);
             await storage.update(constants.FAV_TASKS_STORE, favTasks);
         }
@@ -526,7 +526,7 @@ suite("Provider Tests", () =>
     test("Run Refresh Task", async function()
     {
         this.slow(testsControl.slowTimeForRefreshCommand);
-        await executeSettingsUpdate("expanded.test-files", true);
+        await executeSettingsUpdate("specialFolders.expanded.test-files", true);
         await executeTeCommand("refresh");
         await executeSettingsUpdate("debug", false); // was hitting tree.logTask()
     });
@@ -543,7 +543,7 @@ suite("Provider Tests", () =>
         await teApi.waitForIdle(waitTimeForConfigEvent, 1000);
         await teApi.testsApi.fileCache.buildCache("bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
         await teApi.waitForIdle();
-        await executeSettingsUpdate("expanded.test-files", false);
+        await executeSettingsUpdate("specialFolders.expanded.test-files", false);
     });
 
 
