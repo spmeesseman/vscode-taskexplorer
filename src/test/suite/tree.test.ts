@@ -62,6 +62,21 @@ suite("Tree Tests", () =>
     });
 
 
+    test("Show Favorites", async function()
+    {
+        ant = await getTreeTasks("ant", 3);
+        batch = await getTreeTasks("batch", 2);
+        if (favTasks.length === 0)
+        {
+            await storage.update(constants.FAV_TASKS_STORE, [
+                util.getTaskItemId(batch[0]), util.getTaskItemId(batch[1]), util.getTaskItemId(ant[0])
+            ]);
+        }
+        await executeSettingsUpdate("specialFolders.showFavorites", false);
+        await executeSettingsUpdate("specialFolders.showFavorites", true);
+    });
+
+
     test("Show Last Tasks", async function()
     {
         ant = await getTreeTasks("ant", 3);
@@ -245,7 +260,18 @@ suite("Tree Tests", () =>
     });
 
 
-    test("Hide last tasks", async function()
+    test("Hide Favorites", async function()
+    {
+        this.slow(testsControl.slowTimeForConfigEvent * 3);
+        await executeSettingsUpdate("specialFolders.showFavorites", false);
+        await explorer.showSpecialTasks(false, true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await explorer.showSpecialTasks(true, true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+    });
+
+
+    test("Hide Last Tasks", async function()
     {
         this.slow(testsControl.slowTimeForConfigEvent * 3);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
@@ -263,7 +289,18 @@ suite("Tree Tests", () =>
     });
 
 
-    test("Show last tasks", async function()
+    test("Show Favorites", async function()
+    {
+        this.slow(testsControl.slowTimeForConfigEvent * 3);
+        await executeSettingsUpdate("specialFolders.showFavorites", true);
+        await explorer.showSpecialTasks(false, true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await explorer.showSpecialTasks(true, true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+    });
+
+
+    test("Show Last Tasks", async function()
     {
         this.slow(testsControl.slowTimeForConfigEvent * 3);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);

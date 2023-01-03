@@ -172,7 +172,6 @@ suite("Task Tests", () =>
         await startTask(bash[0]);
         await executeTeCommand2("run", [ bash[0] ], waitTimeForRunCommand);
         await endTask(bash[0]);
-        await executeSettingsUpdate("visual.disableAnimatedIcons", false);
         lastTask = bash[0];
     });
 
@@ -195,6 +194,7 @@ suite("Task Tests", () =>
         await executeTeCommand2("pause", [ batchTask ], 500);
         await executeTeCommand2("run", [ batchTask ], waitTimeForRunCommand);
         await executeSettingsUpdate("taskButtons.clickAction", "Open");
+        await executeSettingsUpdate("visual.disableAnimatedIcons", false);
         await executeTeCommand2("run", [ batchTask ], waitTimeForRunCommand / 3);
         await executeSettingsUpdate("taskButtons.clickAction", "Execute");
         await executeTeCommand2("openTerminal", [ batchTask ], 50);

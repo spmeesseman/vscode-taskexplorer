@@ -144,7 +144,15 @@ suite("Provider Tests", () =>
         //
         (workspace.workspaceFolders as WorkspaceFolder[]).concat(wsf);
 
-        await teApi.waitForIdle(2500);
+        await teApi.waitForIdle(3000);
+    });
+
+
+    test("Build Tree (View Collapsed)", async function()
+    {
+        if (!explorer.isVisible()) {
+            await buildTree(this);
+        }
     });
 
 
@@ -282,7 +290,7 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showLastTasks", true);
             await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
-            expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(1);
+            expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(2);
         }
         catch (e) {
             throw e;
@@ -302,6 +310,52 @@ suite("Provider Tests", () =>
         try {
             await executeSettingsUpdate("specialFolders.showFavorites", true);
             await executeSettingsUpdate("specialFolders.showLastTasks", true);
+            await executeSettingsUpdate("specialFolders.expanded.favorites", false);
+            expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
+            expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(2);
+        }
+        catch (e) {
+            throw e;
+        }
+        finally {
+            await executeSettingsUpdate("specialFolders.expanded.favorites", true);
+            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
+            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
+        }
+    });
+
+
+    test("Build Tree Variations - Favorites Disabled", async function()
+    {
+        const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
+        try {
+            await executeSettingsUpdate("specialFolders.showFavorites", false);
+            await executeSettingsUpdate("specialFolders.showLastTasks", true);
+            await executeSettingsUpdate("specialFolders.expanded.favorites", false);
+            await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
+            expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
+            expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(1);
+        }
+        catch (e) {
+            throw e;
+        }
+        finally {
+            await executeSettingsUpdate("specialFolders.expanded.favorites", true);
+            await executeSettingsUpdate("specialFolders.expanded.lastTasks", true);
+            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
+            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
+        }
+    });
+
+
+    test("Build Tree Variations - Last Tasks Disabled", async function()
+    {
+        const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
+        try {
+            await executeSettingsUpdate("specialFolders.showFavorites", true);
+            await executeSettingsUpdate("specialFolders.showLastTasks", false);
             await executeSettingsUpdate("specialFolders.expanded.favorites", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
             expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(1);
