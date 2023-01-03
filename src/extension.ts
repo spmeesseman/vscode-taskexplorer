@@ -105,7 +105,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     // in stdout's business.  Displaying an 'Initializing...' message in the tree now on
     // startup resulting from this, looks kinda nice I guess, so oh well.
     //
-    setTimeout(async(api) =>
+    setTimeout(async(api: ITaskExplorerApi) =>
     {   //
         // Create license manager instance
         //
@@ -116,11 +116,16 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         //
         await registerFileWatchers(context, api);
         //
+        // TaskTreeDataProvider fires event for engine to make tree provider to refresh on setEnabled()
+        //
+        api.explorer?.setEnabled(true);
+        api.sidebar?.setEnabled(true);
+        //
         // Signal that first task load has completed
         //
         ready = true;
         //
-    }, 500, teApi);
+    }, 100, teApi);
 
     log.write("Task Explorer activated, tree construction pending");
 

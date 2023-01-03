@@ -62,11 +62,6 @@ export async function registerFileWatchers(context: ExtensionContext, api: ITask
     // Refresh tree when folders/projects are added/removed from the workspace, in a multi-root ws
     //
     createWorkspaceWatcher(context);
-    //
-    // TaskTreeDataProvider fires event for engine to make tree provider to refresh on setEnabled()
-    //
-    teApi.explorer?.setEnabled(!!teApi.explorer);
-    teApi.sidebar?.setEnabled(!!teApi.sidebar);
 }
 
 
