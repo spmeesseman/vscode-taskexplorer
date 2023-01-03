@@ -10,7 +10,7 @@ export type TaskMap = { [id: string]: TaskItem };
 
 export interface IExplorerApi
 {
-    buildTaskTree(tasksList: Task[], logPad: string, logLevel: number): Promise<TaskFolder[] | NoScripts[]>;
+    buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<TaskFolder[] | NoScripts[]>;
     dispose(context: ExtensionContext): void;
     getChildren(element?: TreeItem, logPad?: string, logLevel?: number): Promise<TreeItem[]>;
     getParent(element: TreeItem): TreeItem | null;

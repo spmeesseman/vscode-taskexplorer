@@ -22,13 +22,13 @@ suite("API Init and Tests", () =>
             assert.fail("        ✘ Explorer instance does not exist");
         }
         explorer = teApi.explorer;
-        await executeSettingsUpdate("debug", true);
+        await executeSettingsUpdate("logging.enable", true);
     });
 
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate("debug", testsControl.writeToOutput || testsControl.writeToConsole);
+        await executeSettingsUpdate("logging.enable", testsControl.writeToOutput || testsControl.writeToConsole);
         enableConfigWatcher(true); // in case misc test fails after setting to `false`.
     });
 

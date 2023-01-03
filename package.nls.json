@@ -51,7 +51,7 @@
 
 	"config.taskExplorer.keepTermOnStop": "Keep terminal open when stopping a task.",
 
-	"config.taskExplorer.logging.enabled": "Turn on logging. Log messages are written to the `Task Explorer` output window.",
+	"config.taskExplorer.logging.enable": "Turn on logging. Log messages are written to the `Task Explorer` output window.",
 	"config.taskExplorer.logging.enableFile": "Enable logging to file (in addition to output window). Has no effect if `#logging.enabled#` is disabled.",
 	"config.taskExplorer.logging.fileName": "Turn on logging. Has no effect if `#logging.enabled#` or `#logging.enableFile#` are disabled.",
 	"config.taskExplorer.logging.level": "Set debug verbosity (1 - Low / 5 - High). Has no effect if `#logging.enabled#` is disabled.",

@@ -198,6 +198,16 @@ export function findIdInTaskMap(id: string, taskMap: TaskMap)
 }
 
 
+export async function focusExplorer(instance: any)
+{
+    if (!teApi.explorer?.isVisible()) {
+        instance.slow(testsControl.slowTimeForRefreshCommand);
+        await executeTeCommand("focus", 50, testsControl.slowTimeForFocusCommand);
+        await teApi.waitForIdle(testsControl.slowTimeForRefreshCommand, testsControl.slowTimeForRefreshCommand);
+    }
+}
+
+
 export async function getTreeTasks(taskType: string, expectedCount: number)
 {
     const taskItems: TaskItem[] = [];
@@ -234,8 +244,7 @@ export const getWsPath = (p: string) =>
 async function initSettings(enable = true)
 {
     await configuration.updateVsWs("terminal.integrated.shell.windows",
-                                 "C:\\Windows\\System32\\cmd.exe");
-    await configuration.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
+                                   "C:\\Windows\\System32\\cmd.exe");
     //
     // Enable views, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
@@ -246,31 +255,32 @@ async function initSettings(enable = true)
     // Set misc settings, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("includeAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
-    // Use update() here for coverage, since these two settings wont trigger any processing
-    await configuration.updateWs("debug", testsControl.writeToOutput);
-    await configuration.updateWs("debugLevel", testsControl.logLevel);
     await configuration.updateWs("autoRefresh", enable);
-    await configuration.updateWs("useGulp", false);
-    await configuration.updateWs("useAnt", false);
+    await configuration.updateWs("enabledTasks", configuration.get<object>("enabledTasks"));
+    await configuration.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
+    await configuration.updateWs("includeAnt", []); // Deprecated, use `globPatternsAnt`
+    await configuration.updateWs("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
     await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("specialFolders.numLastTasks", 10);
     await configuration.updateWs("groupMaxLevel", 1);
-    await configuration.updateWs("taskButtons.clickAction", "Open");
-    //
-    // Enabled all options, use workspace level so that running this test from Code itself
-    // in development doesnt trigger the TaskExplorer instance installed in the dev IDE
-    //
     await configuration.updateWs("groupWithSeparator", enable);
     await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("specialFolders.showLastTasks", enable);
     await configuration.updateWs("keepTermOnStop", false);
-    await configuration.updateWs("specialFolders.showUserTasks", enable);
-    await configuration.updateWs("taskButtons.showFavoritesButton", enable);
+    await configuration.updateWs("logging.enable", testsControl.writeToOutput);
+    await configuration.updateWs("logging.level", testsControl.logLevel);
+    await configuration.updateWs("logging.enableFile", testsControl.writeToFile);
+    await configuration.updateWs("logging.fileName", testsControl.writeToFileName);
+    await configuration.updateWs("pathToPrograms", configuration.get<object>("pathToPrograms"));
     await configuration.updateWs("showHiddenWsTasks", enable);
     await configuration.updateWs("showRunningTask", enable);
-    await configuration.updateWs("enabledTasks", configuration.get<object>("enabledTasks"));
-    await configuration.updateWs("pathToPrograms", configuration.get<object>("pathToPrograms"));
+    await configuration.updateWs("specialFolders.expanded", configuration.get<object>("specialFolders.expanded"));
+    await configuration.updateWs("specialFolders.numLastTasks", 10);
+    await configuration.updateWs("specialFolders.showFavorites", enable);
+    await configuration.updateWs("specialFolders.showLastTasks", enable);
+    await configuration.updateWs("specialFolders.showUserTasks", enable);
+    await configuration.updateWs("taskButtons.clickAction", "Open");
+    await configuration.updateWs("taskButtons.showFavoritesButton", enable);
+    await configuration.updateWs("useGulp", false);
+    await configuration.updateWs("useAnt", false);
 }
 
 
