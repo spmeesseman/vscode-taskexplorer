@@ -222,7 +222,7 @@ function isBusy()
 }
 
 
-let isTests = () => tests;
+const isTests = () => tests;
 
 
 /* istanbul ignore next */

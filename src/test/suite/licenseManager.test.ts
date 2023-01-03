@@ -2,6 +2,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as assert from "assert";
+import { ChildProcess, fork } from "child_process";
 import { ILicenseManager } from "../../interface/licenseManager";
 import { storage } from "../../lib/utils/storage";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
@@ -9,17 +10,20 @@ import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import {
 	activate, closeActiveDocument, isReady, overrideNextShowInfoBox,
-	overrideNextShowInputBox, sleep, executeTeCommand, testsControl, focusExplorer
+	overrideNextShowInputBox, sleep, executeTeCommand, focusExplorer, getWsPath
 } from "../helper";
 
 
 let teApi: ITaskExplorerApi;
+let explorer: IExplorerApi;
 let licMgr: ILicenseManager;
+let tasks: Task[] = [];
+let setTasksCallCount = 0;
+let lsProcess: ChildProcess;
 
 
 suite("License Manager Tests", () =>
 {
-	let tasks: Task[] = [];
 	let licenseKey: string | undefined;
 	let version: string;
 
@@ -28,12 +32,20 @@ suite("License Manager Tests", () =>
 	{
 		teApi = await activate(this);
         assert(isReady("make") === true, "    ✘ TeApi not ready");
+        if (!teApi.explorer) {
+            assert.fail("        ✘ Explorer instance does not exist");
+        }
+        explorer = teApi.explorer;
 	});
 
 
 	suiteTeardown(async function()
     {
 		await closeActiveDocument();
+		if (lsProcess) {
+			lsProcess.send("close");
+			await sleep(500);
+		}
 	});
 
 
@@ -46,8 +58,9 @@ suite("License Manager Tests", () =>
 	test("Get License Manager", async function()
 	{
 		licMgr = getLicenseManager();
-		tasks = teApi.explorer?.getTasks() || [];
+		tasks = explorer.getTasks() || [];
 		await licMgr.setTasks(tasks, "");
+		await licMgr.setTasks(tasks);
 	});
 
 
@@ -65,13 +78,31 @@ suite("License Manager Tests", () =>
 		// 1111-2222-3333-4444-5555 for now.  When lic server is done, it will fail
 		//
 		this.slow(500);
+		const licenseKey = licMgr.getLicenseKey();
+		licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
+		await licMgr.setTasks(tasks);
+		await sleep(400);
+		await closeActiveDocument();
+		licMgr.setLicenseKey(licenseKey);
+	});
+
+
+	test("License Prompt (Enter Valid Key)", async function()
+	{   //
+		// If version is set, the prompt will show
+		//
+		this.slow(500);
+		overrideNextShowInfoBox("Enter License Key");
+		overrideNextShowInputBox("1234-5678-9098-7654321");
+		await storage.update("version", undefined);
+		await setTasks();
 		await sleep(400);
 		await closeActiveDocument();
 	});
 
 
-	test("License Prompt", async function()
+	test("License Prompt (Enter Invalid Key)", async function()
 	{   //
 		// If version is set, the prompt will show
 		//
@@ -79,7 +110,7 @@ suite("License Manager Tests", () =>
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("1111-2222-3333-4444-5555");
 		await storage.update("version", undefined);
-		await licMgr.checkLicense();
+		await setTasks();
 		await sleep(400);
 		await closeActiveDocument();
 	});
@@ -92,6 +123,7 @@ suite("License Manager Tests", () =>
 		this.slow(500);
 		await storage.update("version", undefined);
 		await licMgr.checkLicense();
+		await setTasks();
 		await sleep(400);
 		await closeActiveDocument();
 	});
@@ -106,6 +138,7 @@ suite("License Manager Tests", () =>
 		//
 		licMgr.setLicenseKey(licenseKey);
 		await licMgr.checkLicense();
+		await setTasks();
 		await sleep(400);
 		await closeActiveDocument();
 	});
@@ -119,6 +152,7 @@ suite("License Manager Tests", () =>
 		//
 		await storage.update("version", version);
 		await licMgr.checkLicense();
+		await setTasks();
 		await sleep(400);
 		await closeActiveDocument();
 		//
@@ -137,6 +171,7 @@ suite("License Manager Tests", () =>
 		//
 		await storage.update("version", version);
 		await licMgr.checkLicense();
+		await setTasks();
 		await sleep(400);
 		await closeActiveDocument();
 		//
@@ -164,7 +199,7 @@ suite("License Manager Tests", () =>
 		licMgr.setLicenseKey(undefined);
 		overrideNextShowInfoBox("Info");
 		overrideNextShowInfoBox("");
-		await licMgr.checkLicense();
+		await setTasks();
 		await sleep(400);
 		await closeActiveDocument();
 		licMgr.setLicenseKey(licenseKey);
@@ -177,7 +212,7 @@ suite("License Manager Tests", () =>
 		const licenseKey = licMgr.getLicenseKey(); // will be set on ext. startup
 		licMgr.setLicenseKey(undefined);
 		overrideNextShowInfoBox("Not Now");
-		await licMgr.checkLicense();
+		await setTasks();
 		await sleep(400);
 		await closeActiveDocument();
 		licMgr.setLicenseKey(licenseKey);
@@ -193,7 +228,7 @@ suite("License Manager Tests", () =>
 		await sleep(400);
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("");
-		await licMgr.enterLicenseKey();
+		await setTasks();
 		await sleep(400);
 	});
 
@@ -202,7 +237,7 @@ suite("License Manager Tests", () =>
 	{
 		this.slow(1500);
 		overrideNextShowInfoBox("Enter License Key");
-		overrideNextShowInputBox("1111-2222-3333-4444-5555");
+		overrideNextShowInputBox("1234-5678-9098-7654321");
 		await executeTeCommand("enterLicense", 400, 1100);
 
 		overrideNextShowInfoBox("Enter License Key");
@@ -240,4 +275,58 @@ suite("License Manager Tests", () =>
 		// }
 	});
 
+
+	test("Start License Server", async function()
+	{
+		this.slow(7000);
+		lsProcess = fork("spm-license-server.js", {
+			cwd: getWsPath("../../spm-license-server/bin"), detached: true,
+		});
+		await sleep(3000);
+	});
+
+
+	test("Enter License key on Startup (1st time, Server Live)", async function()
+	{
+		await storage.update("version", undefined);
+		const licenseKey = licMgr.getLicenseKey();
+		licMgr.setLicenseKey("1234-5678-9098-7654321");
+		await licMgr.checkLicense();
+		await setTasks();
+		licMgr.setLicenseKey(licenseKey);
+	});
+
+
+	test("Enter License key on Startup (> 1st time, Server Live)", async function()
+	{
+		const licenseKey = licMgr.getLicenseKey();
+		licMgr.setLicenseKey("1234-5678-9098-7654321");
+		await licMgr.checkLicense();
+		await setTasks();
+		licMgr.setLicenseKey(licenseKey);
+	});
+
+
+	test("Invalid License key (Server Live)", async function()
+	{
+		const licenseKey = licMgr.getLicenseKey();
+		licMgr.setLicenseKey("1234-5678-9098-1234567");
+		await licMgr.checkLicense();
+		await setTasks();
+		licMgr.setLicenseKey(licenseKey);
+	});
+
 });
+
+
+async function setTasks()
+{
+	let removed: Task | undefined;
+	if (++setTasksCallCount % 2 === 1) {
+		removed = tasks.pop();
+	}
+	await licMgr.setTasks(tasks);
+	if (removed) {
+		tasks.push(removed);
+	}
+}

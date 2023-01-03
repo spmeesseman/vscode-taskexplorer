@@ -12,7 +12,7 @@ import { teApi } from "../extension";
 export class LicenseManager implements ILicenseManager
 {
 
-	private useFakeLicense = true; // Temp
+	private useGlobalLicense = true; // Temp
 	private maxFreeTasks = 500;
 	private maxFreeTaskFiles = 100;
 	private maxFreeTasksForTaskType = 100;
@@ -57,7 +57,6 @@ export class LicenseManager implements ILicenseManager
 		if (this.numTasks === components.length) {
 			return;
 		}
-
 		this.numTasks = components.length;
 
 		// if (this.numTasks < this.maxFreeTasks) {
@@ -165,7 +164,8 @@ export class LicenseManager implements ILicenseManager
 
 	getLicenseKey()
 	{
-		return !this.useFakeLicense ? storage.get<string>("license_key") : "1234-5678-9098-7654321";
+		/* istanbul ignore next */
+		return !this.useGlobalLicense || teApi.isTests() ? storage.get<string>("license_key") : "1234-5678-9098-7654321";
 	}
 
 
@@ -230,7 +230,7 @@ export class LicenseManager implements ILicenseManager
 			taskCounts[t.source]++;
 		});
 
-		/** istanbul ignore else */
+		/* istanbul ignore else */
 		if (workspace.workspaceFolders)
 		{
 			for (const wf of workspace.workspaceFolders)
@@ -246,7 +246,7 @@ export class LicenseManager implements ILicenseManager
 			<tr>
 				<td style="font-size:16px;font-weight:bold" nowrap>
 					Task Explorer has parsed ${taskCounts.length} components in
-					${projects.length} project${ /** istanbul ignore next */ projects.length > 1 ? "s" : ""}.
+					${projects.length} project${ /* istanbul ignore next */ projects.length > 1 ? "s" : ""}.
 				</td>
 			</tr>
 			<tr>
@@ -345,6 +345,7 @@ export class LicenseManager implements ILicenseManager
 
 			const _onError = (e: any)  =>
 			{
+				/* istanbul ignore else */
 				if (e.message && e.message.includes("ECONNREFUSED")) {
 					log.write("   it appears that the license server is down or offline", 1, logPad);
 					log.write("      licensed mode will be automatically enabled.");
@@ -356,7 +357,7 @@ export class LicenseManager implements ILicenseManager
 			
 			log.write("   send validation request", 1, logPad);
 
-			const req = https.request(options,/* istanbul ignore next */ (res) =>
+			const req = https.request(options, (res) =>
 			{
 				log.write("   response received", 1, logPad);
 				log.value("      status code", res.statusCode, 2, logPad);
@@ -368,23 +369,17 @@ export class LicenseManager implements ILicenseManager
 							  licensed = res.statusCode === 200 && jso.success && jso.message === "Success";
 						log.value("      success", jso.success, 3, logPad);
 						log.value("      message", jso.message, 3, logPad);
-						/** istanbul ignore else */
 						if (licensed) {
 							await this.setLicenseKey(licenseKey);
 						}
 						log.methodDone("validate license", 1, logPad, false, [["is valid license", licensed]]);
 						resolve(licensed);
 					}
-					catch (e) { _onError(e); }
+					catch (e) { /* istanbul ignore next */ _onError(e); }
 				});
 			});
-
 			req.on("error", (e) => { _onError(e); });
-
-			req.write(JSON.stringify({
-				licensekey: "1234-5678-9098-7654321"
-			}));
-
+			req.write(JSON.stringify({ licensekey: licenseKey }));
 			req.end();
 		});
 	}
