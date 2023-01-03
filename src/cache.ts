@@ -28,6 +28,10 @@ let taskFilesMap: { [taskType: string]:  ICacheItem[] } = {};  // will replace f
 const filesCache: Map<string, Set<ICacheItem>> = new Map<string, Set<ICacheItem>>();
 
 
+/**
+ * @method addFileToCache
+ * @since 3.0.0
+ */
 export async function addFileToCache(taskType: string, uri: Uri, logPad: string)
 {
     log.methodStart("add file to cache", 1, logPad);
@@ -38,6 +42,16 @@ export async function addFileToCache(taskType: string, uri: Uri, logPad: string)
 }
 
 
+/**
+ * @method addFolderToCache
+ *
+ * @param folder The folder to be added to the cache.  This folder should be a sub-folder within
+ * a workspace folder.  Workspace folders are handled differently and are handled by the
+ * 'addWsFolderToCache()` function.  This function is calledfrom thefileWatcher instance when
+ * a new folder is created, or copied into a workspace.
+ *
+ * @since 3.0.0
+ */
 export async function addFolderToCache(folder: Uri, logPad: string)
 {
     const licMgr = getLicenseManager();
@@ -252,6 +266,10 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
 }
 
 
+/**
+ * @method addToMappings
+ * @since 3.0.0
+ */
 function addToMappings(taskType: string, item: ICacheItem, logPad: string)
 {
     log.methodStart("add item to mappings", 4, logPad, false, [[ "task type", taskType ], [ "file", item.uri.fsPath ]]);
@@ -451,6 +469,10 @@ function disposeStatusBarSpace(statusBarSpace: StatusBarItem)
 }
 
 
+/**
+ * @method getExcludesPatternGlob
+ * @since 3.0.0
+ */
 function getExcludesPatternGlob()
 {
     const excludes: string[] = configuration.get("exclude");
@@ -488,6 +510,10 @@ export const getTaskFiles = (taskType: string) =>
 };
 
 
+/**
+ * @method getTaskFileCount
+ * @since 3.0.0
+ */
 const getTaskFileCount = (taskType?: string) =>
 {
     let count = 0;
@@ -501,6 +527,10 @@ const getTaskFileCount = (taskType?: string) =>
 };
 
 
+/**
+ * @method globAsync
+ * @since 3.0.0
+ */
 export function globAsync(pattern: string, options: any): Promise<string[]>
 {
     return new Promise(function (resolve, reject)
@@ -595,6 +625,16 @@ export async function removeFileFromCache(taskType: string, uri: Uri, logPad: st
 }
 
 
+/**
+ * @method removeFolderFromCache
+ *
+ * @param folder The folder to be removed from the cache.  This folder should be a sub-folder within
+ * a workspace folder.  Workspace folders are handled differently and are handled by the
+ * 'removeWsFolders()` function.  This function is calledfrom the fileWatcher instance when
+ * a new folder is deleted or renamed.
+ *
+ * @since 3.0.0
+ */
 export async function removeFolderFromCache(uri: Uri, logPad: string)
 {
     log.methodStart("remove folder from cache", 2, logPad, false, [[ "folder", uri.fsPath ]]);
@@ -607,6 +647,10 @@ export async function removeFolderFromCache(uri: Uri, logPad: string)
 }
 
 
+/**
+ * @method removeTaskTypeFromCache
+ * @since 3.0.0
+ */
 export async function removeTaskTypeFromCache(taskType: string, logPad: string)
 {
     log.methodStart("remove task type from cache", 2, logPad, false, [[ "task type", taskType ]]);
@@ -615,6 +659,10 @@ export async function removeTaskTypeFromCache(taskType: string, logPad: string)
 }
 
 
+/**
+ * @method removeFromMappings
+ * @since 3.0.0
+ */
 function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: boolean, logPad: string)
 {
     let wsFolders: readonly WorkspaceFolder[];

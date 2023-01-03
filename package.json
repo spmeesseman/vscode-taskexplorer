@@ -1764,12 +1764,6 @@
                     "order": 60,
                     "markdownDescription": "%config.taskExplorer.logging.enableFile%"
                 },
-                "taskExplorer.logging.fileName": {
-                    "type": "string",
-                    "default": "taskexplorer.log",
-                    "order": 65,
-                    "markdownDescription": "%config.taskExplorer.logging.fileName%"
-                },
                 "taskExplorer.logging.level": {
                     "type": "number",
                     "enum": [ 1, 2,  3, 4, 5 ],

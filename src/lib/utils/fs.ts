@@ -123,6 +123,7 @@ export function createDir(dir: string)
             }
             fs.mkdir(path.resolve(cwd, dir), { mode: 0o777 }, (err) =>
             {
+                // istanbul ignore if //
                 if (err) {
                     reject(err);
                 }
@@ -135,7 +136,7 @@ export function createDir(dir: string)
     });
 }
 
-
+/*
 export function deleteDir(dir: string): Promise<void>
 {
     return new Promise<void>(async (resolve, reject) =>
@@ -155,7 +156,7 @@ export function deleteDir(dir: string): Promise<void>
         }
     });
 }
-
+*/
 /*
 export function deleteFile(file: string): Promise<void>
 {

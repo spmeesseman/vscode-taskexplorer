@@ -41,7 +41,7 @@ export const providersExternal: Map<string, ExternalExplorerProvider> = new Map(
 
 export async function activate(context: ExtensionContext) // , disposables: Disposable[]): Promise<ITaskExplorerApi>
 {
-    log.initLog("taskExplorer", "Task Explorer", context);
+    await log.initLog("taskExplorer", "Task Explorer", context);
     initStorage(context);
 
     log.write("");

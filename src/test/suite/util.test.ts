@@ -6,7 +6,7 @@ import * as assert from "assert";
 import * as log from "../../lib/utils/log";
 import * as util from "../../lib/utils/utils";
 import { workspace, WorkspaceFolder } from "vscode";
-import { activate, isReady, testsControl } from "../helper";
+import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl } from "../helper";
 import { storage } from "../../lib/utils/storage";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { numFilesInDirectory } from "../../lib/utils/fs";
@@ -35,18 +35,19 @@ suite("Util Tests", () =>
 
 	suiteTeardown(async function()
 	{
-		await teApi.config.updateWs("logging.enable", testsControl.writeToOutput);
+		await executeSettingsUpdate("logging.enable", testsControl.writeToOutput);
+		await executeSettingsUpdate("logging.enableFile", false);
 	});
 
 
-    test("General Utility methods", async function()
+    test("Logging", async function()
     {
         const uri = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined;
         if (!uri) {
             assert.fail("         ✘ Workspace folder does not exist");
         }
 
-        await teApi.config.updateWs("logging.enable", true);
+        await executeSettingsUpdate("logging.enable", true);
 
         log.blank();
         log.write(`        ${creator}.${extension}`);
@@ -67,17 +68,35 @@ suite("Util Tests", () =>
 		log.setWriteToConsole(false);
 
 		// nullvalue
+		log.write(null as unknown as string);
+		log.write(undefined as unknown as string);
+		log.blank();
+		log.write("");
+		log.write("");
 		log.value("null value", null);
 		log.value("empty string value", "");
+		log.value("undefined value", undefined, 1);
 
 		log.error("Test5 error");
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
-		log.error([ "Test error 1",  new Error("Test error object") ]);
-		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
+		log.error([ "Test error 2",  new Error("Test error object") ]);
+		log.error([ "Test error 3", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
+		log.error({
+			status: false,
+			message: "Test error 4"
+		});
+		log.error({
+			status: false,
+			message: "Test error 5",
+			messageX: "Test error 5X"
+		});
+		log.error({
+			status: false
+		});
 
 		// Disabled logging
-		await teApi.config.updateWs("logging.enable", false);
+		await executeSettingsUpdate("logging.enable", false);
 		log.write("test");
 		log.value("test", "1");
 
@@ -96,7 +115,7 @@ suite("Util Tests", () =>
 		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
 
 		// Re-enable logging
-		await teApi.config.updateWs("logging.enable", true);
+		await executeSettingsUpdate("logging.enable", true);
 
         assert(util.camelCase("taskexplorer", 4) === "taskExplorer");
         assert(util.camelCase(undefined, 4) === undefined);
@@ -132,96 +151,18 @@ suite("Util Tests", () =>
     });
 
 
-    // test("Info Page / Licensing", async function()
-    // {
-	// 	const licenseKey = getLicenseKey(),
-	// 		  version = getVersion(),
-	// 		  storedVersion = storage.get<string>("version") as string;
-//
-	// 	this.timeout(45000);
-//
-	// 	await setLicenseKey(undefined);
-    //     let panel = await displayInfoPage(storedVersion);
-	// 	assert(panel);
-	// 	await sleep(100);
-	// 	panel.dispose();
-	// 	await sleep(100);
-//
-	// 	await storage.update("version", "10.0.0.0");
-    //     panel = await displayInfoPage(storedVersion);
-	// 	assert(panel);
-	// 	await sleep(100);
-	// 	panel.dispose();
-	// 	await sleep(100);
-//
-	// 	await setLicenseKey("1111-2222-3333-4444");
-    //     panel = await displayInfoPage(storedVersion);
-	// 	assert(panel);
-	// 	await sleep(100);
-	// 	panel.dispose();
-	// 	await sleep(100);
-//
-	// 	await storage.update("version", storedVersion);
-    //     panel = await displayInfoPage(version);
-	// 	assert(panel);
-	// 	await sleep(100);
-	// 	panel.dispose();
-	// 	await sleep(100);
-//
-	// 	await storage.update("version", version);
-    //     panel = await displayInfoPage(version);
-	// 	assert(panel);
-	// 	await sleep(100);
-	// 	panel.dispose();
-	// 	await sleep(100);
-//
-	// 	await storage.update("version", storedVersion); // restore
-	// 	await setLicenseKey(licenseKey);                // restore
-    // });
-
-
-    test("Asynchronous forEach", async function()
+	test("Logging (File)", async function()
     {
-        const arr = [ 1, 2, 3, 4, 5 ];
-        let curNum = 1;
-
-        const asyncFn = async function(num: number)
-        {
-            setTimeout(() => {
-                assert(num === curNum++);
-            }, 100);
-        };
-
-        for (const n of arr)
-        {
-            await asyncFn(n);
-        }
-    });
-
-
-    test("Asynchronous mapForEach", async function()
-    {
-        const arr: Map<number, number> = new Map();
-        let curNum = 1;
-
-        for (let i = 1; i <= 5; i++) {
-            arr.set(i, i);
-        }
-
-        const asyncFn = async function(num: number)
-        {
-            setTimeout(() => {
-                assert(num === curNum++);
-            }, 100);
-        };
-
-        for (const a of arr)
-        {
-            const n = a[1], n2 = a[0];
-            assert(n === n2);
-            await asyncFn(n);
-        }
-    });
+		await executeSettingsUpdate("logging.enableFile", true);
+		log.write("Test1", 1);
+		log.value("Test2", "value", 1);
+		await executeSettingsUpdate("logging.enableFile", false);
+		log.write("Test1", 1);
+		log.value("Test2", "value", 1);
+		await executeSettingsUpdate("logging.enableFile", true);
+		log.value("Test3", "value3", 1);
+		await executeSettingsUpdate("logging.enableFile", false);
+	});
 
 
 	test("Data paths", async function()

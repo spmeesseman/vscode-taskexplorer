@@ -269,7 +269,6 @@ async function initSettings(enable = true)
     await configuration.updateWs("logging.enable", testsControl.writeToOutput);
     await configuration.updateWs("logging.level", testsControl.logLevel);
     await configuration.updateWs("logging.enableFile", testsControl.writeToFile);
-    await configuration.updateWs("logging.fileName", testsControl.writeToFileName);
     await configuration.updateWs("pathToPrograms", configuration.get<object>("pathToPrograms"));
     await configuration.updateWs("showHiddenWsTasks", enable);
     await configuration.updateWs("showRunningTask", enable);

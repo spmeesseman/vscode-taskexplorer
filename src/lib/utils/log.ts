@@ -3,8 +3,9 @@
 import { configuration } from "./configuration";
 import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
 import { writeFileSync } from "fs";
-import { getUserDataPath, isArray, isError, isObject, isString } from "./utils";
-import { join } from "path";
+import { isArray, isError, isObject, isString } from "./utils";
+import { dirname, join } from "path";
+import { createDir } from "./fs";
 
 
 // export enum LogColor
@@ -31,7 +32,7 @@ const msgQueue: { [queueId: string]:  IMsgQueueItem[] } = {};
 
 let enable= false;
 let enableFile= false;
-let fileName= "taskexplorer.log";
+let fileName= "";
 let logLevel = -1;
 let writeToConsole = false;
 let writeToConsoleLevel = 2;
@@ -76,11 +77,11 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
             }
             else if (isObject(err)) {
                 writeError(err);
-                if (err.message) {
-                    writeError(err.message, queueId);
-                }
                 if (err.messageX) {
                     writeError(err.messageX, queueId);
+                }
+                else if (err.message) {
+                    writeError(err.message, queueId);
                 }
                 else {
                     writeError(err.toString(), queueId);
@@ -102,7 +103,7 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
 }
 
 
-export function initLog(settingGrpName: string, dispName: string, context: ExtensionContext, showLog?: boolean)
+export async function initLog(settingGrpName: string, dispName: string, context: ExtensionContext, showLog?: boolean)
 {
     function showLogOutput(show: boolean)
     {
@@ -111,10 +112,12 @@ export function initLog(settingGrpName: string, dispName: string, context: Exten
         }
     }
 
-    enable = configuration.get("logging.enable");
-    enableFile = configuration.get("logging.enableFile");
-    fileName = configuration.get("logging.fileName");
-    logLevel = configuration.get("logging.level");
+    enable = configuration.get<boolean>("logging.enable");
+    logLevel = configuration.get<number>("logging.level");
+
+    enableFile = configuration.get<boolean>("logging.enableFile");
+    fileName = join(context.logUri.fsPath, getLogFileName());
+    await createDir(dirname(fileName));
 
     //
     // Set up a log in the Output window
@@ -129,12 +132,39 @@ export function initLog(settingGrpName: string, dispName: string, context: Exten
     });
     context.subscriptions.push(d);
     showLogOutput(showLog || false);
+
+    write("Log has beeninitialized", 1);
+    logLogFileLocation();
+}
+
+
+// export function getAbsLogFilePath()
+// {
+//     return fileName;
+// }
+
+
+function getLogFileName()
+{
+    const tzOffset = (new Date()).getTimezoneOffset() * 60000, //offset in milliseconds
+          locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T")[0].replace(/[\-]/g, "");
+    return `taskexplorer-${locISOTime}.log`;
 }
 
 
 export function isLoggingEnabled()
 {
     return enable;
+}
+
+
+function logLogFileLocation()
+{
+    if (enable && enableFile) {
+        write("*************************************************************************************", 1);
+        write(" Log File: " + fileName);
+        write("*************************************************************************************", 1);
+    }
 }
 
 
@@ -172,12 +202,9 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     if (e.affectsConfiguration("taskExplorer.logging.enableFile"))
     {
         enableFile = configuration.get<boolean>("logging.enableFile", false);
+        logLogFileLocation();
     }
     if (e.affectsConfiguration("taskExplorer.logging.level"))
-    {
-        fileName = join(getUserDataPath(), configuration.get<string>("logging.fileName", "taskexplorer.log"))
-    }
-    if (e.affectsConfiguration("taskExplorer.logging.fileName"))
     {
         logLevel = configuration.get<number>("logging.level", -1);
     }
