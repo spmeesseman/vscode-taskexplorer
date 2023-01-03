@@ -450,19 +450,28 @@ export function isExcluded(uriPath: string, logPad = "")
     const exclude = configuration.get<string[]>("exclude", []);
 
     log.blank(4);
-    log.write(logPad + "Check exclusion", 4);
-    log.value(logPad + "   path", uriPath, 4);
+    log.write("Check exclusion", 4, logPad);
+    log.value("   path", uriPath, 4, logPad);
 
-
-    for (const pattern of exclude) {
-        log.value(logPad + "   checking pattern", pattern, 5);
-        if (testForExclusionPattern(uriPath, pattern)) {
-            log.write(logPad + "   Excluded!", 4);
+    for (const pattern of exclude)
+    {
+        log.value("   checking pattern", pattern, 5);
+        if (testForExclusionPattern(uriPath, pattern))
+        {
+            log.write("   Excluded!", 4, logPad);
             return true;
+        }
+        if (!path.extname(uriPath) && !uriPath.endsWith(path.sep))
+        {
+            if (testForExclusionPattern(uriPath + path.sep, pattern))
+            {
+                log.write("   Folder excluded!", 4, logPad);
+                return true;
+            }
         }
     }
 
-    log.write(logPad + "   Not excluded", 4);
+    log.write("   Not excluded", 4, logPad);
     return false;
 }
 
