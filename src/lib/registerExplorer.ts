@@ -7,7 +7,7 @@ import { ExtensionContext, workspace, window } from "vscode";
 import { ITaskExplorerApi } from "../interface";
 
 
-export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext, enabled: boolean, teApi: ITaskExplorerApi)
+export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext, enabled: boolean, teApi: ITaskExplorerApi, isActivation: boolean)
 {
     let view = views.get(name);
     log.write("Register explorer view / tree provider '" + name + "'", 1, "   ");
@@ -29,11 +29,13 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
             if (name === "taskExplorer")
             {
                 teApi.explorer = treeDataProvider;
+                teApi.explorer.setEnabled(!isActivation);
                 teApi.explorerView = view;
             }
             else // name === "taskExplorerSideBar"
             {
                 teApi.sidebar = treeDataProvider;
+                teApi.sidebar.setEnabled(!isActivation);
                 teApi.sidebarView = view;
             }
         }

@@ -69,8 +69,8 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     // Register the tree providers
     //
-    registerExplorer("taskExplorer", context, configuration.get<boolean>("enableExplorerView", true), teApi);
-    registerExplorer("taskExplorerSideBar", context, configuration.get<boolean>("enableSideBar", false), teApi);
+    registerExplorer("taskExplorer", context, configuration.get<boolean>("enableExplorerView", true), teApi, true);
+    registerExplorer("taskExplorerSideBar", context, configuration.get<boolean>("enableSideBar", false), teApi, true);
 
     //
     // Register configurations/settings change watcher
@@ -307,6 +307,6 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
         await util.timeout(minWait - waited);
     }
     if (waited > 0) {
-        log.write(`waited ${waited} milliseconds for idle state`, 3, logPad);
+        log.write(`waited ${waited} milliseconds for idle state`, 4, logPad);
     }
 }
