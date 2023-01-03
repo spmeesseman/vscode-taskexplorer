@@ -315,6 +315,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
+    private babysitterCt = 0;
     /**
      * Used as a check to reset node state when a task 'hangs' or whatever it does sometimes
      * when the task fails ad the vscode engine doesnt trigger the taskexec finished event.
@@ -330,7 +331,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             {   /* istanbul ignore if */
                 if (!t.isExecuting()) {
                     // t.refreshState(false);
-                    this.fireTaskChangeEvents(t, "", 5);
+                    if (++this.babysitterCt >= 3)
+                    {
+                        this.babysitterCt = 0;
+                        log.write("task babysitter firing change event", 1);
+                        log.value("   task name", t.task.name, 1);
+                        this.fireTaskChangeEvents(t, "   ", 1);
+                    }
+                    else {
+                        this.babysitRunningTask(t);
+                    }
                 }
                 else {
                     this.babysitRunningTask(t);
@@ -929,14 +939,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     private fireTaskChangeEvents(taskItem: TaskItem, logPad: string, logLevel: number)
     {
         /* istanbul ignore next */
-        if (!this.taskTree || !taskItem) {
+        if (!this.taskTree) {
+            return;
+        }
+        /* istanbul ignore next */
+        if (!taskItem) {
             /* istanbul ignore next */
-            log.error("task change event fire, invalid argument");
+            log.error("task change event fire, invalid taskItem argument");
             /* istanbul ignore next */
             return;
         }
 
-        log.methodStart("fire task change events", logLevel, logPad);
+        log.methodStart("fire task change events", logLevel, logPad, false, [
+            [ "task name", taskItem.task.name ], [ "task type", taskItem.task.source ], [ "resource path", taskItem.taskFile.resourceUri.fsPath ]
+        ]);
 
         //
         // Fire change event for parent folder.  Firing the change event for the task item itself
@@ -1042,6 +1058,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             [ "current invalidation", this.currentInvalidation ], [ "tree needs rebuild", !this.taskTree ],
             [ "first run", firstRun ]
         ]);
+        if (element instanceof TaskFile)
+        {
+            log.values(logLevel, logPad + "   ", [
+                [ "tree item type", "task file" ], [ "id", element.id ], [ "file name", element.fileName ]
+            ]);
+        }
+        else if (element instanceof TaskFolder)
+        {
+            log.values(logLevel, logPad + "   ", [
+                [ "tree item type", "task folder" ], [ "id", element.id ], [ "resource path", element.resourceUri?.fsPath ]
+            ]);
+        }
+        /* istanbul ignore else */
+        else if (!element)
+        {
+            log.value("tree item type", "asking for all (null)", logLevel, logPad);
+        }
+        else { log.error("Unknown treeitem type"); }
 
         //
         // The vscode task engine processing will call back in multiple time while we are awaiting
@@ -1096,42 +1130,28 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 // all tasks of the type defined in 'currentInvalidation' from the tasks list cache,
                 // and add the new tasks from VSCode into the tasks list.
                 //
-                const toRemove: number[] = [];
                 const taskItems = await tasks.fetchTasks(
                 {
                     type: !isScriptType ? this.currentInvalidation : "script"
                 });
-
-                for (let i = 0; i < this.tasks.length; i++)
-                {
-                    const t = this.tasks[i];
-                    //
+                //
+                // Remove tasks of type '' from the 'tasks'array
+                //
+                this.tasks.slice().reverse().forEach((item, index, object) =>
+                {   //
                     // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
                     // if the script type set for the task in tasks.json is of type 'currentInvalidation'.
                     // Remove any Workspace type tasks returned as well, in this case the source type is
                     // != currentInvalidation, but the definition type == currentInvalidation
                     //
-                    if (t.source === this.currentInvalidation || t.source === "Workspace" || (isScriptType && util.isScriptType(t.source)))
+                    if (item.source === this.currentInvalidation || item.source === "Workspace" || (isScriptType && util.isScriptType(item.source)))
                     {
-                        if (t.source !== "Workspace" || t.definition.type === this.currentInvalidation) {
-                            toRemove.push(i);
+                        if (item.source !== "Workspace" || item.definition.type === this.currentInvalidation) {
+                            log.write(`   removing old task '${item.source}/${item.name}'`, 4, logPad);
+                            (this.tasks as Task[]).splice(object.length - 1 - index, 1);
                         }
                     }
-
-                    // for (const externalProviderMap of providersExternal)
-                    // {
-                    //     const externalTasks = await externalProviderMap[1].provideTasks();
-                    //     log.write(`   Get tasks from external provider ${externalProviderMap[0]}`, 4, logPad);
-                    //     this.tasks.push(...(externalTasks || []));
-                    // }
-                }
-
-                let rmvCount = -1;
-                for (const t of toRemove) {
-                    const idx = t - (++rmvCount);
-                    log.write(`   removing old task '${this.tasks[idx].source}/${this.tasks[idx].name}'`, 4, logPad);
-                    this.tasks.splice(idx, 1);
-                }
+                });
 
                 this.tasks.push(...taskItems);
             }
@@ -1183,17 +1203,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         let items: TreeItem[] = [];
         if (element instanceof TaskFolder)
         {
-            log.write("   Get folder task files", logLevel, logPad);
+            log.write("   Return task folder (task files)", logLevel, logPad);
             items = element.taskFiles;
         }
         else if (element instanceof TaskFile)
         {
-            log.write("   Get file tasks/scripts", logLevel, logPad);
+            log.write("   Return taskfile (tasks/scripts)", logLevel, logPad);
             items = element.treeNodes;
         }
         else if (!element)
         {
-            log.write("   Get task tree", logLevel, logPad);
+            log.write("   Return full task tree", logLevel, logPad);
             items = this.taskTree;
         }
 
@@ -1208,7 +1228,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.currentInvalidation = undefined; // reset file modification task type flag
 
         log.methodDone("get tree children", logLevel, logPad, false, [
-            [ "# of tasks total", this.tasks?.length ], [ "# of tasks returned", items.length ]
+            [ "# of tasks total", this.tasks?.length ], [ "# of tree task items returned", items.length ]
         ]);
 
         return items;
@@ -2622,7 +2642,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         taskTimerId = setTimeout(async () =>
         {
             try
-            {   log.methodStart("task started event", 1);
+            {   log.methodStart("task started event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ]]);
                 //
                 // Show status bar message (if ON in settings)
                 //
