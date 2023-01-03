@@ -2458,7 +2458,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         if (!tree || tree.length === 0 || (tree.length === 1 &&
             (tree[0].contextValue === "noscripts" || tree[0].contextValue === "noworkspace" || tree[0].contextValue === "initscripts" || tree[0].contextValue === "loadscripts")))
         {
-            log.write(logPad + "   no tasks found in tree", 1);
+            log.write("   no tasks found in tree", 1, logPad);
+            log.methodDone("show special tasks", 1, logPad);
             return;
         }
 
@@ -2508,6 +2509,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         if (changed) {
             this._onDidChangeTreeData.fire(taskItem);
         }
+
+        log.methodDone("show special tasks", 1, logPad);
     }
 
 

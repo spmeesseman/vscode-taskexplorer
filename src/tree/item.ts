@@ -148,7 +148,7 @@ export default class TaskItem extends TreeItem
         const isExecuting = !!this.isExecuting();
         if (doLog) log.methodStart("refresh state", 5, "   ", false, [[ "is executing", isExecuting ]]);
         this.setContextValue(this.task, isExecuting);
-        this.setIconPath(this.task, this.context, isExecuting);
+        this.setIconPath(this.context, isExecuting);
         if (doLog) log.methodDone("refresh state", 5, "   ", false, [[ "is executing", isExecuting ]]);
     }
 
@@ -189,13 +189,13 @@ export default class TaskItem extends TreeItem
     }
 
 
-    setIconPath(task: Task, context: ExtensionContext, running: boolean)
+    setIconPath(context: ExtensionContext, running: boolean)
     {   //
         // Type "$empty" is a composite tasks
         //
         if (running) // && task.definition.type !== "$empty")
         {
-            const disableAnimated = configuration.get<boolean>("disableAnimatedIcons");
+            const disableAnimated = configuration.get<boolean>("visual.disableAnimatedIcons");
             this.iconPath = {
                 light: context.asAbsolutePath(path.join("res", "light", !disableAnimated ? "loading.svg" : "loadingna.svg")),
                 dark: context.asAbsolutePath(path.join("res", "dark", !disableAnimated ? "loading.svg" : "loadingna.svg"))

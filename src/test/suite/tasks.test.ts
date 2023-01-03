@@ -9,15 +9,15 @@ import * as assert from "assert";
 import TaskItem from "../../tree/item";
 import { storage } from "../../lib/utils/storage";
 import constants from "../../lib/constants";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks,
+    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer, getTreeTasks,
     isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
 } from "../helper";
 
-let runCount = 0;
 let lastTask: TaskItem | null = null;
 let teApi: ITaskExplorerApi;
+let explorer: IExplorerApi;
 let ant: TaskItem[];
 let bash: TaskItem[];
 let batch: TaskItem[];
@@ -37,14 +37,17 @@ suite("Task Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
+        if (!teApi.explorer) {
+            assert.fail("        ✘ Explorer instance does not exist");
+        }
+        explorer = teApi.explorer;
     });
 
 
-    test("Refresh", async function()
-    {
-        this.slow(testsControl.slowTimeForRefreshCommand);
-        await executeTeCommand("refresh", 1000);
-    });
+	test("Focus Task Explorer View for Tree Population", async function()
+	{
+        await focusExplorer(this);
+	});
 
 
     test("Check task counts", async function()
@@ -115,7 +118,7 @@ suite("Task Tests", () =>
     test("Trigger busy on run last task", async function()
     {
         this.slow(waitTimeForRunCommand + 1000 + waitTimeForFsCreateEvent);
-        teApi.explorer?.invalidateTasksCache();// Don't await
+        explorer.invalidateTasksCache();// Don't await
         await executeTeCommand("runLastTask", waitTimeForRunCommand, 5000);
     });
 
@@ -201,7 +204,6 @@ suite("Task Tests", () =>
         await executeTeCommand2("pause", [ batchTask ], 500);
         await executeSettingsUpdate("keepTermOnStop", true);
         await executeTeCommand2("stop", [ batchTask ], 50);
-        await executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await executeSettingsUpdate("showRunningTask", false);
         await executeTeCommand("runLastTask", 1500, waitTimeMax, batchTask);
         await executeSettingsUpdate("keepTermOnStop", false);
@@ -225,7 +227,6 @@ suite("Task Tests", () =>
         await executeTeCommand2("open", [ batchTask, true ], 100); // clickaction=execute
         await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], waitTimeForRunCommand);
         await executeTeCommand2("stop", [ batchTask ], 200);
-        await executeSettingsUpdate("visual.disableAnimatedIcons", false);
         overrideNextShowInputBox("--test --test2");
         await executeTeCommand2("runWithArgs", [ batchTask ], waitTimeForRunCommand / 3);
         // await executeTeCommand("stop", 200, waitTimeMax, batchTask);
@@ -242,7 +243,7 @@ async function startTask(taskItem: TaskItem)
     console.log(`    ℹ Run ${taskItem.taskSource} task: ${taskItem.label}`);
     console.log(`        Folder: ${taskItem.getFolder()?.name}`);
     await executeSettingsUpdate("taskButtons.clickAction", "Execute");
-    await executeSettingsUpdate("specialFolders.showLastTasks", (++runCount % 2) === 1);
+    // await executeSettingsUpdate("specialFolders.showLastTasks", (++runCount % 2) === 1);
     let removed = await executeTeCommand2("addRemoveFromFavorites", [ taskItem ]);
     if (removed) {
         await executeTeCommand2("addRemoveFromFavorites", [ taskItem ]);
