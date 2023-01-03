@@ -105,7 +105,11 @@ export default class TaskItem extends TreeItem
         //
         // Tooltip
         //
-        this.tooltip = "Open " + task.name + (task.detail ? ` | ${task.detail}` : "");
+        this.tooltip = "Open " + task.name + (task.detail ? ` | ${task.detail}` : "") +
+                        `   source : \`${task.source}\``;
+        if (task.definition.type !== task.source) {
+            this.tooltip += `   type   : \`${task.definition.type}\``;
+        }
         //
         // Refresh state - sets context value, icon path from execution state
         //
