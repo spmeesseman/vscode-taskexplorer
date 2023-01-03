@@ -144,7 +144,15 @@ suite("Typescript Tests", () =>
 
     test("Invalid JSON", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent);
+        // let resetLogging = teApi.log.isLoggingEnabled();
+        // if (resetLogging) { // turn scary error logging off
+        //     this.slow(testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForConfigEvent * 2));
+        //     executeSettingsUpdate("logging.enable", false);
+        //     resetLogging = true;
+        // }
+        // else {
+        //     this.slow(testsControl.slowTimeForFsCreateEvent);
+        // }
         fs.writeFileSync(
             fileUri.fsPath,
             "{\n" +
@@ -166,6 +174,9 @@ suite("Typescript Tests", () =>
         );
         await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent, 3000);
         await verifyTaskCountByTree(testsName, 4); // I guess internal TSC must not invalidate tasks on bad syntax
+        // if (resetLogging) { // turn scary error logging off
+        //     executeSettingsUpdate("logging.enable", true);
+        // }
     });
 
 

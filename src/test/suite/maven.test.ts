@@ -109,7 +109,15 @@ suite("Maven Tests", () =>
 
     test("Invalid XML", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent);
+        let resetLogging = teApi.log.isLoggingEnabled();
+        if (resetLogging) { // turn scary error logging off
+            this.slow(testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForConfigEvent * 2));
+            executeSettingsUpdate("logging.enable", false);
+            resetLogging = true;
+        }
+        else {
+            this.slow(testsControl.slowTimeForFsCreateEvent);
+        }
         fs.writeFileSync(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
@@ -118,6 +126,9 @@ suite("Maven Tests", () =>
         );
         await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent, 3000);
         await verifyTaskCount(testsName, 0);
+        if (resetLogging) { // turn scary error logging off
+            executeSettingsUpdate("logging.enable", true);
+        }
     });
 
 

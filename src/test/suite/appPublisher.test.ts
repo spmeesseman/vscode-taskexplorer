@@ -122,7 +122,15 @@ suite("App-Publisher Tests", () =>
 
     test("Invalid JSON", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent);
+        let resetLogging = teApi.log.isLoggingEnabled();
+        if (resetLogging) { // turn scary error logging off
+            this.slow(testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForConfigEvent * 2));
+            executeSettingsUpdate("logging.enable", false);
+            resetLogging = true;
+        }
+        else {
+            this.slow(testsControl.slowTimeForFsCreateEvent);
+        }
         fs.writeFileSync(
             fileUri.fsPath,
             "{\n" +
@@ -137,6 +145,9 @@ suite("App-Publisher Tests", () =>
         );
         await teApi.waitForIdle(waitTimeForFsModEvent);
         await verifyTaskCount(testsName, 21);
+        if (resetLogging) { // turn scary error logging off
+            executeSettingsUpdate("logging.enable", true);
+        }
     });
 
 

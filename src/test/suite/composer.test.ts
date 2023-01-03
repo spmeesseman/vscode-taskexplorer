@@ -164,6 +164,15 @@ suite("Composer Tests", () =>
 
     test("Invalid JSON", async function()
     {
+        let resetLogging = teApi.log.isLoggingEnabled();
+        if (resetLogging) { // turn scary error logging off
+            this.slow(testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForConfigEvent * 2));
+            executeSettingsUpdate("logging.enable", false);
+            resetLogging = true;
+        }
+        else {
+            this.slow(testsControl.slowTimeForFsCreateEvent);
+        }
         fs.writeFileSync(
             fileUri.fsPath,
             "{\n" +
@@ -176,9 +185,11 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "\n"
         );
-
         await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
         await verifyTaskCount(testsName, 2);
+        if (resetLogging) { // turn scary error logging off
+            executeSettingsUpdate("logging.enable", true);
+        }
     });
 
 
