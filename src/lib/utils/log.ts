@@ -1,10 +1,10 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { configuration } from "./configuration";
-import { OutputChannel, ExtensionContext, commands, window } from "vscode";
+import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
 import { writeFileSync } from "fs";
-import { isArray, isError, isObject, isString } from "./utils";
-import { log } from "console";
+import { getUserDataPath, isArray, isError, isObject, isString } from "./utils";
+import { join } from "path";
 
 
 // export enum LogColor
@@ -29,10 +29,12 @@ export interface IMsgQueueItem
 const logValueWhiteSpace = 45;
 const msgQueue: { [queueId: string]:  IMsgQueueItem[] } = {};
 
+let enable= false;
+let enableFile= false;
+let fileName= "taskexplorer.log";
+let logLevel = -1;
 let writeToConsole = false;
 let writeToConsoleLevel = 2;
-let writeToFile = false;
-let writeToFileLevel = 2;
 let lastWriteWasBlank = false;
 let logOutputChannel: OutputChannel | undefined;
 
@@ -108,6 +110,12 @@ export function initLog(settingGrpName: string, dispName: string, context: Exten
             logOutputChannel.show();
         }
     }
+
+    enable = configuration.get("logging.enable");
+    enableFile = configuration.get("logging.enableFile");
+    fileName = configuration.get("logging.fileName");
+    logLevel = configuration.get("logging.level");
+
     //
     // Set up a log in the Output window
     //
@@ -116,19 +124,23 @@ export function initLog(settingGrpName: string, dispName: string, context: Exten
     context.subscriptions.push(
         commands.registerCommand(settingGrpName + ".showOutput", showLogOutput)
     );
+    const d = workspace.onDidChangeConfiguration(async e => {
+        await processConfigChanges(context, e);
+    });
+    context.subscriptions.push(d);
     showLogOutput(showLog || false);
 }
 
 
 export function isLoggingEnabled()
 {
-    return configuration.get("debug") === true;
+    return enable;
 }
 
 
 export function methodStart(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][], queueId?: string) // , color?: LogColor)
 {
-    if (isLoggingEnabled())
+    if (enable)
     {
         const lLevel = level || 1;
         if (doLogBlank === true) {
@@ -142,7 +154,7 @@ export function methodStart(msg: string, level?: number, logPad = "", doLogBlank
 
 export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][], queueId?: string)
 {
-    if (isLoggingEnabled())
+    if (enable)
     {
         const lLevel = level || 1;
         values(lLevel, logPad + "   ", params, doLogBlank, queueId);
@@ -151,10 +163,24 @@ export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?
 }
 
 
-export function setWriteToFile(set: boolean, level = 2)
+async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChangeEvent)
 {
-    writeToFile = set;
-    writeToFileLevel = level;
+    if (e.affectsConfiguration("taskExplorer.logging.enable"))
+    {
+        enable = configuration.get<boolean>("logging.enable", false);
+    }
+    if (e.affectsConfiguration("taskExplorer.logging.enableFile"))
+    {
+        enableFile = configuration.get<boolean>("logging.enableFile", false);
+    }
+    if (e.affectsConfiguration("taskExplorer.logging.level"))
+    {
+        fileName = join(getUserDataPath(), configuration.get<string>("logging.fileName", "taskexplorer.log"))
+    }
+    if (e.affectsConfiguration("taskExplorer.logging.fileName"))
+    {
+        logLevel = configuration.get<number>("logging.level", -1);
+    }
 }
 
 
@@ -167,7 +193,7 @@ export function setWriteToConsole(set: boolean, level = 2)
 
 export function value(msg: string, value: any, level?: number, logPad = "", queueId?: string)
 {
-    if (isLoggingEnabled())
+    if (enable)
     {
         let logMsg = msg,
             valuePad = "";
@@ -218,7 +244,7 @@ export function value(msg: string, value: any, level?: number, logPad = "", queu
 
 export function values(level: number, logPad: string, params: any | (string|any)[][], doLogBlank?: boolean, queueId?: string)
 {
-    if (isLoggingEnabled())
+    if (enable)
     {
         if (doLogBlank === true) {
             blank(level, queueId);
@@ -238,7 +264,7 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
         return;
     }
 
-    if (isLoggingEnabled())
+    if (enable)
     {
         // if (color) {
         //     msg = color + msg + LogColor.white;
@@ -278,7 +304,7 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
             }
         };
 
-        if (logOutputChannel && (!level || level <= (configuration.get<number>("debugLevel") || -1))) {
+        if (logOutputChannel && (!level || level <= (logLevel))) {
             _write(logOutputChannel.appendLine, logOutputChannel);
         }
         if (writeToConsole) {
@@ -286,9 +312,9 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
                 _write(console.log, console);
             }
         }
-        if (writeToFile) {
-            if (!level || level <= writeToFileLevel) {
-                _write(writeFileSync, null, "taskexplorer.log");
+        if (enableFile) {
+            if (!level || level <= logLevel) {
+                _write(writeFileSync, null, fileName);
             }
         }
         lastWriteWasBlank = msg === "";

@@ -6,9 +6,6 @@
 	"config.taskExplorer.autoRefresh": "Auto refresh the task trees when a task file is modified.",
 	"config.taskExplorer.autoRefreshDeprecated": "Why did it exist in the first place",
 
-	"config.taskExplorer.debug": "Turn on logging.",
-	"config.taskExplorer.debugLevel": "Set debug verbosity (1 - Low / 5 - High).",
-
 	"config.taskExplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
 	"config.taskExplorer.enableSideBar": "Add a task explorer to the the sidebar.",
 
@@ -53,6 +50,11 @@
 	"config.taskExplorer.includeAntDeprecated": "Deprecated - Use `#globPatternsAnt#`",
 
 	"config.taskExplorer.keepTermOnStop": "Keep terminal open when stopping a task.",
+
+	"config.taskExplorer.logging.enabled": "Turn on logging. Log messages are written to the `Task Explorer` output window.",
+	"config.taskExplorer.logging.enableFile": "Enable logging to file (in addition to output window). Has no effect if `#logging.enabled#` is disabled.",
+	"config.taskExplorer.logging.fileName": "Turn on logging. Has no effect if `#logging.enabled#` or `#logging.enableFile#` are disabled.",
+	"config.taskExplorer.logging.level": "Set debug verbosity (1 - Low / 5 - High). Has no effect if `#logging.enabled#` is disabled.",
 	
 	"config.taskExplorer.pathToPrograms": "Paths to programs, if not registered in system path",
 	"config.taskExplorer.pathToAnsicon": "Ansicon",
