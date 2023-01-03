@@ -15,9 +15,9 @@ import { expect } from "chai";
 import { workspace, tasks, commands, Uri, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../lib/utils/utils";
 import { ITaskExplorerApi, IExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
-import { storage } from "../../lib/utils/storage";
 import {
     activate, buildTree, executeSettingsUpdate, executeTeCommand, executeTeCommand2, findIdInTaskMap,
+    focusExplorer,
     getTreeTasks, getWsPath, isReady, sleep, testsControl, verifyTaskCount
 } from "../helper";
 
@@ -68,7 +68,7 @@ suite("Provider Tests", () =>
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate("debug", testsControl.writeToOutput || testsControl.writeToConsole);
+        await executeSettingsUpdate("logging.enable", testsControl.writeToOutput || testsControl.writeToConsole);
         await executeSettingsUpdate("specialFolders.expanded.test-files", false);
     });
 
@@ -234,10 +234,7 @@ suite("Provider Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-        if (!explorer.isVisible()) {
-            this.slow(testsControl.slowTimeForFocusCommand);
-		    await executeTeCommand("focus", testsControl.waitTimeForCommand);
-        }
+        await focusExplorer(this);
 	});
 
 
@@ -278,45 +275,44 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations  - Last Tasks Collapsed", async function()
     {
-        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-        const showLasTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
-            await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
-            await storage.update(constants.LAST_TASKS_STORE, [ "hello.bat" ]);
+            await executeSettingsUpdate("specialFolders.showFavorites", true);
             await executeSettingsUpdate("specialFolders.showLastTasks", true);
             await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
-            expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(2);
+            expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
+            expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(1);
         }
         catch (e) {
             throw e;
         }
         finally {
             await executeSettingsUpdate("specialFolders.expanded.lastTasks", true);
-            await executeSettingsUpdate("specialFolders.showLastTasks", showLasTasks);
-            await storage.update(constants.FAV_TASKS_STORE, favTasks);
-            await storage.update(constants.LAST_TASKS_STORE, lastTasks);
+            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
+            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
         }
     });
 
 
     test("Build Tree Variations - Favorites Collapsed", async function()
     {
-        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        const showLasTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
-            await storage.update(constants.FAV_TASKS_STORE, [ "hello.bat" ]);
-            await executeSettingsUpdate("specialFolders.showLastTasks", false);
+            await executeSettingsUpdate("specialFolders.showFavorites", true);
+            await executeSettingsUpdate("specialFolders.showLastTasks", true);
             await executeSettingsUpdate("specialFolders.expanded.favorites", false);
-            expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1);
+            expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
+            expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(1);
         }
         catch (e) {
             throw e;
         }
         finally {
             await executeSettingsUpdate("specialFolders.expanded.favorites", true);
-            await executeSettingsUpdate("specialFolders.showLastTasks", showLasTasks);
-            await storage.update(constants.FAV_TASKS_STORE, favTasks);
+            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
+            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
         }
     });
 
@@ -326,7 +322,7 @@ suite("Provider Tests", () =>
         // The 3rd param `true` will open the task files and locate task positions while parsing the tree
         //
         this.slow(3000);
-        taskMap = await explorer.getTaskItems(undefined, "   ", true) as TaskMap;
+        taskMap = await explorer.getTaskItems(undefined, "   ", true);
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10);
     });
 
@@ -486,7 +482,7 @@ suite("Provider Tests", () =>
         fs.unlinkSync(file);
         await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
         await createMakeFile();
-        await teApi.config.updateWs("debug", true); // hit tree.logTask()
+        await teApi.config.updateWs("logging.enable", true); // hit tree.logTask()
     });
 
 
@@ -528,7 +524,7 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForRefreshCommand);
         await executeSettingsUpdate("specialFolders.expanded.test-files", true);
         await executeTeCommand("refresh");
-        await executeSettingsUpdate("debug", false); // was hitting tree.logTask()
+        await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
     });
 
 

@@ -202,8 +202,8 @@ export async function focusExplorer(instance: any)
 {
     if (!teApi.explorer?.isVisible()) {
         instance.slow(testsControl.slowTimeForRefreshCommand);
-        await executeTeCommand("focus", 50, testsControl.slowTimeForFocusCommand);
-        await teApi.waitForIdle(testsControl.slowTimeForRefreshCommand, testsControl.slowTimeForRefreshCommand);
+        await executeTeCommand("focus", 500, testsControl.slowTimeForFocusCommand);
+        await teApi.waitForIdle(500, testsControl.slowTimeForRefreshCommand);
     }
 }
 
@@ -345,7 +345,7 @@ export async function verifyTaskCount(taskType: string, expectedCount: number, s
 
 export async function verifyTaskCountByTree(taskType: string, expectedCount: number, taskMap?: TaskMap)
 {
-    const tasksMap = (taskMap || (await teApi.explorer?.getTaskItems(undefined, "   "))) as TaskMap,
+    const tasksMap = (taskMap || (await (teApi.explorer as IExplorerApi).getTaskItems(undefined, "   "))),
             taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
     assert(taskCount === expectedCount, `Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 }
