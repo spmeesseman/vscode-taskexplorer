@@ -10,7 +10,7 @@ import TaskFolder from "./folder";
 import constants from "../lib/constants";
 import { storage } from "../lib/utils/storage";
 import { rebuildCache } from "../cache";
-import { InitScripts, NoScripts, NoWorkspace } from "../lib/noScripts";
+import { InitScripts, LoadScripts, NoScripts, NoWorkspace } from "../lib/noScripts";
 import { configuration } from "../lib/utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
@@ -44,15 +44,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     private refreshPending = false;
     private visible = false;
     private enabled = false;
+    private setEnableCalled = false;
     private busy = false;
     private extensionContext: ExtensionContext;
     private name: string;
-    private taskTree: TaskFolder[] | NoScripts[] | InitScripts[] | NoWorkspace[] | null = null;
+    private taskTree: TaskFolder[] | NoScripts[] | InitScripts[] | NoWorkspace[] | undefined | null | void = null;
     private currentInvalidation: string | undefined;
     private taskIdStartEvents: Map<string, NodeJS.Timeout> = new Map();
     private taskIdStopEvents: Map<string, NodeJS.Timeout> = new Map();
-    private _onDidChangeTreeData: EventEmitter<TreeItem | null> = new EventEmitter<TreeItem | null>();
-    readonly onDidChangeTreeData: Event<TreeItem | null> = this._onDidChangeTreeData.event;
+    private _onDidChangeTreeData: EventEmitter<TreeItem | undefined | null | void> = new EventEmitter<TreeItem | undefined | null | void>();
+    readonly onDidChangeTreeData: Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
 
     constructor(name: string, context: ExtensionContext)
@@ -346,7 +347,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    public async buildTaskTree(tasksList: Task[], logPad: string, logLevel: number)
+    public async buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean)
     {
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
@@ -371,12 +372,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
         if (configuration.get<boolean>("specialFolders.showLastTasks") === true)
         {
-            if (lastTasks && lastTasks.length > 0)
-            {
+            // if (lastTasks && lastTasks.length > 0)
+            // {
                 ltFolder = new TaskFolder(constants.LAST_TASKS_LABEL, nodeExpandedeMap.lastTasks !== false ?
                                                                       TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
                 folders.set(constants.LAST_TASKS_LABEL, ltFolder);
-            }
+            // }
         }
 
         //
@@ -386,12 +387,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         if (configuration.get<boolean>("specialFolders.showFavorites"))
         {
-            if (favTasks && favTasks.length > 0)
-            {
+            // if (favTasks && favTasks.length > 0)
+            // {
                 favFolder = new TaskFolder(constants.FAV_TASKS_LABEL, nodeExpandedeMap.favorites !== false ?
                                                                     TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
                 folders.set(constants.FAV_TASKS_LABEL, favFolder);
-            }
+            // }
         }
 
         //
@@ -972,12 +973,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
         if (!this.enabled)
         {
-            const firstRun = this.name === "taskExplorer" && !this.tasks && !this.taskTree;
-            if (firstRun)
-            {
-                return [ new InitScripts() ];
-            }
-            return [ new NoScripts() ];
+            return [ !this.tasks && !this.taskTree ? new InitScripts() : new NoScripts() ];
+        }
+        else if (this.setEnableCalled && this.taskTree && !element)
+        {
+            // this.taskTree[0] = new LoadScripts();
+            // this.taskTree[0].contextValue = "loadscripts";
+            // return [ !this.tasks && !this.taskTree ? new InitScripts() : new NoScripts() ];
+            this.setEnableCalled = false;
+            // this._onDidChangeTreeData.fire();
+            // return [ new LoadScripts() ];
         }
 
         if (element instanceof TaskFile)
@@ -994,7 +999,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
 
         let waited = 0;
-        let items: TaskFolder[]|NoScripts[]|InitScripts[]|NoWorkspace[]|TaskFile[]|TaskItem[] = [];
         const licMgr = getLicenseManager();
         const firstRun = this.name === "taskExplorer" && !this.tasks && this.enabled &&
                           (!this.taskTree || this.taskTree[0].contextValue === "initscripts");
@@ -1016,6 +1020,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         // whole tree if it doesnt exist and build it node by node as theyare expanded, but, because we
         // have 'LastTasks' and 'Favorites', we need to load everything.  Oh well.
         //
+        // ^^^^^^ 1/2/23 -  WAIT?!?!  Was this because of the try/catch around the cll to buildTaskTree()???
+        //                            Commented the try/catch for now, look into side effects as we move on...
+        //
         while (this.treeBuilding) {
             /* istanbul ignore next */
             await util.timeout(200);
@@ -1026,8 +1033,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         if (waited) {
             log.write("   waited " + waited + " ms", logLevel, logPad);
         }
-
-        this.treeBuilding = true;
 
         //
         // Build task tree if not built already.
@@ -1129,10 +1134,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 //
                 // Build the entire task tree
                 //
-                try {
+                // try {
                     this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
-                }
-                catch (e: any) { /* istanbul ignore next */ log.error(e); }
+                // }
+                // catch (e: any) { /* istanbul ignore next */ log.error(e); }
                 /* istanbul ignore if */
                 if (!this.taskTree || this.taskTree.length === 0)
                 {
@@ -1144,6 +1149,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             }
         }
 
+        let items: TreeItem[] = [];
         if (element instanceof TaskFolder)
         {
             log.write("   Get folder task files", logLevel, logPad);
@@ -1167,7 +1173,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             await licMgr.setTasks(this.tasks || [], logPad + "   ");
         }
 
-        this.treeBuilding = false;
         this.refreshPending = false;
         this.currentInvalidation = undefined; // reset file modification task type flag
 
@@ -1883,7 +1888,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             //                                         //
             this.currentInvalidation = invalidate;     // 'invalidate' will be taskType if 'opt' is uri
             this.taskTree = null;                      // see todo above
-            // this._onDidChangeTreeData.fire(null);      // see todo above // task.definition.treeItem
+            // this._onDidChangeTreeData.fire();      // see todo above // task.definition.treeItem
         }                                              // not sure if its even possible
         else //                                        //
         {   // Re-ask for all tasks from all providers and rebuild tree
@@ -1893,7 +1898,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             this.taskTree = null;
         }
         if (this.visible) {
-            this._onDidChangeTreeData.fire(null);
+            this._onDidChangeTreeData.fire();
         }
         else {
             // this.getChildren();
@@ -2395,7 +2400,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     public setEnabled(enable: boolean)
     {
         this.enabled = enable;
-        this._onDidChangeTreeData.fire(null);
+        this.setEnableCalled = true;
+        this._onDidChangeTreeData.fire();
     }
 
 
@@ -2419,7 +2425,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
 
         if (!tree || tree.length === 0 || (tree.length === 1 &&
-            (tree[0].contextValue === "noscripts" || tree[0].contextValue === "noworkspace") || tree[0].contextValue === "initscripts"))
+            (tree[0].contextValue === "noscripts" || tree[0].contextValue === "noworkspace" || tree[0].contextValue === "initscripts" || tree[0].contextValue === "loadscripts")))
         {
             log.write(logPad + "   no tasks found in tree", 1);
             return;
@@ -2469,7 +2475,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
         /* istanbul ignore else */
         if (changed) {
-            this._onDidChangeTreeData.fire(taskItem || null);
+            this._onDidChangeTreeData.fire(taskItem);
         }
     }
 
