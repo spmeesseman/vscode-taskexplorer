@@ -3,9 +3,11 @@ import { configuration } from "../lib/utils/configuration";
 
 export const testControl = {
     keepSettingsFile: false,
-    logLevel: 3,
+    logLevel: 1,
     writeToConsole: false,
-    writeToOutput: false,
+    writeToFile: false,
+    writeToFileName: "taskexplorer.log",
+    writeToOutput: true,
     slowTimeForCommand: 1250,
     slowTimeForCommandFast: 450,
     slowTimeForConfigEvent: 200,
@@ -16,7 +18,8 @@ export const testControl = {
     slowTimeForNpmCommand: 7500,
     slowTimeForRefreshCommand: 10000,
     slowTimeForFetchTasksCommand: 1000,
-    userLogLevel: configuration.get<number>("debugLevel"),
+    // Use update() here for coverage, since these two settings wont trigger any processing
+    userLogLevel: configuration.get<number>("logging.level"),
     userPathToAnt: configuration.get<string>("pathToPrograms.ant"),
     waitTimeForBuildTree: 5000,
     waitTimeForFsCreateEvent: 200,

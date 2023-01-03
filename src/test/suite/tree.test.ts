@@ -13,7 +13,7 @@ import { storage } from "../../lib/utils/storage";
 import TaskItem from "../../tree/item";
 import { TreeItem } from "vscode";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, getTreeTasks,
+    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer, getTreeTasks,
     isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
 } from "../helper";
 
@@ -51,10 +51,7 @@ suite("Tree Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-        if (!explorer.isVisible()) {
-            this.slow(testsControl.slowTimeForFocusCommand);
-		    await executeTeCommand("focus", testsControl.waitTimeForCommand);
-        }
+        await focusExplorer(this);
 	});
 
 

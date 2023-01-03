@@ -4,10 +4,9 @@
 import * as assert from "assert";
 import { Uri } from "vscode";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {  activate, closeActiveDocument, isReady, executeTeCommand, testsControl } from "../helper";
+import {  activate, closeActiveDocument, isReady, executeTeCommand, testsControl, focusExplorer } from "../helper";
 
 let teApi: ITaskExplorerApi;
-let explorer: IExplorerApi;
 
 
 suite("Report Tests", () =>
@@ -18,10 +17,6 @@ suite("Report Tests", () =>
     {
 		teApi = await activate(this);
         assert(isReady("make") === true, "    ✘ TeApi not ready");
-        if (!teApi.explorer) {
-            assert.fail("        ✘ Explorer instance does not exist");
-        }
-        explorer = teApi.explorer;
 	});
 
 
@@ -33,10 +28,7 @@ suite("Report Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-		if (!explorer.isVisible()) {
-            this.slow(1000);
-		    await executeTeCommand("focus", testsControl.slowTimeForFocusCommand, 3000);
-        }
+		await focusExplorer(this);
 	});
 
 

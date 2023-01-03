@@ -9,12 +9,11 @@ import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import {
 	activate, closeActiveDocument, isReady, overrideNextShowInfoBox,
-	overrideNextShowInputBox, sleep, executeTeCommand, testsControl
+	overrideNextShowInputBox, sleep, executeTeCommand, testsControl, focusExplorer
 } from "../helper";
 
 
 let teApi: ITaskExplorerApi;
-let explorer: IExplorerApi;
 let licMgr: ILicenseManager;
 
 
@@ -28,10 +27,6 @@ suite("License Manager Tests", () =>
 	{
 		teApi = await activate(this);
         assert(isReady("make") === true, "    ✘ TeApi not ready");
-        if (!teApi.explorer) {
-            assert.fail("        ✘ Explorer instance does not exist");
-        }
-        explorer = teApi.explorer;
 	});
 
 
@@ -43,10 +38,7 @@ suite("License Manager Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-		if (!explorer.isVisible()) {
-            this.slow(1000);
-		    await executeTeCommand("focus", testsControl.slowTimeForFocusCommand, 3000);
-        }
+		await focusExplorer(this);
 	});
 
 

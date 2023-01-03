@@ -8,13 +8,12 @@ import TaskItem from "../../tree/item";
 import { getPackageManager } from "../../lib/utils/utils";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeTeCommand, executeTeCommand2, getTreeTasks, getWsPath, isReady, overrideNextShowInputBox, testsControl, verifyTaskCount
+    activate, executeTeCommand, executeTeCommand2, focusExplorer, getTreeTasks, getWsPath, isReady, overrideNextShowInputBox, testsControl, verifyTaskCount
 } from "../helper";
 
 const testsName = "npm";
 
 let teApi: ITaskExplorerApi;
-let explorer: IExplorerApi;
 let packageJsonPath: string;
 let npmTaskItems: TaskItem[];
 
@@ -26,10 +25,6 @@ suite("NPM Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
-        if (!teApi.explorer) {
-            assert.fail("        ✘ Explorer instance does not exist");
-        }
-        explorer = teApi.explorer;
     });
 
 
@@ -50,10 +45,7 @@ suite("NPM Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-        if (!explorer.isVisible()) {
-            this.slow(testsControl.slowTimeForFocusCommand);
-		    await executeTeCommand("focus", testsControl.waitTimeForCommand);
-        }
+        await focusExplorer(this);
 	});
 
 
@@ -104,7 +96,7 @@ suite("NPM Tests", () =>
         getPackageManager();
     });
 
-/*
+
     test("Document Position", async function()
     {
         this.slow(testsControl.slowTimeForCommandFast * npmTaskItems.length);
@@ -148,5 +140,5 @@ suite("NPM Tests", () =>
         this.slow(testsControl.slowTimeForNpmCommand);
         await executeTeCommand2("runAuditFix", [ npmTaskItems[0].taskFile ], testsControl.waitTimeForNpmCommand);
     });
-*/
+
 });

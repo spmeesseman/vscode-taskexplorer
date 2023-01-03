@@ -12,6 +12,7 @@ import { Uri } from "vscode";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
+    focusExplorer,
     getTreeTasks, getWsPath, isReady, testsControl, verifyTaskCountByTree
 } from "../helper";
 
@@ -19,7 +20,6 @@ import {
 const testsName = "tsc";
 
 let teApi: ITaskExplorerApi;
-let explorer: IExplorerApi;
 let rootPath: string;
 let dirName: string;
 let fileUri: Uri;
@@ -33,10 +33,6 @@ suite("Typescript Tests", () =>
     {
         teApi = await activate(this);
         assert(isReady() === true, "    ✘ TeApi not ready");
-        if (!teApi.explorer) {
-            assert.fail("        ✘ Explorer instance does not exist");
-        }
-        explorer = teApi.explorer;
         rootPath = getWsPath(".");
         dirName = path.join(rootPath, "tasks_test_ts_");
         fileUri = Uri.file(path.join(rootPath, "tsconfig.json"));
@@ -60,10 +56,7 @@ suite("Typescript Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-        if (!explorer.isVisible()) {
-            this.slow(testsControl.slowTimeForFocusCommand);
-		    await executeTeCommand("focus", testsControl.waitTimeForCommand, 3000);
-        }
+        await await focusExplorer(this);
 	});
 
 

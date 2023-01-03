@@ -299,9 +299,9 @@ suite("Configuration / Settings Tests", () =>
     test("User Level Setting Update", async function()
     {
         this.slow(testsControl.slowTimeForConfigEvent * 4);
-        await configuration.update("debugLevel", testsControl.userLogLevel !== 3 ? 3 : 2);
+        await configuration.update("logging.level", testsControl.userLogLevel !== 3 ? 3 : 2);
         await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
-        await configuration.update("debugLevel", testsControl.userLogLevel);
+        await configuration.update("logging.level", testsControl.userLogLevel);
         await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
         await configuration.update("pathToPrograms.ant", testsControl.userPathToAnt !== "ant" ? "ant" : "ant.bat");
         await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
