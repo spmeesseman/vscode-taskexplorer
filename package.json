@@ -1667,11 +1667,14 @@
                     },
                     "markdownDescription": "%config.taskExplorer.exclude%",
                     "default": [
+                        "**/.coverage/**",
                         "**/.nuget/**",
+                        "**/.nyc_output/**",
                         "**/.vscode-test/**",
                         "**/Assets/**",
                         "**/bin/**",
                         "**/build/**",
+                        "**/coverage/**",
                         "**/dep/**",
                         "**/dependency/**",
                         "**/dist/**",
@@ -1690,6 +1693,7 @@
                         "**/static/**",
                         "**/target/**",
                         "**/test/**",
+                        "**/test-files/**",
                         "**/third_party/**",
                         "**/vendor/**",
                         "**/work/**"
