@@ -6,7 +6,7 @@ import * as assert from "assert";
 import * as log from "../../lib/utils/log";
 import * as util from "../../lib/utils/utils";
 import { workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl } from "../helper";
+import { activate, executeSettingsUpdate, getWsPath, isReady, overrideNextShowInputBox, testsControl } from "../helper";
 import { storage } from "../../lib/utils/storage";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { numFilesInDirectory } from "../../lib/utils/fs";
@@ -82,6 +82,8 @@ suite("Util Tests", () =>
 		log.error([ "Test error 1", "Test error 2" ]);
 		log.error([ "Test error 2",  new Error("Test error object") ]);
 		log.error([ "Test error 3", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
+		log.error(true);
+		log.error(undefined);
 		log.error({
 			status: false,
 			message: "Test error 4"
@@ -162,6 +164,30 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.value("Test3", "value3", 1);
 		await executeSettingsUpdate("logging.enableFile", false);
+	});
+
+
+    test("Miscellaneous", async function()
+    {
+		util.getTaskTypeFriendlyName("Workspace");
+		util.getTaskTypeFriendlyName("Workspace", true);
+		util.getTaskTypeFriendlyName("apppublisher");
+		util.getTaskTypeFriendlyName("apppublisher", true);
+		util.getTaskTypeFriendlyName("tsc");
+		util.getTaskTypeFriendlyName("tsc", true);
+		util.getTaskTypeFriendlyName("ant");
+		util.getTaskTypeFriendlyName("ant", true);
+
+		overrideNextShowInputBox("ok");
+		util.showMaxTasksReachedMessage();
+		overrideNextShowInputBox("ok");
+		util.showMaxTasksReachedMessage("npm");
+		overrideNextShowInputBox("ok");
+		util.showMaxTasksReachedMessage("ant");
+		overrideNextShowInputBox("ok");
+		util.showMaxTasksReachedMessage("gulp");
+		overrideNextShowInputBox("ok");
+		util.showMaxTasksReachedMessage("grunt");
 	});
 
 

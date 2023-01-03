@@ -203,6 +203,9 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     {
         enableFile = configuration.get<boolean>("logging.enableFile", false);
         logLogFileLocation();
+        if (enableFile) {
+            window.showInformationMessage("Log file location: " + fileName);
+        }
     }
     if (e.affectsConfiguration("taskExplorer.logging.level"))
     {
