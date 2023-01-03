@@ -72,7 +72,7 @@ export default class TaskItem extends TreeItem
         // save them with.  We can just use the existing id parameter...
         //
         const fsPath = taskFile.resourceUri.fsPath;
-        this.id = TaskItem.getId(fsPath, task.source, task.name, taskGroup);
+        this.id = fsPath + ":" + task.source + ":" + task.name + ":" + (taskGroup || "");
         this.paused = false;                // paused flag used by start/stop/pause task functionality
         this.taskFile = taskFile;           // Save a reference to the TaskFile that this TaskItem belongs to
         this.task = task;                   // Save a reference to the Task that this TaskItem represents
@@ -110,12 +110,6 @@ export default class TaskItem extends TreeItem
         // Refresh state - sets context value, icon path from execution state
         //
         this.refreshState(false);
-    }
-
-
-    static getId(fsPath: string, source: string, name: string, group?: string)
-    {
-        return fsPath + ":" + source + ":" + name + ":" + (group || "");
     }
 
 

@@ -278,12 +278,33 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    private addToSpecialFolder(taskItem: TaskItem, folder: any, tasks: string[], label: string, logPad: string)
+    private async addToSpecialFolder(taskItem: TaskItem, folder: any, tasks: string[], label: string, logPad: string)
     {
         if (taskItem && taskItem.id && folder && tasks && label && taskItem.task && tasks.includes(taskItem.id))
         {
-            const id = TaskItem.getId(taskItem.taskFile.resourceUri.fsPath, taskItem.task.source, taskItem.task.name, label);
-            if (!this.getTaskItem(id, logPad))
+            let add = true;
+            if (label === constants.LAST_TASKS_LABEL)
+            {
+                if (this.taskTree && (this.taskTree[0] && this.taskTree[0].label === constants.LAST_TASKS_LABEL))
+                {
+                    const treeFolder = this.taskTree[0] as TaskFolder;
+                    add = !treeFolder.taskFiles.find(tf => tf instanceof TaskItem && util.getTaskItemId(tf) === taskItem.id);
+                }
+            }
+            else // label === constants.FAV_TASKS_LABEL
+            {
+                if (this.taskTree && this.taskTree[0] && this.taskTree[0].label === constants.FAV_TASKS_LABEL)
+                {
+                    const treeFolder = this.taskTree[0] as TaskFolder;
+                    add = !treeFolder.taskFiles.find(tf => tf instanceof TaskItem && util.getTaskItemId(tf) === taskItem.id);
+                }
+                else if (this.taskTree && this.taskTree[1] && this.taskTree[1].label === constants.FAV_TASKS_LABEL)
+                {
+                    const treeFolder = this.taskTree[1] as TaskFolder;
+                    add = !treeFolder.taskFiles.find(tf => tf instanceof TaskItem && util.getTaskItemId(tf) === taskItem.id);
+                }
+            }
+            if (add)
             {
                 const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
                 taskItem2.id = label + ":" + taskItem2.id; // note 'label:' + taskItem2.id === id
@@ -406,7 +427,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         {
             log.blank(2);
             log.write(`   Processing task ${++taskCt} of ${tasksList.length} (${each.source})`, logLevel, logPad);
-            this.buildTaskTreeList(each, folders, files, ltFolder, favFolder, lastTasks, favTasks, logPad + "   ");
+            await this.buildTaskTreeList(each, folders, files, ltFolder, favFolder, lastTasks, favTasks, logPad + "   ");
         }
 
         //
@@ -452,7 +473,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      * @param favTasks List of Task ID's currently in the "Favorites" TaskFolder.
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
-    private buildTaskTreeList(each: Task, folders: Map<string, TaskFolder>, files: Map<string, TaskFile>, ltFolder: TaskFolder | undefined, favFolder: TaskFolder | undefined, lastTasks: string[], favTasks: string[], logPad: string)
+    private async buildTaskTreeList(each: Task, folders: Map<string, TaskFolder>, files: Map<string, TaskFile>, ltFolder: TaskFolder | undefined, favFolder: TaskFolder | undefined, lastTasks: string[], favTasks: string[], logPad: string)
     {
         let folder: TaskFolder | undefined,
             scopeName: string;
@@ -541,11 +562,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             //
             // Add this task to the 'Last Tasks' folder if we need to
             //
-            this.addToSpecialFolder(taskItem, ltFolder, lastTasks, constants.LAST_TASKS_LABEL, logPad + "   ");
+            await this.addToSpecialFolder(taskItem, ltFolder, lastTasks, constants.LAST_TASKS_LABEL, logPad + "   ");
             //
             // Add this task to the 'Favorites' folder if we need to
             //
-            this.addToSpecialFolder(taskItem, favFolder, favTasks, constants.FAV_TASKS_LABEL, logPad + "   ");
+            await this.addToSpecialFolder(taskItem, favFolder, favTasks, constants.FAV_TASKS_LABEL, logPad + "   ");
         }
 
         log.methodDone("build task tree list", 2, logPad);
