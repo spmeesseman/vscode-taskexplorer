@@ -7,8 +7,8 @@ import { getLicenseManager, providers, providersExternal } from "./extension";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
 } from "vscode";
-// import * as glob from "glob";
-// import { join } from "path";
+import * as glob from "glob";
+import { join } from "path";
 
 export interface ICacheItem
 {
@@ -104,14 +104,14 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                         }
                         log.write(`   Set max files to scan at ${maxFiles} files (no license)`, 2, logPad);
                     }
-                    const relativePattern = new RelativePattern(folder, glob),
-                          paths = await workspace.findFiles(relativePattern, getExcludesPatternVsc(folder.fsPath), maxFiles);
+                    const paths = await globAsync(glob, { nocase: true, ignore: getExcludesPatternGlob(), cwd: folder.fsPath  });
                     for (const fPath of paths)
                     {
                         if (cancel) {
                             break;
                         }
-                        addToMappings(providerName, { uri: fPath, folder: wsFolder }, logPad + "      ");
+                        const uriFile = Uri.file(join(folder.fsPath, fPath));
+                        addToMappings(providerName, { uri: uriFile, folder: wsFolder }, logPad + "      ");
                     }
                     projectToFileCountMap[wsFolder.name][providerName] += paths.length;
                     log.write(`   Folder scan complete, found '${paths.length}' files`, 2, logPad);
@@ -404,7 +404,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
         }
         catch (e: any) { /* istanbul ignore next */ log.error(e); }
         /*
-        const paths = await globAsync(fileGlob, { cwd: folder.uri.fsPath, ignore: getExcludesPattern() });
+        const paths = await globAsync(fileGlob, { cwd: folder.uri.fsPath, ignore: getExcludesPatternsGlob() });
         for (const fPath of paths)
         {
             if (cancel)
@@ -430,7 +430,6 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
 }
 
 
-
 export async function cancelBuildCache(wait?: boolean)
 {
     let waitCount = 20;
@@ -452,11 +451,11 @@ function disposeStatusBarSpace(statusBarSpace: StatusBarItem)
 }
 
 
-// function getExcludesPatternGlob()
-// {
-//     const excludes: string[] = configuration.get("exclude");
-//     return [ "**/node_modules/**", "**/work/**", ...excludes ];
-// }
+function getExcludesPatternGlob()
+{
+    const excludes: string[] = configuration.get("exclude");
+    return [ "**/node_modules/**", "**/work/**", ...excludes ];
+}
 
 
 function getExcludesPatternVsc(folder: string | WorkspaceFolder): RelativePattern
@@ -502,21 +501,21 @@ const getTaskFileCount = (taskType?: string) =>
 };
 
 
-// export function globAsync(pattern: string, options: any): Promise<string[]>
-// {
-//     return new Promise(function (resolve, reject)
-//     {
-//         glob(pattern, options, function (err, files)
-//         {
-//             if (!err) {
-//                 resolve(files);
-//             }
-//             else {
-//                 reject(err);
-//             }
-//         });
-//     });
-// }
+export function globAsync(pattern: string, options: any): Promise<string[]>
+{
+    return new Promise(function (resolve, reject)
+    {
+        glob(pattern, options, function (err, files)
+        {
+            if (!err) {
+                resolve(files);
+            }
+            else {
+                reject(err);
+            }
+        });
+    });
+}
 
 
 function initMaps(taskType: string, project: string)
@@ -592,13 +591,13 @@ export async function removeFileFromCache(taskType: string, uri: Uri, logPad: st
 {
     log.methodStart("remove file from cache", 2, logPad, false, [[ "task type", taskType ], [ "path", uri.fsPath ]]);
     removeFromMappings(taskType, uri, false, logPad + "   ");
-    log.methodDone("remove file from cache", 1, logPad);
+    log.methodDone("remove file from cache", 2, logPad);
 }
 
 
 export async function removeFolderFromCache(uri: Uri, logPad: string)
 {
-    log.methodStart("remove folder from cache", 1, logPad, false, [[ "folder", uri.fsPath ]]);
+    log.methodStart("remove folder from cache", 2, logPad, false, [[ "folder", uri.fsPath ]]);
     for (const taskType of filesCache.keys())
     {
         log.write(`   Processing files cached for ${taskType} tasks`, 2, logPad);
@@ -610,9 +609,9 @@ export async function removeFolderFromCache(uri: Uri, logPad: string)
 
 export async function removeTaskTypeFromCache(taskType: string, logPad: string)
 {
-    log.methodStart("remove task type from cache", 1, logPad, false, [[ "task type", taskType ]]);
+    log.methodStart("remove task type from cache", 2, logPad, false, [[ "task type", taskType ]]);
     removeFromMappings(taskType, undefined, true, logPad + "   ");
-    log.methodDone("remove task type from cache", 1, logPad);
+    log.methodDone("remove task type from cache", 2, logPad);
 }
 
 
@@ -724,7 +723,7 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
         taskFilesMap[taskType] = [];
     }
 
-    log.values(3, logPad + "   ", [
+    log.values(2, logPad + "   ", [
         [ "cache1 count", removed.c1 ], [ "cache2 count", removed.c2 ], [ "cache3 count", removed.c3 ]
     ]);
 
