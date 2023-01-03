@@ -111,43 +111,52 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
 
         if (!ignoreModify)
         {
-            watcherDisposables.set(taskType, watcher.onDidChange(async _e =>
+            watcherDisposables.set(taskType, watcher.onDidChange(async uri =>
             {
-                processingFsEvent = true;
-                try
-                {   logFileWatcherEvent(_e, "change");
-                    await refreshTree(teApi, taskType, _e, "   ");
-                    log.write("file 'change' event complete", 1);
+                if (!util.isExcluded(uri.fsPath))
+                {
+                    processingFsEvent = true;
+                    try
+                    {   logFileWatcherEvent(uri, "change");
+                        await refreshTree(teApi, taskType, uri, "   ");
+                        log.write("file 'change' event complete", 1);
+                    }
+                    catch (e) {}
+                    finally { processingFsEvent = false; }
                 }
-                catch (e) {}
-                finally { processingFsEvent = false; }
             }));
         }
 
-        watcherDisposables.set(taskType, watcher.onDidDelete(async _e =>
+        watcherDisposables.set(taskType, watcher.onDidDelete(async uri =>
         {
-            processingFsEvent = true;
-            try
-            {   logFileWatcherEvent(_e, "delete");
-                await cache.removeFileFromCache(taskType, _e, "   ");
-                await refreshTree(teApi, taskType, _e, "   ");
-                log.write("file 'delete' event complete", 1);
+            if (!util.isExcluded(uri.fsPath))
+            {
+                processingFsEvent = true;
+                try
+                {   logFileWatcherEvent(uri, "delete");
+                    await cache.removeFileFromCache(taskType, uri, "   ");
+                    await refreshTree(teApi, taskType, uri, "   ");
+                    log.write("file 'delete' event complete", 1);
+                }
+                catch (e) {}
+                finally { processingFsEvent = false; }
             }
-            catch (e) {}
-            finally { processingFsEvent = false; }
         }));
 
-        watcherDisposables.set(taskType, watcher.onDidCreate(async _e =>
+        watcherDisposables.set(taskType, watcher.onDidCreate(async uri =>
         {
-            processingFsEvent = true;
-            try
-            {   logFileWatcherEvent(_e, "create");
-                await cache.addFileToCache(taskType, _e, "   ");
-                await refreshTree(teApi, taskType, _e, "   ");
-                log.write("file 'create' event complete", 1);
+            if (!util.isExcluded(uri.fsPath))
+            {
+                processingFsEvent = true;
+                try
+                {   logFileWatcherEvent(uri, "create");
+                    await cache.addFileToCache(taskType, uri, "   ");
+                    await refreshTree(teApi, taskType, uri, "   ");
+                    log.write("file 'create' event complete", 1);
+                }
+                catch (e) {}
+                finally { processingFsEvent = false; }
             }
-            catch (e) {}
-            finally { processingFsEvent = false; }
         }));
     }
 
@@ -232,16 +241,19 @@ function getDirWatchGlob(wsFolders: readonly WorkspaceFolder[])
 
 async function onDirCreate(uri: Uri)
 {
-    if (isDirectory(uri.fsPath) && (await numFilesInDirectory(uri.fsPath)) > 0)
+    if (!util.isExcluded(uri.fsPath))
     {
-        const wsf = workspace.getWorkspaceFolder(uri);
-        if (!wsf || wsf.uri.fsPath !== uri.fsPath)
+        if (isDirectory(uri.fsPath) && (await numFilesInDirectory(uri.fsPath)) > 0)
         {
-            if (createTaskTimerId) {
-                clearTimeout(createTaskTimerId);
+            const wsf = workspace.getWorkspaceFolder(uri);
+            if (!wsf || wsf.uri.fsPath !== uri.fsPath)
+            {
+                if (createTaskTimerId) {
+                    clearTimeout(createTaskTimerId);
+                }
+                pendingCreateFolders.push(uri);
+                createTaskTimerId = setTimeout(async () => processDirCreated(), 50, uri);
             }
-            pendingCreateFolders.push(uri);
-            createTaskTimerId = setTimeout(async () => processDirCreated(), 50, uri);
         }
     }
 }
@@ -249,7 +261,7 @@ async function onDirCreate(uri: Uri)
 
 async function onDirDelete(uri: Uri)
 {
-    if (!extname(uri.fsPath)) // ouch
+    if (!extname(uri.fsPath) && !util.isExcluded(uri.fsPath)) // ouch
     //if (isDirectory(uri.fsPath)) // it's gone, so we can't lstat it
     {
         processingFsEvent = true;

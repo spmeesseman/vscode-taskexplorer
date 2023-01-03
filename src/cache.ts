@@ -40,8 +40,6 @@ export async function addFileToCache(taskType: string, uri: Uri, logPad: string)
 
 export async function addFolderToCache(folder: Uri, logPad: string)
 {
-    if (util.isExcluded(folder.fsPath)) { return; }
-
     const licMgr = getLicenseManager();
     const wsFolder = workspace.getWorkspaceFolder(folder) as WorkspaceFolder;
 
