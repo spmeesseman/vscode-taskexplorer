@@ -975,15 +975,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         {
             return [ !this.tasks && !this.taskTree ? new InitScripts() : new NoScripts() ];
         }
-        else if (this.setEnableCalled && this.taskTree && !element)
-        {
-            // this.taskTree[0] = new LoadScripts();
-            // this.taskTree[0].contextValue = "loadscripts";
-            // return [ !this.tasks && !this.taskTree ? new InitScripts() : new NoScripts() ];
-            this.setEnableCalled = false;
-            // this._onDidChangeTreeData.fire();
-            // return [ new LoadScripts() ];
-        }
 
         if (element instanceof TaskFile)
         {
@@ -1000,10 +991,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
         let waited = 0;
         const licMgr = getLicenseManager();
-        const firstRun = this.name === "taskExplorer" && !this.tasks && this.enabled &&
-                          (!this.taskTree || this.taskTree[0].contextValue === "initscripts");
+        const explorerViewEnabled = configuration.get<boolean>("enableExplorerView");
+        const firstRun = ((explorerViewEnabled && this.name === "taskExplorer") ||
+                          (!explorerViewEnabled && this.name === "taskExplorerSideBar")) &&
+                          !this.tasks && this.enabled && (!this.taskTree || this.taskTree[0].contextValue === "initscripts");
 
         this.refreshPending = true;
+
+        //
+        // If this is just after activation, or the view getting enabled, setEnabled() will have been
+        // called, and the current displayed text in the view will be 'Scanning task files...'.  Reset
+        // the text 'Scanning task files...' to 'Building task tree...' for a nice status update, as
+        // the tree build can be a multi-second process as well depending on the size of the workspace
+        //
+        if (this.setEnableCalled && !this.taskTree && !element)
+        {
+            this.setEnableCalled = false;
+            setTimeout(() => this._onDidChangeTreeData.fire(), 10);
+            return [ new LoadScripts() ];
+        }
 
         log.methodStart("get tree children", logLevel, logPad, false, [
             [ "task folder", element?.label ], [ "all tasks need to be retrieved", !this.tasks ],

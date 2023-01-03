@@ -17,8 +17,17 @@ export class InitScripts extends TreeItem
 {
     constructor()
     {
-        super(localize("initScripts", "Initializing..."), TreeItemCollapsibleState.None);
+        super(localize("initScripts", "Scanning task files..."), TreeItemCollapsibleState.None);
         this.contextValue = "initscripts";
+    }
+}
+
+export class LoadScripts extends TreeItem
+{
+    constructor()
+    {
+        super(localize("loadScripts", "Building task tree..."), TreeItemCollapsibleState.None);
+        this.contextValue = "loadscripts";
     }
 }
 
