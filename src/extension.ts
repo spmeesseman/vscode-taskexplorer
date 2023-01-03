@@ -214,6 +214,7 @@ async function initLicenseManager(context: ExtensionContext)
     }
 }
 
+
 /* istanbul ignore next */
 function isBusy()
 {   /* istanbul ignore next */
