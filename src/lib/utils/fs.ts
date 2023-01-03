@@ -106,7 +106,7 @@ export function copyDir(src: string, dst: string, filter?: RegExp, copyWithBaseF
         resolve(true);
     });
 }
-
+*/
 
 
 export function createDir(dir: string)
@@ -156,7 +156,7 @@ export function deleteDir(dir: string): Promise<void>
     });
 }
 
-
+/*
 export function deleteFile(file: string): Promise<void>
 {
     return new Promise<void>(async (resolve, reject) =>
@@ -224,7 +224,6 @@ export function numFilesInDirectory(dirPath: string): Promise<number>
 }
 
 
-/*
 export function pathExists(file: string): Promise<boolean>
 {
     return new Promise<boolean>((resolve, reject) =>
@@ -238,7 +237,7 @@ export function pathExists(file: string): Promise<boolean>
         });
     });
 }
-*/
+
 
 export function readFileAsync(file: string): Promise<string>
 {

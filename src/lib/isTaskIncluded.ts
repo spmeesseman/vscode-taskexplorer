@@ -109,7 +109,7 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = "", lo
             // the tasks.json file to see if the hideproperty is set.
             //
             const tasksFile = path.join(task.scope.uri.fsPath, ".vscode", "tasks.json");
-		    /** istanbul ignore else */
+		    /* istanbul ignore else */
             if (existsSync(tasksFile))
             {
                 try
@@ -122,7 +122,7 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = "", lo
                         return false;
                     }
                 }
-                catch (e: any) { /** istanbul ignore next */ log.error(e); }
+                catch (e: any) { /* istanbul ignore next */ log.error(e); }
             }
         }
     }
@@ -156,10 +156,10 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = "", lo
         log.methodDone('Check task inclusion', 3, logPad, false, undefined, logQueueId);
         return "npm-install";
     }
-    /** istanbul ignore next */
+    /* istanbul ignore next */
     log.write("   skipping this task", 3, logPad, logQueueId);
-    /** istanbul ignore next */
+    /* istanbul ignore next */
     log.methodDone('Check task inclusion', 3, logPad, false, undefined, logQueueId);
-    /** istanbul ignore next */
+    /* istanbul ignore next */
     return false;
 }

@@ -274,7 +274,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         }
     }
     catch (e) {
-        /** istanbul-ignore-next */
+        /* istanbul-ignore-next */
         teApi.log.error(e);
     }
 

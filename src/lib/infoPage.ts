@@ -4,6 +4,7 @@ import * as log  from "./utils/log";
 import { teApi } from "../extension";
 import { Task, Uri, ViewColumn, WebviewPanel, window, workspace, WorkspaceFolder } from "vscode";
 import { getHeaderContent, getBodyContent, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "./utils/utils";
+import { IExplorerApi } from "../interface";
 
 
 let panel: WebviewPanel | undefined;
@@ -53,7 +54,8 @@ function getInfoContent(logPad: string, logLevel: number, uri?: Uri)
 {
     log.methodStart("get body content", logLevel, logPad);
 
-	/** istanbul ignore next */
+	const api = (teApi.explorer || teApi.sidebar) as IExplorerApi;
+	/* istanbul ignore next */
 	let project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 
 	let details = `<table style="margin-top:15px" width="97%" align="center">
@@ -66,14 +68,14 @@ function getInfoContent(logPad: string, logLevel: number, uri?: Uri)
 		<td style="padding-right:20px" nowrap>File</td>
 	</tr><tr><td colspan="6"><hr></td></tr>`;
 
-	const tasks = teApi.explorer?.getTasks()?.filter((t: Task) => !project || (isWorkspaceFolder(t.scope) && 
-                                                    project === getWorkspaceProjectName(t.scope.uri.fsPath))),
+	const tasks = api.getTasks()?.filter((t: Task) => !project || (isWorkspaceFolder(t.scope) && 
+                                         project === getWorkspaceProjectName(t.scope.uri.fsPath))),
 		  projects: string[] = [];
 
 	tasks?.forEach((t: Task) =>
 	{
 		let wsFolder;
-		/** istanbul ignore else */
+		/* istanbul ignore else */
 		if (isWorkspaceFolder(t.scope))
 		{
 			wsFolder = t.scope as WorkspaceFolder;
@@ -84,10 +86,10 @@ function getInfoContent(logPad: string, logLevel: number, uri?: Uri)
 		}
 
 		let filePath = "N/A";
-		/** istanbul ignore else */
+		/* istanbul ignore else */
 		if (t.definition.uri)
 		{
-			/** istanbul ignore else */
+			/* istanbul ignore else */
 			if (wsFolder) {
 				filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.definition.uri.fsPath)
 			}
@@ -115,7 +117,7 @@ function getInfoContent(logPad: string, logLevel: number, uri?: Uri)
 	</tr>
 	<tr><td height="10"></td></tr>`;
 
-		/** istanbul ignore else */
+		/* istanbul ignore else */
 		if (wsFolder) {
 			pushIfNotExists(projects, wsFolder.name);
 		}

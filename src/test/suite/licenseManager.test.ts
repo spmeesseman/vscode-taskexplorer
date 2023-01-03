@@ -84,6 +84,7 @@ suite("License Manager Tests", () =>
 
 	test("License Info Page - View Report (From Webview)", async function()
 	{
+		this.slow(500);
 		await storage.update("version", undefined);
 		await setTasks();
 		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "viewReport" });
@@ -94,6 +95,7 @@ suite("License Manager Tests", () =>
 
 	test("License Info Page - Enter License Key (From Webview)", async function()
 	{
+		this.slow(500);
 		await storage.update("version", undefined);
 		await setTasks();
 		overrideNextShowInputBox("1234-5678-9098-0000000");
