@@ -78,6 +78,7 @@ export async function activate(instance?: any)
         // Activate extension
         //
         teApi = await ext.activate();
+        teApi.waitForIdle(); // added 1/2/03 - Tree loads in delay 'after' activate()
         activated = true;
         //
         // For debugging
@@ -206,8 +207,6 @@ export async function getTreeTasks(taskType: string, expectedCount: number)
     const taskMap = await (teApi.explorer as IExplorerApi).getTaskItems(undefined, "   ");
     //
     // Make sure the tasks have been mapped in the explorer tree
-    // There should be one less task as the VSCode enginereturned above as the Explorer
-    // tree does not display the 'install' task
     //
     const taskCount = findIdInTaskMap(`:${taskType}:`, taskMap);
     if (taskCount !== expectedCount) {

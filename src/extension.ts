@@ -33,6 +33,7 @@ const isLicenseManagerActive = true;
 
 export const teApi = {} as ITaskExplorerApi;
 let licenseManager: ILicenseManager;
+let ready = false;
 export const providers: Map<string, TaskExplorerProvider> = new Map();
 export const providersExternal: Map<string, ExternalExplorerProvider> = new Map();
 
@@ -80,7 +81,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     // Construct the API export
     //
     Object.assign(teApi, {
-        isBusy: isTaskExplorerBusy,
+        isBusy,
         config: configuration,
         log,
         providers,
@@ -114,6 +115,11 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         // This also starts the file scan to build the file task file cache
         //
         await registerFileWatchers(context, api);
+        //
+        // Signal that first task load has completed
+        //
+        ready = true;
+        //
     }, 500, teApi);
 
     log.write("Task Explorer activated, tree construction pending");
@@ -201,9 +207,9 @@ async function initLicenseManager(context: ExtensionContext)
 }
 
 /* istanbul ignore next */
-function isTaskExplorerBusy()
+function isBusy()
 {   /* istanbul ignore next */
-    return isCachingBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
+    return !ready || isCachingBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
            isProcessingFsEvent() || isProcessingConfigChange();
 }
 
@@ -283,15 +289,15 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
 {
     let waited = 0;
     let iterationsIdle = 0;
-    if (isTaskExplorerBusy()) {
+    if (isBusy()) {
         log.write("waiting for task explorer extension idle state...", 3, logPad);
     }
-    while ((iterationsIdle < 3 || isTaskExplorerBusy()) && waited < maxWait)
+    while ((iterationsIdle < 3 || isBusy()) && waited < maxWait)
     {
         await util.timeout(10);
         waited += 10;
         ++iterationsIdle;
-        if (isTaskExplorerBusy()) {
+        if (isBusy()) {
             iterationsIdle = 0;
         }
     }

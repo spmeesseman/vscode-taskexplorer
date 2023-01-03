@@ -1018,16 +1018,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         //
         while (this.treeBuilding) {
             /* istanbul ignore next */
-            log.write("   waiting...", logLevel, logPad);
+            await util.timeout(200);
             /* istanbul ignore next */
-            await util.timeout(100);
-            /* istanbul ignore next */
-            waited += 100;
+            waited += 200;
         }
         /* istanbul ignore if */
         if (waited) {
             log.write("   waited " + waited + " ms", logLevel, logPad);
         }
+
+        this.treeBuilding = true;
 
         //
         // Build task tree if not built already.
@@ -1085,7 +1085,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                     // for (const externalProviderMap of providersExternal)
                     // {
                     //     const externalTasks = await externalProviderMap[1].provideTasks();
-                    //     log.write(`   Get tasks from external provider ${externalProviderMap[0]}`, logLevel + 1, logPad);
+                    //     log.write(`   Get tasks from external provider ${externalProviderMap[0]}`, 4, logPad);
                     //     this.tasks.push(...(externalTasks || []));
                     // }
                 }
@@ -1093,7 +1093,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 let rmvCount = -1;
                 for (const t of toRemove) {
                     const idx = t - (++rmvCount);
-                    log.write(`   removing old task '${this.tasks[idx].source}/${this.tasks[idx].name}'`, logLevel, logPad);
+                    log.write(`   removing old task '${this.tasks[idx].source}/${this.tasks[idx].name}'`, 4, logPad);
                     this.tasks.splice(idx, 1);
                 }
 
@@ -1121,7 +1121,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                     if (this.tasks.length > maxTasks)
                     {
                         const rmvCount = this.tasks.length - maxTasks;
-                        log.write(`   removing ${rmvCount} tasks, max count reached (no license)`, logLevel, logPad);
+                        log.write(`   removing ${rmvCount} tasks, max count reached (no license)`, logLevel + 1, logPad);
                         this.tasks.splice(maxTasks, rmvCount);
                         util.showMaxTasksReachedMessage();
                     }
@@ -1130,7 +1130,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 // Build the entire task tree
                 //
                 try {
-                    this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel);
+                    this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
                 }
                 catch (e: any) { /* istanbul ignore next */ log.error(e); }
                 /* istanbul ignore if */
@@ -1146,17 +1146,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
         if (element instanceof TaskFolder)
         {
-            log.write(logPad + "   Get folder task files", logLevel);
+            log.write("   Get folder task files", logLevel, logPad);
             items = element.taskFiles;
         }
         else if (element instanceof TaskFile)
         {
-            log.write(logPad + "   Get file tasks/scripts", logLevel);
+            log.write("   Get file tasks/scripts", logLevel, logPad);
             items = element.treeNodes;
         }
         else if (!element)
         {
-            log.write(logPad + "   Get task tree", logLevel);
+            log.write("   Get task tree", logLevel, logPad);
             items = this.taskTree;
         }
 
@@ -1167,6 +1167,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             await licMgr.setTasks(this.tasks || [], logPad + "   ");
         }
 
+        this.treeBuilding = false;
         this.refreshPending = false;
         this.currentInvalidation = undefined; // reset file modification task type flag
 
@@ -1238,7 +1239,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     public async getTaskItems(taskId: string | undefined, logPad = "", executeOpenForTests = false, logLevel = 1): Promise<TaskMap>
     {
         const me = this;
-        const taskMap: { [id: string]:  TaskItem } = {};
+        const taskMap: TaskMap = {};
         let done = false;
 
         log.methodStart("Get task items from tree", logLevel, logPad, false, [[ "execute open", executeOpenForTests ]]);
