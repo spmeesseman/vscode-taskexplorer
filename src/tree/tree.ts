@@ -278,14 +278,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    private addToSpecialFolder(taskItem: TaskItem, folder: any, tasks: string[], label: string)
+    private addToSpecialFolder(taskItem: TaskItem, folder: any, tasks: string[], label: string, logPad: string)
     {
         if (taskItem && taskItem.id && folder && tasks && label && taskItem.task && tasks.includes(taskItem.id))
         {
-            const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
-            taskItem2.id = label + ":" + taskItem2.id;
-            taskItem2.label = getSpecialTaskName(taskItem2);
-            folder.insertTaskFile(taskItem2, 0);
+            const id = TaskItem.getId(taskItem.taskFile.resourceUri.fsPath, taskItem.task.source, taskItem.task.name, label);
+            if (!this.getTaskItem(id, logPad))
+            {
+                const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
+                taskItem2.id = label + ":" + taskItem2.id; // note 'label:' + taskItem2.id === id
+                taskItem2.label = getSpecialTaskName(taskItem2);
+                folder.insertTaskFile(taskItem2, 0);
+            }
         }
     }
 
@@ -357,7 +361,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
         log.methodStart("build task tree", logLevel, logPad);
 
-        if (tasksList.length === 0)
+        if (tasksList.length === 0 && force !== true)
         {
             log.methodDone("build task tree", logLevel, logPad);
             return [ new NoScripts() ];
@@ -537,11 +541,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             //
             // Add this task to the 'Last Tasks' folder if we need to
             //
-            this.addToSpecialFolder(taskItem, ltFolder, lastTasks, constants.LAST_TASKS_LABEL);
+            this.addToSpecialFolder(taskItem, ltFolder, lastTasks, constants.LAST_TASKS_LABEL, logPad + "   ");
             //
             // Add this task to the 'Favorites' folder if we need to
             //
-            this.addToSpecialFolder(taskItem, favFolder, favTasks, constants.FAV_TASKS_LABEL);
+            this.addToSpecialFolder(taskItem, favFolder, favTasks, constants.FAV_TASKS_LABEL, logPad + "   ");
         }
 
         log.methodDone("build task tree list", 2, logPad);
