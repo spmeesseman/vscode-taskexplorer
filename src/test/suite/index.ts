@@ -49,11 +49,13 @@ export async function run(): Promise<void>
         cwd: nycRoot,
         reporter: [ "text-summary", "html", "lcov", "cobertura" ],
         all: true,
+        cache: true,
         silent: false,
         instrument: true,
         hookRequire: true,
         hookRunInContext: true,
         hookRunInThisContext: true,
+        // useSpawnWrap: true,
         include: [ "dist/**/*.js" ],
         exclude: [ "dist/test/**" ],
     });
@@ -67,15 +69,12 @@ export async function run(): Promise<void>
     // Object.keys(require.cache).forEach((reqKey) => {
     //     console.log("   " + reqKey);
     // });
-    //
-    // 1-3-03 - This is taking forever, and has never been triggered
-    //
-    // const myFilesRegex = /vscode-taskexplorer\/dist/;
-    // const filterFn = myFilesRegex.test.bind(myFilesRegex);
-    // if (Object.keys(require.cache).filter(filterFn).length > 1)
-    // {
-    //     console.warn("NYC initialized after modules were loaded", Object.keys(require.cache).filter(filterFn));
-    // }
+    const myFilesRegex = /vscode-taskexplorer\/dist/;
+    const filterFn = myFilesRegex.test.bind(myFilesRegex);
+    if (Object.keys(require.cache).filter(filterFn).length > 1)
+    {
+        console.warn("NYC initialized after modules were loaded", Object.keys(require.cache).filter(filterFn));
+    }
 
     //
     // Debug which files will be included/excluded

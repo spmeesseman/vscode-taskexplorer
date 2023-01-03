@@ -17,9 +17,6 @@ export interface ITaskExplorerApi
     sidebar: IExplorerApi | undefined;
     sidebarView: TreeView<TreeItem> | undefined;
     providers: Map<string, any>;
-    // explorer: TaskTreeDataProvider | undefined;
-    // sidebar: TaskTreeDataProvider | undefined;
-    // providers: Map<string, TaskExplorerProvider>;
     providersExternal: Map<string, ExternalExplorerProvider>;
     testsApi: TaskExplorerTestsApi;
 
