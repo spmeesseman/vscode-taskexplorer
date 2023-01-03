@@ -9,12 +9,7 @@ import {
 } from "vscode";
 import * as glob from "glob";
 import { join } from "path";
-
-export interface ICacheItem
-{
-    uri: Uri;
-    folder: WorkspaceFolder;
-}
+import { ICacheItem } from "./interface/cacheItem";
 
 
 let statusBarSpace: StatusBarItem;

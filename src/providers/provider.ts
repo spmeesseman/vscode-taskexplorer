@@ -137,34 +137,38 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
         if (this.cachedTasks)
         {
-            if (uri)
+            const enabled = util.isTaskTypeEnabled(this.providerName);
+            // if (!enabled)
+            // {
+            //     // if (this.providerName === "script") {
+            //     //     someday.  we still kill the whole script typegroup (i.e. batch, bash, python, etc)
+            //     // }
+            //     // else {
+            //         // uri = undefined;
+            //     // }
+            // }
+            if (enabled && uri)
             {
-                const pathExists = util.pathExists(uri.fsPath),
-                      rmvTasks: number[] = [],
-                      enabled = util.isTaskTypeEnabled(this.providerName);
-
-                for (let i = 0; i < this.cachedTasks.length; i++)
+                const pathExists = util.pathExists(uri.fsPath);
+                //
+                // Remove tasks of type '' from the 'tasks'array
+                //
+                this.cachedTasks.slice().reverse().forEach((item, index, object) =>
                 {
-                    const cachedTask = this.cachedTasks[i];
-                    const cstDef = cachedTask.definition;
-                    // if (excludeTask.includes(cstDef.uri) || (cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath))))
+                    const cstDef = item.definition; // leave`enabled` below, for one day when we invalidate only a specific script type
                     if (!enabled || (cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath))) ||
-                        (cstDef.path && !isTaskIncluded(cachedTask, cstDef.path)))
+                        (cstDef.path && !isTaskIncluded(item, cstDef.path)))
                     {
-                        rmvTasks.push(i);
+                        if (item.source !== "Workspace" || item.definition.type === this.providerName) {
+                            log.write(`   removing cached task '${item.source}/${item.name}'`, 4, logPad);
+                            (this.cachedTasks as Task[]).splice(object.length - 1 - index, 1);
+                        }
                     }
-                }
-
-                let rmvCount = -1;
-                for (const tIdx of rmvTasks) {
-                    const idx = tIdx - (++rmvCount);
-                    log.write(`   removing old cached task '${this.providerName}/${this.cachedTasks[idx].name}'`, 2, logPad);
-                    this.cachedTasks.splice(idx, 1);
-                }
+                });
 
                 if (pathExists && !configuration.get<string[]>("exclude", []).includes(uri.path))
                 // if (pathExists && !util.isExcluded(uri.path))
-                {
+                {    // leave`enabled` below, for one day when we invalidate only a specific script type
                     const tasks = enabled ? (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path)) : [];
                     //
                     // If the implementation of the readUri() method awaits, it can theoretically reset

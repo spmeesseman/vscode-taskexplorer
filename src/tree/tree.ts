@@ -315,6 +315,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
+    private babysitterTimer: NodeJS.Timeout | undefined;
     private babysitterCt = 0;
     /**
      * Used as a check to reset node state when a task 'hangs' or whatever it does sometimes
@@ -325,7 +326,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      */
     private babysitRunningTask(taskItem: TaskItem)
     {
-        setTimeout((t: TaskItem) =>
+        this.babysitterTimer = setTimeout((t: TaskItem) =>
         {
             if (t.isRunning())
             {   /* istanbul ignore if */
@@ -1075,7 +1076,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         {
             log.value("tree item type", "asking for all (null)", logLevel, logPad);
         }
-        else { log.error("Unknown treeitem type"); }
+        else { log.error("Unknown treeitem type " + (typeof element)); }
 
         //
         // The vscode task engine processing will call back in multiple time while we are awaiting
@@ -2659,8 +2660,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
 
     private async taskFinishedEvent(e: TaskEndEvent)
-    {
-        //
+    {   //
         // Clear debounce timeout if still pending.  VScode v1.57+ emits about a dozen task
         // start/end event for a task.  Sick of these damn bugs that keep getting introduced
         // seemingly every other version AT LEAST.
@@ -2671,6 +2671,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         if (taskTimerId = this.taskIdStopEvents.get(taskId)) {
             clearTimeout(taskTimerId);
             this.taskIdStopEvents.delete(taskId);
+        }
+        if (this.babysitterTimer) {
+            clearTimeout(this.babysitterTimer);
+            this.babysitterTimer = undefined;
         }
         //
         // Debounce!!  VScode v1.57+ emits about a dozen task start/end event for a task.  Sick
