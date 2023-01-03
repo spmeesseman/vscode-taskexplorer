@@ -51,8 +51,9 @@ export class LicenseManager implements ILicenseManager
 
 	async setTasks(components: Task[], logPad = "   ")
 	{
-		let displayInfo = false, displayPopup = false;
-		const storedVersion = storage.get<string>("version");
+		let displayPopup = false;
+		const storedVersion = storage.get<string>("version"),
+			  versionChange = this.version !== storedVersion;
 
 		if (this.numTasks === components.length) {
 			return;
@@ -67,30 +68,11 @@ export class LicenseManager implements ILicenseManager
 			["stored version", storedVersion], ["is licensed", this.licensed]
 		]);
 
-		let content = getHeaderContent();
-
-		content += "<table align=\"center\" width=\"900\">";
-
-		content += ("<tr><td>" + getBodyContent("Welcome to Task Explorer") + "</td></tr>");
-
-		if (this.version !== storedVersion)
-		{
-			content += ("<tr><td>" + this.getInfoContent(components) + "</td></tr>");
-			displayInfo = true;
+		if (!this.licensed) { // only display the nag on startup when the version changes
+			displayPopup = !versionChange;
 		}
 
-		if (!this.licensed)
-		{
-			content += ("<tr><td>" + this.getLicenseContent() + "</td></tr>");
-			displayPopup = !displayInfo;
-			// displayInfo = true; // temp
-		}
-
-		content + "</table>";
-
-		content += this.getFooterContent();
-
-		if (displayInfo)
+		if (versionChange)
 		{
 			this.panel = window.createWebviewPanel(
 				"taskExplorer",   // Identifies the type of the webview. Used internally
@@ -100,6 +82,21 @@ export class LicenseManager implements ILicenseManager
 					enableScripts: true
 				}
 			);
+			
+			let content = getHeaderContent();
+			content += "<table align=\"center\" width=\"900\">";
+			content += ("<tr><td>" + getBodyContent("Welcome to Task Explorer") + "</td></tr>");
+			if (versionChange)
+			{
+				content += ("<tr><td>" + this.getInfoContent(components) + "</td></tr>");
+			}
+			if (!this.licensed)
+			{
+				content += ("<tr><td>" + this.getLicenseContent() + "</td></tr>");
+			}
+			content += "</table>";
+			content += this.getFooterContent();
+
 			this.panel.webview.html = content;
 			this.panel.reveal();
 			await storage.update("version", this.version);
@@ -116,8 +113,6 @@ export class LicenseManager implements ILicenseManager
 						case "viewReport":
 							commands.executeCommand("taskExplorer.viewReport");
 							return;
-						default:
-							return;
 					}
 				}, undefined, this.context.subscriptions
 			);
@@ -126,15 +121,15 @@ export class LicenseManager implements ILicenseManager
 		{
 			const msg = "Purchase a license to unlock unlimited parsed tasks.";
 			window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now")
-			.then((action) =>
+			.then(async (action) =>
 			{
 				if (action === "Enter License Key")
 				{
-					this.enterLicenseKey(); // don't await
+					await this.enterLicenseKey(); // don't await
 				}
 				else if (action === "Info")
 				{
-					commands.executeCommand("taskExplorer.viewReport");
+					await commands.executeCommand("taskExplorer.viewReport");
 				}
 			});
 		}
@@ -309,6 +304,12 @@ export class LicenseManager implements ILicenseManager
 	getVersion()
 	{
 		return this.version;
+	}
+
+
+	getWebviewPanel()
+	{
+		return this.panel;
 	}
 
 

@@ -127,6 +127,18 @@ export function getHeaderContent()
                     text: ''
                 });
             }
+            // Handle message inside the webview
+            window.addEventListener('message', event => {
+                const message = event.data; // JSON data from tests
+                switch (message.command) {
+                    case 'viewReport':
+                        viewReport();
+                        break;
+                    case 'enterLicense':
+                        getLicense();
+                        break;
+                }
+            });
         </script>
     </head>
     <body style="padding:20px">`;
