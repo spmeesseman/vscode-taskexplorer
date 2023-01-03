@@ -19,8 +19,11 @@ const dirWatcher: {
     onDidCreate?: Disposable;
     onDidDelete?: Disposable;
 } = {};
+// let createDeleteFileTimerId: NodeJS.Timeout | undefined;
 let createTaskTimerId: NodeJS.Timeout | undefined;
 let deleteTaskTimerId: NodeJS.Timeout | undefined;
+// let pendingCreateFiles: { taskType: string; uri: Uri }[] = [];
+// let pendingDeleteFiles: { taskType: string; uri: Uri }[] = [];
 let pendingCreateFolders: Uri[] = [];
 let pendingDeleteFolders: Uri[] = [];
 
@@ -131,6 +134,11 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
                 {   logFileWatcherEvent(uri, "delete");
                     await cache.removeFileFromCache(taskType, uri, "   ");
                     await refreshTree(teApi, taskType, uri, "   ");
+                    // if (createDeleteFileTimerId) {
+                    //     clearTimeout(createDeleteFileTimerId);
+                    // }
+                    // pendingDeleteFiles.push({ taskType, uri });
+                    // createDeleteFileTimerId = setTimeout(async () => { await processCreateDeleteFiles(); }, 50, uri);
                     log.write("file 'delete' event complete", 1);
                 }
                 catch (e) {}
@@ -147,6 +155,11 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
                 {   logFileWatcherEvent(uri, "create");
                     await cache.addFileToCache(taskType, uri, "   ");
                     await refreshTree(teApi, taskType, uri, "   ");
+                    // if (createDeleteFileTimerId) {
+                    //     clearTimeout(createDeleteFileTimerId);
+                    // }
+                    // pendingCreateFiles.push({ taskType, uri });
+                    // createDeleteFileTimerId = setTimeout(async () => { await processCreateDeleteFiles(); }, 50, uri);
                     log.write("file 'create' event complete", 1);
                 }
                 catch (e) {}
@@ -326,3 +339,20 @@ async function processDirCreated()
     }
 }
 
+/*
+async function processCreateDeleteFiles()
+{
+    const taskTypes: string[] = [];
+    pendingCreateFiles.forEach(async (f) =>
+    {
+        util.pushIfNotExists(taskTypes, f.taskType);
+        await cache.addFileToCache(f.taskType, f.uri, "   ");
+    });
+    for (const taskType of taskTypes) {
+        await refreshTree(teApi, taskType, uri, "   ");
+    }
+    pendingCreateFiles = [];
+    pendingDeleteFiles = [];
+    processingFsEvent = false;
+}
+*/

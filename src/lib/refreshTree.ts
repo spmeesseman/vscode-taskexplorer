@@ -4,15 +4,7 @@ import { ITaskExplorerApi } from "../interface";
 
 
 export async function refreshTree(teApi: ITaskExplorerApi, taskType?: string, uri?: Uri, logPad?: string)
-{
-    //
-    // If this request is from a filesystem event for a file that exists in an ignored path,
-    // then get out of here
-    //
-    if (uri && isExcluded(uri.path)) {
-        return;
-    }
-    //
+{   //
     // Refresh tree(s)
     //
     // Note the static task cache only needs to be refreshed once if both the explorer view
