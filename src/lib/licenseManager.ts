@@ -6,6 +6,7 @@ import { storage } from "./utils/storage";
 import { commands, ExtensionContext, InputBoxOptions, Task, ViewColumn, WebviewPanel,  window, workspace } from "vscode";
 import { ILicenseManager } from "../interface/licenseManager";
 import { getHeaderContent, getBodyContent, isScriptType } from "./utils/utils";
+import { teApi } from "../extension";
 
 
 export class LicenseManager implements ILicenseManager
@@ -350,12 +351,12 @@ export class LicenseManager implements ILicenseManager
 				}
 				else { log.error(e); }
 				log.methodDone("validate license", 1, logPad, false, [["licensed", this.licensed]]);
-				resolve(true);
+				resolve(!teApi.isTests());
 			};
 			
 			log.write("   send validation request", 1, logPad);
 
-			var req = https.request(options, (res) =>
+			const req = https.request(options,/* istanbul ignore next */ (res) =>
 			{
 				log.write("   response received", 1, logPad);
 				log.value("      status code", res.statusCode, 2, logPad);
@@ -363,8 +364,8 @@ export class LicenseManager implements ILicenseManager
 				res.on("end", async() =>
 				{
 					try
-					{   const jso = JSON.parse(rspData);
-						const licensed = res.statusCode === 200 && jso.success && jso.message === "Success";
+					{   const jso = JSON.parse(rspData),
+							  licensed = res.statusCode === 200 && jso.success && jso.message === "Success";
 						log.value("      success", jso.success, 3, logPad);
 						log.value("      message", jso.message, 3, logPad);
 						/** istanbul ignore else */

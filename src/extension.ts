@@ -34,6 +34,7 @@ const isLicenseManagerActive = true;
 export const teApi = {} as ITaskExplorerApi;
 let licenseManager: ILicenseManager;
 let ready = false;
+let tests = false;
 export const providers: Map<string, TaskExplorerProvider> = new Map();
 export const providersExternal: Map<string, ExternalExplorerProvider> = new Map();
 
@@ -83,11 +84,13 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     Object.assign(teApi, {
         isBusy,
         config: configuration,
+        isTests,
         log,
         providers,
         providersExternal,
         refresh: refreshExternalProvider,
         register: registerExternalProvider,
+        setTests,
         unregister: unregisterExternalProvider,
         utilities: util,
         waitForIdle: waitForTaskExplorerIdle,
@@ -219,6 +222,9 @@ function isBusy()
 }
 
 
+let isTests = () => tests;
+
+
 /* istanbul ignore next */
 async function refreshExternalProvider(providerName: string)
 {
@@ -280,6 +286,12 @@ function registerTaskProviders(context: ExtensionContext)
     // The 'script' provider handles all file based 'scripts', e.g. batch files, bash, powershell, etc
     //
     registerTaskProvider("script", new ScriptTaskProvider(), context);
+}
+
+
+function setTests()
+{
+    tests = true;
 }
 
 

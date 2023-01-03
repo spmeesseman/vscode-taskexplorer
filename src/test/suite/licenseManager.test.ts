@@ -23,6 +23,7 @@ suite("License Manager Tests", () =>
 	let licenseKey: string | undefined;
 	let version: string;
 
+
 	suiteSetup(async function()
 	{
 		teApi = await activate(this);
@@ -147,8 +148,7 @@ suite("License Manager Tests", () =>
 
 
 	test("Reset License Manager", async function()
-	{
-		//
+	{   //
 		// Reset
 		//
 		licMgr.setLicenseKey(licenseKey);

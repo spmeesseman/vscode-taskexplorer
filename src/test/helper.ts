@@ -78,6 +78,7 @@ export async function activate(instance?: any)
         // Activate extension
         //
         teApi = await ext.activate();
+        teApi.setTests();
         teApi.waitForIdle(); // added 1/2/03 - Tree loads in delay 'after' activate()
         activated = true;
         //
