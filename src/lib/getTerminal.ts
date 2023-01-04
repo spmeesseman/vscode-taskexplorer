@@ -12,6 +12,7 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
 
     log.write("Get terminal", 1, logPad);
 
+    /* istanbul ignore if */
     if (!taskItem.task || !taskItem.label)
     {
         log.write("   no defined task on TaskItem", 2, logPad);

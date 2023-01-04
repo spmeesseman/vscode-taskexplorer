@@ -19,7 +19,7 @@ function findJsonDocumentPosition(documentText: string, taskItem: TaskItem)
     log.methodStart("find json document position", 3, "   ", false, [[ "task name", taskItem.task.name ]]);
 
     const visitor: JSONVisitor =
-    {
+    {   /* instanbul ignore next */
         onError: () =>
         {
             return scriptOffset;

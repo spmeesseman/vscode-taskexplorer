@@ -11,13 +11,14 @@ import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { ScriptTaskProvider } from "../../providers/script";
+import { PythonTaskProvider } from "../../providers/python";
+import { createDir, deleteDir, writeFile } from "../../lib/utils/fs";
 
 const testsName = "python";
 
 let teApi: ITaskExplorerApi;
-let pathToPython: string;
-let enablePython: boolean;
+let pathToTaskProgram: string;
+let enableTaskType: boolean;
 let wsFolder: WorkspaceFolder;
 let dirName: string;
 let fileUri: Uri;
@@ -31,17 +32,17 @@ suite("Python Tests", () =>
         // Initialize
         //
         teApi = await activate(this);
-        assert(isReady("python") === true, "    ✘ TeApi not ready");
+        assert(isReady(testsName) === true, "    ✘ TeApi not ready");
         wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "test2.py"));
         //
         // Store / set initial settings
         //
-        pathToPython = teApi.config.get<string>("pathToPrograms.python");
-        enablePython = teApi.config.get<boolean>("enabledTasks.python");
-        await executeSettingsUpdate("pathToPrograms.python", "python_7/python.exe");
-        await executeSettingsUpdate("enabledTasks.python", true, testsControl.waitTimeForConfigEnableEvent);
+        pathToTaskProgram = teApi.config.get<string>("pathToPrograms." + testsName);
+        enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
+        await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe");
+        await executeSettingsUpdate("enabledTasks." + testsName, true, testsControl.waitTimeForConfigEnableEvent);
     });
 
 
@@ -49,58 +50,52 @@ suite("Python Tests", () =>
     {   //
         // Reset settings
         //
-        await executeSettingsUpdate("pathToPrograms.python", pathToPython);
-        await executeSettingsUpdate("enabledTasks.python", enablePython, testsControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
+        await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testsControl.waitTimeForConfigEnableEvent);
     });
 
 
     test("Document Position", async function()
     {
-        const provider = teApi.providers.get("python") as ScriptTaskProvider;
+        const provider = teApi.providers.get(testsName) as PythonTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
     });
 
 
-    test("Invalid Script Type", async function()
+    test("Invalid ScriptProvider Type", async function()
     {
-        const provider = teApi.providers.get("python") as ScriptTaskProvider;
+        const provider = teApi.providers.get(testsName) as PythonTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.py"))),
-               "Script type should return position 1");
+               "ScriptProvider type should return position 1");
     });
 
 
     test("Start", async function()
     {
-        await verifyTaskCount("python", 2);
+        await verifyTaskCount(testsName, 2);
     });
 
 
     test("Disable", async function()
     {
-        await executeSettingsUpdate("enabledTasks.python", false, testsControl.waitTimeForConfigEnableEvent);
-        await verifyTaskCount("python", 0);
+        await executeSettingsUpdate("enabledTasks." + testsName, false, testsControl.waitTimeForConfigEnableEvent);
+        await verifyTaskCount(testsName, 0);
     });
 
 
     test("Re-enable", async function()
     {
-        await executeSettingsUpdate("enabledTasks.python", true, testsControl.waitTimeForConfigEnableEvent);
-        await verifyTaskCount("python", 2);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, testsControl.waitTimeForConfigEnableEvent);
+        await verifyTaskCount(testsName, 2);
     });
 
 
     test("Create File", async function()
     {
-        if (!fs.existsSync(dirName)) {
-            fs.mkdirSync(dirName, { mode: 0o777 });
-        }
-        fs.writeFileSync(
-            fileUri.fsPath,
-            "#!/usr/local/bin/python\n" +
-            "\n"
-        );
+        await createDir(dirName);
+        await writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
-        await verifyTaskCount("python", 3);
+        await verifyTaskCount(testsName, 3);
     });
 
 
@@ -108,36 +103,26 @@ suite("Python Tests", () =>
     {
         fs.unlinkSync(fileUri.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
-        await verifyTaskCount("python", 2);
-        fs.rmdirSync(dirName, {
-            recursive: true
-        });
+        await verifyTaskCount(testsName, 2);
+        await deleteDir(dirName);
     });
 
 
     test("Re-create File", async function()
     {
-        if (!fs.existsSync(dirName)) {
-            fs.mkdirSync(dirName, { mode: 0o777 });
-        }
-        fs.writeFileSync(
-            fileUri.fsPath,
-            "#!/usr/local/bin/python\n" +
-            "\n"
-        );
+        await createDir(dirName);
+        await writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
-        await verifyTaskCount("python", 3);
+        await verifyTaskCount(testsName, 3);
     });
 
 
     test("Delete Folder", async function()
     {
         // fs.unlinkSync(fileUri.fsPath);
-        fs.rmdirSync(dirName, {
-            recursive: true
-        });
+        await deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
-        await verifyTaskCount("python", 2);
+        await verifyTaskCount(testsName, 2);
     });
 
 });

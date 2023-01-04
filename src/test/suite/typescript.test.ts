@@ -9,10 +9,9 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
-    focusExplorer,
+    activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand2, focusExplorer,
     getTreeTasks, getWsPath, isReady, testsControl, verifyTaskCountByTree
 } from "../helper";
 

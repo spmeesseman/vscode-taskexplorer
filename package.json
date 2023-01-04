@@ -1639,7 +1639,7 @@
                         "nsis": false,
                         "perl": false,
                         "pipenv": false,
-                        "powershell": true,
+                        "powershell": false,
                         "python": true,
                         "ruby": false,
                         "tsc": true,

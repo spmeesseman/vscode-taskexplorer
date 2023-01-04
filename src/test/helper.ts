@@ -12,6 +12,7 @@ import { commands, extensions, tasks, window, workspace } from "vscode";
 
 let activated = false;
 let teApi: ITaskExplorerApi;
+let teExplorer: IExplorerApi;
 const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
 const overridesShowInputBox: any[] = [];
@@ -81,6 +82,10 @@ export async function activate(instance?: any)
         teApi.setTests();
         teApi.waitForIdle(); // added 1/2/03 - Tree loads in delay 'after' activate()
         activated = true;
+        if (!teApi.explorer) {
+            assert.fail("        ✘ Explorer instance does not exist");
+        }
+        teExplorer = teApi.explorer;
         //
         // For debugging
         //
@@ -103,10 +108,6 @@ export async function buildTree(instance: any)
     instance.slow(20000);
     instance.timeout(30000);
 
-    if (!teApi.explorer) {
-        return [];
-    }
-
     await executeSettingsUpdate("groupWithSeparator", true);
     await executeSettingsUpdate("groupSeparator", "-");
     await executeSettingsUpdate("groupMaxLevel", 5);
@@ -114,9 +115,9 @@ export async function buildTree(instance: any)
     //
     // A special refresh() for test suite, will open all task files and open to position
     //
-    await teApi.explorer.refresh("tests");
+    await teExplorer.refresh("tests");
     await teApi.waitForIdle(testsControl.waitTimeForBuildTree, 22500);
-    return teApi.explorer.getChildren();
+    return teExplorer.getChildren();
 }
 
 
@@ -201,7 +202,7 @@ export function findIdInTaskMap(id: string, taskMap: TaskMap)
 
 export async function focusExplorer(instance: any)
 {
-    if (!teApi.explorer?.isVisible()) {
+    if (!teExplorer.isVisible()) {
         instance.slow(testsControl.slowTimeForRefreshCommand);
         await executeTeCommand("focus", 500, testsControl.slowTimeForFocusCommand);
         await teApi.waitForIdle(500, testsControl.slowTimeForRefreshCommand);
@@ -257,7 +258,28 @@ async function initSettings(enable = true)
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
     await configuration.updateWs("autoRefresh", enable);
-    await configuration.updateWs("enabledTasks", configuration.get<object>("enabledTasks"));
+    await configuration.updateWs("enabledTasks",
+    {
+        ant: true,
+        apppublisher: false,
+        bash: true,
+        batch: true,
+        composer: false,
+        gradle: true,
+        grunt: true,
+        gulp: true,
+        make: true,
+        maven: false,
+        npm: true,
+        nsis: false,
+        perl: false,
+        pipenv: false,
+        powershell: false,
+        python: true,
+        ruby: false,
+        tsc: true,
+        workspace: true
+    });
     await configuration.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
     await configuration.updateWs("includeAnt", []); // Deprecated, use `globPatternsAnt`
     await configuration.updateWs("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
