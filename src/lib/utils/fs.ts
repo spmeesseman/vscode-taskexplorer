@@ -136,7 +136,7 @@ export function createDir(dir: string)
     });
 }
 
-/*
+
 export function deleteDir(dir: string): Promise<void>
 {
     return new Promise<void>(async (resolve, reject) =>
@@ -156,8 +156,8 @@ export function deleteDir(dir: string): Promise<void>
         }
     });
 }
-*/
-/*
+
+
 export function deleteFile(file: string): Promise<void>
 {
     return new Promise<void>(async (resolve, reject) =>
@@ -178,7 +178,7 @@ export function deleteFile(file: string): Promise<void>
     });
 }
 
-
+/*
 export function getDateModified(file: string)
 {
     return new Promise<Date|undefined>(async (resolve, reject) =>
@@ -362,29 +362,28 @@ export function renameFile(fileCurrent: string, fileNew: string): Promise<void>
 // }
 // 
 // 
-// /**
-//  * Overwrites file if it exists
-//  *
-//  * @param file The file path to write to
-//  * @param data The data to write
-//  */
-// export function writeFile(file: string, data: string): Promise<void>
-// {
-//     return new Promise<void>((resolve, reject) =>
-//     {
-//         if (!isDirectory(file))
-//         {
-//             fs.writeFile(path.resolve(cwd, file), data, (err) =>
-//             {
-//                 if (err) {
-//                     reject(err);
-//                 }
-//                 resolve();
-//             });
-//         }
-//         else {
-//             reject(new Error("Specified path is a directory"));
-//         }
-//     });
-// }
-// 
+/**
+ * Overwrites file if it exists
+ *
+ * @param file The file path to write to
+ * @param data The data to write
+ */
+export function writeFile(file: string, data: string): Promise<void>
+{
+    return new Promise<void>((resolve, reject) =>
+    {
+        if (!isDirectory(file))
+        {
+            fs.writeFile(path.resolve(cwd, file), data, (err) =>
+            {
+                if (err) {
+                    reject(err);
+                }
+                resolve();
+            });
+        }
+        else {
+            reject(new Error("Specified path is a directory"));
+        }
+    });
+}
