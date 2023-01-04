@@ -27,6 +27,13 @@ import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
 import { ExtensionContext, tasks, commands } from "vscode";
+import { BatchTaskProvider } from "./providers/batch";
+import { BashTaskProvider } from "./providers/bash";
+import { NsisTaskProvider } from "./providers/nsis";
+import { PerlTaskProvider } from "./providers/perl";
+import { PowershellTaskProvider } from "./providers/powershell";
+import { PythonTaskProvider } from "./providers/python";
+import { RubyTaskProvider } from "./providers/ruby";
 
 
 const isLicenseManagerActive = true;
@@ -274,19 +281,23 @@ function registerTaskProviders(context: ExtensionContext)
     // TODO: VSCODE API now implements "resolveTask" in addition to "provideTask".  Need to implement
     //     https://code.visualstudio.com/api/extension-guides/task-provider
     //
-    registerTaskProvider("ant", new AntTaskProvider(), context);                      // Apache Ant Build Automation Tool
-    registerTaskProvider("apppublisher", new AppPublisherTaskProvider(), context);   // App Publisher (work related)
-    registerTaskProvider("composer", new ComposerTaskProvider(), context);            // PHP / composer.json
-    registerTaskProvider("gradle", new GradleTaskProvider(), context);                // Gradle multi-Language Automation Tool
-    registerTaskProvider("grunt", new GruntTaskProvider(), context);                  // Gulp JavaScript Toolkit
-    registerTaskProvider("gulp", new GulpTaskProvider(), context);                    // Grunt JavaScript Task Runner
-    registerTaskProvider("make", new MakeTaskProvider(), context);                    // C/C++ Makefile
-    registerTaskProvider("maven", new MavenTaskProvider(), context);                  // Apache Maven Toolset
-    registerTaskProvider("pipenv", new PipenvTaskProvider(), context);                // Pipfile for Python pipenv package manager
-    //
-    // The 'script' provider handles all file based 'scripts', e.g. batch files, bash, powershell, etc
-    //
-    registerTaskProvider("script", new ScriptTaskProvider(), context);
+    registerTaskProvider("ant", new AntTaskProvider(), context);                    // Apache Ant Build Automation Tool
+    registerTaskProvider("apppublisher", new AppPublisherTaskProvider(), context);  // App Publisher (work related)
+    registerTaskProvider("composer", new ComposerTaskProvider(), context);          // PHP / composer.json
+    registerTaskProvider("gradle", new GradleTaskProvider(), context);              // Gradle multi-Language Automation Tool
+    registerTaskProvider("grunt", new GruntTaskProvider(), context);                // Gulp JavaScript Toolkit
+    registerTaskProvider("gulp", new GulpTaskProvider(), context);                  // Grunt JavaScript Task Runner
+    registerTaskProvider("make", new MakeTaskProvider(), context);                  // C/C++ Makefile
+    registerTaskProvider("maven", new MavenTaskProvider(), context);                // Apache Maven Toolset
+    registerTaskProvider("pipenv", new PipenvTaskProvider(), context);              // Pipfile for Python pipenv package manager
+    // Script type tasks
+    registerTaskProvider("bash", new BashTaskProvider(), context);
+    registerTaskProvider("batch", new BatchTaskProvider(), context);
+    registerTaskProvider("nsis", new NsisTaskProvider(), context);
+    registerTaskProvider("perl", new PerlTaskProvider(), context);
+    registerTaskProvider("powershell", new PowershellTaskProvider(), context);
+    registerTaskProvider("python", new PythonTaskProvider(), context);
+    registerTaskProvider("ruby", new RubyTaskProvider(), context);
 }
 
 

@@ -383,7 +383,7 @@ suite("Provider Tests", () =>
 
     test("Resolve Task", async function()
     {
-        const provider = teApi.providers.get("script");
+        const provider = teApi.providers.get("batch");
         assert(provider);
         provider.resolveTask(batch[0]);
     });
@@ -419,7 +419,7 @@ suite("Provider Tests", () =>
     test("Add to Excludes - TaskItem (Script Type)", async function()
     {
         this.slow(1000);
-        const taskItems = await tasks.fetchTasks({ type: "script" }),
+        const taskItems = await tasks.fetchTasks({ type: "batch" }),
               scriptCt = taskItems.length;
         for (const property in taskMap)
         {
@@ -439,7 +439,7 @@ suite("Provider Tests", () =>
                 }
             }
         }
-        await verifyTaskCount("script", scriptCt - 1);
+        await verifyTaskCount("batch", scriptCt - 1);
     });
 
 

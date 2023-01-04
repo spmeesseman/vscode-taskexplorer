@@ -327,13 +327,10 @@ export async function sleep(ms: number)
 }
 
 
-export async function verifyTaskCount(taskType: string, expectedCount: number, scriptType?: string)
+export async function verifyTaskCount(taskType: string, expectedCount: number)
 {
     let tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
-    if (scriptType) {
-        tTasks = tTasks.filter(t => !scriptType || scriptType === t.source);
-    }
-    else if (taskType === "Workspace") {
+    if (taskType === "Workspace") {
         tTasks = tTasks.filter(t => t.source === "Workspace");
     }
     try {

@@ -69,12 +69,6 @@ export interface TaskExplorerDefinition extends TaskDefinition
      */
     scriptFile?: boolean;
     /**
-     * @property scriptType
-     *
-     * The `script` task provider has multiple sub-task-types, e.g. bash, python
-     */
-    scriptType?: string;
-    /**
      * @property cmdLine
      *
      * The full command that is executed for this task.  This should be the same as the command

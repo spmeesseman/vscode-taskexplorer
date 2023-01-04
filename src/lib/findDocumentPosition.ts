@@ -6,7 +6,7 @@ import { getTaskName } from "./getTaskName";
 import TaskItem from "../tree/item";
 import * as log from "./utils/log";
 import { providers, providersExternal } from "../extension";
-import { getTaskProviderType, isWatchTask } from "./utils/utils";
+import { isWatchTask } from "./utils/utils";
 
 
 function findJsonDocumentPosition(documentText: string, taskItem: TaskItem)
@@ -115,8 +115,7 @@ export function findDocumentPosition(document: TextDocument, taskItem: TaskItem)
     }
     else if (!isWatchTask(taskItem.taskSource))
     {
-        const provider = providers.get(getTaskProviderType(def.type)) ||
-                        providersExternal.get(def.type);
+        const provider = providers.get(def.type) || providersExternal.get(def.type);
         scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || -1;
     }
 

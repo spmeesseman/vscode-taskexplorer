@@ -25,7 +25,7 @@ import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOp
 export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
-    constructor() { super("script"); }
+    constructor(name = "script") { super(name); }
 
 
     private scriptTable: any = {
@@ -212,15 +212,14 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
               scriptDef = this.scriptTable[tgt],
               fileName = path.basename(uri.fsPath);
 
-        if (!scriptDef) {
+        if (!scriptDef || !scriptDef.type) {
             return;
         }
 
         const def: TaskExplorerDefinition = {
-            type: "script",
+            type: scriptDef.type,
             script: target.toLowerCase(),
             target: tgt,
-            scriptType: scriptDef.type || /* istanbul ignore next */ "unknown",
             fileName,
             scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
             path: util.getRelativePath(folder, uri),
@@ -249,54 +248,9 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public getGlobPattern(scriptType: string)
+    public getGlobPattern()
     {
-        if (scriptType === "bash") {
-            return util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
-        }
-        return constants[`GLOB_${scriptType.replace(/\-/g, "").toUpperCase()}`];
-    }
-
-    /**
-     * Override TaskExplorerProvider
-     *
-     * @param logPad Log padding
-     */
-    protected async readTasks(logPad: string): Promise<Task[]>
-    {
-        const allTasks: Task[] = [],
-              visitedFiles: string[] = [],
-              scriptTypes = util.getScriptTaskTypes();
-
-        log.methodStart(`read ${this.providerName} task files`, 1, logPad, false, undefined, this.logQueueId);
-
-        for (const taskType of scriptTypes)
-        {
-            const paths = getTaskFiles(taskType),
-                  enabled = util.isTaskTypeEnabled(taskType);
-            if (enabled && paths)
-            {
-                log.write("   detect script type " + taskType, 2, logPad, this.logQueueId);
-                for (const fObj of paths)
-                {
-                    if (!util.isExcluded(fObj.uri.path) && !visitedFiles.includes(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
-                    {
-                        visitedFiles.push(fObj.uri.fsPath);
-                        const task = this.createTask(path.extname(fObj.uri.fsPath).substring(1), undefined, fObj.folder, fObj.uri, undefined, logPad + "   ");
-                        /* istanbul ignore else */
-                        if (task)
-                        {
-                            allTasks.push(task);
-                            log.write(`   processed ${this.providerName} file`, 3, logPad, this.logQueueId);
-                            log.value("      script file", fObj.uri.fsPath, 3, logPad, this.logQueueId);
-                        }
-                    }
-                }
-            }
-        }
-
-        log.methodDone(`read ${this.providerName} task files`, 1, logPad, false, [[ "# of tasks", allTasks.length ]], this.logQueueId);
-        return allTasks;
+        return constants[`GLOB_${this.providerName.replace(/\-/g, "").toUpperCase()}`];
     }
 
 

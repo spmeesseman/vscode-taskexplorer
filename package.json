@@ -2266,16 +2266,257 @@
                 }
             },
             {
-                "type": "script",
+                "type": "bash",
                 "required": [
-                    "scriptType",
                     "fileName"
                 ],
                 "properties": {
-                    "scriptType": {
+                    "path": {
                         "type": "string",
-                        "description": "%taskdef.task.scriptType%"
+                        "description": "%taskdef.task.path%"
                     },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "scriptFile": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.scriptFile%",
+                        "default": true
+                    },
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.task.script%"
+                    },
+                    "target": {
+                        "type": "string",
+                        "description": "%taskdef.task.target%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.task.fileUri%"
+                    },
+                    "taskItemId": {
+                        "type": "string",
+                        "description": "%taskdef.task.taskItemId%"
+                    },
+                    "takesArgs": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.takesArgs%"
+                    }
+                }
+            },
+            {
+                "type": "batch",
+                "required": [
+                    "fileName"
+                ],
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.task.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "scriptFile": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.scriptFile%",
+                        "default": true
+                    },
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.task.script%"
+                    },
+                    "target": {
+                        "type": "string",
+                        "description": "%taskdef.task.target%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.task.fileUri%"
+                    },
+                    "taskItemId": {
+                        "type": "string",
+                        "description": "%taskdef.task.taskItemId%"
+                    },
+                    "takesArgs": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.takesArgs%"
+                    }
+                }
+            },
+            {
+                "type": "nsis",
+                "required": [
+                    "fileName"
+                ],
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.task.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "scriptFile": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.scriptFile%",
+                        "default": true
+                    },
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.task.script%"
+                    },
+                    "target": {
+                        "type": "string",
+                        "description": "%taskdef.task.target%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.task.fileUri%"
+                    },
+                    "taskItemId": {
+                        "type": "string",
+                        "description": "%taskdef.task.taskItemId%"
+                    },
+                    "takesArgs": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.takesArgs%"
+                    }
+                }
+            },
+            {
+                "type": "perl",
+                "required": [
+                    "fileName"
+                ],
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.task.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "scriptFile": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.scriptFile%",
+                        "default": true
+                    },
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.task.script%"
+                    },
+                    "target": {
+                        "type": "string",
+                        "description": "%taskdef.task.target%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.task.fileUri%"
+                    },
+                    "taskItemId": {
+                        "type": "string",
+                        "description": "%taskdef.task.taskItemId%"
+                    },
+                    "takesArgs": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.takesArgs%"
+                    }
+                }
+            },
+            {
+                "type": "powershell",
+                "required": [
+                    "fileName"
+                ],
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.task.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "scriptFile": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.scriptFile%",
+                        "default": true
+                    },
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.task.script%"
+                    },
+                    "target": {
+                        "type": "string",
+                        "description": "%taskdef.task.target%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.task.fileUri%"
+                    },
+                    "taskItemId": {
+                        "type": "string",
+                        "description": "%taskdef.task.taskItemId%"
+                    },
+                    "takesArgs": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.takesArgs%"
+                    }
+                }
+            },
+            {
+                "type": "python",
+                "required": [
+                    "fileName"
+                ],
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.task.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "scriptFile": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.scriptFile%",
+                        "default": true
+                    },
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.task.script%"
+                    },
+                    "target": {
+                        "type": "string",
+                        "description": "%taskdef.task.target%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.task.fileUri%"
+                    },
+                    "taskItemId": {
+                        "type": "string",
+                        "description": "%taskdef.task.taskItemId%"
+                    },
+                    "takesArgs": {
+                        "type": "boolean",
+                        "description": "%taskdef.task.takesArgs%"
+                    }
+                }
+            },
+            {
+                "type": "ruby",
+                "required": [
+                    "fileName"
+                ],
+                "properties": {
                     "path": {
                         "type": "string",
                         "description": "%taskdef.task.path%"

@@ -307,15 +307,6 @@ export function getTaskTypeEnabledSettingName(taskType: string)
 }
 
 
-export function getTaskProviderType(taskType: string): string
-{
-    if (isScriptType(taskType)) {
-        return "script";
-    }
-    return taskType;
-}
-
-
 export function getTaskTypes()
 {
     return [
@@ -502,7 +493,7 @@ export function isObject(value: any)
 
 export function isScriptType(source: string)
 {
-    return source === "script" || getScriptTaskTypes().includes(source);
+    return getScriptTaskTypes().includes(source);
 }
 
 

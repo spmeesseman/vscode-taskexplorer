@@ -1124,16 +1124,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 this.tasks = await tasks.fetchTasks();
             }
             else if (this.tasks && this.currentInvalidation)
-            {
-                const isScriptType = util.isScriptType(this.currentInvalidation);
-                //
+            {   //
                 // Get all tasks of the type defined in 'currentInvalidation' from VSCode, remove
                 // all tasks of the type defined in 'currentInvalidation' from the tasks list cache,
                 // and add the new tasks from VSCode into the tasks list.
                 //
                 const taskItems = await tasks.fetchTasks(
                 {
-                    type: !isScriptType ? this.currentInvalidation : "script"
+                    type: this.currentInvalidation
                 });
                 //
                 // Remove tasks of type '' from the 'tasks'array
@@ -1145,7 +1143,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                     // Remove any Workspace type tasks returned as well, in this case the source type is
                     // != currentInvalidation, but the definition type == currentInvalidation
                     //
-                    if (item.source === this.currentInvalidation || item.source === "Workspace" || (isScriptType && util.isScriptType(item.source)))
+                    if (item.source === this.currentInvalidation || item.source === "Workspace")
                     {
                         if (item.source !== "Workspace" || item.definition.type === this.currentInvalidation) {
                             log.write(`   removing old task '${item.source}/${item.name}'`, 4, logPad);
@@ -1601,7 +1599,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             {
                 log.write("   invalidate '" + opt1 + "' task provider file ", 1, logPad);
                 log.value("      file", opt2.fsPath, 1, logPad);
-                const provider = providers.get(util.getTaskProviderType(opt1)) ||
+                const provider = providers.get(opt1) ||
                                  providersExternal.get(opt1);
                 // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
                 await provider?.invalidate(opt2, logPad + "   ");
@@ -1620,7 +1618,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 }
                 else { // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
                     log.write("   invalidate '" + opt1 + "' task provider", 1, logPad);
-                    const provider = providers.get(util.getTaskProviderType(opt1)) ||
+                    const provider = providers.get(opt1) ||
                                      providersExternal.get(opt1);
                     provider?.invalidate(undefined, logPad + "   ");
                 }
@@ -1667,10 +1665,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
         log.value("   type", definition.type, 4, logPad);
         log.value("   relative Path", definition.path ? definition.path : "", 4, logPad);
-        if (definition.scriptType)
-        {
-            log.value("      script type", definition.scriptType, 4, logPad);
-        }
         if (definition.scriptFile)
         {
             log.value("      script file", definition.scriptFile, 4, logPad);
@@ -2199,8 +2193,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 //
                 const def = newTask.definition,
                       folder = taskItem.getFolder(),
-                      p = providers.get(util.getTaskProviderType(def.type))
-                          /* istanbul ignore next */ || providersExternal.get(def.type);
+                      p = providers.get(def.type) /* istanbul ignore next */ || providersExternal.get(def.type);
                 /* istanbul ignore else */
                 if (folder && p)
                 {
@@ -2378,7 +2371,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                     /* istanbul ignore else */
                     if (folder)
                     {
-                        newTask = (providers.get("script") as ScriptTaskProvider).createTask(
+                        newTask = (new ScriptTaskProvider()).createTask(
                             def.script, undefined, folder, def.uri, _args.trim().split(" "), logPad + "   "
                         ) as Task;
                         newTask.definition.taskItemId = def.taskItemId;

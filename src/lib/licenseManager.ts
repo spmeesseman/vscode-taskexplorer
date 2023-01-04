@@ -297,7 +297,7 @@ export class LicenseManager implements ILicenseManager
 	getMaxNumberOfTasksByType(taskType: string)
 	{
 		return this.licensed ? Infinity :
-			(taskType === "script" || isScriptType(taskType) ? this.maxFreeTasksForScriptType : this.maxFreeTasksForTaskType);
+			(isScriptType(taskType) ? this.maxFreeTasksForScriptType : this.maxFreeTasksForTaskType);
 	}
 
 

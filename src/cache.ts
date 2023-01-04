@@ -87,8 +87,8 @@ export async function addFolderToCache(folder: Uri, logPad: string)
             let glob;
             if (!util.isWatchTask(providerName))
             {
-                const provider = providers.get(util.getTaskProviderType(providerName)) || externalProvider;
-                glob = provider?.getGlobPattern(providerName);
+                const provider = providers.get(providerName) || externalProvider;
+                glob = provider?.getGlobPattern();
             }
             if (!glob) {
                 glob = util.getGlobPattern(providerName);
@@ -185,8 +185,8 @@ async function addWsFolderToCache(folder: WorkspaceFolder | undefined, setCacheB
             let glob;
             if (!util.isWatchTask(providerName))
             {
-                const provider = providers.get(util.getTaskProviderType(providerName)) || externalProvider;
-                glob = provider?.getGlobPattern(providerName);
+                const provider = providers.get(providerName) || externalProvider;
+                glob = provider?.getGlobPattern();
             }
             if (!glob) {
                 glob = util.getGlobPattern(providerName);
@@ -319,11 +319,9 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
 
 export async function buildCache(taskType: string, fileGlob: string, wsFolder: WorkspaceFolder | undefined, setCacheBuilding: boolean, logPad: string)
 {
-    const taskProviderType = util.getTaskProviderType(taskType);
-
     log.methodStart("build file cache", 2, logPad, false, [
         [ "folder", !wsFolder ? "entire workspace" : wsFolder.name ], [ "task type", taskType ],
-        [ "task provider type", taskProviderType ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
+        [ "task provider type", taskType ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
     ]);
 
     if (setCacheBuilding)

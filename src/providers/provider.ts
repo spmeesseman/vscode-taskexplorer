@@ -7,6 +7,7 @@ import { getTaskFiles, removeFileFromCache } from "../cache";
 import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { getLicenseManager } from "../extension";
+import { isDirectory } from "../lib/utils/fs";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
@@ -53,7 +54,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
      *
      * @since 2.6.3
      */
-    public getGlobPattern(subType?: string)
+    public getGlobPattern()
     {
         return constants[`GLOB_${this.providerName.replace(/\-/g, "").toUpperCase()}`];
     }
@@ -125,6 +126,11 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
     public async invalidate(uri?: Uri, logPad = ""): Promise<void>
     {
+        //
+        // Note that 'taskType' may be different than 'this.providerName' for 'script' type tasks (e.g.
+        // batch, bash, python, etc...)
+        //
+
         log.methodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, false,
             [[ "uri", uri?.path ], [ "has cached tasks", !!this.cachedTasks ]]
         );
@@ -138,15 +144,6 @@ export abstract class TaskExplorerProvider implements TaskProvider
         if (this.cachedTasks)
         {
             const enabled = util.isTaskTypeEnabled(this.providerName);
-            // if (!enabled)
-            // {
-            //     // if (this.providerName === "script") {
-            //     //     someday.  we still kill the whole script typegroup (i.e. batch, bash, python, etc)
-            //     // }
-            //     // else {
-            //         // uri = undefined;
-            //     // }
-            // }
             if (enabled && uri)
             {
                 const pathExists = util.pathExists(uri.fsPath);
@@ -155,9 +152,11 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 //
                 this.cachedTasks.slice().reverse().forEach((item, index, object) =>
                 {
-                    const cstDef = item.definition; // leave`enabled` below, for one day when we invalidate only a specific script type
-                    if (!enabled || (cstDef.uri && (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath))) ||
-                        (cstDef.path && !isTaskIncluded(item, cstDef.path)))
+                    const cstDef = item.definition;
+                    if ((cstDef.uri &&
+                            (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath) ||
+                            (cstDef.uri.fsPath.startsWith(uri.fsPath) && isDirectory(uri.fsPath)))) ||
+                        (cstDef.uri.path && !isTaskIncluded(item, cstDef.uri.path)))
                     {
                         if (item.source !== "Workspace" || item.definition.type === this.providerName) {
                             log.write(`   removing cached task '${item.source}/${item.name}'`, 4, logPad);
@@ -168,7 +167,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
                 if (pathExists && !configuration.get<string[]>("exclude", []).includes(uri.path))
                 // if (pathExists && !util.isExcluded(uri.path))
-                {    // leave`enabled` below, for one day when we invalidate only a specific script type
+                {
                     const tasks = enabled ? (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path)) : [];
                     //
                     // If the implementation of the readUri() method awaits, it can theoretically reset

@@ -31,7 +31,7 @@ suite("Python Tests", () =>
         // Initialize
         //
         teApi = await activate(this);
-        assert(isReady("script") === true, "    ✘ TeApi not ready");
+        assert(isReady("python") === true, "    ✘ TeApi not ready");
         wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "test2.py"));
@@ -56,14 +56,14 @@ suite("Python Tests", () =>
 
     test("Document Position", async function()
     {
-        const provider = teApi.providers.get("script") as ScriptTaskProvider;
+        const provider = teApi.providers.get("python") as ScriptTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
     });
 
 
     test("Invalid Script Type", async function()
     {
-        const provider = teApi.providers.get("script") as ScriptTaskProvider;
+        const provider = teApi.providers.get("python") as ScriptTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.py"))),
                "Script type should return position 1");
     });
@@ -71,21 +71,21 @@ suite("Python Tests", () =>
 
     test("Start", async function()
     {
-        await verifyTaskCount("script", 2, testsName);
+        await verifyTaskCount("python", 2);
     });
 
 
     test("Disable", async function()
     {
         await executeSettingsUpdate("enabledTasks.python", false, testsControl.waitTimeForConfigEnableEvent);
-        await verifyTaskCount("script", 0, testsName);
+        await verifyTaskCount("python", 0);
     });
 
 
     test("Re-enable", async function()
     {
         await executeSettingsUpdate("enabledTasks.python", true, testsControl.waitTimeForConfigEnableEvent);
-        await verifyTaskCount("script", 2, testsName);
+        await verifyTaskCount("python", 2);
     });
 
 
@@ -100,7 +100,7 @@ suite("Python Tests", () =>
             "\n"
         );
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
-        await verifyTaskCount("script", 3, testsName);
+        await verifyTaskCount("python", 3);
     });
 
 
@@ -108,7 +108,7 @@ suite("Python Tests", () =>
     {
         fs.unlinkSync(fileUri.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
-        await verifyTaskCount("script", 2, testsName);
+        await verifyTaskCount("python", 2);
         fs.rmdirSync(dirName, {
             recursive: true
         });
@@ -126,7 +126,7 @@ suite("Python Tests", () =>
             "\n"
         );
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
-        await verifyTaskCount("script", 3, testsName);
+        await verifyTaskCount("python", 3);
     });
 
 
@@ -137,7 +137,7 @@ suite("Python Tests", () =>
             recursive: true
         });
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
-        await verifyTaskCount("script", 2, testsName);
+        await verifyTaskCount("python", 2);
     });
 
 });
