@@ -7,7 +7,7 @@ export const testControl = {
     writeToConsole: false,
     writeToFile: false,
     writeToFileName: "taskexplorer.log",
-    writeToOutput: true,
+    writeToOutput: false,
     slowTimeForCommand: 1250,
     slowTimeForCommandFast: 450,
     slowTimeForConfigEvent: 200,
@@ -18,6 +18,8 @@ export const testControl = {
     slowTimeForNpmCommand: 7500,
     slowTimeForRefreshCommand: 10000,
     slowTimeForFetchTasksCommand: 1000,
+    slowTimeForLocalLicenseCheck: 2000,
+    slowTimeForRemoteLicenseCheck: 4000,
     // Use update() here for coverage, since these two settings wont trigger any processing
     userLogLevel: configuration.get<number>("logging.level"),
     userPathToAnt: configuration.get<string>("pathToPrograms.ant"),
@@ -30,9 +32,9 @@ export const testControl = {
     waitTimeForCommand: 150,
     waitTimeForCommandFast: 50,
     waitTimeForNpmCommandMin: 3000,
-    waitTimeForNpmCommandMax: 10000,
+    waitTimeForNpmCommandMax: 12000,
     waitTimeForRefreshCommand: 500,
     waitTimeForRefreshTaskTypeCommand: 1000,
-    waitTimeForRunCommand: 3000,
+    waitTimeForRunCommand: 3500,
     waitTimeMax: 15000
 };

@@ -82,7 +82,7 @@ suite("Task Tests", () =>
 
     test("Run non-existent last task", async function()
     {
-        this.slow(1200);
+        this.slow(5000);
         const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []),
               hasLastTasks = lastTasks && lastTasks.length > 0;
         if (hasLastTasks)
@@ -99,7 +99,7 @@ suite("Task Tests", () =>
 
     test("Keep Terminal on Stop (OFF)", async function()
     {
-        this.slow(1500 + waitTimeForRunCommand + waitTimeForConfigEvent);
+        this.slow(5000 + waitTimeForRunCommand + waitTimeForConfigEvent);
         await executeSettingsUpdate("keepTermOnStop", false);
         await executeTeCommand("run", waitTimeForRunCommand, 5000, batch[0]);
         await executeTeCommand("stop", 1000, 1500, batch[0]);
@@ -108,7 +108,7 @@ suite("Task Tests", () =>
 
     test("Keep Terminal on Stop (ON)", async function()
     {
-        this.slow(1500 + waitTimeForRunCommand + waitTimeForConfigEvent);
+        this.slow(5000 + waitTimeForRunCommand + waitTimeForConfigEvent);
         await executeSettingsUpdate("keepTermOnStop", true);
         await executeTeCommand("run", waitTimeForRunCommand, 5000, batch[0]);
         await executeTeCommand("stop", 1000, 1500, batch[0]);
@@ -117,7 +117,7 @@ suite("Task Tests", () =>
 
     test("Trigger busy on run last task", async function()
     {
-        this.slow(waitTimeForRunCommand + 1000 + waitTimeForFsCreateEvent);
+        this.slow(waitTimeForRunCommand + 2000 + waitTimeForFsCreateEvent);
         explorer.invalidateTasksCache();// Don't await
         await executeTeCommand("runLastTask", waitTimeForRunCommand, 5000);
     });
@@ -125,7 +125,7 @@ suite("Task Tests", () =>
 
     test("Resume task no terminal", async function()
     {
-        this.slow(waitTimeForRunCommand + 1000);
+        this.slow(waitTimeForRunCommand + 2000);
         bash[0].paused = true;
         await executeTeCommand2("runLastTask", [ batch[0] ], waitTimeForRunCommand);
         bash[0].paused = false;

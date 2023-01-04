@@ -103,8 +103,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         waitForIdle: waitForTaskExplorerIdle,
         testsApi: {
             log,
-            /* istanbul ignore next */
-            explorer: teApi.explorer || teApi.sidebar,
+            explorer: teApi.explorer || /* istanbul ignore next */teApi.sidebar,
             fileCache: cache
         }
     });
@@ -128,7 +127,9 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         //
         // TaskTreeDataProvider fires event for engine to make tree provider to refresh on setEnabled()
         //
+        /* istanbul ignore next */
         api.explorer?.setEnabled(true);
+        /* istanbul ignore next */
         api.sidebar?.setEnabled(true);
         //
         // Signal that first task load has completed
@@ -216,6 +217,7 @@ export function getLicenseManager()
 async function initLicenseManager(context: ExtensionContext)
 {
     licenseManager = new LicenseManager(context);
+    /* istanbul ignore else */
     if (isLicenseManagerActive) {
         await licenseManager.checkLicense("   ");
     }

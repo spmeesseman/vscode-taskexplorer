@@ -10,7 +10,7 @@ import TaskFolder from "./folder";
 import constants from "../lib/constants";
 import { storage } from "../lib/utils/storage";
 import { rebuildCache } from "../cache";
-import { InitScripts, LoadScripts, NoScripts, NoWorkspace } from "../lib/noScripts";
+import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { configuration } from "../lib/utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
@@ -48,7 +48,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     private busy = false;
     private extensionContext: ExtensionContext;
     private name: string;
-    private taskTree: TaskFolder[] | NoScripts[] | InitScripts[] | NoWorkspace[] | undefined | null | void = null;
+    private taskTree: TaskFolder[] | NoScripts[] | InitScripts[] | LoadScripts[] | undefined | null | void = null;
     private currentInvalidation: string | undefined;
     private taskIdStartEvents: Map<string, NodeJS.Timeout> = new Map();
     private taskIdStopEvents: Map<string, NodeJS.Timeout> = new Map();
@@ -635,7 +635,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             [ "store",  storeName ], [ "name",  label ]
         ]);
 
-        (this.taskTree as TaskFolder[]|NoScripts[]|InitScripts[]|NoWorkspace[]).splice(treeIndex, 0, folder);
+        (this.taskTree as TaskFolder[]|NoScripts[]|InitScripts[]|LoadScripts[]).splice(treeIndex, 0, folder);
 
         for (const tId of lTasks)
         {
@@ -1010,7 +1010,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     {
         if (!workspace.workspaceFolders && !configuration.get<boolean>("specialFolders.showUserTasks"))
         {
-            return [ new NoWorkspace() ];
+            return [ new NoScripts() ];
         }
 
         if (!this.enabled)
@@ -1263,7 +1263,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             return element.taskFile;
         }
         /* istanbul ignore next */
-        if (element instanceof NoScripts || element instanceof InitScripts || element instanceof NoWorkspace)
+        if (element instanceof NoScripts || element instanceof InitScripts || element instanceof LoadScripts)
         {
             /* istanbul ignore next */
             return null;
@@ -2456,9 +2456,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     //
     public setEnabled(enable: boolean)
     {
-        this.enabled = enable;
-        this.setEnableCalled = true;
-        this._onDidChangeTreeData.fire();
+        if (enable !== this.enabled)
+        {
+            this.enabled = enable;
+            if (!enable) {
+                this.tasks = null;
+                this.taskTree = null;
+                this.setEnableCalled = true;
+            }
+            else {
+                this.setEnableCalled = enable;
+                this._onDidChangeTreeData.fire();
+            }
+        }
     }
 
 

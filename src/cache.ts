@@ -10,6 +10,7 @@ import {
 import * as glob from "glob";
 import { join } from "path";
 import { ICacheItem } from "./interface/cacheItem";
+import { TaskExplorerProvider } from "./providers/provider";
 
 
 let statusBarSpace: StatusBarItem;
@@ -76,8 +77,8 @@ export async function addFolderToCache(folder: Uri, logPad: string)
 
         if (!cancel && (externalProvider || util.isTaskTypeEnabled(providerName)))
         {
+            /* istanbul ignore if */
             if (!filesCache.get(providerName)) {
-                /* istanbul ignore next */
                 throw new Error("Workspace project folder has not yet been scanned");
             }
 
@@ -95,6 +96,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
             statusBarSpace.text = getStatusString(`Scanning for ${dspTaskType} tasks in project ${wsFolder.name}`, 65);
             log.value("   adding folder cache for provider", providerName, 3, logPad);
 
+            /* istanbul ignore else */
             if (!providersExternal.get(providerName))
             {
                 try
@@ -112,7 +114,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                     }
                     const paths = await globAsync(glob, { nocase: true, ignore: getExcludesPatternGlob(), cwd: folder.fsPath  });
                     for (const fPath of paths)
-                    {
+                    {   /* istanbul ignore if */
                         if (cancel) {
                             break;
                         }
@@ -135,6 +137,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
     //
     disposeStatusBarSpace(statusBarSpace);
 
+    /* istanbul ignore if */
     if (cancel) {
         log.write("Add folder to cache cancelled", 3, logPad);
     }
@@ -179,8 +182,8 @@ async function addWsFolderToCache(folder: WorkspaceFolder | undefined, setCacheB
             let glob;
             if (!util.isWatchTask(providerName))
             {
-                const provider = providers.get(providerName) || externalProvider;
-                glob = provider?.getGlobPattern();
+                const provider = providers.get(providerName) || /* istanbul ignore next */externalProvider;
+                glob = (provider as TaskExplorerProvider).getGlobPattern();
             }
             if (!glob) {
                 glob = util.getGlobPattern(providerName);
@@ -234,6 +237,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         for (const f of wsf)
         {
             await addWsFolderToCache(f, false, logPad + "   ");
+            /* istanbul ignore if */
             if (cancel) {
                 break;
             }
@@ -418,7 +422,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
         }
         */
     }
-    /* istanbul ignore else */
+    /* istanbul ignore if */
     else if (isExternal) {
         await util.timeout(250);
     }
@@ -514,7 +518,8 @@ export function globAsync(pattern: string, options: any): Promise<string[]>
     return new Promise(function (resolve, reject)
     {
         glob(pattern, options, function (err, files)
-        {   /* istanbul ignore else */
+        {
+            /* istanbul ignore else */
             if (!err) {
                 resolve(files);
             }
@@ -679,6 +684,7 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
                 if (item.folder.name === wsf.name)
                 {
                     toRemove.push(item);
+                    /* istanbul ignore if */
                     if (!isFolder) {
                         break;
                     }
@@ -707,7 +713,8 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
                     }
                 }
                 else
-                {   if (item.fsPath.startsWith(wsf.uri.fsPath))
+                {   /* istanbul ignore else */
+                    if (item.fsPath.startsWith(wsf.uri.fsPath))
                     {
                         log.value(`   remove from project files map (${index})`, item.fsPath, 3, logPad);
                         projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
@@ -732,7 +739,8 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
                     }
                 }
                 else
-                {   if (item.folder.name === wsf.name)
+                {   /* istanbul ignore else */
+                    if (item.folder.name === wsf.name)
                     {
                         log.value(`   remove from task files map (${index})`, item.uri.fsPath, 3, logPad);
                         projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);

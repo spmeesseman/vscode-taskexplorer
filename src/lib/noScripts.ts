@@ -30,12 +30,3 @@ export class LoadScripts extends TreeItem
         this.contextValue = "loadscripts";
     }
 }
-
-export class NoWorkspace extends TreeItem
-{
-    constructor()
-    {
-        super(localize("noWorkspace", "No workspace found"), TreeItemCollapsibleState.None);
-        this.contextValue = "noworkspace";
-    }
-}

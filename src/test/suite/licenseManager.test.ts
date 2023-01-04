@@ -12,6 +12,7 @@ import {
 	activate, closeActiveDocument, isReady, overrideNextShowInfoBox,
 	overrideNextShowInputBox, sleep, executeTeCommand, focusExplorer, getWsPath
 } from "../helper";
+import { testControl } from "../control";
 
 
 let teApi: ITaskExplorerApi;
@@ -310,16 +311,17 @@ suite("License Manager Tests", () =>
 
 	test("Start License Server", async function()
 	{
-		this.slow(7000);
+		this.slow(100000);
 		lsProcess = fork("spm-license-server.js", {
 			cwd: getWsPath("../../spm-license-server/bin"), detached: true,
 		});
-		await sleep(3000);
+		await sleep(3500);
 	});
 
 
 	test("Enter License key on Startup (1st time, Server Live)", async function()
 	{
+		this.slow(testControl.slowTimeForLocalLicenseCheck);
 		await storage.update("version", undefined);
 		const licenseKey = licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
@@ -331,6 +333,7 @@ suite("License Manager Tests", () =>
 
 	test("Enter License key on Startup (> 1st time, Server Live)", async function()
 	{
+		this.slow(testControl.slowTimeForLocalLicenseCheck);
 		const licenseKey = licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();

@@ -514,7 +514,7 @@ suite("Tree Tests", () =>
     });
 
 
-    test("Get tree parent", async function()
+    test("Get Tree Parent", async function()
     {
         explorer.getParent("Invalid" as TreeItem);
         explorer.getParent(new NoScripts());
@@ -522,9 +522,18 @@ suite("Tree Tests", () =>
     });
 
 
-    test("Get tree children when busy", async function()
+    test("Get Tree Children When Busy", async function()
     {
         explorer.getChildren(undefined, "", 1); // don't wait
+        await explorer.getChildren(undefined, "");
+    });
+
+
+    test("Imitate Activation", async function()
+    {
+        explorer.setEnabled(false);
+        await explorer.getChildren(undefined); // don't wait
+        explorer.setEnabled(true);
         await explorer.getChildren(undefined, "");
     });
 
