@@ -52,6 +52,7 @@ suite("Python Tests", () =>
         //
         await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
         await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testsControl.waitTimeForConfigEnableEvent);
+        await deleteDir(dirName);
     });
 
 

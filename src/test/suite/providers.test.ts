@@ -260,6 +260,13 @@ suite("Provider Tests", () =>
     });
 
 
+    test("Enable Python Tasks (Turned Off in Configuration Suite)", async function()
+    {
+        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks.apppublisher", true);
+    });
+
+
     test("Enable Maven Tasks (Off by Default)", async function()
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent);

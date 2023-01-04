@@ -9,7 +9,7 @@ import { workspace, WorkspaceFolder } from "vscode";
 import { activate, executeSettingsUpdate, getWsPath, isReady, overrideNextShowInputBox, testsControl } from "../helper";
 import { storage } from "../../lib/utils/storage";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { numFilesInDirectory } from "../../lib/utils/fs";
+import * as afs from "../../lib/utils/fs";
 import { join } from "path";
 
 const creator = "spmeesseman",
@@ -334,6 +334,22 @@ suite("Util Tests", () =>
     });
 
 
+	test("Filesystem", async function()
+    {
+		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
+		await afs.createDir(__dirname);
+		await afs.createDir(join(__dirname, "folder1", "folder2", "folder3", "folder4"));
+		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
+		await afs.deleteDir(join(__dirname, "folder1"));
+		await afs.deleteFile(join(__dirname, "folder1", "file1.png"));
+		await afs.numFilesInDirectory(rootPath);
+		try {
+			await afs.numFilesInDirectory(join(rootPath, "tasks_test_"));
+		}
+		catch {}
+	});
+
+
     test("Storage", async function()
     {
         if (storage)
@@ -347,16 +363,5 @@ suite("Util Tests", () =>
 			assert(storage.get<string>("TEST_KEY2_DOESNT_EXIST") === undefined);
         }
     });
-
-
-    test("File System", async function()
-    {
-		await numFilesInDirectory(rootPath);
-		try {
-			await numFilesInDirectory(join(rootPath, "tasks_test_"));
-		}
-		catch {}
-    });
-
 
 });

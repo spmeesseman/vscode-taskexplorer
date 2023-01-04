@@ -36,8 +36,8 @@ suite("Powershell Tests", () =>
         assert(isReady(testsName) === true, "    ✘ TeApi not ready");
         wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         dirName = getWsPath("tasks_test_");
-        fileUri = Uri.file(path.join(dirName, "test2.ps1"));
-        fileUri2 = Uri.file(path.join(getWsPath("."), "test2.ps1"));
+        fileUri = Uri.file(path.join(getWsPath("."), "test2.ps1"));
+        fileUri2 = Uri.file(path.join(dirName, "test2.ps1"));
         //
         // Store / set initial settings
         //
@@ -54,6 +54,8 @@ suite("Powershell Tests", () =>
         //
         await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
         await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testsControl.waitTimeForConfigEnableEvent);
+        await  deleteFile(fileUri.fsPath);
+        await deleteDir(dirName);
     });
 
 
@@ -94,7 +96,7 @@ suite("Powershell Tests", () =>
 
     test("Create File", async function()
     {
-        await writeFile(fileUri2.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
+        await writeFile(fileUri.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, 2);
     });
@@ -103,27 +105,27 @@ suite("Powershell Tests", () =>
     test("Create File 2", async function()
     {
         await createDir(dirName);
-        await writeFile(fileUri.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
+        await writeFile(fileUri2.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, 3);
     });
 
 
-    test("Delete File", async function()
+    test("Delete File 2", async function()
     {
         await  deleteFile(fileUri2.fsPath);
-        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
+        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, 2);
         await deleteDir(dirName);
     });
 
 
-    test("Re-create File", async function()
+    test("Re-create File 2", async function()
     {
         await createDir(dirName);
         await writeFile(fileUri2.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, 3);
     });
 
 
@@ -131,6 +133,14 @@ suite("Powershell Tests", () =>
     {
         await deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
+        await verifyTaskCount(testsName, 2);
+    });
+
+
+    test("Delete File", async function()
+    {
+        await  deleteFile(fileUri.fsPath);
+        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, 1);
     });
 
