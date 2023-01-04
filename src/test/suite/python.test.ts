@@ -40,7 +40,7 @@ suite("Python Tests", () =>
         //
         pathToPython = teApi.config.get<string>("pathToPrograms.python");
         enablePython = teApi.config.get<boolean>("enabledTasks.python");
-        await executeSettingsUpdate("pathToPrograms.python", "php\\composer.exe");
+        await executeSettingsUpdate("pathToPrograms.python", "python_7/python.exe");
         await executeSettingsUpdate("enabledTasks.python", true, testsControl.waitTimeForConfigEnableEvent);
     });
 

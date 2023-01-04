@@ -66,17 +66,20 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
         write("✘", 0, "", queueId);
         const _writeErr = (err: any) =>
         {
-            if (isString(err)) {
+            if (isString(err))
+            {
                 write("✘ " + err, 0, "", queueId);
             }
-            else if (isError(err)) {
+            else if (isError(err))
+            {
                 writeError(err, queueId);
             }
-            else if (isArray(err)) {
+            else if (isArray(err))
+            {
                 err.forEach((m: any) => _writeErr(m));
             }
-            else if (isObject(err)) {
-                writeError(err);
+            else if (isObject(err))
+            {
                 if (err.messageX) {
                     writeError(err.messageX, queueId);
                 }

@@ -563,7 +563,9 @@ suite("Provider Tests", () =>
 
 
     test("Add WS Folder to File Cache", async function()
-    {   //
+    {
+        await executeSettingsUpdate("enabledTasks.pipenv", false);
+        //
         // Cover single-if branches in cache module
         //
         this.slow(7500);

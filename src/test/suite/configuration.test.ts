@@ -252,10 +252,11 @@ suite("Configuration / Settings Tests", () =>
         await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: true,
             batch: true,
-            perl: true,
-            powershell: true,
-            python: true,
-            ruby: true
+            nsis: false,
+            perl: false,
+            powershell: false,
+            python: false,
+            ruby: false
         }), 25, 50);
     });
 
