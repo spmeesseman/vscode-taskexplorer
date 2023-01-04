@@ -73,12 +73,14 @@ suite("Python Tests", () =>
 
     test("Start", async function()
     {
+        this.slow(testsControl.slowTimeForVerifyTaskCount);
         await verifyTaskCount(testsName, 2);
     });
 
 
     test("Disable", async function()
     {
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, false, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
@@ -86,6 +88,7 @@ suite("Python Tests", () =>
 
     test("Re-enable", async function()
     {
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 2);
     });
@@ -93,6 +96,7 @@ suite("Python Tests", () =>
 
     test("Create File", async function()
     {
+        this.slow(testsControl.slowTimeForFsCreateFolderEvent + testsControl.slowTimeForVerifyTaskCount);
         await createDir(dirName);
         await writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
@@ -102,6 +106,7 @@ suite("Python Tests", () =>
 
     test("Delete File", async function()
     {
+        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
         await deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
         await verifyTaskCount(testsName, 2);
@@ -112,6 +117,7 @@ suite("Python Tests", () =>
 
     test("Re-create File", async function()
     {
+        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
         await createDir(dirName);
         await writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
@@ -121,6 +127,7 @@ suite("Python Tests", () =>
 
     test("Delete Folder", async function()
     {
+        this.slow(testsControl.slowTimeForFsDeleteFolderEvent + testsControl.slowTimeForVerifyTaskCount);
         // fs.unlinkSync(fileUri.fsPath);
         await deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);

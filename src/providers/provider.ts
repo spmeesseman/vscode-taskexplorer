@@ -152,13 +152,10 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 //
                 this.cachedTasks.slice().reverse().forEach((item, index, object) =>
                 {
-                    const cstDef = item.definition;
-                    if ((cstDef.uri &&
-                            (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath) ||
-                            (cstDef.uri.fsPath.startsWith(uri.fsPath) && isDirectory(uri.fsPath)))) ||
-                        (cstDef.uri.path && !isTaskIncluded(item, cstDef.uri.path)))
+                    if (this.needsRemoval(item, uri))
                     {
-                        if (item.source !== "Workspace" || item.definition.type === this.providerName) {
+                        /* instanbul ignore else */
+                        if (item.source !== "Workspace" /* instanbul ignore next */|| item.definition.type === this.providerName) {
                             log.write(`   removing cached task '${item.source}/${item.name}'`, 4, logPad);
                             (this.cachedTasks as Task[]).splice(object.length - 1 - index, 1);
                         }
@@ -168,7 +165,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 if (pathExists && !configuration.get<string[]>("exclude", []).includes(uri.path))
                 // if (pathExists && !util.isExcluded(uri.path))
                 {
-                    const tasks = enabled ? (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path)) : [];
+                    const tasks = (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
                     //
                     // If the implementation of the readUri() method awaits, it can theoretically reset
                     // this.cachedTasks under certain circumstances via invalidation by the tree that's
@@ -191,6 +188,16 @@ export abstract class TaskExplorerProvider implements TaskProvider
         log.methodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad);
         this.invalidating = false;
         await this.processQueue();
+    }
+
+
+    private needsRemoval(item: Task, uri: Uri)
+    {
+        const cstDef = item.definition;
+        return (cstDef.uri &&
+               (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath) ||
+               (cstDef.uri.fsPath.startsWith(uri.fsPath) /* instanbul ignore next */&& isDirectory(uri.fsPath)))) ||
+               (cstDef.uri.path && !isTaskIncluded(item, cstDef.uri.path));
     }
 
 

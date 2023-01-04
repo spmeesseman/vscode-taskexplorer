@@ -290,6 +290,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations  - Last Tasks Collapsed", async function()
     {
+        this.slow(1250);
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -312,6 +313,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations - Favorites Collapsed", async function()
     {
+        this.slow(1250);
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -334,6 +336,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations - Favorites Disabled", async function()
     {
+        this.slow(1250);
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -358,6 +361,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations - Last Tasks Disabled", async function()
     {
+        this.slow(1250);
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {

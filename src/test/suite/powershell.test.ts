@@ -76,12 +76,14 @@ suite("Powershell Tests", () =>
 
     test("Start", async function()
     {
+        this.slow(testsControl.slowTimeForVerifyTaskCount);
         await verifyTaskCount(testsName, 1);
     });
 
 
     test("Disable", async function()
     {
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, false, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
@@ -89,6 +91,7 @@ suite("Powershell Tests", () =>
 
     test("Re-enable", async function()
     {
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 1);
     });
@@ -96,6 +99,7 @@ suite("Powershell Tests", () =>
 
     test("Create File", async function()
     {
+        this.slow(testsControl.slowTimeForFsCreateFolderEvent + testsControl.slowTimeForVerifyTaskCount);
         await writeFile(fileUri.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, 2);
@@ -104,6 +108,7 @@ suite("Powershell Tests", () =>
 
     test("Create File 2", async function()
     {
+        this.slow(testsControl.slowTimeForFsCreateFolderEvent + testsControl.slowTimeForVerifyTaskCount);
         await createDir(dirName);
         await writeFile(fileUri2.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
@@ -113,6 +118,7 @@ suite("Powershell Tests", () =>
 
     test("Delete File 2", async function()
     {
+        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
         await  deleteFile(fileUri2.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, 2);
@@ -122,6 +128,7 @@ suite("Powershell Tests", () =>
 
     test("Re-create File 2", async function()
     {
+        this.slow(testsControl.slowTimeForFsCreateFolderEvent + testsControl.slowTimeForVerifyTaskCount);
         await createDir(dirName);
         await writeFile(fileUri2.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
@@ -131,6 +138,7 @@ suite("Powershell Tests", () =>
 
     test("Delete Folder", async function()
     {
+        this.slow(testsControl.slowTimeForFsDeleteFolderEvent + testsControl.slowTimeForVerifyTaskCount);
         await deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
         await verifyTaskCount(testsName, 2);
@@ -139,6 +147,7 @@ suite("Powershell Tests", () =>
 
     test("Delete File", async function()
     {
+        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
         await  deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, 1);
