@@ -3,6 +3,7 @@ import { TreeItem, TreeView } from "vscode";
 import { IConfigurationApi } from "./configurationApi";
 import { IExplorerApi } from "./explorer";
 import { ExternalExplorerProvider } from "./externalProvider";
+import { ILogApi } from "./logApi";
 import { TaskExplorerTestsApi } from "./testsApi";
 // import { TaskExplorerProvider } from "../providers/provider";
 // import { TaskTreeDataProvider } from "../tree/tree";
@@ -10,7 +11,7 @@ import { TaskExplorerTestsApi } from "./testsApi";
 export interface ITaskExplorerApi
 {
     config: IConfigurationApi;
-    log: any;
+    log: ILogApi;
     utilities: any;
     explorer: IExplorerApi | undefined;
     explorerView: TreeView<TreeItem> | undefined;
