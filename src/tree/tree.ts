@@ -23,7 +23,7 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, Disposable
+    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, Disposable, TaskExecution
 } from "vscode";
 import { IExplorerApi, TaskMap } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
@@ -61,21 +61,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.extensionContext = context;
         this.name = name;
 
-        this.disposables.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => { await this.run(item); }, this));
-        this.disposables.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => { await this.run(item, true, false); }, this));
-        this.disposables.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args: string) => { await this.run(item, false, true, args); }, this));
-        this.disposables.push(commands.registerCommand(name + ".runLastTask",  async () => { await this.runLastTask(); }, this));
+        this.disposables.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => this.run(item), this));
+        this.disposables.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => this.run(item, true, false), this));
+        this.disposables.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args: string) => this.run(item, false, true, args), this));
+        this.disposables.push(commands.registerCommand(name + ".runLastTask",  async () => this.runLastTask(), this));
         this.disposables.push(commands.registerCommand(name + ".stop",  (item: TaskItem) => { this.stop(item); }, this));
         this.disposables.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
         this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => { this.pause(item); }, this));
         this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick: boolean) => { await this.open(item, itemClick); }, this));
         this.disposables.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => { this.openTerminal(item); }, this));
         this.disposables.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
-        this.disposables.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "install"); }, this));
-        this.disposables.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update"); }, this));
-        this.disposables.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "update <packagename>"); }, this));
-        this.disposables.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit"); }, this));
-        this.disposables.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => { await this.runNpmCommand(taskFile, "audit fix"); }, this));
+        this.disposables.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "install"), this));
+        this.disposables.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update"), this));
+        this.disposables.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update <packagename>"), this));
+        this.disposables.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit"), this));
+        this.disposables.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit fix"), this));
         this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem | string) => { await this.addToExcludes(taskFile); }, this));
         this.disposables.push(commands.registerCommand(name + ".addRemoveFromFavorites", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
         this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", (taskItem: TaskItem) => this.addRemoveSpecialLabel(taskItem), this));
@@ -2133,17 +2133,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
     private async resumeTask(taskItem: TaskItem)
     {
+        let exec: TaskExecution | undefined;
         log.methodStart("resume task", 1, "", true);
         const term = getTerminal(taskItem, "   ");
         if (term) {
             log.value("   send to terminal", "N", 1);
             term.sendText("N", true);
             taskItem.paused = false;
+            exec = taskItem.execution;
         }
         else {
             window.showInformationMessage("Terminal not found");
         }
         log.methodDone("resume task", 1);
+        return exec;
     }
 
 
@@ -2160,10 +2163,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      */
     private async run(taskItem: TaskItem, noTerminal = false, withArgs = false, args?: string)
     {
+        let exec: TaskExecution | undefined;
+
         if (this.isBusy() || !taskItem)
         {
             window.showInformationMessage("Busy, please wait...");
-            return;
+            return exec;
         }
 
         log.methodStart("run task", 1, "", true, [[ "task name", taskItem.label ]]);
@@ -2171,11 +2176,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
         if (withArgs === true)
 		{
-            await this.runWithArgs(taskItem, args, noTerminal);
+            exec = await this.runWithArgs(taskItem, args, noTerminal);
 		}
         else if (taskItem.paused)
         {
-            await this.resumeTask(taskItem);
+            exec = await this.resumeTask(taskItem);
         }
         else //
         {   // Create a new instance of 'task' if this is to be ran with no terminal (see notes below)
@@ -2212,7 +2217,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                     }
                 }
             }
-            if (await this.runTask(newTask, noTerminal))
+            exec = await this.runTask(newTask, noTerminal);
+            if (exec)
             {
                 await this.saveTask(taskItem, configuration.get<number>("specialFolders.numLastTasks"), false, "   ");
                 this.babysitRunningTask(taskItem);
@@ -2220,6 +2226,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
 
         log.methodDone("run task", 1);
+        return exec;
     }
 
 
@@ -2247,11 +2254,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         log.methodStart("Run last task", 1, "", true, [[ "last task id", lastTaskId ]]);
 
         const taskItem = await this.getTaskItems(lastTaskId, "   ");
+        let exec: TaskExecution | undefined;
 
         /* istanbul ignore else */
         if (taskItem && taskItem instanceof TaskItem)
         {
-            await this.run(taskItem);
+            exec = await this.run(taskItem);
         }
         else
         {
@@ -2262,6 +2270,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
 
         log.methodDone("Run last task", 1);
+        return exec;
     }
 
 
@@ -2286,7 +2295,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             {
                 const execution = new ShellExecution(pkgMgr + " " + command, options);
                 const task = new Task(kind, taskFile.folder.workspaceFolder, command, "npm", execution, undefined);
-                await tasks.executeTask(task);
+                return tasks.executeTask(task);
             }
         }
         else
@@ -2298,16 +2307,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 {
                     const execution = new ShellExecution(pkgMgr + " " + command.replace("<packagename>", "").trim() + " " + str.trim(), options);
                     const task = new Task(kind, taskFile.folder.workspaceFolder, command.replace("<packagename>", "").trim() + str.trim(), "npm", execution, undefined);
-                    await tasks.executeTask(task);
+                    return tasks.executeTask(task);
                 }
             });
         }
     }
 
 
-    private async runTask(task: Task, noTerminal?: boolean, logPad = "   "): Promise<boolean>
+    private async runTask(task: Task, noTerminal?: boolean, logPad = "   ")
     {
-        let result = true;
+        let exec: TaskExecution | undefined;
         log.methodStart("run task", 1, logPad, false, [[ "no terminal", noTerminal ]]);
 
         if (noTerminal === true) {
@@ -2318,7 +2327,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
 
         try {
-            await tasks.executeTask(task);
+            exec = await tasks.executeTask(task);
         }
         catch (e: any) {
             /* istanbul ignore next */
@@ -2336,12 +2345,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             }
             /* istanbul ignore next */
             log.write("Task execution failed: " + err, 1, logPad);
-            /* istanbul ignore next */
-            result = false;
         }
 
-        log.methodDone("run task", 1, logPad, false, [[ "result", result ]]);
-        return result;
+        log.methodDone("run task", 1, logPad, false, [[ "success", !!exec ]]);
+        return exec;
     }
 
 
@@ -2354,6 +2361,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      */
     public async runWithArgs(taskItem: TaskItem, args?: string, noTerminal?: boolean, logPad = "   ")
     {
+        let exec: TaskExecution | undefined;
         log.methodStart("run task with arguments", 1, logPad, false, [[ "no terminal", noTerminal ]]);
         /* istanbul ignore else */
         if (taskItem.task && !(taskItem.task.execution instanceof CustomExecution))
@@ -2363,6 +2371,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
             const _run = async (_args: string | undefined) =>
             {
+                let exec: TaskExecution | undefined;
                 if (_args)
                 {
                     let newTask = taskItem.task;
@@ -2376,27 +2385,30 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                         ) as Task;
                         newTask.definition.taskItemId = def.taskItemId;
                     }
+                    exec = await this.runTask(newTask, noTerminal, logPad + "   ");
                     /* istanbul ignore else */
-                    if (await this.runTask(newTask, noTerminal, logPad + "   "))
+                    if (exec)
                     {
                         await me.saveTask(taskItem, configuration.get<number>("specialFolders.numLastTasks"), false, logPad + "   ");
                         this.babysitRunningTask(taskItem);
                     }
                 }
+                return exec;
             };
 
             taskItem.taskDetached = undefined;
             if (!args) {
-                await _run(await window.showInputBox(opts));
+                exec = await _run(await window.showInputBox(opts));
             }
             else {
-                await _run(args);
+                exec = await _run(args);
             }
         }
         else {
             window.showInformationMessage("Custom execution tasks cannot have the cmd line altered");
         }
         log.methodDone("run task with arguments", 1, logPad);
+        return exec;
     }
 
 

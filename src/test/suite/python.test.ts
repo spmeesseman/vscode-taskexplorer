@@ -12,7 +12,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { PythonTaskProvider } from "../../providers/python";
-import { createDir, deleteDir, writeFile } from "../../lib/utils/fs";
+import { createDir, deleteDir, deleteFile, writeFile } from "../../lib/utils/fs";
 
 const testsName = "python";
 
@@ -102,10 +102,11 @@ suite("Python Tests", () =>
 
     test("Delete File", async function()
     {
-        fs.unlinkSync(fileUri.fsPath);
+        await deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
         await verifyTaskCount(testsName, 2);
         await deleteDir(dirName);
+        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
     });
 
 

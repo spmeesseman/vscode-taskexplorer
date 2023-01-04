@@ -65,7 +65,11 @@ suite("Util Tests", () =>
 		log.setWriteToConsole(true);
 		log.write("test");
 		log.value("test", "1");
+		log.value("test", "1", 1);
+		log.value("test", "1", 5);
 		log.setWriteToConsole(false);
+		log.value(null as unknown as string, 1);
+		log.value(undefined as unknown as string, 1);
 
 		// nullvalue
 		log.write(null as unknown as string);
@@ -101,7 +105,10 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enable", false);
 		log.write("test");
 		log.value("test", "1");
+		log.value(null as unknown as string, 1);
+		log.value(undefined as unknown as string, 1);
 
+		log.write("Test1", 1);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
 		log.value("Test3", null, 1);

@@ -8,7 +8,7 @@ import { deactivate } from "../extension";
 import { testControl } from "./control";
 import { IExplorerApi, ITaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../lib/utils/configuration";
-import { commands, extensions, tasks, window, workspace } from "vscode";
+import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 
 let activated = false;
 let teApi: ITaskExplorerApi;
@@ -306,6 +306,16 @@ async function initSettings(enable = true)
 }
 
 
+function isExecuting(task: Task)
+{
+    const execs = tasks.taskExecutions.filter(e => e.task.name === task.name && e.task.source === task.source &&
+                                            e.task.scope === task.scope && e.task.definition.path === task.definition.path);
+    const exec = execs.find(e => e.task.name === task.name && e.task.source === task.source &&
+                            e.task.scope === task.scope && e.task.definition.path === task.definition.path);
+    return exec;
+}
+
+
 export function isReady(taskType?: string)
 {
     let err: string | undefined;
@@ -367,4 +377,14 @@ export async function verifyTaskCountByTree(taskType: string, expectedCount: num
     const tasksMap = (taskMap || (await (teApi.explorer as IExplorerApi).getTaskItems(undefined, "   "))),
             taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
     assert(taskCount === expectedCount, `Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
+}
+
+
+export async function waitForTaskExecution(exec: TaskExecution | undefined)
+{
+    if (exec) {
+        while (isExecuting(exec.task)) {
+            await sleep(25);
+        }
+    }
 }
