@@ -3,7 +3,7 @@
 import * as util from "./utils/utils";
 import constants from "./constants";
 import { configuration } from "./utils/configuration";
-import { ExtensionContext, ConfigurationChangeEvent, commands, workspace } from "vscode";
+import { ExtensionContext, ConfigurationChangeEvent, workspace } from "vscode";
 import { registerFileWatcher } from "./fileWatcher";
 import { refreshTree } from "./refreshTree";
 import { registerExplorer } from "./registerExplorer";
@@ -91,38 +91,6 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     if (e.affectsConfiguration("taskExplorer.specialFolders.showUserTasks"))
     {
         refresh= true;
-    }
-
-    //
-    // Last Tasks
-    //
-    if (e.affectsConfiguration("taskExplorer.specialFolders.showLastTasks"))
-    {   /* istanbul ignore else */
-        if (configuration.get<boolean>("enableSideBar") && teApi.sidebar)
-        {
-            await teApi.sidebar.specialFolders.lastTasks.showSpecialTasks(configuration.get<boolean>("specialFolders.showLastTasks"), true, undefined, "   ");
-        }
-        /* istanbul ignore else */
-        if (configuration.get<boolean>("enableExplorerView") && teApi.explorer)
-        {
-            await teApi.explorer.specialFolders.lastTasks.showSpecialTasks(configuration.get<boolean>("specialFolders.showLastTasks"), true, undefined, "   ");
-        }
-    }
-
-    //
-    // Favorites
-    //
-    if (e.affectsConfiguration("taskExplorer.specialFolders.showFavorites"))
-    {   /* istanbul ignore else */
-        if (configuration.get<boolean>("enableSideBar") && teApi.sidebar)
-        {
-            await teApi.sidebar.specialFolders.lastTasks.showSpecialTasks(configuration.get<boolean>("specialFolders.showFavorites"), true, undefined, "   ");
-        }
-        /* istanbul ignore else */
-        if (configuration.get<boolean>("enableExplorerView") && teApi.explorer)
-        {
-            await teApi.explorer.specialFolders.lastTasks.showSpecialTasks(configuration.get<boolean>("specialFolders.showFavorites"), true, undefined, "   ");
-        }
     }
 
     //
@@ -286,9 +254,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
 export const registerConfigWatcher = (context: ExtensionContext, api: ITaskExplorerApi) =>
 {
     teApi = api;
-    const d = workspace.onDidChangeConfiguration(async e => {
-        await processConfigChanges(context, e);
-    });
+    const d = workspace.onDidChangeConfiguration(async e => { await processConfigChanges(context, e); });
     context.subscriptions.push(d);
 };
 

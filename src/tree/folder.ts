@@ -3,6 +3,8 @@ import { ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder } from "
 import constants from "../lib/constants";
 import TaskItem from "./item";
 import TaskFile from "./file";
+import { isString } from "../lib/utils/utils";
+import * as log from "../lib/utils/log";
 
 
 /**
@@ -13,13 +15,16 @@ import TaskFile from "./file";
  */
 export default class TaskFolder extends TreeItem
 {
+    public id: string;
     public taskFiles: (TaskFile|TaskItem)[] = [];
     public workspaceFolder: WorkspaceFolder | undefined;
 
 
-    constructor(folder: WorkspaceFolder | string, state: TreeItemCollapsibleState = TreeItemCollapsibleState.Expanded)
+    constructor(folder: WorkspaceFolder | string, state: TreeItemCollapsibleState = TreeItemCollapsibleState.Expanded, logPad = "")
     {
         super(typeof folder === "string" ? folder  : folder.name, state);
+
+        log.methodStart("construct tree folder", 3, logPad, false, [[ "label", this.label ]]);
 
         if (this.label === constants.FAV_TASKS_LABEL || this.label === constants.LAST_TASKS_LABEL) {
             this.contextValue = this.label.toLowerCase().replace(/[\W \_\-]/g, "");
@@ -34,6 +39,10 @@ export default class TaskFolder extends TreeItem
         }
 
         this.iconPath = ThemeIcon.Folder;
+        this.id = "fid-" + this.label;
+        this.description = "A tree item representing a task or project folder";
+
+        log.methodDone("construct tree folder", 3, logPad, false, [[ "id", this.id ], [ "context value", this.contextValue ]]);
     }
 
 
@@ -49,23 +58,12 @@ export default class TaskFolder extends TreeItem
     }
 
 
-    removeTaskFile(taskFile: TaskFile|TaskItem)
+    removeTaskFile(taskFile: TaskFile|TaskItem|string)
     {
-        let idx = -1;
-        let idx2 = -1;
-
-        for (const each of this.taskFiles)
-        {
-            idx++;
-            if (taskFile === each)
-            {
-                idx2 = idx;
-            }
-        }
-
-        if (idx2 !== -1 && idx2 < this.taskFiles.length)
-        {
-            this.taskFiles.splice(idx2, 1);
+        const id = isString(taskFile) ? taskFile : taskFile.id;
+        const idx = this.taskFiles.findIndex(f => f.id === id);
+        if (idx !== -1) {
+            this.taskFiles.splice(idx, 1);
         }
     }
 }

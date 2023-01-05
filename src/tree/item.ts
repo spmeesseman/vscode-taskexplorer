@@ -20,44 +20,37 @@ export default class TaskItem extends TreeItem
 {
     public readonly context: ExtensionContext; // Note:  Making this field private bombs the types
     public readonly taskSource: string;
-    public readonly taskGroup: string;
     public readonly isUser: boolean;
+    readonly taskFile: TaskFile;
     public task: Task;
     public taskDetached: Task | undefined;
     public execution: TaskExecution | undefined;
     public paused: boolean;
     /**
-     * Equivalent to task.definition.path
+     * @property Equivalent to `task.definition.path`
      */
     public nodePath: string;
     public groupLevel: number;
-    public taskItemId: string | undefined;
     public id: string;
     public command: Command;
 
-    taskFile: TaskFile;
 
-    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task, taskGroup = "", groupLevel = 0)
+    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task)
     {
-        const getDisplayName = (taskName: string, taskGroup: string): string =>
+        const getDisplayName = (taskName: string): string =>
         {
             let displayName = taskName;
             if (displayName.indexOf(" - ") !== -1 && (displayName.indexOf("/") !== -1 || displayName.indexOf("\\") !== -1 ||
                 displayName.indexOf(" - tsconfig.json") !== -1))
             {
-                if (taskGroup) {
-                    displayName = taskName.replace(taskGroup + util.getGroupSeparator(), "");
-                }
-                else {
-                    displayName = task.name.substring(0, taskName.indexOf(" - "));
-                }
+                displayName = task.name.substring(0, taskName.indexOf(" - "));
             }
             return displayName;
         };
         //
         // Construction
         //
-        super(getDisplayName(task.name, taskGroup), TreeItemCollapsibleState.None);
+        super(getDisplayName(task.name), TreeItemCollapsibleState.None);
         //
         // Save extension context, we need it in a few of the classes functions
         //
@@ -65,18 +58,17 @@ export default class TaskItem extends TreeItem
         //
         // Task group indicates the TaskFile group name (double check this???)
         //
-        this.taskGroup = taskGroup;
         this.isUser = taskFile.isUser;
         //
         // Since we save tasks (last tasks and favorites), we need a known unique key to
         // save them with.  We can just use the existing id parameter...
         //
         const fsPath = taskFile.resourceUri.fsPath;
-        this.id = fsPath + ":" + task.source + ":" + task.name + ":" + (taskGroup || "");
+        this.id = fsPath + ":" + task.source + ":" + task.name + ":"; // <- leave trailing ':' for backwards compat
         this.paused = false;                // paused flag used by start/stop/pause task functionality
         this.taskFile = taskFile;           // Save a reference to the TaskFile that this TaskItem belongs to
         this.task = task;                   // Save a reference to the Task that this TaskItem represents
-        this.groupLevel = groupLevel;       // Grouping level - indicates how many levels deep the TaskItem node is
+        this.groupLevel = 0;                // Grouping level - will get set by treefile.addTreeNode()
         this.command = {                    // Note that 'groupLevel' will be set by TaskFile.addScript()
             title: "Open definition",       // Default click action is Open file since it's easy to click on accident
             command: "taskExplorer.open",   // Default click action can be set to 'Execute/Run' in Settings
@@ -105,11 +97,13 @@ export default class TaskItem extends TreeItem
         //
         // Tooltip
         //
+        const taskName = util.getTaskTypeFriendlyName(task.source, true);
         this.tooltip = "Open " + task.name + (task.detail ? ` | ${task.detail}` : "") +
-                        `   source : \`${task.source}\``;
+                        `   source : \`${taskName}\``;
         if (task.definition.type !== task.source) {
             this.tooltip += `   type   : \`${task.definition.type}\``;
         }
+        this.description = `A tree item representing a ${taskName} task or script`;
         //
         // Refresh state - sets context value, icon path from execution state
         //

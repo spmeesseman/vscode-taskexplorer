@@ -260,14 +260,12 @@
             },
             {
                 "command": "taskExplorerSideBar.clearFavorites",
-                "shortTitle": "CLR",
-                "title": "%command.clearFavorites%",
+                "title": "CLR",
                 "when": "config.taskExplorer.enableSideBar"
             },
             {
                 "command": "taskExplorerSideBar.clearLastTasks",
-                "shortTitle": "CLR",
-                "title": "%command.clearLastTasks%",
+                "title": "CLR",
                 "when": "config.taskExplorer.enableSideBar"
             },
             {
@@ -406,14 +404,12 @@
             },
             {
                 "command": "taskExplorer.clearFavorites",
-                "shortTitle": "CLR",
-                "title": "%command.clearFavorites%",
+                "title": "CLR",
                 "when": "config.taskExplorer.enableExplorerView"
             },
             {
                 "command": "taskExplorer.clearLastTasks",
-                "shortTitle": "CLR",
-                "title": "%command.clearLastTasks%",
+                "title": "CLR",
                 "when": "config.taskExplorer.enableExplorerView"
             },
             {

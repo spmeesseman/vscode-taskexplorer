@@ -588,12 +588,12 @@ export function pushIfNotExists(arr: any[], item: any)
 }
 
 
-export function properCase(name: string | undefined)
+export function properCase(name: string | undefined, removeSpaces?: boolean)
 {
     if (!name) {
-      return name;
+      return "";
     }
-    return name.replace(/(?:^\w|[A-Z]|\b\w)/g, (ltr) => ltr.toUpperCase()).replace(/[ ]+/g, " ");
+    return name.replace(/(?:^\w|[A-Z]|\b\w)/g, (ltr) => ltr.toUpperCase()).replace(!removeSpaces ? /[ ]+/g : / /g, " ");
 }
 
 

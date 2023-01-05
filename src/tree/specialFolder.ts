@@ -1,7 +1,7 @@
 
 import constants from "../lib/constants";
 import TaskItem from "./item";
-import { getTaskItemId, removeFromArray } from "../lib/utils/utils";
+import { getTaskItemId, isString, properCase, removeFromArray } from "../lib/utils/utils";
 import TaskFolder from "./folder";
 import { storage } from "../lib/utils/storage";
 import * as log from "../lib/utils/log";
@@ -9,7 +9,7 @@ import * as sortTasks from "../lib/sortTasks";
 import { configuration } from "../lib/utils/configuration";
 import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { TaskTreeDataProvider } from "./tree";
-import { commands, Disposable, ExtensionContext, InputBoxOptions, ThemeIcon, TreeItemCollapsibleState, window } from "vscode";
+import { commands, ConfigurationChangeEvent, Disposable, ExtensionContext, InputBoxOptions, ThemeIcon, TreeItem, TreeItemCollapsibleState, window, workspace } from "vscode";
 
 
 /**
@@ -29,6 +29,9 @@ export default class SpecialTaskFolder extends TaskFolder
     public isSpecial = true;
     public taskFiles: TaskItem[] = [];
     private subscriptionStartIndex = -1;
+    private store: string[];
+    private enabled: boolean;
+    private settingNameEnabled: string;
 
 
     constructor(context: ExtensionContext, treeName: "taskExplorer"|"taskExplorerSideBar", treeProvider: TaskTreeDataProvider, label: string, state: TreeItemCollapsibleState = TreeItemCollapsibleState.Expanded)
@@ -41,6 +44,9 @@ export default class SpecialTaskFolder extends TaskFolder
         this.extensionContext = context;
         this.isFavorites = label === constants.FAV_TASKS_LABEL;
         this.storeName = this.isFavorites ? constants.FAV_TASKS_STORE : constants.LAST_TASKS_STORE;
+        this.store = storage.get<string[]>(this.storeName, []);
+        this.settingNameEnabled = "specialFolders.show" + label.replace(/ /g, "");
+        this.enabled = configuration.get<boolean>(this.settingNameEnabled);
         if (this.isFavorites)
         {
             this.disposables.push(commands.registerCommand(treeName + ".addRemoveFavorite", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
@@ -49,6 +55,8 @@ export default class SpecialTaskFolder extends TaskFolder
         else {
             this.disposables.push(commands.registerCommand(treeName + ".clearLastTasks", async() => { await this.clearSavedTasks(); }, this));
         }
+        const d = workspace.onDidChangeConfiguration(async e => { await this.processConfigChanges(context, e); }, this);
+        this.disposables.push(d);
         context.subscriptions.push(...this.disposables);
         this.subscriptionStartIndex = context.subscriptions.length - (this.disposables.length + 1);
     }
@@ -56,58 +64,24 @@ export default class SpecialTaskFolder extends TaskFolder
 
     async addTaskFile(taskItem: TaskItem, logPad?: string)
     {
-        log.methodStart(`add taskitem to ${this.label}`, 1, logPad);
-
-        let tasks: string[];
-        if (this.label === constants.LAST_TASKS_LABEL)
+        if (this.store.includes(taskItem.id))
         {
-            tasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-        }
-        else {
-            tasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        }
+            log.methodStart(`add taskitem to ${this.label}`, 1, logPad);
 
-        if (taskItem && taskItem.id && tasks && taskItem.task && tasks.includes(taskItem.id))
-        {
-            let add = true;
-            const taskTree = this.explorer.getTaskTree();
+            const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
+            taskItem2.id = this.label + ":" + taskItem2.id; // note 'label:' + taskItem2.id === id
+            taskItem2.label = this.getRenamedTaskName(taskItem2);
+            this.insertTaskFile(taskItem2, 0);
             if (this.label === constants.LAST_TASKS_LABEL)
             {
-                if (taskTree && (taskTree[0] && taskTree[0].label === constants.LAST_TASKS_LABEL))
-                {
-                    add = !this.taskFiles.find(tf => tf instanceof TaskItem && getTaskItemId(tf) === taskItem.id);
-                }
+                this.sortLastTasks(this.taskFiles, this.store, logPad + "   ", 4);
             }
-            else // label === constants.FAV_TASKS_LABEL
-            {
-                if (taskTree && taskTree[0] && taskTree[0].label === constants.FAV_TASKS_LABEL)
-                {
-                    add = !this.taskFiles.find(tf => tf instanceof TaskItem && getTaskItemId(tf) === taskItem.id);
-                }
-                else if (taskTree && taskTree[1] && taskTree[1].label === constants.FAV_TASKS_LABEL)
-                {
-                    add = !this.taskFiles.find(tf => tf instanceof TaskItem && getTaskItemId(tf) === taskItem.id);
-                }
+            else {
+                sortTasks.sortTasks(this.taskFiles, logPad + "   ", 4);
             }
-            if (add)
-            {
-                const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
-                taskItem2.id = this.label + ":" + taskItem2.id; // note 'label:' + taskItem2.id === id
-                taskItem2.label = this.getRenamedTaskName(taskItem2);
-                this.insertTaskFile(taskItem2, 0);
-                if (this.label === constants.LAST_TASKS_LABEL)
-                {
-                    tasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-                    sortTasks.sortLastTasks(this.taskFiles, tasks, logPad + "   ", 4);
-                }
-                else {
-                    tasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-                    sortTasks.sortTasks(this.taskFiles, logPad + "   ", 4);
-                }
-            }
-        }
 
-        log.methodDone(`add item to ${this.label}`, 1, logPad);
+            log.methodDone(`add taskitem to ${this.label}`, 1, logPad);
+        }
     }
 
 
@@ -123,38 +97,47 @@ export default class SpecialTaskFolder extends TaskFolder
     private async addRemoveFavorite(taskItem: TaskItem)
     {
         let removed = false;
-        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        const favId = getTaskItemId(taskItem);
+        const id = getTaskItemId(taskItem);
 
-        log.methodStart("add/remove favorite", 1, "", false, [
-            [ "id", taskItem.id ], [ "current fav count", favTasks.length ]
+        log.methodStart("add/remove " + this.contextValue, 1, "", false, [
+            [ "id", taskItem.id ], [ "current fav count", this.store.length ]
         ]);
 
         //
-        // If this task exists in the favorites, remove it, if it doesnt, then add it
+        // If this task exists in the store, remove it, if it doesnt, then add it
         //
-        if (!favTasks.includes(favId))
+        const idx = this.store.findIndex(f => f === id);
+        if (idx === -1)
         {
             await this.saveTask(taskItem, "   ");
         }
-        else //
-        {   // Remove
-            //
-            removeFromArray(favTasks, favId);
-            log.value("   new fav count", favTasks.length, 2);
-            //
-            // Update local storage for persistence
-            //
-            await storage.update(constants.FAV_TASKS_STORE, favTasks);
-            //
-            // Update
-            //
-            await this.showSpecialTasks(true, false, undefined, "   ");
-            removed = true;
+        else {
+           await this.removeTaskFile(id, true);
+           removed = true;
         }
 
         log.methodDone("add/remove favorite", 1);
         return removed;
+    }
+
+
+    async removeTaskFile(taskFile: TaskItem|string, persist?: boolean)
+    {
+        const id = isString(taskFile) ? taskFile : taskFile.id, // getTaskItemId(taskFile);
+              idx = this.taskFiles.findIndex(f => f.id === id);
+        if (idx !== -1)
+        {
+            this.taskFiles.splice(idx, 1);
+            if (persist)
+            {
+                const idx = this.store.findIndex(f => f === id);
+                if (idx !== -1) {
+                    this.store.splice(idx, 1);
+                    await storage.update(constants.LAST_TASKS_STORE, this.store);
+                }
+            }
+            await this.show(true);
+        }
     }
 
 
@@ -201,7 +184,7 @@ export default class SpecialTaskFolder extends TaskFolder
         //
         if (addRemoved) {
             await storage.update(constants.TASKS_RENAME_STORE, renames);
-            await this.showSpecialTasks(true, false, undefined, "   ");
+            await this.show(true, undefined, "   ");
         }
 
         log.methodDone("add/remove rename special", 1);
@@ -248,51 +231,54 @@ export default class SpecialTaskFolder extends TaskFolder
         {
             this.taskFiles = [];
             if (this.label === constants.FAV_TASKS_LABEL) {
-                await storage.update(constants.FAV_TASKS_STORE, []);
-                await this.showSpecialTasks(false, true);
+                this.store = [];
+                await storage.update(constants.FAV_TASKS_STORE, this.store);
+                await this.show(false);
             }
             else if (this.label === constants.LAST_TASKS_LABEL) {
-                await storage.update(constants.LAST_TASKS_STORE, []);
-                await this.showSpecialTasks(false);
+                await storage.update(constants.LAST_TASKS_STORE, this.store);
+                await this.show(false);
             }
         }
     }
 
 
     /**
-     * @method createSpecialFolder
+     * @method build
      *
      * Create and add a special folder the the tree.  As of v2.0 these are the "Last Tasks" and
      * "Favorites" folders.
      *
-     * @param storeName A defined constant representing the special folder ("Last Tasks", or "Favorites")
-     * @see [TaskItem](TaskItem)
-     * @param label The folder label to be displayed in the tree.
      * @param treeIndex The tree index to insert the created folder at.
      * @param sort Whether or not to sort any existing items in the folder.
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
-    async createSpecialFolder(storeName: string, label: string, treeIndex: number, sort: boolean, logPad: string)
+    private async build(treeIndex: number, sort: boolean, logPad: string)
     {
-        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
-        this.collapsibleState =  nodeExpandedeMap.lastTasks !== false ?
-                                 TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
-        const lTasks = storage.get<string[]>(storeName, []);
-        this.taskFiles = [];
-        log.methodStart("create special tasks folder", 1, logPad, true, [
-            [ "store",  storeName ], [ "name",  label ]
+        log.methodStart("create special tasks folder", 1, logPad, false, [[ "name", this.label ]]);
+
+        const tree = this.explorer.getTaskTree();
+        const showLastTasks = configuration.get<boolean>("specialFolders.showLastTasks");
+        if (!tree || !showLastTasks && !this.isFavorites) { // && !forceChange) {
+            return;
+        }
+
+        const favIdx = showLastTasks ? 1 : 0;
+        const treeIdx = !this.isFavorites ? 0 : favIdx;
+        log.values(3, logPad + "   ", [
+            [ "fav index", favIdx ], [ "tree index", treeIdx ], [ "showLastTasks setting", showLastTasks ]
         ]);
 
-        (this.explorer.getTaskTree() as TaskFolder[]|NoScripts[]|InitScripts[]|LoadScripts[]).splice(treeIndex, 0, this);
+        this.taskFiles = [];
 
-        for (const tId of lTasks)
+        for (const tId of this.store)
         {
             const taskItem2 = await this.explorer.treeUtils.getTreeItem(tId, logPad + "   ");
             /* istanbul ignore else */
             if (taskItem2 && taskItem2 instanceof TaskItem && taskItem2.task)
             {
                 const taskItem3 = new TaskItem(this.extensionContext, taskItem2.taskFile, taskItem2.task);
-                taskItem3.id = label + ":" + taskItem3.id;
+                taskItem3.id = this.label + ":" + taskItem3.id;
                 taskItem3.label = this.getRenamedTaskName(taskItem3);
                 this.insertTaskFile(taskItem3, 0);
             }
@@ -302,7 +288,9 @@ export default class SpecialTaskFolder extends TaskFolder
             sortTasks.sortTasks(this.taskFiles, logPad + "   ");
         }
 
-        log.methodDone("create special tasks folder", 1, logPad);
+        tree.splice(treeIndex, 0, this);
+
+        log.methodDone("create special tasks folder", 3, logPad);
     }
 
 
@@ -334,35 +322,40 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
-    private pushToTop(taskItem: TaskItem, label: string, treeIndex: number, logPad = "")
+    getStore = () => this.store as readonly string[];
+
+
+    isEnabled = () => this.enabled;
+
+
+    async processConfigChanges(ctx: ExtensionContext, e: ConfigurationChangeEvent)
     {
-        let taskItem2: TaskItem | undefined;
-        const taskTree = this.explorer.getTaskTree();
-        /* istanbul ignore next */
-        const ltFolder = taskTree ? taskTree[treeIndex] as TaskFolder : undefined;
-        const taskId = label + ":" + getTaskItemId(taskItem);
+        if (e.affectsConfiguration("taskExplorer." + this.settingNameEnabled))
+        {
+            this.enabled = configuration.get<boolean>(this.settingNameEnabled);
+            this.show(this.enabled, undefined, "   ");
+        }
+    }
+
+
+    private pushToTop(taskItem: TaskItem, logPad = "")
+    {
+        const taskId = this.label + ":" + getTaskItemId(taskItem);
 
         /* istanbul ignore if */
-        if (!ltFolder || !taskItem.task) {
+        if (!taskItem.task) {
             return;
         }
 
-        for (const t of ltFolder.taskFiles)
-        {
-            if (t instanceof TaskItem && t.id === taskId) {
-                taskItem2 = t;
-                break;
-            }
-        }
-
+        let taskItem2 = this.taskFiles.find(t => t instanceof TaskItem && t.id === taskId);
         /* istanbul ignore else */
         if (taskItem2)
         {
-            ltFolder.removeTaskFile(taskItem2);
+            this.removeTaskFile(taskItem2);
         }
-        else if (ltFolder.taskFiles.length >= configuration.get<number>("specialFolders.numLastTasks"))
+        else if (this.taskFiles.length >= configuration.get<number>("specialFolders.numLastTasks"))
         {
-            ltFolder.removeTaskFile(ltFolder.taskFiles[ltFolder.taskFiles.length - 1]);
+            this.removeTaskFile(this.taskFiles[this.taskFiles.length - 1]);
         }
 
         if (!taskItem2)
@@ -373,63 +366,50 @@ export default class SpecialTaskFolder extends TaskFolder
         }
 
         log.value(logPad + "   add item", taskItem2.id, 2);
-        ltFolder.insertTaskFile(taskItem2, 0);
+        this.insertTaskFile(taskItem2, 0);
     }
 
 
     async saveTask(taskItem: TaskItem, logPad = "   ")
     {
-        const cstTasks = storage.get<string[]>(this.storeName, []);
         const taskId =  getTaskItemId(taskItem);
         const maxTasks = configuration.get<number>("specialFolders.numLastTasks");
 
         log.methodStart("save task", 1, logPad, false, [
             [ "treenode label", this.label ], [ "max tasks", maxTasks ], [ "is favorite", this.isFavorites ],
-            [ "task id", taskId ], [ "current saved task ids", cstTasks.toString() ]
+            [ "task id", taskId ], [ "current # of saved tasks", this.store.length ]
         ]);
+        log.value("current saved task ids", this.store.toString() , 3, logPad + "   ");
 
         //
         // Moving it to the top of the list it if it already exists
         //
-        removeFromArray(cstTasks, taskId);
+        removeFromArray(this.store, taskId);
 
         if (maxTasks > 0) {
-            while (cstTasks.length >= maxTasks)
+            while (this.store.length >= maxTasks)
             {
-                cstTasks.shift();
+                this.store.shift();
             }
         }
 
-        cstTasks.push(taskId);
+        this.store.push(taskId);
 
-        await storage.update(this.storeName, cstTasks);
-        await this.showSpecialTasks(true, false, taskItem, logPad);
+        await storage.update(this.storeName, this.store);
+        await this.show(true, taskItem, logPad);
 
-        log.methodDone("save task", 1, logPad, false, [
-            [ "new saved task ids", cstTasks.toString() ]
-        ]);
+        log.methodDone("save task", 1, logPad, false, [[ "new # of saved tasks", this.store.length ]]);
     }
 
 
-    async showSpecialTasks(show: boolean, forceChange?: boolean, taskItem?: TaskItem, logPad = "")
+    private async show(show: boolean, taskItem?: TaskItem, logPad = "")
     {
         let changed = true;
         const tree = this.explorer.getTaskTree();
-        const isFavorite = this.label === constants.FAV_TASKS_LABEL;
-        const storeName: string = !isFavorite ? constants.LAST_TASKS_STORE : constants.FAV_TASKS_STORE;
-        const label = this.label as string;
-        const showLastTasks = configuration.get<boolean>("specialFolders.showLastTasks");
-        const favIdx = showLastTasks ? 1 : 0;
-        const treeIdx = !isFavorite ? 0 : favIdx;
 
         log.methodStart("show special tasks", 1, logPad, false, [
-            [ "is favorite", isFavorite ], [ "fav index", favIdx ], [ "tree index", treeIdx ],
-            [ "show", show ], [ "has task item", !!taskItem ], [ "showLastTasks setting", showLastTasks ]
+            [ "is favorite", this.isFavorites ], [ "show", show ], [ "has task item", !!taskItem ]
         ]);
-
-        if (!showLastTasks && !isFavorite && !forceChange) {
-            return;
-        }
 
         if (!tree || tree.length === 0 || (tree.length === 1 &&
             (tree[0].contextValue === "noscripts" || tree[0].contextValue === "noworkspace" || tree[0].contextValue === "initscripts" || tree[0].contextValue === "loadscripts")))
@@ -441,42 +421,32 @@ export default class SpecialTaskFolder extends TaskFolder
 
         if (show)
         {
-            if (!taskItem || isFavorite) // refresh
-            {
-                taskItem = undefined;
-                if (tree[treeIdx].label === label) {
-                    // file deepcode ignore AttrAccessOnNull: whatever
-                    tree.splice(treeIdx, 1);
-                }
-                changed = true;
-            }
-
             /* istanbul ignore else */
-            if (!isFavorite && tree[0].label !== label)
+            if (!taskItem)
             {
-                await this.createSpecialFolder(storeName, label, 0, false, "   ");
-                changed = true;
-            }
-            else if (isFavorite && tree[favIdx].label !== label)
-            {
-                await this.createSpecialFolder(storeName, label, favIdx, true, "   ");
+                await this.build(0, false, "   ");
                 changed = true;
             }
             else if (taskItem) // only 'last tasks' case here.  'favorites' are added
             {
-                this.pushToTop(taskItem, label, treeIdx);
+                this.pushToTop(taskItem);
                 changed = true;
             }
         }
         else {
-            if (!isFavorite && tree[0].label === constants.LAST_TASKS_LABEL)
+            if (!this.isFavorites && tree[0].label === constants.LAST_TASKS_LABEL)
             {
                 tree.splice(0, 1);
                 changed = true;
             }
-            else if (isFavorite && tree[favIdx].label === constants.FAV_TASKS_LABEL)
+            else if (this.isFavorites)
             {
-                tree.splice(favIdx, 1);
+                if (tree[0].label === constants.FAV_TASKS_LABEL) {
+                    tree.splice(0, 1);
+                }
+                else {
+                    tree.splice(1, 1);
+                }
                 changed = true;
             }
         }
@@ -487,6 +457,22 @@ export default class SpecialTaskFolder extends TaskFolder
         }
 
         log.methodDone("show special tasks", 1, logPad);
+    }
+
+
+    private sortLastTasks(items: TaskItem[] | undefined, lastTasks: string[], logPad: string, logLevel: number)
+    {
+        log.methodStart("sort last tasks", logLevel, logPad);
+        items?.sort((a: TaskItem, b: TaskItem) =>
+        {   /* istanbul ignore else */
+            if (a.id && b.id) {
+                const aIdx = lastTasks.indexOf(a.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
+                const bIdx = lastTasks.indexOf(b.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
+                return (aIdx < bIdx ? 1 : (bIdx < aIdx ? -1 : 0));
+            }
+            return 0;
+        });
+        log.methodDone("sort last tasks", logLevel, logPad);
     }
 
 }

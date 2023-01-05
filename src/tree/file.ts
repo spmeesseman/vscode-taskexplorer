@@ -76,6 +76,8 @@ export default class TaskFile extends TreeItem
 
     resourceUri: Uri;
 
+    public id: string;
+
     /**
      * @constructor
      *
@@ -94,15 +96,14 @@ export default class TaskFile extends TreeItem
     {
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group || false), TreeItemCollapsibleState.Collapsed);
 
-        log.methodStart("Construct tree file", 4, logPad, false, [
-            [ "source", source ], [ "relativePath", relativePath ], [ "task folder", folder.label ],
+        log.methodStart("construct tree file", 4, logPad, false, [
+            [ "label", this.label ], [ "source", source ], [ "relativePath", relativePath ], [ "task folder", folder.label ],
             [ "groupLevel", groupLevel ], [ "group", group ], [ "label", label ?? source ], [ "taskDef cmd line", taskDef.cmdLine ],
             [ "taskDef file name", taskDef.fileName ], [ "taskDef icon light", taskDef.icon ], [ "taskDef icon dark", taskDef.iconDark ],
             [ "taskDef script", taskDef.script ], [ "taskDef target", taskDef.target ], [ "taskDef path", taskDef.path ]
         ]);
 
         this.folder = folder;
-        this.nodePath = this.label !== "vscode" ? relativePath : "vscode";
         this.taskSource = source;
         this.isGroup = (group === true);
         this.isUser = false;
@@ -116,6 +117,7 @@ export default class TaskFile extends TreeItem
         // exception of TSC, which is handled elsewhere).
         //
         this.path = this.label !== "vscode" ? relativePath : ".vscode";
+        this.nodePath = this.label !== "vscode" ? relativePath : "vscode"; // <---- ??? TODO - Why vscode and not .vscode.  same as .path?
 
         if (group && this.label) {
             this.nodePath = path.join(this.nodePath, this.label.toString());
@@ -159,7 +161,9 @@ export default class TaskFile extends TreeItem
             //
             this.fileName = "group";      // change to name of directory
             // Use a custom toolip (default is to display resource uri)
-            this.tooltip = util.properCase(source) + " Task Files";
+            const taskName = util.getTaskTypeFriendlyName(source, true);
+            this.tooltip = taskName + " Task Files";
+            this.description = `A tree item representing a ${taskName} task file or grouping`;
             this.contextValue = "taskGroup" + util.properCase(this.taskSource);
             this.groupLevel = groupLevel;
         }
@@ -209,8 +213,10 @@ export default class TaskFile extends TreeItem
             log.value("      dark", iconDark, 4, logPad);
         }
 
-        log.methodDone("Construct tree file", 4, logPad, false, [
-            [ "label", this.label ], [ "Node Path", this.nodePath ], [ "is usertask", this.isUser ],
+        this.id = "id-" + folder.id.replace("fid-", ":") + this.nodePath + ":" + this.fileName + ":" + source;
+
+        log.methodDone("construct tree file", 4, logPad, false, [
+            [ "id", this.id ], [ "label", this.label ], [ "Node Path", this.nodePath ], [ "is usertask", this.isUser ],
             [ "context value", this.contextValue ], [ "is group", this.isGroup ], [ "groupLevel", this.groupLevel ],
             [ "filename", this.fileName ], [ "resource uri path", this.resourceUri.fsPath ],
             [ "path", this.path  ], [ "icon light", iconLight ], [ "icon dark", iconDark ]
@@ -363,22 +369,10 @@ export default class TaskFile extends TreeItem
      */
     public removeTreeNode(treeItem: (TaskFile | TaskItem))
     {
-        let idx = -1;
-        let idx2 = -1;
-
-        this.treeNodes.forEach(each =>
-        {
-            idx++;
-            if (treeItem === each)
-            {
-                idx2 = idx;
-            }
-        });
-
+        const idx = this.treeNodes.findIndex(tn => tn.id === treeItem.id);
         /* istanbul ignore else */
-        if (idx2 !== -1 && idx2 < this.treeNodes.length)
-        {
-            this.treeNodes.splice(idx2, 1);
+        if (idx !== -1) {
+            this.treeNodes.splice(idx, 1);
         }
     }
 

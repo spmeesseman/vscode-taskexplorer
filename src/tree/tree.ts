@@ -115,7 +115,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-
     private async addRemoveSpecialTaskLabel(taskItem: TaskItem)
     {
         const folder = taskItem.taskFile.folder;
@@ -275,7 +274,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    public async buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean)
+    public async buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<TaskFolder[]|NoScripts[]>
     {
         let taskCt = 0;
         const folders: Map<string, TaskFolder> = new Map();
@@ -290,13 +289,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
 
         this.treeBuilding = true;
-        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
 
         //
         // The 'Last Tasks' folder will be 1st in the tree
         //
         this.specialFolders.lastTasks.clearTaskItems();
-        if (configuration.get<boolean>("specialFolders.showLastTasks") === true)
+        if (this.specialFolders.lastTasks.isEnabled())
         {
             folders.set(constants.LAST_TASKS_LABEL, this.specialFolders.lastTasks);
         }
@@ -306,7 +304,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         // the 'Last Tasks' folder)
         //
         this.specialFolders.favorites.clearTaskItems();
-        if (configuration.get<boolean>("specialFolders.showFavorites"))
+        if (this.specialFolders.favorites.isEnabled())
         {
             folders.set(constants.FAV_TASKS_LABEL, this.specialFolders.favorites);
         }
@@ -317,7 +315,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         for (const each of tasksList)
         {
             log.blank(2);
-            log.write(`   Processing task ${++taskCt} of ${tasksList.length} (${each.source})`, logLevel, logPad);
+            log.write(`   Processing task ${++taskCt} of ${tasksList.length} (${each.source})`, logLevel + 1, logPad);
             await this.buildTaskTreeList(each, folders, files, logPad + "   ");
         }
 
@@ -447,12 +445,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             const taskItem = new TaskItem(this.extensionContext, taskFile, each);
             taskFile.addTreeNode(taskItem);
             //
-            // Add this task to the 'Last Tasks' folder if we need to
+            // Maybe add this task to the 'Favorites' and 'Last Tasks' folders
             //
             await this.specialFolders.lastTasks.addTaskFile(taskItem, logPad + "   ");
-            //
-            // Add this task to the 'Favorites' folder if we need to
-            //
             await this.specialFolders.favorites.addTaskFile(taskItem, logPad + "   ");
         }
 
@@ -772,12 +767,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             //
             // Fire change event for the 'Last Tasks' folder if the task exists there
             //
-            if (configuration.get<boolean>("specialFolders.showLastTasks") === true)
+            if (this.specialFolders.lastTasks.isEnabled())
             {
-                const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-                if (lastTasks.includes(util.getTaskItemId(taskItem)) !== false)
+                if (this.specialFolders.lastTasks.getStore().includes(util.getTaskItemId(taskItem)) !== false)
                 {
-                    if (this.taskTree[0] && this.taskTree[0].label === constants.LAST_TASKS_LABEL)
+                    if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.lastTasks.label)
                     {
                         this._onDidChangeTreeData.fire(this.taskTree[0]);
                     }
@@ -787,16 +781,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             //
             // Fire change event for the 'Favorites' folder if the task exists there
             //
-            const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-            if (favTasks.includes(util.getTaskItemId(taskItem)) !== false)
+            if (this.specialFolders.favorites.isEnabled())
             {
-                if (this.taskTree[0] && this.taskTree[0].label === constants.FAV_TASKS_LABEL)
+                if (this.specialFolders.favorites.getStore().includes(util.getTaskItemId(taskItem)) !== false)
                 {
-                    this._onDidChangeTreeData.fire(this.taskTree[0]);
-                }
-                else if (this.taskTree[1] && this.taskTree[1].label === constants.FAV_TASKS_LABEL)
-                {
-                    this._onDidChangeTreeData.fire(this.taskTree[1]);
+                    if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.favorites.label)
+                    {
+                        this._onDidChangeTreeData.fire(this.taskTree[0]);
+                    }
+                    else if (this.taskTree[1] && this.taskTree[1].label === this.specialFolders.favorites.label)
+                    {
+                        this._onDidChangeTreeData.fire(this.taskTree[1]);
+                    }
                 }
             }
         }
@@ -837,6 +833,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             }
         }
 
+        let ctRmv = 0;
         let waited = 0;
         const licMgr = getLicenseManager();
         const explorerViewEnabled = configuration.get<boolean>("enableExplorerView");
@@ -867,7 +864,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         ]);
         if (element instanceof TaskFile)
         {
-            log.values(logLevel, logPad + "   ", [
+            log.values(logLevel + 1, logPad + "   ", [
                 [ "tree item type", "task file" ], [ "label", element.label ], [ "id", element.id ],
                 [ "description", element.description ], [ "file name", element.fileName ], [ "is user", element.isUser ],
                 [ "resource path", element.resourceUri?.fsPath ]
@@ -875,26 +872,26 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
         else if (element instanceof TaskFolder)
         {
-            log.values(logLevel, logPad + "   ", [
+            log.values(logLevel + 1, logPad + "   ", [
                 [ "tree item type", "task folder" ], [ "label", element.label ], [ "id", element.id ],
                 [ "description", element.description ], [ "resource path", element.resourceUri?.fsPath ]
             ]);
         }
         else if (element instanceof TaskItem)
         {
-            log.values(logLevel, logPad + "   ", [
+            log.values(logLevel + 1, logPad + "   ", [
                 [ "tree item type", "task item" ], [ "label", element.label ], [ "id", element.id ],
-                [ "taskitem id", element.taskItemId ], [ "description", element.description ],
+                [ "taskitem id", element.task.definition.taskItemId ], [ "description", element.description ],
                 [ "resource path", element.resourceUri?.fsPath ],
             ]);
         }
         else if (!element)
         {
-            log.value("tree item type", "asking for all (null)", logLevel, logPad);
+            log.value("tree item type", "asking for all (null)", logLevel + 1, logPad);
         }
         else
         {
-            log.values(logLevel, logPad + "   ", [
+            log.values(logLevel + 1, logPad + "   ", [
                 [ "tree item type", "unknown" ], [ "label", element.label ], [ "id", element.id ],
                 [ "resource path", element.resourceUri?.fsPath ]
             ]);
@@ -943,11 +940,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             /* istanbul ignore else */
             if (!this.tasks || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
             {
+                log.write("   fetching all tasks via VSCode.fetchTasks", logLevel, logPad);
                 this.tasks = (await tasks.fetchTasks());
                 // .filter((t) => !util.isWatchTask(t.source) || !util.isExcluded(t.definition.path, logPad + "   "));
             }
             else if (this.tasks && this.currentInvalidation)
-            {   //
+            {
+                log.write(`   fetching ${this.currentInvalidation} tasks via VSCode.fetchTasks`, logLevel, logPad);
+                //
                 // Get all tasks of the type defined in 'currentInvalidation' from VSCode, remove
                 // all tasks of the type defined in 'currentInvalidation' from the tasks list cache,
                 // and add the new tasks from VSCode into the tasks list.
@@ -960,6 +960,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 //
                 // Remove tasks of type '' from the 'tasks'array
                 //
+                log.write(`   removing current ${this.currentInvalidation} tasks from cache`, logLevel + 1, logPad);
                 this.tasks.slice().reverse().forEach((item, index, object) =>
                 {   //
                     // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
@@ -969,12 +970,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                     //
                     if (item.source === this.currentInvalidation || item.source === "Workspace")
                     {
-                        if (item.source !== "Workspace" || item.definition.type === this.currentInvalidation) {
-                            log.write(`   removing old task '${item.source}/${item.name}'`, 4, logPad);
+                        if (item.source !== "Workspace" || item.definition.type === this.currentInvalidation)
+                        {
+                            log.write(`      removing task '${item.source}/${item.name}'`, logLevel + 2, logPad);
                             (this.tasks as Task[]).splice(object.length - 1 - index, 1);
+                            ++ctRmv;
                         }
                     }
                 });
+                log.write(`   removed ${ctRmv} ${this.currentInvalidation} current tasks from cache`, logLevel + 1, logPad);
+                log.write(`   adding ${taskItems.length} new ${this.currentInvalidation} tasks from cache`, logLevel + 1, logPad);
                 this.tasks.push(...taskItems);
             }
 
@@ -992,30 +997,27 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                         }
                     });
                 }
-
-                if (licMgr)
+                //
+                // Check License Manager for any task count restrictions
+                //
+                const maxTasks = licMgr.getMaxNumberOfTasks();
+                log.write("   checking license manager for restrictions", logLevel + 1, logPad);
+                if (this.tasks.length > maxTasks)
                 {
-                    const maxTasks = licMgr.getMaxNumberOfTasks();
-                    if (this.tasks.length > maxTasks)
-                    {
-                        const rmvCount = this.tasks.length - maxTasks;
-                        log.write(`   removing ${rmvCount} tasks, max count reached (no license)`, logLevel + 1, logPad);
-                        this.tasks.splice(maxTasks, rmvCount);
-                        util.showMaxTasksReachedMessage();
-                    }
+                    ctRmv = this.tasks.length - maxTasks;
+                    log.write(`      removing ${ctRmv} tasks, max count reached (no license)`, logLevel + 2, logPad);
+                    this.tasks.splice(maxTasks, ctRmv);
+                    util.showMaxTasksReachedMessage();
                 }
+                log.write("   finished license manager restriction check", logLevel + 1, logPad);
                 //
                 // Build the entire task tree
+                // TODO - See notes above on the try/catch here
                 //
                 // try {
                     this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
                 // }
                 // catch (e: any) { /* istanbul ignore next */ log.error(e); }
-                /* istanbul ignore if */
-                if (!this.taskTree || this.taskTree.length === 0)
-                {
-                    this.taskTree = [ new NoScripts() ];
-                }
             }
             else {
                 this.taskTree = [ new NoScripts() ];
@@ -1025,17 +1027,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         let items: TreeItem[] = [];
         if (element instanceof TaskFolder)
         {
-            log.write("   Return task folder (task files)", logLevel, logPad);
+            log.write("   Return task folder (task files)", logLevel + 1, logPad);
             items = element.taskFiles;
         }
         else if (element instanceof TaskFile)
         {
-            log.write("   Return taskfile (tasks/scripts)", logLevel, logPad);
+            log.write("   Return taskfile (tasks/scripts)", logLevel + 1, logPad);
             items = element.treeNodes;
         }
         else if (!element)
         {
-            log.write("   Return full task tree", logLevel, logPad);
+            log.write("   Return full task tree", logLevel + 1, logPad);
             items = this.taskTree;
         }
 
@@ -1585,23 +1587,27 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             }
             else if (each.isGroup)
             {
-                for (const each2 of each.treeNodes)
+                const _rmv = (treeNodes: (TaskItem | TaskFile)[]) =>
                 {
-                    this.removeScripts(each2 as TaskFile, folder, subfolders, 0, logPad, logLevel + 1);
-                    if (each2 instanceof TaskFile && each2.isGroup && each2.groupLevel > 0)
+                    for (const each2 of treeNodes)
                     {
-                        for (const each3 of each2.treeNodes)
+                        this.removeTreeNodes(each2 as TaskFile, folder, subfolders, 0, logPad, logLevel + 1);
+                        if (each2 instanceof TaskFile && each2.isGroup && each2.groupLevel > 0)
                         {
-                            if (each3 instanceof TaskFile)
+                            for (const each3 of each2.treeNodes)
                             {
-                                this.removeScripts(each3, folder, subfolders, 0, logPad, logLevel + 1);
+                                if (each3 instanceof TaskFile)
+                                {
+                                    this.removeTreeNodes(each3, folder, subfolders, 0, logPad, logLevel + 1);
+                                }
                             }
                         }
                     }
-                }
+                };
+                _rmv(each.treeNodes);
             }
             else {
-                this.removeScripts(each, folder, subfolders, 0, logPad, logLevel + 1);
+                this.removeTreeNodes(each, folder, subfolders, 0, logPad, logLevel + 1);
             }
         }
 
@@ -1623,7 +1629,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      * @param subfolders Current tree subfolders map
      * @param level Current grouping level
      */
-    private removeScripts(taskFile: TaskFile, folder: TaskFolder, subfolders: Map<string, TaskFile>, level: number, logPad: string, logLevel: number)
+    private removeTreeNodes(taskFile: TaskFile, folder: TaskFolder, subfolders: Map<string, TaskFile>, level: number, logPad: string, logLevel: number)
     {
         const me = this;
         const taskTypesRmv: (TaskItem|TaskFile)[] = [];
@@ -1667,7 +1673,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 }
 
                 if (!allTasks) {
-                    me.removeScripts(each, folder, subfolders, level + 1, logPad, logLevel + 1);
+                    me.removeTreeNodes(each, folder, subfolders, level + 1, logPad, logLevel + 1);
                 }
             }
         }
@@ -1870,9 +1876,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         else
         {
             window.showInformationMessage("Task not found!  Check log for details");
-            util.removeFromArray(lastTasks, lastTaskId);
-            await storage.update(constants.LAST_TASKS_STORE, lastTasks);
-            await this.specialFolders.lastTasks.showSpecialTasks(true);
+            await this.specialFolders.lastTasks.removeTaskFile(lastTaskId);
         }
 
         log.methodDone("Run last task", 1);
