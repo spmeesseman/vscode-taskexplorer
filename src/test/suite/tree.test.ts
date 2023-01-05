@@ -142,14 +142,14 @@ suite("Tree Tests", () =>
     test("Add to Favorites", async function()
     {
         this.slow(testsControl.slowTimeForCommand * 4);
-        let removed = await executeTeCommand2("addRemoveFromFavorites", [ batch[0] ]);
+        let removed = await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         if (removed) {
-            await executeTeCommand2("addRemoveFromFavorites", [ batch[0] ]);
+            await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         }
 
-        removed = await executeTeCommand2("addRemoveFromFavorites", [ batch[1] ]);
+        removed = await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
         if (removed) {
-            await executeTeCommand2("addRemoveFromFavorites", [ batch[1] ]);
+            await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
         }
     });
 
@@ -157,8 +157,8 @@ suite("Tree Tests", () =>
     test("Remove from Favorites", async function()
     {
         this.slow(testsControl.slowTimeForCommand * 2);
-        await executeTeCommand2("addRemoveFromFavorites", [ batch[0] ]);
-        await executeTeCommand2("addRemoveFromFavorites", [ batch[1] ]);
+        await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
+        await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
     });
 
 

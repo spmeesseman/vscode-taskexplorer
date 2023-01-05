@@ -1,8 +1,7 @@
-import { ExtensionContext, InputBoxOptions, ThemeIcon, TreeItem, TreeItemCollapsibleState, window, WorkspaceFolder } from "vscode";
+
 import constants from "../lib/constants";
 import TaskItem from "./item";
-import TaskFile from "./file";
-import { getTaskItemId, lowerCaseFirstChar, removeFromArray } from "../lib/utils/utils";
+import { getTaskItemId, removeFromArray } from "../lib/utils/utils";
 import TaskFolder from "./folder";
 import { storage } from "../lib/utils/storage";
 import * as log from "../lib/utils/log";
@@ -10,6 +9,7 @@ import * as sortTasks from "../lib/sortTasks";
 import { configuration } from "../lib/utils/configuration";
 import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { TaskTreeDataProvider } from "./tree";
+import { commands, Disposable, ExtensionContext, InputBoxOptions, ThemeIcon, TreeItemCollapsibleState, window } from "vscode";
 
 
 /**
@@ -19,13 +19,16 @@ import { TaskTreeDataProvider } from "./tree";
  */
 export default class SpecialTaskFolder extends TaskFolder
 {
+
     explorerName: string;
     explorer: TaskTreeDataProvider;
+    private disposables: Disposable[] = [];
     private storeName: string;
     private isFavorites: boolean;
     private extensionContext: ExtensionContext;
     public isSpecial = true;
     public taskFiles: TaskItem[] = [];
+    private subscriptionStartIndex = -1;
 
 
     constructor(context: ExtensionContext, treeName: "taskExplorer"|"taskExplorerSideBar", treeProvider: TaskTreeDataProvider, label: string, state: TreeItemCollapsibleState = TreeItemCollapsibleState.Expanded)
@@ -38,8 +41,16 @@ export default class SpecialTaskFolder extends TaskFolder
         this.extensionContext = context;
         this.isFavorites = label === constants.FAV_TASKS_LABEL;
         this.storeName = this.isFavorites ? constants.FAV_TASKS_STORE : constants.LAST_TASKS_STORE;
-        // this.disposables.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: "favorites"|"lastTasks") => { await this.clearSpecialTaskFolder(taskFolder); }, this));
-
+        if (this.isFavorites)
+        {
+            this.disposables.push(commands.registerCommand(treeName + ".addRemoveFavorite", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
+            this.disposables.push(commands.registerCommand(treeName + ".clearFavorites", async() => { await this.clearSavedTasks(); }, this));
+        }
+        else {
+            this.disposables.push(commands.registerCommand(treeName + ".clearLastTasks", async() => { await this.clearSavedTasks(); }, this));
+        }
+        context.subscriptions.push(...this.disposables);
+        this.subscriptionStartIndex = context.subscriptions.length - (this.disposables.length + 1);
     }
 
 
@@ -82,7 +93,7 @@ export default class SpecialTaskFolder extends TaskFolder
             {
                 const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
                 taskItem2.id = this.label + ":" + taskItem2.id; // note 'label:' + taskItem2.id === id
-                taskItem2.label = this.getSpecialTaskName(taskItem2);
+                taskItem2.label = this.getRenamedTaskName(taskItem2);
                 this.insertTaskFile(taskItem2, 0);
                 if (this.label === constants.LAST_TASKS_LABEL)
                 {
@@ -100,7 +111,54 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
-    async addRemoveSpecialLabel(taskItem: TaskItem)
+    /**
+     * @method addRemoveFavorite
+     * @since 2.0.0
+     *
+     * Adds/removes tasks from the Favorites List.  Basically a toggle, if the task exists as a
+     * favorite already when this function is called, it gets removed, if it doesnt exist, it gets added.
+     *
+     * @param taskItem The representative TaskItem of the task to add/remove
+     */
+    private async addRemoveFavorite(taskItem: TaskItem)
+    {
+        let removed = false;
+        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
+        const favId = getTaskItemId(taskItem);
+
+        log.methodStart("add/remove favorite", 1, "", false, [
+            [ "id", taskItem.id ], [ "current fav count", favTasks.length ]
+        ]);
+
+        //
+        // If this task exists in the favorites, remove it, if it doesnt, then add it
+        //
+        if (!favTasks.includes(favId))
+        {
+            await this.saveTask(taskItem, "   ");
+        }
+        else //
+        {   // Remove
+            //
+            removeFromArray(favTasks, favId);
+            log.value("   new fav count", favTasks.length, 2);
+            //
+            // Update local storage for persistence
+            //
+            await storage.update(constants.FAV_TASKS_STORE, favTasks);
+            //
+            // Update
+            //
+            await this.showSpecialTasks(true, false, undefined, "   ");
+            removed = true;
+        }
+
+        log.methodDone("add/remove favorite", 1);
+        return removed;
+    }
+
+
+    async addRemoveRenamedLabel(taskItem: TaskItem)
     {
         let removed = false,
             addRemoved = false,
@@ -235,7 +293,7 @@ export default class SpecialTaskFolder extends TaskFolder
             {
                 const taskItem3 = new TaskItem(this.extensionContext, taskItem2.taskFile, taskItem2.task);
                 taskItem3.id = label + ":" + taskItem3.id;
-                taskItem3.label = this.getSpecialTaskName(taskItem3);
+                taskItem3.label = this.getRenamedTaskName(taskItem3);
                 this.insertTaskFile(taskItem3, 0);
             }
         }
@@ -248,7 +306,18 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
-    private getSpecialTaskName(taskItem: TaskItem)
+    dispose(context: ExtensionContext)
+    {
+        this.taskFiles = [];
+        this.disposables.forEach((d) => {
+            d.dispose();
+        });
+        context.subscriptions.splice(this.subscriptionStartIndex, this.disposables.length);
+        this.disposables = [];
+    }
+
+
+    private getRenamedTaskName(taskItem: TaskItem)
     {
         let label = taskItem.taskFile.folder.label + " - " + taskItem.taskSource;
         const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
@@ -265,7 +334,7 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
-    private pushToTopOfSpecialFolder(taskItem: TaskItem, label: string, treeIndex: number, logPad = "")
+    private pushToTop(taskItem: TaskItem, label: string, treeIndex: number, logPad = "")
     {
         let taskItem2: TaskItem | undefined;
         const taskTree = this.explorer.getTaskTree();
@@ -300,7 +369,7 @@ export default class SpecialTaskFolder extends TaskFolder
         {
             taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
             taskItem2.id = taskId;
-            taskItem2.label = this.getSpecialTaskName(taskItem2);
+            taskItem2.label = this.getRenamedTaskName(taskItem2);
         }
 
         log.value(logPad + "   add item", taskItem2.id, 2);
@@ -395,7 +464,7 @@ export default class SpecialTaskFolder extends TaskFolder
             }
             else if (taskItem) // only 'last tasks' case here.  'favorites' are added
             {
-                this.pushToTopOfSpecialFolder(taskItem, label, treeIdx);
+                this.pushToTop(taskItem, label, treeIdx);
                 changed = true;
             }
         }
@@ -419,6 +488,5 @@ export default class SpecialTaskFolder extends TaskFolder
 
         log.methodDone("show special tasks", 1, logPad);
     }
-
 
 }

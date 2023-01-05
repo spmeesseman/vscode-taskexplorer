@@ -244,9 +244,9 @@ async function startTask(taskItem: TaskItem)
     console.log(`        Folder: ${taskItem.getFolder()?.name}`);
     await executeSettingsUpdate("taskButtons.clickAction", "Execute");
     // await executeSettingsUpdate("specialFolders.showLastTasks", (++runCount % 2) === 1);
-    let removed = await executeTeCommand2("addRemoveFromFavorites", [ taskItem ]);
+    let removed = await executeTeCommand2("addRemoveFavorite", [ taskItem ]);
     if (removed) {
-        await executeTeCommand2("addRemoveFromFavorites", [ taskItem ]);
+        await executeTeCommand2("addRemoveFavorite", [ taskItem ]);
     }
     overrideNextShowInputBox("test label");
     removed = await executeTeCommand2("addRemoveCustomLabel", [ taskItem ]);

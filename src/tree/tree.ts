@@ -83,9 +83,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.disposables.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit"), this));
         this.disposables.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit fix"), this));
         this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem | string) => { await this.addToExcludes(taskFile); }, this));
-        this.disposables.push(commands.registerCommand(name + ".addRemoveFromFavorites", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
         this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", (taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this));
-        this.disposables.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: "favorites"|"lastTasks") => { await this.clearSpecialTaskFolder(taskFolder); }, this));
 
         context.subscriptions.push(...this.disposables);
         this.subscriptionStartIndex = context.subscriptions.length - (this.disposables.length + 1);
@@ -110,61 +108,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.disposables.forEach((d) => {
             d.dispose();
         });
+        this.specialFolders.favorites.dispose(context);
+        this.specialFolders.lastTasks.dispose(context);
         context.subscriptions.splice(this.subscriptionStartIndex, this.disposables.length);
         this.disposables = [];
     }
 
 
-    /**
-     * @method addRemoveFavorite
-     * @since 2.0.0
-     *
-     * Adds/removes tasks from the Favorites List.  Basically a toggle, if the task exists as a
-     * favorite already when this function is called, it gets removed, if it doesnt exist, it gets added.
-     *
-     * @param taskItem The representative TaskItem of the task to add/remove
-     */
-    private async addRemoveFavorite(taskItem: TaskItem)
-    {
-        let removed = false;
-        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        const favId = util.getTaskItemId(taskItem);
-
-        log.methodStart("add/remove favorite", 1, "", false, [
-            [ "id", taskItem.id ], [ "current fav count", favTasks.length ]
-        ]);
-
-        //
-        // If this task exists in the favorites, remove it, if it doesnt, then add it
-        //
-        if (!favTasks.includes(favId))
-        {
-            await this.specialFolders.favorites.saveTask(taskItem, "   ");
-        }
-        else //
-        {   // Remove
-            //
-            util.removeFromArray(favTasks, favId);
-            log.value("   new fav count", favTasks.length, 2);
-            //
-            // Update local storage for persistence
-            //
-            await storage.update(constants.FAV_TASKS_STORE, favTasks);
-            //
-            // Update
-            //
-            await this.specialFolders.favorites.showSpecialTasks(true, false, undefined, "   ");
-            removed = true;
-        }
-
-        log.methodDone("add/remove favorite", 1);
-        return removed;
-    }
-
 
     private async addRemoveSpecialTaskLabel(taskItem: TaskItem)
     {
-        await this.specialFolders.favorites.addRemoveSpecialLabel(taskItem);
+        const folder = taskItem.taskFile.folder;
+        const folderName = (util.isString(folder) ? folder : util.lowerCaseFirstChar(folder.label as string, true)) as "favorites"|"lastTasks";
+        await this.specialFolders[folderName].clearSavedTasks();
+        await this.specialFolders.favorites.addRemoveRenamedLabel(taskItem);
     }
 
 
@@ -500,18 +457,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
 
         log.methodDone("build task tree list", 2, logPad);
-    }
-
-
-    /**
-     * @method clearSpecialFolder
-y
-     * @since v2.0.0
-     */
-    private async clearSpecialTaskFolder(folder: TaskFolder|"favorites"|"lastTasks")
-    {
-        const folderName = (util.isString(folder) ? folder : util.lowerCaseFirstChar(folder.label as string, true)) as "favorites"|"lastTasks";
-        await this.specialFolders[folderName].clearSavedTasks();
     }
 
 

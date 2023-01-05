@@ -49,6 +49,16 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = "", lo
         return false;
     }
 
+    if (isScopeWsFolder)
+    {
+        if (util.isExcluded(path.join(task.scope.uri.path, relativePath)))
+        {
+            log.write("   skipping this task (by 'exclude' setting)", 3, logPad);
+            log.methodDone('Check task inclusion', 3, logPad);
+            return false;
+        }
+    }
+
     //
     // Check task excludes array
     //
@@ -65,27 +75,6 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = "", lo
                 log.methodDone('Check task inclusion', 3, logPad, false, undefined, logQueueId);
                 return false;
             }
-        }
-    }
-
-    //
-    // TSC tasks are returned with no path value, the relative path is in the task name:
-    //
-    //     watch - tsconfig.json
-    //     watch - .vscode-test\vscode-1.32.3\resources\app\tsconfig.schema.json
-    //
-    if (task.source === "tsc" && isScopeWsFolder)
-    {
-        if (task.name.indexOf(" - ") !== -1 && task.name.indexOf(" - tsconfig.json") === -1)
-        {
-            relativePath = path.dirname(task.name.substring(task.name.indexOf(" - ") + 3));
-            if (util.isExcluded(path.join(task.scope.uri.path, relativePath)))
-            {
-                log.write("   skipping this tsc task (remapped subfolder)", 3, logPad, logQueueId);
-                log.methodDone('Check task inclusion', 3, logPad, false, undefined, logQueueId);
-                return false;
-            }
-            return relativePath;
         }
     }
 
@@ -126,19 +115,7 @@ export function isTaskIncluded(task: Task, relativePath: string, logPad = "", lo
             }
         }
     }
-/*
-    Hmmmmmm....  Do we need?  Put it here just in case, while I was in here fixing s***
 
-    if (isScopeWsFolder && task.source !== "Workspace" && task.source !== "tsc")
-    {
-        if (util.isExcluded(path.join(task.scope.uri.path, relativePath)))
-        {
-            log.write("   skipping this task (by 'exclude' setting)", 3, logPad);
-            log.methodDone('Check task inclusion', 3, logPad);
-            return false;
-        }
-    }
-*/
     //
     // Check enabled and npm install task
     // This will ignore tasks from other providers as well, unless it has registered
