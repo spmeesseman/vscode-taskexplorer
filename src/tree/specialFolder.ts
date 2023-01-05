@@ -38,6 +38,8 @@ export default class SpecialTaskFolder extends TaskFolder
         this.extensionContext = context;
         this.isFavorites = label === constants.FAV_TASKS_LABEL;
         this.storeName = this.isFavorites ? constants.FAV_TASKS_STORE : constants.LAST_TASKS_STORE;
+        // this.disposables.push(commands.registerCommand(name + ".clearSpecialFolder", async (taskFolder: "favorites"|"lastTasks") => { await this.clearSpecialTaskFolder(taskFolder); }, this));
+
     }
 
 
@@ -181,7 +183,7 @@ export default class SpecialTaskFolder extends TaskFolder
      *
      * @since v2.0.0
      */
-    async clearSpecialFolder()
+    async clearSavedTasks()
     {
         const choice = await window.showInformationMessage(`Clear all tasks from the \`${this.label}\` folder?`, "Yes", "No");
         if (choice === "Yes")

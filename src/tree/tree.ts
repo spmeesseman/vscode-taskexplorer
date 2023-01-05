@@ -508,9 +508,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 y
      * @since v2.0.0
      */
-    private async clearSpecialTaskFolder(folder: "favorites"|"lastTasks")
+    private async clearSpecialTaskFolder(folder: TaskFolder|"favorites"|"lastTasks")
     {
-        await this.specialFolders[folder].clearSpecialFolder();
+        const folderName = (util.isString(folder) ? folder : util.lowerCaseFirstChar(folder.label as string, true)) as "favorites"|"lastTasks";
+        await this.specialFolders[folderName].clearSavedTasks();
     }
 
 
@@ -793,23 +794,24 @@ y
     }
 
 
-    fireTaskChangeEvents(taskItem: TaskItem, invalidateFileNode: boolean, logPad: string, logLevel: number)
+    fireTaskChangeEvents(taskItem?: TaskItem, invalidateFileNode?: boolean, logPad?: string, logLevel?: number)
     {
         /* istanbul ignore next */
         if (!this.taskTree) {
             return;
         }
         /* istanbul ignore next */
-        if (!taskItem) {
+        if (!taskItem && invalidateFileNode) {
             /* istanbul ignore next */
             log.error("task change event fire, invalid taskItem argument");
             /* istanbul ignore next */
             return;
         }
 
-        log.methodStart("fire task change events", logLevel, logPad, false, [
+        const logValues = taskItem ? [
             [ "task name", taskItem.task.name ], [ "task type", taskItem.task.source ], [ "resource path", taskItem.taskFile.resourceUri.fsPath ]
-        ]);
+        ] : [[ "event", "rebuild entire tree" ]];
+        log.methodStart("fire task change events", logLevel, logPad, false, logValues);
 
         //
         // Fire change event for parent folder.  Firing the change event for the task item itself
@@ -818,36 +820,39 @@ y
         // tree, so this is still good.  TODO possibly this gets fixed in the future to be able to
         // invalidate just the TaskItem, so check back on this sometime.
         //
-        this._onDidChangeTreeData.fire(invalidateFileNode ? taskItem.taskFile : taskItem);
+        this._onDidChangeTreeData.fire(taskItem ? (invalidateFileNode ? taskItem.taskFile : taskItem) : undefined);
 
-        //
-        // Fire change event for the 'Last Tasks' folder if the task exists there
-        //
-        if (configuration.get<boolean>("specialFolders.showLastTasks") === true)
+        if (taskItem)
         {
-            const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-            if (lastTasks.includes(util.getTaskItemId(taskItem)) !== false)
+            //
+            // Fire change event for the 'Last Tasks' folder if the task exists there
+            //
+            if (configuration.get<boolean>("specialFolders.showLastTasks") === true)
             {
-                if (this.taskTree[0] && this.taskTree[0].label === constants.LAST_TASKS_LABEL)
+                const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
+                if (lastTasks.includes(util.getTaskItemId(taskItem)) !== false)
+                {
+                    if (this.taskTree[0] && this.taskTree[0].label === constants.LAST_TASKS_LABEL)
+                    {
+                        this._onDidChangeTreeData.fire(this.taskTree[0]);
+                    }
+                }
+            }
+
+            //
+            // Fire change event for the 'Favorites' folder if the task exists there
+            //
+            const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
+            if (favTasks.includes(util.getTaskItemId(taskItem)) !== false)
+            {
+                if (this.taskTree[0] && this.taskTree[0].label === constants.FAV_TASKS_LABEL)
                 {
                     this._onDidChangeTreeData.fire(this.taskTree[0]);
                 }
-            }
-        }
-
-        //
-        // Fire change event for the 'Favorites' folder if the task exists there
-        //
-        const favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        if (favTasks.includes(util.getTaskItemId(taskItem)) !== false)
-        {
-            if (this.taskTree[0] && this.taskTree[0].label === constants.FAV_TASKS_LABEL)
-            {
-                this._onDidChangeTreeData.fire(this.taskTree[0]);
-            }
-            else if (this.taskTree[1] && this.taskTree[1].label === constants.FAV_TASKS_LABEL)
-            {
-                this._onDidChangeTreeData.fire(this.taskTree[1]);
+                else if (this.taskTree[1] && this.taskTree[1].label === constants.FAV_TASKS_LABEL)
+                {
+                    this._onDidChangeTreeData.fire(this.taskTree[1]);
+                }
             }
         }
 
