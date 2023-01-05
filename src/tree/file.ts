@@ -162,8 +162,7 @@ export default class TaskFile extends TreeItem
             this.fileName = "group";      // change to name of directory
             // Use a custom toolip (default is to display resource uri)
             const taskName = util.getTaskTypeFriendlyName(source, true);
-            this.tooltip = taskName + " Task Files";
-            this.description = `A tree item representing a ${taskName} task file or grouping`;
+            this.tooltip = `A tree item representing a ${taskName} task file${group ? " grouping" : ""}`;
             this.contextValue = "taskGroup" + util.properCase(this.taskSource);
             this.groupLevel = groupLevel;
         }

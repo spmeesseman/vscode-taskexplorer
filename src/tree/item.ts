@@ -62,8 +62,9 @@ export default class TaskItem extends TreeItem
         //
         // Since we save tasks (last tasks and favorites), we need a known unique key to
         // save them with.  We can just use the existing id parameter...
+        // 'Script' type tasks will set the file 'uri' and the 'scriptFile' flag on the task definition
         //
-        const fsPath = taskFile.resourceUri.fsPath;
+        const fsPath = !task.definition.scriptFile ? taskFile.resourceUri.fsPath : task.definition.uri.fsPath;
         this.id = fsPath + ":" + task.source + ":" + task.name + ":"; // <- leave trailing ':' for backwards compat
         this.paused = false;                // paused flag used by start/stop/pause task functionality
         this.taskFile = taskFile;           // Save a reference to the TaskFile that this TaskItem belongs to
@@ -103,7 +104,6 @@ export default class TaskItem extends TreeItem
         if (task.definition.type !== task.source) {
             this.tooltip += `   type   : \`${task.definition.type}\``;
         }
-        this.description = `A tree item representing a ${taskName} task or script`;
         //
         // Refresh state - sets context value, icon path from execution state
         //

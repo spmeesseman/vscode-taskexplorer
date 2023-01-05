@@ -404,6 +404,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 folder = new TaskFolder(each.scope, nodeExpandedeMap[util.lowerCaseFirstChar(scopeName, true)] !== false ?
                                                     TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
                 folders.set(scopeName, folder);
+                log.value("constructed tree taskfolder", `${scopeName} (${folder.id})`, 3, logPad + "   ");
             }
         }     //
         else // User Task (not related to a ws or project)
@@ -415,6 +416,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 folder = new TaskFolder(scopeName, nodeExpandedeMap[util.lowerCaseFirstChar(scopeName, true)] !== false ?
                                                 TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
                 folders.set(scopeName, folder);
+                log.value("constructed tree user taskfolder", `${scopeName} (${folder.id})`, 3, logPad + "   ");
             }
         }
 
@@ -438,6 +440,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         // found, but in doing so, if there were no npm "scripts" in the package.json, code execution
         // would not get far enough to create the "tree file" node for the context menu.
         //
+        if (taskFile.taskSource === "batch")
+        {
+            console.log("test");
+        }
         if (!isNpmInstallTask)
         {   //
             // Create "tree item" node and add it to the owner "tree file" node

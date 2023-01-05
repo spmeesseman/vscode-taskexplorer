@@ -20,29 +20,20 @@ export default class TaskFolder extends TreeItem
     public workspaceFolder: WorkspaceFolder | undefined;
 
 
-    constructor(folder: WorkspaceFolder | string, state: TreeItemCollapsibleState = TreeItemCollapsibleState.Expanded, logPad = "")
+    constructor(folder: WorkspaceFolder | string, state: TreeItemCollapsibleState = TreeItemCollapsibleState.Expanded)
     {
-        super(typeof folder === "string" ? folder  : folder.name, state);
+        super(isString(folder) ? folder  : folder.name, state);
 
-        log.methodStart("construct tree folder", 3, logPad, false, [[ "label", this.label ]]);
+        this.contextValue = "folder";
 
-        if (this.label === constants.FAV_TASKS_LABEL || this.label === constants.LAST_TASKS_LABEL) {
-            this.contextValue = this.label.toLowerCase().replace(/[\W \_\-]/g, "");
-        }
-        else {
-            this.contextValue = "folder";
-        }
-
-        if (!(typeof folder === "string")) {
+        if (!isString(folder)) {
             this.workspaceFolder = folder;
             this.resourceUri = folder.uri;
         }
 
         this.iconPath = ThemeIcon.Folder;
         this.id = "fid-" + this.label;
-        this.description = "A tree item representing a task or project folder";
-
-        log.methodDone("construct tree folder", 3, logPad, false, [[ "id", this.id ], [ "context value", this.contextValue ]]);
+        this.tooltip = "A tree folder representing a workspace/project";
     }
 
 

@@ -47,6 +47,7 @@ export default class SpecialTaskFolder extends TaskFolder
         this.store = storage.get<string[]>(this.storeName, []);
         this.settingNameEnabled = "specialFolders.show" + label.replace(/ /g, "");
         this.enabled = configuration.get<boolean>(this.settingNameEnabled);
+        this.tooltip = `A tree folder to store '${label}' tasks`;
         if (this.isFavorites)
         {
             this.disposables.push(commands.registerCommand(treeName + ".addRemoveFavorite", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
@@ -66,7 +67,7 @@ export default class SpecialTaskFolder extends TaskFolder
     {
         if (this.store.includes(taskItem.id))
         {
-            log.methodStart(`add taskitem to ${this.label}`, 1, logPad);
+            log.methodStart(`add tree taskitem to ${this.label}`, 1, logPad);
 
             const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
             taskItem2.id = this.label + ":" + taskItem2.id; // note 'label:' + taskItem2.id === id
@@ -80,7 +81,7 @@ export default class SpecialTaskFolder extends TaskFolder
                 sortTasks.sortTasks(this.taskFiles, logPad + "   ", 4);
             }
 
-            log.methodDone(`add taskitem to ${this.label}`, 1, logPad);
+            log.methodDone(`add tree taskitem to ${this.label}`, 1, logPad);
         }
     }
 
