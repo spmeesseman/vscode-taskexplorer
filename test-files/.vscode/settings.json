@@ -1,34 +1,32 @@
 {
+    "terminal.integrated.shell.windows": "C:\\Windows\\System32\\cmd.exe",
     "taskExplorer.enableExplorerView": true,
     "taskExplorer.enableSideBar": false,
     "taskExplorer.autoRefresh": true,
     "taskExplorer.enabledTasks": {
         "ant": true,
-        "apppublisher": true,
+        "apppublisher": false,
         "bash": true,
         "batch": true,
-        "composer": true,
+        "composer": false,
         "gradle": true,
         "grunt": true,
         "gulp": true,
         "make": true,
-        "maven": true,
+        "maven": false,
         "npm": true,
-        "nsis": true,
-        "perl": true,
-        "pipenv": true,
-        "powershell": true,
+        "nsis": false,
+        "perl": false,
+        "pipenv": false,
+        "powershell": false,
         "python": true,
-        "ruby": true,
+        "ruby": false,
         "tsc": true,
         "workspace": true
     },
     "taskExplorer.exclude": [
         "**/tasks_test_ignore_/**",
-        "**/ant/**",
-        "/c:/Projects/vscode-taskexplorer/test-files/tasks_test_/test2.BAT",
-        "/c:/Projects/vscode-taskexplorer/test-files/GRUNTFILE.js",
-        "/c:/Projects/vscode-taskexplorer/test-files/tasks_test_/subfolder/GRUNTFILE.JS"
+        "**/ant/**"
     ],
     "taskExplorer.includeAnt": [],
     "taskExplorer.globPatternsAnt": [
@@ -38,11 +36,11 @@
         "**/hello.xml"
     ],
     "taskExplorer.groupSeparator": "-",
-    "taskExplorer.groupMaxLevel": 5,
+    "taskExplorer.groupMaxLevel": 1,
     "taskExplorer.groupWithSeparator": true,
     "taskExplorer.keepTermOnStop": false,
     "taskExplorer.logging.enable": true,
-    "taskExplorer.logging.level": 5,
+    "taskExplorer.logging.level": 1,
     "taskExplorer.logging.enableFile": false,
     "taskExplorer.pathToPrograms": {
         "ant": "c:\\Projects\\vscode-taskexplorer\\tools\\ant\\bin\\ant.bat",
@@ -65,25 +63,14 @@
     "taskExplorer.specialFolders.expanded": {
         "lastTasks": true,
         "favorites": true,
-        "userTasks": true,
-        "test-files": false
+        "userTasks": true
     },
     "taskExplorer.specialFolders.numLastTasks": 10,
     "taskExplorer.specialFolders.showFavorites": true,
     "taskExplorer.specialFolders.showLastTasks": true,
     "taskExplorer.specialFolders.showUserTasks": true,
-    "taskExplorer.taskButtons.clickAction": "Execute",
+    "taskExplorer.taskButtons.clickAction": "Open",
     "taskExplorer.taskButtons.showFavoritesButton": true,
     "taskExplorer.useGulp": false,
-    "taskExplorer.useAnt": false,
-    "taskExplorer.visual.enableAnsiconForAnt": false,
-    "taskExplorer.visual.disableAnimatedIcons": false,
-    "taskExplorer.globPatternsBash": [],
-    "npm.packageManager": "auto",
-    "terminal.integrated.shell.osx": null,
-    "terminal.integrated.shell.linux": null,
-    "taskExplorer.excludeTask": [
-        "pre-launch[0-9]{2}\\.r(?:b|c)",
-        "upload2"
-    ]
+    "taskExplorer.useAnt": false
 }

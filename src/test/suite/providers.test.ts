@@ -16,9 +16,9 @@ import { workspace, tasks, commands, Uri, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../lib/utils/utils";
 import { ITaskExplorerApi, IExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, buildTree, executeSettingsUpdate, executeTeCommand, executeTeCommand2, findIdInTaskMap,
+    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, findIdInTaskMap,
     focusExplorer,
-    getTreeTasks, getWsPath, isReady, sleep, testsControl, verifyTaskCount
+    getTreeTasks, getWsPath, isReady, sleep, testsControl, treeUtils, verifyTaskCount
 } from "../helper";
 
 
@@ -151,22 +151,22 @@ suite("Provider Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         if (!explorer.isVisible()) {
-            await buildTree(this);
+            await treeUtils.buildTree(this);
         }
     });
 
 
-    test("Check Existing Bash Task Counts", function()
+    test("Check Existing Bash Task Counts", async function()
     {
         this.slow(testsControl.slowTimeForCommand);
-        batch = getTreeTasks("bash", 1);
+        batch = await getTreeTasks("bash", 1);
     });
 
 
-    test("Check Existing Batch Task Counts", function()
+    test("Check Existing Batch Task Counts", async function()
     {
         this.slow(testsControl.slowTimeForCommand);
-        batch = getTreeTasks("batch", 2);
+        batch = await getTreeTasks("batch", 2);
     });
 
 
@@ -276,7 +276,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree", async function()
     {
-        await buildTree(this);
+        await treeUtils.buildTree(this);
         //
         // Check VSCode provided task types for the hell of it
         //
@@ -284,7 +284,7 @@ suite("Provider Tests", () =>
         assert(nTasks.length > 0, "No grunt tasks registered");
         nTasks = await tasks.fetchTasks({ type: "gulp" });
         assert(nTasks.length > 0, "No gulp tasks registered");
-        batch = getTreeTasks("batch", 4);
+        batch = await getTreeTasks("batch", 4);
     });
 
 
@@ -387,7 +387,7 @@ suite("Provider Tests", () =>
         // The 3rd param `true` will open the task files and locate task positions while parsing the tree
         //
         this.slow(3000);
-        taskMap = explorer.getTaskMap();
+        taskMap = await treeUtils.walkTreeItems(undefined, true);
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10);
     });
 
@@ -405,21 +405,18 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForFetchTasksCommand + testsControl.slowTimeForCommand);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
-        for (const property in taskMap)
+        for (const taskItem of Object.values(taskMap))
         {
-            if ({}.hasOwnProperty.call(taskMap, property))
+            const value = taskItem as TaskItem;
+            if (value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
             {
-                const value= taskMap[property];
-                if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
+                const node = value.taskFile.treeNodes.find(
+                    n => n instanceof TaskItem && n.task.name && n.task.name.includes("upload2")
+                ) as TaskItem;
+                if (node)
                 {
-                    const node = value.taskFile.treeNodes.find(
-                        n => n instanceof TaskItem && n.task.name && n.task.name.includes("upload2")
-                    ) as TaskItem;
-                    if (node)
-                    {
-                        await executeTeCommand("addToExcludes", waitTimeForConfigEvent, 3000, node);
-                        break;
-                    }
+                    await executeTeCommand("addToExcludes", waitTimeForConfigEvent, 3000, node);
+                    break;
                 }
             }
         }

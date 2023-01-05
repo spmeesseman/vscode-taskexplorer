@@ -10,6 +10,7 @@ import { IExplorerApi, ITaskExplorerApi, TaskMap } from "@spmeesseman/vscode-tas
 import { configuration } from "../lib/utils/configuration";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import constants from "../lib/constants";
+import TreeUtils from "./treeUtils";
 
 let activated = false;
 let teApi: ITaskExplorerApi;
@@ -21,6 +22,7 @@ const overridesShowInfoBox: any[] = [];
 
 export const testsControl = testControl;
 
+export let treeUtils: TreeUtils;
 
 window.showInputBox = (...args: any[]) =>
 {
@@ -87,37 +89,14 @@ export async function activate(instance?: any)
             assert.fail("        ✘ Explorer instance does not exist");
         }
         teExplorer = teApi.explorer;
+        treeUtils = new TreeUtils(teApi);
+        setExplorer(teExplorer);
         //
         // For debugging
         //
         teApi.log.setWriteToConsole(testsControl.writeToConsole, testsControl.logLevel);
     }
     return teApi;
-}
-
-
-/**
- * Pretty much mimics the tree construction in cases when we want to construct it
- * when the tree view is collapsed and not updating automatically via GUI events.
- * Once the view/shelf is focused/opened somewhere within the running tests, there'd
- * be no need to call this function anymore.
- *
- * @param instance The test instance to set the timeout and slow time on.
- */
-export async function buildTree(instance: any)
-{
-    instance.slow(20000);
-    instance.timeout(30000);
-
-    await executeSettingsUpdate("groupWithSeparator", true);
-    await executeSettingsUpdate("groupMaxLevel", 5);
-
-    //
-    // A special refresh() for test suite, will open all task files and open to position
-    //
-    await teExplorer.refresh("tests");
-    await teApi.waitForIdle(testsControl.waitTimeForBuildTree, 22500);
-    return teExplorer.getTaskMap();
 }
 
 
@@ -221,13 +200,14 @@ export function getSpecialTaskItemId(taskItem: TaskItem)
 }
 
 
-export function getTreeTasks(taskType: string, expectedCount: number)
+export async function getTreeTasks(taskType: string, expectedCount: number)
 {
     const taskItems: TaskItem[] = [];
     //
     // Get the task mapped tree items
     //
-    const taskMap = (teApi.explorer as IExplorerApi).getTaskMap();
+    // const taskMap = (teApi.explorer as IExplorerApi).getTaskMap();
+    const taskMap = await treeUtils.walkTreeItems(undefined);
     //
     // Make sure the tasks have been mapped in the explorer tree
     //
@@ -364,6 +344,12 @@ export function overrideNextShowInfoBox(value: any)
 }
 
 
+export function setExplorer(explorer: IExplorerApi)
+{
+    teExplorer = explorer;
+}
+
+
 export async function sleep(ms: number)
 {
 	return new Promise(resolve => setTimeout(resolve, ms));
@@ -385,7 +371,8 @@ export async function verifyTaskCount(taskType: string, expectedCount: number)
 
 export async function verifyTaskCountByTree(taskType: string, expectedCount: number, taskMap?: TaskMap)
 {
-    const tasksMap = (teApi.explorer as IExplorerApi).getTaskMap(),
+    const tasksMap = (taskMap || (await treeUtils.walkTreeItems(undefined))),
+    // const tasksMap = (teApi.explorer as IExplorerApi).getTaskMap(),
             taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
     assert(taskCount === expectedCount, `Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 }

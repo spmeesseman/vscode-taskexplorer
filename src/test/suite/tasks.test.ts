@@ -50,12 +50,12 @@ suite("Task Tests", () =>
 	});
 
 
-    test("Check task counts", function()
+    test("Check task counts", async function()
     {
         this.slow(1750);
-        bash = getTreeTasks("bash", 1);
-        batch = getTreeTasks("batch", 2);
-        ant = getTreeTasks("ant", 3);
+        bash = await getTreeTasks("bash", 1);
+        batch = await getTreeTasks("batch", 2);
+        ant = await getTreeTasks("ant", 3);
     });
 
 

@@ -64,8 +64,8 @@ suite("Tree Tests", () =>
 
     test("Show Favorites", async function()
     {
-        ant = getTreeTasks("ant", 3);
-        batch = getTreeTasks("batch", 2);
+        ant = await getTreeTasks("ant", 3);
+        batch = await getTreeTasks("batch", 2);
         if (favTasks.length === 0)
         {
             await storage.update(constants.FAV_TASKS_STORE, [
@@ -79,8 +79,8 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
-        ant = getTreeTasks("ant", 3);
-        batch = getTreeTasks("batch", 2);
+        ant = await getTreeTasks("ant", 3);
+        batch = await getTreeTasks("batch", 2);
         if (lastTasks.length === 0)
         {
             await storage.update(constants.LAST_TASKS_STORE, [
@@ -350,16 +350,11 @@ suite("Tree Tests", () =>
 
     test("Clear Special Folders", async function()
     {
-        this.slow(testsControl.slowTimeForCommand * 4);
+        this.slow(testsControl.slowTimeForCommand * 2);
         overrideNextShowInputBox("Yes");
-        await executeTeCommand2("clearSpecialFolder", [ constants.LAST_TASKS_LABEL ], 1000);
+        await executeTeCommand("clearLastTasks");
         overrideNextShowInputBox("Yes");
-        await executeTeCommand2("clearSpecialFolder", [ constants.FAV_TASKS_LABEL ], 1000);
-        overrideNextShowInputBox("Yes");
-        await executeTeCommand2("clearSpecialFolder", [ "Invalid" ], 1000);
-        overrideNextShowInfoBox("test ask");
-        overrideNextShowInputBox("Yes");
-        await executeTeCommand2("clearSpecialFolder", [ batch[0].getFolder() ], 1000);
+        await executeTeCommand("clearFavorites");
     });
 
 

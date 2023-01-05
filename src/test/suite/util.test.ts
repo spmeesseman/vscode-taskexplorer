@@ -132,7 +132,7 @@ suite("Util Tests", () =>
         assert(util.camelCase("test", -1) === "test");
 
         assert(util.properCase("taskexplorer") === "Taskexplorer");
-        assert(util.properCase(undefined) === undefined);
+        assert(util.properCase(undefined) === "");
 
         assert(util.isScriptType("batch"));
         assert(util.getScriptTaskTypes().length > 0);

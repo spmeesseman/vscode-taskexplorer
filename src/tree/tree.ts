@@ -75,7 +75,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.disposables.push(commands.registerCommand(name + ".stop",  (item: TaskItem) => { this.stop(item); }, this));
         this.disposables.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
         this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => { this.pause(item); }, this));
-        this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick: boolean) => { await this.open(item, itemClick); }, this));
+        this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick?: boolean) => { await this.open(item, itemClick); }, this));
         this.disposables.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => { this.openTerminal(item); }, this));
         this.disposables.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
         this.disposables.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "install"), this));
@@ -1404,7 +1404,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         const uri = !util.isScriptType(selection.taskSource) ?
                     selection.taskFile.resourceUri : Uri.file(selection.task.definition.uri.fsPath);
 
-
         log.methodStart("open document at position", 1, "", true, [
             [ "command", selection.command.command ], [ "source", selection.taskSource ],
             [ "uri path", uri.path ], [ "fs path", uri.fsPath ]
@@ -1560,9 +1559,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             this.taskTree = null;
         }
         if (this.visible) {
+            log.write("   fire tree data change event", 2, logPad);
             this._onDidChangeTreeData.fire();
         }
         else {
+            log.write("   view is not visible, delay firing data change event", 1, logPad);
             // this.getChildren();
             this.refreshPending = false;
         }

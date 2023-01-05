@@ -3,7 +3,7 @@
 
 import * as assert from "assert";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, isReady, testsControl } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand, isReady, setExplorer, testsControl } from "../helper";
 import { refreshTree } from "../../lib/refreshTree";
 import { getInstallPath, isBoolean, isObject, isString } from "../../lib/utils/utils";
 import { enableConfigWatcher } from "../../lib/configWatcher";
@@ -76,6 +76,7 @@ suite("API Init and Tests", () =>
     test("Re-enable Explorer View", async function()
     {
         await executeSettingsUpdate("enableExplorerView", true, testsControl.waitTimeForConfigEnableEvent);
+        setExplorer(teApi.explorer as IExplorerApi);
     });
 
 

@@ -44,8 +44,7 @@ export const isProcessingFsEvent = () => processingFsEvent;
 
 function logFileWatcherEvent(uri: Uri, type: string)
 {
-    log.write("file change event", 1);
-    log.value("   type", type, 1);
+    log.write(`file '${type}' event`, 1);
     log.value("   file", uri.fsPath, 1);
 }
 

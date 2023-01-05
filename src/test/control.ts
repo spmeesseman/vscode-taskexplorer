@@ -12,7 +12,7 @@ export const testControl =
     logLevel: 1,
     writeToConsole: false,
     writeToFile: false,
-    writeToOutput: false,
+    writeToOutput: true,
     //
     // Use update() here for coverage, since these two settings wont trigger any processing
     //

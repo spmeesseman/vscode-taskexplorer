@@ -6,12 +6,12 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { activate, buildTree, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, treeUtils, verifyTaskCount } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
+import { deleteFile, writeFile } from "../../lib/utils/fs";
 
 
 const testsName = "apppublisher";
@@ -48,10 +48,9 @@ suite("App-Publisher Tests", () =>
 
 
     suiteTeardown(async function()
-    {   //
-        // Reset settings
-        //
+    {
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
+        await deleteFile(fileUri.fsPath);
     });
 
 
@@ -64,7 +63,7 @@ suite("App-Publisher Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        await buildTree(this);
+        await treeUtils.buildTree(this);
     });
 
 
@@ -86,8 +85,8 @@ suite("App-Publisher Tests", () =>
 
     test("Create file", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent);
-        fs.writeFileSync(
+        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
+        await writeFile(
             fileUri.fsPath,
             "{\n" +
             '    "version": "1.0.0",\n' +
@@ -106,7 +105,7 @@ suite("App-Publisher Tests", () =>
 
     test("Disable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
@@ -114,7 +113,7 @@ suite("App-Publisher Tests", () =>
 
     test("Re-enable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 42);
     });
@@ -129,9 +128,9 @@ suite("App-Publisher Tests", () =>
             resetLogging = true;
         }
         else {
-            this.slow(testsControl.slowTimeForFsCreateEvent);
+            this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
         }
-        fs.writeFileSync(
+        await writeFile(
             fileUri.fsPath,
             "{\n" +
             '    "version": "1.0.0"\n' +
@@ -153,8 +152,8 @@ suite("App-Publisher Tests", () =>
 
     test("Fix Invalid JSON", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent);
-        fs.writeFileSync(
+        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
+        await writeFile(
             fileUri.fsPath,
             "{\n" +
             '    "version": "1.0.0",\n' +
@@ -166,15 +165,15 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(waitTimeForFsModEvent);
+        await teApi.waitForIdle(waitTimeForFsModEvent + testsControl.slowTimeForVerifyTaskCount);
         await verifyTaskCount(testsName, 42);
     });
 
 
     test("Delete file", async function()
     {
-        this.slow(testsControl.slowTimeForFsDeleteEvent);
-        fs.unlinkSync(fileUri.fsPath);
+        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
+        await deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(waitTimeForFsDelEvent);
         await verifyTaskCount(testsName, 21);
     });
@@ -182,7 +181,7 @@ suite("App-Publisher Tests", () =>
 
     test("Disable (Default is OFF)", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
