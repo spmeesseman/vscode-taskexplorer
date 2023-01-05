@@ -7,7 +7,6 @@ import { storage } from "../lib/utils/storage";
 import * as log from "../lib/utils/log";
 import * as sortTasks from "../lib/sortTasks";
 import { configuration } from "../lib/utils/configuration";
-import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { TaskTreeDataProvider } from "./tree";
 import { commands, ConfigurationChangeEvent, Disposable, ExtensionContext, InputBoxOptions, ThemeIcon, TreeItem, TreeItemCollapsibleState, window, workspace } from "vscode";
 
@@ -20,15 +19,15 @@ import { commands, ConfigurationChangeEvent, Disposable, ExtensionContext, Input
 export default class SpecialTaskFolder extends TaskFolder
 {
 
-    explorerName: string;
-    explorer: TaskTreeDataProvider;
-    private disposables: Disposable[] = [];
+    private explorerName: string;
+    private explorer: TaskTreeDataProvider;
+    private disposables: Disposable[];
     private storeName: string;
     private isFavorites: boolean;
     private extensionContext: ExtensionContext;
     public isSpecial = true;
-    public taskFiles: TaskItem[] = [];
-    private subscriptionStartIndex = -1;
+    public taskFiles: TaskItem[];
+    private subscriptionStartIndex: number;
     private store: string[];
     private enabled: boolean;
     private settingNameEnabled: string;
@@ -37,6 +36,7 @@ export default class SpecialTaskFolder extends TaskFolder
     constructor(context: ExtensionContext, treeName: "taskExplorer"|"taskExplorerSideBar", treeProvider: TaskTreeDataProvider, label: string, state: TreeItemCollapsibleState = TreeItemCollapsibleState.Expanded)
     {
         super(label, state);
+        this.subscriptionStartIndex = -1;
         this.contextValue = label.toLowerCase().replace(/[\W \_\-]/g, "");
         this.iconPath = ThemeIcon.Folder;
         this.explorer = treeProvider;
@@ -48,6 +48,8 @@ export default class SpecialTaskFolder extends TaskFolder
         this.settingNameEnabled = "specialFolders.show" + label.replace(/ /g, "");
         this.enabled = configuration.get<boolean>(this.settingNameEnabled);
         this.tooltip = `A tree folder to store '${label}' tasks`;
+        this.disposables = [];
+        this.taskFiles = [];
         if (this.isFavorites)
         {
             this.disposables.push(commands.registerCommand(treeName + ".addRemoveFavorite", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));

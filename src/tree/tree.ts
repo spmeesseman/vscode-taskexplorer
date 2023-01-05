@@ -36,8 +36,8 @@ import SpecialTaskFolder from "./specialFolder";
 export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplorerApi
 {
     private static statusBarSpace: StatusBarItem;
-    private disposables: Disposable[] = [];
-    private subscriptionStartIndex = -1;
+    private disposables: Disposable[];
+    private subscriptionStartIndex: number;
     private tasks: Task[] | null = null;
     private treeBuilding = false;
     private refreshPending = false;
@@ -65,7 +65,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     {
         this.name = name;
         this.extensionContext = context;
+        this.subscriptionStartIndex = -1;
 
+        this.disposables = [];
         this.disposables.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => this.run(item), this));
         this.disposables.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => this.run(item, true, false), this));
         this.disposables.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args: string) => this.run(item, false, true, args), this));

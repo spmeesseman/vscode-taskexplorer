@@ -56,7 +56,7 @@ suite("API Init and Tests", () =>
 
     test("Refresh for SideBar Coverage", async function()
     {
-        await refreshTree(teApi);
+        await teApi.sidebar?.refresh();
         await teApi.waitForIdle(testsControl.waitTimeForConfigEnableEvent);
     });
 
