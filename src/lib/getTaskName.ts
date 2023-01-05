@@ -1,10 +1,4 @@
 
-import { getTaskItemId } from "./utils/utils";
-import { storage } from "./utils/storage";
-import TaskItem from "../tree/item";
-import constants from "./constants";
-
-
 export function getTaskName(script: string, relativePath: string | undefined)
 {
     if (relativePath && relativePath.length)
@@ -17,21 +11,4 @@ export function getTaskName(script: string, relativePath: string | undefined)
         }
     }
     return script;
-}
-
-
-export function getSpecialTaskName(taskItem: TaskItem)
-{
-    let label = taskItem.taskFile.folder.label + " - " + taskItem.taskSource;
-    const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
-          id = getTaskItemId(taskItem);
-    for (const i in renames)
-    {
-        if (id === renames[i][0])
-        {
-            label = renames[i][1];
-            break;
-        }
-    }
-    return taskItem.label + " (" + label + ")";
 }

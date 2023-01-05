@@ -356,10 +356,14 @@ suite("Tree Tests", () =>
     test("Clear Special Folders", async function()
     {
         this.slow(testsControl.slowTimeForCommand * 4);
+        overrideNextShowInputBox("Yes");
         await executeTeCommand2("clearSpecialFolder", [ constants.LAST_TASKS_LABEL ], 1000);
+        overrideNextShowInputBox("Yes");
         await executeTeCommand2("clearSpecialFolder", [ constants.FAV_TASKS_LABEL ], 1000);
+        overrideNextShowInputBox("Yes");
         await executeTeCommand2("clearSpecialFolder", [ "Invalid" ], 1000);
         overrideNextShowInfoBox("test ask");
+        overrideNextShowInputBox("Yes");
         await executeTeCommand2("clearSpecialFolder", [ batch[0].getFolder() ], 1000);
     });
 

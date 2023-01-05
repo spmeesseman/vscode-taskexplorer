@@ -100,12 +100,12 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     {   /* istanbul ignore else */
         if (configuration.get<boolean>("enableSideBar") && teApi.sidebar)
         {
-            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("specialFolders.showLastTasks"), false, true, undefined, "   ");
+            await teApi.sidebar.specialFolders.lastTasks.showSpecialTasks(configuration.get<boolean>("specialFolders.showLastTasks"), true, undefined, "   ");
         }
         /* istanbul ignore else */
         if (configuration.get<boolean>("enableExplorerView") && teApi.explorer)
         {
-            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("specialFolders.showLastTasks"), false, true, undefined, "   ");
+            await teApi.explorer.specialFolders.lastTasks.showSpecialTasks(configuration.get<boolean>("specialFolders.showLastTasks"), true, undefined, "   ");
         }
     }
 
@@ -116,12 +116,12 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     {   /* istanbul ignore else */
         if (configuration.get<boolean>("enableSideBar") && teApi.sidebar)
         {
-            await teApi.sidebar.showSpecialTasks(configuration.get<boolean>("specialFolders.showFavorites"), true, true, undefined, "   ");
+            await teApi.sidebar.specialFolders.lastTasks.showSpecialTasks(configuration.get<boolean>("specialFolders.showFavorites"), true, undefined, "   ");
         }
         /* istanbul ignore else */
         if (configuration.get<boolean>("enableExplorerView") && teApi.explorer)
         {
-            await teApi.explorer.showSpecialTasks(configuration.get<boolean>("specialFolders.showFavorites"), true, true, undefined, "   ");
+            await teApi.explorer.specialFolders.lastTasks.showSpecialTasks(configuration.get<boolean>("specialFolders.showFavorites"), true, undefined, "   ");
         }
     }
 
