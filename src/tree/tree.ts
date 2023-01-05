@@ -21,11 +21,10 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, Disposable, TaskExecution, languages
+    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, Disposable, TaskExecution
 } from "vscode";
 import { IExplorerApi, TaskMap } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
-import TreeUtils from "./treeUtils";
 import SpecialTaskFolder from "./specialFolder";
 
 
@@ -48,6 +47,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     private busy = false;
     private extensionContext: ExtensionContext;
     private name: string;
+    private taskMap: TaskMap = {};
+    private babysitterCt = 0;
+    private babysitterTimer: NodeJS.Timeout | undefined;
     private taskTree: TaskFolder[] | NoScripts[] | InitScripts[] | LoadScripts[] | undefined | null | void = null;
     private currentInvalidation: string | undefined;
     private taskIdStartEvents: Map<string, NodeJS.Timeout> = new Map();
@@ -59,13 +61,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         lastTasks: SpecialTaskFolder;
     };
 
-    public treeUtils: TreeUtils;
-
     constructor(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext)
     {
         this.name = name;
         this.extensionContext = context;
-        this.treeUtils = new TreeUtils(name, this);
 
         this.disposables.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => this.run(item), this));
         this.disposables.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => this.run(item, true, false), this));
@@ -206,8 +205,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    private babysitterTimer: NodeJS.Timeout | undefined;
-    private babysitterCt = 0;
     /**
      * Used as a check to reset node state when a task 'hangs' or whatever it does sometimes
      * when the task fails ad the vscode engine doesnt trigger the taskexec finished event.
@@ -228,7 +225,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                         this.babysitterCt = 0;
                         log.write("task babysitter firing change event", 1);
                         log.value("   task name", t.task.name, 1);
-                        this.fireTaskChangeEvents(t, true, "   ", 1);
+                        this.fireTaskChangeEvents(t, "   ", 1);
                     }
                     else {
                         this.babysitRunningTask(t);
@@ -289,6 +286,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
 
         this.treeBuilding = true;
+        this.taskMap = {};
 
         //
         // The 'Last Tasks' folder will be 1st in the tree
@@ -440,16 +438,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         // found, but in doing so, if there were no npm "scripts" in the package.json, code execution
         // would not get far enough to create the "tree file" node for the context menu.
         //
-        if (taskFile.taskSource === "batch")
-        {
-            console.log("test");
-        }
         if (!isNpmInstallTask)
         {   //
             // Create "tree item" node and add it to the owner "tree file" node
             //
             const taskItem = new TaskItem(this.extensionContext, taskFile, each);
             taskFile.addTreeNode(taskItem);
+            this.taskMap[taskItem.id] = taskItem;
             //
             // Maybe add this task to the 'Favorites' and 'Last Tasks' folders
             //
@@ -740,21 +735,28 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    fireTaskChangeEvents(taskItem?: TaskItem, invalidateFileNode?: boolean, logPad?: string, logLevel?: number)
+    fireTreeRefreshEvent(taskItem?: TreeItem)
+    {
+        this._onDidChangeTreeData.fire(taskItem);
+    }
+
+
+    private fireTaskChangeEvents(taskItem: TaskItem, logPad?: string, logLevel?: number)
     {
         /* istanbul ignore next */
         if (!this.taskTree) {
             return;
         }
         /* istanbul ignore next */
-        if (!taskItem && invalidateFileNode) {
+        if (!taskItem) {
             /* istanbul ignore next */
             log.error("task change event fire, invalid taskItem argument");
             /* istanbul ignore next */
             return;
         }
 
-        const logValues = taskItem ? [
+        const isTaskItem = taskItem instanceof TaskItem,
+              logValues = taskItem && isTaskItem ? [
             [ "task name", taskItem.task.name ], [ "task type", taskItem.task.source ], [ "resource path", taskItem.taskFile.resourceUri.fsPath ]
         ] : [[ "event", "rebuild entire tree" ]];
         log.methodStart("fire task change events", logLevel, logPad, false, logValues);
@@ -766,9 +768,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         // tree, so this is still good.  TODO possibly this gets fixed in the future to be able to
         // invalidate just the TaskItem, so check back on this sometime.
         //
-        this._onDidChangeTreeData.fire(taskItem ? (invalidateFileNode ? taskItem.taskFile : taskItem) : undefined);
+        this._onDidChangeTreeData.fire(taskItem.taskFile);
 
-        if (taskItem)
+        if (isTaskItem)
         {
             //
             // Fire change event for the 'Last Tasks' folder if the task exists there
@@ -1149,13 +1151,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
+    public getTaskMap = () => this.taskMap;
+
+
     public getTaskTree = () => this.taskTree;
 
 
     public getTreeItem(element: TaskItem | TaskFile | TaskFolder): TreeItem
     {
         /* istanbul ignore else */
-        if (element instanceof TaskItem) {
+        if (element instanceof TaskItem)
+        {
             log.methodStart("get tree item", 3, "", true, [[ "label", element.label ]]);
             log.write("   refresh task item state", 3);
             element.refreshState(true);
@@ -1869,9 +1875,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             return;
         }
 
-        log.methodStart("Run last task", 1, "", true, [[ "last task id", lastTaskId ]]);
+        log.methodStart("run last task", 1, "", true, [[ "last task id", lastTaskId ]]);
 
-        const taskItem = await this.treeUtils.getTreeItems(lastTaskId, "   ");
+        const taskItem = this.taskMap[lastTaskId];
         let exec: TaskExecution | undefined;
 
         /* istanbul ignore else */
@@ -1885,7 +1891,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             await this.specialFolders.lastTasks.removeTaskFile(lastTaskId);
         }
 
-        log.methodDone("Run last task", 1);
+        log.methodDone("run last task", 1);
         return exec;
     }
 
@@ -2165,8 +2171,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 // Show status bar message (if ON in settings)
                 //
                 this.showStatusMessage(task);
-                const taskItem = await this.treeUtils.getTreeItem(taskId, "   ", 3) as TaskItem;
-                this.fireTaskChangeEvents(taskItem, true, "   ", 1);
+                const taskItem = this.taskMap[taskId] as TaskItem;
+                this.fireTaskChangeEvents(taskItem, "   ", 1);
                 log.methodDone("task started event", 1);
             }
             catch (e) { /* istanbul ignore next */ console.error(e); }
@@ -2205,8 +2211,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 // Hide status bar message (if ON in settings)
                 //
                 this.showStatusMessage(task);
-                const taskItem = await this.treeUtils.getTreeItem(taskId, "   ", 3) as TaskItem;
-                this.fireTaskChangeEvents(taskItem, true, "   ", 1);
+                const taskItem = this.taskMap[taskId];
+                this.fireTaskChangeEvents(taskItem as TaskItem, "   ", 1);
                 log.methodDone("task finished event", 1);
             }
             catch (e) { /* istanbul ignore next */ console.error(e); }

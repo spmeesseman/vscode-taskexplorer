@@ -5,15 +5,12 @@ import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import TaskItem from "../tree/item";
 import SpecialTaskFolder from "../tree/specialFolder";
-import TreeUtils from "../tree/treeUtils";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-export type TaskMap = { [id: string]: TaskItem };
+export type TaskMap = { [id: string]: TaskItem | undefined };
 
 export interface IExplorerApi
 {
-    treeUtils: TreeUtils;
-
     specialFolders: {
         favorites: SpecialTaskFolder;
         lastTasks: SpecialTaskFolder;
@@ -24,7 +21,6 @@ export interface IExplorerApi
     getChildren(element?: TreeItem, logPad?: string, logLevel?: number): Promise<TreeItem[]>;
     getParent(element: TreeItem): TreeItem | null;
     getTasks(): Task[] | null;
-    getTreeItem(element: TaskItem | TaskFile | TaskFolder): TreeItem;
     isBusy (): boolean;
     isVisible(): boolean;
     invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad?: string): Promise<void>;
