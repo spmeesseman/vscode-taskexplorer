@@ -64,8 +64,8 @@ suite("Tree Tests", () =>
 
     test("Show Favorites", async function()
     {
-        ant = await getTreeTasks("ant", 3);
-        batch = await getTreeTasks("batch", 2);
+        ant = getTreeTasks("ant", 3);
+        batch = getTreeTasks("batch", 2);
         if (favTasks.length === 0)
         {
             await storage.update(constants.FAV_TASKS_STORE, [
@@ -79,8 +79,8 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
-        ant = await getTreeTasks("ant", 3);
-        batch = await getTreeTasks("batch", 2);
+        ant = getTreeTasks("ant", 3);
+        batch = getTreeTasks("batch", 2);
         if (lastTasks.length === 0)
         {
             await storage.update(constants.LAST_TASKS_STORE, [
@@ -264,9 +264,8 @@ suite("Tree Tests", () =>
     {
         this.slow(testsControl.slowTimeForConfigEvent * 3);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
-        await explorer.showSpecialTasks(false, true);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
-        await explorer.showSpecialTasks(true, true);
+        await executeSettingsUpdate("specialFolders.showFavorites", true);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
 
@@ -275,9 +274,6 @@ suite("Tree Tests", () =>
     {
         this.slow(testsControl.slowTimeForConfigEvent * 3);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await explorer.showSpecialTasks(false);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
-        await explorer.showSpecialTasks(true);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
 
@@ -291,11 +287,8 @@ suite("Tree Tests", () =>
 
     test("Show Favorites", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEvent * 3);
+        this.slow(testsControl.slowTimeForConfigEnableEvent);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
-        await explorer.showSpecialTasks(false, true);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
-        await explorer.showSpecialTasks(true, true);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
 
@@ -304,24 +297,20 @@ suite("Tree Tests", () =>
     {
         this.slow(testsControl.slowTimeForConfigEvent * 3);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
-        await explorer.showSpecialTasks(false);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
-        await explorer.showSpecialTasks(true);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
 
 
     test("Show Favorite Tasks w/ Last Tasks", async function()
     {
-        this.slow(testsControl.slowTimeForRefreshCommand + (testsControl.waitTimeForConfigEvent * 3) + (testsControl.waitTimeForCommand * 2));
+        this.slow((testsControl.waitTimeForConfigEvent * 3) + (testsControl.waitTimeForCommand * 2));
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await explorer.showSpecialTasks(false, true);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
-        await explorer.showSpecialTasks(false, true);
+        await executeSettingsUpdate("specialFolders.showFavorites", false);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
-        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
-        await executeSettingsUpdate("specialFolders.showLastTasks", false);
+        await executeSettingsUpdate("specialFolders.showFavorites", true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
 
 
@@ -334,15 +323,21 @@ suite("Tree Tests", () =>
     test("Hide Favorite and Last Tasks", async function()
     {
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await explorer.showSpecialTasks(true, true);
+        await executeSettingsUpdate("specialFolders.showFavorites", false);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
 
 
-    test("Hide Favorite Tasks", async function()
+    test("Show Favorite Tasks", async function()
+    {
+        await executeSettingsUpdate("specialFolders.showFavorites", true);
+        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+    });
+
+
+    test("Show Last Tasks", async function()
     {
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
-        await explorer.showSpecialTasks(true, true);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
     });
 
@@ -499,46 +494,12 @@ suite("Tree Tests", () =>
     });
 
 
-    test("Invalidation (Task)", async function()
-    {
-        this.slow(7500);
-        teApi.explorer?.getChildren(undefined, "", 1); // don't wait
-        await explorer.invalidateTasksCache("ant");
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
-        await executeTeCommand2("refresh", [ "ant" ], testsControl.waitTimeForRefreshTaskTypeCommand);
-    });
-
-
     test("Invalidation (Workspace)", async function()
     {
         this.slow(15000);
         await explorer.invalidateTasksCache();
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
-    });
-
-
-    test("Get Tree Parent", async function()
-    {
-        explorer.getParent("Invalid" as TreeItem);
-        explorer.getParent(new NoScripts());
-        explorer.getParent(batch[0]);
-    });
-
-
-    test("Get Tree Children When Busy", async function()
-    {
-        explorer.getChildren(undefined, "", 1); // don't wait
-        await explorer.getChildren(undefined, "");
-    });
-
-
-    test("Imitate Activation", async function()
-    {
-        explorer.setEnabled(false);
-        await explorer.getChildren(undefined); // don't wait
-        explorer.setEnabled(true);
-        await explorer.getChildren(undefined, "");
     });
 
 });

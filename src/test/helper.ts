@@ -110,7 +110,6 @@ export async function buildTree(instance: any)
     instance.timeout(30000);
 
     await executeSettingsUpdate("groupWithSeparator", true);
-    await executeSettingsUpdate("groupSeparator", "-");
     await executeSettingsUpdate("groupMaxLevel", 5);
 
     //
@@ -118,7 +117,7 @@ export async function buildTree(instance: any)
     //
     await teExplorer.refresh("tests");
     await teApi.waitForIdle(testsControl.waitTimeForBuildTree, 22500);
-    return teExplorer.getChildren();
+    return teExplorer.getTaskMap();
 }
 
 
@@ -222,13 +221,13 @@ export function getSpecialTaskItemId(taskItem: TaskItem)
 }
 
 
-export async function getTreeTasks(taskType: string, expectedCount: number)
+export function getTreeTasks(taskType: string, expectedCount: number)
 {
     const taskItems: TaskItem[] = [];
     //
     // Get the task mapped tree items
     //
-    const taskMap = await (teApi.explorer as IExplorerApi).getTaskMap();
+    const taskMap = (teApi.explorer as IExplorerApi).getTaskMap();
     //
     // Make sure the tasks have been mapped in the explorer tree
     //

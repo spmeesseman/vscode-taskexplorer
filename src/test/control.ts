@@ -25,6 +25,8 @@ export const testControl =
     slowTimeForCommandFast: 550,
     slowTimeForConfigEvent: 300,
     slowTimeForConfigEnableEvent: 875,
+    slowTimeForConfigExcludesEvent: 475,
+    slowTimeForConfigGroupingEvent: 700,
     slowTimeForFocusCommand: 4500,
     slowTimeForFsCreateEvent: 1250,
     slowTimeForFsCreateFolderEvent: 1800,

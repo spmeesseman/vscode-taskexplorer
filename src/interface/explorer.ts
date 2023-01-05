@@ -17,7 +17,6 @@ export interface IExplorerApi
 
     buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<TaskFolder[] | NoScripts[]>;
     dispose(context: ExtensionContext): void;
-    getChildren(element?: TreeItem, logPad?: string, logLevel?: number): Promise<TreeItem[]>;
     getTasks(): Task[] | null;
     getTaskMap(): TaskMap;
     isBusy (): boolean;

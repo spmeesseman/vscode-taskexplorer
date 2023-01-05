@@ -90,7 +90,7 @@ suite("Typescript Tests", () =>
     {   //
         // Typescript 'open' just opens the document, doesnt find the task position
         //
-        const tscItems = await getTreeTasks("tsc", 2);
+        const tscItems = getTreeTasks("tsc", 2);
         await executeTeCommand2("open", [ tscItems[0] ]);
         await closeActiveDocument();
         await executeTeCommand2("open", [ tscItems[1] ]);
