@@ -13,7 +13,7 @@ import { storage } from "../../lib/utils/storage";
 import TaskItem from "../../tree/item";
 import { TreeItem } from "vscode";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer, getTreeTasks,
+    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer, getSpecialTaskItemId, getTreeTasks,
     isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
 } from "../helper";
 
@@ -69,7 +69,7 @@ suite("Tree Tests", () =>
         if (favTasks.length === 0)
         {
             await storage.update(constants.FAV_TASKS_STORE, [
-                util.getTaskItemId(batch[0]), util.getTaskItemId(batch[1]), util.getTaskItemId(ant[0])
+                getSpecialTaskItemId(batch[0]), getSpecialTaskItemId(batch[1]), getSpecialTaskItemId(ant[0])
             ]);
         }
         await executeSettingsUpdate("specialFolders.showFavorites", false);
@@ -84,7 +84,7 @@ suite("Tree Tests", () =>
         if (lastTasks.length === 0)
         {
             await storage.update(constants.LAST_TASKS_STORE, [
-                util.getTaskItemId(batch[0]), util.getTaskItemId(batch[1]), util.getTaskItemId(ant[0])
+                getSpecialTaskItemId(batch[0]), getSpecialTaskItemId(batch[1]), getSpecialTaskItemId(ant[0])
             ]);
         }
         await executeSettingsUpdate("specialFolders.showLastTasks", false);

@@ -272,14 +272,6 @@ export function getScriptTaskTypes(): string[]
 }
 
 
-export function getTaskItemId(taskItem: TaskItem)
-{
-    return taskItem.id.replace(constants.LAST_TASKS_LABEL + ":", "")
-                      .replace(constants.FAV_TASKS_LABEL + ":", "")
-                      .replace(constants.USER_TASKS_LABEL + ":", "");
-}
-
-
 /**
  * @deprecated Use `isTaskTypeEnabled` and `getPathToProgram`
  * To be removed after the temp extension.tempRemapSettingsToNewLayout() method is removed.

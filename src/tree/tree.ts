@@ -775,34 +775,28 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             //
             // Fire change event for the 'Last Tasks' folder if the task exists there
             //
-            if (this.specialFolders.lastTasks.isEnabled())
+            if (this.specialFolders.lastTasks.hasTask(taskItem))
             {
-                if (this.specialFolders.lastTasks.getStore().includes(util.getTaskItemId(taskItem)) !== false)
+                if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.lastTasks.label)
                 {
-                    if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.lastTasks.label)
-                    {
-                        this._onDidChangeTreeData.fire(this.taskTree[0]);
-                    }
+                    this._onDidChangeTreeData.fire(this.taskTree[0]);
                 }
             }
 
             //
             // Fire change event for the 'Favorites' folder if the task exists there
             //
-            if (this.specialFolders.favorites.isEnabled())
+            if (this.specialFolders.favorites.hasTask(taskItem))
             {
-                if (this.specialFolders.favorites.getStore().includes(util.getTaskItemId(taskItem)) !== false)
+                if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.favorites.label)
                 {
-                    if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.favorites.label)
-                    {
-                        this._onDidChangeTreeData.fire(this.taskTree[0]);
-                    }
-                    else if (this.taskTree[1] && this.taskTree[1].label === this.specialFolders.favorites.label)
-                    {
-                        this._onDidChangeTreeData.fire(this.taskTree[1]);
-                    }
+                    this._onDidChangeTreeData.fire(this.taskTree[0]);
                 }
-            }
+                else if (this.taskTree[1] && this.taskTree[1].label === this.specialFolders.favorites.label)
+                {
+                    this._onDidChangeTreeData.fire(this.taskTree[1]);
+                }
+        }
         }
 
         log.methodDone("fire task change events", logLevel, logPad);

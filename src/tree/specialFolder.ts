@@ -1,7 +1,7 @@
 
 import constants from "../lib/constants";
 import TaskItem from "./item";
-import { getTaskItemId, isString, properCase, removeFromArray } from "../lib/utils/utils";
+import { isString, removeFromArray } from "../lib/utils/utils";
 import TaskFolder from "./folder";
 import { storage } from "../lib/utils/storage";
 import * as log from "../lib/utils/log";
@@ -92,7 +92,7 @@ export default class SpecialTaskFolder extends TaskFolder
     private async addRemoveFavorite(taskItem: TaskItem)
     {
         let removed = false;
-        const id = getTaskItemId(taskItem);
+        const id = this.getTaskItemId(taskItem);
 
         log.methodStart("add/remove " + this.contextValue, 1, "", false, [
             [ "id", taskItem.id ], [ "current fav count", this.store.length ]
@@ -143,7 +143,7 @@ export default class SpecialTaskFolder extends TaskFolder
             addRemoved = false,
             index = 0;
         const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
-              id = getTaskItemId(taskItem);
+              id = this.getTaskItemId(taskItem);
 
         log.methodStart("add/remove rename special", 1, "", false, [[ "id", id ]]);
 
@@ -306,7 +306,7 @@ export default class SpecialTaskFolder extends TaskFolder
     {
         let label = taskItem.taskFile.folder.label + " - " + taskItem.taskSource;
         const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
-              id = getTaskItemId(taskItem);
+              id = this.getTaskItemId(taskItem);
         for (const i in renames)
         {
             if (id === renames[i][0])
@@ -319,7 +319,15 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
-    getStore = () => this.store as readonly string[];
+    getTaskItemId(taskItem: TaskItem)
+    {
+        return taskItem.id.replace(constants.LAST_TASKS_LABEL + ":", "")
+                          .replace(constants.FAV_TASKS_LABEL + ":", "")
+                          .replace(constants.USER_TASKS_LABEL + ":", "");
+    }
+
+
+    hasTask = (taskItem: TaskItem) => this.enabled && this.store.includes(this.getTaskItemId(taskItem));
 
 
     isEnabled = () => this.enabled;
@@ -337,7 +345,7 @@ export default class SpecialTaskFolder extends TaskFolder
 
     private pushToTop(taskItem: TaskItem, logPad = "")
     {
-        const taskId = this.label + ":" + getTaskItemId(taskItem);
+        const taskId = this.label + ":" + this.getTaskItemId(taskItem);
 
         /* istanbul ignore if */
         if (!taskItem.task) {
@@ -409,7 +417,7 @@ export default class SpecialTaskFolder extends TaskFolder
 
     async saveTask(taskItem: TaskItem, logPad = "   ")
     {
-        const taskId =  getTaskItemId(taskItem);
+        const taskId =  this.getTaskItemId(taskItem);
         const maxTasks = configuration.get<number>("specialFolders.numLastTasks");
 
         log.methodStart("save task", 1, logPad, false, [

@@ -1,7 +1,6 @@
 
 import { ExtensionContext, Task, TreeItem, Uri } from "vscode";
 import { NoScripts } from "../lib/noScripts";
-import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import TaskItem from "../tree/item";
 import SpecialTaskFolder from "../tree/specialFolder";
@@ -19,8 +18,8 @@ export interface IExplorerApi
     buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<TaskFolder[] | NoScripts[]>;
     dispose(context: ExtensionContext): void;
     getChildren(element?: TreeItem, logPad?: string, logLevel?: number): Promise<TreeItem[]>;
-    getParent(element: TreeItem): TreeItem | null;
     getTasks(): Task[] | null;
+    getTaskMap(): TaskMap;
     isBusy (): boolean;
     isVisible(): boolean;
     invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad?: string): Promise<void>;
