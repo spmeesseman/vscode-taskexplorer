@@ -21,7 +21,7 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, Disposable, TaskExecution
+    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, Disposable, TaskExecution, languages
 } from "vscode";
 import { IExplorerApi, TaskMap } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
@@ -296,7 +296,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.specialFolders.lastTasks.clearTaskItems();
         if (this.specialFolders.lastTasks.isEnabled())
         {
-            folders.set(constants.LAST_TASKS_LABEL, this.specialFolders.lastTasks);
+            folders.set(this.specialFolders.lastTasks.label as string, this.specialFolders.lastTasks);
         }
 
         //
@@ -306,7 +306,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.specialFolders.favorites.clearTaskItems();
         if (this.specialFolders.favorites.isEnabled())
         {
-            folders.set(constants.FAV_TASKS_LABEL, this.specialFolders.favorites);
+            folders.set(this.specialFolders.favorites.label as string, this.specialFolders.favorites);
         }
 
         //
@@ -893,7 +893,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
         else if (!element)
         {
-            log.value("tree item type", "asking for all (null)", logLevel + 1, logPad);
+            log.value("tree item type", "asking for all (null)", logLevel + 1, logPad + "   ");
         }
         else
         {

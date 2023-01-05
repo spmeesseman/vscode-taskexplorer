@@ -454,7 +454,7 @@ export default class SpecialTaskFolder extends TaskFolder
 
         /* istanbul ignore else */
         if (changed) {
-            this.explorer.fireTaskChangeEvents(taskItem, false, logPad, 1);
+            this.explorer.fireTaskChangeEvents(taskItem, !!taskItem, logPad, 1);
         }
 
         log.methodDone("show special tasks", 1, logPad);
