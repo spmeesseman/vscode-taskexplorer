@@ -173,9 +173,9 @@ function logLogFileLocation()
         /* istanbul ignore else */
         if (isTests)
         {
-            console.log(`     ${figures.pointer} *************************************************************************************`, 1);
-            console.log(`     ${figures.pointer}  Log File: ` + fileName);
-            console.log(`     ${figures.pointer} *************************************************************************************`, 1);
+            console.log(`    ${figures.pointer} *************************************************************************************`, 1);
+            console.log(`    ${figures.pointer}  Log File: ` + fileName);
+            console.log(`    ${figures.pointer} *************************************************************************************`, 1);
         }
         enableOutputWindow = writeToOutputOrig;
         writeToConsole = writeToConsoleOrig;

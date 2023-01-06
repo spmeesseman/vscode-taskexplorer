@@ -143,6 +143,15 @@ suite("Bash Tests", () =>
     });
 
 
+	// test("Focus Task Explorer View for Tree Population", async function()
+	// {
+	//     await focusExplorer(this);
+	// });
+
+
+    //
+    // To run this we'd need to focus the tree and I don't want to yet until the infoPage test suite
+    //
     test("Run Shell Script", async function()
     {   //
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time

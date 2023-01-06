@@ -1,16 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import assert from "assert";
+import * as assert from "assert";
 import constants from "../lib/constants";
 import TaskItem from "../tree/item";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import { isObjectEmpty } from "../lib/utils/utils";
 import { IExplorerApi, ITaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeSettingsUpdate, executeTeCommand2, figures, testControl } from "./helper";
+import { executeSettingsUpdate, executeTeCommand2, figures, getTeApi, testControl } from "./helper";
 
-
-let teApi: ITaskExplorerApi;
 let treeBuiltOnce = false;
 
 
@@ -24,6 +22,8 @@ let treeBuiltOnce = false;
  */
 export const buildTree = async(instance: any,  rebuild?: boolean) =>
 {
+    const teApi = getTeApi();
+
     if (rebuild || !treeBuiltOnce)
     {
         instance.slow(20000);
@@ -65,21 +65,23 @@ export const findIdInTaskMap = (id: string, taskMap: TaskMap) =>
 
 // async getTreeItem(taskId: string): Promise<TaskItem | undefined>
 // {
-//     return figures.errorteApi.explorer?.getTaskMap()[taskId];
+//     return rteApi.explorer?.getTaskMap()[taskId];
 // }
+
 
 export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 {
+    const teApi = getTeApi();
     const taskItems: TaskItem[] = [];
     //
     // Get the task mapped tree items
     //
-    let taskMap = (teApi.explorer as IExplorerApi).getTaskMap();
+    let taskMap = teApi.testsApi.explorer.getTaskMap();
     if (!taskMap || isObjectEmpty(taskMap)) {
-        console.log(`     ${figures.warning} Task map is empty, fall back to walkTreeItems`);
+        console.log(`    ${figures.warning} Task map is empty, fall back to walkTreeItems`);
         taskMap = await walkTreeItems(undefined);
         if (!taskMap || isObjectEmpty(taskMap)) {
-            console.log(`     ${figures.error} Task map is empty, test will fail in 3, 2, 1...`);
+            console.log(`    ${figures.error} Task map is empty, test will fail in 3, 2, 1...`);
         }
     }
     //
@@ -113,21 +115,28 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
  */
 export const walkTreeItems = async(taskId: string | undefined, executeOpenForTests = false) =>
 {
-    const taskMap: TaskMap = {};
+    const teApi = getTeApi(),
+         taskMap: TaskMap = {},
+         now = Date.now();
     let done = false;
-    if (!teApi.explorer) {
-        return taskMap;
-    }
-    const teExplorer = teApi.explorer;
 
-    const treeItems = await teApi.explorer.getChildren(undefined, "", 5);
-    if (!treeItems || treeItems.length === 0) {
-        return taskMap;
+    let treeItems = await teApi.testsApi.explorer.getChildren(undefined, "", 5);
+    if (!treeItems || treeItems.length === 0)
+    {
+        console.log(`    ${figures.warning} No tree items!`);
+        if (Date.now() - now < 500) {
+            console.log(`    ${figures.warning} Trying again...`);
+            treeItems = await teApi.testsApi.explorer.getChildren(undefined, "", 5);
+        }
+        if (!treeItems || treeItems.length === 0) {
+            console.log(`    ${figures.error} No tree items!!`);
+            return taskMap;
+        }
     }
 
     const processItem2g = async (pItem2: TaskFile) =>
     {
-        const treeFiles = await teExplorer.getChildren(pItem2, "", 5);
+        const treeFiles = await teApi.testsApi.explorer.getChildren(pItem2, "", 5);
         if (treeFiles.length > 0)
         {
             for (const item2 of treeFiles)
@@ -153,7 +162,7 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
 
     const processItem2 = async (pItem2: any) =>
     {
-        const treeTasks = await teExplorer.getChildren(pItem2, "", 5);
+        const treeTasks = await teApi.testsApi.explorer.getChildren(pItem2, "", 5);
         if (treeTasks.length > 0)
         {
             for (const item3 of treeTasks)
@@ -187,7 +196,7 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
 
     const processItem = async (pItem: any) =>
     {
-        const treeFiles = await teExplorer.getChildren(pItem, "", 5);
+        const treeFiles = await teApi.testsApi.explorer.getChildren(pItem, "", 5);
         if (treeFiles && treeFiles.length > 0)
         {
             for (const item2 of treeFiles)
@@ -215,10 +224,10 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
     {
         if (item instanceof TaskFolder)
         {
-            let isFav = false, isLast = false, isUser = false;
-            isFav = (item.label as string).includes(constants.FAV_TASKS_LABEL);
-            isLast = (item.label as string).includes(constants.LAST_TASKS_LABEL);
-            isUser = (item.label as string).includes(constants.USER_TASKS_LABEL);
+            // let isFav = false, isLast = false, isUser = false;
+            // isFav = (item.label as string).includes(constants.FAV_TASKS_LABEL);
+            // isLast = (item.label as string).includes(constants.LAST_TASKS_LABEL);
+            // isUser = (item.label as string).includes(constants.USER_TASKS_LABEL);
             await processItem(item);
         }
     }

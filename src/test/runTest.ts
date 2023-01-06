@@ -1,5 +1,6 @@
-import { execSync, exec } from "child_process";
+import { execSync } from "child_process";
 import * as path from "path";
+// import  runConfig from "./runConfig";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { runTests } from "@vscode/test-electron";
 import { testControl } from "./control";
@@ -34,6 +35,7 @@ async function main(args: string[])
             settingsJsonOrig = await readFileAsync(settingsFile);
             await writeFile(settingsFile, "{}");
         }
+        // const runCfg = await runConfig();
         //
         // Download VS Code, unzip it and run the integration test
         //
@@ -53,6 +55,26 @@ async function main(args: string[])
         if (settingsJsonOrig && !testControl.keepSettingsFileChanges) {
             await writeFile(settingsFile, settingsJsonOrig);
         }
+        //
+        // Open log file
+        //
+        // if (testControl.logEnabled && testControl.logToFile && testControl.logOpenFileOnFinish)
+        // {
+        //     if (await pathExists(settingsFile))
+        //     {
+        //         try {
+        //             const settings = await readJsonAsync<any>(settingsFile);
+        //             if (settings.logFilePath) {
+        //                 try {
+        //                     const doc = await workspace.openTextDocument(Uri.file(logFilePath));
+        //                     await window.showTextDocument(doc);
+        //                 } catch (e) { console.error(e); }
+        //             }
+        //         }
+        //         catch {}
+        //         await writeFile(settingsFile, "{}");
+        //     }
+        // }
     }
     catch (err: any) {
         console.error(`Failed to run tests: ${err}\n${err.stack ?? "No call stack details found"}`);

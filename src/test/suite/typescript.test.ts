@@ -10,7 +10,7 @@ import { Uri } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand2, focusExplorer,
-    getTreeTasks, getWsPath, testControl, verifyTaskCountByTree
+    getWsPath, testControl, treeUtils
 } from "../helper";
 
 
@@ -59,7 +59,7 @@ suite("Typescript Tests", () =>
 
     test("Create File", async function()
     {
-        this.slow(testControl.slowTime.FsCreateEvent + testControl.slowTime.VerifyTaskCount);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -80,7 +80,7 @@ suite("Typescript Tests", () =>
             "}\n"
         );
         await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent, 3000);
-        await verifyTaskCountByTree(testsName, startTaskCount + 2);
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
     });
 
 
@@ -88,7 +88,7 @@ suite("Typescript Tests", () =>
     {   //
         // Typescript 'open' just opens the document, doesnt find the task position
         //
-        const tscItems = await getTreeTasks("tsc", startTaskCount + 2);
+        const tscItems = await treeUtils.getTreeTasks("tsc", startTaskCount + 2);
         await executeTeCommand2("open", [ tscItems[0] ]);
         await closeActiveDocument();
         await executeTeCommand2("open", [ tscItems[1] ]);
@@ -98,7 +98,7 @@ suite("Typescript Tests", () =>
 
     test("Create File 2", async function()
     {
-        this.slow(testControl.slowTime.FsCreateEvent + testControl.slowTime.VerifyTaskCount);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri2.fsPath,
             "{\n" +
@@ -119,29 +119,29 @@ suite("Typescript Tests", () =>
             "}\n"
         );
         await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent, 3000);
-        await verifyTaskCountByTree(testsName, startTaskCount + 4);
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 
 
     test("Disable", async function()
     {
-        this.slow(testControl.slowTime.ConfigEnableEvent + testControl.slowTime.VerifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTimeForConfigEnableEvent);
-        await verifyTaskCountByTree(testsName, 0);
+        await treeUtils.verifyTaskCountByTree(testsName, 0);
     });
 
 
     test("Re-enable", async function()
     {
-        this.slow(testControl.slowTime.ConfigEnableEvent + testControl.slowTime.VerifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTimeForConfigEnableEvent);
-        await verifyTaskCountByTree(testsName, startTaskCount + 4);
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 
 
     test("Invalid JSON", async function()
     {
-        this.slow(testControl.slowTime.FsModifyEvent + testControl.slowTime.VerifyTaskCount);
+        this.slow(testControl.slowTime.fsModifyEvent + testControl.slowTime.verifyTaskCount);
         // let resetLogging = teApi.log.isLoggingEnabled();
         // if (resetLogging) { // turn scary error logging off
         //     this.slow(testControl.slowTime.FsCreateEvent + (testControl.slowTime.ConfigEvent * 2));
@@ -171,7 +171,7 @@ suite("Typescript Tests", () =>
             "\n"
         );
         await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent, 3000);
-        await verifyTaskCountByTree(testsName, startTaskCount + 4); // I guess internal TSC must not invalidate tasks on bad syntax
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4); // I guess internal TSC must not invalidate tasks on bad syntax
         // if (resetLogging) { // turn scary error logging off
         //     executeSettingsUpdate("logging.enable", true);
         // }
@@ -180,7 +180,7 @@ suite("Typescript Tests", () =>
 
     test("Fix Invalid JSON", async function()
     {
-        this.slow(testControl.slowTime.FsModifyEvent + testControl.slowTime.VerifyTaskCount);
+        this.slow(testControl.slowTime.fsModifyEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -201,25 +201,25 @@ suite("Typescript Tests", () =>
             "}\n"
         );
         await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent, 3000);
-        await verifyTaskCountByTree(testsName, startTaskCount + 4);
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 
 
     test("Delete File 1", async function()
     {
-        this.slow(testControl.slowTime.FsDeleteEvent + testControl.slowTime.VerifyTaskCount);
+        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
-        await verifyTaskCountByTree(testsName, startTaskCount+ 2);
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount+ 2);
     });
 
 
     test("Delete File 2", async function()
     {
-        this.slow(testControl.slowTime.FsDeleteEvent + testControl.slowTime.VerifyTaskCount);
+        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri2.fsPath);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
-        await verifyTaskCountByTree(testsName, startTaskCount);
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
     });
 
 });
