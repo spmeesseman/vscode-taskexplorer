@@ -6,7 +6,7 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import { activate, executeTeCommand, isReady, verifyTaskCount } from "../helper";
+import { activate, executeTeCommand, verifyTaskCount } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ExternalTaskProvider } from "./externalTaskProvider";

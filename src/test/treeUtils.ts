@@ -42,7 +42,7 @@ export default class TreeUtils
         // A special refresh() for test suite, will open all task files and open to position
         //
         await this.teApi.explorer?.refresh("tests");
-        await this.teApi.waitForIdle(testsControl.waitTimeForBuildTree, 22500);
+        await this.teApi.waitForIdle(testsControl.waitTimeForBuildTree);
         // this.teApi.explorer?.getTaskMap();
         // return this.teApi.explorer?.getChildren();
     }

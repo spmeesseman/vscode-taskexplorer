@@ -64,7 +64,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     {
         let rmvCount;
         this.logQueueId = this.providerName + (++this.callCount);
-        log.methodStart(`provide ${this.providerName} tasks`, 1, "   ", false, [[ "call count", ++this.callCount ]], this.logQueueId);
+        log.methodStart(`provide ${this.providerName} tasks`, 1, "", false, [[ "call count", ++this.callCount ]], this.logQueueId);
         if (!this.cachedTasks)
         {
             const licMgr = getLicenseManager();
@@ -81,7 +81,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 }
             }
         }
-        log.methodDone(`provide ${this.providerName} tasks`, 1, "   ", false, [[ "# of tasks found", this.cachedTasks.length ]], this.logQueueId);
+        log.methodDone(`provide ${this.providerName} tasks`, 1, "", false, [[ "# of tasks found", this.cachedTasks.length ]], this.logQueueId);
         log.dequeue(this.logQueueId);
         this.logQueueId = undefined;
         return this.cachedTasks;
@@ -133,8 +133,9 @@ export abstract class TaskExplorerProvider implements TaskProvider
         //
 
         log.methodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, false,
-            [[ "uri", uri?.path ], [ "has cached tasks", !!this.cachedTasks ], [ "# of cached tasks", this.cachedTasks!.length ]]
-        );
+            [[ "uri", uri?.path ], [ "has cached tasks", !!this.cachedTasks ],
+            [ "current # of cached tasks", this.cachedTasks ? this.cachedTasks.length : 0 ]
+        ]);
 
         if (uri && this.invalidating) {
             this.queue.push(uri);
@@ -163,8 +164,12 @@ export abstract class TaskExplorerProvider implements TaskProvider
                     }
                 });
 
+                //
+                // Check `excludes` for exact path which would have been entered via the context menu in
+                // the the tree ui.  The check for excluded path patterns also found in the `excludes` array
+                // is done by the file caching layer.
+                //
                 if (pathExists && !configuration.get<string[]>("exclude", []).includes(uri.path))
-                // if (pathExists && !util.isExcluded(uri.path))
                 {
                     const tasks = (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
                     //
@@ -186,7 +191,9 @@ export abstract class TaskExplorerProvider implements TaskProvider
             }
         }
 
-        log.methodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad, false, [[ "# of cached tasks", this.cachedTasks!.length ]]);
+        log.methodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad, false, [
+            [ "new # of cached tasks", this.cachedTasks ? this.cachedTasks.length : 0 ]
+        ]);
         this.invalidating = false;
         await this.processQueue();
     }

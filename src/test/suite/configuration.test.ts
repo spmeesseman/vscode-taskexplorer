@@ -4,12 +4,11 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import * as util from "../../lib/utils/utils";
-import { activate, executeSettingsUpdate, isReady, sleep, testsControl } from "../helper";
+import { activate, executeSettingsUpdate, sleep, testsControl } from "../helper";
 import { configuration } from "../../lib/utils/configuration";
 import { teApi } from "../../extension";
 import { enableConfigWatcher } from "../../lib/configWatcher";
 
-let autoRefresh: boolean;
 let enabledTasks: any;
 let globPatterns: string[];
 let pathToPrograms: any;
@@ -22,8 +21,6 @@ suite("Configuration / Settings Tests", () =>
     suiteSetup(async function()
     {
         await activate(this);
-        assert(isReady() === true, "    ✘ TeApi not ready");
-        autoRefresh = configuration.get<boolean>("autoRefresh");
         enabledTasks = configuration.get<object>("enabledTasks");
         pathToPrograms = configuration.get<object>("pathToPrograms");
         shellW32 = configuration.getVs<string>("terminal.integrated.shell.windows");
@@ -34,7 +31,6 @@ suite("Configuration / Settings Tests", () =>
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate("autoRefresh", autoRefresh);
         await executeSettingsUpdate("pathToPrograms", pathToPrograms);
     });
 
@@ -100,22 +96,6 @@ suite("Configuration / Settings Tests", () =>
         // Re-enable config watcher
         //
         enableConfigWatcher(true);
-    });
-
-
-
-    test("Auto Refresh", async function()
-    {
-        await configuration.updateWs("autoRefresh", false);
-        await vscode.commands.executeCommand("taskExplorer.showOutput", false);
-    });
-
-
-    test("Auto Refresh", async function()
-    {
-        await configuration.updateWs("autoRefresh", true);
-        await vscode.commands.executeCommand("taskExplorer.showOutput", true);
-        await configuration.updateWs("autoRefresh", autoRefresh);
     });
 
 

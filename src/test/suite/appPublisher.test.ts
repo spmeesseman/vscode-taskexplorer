@@ -65,6 +65,7 @@ suite("App-Publisher Tests", () =>
 
     test("Start", async function()
     {
+        this.slow(testsControl.slowTimeForVerifyTaskCount);
         await verifyTaskCount(testsName, 21);
     });
 
