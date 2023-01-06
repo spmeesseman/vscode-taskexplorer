@@ -5,24 +5,22 @@ import * as assert from "assert";
 import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
 import { testControl } from "./control";
-import { IExplorerApi, ITaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { configuration } from "../lib/utils/configuration";
-import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import constants from "../lib/constants";
 import TreeUtils from "./treeUtils";
-import { deleteFile, pathExists, readFileAsync, writeFile } from "../lib/utils/fs";
+import { deleteFile, pathExists } from "../lib/utils/fs";
+import { IExplorerApi, ITaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 
 let activated = false;
 let teApi: ITaskExplorerApi;
 let teExplorer: IExplorerApi;
-let settingsJsonOrig: string;
 const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
 const overridesShowInputBox: any[] = [];
 const overridesShowInfoBox: any[] = [];
 
 export const testsControl = testControl;
-
 export let treeUtils: TreeUtils;
 
 window.showInputBox = (...args: any[]) =>
@@ -61,7 +59,8 @@ window.showInformationMessage = (str: string, ...args: any[]) =>
 export async function activate(instance?: any)
 {
     const ext = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-    assert(ext, "Could not find extension");
+    assert(ext, "✘ Could not find extension");
+
     if (instance) instance.timeout(60 * 1000);
 
     if (!activated)
@@ -73,18 +72,42 @@ export async function activate(instance?: any)
         //
         // Activate extension
         //
+        console.log("Activating extension 'spmeesseman.vscode-taskexplorer'");
         teApi = await ext.activate();
+        console.log("Extension 'spmeesseman.vscode-taskexplorer' successfully activated");
         //
-        // FInish tests helper api construction
+        // Ensure extension initialized successfully
         //
         assert(isReady() === true, "✘ TeApi not ready");
-        if (!teApi.explorer) { assert.fail("✘ Explorer instance does not exist"); }
+        if (!teApi.explorer) {
+            assert.fail("✘ Explorer instance does not exist");
+        }
+        //
+        // Enable tests mode within the application, it alters the flow in a few spots, not many.
+        //
         teApi.setTests();
-        activated = true;
+        //
+        // Instantiate the treeUtils helper.  why a class? i don't know, got rid of it in production code
+        // within a class and then added it to the test suite to still use the file walker to open and
+        // find script locations within task files
+        //
         treeUtils = new TreeUtils(teApi);
-        setExplorer(teApi.explorer);  // _api pre-test suite will reset after disable/enable
-        teApi.waitForIdle(); // added 1/2/03 - Tree loads in delay 'after' activate()
+        //
+        // _api pre-test suite will reset after disable/enable
+        //
+        setExplorer(teApi.explorer);
+        //
+        // waitForIdle() added 1/2/03 - Tree loads in delay 'after' activate()
+        //
+        teApi.waitForIdle();
+        //
+        // Write to console is just a tests feature, it's not controlled by settings, set it here if needed
+        //
         teApi.log.setWriteToConsole(testsControl.logToConsole, testsControl.logLevel);
+        //
+        // All done
+        //
+        activated = true;
     }
     return teApi;
 }
@@ -100,14 +123,18 @@ export async function cleanup()
     window.showInputBox = originalShowInputBox;
     window.showInformationMessage = originalShowInfoBox;
 
-    if (!testsControl.keepSettingsFileChanges)
-    {
-        try {
-            if (await pathExists(settingsFile)) {
-                await writeFile(settingsFile, settingsJsonOrig);
-            }
-        } catch (e: any) { console.error(e.message); }
-    }
+    //
+    // 1/5/23 - Removed and added to runTest.ts, before VSCoe is launched. leaving here
+    //          commented in case i realize i need it again, 'cause that never happens
+    //
+    // if (!testsControl.keepSettingsFileChanges)
+    // {
+    //     try {
+    //         if (await pathExists(settingsFile)) {
+    //             await writeFile(settingsFile, settingsJsonOrig);
+    //         }
+    //     } catch (e: any) { console.error(e.message); }
+    // }
 
     try {
         const packageLockFile = path.join(rootPath, "package-lock.json");
@@ -232,13 +259,16 @@ async function initSettings()
     // Create .vscode directory if it doesn't exist, so the we have perms to
     // remove it after tests are done
     //
-    const dirNameCode = getWsPath(".vscode"),
-          settingsFile = path.join(dirNameCode, "settings.json");
-
-    if (await pathExists(settingsFile)) {
-        settingsJsonOrig = await readFileAsync(settingsFile);
-    }
-    await writeFile(settingsFile, "{}");
+    // 1/5/23 - Removed and added to runTest.ts, before VSCoe is launched. leaving here
+    //          commented in case i realize i need it again, 'cause that never happens
+    //
+    // const dirNameCode = getWsPath(".vscode"),
+    //       settingsFile = path.join(dirNameCode, "settings.json");
+    //
+    // if (await pathExists(settingsFile)) {
+    //     settingsJsonOrig = await readFileAsync(settingsFile);
+    // }
+    // await writeFile(settingsFile, "{}");
 
     await configuration.updateVsWs("terminal.integrated.shell.windows",
                                    "C:\\Windows\\System32\\cmd.exe");

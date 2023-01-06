@@ -7,8 +7,8 @@
 //
 import * as assert from "assert";
 import * as path from "path";
-import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, getWsPath, testsControl, verifyTaskCount } from "../helper";
+import { TaskExecution, Uri, workspace, WorkspaceFolder } from "vscode";
+import { activate, executeSettingsUpdate, executeTeCommand2, getTreeTasks, getWsPath, testsControl, verifyTaskCount, waitForTaskExecution } from "../helper";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { BashTaskProvider } from "../../providers/bash";
 
@@ -127,10 +127,20 @@ suite("Python Tests", () =>
     test("Delete Folder", async function()
     {
         this.slow(testsControl.slowTimeForFsDeleteFolderEvent + testsControl.slowTimeForVerifyTaskCount);
-        // await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
         await verifyTaskCount(testsName, 1);
+    });
+
+
+    test("Run Shell Script", async function()
+    {   //
+        // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
+        //
+        this.slow(testsControl.slowTimeForGetTreeTasks + testsControl.slowTimeForBashScript);
+        const bash = await getTreeTasks("bash", 1);
+        const exec = await executeTeCommand2("run", [ bash[0] ], testsControl.waitTimeForRunCommand) as TaskExecution | undefined;
+        await waitForTaskExecution(exec);
     });
 
 });

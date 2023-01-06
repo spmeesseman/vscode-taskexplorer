@@ -47,7 +47,7 @@ suite("Task Tests", () =>
 
     test("Check task counts", async function()
     {
-        this.slow(1750);
+        this.slow(testsControl.slowTimeForGetTreeTasks * 3);
         bash = await getTreeTasks("bash", 1);
         batch = await getTreeTasks("batch", 2);
         ant = await getTreeTasks("ant", 3);
@@ -77,7 +77,7 @@ suite("Task Tests", () =>
 
     test("Run non-existent last task", async function()
     {
-        this.slow(5000);
+        this.slow(testsControl.slowTimeForRunCommand + (testsControl.slowTimeForStorageUpdate * 2));
         const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []),
               hasLastTasks = lastTasks && lastTasks.length > 0;
         if (hasLastTasks)
@@ -94,7 +94,7 @@ suite("Task Tests", () =>
 
     test("Keep Terminal on Stop (OFF)", async function()
     {
-        this.slow(5000 + waitTimeForRunCommand + waitTimeForConfigEvent);
+        this.slow(testsControl.slowTimeForRunCommand + waitTimeForRunCommand + waitTimeForConfigEvent);
         await executeSettingsUpdate("keepTermOnStop", false);
         await executeTeCommand("run", waitTimeForRunCommand, 5000, batch[0]);
         await executeTeCommand("stop", 1000, 1500, batch[0]);
@@ -103,7 +103,7 @@ suite("Task Tests", () =>
 
     test("Keep Terminal on Stop (ON)", async function()
     {
-        this.slow(5000 + waitTimeForRunCommand + waitTimeForConfigEvent);
+        this.slow(testsControl.slowTimeForRunCommand + waitTimeForRunCommand + waitTimeForConfigEvent);
         await executeSettingsUpdate("keepTermOnStop", true);
         await executeTeCommand("run", waitTimeForRunCommand, 5000, batch[0]);
         await executeTeCommand("stop", 1000, 1500, batch[0]);
@@ -112,15 +112,15 @@ suite("Task Tests", () =>
 
     test("Trigger busy on run last task", async function()
     {
-        this.slow(waitTimeForRunCommand + 2000 + waitTimeForFsCreateEvent);
+        this.slow(testsControl.slowTimeForRunCommand + waitTimeForFsCreateEvent);
         explorer.invalidateTasksCache();// Don't await
-        await executeTeCommand("runLastTask", waitTimeForRunCommand, 5000);
+        await executeTeCommand("runLastTask", waitTimeForRunCommand, testsControl.slowTimeForRunCommand);
     });
 
 
     test("Resume task no terminal", async function()
     {
-        this.slow(waitTimeForRunCommand + 2000);
+        this.slow(testsControl.slowTimeForRunCommand);
         bash[0].paused = true;
         await executeTeCommand2("runLastTask", [ batch[0] ], waitTimeForRunCommand);
         bash[0].paused = false;
@@ -129,7 +129,7 @@ suite("Task Tests", () =>
 
     test("Pause", async function()
     {
-        this.slow(waitTimeForRunCommand * 2);
+        this.slow((waitTimeForRunCommand * 2) + testsControl.slowTimeForRunCommand);
         await executeTeCommand2("run", [ batch[0] ], waitTimeForRunCommand);
         await executeTeCommand2("pause", [ batch[0] ], 500);
         await executeTeCommand2("stop", [ batch[0] ], 400);
@@ -165,7 +165,7 @@ suite("Task Tests", () =>
     {   //
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
         //
-        this.slow((waitTimeForRunCommand * 2) + (slowTimeForConfigEvent * 4) + (slowTimeForCommand * 4));
+        this.slow(testsControl.slowTimeForRunCommand + (slowTimeForConfigEvent * 4) + (slowTimeForCommand * 4));
         await executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await startTask(bash[0]);
         await executeTeCommand2("run", [ bash[0] ], waitTimeForRunCommand);
@@ -176,8 +176,8 @@ suite("Task Tests", () =>
 
     test("Batch 1", async function()
     {
-        this.slow(35000);
-        this.timeout(45000);
+        this.slow(testsControl.slowTimeForRunCommand * 6);
+        this.timeout(testsControl.slowTimeForRunCommand * 8);
         //
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
@@ -214,8 +214,8 @@ suite("Task Tests", () =>
     {   //
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
-        this.slow(25000);
-        this.timeout(35000);
+        this.slow(testsControl.slowTimeForRunCommand * 5);
+        this.timeout(testsControl.slowTimeForRunCommand * 7);
         const batchTask = batch[1];
         await startTask(batchTask);
         await executeSettingsUpdate("keepTermOnStop", false);
