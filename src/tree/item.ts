@@ -8,6 +8,7 @@ import {
     Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks, Command
 }
 from "vscode";
+import TaskFolder from "./folder";
 
 
 /**
@@ -22,6 +23,7 @@ export default class TaskItem extends TreeItem
     public readonly taskSource: string;
     public readonly isUser: boolean;
     readonly taskFile: TaskFile;
+    public folder: TaskFolder | undefined; // set for specialfolder tasks (i.e. Favorites or Last Tasks)
     public task: Task;
     public taskDetached: Task | undefined;
     public execution: TaskExecution | undefined;

@@ -74,6 +74,7 @@ export default class SpecialTaskFolder extends TaskFolder
             const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
             taskItem2.id = this.label + ":" + taskItem2.id; // note 'label:' + taskItem2.id === id
             taskItem2.label = this.getRenamedTaskName(taskItem2);
+            taskItem2.folder = this;
             this.insertTaskFile(taskItem2, 0);
             this.sort(logPad + "   ");
 
@@ -141,12 +142,13 @@ export default class SpecialTaskFolder extends TaskFolder
 
     async addRemoveRenamedLabel(taskItem: TaskItem)
     {
+console.log("aaaa");
         let removed = false,
             addRemoved = false,
             index = 0;
         const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
               id = this.getTaskItemId(taskItem);
-
+console.log("a");
         log.methodStart("add/remove rename special", 1, "", false, [[ "id", id ]]);
 
         for (const i in renames)
@@ -163,7 +165,7 @@ export default class SpecialTaskFolder extends TaskFolder
                 ++index;
             }
         }
-
+console.log("b");
         if (!addRemoved)
         {
             const opts: InputBoxOptions = { prompt: "Enter favorites label" };
@@ -176,7 +178,7 @@ export default class SpecialTaskFolder extends TaskFolder
                 }
             });
         }
-
+console.log("c");
         //
         // Update
         //
@@ -280,6 +282,7 @@ export default class SpecialTaskFolder extends TaskFolder
                 const taskItem3 = new TaskItem(this.extensionContext, taskItem2.taskFile, taskItem2.task);
                 taskItem3.id = this.label + ":" + taskItem3.id;
                 taskItem3.label = this.getRenamedTaskName(taskItem3);
+                taskItem3.folder = this;
                 this.insertTaskFile(taskItem3, 0);
             }
         }
@@ -370,6 +373,7 @@ export default class SpecialTaskFolder extends TaskFolder
             taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
             taskItem2.id = taskId;
             taskItem2.label = this.getRenamedTaskName(taskItem2);
+            taskItem2.folder = this;
         }
 
         log.value(logPad + "   add item", taskItem2.id, 2);

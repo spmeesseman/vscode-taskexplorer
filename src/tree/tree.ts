@@ -86,7 +86,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.disposables.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit"), this));
         this.disposables.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit fix"), this));
         this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem | string) => { await this.addToExcludes(taskFile); }, this));
-        this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", (taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this));
+        this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", async(taskItem: TaskItem) => { await this.addRemoveSpecialTaskLabel(taskItem); }, this));
 
         context.subscriptions.push(...this.disposables);
         this.subscriptionStartIndex = context.subscriptions.length - (this.disposables.length + 1);
@@ -120,10 +120,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
     private async addRemoveSpecialTaskLabel(taskItem: TaskItem)
     {
-        const folder = taskItem.taskFile.folder;
-        const folderName = (util.isString(folder) ? folder : util.lowerCaseFirstChar(folder.label as string, true)) as "favorites"|"lastTasks";
-        await this.specialFolders[folderName].clearSavedTasks();
-        await this.specialFolders.favorites.addRemoveRenamedLabel(taskItem);
+        /* istanbulignore else */
+        if (taskItem.folder)
+        {
+            const folderName = util.lowerCaseFirstChar(taskItem.folder.label as string, true) as "favorites"|"lastTasks";
+            // await this.specialFolders[folderName].clearSavedTasks(); // don't know why i had this here, leaving commented for now
+            await this.specialFolders[folderName].addRemoveRenamedLabel(taskItem);
+        }
     }
 
 

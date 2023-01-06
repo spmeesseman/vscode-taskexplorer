@@ -100,7 +100,7 @@ export async function activate(instance?: any)
         // All done
         //
         activated = true;
-        console.log(`    ${figures.success} Tests ready`);
+        console.log(`    ${figures.color.success} Tests ready`);
     }
     return teApi;
 }
