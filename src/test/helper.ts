@@ -153,8 +153,8 @@ export async function closeActiveDocument()
 export async function executeSettingsUpdate(key: string, value?: any, minWait?: number, maxWait?: number)
 {
     const rc = await teApi.config.updateWs(key, value);
-    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testControl.waitTimeForConfigEvent),
-                            maxWait === 0 ? maxWait : (maxWait || testControl.waitTimeMax));
+    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testControl.waitTime.configEvent),
+                            maxWait === 0 ? maxWait : (maxWait || testControl.waitTime.max));
     return rc;
 }
 
@@ -162,8 +162,8 @@ export async function executeSettingsUpdate(key: string, value?: any, minWait?: 
 export async function executeTeCommand(command: string, minWait?: number, maxWait?: number, ...args: any[])
 {
     const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
-    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testControl.waitTimeForCommand),
-                            maxWait === 0 ? maxWait : (maxWait || testControl.waitTimeMax));
+    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testControl.waitTime.command),
+                            maxWait === 0 ? maxWait : (maxWait || testControl.waitTime.max));
     return rc;
 }
 

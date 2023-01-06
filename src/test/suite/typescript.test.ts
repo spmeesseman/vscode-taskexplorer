@@ -79,7 +79,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
     });
 
@@ -118,7 +118,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 
@@ -126,7 +126,7 @@ suite("Typescript Tests", () =>
     test("Disable", async function()
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configEnableEvent);
         await treeUtils.verifyTaskCountByTree(testsName, 0);
     });
 
@@ -134,7 +134,7 @@ suite("Typescript Tests", () =>
     test("Re-enable", async function()
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 
@@ -170,7 +170,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent, 3000);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4); // I guess internal TSC must not invalidate tasks on bad syntax
         // if (resetLogging) { // turn scary error logging off
         //     executeSettingsUpdate("logging.enable", true);
@@ -200,7 +200,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 
@@ -209,7 +209,7 @@ suite("Typescript Tests", () =>
     {
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount+ 2);
     });
 
@@ -218,7 +218,7 @@ suite("Typescript Tests", () =>
     {
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri2.fsPath);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
     });
 

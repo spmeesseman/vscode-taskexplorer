@@ -64,7 +64,7 @@ suite("Maven Tests", () =>
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project>\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
     });
 
 
@@ -124,7 +124,7 @@ suite("Maven Tests", () =>
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent, 3000);
         await verifyTaskCount(testsName, 0);
         if (resetLogging) { // turn scary error logging off
             executeSettingsUpdate("logging.enable", true);
@@ -141,7 +141,7 @@ suite("Maven Tests", () =>
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project>\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent, 3000);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
@@ -150,7 +150,7 @@ suite("Maven Tests", () =>
     {
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fs.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, 0);
     });
 

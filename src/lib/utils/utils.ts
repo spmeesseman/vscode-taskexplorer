@@ -488,10 +488,13 @@ export function isObject(value: any): value is { [key: string]: any }
  */
 export const isObjectEmpty = (value: any) =>
 {
-    for (const key in value)
+    if (value)
     {
-        if ({}.hasOwnProperty.call(value, key)) {
-            return false;
+        for (const key in value)
+        {
+            if ({}.hasOwnProperty.call(value, key)) {
+                return false;
+            }
         }
     }
     return true;

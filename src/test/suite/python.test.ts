@@ -42,7 +42,7 @@ suite("Python Tests", () =>
         pathToTaskProgram = teApi.config.get<string>("pathToPrograms." + testsName);
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe");
-        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
     });
 
 
@@ -51,7 +51,7 @@ suite("Python Tests", () =>
         // Reset settings
         //
         await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
-        await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTime.configEnableEvent);
         await fsApi.deleteDir(dirName);
     });
 
@@ -81,7 +81,7 @@ suite("Python Tests", () =>
     test("Disable", async function()
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 
@@ -89,7 +89,7 @@ suite("Python Tests", () =>
     test("Re-enable", async function()
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
@@ -99,7 +99,7 @@ suite("Python Tests", () =>
         this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
-        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
@@ -108,10 +108,10 @@ suite("Python Tests", () =>
     {
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent * 2);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent * 2);
         await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
     });
 
 
@@ -120,7 +120,7 @@ suite("Python Tests", () =>
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
-        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
@@ -130,7 +130,7 @@ suite("Python Tests", () =>
         this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount);
         // await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent * 2);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent * 2);
         await verifyTaskCount(testsName, startTaskCount);
     });
 

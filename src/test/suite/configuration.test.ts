@@ -35,8 +35,10 @@ suite("Configuration / Settings Tests", () =>
     });
 
 
-    test("Multi-Part", async function()
-    {   //
+    test("Multi-Dot", async function()
+    {
+        this.slow(testControl.slowTime.configEventFast * 10);
+        //
         // Multi-part settings updates (behavior differs when value is an object)
         // Disable config watcher
         //
@@ -101,40 +103,49 @@ suite("Configuration / Settings Tests", () =>
 
     test("Ant Glob", async function()
     {
+        this.slow((testControl.slowTime.configEnableEvent * 2) + testControl.slowTime.configReadEvent);
         globPatterns = configuration.get<string[]>("globPatternsAnt");
         await configuration.updateWs("enabledTasks.ant", false);
         globPatterns.push("**/dummy.xml");
         await executeSettingsUpdate("globPatternsAnt", globPatterns, 50, 100);
+        await teApi.waitForIdle(20);
     });
 
 
     test("Ant Glob", async function()
     {
+        this.slow(testControl.slowTime.configEnableEvent * 2);
         await executeSettingsUpdate("enabledTasks.ant", true);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsAnt", globPatterns);
+        await teApi.waitForIdle(20);
     });
 
 
     test("Bash Glob", async function()
     {
+        this.slow((testControl.slowTime.configEnableEvent * 2) + testControl.slowTime.configReadEvent);
         globPatterns = configuration.get<string[]>("globPatternsBash");
         await configuration.updateWs("enabledTasks.bash", false);
         globPatterns.push("**/extensionless/**");
         await executeSettingsUpdate("globPatternsBash", globPatterns);
+        await teApi.waitForIdle(20);
     });
 
 
     test("Bash Glob", async function()
     {
+        this.slow(testControl.slowTime.configEnableEvent * 2);
         await executeSettingsUpdate("enabledTasks.bash", true);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsBash", globPatterns);
+        await teApi.waitForIdle(20);
     });
 
 
     test("Package Manager - Yarn", async function()
     {
+        this.slow(testControl.slowTime.configEvent + testControl.slowTime.configReadEvent);
         pkgMgr = configuration.getVs<string>("npm.packageManager");
         await configuration.updateVsWs("npm.packageManager", "yarn");
         assert(util.getPackageManager() === "yarn");
@@ -143,6 +154,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Package Manager - NPM Explicit", async function()
     {
+        this.slow(testControl.slowTime.configEvent);
         await configuration.updateVsWs("npm.packageManager", "npm");
         assert(util.getPackageManager() === "npm");
     });
@@ -150,6 +162,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Package Manager - NPM Implicit", async function()
     {
+        this.slow(testControl.slowTime.configEvent);
         await configuration.updateVsWs("npm.packageManager", "");
         assert(util.getPackageManager() === "npm");
     });
@@ -157,6 +170,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Package Manager - Auto", async function()
     {
+        this.slow(testControl.slowTime.configEvent);
         await configuration.updateVsWs("npm.packageManager", "auto");
         assert(util.getPackageManager() === "npm");
     });
@@ -164,6 +178,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Package Manager - Reset", async function()
     {
+        this.slow(testControl.slowTime.configEvent);
         await configuration.updateVsWs("npm.packageManager", pkgMgr);
         await configuration.updateVs("npm.packageManager", pkgMgr); // cover global
         assert(util.getPackageManager() === (pkgMgr === "auto" ? "npm" : pkgMgr));
@@ -172,6 +187,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Change Default Shell - OSX", async function()
     {
+        this.slow(testControl.slowTime.configEvent + 50);
         await configuration.updateVsWs("terminal.integrated.shell.osx", "/usr/bin/sh");
         await sleep(50);
     });
@@ -179,6 +195,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Change Default Shell - Linux", async function()
     {
+        this.slow(testControl.slowTime.configEvent + 50);
         await configuration.updateVsWs("terminal.integrated.shell.linux", "/bin/sh");
         await sleep(50);
     });
@@ -186,6 +203,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Change Default Shell - Windows", async function()
     {
+        this.slow(testControl.slowTime.configEvent + 50);
         await configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
         await sleep(50);
     });
@@ -193,6 +211,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Reset Default Shell - OSX", async function()
     {
+        this.slow(testControl.slowTime.configEvent + 50);
         await configuration.updateVsWs("terminal.integrated.shell.osx", shellOsx);
         await sleep(50);
     });
@@ -200,6 +219,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Reset Default Shell - Linux", async function()
     {
+        this.slow(testControl.slowTime.configEvent + 50);
         await configuration.updateVsWs("terminal.integrated.shell.linux", shellLnx);
         await sleep(50);
     });
@@ -207,6 +227,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Reset Default Shell - Coverage Hit", async function()
     {
+        this.slow(testControl.slowTime.configEnableEvent * 2);
         await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: false,
             batch: false,
@@ -222,6 +243,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Reset Default Shell - Windows", async function()
     {
+        this.slow(testControl.slowTime.configEvent + 50);
         await configuration.updateVsWs("terminal.integrated.shell.windows", shellW32);
         await sleep(50);
     });
@@ -229,6 +251,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Reset Coverage Hit", async function()
     {
+        this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: true,
             batch: true,
@@ -243,51 +266,53 @@ suite("Configuration / Settings Tests", () =>
 
     test("Path to Programs Set Bash", async function()
     {
+        this.slow(testControl.slowTime.configEvent);
         await executeSettingsUpdate("pathToPrograms.bash", "c:\\unix\\sh.exe", 20, 50);
     });
 
 
     test("Path to Programs Set Composer", async function()
     {
+        this.slow(testControl.slowTime.configEvent);
         await executeSettingsUpdate("pathToPrograms.composer", "c:\\php5\\composer.exe", 20, 50);
     });
 
 
     test("Path to Programs Clear Bash", async function()
     {
+        this.slow(testControl.slowTime.configEvent);
         await executeSettingsUpdate("pathToPrograms.bash", undefined, 20, 50);
     });
 
 
     test("Path to Programs Clear Composer", async function()
     {
+        this.slow(testControl.slowTime.configEvent);
         await executeSettingsUpdate("pathToPrograms.composer", undefined, 20, 50);
     });
 
 
     test("Path to Programs Restore Bash", async function()
     {
-        executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash, 20, 50);
+        this.slow(testControl.slowTime.configEvent);
+        await executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash, 20, 50);
     });
 
 
     test("Path to Programs Restore Composer", async function()
     {
-        executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer, 20, 50);
+        this.slow(testControl.slowTime.configEvent);
+        await executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer, 20, 50);
     });
 
 
     test("User Level Setting Update", async function()
     {
         this.slow(testControl.slowTime.configEvent * 4);
-        await configuration.update("logging.level", testControl.userLogLevel !== 3 ? 3 : 2);
-        await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
-        await configuration.update("logging.level", testControl.userLogLevel);
-        await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
-        await configuration.update("pathToPrograms.ant", testControl.userPathToAnt !== "ant" ? "ant" : "ant.bat");
-        await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
-        await configuration.update("pathToPrograms.ant", testControl.userPathToAnt);
-        await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
+        await executeSettingsUpdate("logging.level", testControl.userLogLevel !== 3 ? 3 : 2);
+        await executeSettingsUpdate("logging.level", testControl.userLogLevel);
+        await executeSettingsUpdate("pathToPrograms.ant", testControl.userPathToAnt !== "ant" ? "ant" : "ant.bat");
+        await executeSettingsUpdate("pathToPrograms.ant", testControl.userPathToAnt);
     });
 
 });

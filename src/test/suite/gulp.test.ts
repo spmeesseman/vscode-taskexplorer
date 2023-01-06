@@ -50,7 +50,7 @@ suite("Gulp Tests", () =>
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await teApi.config.updateWs("enabledTasks.gulp", false);
-        await teApi.waitForIdle(testControl.waitTimeForConfigEnableEvent);
+        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 
@@ -59,7 +59,7 @@ suite("Gulp Tests", () =>
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await teApi.config.updateWs("enabledTasks.gulp", true);
-        await teApi.waitForIdle(testControl.waitTimeForConfigEnableEvent);
+        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
@@ -82,7 +82,7 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
     });
 
@@ -106,7 +106,7 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 3);
     });
 
@@ -122,7 +122,7 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
@@ -132,7 +132,7 @@ suite("Gulp Tests", () =>
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 

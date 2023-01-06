@@ -21,10 +21,6 @@ import {
 
 
 const tempFiles: string[] = [];
-const slowTimeForFsCreateEvent = testControl.slowTime.fsCreateEvent;
-const waitTimeForFsDelEvent = testControl.waitTimeForFsDeleteEvent;
-const waitTimeForFsNewEvent = testControl.waitTimeForFsCreateEvent;
-const waitTimeForConfigEvent = testControl.waitTimeForConfigEvent;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -383,7 +379,7 @@ suite("Provider Tests", () =>
     {   //
         // The 3rd param `true` will open the task files and locate task positions while parsing the tree
         //
-        this.slow(3000);
+        this.slow(testControl.slowTime.walkTaskTreeWithDocOpen);
         taskMap = await treeUtils.walkTreeItems(undefined, true);
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10);
     });
@@ -412,7 +408,7 @@ suite("Provider Tests", () =>
                 ) as TaskItem;
                 if (node)
                 {
-                    await executeTeCommand("addToExcludes", waitTimeForConfigEvent, 3000, node);
+                    await executeTeCommand("addToExcludes", testControl.waitTime.configEvent, 3000, node);
                     break;
                 }
             }
@@ -460,7 +456,7 @@ suite("Provider Tests", () =>
                 const value= taskMap[property];
                 if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
                 {
-                    await executeTeCommand2("addToExcludes", [ value.taskFile ], testControl.waitTimeForCommand);
+                    await executeTeCommand2("addToExcludes", [ value.taskFile ], testControl.waitTime.command);
                     break;
                 }
             }
@@ -472,7 +468,7 @@ suite("Provider Tests", () =>
     test("Add to Excludes - Bad Call", async function()
     {
         this.slow(testControl.slowTime.command);
-        await executeTeCommand("addToExcludes", testControl.waitTimeForCommand);
+        await executeTeCommand("addToExcludes", testControl.waitTime.command);
     });
 
 
@@ -482,7 +478,7 @@ suite("Provider Tests", () =>
         const file = path.join(rootPath, ".publishrc.json");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await teApi.waitForIdle(waitTimeForFsDelEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount("apppublisher", 21);
         await createAppPublisherFile();
         await verifyTaskCount("apppublisher", 42);
@@ -495,7 +491,7 @@ suite("Provider Tests", () =>
         const file = path.join(dirName, "build.xml");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createAntFile();
     });
 
@@ -506,7 +502,7 @@ suite("Provider Tests", () =>
         const file = path.join(dirName, "build.gradle");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createGradleFile();
     });
 
@@ -517,7 +513,7 @@ suite("Provider Tests", () =>
         const file = path.join(rootPath, "GRUNTFILE.js");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createGruntFile();
     });
 
@@ -528,7 +524,7 @@ suite("Provider Tests", () =>
         const file = path.join(rootPath, "gulpfile.js");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createGulpFile();
     });
 
@@ -539,7 +535,7 @@ suite("Provider Tests", () =>
         const file = path.join(rootPath, "Makefile");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createMakeFile();
         await teApi.config.updateWs("logging.enable", true); // hit tree.logTask()
     });
@@ -551,7 +547,7 @@ suite("Provider Tests", () =>
         const file = path.join(rootPath, "pom.xml");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createMavenPomFile();
     });
 
@@ -562,7 +558,7 @@ suite("Provider Tests", () =>
         const file = path.join(rootPath, "test.bat");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createBatchFile();
     });
 
@@ -594,7 +590,7 @@ suite("Provider Tests", () =>
         }
         await teApi.config.updateVsWs("terminal.integrated.shell.windows",
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
-        await teApi.waitForIdle(waitTimeForConfigEvent, 1000);
+        await teApi.waitForIdle(testControl.waitTime.configEvent, 1000);
         await teApi.testsApi.fileCache.buildCache("bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
         await teApi.waitForIdle();
         await executeSettingsUpdate("specialFolders.expanded.test-files", false);
@@ -856,7 +852,7 @@ async function setupAnt()
         "</project>\n"
     );
 
-    await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
 }
 
 
@@ -902,7 +898,7 @@ async function setupGradle()
         "}\n"
     );
 
-    await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
 }
 
 
@@ -957,7 +953,7 @@ async function setupTsc()
         "}\n"
     );
 
-    await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
 }
 
 
@@ -1061,7 +1057,7 @@ async function setupGulp()
         "});\n"
     );
 
-    await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
 }
 
 
@@ -1090,7 +1086,7 @@ async function setupMakefile()
         "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
     );
 
-    await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
 }
 
 
@@ -1110,7 +1106,7 @@ async function setupBatch()
 
     await fsApi.writeFile(file2, "@echo testing batch file 2\r\nsleep /t 5\r\n");
     await fsApi.writeFile(file3, "@echo testing batch file 3\r\n");
-    await teApi.waitForIdle(waitTimeForFsNewEvent);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
 }
 
 
@@ -1133,7 +1129,7 @@ async function setupBash()
     await fsApi.writeFile(file2, "echo testing bash file 2\n");
     await fsApi.writeFile(file3, "echo testing bash file 3\n");
 
-    await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
 }
 
 
@@ -1178,7 +1174,7 @@ async function setupGrunt()
         "};\n"
     );
 
-    await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
 }
 
 
@@ -1219,7 +1215,7 @@ async function createAntFile()
                 '    <target name="test2" depends="init"></target>\n' +
                 "</project>\n"
             );
-            await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
         }
     }
 }
@@ -1246,7 +1242,7 @@ async function createAppPublisherFile()
                 '    "repoType": "svn"\n' +
                 "}\n"
             );
-            await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
         }
     }
 }
@@ -1267,7 +1263,7 @@ async function createMavenPomFile()
                 "    <modelVersion>4.0.0</modelVersion>\n" +
                 "</project>\n"
             );
-            await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
         }
     }
 }
@@ -1282,7 +1278,7 @@ async function createBatchFile()
         if (!await fsApi.pathExists(file))
         {
             await fsApi.writeFile(file, "@echo testing batch file\r\n");
-            await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
         }
     }
 }
@@ -1310,7 +1306,7 @@ async function createGradleFile()
                 "    with jar\n" +
                 "}\n"
             );
-            await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
         }
     }
 }
@@ -1332,7 +1328,7 @@ async function createGruntFile()
                 '    grunt.registerTask("upload", [\'s3\']);\n' +
                 "};\n"
             );
-            await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
         }
     }
 }
@@ -1358,7 +1354,7 @@ async function createGulpFile()
                 "    done();\n" +
                 "});\n"
             );
-            await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
         }
     }
 }
@@ -1377,7 +1373,7 @@ async function createMakeFile()
                 file,
                 "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
             );
-            await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
         }
     }
 }

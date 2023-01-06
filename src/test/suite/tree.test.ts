@@ -50,7 +50,7 @@ suite("Tree Tests", () =>
     test("Refresh", async function()
     {
         this.slow(testControl.slowTime.refreshCommand);
-        await executeTeCommand("refresh", testControl.waitTimeForRefreshCommand);
+        await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
     });
 
 
@@ -256,9 +256,9 @@ suite("Tree Tests", () =>
     {
         this.slow(testControl.slowTime.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
@@ -266,14 +266,14 @@ suite("Tree Tests", () =>
     {
         this.slow(testControl.slowTime.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
     test("Refresh", async function()
     {
         this.slow(testControl.slowTime.refreshCommand);
-        await executeTeCommand("refresh", testControl.waitTimeForRefreshCommand);
+        await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
     });
 
 
@@ -281,7 +281,7 @@ suite("Tree Tests", () =>
     {
         this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
@@ -289,7 +289,7 @@ suite("Tree Tests", () =>
     {
         this.slow(testControl.slowTime.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
@@ -297,12 +297,12 @@ suite("Tree Tests", () =>
     {
         this.slow((testControl.slowTime.showHideSpecialFolder * 4)  + (testControl.slowTime.configEvent * 4));
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
@@ -318,7 +318,7 @@ suite("Tree Tests", () =>
         this.slow((testControl.slowTime.showHideSpecialFolder * 2) + (testControl.slowTime.configEvent *2));
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
@@ -326,7 +326,7 @@ suite("Tree Tests", () =>
     {
         this.slow(testControl.slowTime.showHideSpecialFolder + testControl.slowTime.configEvent);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
@@ -334,7 +334,7 @@ suite("Tree Tests", () =>
     {
         this.slow(testControl.slowTime.showHideSpecialFolder + testControl.slowTime.configEvent);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
@@ -489,8 +489,8 @@ suite("Tree Tests", () =>
     {
         this.slow(testControl.slowTime.workspaceInvalidation);
         await explorer.invalidateTasksCache();
-        await teApi.waitForIdle(testControl.waitTimeForCommand);
-        await executeTeCommand("refresh", testControl.waitTimeForRefreshCommand);
+        await teApi.waitForIdle(testControl.waitTime.command);
+        await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
     });
 
 });

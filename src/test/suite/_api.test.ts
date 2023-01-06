@@ -54,30 +54,30 @@ suite("API Init and Tests", () =>
     {
         this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.configEvent);
         await teApi.sidebar?.refresh();
-        await teApi.waitForIdle(testControl.waitTimeForConfigEnableEvent);
+        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
         await teApi.sidebar?.refresh();
-        await teApi.waitForIdle(testControl.waitTimeForConfigEnableEvent);
+        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
     });
 
 
     test("Disable Explorer Views", async function()
     {
         this.slow(testControl.slowTime.configRegisterExplorerEvent);
-        await executeSettingsUpdate("enableExplorerView", false, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enableExplorerView", false, testControl.waitTime.configEnableEvent);
     });
 
 
     test("Disable SideBar View", async function()
     {
         this.slow(testControl.slowTime.configRegisterExplorerEvent);
-        await executeSettingsUpdate("enableSideBar", false, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enableSideBar", false, testControl.waitTime.configEnableEvent);
     });
 
 
     test("Re-enable Explorer View", async function()
     {
         this.slow(testControl.slowTime.configRegisterExplorerEvent);
-        await executeSettingsUpdate("enableExplorerView", true, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enableExplorerView", true, testControl.waitTime.configEnableEvent);
         setExplorer(teApi.explorer as IExplorerApi);
     });
 
@@ -85,7 +85,7 @@ suite("API Init and Tests", () =>
     test("Refresh", async function()
     {
         this.slow(testControl.slowTime.refreshCommand);
-        await executeTeCommand("refresh", testControl.waitTimeForRefreshCommand);
+        await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
     });
 
 });

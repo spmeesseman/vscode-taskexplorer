@@ -28,10 +28,12 @@ export const testControl =
         command: 1450,
         commandFast: 550,
         configEvent: 300,
+        configEventFast: 90,
         configRegisterExplorerEvent: 500,
         configEnableEvent: 975,
         configExcludesEvent: 475,
         configGroupingEvent: 700,
+        configReadEvent: 25,
         fetchTasksCommand: 3000,
         focusCommand: 4500,
         fsCreateEvent: 1250,
@@ -40,38 +42,47 @@ export const testControl =
         fsDeleteFolderEvent: 1550,
         fsModifyEvent: 650,
         getTreeTasks: 150,
+        licenseMgrOpenPage: 1000,
         localLicenseCheck: 2000,
+        localStartLicenseServer: 4500,
         npmCommand: 12500,
         refreshCommand: 10250,
         rebuildFileCache: 4500,
         remoteLicenseCheck: 3750,
+        remoteStartLicenseServer: 7500,
         runCommand: 5000,
         runPauseCommand: 2000,
         runStopCommand: 2000,
         showHideSpecialFolder: 350,
+        storageRead: 50,
         storageUpdate: 50,
         taskProviderReadUri: 100,
         verifyTaskCount: 875,
+        walkTaskTree: 5500,
+        walkTaskTreeWithDocOpen: 30000,
         workspaceInvalidation: 15000
     },
     //
     // MINIMUM WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME)
     //
-    waitTimeForBuildTree: 5000,
-    waitTimeForFsCreateEvent: 200,
-    waitTimeForFsDeleteEvent: 200,
-    waitTimeForFsModifyEvent: 150,
-    waitTimeForConfigEvent: 125,
-    waitTimeForConfigEnableEvent: 175,
-    waitTimeForCommand: 150,
-    waitTimeForCommandFast: 50,
-    waitTimeForNpmCommandMin: 3000,
-    waitTimeForRefreshCommand: 500,
-    waitTimeForRefreshTaskTypeCommand: 1000,
-    waitTimeForRunCommand: 3500,
-    waitTimeMax: 15000,
-    //
-    // MAXIMUM WAIT TIMES
-    //
-    waitTimeForNpmCommandMax: 12000
+    waitTime:
+    {
+        buildTree: 5000,
+        fsCreateEvent: 200,
+        fsDeleteEvent: 200,
+        fsModifyEvent: 150,
+        configEvent: 125,
+        configEnableEvent: 175,
+        command: 150,
+        commandFast: 50,
+        npmCommandMin: 3000,
+        refreshCommand: 500,
+        refreshTaskTypeCommand: 1000,
+        runCommand: 3500,
+        max: 15000,
+        //
+        // MAXIMUM WAIT TIMES
+        //
+        waitTimeForNpmCommandMax: 12000
+    }
 };

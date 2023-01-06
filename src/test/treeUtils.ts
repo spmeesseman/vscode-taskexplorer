@@ -36,7 +36,7 @@ export const buildTree = async(instance: any,  rebuild?: boolean) =>
         //
         await teApi.explorer?.refresh("tests");
     }
-    await teApi.waitForIdle(testControl.waitTimeForBuildTree);
+    await teApi.waitForIdle(testControl.waitTime.buildTree);
     // teApi.explorer?.getTaskMap();
     // return teApi.explorer?.getChildren();
     treeBuiltOnce = true;

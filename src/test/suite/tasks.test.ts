@@ -21,13 +21,6 @@ let ant: TaskItem[];
 let bash: TaskItem[];
 let batch: TaskItem[];
 
-const waitTimeMax = testControl.waitTimeMax;
-const waitTimeForConfigEvent = testControl.waitTimeForConfigEvent;
-const waitTimeForFsCreateEvent = testControl.waitTimeForFsCreateEvent;
-const slowTimeForCommand = testControl.slowTime.command;
-const slowTimeForConfigEvent = testControl.slowTime.configEvent;
-const waitTimeForRunCommand = testControl.waitTimeForRunCommand;
-
 
 suite("Task Tests", () =>
 {
@@ -57,7 +50,7 @@ suite("Task Tests", () =>
     test("Empty TaskItem Parameter - Run", async function()
     {
         this.slow(testControl.slowTime.runCommand);
-        await executeTeCommand("run", waitTimeForRunCommand);
+        await executeTeCommand("run", testControl.waitTime.runCommand);
     });
 
 
@@ -84,7 +77,7 @@ suite("Task Tests", () =>
         {
             await storage.update(constants.LAST_TASKS_STORE, undefined);
         }
-        await executeTeCommand("runLastTask", waitTimeForRunCommand);
+        await executeTeCommand("runLastTask", testControl.waitTime.runCommand);
         if (hasLastTasks)
         {
             await storage.update(constants.LAST_TASKS_STORE, lastTasks);
@@ -96,7 +89,7 @@ suite("Task Tests", () =>
     {
         this.slow(testControl.slowTime.runCommand + testControl.slowTime.runStopCommand + testControl.slowTime.configEvent);
         await executeSettingsUpdate("keepTermOnStop", false);
-        await executeTeCommand("run", waitTimeForRunCommand, 5000, batch[0]);
+        await executeTeCommand("run", testControl.waitTime.runCommand, 5000, batch[0]);
         await executeTeCommand("stop", 1000, 1500, batch[0]);
     });
 
@@ -105,16 +98,16 @@ suite("Task Tests", () =>
     {
         this.slow(testControl.slowTime.runCommand + testControl.slowTime.runStopCommand + testControl.slowTime.configEvent);
         await executeSettingsUpdate("keepTermOnStop", true);
-        await executeTeCommand("run", waitTimeForRunCommand, 5000, batch[0]);
+        await executeTeCommand("run", testControl.waitTime.runCommand, 5000, batch[0]);
         await executeTeCommand("stop", 1000, 1500, batch[0]);
     });
 
 
     test("Trigger busy on run last task", async function()
     {
-        this.slow(testControl.slowTime.runCommand + waitTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.runCommand + testControl.waitTime.fsCreateEvent);
         explorer.invalidateTasksCache();// Don't await
-        await executeTeCommand("runLastTask", waitTimeForRunCommand, testControl.slowTime.runCommand);
+        await executeTeCommand("runLastTask", testControl.waitTime.runCommand, testControl.slowTime.runCommand);
     });
 
 
@@ -122,15 +115,15 @@ suite("Task Tests", () =>
     {
         this.slow(testControl.slowTime.runCommand);
         bash[0].paused = true;
-        await executeTeCommand2("runLastTask", [ batch[0] ], waitTimeForRunCommand);
+        await executeTeCommand2("runLastTask", [ batch[0] ], testControl.waitTime.runCommand);
         bash[0].paused = false;
     });
 
 
     test("Pause", async function()
     {
-        this.slow((waitTimeForRunCommand * 2) + testControl.slowTime.runCommand);
-        await executeTeCommand2("run", [ batch[0] ], waitTimeForRunCommand);
+        this.slow((testControl.waitTime.runCommand * 2) + testControl.slowTime.runCommand);
+        await executeTeCommand2("run", [ batch[0] ], testControl.waitTime.runCommand);
         await executeTeCommand2("pause", [ batch[0] ], 500);
         await executeTeCommand2("stop", [ batch[0] ], 400);
     });
@@ -154,9 +147,9 @@ suite("Task Tests", () =>
 
     test("Ant", async function()
     {
-        this.slow(waitTimeForRunCommand * 2);
+        this.slow(testControl.waitTime.runCommand * 2);
         const antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
-        await executeTeCommand2("run", [ antTask ], waitTimeForRunCommand);
+        await executeTeCommand2("run", [ antTask ], testControl.waitTime.runCommand);
         lastTask = antTask;
     });
 
@@ -165,10 +158,10 @@ suite("Task Tests", () =>
     {   //
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
         //
-        this.slow(testControl.slowTime.runCommand + (slowTimeForConfigEvent * 4) + (slowTimeForCommand * 4));
+        this.slow(testControl.slowTime.runCommand + (testControl.slowTime.configEvent * 4) + (testControl.slowTime.command * 4));
         await executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await startTask(bash[0]);
-        await executeTeCommand2("run", [ bash[0] ], waitTimeForRunCommand);
+        await executeTeCommand2("run", [ bash[0] ], testControl.waitTime.runCommand);
         await endTask(bash[0]);
         lastTask = bash[0];
     });
@@ -185,26 +178,26 @@ suite("Task Tests", () =>
         await startTask(batchTask);
         await executeSettingsUpdate("keepTermOnStop", false);
         await executeTeCommand2("open", [ batchTask, true ], 100); // clickaction=execute
-        await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], waitTimeForRunCommand);
+        await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], testControl.waitTime.runCommand);
         await executeTeCommand2("stop", [ batchTask ], 0, 0);
-        await executeTeCommand2("run", [ batchTask ], waitTimeForRunCommand);
-        executeTeCommand("pause", 1000, waitTimeMax, batchTask); // ?? No await ?
+        await executeTeCommand2("run", [ batchTask ], testControl.waitTime.runCommand);
+        executeTeCommand("pause", 1000, testControl.waitTime.max, batchTask); // ?? No await ?
         await executeTeCommand2("pause", [ batchTask ], 500);
-        await executeTeCommand2("run", [ batchTask ], waitTimeForRunCommand);
+        await executeTeCommand2("run", [ batchTask ], testControl.waitTime.runCommand);
         await executeSettingsUpdate("taskButtons.clickAction", "Open");
         await executeSettingsUpdate("visual.disableAnimatedIcons", false);
-        await executeTeCommand2("run", [ batchTask ], waitTimeForRunCommand / 3);
+        await executeTeCommand2("run", [ batchTask ], testControl.waitTime.runCommand / 3);
         await executeSettingsUpdate("taskButtons.clickAction", "Execute");
         await executeTeCommand2("openTerminal", [ batchTask ], 50);
         await executeTeCommand2("pause", [ batchTask ], 500);
         await executeSettingsUpdate("keepTermOnStop", true);
         await executeTeCommand2("stop", [ batchTask ], 50);
         await executeSettingsUpdate("showRunningTask", false);
-        await executeTeCommand("runLastTask", 1500, waitTimeMax, batchTask);
+        await executeTeCommand("runLastTask", 1500, testControl.waitTime.max, batchTask);
         await executeSettingsUpdate("keepTermOnStop", false);
         await executeTeCommand2("restart", [ batchTask ], 1500);
         await executeTeCommand2("stop", [ batchTask ], 400);
-        await executeTeCommand("runNoTerm", 1500, waitTimeMax, batchTask);
+        await executeTeCommand("runNoTerm", 1500, testControl.waitTime.max, batchTask);
         await executeTeCommand2("stop", [ batchTask ], 200);
         await endTask(batchTask);
     });
@@ -220,11 +213,11 @@ suite("Task Tests", () =>
         await startTask(batchTask);
         await executeSettingsUpdate("keepTermOnStop", false);
         await executeTeCommand2("open", [ batchTask, true ], 100); // clickaction=execute
-        await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], waitTimeForRunCommand);
+        await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], testControl.waitTime.runCommand);
         await executeTeCommand2("stop", [ batchTask ], 200);
         overrideNextShowInputBox("--test --test2");
-        await executeTeCommand2("runWithArgs", [ batchTask ], waitTimeForRunCommand / 3);
-        // await executeTeCommand("stop", 200, waitTimeMax, batchTask);
+        await executeTeCommand2("runWithArgs", [ batchTask ], testControl.waitTime.runCommand / 3);
+        // await executeTeCommand("stop", 200, testControl.waitTime.max, batchTask);
         await executeSettingsUpdate("showRunningTask", true);
         await teApi.waitForIdle(8000);
         await endTask(batchTask);

@@ -70,7 +70,7 @@ suite("NPM Tests", () =>
             "    }\r\n" +
             "}\r\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
     });
 
 
@@ -102,7 +102,7 @@ suite("NPM Tests", () =>
     {
         this.slow(testControl.slowTime.commandFast * npmTaskItems.length);
         for (const taskItem of npmTaskItems) {
-            await executeTeCommand2("open", [ taskItem ], testControl.waitTimeForCommandFast);
+            await executeTeCommand2("open", [ taskItem ], testControl.waitTime.commandFast);
         }
     });
 
@@ -110,7 +110,7 @@ suite("NPM Tests", () =>
     test("Install", async function()
     {
         this.slow(testControl.slowTime.npmCommand);
-        const exec = await executeTeCommand2("runInstall", [ npmTaskItems[0].taskFile ], testControl.waitTimeForNpmCommandMin, testControl.waitTimeForNpmCommandMax) as TaskExecution | undefined;
+        const exec = await executeTeCommand2("runInstall", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });
 
@@ -118,7 +118,7 @@ suite("NPM Tests", () =>
     test("Update", async function()
     {
         this.slow(testControl.slowTime.npmCommand);
-        const exec = await executeTeCommand2("runUpdate", [ npmTaskItems[0].taskFile ], testControl.waitTimeForNpmCommandMin, testControl.waitTimeForNpmCommandMax) as TaskExecution | undefined;
+        const exec = await executeTeCommand2("runUpdate", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });
 
@@ -127,7 +127,7 @@ suite("NPM Tests", () =>
     {
         this.slow(testControl.slowTime.npmCommand);
         overrideNextShowInputBox("@spmeesseman/app-publisher");
-        const exec = await executeTeCommand2("runUpdatePackage", [ npmTaskItems[0].taskFile ], testControl.waitTimeForNpmCommandMin, testControl.waitTimeForNpmCommandMax) as TaskExecution | undefined;
+        const exec = await executeTeCommand2("runUpdatePackage", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });
 
@@ -135,7 +135,7 @@ suite("NPM Tests", () =>
     test("Audit", async function()
     {
         this.slow(testControl.slowTime.npmCommand);
-        const exec = await executeTeCommand2("runAudit", [ npmTaskItems[0].taskFile ], testControl.waitTimeForNpmCommandMin, testControl.waitTimeForNpmCommandMax) as TaskExecution | undefined;
+        const exec = await executeTeCommand2("runAudit", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });
 
@@ -143,7 +143,7 @@ suite("NPM Tests", () =>
     test("Audit Fix", async function()
     {
         this.slow(testControl.slowTime.npmCommand);
-        const exec = await executeTeCommand2("runAuditFix", [ npmTaskItems[0].taskFile ], testControl.waitTimeForNpmCommandMin, testControl.waitTimeForNpmCommandMax) as TaskExecution | undefined;
+        const exec = await executeTeCommand2("runAuditFix", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });
 

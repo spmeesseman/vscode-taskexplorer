@@ -14,6 +14,7 @@ import {
     activate, executeSettingsUpdate, executeTeCommand2, getWsPath, testControl, treeUtils,
     verifyTaskCount, waitForTaskExecution
 } from "../helper";
+import { isObjectEmpty } from "../../lib/utils/utils";
 
 const testsName = "bash";
 const startTaskCount = 1;
@@ -45,7 +46,7 @@ suite("Bash Tests", () =>
         pathToTaskProgram = teApi.config.get<string>("pathToPrograms." + testsName);
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe");
-        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
     });
 
 
@@ -54,7 +55,7 @@ suite("Bash Tests", () =>
         // Reset settings
         //
         await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
-        await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTime.configEnableEvent);
         await fsApi.deleteDir(dirName);
     });
 
@@ -90,7 +91,7 @@ suite("Bash Tests", () =>
     test("Disable", async function()
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 
@@ -98,7 +99,7 @@ suite("Bash Tests", () =>
     test("Re-enable", async function()
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
@@ -108,7 +109,7 @@ suite("Bash Tests", () =>
         this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
-        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
@@ -117,10 +118,10 @@ suite("Bash Tests", () =>
     {
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
     });
 
 
@@ -129,7 +130,7 @@ suite("Bash Tests", () =>
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
-        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
@@ -138,7 +139,7 @@ suite("Bash Tests", () =>
     {
         this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
@@ -156,9 +157,15 @@ suite("Bash Tests", () =>
     {   //
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
         //
-        this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript);
+        const taskMap = teApi.testsApi.explorer.getTaskMap();
+        if (isObjectEmpty(taskMap)) {
+            this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript + testControl.slowTime.refreshCommand);
+        }
+        else {
+            this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript);
+        }
         const bash = await treeUtils.getTreeTasks("bash", startTaskCount);
-        const exec = await executeTeCommand2("run", [ bash[0] ], testControl.waitTimeForRunCommand) as TaskExecution | undefined;
+        const exec = await executeTeCommand2("run", [ bash[0] ], testControl.waitTime.runCommand) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });
 

@@ -50,7 +50,7 @@ suite("App-Publisher Tests", () =>
     test("Enable (Off by Default)", async function()
     {
         this.slow(testControl.slowTime.configEnableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
     });
 
 
@@ -92,7 +92,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
     });
 
@@ -100,7 +100,7 @@ suite("App-Publisher Tests", () =>
     test("Disable", async function()
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 
@@ -108,7 +108,7 @@ suite("App-Publisher Tests", () =>
     test("Re-enable", async function()
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
     });
 
@@ -136,7 +136,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn""\n' +
             "\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount);
         if (resetLogging) { // turn scary error logging off
             executeSettingsUpdate("logging.enable", true);
@@ -159,7 +159,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent + testControl.slowTime.verifyTaskCount);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent + testControl.slowTime.verifyTaskCount);
         await verifyTaskCount(testsName, startTaskCount + 21);
     });
 
@@ -168,7 +168,7 @@ suite("App-Publisher Tests", () =>
     {
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
@@ -176,7 +176,7 @@ suite("App-Publisher Tests", () =>
     test("Disable (Default is OFF)", async function()
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 

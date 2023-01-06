@@ -67,7 +67,7 @@ suite("Ant Tests", () =>
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", false);
-        await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
+        await teApi.waitForIdle(testControl.waitTime.configEvent);
         await verifyTaskCount("ant", 0);
     });
 
@@ -76,7 +76,7 @@ suite("Ant Tests", () =>
     {
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", true);
-        await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
+        await teApi.waitForIdle(testControl.waitTime.configEvent);
         await verifyTaskCount("ant", 3);
     });
 
@@ -234,7 +234,7 @@ suite("Ant Tests", () =>
  */
 async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAnt2: number, waitTime?: number)
 {
-    await teApi.waitForIdle(waitTime || testControl.waitTimeForFsModifyEvent);
+    await teApi.waitForIdle(waitTime || testControl.waitTime.fsModifyEvent);
     //
     // Don't use Ant
     //
