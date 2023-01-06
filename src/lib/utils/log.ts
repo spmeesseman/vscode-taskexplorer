@@ -162,9 +162,9 @@ function logLogFileLocation()
         /* istanbul ignore else */
         if (isTests)
         {
-            console.log(`    ${figures.pointer} ${withColor("*************************************************************************************", colors.grey)}`, 1);
-            console.log(`    ${figures.pointer} ${withColor(" Log File: " + fileName, colors.grey)}`);
-            console.log(`    ${figures.pointer} ${withColor("*************************************************************************************", colors.grey)}`, 1);
+            console.log(`    ${figures.color.pointer} ${withColor("*************************************************************************************", colors.grey)}`);
+            console.log(`    ${figures.color.pointer} ${withColor(" Log File: " + fileName, colors.grey)}`);
+            console.log(`    ${figures.color.pointer} ${withColor("*************************************************************************************", colors.grey)}`);
         }
         enableOutputWindow = writeToOutputOrig;
         writeToConsole = writeToConsoleOrig;

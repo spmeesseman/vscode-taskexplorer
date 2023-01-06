@@ -77,10 +77,10 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
     //
     let taskMap = teApi.testsApi.explorer.getTaskMap();
     if (!taskMap || isObjectEmpty(taskMap)) {
-        console.log(`    ${figures.color.warning} Task map is empty, fall back to walkTreeItems`);
+        console.log(`    ${figures.color.warning} ${teApi.log.withColor("Task map is empty, fall back to walkTreeItems", colors.grey)}`);
         taskMap = await walkTreeItems(undefined);
         if (!taskMap || isObjectEmpty(taskMap)) {
-            console.log(`    ${figures.color.error} Task map is empty, test will fail in 3, 2, 1...`);
+            console.log(`    ${figures.color.error} ${teApi.log.withColor("Task map is empty, test will fail in 3, 2, 1...", colors.grey)}`);
         }
     }
     //
@@ -124,7 +124,7 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
     {
         console.log(`    ${figures.color.warning} ${teApi.log.withColor("No tree items!", colors.grey)}`);
         if (Date.now() - now < 500) {
-            console.log(`    ${figures.warning} Trying again...`);
+            console.log(`    ${figures.warning} ${teApi.log.withColor("Trying again..." , colors.grey)}`);
             treeItems = await teApi.testsApi.explorer.getChildren(undefined, "", 5);
         }
         if (!treeItems || treeItems.length === 0) {
@@ -237,5 +237,5 @@ export const verifyTaskCountByTree = async(taskType: string, expectedCount: numb
     const tasksMap = (taskMap || (await walkTreeItems(undefined))),
     // const tasksMap = (teApi.explorer as IExplorerApi).getTaskMap(),
             taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
-    assert(taskCount === expectedCount, `Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
+    assert(taskCount === expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 };

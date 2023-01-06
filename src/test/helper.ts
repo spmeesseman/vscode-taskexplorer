@@ -296,20 +296,20 @@ function isExecuting(task: Task)
 function isReady(taskType?: string)
 {
     let err: string | undefined;
-    if (!teApi)                                 err = `    ${figures.error} TeApi null`;
+    if (!teApi)                                 err = `    ${figures.color.error} TeApi null`;
     else {
-        if (!teApi.explorer)                    err = `    ${figures.error} TeApi Explorer provider == null`;
-        else if (teApi.sidebar)                 err = `    ${figures.error} TeApi Sidebar Provider != null`;
-        else if (!teApi.providers)              err = `    ${figures.error} Providers null`;
+        if (!teApi.explorer)                    err = `    ${figures.color.error} TeApi Explorer provider == null`;
+        else if (teApi.sidebar)                 err = `    ${figures.color.error} TeApi Sidebar Provider != null`;
+        else if (!teApi.providers)              err = `    ${figures.color.error} Providers null`;
     }
     if (!err && taskType) {
-        if (!teApi.providers.get(taskType))     err = `    ${figures.error} ${taskType} Provider == null`;
+        if (!teApi.providers.get(taskType))     err = `    ${figures.color.error} ${taskType} Provider == null`;
     }
     if (!err && !(workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined)) {
-                                                err = `    ${figures.error} Workspace folder does not exist`;
+                                                err = `    ${figures.color.error} Workspace folder does not exist`;
     }
     if (!err && !extensions.getExtension("spmeesseman.vscode-taskexplorer")) {
-                                                err = `    ${figures.error} Extension not found`;
+                                                err = `    ${figures.color.error} Extension not found`;
     }
     if (err) {
         console.log(err);
@@ -349,7 +349,7 @@ export async function verifyTaskCount(taskType: string, expectedCount: number)
         tTasks = tTasks.filter(t => t.source === "Workspace");
     }
     try {
-        assert(tTasks && tTasks.length === expectedCount, `Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
+        assert(tTasks && tTasks.length === expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
     }
     catch (e) { throw e; }
 }

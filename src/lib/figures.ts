@@ -42,7 +42,8 @@ export default
         warning: withColor("⚠", colors.yellow),
         error: withColor("✘", colors.red),
         start: withColor("▶", colors.green),
-        end: withColor("◀", colors.green)
+        end: withColor("◀", colors.green),
+        pointer: withColor("❯", colors.grey),
     }
 
 };
