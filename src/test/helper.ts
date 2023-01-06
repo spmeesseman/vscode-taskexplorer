@@ -84,7 +84,7 @@ export async function activate(instance?: any)
         treeUtils = new TreeUtils(teApi);
         setExplorer(teApi.explorer);  // _api pre-test suite will reset after disable/enable
         teApi.waitForIdle(); // added 1/2/03 - Tree loads in delay 'after' activate()
-        teApi.log.setWriteToConsole(testsControl.writeToConsole, testsControl.logLevel);
+        teApi.log.setWriteToConsole(testsControl.logToConsole, testsControl.logLevel);
     }
     return teApi;
 }
@@ -252,7 +252,6 @@ async function initSettings()
     // Set misc settings, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("autoRefresh", true);
     await configuration.updateWs("enabledTasks",
     {
         ant: true,
@@ -283,9 +282,10 @@ async function initSettings()
     await configuration.updateWs("groupWithSeparator", true);
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("keepTermOnStop", false);
-    await configuration.updateWs("logging.enable", testsControl.writeToOutput);
+    await configuration.updateWs("logging.enable", testsControl.logEnabled);
     await configuration.updateWs("logging.level", testsControl.logLevel);
-    await configuration.updateWs("logging.enableFile", testsControl.writeToFile);
+    await configuration.updateWs("logging.enableFile", testsControl.logToFile);
+    await configuration.updateWs("logging.enableOutputWindow", testsControl.logToOutput);
     await configuration.updateWs("pathToPrograms", configuration.get<object>("pathToPrograms"));
     await configuration.updateWs("showHiddenWsTasks", true);
     await configuration.updateWs("showRunningTask", true);

@@ -10,9 +10,10 @@ export const testControl =
     // LOGGING DEFAULTS
     //
     logLevel: 1,
-    writeToConsole: false,
-    writeToFile: false,
-    writeToOutput: true,
+    logEnabled: true,
+    logToConsole: false,
+    logToFile: true,
+    logToOutput: true,
     //
     // Use update() here for coverage, since these two settings wont trigger any processing
     //

@@ -2,7 +2,7 @@
 
 import { configuration } from "./configuration";
 import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
-import { writeFileSync } from "fs";
+import { appendFileSync } from "fs";
 import { isArray, isError, isObject, isString } from "./utils";
 import { dirname, join } from "path";
 import { createDir } from "./fs";
@@ -32,6 +32,7 @@ const msgQueue: { [queueId: string]:  IMsgQueueItem[] } = {};
 
 let enable= false;
 let enableFile= false;
+let enableOutputWindow= false;
 let fileName= "";
 let logLevel = -1;
 let writeToConsole = false;
@@ -115,15 +116,15 @@ export async function initLog(settingGrpName: string, dispName: string, context:
         }
     }
 
-    enable = configuration.get<boolean>("logging.enable");
-    logLevel = configuration.get<number>("logging.level");
-
-    enableFile = configuration.get<boolean>("logging.enableFile");
+    enable = configuration.get<boolean>("logging.enable", false);
+    logLevel = configuration.get<number>("logging.level", 1);
+    enableOutputWindow = configuration.get<boolean>("logging.enableOutputWindow", true);
+    enableFile = configuration.get<boolean>("logging.enableFile", false);
     fileName = join(context.logUri.fsPath, getLogFileName());
     await createDir(dirname(fileName));
 
     //
-    // Set up a log in the Output window
+    // Set up a log in the Output window (even if enableOutputWindow is off)
     //
     logOutputChannel = window.createOutputChannel(dispName);
     context.subscriptions.push(logOutputChannel);
@@ -163,10 +164,17 @@ export function isLoggingEnabled()
 
 function logLogFileLocation()
 {
-    if (enable && enableFile) {
+    if (enable && enableFile)
+    {
+        const writeToConsoleOrig = writeToConsole;
+        const writeToOutputOrig = enableOutputWindow;
+        enableOutputWindow = true;
+        writeToConsole = true;
         write("*************************************************************************************", 1);
         write(" Log File: " + fileName);
         write("*************************************************************************************", 1);
+        enableOutputWindow = writeToOutputOrig;
+        writeToConsole = writeToConsoleOrig;
     }
 }
 
@@ -201,6 +209,10 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     if (e.affectsConfiguration("taskExplorer.logging.enable"))
     {
         enable = configuration.get<boolean>("logging.enable", false);
+    }
+    if (e.affectsConfiguration("taskExplorer.logging.enableOutputWindow"))
+    {
+        enableOutputWindow = configuration.get<boolean>("logging.enableOutputWindow", true);
     }
     if (e.affectsConfiguration("taskExplorer.logging.enableFile"))
     {
@@ -337,7 +349,7 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
             }
         };
 
-        if (logOutputChannel && (!level || level <= (logLevel))) {
+        if (enableOutputWindow && logOutputChannel && (!level || level <= (logLevel))) {
             _write(logOutputChannel.appendLine, logOutputChannel);
         }
         if (writeToConsole) {
@@ -347,7 +359,7 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
         }
         if (enableFile) {
             if (!level || level <= logLevel) {
-                _write(writeFileSync, null, fileName);
+                _write(appendFileSync, null, fileName);
             }
         }
         lastWriteWasBlank = msg === "";
