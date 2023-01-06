@@ -55,7 +55,7 @@
         "build_test": "npx tsc -p tsconfig.test.json",
         "build_types": "tsc -p ./types && cmd /c xcopy .\\types\\lib\\* .\\node_modules\\@spmeesseman\\vscode-taskexplorer-types\\lib /s /i /y",
         "clean": "rimraf dist && rimraf .nyc_output && rimraf coverage",
-        "copy-build-to-code": "cmd /c xcopy .\\dist\\*.js ..\\..\\Code\\data\\extensions\\spmeesseman.vscode-taskexplorer-2.13.2\\dist /s /i /y && npm run cp-pkgjson-to-code-install",
+        "copy-build-to-code": "cmd /c xcopy .\\dist\\*.js ..\\..\\Code\\data\\extensions\\spmeesseman.vscode-taskexplorer-2.13.2\\dist /s /i /y",
         "copy-pkgjson-to-code": "cmd /c copy /Y .\\package*.json ..\\..\\Code\\data\\extensions\\spmeesseman.vscode-taskexplorer-2.13.2",
         "lint": "eslint -c .eslintrc.js --ext .ts .",
         "vsce-package": "vsce package",

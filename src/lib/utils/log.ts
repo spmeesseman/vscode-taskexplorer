@@ -60,19 +60,40 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
     if (msg)
     {
         const currentWriteToConsole = writeToConsole;
+        const currentWriteToFile = enableFile;
+        const currentWriteToOutputWindow = enableOutputWindow;
         writeToConsole = true;
-        if (!lastWriteWasBlankError && !lastWriteToConsoleWasBlank) {
-            write(figures.color.error, 0, "", queueId);
-        }
+        const _write = (err: any) =>
+        {
+            writeToConsole = true;
+            enableFile = false;
+            enableOutputWindow = false;
+            write(figures.color.error + (err ? " " : "") + (err || ""), 0, "");
+            writeToConsole = false;
+            enableFile = currentWriteToFile;
+            enableOutputWindow = currentWriteToOutputWindow;
+            write(figures.error + (err ? " " : "") + (err || ""), 0, "", queueId);
+        };
+        const _write2 = (err: any) =>
+        {
+            writeToConsole = true;
+            enableFile = false;
+            enableOutputWindow = false;
+            writeError(err, figures.color.error);
+            writeToConsole = false;
+            enableFile = currentWriteToFile;
+            enableOutputWindow = currentWriteToOutputWindow;
+            writeError(err, figures.error, queueId);
+        };
         const _writeErr = (err: any) =>
         {
             if (isString(err))
             {
-                write(figures.color.error + " " + err, 0, "", queueId);
+                _write(err);
             }
             else if (isError(err))
             {
-                writeError(err, queueId);
+                _write2(err);
             }
             else if (isArray(err))
             {
@@ -81,33 +102,38 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
             else if (isObject(err))
             {
                 if (err.messageX) {
-                    writeError(err.messageX, queueId);
+                    _write2(err.messageX);
                 }
                 else if (err.message) {
-                    writeError(err.message, queueId);
+                    _write2(err.message);
                 }
                 else if (isObjectEmpty(err)) {
-                    write(figures.color.error + "{} (empty object)", 0, "", queueId);
+                    _write(figures.color.error + "{} (empty object)");
                 }
                 else if (isFunction(err.toString)) {
-                    write(figures.color.error + " " + err.toString(), 0, "", queueId);
+                    _write(figures.color.error + " " + err.toString());
                 }
             }
             else if (isFunction(err.toString)) {
-                write(figures.color.error + " " + err.toString(), 0, "", queueId);
+                _write(figures.color.error + " " + err.toString());
             }
         };
+        if (!lastWriteWasBlankError && !lastWriteToConsoleWasBlank) {
+            _write("");
+        }
         _writeErr(msg);
         if (params) {
             for (const [ n, v, l ] of params) {
                 value(figures.color.error + "   " + n, v, 0, "", queueId);
             }
         }
-        write(figures.color.error, 0, "", queueId);
+        _write("");
         lastWriteWasBlank = true;
         lastWriteWasBlankError = true;
         lastWriteToConsoleWasBlank = true;
         writeToConsole = currentWriteToConsole;
+        enableFile = currentWriteToFile;
+        enableOutputWindow = currentWriteToOutputWindow;
     }
 }
 
@@ -382,12 +408,12 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
 }
 
 
-function writeError(e: Error, queueId?: string)
+function writeError(e: Error, figure: string, queueId?: string)
 {
-    write(figures.color.error + " " + e.name, 0, "", queueId);
-    write(figures.color.error + " " + e.message, 0, "", queueId);
+    write(figure + " " + e.name, 0, "", queueId);
+    write(figure + " " + e.message, 0, "", queueId);
     if (e.stack) {
-        const stackFmt = e.stack.replace(/\n/g, `\n${figures.color.error} `);
-        write(figures.color.error + " " + stackFmt, 0, "", queueId);
+        const stackFmt = e.stack.replace(/\n/g, `\n${figure} `);
+        write(figure + " " + stackFmt, 0, "", queueId);
     }
 }

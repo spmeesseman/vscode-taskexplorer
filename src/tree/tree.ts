@@ -1876,43 +1876,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
     private async runLastTask()
     {
-        if (this.isBusy())
-        {
-            window.showInformationMessage("Busy, please wait...");
-            return;
-        }
-
-        let lastTaskId: string | undefined;
-        const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-        if (lastTasks && lastTasks.length > 0)
-        {
-            lastTaskId = lastTasks[lastTasks.length - 1];
-        }
-
-        if (!lastTaskId)
-        {
-            window.showInformationMessage("No saved tasks!");
-            return;
-        }
-
-        log.methodStart("run last task", 1, "", true, [[ "last task id", lastTaskId ]]);
-
-        const taskItem = this.taskMap[lastTaskId];
-        let exec: TaskExecution | undefined;
-
-        /* istanbul ignore else */
-        if (taskItem && taskItem instanceof TaskItem)
-        {
-            exec = await this.run(taskItem);
-        }
-        else
-        {
-            window.showInformationMessage("Task not found!  Check log for details");
-            await this.specialFolders.lastTasks.removeTaskFile(lastTaskId);
-        }
-
-        log.methodDone("run last task", 1);
-        return exec;
+log.error("Test5 error");
+log.write("-----------------");
+log.error(new Error("Test error object"));
+log.write("-----------------");
+log.error([ "Test error 1", "Test error 2" ]);
+log.write("-----------------");
+log.error([ "Test error 2",  new Error("Test error object") ]);
+log.write("-----------------");
+log.error([ "Test error 3", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
+log.write("-----------------");
+log.error(true);
+log.write("-----------------");
+log.error(undefined);
+log.write("-----------------");
+return;
     }
 
 
