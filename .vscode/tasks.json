@@ -3,7 +3,7 @@
     "tasks": [
     {
         "type": "npm",
-        "script": "watch",
+        "script": "tsc-watch",
         "problemMatcher": "$tsc-watch",
         "isBackground": true,
         "presentation": {
@@ -45,7 +45,7 @@
     },
     {
         "type": "npm",
-        "script": "build",
+        "script": "tsc-build",
         "problemMatcher": [
             "$tsc"
         ]

@@ -11,7 +11,7 @@
             "request": "launch",
             "runtimeExecutable": "${execPath}",
             "sourceMaps": true,
-            "preLaunchTask": "npm: watch",
+            "preLaunchTask": "npm: tsc-watch",
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],
@@ -27,7 +27,7 @@
             "request": "launch",
             "runtimeExecutable": "${execPath}",
             "sourceMaps": true,
-            "preLaunchTask": "npm: watch",
+            "preLaunchTask": "npm: tsc-watch",
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],
@@ -44,7 +44,7 @@
             "request": "launch",
             "runtimeExecutable": "${execPath}",
             "sourceMaps": true,
-            "preLaunchTask": "npm: watch",
+            "preLaunchTask": "npm: tsc-watch",
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],
@@ -61,7 +61,7 @@
             "request": "launch",
             "runtimeExecutable": "${execPath}",
             "sourceMaps": true,
-            "preLaunchTask": "npm: watch",
+            "preLaunchTask": "npm: tsc-watch",
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],

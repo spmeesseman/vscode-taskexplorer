@@ -5,7 +5,7 @@ import { appendFileSync } from "fs";
 import { dirname, join } from "path";
 import { createDir } from "./fs";
 import { configuration } from "./configuration";
-import { isArray, isError, isFunction, isObject, isString } from "./utils";
+import { isArray, isError, isFunction, isObject, isObjectEmpty, isString } from "./utils";
 import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
 import figures from "../figures";
 
@@ -28,6 +28,8 @@ let logLevel = -1;
 let writeToConsole = false;
 let writeToConsoleLevel = 2;
 let lastWriteWasBlank = false;
+let lastWriteWasBlankError = false;
+let lastWriteToConsoleWasBlank = false;
 let logOutputChannel: OutputChannel | undefined;
 
 
@@ -57,7 +59,11 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
 {
     if (msg)
     {
-        write(figures.color.error, 0, "", queueId);
+        const currentWriteToConsole = writeToConsole;
+        writeToConsole = true;
+        if (!lastWriteWasBlankError && !lastWriteToConsoleWasBlank) {
+            write(figures.color.error, 0, "", queueId);
+        }
         const _writeErr = (err: any) =>
         {
             if (isString(err))
@@ -80,6 +86,9 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
                 else if (err.message) {
                     writeError(err.message, queueId);
                 }
+                else if (isObjectEmpty(err)) {
+                    write(figures.color.error + "{} (empty object)", 0, "", queueId);
+                }
                 else if (isFunction(err.toString)) {
                     write(figures.color.error + " " + err.toString(), 0, "", queueId);
                 }
@@ -89,13 +98,16 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
             }
         };
         _writeErr(msg);
-        if (params)
-        {
+        if (params) {
             for (const [ n, v, l ] of params) {
                 value(figures.color.error + "   " + n, v, 0, "", queueId);
             }
         }
         write(figures.color.error, 0, "", queueId);
+        lastWriteWasBlank = true;
+        lastWriteWasBlankError = true;
+        lastWriteToConsoleWasBlank = true;
+        writeToConsole = currentWriteToConsole;
     }
 }
 
@@ -304,6 +316,7 @@ export const withColor = figures.withColor;
 
 export function write(msg: string, level?: number, logPad = "", queueId?: string) // , color?: LogColor)
 {
+    // const isBlankError = /\[[0-9]{1,2}m[\W]{1}\[[0-9]{1,2}m/.test(msg);
     if (msg === null || msg === undefined || (lastWriteWasBlank && msg === "")) {
         return;
     }
@@ -354,6 +367,7 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
             if (!level || level <= writeToConsoleLevel) {
                 msg = withColor(msg, colors.grey);
                 _write(console.log, console, false);
+                lastWriteToConsoleWasBlank = false;
             }
         }
         if (enableFile) {
@@ -361,20 +375,19 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
                 _write(appendFileSync, null, true, fileName);
             }
         }
-        lastWriteWasBlank = msg === "";
+
+        lastWriteWasBlankError = false;
+        lastWriteWasBlank = (msg === "");
     }
 }
 
 
 function writeError(e: Error, queueId?: string)
 {
-    const currentWriteToConsole = writeToConsole;
-    writeToConsole = true;
     write(figures.color.error + " " + e.name, 0, "", queueId);
     write(figures.color.error + " " + e.message, 0, "", queueId);
     if (e.stack) {
         const stackFmt = e.stack.replace(/\n/g, `\n${figures.color.error} `);
         write(figures.color.error + " " + stackFmt, 0, "", queueId);
     }
-    writeToConsole = currentWriteToConsole;
 }
