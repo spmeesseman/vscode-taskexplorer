@@ -220,16 +220,13 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
         }
     };
 
-    for (const item of treeItems)
+    for (const item of treeItems.filter(i => i instanceof TaskFolder))
     {
-        if (item instanceof TaskFolder)
-        {
-            // let isFav = false, isLast = false, isUser = false;
-            // isFav = (item.label as string).includes(constants.FAV_TASKS_LABEL);
-            // isLast = (item.label as string).includes(constants.LAST_TASKS_LABEL);
-            // isUser = (item.label as string).includes(constants.USER_TASKS_LABEL);
-            await processItem(item);
-        }
+        // let isFav = false, isLast = false, isUser = false;
+        // isFav = (item.label as string).includes(constants.FAV_TASKS_LABEL);
+        // isLast = (item.label as string).includes(constants.LAST_TASKS_LABEL);
+        // isUser = (item.label as string).includes(constants.USER_TASKS_LABEL);
+        await processItem(item);
     }
 
     return taskMap;

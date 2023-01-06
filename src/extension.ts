@@ -63,7 +63,7 @@ export const teApi: ITaskExplorerApi =
     waitForIdle: waitForTaskExplorerIdle,
     testsApi: {
         fs,
-        explorer: {} as IExplorerApi,
+        explorer: {} as IExplorerApi, // registerExplorer() will set
         fileCache: cache
     }
 };
@@ -71,10 +71,8 @@ export const teApi: ITaskExplorerApi =
 
 export async function activate(context: ExtensionContext) // , disposables: Disposable[]): Promise<ITaskExplorerApi>
 {
-    tests = await fs.pathExists(join(context.extensionUri.fsPath, "test", "runTest.js"));
-
+    tests = await fs.pathExists(join(__dirname, "test", "runTest.js"));
     await log.initLog("taskExplorer", "Task Explorer", context, tests);
-
     initStorage(context);
 
     log.write("");
