@@ -10,7 +10,7 @@ import constants from "../lib/constants";
 import TreeUtils from "./treeUtils";
 import { deleteFile, pathExists } from "../lib/utils/fs";
 import { IExplorerApi, ITaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
-import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
+import { commands, extensions, Task, TaskExecution, tasks, Uri, window, workspace } from "vscode";
 
 let activated = false;
 let teApi: ITaskExplorerApi;
@@ -115,8 +115,7 @@ export async function activate(instance?: any)
 
 export async function cleanup()
 {
-    const rootPath = getWsPath("."),
-          settingsFile = path.join(rootPath, ".vscode", "settings.json");
+    const rootPath = getWsPath(".");
 
     await deactivate();
 
@@ -129,6 +128,7 @@ export async function cleanup()
     //
     // if (!testsControl.keepSettingsFileChanges)
     // {
+    //     settingsFile = path.join(rootPath, ".vscode", "settings.json");
     //     try {
     //         if (await pathExists(settingsFile)) {
     //             await writeFile(settingsFile, settingsJsonOrig);
@@ -141,7 +141,18 @@ export async function cleanup()
         if (await pathExists(packageLockFile)) {
             await deleteFile(packageLockFile);
         }
-    } catch (e: any) { console.error(e.message); }
+    } catch (e) { console.error(e); }
+
+    if (testsControl.logEnabled && testsControl.logToFile && testsControl.logOpenFileOnFinish)
+    {
+        const logFilePath = teApi.log.getLogFileName();
+        if (logFilePath) {
+            try {
+                const doc = await workspace.openTextDocument(Uri.file(logFilePath));
+                await window.showTextDocument(doc);
+            } catch (e) { console.error(e); }
+        }
+    }
 }
 
 
@@ -272,6 +283,11 @@ async function initSettings()
 
     await configuration.updateVsWs("terminal.integrated.shell.windows",
                                    "C:\\Windows\\System32\\cmd.exe");
+    //
+    // Use update() here for coverage, since these two settings wont trigger any processing
+    //
+    testsControl.userLogLevel = configuration.get<number>("logging.level");
+    testsControl.userPathToAnt = configuration.get<string>("pathToPrograms.ant");
     //
     // Enable views, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE

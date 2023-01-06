@@ -1,7 +1,5 @@
 
-import { configuration } from "../lib/utils/configuration";
-
-export const testControl =
+export const testControl: { [property: string]: any } =
 {   //
     // KEEP SETTINGS FILE CHANGES (@ test-files/.vscode/workspace.json)
     //
@@ -14,11 +12,7 @@ export const testControl =
     logToConsole: false,
     logToFile: true,
     logToOutput: false,
-    //
-    // Use update() here for coverage, since these two settings wont trigger any processing
-    //
-    userLogLevel: configuration.get<number>("logging.level"),
-    userPathToAnt: configuration.get<string>("pathToPrograms.ant"),
+    logOpenFileOnFinish: true,
     //
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)
     //

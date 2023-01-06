@@ -74,15 +74,13 @@ export default class TreeUtils
         const teExplorer = this.teApi.explorer;
 
         const treeItems = await this.teApi.explorer.getChildren(undefined, "", 5);
-        if (!treeItems || treeItems.length === 0)
-        {
-            window.showInformationMessage("No tasks found!");
+        if (!treeItems || treeItems.length === 0) {
             return taskMap;
         }
 
         const processItem2g = async (pItem2: TaskFile) =>
         {
-            const treeFiles: any[] = await teExplorer.getChildren(pItem2, "", 5);
+            const treeFiles = await teExplorer.getChildren(pItem2, "", 5);
             if (treeFiles.length > 0)
             {
                 for (const item2 of treeFiles)
@@ -108,7 +106,7 @@ export default class TreeUtils
 
         const processItem2 = async (pItem2: any) =>
         {
-            const treeTasks: any[] = await teExplorer.getChildren(pItem2, "", 5);
+            const treeTasks = await teExplorer.getChildren(pItem2, "", 5);
             if (treeTasks.length > 0)
             {
                 for (const item3 of treeTasks)

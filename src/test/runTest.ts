@@ -2,8 +2,8 @@ import { execSync, exec } from "child_process";
 import * as path from "path";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { runTests } from "@vscode/test-electron";
+import { testControl } from "./control";
 import { pathExists, readFileAsync, writeFile } from "../lib/utils/fs";
-import { testsControl } from "./helper";
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import { runTests } from "vscode-test";
 
@@ -50,7 +50,7 @@ async function main(args: string[])
         //
         console.log("restore package.json activation event");
         execSync("enable-full-coverage.sh --off", { cwd: "tools" });
-        if (settingsJsonOrig && !testsControl.keepSettingsFileChanges) {
+        if (settingsJsonOrig && !testControl.keepSettingsFileChanges) {
             await writeFile(settingsFile, settingsJsonOrig);
         }
     }
