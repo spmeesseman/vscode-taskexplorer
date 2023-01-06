@@ -53,16 +53,6 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     }
 
     //
-    // if the 'autoRefresh' settings if turned off, then there's nothing to do
-    //
-    if (configuration.get<boolean>("autoRefresh") === false) {
-        teApi.log.write("   Auto refresh by config changes is disabled in settings", 1);
-        teApi.log.methodDone("Process config changes", 1, "");
-        processingConfigEvent = false;
-        return;
-    }
-
-    //
     // Check configs that may require a tree refresh...
     //
 
@@ -190,7 +180,9 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         }
 
         //
-        // if the 'autoRefresh' settings if turned off, then there's nothing to do
+        // Hidden VSCode workspace tasks.  tasks.json task definitions can be marked with the `hiddem`
+        // flag but the flag is not visible via the Task API Task definition, the file must be read
+        // and parsed by the application to locate the value.
         //
         if (e.affectsConfiguration("taskExplorer.showHiddenWsTasks")) {
             registerChange("Workspace");
