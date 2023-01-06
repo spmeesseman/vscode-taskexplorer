@@ -56,21 +56,21 @@ suite("Task Tests", () =>
 
     test("Empty TaskItem Parameter - Run", async function()
     {
-        this.slow(waitTimeForRunCommand + 1000);
+        this.slow(testControl.slowTime.runCommand);
         await executeTeCommand("run", waitTimeForRunCommand);
     });
 
 
     test("Empty TaskItem Parameter - Pause", async function()
     {
-        this.slow(1000);
+        this.slow(testControl.slowTime.runPauseCommand);
         await executeTeCommand("pause", 500);
     });
 
 
     test("Empty TaskItem Parameter - Restart", async function()
     {
-        this.slow(1000);
+        this.slow(testControl.slowTime.runCommand);
         await executeTeCommand("restart", 500);
     });
 
@@ -94,7 +94,7 @@ suite("Task Tests", () =>
 
     test("Keep Terminal on Stop (OFF)", async function()
     {
-        this.slow(testControl.slowTime.runCommand + waitTimeForRunCommand + waitTimeForConfigEvent);
+        this.slow(testControl.slowTime.runCommand + testControl.slowTime.runStopCommand + testControl.slowTime.configEvent);
         await executeSettingsUpdate("keepTermOnStop", false);
         await executeTeCommand("run", waitTimeForRunCommand, 5000, batch[0]);
         await executeTeCommand("stop", 1000, 1500, batch[0]);
@@ -103,7 +103,7 @@ suite("Task Tests", () =>
 
     test("Keep Terminal on Stop (ON)", async function()
     {
-        this.slow(testControl.slowTime.runCommand + waitTimeForRunCommand + waitTimeForConfigEvent);
+        this.slow(testControl.slowTime.runCommand + testControl.slowTime.runStopCommand + testControl.slowTime.configEvent);
         await executeSettingsUpdate("keepTermOnStop", true);
         await executeTeCommand("run", waitTimeForRunCommand, 5000, batch[0]);
         await executeTeCommand("stop", 1000, 1500, batch[0]);
