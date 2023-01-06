@@ -1,12 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as assert from "assert";
-import constants from "../lib/constants";
 import TaskItem from "../tree/item";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import { isObjectEmpty } from "../lib/utils/utils";
-import { IExplorerApi, ITaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2, figures, getTeApi, testControl } from "./helper";
 
 let treeBuiltOnce = false;

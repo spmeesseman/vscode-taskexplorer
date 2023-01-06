@@ -61,7 +61,7 @@ window.showInformationMessage = (str: string, ...args: any[]) =>
 export async function activate(instance?: any)
 {
     const ext = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-    assert(ext, "✘ Could not find extension");
+    assert(ext, `    ${figures.error} Could not find extension`);
 
     if (instance) instance.timeout(60 * 1000);
 

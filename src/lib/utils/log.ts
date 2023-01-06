@@ -9,18 +9,6 @@ import { isArray, isError, isFunction, isObject, isString } from "./utils";
 import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
 import figures from "../figures";
 
-// export enum LogColor
-// {
-//     black = "\\u001b[30m",
-//     red = "\\u001b[31",
-//     green = "\\u001b[32m",
-//     yellow = "\\u001b[33m",
-//     blue = "\\u001b[34m", // "<span style=\"color:blue\">"  "</style>"
-//     magenta = "\\u001b[35",
-//     cyan = "\\u001b[36m",
-//     white = "\\u001b[37m"
-// }
-
 export interface IMsgQueueItem
 {
     fn: any;

@@ -47,9 +47,7 @@
         "bash"
     ],
     "main": "./dist/extension",
-    "activationEvents": [
-        "*"
-    ],
+    "activationEvents": [],
     "scripts": {
         "build": "npx tsc -p ./",
         "build_test": "npx tsc -p tsconfig.test.json",
