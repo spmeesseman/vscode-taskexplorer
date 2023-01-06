@@ -9,7 +9,7 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, getWsPath, testsControl, treeUtils, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, getWsPath, testControl, treeUtils, verifyTaskCount } from "../helper";
 
 const testsName = "apppublisher";
 const startTaskCount = 21;
@@ -49,8 +49,8 @@ suite("App-Publisher Tests", () =>
 
     test("Enable (Off by Default)", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testsControl.waitTimeForConfigEnableEvent);
+        this.slow(testControl.slowTimeForConfigEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTimeForConfigEnableEvent);
     });
 
 
@@ -62,7 +62,7 @@ suite("App-Publisher Tests", () =>
 
     test("Start", async function()
     {
-        this.slow(testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForVerifyTaskCount);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
@@ -79,7 +79,7 @@ suite("App-Publisher Tests", () =>
 
     test("Create file", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -92,23 +92,23 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
     });
 
 
     test("Disable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testsControl.waitTimeForConfigEnableEvent);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 
 
     test("Re-enable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testsControl.waitTimeForConfigEnableEvent);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
     });
 
@@ -117,12 +117,12 @@ suite("App-Publisher Tests", () =>
     {
         let resetLogging = teApi.log.isLoggingEnabled();
         if (resetLogging) { // turn scary error logging off
-            this.slow(testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForConfigEvent * 2));
+            this.slow(testControl.slowTimeForFsCreateEvent + (testControl.slowTimeForConfigEvent * 2));
             executeSettingsUpdate("logging.enable", false);
             resetLogging = true;
         }
         else {
-            this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
+            this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
         }
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -136,7 +136,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn""\n' +
             "\n"
         );
-        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount);
         if (resetLogging) { // turn scary error logging off
             executeSettingsUpdate("logging.enable", true);
@@ -146,7 +146,7 @@ suite("App-Publisher Tests", () =>
 
     test("Fix Invalid JSON", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -159,24 +159,24 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent + testsControl.slowTimeForVerifyTaskCount);
+        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent + testControl.slowTimeForVerifyTaskCount);
         await verifyTaskCount(testsName, startTaskCount + 21);
     });
 
 
     test("Delete file", async function()
     {
-        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsDeleteEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
 
     test("Disable (Default is OFF)", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testsControl.waitTimeForConfigEnableEvent);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 

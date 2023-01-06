@@ -35,6 +35,7 @@ let enable = false;
 let enableFile = false;
 let enableOutputWindow = false;
 let fileName = "";
+let isTests = false;
 let logLevel = -1;
 let writeToConsole = false;
 let writeToConsoleLevel = 2;
@@ -65,12 +66,12 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
 {
     if (msg)
     {
-        write(figures.cross, 0, "", queueId);
+        write(figures.error, 0, "", queueId);
         const _writeErr = (err: any) =>
         {
             if (isString(err))
             {
-                write(figures.cross + " " + err, 0, "", queueId);
+                write(figures.error + " " + err, 0, "", queueId);
             }
             else if (isError(err))
             {
@@ -89,21 +90,21 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
                     writeError(err.message, queueId);
                 }
                 else if (isFunction(err.toString)) {
-                    write(figures.cross + " " + err.toString(), 0, "", queueId);
+                    write(figures.error + " " + err.toString(), 0, "", queueId);
                 }
             }
             else if (isFunction(err.toString)) {
-                write(figures.cross + " " + err.toString(), 0, "", queueId);
+                write(figures.error + " " + err.toString(), 0, "", queueId);
             }
         };
         _writeErr(msg);
         if (params)
         {
             for (const [ n, v, l ] of params) {
-                value(figures.cross + "   " + n, v, 0, "", queueId);
+                value(figures.error + "   " + n, v, 0, "", queueId);
             }
         }
-        write(figures.cross, 0, "", queueId);
+        write(figures.error, 0, "", queueId);
     }
 }
 
@@ -145,7 +146,7 @@ export async function initLog(settingGrpName: string, dispName: string, context:
 
 function getFileName()
 {
-    const tzOffset = (new Date()).getTimezoneOffset() * 60000, //offset in milliseconds
+    const tzOffset = (new Date()).getTimezoneOffset() * 60000,
           locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T")[0].replace(/[\-]/g, "");
     return `taskexplorer-${locISOTime}.log`;
 }
@@ -164,10 +165,17 @@ function logLogFileLocation()
         const writeToConsoleOrig = writeToConsole;
         const writeToOutputOrig = enableOutputWindow;
         enableOutputWindow = true;
-        writeToConsole = true;
+        writeToConsole = false;
         write("*************************************************************************************", 1);
         write(" Log File: " + fileName);
         write("*************************************************************************************", 1);
+        /* istanbul ignore else */
+        if (isTests)
+        {
+            console.log(`     ${figures.pointer} *************************************************************************************`, 1);
+            console.log(`     ${figures.pointer}  Log File: ` + fileName);
+            console.log(`     ${figures.pointer} *************************************************************************************`, 1);
+        }
         enableOutputWindow = writeToOutputOrig;
         writeToConsole = writeToConsoleOrig;
     }
@@ -228,6 +236,11 @@ export function setWriteToConsole(set: boolean, level = 2)
 {
     writeToConsole = set;
     writeToConsoleLevel = level;
+}
+
+export function setTests(testsRunning: boolean)
+{
+    isTests = testsRunning;
 }
 
 
@@ -368,11 +381,11 @@ function writeError(e: Error, queueId?: string)
 {
     const currentWriteToConsole = writeToConsole;
     writeToConsole = true;
-    write(figures.cross + " " + e.name, 0, "", queueId);
-    write(figures.cross + " " + e.message, 0, "", queueId);
+    write(figures.error + " " + e.name, 0, "", queueId);
+    write(figures.error + " " + e.message, 0, "", queueId);
     if (e.stack) {
-        const stackFmt = e.stack.replace(/\n/g, `\n${figures.cross} `);
-        write(figures.cross + " " + stackFmt, 0, "", queueId);
+        const stackFmt = e.stack.replace(/\n/g, `\n${figures.error} `);
+        write(figures.error + " " + stackFmt, 0, "", queueId);
     }
     writeToConsole = currentWriteToConsole;
 }

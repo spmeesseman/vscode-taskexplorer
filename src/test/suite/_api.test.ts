@@ -3,7 +3,7 @@
 
 import * as assert from "assert";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, setExplorer, testsControl } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand, setExplorer, testControl } from "../helper";
 import { getInstallPath } from "../../lib/utils/utils";
 import { enableConfigWatcher } from "../../lib/configWatcher";
 
@@ -23,7 +23,7 @@ suite("API Init and Tests", () =>
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate("logging.enable", testsControl.logEnabled);
+        await executeSettingsUpdate("logging.enable", testControl.logEnabled);
         enableConfigWatcher(true); // in case misc test fails after setting to `false`.
     });
 
@@ -32,7 +32,7 @@ suite("API Init and Tests", () =>
     {
         await executeTeCommand("showOutput", 10, 50, false);
         await executeTeCommand("showOutput", 10, 50, true);
-        await executeTeCommand("showOutput", 10, 50, testsControl.logEnabled && testsControl.logToOutput);
+        await executeTeCommand("showOutput", 10, 50, testControl.logEnabled && testControl.logToOutput);
     });
 
 
@@ -52,32 +52,32 @@ suite("API Init and Tests", () =>
     test("Refresh for SideBar Coverage", async function()
     {
         await teApi.sidebar?.refresh();
-        await teApi.waitForIdle(testsControl.waitTimeForConfigEnableEvent);
+        await teApi.waitForIdle(testControl.waitTimeForConfigEnableEvent);
     });
 
 
     test("Disable Explorer Views", async function()
     {
-        await executeSettingsUpdate("enableExplorerView", false, testsControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enableExplorerView", false, testControl.waitTimeForConfigEnableEvent);
     });
 
 
     test("Disable SideBar View", async function()
     {
-        await executeSettingsUpdate("enableSideBar", false, testsControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enableSideBar", false, testControl.waitTimeForConfigEnableEvent);
     });
 
 
     test("Re-enable Explorer View", async function()
     {
-        await executeSettingsUpdate("enableExplorerView", true, testsControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enableExplorerView", true, testControl.waitTimeForConfigEnableEvent);
         setExplorer(teApi.explorer as IExplorerApi);
     });
 
 
     test("Refresh", async function()
     {
-        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
+        await executeTeCommand("refresh", testControl.waitTimeForRefreshCommand);
     });
 
 });

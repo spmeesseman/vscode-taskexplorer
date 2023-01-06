@@ -4,7 +4,7 @@
 
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { activate, getWsPath, testsControl, verifyTaskCount } from "../helper";
+import { activate, getWsPath, testControl, verifyTaskCount } from "../helper";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { GulpTaskProvider } from "../../providers/gulp";
 
@@ -41,32 +41,32 @@ suite("Gulp Tests", () =>
 
     test("Start", async function()
     {
-        this.slow(testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForVerifyTaskCount);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
 
     test("Disable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
         await teApi.config.updateWs("enabledTasks.gulp", false);
-        await teApi.waitForIdle(testsControl.waitTimeForConfigEnableEvent);
+        await teApi.waitForIdle(testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 
 
     test("Re-enable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
         await teApi.config.updateWs("enabledTasks.gulp", true);
-        await teApi.waitForIdle(testsControl.waitTimeForConfigEnableEvent);
+        await teApi.waitForIdle(testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
 
     test("Create File", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
         if (!(await fsApi.pathExists(dirName))) {
             await fsApi.createDir(dirName);
         }
@@ -82,14 +82,14 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
     });
 
 
     test("Add Task to file", async function()
     {
-        this.slow(testsControl.slowTimeForFsModifyEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsModifyEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
@@ -106,14 +106,14 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 3);
     });
 
 
     test("Remove 2 Tasks from file", async function()
     {
-        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsDeleteEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
@@ -122,17 +122,17 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
 
     test("Delete File", async function()
     {
-        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsDeleteEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 

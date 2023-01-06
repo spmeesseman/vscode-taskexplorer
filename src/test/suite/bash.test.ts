@@ -8,7 +8,7 @@
 import * as assert from "assert";
 import * as path from "path";
 import { TaskExecution, Uri, workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, executeTeCommand2, getTreeTasks, getWsPath, testsControl, treeUtils, verifyTaskCount, waitForTaskExecution } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand2, getTreeTasks, getWsPath, testControl, treeUtils, verifyTaskCount, waitForTaskExecution } from "../helper";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { BashTaskProvider } from "../../providers/bash";
 
@@ -42,7 +42,7 @@ suite("Bash Tests", () =>
         pathToTaskProgram = teApi.config.get<string>("pathToPrograms." + testsName);
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe");
-        await executeSettingsUpdate("enabledTasks." + testsName, true, testsControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTimeForConfigEnableEvent);
     });
 
 
@@ -51,7 +51,7 @@ suite("Bash Tests", () =>
         // Reset settings
         //
         await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
-        await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testsControl.waitTimeForConfigEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTimeForConfigEnableEvent);
         await fsApi.deleteDir(dirName);
     });
 
@@ -79,63 +79,63 @@ suite("Bash Tests", () =>
 
     test("Start", async function()
     {
-        this.slow(testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForVerifyTaskCount);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
 
     test("Disable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
-        await executeSettingsUpdate("enabledTasks." + testsName, false, testsControl.waitTimeForConfigEnableEvent);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
 
 
     test("Re-enable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
-        await executeSettingsUpdate("enabledTasks." + testsName, true, testsControl.waitTimeForConfigEnableEvent);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
 
     test("Create File", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateFolderEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsCreateFolderEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
-        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
 
     test("Delete File", async function()
     {
-        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsDeleteEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
     });
 
 
     test("Re-create File", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
-        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
 
     test("Delete Folder", async function()
     {
-        this.slow(testsControl.slowTimeForFsDeleteFolderEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsDeleteFolderEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
+        await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
@@ -144,9 +144,9 @@ suite("Bash Tests", () =>
     {   //
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
         //
-        this.slow(testsControl.slowTimeForGetTreeTasks + testsControl.slowTimeForBashScript);
+        this.slow(testControl.slowTimeForGetTreeTasks + testControl.slowTimeForBashScript);
         const bash = await getTreeTasks("bash", startTaskCount);
-        const exec = await executeTeCommand2("run", [ bash[0] ], testsControl.waitTimeForRunCommand) as TaskExecution | undefined;
+        const exec = await executeTeCommand2("run", [ bash[0] ], testControl.waitTimeForRunCommand) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });
 

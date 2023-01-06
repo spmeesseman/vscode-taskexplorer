@@ -10,7 +10,7 @@ import { Uri } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand2, focusExplorer,
-    getTreeTasks, getWsPath, testsControl, verifyTaskCountByTree
+    getTreeTasks, getWsPath, testControl, verifyTaskCountByTree
 } from "../helper";
 
 
@@ -59,7 +59,7 @@ suite("Typescript Tests", () =>
 
     test("Create File", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -79,7 +79,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent, 3000);
         await verifyTaskCountByTree(testsName, startTaskCount + 2);
     });
 
@@ -98,7 +98,7 @@ suite("Typescript Tests", () =>
 
     test("Create File 2", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.writeFile(
             fileUri2.fsPath,
             "{\n" +
@@ -118,38 +118,38 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent, 3000);
         await verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 
 
     test("Disable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testsControl.waitTimeForConfigEnableEvent);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCountByTree(testsName, 0);
     });
 
 
     test("Re-enable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testsControl.waitTimeForConfigEnableEvent);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 
 
     test("Invalid JSON", async function()
     {
-        this.slow(testsControl.slowTimeForFsModifyEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsModifyEvent + testControl.slowTimeForVerifyTaskCount);
         // let resetLogging = teApi.log.isLoggingEnabled();
         // if (resetLogging) { // turn scary error logging off
-        //     this.slow(testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForConfigEvent * 2));
+        //     this.slow(testControl.slowTimeForFsCreateEvent + (testControl.slowTimeForConfigEvent * 2));
         //     executeSettingsUpdate("logging.enable", false);
         //     resetLogging = true;
         // }
         // else {
-        //     this.slow(testsControl.slowTimeForFsCreateEvent);
+        //     this.slow(testControl.slowTimeForFsCreateEvent);
         // }
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -170,7 +170,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "\n"
         );
-        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTimeForFsModifyEvent, 3000);
         await verifyTaskCountByTree(testsName, startTaskCount + 4); // I guess internal TSC must not invalidate tasks on bad syntax
         // if (resetLogging) { // turn scary error logging off
         //     executeSettingsUpdate("logging.enable", true);
@@ -180,7 +180,7 @@ suite("Typescript Tests", () =>
 
     test("Fix Invalid JSON", async function()
     {
-        this.slow(testsControl.slowTimeForFsModifyEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsModifyEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -200,25 +200,25 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent, 3000);
         await verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 
 
     test("Delete File 1", async function()
     {
-        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsDeleteEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
         await verifyTaskCountByTree(testsName, startTaskCount+ 2);
     });
 
 
     test("Delete File 2", async function()
     {
-        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForFsDeleteEvent + testControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteFile(fileUri2.fsPath);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
         await verifyTaskCountByTree(testsName, startTaskCount);
     });
 

@@ -2,17 +2,17 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import * as path from "path";
 import * as assert from "assert";
+import * as treeUtils from "./treeUtils";
 import figures from "../lib/figures";
 import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
 import { testControl } from "./control";
 import { configuration } from "../lib/utils/configuration";
 import constants from "../lib/constants";
-import TreeUtils from "./treeUtils";
 import { deleteFile, pathExists } from "../lib/utils/fs";
-import { IExplorerApi, ITaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { setTests } from "../lib/utils/log";
+import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, Uri, window, workspace } from "vscode";
-import { isObjectEmpty } from "../lib/utils/utils";
 
 let activated = false;
 let teApi: ITaskExplorerApi;
@@ -22,9 +22,9 @@ const originalShowInfoBox = window.showInformationMessage;
 const overridesShowInputBox: any[] = [];
 const overridesShowInfoBox: any[] = [];
 
-export const testsControl = testControl;
-export let treeUtils: TreeUtils;
 export { figures };
+export { testControl };
+export { treeUtils };
 
 window.showInputBox = (...args: any[]) =>
 {
@@ -75,26 +75,21 @@ export async function activate(instance?: any)
         //
         // Activate extension
         //
-        console.log(`        ${figures.tick} Activating extension 'spmeesseman.vscode-taskexplorer'`);
+        console.log(`     ${figures.success} Activating extension 'spmeesseman.vscode-taskexplorer'`);
         teApi = await ext.activate();
-        console.log(`        ${figures.tick} Extension 'spmeesseman.vscode-taskexplorer' successfully activated`);
+        console.log(`     ${figures.success} Extension 'spmeesseman.vscode-taskexplorer' successfully activated`);
         //
         // Ensure extension initialized successfully
         //
-        assert(isReady() === true, `        ${figures.cross} TeApi not ready`);
+        assert(isReady() === true, `     ${figures.error} TeApi not ready`);
         if (!teApi.explorer) {
-            assert.fail(`        ${figures.cross} Explorer instance does not exist`);
+            assert.fail(`     ${figures.error} Explorer instance does not exist`);
         }
         //
         // Enable tests mode within the application, it alters the flow in a few spots, not many.
         //
         teApi.setTests();
-        //
-        // Instantiate the treeUtils helper.  why a class? i don't know, got rid of it in production code
-        // within a class and then added it to the test suite to still use the file walker to open and
-        // find script locations within task files
-        //
-        treeUtils = new TreeUtils(teApi);
+        setTests(true);
         //
         // _api pre-test suite will reset after disable/enable
         //
@@ -106,12 +101,12 @@ export async function activate(instance?: any)
         //
         // Write to console is just a tests feature, it's not controlled by settings, set it here if needed
         //
-        teApi.log.setWriteToConsole(testsControl.logToConsole, testsControl.logLevel);
+        teApi.log.setWriteToConsole(testControl.logToConsole, testControl.logLevel);
         //
         // All done
         //
         activated = true;
-        console.log(`        ${figures.tick} Tests ready`);
+        console.log(`     ${figures.success} Tests ready`);
     }
     return teApi;
 }
@@ -130,7 +125,7 @@ export async function cleanup()
     // 1/5/23 - Removed and added to runTest.ts, before VSCoe is launched. leaving here
     //          commented in case i realize i need it again, 'cause that never happens
     //
-    // if (!testsControl.keepSettingsFileChanges)
+    // if (!testControl.keepSettingsFileChanges)
     // {
     //     settingsFile = path.join(rootPath, ".vscode", "settings.json");
     //     try {
@@ -147,7 +142,7 @@ export async function cleanup()
         }
     } catch (e) { console.error(e); }
 
-    if (testsControl.logEnabled && testsControl.logToFile && testsControl.logOpenFileOnFinish)
+    if (testControl.logEnabled && testControl.logToFile && testControl.logOpenFileOnFinish)
     {
         const logFilePath = teApi.log.getLogFileName();
         if (logFilePath) {
@@ -177,8 +172,8 @@ export async function closeActiveDocument()
 export async function executeSettingsUpdate(key: string, value?: any, minWait?: number, maxWait?: number)
 {
     const rc = await teApi.config.updateWs(key, value);
-    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testsControl.waitTimeForConfigEvent),
-                            maxWait === 0 ? maxWait : (maxWait || testsControl.waitTimeMax));
+    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testControl.waitTimeForConfigEvent),
+                            maxWait === 0 ? maxWait : (maxWait || testControl.waitTimeMax));
     return rc;
 }
 
@@ -186,8 +181,8 @@ export async function executeSettingsUpdate(key: string, value?: any, minWait?: 
 export async function executeTeCommand(command: string, minWait?: number, maxWait?: number, ...args: any[])
 {
     const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
-    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testsControl.waitTimeForCommand),
-                            maxWait === 0 ? maxWait : (maxWait || testsControl.waitTimeMax));
+    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testControl.waitTimeForCommand),
+                            maxWait === 0 ? maxWait : (maxWait || testControl.waitTimeMax));
     return rc;
 }
 
@@ -198,31 +193,12 @@ export function executeTeCommand2(command: string, args: any[], minWait?: number
 }
 
 
-export function findIdInTaskMap(id: string, taskMap: TaskMap)
-{
-    let found = 0;
-    Object.values(taskMap).forEach((taskItem) =>
-    {
-        if (taskItem)
-        {
-            if (taskItem.id?.includes(id) && !taskItem.isUser) {
-                if (taskItem.id === ":ant") {
-                    console.error("ant: " + taskItem.resourceUri?.fsPath);
-                }
-                found++;
-            }
-        }
-    });
-    return found;
-}
-
-
 export async function focusExplorer(instance: any)
 {
     if (!teExplorer.isVisible()) {
-        instance.slow(testsControl.slowTimeForRefreshCommand);
-        await executeTeCommand("focus", 500, testsControl.slowTimeForFocusCommand);
-        await teApi.waitForIdle(500, testsControl.slowTimeForRefreshCommand);
+        instance.slow(testControl.slowTimeForRefreshCommand);
+        await executeTeCommand("focus", 500, testControl.slowTimeForFocusCommand);
+        await teApi.waitForIdle(500, testControl.slowTimeForRefreshCommand);
     }
 }
 
@@ -232,40 +208,6 @@ export function getSpecialTaskItemId(taskItem: TaskItem)
     return taskItem.id.replace(constants.LAST_TASKS_LABEL + ":", "")
                       .replace(constants.FAV_TASKS_LABEL + ":", "")
                       .replace(constants.USER_TASKS_LABEL + ":", "");
-}
-
-
-export async function getTreeTasks(taskType: string, expectedCount: number)
-{
-    const taskItems: TaskItem[] = [];
-    //
-    // Get the task mapped tree items
-    //
-    let taskMap = (teApi.explorer as IExplorerApi).getTaskMap();
-    if (!taskMap || isObjectEmpty(taskMap)) {
-        console.log(`        ${figures.warning} Task map is empty, fall back to walkTreeItems`);
-        taskMap = await treeUtils.walkTreeItems(undefined);
-        if (!taskMap || isObjectEmpty(taskMap)) {
-            console.log(`        ${figures.cross} Task map is empty, getTreeTasks will fail`);
-        }
-    }
-    //
-    // Make sure the tasks have been mapped in the explorer tree
-    //
-    const taskCount = findIdInTaskMap(`:${taskType}:`, taskMap);
-    if (taskCount !== expectedCount) {
-        assert.fail(`Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
-    }
-    //
-    // Get the NPM tasks from the tree mappings
-    //
-    Object.values(taskMap).forEach((taskItem) =>
-    {
-        if (taskItem && taskItem.taskSource === taskType) {
-            taskItems.push(taskItem);
-        }
-    });
-    return taskItems;
 }
 
 
@@ -296,8 +238,8 @@ async function initSettings()
     //
     // Use update() here for coverage, since these two settings wont trigger any processing
     //
-    testsControl.userLogLevel = configuration.get<number>("logging.level");
-    testsControl.userPathToAnt = configuration.get<string>("pathToPrograms.ant");
+    testControl.userLogLevel = configuration.get<number>("logging.level");
+    testControl.userPathToAnt = configuration.get<string>("pathToPrograms.ant");
     //
     // Enable views, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
@@ -338,10 +280,10 @@ async function initSettings()
     await configuration.updateWs("groupWithSeparator", true);
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("keepTermOnStop", false);
-    await configuration.updateWs("logging.enable", testsControl.logEnabled);
-    await configuration.updateWs("logging.level", testsControl.logLevel);
-    await configuration.updateWs("logging.enableFile", testsControl.logToFile);
-    await configuration.updateWs("logging.enableOutputWindow", testsControl.logToOutput);
+    await configuration.updateWs("logging.enable", testControl.logEnabled);
+    await configuration.updateWs("logging.level", testControl.logLevel);
+    await configuration.updateWs("logging.enableFile", testControl.logToFile);
+    await configuration.updateWs("logging.enableOutputWindow", testControl.logToOutput);
     await configuration.updateWs("pathToPrograms", configuration.get<object>("pathToPrograms"));
     await configuration.updateWs("showHiddenWsTasks", true);
     await configuration.updateWs("showRunningTask", true);
@@ -370,20 +312,20 @@ function isExecuting(task: Task)
 function isReady(taskType?: string)
 {
     let err: string | undefined;
-    if (!teApi)                                 err = `        ${figures.cross} TeApi null`;
+    if (!teApi)                                 err = `     ${figures.error} TeApi null`;
     else {
-        if (!teApi.explorer)                    err = `        ${figures.cross} TeApi Explorer provider == null`;
-        else if (teApi.sidebar)                err = `         ${figures.cross} TeApi Sidebar Provider != null`;
-        else if (!teApi.providers)              err = `        ${figures.cross} Providers null`;
+        if (!teApi.explorer)                    err = `     ${figures.error} TeApi Explorer provider == null`;
+        else if (teApi.sidebar)                 err = `     ${figures.error} TeApi Sidebar Provider != null`;
+        else if (!teApi.providers)              err = `     ${figures.error} Providers null`;
     }
     if (!err && taskType) {
-        if (!teApi.providers.get(taskType))     err = `        ${figures.cross} ${taskType} Provider == null`;
+        if (!teApi.providers.get(taskType))     err = `     ${figures.error} ${taskType} Provider == null`;
     }
     if (!err && !(workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined)) {
-                                                err = `        ${figures.cross} Workspace folder does not exist`;
+                                                err = `     ${figures.error} Workspace folder does not exist`;
     }
     if (!err && !extensions.getExtension("spmeesseman.vscode-taskexplorer")) {
-                                                err = `        ${figures.cross} Extension not found`;
+                                                err = `     ${figures.error} Extension not found`;
     }
     if (err) {
         console.log(err);
@@ -426,15 +368,6 @@ export async function verifyTaskCount(taskType: string, expectedCount: number)
         assert(tTasks && tTasks.length === expectedCount, `Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
     }
     catch (e) { throw e; }
-}
-
-
-export async function verifyTaskCountByTree(taskType: string, expectedCount: number, taskMap?: TaskMap)
-{
-    const tasksMap = (taskMap || (await treeUtils.walkTreeItems(undefined))),
-    // const tasksMap = (teApi.explorer as IExplorerApi).getTaskMap(),
-            taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
-    assert(taskCount === expectedCount, `Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 }
 
 

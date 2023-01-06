@@ -4,7 +4,7 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import * as util from "../../lib/utils/utils";
-import { activate, executeSettingsUpdate, sleep, testsControl } from "../helper";
+import { activate, executeSettingsUpdate, sleep, testControl } from "../helper";
 import { configuration } from "../../lib/utils/configuration";
 import { teApi } from "../../extension";
 import { enableConfigWatcher } from "../../lib/configWatcher";
@@ -279,15 +279,15 @@ suite("Configuration / Settings Tests", () =>
 
     test("User Level Setting Update", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEvent * 4);
-        await configuration.update("logging.level", testsControl.userLogLevel !== 3 ? 3 : 2);
-        await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
-        await configuration.update("logging.level", testsControl.userLogLevel);
-        await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
-        await configuration.update("pathToPrograms.ant", testsControl.userPathToAnt !== "ant" ? "ant" : "ant.bat");
-        await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
-        await configuration.update("pathToPrograms.ant", testsControl.userPathToAnt);
-        await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
+        this.slow(testControl.slowTimeForConfigEvent * 4);
+        await configuration.update("logging.level", testControl.userLogLevel !== 3 ? 3 : 2);
+        await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
+        await configuration.update("logging.level", testControl.userLogLevel);
+        await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
+        await configuration.update("pathToPrograms.ant", testControl.userPathToAnt !== "ant" ? "ant" : "ant.bat");
+        await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
+        await configuration.update("pathToPrograms.ant", testControl.userPathToAnt);
+        await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
     });
 
 });

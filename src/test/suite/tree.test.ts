@@ -10,7 +10,7 @@ import { storage } from "../../lib/utils/storage";
 import TaskItem from "../../tree/item";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer,
-    getSpecialTaskItemId, getTreeTasks, overrideNextShowInputBox, testsControl
+    getSpecialTaskItemId, getTreeTasks, overrideNextShowInputBox, testControl
 } from "../helper";
 
 
@@ -49,8 +49,8 @@ suite("Tree Tests", () =>
 
     test("Refresh", async function()
     {
-        this.slow(testsControl.slowTimeForRefreshCommand);
-        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
+        this.slow(testControl.slowTimeForRefreshCommand);
+        await executeTeCommand("refresh", testControl.waitTimeForRefreshCommand);
     });
 
 
@@ -133,7 +133,7 @@ suite("Tree Tests", () =>
 
     test("Add to Favorites", async function()
     {
-        this.slow(testsControl.slowTimeForCommand * 4);
+        this.slow(testControl.slowTimeForCommand * 4);
         let removed = await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         if (removed) {
             await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
@@ -148,7 +148,7 @@ suite("Tree Tests", () =>
 
     test("Remove from Favorites", async function()
     {
-        this.slow(testsControl.slowTimeForCommand * 2);
+        this.slow(testControl.slowTimeForCommand * 2);
         await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
     });
@@ -156,7 +156,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 1", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 1");
         await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
@@ -164,7 +164,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 2", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 2");
         await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
@@ -172,7 +172,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 3", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 3");
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
@@ -180,7 +180,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 4", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 4");
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
@@ -188,7 +188,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 5", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 5");
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
@@ -196,7 +196,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 6", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         overrideNextShowInputBox("Label 6");
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
@@ -204,49 +204,49 @@ suite("Tree Tests", () =>
 
     test("Remove Custom Label 1", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
 
 
     test("Remove Custom Label 2", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
 
 
     test("Remove Custom Label 3", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
 
 
     test("Remove Custom Label 4", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
 
 
     test("Remove Custom Label 5", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
 
 
     test("Remove Custom Label 6", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
 
 
     test("Cancel Add Custom Label", async function()
     {
-        this.slow(testsControl.slowTimeForCommand);
+        this.slow(testControl.slowTimeForCommand);
         overrideNextShowInputBox(undefined);
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
@@ -254,55 +254,55 @@ suite("Tree Tests", () =>
 
     test("Hide Favorites", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEvent * 3);
+        this.slow(testControl.slowTimeForConfigEvent * 3);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
 
 
     test("Hide Last Tasks", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEvent * 3);
+        this.slow(testControl.slowTimeForConfigEvent * 3);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
 
 
     test("Refresh", async function()
     {
-        this.slow(testsControl.slowTimeForRefreshCommand);
-        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
+        this.slow(testControl.slowTimeForRefreshCommand);
+        await executeTeCommand("refresh", testControl.waitTimeForRefreshCommand);
     });
 
 
     test("Show Favorites", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        this.slow(testControl.slowTimeForConfigEnableEvent);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
 
 
     test("Show Last Tasks", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEvent * 3);
+        this.slow(testControl.slowTimeForConfigEvent * 3);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
 
 
     test("Show Favorite Tasks w/ Last Tasks", async function()
     {
-        this.slow((testsControl.waitTimeForConfigEvent * 3) + (testsControl.waitTimeForCommand * 2));
+        this.slow((testControl.waitTimeForConfigEvent * 3) + (testControl.waitTimeForCommand * 2));
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
 
 
@@ -316,21 +316,21 @@ suite("Tree Tests", () =>
     {
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
 
 
     test("Show Favorite Tasks", async function()
     {
         await executeSettingsUpdate("specialFolders.showFavorites", true);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
 
 
     test("Show Last Tasks", async function()
     {
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
 
 
@@ -342,7 +342,7 @@ suite("Tree Tests", () =>
 
     test("Clear Special Folders", async function()
     {
-        this.slow(testsControl.slowTimeForCommand * 2);
+        this.slow(testControl.slowTimeForCommand * 2);
         overrideNextShowInputBox("Yes");
         await executeTeCommand("clearLastTasks");
         overrideNextShowInputBox("Yes");
@@ -485,8 +485,8 @@ suite("Tree Tests", () =>
     {
         this.slow(15000);
         await explorer.invalidateTasksCache();
-        await teApi.waitForIdle(testsControl.waitTimeForCommand);
-        await executeTeCommand("refresh", testsControl.waitTimeForRefreshCommand);
+        await teApi.waitForIdle(testControl.waitTimeForCommand);
+        await executeTeCommand("refresh", testControl.waitTimeForRefreshCommand);
     });
 
 });

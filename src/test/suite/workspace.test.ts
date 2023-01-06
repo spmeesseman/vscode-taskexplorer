@@ -3,7 +3,7 @@
 /* tslint:disable */
 
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, testsControl, verifyTaskCountByTree } from "../helper";
+import { activate, executeSettingsUpdate, testControl, verifyTaskCountByTree } from "../helper";
 
 const testsName = "Workspace";
 const startTaskCount = 10;
@@ -31,7 +31,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Show VSCode Tasks Marked Hidden", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForConfigEvent + testControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("showHiddenWsTasks", true);
         await verifyTaskCountByTree(testsName, startTaskCount);
     });
@@ -39,7 +39,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Hide VSCode Tasks Marked Hidden", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("showHiddenWsTasks", false);
         await verifyTaskCountByTree(testsName, startTaskCount - 1);
     });
@@ -47,7 +47,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Disable Workspace Tasks", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("enabledTasks.workspace", false);
         await verifyTaskCountByTree(testsName, 0);
     });
@@ -55,7 +55,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Re-enable Workspace Tasks", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("enabledTasks.workspace", true);
         await verifyTaskCountByTree(testsName, startTaskCount - 1);
     });
@@ -63,7 +63,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Re-show VSCode Tasks Marked Hidden", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEvent + testsControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTimeForConfigEvent + testControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("showHiddenWsTasks", true);
         await verifyTaskCountByTree(testsName, startTaskCount);
     });

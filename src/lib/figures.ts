@@ -1,14 +1,13 @@
 
 export default
 {
-    tick: "✔",
+    success: "✔",
     info: "ℹ",
 	warning: "⚠",
-	cross: "✘",
+	error: "✘",
 	pointer: "❯",
-	play: "▶",
-	triangleLeft: "◀",
-	triangleRight: "▶",
+	start: "▶",
+	end: "◀",
 	nodejs: "⬢",
 	star: "★",
 	checkboxOn: "☒",
