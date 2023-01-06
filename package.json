@@ -1779,8 +1779,14 @@
                 "taskExplorer.logging.enableFile": {
                     "type": "boolean",
                     "default": false,
-                    "order": 60,
+                    "order": 55,
                     "markdownDescription": "%config.taskExplorer.logging.enableFile%"
+                },
+                "taskExplorer.logging.enableOutputWindow": {
+                    "type": "boolean",
+                    "default": true,
+                    "order": 60,
+                    "markdownDescription": "%config.taskExplorer.logging.enableOutputWindow%"
                 },
                 "taskExplorer.logging.level": {
                     "type": "number",
@@ -1904,6 +1910,27 @@
                     "default": false,
                     "markdownDescription": "%config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton%"
                 },
+                "taskExplorer.specialFolders.showFavorites": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.specialFolders.showFavorites%"
+                },
+                "taskExplorer.specialFolders.showLastTasks": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "%config.taskExplorer.specialFolders.showLastTasks%"
+                },
+                "taskExplorer.specialFolders.showUserTasks": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%config.taskExplorer.specialFolders.showUserTasks%"
+                },
+                "taskExplorer.specialFolders.numLastTasks": {
+                    "type": "number",
+                    "enum": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 ],
+                    "default": 10,
+                    "markdownDescription": "%config.taskExplorer.specialFolders.numLastTasks%"
+                },
                 "taskExplorer.specialFolders.expanded": {
                     "type": "object",
                     "markdownDescription": "%config.taskExplorer.specialFolders.expanded%",
@@ -1931,27 +1958,6 @@
                         "userTasks": true
                     }
                 },
-                "taskExplorer.specialFolders.showFavorites": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "%config.taskExplorer.specialFolders.showFavorites%"
-                },
-                "taskExplorer.specialFolders.showLastTasks": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "%config.taskExplorer.specialFolders.showLastTasks%"
-                },
-                "taskExplorer.specialFolders.numLastTasks": {
-                    "type": "number",
-                    "enum": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ],
-                    "default": 10,
-                    "markdownDescription": "%config.taskExplorer.specialFolders.numLastTasks%"
-                },
-                "taskExplorer.specialFolders.showUserTasks": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "%config.taskExplorer.specialFolders.showUserTasks%"
-                },
                 "taskExplorer.visual.disableAnimatedIcons": {
                     "type": "boolean",
                     "default": false,
@@ -1961,12 +1967,6 @@
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "%config.taskExplorer.visual.enableAnsiconForAnt%"
-                },
-                "taskExplorer.autoRefresh": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "%config.taskExplorer.autoRefresh%",
-                    "markdownDeprecationMessage": "%config.taskExplorer.autoRefreshDeprecated%"
                 },
                 "taskExplorer.groupMaxLevel": {
                     "type": "number",

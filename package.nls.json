@@ -3,9 +3,6 @@
 	"description": "Extension to add support for tasks in VSCode.",
 	"displayName": "Task support for VSCode",
 
-	"config.taskExplorer.autoRefresh": "Auto refresh the task trees when a task file is modified.",
-	"config.taskExplorer.autoRefreshDeprecated": "Why did it exist in the first place",
-
 	"config.taskExplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
 	"config.taskExplorer.enableSideBar": "Add a task explorer to the the sidebar.",
 
@@ -51,8 +48,9 @@
 
 	"config.taskExplorer.keepTermOnStop": "Keep terminal open when stopping a task.",
 
-	"config.taskExplorer.logging.enable": "Turn on logging. Log messages are written to the `Task Explorer` output window.",
-	"config.taskExplorer.logging.enableFile": "Enable logging to file (in addition to output window). Has no effect if `#logging.enabled#` is disabled.",
+	"config.taskExplorer.logging.enable": "Turn on logging. Log messages are written to either the `Task Explorer` output window or to file, dependent on the `#logging.enableFile#` and `#logging.enableOutputWindow#` settings.",
+	"config.taskExplorer.logging.enableFile": "Enable logging to file (check the output window for location). If `#logging.enabled#` is *on*, either writing to file or to the output window should be enabled. Has no effect if `#logging.enabled#` is *off*.",
+	"config.taskExplorer.logging.enableOutputWindow": "Enable logging to a VSCode output window.  If `#logging.enabled#` is *on*, either writing to file or to the output window should be enabled. Has no effect if `#logging.enabled#` is *off*.",
 	"config.taskExplorer.logging.level": "Set debug verbosity (1 - Low / 5 - High). Has no effect if `#logging.enabled#` is disabled.",
 	
 	"config.taskExplorer.pathToPrograms": "Paths to programs, if not registered in system path",
