@@ -310,7 +310,7 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
 
 export async function buildCache(taskType: string, fileGlob: string, wsFolder: WorkspaceFolder | undefined, setCacheBuilding: boolean, logPad: string)
 {
-    log.methodStart("build file cache", 2, logPad, false, [
+    log.methodStart("build file cache", 1, logPad, false, [
         [ "folder", !wsFolder ? "entire workspace" : wsFolder.name ], [ "task type", taskType ],
         [ "task provider type", taskType ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
     ]);
@@ -353,7 +353,7 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
         cancel = false;
     }
 
-    log.methodDone("build file cache", 2, logPad);
+    log.methodDone("build file cache", 1, logPad);
 }
 
 

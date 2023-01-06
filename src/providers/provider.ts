@@ -64,7 +64,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     {
         let rmvCount;
         this.logQueueId = this.providerName + (++this.callCount);
-        log.methodStart(`provide ${this.providerName} tasks`, 1, "", false, [[ "call count", ++this.callCount ]], this.logQueueId);
+        log.methodStart(`provide ${this.providerName} tasks`, 1, "", true, [[ "call count", ++this.callCount ]], this.logQueueId);
         if (!this.cachedTasks)
         {
             const licMgr = getLicenseManager();

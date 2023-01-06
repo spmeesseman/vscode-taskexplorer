@@ -40,7 +40,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         }
     };
 
-    teApi.log.methodStart("Process config changes", 1, "");
+    teApi.log.methodStart("Process config changes", 1, "", true);
 
     //
     // if the application has called 'enableConfigWatcher' to disable, then there's nothing to do

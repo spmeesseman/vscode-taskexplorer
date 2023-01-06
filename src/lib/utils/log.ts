@@ -137,7 +137,7 @@ export async function initLog(settingGrpName: string, dispName: string, context:
     context.subscriptions.push(d);
     showLogOutput(showLog || false);
 
-    write("Log has beeninitialized", 1);
+    write("Log has been initialized", 1);
     logLogFileLocation();
 }
 
@@ -316,34 +316,35 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
         // }
         const ts = new Date().toISOString().replace(/[TZ]/g, " ");
 
-        const _write = (fn: (...fnArgs: any) => void, scope: any, ...args: any) =>
+        const _write = (fn: (...fnArgs: any) => void, scope: any, isFile: boolean, ...args: any) =>
         {
             const msgs = msg.split("\n");
             for (const m of msgs)
             {
+                const _msg = ts + logPad + m.trimEnd() + (isFile ? "\n" : "");
                 if (args && args.length > 0) {
                     if (!queueId) {
-                        fn.call(scope || window, ...args, ts + logPad + m.trimEnd());
+                        fn.call(scope || window, ...args, _msg);
                     }
                     else {
                         if (!msgQueue[queueId]) msgQueue[queueId] = [];
                         msgQueue[queueId].push({
                             fn,
                             scope: scope || window,
-                            args: [ ...args, ts + logPad + m.trimEnd() ]
+                            args: [ ...args, _msg ]
                         });
                     }
                 }
                 else {
                     if (!queueId) {
-                        fn.call(scope || window, ts + logPad + m.trimEnd());
+                        fn.call(scope || window, _msg);
                     }
                     else {
                         if (!msgQueue[queueId]) msgQueue[queueId] = [];
                         msgQueue[queueId].push({
                             fn,
                             scope: scope || window,
-                            args: [ ts + logPad + m.trimEnd() ]
+                            args: [ _msg ]
                         });
                     }
                 }
@@ -351,16 +352,16 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
         };
 
         if (enableOutputWindow && logOutputChannel && (!level || level <= (logLevel))) {
-            _write(logOutputChannel.appendLine, logOutputChannel);
+            _write(logOutputChannel.appendLine, logOutputChannel, false);
         }
         if (writeToConsole) {
             if (!level || level <= writeToConsoleLevel) {
-                _write(console.log, console);
+                _write(console.log, console, false);
             }
         }
         if (enableFile) {
             if (!level || level <= logLevel) {
-                _write(appendFileSync, null, fileName);
+                _write(appendFileSync, null, true, fileName);
             }
         }
         lastWriteWasBlank = msg === "";
