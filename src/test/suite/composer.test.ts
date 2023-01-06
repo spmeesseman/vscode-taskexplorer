@@ -49,7 +49,7 @@ suite("Composer Tests", () =>
 
     test("Enable (Off by Default)", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent);
+        this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTimeForConfigEnableEvent);
     });
 
@@ -73,7 +73,7 @@ suite("Composer Tests", () =>
 
     test("Disable", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
@@ -81,7 +81,7 @@ suite("Composer Tests", () =>
 
     test("Re-enable", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
@@ -89,7 +89,7 @@ suite("Composer Tests", () =>
 
     test("Create File", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
 
         if (!await fsApi.pathExists(dirName)) {
             await fsApi.createDir(dirName);
@@ -114,7 +114,7 @@ suite("Composer Tests", () =>
 
     test("Add Task to File", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -136,7 +136,7 @@ suite("Composer Tests", () =>
 
     test("Remove 2 Tasks from File", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -158,12 +158,12 @@ suite("Composer Tests", () =>
     {
         let resetLogging = teApi.log.isLoggingEnabled();
         if (resetLogging) { // turn scary error logging off
-            this.slow(testControl.slowTimeForFsCreateEvent + (testControl.slowTimeForConfigEvent * 2) + testControl.slowTimeForVerifyTaskCount);
+            this.slow(testControl.slowTime.fsCreateEvent + (testControl.slowTime.configEvent * 2) + testControl.slowTime.verifyTaskCount);
             executeSettingsUpdate("logging.enable", false);
             resetLogging = true;
         }
         else {
-            this.slow(testControl.slowTimeForFsCreateEvent);
+            this.slow(testControl.slowTime.fsCreateEvent);
         }
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -188,7 +188,7 @@ suite("Composer Tests", () =>
 
     test("Delete File", async function()
     {
-        this.slow(testControl.slowTimeForFsDeleteEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
@@ -198,7 +198,7 @@ suite("Composer Tests", () =>
 
     test("Disable (Default is OFF)", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });

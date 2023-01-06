@@ -8,9 +8,12 @@
 import * as assert from "assert";
 import * as path from "path";
 import { TaskExecution, Uri, workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, executeTeCommand2, getTreeTasks, getWsPath, testControl, treeUtils, verifyTaskCount, waitForTaskExecution } from "../helper";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { BashTaskProvider } from "../../providers/bash";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import {
+    activate, executeSettingsUpdate, executeTeCommand2, getWsPath, testControl, treeUtils,
+    verifyTaskCount, waitForTaskExecution
+} from "../helper";
 
 const testsName = "bash";
 const startTaskCount = 1;
@@ -79,14 +82,14 @@ suite("Bash Tests", () =>
 
     test("Start", async function()
     {
-        this.slow(testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.verifyTaskCount);
         await verifyTaskCount(testsName, startTaskCount);
     });
 
 
     test("Disable", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
@@ -94,7 +97,7 @@ suite("Bash Tests", () =>
 
     test("Re-enable", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
@@ -102,7 +105,7 @@ suite("Bash Tests", () =>
 
     test("Create File", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateFolderEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
         await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
@@ -112,7 +115,7 @@ suite("Bash Tests", () =>
 
     test("Delete File", async function()
     {
-        this.slow(testControl.slowTimeForFsDeleteEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -123,7 +126,7 @@ suite("Bash Tests", () =>
 
     test("Re-create File", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
         await teApi.waitForIdle(testControl.waitTimeForFsCreateEvent);
@@ -133,7 +136,7 @@ suite("Bash Tests", () =>
 
     test("Delete Folder", async function()
     {
-        this.slow(testControl.slowTimeForFsDeleteFolderEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -144,8 +147,8 @@ suite("Bash Tests", () =>
     {   //
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
         //
-        this.slow(testControl.slowTimeForGetTreeTasks + testControl.slowTimeForBashScript);
-        const bash = await getTreeTasks("bash", startTaskCount);
+        this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript);
+        const bash = await treeUtils.getTreeTasks("bash", startTaskCount);
         const exec = await executeTeCommand2("run", [ bash[0] ], testControl.waitTimeForRunCommand) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });

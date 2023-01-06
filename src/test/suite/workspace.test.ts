@@ -31,7 +31,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Show VSCode Tasks Marked Hidden", async function()
     {
-        this.slow(testControl.slowTimeForConfigEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.ConfigEvent + testControl.slowTime.VerifyTaskCount);
         await executeSettingsUpdate("showHiddenWsTasks", true);
         await verifyTaskCountByTree(testsName, startTaskCount);
     });
@@ -39,7 +39,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Hide VSCode Tasks Marked Hidden", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.ConfigEnableEvent + testControl.slowTime.VerifyTaskCount);
         await executeSettingsUpdate("showHiddenWsTasks", false);
         await verifyTaskCountByTree(testsName, startTaskCount - 1);
     });
@@ -47,7 +47,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Disable Workspace Tasks", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.ConfigEnableEvent + testControl.slowTime.VerifyTaskCount);
         await executeSettingsUpdate("enabledTasks.workspace", false);
         await verifyTaskCountByTree(testsName, 0);
     });
@@ -55,7 +55,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Re-enable Workspace Tasks", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.ConfigEnableEvent + testControl.slowTime.VerifyTaskCount);
         await executeSettingsUpdate("enabledTasks.workspace", true);
         await verifyTaskCountByTree(testsName, startTaskCount - 1);
     });
@@ -63,7 +63,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Re-show VSCode Tasks Marked Hidden", async function()
     {
-        this.slow(testControl.slowTimeForConfigEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.ConfigEvent + testControl.slowTime.VerifyTaskCount);
         await executeSettingsUpdate("showHiddenWsTasks", true);
         await verifyTaskCountByTree(testsName, startTaskCount);
     });

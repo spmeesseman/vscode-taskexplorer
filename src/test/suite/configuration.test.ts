@@ -279,7 +279,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("User Level Setting Update", async function()
     {
-        this.slow(testControl.slowTimeForConfigEvent * 4);
+        this.slow(testControl.slowTime.configEvent * 4);
         await configuration.update("logging.level", testControl.userLogLevel !== 3 ? 3 : 2);
         await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
         await configuration.update("logging.level", testControl.userLogLevel);

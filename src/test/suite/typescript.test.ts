@@ -59,7 +59,7 @@ suite("Typescript Tests", () =>
 
     test("Create File", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.FsCreateEvent + testControl.slowTime.VerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -98,7 +98,7 @@ suite("Typescript Tests", () =>
 
     test("Create File 2", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.FsCreateEvent + testControl.slowTime.VerifyTaskCount);
         await fsApi.writeFile(
             fileUri2.fsPath,
             "{\n" +
@@ -125,7 +125,7 @@ suite("Typescript Tests", () =>
 
     test("Disable", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.ConfigEnableEvent + testControl.slowTime.VerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCountByTree(testsName, 0);
     });
@@ -133,7 +133,7 @@ suite("Typescript Tests", () =>
 
     test("Re-enable", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.ConfigEnableEvent + testControl.slowTime.VerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTimeForConfigEnableEvent);
         await verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
@@ -141,15 +141,15 @@ suite("Typescript Tests", () =>
 
     test("Invalid JSON", async function()
     {
-        this.slow(testControl.slowTimeForFsModifyEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.FsModifyEvent + testControl.slowTime.VerifyTaskCount);
         // let resetLogging = teApi.log.isLoggingEnabled();
         // if (resetLogging) { // turn scary error logging off
-        //     this.slow(testControl.slowTimeForFsCreateEvent + (testControl.slowTimeForConfigEvent * 2));
+        //     this.slow(testControl.slowTime.FsCreateEvent + (testControl.slowTime.ConfigEvent * 2));
         //     executeSettingsUpdate("logging.enable", false);
         //     resetLogging = true;
         // }
         // else {
-        //     this.slow(testControl.slowTimeForFsCreateEvent);
+        //     this.slow(testControl.slowTime.FsCreateEvent);
         // }
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -180,7 +180,7 @@ suite("Typescript Tests", () =>
 
     test("Fix Invalid JSON", async function()
     {
-        this.slow(testControl.slowTimeForFsModifyEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.FsModifyEvent + testControl.slowTime.VerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -207,7 +207,7 @@ suite("Typescript Tests", () =>
 
     test("Delete File 1", async function()
     {
-        this.slow(testControl.slowTimeForFsDeleteEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.FsDeleteEvent + testControl.slowTime.VerifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
         await verifyTaskCountByTree(testsName, startTaskCount+ 2);
@@ -216,7 +216,7 @@ suite("Typescript Tests", () =>
 
     test("Delete File 2", async function()
     {
-        this.slow(testControl.slowTimeForFsDeleteEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.FsDeleteEvent + testControl.slowTime.VerifyTaskCount);
         await fsApi.deleteFile(fileUri2.fsPath);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
         await verifyTaskCountByTree(testsName, startTaskCount);

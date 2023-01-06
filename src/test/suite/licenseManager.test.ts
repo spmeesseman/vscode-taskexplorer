@@ -316,7 +316,7 @@ suite("License Manager Tests", () =>
 
 	test("Enter License key on Startup (1st time, Server Live)", async function()
 	{
-		this.slow(testControl.slowTimeForLocalLicenseCheck);
+		this.slow(testControl.slowTime.localLicenseCheck);
 		await storage.update("version", undefined);
 		const licenseKey = licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
@@ -328,7 +328,7 @@ suite("License Manager Tests", () =>
 
 	test("Enter License key on Startup (> 1st time, Server Live)", async function()
 	{
-		this.slow(testControl.slowTimeForLocalLicenseCheck);
+		this.slow(testControl.slowTime.localLicenseCheck);
 		const licenseKey = licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();

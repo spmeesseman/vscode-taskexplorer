@@ -57,7 +57,7 @@ suite("Ant Tests", () =>
 
     test("Start", async function()
     {
-        this.slow(testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.verifyTaskCount);
         // await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("ant", 3);
     });
@@ -65,7 +65,7 @@ suite("Ant Tests", () =>
 
     test("Disable", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", false);
         await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
         await verifyTaskCount("ant", 0);
@@ -74,7 +74,7 @@ suite("Ant Tests", () =>
 
     test("Re-enable", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent + testControl.slowTimeForVerifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", true);
         await teApi.waitForIdle(testControl.waitTimeForConfigEvent);
         await verifyTaskCount("ant", 3);
@@ -83,7 +83,7 @@ suite("Ant Tests", () =>
 
     test("Non-existent file", async function()
     {
-        this.slow((testControl.slowTimeForConfigEvent * 2) + (testControl.slowTimeForCommandFast * 2));
+        this.slow((testControl.slowTime.configEvent * 2) + (testControl.slowTime.commandFast * 2));
         await provider.readUriTasks(Uri.file(getWsPath("build2.xml")), "");
         await executeSettingsUpdate("useAnt", true);
         await provider.readUriTasks(Uri.file(getWsPath("build2.xml")), "");
@@ -93,7 +93,7 @@ suite("Ant Tests", () =>
 
     test("Enable Ansicon", async function()
     {
-        this.slow((testControl.slowTimeForConfigEvent * 5) + (testControl.slowTimeForCommandFast * 4));
+        this.slow((testControl.slowTime.configEvent * 5) + (testControl.slowTime.commandFast * 4));
         await executeSettingsUpdate("pathToPrograms.ansicon", "ansicon\\x64\\ansicon.exe");
         await executeSettingsUpdate("visual.enableAnsiconForAnt", true);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -108,7 +108,7 @@ suite("Ant Tests", () =>
 
     test("Disable Ansicon", async function()
     {
-        this.slow((testControl.slowTimeForConfigEvent * 3) + (testControl.slowTimeForCommandFast * 2));
+        this.slow((testControl.slowTime.configEvent * 3) + (testControl.slowTime.commandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
         await executeSettingsUpdate("visual.enableAnsiconForAnt", false);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -119,7 +119,7 @@ suite("Ant Tests", () =>
 
     test("Ansicon Path", async function()
     {
-        this.slow(testControl.slowTimeForConfigEvent + testControl.slowTimeForCommandFast);
+        this.slow(testControl.slowTime.configEvent + testControl.slowTime.commandFast);
         await executeSettingsUpdate("pathToPrograms.ansicon", undefined);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
     });
@@ -127,7 +127,7 @@ suite("Ant Tests", () =>
 
     test("Win32 Create Task", async function()
     {
-        this.slow((testControl.slowTimeForConfigEvent * 2) + (testControl.slowTimeForCommandFast * 2));
+        this.slow((testControl.slowTime.configEvent * 2) + (testControl.slowTime.commandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant"));
@@ -137,7 +137,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser", async function()
     {
-        this.slow((testControl.slowTimeForConfigEvent * 3) + (testControl.slowTimeForFetchTasksCommand * 2));
+        this.slow((testControl.slowTime.configEvent * 3) + (testControl.slowTime.fetchTasksCommand * 2));
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2);
     });
@@ -145,7 +145,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser no default", async function()
     {
-        this.slow((testControl.slowTimeForConfigEvent * 2)+ testControl.slowTimeForFsCreateEvent + (testControl.slowTimeForFetchTasksCommand * 2));
+        this.slow((testControl.slowTime.configEvent * 2)+ testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2));
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -160,7 +160,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser invalid target", async function()
     {
-        this.slow((testControl.slowTimeForConfigEvent * 2) + testControl.slowTimeForFsCreateEvent + (testControl.slowTimeForFetchTasksCommand * 2));
+        this.slow((testControl.slowTime.configEvent * 2) + testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2));
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -177,7 +177,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Target", async function()
     {
-        this.slow((testControl.slowTimeForConfigEvent * 2) + testControl.slowTimeForFsCreateEvent + (testControl.slowTimeForFetchTasksCommand * 2));
+        this.slow((testControl.slowTime.configEvent * 2) + testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2));
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -191,7 +191,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Project", async function()
     {
-        this.slow((testControl.slowTimeForConfigEvent * 2)+ testControl.slowTimeForFsCreateEvent + (testControl.slowTimeForFetchTasksCommand * 2));
+        this.slow((testControl.slowTime.configEvent * 2)+ testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2));
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -205,7 +205,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser Invalid Xml", async function()
     {
-        this.slow((testControl.slowTimeForConfigEvent * 2) + testControl.slowTimeForFsCreateEvent + (testControl.slowTimeForFetchTasksCommand * 2));
+        this.slow((testControl.slowTime.configEvent * 2) + testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2));
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +

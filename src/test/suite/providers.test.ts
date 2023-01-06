@@ -15,14 +15,13 @@ import { workspace, tasks, Uri, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../lib/utils/utils";
 import { ITaskExplorerApi, IExplorerApi, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, findIdInTaskMap,
-    focusExplorer,
-    getTreeTasks, getWsPath, sleep, testControl, treeUtils, verifyTaskCount
+    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
+    focusExplorer, getWsPath, sleep, testControl, treeUtils, verifyTaskCount
 } from "../helper";
 
 
 const tempFiles: string[] = [];
-const slowTimeForFsCreateEvent = testControl.slowTimeForFsCreateEvent;
+const slowTimeForFsCreateEvent = testControl.slowTime.fsCreateEvent;
 const waitTimeForFsDelEvent = testControl.waitTimeForFsDeleteEvent;
 const waitTimeForFsNewEvent = testControl.waitTimeForFsCreateEvent;
 const waitTimeForConfigEvent = testControl.waitTimeForConfigEvent;
@@ -156,84 +155,84 @@ suite("Provider Tests", () =>
 
     test("Check Existing Bash Task Counts", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
-        batch = await getTreeTasks("bash", 1);
+        this.slow(testControl.slowTime.command);
+        batch = await treeUtils.getTreeTasks("bash", 1);
     });
 
 
     test("Check Existing Batch Task Counts", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
-        batch = await getTreeTasks("batch", 2);
+        this.slow(testControl.slowTime.command);
+        batch = await treeUtils.getTreeTasks("batch", 2);
     });
 
 
     test("Create Temporary Task Files - App Publisher", async function()
     {
-        this.slow(slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         await setupAppPublisher();
     });
 
 
     test("Create Temporary Task Files - Ant", async function()
     {
-        this.slow(slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         await setupAnt();
     });
 
 
     test("Create Temporary Task Files - Bash", async function()
     {
-        this.slow(slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         await setupBash();
     });
 
 
     test("Create Temporary Task Files - Batch", async function()
     {
-        this.slow(slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         await setupBatch();
     });
 
 
     test("Create Temporary Task Files - Gradle", async function()
     {
-        this.slow(slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         await setupGradle();
     });
 
 
     test("Create Temporary Task Files - Grunt", async function()
     {
-        this.slow(slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         await setupGrunt();
     });
 
 
     test("Create Temporary Task Files - Gulp", async function()
     {
-        this.slow(slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         await setupGulp();
     });
 
 
     test("Create Temporary Task Files - Makefile", async function()
     {
-        this.slow(slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         await setupMakefile();
     });
 
 
     test("Create Temporary Task Files - Maven", async function()
     {
-        this.slow(slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         await setupMaven();
     });
 
 
     test("Create Temporary Task Files - Typescript", async function()
     {
-        this.slow(slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         await setupTsc();
     });
 
@@ -246,28 +245,28 @@ suite("Provider Tests", () =>
 
     test("Enable App-Publisher Tasks (Off by Default)", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent);
+        this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks.apppublisher", true);
     });
 
 
     test("Enable Pipenv Tasks (Off by Default)", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent);
+        this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks.pipenv", true);
     });
 
 
     test("Enable Python Tasks (Turned Off in Configuration Suite)", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent);
+        this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks.python", true);
     });
 
 
     test("Enable Maven Tasks (Off by Default)", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent);
+        this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks.maven", true);
     });
 
@@ -282,7 +281,7 @@ suite("Provider Tests", () =>
         assert(nTasks.length > 0, "No grunt tasks registered");
         nTasks = await tasks.fetchTasks({ type: "gulp" });
         assert(nTasks.length > 0, "No gulp tasks registered");
-        batch = await getTreeTasks("batch", 4);
+        batch = await treeUtils.getTreeTasks("batch", 4);
     });
 
 
@@ -400,7 +399,7 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes - TaskItem", async function()
     {
-        this.slow(testControl.slowTimeForFetchTasksCommand + testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.fetchTasksCommand + testControl.slowTime.command);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
         for (const taskItem of Object.values(taskMap))
@@ -451,7 +450,7 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes - TaskFile", async function()
     {
-        this.slow(testControl.slowTimeForFetchTasksCommand + (testControl.slowTimeForCommand * 2));
+        this.slow(testControl.slowTime.fetchTasksCommand + (testControl.slowTime.command * 2));
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
         for (const property in taskMap)
@@ -472,14 +471,14 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes - Bad Call", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         await executeTeCommand("addToExcludes", testControl.waitTimeForCommand);
     });
 
 
     test("App Publisher Delete / Add", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForFsDeleteEvent + (testControl.slowTimeForFetchTasksCommand * 2));
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + (testControl.slowTime.fetchTasksCommand * 2));
         const file = path.join(rootPath, ".publishrc.json");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -492,7 +491,7 @@ suite("Provider Tests", () =>
 
     test("Ant Delete / Add", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForFsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent);
         const file = path.join(dirName, "build.xml");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -503,7 +502,7 @@ suite("Provider Tests", () =>
 
     test("Gradle Delete / Add", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForFsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent);
         const file = path.join(dirName, "build.gradle");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -514,7 +513,7 @@ suite("Provider Tests", () =>
 
     test("Grunt Delete / Add", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForFsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent);
         const file = path.join(rootPath, "GRUNTFILE.js");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -525,7 +524,7 @@ suite("Provider Tests", () =>
 
     test("Gulp Delete / Add", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForFsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent);
         const file = path.join(rootPath, "gulpfile.js");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -536,7 +535,7 @@ suite("Provider Tests", () =>
 
     test("Makefile Delete / Add", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForFsDeleteEvent + testControl.slowTimeForConfigEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.slowTime.configEvent);
         const file = path.join(rootPath, "Makefile");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -548,7 +547,7 @@ suite("Provider Tests", () =>
 
     test("Maven Delete / Add", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForFsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent);
         const file = path.join(rootPath, "pom.xml");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -559,7 +558,7 @@ suite("Provider Tests", () =>
 
     test("Batch Delete / Add", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent + testControl.slowTimeForFsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent);
         const file = path.join(rootPath, "test.bat");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -570,17 +569,17 @@ suite("Provider Tests", () =>
 
     test("Add WS Folder to File Cache", async function()
     {
-        this.slow(testControl.slowTimeForRefreshCommand);
+        this.slow(testControl.slowTime.refreshCommand);
         await executeSettingsUpdate("enabledTasks.pipenv", false);
         await teApi.testsApi.fileCache.addWsFolders();
         await teApi.testsApi.fileCache.addWsFolders(workspace.workspaceFolders as WorkspaceFolder[]);
-        await teApi.waitForIdle(2500, testControl.slowTimeForRefreshCommand + 5000);
+        await teApi.waitForIdle(2500, testControl.slowTime.refreshCommand + 5000);
     });
 
 
     test("Run Refresh Task", async function()
     {
-        this.slow(testControl.slowTimeForRefreshCommand + testControl.slowTimeForConfigEvent);
+        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.configEvent);
         await executeSettingsUpdate("specialFolders.expanded.test-files", true);
         await executeTeCommand("refresh");
         await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
@@ -604,7 +603,7 @@ suite("Provider Tests", () =>
 
     test("Rebuild Gulp FileCache on Single Workspace Folder", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
@@ -615,7 +614,7 @@ suite("Provider Tests", () =>
 
     test("Groups with Separator", async function()
     {
-        this.slow(testControl.slowTimeForConfigGroupingEvent * 3);
+        this.slow(testControl.slowTime.configGroupingEvent * 3);
         await executeSettingsUpdate("groupWithSeparator", true);
         await executeSettingsUpdate("groupSeparator", "-");
         await executeSettingsUpdate("groupMaxLevel", 5);
@@ -624,7 +623,7 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes After Grouping", async function()
     {
-        this.slow(testControl.slowTimeForConfigExcludesEvent);
+        this.slow(testControl.slowTime.configExcludesEvent);
 
         const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItemsB4.length;
@@ -746,61 +745,61 @@ function checkTasks(ant: number, ap: number, bash: number, bat: number, gradle: 
 {
     console.log("    Task Counts");
 
-    let taskCount = findIdInTaskMap(":ant", taskMap);
+    let taskCount = treeUtils.findIdInTaskMap(":ant", taskMap);
     console.log("      Ant           : " + taskCount.toString());
     if (taskCount !== ant) {
         assert.fail(`Unexpected Ant task count (Found ${taskCount} of ${ant})`);
     }
 
-    taskCount = findIdInTaskMap(":apppublisher:", taskMap);
+    taskCount = treeUtils.findIdInTaskMap(":apppublisher:", taskMap);
     console.log("      App-Publisher : " + taskCount.toString());
     if (taskCount !== ap) {
         assert.fail(`Unexpected AppPublisher task count (Found ${taskCount} of ${ap})`);
     }
 
-    taskCount = findIdInTaskMap(":bash:", taskMap);
+    taskCount = treeUtils.findIdInTaskMap(":bash:", taskMap);
     console.log("      Bash          : " + taskCount.toString());
     if (taskCount !== bash) {
         assert.fail(`Unexpected Bash task count (Found ${taskCount} of ${bash})`);
     }
 
-    taskCount = findIdInTaskMap(":batch:", taskMap);
+    taskCount = treeUtils.findIdInTaskMap(":batch:", taskMap);
     console.log("      Batch         : " + taskCount.toString());
     if (taskCount !== bat) {
         assert.fail(`Unexpected Batch task count (Found ${taskCount} of ${bat})`);
     }
 
-    taskCount = findIdInTaskMap(":gradle:", taskMap);
+    taskCount = treeUtils.findIdInTaskMap(":gradle:", taskMap);
     console.log("      Gradle        : " + taskCount.toString());
     if (taskCount !== gradle) {
         assert.fail(`Unexpected Gradle task count (Found ${taskCount} of ${gradle})`);
     }
 
-    taskCount = findIdInTaskMap(":grunt:", taskMap);
+    taskCount = treeUtils.findIdInTaskMap(":grunt:", taskMap);
     console.log("      Grunt         : " + taskCount.toString());
     if (taskCount !== grunt) {
         assert.fail(`Unexpected Grunt task count (Found ${taskCount} of ${grunt})`);
     }
 
-    taskCount = findIdInTaskMap(":gulp:", taskMap);
+    taskCount = treeUtils.findIdInTaskMap(":gulp:", taskMap);
     console.log("      Gulp          : " + taskCount.toString());
     if (taskCount !== gulp) {
         assert.fail(`Unexpected Gulp task count (Found ${taskCount} of ${gulp})`);
     }
 
-    taskCount = findIdInTaskMap(":python:", taskMap);
+    taskCount = treeUtils.findIdInTaskMap(":python:", taskMap);
     console.log("      Python        : " + taskCount.toString());
     if (taskCount !== python) {
         assert.fail(`Unexpected Python task count (Found ${taskCount} of ${python})`);
     }
 
-    taskCount = findIdInTaskMap(":tsc:", taskMap);
+    taskCount = treeUtils.findIdInTaskMap(":tsc:", taskMap);
     console.log("      TypeScript    : " + taskCount.toString());
     if (taskCount !== tsc) {
         assert.fail(`Unexpected Typescript task count (Found ${taskCount} of ${tsc})`);
     }
 
-    taskCount = findIdInTaskMap(":Workspace:", taskMap);
+    taskCount = treeUtils.findIdInTaskMap(":Workspace:", taskMap);
     console.log("      VSCode        : " + taskCount.toString());
     if (taskCount !== vsc) {
         assert.fail(`Unexpected VSCode task count (Found ${taskCount} of ${vsc})`);

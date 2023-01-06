@@ -6,7 +6,7 @@ import TaskItem from "../../tree/item";
 import { getPackageManager } from "../../lib/utils/utils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeTeCommand2, focusExplorer, getTreeTasks, getWsPath,
+    activate, executeTeCommand2, focusExplorer, treeUtils, getWsPath,
     overrideNextShowInputBox, testControl, verifyTaskCount, waitForTaskExecution
 } from "../helper";
 import { TaskExecution } from "vscode";
@@ -52,7 +52,7 @@ suite("NPM Tests", () =>
 
     test("Create Package File (package.json)", async function()
     {
-        this.slow(testControl.slowTimeForFsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent);
         //
         // Create NPM package.json
         //
@@ -87,7 +87,7 @@ suite("NPM Tests", () =>
         // are the 'build' and 'watch' tasks are registered in tasks.json and will show in
         // the tree under the VSCode tasks node, not the npm node)
         //
-        npmTaskItems = await getTreeTasks(testsName, 2);
+        npmTaskItems = await treeUtils.getTreeTasks(testsName, 2);
     });
 
 
@@ -100,7 +100,7 @@ suite("NPM Tests", () =>
 
     test("Document Position", async function()
     {
-        this.slow(testControl.slowTimeForCommandFast * npmTaskItems.length);
+        this.slow(testControl.slowTime.commandFast * npmTaskItems.length);
         for (const taskItem of npmTaskItems) {
             await executeTeCommand2("open", [ taskItem ], testControl.waitTimeForCommandFast);
         }
@@ -109,7 +109,7 @@ suite("NPM Tests", () =>
 
     test("Install", async function()
     {
-        this.slow(testControl.slowTimeForNpmCommand);
+        this.slow(testControl.slowTime.npmCommand);
         const exec = await executeTeCommand2("runInstall", [ npmTaskItems[0].taskFile ], testControl.waitTimeForNpmCommandMin, testControl.waitTimeForNpmCommandMax) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });
@@ -117,7 +117,7 @@ suite("NPM Tests", () =>
 
     test("Update", async function()
     {
-        this.slow(testControl.slowTimeForNpmCommand);
+        this.slow(testControl.slowTime.npmCommand);
         const exec = await executeTeCommand2("runUpdate", [ npmTaskItems[0].taskFile ], testControl.waitTimeForNpmCommandMin, testControl.waitTimeForNpmCommandMax) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });
@@ -125,7 +125,7 @@ suite("NPM Tests", () =>
 
     test("Update Specified Package", async function()
     {
-        this.slow(testControl.slowTimeForNpmCommand);
+        this.slow(testControl.slowTime.npmCommand);
         overrideNextShowInputBox("@spmeesseman/app-publisher");
         const exec = await executeTeCommand2("runUpdatePackage", [ npmTaskItems[0].taskFile ], testControl.waitTimeForNpmCommandMin, testControl.waitTimeForNpmCommandMax) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
@@ -134,7 +134,7 @@ suite("NPM Tests", () =>
 
     test("Audit", async function()
     {
-        this.slow(testControl.slowTimeForNpmCommand);
+        this.slow(testControl.slowTime.npmCommand);
         const exec = await executeTeCommand2("runAudit", [ npmTaskItems[0].taskFile ], testControl.waitTimeForNpmCommandMin, testControl.waitTimeForNpmCommandMax) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });
@@ -142,7 +142,7 @@ suite("NPM Tests", () =>
 
     test("Audit Fix", async function()
     {
-        this.slow(testControl.slowTimeForNpmCommand);
+        this.slow(testControl.slowTime.npmCommand);
         const exec = await executeTeCommand2("runAuditFix", [ npmTaskItems[0].taskFile ], testControl.waitTimeForNpmCommandMin, testControl.waitTimeForNpmCommandMax) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });

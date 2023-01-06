@@ -10,7 +10,7 @@ import { storage } from "../../lib/utils/storage";
 import TaskItem from "../../tree/item";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer,
-    getSpecialTaskItemId, getTreeTasks, overrideNextShowInputBox, testControl
+    getSpecialTaskItemId, overrideNextShowInputBox, testControl, treeUtils
 } from "../helper";
 
 
@@ -49,15 +49,15 @@ suite("Tree Tests", () =>
 
     test("Refresh", async function()
     {
-        this.slow(testControl.slowTimeForRefreshCommand);
+        this.slow(testControl.slowTime.refreshCommand);
         await executeTeCommand("refresh", testControl.waitTimeForRefreshCommand);
     });
 
 
     test("Show Favorites", async function()
     {
-        ant = await getTreeTasks("ant", 3);
-        batch = await getTreeTasks("batch", 2);
+        ant = await treeUtils.getTreeTasks("ant", 3);
+        batch = await treeUtils.getTreeTasks("batch", 2);
         if (favTasks.length === 0)
         {
             await storage.update(constants.FAV_TASKS_STORE, [
@@ -71,8 +71,8 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
-        ant = await getTreeTasks("ant", 3);
-        batch = await getTreeTasks("batch", 2);
+        ant = await treeUtils.getTreeTasks("ant", 3);
+        batch = await treeUtils.getTreeTasks("batch", 2);
         if (lastTasks.length === 0)
         {
             await storage.update(constants.LAST_TASKS_STORE, [
@@ -133,7 +133,7 @@ suite("Tree Tests", () =>
 
     test("Add to Favorites", async function()
     {
-        this.slow(testControl.slowTimeForCommand * 4);
+        this.slow(testControl.slowTime.command * 4);
         let removed = await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         if (removed) {
             await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
@@ -148,7 +148,7 @@ suite("Tree Tests", () =>
 
     test("Remove from Favorites", async function()
     {
-        this.slow(testControl.slowTimeForCommand * 2);
+        this.slow(testControl.slowTime.command * 2);
         await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
     });
@@ -156,7 +156,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 1", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         overrideNextShowInputBox("Label 1");
         await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
@@ -164,7 +164,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 2", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         overrideNextShowInputBox("Label 2");
         await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
@@ -172,7 +172,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 3", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         overrideNextShowInputBox("Label 3");
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
@@ -180,7 +180,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 4", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         overrideNextShowInputBox("Label 4");
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
@@ -188,7 +188,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 5", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         overrideNextShowInputBox("Label 5");
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
@@ -196,7 +196,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 6", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         overrideNextShowInputBox("Label 6");
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
@@ -204,49 +204,49 @@ suite("Tree Tests", () =>
 
     test("Remove Custom Label 1", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
 
 
     test("Remove Custom Label 2", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
     });
 
 
     test("Remove Custom Label 3", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
 
 
     test("Remove Custom Label 4", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
     });
 
 
     test("Remove Custom Label 5", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
 
 
     test("Remove Custom Label 6", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
 
 
     test("Cancel Add Custom Label", async function()
     {
-        this.slow(testControl.slowTimeForCommand);
+        this.slow(testControl.slowTime.command);
         overrideNextShowInputBox(undefined);
         await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
     });
@@ -254,7 +254,7 @@ suite("Tree Tests", () =>
 
     test("Hide Favorites", async function()
     {
-        this.slow(testControl.slowTimeForConfigEvent * 3);
+        this.slow(testControl.slowTime.configEvent * 3);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
@@ -264,7 +264,7 @@ suite("Tree Tests", () =>
 
     test("Hide Last Tasks", async function()
     {
-        this.slow(testControl.slowTimeForConfigEvent * 3);
+        this.slow(testControl.slowTime.configEvent * 3);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
@@ -272,14 +272,14 @@ suite("Tree Tests", () =>
 
     test("Refresh", async function()
     {
-        this.slow(testControl.slowTimeForRefreshCommand);
+        this.slow(testControl.slowTime.refreshCommand);
         await executeTeCommand("refresh", testControl.waitTimeForRefreshCommand);
     });
 
 
     test("Show Favorites", async function()
     {
-        this.slow(testControl.slowTimeForConfigEnableEvent);
+        this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
@@ -287,7 +287,7 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
-        this.slow(testControl.slowTimeForConfigEvent * 3);
+        this.slow(testControl.slowTime.configEvent * 3);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
@@ -342,7 +342,7 @@ suite("Tree Tests", () =>
 
     test("Clear Special Folders", async function()
     {
-        this.slow(testControl.slowTimeForCommand * 2);
+        this.slow(testControl.slowTime.command * 2);
         overrideNextShowInputBox("Yes");
         await executeTeCommand("clearLastTasks");
         overrideNextShowInputBox("Yes");
