@@ -40,6 +40,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     private subscriptionStartIndex: number;
     private tasks: Task[] | null = null;
     private treeBuilding = false;
+    private wasVisibleOnce = false;
+    private wasVisibleLastRefresh = false;
+    private isTests = false;
     private refreshPending = false;
     private visible = false;
     private enabled = false;
@@ -61,9 +64,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         lastTasks: SpecialTaskFolder;
     };
 
-    constructor(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext)
+    constructor(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext, testsRunning: boolean)
     {
         this.name = name;
+        this.isTests = testsRunning;
         this.extensionContext = context;
         this.subscriptionStartIndex = -1;
 
@@ -1547,39 +1551,45 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
         }
 
-        if (opt !== false && util.isString(invalidate, true) && invalidate !== "tests")
+        if (this.wasVisibleLastRefresh || this.wasVisibleOnce)
         {
-            log.write(`   invalidation is for type '${invalidate}'`, 1, logPad);
-            //
-            // TODO - Performance Enhancement
-            // Get the invalidated treeitem.treefile and invalidate that instead of rebuilding
-            // the entire tree.
-            // We set currentInvalidation here, setting the 'currentInvalidation' flag will cause the
-            // resulting call to getChildren() from the VSCode task engine to only re-provide the
-            // invalidated task type, instead of all task types
-            //                                         //
-            this.currentInvalidation = invalidate;     // 'invalidate' will be taskType if 'opt' is uri
-            this.taskTree = null;                      // see todo above
-            this.taskMap = {};                         //
-            // this._onDidChangeTreeData.fire();       // see todo above // task.definition.treeItem
-        }                                              // not sure if its even possible
-        else //                                        //
-        {   // Re-ask for all tasks from all providers and rebuild tree
-            //
-            log.write("   invalidation is for all types", 1, logPad);
-            this.tasks = null; // !skipAskTasks ? null : this.tasks;
-            this.taskTree = null;
-            this.taskMap = {};
+            if (opt !== false && util.isString(invalidate, true) && invalidate !== "tests")
+            {
+                log.write(`   invalidation is for type '${invalidate}'`, 1, logPad);
+                //
+                // TODO - Performance Enhancement
+                // Get the invalidated treeitem.treefile and invalidate that instead of rebuilding
+                // the entire tree.
+                // We set currentInvalidation here, setting the 'currentInvalidation' flag will cause the
+                // resulting call to getChildren() from the VSCode task engine to only re-provide the
+                // invalidated task type, instead of all task types
+                //                                         //
+                this.currentInvalidation = invalidate;     // 'invalidate' will be taskType if 'opt' is uri
+                this.taskTree = null;                      // see todo above
+                this.taskMap = {};                         //
+                // this._onDidChangeTreeData.fire();       // see todo above // task.definition.treeItem
+            }                                              // not sure if its even possible
+            else //                                        //
+            {   // Re-ask for all tasks from all providers and rebuild tree
+                //
+                log.write("   invalidation is for all types", 1, logPad);
+                this.tasks = null; // !skipAskTasks ? null : this.tasks;
+                this.taskTree = null;
+                this.taskMap = {};
+            }
         }
+
         if (this.visible) {
             log.write("   fire tree data change event", 2, logPad);
             this._onDidChangeTreeData.fire();
+            this.wasVisibleLastRefresh = this.wasVisibleOnce = true;
         }
         else {
             log.write("   view is not visible, delay firing data change event", 1, logPad);
             // this.getChildren();
-            this.refreshPending = false;
+            this.refreshPending = this.wasVisibleLastRefresh = false;
         }
+
         log.methodDone("refresh task tree", 1, logPad);
     }
 

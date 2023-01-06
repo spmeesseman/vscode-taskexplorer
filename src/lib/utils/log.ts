@@ -109,7 +109,7 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
 }
 
 
-export async function initLog(settingGrpName: string, dispName: string, context: ExtensionContext, showLog?: boolean)
+export async function initLog(settingGrpName: string, dispName: string, context: ExtensionContext, testsRunning: boolean)
 {
     function showLogOutput(show: boolean)
     {
@@ -118,6 +118,7 @@ export async function initLog(settingGrpName: string, dispName: string, context:
         }
     }
 
+    isTests = testsRunning;
     enable = configuration.get<boolean>("logging.enable", false);
     logLevel = configuration.get<number>("logging.level", 1);
     enableOutputWindow = configuration.get<boolean>("logging.enableOutputWindow", true);
@@ -137,7 +138,7 @@ export async function initLog(settingGrpName: string, dispName: string, context:
         await processConfigChanges(context, e);
     });
     context.subscriptions.push(d);
-    showLogOutput(showLog || false);
+    // showLogOutput(showLog || false);
 
     write("Log has been initialized", 1);
     logLogFileLocation();
@@ -236,11 +237,6 @@ export function setWriteToConsole(set: boolean, level = 2)
 {
     writeToConsole = set;
     writeToConsoleLevel = level;
-}
-
-export function setTests(testsRunning: boolean)
-{
-    isTests = testsRunning;
 }
 
 

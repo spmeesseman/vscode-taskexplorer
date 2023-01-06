@@ -79,15 +79,15 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
         console.log(`     ${figures.warning} Task map is empty, fall back to walkTreeItems`);
         taskMap = await walkTreeItems(undefined);
         if (!taskMap || isObjectEmpty(taskMap)) {
-            console.log(`     ${figures.error} Task map is empty, getTreeTasks will fail`);
+            console.log(`     ${figures.error} Task map is empty, test will fail in 3, 2, 1...`);
         }
     }
     //
     // Make sure the tasks have been mapped in the explorer tree
     //
-    const taskCount = findIdInTaskMap(`:${taskType}:`, taskMap);
+    const taskCount = taskMap ? findIdInTaskMap(`:${taskType}:`, taskMap) : 0;
     if (taskCount !== expectedCount) {
-        assert.fail(`Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
+        assert.fail(`${figures.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
     }
     //
     // Get the NPM tasks from the tree mappings

@@ -34,6 +34,7 @@ import { PerlTaskProvider } from "./providers/perl";
 import { PowershellTaskProvider } from "./providers/powershell";
 import { PythonTaskProvider } from "./providers/python";
 import { RubyTaskProvider } from "./providers/ruby";
+import { join } from "path";
 
 
 const isLicenseManagerActive = true;
@@ -55,7 +56,6 @@ export const teApi: ITaskExplorerApi =
     providersExternal,
     refresh: refreshExternalProvider,
     register: registerExternalProvider,
-    setTests,
     sidebar: undefined,
     sidebarView: undefined,
     unregister: unregisterExternalProvider,
@@ -71,7 +71,10 @@ export const teApi: ITaskExplorerApi =
 
 export async function activate(context: ExtensionContext) // , disposables: Disposable[]): Promise<ITaskExplorerApi>
 {
-    await log.initLog("taskExplorer", "Task Explorer", context);
+    tests = await fs.pathExists(join(context.extensionUri.fsPath, "test", "runTest.js"));
+
+    await log.initLog("taskExplorer", "Task Explorer", context, tests);
+
     initStorage(context);
 
     log.write("");
@@ -297,12 +300,6 @@ function registerTaskProviders(context: ExtensionContext)
     registerTaskProvider("powershell", new PowershellTaskProvider(), context);
     registerTaskProvider("python", new PythonTaskProvider(), context);
     registerTaskProvider("ruby", new RubyTaskProvider(), context);
-}
-
-
-function setTests()
-{
-    tests = true;
 }
 
 

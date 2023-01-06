@@ -88,7 +88,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     {
         teApi.log.write("   the 'specialFolders.showUserTasks' setting has changed", 1);
         teApi.log.value("      new value", configuration.get<boolean>("specialFolders.showUserTasks"), 2);
-        refresh= true;
+        refresh = true;
     }
 
     //

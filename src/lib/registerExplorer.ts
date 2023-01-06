@@ -3,7 +3,7 @@
 import * as log from "./utils/log";
 import { views } from "../views";
 import { TaskTreeDataProvider } from "../tree/tree";
-import { ExtensionContext, workspace, window } from "vscode";
+import { ExtensionContext, window } from "vscode";
 import { IExplorerApi, ITaskExplorerApi } from "../interface";
 
 
@@ -13,11 +13,11 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
     log.write("Register explorer view / tree provider '" + name + "'", 1, "   ");
 
     if (enabled)
-    {   
+    {
         /* istanbul ignore else */
         if (!view)
         {
-            const treeDataProvider = new TaskTreeDataProvider(name, context),
+            const treeDataProvider = new TaskTreeDataProvider(name, context, teApi.isTests()),
                   treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
             views.set(name, treeView);
             view = views.get(name);

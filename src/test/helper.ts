@@ -10,7 +10,6 @@ import { testControl } from "./control";
 import { configuration } from "../lib/utils/configuration";
 import constants from "../lib/constants";
 import { deleteFile, pathExists } from "../lib/utils/fs";
-import { setTests } from "../lib/utils/log";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, Uri, window, workspace } from "vscode";
 
@@ -86,11 +85,6 @@ export async function activate(instance?: any)
             assert.fail(`     ${figures.error} Explorer instance does not exist`);
         }
         //
-        // Enable tests mode within the application, it alters the flow in a few spots, not many.
-        //
-        teApi.setTests();
-        setTests(true);
-        //
         // _api pre-test suite will reset after disable/enable
         //
         setExplorer(teApi.explorer);
@@ -115,6 +109,20 @@ export async function activate(instance?: any)
 export async function cleanup()
 {
     const rootPath = getWsPath(".");
+console.log("1");
+    if (testControl.logEnabled && testControl.logToFile && testControl.logOpenFileOnFinish)
+    {
+console.log("2");
+        const logFilePath = teApi.log.getLogFileName();
+        if (logFilePath) {
+console.log("3");
+            try {
+                const doc = await workspace.openTextDocument(Uri.file(logFilePath));
+console.log("4");
+                await window.showTextDocument(doc);
+            } catch (e) { console.error(e); }
+        }
+    }
 
     await deactivate();
 
@@ -141,17 +149,6 @@ export async function cleanup()
             await deleteFile(packageLockFile);
         }
     } catch (e) { console.error(e); }
-
-    if (testControl.logEnabled && testControl.logToFile && testControl.logOpenFileOnFinish)
-    {
-        const logFilePath = teApi.log.getLogFileName();
-        if (logFilePath) {
-            try {
-                const doc = await workspace.openTextDocument(Uri.file(logFilePath));
-                await window.showTextDocument(doc);
-            } catch (e) { console.error(e); }
-        }
-    }
 }
 
 
