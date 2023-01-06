@@ -1,5 +1,4 @@
 
-
 import { visit, JSONVisitor } from "jsonc-parser";
 import { TextDocument } from "vscode";
 import { getTaskName } from "./getTaskName";
@@ -9,7 +8,7 @@ import { providers, providersExternal } from "../extension";
 import { isWatchTask } from "./utils/utils";
 
 
-function findJsonDocumentPosition(documentText: string, taskItem: TaskItem)
+const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): number =>
 {
     let inScripts = false;
     let inTasks = false;
@@ -95,10 +94,10 @@ function findJsonDocumentPosition(documentText: string, taskItem: TaskItem)
 
     log.methodDone("find json document position", 3, "   ", false, [[ "position", scriptOffset ]]);
     return scriptOffset;
-}
+};
 
 
-export function findDocumentPosition(document: TextDocument, taskItem: TaskItem): number
+export const findDocumentPosition = (document: TextDocument, taskItem: TaskItem): number =>
 {
     let scriptOffset = 0;
     const documentText = document.getText();
@@ -125,4 +124,4 @@ export function findDocumentPosition(document: TextDocument, taskItem: TaskItem)
 
     log.methodDone("find task definition document position", 1, "", true, [[ "offset", scriptOffset ]]);
     return scriptOffset;
-}
+};

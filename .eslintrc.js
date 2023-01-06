@@ -25,11 +25,11 @@ module.exports = {
         "sourceType": "module",
         "ecmaVersion": 2019
     },
-    "ignorePatterns": ["**/test-files/*.js", "**/*.js", "*.json" ],
+    "ignorePatterns": ["**/test-files/*.js", "types", "**/*.js", "*.json" ],
     "overrides": [
     {
         "files": ["src/**/*.ts"],
-        "excludedFiles": ["test-files", "*.js", "*.json"  ]
+        "excludedFiles": ["test-files", "types", "*.js", "*.json"  ]
     }],
     "plugins": [
         "eslint-plugin-jsdoc",

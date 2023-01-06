@@ -7,7 +7,7 @@ import constants from "./constants";
 
 
 
-export function sortFolders(folders: Map<string, TaskFolder>): TaskFolder[]
+export const sortFolders = (folders: Map<string, TaskFolder>): TaskFolder[] =>
 {
     return [ ...folders.values() ].sort((a: TaskFolder, b: TaskFolder) =>
     {
@@ -34,10 +34,10 @@ export function sortFolders(folders: Map<string, TaskFolder>): TaskFolder[]
         }
         return 0;
     });
-}
+};
 
 
-export function sortTaskFolder(folder: TaskFolder, logPad: string, logLevel: number)
+export const sortTaskFolder = (folder: TaskFolder, logPad: string, logLevel: number) =>
 {
     sortTasks(folder.taskFiles, logPad, logLevel);
     for (const each of folder.taskFiles)
@@ -47,10 +47,10 @@ export function sortTaskFolder(folder: TaskFolder, logPad: string, logLevel: num
             sortTasks(each.treeNodes, logPad, logLevel);
         }
     }
-}
+};
 
 
-export function sortTasks(items: (TaskFile | TaskItem)[] | undefined, logPad = "", logLevel = 1)
+export const sortTasks = (items: (TaskFile | TaskItem)[] | undefined, logPad = "", logLevel = 1) =>
 {
     log.methodStart("sort tasks", logLevel, logPad);
     items?.sort((a: TaskFile| TaskItem, b: TaskFile| TaskItem) =>
@@ -73,4 +73,4 @@ export function sortTasks(items: (TaskFile | TaskItem)[] | undefined, logPad = "
         return 0;
     });
     log.methodDone("sort tasks", logLevel, logPad);
-}
+};

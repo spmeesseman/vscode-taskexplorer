@@ -1,5 +1,5 @@
 
-export function getTaskName(script: string, relativePath: string | undefined)
+export const getTaskName = (script: string, relativePath: string | undefined) =>
 {
     if (relativePath && relativePath.length)
     {
@@ -11,4 +11,4 @@ export function getTaskName(script: string, relativePath: string | undefined)
         }
     }
     return script;
-}
+};

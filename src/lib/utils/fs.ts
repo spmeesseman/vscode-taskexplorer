@@ -1,9 +1,9 @@
 
 import * as fs from "fs";
 import * as path from "path";
-//import { isString } from "../../common/utils";
+// import { isString } from "../../common/utils";
 
-let cwd = process.cwd();
+const cwd = process.cwd();
 
 /*
 export function appendFile(file: string, data: string): Promise<void>
@@ -109,7 +109,7 @@ export function copyDir(src: string, dst: string, filter?: RegExp, copyWithBaseF
 */
 
 
-export function createDir(dir: string): Promise<void>
+export const createDir = (dir: string): Promise<void> =>
 {
     return new Promise<void>(async (resolve, reject) =>
     {
@@ -134,10 +134,10 @@ export function createDir(dir: string): Promise<void>
             resolve();
         }
     });
-}
+};
 
 
-export function deleteDir(dir: string): Promise<void>
+export const deleteDir = (dir: string): Promise<void> =>
 {
     return new Promise<void>(async (resolve, reject) =>
     {
@@ -155,10 +155,10 @@ export function deleteDir(dir: string): Promise<void>
             resolve();
         }
     });
-}
+};
 
 
-export function deleteFile(file: string): Promise<void>
+export const deleteFile = (file: string): Promise<void> =>
 {
     return new Promise<void>(async (resolve, reject) =>
     {
@@ -176,7 +176,7 @@ export function deleteFile(file: string): Promise<void>
             resolve();
         }
     });
-}
+};
 
 /*
 export function getDateModified(file: string)
@@ -199,13 +199,10 @@ export function getDateModified(file: string)
 */
 
 
-export function isDirectory(dirPath: string)
-{
-    return fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory();
-}
+export const isDirectory = (dirPath: string) => fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory();
 
 
-export function numFilesInDirectory(dirPath: string): Promise<number>
+export const numFilesInDirectory = (dirPath: string): Promise<number> =>
 {
     return new Promise((resolve, reject) =>
     {
@@ -217,15 +214,15 @@ export function numFilesInDirectory(dirPath: string): Promise<number>
                 if (!err) {
                     resolve(files.length);
                 }
-                else reject(err); 
+                else reject(err);
             });
         }
         else { reject(new Error("Invalid directory does not exist")); }
     });
-}
+};
 
 
-export function pathExists(file: string): Promise<boolean>
+export const pathExists = (file: string): Promise<boolean> =>
 {
     return new Promise<boolean>((resolve, reject) =>
     {
@@ -237,10 +234,10 @@ export function pathExists(file: string): Promise<boolean>
             resolve(true);
         });
     });
-}
+};
 
 
-export function readFileAsync(file: string): Promise<string>
+export const readFileAsync = (file: string): Promise<string> =>
 {
     return new Promise<string>(async (resolve, reject) =>
     {
@@ -256,10 +253,10 @@ export function readFileAsync(file: string): Promise<string>
         }
         catch (e) { /* istanbul ignore next */ reject(e); }
     });
-}
+};
 
 
-export function readJsonAsync<T>(file: string): Promise<T>
+export const readJsonAsync = <T>(file: string): Promise<T> =>
 {
     return new Promise<T>(async (resolve, reject) =>
     {
@@ -270,10 +267,10 @@ export function readJsonAsync<T>(file: string): Promise<T>
         }
         catch (e) { reject(e); }
     });
-}
+};
 
 
-function readFileBufAsync(file: string): Promise<Buffer>
+const readFileBufAsync = (file: string): Promise<Buffer> =>
 {
     return new Promise<Buffer>(async (resolve, reject) =>
     {
@@ -288,7 +285,7 @@ function readFileBufAsync(file: string): Promise<Buffer>
             }
         });
     });
-}
+};
 
 /*
 export function renameFile(fileCurrent: string, fileNew: string): Promise<void>
@@ -327,7 +324,7 @@ export function renameFile(fileCurrent: string, fileNew: string): Promise<void>
 //         let contentNew: string | undefined;
 //         const content = await readFile(file),
 //               regex = new RegExp(old, caseSensitive ? "gm" : "gmi");
-// 
+//
 //         if (isString(nu))
 //         {
 //             if (caseSensitive) {
@@ -344,31 +341,31 @@ export function renameFile(fileCurrent: string, fileNew: string): Promise<void>
 //                 contentNew = content.replace(new RegExp(old, caseSensitive ? "gm" : "gmi"), nu(match));
 //             }
 //         }
-// 
+//
 //         if (contentNew && content !== contentNew)
 //         {
 //             await writeFile(file, contentNew);
 //             return true;
 //         }
 //     }
-// 
+//
 //     return false;
 // }
-// 
-// 
+//
+//
 // export function setCwd(dir: string)
 // {
 //     cwd = dir;
 // }
-// 
-// 
+//
+//
 /**
  * Overwrites file if it exists
  *
  * @param file The file path to write to
  * @param data The data to write
  */
-export function writeFile(file: string, data: string): Promise<void>
+export const writeFile = (file: string, data: string): Promise<void> =>
 {
     return new Promise<void>((resolve, reject) =>
     {
@@ -386,4 +383,4 @@ export function writeFile(file: string, data: string): Promise<void>
             reject(new Error("Specified path is a directory"));
         }
     });
-}
+};

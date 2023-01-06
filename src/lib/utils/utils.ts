@@ -320,7 +320,7 @@ export function getTaskTypeFriendlyName(taskType: string, lowerCase = false)
     else if (taskType === "tsc") {
         return lowerCase ? "typescript" : "Typescript";
     }
-    return lowerCase ? taskType : properCase(taskType) as string;
+    return lowerCase ? taskType : properCase(taskType);
 }
 
 

@@ -1,6 +1,6 @@
 
 import * as https from "http";
-//import * as https from "https";
+// import * as https from "https";
 import * as log from "./utils/log";
 import { storage } from "./utils/storage";
 import { commands, ExtensionContext, InputBoxOptions, Task, ViewColumn, WebviewPanel,  window, workspace } from "vscode";
@@ -38,14 +38,14 @@ export class LicenseManager implements ILicenseManager
 	async checkLicense(logPad = "   ")
 	{
 		const storedLicenseKey = this.getLicenseKey();
-		log.methodStart("Check license", 1, logPad, false, [["stored license key", storedLicenseKey]]);
+		log.methodStart("Check license", 1, logPad, false, [[ "stored license key", storedLicenseKey ]]);
 		if (storedLicenseKey) {
 			try {
 				this.licensed = await this.validateLicense(storedLicenseKey, logPad + "   ");
 			}
-			catch{}
+			catch {}
 		}
-		log.methodDone("Check license", 1, logPad, false, [["is valid license", this.licensed]]);
+		log.methodDone("Check license", 1, logPad, false, [[ "is valid license", this.licensed ]]);
 	}
 
 
@@ -65,7 +65,7 @@ export class LicenseManager implements ILicenseManager
 		// }
 
 		log.methodStart("display info startup page", 1, logPad, false, [
-			["stored version", storedVersion], ["is licensed", this.licensed]
+			[ "stored version", storedVersion ], [ "is licensed", this.licensed ]
 		]);
 
 		if (!this.licensed) { // only display the nag on startup when the version changes
@@ -82,7 +82,7 @@ export class LicenseManager implements ILicenseManager
 					enableScripts: true
 				}
 			);
-			
+
 			let content = getHeaderContent();
 			content += "<table align=\"center\" width=\"900\">";
 			content += ("<tr><td>" + getBodyContent("Welcome to Task Explorer") + "</td></tr>");
@@ -214,6 +214,7 @@ export class LicenseManager implements ILicenseManager
 			python: 0,
 			ruby: 0,
 			tsc: 0,
+			// eslint-disable-next-line @typescript-eslint/naming-convention
 			Workspace: 0
 		};
 
@@ -230,7 +231,7 @@ export class LicenseManager implements ILicenseManager
 		{
 			for (const wf of workspace.workspaceFolders)
 			{
-				projects.push(wf.name)
+				projects.push(wf.name);
 			}
 		}
 
@@ -329,7 +330,7 @@ export class LicenseManager implements ILicenseManager
 	{
 		return new Promise<boolean>((resolve) =>
 		{
-			log.methodStart("validate license", 1, logPad, false, [["license key", licenseKey]]);
+			log.methodStart("validate license", 1, logPad, false, [[ "license key", licenseKey ]]);
 
 			let rspData = "";
 			const options = {
@@ -340,6 +341,7 @@ export class LicenseManager implements ILicenseManager
 				timeout: 5000,
 				headers: {
 					"token": "HjkSgsR55WepsaWYtFoNmRMLiTJS4nKOhgXoPIuhd8zL3CVK694UXNw/n9e1GXiG9U5WiAmjGxAoETapHCjB67G0DkDZnXbbzYICr/tfpVc4NKNy1uM3GHuAVXLeKJQLtUMLfxgXYTJFNMU7H/vTaw==",
+					// eslint-disable-next-line @typescript-eslint/naming-convention
 					"Content-Type": "application/json"
 				}
 			};
@@ -352,10 +354,10 @@ export class LicenseManager implements ILicenseManager
 					log.write("      licensed mode will be automatically enabled.");
 				}
 				else { log.error(e); }
-				log.methodDone("validate license", 1, logPad, false, [["licensed", this.licensed]]);
+				log.methodDone("validate license", 1, logPad, false, [[ "licensed", this.licensed ]]);
 				resolve(!teApi.isTests());
 			};
-			
+
 			log.write("   send validation request", 1, logPad);
 
 			const req = https.request(options, (res) =>
@@ -373,7 +375,7 @@ export class LicenseManager implements ILicenseManager
 						if (licensed) {
 							await this.setLicenseKey(licenseKey);
 						}
-						log.methodDone("validate license", 1, logPad, false, [["is valid license", licensed]]);
+						log.methodDone("validate license", 1, logPad, false, [[ "is valid license", licensed ]]);
 						resolve(licensed);
 					}
 					catch (e) { /* istanbul ignore next */ _onError(e); }

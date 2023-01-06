@@ -5,7 +5,7 @@ import { basename } from "path";
 import { window, Terminal } from "vscode";
 
 
-export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefined
+export const getTerminal = (taskItem: TaskItem, logPad = ""): Terminal | undefined =>
 {
     let checkNum = 0;
     let term: Terminal | undefined;
@@ -148,4 +148,4 @@ export function getTerminal(taskItem: TaskItem, logPad = ""): Terminal | undefin
     }
 
     return term;
-}
+};

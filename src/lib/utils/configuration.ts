@@ -53,7 +53,7 @@ class Configuration implements IConfigurationApi
     {
         let propertyKey = key,
             valueKey = key,
-            isObject = false;;
+            isObject = false;
         if (!pkgJsonCfgProps[propertyKey] && key.includes("."))
         {
             let propsKey = "";

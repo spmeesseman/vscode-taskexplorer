@@ -10,7 +10,7 @@ import { IExplorerApi } from "../interface";
 let panel: WebviewPanel | undefined;
 
 
-export async function displayParsingReport(logPad: string, logLevel: number, uri?: Uri)
+export const displayParsingReport = async(logPad: string, logLevel: number, uri?: Uri) =>
 {
     log.methodStart("display parsing report", logLevel, logPad);
 
@@ -19,7 +19,7 @@ export async function displayParsingReport(logPad: string, logLevel: number, uri
 	content += "<table align=\"center\">";
 	content += ("<tr><td>" + getBodyContent("Welcome to Task Explorer") + "</td></tr>");
 	content += ("<tr><td>" + getInfoContent(logPad + "   ", logLevel + 1, uri) + "</td></tr>");
-	content + "</table>";
+	content += "</table>";
     content += getFooterContent();
 
 	panel = window.createWebviewPanel(
@@ -36,7 +36,7 @@ export async function displayParsingReport(logPad: string, logLevel: number, uri
     log.methodDone("display parsing report", logLevel, logPad);
 
     return panel;
-}
+};
 
 
 // function closeWebView()
@@ -44,13 +44,10 @@ export async function displayParsingReport(logPad: string, logLevel: number, uri
 //     panel?.dispose();
 // }
 
-function getFooterContent()
-{
-    return "</body></html>";
-}
+const getFooterContent = () => "</body></html>";
 
 
-function getInfoContent(logPad: string, logLevel: number, uri?: Uri)
+const getInfoContent = (logPad: string, logLevel: number, uri?: Uri) =>
 {
     log.methodStart("get body content", logLevel, logPad);
 
@@ -68,7 +65,7 @@ function getInfoContent(logPad: string, logLevel: number, uri?: Uri)
 		<td style="padding-right:20px" nowrap>File</td>
 	</tr><tr><td colspan="6"><hr></td></tr>`;
 
-	const tasks = api.getTasks()?.filter((t: Task) => !project || (isWorkspaceFolder(t.scope) && 
+	const tasks = api.getTasks()?.filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
                                          project === getWorkspaceProjectName(t.scope.uri.fsPath))),
 		  projects: string[] = [];
 
@@ -78,7 +75,7 @@ function getInfoContent(logPad: string, logLevel: number, uri?: Uri)
 		/* istanbul ignore else */
 		if (isWorkspaceFolder(t.scope))
 		{
-			wsFolder = t.scope as WorkspaceFolder;
+			wsFolder = t.scope;
 			project = project || getWorkspaceProjectName(wsFolder.uri.fsPath);
 		}
 		else {
@@ -91,7 +88,7 @@ function getInfoContent(logPad: string, logLevel: number, uri?: Uri)
 		{
 			/* istanbul ignore else */
 			if (wsFolder) {
-				filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.definition.uri.fsPath)
+				filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.definition.uri.fsPath);
 			}
 			else {
 				filePath = t.definition.uri.fsPath;
@@ -99,7 +96,7 @@ function getInfoContent(logPad: string, logLevel: number, uri?: Uri)
 		}
 		else if (wsFolder)
 		{
-			filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.name)
+			filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.name);
 		}
 		else if (t.definition.path)
 		{
@@ -126,12 +123,12 @@ function getInfoContent(logPad: string, logLevel: number, uri?: Uri)
 		}
 	});
 
-	details += "</table>"
+	details += "</table>";
 
-	let summary = `# of Tasks: ${tasks?.length}<br><br>Projects: ${projects.join(", ")}`;
+	const summary = `# of Tasks: ${tasks?.length}<br><br>Projects: ${projects.join(", ")}`;
 
 	log.methodDone("get body content", logLevel, logPad);
 
 	return `<table><tr><td>${summary}</td><?tr></table>
-<table><tr><td>${details}</td><?tr></table>`
-}
+<table><tr><td>${details}</td><?tr></table>`;
+};

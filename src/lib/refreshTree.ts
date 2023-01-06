@@ -1,9 +1,8 @@
 import { Uri } from "vscode";
-import { isExcluded } from "./utils/utils";
 import { ITaskExplorerApi } from "../interface";
 
 
-export async function refreshTree(teApi: ITaskExplorerApi, taskType?: string, uri?: Uri, logPad?: string)
+export const refreshTree = async(teApi: ITaskExplorerApi, taskType?: string, uri?: Uri, logPad?: string) =>
 {   //
     // Refresh tree(s)
     //
@@ -17,4 +16,4 @@ export async function refreshTree(teApi: ITaskExplorerApi, taskType?: string, ur
     if (teApi.sidebar) {
         await teApi.sidebar.refresh(taskType, uri, logPad);
     }
-}
+};

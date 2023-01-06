@@ -43,7 +43,7 @@ export const isProcessingFsEvent = () => processingFsEvent;
 
 
 export async function registerFileWatchers(context: ExtensionContext, api: ITaskExplorerApi)
-{   
+{
     teApi = api;
     //
     // Watch individual task type files within the project folder
@@ -262,7 +262,7 @@ async function onDirCreate(uri: Uri)
 async function onDirDelete(uri: Uri)
 {
     if (!extname(uri.fsPath) && !util.isExcluded(uri.fsPath)) // ouch
-    //if (isDirectory(uri.fsPath)) // it's gone, so we can't lstat it
+    // if (isDirectory(uri.fsPath)) // it's gone, so we can't lstat it
     {
         processingFsEvent = true;
         try
@@ -290,7 +290,7 @@ async function onDirDelete(uri: Uri)
                         await cache.removeFolderFromCache(u, "   ");
                     }
                     if (wfs.length === 1) {
-                        await refreshTree(teApi, undefined, pendingDeleteFolders.length > 1 ? wfs[0].uri: uri);
+                        await refreshTree(teApi, undefined, pendingDeleteFolders.length > 1 ? wfs[0].uri : uri);
                     }
                     else {
                         await refreshTree(teApi, undefined, undefined);

@@ -154,13 +154,16 @@ function logLogFileLocation()
 {
     if (enable && enableFile)
     {
-        const writeToConsoleOrig = writeToConsole;
-        const writeToOutputOrig = enableOutputWindow;
-        enableOutputWindow = true;
-        writeToConsole = false;
-        write("*************************************************************************************", 1);
-        write(" Log File: " + fileName);
-        write("*************************************************************************************", 1);
+        /* istanbul ignore else */
+        if (logOutputChannel)
+        {
+            logOutputChannel.appendLine("*************************************************************************************");
+            logOutputChannel.appendLine(" Log File: " + fileName);
+            logOutputChannel.appendLine("*************************************************************************************");
+            logOutputChannel.appendLine(`${figures.color.pointer} ${withColor("*************************************************************************************", colors.grey)}`);
+            logOutputChannel.appendLine(`${figures.color.pointer} ${withColor(" Log File: " + fileName, colors.grey)}`);
+            logOutputChannel.appendLine(`${figures.color.pointer} ${withColor("*************************************************************************************", colors.grey)}`);
+        }
         /* istanbul ignore else */
         if (isTests)
         {
@@ -168,8 +171,6 @@ function logLogFileLocation()
             console.log(`    ${figures.color.pointer} ${withColor(" Log File: " + fileName, colors.grey)}`);
             console.log(`    ${figures.color.pointer} ${withColor("*************************************************************************************", colors.grey)}`);
         }
-        enableOutputWindow = writeToOutputOrig;
-        writeToConsole = writeToConsoleOrig;
     }
 }
 
