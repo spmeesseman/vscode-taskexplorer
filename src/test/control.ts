@@ -22,12 +22,17 @@ export const testControl =
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)s
     //
     slowTime: {
+        bashScript: 4000,
+        batchScript: 8000,
+        buildFileCache: 1500,
         command: 1450,
         commandFast: 550,
         configEvent: 300,
-        configEnableEvent: 875,
+        configRegisterExplorerEvent: 500,
+        configEnableEvent: 975,
         configExcludesEvent: 475,
         configGroupingEvent: 700,
+        fetchTasksCommand: 3000,
         focusCommand: 4500,
         fsCreateEvent: 1250,
         fsCreateFolderEvent: 1800,
@@ -35,16 +40,17 @@ export const testControl =
         fsDeleteFolderEvent: 1550,
         fsModifyEvent: 650,
         getTreeTasks: 150,
-        npmCommand: 10000,
-        bashScript: 4000,
-        batchScript: 8000,
-        refreshCommand: 10250,
-        runCommand: 5000,
-        storageUpdate: 50,
-        fetchTasksCommand: 3000,
         localLicenseCheck: 2000,
+        npmCommand: 12500,
+        refreshCommand: 10250,
+        rebuildFileCache: 3000,
         remoteLicenseCheck: 3750,
-        verifyTaskCount: 875
+        runCommand: 5000,
+        showHideSpecialFolder: 350,
+        storageUpdate: 50,
+        taskProviderReadUri: 100,
+        verifyTaskCount: 875,
+        workspaceInvalidation: 15000
     },
     //
     // MINIMUM WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME)

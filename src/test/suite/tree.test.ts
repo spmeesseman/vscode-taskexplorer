@@ -254,7 +254,7 @@ suite("Tree Tests", () =>
 
     test("Hide Favorites", async function()
     {
-        this.slow(testControl.slowTime.configEvent * 3);
+        this.slow(testControl.slowTime.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
@@ -264,7 +264,7 @@ suite("Tree Tests", () =>
 
     test("Hide Last Tasks", async function()
     {
-        this.slow(testControl.slowTime.configEvent * 3);
+        this.slow(testControl.slowTime.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
@@ -287,7 +287,7 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
-        this.slow(testControl.slowTime.configEvent * 3);
+        this.slow(testControl.slowTime.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
@@ -295,7 +295,7 @@ suite("Tree Tests", () =>
 
     test("Show Favorite Tasks w/ Last Tasks", async function()
     {
-        this.slow((testControl.waitTimeForConfigEvent * 3) + (testControl.waitTimeForCommand * 2));
+        this.slow((testControl.slowTime.showHideSpecialFolder * 4)  + (testControl.slowTime.configEvent * 4));
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
@@ -308,12 +308,14 @@ suite("Tree Tests", () =>
 
     test("Show Favorite Tasks Only", async function()
     {
+        this.slow(testControl.slowTime.showHideSpecialFolder + testControl.slowTime.configEvent);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
     });
 
 
     test("Hide Favorite and Last Tasks", async function()
     {
+        this.slow((testControl.slowTime.showHideSpecialFolder * 2) + (testControl.slowTime.configEvent *2));
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
@@ -322,6 +324,7 @@ suite("Tree Tests", () =>
 
     test("Show Favorite Tasks", async function()
     {
+        this.slow(testControl.slowTime.showHideSpecialFolder + testControl.slowTime.configEvent);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
@@ -329,6 +332,7 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
+        this.slow(testControl.slowTime.showHideSpecialFolder + testControl.slowTime.configEvent);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await teApi.waitForIdle(testControl.waitTimeForCommand);
     });
@@ -483,7 +487,7 @@ suite("Tree Tests", () =>
 
     test("Invalidation (Workspace)", async function()
     {
-        this.slow(15000);
+        this.slow(testControl.slowTime.workspaceInvalidation);
         await explorer.invalidateTasksCache();
         await teApi.waitForIdle(testControl.waitTimeForCommand);
         await executeTeCommand("refresh", testControl.waitTimeForRefreshCommand);

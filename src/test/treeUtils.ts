@@ -5,7 +5,7 @@ import TaskItem from "../tree/item";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import { isObjectEmpty } from "../lib/utils/utils";
-import { colors, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2, figures, getTeApi, testControl } from "./helper";
 
 let treeBuiltOnce = false;
@@ -77,10 +77,10 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
     //
     let taskMap = teApi.testsApi.explorer.getTaskMap();
     if (!taskMap || isObjectEmpty(taskMap)) {
-        console.log(`    ${figures.color.warning} ${teApi.log.withColor("Task map is empty, fall back to walkTreeItems", colors.grey)}`);
+        console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, fall back to walkTreeItems", figures.colors.grey)}`);
         taskMap = await walkTreeItems(undefined);
         if (!taskMap || isObjectEmpty(taskMap)) {
-            console.log(`    ${figures.color.error} ${teApi.log.withColor("Task map is empty, test will fail in 3, 2, 1...", colors.grey)}`);
+            console.log(`    ${figures.color.error} ${figures.withColor("Task map is empty, test will fail in 3, 2, 1...", figures.colors.grey)}`);
         }
     }
     //
@@ -122,9 +122,9 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
     let treeItems = await teApi.testsApi.explorer.getChildren(undefined, "", 5);
     if (!treeItems || treeItems.length === 0)
     {
-        console.log(`    ${figures.color.warning} ${teApi.log.withColor("No tree items!", colors.grey)}`);
+        console.log(`    ${figures.color.warning} ${figures.withColor("No tree items!", figures.colors.grey)}`);
         if (Date.now() - now < 500) {
-            console.log(`    ${figures.warning} ${teApi.log.withColor("Trying again..." , colors.grey)}`);
+            console.log(`    ${figures.warning} ${figures.withColor("Trying again..." , figures.colors.grey)}`);
             treeItems = await teApi.testsApi.explorer.getChildren(undefined, "", 5);
         }
         if (!treeItems || treeItems.length === 0) {

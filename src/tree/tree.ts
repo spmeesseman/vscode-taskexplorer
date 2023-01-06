@@ -1191,7 +1191,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         // invalidate=true means the refresh button was clicked (opt will be false)
         // invalidate="tests" means this is being called from unit tests (opt will be undefined)
         //
-        if ((invalidate === true || invalidate === "tests") && !opt)
+        if ((invalidate === true || (invalidate === "tests" && this.isTests)) && !opt)
         {   //
             // The file cache oly needs to update once on any change, since this will get called through
             // twice if both the Explorer and Sidebar Views are enabled, do a lil check here to make sure
@@ -1204,13 +1204,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 this.busy = true;
                 await rebuildCache(logPad + "   ");
                 log.write("   handling 'rebuild cache' eventcomplete", 1, logPad + "   ");
-                this.busy = invalidate !== "tests";
+                this.busy = !this.isTests || invalidate !== "tests";
             }
         }
         //
         // If this is not from unit testing, then invalidate the appropriate task cache/file
         //
-        if (invalidate !== "tests")
+        if (!this.isTests || invalidate !== "tests")
         {
             log.write("   handling 'invalidate tasks cache' event", 1, logPad);
             await this.invalidateTasksCache(invalidate !== true ? invalidate : undefined, opt, logPad + "   ");
@@ -1270,7 +1270,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.busy = true;
 
         try {
-            if (opt1 && opt1 !== "tests" && opt2 instanceof Uri)
+            if (opt1 && (opt1 !== "tests" || !this.isTests) && opt2 instanceof Uri)
             {
                 log.write("   invalidate '" + opt1 + "' task provider file ", 1, logPad);
                 log.value("      file", opt2.fsPath, 1, logPad);
@@ -1555,7 +1555,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
         }
 
-        if (opt !== false && util.isString(invalidate, true) && invalidate !== "tests")
+        if (opt !== false && util.isString(invalidate, true) && (!this.isTests || invalidate !== "tests"))
         {
             log.write(`   invalidation is for type '${invalidate}'`, 1, logPad);
             //

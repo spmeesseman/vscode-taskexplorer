@@ -4,7 +4,6 @@
 import { appendFileSync } from "fs";
 import { dirname, join } from "path";
 import { createDir } from "./fs";
-import { colors, LogColor } from "../../interface/logApi";
 import { configuration } from "./configuration";
 import { isArray, isError, isFunction, isObject, isString } from "./utils";
 import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
@@ -36,6 +35,9 @@ export function blank(level?: number, queueId?: string)
 {
     write("", level, "", queueId);
 }
+
+
+export const colors = figures.colors;
 
 
 export function dequeue(queueId: string)
@@ -296,10 +298,7 @@ export function values(level: number, logPad: string, params: any | (string|any)
 }
 
 
-export const withColor = (str: string, color: LogColor) =>
-{
-    return "\x1B[" + color[0] + "m" + str + "\x1B[" + color[1] + "m";
-};
+export const withColor = figures.withColor;
 
 
 export function write(msg: string, level?: number, logPad = "", queueId?: string) // , color?: LogColor)

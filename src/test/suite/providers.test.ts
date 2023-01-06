@@ -569,7 +569,7 @@ suite("Provider Tests", () =>
 
     test("Add WS Folder to File Cache", async function()
     {
-        this.slow(testControl.slowTime.refreshCommand);
+        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2));
         await executeSettingsUpdate("enabledTasks.pipenv", false);
         await teApi.testsApi.fileCache.addWsFolders();
         await teApi.testsApi.fileCache.addWsFolders(workspace.workspaceFolders as WorkspaceFolder[]);
@@ -579,7 +579,7 @@ suite("Provider Tests", () =>
 
     test("Run Refresh Task", async function()
     {
-        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.configEvent);
+        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.configEvent * 2));
         await executeSettingsUpdate("specialFolders.expanded.test-files", true);
         await executeTeCommand("refresh");
         await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
@@ -588,7 +588,7 @@ suite("Provider Tests", () =>
 
     test("Invalidate Bash Tasks With New Bash Shell Setting", async function()
     {
-        this.slow(1000);
+        this.slow(testControl.slowTime.buildFileCache + (testControl.slowTime.configEvent * 2));
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
@@ -603,7 +603,7 @@ suite("Provider Tests", () =>
 
     test("Rebuild Gulp FileCache on Single Workspace Folder", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent);
+        this.slow(testControl.slowTime.buildFileCache);
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
@@ -655,7 +655,7 @@ suite("Provider Tests", () =>
 
     test("Cancel Rebuild Cache", async function()
     {
-        this.slow(20000);
+        this.slow((testControl.slowTime.rebuildFileCache * 5) + 115);
         //
         // Try a bunch of times to cover all of the hooks in the processing loops
         //
@@ -683,6 +683,7 @@ suite("Provider Tests", () =>
 
     test("Remove Temporary Directories", async function()
     {
+        this.slow(testControl.slowTime.fsDeleteFolderEvent * 8 + (testControl.slowTime.fsDeleteEvent * 2));
         if (tempFiles.length)
         {
             let file: string | undefined;

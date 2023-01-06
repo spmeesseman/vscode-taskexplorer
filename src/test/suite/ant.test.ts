@@ -127,7 +127,7 @@ suite("Ant Tests", () =>
 
     test("Win32 Create Task", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2) + (testControl.slowTime.commandFast * 2));
+        this.slow((testControl.slowTime.configEvent * 2) + (testControl.slowTime.commandFast * 2) + testControl.slowTime.taskProviderReadUri);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant"));
@@ -137,7 +137,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 3) + (testControl.slowTime.fetchTasksCommand * 2));
+        this.slow((testControl.slowTime.configEvent * 3) + (testControl.slowTime.fetchTasksCommand * 2) + testControl.slowTime.taskProviderReadUri);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2);
     });
@@ -145,7 +145,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser no default", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2)+ testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2));
+        this.slow((testControl.slowTime.configEvent * 2)+ testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.slowTime.taskProviderReadUri);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -160,7 +160,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser invalid target", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2) + testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2));
+        this.slow((testControl.slowTime.configEvent * 2) + testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.slowTime.taskProviderReadUri);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -177,7 +177,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Target", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2) + testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2));
+        this.slow((testControl.slowTime.configEvent * 2) + testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.slowTime.taskProviderReadUri);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -191,7 +191,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Project", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2)+ testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2));
+        this.slow((testControl.slowTime.configEvent * 2)+ testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.slowTime.taskProviderReadUri);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +

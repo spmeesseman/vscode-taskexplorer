@@ -11,7 +11,7 @@ import { configuration } from "../lib/utils/configuration";
 import constants from "../lib/constants";
 import { deleteFile, pathExists } from "../lib/utils/fs";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { commands, extensions, Task, TaskExecution, tasks, Uri, window, workspace } from "vscode";
+import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 
 let activated = false;
 let teApi: ITaskExplorerApi;
@@ -74,9 +74,9 @@ export async function activate(instance?: any)
         //
         // Activate extension
         //
-        console.log(`    ${figures.color.info} Activating extension 'spmeesseman.vscode-taskexplorer'`);
+        console.log(`    ${figures.color.info} ${figures.withColor("Activating extension 'spmeesseman.vscode-taskexplorer'", figures.colors.grey)}`);
         teApi = await ext.activate();
-        console.log(`    ${figures.color.success} Extension 'spmeesseman.vscode-taskexplorer' successfully activated`);
+        console.log(`    ${figures.color.success} ${figures.withColor("Extension 'spmeesseman.vscode-taskexplorer' successfully activated", figures.colors.grey)}`);
         //
         // Ensure extension initialized successfully
         //
@@ -100,7 +100,7 @@ export async function activate(instance?: any)
         // All done
         //
         activated = true;
-        console.log(`    ${figures.color.success} Tests ready`);
+        console.log(`    ${figures.color.success} ${figures.withColor("Tests ready", figures.colors.grey)}`);
     }
     return teApi;
 }
@@ -296,20 +296,20 @@ function isExecuting(task: Task)
 function isReady(taskType?: string)
 {
     let err: string | undefined;
-    if (!teApi)                                 err = `    ${figures.color.error} TeApi null`;
+    if (!teApi)                                 err = `    ${figures.color.error} ${figures.withColor("TeApi null", figures.colors.grey)}`;
     else {
-        if (!teApi.explorer)                    err = `    ${figures.color.error} TeApi Explorer provider == null`;
-        else if (teApi.sidebar)                 err = `    ${figures.color.error} TeApi Sidebar Provider != null`;
-        else if (!teApi.providers)              err = `    ${figures.color.error} Providers null`;
+        if (!teApi.explorer)                    err = `    ${figures.color.error} ${figures.withColor("TeApi Explorer provider == null", figures.colors.grey)}`;
+        else if (teApi.sidebar)                 err = `    ${figures.color.error} ${figures.withColor("TeApi Sidebar Provider != null", figures.colors.grey)}`;
+        else if (!teApi.providers)              err = `    ${figures.color.error} ${figures.withColor("Providers null", figures.colors.grey)}`;
     }
     if (!err && taskType) {
-        if (!teApi.providers.get(taskType))     err = `    ${figures.color.error} ${taskType} Provider == null`;
+        if (!teApi.providers.get(taskType))     err = `    ${figures.color.error} ${taskType} ${figures.withColor("Provider == null", figures.colors.grey)}`;
     }
     if (!err && !(workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined)) {
-                                                err = `    ${figures.color.error} Workspace folder does not exist`;
+                                                err = `    ${figures.color.error} ${figures.withColor("Workspace folder does not exist", figures.colors.grey)}`;
     }
     if (!err && !extensions.getExtension("spmeesseman.vscode-taskexplorer")) {
-                                                err = `    ${figures.color.error} Extension not found`;
+                                                err = `    ${figures.color.error} ${figures.withColor("Extension not found", figures.colors.grey)}`;
     }
     if (err) {
         console.log(err);

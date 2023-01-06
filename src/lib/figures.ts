@@ -1,12 +1,10 @@
-import { colors } from "../interface/logApi";
-
-const withColor = (str: string, color: any) =>
-{
-    return "\x1B[" + color[0] + "m" + str + "\x1B[" + color[1] + "m";
-};
+import { colors, withColor } from "../interface/logApi";
 
 export default
 {
+    colors,
+    withColor,
+
     success: "✔",
     info: "ℹ",
 	warning: "⚠",
