@@ -61,7 +61,7 @@ window.showInformationMessage = (str: string, ...args: any[]) =>
 export async function activate(instance?: any)
 {
     const ext = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-    assert(ext, `    ${figures.error} Could not find extension`);
+    assert(ext, `    ${figures.color.error} Could not find extension`);
 
     if (instance) instance.timeout(60 * 1000);
 
@@ -74,15 +74,15 @@ export async function activate(instance?: any)
         //
         // Activate extension
         //
-        console.log(`    ${figures.success} Activating extension 'spmeesseman.vscode-taskexplorer'`);
+        console.log(`    ${figures.color.info} Activating extension 'spmeesseman.vscode-taskexplorer'`);
         teApi = await ext.activate();
-        console.log(`    ${figures.success} Extension 'spmeesseman.vscode-taskexplorer' successfully activated`);
+        console.log(`    ${figures.color.success} Extension 'spmeesseman.vscode-taskexplorer' successfully activated`);
         //
         // Ensure extension initialized successfully
         //
-        assert(isReady() === true, `    ${figures.error} TeApi not ready`);
+        assert(isReady() === true, `    ${figures.color.error} TeApi not ready`);
         if (!teApi.explorer) {
-            assert.fail(`    ${figures.error} Explorer instance does not exist`);
+            assert.fail(`    ${figures.color.error} Explorer instance does not exist`);
         }
         //
         // _api pre-test suite will reset after disable/enable

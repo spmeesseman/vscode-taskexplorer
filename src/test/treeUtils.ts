@@ -5,7 +5,7 @@ import TaskItem from "../tree/item";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import { isObjectEmpty } from "../lib/utils/utils";
-import { TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { colors, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2, figures, getTeApi, testControl } from "./helper";
 
 let treeBuiltOnce = false;
@@ -77,10 +77,10 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
     //
     let taskMap = teApi.testsApi.explorer.getTaskMap();
     if (!taskMap || isObjectEmpty(taskMap)) {
-        console.log(`    ${figures.warning} Task map is empty, fall back to walkTreeItems`);
+        console.log(`    ${figures.color.warning} Task map is empty, fall back to walkTreeItems`);
         taskMap = await walkTreeItems(undefined);
         if (!taskMap || isObjectEmpty(taskMap)) {
-            console.log(`    ${figures.error} Task map is empty, test will fail in 3, 2, 1...`);
+            console.log(`    ${figures.color.error} Task map is empty, test will fail in 3, 2, 1...`);
         }
     }
     //
@@ -88,7 +88,7 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
     //
     const taskCount = taskMap ? findIdInTaskMap(`:${taskType}:`, taskMap) : 0;
     if (taskCount !== expectedCount) {
-        assert.fail(`${figures.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
+        assert.fail(`${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
     }
     //
     // Get the NPM tasks from the tree mappings
@@ -122,13 +122,13 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
     let treeItems = await teApi.testsApi.explorer.getChildren(undefined, "", 5);
     if (!treeItems || treeItems.length === 0)
     {
-        console.log(`    ${figures.warning} No tree items!`);
+        console.log(`    ${figures.color.warning} ${teApi.log.withColor("No tree items!", colors.grey)}`);
         if (Date.now() - now < 500) {
             console.log(`    ${figures.warning} Trying again...`);
             treeItems = await teApi.testsApi.explorer.getChildren(undefined, "", 5);
         }
         if (!treeItems || treeItems.length === 0) {
-            console.log(`    ${figures.error} No tree items!!`);
+            console.log(`    ${figures.color.error} No tree items!!`);
             return taskMap;
         }
     }

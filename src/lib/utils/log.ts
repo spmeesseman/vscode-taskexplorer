@@ -4,6 +4,7 @@
 import { appendFileSync } from "fs";
 import { dirname, join } from "path";
 import { createDir } from "./fs";
+import { colors, LogColor } from "../../interface/logApi";
 import { configuration } from "./configuration";
 import { isArray, isError, isFunction, isObject, isString } from "./utils";
 import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
@@ -54,12 +55,12 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
 {
     if (msg)
     {
-        write(figures.error, 0, "", queueId);
+        write(figures.color.error, 0, "", queueId);
         const _writeErr = (err: any) =>
         {
             if (isString(err))
             {
-                write(figures.error + " " + err, 0, "", queueId);
+                write(figures.color.error + " " + err, 0, "", queueId);
             }
             else if (isError(err))
             {
@@ -78,21 +79,21 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
                     writeError(err.message, queueId);
                 }
                 else if (isFunction(err.toString)) {
-                    write(figures.error + " " + err.toString(), 0, "", queueId);
+                    write(figures.color.error + " " + err.toString(), 0, "", queueId);
                 }
             }
             else if (isFunction(err.toString)) {
-                write(figures.error + " " + err.toString(), 0, "", queueId);
+                write(figures.color.error + " " + err.toString(), 0, "", queueId);
             }
         };
         _writeErr(msg);
         if (params)
         {
             for (const [ n, v, l ] of params) {
-                value(figures.error + "   " + n, v, 0, "", queueId);
+                value(figures.color.error + "   " + n, v, 0, "", queueId);
             }
         }
-        write(figures.error, 0, "", queueId);
+        write(figures.color.error, 0, "", queueId);
     }
 }
 
@@ -161,9 +162,9 @@ function logLogFileLocation()
         /* istanbul ignore else */
         if (isTests)
         {
-            console.log(`    ${figures.pointer} *************************************************************************************`, 1);
-            console.log(`    ${figures.pointer}  Log File: ` + fileName);
-            console.log(`    ${figures.pointer} *************************************************************************************`, 1);
+            console.log(`    ${figures.pointer} ${withColor("*************************************************************************************", colors.grey)}`, 1);
+            console.log(`    ${figures.pointer} ${withColor(" Log File: " + fileName, colors.grey)}`);
+            console.log(`    ${figures.pointer} ${withColor("*************************************************************************************", colors.grey)}`, 1);
         }
         enableOutputWindow = writeToOutputOrig;
         writeToConsole = writeToConsoleOrig;
@@ -295,6 +296,12 @@ export function values(level: number, logPad: string, params: any | (string|any)
 }
 
 
+export const withColor = (str: string, color: LogColor) =>
+{
+    return "\x1B[" + color[0] + "m" + str + "\x1B[" + color[1] + "m";
+};
+
+
 export function write(msg: string, level?: number, logPad = "", queueId?: string) // , color?: LogColor)
 {
     if (msg === null || msg === undefined || (lastWriteWasBlank && msg === "")) {
@@ -303,9 +310,6 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
 
     if (enable)
     {
-        // if (color) {
-        //     msg = color + msg + LogColor.white;
-        // }
         const ts = new Date().toISOString().replace(/[TZ]/g, " ");
 
         const _write = (fn: (...fnArgs: any) => void, scope: any, isFile: boolean, ...args: any) =>
@@ -348,6 +352,7 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
         }
         if (writeToConsole) {
             if (!level || level <= writeToConsoleLevel) {
+                msg = withColor(msg, colors.grey);
                 _write(console.log, console, false);
             }
         }
@@ -365,11 +370,11 @@ function writeError(e: Error, queueId?: string)
 {
     const currentWriteToConsole = writeToConsole;
     writeToConsole = true;
-    write(figures.error + " " + e.name, 0, "", queueId);
-    write(figures.error + " " + e.message, 0, "", queueId);
+    write(figures.color.error + " " + e.name, 0, "", queueId);
+    write(figures.color.error + " " + e.message, 0, "", queueId);
     if (e.stack) {
-        const stackFmt = e.stack.replace(/\n/g, `\n${figures.error} `);
-        write(figures.error + " " + stackFmt, 0, "", queueId);
+        const stackFmt = e.stack.replace(/\n/g, `\n${figures.color.error} `);
+        write(figures.color.error + " " + stackFmt, 0, "", queueId);
     }
     writeToConsole = currentWriteToConsole;
 }
