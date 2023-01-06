@@ -61,7 +61,9 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     if (e.affectsConfiguration("taskExplorer.exclude") || e.affectsConfiguration("taskExplorer.excludeTask"))
     {
-        teApi.log.write("   The 'exclude/excludeTask' setting has changed", 1);
+        teApi.log.write("   the 'exclude/excludeTask' setting has changed", 1);
+        teApi.log.value("      exclude changed", e.affectsConfiguration("taskExplorer.exclude"), 2);
+        teApi.log.value("      excludeTask changed", e.affectsConfiguration("taskExplorer.excludeTask"), 2);
         refresh = true;
     }
 
@@ -72,6 +74,10 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         e.affectsConfiguration("taskExplorer.groupMaxLevel") || e.affectsConfiguration("taskExplorer.groupStripTaskLabel")))
     {
         teApi.log.write("   A tree grouping setting has changed", 1);
+        teApi.log.value("      groupWithSeparator changed", configuration.get<boolean>("groupWithSeparator"), 2);
+        teApi.log.value("      groupSeparator changed", configuration.get<boolean>("groupSeparator"), 2);
+        teApi.log.value("      groupMaxLevel changed", configuration.get<boolean>("groupMaxLevel"), 2);
+        teApi.log.value("      groupStripTaskLabel changed", configuration.get<boolean>("groupStripTaskLabel"), 2);
         refresh = true;
     }
 
@@ -80,6 +86,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     if (e.affectsConfiguration("taskExplorer.specialFolders.showUserTasks"))
     {
+        teApi.log.write("   the 'specialFolders.showUserTasks' setting has changed", 1);
+        teApi.log.value("      new value", configuration.get<boolean>("specialFolders.showUserTasks"), 2);
         refresh= true;
     }
 
@@ -98,6 +106,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
                       newValue = newEnabledTasks[p];
                 if (newValue !== oldValue)
                 {
+                    teApi.log.write(`   the 'enabledTasks.${taskType}' setting has changed`, 1);
+                    teApi.log.value("      new value", newValue, 2);
                     await registerFileWatcher(ctx, taskType, util.getGlobPattern(taskType), newValue, "   ");
                     registerChange(taskType);
                 }
@@ -122,6 +132,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
                           oldValue = pathToPrograms[p],
                           newValue = newPathToPrograms[p];
                     if (newValue !== oldValue) {
+                        teApi.log.write(`   the 'pathToPrograms.${taskType}' setting has changed`, 1);
+                        teApi.log.value("      new value", newValue, 2);
                         registerChange(taskType);
                     }
                 }
@@ -136,9 +148,13 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         {   /* istanbul ignore else */
             if (refreshTaskTypes.includes("bash") === false)
             {
+                const newValue = configuration.get<string[]>("globPatternsBash", []);
+                const newGlob = util.getCombinedGlobPattern(constants.GLOB_BASH, newValue);
+                teApi.log.write("   the 'globPatternsBash' setting has changed", 1);
+                teApi.log.value("      new glob", newGlob, 2);
                 await registerFileWatcher(ctx, "bash",
-                                        util.getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", [])),
-                                        configuration.get<boolean>("enabledTasks.bash"), "   ");
+                                          newGlob,
+                                          configuration.get<boolean>("enabledTasks.bash"), "   ");
                 registerChange("bash");
             }
         }
@@ -151,8 +167,10 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
             if (refreshTaskTypes.includes("ant") === false)
             {
                 const antGlobs = [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ];
-                await registerFileWatcher(ctx, "ant", util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs),
-                                          configuration.get<boolean>("enabledTasks.ant"), "   ");
+                const newGlob = util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs);
+                teApi.log.write("   the 'globPatternsAnt' setting has changed", 1);
+                teApi.log.value("      new glob", newGlob, 2);
+                await registerFileWatcher(ctx, "ant", newGlob, configuration.get<boolean>("enabledTasks.ant"), "   ");
                 registerChange("ant");
             }
         }
@@ -161,6 +179,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         // Whether or not to use the 'ant' program to detect ant tasks (default is xml2js parser)
         //
         if (e.affectsConfiguration("taskExplorer.useAnt")) {
+            teApi.log.write("   the 'useAnt' setting has changed", 1);
+            teApi.log.value("      new value", configuration.get<boolean>("useAnt"), 2);
             registerChange("ant");
         }
 
@@ -168,6 +188,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         // Whether or not to use the 'gulp' program to detect gulp tasks (default is custom parser)
         //
         if (e.affectsConfiguration("taskExplorer.useGulp")) {
+            teApi.log.write("   the 'useGulp' setting has changed", 1);
+            teApi.log.value("      new value", configuration.get<boolean>("useGulp"), 2);
             registerChange("gulp");
         }
 
@@ -176,6 +198,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         // Do a global refresh since we don't provide the npm tasks, VSCode itself does
         //
         if (e.affectsConfiguration("npm.packageManager", undefined)) {
+            teApi.log.write("   the 'npm.packageManager' setting has changed", 1);
+            teApi.log.value("      new value", configuration.getVs<boolean>("npm.packageManager"), 2);
             registerChange("npm");
         }
 
@@ -185,6 +209,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         // and parsed by the application to locate the value.
         //
         if (e.affectsConfiguration("taskExplorer.showHiddenWsTasks")) {
+            teApi.log.write("   the 'npm.showHiddenWsTasks' setting has changed", 1);
+            teApi.log.value("      new value", configuration.get<boolean>("showHiddenWsTasks"), 2);
             registerChange("Workspace");
         }
 
@@ -197,10 +223,14 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
             //
             // Script type task defs will change with terminal change
             //
-            if (configuration.get<boolean>("enabledTasks.bash") || configuration.get<boolean>("enabledTasks.batch") ||
-                configuration.get<boolean>("enabledTasks.perl") || configuration.get<boolean>("enabledTasks.powershell") ||
-                configuration.get<boolean>("enabledTasks.python") || configuration.get<boolean>("enabledTasks.ruby") ||
-                configuration.get<boolean>("enabledTasks.nsis")) {
+            const enabledTasks = configuration.get<any>("enabledTasks");
+            if (enabledTasks.bash || enabledTasks.batch || enabledTasks.perl || enabledTasks.powershell ||
+                enabledTasks.python || enabledTasks.ruby || enabledTasks.nsis)
+            {
+                teApi.log.write("   a 'terminal.integrated.shell' setting has changed", 1);
+                teApi.log.value("      windows shell", configuration.getVs<boolean>("terminal.integrated.shell.windows"), 2);
+                teApi.log.value("      linux shell", configuration.getVs<boolean>("terminal.integrated.shell.linux"), 2);
+                teApi.log.value("      osx shell", configuration.getVs<boolean>("terminal.integrated.shell.osx"), 2);
                 refresh = true;
             }
         }
@@ -211,10 +241,12 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
     {
+        teApi.log.write("   the 'enableExplorerView' setting has changed", 1);
         registerExplorer("taskExplorer", ctx, configuration.get<boolean>("enableExplorerView"), teApi, false);
     }
     if (e.affectsConfiguration("taskExplorer.enableSideBar"))
     {
+        teApi.log.write("   the 'enableSideBar' setting has changed", 1);
         registerExplorer("taskExplorerSideBar", ctx, configuration.get<boolean>("enableSideBar"), teApi, false);
     }
 
@@ -231,6 +263,9 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
             for (const t of refreshTaskTypes) {
                 await refreshTree(teApi, t, undefined, "   ");
             }
+        }
+        else {
+            teApi.log.write("   Current changes require no processing", 1);
         }
     }
     catch (e) {

@@ -310,9 +310,10 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
 
 export async function buildCache(taskType: string, fileGlob: string, wsFolder: WorkspaceFolder | undefined, setCacheBuilding: boolean, logPad: string)
 {
+    const providerType = util.isScriptType(taskType) ? "script" : taskType;
     log.methodStart("build file cache", 1, logPad, false, [
         [ "folder", !wsFolder ? "entire workspace" : wsFolder.name ], [ "task type", taskType ],
-        [ "task provider type", taskType ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
+        [ "task provider type", providerType ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
     ]);
 
     if (setCacheBuilding)
@@ -333,7 +334,7 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
     //
     if (!wsFolder)
     {
-        log.write("   Scan all projects for taskType '" + taskType + "' (" + taskType + ")", 1, logPad);
+        log.write("   Scan all projects for taskType '" + taskType + "' (" + providerType + ")", 1, logPad);
         for (const folder of workspace.workspaceFolders as readonly WorkspaceFolder[])
         {
             await buildFolderCache(folder, taskType, fileGlob, logPad + "   ");

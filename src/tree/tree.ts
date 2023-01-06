@@ -745,23 +745,31 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
     private fireTaskChangeEvents(taskItem: TaskItem, logPad?: string, logLevel?: number)
     {
-        /* istanbul ignore next */
-        if (!this.taskTree) {
-            return;
-        }
-        /* istanbul ignore next */
-        if (!taskItem) {
-            /* istanbul ignore next */
-            log.error("task change event fire, invalid taskItem argument");
-            /* istanbul ignore next */
+        /* istanbul ignore if */
+        if (!taskItem || !taskItem.task || !taskItem.taskFile) {
+            log.error(`fire task change event invalid (${!taskItem}/${!taskItem.task}/${!taskItem.taskFile})`);
             return;
         }
 
-        const isTaskItem = taskItem instanceof TaskItem,
-              logValues = taskItem && isTaskItem ? [
-            [ "task name", taskItem.task.name ], [ "task type", taskItem.task.source ], [ "resource path", taskItem.taskFile.resourceUri.fsPath ]
-        ] : [[ "event", "rebuild entire tree" ]];
-        log.methodStart("fire task change events", logLevel, logPad, false, logValues);
+        const isTaskItem = taskItem instanceof TaskItem;
+        log.methodStart("fire task change events", logLevel, logPad, false, [
+            [ "task name", taskItem.task.name ], [ "task type", taskItem.task.source ],
+            [ "resource path", taskItem.taskFile.resourceUri.fsPath ]
+        ]);
+
+        /* istanbul ignore if */
+        if (!this.taskTree) {
+            log.write("   no task tree!!", logLevel, logPad);
+            log.methodDone("fire task change events", logLevel, logPad);
+            return;
+        }
+
+        /* istanbul ignore if */
+        if (!isTaskItem) {
+            log.write("   change event object is not a taskitem!!", logLevel, logPad);
+            log.methodDone("fire task change events", logLevel, logPad);
+            return;
+        }
 
         //
         // Fire change event for parent folder.  Firing the change event for the task item itself
@@ -772,33 +780,30 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         //
         this._onDidChangeTreeData.fire(taskItem.taskFile);
 
-        if (isTaskItem)
+        //
+        // Fire change event for the 'Last Tasks' folder if the task exists there
+        //
+        if (this.specialFolders.lastTasks.hasTask(taskItem))
         {
-            //
-            // Fire change event for the 'Last Tasks' folder if the task exists there
-            //
-            if (this.specialFolders.lastTasks.hasTask(taskItem))
+            if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.lastTasks.label)
             {
-                if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.lastTasks.label)
-                {
-                    this._onDidChangeTreeData.fire(this.taskTree[0]);
-                }
+                this._onDidChangeTreeData.fire(this.taskTree[0]);
             }
-
-            //
-            // Fire change event for the 'Favorites' folder if the task exists there
-            //
-            if (this.specialFolders.favorites.hasTask(taskItem))
-            {
-                if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.favorites.label)
-                {
-                    this._onDidChangeTreeData.fire(this.taskTree[0]);
-                }
-                else if (this.taskTree[1] && this.taskTree[1].label === this.specialFolders.favorites.label)
-                {
-                    this._onDidChangeTreeData.fire(this.taskTree[1]);
-                }
         }
+
+        //
+        // Fire change event for the 'Favorites' folder if the task exists there
+        //
+        if (this.specialFolders.favorites.hasTask(taskItem))
+        {
+            if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.favorites.label)
+            {
+                this._onDidChangeTreeData.fire(this.taskTree[0]);
+            }
+            else if (this.taskTree[1] && this.taskTree[1].label === this.specialFolders.favorites.label)
+            {
+                this._onDidChangeTreeData.fire(this.taskTree[1]);
+            }
         }
 
         log.methodDone("fire task change events", logLevel, logPad);
@@ -2208,8 +2213,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 // Hide status bar message (if ON in settings)
                 //
                 this.showStatusMessage(task);
-                const taskItem = this.taskMap[taskId];
-                this.fireTaskChangeEvents(taskItem as TaskItem, "   ", 1);
+                const taskItem = this.taskMap[taskId] as TaskItem;
+                this.fireTaskChangeEvents(taskItem, "   ", 1);
                 log.methodDone("task finished event", 1);
             }
             catch (e) { /* istanbul ignore next */ console.error(e); }
