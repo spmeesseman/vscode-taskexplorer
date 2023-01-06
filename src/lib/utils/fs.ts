@@ -109,7 +109,7 @@ export function copyDir(src: string, dst: string, filter?: RegExp, copyWithBaseF
 */
 
 
-export function createDir(dir: string)
+export function createDir(dir: string): Promise<void>
 {
     return new Promise<void>(async (resolve, reject) =>
     {

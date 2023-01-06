@@ -5,18 +5,17 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as assert from "assert";
-import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { activate, executeSettingsUpdate, executeTeCommand, focusExplorer, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, executeSettingsUpdate, focusExplorer, getWsPath, testsControl, verifyTaskCount } from "../helper";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
-
+import { IFilesystemApi } from "../../interface/fsApi";
 
 const testsName = "maven";
 
 let teApi: ITaskExplorerApi;
+let fs: IFilesystemApi;
 let pathToProgram: string;
 let rootPath: string;
 let fileUri: Uri;
@@ -30,7 +29,7 @@ suite("Maven Tests", () =>
         // Initialize
         //
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "    ✘ TeApi not ready");
+        fs = teApi.testsApi.fs;
         rootPath = getWsPath(".");
         fileUri = Uri.file(path.join(rootPath, "pom.xml"));
         //
@@ -58,7 +57,7 @@ suite("Maven Tests", () =>
     test("Create file", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
-        fs.writeFileSync(
+        await fs.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
@@ -118,7 +117,7 @@ suite("Maven Tests", () =>
         else {
             this.slow(testsControl.slowTimeForFsCreateEvent);
         }
-        fs.writeFileSync(
+        await fs.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
@@ -135,7 +134,7 @@ suite("Maven Tests", () =>
     test("Fix Invalid XML", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
-        fs.writeFileSync(
+        await fs.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
@@ -149,7 +148,7 @@ suite("Maven Tests", () =>
     test("Delete file", async function()
     {
         this.slow(testsControl.slowTimeForFsDeleteEvent);
-        fs.unlinkSync(fileUri.fsPath);
+        await fs.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, 0);
     });

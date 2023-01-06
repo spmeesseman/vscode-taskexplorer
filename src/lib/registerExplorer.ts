@@ -4,7 +4,7 @@ import * as log from "./utils/log";
 import { views } from "../views";
 import { TaskTreeDataProvider } from "../tree/tree";
 import { ExtensionContext, workspace, window } from "vscode";
-import { ITaskExplorerApi } from "../interface";
+import { IExplorerApi, ITaskExplorerApi } from "../interface";
 
 
 export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext, enabled: boolean, teApi: ITaskExplorerApi, isActivation: boolean)
@@ -22,7 +22,8 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
             views.set(name, treeView);
             view = views.get(name);
             /* istanbul ignore else */
-            if (view) {
+            if (view)
+            {
                 view.onDidChangeVisibility(e => { treeDataProvider.onVisibilityChanged(e.visible); }, treeDataProvider);
                 context.subscriptions.push(view);
                 log.write("   Tree data provider registered'" + name + "'", 1, "   ");
@@ -62,4 +63,6 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
             view.dispose();
         }
     }
+
+    teApi.testsApi.explorer = teApi.explorer /* istanbul ignore next */|| teApi.sidebar || {} as IExplorerApi;
 }

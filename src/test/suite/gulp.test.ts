@@ -2,17 +2,16 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import * as assert from "assert";
-import * as fs from "fs";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { activate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, getWsPath, testsControl, verifyTaskCount } from "../helper";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { GulpTaskProvider } from "../../providers/gulp";
 
 const testsName = "gulp";
 
 let teApi: ITaskExplorerApi;
+let fsApi: IFilesystemApi;
 let provider: GulpTaskProvider;
 let dirName: string;
 let fileUri: Uri;
@@ -24,7 +23,7 @@ suite("Gulp Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "    ✘ TeApi not ready");
+        fsApi = teApi.testsApi.fs;
         provider = teApi.providers.get(testsName) as GulpTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "gulpfile.js"));
@@ -63,11 +62,11 @@ suite("Gulp Tests", () =>
 
     test("Create file", async function()
     {
-        if (!fs.existsSync(dirName)) {
-            fs.mkdirSync(dirName, { mode: 0o777 });
+        if (!(await fsApi.pathExists(dirName))) {
+            await fsApi.createDir(dirName);
         }
 
-        fs.writeFileSync(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
             "gulp.task('hello3', (done) => {\n" +
@@ -87,7 +86,7 @@ suite("Gulp Tests", () =>
 
     test("Add task to file", async function()
     {
-        fs.writeFileSync(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
             "gulp.task('hello3', (done) => {\n" +
@@ -111,7 +110,7 @@ suite("Gulp Tests", () =>
 
     test("Remove task from file", async function()
     {
-        fs.writeFileSync(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
             "gulp.task('hello3', (done) => {\n" +
@@ -127,11 +126,8 @@ suite("Gulp Tests", () =>
 
     test("Delete file", async function()
     {
-        fs.unlinkSync(fileUri.fsPath);
-        fs.rmdirSync(dirName, {
-            recursive: true
-        });
-
+        await fsApi.deleteFile(fileUri.fsPath);
+        await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, 17);
     });

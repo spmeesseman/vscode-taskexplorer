@@ -5,20 +5,19 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as assert from "assert";
-import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand2, focusExplorer,
-    getTreeTasks, getWsPath, isReady, testsControl, verifyTaskCountByTree
+    getTreeTasks, getWsPath, testsControl, verifyTaskCountByTree
 } from "../helper";
 
 
 const testsName = "tsc";
 
 let teApi: ITaskExplorerApi;
+let fsApi: IFilesystemApi;
 let rootPath: string;
 let dirName: string;
 let fileUri: Uri;
@@ -31,13 +30,13 @@ suite("Typescript Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady() === true, "    ✘ TeApi not ready");
+        fsApi = teApi.testsApi.fs;
         rootPath = getWsPath(".");
         dirName = path.join(rootPath, "tasks_test_ts_");
         fileUri = Uri.file(path.join(rootPath, "tsconfig.json"));
         fileUri2 = Uri.file(path.join(dirName, "tsconfig.json"));
-        if (!fs.existsSync(dirName)) {
-            fs.mkdirSync(dirName, { mode: 0o777 });
+        if (!await fsApi.pathExists(dirName)) {
+            await fsApi.createDir(dirName);
         }
     });
 
@@ -46,9 +45,7 @@ suite("Typescript Tests", () =>
     {
         await closeActiveDocument();
         try {
-            fs.rmdirSync(dirName, {
-                recursive: true
-            });
+            await fsApi.deleteDir(dirName);
         } catch {}
     });
 
@@ -62,7 +59,7 @@ suite("Typescript Tests", () =>
     test("Create File", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
-        fs.writeFileSync(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
             '  "compilerOptions":\n' +
@@ -101,7 +98,7 @@ suite("Typescript Tests", () =>
     test("Create File 2", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
-        fs.writeFileSync(
+        await fsApi.writeFile(
             fileUri2.fsPath,
             "{\n" +
             '  "compilerOptions":\n' +
@@ -152,7 +149,7 @@ suite("Typescript Tests", () =>
         // else {
         //     this.slow(testsControl.slowTimeForFsCreateEvent);
         // }
-        fs.writeFileSync(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
             '    "compilerOptions":\n' +
@@ -182,7 +179,7 @@ suite("Typescript Tests", () =>
     test("Fix Invalid JSON", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
-        fs.writeFileSync(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
             '    "compilerOptions":\n' +
@@ -209,7 +206,7 @@ suite("Typescript Tests", () =>
     test("Delete File 1", async function()
     {
         this.slow(testsControl.slowTimeForFsDeleteEvent);
-        fs.unlinkSync(fileUri.fsPath);
+        await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await verifyTaskCountByTree(testsName, 2);
     });
@@ -218,7 +215,7 @@ suite("Typescript Tests", () =>
     test("Delete File 2", async function()
     {
         this.slow(testsControl.slowTimeForFsDeleteEvent);
-        fs.unlinkSync(fileUri2.fsPath);
+        await fsApi.deleteFile(fileUri2.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForCommand);
         await verifyTaskCountByTree(testsName, 0);
     });

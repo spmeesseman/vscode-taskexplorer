@@ -6,17 +6,16 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import * as fs from "fs";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, executeSettingsUpdate, getWsPath, testsControl, verifyTaskCount } from "../helper";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { PythonTaskProvider } from "../../providers/python";
-import { createDir, deleteDir, deleteFile, writeFile } from "../../lib/utils/fs";
 
 const testsName = "python";
 
 let teApi: ITaskExplorerApi;
+let fsApi: IFilesystemApi;
 let pathToTaskProgram: string;
 let enableTaskType: boolean;
 let wsFolder: WorkspaceFolder;
@@ -32,7 +31,7 @@ suite("Python Tests", () =>
         // Initialize
         //
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "    ✘ TeApi not ready");
+        fsApi = teApi.testsApi.fs;
         wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "test2.py"));
@@ -52,7 +51,7 @@ suite("Python Tests", () =>
         //
         await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
         await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testsControl.waitTimeForConfigEnableEvent);
-        await deleteDir(dirName);
+        await fsApi.deleteDir(dirName);
     });
 
 
@@ -97,8 +96,8 @@ suite("Python Tests", () =>
     test("Create File", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateFolderEvent + testsControl.slowTimeForVerifyTaskCount);
-        await createDir(dirName);
-        await writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
+        await fsApi.createDir(dirName);
+        await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, 3);
     });
@@ -107,10 +106,10 @@ suite("Python Tests", () =>
     test("Delete File", async function()
     {
         this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
-        await deleteFile(fileUri.fsPath);
+        await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
         await verifyTaskCount(testsName, 2);
-        await deleteDir(dirName);
+        await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
     });
 
@@ -118,8 +117,8 @@ suite("Python Tests", () =>
     test("Re-create File", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
-        await createDir(dirName);
-        await writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
+        await fsApi.createDir(dirName);
+        await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, 3);
     });
@@ -128,8 +127,8 @@ suite("Python Tests", () =>
     test("Delete Folder", async function()
     {
         this.slow(testsControl.slowTimeForFsDeleteFolderEvent + testsControl.slowTimeForVerifyTaskCount);
-        // fs.unlinkSync(fileUri.fsPath);
-        await deleteDir(dirName);
+        // await fsApi.deleteFile(fileUri.fsPath);
+        await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
         await verifyTaskCount(testsName, 2);
     });

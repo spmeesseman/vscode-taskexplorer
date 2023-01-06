@@ -5,13 +5,11 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as assert from "assert";
 import * as path from "path";
 import { Uri } from "vscode";
-import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, treeUtils, verifyTaskCount } from "../helper";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, executeSettingsUpdate, getWsPath, testsControl, treeUtils, verifyTaskCount } from "../helper";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
-import { deleteFile, writeFile } from "../../lib/utils/fs";
 
 
 const testsName = "apppublisher";
@@ -20,6 +18,7 @@ const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
 const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 
 let teApi: ITaskExplorerApi;
+let fsApi: IFilesystemApi;
 let pathToProgram: string;
 let rootPath: string;
 let fileUri: Uri;
@@ -33,10 +32,7 @@ suite("App-Publisher Tests", () =>
         // Initialize
         //
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "    ✘ TeApi not ready");
-        if (!teApi.explorer) {
-            assert.fail("        ✘ Explorer instance does not exist");
-        }
+        fsApi = teApi.testsApi.fs;
         rootPath = getWsPath(".");
         fileUri = Uri.file(path.join(rootPath, ".publishrc.json"));
         //
@@ -50,7 +46,7 @@ suite("App-Publisher Tests", () =>
     suiteTeardown(async function()
     {
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
-        await deleteFile(fileUri.fsPath);
+        await fsApi.deleteFile(fileUri.fsPath);
     });
 
 
@@ -86,7 +82,7 @@ suite("App-Publisher Tests", () =>
     test("Create file", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
-        await writeFile(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
             '    "version": "1.0.0",\n' +
@@ -130,7 +126,7 @@ suite("App-Publisher Tests", () =>
         else {
             this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
         }
-        await writeFile(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
             '    "version": "1.0.0"\n' +
@@ -153,7 +149,7 @@ suite("App-Publisher Tests", () =>
     test("Fix Invalid JSON", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
-        await writeFile(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
             '    "version": "1.0.0",\n' +
@@ -173,7 +169,7 @@ suite("App-Publisher Tests", () =>
     test("Delete file", async function()
     {
         this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
-        await deleteFile(fileUri.fsPath);
+        await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(waitTimeForFsDelEvent);
         await verifyTaskCount(testsName, 21);
     });

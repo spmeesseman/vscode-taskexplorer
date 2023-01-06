@@ -1,7 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as assert from "assert";
 import { ChildProcess, fork } from "child_process";
 import { ILicenseManager } from "../../interface/licenseManager";
 import { storage } from "../../lib/utils/storage";
@@ -9,7 +8,7 @@ import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer
 import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import {
-	activate, closeActiveDocument, isReady, overrideNextShowInfoBox,
+	activate, closeActiveDocument, overrideNextShowInfoBox,
 	overrideNextShowInputBox, sleep, executeTeCommand, focusExplorer, getWsPath
 } from "../helper";
 import { testControl } from "../control";
@@ -33,12 +32,8 @@ suite("License Manager Tests", () =>
 
 	suiteSetup(async function()
 	{
-		teApi = await activate(this);
-        assert(isReady("make") === true, "    ✘ TeApi not ready");
-        if (!teApi.explorer) {
-            assert.fail("        ✘ Explorer instance does not exist");
-        }
-        explorer = teApi.explorer;
+        teApi = await activate(this);
+        explorer = teApi.testsApi.explorer;
 		oLicenseKey = storage.get<string>("license_key");
 		oVersion = storage.get<string>("version");
 	});

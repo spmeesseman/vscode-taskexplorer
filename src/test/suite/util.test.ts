@@ -6,7 +6,7 @@ import * as assert from "assert";
 import * as log from "../../lib/utils/log";
 import * as util from "../../lib/utils/utils";
 import { workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, getWsPath, isReady, overrideNextShowInputBox, testsControl } from "../helper";
+import { activate, executeSettingsUpdate, overrideNextShowInputBox, testsControl } from "../helper";
 import { storage } from "../../lib/utils/storage";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import * as afs from "../../lib/utils/fs";
@@ -25,7 +25,6 @@ suite("Util Tests", () =>
 	suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady() === true, "    ✘ TeApi not ready");
 		rootPath = (workspace.workspaceFolders as WorkspaceFolder[])[0].uri.fsPath;
         if (!rootPath) {
             assert.fail("        ✘ Workspace folder does not exist");

@@ -5,14 +5,13 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as assert from "assert";
 import TaskItem from "../../tree/item";
 import { storage } from "../../lib/utils/storage";
 import constants from "../../lib/constants";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer, getTreeTasks,
-    isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
+    overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
 } from "../helper";
 
 let lastTask: TaskItem | null = null;
@@ -36,11 +35,7 @@ suite("Task Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady() === true, "    ✘ TeApi not ready");
-        if (!teApi.explorer) {
-            assert.fail("        ✘ Explorer instance does not exist");
-        }
-        explorer = teApi.explorer;
+        explorer = teApi.testsApi.explorer;
     });
 
 

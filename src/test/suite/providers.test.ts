@@ -6,19 +6,18 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import * as fs from "fs";
 import * as path from "path";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import constants from "../../lib/constants";
 import { expect } from "chai";
-import { workspace, tasks, commands, Uri, WorkspaceFolder } from "vscode";
+import { workspace, tasks, Uri, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../lib/utils/utils";
-import { ITaskExplorerApi, IExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, IExplorerApi, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, findIdInTaskMap,
     focusExplorer,
-    getTreeTasks, getWsPath, isReady, sleep, testsControl, treeUtils, verifyTaskCount
+    getTreeTasks, getWsPath, sleep, testsControl, treeUtils, verifyTaskCount
 } from "../helper";
 
 
@@ -29,6 +28,7 @@ const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
 const waitTimeForConfigEvent = testsControl.waitTimeForConfigEvent;
 
 let teApi: ITaskExplorerApi;
+let fsApi: IFilesystemApi;
 let explorer: IExplorerApi;
 let rootPath: string;
 let dirName: string;
@@ -45,11 +45,9 @@ suite("Provider Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady() === true, "    ✘ TeApi not ready");
-        if (!teApi.explorer) {
-            assert.fail("        ✘ Explorer instance does not exist");
-        }
-        explorer = teApi.explorer;
+        explorer = teApi.testsApi.explorer;
+        fsApi = teApi.testsApi.fs;
+
         rootPath = getWsPath(".");
         dirName = path.join(rootPath, "tasks_test_");
         dirNameL2 = path.join(dirName, "subfolder");
@@ -79,37 +77,37 @@ suite("Provider Tests", () =>
          //
         // Create the temporary project dirs
         //
-        if (!fs.existsSync(dirName)) {
-            fs.mkdirSync(dirName, { mode: 0o777 });
+        if (!await fsApi.pathExists(dirName)) {
+            await fsApi.createDir(dirName);
         }
-        if (!fs.existsSync(dirNameL2)) {
-            fs.mkdirSync(dirNameL2, { mode: 0o777 });
+        if (!await fsApi.pathExists(dirNameL2)) {
+            await fsApi.createDir(dirNameL2);
         }
-        if (!fs.existsSync(ws2DirName)) {
-            fs.mkdirSync(ws2DirName, { mode: 0o777 });
+        if (!await fsApi.pathExists(ws2DirName)) {
+            await fsApi.createDir(ws2DirName);
         }
-        if (!fs.existsSync(dirNameIgn)) {
-            fs.mkdirSync(dirNameIgn, { mode: 0o777 });
+        if (!await fsApi.pathExists(dirNameIgn)) {
+            await fsApi.createDir(dirNameIgn);
         }
 
         //
         // New Workspace folders
         //
         let wsDirName = path.join(rootPath, "newA");
-        if (!fs.existsSync(wsDirName)) {
-            fs.mkdirSync(wsDirName, { mode: 0o777 });
+        if (!await fsApi.pathExists(wsDirName)) {
+            await fsApi.createDir(wsDirName);
         }
         wsDirName = path.join(rootPath, "newB");
-        if (!fs.existsSync(wsDirName)) {
-            fs.mkdirSync(wsDirName, { mode: 0o777 });
+        if (!await fsApi.pathExists(wsDirName)) {
+            await fsApi.createDir(wsDirName);
         }
         wsDirName = path.join(rootPath, "newC");
-        if (!fs.existsSync(wsDirName)) {
-            fs.mkdirSync(wsDirName, { mode: 0o777 });
+        if (!await fsApi.pathExists(wsDirName)) {
+            await fsApi.createDir(wsDirName);
         }
         wsDirName = path.join(rootPath, "newD");
-        if (!fs.existsSync(wsDirName)) {
-            fs.mkdirSync(wsDirName, { mode: 0o777 });
+        if (!await fsApi.pathExists(wsDirName)) {
+            await fsApi.createDir(wsDirName);
         }
 
         const wsf: WorkspaceFolder[] = [
@@ -484,7 +482,7 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForFsDeleteEvent + (testsControl.slowTimeForFetchTasksCommand * 2));
         const file = path.join(rootPath, ".publishrc.json");
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        await fsApi.deleteFile(file);
         await teApi.waitForIdle(waitTimeForFsDelEvent);
         await verifyTaskCount("apppublisher", 21);
         await createAppPublisherFile();
@@ -497,7 +495,7 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForFsDeleteEvent);
         const file = path.join(dirName, "build.xml");
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        await fsApi.deleteFile(file);
         await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
         await createAntFile();
     });
@@ -508,7 +506,7 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForFsDeleteEvent);
         const file = path.join(dirName, "build.gradle");
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        await fsApi.deleteFile(file);
         await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
         await createGradleFile();
     });
@@ -519,7 +517,7 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForFsDeleteEvent);
         const file = path.join(rootPath, "GRUNTFILE.js");
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        await fsApi.deleteFile(file);
         await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
         await createGruntFile();
     });
@@ -530,7 +528,7 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForFsDeleteEvent);
         const file = path.join(rootPath, "gulpfile.js");
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        await fsApi.deleteFile(file);
         await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
         await createGulpFile();
     });
@@ -541,7 +539,7 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForConfigEvent);
         const file = path.join(rootPath, "Makefile");
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        await fsApi.deleteFile(file);
         await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
         await createMakeFile();
         await teApi.config.updateWs("logging.enable", true); // hit tree.logTask()
@@ -553,7 +551,7 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForFsDeleteEvent);
         const file = path.join(rootPath, "pom.xml");
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        await fsApi.deleteFile(file);
         await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
         await createMavenPomFile();
     });
@@ -564,7 +562,7 @@ suite("Provider Tests", () =>
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForFsDeleteEvent);
         const file = path.join(rootPath, "test.bat");
         removeFromArray(tempFiles, file);
-        fs.unlinkSync(file);
+        await fsApi.deleteFile(file);
         await teApi.waitForIdle(waitTimeForFsDelEvent, 1500);
         await createBatchFile();
     });
@@ -631,23 +629,19 @@ suite("Provider Tests", () =>
         const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItemsB4.length;
 
-        for (const property in taskMap)
+        for (const taskItem of Object.values(taskMap))
         {
-            if ({}.hasOwnProperty.call(taskMap, property))
+            if (taskItem && taskItem.taskSource === "grunt")
             {
-                const value= taskMap[property];
-                if (value && value.taskSource === "grunt")
+                let taskFile = taskItem.taskFile;
+                while (taskFile.treeNodes.length === 1 && taskFile.treeNodes[0] instanceof TaskFile && !taskFile.isGroup)
                 {
-                    let taskFile = value.taskFile;
-                    while (taskFile.treeNodes.length === 1 && taskFile.treeNodes[0] instanceof TaskFile && !taskFile.isGroup)
-                    {
-                        taskFile = taskFile.treeNodes[0];
-                    }
-                    if (taskFile && taskFile.isGroup && !value.taskFile.path.startsWith("grunt"))
-                    {
-                        await executeTeCommand2("taskExplorer.addToExcludes", [ taskFile ]);
-                        break;
-                    }
+                    taskFile = taskFile.treeNodes[0];
+                }
+                if (taskFile && taskFile.isGroup && !taskItem.taskFile.path.startsWith("grunt"))
+                {
+                    await executeTeCommand2("addToExcludes", [ taskFile ]);
+                    break;
                 }
             }
         }
@@ -696,7 +690,7 @@ suite("Provider Tests", () =>
             while ((file = tempFiles.shift()))
             {
                 try {
-                    fs.unlinkSync(file);
+                    await fsApi.deleteFile(file);
                 }
                 catch (error) {
                     console.log(error);
@@ -707,18 +701,10 @@ suite("Provider Tests", () =>
         if (dirName && ws2DirName && dirNameIgn && dirNameL2)
         {
             try {
-                fs.rmdirSync(ws2DirName, {
-                    recursive: true
-                });
-                fs.rmdirSync(dirNameL2, {
-                    recursive: true
-                });
-                fs.rmdirSync(dirName, {
-                    recursive: true
-                });
-                fs.rmdirSync(dirNameIgn, {
-                    recursive: true
-                });
+                await fsApi.deleteDir(ws2DirName);
+                await fsApi.deleteDir(dirNameL2);
+                await fsApi.deleteDir(dirName);
+                await fsApi.deleteDir(dirNameIgn);
             }
             catch (error) {
                 console.log(error);
@@ -730,20 +716,20 @@ suite("Provider Tests", () =>
         //
         try {
             let wsDirName = path.join(rootPath, "newA");
-            if (fs.existsSync(wsDirName)) {
-                fs.rmdirSync(wsDirName);
+            if (await fsApi.pathExists(wsDirName)) {
+                await fsApi.deleteDir(wsDirName);
             }
             wsDirName = path.join(rootPath, "newB");
-            if (fs.existsSync(wsDirName)) {
-                fs.rmdirSync(wsDirName);
+            if (await fsApi.pathExists(wsDirName)) {
+                await fsApi.deleteDir(wsDirName);
             }
             wsDirName = path.join(rootPath, "newC");
-            if (fs.existsSync(wsDirName)) {
-                fs.rmdirSync(wsDirName);
+            if (await fsApi.pathExists(wsDirName)) {
+                await fsApi.deleteDir(wsDirName);
             }
             wsDirName = path.join(rootPath, "newD");
-            if (fs.existsSync(wsDirName)) {
-                fs.rmdirSync(wsDirName);
+            if (await fsApi.pathExists(wsDirName)) {
+                await fsApi.deleteDir(wsDirName);
             }
         }
         catch(error) {
@@ -840,7 +826,7 @@ async function setupAnt()
     tempFiles.push(file4);
     tempFiles.push(file5);
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file2,
         '<?xml version="1.0"?>\n' +
         '<project basedir="." default="test2">\n' +
@@ -850,7 +836,7 @@ async function setupAnt()
         "</project>\n"
     );
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file3,
         '<?xml version="1.0"?>\n' +
         '<project basedir="." default="test1">\n' +
@@ -859,9 +845,9 @@ async function setupAnt()
         "</project>\n"
     );
 
-    fs.writeFileSync(file4, '<?xml version="1.0"?>\n');
+    await fsApi.writeFile(file4, '<?xml version="1.0"?>\n');
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file5,
         '<?xml version="1.0"?>\n' +
         '<project basedir="." default="test2">\n' +
@@ -888,7 +874,7 @@ async function setupGradle()
     tempFiles.push(file2);
     tempFiles.push(file3);
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file2,
         "task fatJar2(type: Jar) {\n" +
         "    manifest {\n" +
@@ -902,7 +888,7 @@ async function setupGradle()
         "}\n"
     );
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file3,
         "task fatJar3(type: Jar) {\n" +
         "    manifest {\n" +
@@ -931,7 +917,7 @@ async function setupTsc()
     const file2 = path.join(dirName, "tsconfig.json");
     tempFiles.push(file2);
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file,
         "{\n" +
         '    "compilerOptions":\n' +
@@ -951,7 +937,7 @@ async function setupTsc()
         "}\n"
     );
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file2,
         "{\n" +
         '    "compilerOptions":\n' +
@@ -996,7 +982,7 @@ async function setupGulp()
     tempFiles.push(file5);
 
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file2,
         "const { series } = require('gulp');\n" +
         "function clean(cb) {\n" +
@@ -1012,7 +998,7 @@ async function setupGulp()
         "exports.default = series(clean, build);\n"
     );
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file3,
         "var gulp = require('gulp');\n" +
         "gulp.task('hello3', (done) => {\n" +
@@ -1025,7 +1011,7 @@ async function setupGulp()
         "});\n"
     );
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file4,
         "var gulp = require('gulp');\n" +
         "gulp.task('group-test-build-ui-one', (done) => {\n" +
@@ -1050,7 +1036,7 @@ async function setupGulp()
         "});\n"
     );
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file5,
         "var gulp = require('gulp');\n" +
         "gulp.task('group2-test2-build-ui-one', (done) => {\n" +
@@ -1093,13 +1079,13 @@ async function setupMakefile()
     const file3 = path.join(dirNameIgn, "Makefile");
     tempFiles.push(file3);
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file2,
         "# all tasks comment\n" +
         "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
     );
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file3,
         "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
     );
@@ -1122,8 +1108,8 @@ async function setupBatch()
     const file3 = path.join(dirNameIgn, "test3.bat");
     tempFiles.push(file3);
 
-    fs.writeFileSync(file2, "@echo testing batch file 2\r\nsleep /t 5\r\n");
-    fs.writeFileSync(file3, "@echo testing batch file 3\r\n");
+    await fsApi.writeFile(file2, "@echo testing batch file 2\r\nsleep /t 5\r\n");
+    await fsApi.writeFile(file3, "@echo testing batch file 3\r\n");
     await teApi.waitForIdle(waitTimeForFsNewEvent);
 }
 
@@ -1143,9 +1129,9 @@ async function setupBash()
     const file3 = path.join(dirNameIgn, "test3.sh");
     tempFiles.push(file3);
 
-    fs.writeFileSync(file, "echo testing bash file\n");
-    fs.writeFileSync(file2, "echo testing bash file 2\n");
-    fs.writeFileSync(file3, "echo testing bash file 3\n");
+    await fsApi.writeFile(file, "echo testing bash file\n");
+    await fsApi.writeFile(file2, "echo testing bash file 2\n");
+    await fsApi.writeFile(file3, "echo testing bash file 3\n");
 
     await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
 }
@@ -1168,7 +1154,7 @@ async function setupGrunt()
     const file4 = path.join(dirNameL2, "GRUNTFILE.JS");
     tempFiles.push(file4);
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file2,
         "module.exports = function(grunt) {\n" +
         '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
@@ -1176,7 +1162,7 @@ async function setupGrunt()
         "};\n"
     );
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file3,
         "module.exports = function(grunt) {\n" +
         '    grunt.registerTask(\n"default3", ["jshint:myproject"]);\n' +
@@ -1184,7 +1170,7 @@ async function setupGrunt()
         "};\n"
     );
 
-    fs.writeFileSync(
+    await fsApi.writeFile(
         file4,
         "module.exports = function(grunt) {\n" +
         '    grunt.registerTask("grp-test-svr-build1", ["s1"]);\n' +
@@ -1221,9 +1207,9 @@ async function createAntFile()
         const file = path.join(dirName, "build.xml");
         tempFiles.push(file);
 
-        if (!fs.existsSync(file))
+        if (!await fsApi.pathExists(file))
         {
-            fs.writeFileSync(
+            await fsApi.writeFile(
                 file,
                 '<?xml version="1.0"?>\n' +
                 '<project basedir="." default="test1">\n' +
@@ -1246,9 +1232,9 @@ async function createAppPublisherFile()
         const file = path.join(rootPath, ".publishrc.json");
         tempFiles.push(file);
 
-        if (!fs.existsSync(file))
+        if (!await fsApi.pathExists(file))
         {
-            fs.writeFileSync(
+            await fsApi.writeFile(
                 file,
                 "{\n" +
                 '    "version": "1.0.0",\n' +
@@ -1273,9 +1259,9 @@ async function createMavenPomFile()
         const file = path.join(rootPath, "pom.xml");
         tempFiles.push(file);
 
-        if (!fs.existsSync(file))
+        if (!await fsApi.pathExists(file))
         {
-            fs.writeFileSync(
+            await fsApi.writeFile(
                 file,
                 "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
                 "    <modelVersion>4.0.0</modelVersion>\n" +
@@ -1293,9 +1279,9 @@ async function createBatchFile()
     {
         const file = path.join(rootPath, "test.bat");
         tempFiles.push(file);
-        if (!fs.existsSync(file))
+        if (!await fsApi.pathExists(file))
         {
-            fs.writeFileSync(file, "@echo testing batch file\r\n");
+            await fsApi.writeFile(file, "@echo testing batch file\r\n");
             await teApi.waitForIdle(waitTimeForFsNewEvent, 3000);
         }
     }
@@ -1309,9 +1295,9 @@ async function createGradleFile()
         const file = path.join(dirName, "build.gradle");
         tempFiles.push(file);
 
-        if (!fs.existsSync(file))
+        if (!await fsApi.pathExists(file))
         {
-            fs.writeFileSync(
+            await fsApi.writeFile(
                 file,
                 "task fatJar(type: Jar) {\n" +
                 "    manifest {\n" +
@@ -1337,9 +1323,9 @@ async function createGruntFile()
         const file = path.join(rootPath, "GRUNTFILE.js");
         tempFiles.push(file);
 
-        if (!fs.existsSync(file))
+        if (!await fsApi.pathExists(file))
         {
-            fs.writeFileSync(
+            await fsApi.writeFile(
                 file,
                 "module.exports = function(grunt) {\n" +
                 "    grunt.registerTask(\n'default', ['jshint:myproject']);\n" +
@@ -1359,9 +1345,9 @@ async function createGulpFile()
         const file = path.join(rootPath, "gulpfile.js");
         tempFiles.push(file);
 
-        if (!fs.existsSync(file))
+        if (!await fsApi.pathExists(file))
         {
-            fs.writeFileSync(
+            await fsApi.writeFile(
                 file,
                 "var gulp = require('gulp');\n" +
                 "gulp.task(\n'hello', (done) => {\n" +
@@ -1385,9 +1371,9 @@ async function createMakeFile()
         const file = path.join(rootPath, "Makefile");
         tempFiles.push(file);
 
-        if (!fs.existsSync(file))
+        if (!await fsApi.pathExists(file))
         {
-            fs.writeFileSync(
+            await fsApi.writeFile(
                 file,
                 "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
             );

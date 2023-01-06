@@ -3,16 +3,17 @@
 /* tslint:disable */
 
 import * as assert from "assert";
-import * as fs from "fs";
 import * as util from "../../lib/utils/utils";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, getWsPath, testsControl, verifyTaskCount } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
+import { IFilesystemApi } from "../../interface/fsApi";
 
 const testsName = "ant";
 
 let teApi: ITaskExplorerApi;
+let fsApi: IFilesystemApi;
 let provider: AntTaskProvider;
 let rootWorkspace: WorkspaceFolder;
 let buildXmlFile: string;
@@ -26,21 +27,19 @@ suite("Ant Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "    ✘ TeApi not ready");
-
+        fsApi = teApi.testsApi.fs;
         provider = teApi.providers.get(testsName) as AntTaskProvider;
         rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         buildXmlFile = getWsPath("build.xml");
         buildXmlFileUri = Uri.file(buildXmlFile);
         buildFileXml = util.readFileSync(buildXmlFileUri.fsPath);
-
         await executeSettingsUpdate("useAnt", false);
     });
 
 
     suiteTeardown(async function()
     {
-        fs.writeFileSync(buildXmlFileUri.fsPath, buildFileXml);
+        await fsApi.writeFile(buildXmlFileUri.fsPath, buildFileXml);
     });
 
 
@@ -58,7 +57,7 @@ suite("Ant Tests", () =>
 
     test("Start", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        this.slow(testsControl.slowTimeForVerifyTaskCount);
         // await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("ant", 3);
     });
@@ -66,7 +65,7 @@ suite("Ant Tests", () =>
 
     test("Disable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForCommandFast);
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", false);
         await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
         await verifyTaskCount("ant", 0);
@@ -75,7 +74,7 @@ suite("Ant Tests", () =>
 
     test("Re-enable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForCommandFast);
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", true);
         await teApi.waitForIdle(testsControl.waitTimeForConfigEvent);
         await verifyTaskCount("ant", 3);
@@ -147,7 +146,7 @@ suite("Ant Tests", () =>
     test("Ant Parser no default", async function()
     {
         this.slow((testsControl.slowTimeForConfigEvent * 2)+ testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForFetchTasksCommand * 2));
-        fs.writeFileSync(
+        await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
             '<project basedir=".">\n' +
@@ -162,7 +161,7 @@ suite("Ant Tests", () =>
     test("Ant Parser invalid target", async function()
     {
         this.slow((testsControl.slowTimeForConfigEvent * 2) + testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForFetchTasksCommand * 2));
-        fs.writeFileSync(
+        await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
             '<project basedir="." default="test2">\n' +
@@ -179,7 +178,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Target", async function()
     {
         this.slow((testsControl.slowTimeForConfigEvent * 2) + testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForFetchTasksCommand * 2));
-        fs.writeFileSync(
+        await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
             '<project basedir="." default="test2">\n' +
@@ -193,7 +192,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Project", async function()
     {
         this.slow((testsControl.slowTimeForConfigEvent * 2)+ testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForFetchTasksCommand * 2));
-        fs.writeFileSync(
+        await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
             "<some_node>\n" +
@@ -207,7 +206,7 @@ suite("Ant Tests", () =>
     test("Ant Parser Invalid Xml", async function()
     {
         this.slow((testsControl.slowTimeForConfigEvent * 2) + testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForFetchTasksCommand * 2));
-        fs.writeFileSync(
+        await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
             '<project basedir="." default="test2">\n' +

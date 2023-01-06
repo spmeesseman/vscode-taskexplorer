@@ -2,19 +2,15 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import * as assert from "assert";
 import { sortFolders } from "../../lib/sortTasks";
-import * as util from "../../lib/utils/utils";
 import TaskFolder from "../../tree/folder";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { NoScripts } from "@spmeesseman/vscode-taskexplorer-types/lib/lib/noScripts";
 import constants from "../../lib/constants";
 import { storage } from "../../lib/utils/storage";
 import TaskItem from "../../tree/item";
-import { TreeItem } from "vscode";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer, getSpecialTaskItemId, getTreeTasks,
-    isReady, overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
+    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer,
+    getSpecialTaskItemId, getTreeTasks, overrideNextShowInputBox, testsControl
 } from "../helper";
 
 
@@ -32,11 +28,7 @@ suite("Tree Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady() === true, "    ✘ TeApi not ready");
-        if (!teApi.explorer) {
-            assert.fail("        ✘ Explorer instance does not exist");
-        }
-        explorer = teApi.explorer;
+        explorer = teApi.testsApi.explorer;
         favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
         lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
     });

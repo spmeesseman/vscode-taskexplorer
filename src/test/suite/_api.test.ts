@@ -3,9 +3,8 @@
 
 import * as assert from "assert";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, isReady, setExplorer, testsControl } from "../helper";
-import { refreshTree } from "../../lib/refreshTree";
-import { getInstallPath, isBoolean, isObject, isString } from "../../lib/utils/utils";
+import { activate, executeSettingsUpdate, executeTeCommand, setExplorer, testsControl } from "../helper";
+import { getInstallPath } from "../../lib/utils/utils";
 import { enableConfigWatcher } from "../../lib/configWatcher";
 
 let teApi: ITaskExplorerApi;
@@ -17,11 +16,7 @@ suite("API Init and Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady() === true, "    ✘ TeApi not ready");
-        if (!teApi.explorer) {
-            assert.fail("        ✘ Explorer instance does not exist");
-        }
-        explorer = teApi.explorer;
+        explorer = teApi.testsApi.explorer;
         await executeSettingsUpdate("logging.enable", true);
     });
 

@@ -7,7 +7,7 @@
 //
 import * as assert from "assert";
 import * as path from "path";
-import { activate, getWsPath, isReady } from "../helper";
+import { activate, getWsPath } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MakeTaskProvider } from "../../providers/make";
 import { readFileSync } from "../../lib/utils/utils";
@@ -24,7 +24,6 @@ suite("Makefile Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady("make") === true, "    ✘ TeApi not ready");
         provider = teApi.providers.get("make") as MakeTaskProvider;
     });
 

@@ -3,9 +3,9 @@ import { configuration } from "../lib/utils/configuration";
 
 export const testControl =
 {   //
-    // KEEP SETTINGS FILE (TEMP CREATED @ test-files/.vscode/workspace.json)
+    // KEEP SETTINGS FILE CHANGES (@ test-files/.vscode/workspace.json)
     //
-    keepSettingsFile: true,
+    keepSettingsFileChanges: false,
     //
     // LOGGING DEFAULTS
     //

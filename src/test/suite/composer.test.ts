@@ -6,17 +6,16 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import * as fs from "fs";
 import * as path from "path";
 import { Uri } from "vscode";
-import { activate, executeSettingsUpdate, getWsPath, isReady, testsControl, verifyTaskCount } from "../helper";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, executeSettingsUpdate, getWsPath, testsControl, verifyTaskCount } from "../helper";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ComposerTaskProvider } from "../../providers/composer";
-import { readFileAsync } from "../../lib/utils/fs";
 
 const testsName = "composer";
 
 let teApi: ITaskExplorerApi;
+let fsApi: IFilesystemApi;
 let pathToProgram: string;
 let dirName: string;
 let fileUri: Uri;
@@ -26,11 +25,9 @@ suite("Composer Tests", () =>
 {
 
     suiteSetup(async function()
-    {   //
-        // Initialize
-        //
+    {
         teApi = await activate(this);
-        assert(isReady(testsName) === true, "    ✘ TeApi not ready");
+        fsApi = teApi.testsApi.fs;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "composer.json"));
         //
@@ -69,7 +66,7 @@ suite("Composer Tests", () =>
         assert (provider.getDocumentPosition(undefined, undefined) === 0);
         assert (provider.getDocumentPosition("test", undefined) === 0);
         assert (provider.getDocumentPosition(undefined, "test") === 0);
-        assert (provider.getDocumentPosition("doc", await readFileAsync(path.join(getWsPath("."), "composer.json"))) > 0);
+        assert (provider.getDocumentPosition("doc", await fsApi.readFileAsync(path.join(getWsPath("."), "composer.json"))) > 0);
     });
 
 
@@ -93,11 +90,10 @@ suite("Composer Tests", () =>
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
 
-        if (!fs.existsSync(dirName)) {
-            fs.mkdirSync(dirName, { mode: 0o777 });
+        if (!await fsApi.pathExists(dirName)) {
+            await fsApi.createDir(dirName);
         }
-
-        fs.writeFileSync(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
             '  "scripts":\n' +
@@ -110,7 +106,6 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
         await verifyTaskCount(testsName, 5);
     });
@@ -119,8 +114,7 @@ suite("Composer Tests", () =>
     test("Add Task to File", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
-
-        fs.writeFileSync(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
             '  "scripts":\n' +
@@ -134,7 +128,6 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-
         await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
         await verifyTaskCount(testsName, 6);
     });
@@ -143,8 +136,7 @@ suite("Composer Tests", () =>
     test("Remove Task from File", async function()
     {
         this.slow(testsControl.slowTimeForFsCreateEvent);
-
-        fs.writeFileSync(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
             '  "scripts":\n' +
@@ -156,7 +148,6 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-
         await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
         await verifyTaskCount(testsName, 4);
     });
@@ -173,7 +164,7 @@ suite("Composer Tests", () =>
         else {
             this.slow(testsControl.slowTimeForFsCreateEvent);
         }
-        fs.writeFileSync(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
             '  "scripts":\n' +
@@ -197,10 +188,8 @@ suite("Composer Tests", () =>
     test("Delete File", async function()
     {
         this.slow(testsControl.slowTimeForFsDeleteEvent);
-        fs.unlinkSync(fileUri.fsPath);
-        fs.rmdirSync(dirName, {
-            recursive: true
-        });
+        await fsApi.deleteFile(fileUri.fsPath);
+        await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, 2);
     });

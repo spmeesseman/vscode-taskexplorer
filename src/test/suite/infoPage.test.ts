@@ -1,10 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as assert from "assert";
 import { Uri } from "vscode";
-import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {  activate, closeActiveDocument, isReady, executeTeCommand, testsControl, focusExplorer, executeSettingsUpdate } from "../helper";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import {  activate, closeActiveDocument, executeTeCommand, focusExplorer, executeSettingsUpdate } from "../helper";
 
 let teApi: ITaskExplorerApi;
 let userTasks: boolean;
@@ -16,7 +15,6 @@ suite("Report Tests", () =>
 	suiteSetup(async function()
     {
 		teApi = await activate(this);
-        assert(isReady("make") === true, "    ✘ TeApi not ready");
 		userTasks = teApi.config.get<boolean>("specialFolders.showUserTasks");
 	});
 

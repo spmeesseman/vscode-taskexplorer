@@ -1,10 +1,10 @@
 
 import { IExplorerApi } from "./explorer";
-import { ILogApi } from "./logApi";
+import { IFilesystemApi } from "./fsApi";
 
 export interface TaskExplorerTestsApi
 {
-    explorer: IExplorerApi | undefined;
+    explorer: IExplorerApi;
     fileCache: any; // for tests use only
-    log: ILogApi;
+    fs: IFilesystemApi;
 }

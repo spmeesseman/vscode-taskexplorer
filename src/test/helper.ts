@@ -1,6 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import * as fs from "fs";
 import * as path from "path";
 import * as assert from "assert";
 import TaskItem from "../tree/item";
@@ -11,10 +10,12 @@ import { configuration } from "../lib/utils/configuration";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import constants from "../lib/constants";
 import TreeUtils from "./treeUtils";
+import { deleteFile, pathExists, readFileAsync, writeFile } from "../lib/utils/fs";
 
 let activated = false;
 let teApi: ITaskExplorerApi;
 let teExplorer: IExplorerApi;
+let settingsJsonOrig: string;
 const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
 const overridesShowInputBox: any[] = [];
@@ -65,35 +66,24 @@ export async function activate(instance?: any)
 
     if (!activated)
     {   //
-        // Create .vscode directory if it doesn't exist, so the we have perms to
-		// remove it after tests are done
-        //
-        const dirNameCode = getWsPath(".vscode"),
-			  settingsFile = path.join(dirNameCode, "settings.json");
-        if (!fs.existsSync(settingsFile)) {
-            fs.writeFileSync(settingsFile, "{}");
-        }
-        //
         // Init settings
         // Note that the '*' is removed from package.json[activationEvents] before the runTest() call
         //
-        await initSettings(true);
+        await initSettings();
         //
         // Activate extension
         //
         teApi = await ext.activate();
+        //
+        // FInish tests helper api construction
+        //
+        assert(isReady() === true, "✘ TeApi not ready");
+        if (!teApi.explorer) { assert.fail("✘ Explorer instance does not exist"); }
         teApi.setTests();
-        teApi.waitForIdle(); // added 1/2/03 - Tree loads in delay 'after' activate()
         activated = true;
-        if (!teApi.explorer) {
-            assert.fail("        ✘ Explorer instance does not exist");
-        }
-        teExplorer = teApi.explorer;
         treeUtils = new TreeUtils(teApi);
-        setExplorer(teExplorer);
-        //
-        // For debugging
-        //
+        setExplorer(teApi.explorer);  // _api pre-test suite will reset after disable/enable
+        teApi.waitForIdle(); // added 1/2/03 - Tree loads in delay 'after' activate()
         teApi.log.setWriteToConsole(testsControl.writeToConsole, testsControl.logLevel);
     }
     return teApi;
@@ -110,16 +100,19 @@ export async function cleanup()
     window.showInputBox = originalShowInputBox;
     window.showInformationMessage = originalShowInfoBox;
 
-    if (!testsControl.keepSettingsFile && fs.existsSync(settingsFile)) {
+    if (!testsControl.keepSettingsFileChanges)
+    {
         try {
-            fs.unlinkSync(settingsFile);
+            if (await pathExists(settingsFile)) {
+                await writeFile(settingsFile, settingsJsonOrig);
+            }
         } catch (e: any) { console.error(e.message); }
     }
 
     try {
         const packageLockFile = path.join(rootPath, "package-lock.json");
-        if (fs.existsSync(packageLockFile)) {
-            fs.unlinkSync(packageLockFile);
+        if (await pathExists(packageLockFile)) {
+            await deleteFile(packageLockFile);
         }
     } catch (e: any) { console.error(e.message); }
 }
@@ -234,8 +227,19 @@ export const getWsPath = (p: string) =>
 };
 
 
-async function initSettings(enable = true)
-{
+async function initSettings()
+{   //
+    // Create .vscode directory if it doesn't exist, so the we have perms to
+    // remove it after tests are done
+    //
+    const dirNameCode = getWsPath(".vscode"),
+          settingsFile = path.join(dirNameCode, "settings.json");
+
+    if (await pathExists(settingsFile)) {
+        settingsJsonOrig = await readFileAsync(settingsFile);
+    }
+    await writeFile(settingsFile, "{}");
+
     await configuration.updateVsWs("terminal.integrated.shell.windows",
                                    "C:\\Windows\\System32\\cmd.exe");
     //
@@ -248,7 +252,7 @@ async function initSettings(enable = true)
     // Set misc settings, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("autoRefresh", enable);
+    await configuration.updateWs("autoRefresh", true);
     await configuration.updateWs("enabledTasks",
     {
         ant: true,
@@ -276,22 +280,22 @@ async function initSettings(enable = true)
     await configuration.updateWs("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("groupMaxLevel", 1);
-    await configuration.updateWs("groupWithSeparator", enable);
+    await configuration.updateWs("groupWithSeparator", true);
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("keepTermOnStop", false);
     await configuration.updateWs("logging.enable", testsControl.writeToOutput);
     await configuration.updateWs("logging.level", testsControl.logLevel);
     await configuration.updateWs("logging.enableFile", testsControl.writeToFile);
     await configuration.updateWs("pathToPrograms", configuration.get<object>("pathToPrograms"));
-    await configuration.updateWs("showHiddenWsTasks", enable);
-    await configuration.updateWs("showRunningTask", enable);
+    await configuration.updateWs("showHiddenWsTasks", true);
+    await configuration.updateWs("showRunningTask", true);
     await configuration.updateWs("specialFolders.expanded", configuration.get<object>("specialFolders.expanded"));
     await configuration.updateWs("specialFolders.numLastTasks", 10);
-    await configuration.updateWs("specialFolders.showFavorites", enable);
-    await configuration.updateWs("specialFolders.showLastTasks", enable);
-    await configuration.updateWs("specialFolders.showUserTasks", enable);
+    await configuration.updateWs("specialFolders.showFavorites", true);
+    await configuration.updateWs("specialFolders.showLastTasks", true);
+    await configuration.updateWs("specialFolders.showUserTasks", true);
     await configuration.updateWs("taskButtons.clickAction", "Open");
-    await configuration.updateWs("taskButtons.showFavoritesButton", enable);
+    await configuration.updateWs("taskButtons.showFavoritesButton", true);
     await configuration.updateWs("useGulp", false);
     await configuration.updateWs("useAnt", false);
 }
@@ -307,7 +311,7 @@ function isExecuting(task: Task)
 }
 
 
-export function isReady(taskType?: string)
+function isReady(taskType?: string)
 {
     let err: string | undefined;
     if (!teApi)                                 err = "        ✘ TeApi null";

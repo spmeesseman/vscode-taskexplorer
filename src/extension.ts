@@ -2,13 +2,13 @@
 
 import * as util from "./lib/utils/utils";
 import * as cache from "./cache";
+import * as fs from "./lib/utils/fs";
 import * as log from "./lib/utils/log";
 import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerViewReportCommand from "./commands/viewReport";
 import { AntTaskProvider } from "./providers/ant";
 import { MakeTaskProvider } from "./providers/make";
 import { MavenTaskProvider } from "./providers/maven";
-import { ScriptTaskProvider } from "./providers/script";
 import { GradleTaskProvider } from "./providers/gradle";
 import { GruntTaskProvider } from "./providers/grunt";
 import { ComposerTaskProvider } from "./providers/composer";
@@ -20,7 +20,7 @@ import { initStorage, storage } from "./lib/utils/storage";
 import { isCachingBusy } from "./cache";
 import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";
-import { ExternalExplorerProvider, ITaskExplorerApi } from "./interface";
+import { ExternalExplorerProvider, IExplorerApi, ITaskExplorerApi } from "./interface";
 import { LicenseManager } from "./lib/licenseManager";
 import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
@@ -37,13 +37,36 @@ import { RubyTaskProvider } from "./providers/ruby";
 
 
 const isLicenseManagerActive = true;
-
-export const teApi = {} as ITaskExplorerApi;
 let licenseManager: ILicenseManager;
 let ready = false;
 let tests = false;
 export const providers: Map<string, TaskExplorerProvider> = new Map();
 export const providersExternal: Map<string, ExternalExplorerProvider> = new Map();
+
+export const teApi: ITaskExplorerApi =
+{
+    config: configuration,
+    explorer: undefined,
+    explorerView: undefined,
+    isBusy,
+    isTests: () => tests,
+    log,
+    providers,
+    providersExternal,
+    refresh: refreshExternalProvider,
+    register: registerExternalProvider,
+    setTests,
+    sidebar: undefined,
+    sidebarView: undefined,
+    unregister: unregisterExternalProvider,
+    utilities: util,
+    waitForIdle: waitForTaskExplorerIdle,
+    testsApi: {
+        fs,
+        explorer: {} as IExplorerApi,
+        fileCache: cache
+    }
+};
 
 
 export async function activate(context: ExtensionContext) // , disposables: Disposable[]): Promise<ITaskExplorerApi>
@@ -84,29 +107,6 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     // Register configurations/settings change watcher
     //
     registerConfigWatcher(context, teApi);
-
-    //
-    // Construct the API export
-    //
-    Object.assign(teApi, {
-        isBusy,
-        config: configuration,
-        isTests,
-        log,
-        providers,
-        providersExternal,
-        refresh: refreshExternalProvider,
-        register: registerExternalProvider,
-        setTests,
-        unregister: unregisterExternalProvider,
-        utilities: util,
-        waitForIdle: waitForTaskExplorerIdle,
-        testsApi: {
-            log,
-            explorer: teApi.explorer || /* istanbul ignore next */teApi.sidebar,
-            fileCache: cache
-        }
-    });
 
     //
     // Tired of VSCode complaining that the the expension was a startup hog. Performing the
@@ -230,9 +230,6 @@ function isBusy()
     return !ready || isCachingBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
            isProcessingFsEvent() || isProcessingConfigChange();
 }
-
-
-const isTests = () => tests;
 
 
 /* istanbul ignore next */

@@ -2,13 +2,11 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import * as assert from "assert";
-import * as fs from "fs";
 import TaskItem from "../../tree/item";
 import { getPackageManager } from "../../lib/utils/utils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeTeCommand2, focusExplorer, getTreeTasks, getWsPath, isReady,
+    activate, executeTeCommand2, focusExplorer, getTreeTasks, getWsPath,
     overrideNextShowInputBox, testsControl, verifyTaskCount, waitForTaskExecution
 } from "../helper";
 import { TaskExecution } from "vscode";
@@ -16,6 +14,7 @@ import { TaskExecution } from "vscode";
 const testsName = "npm";
 
 let teApi: ITaskExplorerApi;
+let fsApi: IFilesystemApi;
 let packageJsonPath: string;
 let npmTaskItems: TaskItem[];
 
@@ -26,17 +25,17 @@ suite("NPM Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        assert(isReady() === true, "    ✘ TeApi not ready");
+        fsApi = teApi.testsApi.fs;
     });
 
 
     suiteTeardown(async function()
     {
         const packageLockJsonPath = packageJsonPath.replace(".", "-lock.");
-        fs.unlinkSync(packageJsonPath);
-        if (fs.existsSync(packageLockJsonPath)) {
+        await fsApi.deleteFile(packageJsonPath);
+        if (await fsApi.pathExists(packageLockJsonPath)) {
             try {
-                fs.unlinkSync(packageLockJsonPath);
+                await fsApi.deleteFile(packageLockJsonPath);
             }
             catch (error) {
                 console.log(error);
@@ -58,7 +57,7 @@ suite("NPM Tests", () =>
         // Create NPM package.json
         //
         packageJsonPath = getWsPath("package.json");
-        fs.writeFileSync(
+        await fsApi.writeFile(
             packageJsonPath,
             "{\r\n" +
             '    "name": "vscode-taskexplorer",\r\n' +

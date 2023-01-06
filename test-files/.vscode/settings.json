@@ -1,11 +1,11 @@
 {
-    "terminal.integrated.shell.windows": "C:\\Windows\\System32\\cmd.exe",
+    "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
     "taskExplorer.enableExplorerView": true,
     "taskExplorer.enableSideBar": false,
     "taskExplorer.autoRefresh": true,
     "taskExplorer.enabledTasks": {
         "ant": true,
-        "apppublisher": false,
+        "apppublisher": true,
         "bash": true,
         "batch": true,
         "composer": false,
@@ -13,7 +13,7 @@
         "grunt": true,
         "gulp": true,
         "make": true,
-        "maven": false,
+        "maven": true,
         "npm": true,
         "nsis": false,
         "perl": false,
@@ -26,7 +26,10 @@
     },
     "taskExplorer.exclude": [
         "**/tasks_test_ignore_/**",
-        "**/ant/**"
+        "**/ant/**",
+        "/c:/Projects/vscode-taskexplorer/test-files/tasks_test_/test2.BAT",
+        "/c:/Projects/vscode-taskexplorer/test-files/GRUNTFILE.js",
+        "/c:/Projects/vscode-taskexplorer/test-files/tasks_test_/subfolder/GRUNTFILE.JS"
     ],
     "taskExplorer.includeAnt": [],
     "taskExplorer.globPatternsAnt": [
@@ -36,7 +39,7 @@
         "**/hello.xml"
     ],
     "taskExplorer.groupSeparator": "-",
-    "taskExplorer.groupMaxLevel": 1,
+    "taskExplorer.groupMaxLevel": 5,
     "taskExplorer.groupWithSeparator": true,
     "taskExplorer.keepTermOnStop": false,
     "taskExplorer.logging.enable": true,
@@ -63,7 +66,8 @@
     "taskExplorer.specialFolders.expanded": {
         "lastTasks": true,
         "favorites": true,
-        "userTasks": true
+        "userTasks": true,
+        "test-files": false
     },
     "taskExplorer.specialFolders.numLastTasks": 10,
     "taskExplorer.specialFolders.showFavorites": true,
@@ -72,5 +76,9 @@
     "taskExplorer.taskButtons.clickAction": "Open",
     "taskExplorer.taskButtons.showFavoritesButton": true,
     "taskExplorer.useGulp": false,
-    "taskExplorer.useAnt": false
+    "taskExplorer.useAnt": false,
+    "taskExplorer.excludeTask": [
+        "pre-launch[0-9]{2}\\.r(?:b|c)",
+        "upload2"
+    ]
 }
