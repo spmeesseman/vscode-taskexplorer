@@ -288,7 +288,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
 
         this.treeBuilding = true;
-        this.taskMap = {};
 
         //
         // The 'Last Tasks' folder will be 1st in the tree
@@ -1554,7 +1553,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             //                                         //
             this.currentInvalidation = invalidate;     // 'invalidate' will be taskType if 'opt' is uri
             this.taskTree = null;                      // see todo above
-            // this._onDidChangeTreeData.fire();      // see todo above // task.definition.treeItem
+            this.taskMap = {};                         //
+            // this._onDidChangeTreeData.fire();       // see todo above // task.definition.treeItem
         }                                              // not sure if its even possible
         else //                                        //
         {   // Re-ask for all tasks from all providers and rebuild tree
@@ -1562,6 +1562,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             log.write("   invalidation is for all types", 1, logPad);
             this.tasks = null; // !skipAskTasks ? null : this.tasks;
             this.taskTree = null;
+            this.taskMap = {};
         }
         if (this.visible) {
             log.write("   fire tree data change event", 2, logPad);

@@ -5,6 +5,7 @@ export interface ILogApi
     dequeue(queueId: string): void;
     error(msg: any, params?: (string|any)[][], queueId?: string): void;
     isLoggingEnabled(): boolean;
+    getLogFileName(): string;
     methodStart(msg: string, level?: number, logPad?: string, doLogBlank?: boolean, params?: (string|any)[][], queueId?: string): void;
     methodDone(msg: string, level?: number, logPad?: string, doLogBlank?: boolean, params?: (string|any)[][], queueId?: string): void;
     setWriteToConsole(set: boolean, level?: number): void;

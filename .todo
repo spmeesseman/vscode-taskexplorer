@@ -18,3 +18,21 @@ Features:
     ☐ Auto detect consecutive task usage
         If noticed that a particular task is always ran after another, provide AI to ask
         user to auto run that task
+
+GeneralTodos:
+
+    ☐ Test visibility change event
+        Differences in tray open/closed, switching views, vscode minimized, etc
+Tests:
+
+    ☐ Finish individual task Type suites
+
+        ✔ Bash @done(23-01-06 01:24)
+        ☐ Batch
+        ☐ Grunt
+        ☐ Gulp
+        ✔ Maven @done(23-01-01 13:02)
+        ☐ NSIS
+        ☐ Perl
+        ☐ Pipenv
+        ☐ Ruby

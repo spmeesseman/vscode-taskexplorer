@@ -120,7 +120,7 @@ export async function initLog(settingGrpName: string, dispName: string, context:
     logLevel = configuration.get<number>("logging.level", 1);
     enableOutputWindow = configuration.get<boolean>("logging.enableOutputWindow", true);
     enableFile = configuration.get<boolean>("logging.enableFile", false);
-    fileName = join(context.logUri.fsPath, getLogFileName());
+    fileName = join(context.logUri.fsPath, getFileName());
     await createDir(dirname(fileName));
 
     //
@@ -142,13 +142,7 @@ export async function initLog(settingGrpName: string, dispName: string, context:
 }
 
 
-// export function getAbsLogFilePath()
-// {
-//     return fileName;
-// }
-
-
-function getLogFileName()
+function getFileName()
 {
     const tzOffset = (new Date()).getTimezoneOffset() * 60000, //offset in milliseconds
           locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T")[0].replace(/[\-]/g, "");
@@ -156,10 +150,10 @@ function getLogFileName()
 }
 
 
-export function isLoggingEnabled()
-{
-    return enable;
-}
+export const getLogFileName = () => fileName;
+
+
+export const isLoggingEnabled = () => enable;
 
 
 function logLogFileLocation()
