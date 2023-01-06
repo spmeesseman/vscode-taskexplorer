@@ -23,7 +23,7 @@ suite("API Init and Tests", () =>
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate("logging.enable", testsControl.writeToOutput || testsControl.writeToConsole);
+        await executeSettingsUpdate("logging.enable", testsControl.logEnabled);
         enableConfigWatcher(true); // in case misc test fails after setting to `false`.
     });
 
@@ -32,7 +32,7 @@ suite("API Init and Tests", () =>
     {
         await executeTeCommand("showOutput", 10, 50, false);
         await executeTeCommand("showOutput", 10, 50, true);
-        await executeTeCommand("showOutput", 10, 50, testsControl.writeToOutput);
+        await executeTeCommand("showOutput", 10, 50, testsControl.logEnabled && testsControl.logToOutput);
     });
 
 

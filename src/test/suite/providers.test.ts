@@ -66,7 +66,7 @@ suite("Provider Tests", () =>
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate("logging.enable", testsControl.writeToOutput || testsControl.writeToConsole);
+        await executeSettingsUpdate("logging.enable", testsControl.logEnabled);
         await executeSettingsUpdate("specialFolders.expanded.test-files", false);
     });
 

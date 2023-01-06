@@ -326,6 +326,7 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
                         fn.call(scope || window, ...args, ts + logPad + m.trimEnd());
                     }
                     else {
+                        if (!msgQueue[queueId]) msgQueue[queueId] = [];
                         msgQueue[queueId].push({
                             fn,
                             scope: scope || window,

@@ -34,7 +34,7 @@ suite("Util Tests", () =>
 
 	suiteTeardown(async function()
 	{
-		await executeSettingsUpdate("logging.enable", testsControl.writeToOutput);
+		await executeSettingsUpdate("logging.enable", testsControl.logEnabled);
 		await executeSettingsUpdate("logging.enableFile", false);
 	});
 
