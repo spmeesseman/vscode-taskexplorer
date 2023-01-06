@@ -1472,6 +1472,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
         else {
             window.showInformationMessage("Executing task not found");
+            taskItem.refreshState(true, "   ", 1);
+            this.fireTaskChangeEvents(taskItem);
         }
 
         log.methodDone("pause", 1);
@@ -2146,7 +2148,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
         else {
             window.showInformationMessage("Executing task not found");
-            taskItem.refreshState(false);
+            taskItem.refreshState(true, "   ", 1);
+            this.fireTaskChangeEvents(taskItem);
         }
 
         log.methodDone("stop", 1);

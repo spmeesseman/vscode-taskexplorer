@@ -101,7 +101,6 @@ export async function run(): Promise<void>
         //     }
         // }
     });
-    // symbols.ok = "";
 
     let filesToTest = "**/*.test.js";
     if (process.env.testArgs)

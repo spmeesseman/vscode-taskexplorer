@@ -5,12 +5,12 @@
         "outDir": "dist",
 		"rootDir": "src",
         "lib": [
-            "ES2015"
+            "es6"
         ],
         "sourceMap": true,
         "strict": true,   /* enable all strict type-checking options */
-        "noUnusedLocals": false /* Report errors on unused locals. */
-		// "allowSyntheticDefaultImports":true,
+        "noUnusedLocals": false, /* Report errors on unused locals. */
+		//"allowSyntheticDefaultImports":true,
         //"allowSyntheticDefaultImports": true,
         //"esModuleInterop": true,
         // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */

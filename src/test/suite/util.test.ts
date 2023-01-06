@@ -184,6 +184,12 @@ suite("Util Tests", () =>
 		util.getTaskTypeFriendlyName("ant");
 		util.getTaskTypeFriendlyName("ant", true);
 
+		util.isObjectEmpty({});
+		util.isObjectEmpty({ a: 1 });
+		util.isObjectEmpty([]);
+		util.isObjectEmpty([ 1, 2 ]);
+		util.isObjectEmpty("aaa" as unknown as object);
+
 		overrideNextShowInputBox("ok");
 		util.showMaxTasksReachedMessage();
 		overrideNextShowInputBox("ok");

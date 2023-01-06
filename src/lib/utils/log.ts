@@ -1,12 +1,13 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { configuration } from "./configuration";
-import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
 import { appendFileSync } from "fs";
-import { isArray, isError, isObject, isString } from "./utils";
 import { dirname, join } from "path";
 import { createDir } from "./fs";
-
+import { configuration } from "./configuration";
+import { isArray, isError, isFunction, isObject, isString } from "./utils";
+import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
+import figures from "../figures";
 
 // export enum LogColor
 // {
@@ -30,10 +31,10 @@ export interface IMsgQueueItem
 const logValueWhiteSpace = 45;
 const msgQueue: { [queueId: string]:  IMsgQueueItem[] } = {};
 
-let enable= false;
-let enableFile= false;
-let enableOutputWindow= false;
-let fileName= "";
+let enable = false;
+let enableFile = false;
+let enableOutputWindow = false;
+let fileName = "";
 let logLevel = -1;
 let writeToConsole = false;
 let writeToConsoleLevel = 2;
@@ -64,12 +65,12 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
 {
     if (msg)
     {
-        write("✘", 0, "", queueId);
+        write(figures.cross, 0, "", queueId);
         const _writeErr = (err: any) =>
         {
             if (isString(err))
             {
-                write("✘ " + err, 0, "", queueId);
+                write(figures.cross + " " + err, 0, "", queueId);
             }
             else if (isError(err))
             {
@@ -87,22 +88,22 @@ export function error(msg: any, params?: (string|any)[][], queueId?: string)
                 else if (err.message) {
                     writeError(err.message, queueId);
                 }
-                else {
-                    writeError(err.toString(), queueId);
+                else if (isFunction(err.toString)) {
+                    write(figures.cross + " " + err.toString(), 0, "", queueId);
                 }
             }
-            else {
-                writeError(err.toString(), queueId);
+            else if (isFunction(err.toString)) {
+                write(figures.cross + " " + err.toString(), 0, "", queueId);
             }
         };
         _writeErr(msg);
         if (params)
         {
             for (const [ n, v, l ] of params) {
-                value("✘   " + n, v, 0, "", queueId);
+                value(figures.cross + "   " + n, v, 0, "", queueId);
             }
         }
-        write("✘", 0, "", queueId);
+        write(figures.cross, 0, "", queueId);
     }
 }
 
@@ -367,11 +368,11 @@ function writeError(e: Error, queueId?: string)
 {
     const currentWriteToConsole = writeToConsole;
     writeToConsole = true;
-    write("✘ " + e.name, 0, "", queueId);
-    write("✘ " + e.message, 0, "", queueId);
+    write(figures.cross + " " + e.name, 0, "", queueId);
+    write(figures.cross + " " + e.message, 0, "", queueId);
     if (e.stack) {
-        const stackFmt = e.stack.replace(/\n/g, "\n✘ ");
-        write("✘ " + stackFmt, 0, "", queueId);
+        const stackFmt = e.stack.replace(/\n/g, `\n${figures.cross} `);
+        write(figures.cross + " " + stackFmt, 0, "", queueId);
     }
     writeToConsole = currentWriteToConsole;
 }

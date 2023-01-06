@@ -471,16 +471,31 @@ export function isExcluded(uriPath: string, logPad = "")
 }
 
 
-// export function isFunction(value: any)
-// {
-//     return !!value && typeof value === "function";
-// }
+export function isFunction(value: any)
+{
+    return !!value && typeof value === "function";
+}
 
 
-export function isObject(value: any)
+export function isObject(value: any): value is { [key: string]: any }
 {
     return !!value && (value instanceof Object || typeof value === "object");
 }
+
+
+/**
+ * Checks if there are any properties on this object.
+ */
+export const isObjectEmpty = (value: any) =>
+{
+    for (const key in value)
+    {
+        if ({}.hasOwnProperty.call(value, key)) {
+            return false;
+        }
+    }
+    return true;
+};
 
 
 export function isScriptType(source: string)

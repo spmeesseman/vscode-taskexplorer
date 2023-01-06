@@ -2,7 +2,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import * as path from "path";
 import * as assert from "assert";
-import figures from "figures";
+import figures from "../lib/figures";
 import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
 import { testControl } from "./control";
@@ -12,6 +12,7 @@ import TreeUtils from "./treeUtils";
 import { deleteFile, pathExists } from "../lib/utils/fs";
 import { IExplorerApi, ITaskExplorerApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, Uri, window, workspace } from "vscode";
+import { isObjectEmpty } from "../lib/utils/utils";
 
 let activated = false;
 let teApi: ITaskExplorerApi;
@@ -23,8 +24,7 @@ const overridesShowInfoBox: any[] = [];
 
 export const testsControl = testControl;
 export let treeUtils: TreeUtils;
-export const symbols = figures;
-
+export { figures };
 
 window.showInputBox = (...args: any[]) =>
 {
@@ -75,15 +75,15 @@ export async function activate(instance?: any)
         //
         // Activate extension
         //
-        console.log(`        ${symbols.tick} Activating extension 'spmeesseman.vscode-taskexplorer'`);
+        console.log(`        ${figures.tick} Activating extension 'spmeesseman.vscode-taskexplorer'`);
         teApi = await ext.activate();
-        console.log(`        ${symbols.tick} Extension 'spmeesseman.vscode-taskexplorer' successfully activated`);
+        console.log(`        ${figures.tick} Extension 'spmeesseman.vscode-taskexplorer' successfully activated`);
         //
         // Ensure extension initialized successfully
         //
-        assert(isReady() === true, `        ${symbols.cross} TeApi not ready`);
+        assert(isReady() === true, `        ${figures.cross} TeApi not ready`);
         if (!teApi.explorer) {
-            assert.fail(`        ${symbols.cross} Explorer instance does not exist`);
+            assert.fail(`        ${figures.cross} Explorer instance does not exist`);
         }
         //
         // Enable tests mode within the application, it alters the flow in a few spots, not many.
@@ -111,7 +111,7 @@ export async function activate(instance?: any)
         // All done
         //
         activated = true;
-        console.log(`        ${symbols.tick} Tests ready`);
+        console.log(`        ${figures.tick} Tests ready`);
     }
     return teApi;
 }
@@ -241,8 +241,14 @@ export async function getTreeTasks(taskType: string, expectedCount: number)
     //
     // Get the task mapped tree items
     //
-    // const taskMap = (teApi.explorer as IExplorerApi).getTaskMap();
-    const taskMap = await treeUtils.walkTreeItems(undefined);
+    let taskMap = (teApi.explorer as IExplorerApi).getTaskMap();
+    if (!taskMap || isObjectEmpty(taskMap)) {
+        console.log(`        ${figures.warning} Task map is empty, fall back to walkTreeItems`);
+        taskMap = await treeUtils.walkTreeItems(undefined);
+        if (!taskMap || isObjectEmpty(taskMap)) {
+            console.log(`        ${figures.cross} Task map is empty, getTreeTasks will fail`);
+        }
+    }
     //
     // Make sure the tasks have been mapped in the explorer tree
     //
@@ -364,20 +370,20 @@ function isExecuting(task: Task)
 function isReady(taskType?: string)
 {
     let err: string | undefined;
-    if (!teApi)                                 err = `        ${symbols.cross} TeApi null`;
+    if (!teApi)                                 err = `        ${figures.cross} TeApi null`;
     else {
-        if (!teApi.explorer)                    err = `        ${symbols.cross} TeApi Explorer provider == null`;
-        else if (teApi.sidebar)                err = `         ${symbols.cross} TeApi Sidebar Provider != null`;
-        else if (!teApi.providers)              err = `        ${symbols.cross} Providers null`;
+        if (!teApi.explorer)                    err = `        ${figures.cross} TeApi Explorer provider == null`;
+        else if (teApi.sidebar)                err = `         ${figures.cross} TeApi Sidebar Provider != null`;
+        else if (!teApi.providers)              err = `        ${figures.cross} Providers null`;
     }
     if (!err && taskType) {
-        if (!teApi.providers.get(taskType))     err = `        ${symbols.cross} ${taskType} Provider == null`;
+        if (!teApi.providers.get(taskType))     err = `        ${figures.cross} ${taskType} Provider == null`;
     }
     if (!err && !(workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined)) {
-                                                err = `        ${symbols.cross} Workspace folder does not exist`;
+                                                err = `        ${figures.cross} Workspace folder does not exist`;
     }
     if (!err && !extensions.getExtension("spmeesseman.vscode-taskexplorer")) {
-                                                err = `        ${symbols.cross} Extension not found`;
+                                                err = `        ${figures.cross} Extension not found`;
     }
     if (err) {
         console.log(err);
@@ -440,3 +446,4 @@ export async function waitForTaskExecution(exec: TaskExecution | undefined)
         }
     }
 }
+
