@@ -746,7 +746,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     {
         /* istanbul ignore if */
         if (!taskItem || !taskItem.task || !taskItem.taskFile) {
-            log.error(`fire task change event invalid (${!taskItem}/${!taskItem.task}/${!taskItem.taskFile})`);
+            log.error(`fire task change event type invalid, received ${typeof taskItem}`);
+            return;
+        }
+        /* istanbul ignore if */
+        if (!taskItem.task || !taskItem.taskFile) {
+            log.error(`fire task change event invalid (${!taskItem.task}/${!taskItem.taskFile})`);
             return;
         }
 

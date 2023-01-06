@@ -2,6 +2,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import * as path from "path";
 import * as assert from "assert";
+import figures from "figures";
 import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
 import { testControl } from "./control";
@@ -22,6 +23,8 @@ const overridesShowInfoBox: any[] = [];
 
 export const testsControl = testControl;
 export let treeUtils: TreeUtils;
+export const symbols = figures;
+
 
 window.showInputBox = (...args: any[]) =>
 {
@@ -72,15 +75,15 @@ export async function activate(instance?: any)
         //
         // Activate extension
         //
-        console.log("Activating extension 'spmeesseman.vscode-taskexplorer'");
+        console.log(`        ${symbols.tick} Activating extension 'spmeesseman.vscode-taskexplorer'`);
         teApi = await ext.activate();
-        console.log("Extension 'spmeesseman.vscode-taskexplorer' successfully activated");
+        console.log(`        ${symbols.tick} Extension 'spmeesseman.vscode-taskexplorer' successfully activated`);
         //
         // Ensure extension initialized successfully
         //
-        assert(isReady() === true, "✘ TeApi not ready");
+        assert(isReady() === true, `        ${symbols.cross} TeApi not ready`);
         if (!teApi.explorer) {
-            assert.fail("✘ Explorer instance does not exist");
+            assert.fail(`        ${symbols.cross} Explorer instance does not exist`);
         }
         //
         // Enable tests mode within the application, it alters the flow in a few spots, not many.
@@ -108,6 +111,7 @@ export async function activate(instance?: any)
         // All done
         //
         activated = true;
+        console.log(`        ${symbols.tick} Tests ready`);
     }
     return teApi;
 }
@@ -360,20 +364,20 @@ function isExecuting(task: Task)
 function isReady(taskType?: string)
 {
     let err: string | undefined;
-    if (!teApi)                                 err = "        ✘ TeApi null";
+    if (!teApi)                                 err = `        ${symbols.cross} TeApi null`;
     else {
-        if (!teApi.explorer)                    err = "        ✘ TeApi Explorer provider == null";
-        else if (teApi.sidebar)                err = "         ✘ TeApi Sidebar Provider != null";
-        else if (!teApi.providers)              err = "        ✘ Providers null";
+        if (!teApi.explorer)                    err = `        ${symbols.cross} TeApi Explorer provider == null`;
+        else if (teApi.sidebar)                err = `         ${symbols.cross} TeApi Sidebar Provider != null`;
+        else if (!teApi.providers)              err = `        ${symbols.cross} Providers null`;
     }
     if (!err && taskType) {
-        if (!teApi.providers.get(taskType))     err = `        ✘ ${taskType} Provider == null`;
+        if (!teApi.providers.get(taskType))     err = `        ${symbols.cross} ${taskType} Provider == null`;
     }
     if (!err && !(workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined)) {
-                                                err = "        ✘ Workspace folder does not exist";
+                                                err = `        ${symbols.cross} Workspace folder does not exist`;
     }
     if (!err && !extensions.getExtension("spmeesseman.vscode-taskexplorer")) {
-                                                err = "        ✘ Extension not found";
+                                                err = `        ${symbols.cross} Extension not found`;
     }
     if (err) {
         console.log(err);

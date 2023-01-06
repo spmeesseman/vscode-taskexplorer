@@ -11,7 +11,7 @@ import constants from "../../lib/constants";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer, getTreeTasks,
-    overrideNextShowInfoBox, overrideNextShowInputBox, testsControl
+    overrideNextShowInfoBox, overrideNextShowInputBox, symbols, testsControl
 } from "../helper";
 
 let lastTask: TaskItem | null = null;
@@ -235,7 +235,7 @@ suite("Task Tests", () =>
 
 async function startTask(taskItem: TaskItem)
 {
-    console.log(`    ℹ Run ${taskItem.taskSource} task: ${taskItem.label}`);
+    console.log(`    ${symbols.info} Run ${taskItem.taskSource} task: ${taskItem.label}`);
     console.log(`        Folder: ${taskItem.getFolder()?.name}`);
     await executeSettingsUpdate("taskButtons.clickAction", "Execute");
     // await executeSettingsUpdate("specialFolders.showLastTasks", (++runCount % 2) === 1);

@@ -8,7 +8,7 @@
 import * as assert from "assert";
 import * as path from "path";
 import { TaskExecution, Uri, workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, executeTeCommand2, getTreeTasks, getWsPath, testsControl, verifyTaskCount, waitForTaskExecution } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand2, getTreeTasks, getWsPath, testsControl, treeUtils, verifyTaskCount, waitForTaskExecution } from "../helper";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { BashTaskProvider } from "../../providers/bash";
 
@@ -53,6 +53,12 @@ suite("Bash Tests", () =>
         await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
         await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testsControl.waitTimeForConfigEnableEvent);
         await fsApi.deleteDir(dirName);
+    });
+
+
+    test("Build Tree (View Collapsed)", async function()
+    {
+        await treeUtils.buildTree(this);
     });
 
 
@@ -108,7 +114,7 @@ suite("Bash Tests", () =>
     {
         this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
+        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
@@ -129,7 +135,7 @@ suite("Bash Tests", () =>
     {
         this.slow(testsControl.slowTimeForFsDeleteFolderEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
+        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
     });
 

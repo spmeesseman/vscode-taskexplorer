@@ -131,6 +131,7 @@
         "eslint-plugin-no-null": "^1.0.2",
         "eslint-plugin-prefer-arrow": "^1.2.3",
         "eslint-plugin-prettier": "^3.3.1",
+        "figures": "^5.0.0",
         "grunt": "^1.5.3",
         "gulp": "^4.0.2",
         "mocha": "^9.2.0",
@@ -1790,7 +1791,13 @@
                 },
                 "taskExplorer.logging.level": {
                     "type": "number",
-                    "enum": [ 1, 2,  3, 4, 5 ],
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                    ],
                     "default": 1,
                     "order": 55,
                     "markdownDescription": "%config.taskExplorer.logging.level%"
@@ -1891,7 +1898,10 @@
                 },
                 "taskExplorer.taskButtons.clickAction": {
                     "type": "string",
-                    "enum": [ "Execute","Open" ],
+                    "enum": [
+                        "Execute",
+                        "Open"
+                    ],
                     "default": "Open",
                     "description": "%config.taskExplorer.taskButtons.clickAction%"
                 },
@@ -1927,7 +1937,33 @@
                 },
                 "taskExplorer.specialFolders.numLastTasks": {
                     "type": "number",
-                    "enum": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 ],
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        20,
+                        21,
+                        22,
+                        23,
+                        24,
+                        25
+                    ],
                     "default": 10,
                     "markdownDescription": "%config.taskExplorer.specialFolders.numLastTasks%"
                 },
@@ -1970,7 +2006,13 @@
                 },
                 "taskExplorer.groupMaxLevel": {
                     "type": "number",
-                    "enum": [ 1, 2,  3, 4, 5 ],
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                    ],
                     "default": 1,
                     "description": "%config.taskExplorer.groupMaxLevel%"
                 },

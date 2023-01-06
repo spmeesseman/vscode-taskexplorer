@@ -2,7 +2,6 @@
     "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
     "taskExplorer.enableExplorerView": true,
     "taskExplorer.enableSideBar": false,
-    "taskExplorer.autoRefresh": true,
     "taskExplorer.enabledTasks": {
         "ant": true,
         "apppublisher": true,
@@ -41,10 +40,11 @@
     "taskExplorer.groupSeparator": "-",
     "taskExplorer.groupMaxLevel": 5,
     "taskExplorer.groupWithSeparator": true,
-    "taskExplorer.keepTermOnStop": false,
+    "taskExplorer.keepTermOnStop": true,
     "taskExplorer.logging.enable": true,
     "taskExplorer.logging.level": 1,
     "taskExplorer.logging.enableFile": false,
+    "taskExplorer.logging.enableOutputWindow": false,
     "taskExplorer.pathToPrograms": {
         "ant": "c:\\Projects\\vscode-taskexplorer\\tools\\ant\\bin\\ant.bat",
         "appPublisher": "",
@@ -73,10 +73,16 @@
     "taskExplorer.specialFolders.showFavorites": true,
     "taskExplorer.specialFolders.showLastTasks": true,
     "taskExplorer.specialFolders.showUserTasks": true,
-    "taskExplorer.taskButtons.clickAction": "Open",
+    "taskExplorer.taskButtons.clickAction": "Execute",
     "taskExplorer.taskButtons.showFavoritesButton": true,
     "taskExplorer.useGulp": false,
     "taskExplorer.useAnt": false,
+    "taskExplorer.visual.enableAnsiconForAnt": false,
+    "taskExplorer.visual.disableAnimatedIcons": true,
+    "taskExplorer.globPatternsBash": [],
+    "npm.packageManager": "auto",
+    "terminal.integrated.shell.osx": null,
+    "terminal.integrated.shell.linux": null,
     "taskExplorer.excludeTask": [
         "pre-launch[0-9]{2}\\.r(?:b|c)",
         "upload2"

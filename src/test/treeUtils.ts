@@ -14,7 +14,7 @@ export default class TreeUtils
 {
 
     private teApi: ITaskExplorerApi;
-
+    private treeBuiltOnce = false;
 
     constructor(api: ITaskExplorerApi)
     {
@@ -30,21 +30,25 @@ export default class TreeUtils
      *
      * @param instance The test instance to set the timeout and slow time on.
      */
-    async buildTree(instance: any)
+    async buildTree(instance: any,  rebuild?: boolean)
     {
-        instance.slow(20000);
-        instance.timeout(30000);
+        if (rebuild || !this.treeBuiltOnce)
+        {
+            instance.slow(20000);
+            instance.timeout(30000);
 
-        await executeSettingsUpdate("groupWithSeparator", true);
-        await executeSettingsUpdate("groupMaxLevel", 5);
+            await executeSettingsUpdate("groupWithSeparator", true);
+            await executeSettingsUpdate("groupMaxLevel", 5);
 
-        //
-        // A special refresh() for test suite, will open all task files and open to position
-        //
-        await this.teApi.explorer?.refresh("tests");
+            //
+            // A special refresh() for test suite, will open all task files and open to position
+            //
+            await this.teApi.explorer?.refresh("tests");
+        }
         await this.teApi.waitForIdle(testsControl.waitTimeForBuildTree);
         // this.teApi.explorer?.getTaskMap();
         // return this.teApi.explorer?.getChildren();
+        this.treeBuiltOnce = true;
     }
 
 

@@ -14,7 +14,12 @@ export const testControl =
     logToOutput: false,
     logOpenFileOnFinish: true,
     //
-    // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)
+    // These 2 properties are for using update() for coverage, see helper.initSettings
+    //
+    userLogLevel: 1,
+    userPathToAnt: "ant.bat",
+    //
+    // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)s
     //
     slowTimeForCommand: 1450,
     slowTimeForCommandFast: 550,

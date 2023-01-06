@@ -19,7 +19,11 @@ Features:
         If noticed that a particular task is always ran after another, provide AI to ask
         user to auto run that task
 
-GeneralTodos:
+    ☐ Log Viewer/ Decorator
+
+        ew extension `Log File Collapse`where start and end tags can be used an expanded/collapsedin vsCode editor window
+
+General Todos:
 
     ☐ Test visibility change event
         Differences in tray open/closed, switching views, vscode minimized, etc
