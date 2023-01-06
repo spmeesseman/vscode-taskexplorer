@@ -30,7 +30,6 @@ Tests:
         ✔ Bash @done(23-01-06 01:24)
         ☐ Batch
         ☐ Grunt
-        ☐ Gulp
         ✔ Maven @done(23-01-01 13:02)
         ☐ NSIS
         ☐ Perl

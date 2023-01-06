@@ -13,6 +13,7 @@ import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplor
 import { ComposerTaskProvider } from "../../providers/composer";
 
 const testsName = "composer";
+const startTaskCount = 2;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -55,7 +56,7 @@ suite("Composer Tests", () =>
 
     test("Start", async function()
     {
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
@@ -72,7 +73,7 @@ suite("Composer Tests", () =>
 
     test("Disable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });
@@ -80,15 +81,15 @@ suite("Composer Tests", () =>
 
     test("Re-enable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testsControl.waitTimeForConfigEnableEvent);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
     test("Create File", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent);
+        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
 
         if (!await fsApi.pathExists(dirName)) {
             await fsApi.createDir(dirName);
@@ -107,13 +108,13 @@ suite("Composer Tests", () =>
             "}\n"
         );
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
-        await verifyTaskCount(testsName, 5);
+        await verifyTaskCount(testsName, startTaskCount + 3);
     });
 
 
     test("Add Task to File", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent);
+        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -129,13 +130,13 @@ suite("Composer Tests", () =>
             "}\n"
         );
         await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
-        await verifyTaskCount(testsName, 6);
+        await verifyTaskCount(testsName, startTaskCount + 4);
     });
 
 
-    test("Remove Task from File", async function()
+    test("Remove 2 Tasks from File", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent);
+        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -149,7 +150,7 @@ suite("Composer Tests", () =>
             "}\n"
         );
         await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
-        await verifyTaskCount(testsName, 4);
+        await verifyTaskCount(testsName, startTaskCount + 2);
     });
 
 
@@ -157,7 +158,7 @@ suite("Composer Tests", () =>
     {
         let resetLogging = teApi.log.isLoggingEnabled();
         if (resetLogging) { // turn scary error logging off
-            this.slow(testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForConfigEvent * 2));
+            this.slow(testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForConfigEvent * 2) + testsControl.slowTimeForVerifyTaskCount);
             executeSettingsUpdate("logging.enable", false);
             resetLogging = true;
         }
@@ -177,7 +178,7 @@ suite("Composer Tests", () =>
             "\n"
         );
         await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, startTaskCount);
         if (resetLogging) { // turn scary error logging off
             executeSettingsUpdate("logging.enable", true);
         }
@@ -187,17 +188,17 @@ suite("Composer Tests", () =>
 
     test("Delete File", async function()
     {
-        this.slow(testsControl.slowTimeForFsDeleteEvent);
+        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
     test("Disable (Default is OFF)", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
     });

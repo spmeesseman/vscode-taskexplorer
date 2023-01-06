@@ -1,5 +1,5 @@
 
-export const testControl: { [property: string]: any } =
+export const testControl =
 {   //
     // KEEP SETTINGS FILE CHANGES (@ test-files/.vscode/workspace.json)
     //
@@ -27,6 +27,7 @@ export const testControl: { [property: string]: any } =
     slowTimeForFsCreateFolderEvent: 1800,
     slowTimeForFsDeleteEvent: 950,
     slowTimeForFsDeleteFolderEvent: 1550,
+    slowTimeForFsModifyEvent: 650,
     slowTimeForGetTreeTasks: 150,
     slowTimeForNpmCommand: 10000,
     slowTimeForBashScript: 4000,
@@ -37,7 +38,7 @@ export const testControl: { [property: string]: any } =
     slowTimeForFetchTasksCommand: 3000,
     slowTimeForLocalLicenseCheck: 2000,
     slowTimeForRemoteLicenseCheck: 3750,
-    slowTimeForVerifyTaskCount: 1250,
+    slowTimeForVerifyTaskCount: 875,
     //
     // MINIMUM WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME)
     //

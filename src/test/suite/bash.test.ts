@@ -13,6 +13,7 @@ import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplor
 import { BashTaskProvider } from "../../providers/bash";
 
 const testsName = "bash";
+const startTaskCount = 1;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -23,7 +24,7 @@ let dirName: string;
 let fileUri: Uri;
 
 
-suite("Python Tests", () =>
+suite("Bash Tests", () =>
 {
 
     suiteSetup(async function()
@@ -65,7 +66,7 @@ suite("Python Tests", () =>
     test("Invalid ScriptProvider Type", async function()
     {
         const provider = teApi.providers.get(testsName) as BashTaskProvider;
-        assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.py"))),
+        assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("hello.sh"))),
                "ScriptProvider type should return position 1");
     });
 
@@ -73,7 +74,7 @@ suite("Python Tests", () =>
     test("Start", async function()
     {
         this.slow(testsControl.slowTimeForVerifyTaskCount);
-        await verifyTaskCount(testsName, 1);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
@@ -89,7 +90,7 @@ suite("Python Tests", () =>
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testsControl.waitTimeForConfigEnableEvent);
-        await verifyTaskCount(testsName, 1);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
@@ -99,7 +100,7 @@ suite("Python Tests", () =>
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
 
@@ -108,7 +109,7 @@ suite("Python Tests", () =>
         this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
-        await verifyTaskCount(testsName, 1);
+        await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
     });
@@ -118,9 +119,9 @@ suite("Python Tests", () =>
     {
         this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.createDir(dirName);
-        await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
+        await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
 
@@ -129,7 +130,7 @@ suite("Python Tests", () =>
         this.slow(testsControl.slowTimeForFsDeleteFolderEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
-        await verifyTaskCount(testsName, 1);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
@@ -138,7 +139,7 @@ suite("Python Tests", () =>
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
         //
         this.slow(testsControl.slowTimeForGetTreeTasks + testsControl.slowTimeForBashScript);
-        const bash = await getTreeTasks("bash", 1);
+        const bash = await getTreeTasks("bash", startTaskCount);
         const exec = await executeTeCommand2("run", [ bash[0] ], testsControl.waitTimeForRunCommand) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });

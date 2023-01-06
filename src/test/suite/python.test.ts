@@ -13,6 +13,7 @@ import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplor
 import { PythonTaskProvider } from "../../providers/python";
 
 const testsName = "python";
+const startTaskCount = 2;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -73,7 +74,7 @@ suite("Python Tests", () =>
     test("Start", async function()
     {
         this.slow(testsControl.slowTimeForVerifyTaskCount);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
@@ -89,7 +90,7 @@ suite("Python Tests", () =>
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testsControl.waitTimeForConfigEnableEvent);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
@@ -99,7 +100,7 @@ suite("Python Tests", () =>
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
-        await verifyTaskCount(testsName, 3);
+        await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
 
@@ -108,7 +109,7 @@ suite("Python Tests", () =>
         this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
     });
@@ -120,7 +121,7 @@ suite("Python Tests", () =>
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
-        await verifyTaskCount(testsName, 3);
+        await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
 
@@ -130,7 +131,7 @@ suite("Python Tests", () =>
         // await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent * 2);
-        await verifyTaskCount(testsName, 2);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 });

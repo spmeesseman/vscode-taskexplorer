@@ -9,6 +9,7 @@ import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplor
 import { GulpTaskProvider } from "../../providers/gulp";
 
 const testsName = "gulp";
+const startTaskCount = 17;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -40,12 +41,14 @@ suite("Gulp Tests", () =>
 
     test("Start", async function()
     {
-        await verifyTaskCount(testsName, 17);
+        this.slow(testsControl.slowTimeForVerifyTaskCount);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
     test("Disable", async function()
     {
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await teApi.config.updateWs("enabledTasks.gulp", false);
         await teApi.waitForIdle(testsControl.waitTimeForConfigEnableEvent);
         await verifyTaskCount(testsName, 0);
@@ -54,18 +57,19 @@ suite("Gulp Tests", () =>
 
     test("Re-enable", async function()
     {
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await teApi.config.updateWs("enabledTasks.gulp", true);
         await teApi.waitForIdle(testsControl.waitTimeForConfigEnableEvent);
-        await verifyTaskCount(testsName, 17);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
-    test("Create file", async function()
+    test("Create File", async function()
     {
+        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
         if (!(await fsApi.pathExists(dirName))) {
             await fsApi.createDir(dirName);
         }
-
         await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
@@ -78,14 +82,14 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-
         await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
-        await verifyTaskCount(testsName, 19);
+        await verifyTaskCount(testsName, startTaskCount + 2);
     });
 
 
-    test("Add task to file", async function()
+    test("Add Task to file", async function()
     {
+        this.slow(testsControl.slowTimeForFsModifyEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
@@ -102,14 +106,14 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-
         await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
-        await verifyTaskCount(testsName, 20);
+        await verifyTaskCount(testsName, startTaskCount + 3);
     });
 
 
-    test("Remove task from file", async function()
+    test("Remove 2 Tasks from file", async function()
     {
+        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
@@ -118,25 +122,25 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-
         await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
-        await verifyTaskCount(testsName, 18);
+        await verifyTaskCount(testsName, startTaskCount + 1);
     });
 
 
-    test("Delete file", async function()
+    test("Delete File", async function()
     {
+        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
-        await verifyTaskCount(testsName, 17);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
     test("Gulp Parser", async function()
     {
-        const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
-              gulpFile = getWsPath("gulp\\gulpfile.js");
+        // const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
+        //       gulpFile = getWsPath("gulp\\gulpfile.js");
         //
         // Use Gulp
         //

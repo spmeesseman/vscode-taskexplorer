@@ -7,15 +7,12 @@
 //
 import * as path from "path";
 import { Uri } from "vscode";
-import { activate, executeSettingsUpdate, getWsPath, testsControl, treeUtils, verifyTaskCount } from "../helper";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
-
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, executeSettingsUpdate, getWsPath, testsControl, treeUtils, verifyTaskCount } from "../helper";
 
 const testsName = "apppublisher";
-const waitTimeForFsModEvent = testsControl.waitTimeForFsModifyEvent;
-const waitTimeForFsDelEvent = testsControl.waitTimeForFsDeleteEvent;
-const waitTimeForFsNewEvent = testsControl.waitTimeForFsCreateEvent;
+const startTaskCount = 21;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -66,7 +63,7 @@ suite("App-Publisher Tests", () =>
     test("Start", async function()
     {
         this.slow(testsControl.slowTimeForVerifyTaskCount);
-        await verifyTaskCount(testsName, 21);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
@@ -95,8 +92,8 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(waitTimeForFsNewEvent);
-        await verifyTaskCount(testsName, 42);
+        await teApi.waitForIdle(testsControl.waitTimeForFsCreateEvent);
+        await verifyTaskCount(testsName, startTaskCount + 21);
     });
 
 
@@ -112,7 +109,7 @@ suite("App-Publisher Tests", () =>
     {
         this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testsControl.waitTimeForConfigEnableEvent);
-        await verifyTaskCount(testsName, 42);
+        await verifyTaskCount(testsName, startTaskCount + 21);
     });
 
 
@@ -139,8 +136,8 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn""\n' +
             "\n"
         );
-        await teApi.waitForIdle(waitTimeForFsModEvent);
-        await verifyTaskCount(testsName, 21);
+        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent);
+        await verifyTaskCount(testsName, startTaskCount);
         if (resetLogging) { // turn scary error logging off
             executeSettingsUpdate("logging.enable", true);
         }
@@ -162,8 +159,8 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(waitTimeForFsModEvent + testsControl.slowTimeForVerifyTaskCount);
-        await verifyTaskCount(testsName, 42);
+        await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent + testsControl.slowTimeForVerifyTaskCount);
+        await verifyTaskCount(testsName, startTaskCount + 21);
     });
 
 
@@ -171,8 +168,8 @@ suite("App-Publisher Tests", () =>
     {
         this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(waitTimeForFsDelEvent);
-        await verifyTaskCount(testsName, 21);
+        await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 

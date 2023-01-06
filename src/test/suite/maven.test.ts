@@ -13,6 +13,7 @@ import { MavenTaskProvider } from "../../providers/maven";
 import { IFilesystemApi } from "../../interface/fsApi";
 
 const testsName = "maven";
+const startTaskCount = 8;
 
 let teApi: ITaskExplorerApi;
 let fs: IFilesystemApi;
@@ -76,7 +77,7 @@ suite("Maven Tests", () =>
 
     test("Start", async function()
     {
-        await verifyTaskCount(testsName, 8);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
@@ -92,7 +93,7 @@ suite("Maven Tests", () =>
 
     test("Disable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false);
         await verifyTaskCount(testsName, 0);
     });
@@ -100,9 +101,9 @@ suite("Maven Tests", () =>
 
     test("Re-enable", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true);
-        await verifyTaskCount(testsName, 8);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
@@ -110,12 +111,12 @@ suite("Maven Tests", () =>
     {
         let resetLogging = teApi.log.isLoggingEnabled();
         if (resetLogging) { // turn scary error logging off
-            this.slow(testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForConfigEvent * 2));
+            this.slow(testsControl.slowTimeForFsCreateEvent + (testsControl.slowTimeForConfigEvent * 2) + testsControl.slowTimeForVerifyTaskCount);
             executeSettingsUpdate("logging.enable", false);
             resetLogging = true;
         }
         else {
-            this.slow(testsControl.slowTimeForFsCreateEvent);
+            this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
         }
         await fs.writeFile(
             fileUri.fsPath,
@@ -133,7 +134,7 @@ suite("Maven Tests", () =>
 
     test("Fix Invalid XML", async function()
     {
-        this.slow(testsControl.slowTimeForFsCreateEvent);
+        this.slow(testsControl.slowTimeForFsCreateEvent + testsControl.slowTimeForVerifyTaskCount);
         await fs.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
@@ -141,13 +142,13 @@ suite("Maven Tests", () =>
             "</project>\n"
         );
         await teApi.waitForIdle(testsControl.waitTimeForFsModifyEvent, 3000);
-        await verifyTaskCount(testsName, 8);
+        await verifyTaskCount(testsName, startTaskCount);
     });
 
 
     test("Delete file", async function()
     {
-        this.slow(testsControl.slowTimeForFsDeleteEvent);
+        this.slow(testsControl.slowTimeForFsDeleteEvent + testsControl.slowTimeForVerifyTaskCount);
         await fs.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testsControl.waitTimeForFsDeleteEvent);
         await verifyTaskCount(testsName, 0);
@@ -156,7 +157,7 @@ suite("Maven Tests", () =>
 
     test("Disable (Default is OFF)", async function()
     {
-        this.slow(testsControl.slowTimeForConfigEnableEvent);
+        this.slow(testsControl.slowTimeForConfigEnableEvent + testsControl.slowTimeForVerifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false);
         await verifyTaskCount(testsName, 0);
     });
