@@ -62,6 +62,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
     public async provideTasks()
     {
+        let rmvCount;
         this.logQueueId = this.providerName + (++this.callCount);
         log.methodStart(`provide ${this.providerName} tasks`, 1, "   ", false, [[ "call count", ++this.callCount ]], this.logQueueId);
         if (!this.cachedTasks)
@@ -73,14 +74,14 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 const maxTasks = licMgr.getMaxNumberOfTasksByType(this.providerName);
                 if (this.cachedTasks.length > maxTasks)
                 {
-                    const rmvCount = this.cachedTasks.length - maxTasks;
+                    rmvCount = this.cachedTasks.length - maxTasks;
                     log.write(`   removing ${rmvCount} tasks, max ${ this.providerName} task count reached (no license)`, 1, "   ", this.logQueueId);
                     this.cachedTasks.splice(maxTasks, rmvCount);
                     util.showMaxTasksReachedMessage(util.getTaskTypeFriendlyName(this.providerName, true));
                 }
             }
         }
-        log.methodDone(`provide ${this.providerName} tasks`, 1, "   ", false, undefined, this.logQueueId);
+        log.methodDone(`provide ${this.providerName} tasks`, 1, "   ", false, [[ "# of tasks found", this.cachedTasks.length ]], this.logQueueId);
         log.dequeue(this.logQueueId);
         this.logQueueId = undefined;
         return this.cachedTasks;
@@ -132,7 +133,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
         //
 
         log.methodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, false,
-            [[ "uri", uri?.path ], [ "has cached tasks", !!this.cachedTasks ]]
+            [[ "uri", uri?.path ], [ "has cached tasks", !!this.cachedTasks ], [ "# of cached tasks", this.cachedTasks!.length ]]
         );
 
         if (uri && this.invalidating) {
@@ -185,7 +186,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             }
         }
 
-        log.methodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad);
+        log.methodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad, false, [[ "# of cached tasks", this.cachedTasks!.length ]]);
         this.invalidating = false;
         await this.processQueue();
     }

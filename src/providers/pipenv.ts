@@ -112,7 +112,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
             result.push(task);
         }
 
-        log.methodDone("read pipenv Pipfile file uri tasks", 1, logPad, false, undefined, this.logQueueId);
+        log.methodDone("read pipenv Pipfile file uri tasks", 1, logPad, false, [[ "#of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 }

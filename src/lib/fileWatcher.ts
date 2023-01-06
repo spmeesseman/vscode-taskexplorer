@@ -42,13 +42,6 @@ export function disposeFileWatchers()
 export const isProcessingFsEvent = () => processingFsEvent;
 
 
-function logFileWatcherEvent(uri: Uri, type: string)
-{
-    log.write(`file '${type}' event`, 1);
-    log.value("   file", uri.fsPath, 1);
-}
-
-
 export async function registerFileWatchers(context: ExtensionContext, api: ITaskExplorerApi)
 {   
     teApi = api;
@@ -114,9 +107,9 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
                 {
                     processingFsEvent = true;
                     try
-                    {   logFileWatcherEvent(uri, "change");
+                    {   log.methodStart("file 'change' event", 1, "", false, [[ "file", uri.fsPath ]]);
                         await refreshTree(teApi, taskType, uri, "   ");
-                        log.write("file 'change' event complete", 1);
+                        log.methodDone("file 'change' event", 1);
                     }
                     catch (e) {}
                     finally { processingFsEvent = false; }
@@ -130,7 +123,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
             {
                 processingFsEvent = true;
                 try
-                {   logFileWatcherEvent(uri, "delete");
+                {   log.methodStart("file 'delete' event", 1, "", false, [[ "file", uri.fsPath ]]);
                     await cache.removeFileFromCache(taskType, uri, "   ");
                     await refreshTree(teApi, taskType, uri, "   ");
                     // if (createDeleteFileTimerId) {
@@ -138,7 +131,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
                     // }
                     // pendingDeleteFiles.push({ taskType, uri });
                     // createDeleteFileTimerId = setTimeout(async () => { await processCreateDeleteFiles(); }, 50, uri);
-                    log.write("file 'delete' event complete", 1);
+                    log.methodDone("file 'delete' event", 1);
                 }
                 catch (e) {}
                 finally { processingFsEvent = false; }
@@ -151,7 +144,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
             {
                 processingFsEvent = true;
                 try
-                {   logFileWatcherEvent(uri, "create");
+                {   log.methodStart("file 'create' event", 1, "", false, [[ "file", uri.fsPath ]]);
                     await cache.addFileToCache(taskType, uri, "   ");
                     await refreshTree(teApi, taskType, uri, "   ");
                     // if (createDeleteFileTimerId) {
@@ -159,7 +152,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
                     // }
                     // pendingCreateFiles.push({ taskType, uri });
                     // createDeleteFileTimerId = setTimeout(async () => { await processCreateDeleteFiles(); }, 50, uri);
-                    log.write("file 'create' event complete", 1);
+                    log.methodDone("file 'create' event", 1);
                 }
                 catch (e) {}
                 finally { processingFsEvent = false; }

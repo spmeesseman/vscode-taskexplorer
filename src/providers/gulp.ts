@@ -285,7 +285,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             result.push(task);
         }
 
-        log.methodDone("read gulp file uri tasks", 1, logPad, false, undefined, this.logQueueId);
+        log.methodDone("read gulp file uri tasks", 1, logPad, false, [[ "#of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 

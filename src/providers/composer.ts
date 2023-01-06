@@ -109,7 +109,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
             result.push(task);
         }
 
-        log.methodDone("read composer file uri task", 1, logPad, false, undefined, this.logQueueId);
+        log.methodDone("read composer file uri task", 1, logPad, false, [[ "#of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 

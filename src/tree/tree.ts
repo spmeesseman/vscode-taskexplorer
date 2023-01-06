@@ -1522,7 +1522,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      */
     public async refresh(invalidate?: any, opt?: Uri | boolean, logPad = ""): Promise<void>
     {
-        log.methodStart("refresh task tree", 1, logPad, true, [
+        log.methodStart("refresh task tree", 1, logPad, false, [
             [ "from view", this.name ], [ "invalidate", invalidate ],
             [ "opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a" ],
             [ "tree is null", !this.taskTree ]

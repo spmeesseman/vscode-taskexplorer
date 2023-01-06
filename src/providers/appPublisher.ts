@@ -204,7 +204,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
                                 `${def.label}${apFmtLabel}`, "apppublisher", exec, undefined));
         });
 
-        log.methodDone("read app-publisher file uri tasks", 1, logPad, false, undefined, this.logQueueId);
+        log.methodDone("read app-publisher file uri tasks", 1, logPad, false, [[ "# of tasks found", tasks.length ]], this.logQueueId);
 
         return tasks;
     }
