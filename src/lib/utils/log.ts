@@ -75,10 +75,10 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
             if (e) {
                 if (e.stack) {
                     const stackFmt = e.stack.replace(/\n\n/g, "\n").replace(/\n/g, `\n${figure} `);
-                    write((figure ? figure + " " : "") + stackFmt, 0, "", queueId, true);
+                    write((figure ? figure + " " : "") + stackFmt, 0, "", queueId, false, true);
                 }
                 else if (e.message) {
-                    write((figure ? figure + " " : "") + e.message.trimEnd(), 0, "", queueId, true);
+                    write((figure ? figure + " " : "") + e.message.trimEnd(), 0, "", queueId, false, true);
                 }
             }
         };
@@ -88,16 +88,16 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
                 writeToConsole = true;
                 enableFile = false;
                 enableOutputWindow = false;
-                write(sym + (err ? " " : "") + (err || ""), 0, "", undefined, true);
+                write(sym + (err ? " " : "") + (err || ""), 0, "", undefined, false, true);
             }
             writeToConsole = false;
             enableFile = wtf;
             if (enableFile && !enableFileSymbols) {
-                write(err, 0, "", undefined, true);
+                write(err, 0, "", undefined, false, true);
                 enableFile = false;
             }
             enableOutputWindow = wto;
-            write(sym2 + (err ? " " : "") + (err || ""), 0, "", queueId, true);
+            write(sym2 + (err ? " " : "") + (err || ""), 0, "", queueId, false, true);
         };
         const _write2 = (err: any, wto: boolean, wtf: boolean) =>
         {
@@ -338,14 +338,12 @@ export function value(msg: string, value: any, level?: number, logPad = "", queu
         }
         else if (isObject(value))
         {
-            let objectString;
             try {
-                objectString = JSON.stringify(value, null, 3);
+                logMsg += JSON.stringify(value, null, 3);
             }
             catch {
-                objectString = value.toString();
+                logMsg += value.toString();
             }
-            logMsg += `\n${objectString}`;
         }
         else if (value || value === 0 || value === "" || value === false)
         {
@@ -359,25 +357,20 @@ export function value(msg: string, value: any, level?: number, logPad = "", queu
             logMsg += "null";
         }
 
-        if (logMsg.includes("\n")) {
-            logMsg = logMsg.replace(/\n/g, `\n${valuePad}  ` + msg.replace(/\W\w/g, " "));
-        }
-        write(logMsg, level, logPad, queueId);
+        write(logMsg, level, logPad, queueId, true);
     }
 }
 
 
 export function values(level: number, logPad: string, params: any | (string|any)[][], doLogBlank?: boolean, queueId?: string)
 {
-    if (enable)
+    if (enable && params)
     {
         if (doLogBlank === true) {
             blank(level, queueId);
         }
-        if (params) {
-            for (const [ n, v ] of params) {
-                value(n, v, level, logPad, queueId);
-            }
+        for (const [ n, v ] of params) {
+            value(n, v, level, logPad, queueId);
         }
     }
 }
@@ -389,7 +382,7 @@ export const warn = (msg: any, params?: (string|any)[][], queueId?: string) => _
 export const withColor = figures.withColor;
 
 
-export function write(msg: string, level?: number, logPad = "", queueId?: string, isError?: boolean) // , color?: LogColor)
+export function write(msg: string, level?: number, logPad = "", queueId?: string, isValue?: boolean, isError?: boolean) // , color?: LogColor)
 {
     if (msg === null || msg === undefined || (lastWriteWasBlank && msg === "")) {
         return;
@@ -399,10 +392,18 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
     {
         const _write = (fn: (...fnArgs: any) => void, scope: any,  ts: string, isFile: boolean, ...args: any) =>
         {
-            const msgs = msg.split("\n").filter(m => !!m);
+            const msgs = msg.split("\n").filter(m => !!m.trim());
+            let firstLineDone = false,
+                valuePad = "";
+            if (isValue && msgs.length > 1)  {
+                for (let i = 0; i < logValueWhiteSpace + 2; i++) {
+                    valuePad += " ";
+                }
+            }
             for (const m of msgs)
             {
-                const _msg = ts + logPad + m.trimEnd() + (isFile ? "\n" : "");
+                const _logPad = isValue && firstLineDone ? valuePad : logPad;
+                const _msg = ts + _logPad + m.trimEnd() + (isFile ? "\n" : "");
                 if (args && args.length > 0) {
                     if (!queueId) {
                         fn.call(scope || window, ...args, _msg);
@@ -429,6 +430,7 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
                         });
                     }
                 }
+                firstLineDone = true;
             }
         };
 
