@@ -76,6 +76,7 @@
         "test-makefile": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js makefile xDeactivate",
         "test-maven": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js maven xDeactivate",
         "test-npm": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js npm xDeactivate",
+        "test-powershell": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js powershell xDeactivate",
         "test-providers": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js providers xDeactivate",
         "test-python": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js python xDeactivate",
         "test-tasks": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js tasks xDeactivate",

@@ -98,7 +98,6 @@ const errorWriteLogs = (lMsg: string | undefined, fileOn: boolean, outWinOn: boo
 {
     if (lMsg !== undefined)
     {
-        if (!symbols || !symbols[0]) symbols = [ figures.color.error, figures.error ];
         errorConsole(lMsg, symbols, queueId);
         if (fileOn) errorFile(lMsg, symbols);
         if (outWinOn) errorOutputWindow(lMsg, symbols);
@@ -163,6 +162,7 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
     const currentWriteToFile = enableFile;
     const currentWriteToOutputWindow = enableOutputWindow;
     const errMsgs = errorParse(msg, symbols, queueId);
+    if (!symbols || !symbols[0]) symbols = [ figures.color.error, figures.error ];
 
     if (lastErrorMesage[0] === errMsgs[0])
     {
@@ -173,8 +173,7 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
             return;
         }
     }
-
-    lastErrorMesage.push(...errMsgs);
+    lastErrorMesage = errMsgs;
 
     if (!lastWriteWasBlankError && !lastWriteToConsoleWasBlank)
     {
@@ -376,7 +375,7 @@ export function value(msg: string, value: any, level?: number, logPad = "", queu
         }
         else if (isArray(value))
         {
-            logMsg += `: [ ${value.join(", ")} ]`;
+            logMsg += `[ ${value.join(", ")} ]`;
         }
         else if (isObject(value))
         {
@@ -493,7 +492,7 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
             _write(logOutputChannel.appendLine, logOutputChannel, ts, false);
         }
     }
-    if (writeToConsole || isError)
+    if (writeToConsole)
     {
         if (!level || level <= writeToConsoleLevel || isError)
         {

@@ -93,7 +93,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
               args: string[] = [];
 
         if (!def) {
-            log.error(`Script extension type ${target} not found in mapping`, undefined, this.logQueueId);
+            log.error(`Script extension type ${target} not found in script file mapping`, undefined, this.logQueueId);
             return;
         }
 

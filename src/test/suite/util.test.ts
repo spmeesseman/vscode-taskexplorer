@@ -131,6 +131,7 @@ suite("Util Tests", () =>
 		log.error([ "Test error 1", "Test error 2" ]);
 		log.error([ "Test error 1",  new Error("Test error object") ]);
 		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
+		log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
 
 		// Re-enable logging
 		await executeSettingsUpdate("logging.enable", true);
