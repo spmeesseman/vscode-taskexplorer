@@ -59,24 +59,15 @@ export function dequeue(queueId: string)
 }
 
 
-export function error(msg: any, params?: (string|any)[][], queueId?: string)
-{
-    _error(msg, params, queueId);
-}
+export const error = (msg: any, params?: (string|any)[][], queueId?: string) => _error(msg, params, queueId);
 
 
 function errorConsole(msg: string, symbols: [ string, string ], queueId?: string)
 {
-    const currentWriteToConsole = writeToConsole;
-    const currentWriteToFile = enableFile;
-    const currentWriteToOutputWindow = enableOutputWindow;
     writeToConsole = true;
     enableFile = false;
     enableOutputWindow = false;
     write(symbols[0] + " " + msg, 0, "", queueId, false, true);
-    writeToConsole = currentWriteToConsole;
-    enableFile = currentWriteToFile;
-    enableOutputWindow = currentWriteToOutputWindow;
 }
 
 
@@ -84,9 +75,6 @@ function errorFile(msg: string, symbols: [ string, string ])
 {
     if (enableFile)
     {
-        const currentWriteToConsole = writeToConsole;
-        const currentWriteToFile = enableFile;
-        const currentWriteToOutputWindow = enableOutputWindow;
         writeToConsole = false;
         enableFile = true;
         enableOutputWindow = false;
@@ -96,9 +84,6 @@ function errorFile(msg: string, symbols: [ string, string ])
         else if (msg) {
             write(msg, 0, "", undefined, false, true);
         }
-        writeToConsole = currentWriteToConsole;
-        enableFile = currentWriteToFile;
-        enableOutputWindow = currentWriteToOutputWindow;
     }
 }
 
@@ -107,18 +92,72 @@ function errorOutputWindow(msg: string, symbols: [ string, string ])
 {
     if (enableOutputWindow)
     {
-        const currentWriteToConsole = writeToConsole;
-        const currentWriteToFile = enableFile;
-        const currentWriteToOutputWindow = enableOutputWindow;
         writeToConsole = false;
         enableFile = false;
         enableOutputWindow = true;
         write(symbols[1] + " " + msg, 0, "", undefined, false, true);
-        writeToConsole = currentWriteToConsole;
-        enableFile = currentWriteToFile;
-        enableOutputWindow = currentWriteToOutputWindow;
     }
 }
+
+
+const errorWriteLogs = (lMsg: string | undefined, symbols: [ string, string ], queueId?: string) =>
+{
+    if (lMsg !== undefined)
+    {
+        if (!symbols || !symbols[0]) symbols = [ figures.color.error, figures.error ];
+        errorConsole(lMsg, symbols, queueId);
+        errorFile(lMsg, symbols);
+        errorOutputWindow(lMsg, symbols);
+    }
+};
+
+
+const errorParse = (err: any, symbols: [ string, string ], queueId?: string, callCount = 0, accumulated: string[] = []) =>
+{
+    let eMsg: string | undefined;
+    if (!err) {
+        return accumulated;
+    }
+    if (isString(err))
+    {
+        eMsg = err;
+    }
+    else if (isError(err))
+    {
+        if (err.stack) {
+            eMsg = err.stack;
+        }
+        else { eMsg = err.message; }
+    }
+    else if (isArray(err))
+    {
+        err.forEach((m: any) => errorParse(m, symbols, queueId, ++callCount, accumulated));
+        return accumulated;
+    }
+    else if (isObject(err))
+    {
+        if (err.messageX) {
+            eMsg = err.messageX;
+        }
+        else if (err.message) {
+            eMsg = err.message;
+        }
+        else if (isObjectEmpty(err)) {
+            eMsg = "{} (empty object)";
+        }
+        else if (isFunction(err.toString)) {
+            eMsg = err.toString();
+        }
+    }
+    else if (err && isFunction(err.toString)) {
+        eMsg = err.toString();
+    }
+    if (eMsg)
+    {
+        accumulated.push(eMsg);
+    }
+    return accumulated;
+};
 
 
 function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: [ string, string ] = [ "", "" ])
@@ -126,85 +165,47 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
     if (!msg) {
         return;
     }
+    const currentWriteToConsole = writeToConsole;
+    const currentWriteToFile = enableFile;
+    const currentWriteToOutputWindow = enableOutputWindow;
+    const errMsgs = errorParse(msg, symbols, queueId);
 
-    const _writeLogs = (lMsg: string | undefined) =>
+    if (lastErrorMesage[0] === errMsgs[0])
     {
-        if (lMsg)
-        {
-            if (!symbols || !symbols[0]) symbols = [ figures.color.error, figures.error ];
-            errorConsole(lMsg, symbols, queueId);
-            errorFile(lMsg, symbols);
-            errorOutputWindow(lMsg, symbols);
-            lastErrorMesage.push(lMsg);
-        }
-    };
-
-    const _writeError = (err: any) =>
-    {
-        let eMsg: string | undefined;
-        if (!err) {
+        if (!isArray(msg)) {
             return;
         }
-        if (isString(err))
-        {
-            eMsg = msg;
+        if (errMsgs[1] === lastErrorMesage[1] && errMsgs.length === lastErrorMesage.length) {
+            return;
         }
-        else if (isError(err))
-        {
-            if (err.stack) {
-                // const stackFmt = e.stack.replace(/\n\n/g, "\n").replace(/\n/g, `\n${figure} `);
-                // write((figure ? figure + " " : "") + stackFmt, 0, "", queueId, false, true);
-                eMsg = err.stack;
-            }
-            else if (msg.message) {
-                eMsg = err.message.trimEnd();
-            }
-        }
-        else if (isArray(err))
-        {
-            err.forEach((m: any) => _writeError(m));
-        }
-        else if (isObject(err))
-        {
-            if (err.messageX) {
-                eMsg = err.messageX;
-            }
-            else if (err.message) {
-                eMsg = err.message;
-            }
-            else if (isObjectEmpty(err)) {
-                eMsg = "{} (empty object)";
-            }
-            else if (isFunction(err.toString)) {
-                eMsg = err.toString();
-            }
-        }
-        else if (err && isFunction(err.toString)) {
-            eMsg = err.toString();
-        }
-        _writeLogs(eMsg);
-    };
-
-    if (lastErrorMesage[0] !== msg)
-    {
-        writeToConsole = true;
-        if (!lastWriteWasBlankError && !lastWriteToConsoleWasBlank) {
-            _writeLogs("");
-        }
-        _writeError(msg);
-        if (params)
-        {
-            const sym = symbols[0] || figures.color.error;
-            for (const [ n, v, l ] of params) {
-                value(sym + "   " + n, v, 0, "", queueId);
-            }
-        }
-        _writeLogs("");
-        // const isBlankError = /\[[0-9]{1,2}m[\W]{1}\[[0-9]{1,2}m/.test(msg);
-        lastWriteWasBlank = true;
-        lastWriteWasBlankError = true;
-        lastWriteToConsoleWasBlank = true;
     }
+
+    lastErrorMesage.push(...errMsgs);
+
+    if (!lastWriteWasBlankError && !lastWriteToConsoleWasBlank)
+    {
+        errorWriteLogs("", symbols, queueId);
+    }
+
+    errMsgs.forEach((m) => errorWriteLogs(m, symbols, queueId));
+
+    if (params)
+    {
+        // const sym = symbols[0] || figures.color.error;
+        for (const [ n, v, l ] of params) {
+            // value(sym + "   " + n, v, 0, "", queueId);
+            value("   " + n, v, 0, "", queueId);
+        }
+    }
+
+    errorWriteLogs("", symbols, queueId);
+
+    lastWriteWasBlank = true;
+    lastWriteWasBlankError = true;
+    lastWriteToConsoleWasBlank = true;
+    writeToConsole = currentWriteToConsole;
+    enableFile = currentWriteToFile;
+    enableOutputWindow = currentWriteToOutputWindow;
 }
 
 
@@ -409,96 +410,102 @@ export const withColor = figures.withColor;
 
 export function write(msg: string, level?: number, logPad = "", queueId?: string, isValue?: boolean, isError?: boolean) // , color?: LogColor)
 {
-    if (msg === null || msg === undefined || (lastWriteWasBlank && msg === "")) {
+    if (!enable || msg === null || msg === undefined || (lastWriteWasBlank && msg === "")) {
         return;
     }
 
-    if (enable)
+    const _write = (fn: (...fnArgs: any) => void, scope: any,  ts: string, isFile: boolean, ...args: any) =>
     {
-        const _write = (fn: (...fnArgs: any) => void, scope: any,  ts: string, isFile: boolean, ...args: any) =>
+        const msgs = msg.split("\n").filter(m => !!m.trim());
+        let firstLineDone = false,
+            valuePad = "";
+        if (msgs.length > 1)
         {
-            const msgs = msg.split("\n").filter(m => !!m.trim());
-            let firstLineDone = false,
-                valuePad = "";
-            if (isValue && msgs.length > 1)  {
+            if (isValue)  {
                 for (let i = 0; i < logValueWhiteSpace + 2; i++) {
                     valuePad += " ";
                 }
             }
-            for (const m of msgs)
-            {
-                const _logPad = isValue && firstLineDone ? valuePad : logPad;
-                const _msg = ts + _logPad + m.trimEnd() + (isFile ? "\n" : "");
-                if (args && args.length > 0) {
-                    if (!queueId) {
-                        fn.call(scope || window, ...args, _msg);
-                    }
-                    else {
-                        if (!msgQueue[queueId]) msgQueue[queueId] = [];
-                        msgQueue[queueId].push({
-                            fn,
-                            scope: scope || window,
-                            args: [ ...args, _msg ]
-                        });
-                    }
+            else if (isError && /\[[0-9]{1,2}m/.test(msg))
+            {   // \[[0-9]{1,2}m[\W]{1}\[[0-9]{1,2}m/.test(msg)
+                for (let m = 1; m < msgs.length; m++) {
+                    msgs[m] = figures.color.error + " " + msgs[m];
+                }
+            }
+        }
+        for (const m of msgs)
+        {
+            const _logPad = isValue && firstLineDone ? valuePad : logPad;
+            const _msg = ts + _logPad + m.trimEnd() + (isFile ? "\n" : "");
+            if (args && args.length > 0) {
+                if (!queueId) {
+                    fn.call(scope || window, ...args, _msg);
                 }
                 else {
-                    if (!queueId) {
-                        fn.call(scope || window, _msg);
-                    }
-                    else {
-                        if (!msgQueue[queueId]) msgQueue[queueId] = [];
-                        msgQueue[queueId].push({
-                            fn,
-                            scope: scope || window,
-                            args: [ _msg ]
-                        });
-                    }
+                    if (!msgQueue[queueId]) msgQueue[queueId] = [];
+                    msgQueue[queueId].push({
+                        fn,
+                        scope: scope || window,
+                        args: [ ...args, _msg ]
+                    });
                 }
-                firstLineDone = true;
             }
-        };
-
-        const timeTags = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T");
-
-        if (enableOutputWindow && logOutputChannel)
-        {
-            if (!level || level <= logLevel)
-            {
-                const ts = timeTags.join(" ") + " ";
-                _write(logOutputChannel.appendLine, logOutputChannel, ts, false);
-            }
-        }
-        if (writeToConsole || isError)
-        {
-            if (!level || level <= writeToConsoleLevel || isError)
-            {
-                const ts = !isTests ? timeTags[1] + " " + figures.pointer + " " : "    ";
-                msg = withColor(msg, colors.grey);
-                _write(console.log, console, ts, false);
-                lastWriteToConsoleWasBlank = false;
-            }
-        }
-        if (enableFile)
-        {
-            if (!level || level <= logLevel)
-            {
-                let ts;
-                if (enableFileSymbols) {
-                    ts = timeTags[1]  + " " + figures.pointer + " ";
+            else {
+                if (!queueId) {
+                    fn.call(scope || window, _msg);
                 }
                 else {
-                    ts = timeTags[1]  + " ";
+                    if (!msgQueue[queueId]) msgQueue[queueId] = [];
+                    msgQueue[queueId].push({
+                        fn,
+                        scope: scope || window,
+                        args: [ _msg ]
+                    });
                 }
-                _write(appendFileSync, null, ts, true, fileName);
             }
+            firstLineDone = true;
         }
+    };
 
-        lastWriteWasBlank = (msg === "");
-        lastWriteToConsoleWasBlank = lastWriteWasBlank;
-        if (!isError) {
-            lastErrorMesage = [];
-            lastWriteWasBlankError = false;
+    const timeTags = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T");
+
+    if (enableOutputWindow && logOutputChannel)
+    {
+        if (!level || level <= logLevel)
+        {
+            const ts = timeTags.join(" ") + " ";
+            _write(logOutputChannel.appendLine, logOutputChannel, ts, false);
         }
     }
+    if (writeToConsole || isError)
+    {
+        if (!level || level <= writeToConsoleLevel || isError)
+        {
+            const ts = !isTests ? timeTags[1] + " " + figures.pointer + " " : "    ";
+            msg = withColor(msg, colors.grey);
+            _write(console.log, console, ts, false);
+            lastWriteToConsoleWasBlank = false;
+        }
+    }
+    if (enableFile)
+    {
+        if (!level || level <= logLevel)
+        {
+            let ts;
+            if (enableFileSymbols) {
+                ts = timeTags[1]  + " " + figures.pointer + " ";
+            }
+            else {
+                ts = timeTags[1]  + " ";
+            }
+            _write(appendFileSync, null, ts, true, fileName);
+        }
+    }
+
+    lastWriteWasBlank = (msg === "");
+    if (!isError) {
+        lastErrorMesage = [];
+        lastWriteWasBlankError = false;
+    }
+
 }

@@ -3,6 +3,7 @@
 /* tslint:disable */
 
 import TaskItem from "../../tree/item";
+import { expect } from "chai";
 import { getPackageManager } from "../../lib/utils/utils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
@@ -17,6 +18,7 @@ let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let packageJsonPath: string;
 let npmTaskItems: TaskItem[];
+let successCount = 0;
 
 
 suite("NPM Tests", () =>
@@ -26,6 +28,7 @@ suite("NPM Tests", () =>
     {
         teApi = await activate(this);
         fsApi = teApi.testsApi.fs;
+        ++successCount;
     });
 
 
@@ -41,17 +44,21 @@ suite("NPM Tests", () =>
                 console.log(error);
             }
         }
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
     });
 
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
+        expect(successCount).to.be.equal(1);
         await focusExplorer(this);
+        ++successCount;
 	});
 
 
     test("Create Package File (package.json)", async function()
     {
+        expect(successCount).to.be.equal(2);
         this.slow(testControl.slowTime.fsCreateEvent);
         //
         // Create NPM package.json
@@ -71,80 +78,100 @@ suite("NPM Tests", () =>
             "}\r\n"
         );
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        ++successCount;
     });
 
 
     test("Verify NPM Task Count", async function()
     {
+        expect(successCount).to.be.equal(3);
         await verifyTaskCount(testsName, 5);
+        ++successCount;
     });
 
 
     test("Get NPM Task Items", async function()
-    {   //
+    {
+        expect(successCount).to.be.equal(4);
+        //
         // Get the explorer tree task items (three less task than above, one of them tree
         // does not display the 'install' task with the other tasks found, and two of them
         // are the 'build' and 'watch' tasks are registered in tasks.json and will show in
         // the tree under the VSCode tasks node, not the npm node)
         //
         npmTaskItems = await treeUtils.getTreeTasks(testsName, 2);
+        ++successCount;
     });
 
 
 
     test("Get Package Manager", function()
     {
+        expect(successCount).to.be.equal(5);
         getPackageManager();
+        ++successCount;
     });
 
 
     test("Document Position", async function()
     {
+        expect(successCount).to.be.equal(6);
         this.slow(testControl.slowTime.commandFast * npmTaskItems.length);
         for (const taskItem of npmTaskItems) {
             await executeTeCommand2("open", [ taskItem ], testControl.waitTime.commandFast);
         }
+        ++successCount;
     });
 
 
     test("Install", async function()
     {
+        expect(successCount).to.be.equal(7);
         this.slow(testControl.slowTime.npmCommand);
         const exec = await executeTeCommand2("runInstall", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
+        ++successCount;
     });
 
 
     test("Update", async function()
     {
+        expect(successCount).to.be.equal(8);
         this.slow(testControl.slowTime.npmCommand);
         const exec = await executeTeCommand2("runUpdate", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
+        ++successCount;
     });
 
 
     test("Update Specified Package", async function()
     {
+        expect(successCount).to.be.equal(9);
         this.slow(testControl.slowTime.npmCommand);
         overrideNextShowInputBox("@spmeesseman/app-publisher");
         const exec = await executeTeCommand2("runUpdatePackage", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
+        ++successCount;
     });
 
 
     test("Audit", async function()
     {
+        expect(successCount).to.be.equal(10);
         this.slow(testControl.slowTime.npmCommand);
         const exec = await executeTeCommand2("runAudit", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
+        ++successCount;
     });
 
 
     test("Audit Fix", async function()
     {
+        expect(successCount).to.be.equal(11);
         this.slow(testControl.slowTime.npmCommand);
         const exec = await executeTeCommand2("runAuditFix", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
+        ++successCount;
     });
 
 });

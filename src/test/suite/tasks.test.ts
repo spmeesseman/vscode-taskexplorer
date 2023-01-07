@@ -6,6 +6,7 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import TaskItem from "../../tree/item";
+import { expect } from "chai";
 import { storage } from "../../lib/utils/storage";
 import constants from "../../lib/constants";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
@@ -13,7 +14,6 @@ import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, focusExplorer,
     treeUtils, overrideNextShowInfoBox, overrideNextShowInputBox, testControl
 } from "../helper";
-import { expect } from "chai";
 
 let lastTask: TaskItem | null = null;
 let teApi: ITaskExplorerApi;

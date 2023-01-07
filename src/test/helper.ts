@@ -388,6 +388,14 @@ export async function sleep(ms: number)
 }
 
 
+export function tagLog(section: string)
+{
+    teApi.log.write("***************************************************************************");
+    teApi.log.write(" " + section);
+    teApi.log.write("***************************************************************************");
+}
+
+
 export async function verifyTaskCount(taskType: string, expectedCount: number)
 {
     let tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });

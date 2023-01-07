@@ -5,6 +5,7 @@ Bugs:
     ✔ Use CRTL+C to kill tasks as opposed to killing the terminal @high @done(21-01-04 12:02)
     ✔ Saving package.json is throwing the 'tree node already exists' error @done(21-03-22 22:24)
     ✔ Swutching away from view while task is running, and switching back after task has ended, view still shows it as running, must refresh @done(20-10-09 02:41)
+    ☐ Damn son of bitch shit hole bug - '..... is already regsutered'
 
 Features:
 
@@ -20,13 +21,16 @@ Features:
         user to auto run that task
 
     ☐ Log Viewer/ Decorator
-
-        ew extension `Log File Collapse`where start and end tags can be used an expanded/collapsedin vsCode editor window
+        an extension `Log File Collapse`where start and end tags can be used an expanded/collapsedin vsCode editor window
 
 General Todos:
 
     ☐ Test visibility change event
         Differences in tray open/closed, switching views, vscode minimized, etc
+
+    ☐ Folder/file create/delete events
+        DOnt process file if folder was just processed, and vice versa
+
 Tests:
 
     ☐ Finish individual task Type suites

@@ -10,9 +10,9 @@ export const testControl =
     logLevel: 2,
     logEnabled: true,
     logToConsole: false,
-    logToFile: true,
+    logToFile: false,
     logToOutput: false,
-    logOpenFileOnFinish: true,
+    logOpenFileOnFinish: true, // not yet
     //
     // These 2 properties are for using update() for coverage, see helper.initSettings
     //
