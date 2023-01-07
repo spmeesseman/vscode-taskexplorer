@@ -672,7 +672,7 @@ suite("Provider Tests", () =>
 
     test("Mimic Add/Remove a Workspace Folder", async function()
     {
-        teApi.testsApi.fileCache.addWsFolders(workspace.workspaceFolders);
+        await teApi.testsApi.fileCache.addWsFolders(workspace.workspaceFolders);
         teApi.testsApi.fileCache.removeWsFolders((workspace.workspaceFolders as WorkspaceFolder[]).filter(f =>  f.index > 0));
     });
 

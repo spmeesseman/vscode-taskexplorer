@@ -27,6 +27,7 @@ import { IExplorerApi, TaskMap } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
 import SpecialTaskFolder from "./specialFolder";
 import { TaskExplorerProvider } from "../providers/provider";
+import { pathExists } from "../lib/utils/fs";
 
 
 /**
@@ -1433,7 +1434,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         ]);
 
         /* istanbul ignore else */
-        if (util.pathExists(uri.fsPath))
+        if (await pathExists(uri.fsPath))
         {
             const document: TextDocument = await workspace.openTextDocument(uri);
             const offset = findDocumentPosition(document, selection);
@@ -2192,11 +2193,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         //
         if (util.isObjectEmpty(this.taskMap) || !this.taskMap[taskId]) {
             /* istanbul ignore if */
-            if (this.taskTree && !this.taskMap[taskId]) {
-                log.error("The task map is empty but the task tree is non-null in the task finished event");
-            }
-            else {
-                log.error("The task map does not contain the task triggering the task finished event");
+            if (this.taskTree && !this.taskMap[taskId] && this.taskTree.length > 0 && this.taskTree[0].contextValue !== "noscripts")
+            {
+                log.error([ `The task map is empty but the task tree is non-null and holds ${this.taskTree.length} folders` ]);
             }
             return;
         }
@@ -2249,11 +2248,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         //
         if (util.isObjectEmpty(this.taskMap) || !this.taskMap[taskId]) {
             /* istanbul ignore if */
-            if (this.taskTree && !this.taskMap[taskId]) {
-                log.error("The task map is empty but the task tree is non-null in the task finished event");
-            }
-            else {
-                log.error("The task map does not contain the task referened in the task finished event");
+            if (this.taskTree && !this.taskMap[taskId] && this.taskTree.length > 0 && this.taskTree[0].contextValue !== "noscripts")
+            {
+                log.error([ `The task map is empty but the task tree is non-null and holds ${this.taskTree.length} folders` ]);
             }
             return;
         }

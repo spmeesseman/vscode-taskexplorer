@@ -37,7 +37,7 @@ suite("Ant Tests", () =>
         rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         buildXmlFile = getWsPath("build.xml");
         buildXmlFileUri = Uri.file(buildXmlFile);
-        buildFileXml = util.readFileSync(buildXmlFileUri.fsPath);
+        buildFileXml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
         await executeSettingsUpdate("useAnt", false);
     });
 
@@ -50,7 +50,7 @@ suite("Ant Tests", () =>
 
     test("Document Position", async function()
     {
-        const xml = util.readFileSync(buildXmlFileUri.fsPath);
+        const xml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");

@@ -266,6 +266,17 @@ export const pathExists = (file: string): Promise<boolean> =>
 };
 
 
+export const pathExistsSync = (file: string) =>
+{
+    try {
+        fs.accessSync(path.resolve(process.cwd(), file));
+    } catch (err) {
+        return false;
+    }
+    return true;
+};
+
+
 export const readFileAsync = (file: string): Promise<string> =>
 {
     return new Promise<string>(async (resolve, reject) =>
@@ -282,6 +293,15 @@ export const readFileAsync = (file: string): Promise<string> =>
         }
         catch (e) { /* istanbul ignore next */ reject(e); }
     });
+};
+
+
+export const readFileSync = (file: string) =>
+{
+    try {
+        return fs.readFileSync(path.resolve(process.cwd(), file)).toString();
+    }
+    catch { /* istanbul ignore next */ return ""; }
 };
 
 

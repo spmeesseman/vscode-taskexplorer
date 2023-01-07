@@ -1,7 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { WorkspaceFolder, Uri, workspace, window } from "vscode";
-import * as fs from "fs";
 import * as minimatch from "minimatch";
 import { configuration } from "./configuration";
 import constants from "../constants";
@@ -9,6 +8,7 @@ import * as path from "path";
 import * as os from "os";
 import * as log from "./log";
 import TaskItem from "../../tree/item";
+import { pathExists, pathExistsSync } from "./fs";
 
 
 /**
@@ -84,79 +84,6 @@ export function getGlobPattern(taskType: string): string
     }
 }
 
-export function getHeaderContent()
-{
-    return `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <!--
-        <meta
-            http-equiv="Content-Security-Policy" content="default-src 'self'; img-src \${webview.cspSource} https:; 
-            script-src \${webview.cspSource} 'self' 'unsafe-inline'; script-src-elem 'self' 'unsafe-inline';
-            style-src \${webview.cspSource}  'unsafe-inline' 'self';"
-        />
-        -->
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Task Explorer</title>
-        <style>
-            button {
-                background-color: var(--vscode-button-background);
-                color: var(--vscode-button-foreground);
-                padding: 8px 12px;
-            }
-            button:hover {
-                background-color: var(--vscode-button-hoverBackground)
-            }
-        </style>
-        <script type="text/javascript">
-            let vscode;
-            function getLicense()
-            {
-                vscode = vscode || acquireVsCodeApi();
-                vscode.postMessage({
-                    command: 'enterLicense',
-                    text: ''
-                });
-            }
-            function viewReport()
-            {
-                vscode = vscode || acquireVsCodeApi();
-                vscode.postMessage({
-                    command: 'viewReport',
-                    text: ''
-                });
-            }
-            // Handle message inside the webview
-            window.addEventListener('message', event => {
-                const message = event.data; // JSON data from tests
-                switch (message.command) {
-                    case 'viewReport':
-                        viewReport();
-                        break;
-                    case 'enterLicense':
-                        getLicense();
-                        break;
-                }
-            });
-        </script>
-    </head>
-    <body style="padding:20px">`;
-}
-
-
-/**
- * Gets the base/root/install path of the extension
- */
-export function getInstallPath()
-{
-    let dir = __dirname;
-    while (dir.length > 3 && !pathExists(path.join(dir, "package.json"))) {
-        dir = path.dirname(dir);
-    }
-    return dir;
-}
-
 
 export function getBodyContent(title: string)
 {
@@ -229,6 +156,80 @@ export function getBodyContent(title: string)
 }
 
 
+export function getHeaderContent()
+{
+    return `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <!--
+        <meta
+            http-equiv="Content-Security-Policy" content="default-src 'self'; img-src \${webview.cspSource} https:; 
+            script-src \${webview.cspSource} 'self' 'unsafe-inline'; script-src-elem 'self' 'unsafe-inline';
+            style-src \${webview.cspSource}  'unsafe-inline' 'self';"
+        />
+        -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Task Explorer</title>
+        <style>
+            button {
+                background-color: var(--vscode-button-background);
+                color: var(--vscode-button-foreground);
+                padding: 8px 12px;
+            }
+            button:hover {
+                background-color: var(--vscode-button-hoverBackground)
+            }
+        </style>
+        <script type="text/javascript">
+            let vscode;
+            function getLicense()
+            {
+                vscode = vscode || acquireVsCodeApi();
+                vscode.postMessage({
+                    command: 'enterLicense',
+                    text: ''
+                });
+            }
+            function viewReport()
+            {
+                vscode = vscode || acquireVsCodeApi();
+                vscode.postMessage({
+                    command: 'viewReport',
+                    text: ''
+                });
+            }
+            // Handle message inside the webview
+            window.addEventListener('message', event => {
+                const message = event.data; // JSON data from tests
+                switch (message.command) {
+                    case 'viewReport':
+                        viewReport();
+                        break;
+                    case 'enterLicense':
+                        getLicense();
+                        break;
+                }
+            });
+        </script>
+    </head>
+    <body style="padding:20px">`;
+}
+
+
+/**
+ * Gets the base/root/install path of the extension
+ */
+export async function getInstallPath()
+{
+    let dir = __dirname;
+    while (dir.length > 3 && !(await pathExists(path.join(dir, "package.json")))) {
+        dir = path.dirname(dir);
+    }
+    return dir;
+}
+
+
 export function getPortableDataPath(padding = "")
 {
     /* istanbul ignore else */
@@ -238,7 +239,7 @@ export function getPortableDataPath(padding = "")
         /* istanbul ignore else */
         if (uri)
         {
-            if (fs.existsSync(uri.fsPath))
+            if (pathExistsSync(uri.fsPath))
             {
                 try {
                     const fullPath = path.join(uri.fsPath, "user-data", "User");
@@ -483,9 +484,6 @@ export function isObject(value: any): value is { [key: string]: any }
 }
 
 
-/**
- * Checks if there are any properties on this object.
- */
 export const isObjectEmpty = (value: any) =>
 {
     if (value)
@@ -511,8 +509,8 @@ export function isSpecial(taskItem: TaskItem)
 {
     return taskItem && taskItem.id &&
            (taskItem.id.includes(constants.LAST_TASKS_LABEL + ":") ||
-           taskItem.id.includes(constants.FAV_TASKS_LABEL + ":") ||
-           taskItem.id.includes(constants.USER_TASKS_LABEL + ":"));
+            taskItem.id.includes(constants.FAV_TASKS_LABEL + ":") ||
+            taskItem.id.includes(constants.USER_TASKS_LABEL + ":"));
 }
 
 
@@ -581,17 +579,6 @@ export function lowerCaseFirstChar(s: string, removeSpaces: boolean)
 }
 
 
-export function pathExists(pathToCheck: string)
-{
-    try {
-        fs.accessSync(path.resolve(process.cwd(), pathToCheck));
-    } catch (err) {
-        return false;
-    }
-    return true;
-}
-
-
 export function pushIfNotExists(arr: any[], item: any)
 {
     if (!arr.includes(item)) { arr.push(item); }
@@ -604,13 +591,6 @@ export function properCase(name: string | undefined, removeSpaces?: boolean)
       return "";
     }
     return name.replace(/(?:^\w|[A-Z]|\b\w)/g, (ltr) => ltr.toUpperCase()).replace(!removeSpaces ? /[ ]+/g : / /g, " ");
-}
-
-
-export function readFileSync(file: string)
-{
-    const buf = fs.readFileSync(path.resolve(process.cwd(), file));
-    return buf.toString();
 }
 
 

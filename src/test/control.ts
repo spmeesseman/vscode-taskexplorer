@@ -7,7 +7,7 @@ export const testControl =
     //
     // LOGGING DEFAULTS
     //
-    logLevel: 1,
+    logLevel: 2,
     logEnabled: true,
     logToConsole: false,
     logToFile: true,
@@ -17,7 +17,7 @@ export const testControl =
     // These 2 properties are for using update() for coverage, see helper.initSettings
     //
     userLogLevel: 1,
-    userPathToAnt: "ant.bat",
+    userPathToAnt: "c:\\Code\\ant\\bin\\ant.bat",
     //
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)s
     //

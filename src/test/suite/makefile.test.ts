@@ -10,7 +10,6 @@ import * as path from "path";
 import { activate, getWsPath } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MakeTaskProvider } from "../../providers/make";
-import { readFileSync } from "../../lib/utils/utils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 
 
@@ -35,7 +34,7 @@ suite("Makefile Tests", () =>
         provider.getDocumentPosition("test", undefined);
         assert(index === 0, `test task position should be 0 (actual ${index}`);
         provider.getDocumentPosition(undefined, "test");
-        const makefileContent = readFileSync(getWsPath("make\\makefile"));
+        const makefileContent = teApi.testsApi.fs.readFileSync(getWsPath("make\\makefile"));
         index = provider.getDocumentPosition("rule1", makefileContent);
         assert(index === 273, `rule1 task position should be 273 (actual ${index}`);
         index = provider.getDocumentPosition("rule2", makefileContent);

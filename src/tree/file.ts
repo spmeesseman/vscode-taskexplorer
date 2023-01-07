@@ -6,6 +6,7 @@ import * as util from "../lib/utils/utils";
 import TaskItem from "./item";
 import TaskFolder  from "./folder";
 import { TaskExplorerDefinition } from "../interface";
+import { pathExistsSync } from "../lib/utils/fs";
 
 
 /**
@@ -184,14 +185,14 @@ export default class TaskFile extends TreeItem
         /* istanbul ignore else */
         if (!taskDef.icon)
         {
-            if (util.pathExists(context.asAbsolutePath(path.join("res", "sources", src + ".svg"))))
+            if (pathExistsSync(context.asAbsolutePath(path.join("res", "sources", src + ".svg"))))
             {
                 iconLight = context.asAbsolutePath(path.join("res", "sources", src + ".svg"));
                 iconDark = context.asAbsolutePath(path.join("res", "sources", src + ".svg"));
                 this.iconPath = { light: iconLight, dark: iconDark };
             }
-            else if (util.pathExists(context.asAbsolutePath(path.join("res", "light", src + ".svg"))) &&
-                    util.pathExists(context.asAbsolutePath(path.join("res", "dark", src + ".svg"))))
+            else if (pathExistsSync(context.asAbsolutePath(path.join("res", "light", src + ".svg"))) &&
+                     pathExistsSync(context.asAbsolutePath(path.join("res", "dark", src + ".svg"))))
             {
                 iconLight = context.asAbsolutePath(path.join("res", "light", src + ".svg"));
                 iconDark = context.asAbsolutePath(path.join("res", "dark", src + ".svg"));
@@ -201,10 +202,10 @@ export default class TaskFile extends TreeItem
             log.value("      light", iconLight, 4, logPad);
             log.value("      dark", iconDark, 4, logPad);
         }
-        else if (util.pathExists(taskDef.icon) && path.extname(taskDef.icon) === ".svg")
+        else if (pathExistsSync(taskDef.icon) && path.extname(taskDef.icon) === ".svg")
         {
             iconLight = taskDef.icon;
-            iconDark = taskDef.iconDark && util.pathExists(taskDef.iconDark) && path.extname(taskDef.iconDark) === ".svg" ?
+            iconDark = taskDef.iconDark && pathExistsSync(taskDef.iconDark) && path.extname(taskDef.iconDark) === ".svg" ?
                         taskDef.iconDark : taskDef.icon;
             this.iconPath = { light: iconLight, dark: iconDark };
             log.write(`   custom icons read for task source '${source}'`, 4, logPad);
