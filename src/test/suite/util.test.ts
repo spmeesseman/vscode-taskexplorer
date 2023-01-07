@@ -6,11 +6,14 @@ import * as assert from "assert";
 import * as log from "../../lib/utils/log";
 import * as util from "../../lib/utils/utils";
 import { workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, overrideNextShowInputBox, testControl } from "../helper";
 import { storage } from "../../lib/utils/storage";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import * as afs from "../../lib/utils/fs";
 import { join } from "path";
+import {
+	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
+	logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs
+} from "../helper";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
@@ -83,22 +86,29 @@ suite("Util Tests", () =>
 		log.error("Test5 error");
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
-		log.error([ "Test error 2",  new Error("Test error object") ]);
-		log.error([ "Test error 3", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
+		log.error([ "Test error 3", null, "Test error 4", "" ]);
+		log.error([ "", "Test error 5", null, "Test error 6", "" ]);
+		log.error([ "Test error 7", "", "Test error 8", "" ]);
+		log.error([ "Test error 9",  new Error("Test error object 10") ]);
+		log.error([ "Test error 11", "Test error 12" ], [[ "Test param error 13", "Test param value 14" ]]);
 		log.error(true);
 		log.error(undefined);
 		log.error({
 			status: false,
-			message: "Test error 4"
+			message: "Test error 15"
 		});
 		log.error({
 			status: false,
-			message: "Test error 5",
-			messageX: "Test error 5X"
+			message: "Test error 16",
+			messageX: "Test error 16 X"
 		});
 		log.error({
 			status: false
 		});
+		log.error({
+			status: false
+		});
+		logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(true);
 
 		// Disabled logging
 		await executeSettingsUpdate("logging.enable", false);
@@ -359,6 +369,9 @@ suite("Util Tests", () =>
 			await afs.numFilesInDirectory(join(rootPath, "tasks_test_"));
 		}
 		catch {}
+		await afs.getDateModified(join(__dirname, "folder1", "folder2", "folder3"));
+		await afs.getDateModified(join(__dirname, "hello.sh"));
+		await afs.getDateModified(__dirname);
 	});
 
 

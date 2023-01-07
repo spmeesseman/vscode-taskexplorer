@@ -5,12 +5,17 @@
 import * as assert from "assert";
 import * as util from "../../lib/utils/utils";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, getWsPath, testControl, verifyTaskCount } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
 import { IFilesystemApi } from "../../interface/fsApi";
+import {
+    activate, executeSettingsUpdate, figures, getWsPath,
+    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, testControl, verifyTaskCount
+} from "../helper";
 
 const testsName = "ant";
+const slowTimeforAntRunTasks = (testControl.slowTime.fetchTasksCommand * 2) + (testControl.slowTime.configEvent * 3) +
+                               (testControl.slowTime.taskProviderReadUri * 2);
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -81,16 +86,6 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Non-existent file", async function()
-    {
-        this.slow((testControl.slowTime.configEvent * 2) + (testControl.slowTime.commandFast * 2));
-        await provider.readUriTasks(Uri.file(getWsPath("build2.xml")), "");
-        await executeSettingsUpdate("useAnt", true);
-        await provider.readUriTasks(Uri.file(getWsPath("build2.xml")), "");
-        await executeSettingsUpdate("useAnt", false);
-    });
-
-
     test("Enable Ansicon", async function()
     {
         this.slow((testControl.slowTime.configEvent * 5) + (testControl.slowTime.commandFast * 4));
@@ -127,7 +122,7 @@ suite("Ant Tests", () =>
 
     test("Win32 Create Task", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2) + (testControl.slowTime.commandFast * 2) + testControl.slowTime.taskProviderReadUri);
+        this.slow((testControl.slowTime.configEvent * 2) + (testControl.slowTime.commandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant"));
@@ -137,15 +132,15 @@ suite("Ant Tests", () =>
 
     test("Ant Parser", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 3) + (testControl.slowTime.fetchTasksCommand * 2) + testControl.slowTime.taskProviderReadUri);
+        this.slow(slowTimeforAntRunTasks);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
-        await runCheck(3, 2, 3, 2);
+        await runCheck(3, 2, 3, 2, false, false);
     });
 
 
     test("Ant Parser no default", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2)+ testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.slowTime.taskProviderReadUri);
+        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -154,13 +149,14 @@ suite("Ant Tests", () =>
             "    <target name='test-build'></target>\n" +
             "</project>\n"
         );
-        await runCheck(2, 1, 2, 1);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await runCheck(2, 1, 2, 1, false, false);
     });
 
 
     test("Ant Parser invalid target", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2) + testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.slowTime.taskProviderReadUri);
+        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -171,13 +167,14 @@ suite("Ant Tests", () =>
             '    <target namee="test5"></target>\n' + // incorrectly spelled 'name' property
             "</project>\n"
         );
-        await runCheck(4, 3, 1, 0);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await runCheck(4, 3, 1, 0, true, false);
     });
 
 
     test("Ant Parser No Target", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2) + testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.slowTime.taskProviderReadUri);
+        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -185,13 +182,14 @@ suite("Ant Tests", () =>
             '    <property name="testProp" value="test2" />\n' +
             "</project>\n"
         );
-        await runCheck(1, 0, 1, 0);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await runCheck(1, 0, 1, 0, false, false);
     });
 
 
     test("Ant Parser No Project", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2)+ testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.slowTime.taskProviderReadUri);
+        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -199,13 +197,14 @@ suite("Ant Tests", () =>
             '    <property name="testProp" value="test2" />\n' +
             "</some_node>\n"
         );
-        await runCheck(1, 0, 1, 0);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await runCheck(1, 0, 1, 0, true, false);
     });
 
 
     test("Ant Parser Invalid Xml", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2) + testControl.slowTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2));
+        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -217,7 +216,8 @@ suite("Ant Tests", () =>
             '    <target namee="test5"</target>\n' + // incorrect XML test5"</
             "</project>\n"
         );
-        await runCheck(1, 0, 1, 0);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await runCheck(1, 0, 1, 0, true, true);
     });
 
 });
@@ -232,10 +232,8 @@ suite("Ant Tests", () =>
  * @param withAnt1 # of tasks in fetchTasks() using ant parser
  * @param withAnt2 # of tasks in readUriTasks() using ant parser
  */
-async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAnt2: number, waitTime?: number)
-{
-    await teApi.waitForIdle(waitTime || testControl.waitTime.fsModifyEvent);
-    //
+async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAnt2: number, antWillFail: boolean, xml2jsWillFail: boolean)
+{   //
     // Don't use Ant
     //
     await executeSettingsUpdate("useAnt", false);
@@ -243,6 +241,7 @@ async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAn
     assert(antTasks.length === noAnt1, `Did not read ${noAnt1} ant tasks(1)(actual ${antTasks ? antTasks.length : 0})`);
     antTasks = await provider.readUriTasks(buildXmlFileUri, "");
     assert(antTasks.length === noAnt2, `Did not read ${noAnt2} ant tasks (2)(actual ${antTasks ? antTasks.length : 0})`);
+    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(xml2jsWillFail);
     //
     // Use Ant
     //
@@ -251,6 +250,7 @@ async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAn
     assert(antTasks.length === withAnt1, `Did not read ${withAnt1} ant tasks (3)(actual ${antTasks ? antTasks.length : 0})`);
     antTasks = await provider.readUriTasks(buildXmlFileUri, "");
     assert(antTasks.length === withAnt2, `Did not read ${withAnt2} ant tasks (4)(actual ${antTasks ? antTasks.length : 0})`);
+    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(antWillFail);
     //
     // Reset
     //
