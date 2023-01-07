@@ -72,27 +72,22 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 {
     const teApi = getTeApi();
     const taskItems: TaskItem[] = [];
-    //
-    // Get the task mapped tree items
-    //
     let taskMap = teApi.testsApi.explorer.getTaskMap();
-    if (!taskMap || isObjectEmpty(taskMap)) {
+    if (!taskMap || isObjectEmpty(taskMap))
+    {
         console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, fall back to walkTreeItems", figures.colors.grey)}`);
         taskMap = await walkTreeItems(undefined);
         if (!taskMap || isObjectEmpty(taskMap)) {
             console.log(`    ${figures.color.error} ${figures.withColor("Task map is empty, test will fail in 3, 2, 1...", figures.colors.grey)}`);
         }
     }
-    //
-    // Make sure the tasks have been mapped in the explorer tree
-    //
     const taskCount = taskMap ? findIdInTaskMap(`:${taskType}:`, taskMap) : 0;
-    if (taskCount !== expectedCount) {
+    if (taskCount !== expectedCount)
+    {
+        console.log(`    ${figures.color.error} ${figures.withColor("Task map is empty, test will fail in 3, 2, 1...", figures.colors.grey)}`);
+        console.log(figures.withColor("    TaskMap files:\n    " + Object.keys(taskMap).join("\n       "), figures.colors.grey));
         assert.fail(`${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
     }
-    //
-    // Get the NPM tasks from the tree mappings
-    //
     Object.values(taskMap).forEach((taskItem) =>
     {
         if (taskItem && taskItem.taskSource === taskType) {
