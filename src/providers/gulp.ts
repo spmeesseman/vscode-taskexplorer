@@ -7,6 +7,7 @@ import { execSync } from "child_process";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
+import { readFileAsync } from "../lib/utils/fs";
 
 
 export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -44,7 +45,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    private findTargets(fsPath: string, logPad: string): string[]
+    private async findTargets(fsPath: string, logPad: string)
     {
         let scripts: string[] = [];
 
@@ -127,7 +128,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             }
         }
         else {
-            scripts = this.parseGulpTasks(fsPath, logPad + "   ");
+            scripts = await this.parseGulpTasks(fsPath, logPad + "   ");
         }
 
         log.methodDone("find gulp targets", 2, logPad, false, undefined, this.logQueueId);
@@ -149,10 +150,10 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    private parseGulpTasks(fsPath: string, logPad: string): string[]
+    private async parseGulpTasks(fsPath: string, logPad: string)
     {
         const scripts: string[] = [];
-        const contents = util.readFileSync(fsPath);
+        const contents = await readFileAsync(fsPath);
         let idx = 0;
         let eol = contents.indexOf("\n", 0);
 
@@ -277,7 +278,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
 
         log.methodStart("read gulp file uri tasks", 1, logPad, false, [[ "path", uri.fsPath ], [ "project folder", folder.name ]], this.logQueueId);
 
-        const scripts = this.findTargets(uri.fsPath, logPad + "   ");
+        const scripts = await this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
         {
             const task = this.createTask(s, s, folder, uri);

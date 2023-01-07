@@ -7,7 +7,7 @@ import { getTaskFiles, removeFileFromCache } from "../cache";
 import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { getLicenseManager } from "../extension";
-import { isDirectory } from "../lib/utils/fs";
+import { isDirectory, pathExistsSync } from "../lib/utils/fs";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
@@ -102,7 +102,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
         {
             for (const fObj of paths.values())
             {
-                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.includes(fObj.uri.fsPath) && util.pathExists(fObj.uri.fsPath))
+                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.includes(fObj.uri.fsPath) && pathExistsSync(fObj.uri.fsPath))
                 {
                     visitedFiles.push(fObj.uri.fsPath);
                     const tasks = (await this.readUriTasks(fObj.uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
@@ -132,7 +132,6 @@ export abstract class TaskExplorerProvider implements TaskProvider
         // Note that 'taskType' may be different than 'this.providerName' for 'script' type tasks (e.g.
         // batch, bash, python, etc...)
         //
-
         log.methodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, false,
             [[ "uri", uri?.path ], [ "has cached tasks", !!this.cachedTasks ],
             [ "current # of cached tasks", this.cachedTasks ? this.cachedTasks.length : 0 ]
@@ -149,7 +148,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             const enabled = util.isTaskTypeEnabled(this.providerName);
             if (enabled && uri)
             {
-                const pathExists = util.pathExists(uri.fsPath);
+                const pathExists = pathExistsSync(uri.fsPath);
                 //
                 // Remove tasks of type '' from the 'tasks'array
                 //
@@ -182,7 +181,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                     this.cachedTasks?.push(...tasks);
                 }
                 else if (!pathExists) {
-                    await removeFileFromCache(this.providerName, uri, "   ");
+                    removeFileFromCache(this.providerName, uri, "   ");
                 }
 
                 this.cachedTasks = this.cachedTasks && this.cachedTasks.length > 0 ? this.cachedTasks : undefined;
@@ -204,8 +203,8 @@ export abstract class TaskExplorerProvider implements TaskProvider
     {
         const cstDef = item.definition;
         return (cstDef.uri &&
-               (cstDef.uri.fsPath === uri.fsPath || !util.pathExists(cstDef.uri.fsPath) ||
-               (cstDef.uri.fsPath.startsWith(uri.fsPath) /* instanbul ignore next */&& isDirectory(uri.fsPath)))) ||
+               (cstDef.uri.fsPath === uri.fsPath || !pathExistsSync(cstDef.uri.fsPath)) ||
+               (cstDef.uri.fsPath.startsWith(uri.fsPath) /* instanbul ignore next */&& isDirectory(uri.fsPath))) ||
                (cstDef.uri.path && !isTaskIncluded(item, cstDef.uri.path));
     }
 

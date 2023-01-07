@@ -1,5 +1,4 @@
 
-import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace } from "vscode";
 import * as path from "path";
 import * as util from "../lib/utils/utils";
 import * as log from "../lib/utils/log";
@@ -9,6 +8,8 @@ import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import constants from "../lib/constants";
+import { pathExistsSync, readFileAsync } from "../lib/utils/fs";
+import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace } from "vscode";
 
 
 interface StringMap { [s: string]: string }
@@ -34,7 +35,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         {
             let ansicon = "ansicon.exe";
             const ansiPath: string = configuration.get("pathToPrograms.ansicon");
-            if (ansiPath && util.pathExists(ansiPath))
+            if (ansiPath && pathExistsSync(ansiPath))
             {
                 ansicon = ansiPath;
                 if (!ansicon.endsWith("ansicon.exe") && !ansicon.endsWith("\\")) {
@@ -193,7 +194,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     {
         log.methodStart("find tasks with xml2js", 2, logPad, false, [[ "path", path ]], this.logQueueId);
 
-        const buffer = util.readFileSync(path);
+        const buffer = await readFileAsync(path);
         //
         // Convert to JSON with Xml2Js parseString()
         //

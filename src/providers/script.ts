@@ -8,6 +8,7 @@ import { getTaskFiles } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
+import { pathExistsSync, readFileSync } from "../lib/utils/fs";
 
 
 /**
@@ -133,7 +134,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
                     bash = "C:\\Program Files\\Git\\bin\\bash.exe";
                 }
                 /* istanbul ignore else */
-                if (!util.pathExists(bash)) {
+                if (!pathExistsSync(bash)) {
                     bash = "bash.exe";
                 }
                 options.executable = bash;
@@ -234,7 +235,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         //
         if (scriptDef.type === "batch")
         {
-            const contents = util.readFileSync(uri.fsPath);
+            const contents = readFileSync(uri.fsPath);
             def.takesArgs = (new RegExp("%[1-9]")).test(contents);
         }
 

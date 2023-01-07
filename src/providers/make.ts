@@ -8,6 +8,7 @@ import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import {
     Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions, extensions
 } from "vscode";
+import { readFileAsync } from "../lib/utils/fs";
 
 
 export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -109,12 +110,12 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    private findTargets(fsPath: string, logPad: string): string[]
+    private async findTargets(fsPath: string, logPad: string)
     {
         const scripts: string[] = [];
         log.methodStart("find makefile targets", 2, logPad, false, [[ "path", fsPath ]], this.logQueueId);
 
-        const contents = util.readFileSync(fsPath);
+        const contents = await readFileAsync(fsPath);
         let match;
         while (match = this.ruleTargetExp.exec(contents))
         {
@@ -184,7 +185,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         log.methodStart("read make file uri tasks", 1, logPad, false, [
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
-        const scripts = this.findTargets(uri.fsPath, logPad + "   ");
+        const scripts = await this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
         {
             const task = this.createTask(s, s, folder, uri, undefined, logPad);

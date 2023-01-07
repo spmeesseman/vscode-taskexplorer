@@ -1,12 +1,13 @@
 
-import * as path from "path";
 import * as util from "../lib/utils/utils";
 import * as log from "../lib/utils/log";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
-import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 import { parseStringPromise } from "xml2js";
+import { readFileAsync } from "../lib/utils/fs";
+import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
+import { basename, dirname } from "path";
 
 
 export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -29,7 +30,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
             type: "maven",
             script: target,
             target,
-            fileName: path.basename(uri.fsPath),
+            fileName: basename(uri.fsPath),
             path: util.getRelativePath(folder, uri),
             cmdLine: "mvn",
             takesArgs: false,
@@ -59,7 +60,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
 
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
-        const cwd = path.dirname(uri.fsPath),
+        const cwd = dirname(uri.fsPath),
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
               defaultDef = this.getDefaultDefinition(undefined, folder, uri),
               options: ShellExecutionOptions = { cwd };
@@ -72,7 +73,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
         // Validate XML with xml2js
         //
         try {
-            const buffer = util.readFileSync(uri.fsPath);
+            const buffer = await readFileAsync(uri.fsPath);
             await parseStringPromise(buffer);
         }
         catch (e: any) {

@@ -930,32 +930,32 @@
                 },
                 {
                     "command": "taskExplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == script",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFile",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunning",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptS",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFileS",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunningS",
+                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
@@ -1342,32 +1342,32 @@
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == script",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptS",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskExplorerSideBar.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {

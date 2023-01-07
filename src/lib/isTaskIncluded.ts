@@ -49,16 +49,6 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
         return false;
     }
 
-    if (isScopeWsFolder)
-    {
-        if (util.isExcluded(path.join(task.scope.uri.path, relativePath)))
-        {
-            log.write("   skipping this task (by 'exclude' setting)", 3, logPad);
-            log.methodDone("Check task inclusion", 3, logPad);
-            return false;
-        }
-    }
-
     //
     // Check task excludes array
     //

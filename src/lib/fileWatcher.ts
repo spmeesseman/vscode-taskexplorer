@@ -11,6 +11,7 @@ import { ITaskExplorerApi } from "../interface";
 
 let teApi: ITaskExplorerApi;
 let processingFsEvent = false;
+const eventQueue: any[] = [];
 const watchers: Map<string, FileSystemWatcher> = new Map();
 const watcherDisposables: Map<string, Disposable> = new Map();
 let workspaceWatcher: Disposable | undefined;
@@ -19,13 +20,6 @@ const dirWatcher: {
     onDidCreate?: Disposable;
     onDidDelete?: Disposable;
 } = {};
-// let createDeleteFileTimerId: NodeJS.Timeout | undefined;
-let createTaskTimerId: NodeJS.Timeout | undefined;
-let deleteTaskTimerId: NodeJS.Timeout | undefined;
-// let pendingCreateFiles: { taskType: string; uri: Uri }[] = [];
-// let pendingDeleteFiles: { taskType: string; uri: Uri }[] = [];
-let pendingCreateFolders: Uri[] = [];
-let pendingDeleteFolders: Uri[] = [];
 
 
 export function disposeFileWatchers()
@@ -77,7 +71,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
             await cache.buildCache(taskType, fileBlob, undefined, true, "   ");
         }
         else {
-            await cache.removeTaskTypeFromCache(taskType, logPad + "   ");
+            cache.removeTaskTypeFromCache(taskType, logPad + "   ");
         }
     }
 
@@ -105,14 +99,12 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
             {
                 if (!util.isExcluded(uri.fsPath))
                 {
-                    processingFsEvent = true;
-                    try
-                    {   log.methodStart("file 'change' event", 1, "", true, [[ "file", uri.fsPath ]]);
-                        await refreshTree(teApi, taskType, uri, "   ");
-                        log.methodDone("file 'change' event", 1);
+                    if (!processingFsEvent) {
+                        await _procFileChangeEvent(taskType, uri);
                     }
-                    catch (e) {}
-                    finally { processingFsEvent = false; }
+                    else {
+                        eventQueue.push({ fn: _procFileChangeEvent, args: [ taskType, uri, "   " ], event: "modify file" });
+                    }
                 }
             }));
         }
@@ -121,20 +113,12 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
         {
             if (!util.isExcluded(uri.fsPath))
             {
-                processingFsEvent = true;
-                try
-                {   log.methodStart("file 'delete' event", 1, "", true, [[ "file", uri.fsPath ]]);
-                    await cache.removeFileFromCache(taskType, uri, "   ");
-                    await refreshTree(teApi, taskType, uri, "   ");
-                    // if (createDeleteFileTimerId) {
-                    //     clearTimeout(createDeleteFileTimerId);
-                    // }
-                    // pendingDeleteFiles.push({ taskType, uri });
-                    // createDeleteFileTimerId = setTimeout(async () => { await processCreateDeleteFiles(); }, 50, uri);
-                    log.methodDone("file 'delete' event", 1);
+                if (!processingFsEvent) {
+                    await _procFileDeleteEvent(taskType, uri);
                 }
-                catch (e) {}
-                finally { processingFsEvent = false; }
+                else {
+                    eventQueue.push({ fn: _procFileDeleteEvent, args: [ taskType, uri, "   " ], event: "delete file" });
+                }
             }
         }));
 
@@ -142,20 +126,12 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
         {
             if (!util.isExcluded(uri.fsPath))
             {
-                processingFsEvent = true;
-                try
-                {   log.methodStart("file 'create' event", 1, "", true, [[ "file", uri.fsPath ]]);
-                    await cache.addFileToCache(taskType, uri, "   ");
-                    await refreshTree(teApi, taskType, uri, "   ");
-                    // if (createDeleteFileTimerId) {
-                    //     clearTimeout(createDeleteFileTimerId);
-                    // }
-                    // pendingCreateFiles.push({ taskType, uri });
-                    // createDeleteFileTimerId = setTimeout(async () => { await processCreateDeleteFiles(); }, 50, uri);
-                    log.methodDone("file 'create' event", 1);
+                if (!processingFsEvent) {
+                    await _procFileCreateEvent(taskType, uri);
                 }
-                catch (e) {}
-                finally { processingFsEvent = false; }
+                else {
+                    eventQueue.push({ fn: _procFileCreateEvent, args: [ taskType, uri, "   " ], event: "create file" });
+                }
             }
         }));
     }
@@ -163,6 +139,75 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
     log.methodDone("Register file watcher for task type '" + taskType + "'", 1, logPad);
 }
 
+
+const _procDirCreateEvent = async(uri: Uri, logPad = "") =>
+{
+    processingFsEvent = true;
+    log.value("   dir", uri.fsPath, 1, "");
+    try
+    {   log.methodStart("directory 'create' event", 1, "", true, [[ "dir", uri.fsPath ]]);
+        await cache.addFolderToCache(uri, "   ");
+        await refreshTree(teApi, undefined, uri);
+        log.methodDone("directory 'create' event", 1, "");
+    }
+    catch (e) {}
+    finally { processingFsEvent = false; await processQueue(); }
+};
+
+
+const _procDirDeleteEvent = async(uri: Uri, logPad = "") =>
+{
+    processingFsEvent = true;
+    try
+    {   log.methodStart("directory 'delete' event", 1, "", true, [[ "dir", uri.fsPath ]]);
+        cache.removeFolderFromCache(uri, "   ");
+        await refreshTree(teApi, undefined, uri);
+        log.methodDone("directory 'delete' delete", 1, "");
+    }
+    catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'change' event error", e ]); }
+    finally { processingFsEvent = false; await processQueue(); }
+};
+
+
+const _procFileChangeEvent = async(taskType: string, uri: Uri, logPad = "") =>
+{
+    processingFsEvent = true;
+    try
+    {   log.methodStart("file 'change' event", 1, "", true, [[ "file", uri.fsPath ]]);
+        await refreshTree(teApi, taskType, uri, "   ");
+        log.methodDone("file 'change' event", 1);
+    }
+    catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'change' event error", e ]); }
+    finally { processingFsEvent = false; await processQueue(); }
+};
+
+
+const _procFileCreateEvent = async(taskType: string, uri: Uri, logPad = "") =>
+{
+    processingFsEvent = true;
+    try
+    {   log.methodStart("file 'create' event", 1, "", true, [[ "file", uri.fsPath ]]);
+        cache.addFileToCache(taskType, uri, "   ");
+        await refreshTree(teApi, taskType, uri, "   ");
+        log.methodDone("file 'create' event", 1);
+    }
+    catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'create' event error", e ]); }
+    finally { processingFsEvent = false; await processQueue(); }
+};
+
+
+const _procFileDeleteEvent = async(taskType: string, uri: Uri, logPad = "") =>
+{
+    processingFsEvent = true;
+    try
+    {   log.methodStart("file 'delete' event", 1, "", true, [[ "file", uri.fsPath ]]);
+        cache.removeFileFromCache(taskType, uri, "   ");
+        await refreshTree(teApi, taskType, uri, "   ");
+        log.methodDone("file 'delete' event", 1);
+    }
+    catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'delete' event error", e ]); }
+    finally { processingFsEvent = false; await processQueue(); }
+};
 
 
 function createDirWatcher(context: ExtensionContext)
@@ -214,7 +259,7 @@ function createWorkspaceWatcher(context: ExtensionContext)
     {   /* istanbul ignore next */
         await cache.addWsFolders(_e.added);
         /* istanbul ignore next */
-        await cache.removeWsFolders(_e.removed);
+        cache.removeWsFolders(_e.removed);
         /* istanbul ignore next */
         createDirWatcher(context);
         /* istanbul ignore next */
@@ -248,11 +293,12 @@ async function onDirCreate(uri: Uri)
             const wsf = workspace.getWorkspaceFolder(uri);
             if (!wsf || wsf.uri.fsPath !== uri.fsPath)
             {
-                if (createTaskTimerId) {
-                    clearTimeout(createTaskTimerId);
+                if (processingFsEvent) {
+                    eventQueue.push({ fn: _procDirCreateEvent, args: [ uri, "   " ] });
                 }
-                pendingCreateFolders.push(uri);
-                createTaskTimerId = setTimeout(async () => processDirCreated(), 50, uri);
+                else {
+                    await _procDirCreateEvent(uri);
+                }
             }
         }
     }
@@ -264,87 +310,26 @@ async function onDirDelete(uri: Uri)
     if (!extname(uri.fsPath) && !util.isExcluded(uri.fsPath)) // ouch
     // if (isDirectory(uri.fsPath)) // it's gone, so we can't lstat it
     {
-        processingFsEvent = true;
-        try
-        {   const wsf = workspace.getWorkspaceFolder(uri);
-            if (wsf && wsf.uri.fsPath !== uri.fsPath)
-            {
-                if (createTaskTimerId) {
-                    clearTimeout(createTaskTimerId);
-                    createTaskTimerId = setTimeout(async () => processDirCreated(), 50, uri);
-                }
-                if (deleteTaskTimerId) {
-                    clearTimeout(deleteTaskTimerId);
-                }
-                pendingDeleteFolders.push(uri);
-                deleteTaskTimerId = setTimeout(async () =>
-                {
-                    log.methodStart("dirwatcher delete", 1, "", true, [[ "dir", uri.fsPath ]]);
-                    const wfs: WorkspaceFolder[] = [];
-                    for (const u of pendingDeleteFolders)
-                    {
-                        const wf = workspace.getWorkspaceFolder(u) as WorkspaceFolder;
-                        if (!wfs.find(w => w.uri.fsPath === u.fsPath)) {
-                            wfs.push(wf);
-                        }
-                        await cache.removeFolderFromCache(u, "   ");
-                    }
-                    if (wfs.length === 1) {
-                        await refreshTree(teApi, undefined, pendingDeleteFolders.length > 1 ? wfs[0].uri : uri);
-                    }
-                    else {
-                        await refreshTree(teApi, undefined, undefined);
-                    }
-                    pendingDeleteFolders = [];
-                    deleteTaskTimerId = undefined;
-                    log.methodDone("dirwatcher delete", 1, "");
-                }, 20);
-            }
-        }
-        catch (e) {}
-        finally { processingFsEvent = false; }
-    }
-}
-
-
-async function processDirCreated()
-{
-    if (pendingCreateFolders.length > 0)
-    {
-        log.methodStart("dirwatcher create", 1, "", true, [[ "dir count", pendingCreateFolders.length ]]);
-        for (const processingDirUri of pendingCreateFolders)
+        const wsf = workspace.getWorkspaceFolder(uri);
+        if (wsf && wsf.uri.fsPath !== uri.fsPath)
         {
-            log.value("   dir", processingDirUri.fsPath, 1, "");
-            processingFsEvent = true;
-            try
-            {   await cache.addFolderToCache(processingDirUri, "   ");
-                await refreshTree(teApi, undefined, processingDirUri);
+            if (processingFsEvent) {
+                eventQueue.push({ fn: _procDirDeleteEvent, args: [ uri, "   " ] });
             }
-            catch (e) {}
-            finally {
-                processingFsEvent = false;
+            else {
+                await _procDirDeleteEvent(uri);
             }
         }
-        pendingCreateFolders = [];
-        createTaskTimerId = undefined;
-        log.methodDone("dirwatcher create", 1, "");
     }
 }
 
-/*
-async function processCreateDeleteFiles()
+
+const processQueue = async () =>
 {
-    const taskTypes: string[] = [];
-    pendingCreateFiles.forEach(async (f) =>
-    {
-        util.pushIfNotExists(taskTypes, f.taskType);
-        await cache.addFileToCache(f.taskType, f.uri, "   ");
-    });
-    for (const taskType of taskTypes) {
-        await refreshTree(teApi, taskType, uri, "   ");
+    if (eventQueue.length > 0) {
+        const next = eventQueue.shift();
+        log.methodStart("file watcher event queue", 1, "", true, [[ "event", next.event ], [ "path", next.uri.fsPath ]]);
+        await next.fn(...next.args);
+        log.methodDone("file watcher event queue", 1, "");
     }
-    pendingCreateFiles = [];
-    pendingDeleteFiles = [];
-    processingFsEvent = false;
-}
-*/
+};

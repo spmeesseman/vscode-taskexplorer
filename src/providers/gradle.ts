@@ -6,6 +6,7 @@ import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
+import { readFileAsync } from "../lib/utils/fs";
 
 
 export class GradleTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -40,13 +41,13 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    private findTargets(fsPath: string, logPad: string): string[]
+    private async findTargets(fsPath: string, logPad: string)
     {
         const scripts: string[] = [];
 
         log.methodStart("find gradle targets", 2, logPad, false, [[ "path", fsPath ]], this.logQueueId);
 
-        const contents = util.readFileSync(fsPath);
+        const contents = await readFileAsync(fsPath);
         let idx = 0;
         let eol = contents.indexOf("\n", 0);
 
@@ -118,7 +119,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
 
-        const scripts = this.findTargets(uri.fsPath, logPad + "   ");
+        const scripts = await this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
         {
             const task = this.createTask(s, s, folder, uri);

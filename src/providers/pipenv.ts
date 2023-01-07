@@ -1,12 +1,13 @@
 
 import * as bombadil from "@sgarciac/bombadil";
 import * as log from "../lib/utils/log";
-import * as path from "path";
 import * as util from "../lib/utils/utils";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { configuration } from "../lib/utils/configuration";
+import { readFileAsync } from "../lib/utils/fs";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
+import { basename, dirname } from "path";
 
 
 /**
@@ -32,7 +33,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
         }
 
         const def = this.getDefaultDefinition(target, folder, uri);
-        const cwd = path.dirname(uri.fsPath);
+        const cwd = dirname(uri.fsPath);
         const args = [ "run", target ];
         /* istanbul ignore else */
         if (pythonPath) {
@@ -46,13 +47,13 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    private findTargets(fsPath: string, logPad: string): string[]
+    private async findTargets(fsPath: string, logPad: string)
     {
         const scripts: string[] = [];
 
         log.methodStart("find pipenv Pipfile targets", 2, logPad, false, [[ "path", fsPath ]], this.logQueueId);
 
-        const contents = util.readFileSync(fsPath);
+        const contents = await readFileAsync(fsPath);
 
         // Using @sgarciac/bombadil package to parse the TOML Pipfile.
         const pipfile = new bombadil.TomlReader();
@@ -78,7 +79,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
             script: target,
             target,
             path: util.getRelativePath(folder, uri),
-            fileName: path.basename(uri.path),
+            fileName: basename(uri.path),
             uri
         };
         return def;
@@ -104,7 +105,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
 
-        const scripts = this.findTargets(uri.fsPath, logPad + "   ");
+        const scripts = await this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
         {
             const task = this.createTask(s, s, folder, uri);

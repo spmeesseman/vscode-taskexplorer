@@ -1,11 +1,12 @@
 
-import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 import * as path from "path";
 import * as util from "../lib/utils/utils";
 import * as log from "../lib/utils/log";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import { readJsonAsync } from "../lib/utils/fs";
+import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 
 
 export class ComposerTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -40,15 +41,15 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
     }
 
 
-    private findTargets(fsPath: string, logPad: string): string[]
+    private async findTargets(fsPath: string, logPad: string)
     {
         const targets: string[] = [];
 
         log.methodStart("find composer targets", 2, logPad, false, [[ "path", fsPath ]], this.logQueueId);
 
         try {
-            const json = JSON.parse(util.readFileSync(fsPath)),
-                scripts = json.scripts;
+            const json = await readJsonAsync<any>(fsPath),
+                  scripts = json.scripts;
             /* istanbul ignore else */
             if (scripts) {
                 Object.keys(scripts).forEach((k) => { targets.push(k); });
@@ -101,7 +102,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
 
-        const scripts = this.findTargets(uri.fsPath, logPad + "   ");
+        const scripts = await this.findTargets(uri.fsPath, logPad + "   ");
         for (const s of scripts)
         {
             const task = this.createTask(s, s, folder, uri);
