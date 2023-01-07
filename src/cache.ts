@@ -412,7 +412,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
                 }
             }
             projectToFileCountMap[folder.name][taskType] = paths.length;
-            log.write(`   Workspace folder scan complete, found '${paths.length}' files`, 3, logPad);
+            log.write(`   Workspace folder scan complete, found '${paths.length}' files`, 2, logPad);
         }
         catch (e: any) { /* istanbul ignore next */ log.error(e); }
         /*

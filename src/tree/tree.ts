@@ -365,9 +365,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             scopeName: string;
 
         log.methodStart("build task tree list", 2, logPad, true, [
-            [ "name", each.name ], [ "source", each.source ], [ "scope", each.scope ],
-            [ "definition type", each.definition.type ], [ "definition path", each.definition.path ]
+            [ "name", each.name ], [ "source", each.source ], [ "definition type", each.definition.type ],
+            [ "definition path", each.definition.path ]
         ]);
+        log.value("   scope", each.scope, 3, logPad);
 
         const definition: TaskExplorerDefinition | TaskDefinition = each.definition;
         let relativePath = definition.path ?? "";
