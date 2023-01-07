@@ -24,7 +24,6 @@ export default class SpecialTaskFolder extends TaskFolder
     private storeName: string;
     private isFavorites: boolean;
     private extensionContext: ExtensionContext;
-    public isSpecial = true;
     public taskFiles: TaskItem[];
     private subscriptionStartIndex: number;
     private store: string[];
