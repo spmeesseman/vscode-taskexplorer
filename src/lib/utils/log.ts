@@ -73,41 +73,35 @@ function errorConsole(msg: string, symbols: [ string, string ], queueId?: string
 
 function errorFile(msg: string, symbols: [ string, string ])
 {
-    if (enableFile)
-    {
-        writeToConsole = false;
-        enableFile = true;
-        enableOutputWindow = false;
-        if (enableFileSymbols) {
-            write(symbols[1] + " " + msg, 0, "", undefined, false, true);
-        }
-        else if (msg) {
-            write(msg, 0, "", undefined, false, true);
-        }
+    writeToConsole = false;
+    enableFile = true;
+    enableOutputWindow = false;
+    if (enableFileSymbols) {
+        write(symbols[1] + " " + msg, 0, "", undefined, false, true);
+    }
+    else if (msg) {
+        write(msg, 0, "", undefined, false, true);
     }
 }
 
 
 function errorOutputWindow(msg: string, symbols: [ string, string ])
 {
-    if (enableOutputWindow)
-    {
-        writeToConsole = false;
-        enableFile = false;
-        enableOutputWindow = true;
-        write(symbols[1] + " " + msg, 0, "", undefined, false, true);
-    }
+    writeToConsole = false;
+    enableFile = false;
+    enableOutputWindow = true;
+    write(symbols[1] + " " + msg, 0, "", undefined, false, true);
 }
 
 
-const errorWriteLogs = (lMsg: string | undefined, symbols: [ string, string ], queueId?: string) =>
+const errorWriteLogs = (lMsg: string | undefined, fileOn: boolean, outWinOn: boolean, symbols: [ string, string ], queueId?: string) =>
 {
     if (lMsg !== undefined)
     {
         if (!symbols || !symbols[0]) symbols = [ figures.color.error, figures.error ];
         errorConsole(lMsg, symbols, queueId);
-        errorFile(lMsg, symbols);
-        errorOutputWindow(lMsg, symbols);
+        if (fileOn) errorFile(lMsg, symbols);
+        if (outWinOn) errorOutputWindow(lMsg, symbols);
     }
 };
 
@@ -184,28 +178,50 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
 
     if (!lastWriteWasBlankError && !lastWriteToConsoleWasBlank)
     {
-        errorWriteLogs("", symbols, queueId);
+        errorWriteLogs("", currentWriteToFile, currentWriteToOutputWindow, symbols, queueId);
     }
 
-    errMsgs.forEach((m) => errorWriteLogs(m, symbols, queueId));
+    errMsgs.forEach((m) => errorWriteLogs(m, currentWriteToFile, currentWriteToOutputWindow, symbols, queueId));
 
     if (params)
     {
-        // const sym = symbols[0] || figures.color.error;
-        for (const [ n, v, l ] of params) {
-            // value(sym + "   " + n, v, 0, "", queueId);
-            value("   " + n, v, 0, "", queueId);
+        for (const [ n, v, l ] of params)
+        {
+            enableFile = false;
+            writeToConsole = true;
+            enableOutputWindow = false;
+            value(symbols[0] + "   " + n, v, 0, "", queueId);
+            if (currentWriteToFile)
+            {
+                enableFile = true;
+                writeToConsole = false;
+                enableOutputWindow = false;
+                if (enableFileSymbols) {
+                    value(symbols[1] + "   " + n, v, 0, "", queueId);
+                }
+                else if (msg) {
+                    value("   " + n, v, 0, "", queueId);
+                }
+            }
+            if (currentWriteToOutputWindow)
+            {
+                enableFile = false;
+                writeToConsole = false;
+                enableOutputWindow = true;
+                value(symbols[1] + "   " + n, v, 0, "", queueId);
+            }
         }
     }
 
-    errorWriteLogs("", symbols, queueId);
+    errorWriteLogs("", currentWriteToFile, currentWriteToOutputWindow, symbols, queueId);
+
+    writeToConsole = currentWriteToConsole;
+    enableFile = currentWriteToFile;
+    enableOutputWindow = currentWriteToOutputWindow;
 
     lastWriteWasBlank = true;
     lastWriteWasBlankError = true;
     lastWriteToConsoleWasBlank = true;
-    writeToConsole = currentWriteToConsole;
-    enableFile = currentWriteToFile;
-    enableOutputWindow = currentWriteToOutputWindow;
 }
 
 

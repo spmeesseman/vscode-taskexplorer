@@ -146,7 +146,6 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
 
 const _procDirCreateEvent = async(uri: Uri, logPad = "") =>
 {
-    processingFsEvent = true;
     try
     {   log.methodStart("directory 'create' event", 1, logPad, true, [[ "dir", uri.fsPath ]]);
         await cache.addFolderToCache(uri, logPad + "   ");
@@ -160,7 +159,6 @@ const _procDirCreateEvent = async(uri: Uri, logPad = "") =>
 
 const _procDirDeleteEvent = async(uri: Uri, logPad = "") =>
 {
-    processingFsEvent = true;
     try
     {   log.methodStart("directory 'delete' event", 1, logPad, true, [[ "dir", uri.fsPath ]]);
         cache.removeFolderFromCache(uri, logPad + "   ");
@@ -174,7 +172,6 @@ const _procDirDeleteEvent = async(uri: Uri, logPad = "") =>
 
 const _procFileChangeEvent = async(taskType: string, uri: Uri, logPad = "") =>
 {
-    processingFsEvent = true;
     try
     {   log.methodStart("file 'change' event", 1, logPad, true, [[ "file", uri.fsPath ]]);
         await refreshTree(teApi, taskType, uri, logPad + "   ");
@@ -187,7 +184,6 @@ const _procFileChangeEvent = async(taskType: string, uri: Uri, logPad = "") =>
 
 const _procFileCreateEvent = async(taskType: string, uri: Uri, logPad = "") =>
 {
-    processingFsEvent = true;
     try
     {   log.methodStart("file 'create' event", 1, logPad, true, [[ "file", uri.fsPath ]]);
         cache.addFileToCache(taskType, uri, logPad + "   ");
@@ -201,7 +197,6 @@ const _procFileCreateEvent = async(taskType: string, uri: Uri, logPad = "") =>
 
 const _procFileDeleteEvent = async(taskType: string, uri: Uri, logPad = "") =>
 {
-    processingFsEvent = true;
     try
     {   log.methodStart("file 'delete' event", 1, logPad, true, [[ "file", uri.fsPath ]]);
         cache.removeFileFromCache(taskType, uri, logPad + "   ");
@@ -339,6 +334,7 @@ const processQueue = async () =>
             [ "arg2", next.args[1] instanceof Uri ? next.args[1].fsPath : "none (log padding)" ],
             [ "# of events still pending", eventQueue.length ]
         ]);
+        processingFsEvent = true;
         await next.fn(...next.args);
         log.methodDone("file watcher event queue", 1, "");
     }
