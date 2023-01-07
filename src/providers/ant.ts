@@ -84,7 +84,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             }
         }
         catch (ex) {
-            this.logException(ex);
+            this.logException(ex, useAnt ? "ant" : "xml2js");
         }
 
 
@@ -177,10 +177,15 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
-    private logException(ex: any)
+    private logException(ex: any, prog: string)
     {
-        log.error([ "*** Error running/executing ant!!", "Check to ensure the path to ant/ant.bat is correct", ex.toString() ], undefined, this.logQueueId);
-        window.showInformationMessage("Error running/executing ant!! Check to ensure the path to ant/ant.bat is correct and your xml is valid<br><br>" + ex.toString());
+        log.error([
+            `Error running/executing ${prog}!!`,
+            "Check to ensure the path to ant is correct and that your task/build file id valid XML",
+            ex
+        ], undefined, this.logQueueId);
+        window.showInformationMessage("Error running/executing ant!! Check to ensure the path to ant/ant.bat " +
+                                      "is correct and your xml is valid<br><br>Check or enable log for details");
     }
 
 
