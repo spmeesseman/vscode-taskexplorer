@@ -2192,11 +2192,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         // before the timer check above, but hey, just in case taskMap goes empty between events
         // for some un4seen reason.
         //
-        if (util.isObjectEmpty(this.taskMap) || !this.taskMap[taskId]) {
+        const isMapEmpty = util.isObjectEmpty(this.taskMap);
+        if (isMapEmpty || !this.taskMap[taskId])
+        {
             /* istanbul ignore if */
             if (this.taskTree && !this.taskMap[taskId] && this.taskTree.length > 0 && this.taskTree[0].contextValue !== "noscripts")
             {
-                log.error([ `The task map is empty but the task tree is non-null and holds ${this.taskTree.length} folders` ]);
+                if (task.source === "npm" && task.definition.type === "npm" &&
+                   (task.name === "build" || task.name === "install" || task.name === "watch" || task.name.startsWith("update")  || task.name.startsWith("audit")))
+                {
+                    return;
+                }
+                log.error(`The task map is ${isMapEmpty ? "empty" : "missing the running task"} but ` +
+                          `the task tree is non-null and holds ${this.taskTree.length} folders (task start event)`,
+                          [[ "# of tasks in task map", Object.keys(this.taskMap).length ], [ "task name", task.name ],
+                          [ "task source", task.source ], [ "task type", task.definition.type ]]);
             }
             return;
         }
@@ -2247,11 +2257,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         // SideBar views are enabled, but the sidebar hasn't received a visible event yet, i.e.
         // it hasn't been opened yet by the user.
         //
-        if (util.isObjectEmpty(this.taskMap) || !this.taskMap[taskId]) {
+        const isMapEmpty = util.isObjectEmpty(this.taskMap);
+        if (isMapEmpty || !this.taskMap[taskId]) {
             /* istanbul ignore if */
             if (this.taskTree && !this.taskMap[taskId] && this.taskTree.length > 0 && this.taskTree[0].contextValue !== "noscripts")
             {
-                log.error([ `The task map is empty but the task tree is non-null and holds ${this.taskTree.length} folders` ]);
+                if (task.source === "npm" && task.definition.type === "npm" &&
+                   (task.name === "build" || task.name === "install" || task.name === "watch" || task.name.startsWith("update")  || task.name.startsWith("audit")))
+                {
+                    return;
+                }
+                log.error(`The task map is ${isMapEmpty ? "empty" : "missing the running task"} but ` +
+                          `the task tree is non-null and holds ${this.taskTree.length} folders (task start event)`,
+                          [[ "# of tasks in task map", Object.keys(this.taskMap).length ], [ "task name", task.name ],
+                          [ "task source", task.source ], [ "task type", task.definition.type ]]);
             }
             return;
         }

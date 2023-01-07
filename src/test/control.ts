@@ -10,7 +10,7 @@ export const testControl =
     logLevel: 2,
     logEnabled: true,
     logToConsole: false,
-    logToFile: false,
+    logToFile: true,
     logToOutput: false,
     logOpenFileOnFinish: true, // not yet
     //
@@ -75,6 +75,8 @@ export const testControl =
         configEnableEvent: 175,
         command: 150,
         commandFast: 50,
+        getTreeMin: 350,
+        getTreeMax: 1800,
         npmCommandMin: 3000,
         refreshCommand: 500,
         refreshTaskTypeCommand: 1000,

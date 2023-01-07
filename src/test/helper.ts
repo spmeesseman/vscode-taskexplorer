@@ -388,11 +388,11 @@ export async function sleep(ms: number)
 }
 
 
-export function tagLog(section: string)
+export function tagLog(test: string, suite: string)
 {
-    teApi.log.write("***************************************************************************");
-    teApi.log.write(" " + section);
-    teApi.log.write("***************************************************************************");
+    teApi.log.write("******************************************************************************************");
+    teApi.log.write(" SUITE: " + suite.toUpperCase() + "  -  TEST : " + test);
+    teApi.log.write("******************************************************************************************");
 }
 
 

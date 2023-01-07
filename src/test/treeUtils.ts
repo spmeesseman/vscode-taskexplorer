@@ -6,7 +6,7 @@ import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import { isObjectEmpty } from "../lib/utils/utils";
 import { TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeSettingsUpdate, executeTeCommand2, figures, getTeApi, testControl } from "./helper";
+import { executeSettingsUpdate, executeTeCommand2, figures, getTeApi, sleep, testControl } from "./helper";
 
 let treeBuiltOnce = false;
 
@@ -72,20 +72,41 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 {
     const teApi = getTeApi();
     const taskItems: TaskItem[] = [];
-    let taskMap = teApi.testsApi.explorer.getTaskMap();
-    if (!taskMap || isObjectEmpty(taskMap))
+    const _getTaskMap = async(retries: number) =>
     {
-        console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, fall back to walkTreeItems", figures.colors.grey)}`);
-        taskMap = await walkTreeItems(undefined);
-        if (!taskMap || isObjectEmpty(taskMap)) {
-            console.log(`    ${figures.color.error} ${figures.withColor("Task map is empty, test will fail in 3, 2, 1...", figures.colors.grey)}`);
+        let taskMap = teApi.testsApi.explorer.getTaskMap();
+        if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
+        {
+            await teApi.waitForIdle(testControl.waitTime.getTreeMin, testControl.waitTime.getTreeMax);
+            taskMap = teApi.testsApi.explorer.getTaskMap();
         }
-    }
+        if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
+        {
+            if (retries === 0) {
+                console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, fall back to walkTreeItems", figures.colors.grey)}`);
+            }
+            if (retries % 10 === 0) {
+                taskMap = await walkTreeItems(undefined);
+            }
+            if (!taskMap || isObjectEmpty(taskMap)) {
+                if (retries === 40) {
+                    console.log(`    ${figures.color.error} ${figures.withColor("Task map is empty, test will fail in 3, 2, 1...", figures.colors.grey)}`);
+                }
+                else {
+                    await sleep(250);
+                    taskMap = await _getTaskMap(++retries);
+                }
+            }
+        }
+        return taskMap || {} as TaskMap;
+    };
+    const taskMap = await _getTaskMap(0);
     const taskCount = taskMap ? findIdInTaskMap(`:${taskType}:`, taskMap) : 0;
     if (taskCount !== expectedCount)
     {
-        console.log(`    ${figures.color.error} ${figures.withColor("Task map is empty, test will fail in 3, 2, 1...", figures.colors.grey)}`);
-        console.log(figures.withColor("    TaskMap files:\n    " + Object.keys(taskMap).join("\n       "), figures.colors.grey));
+        console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty.", figures.colors.grey)}`);
+        console.log(figures.withColor(`    ${figures.color.warning} TaskMap files:\n    ${figures.color.warning}    ` +
+                    Object.keys(taskMap).join(`\n    ${figures.color.warning}    `), figures.colors.grey));
         assert.fail(`${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
     }
     Object.values(taskMap).forEach((taskItem) =>
