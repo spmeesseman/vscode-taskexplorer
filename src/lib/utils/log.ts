@@ -74,7 +74,7 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
         {
             if (e) {
                 if (e.stack) {
-                    const stackFmt = e.stack.replace(/\n/g, `\n${figure} `);
+                    const stackFmt = e.stack.replace(/\n\n/g, "\n").replace(/\n/g, `\n${figure} `);
                     write(figure + " " + stackFmt, 0, "", queueId, true);
                 }
                 else if (e.message) {

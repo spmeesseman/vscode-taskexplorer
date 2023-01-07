@@ -49,9 +49,10 @@
 	"config.taskExplorer.keepTermOnStop": "Keep terminal open when stopping a task.",
 
 	"config.taskExplorer.logging.enable": "Turn on logging. Log messages are written to either the `Task Explorer` output window or to file, dependent on the `#logging.enableFile#` and `#logging.enableOutputWindow#` settings.",
-	"config.taskExplorer.logging.enableFile": "Enable logging to file (check the output window for location). If `#logging.enabled#` is *on*, either writing to file or to the output window should be enabled. Has no effect if `#logging.enabled#` is *off*.",
-	"config.taskExplorer.logging.enableOutputWindow": "Enable logging to a VSCode output window.  If `#logging.enabled#` is *on*, either writing to file or to the output window should be enabled. Has no effect if `#logging.enabled#` is *off*.",
-	"config.taskExplorer.logging.level": "Set debug verbosity (1 - Low / 5 - High). Has no effect if `#logging.enabled#` is disabled.",
+	"config.taskExplorer.logging.enableFile": "Enable logging to file (check the output window for location). If `#logging.enable#` is *on*, either writing to file or to the output window should be enabled. Has no effect if `#logging.enabled#` is *off*.",
+	"config.taskExplorer.logging.enableFileSymbols": "Enable decorative and folding (soon) symbols in log file. Has no effect if `#logging.enable#` or `#logging.enableFile#` are *off*.",
+	"config.taskExplorer.logging.enableOutputWindow": "Enable logging to a VSCode output window.  If `#logging.enable#` is *on*, either writing to file or to the output window should be enabled. Has no effect if `#logging.enabled#` is *off*.",
+	"config.taskExplorer.logging.level": "Set debug verbosity (1 - Low / 5 - High). Has no effect if `#logging.enable#` is disabled.",
 	
 	"config.taskExplorer.pathToPrograms": "Paths to programs, if not registered in system path",
 	"config.taskExplorer.pathToAnsicon": "Ansicon",
