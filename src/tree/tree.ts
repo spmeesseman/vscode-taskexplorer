@@ -765,7 +765,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         const isTaskItem = taskItem instanceof TaskItem;
         log.methodStart("fire task change events", logLevel, logPad, false, [
             [ "task name", taskItem.task.name ], [ "task type", taskItem.task.source ],
-            [ "resource path", taskItem.taskFile.resourceUri.fsPath ]
+            [ "resource path", taskItem.taskFile.resourceUri.fsPath ], [ "view", this.name ]
         ]);
 
         /* istanbul ignore if */
@@ -883,7 +883,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             [ "task folder", element?.label ], [ "all tasks need to be retrieved", !this.tasks ],
             [ "specific task type need to be retrieved", !!this.currentInvalidation ],
             [ "current invalidation", this.currentInvalidation ], [ "tree needs rebuild", !this.taskTree ],
-            [ "first run", firstRun ]
+            [ "first run", firstRun ], [ "view", this.name ]
         ]);
         if (element instanceof TaskFile)
         {
@@ -1548,9 +1548,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     public async refresh(invalidate?: any, opt?: Uri | boolean, logPad = ""): Promise<void>
     {
         log.methodStart("refresh task tree", 1, logPad, logPad === "", [
-            [ "from view", this.name ], [ "invalidate", invalidate ],
-            [ "opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a" ],
-            [ "tree is null", !this.taskTree ]
+            [ "invalidate", invalidate ], [ "opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a" ],
+            [ "tree is null", !this.taskTree ], [ "view", this.name ]
         ]);
 
         await this.waitForRefreshComplete();
@@ -2210,10 +2209,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             const task = taskEvent.execution.task,
                   taskId = task.definition.taskItemId;
             try
-            {   log.methodStart("task started event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ]]);
-                //
-                // Show status bar message (if ON in settings)
-                //
+            {   log.methodStart("task started event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.name ]]);
                 this.showStatusMessage(task);
                 const taskItem = this.taskMap[taskId] as TaskItem;
                 this.fireTaskChangeEvents(taskItem, "   ", 1);
@@ -2270,11 +2266,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             const task = taskEvent.execution.task,
                   taskId = task.definition.taskItemId;
             try
-            {   log.methodStart("task finished event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ]]);
-                //
-                // Hide status bar message (if ON in settings)
-                //
-                this.showStatusMessage(task);
+            {   log.methodStart("task finished event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.name ]]);
+                this.showStatusMessage(task); // hides
                 const taskItem = this.taskMap[taskId] as TaskItem;
                 this.fireTaskChangeEvents(taskItem, "   ", 1);
                 log.methodDone("task finished event", 1);

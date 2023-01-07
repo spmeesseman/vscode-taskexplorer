@@ -329,7 +329,7 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
-    hasTask = (taskItem: TaskItem) => this.enabled && this.store.includes(this.getTaskItemId(taskItem));
+    hasTask = (taskItem: TaskItem) => !!(this.enabled && this.taskFiles.find(t =>  this.getTaskItemId(t) === taskItem.id) && this.store.includes(this.getTaskItemId(taskItem)));
 
 
     isEnabled = () => this.enabled;
@@ -416,6 +416,22 @@ export default class SpecialTaskFolder extends TaskFolder
 
         log.methodDone("show special tasks", 1, logPad);
     }
+
+
+    // refreshState(taskItemId: string, doLog?: boolean, logPad?: string, logLevel?: number)
+    // {
+    //     if (this.enabled)
+    //     {
+    //         if (doLog) log.methodStart("refresh taskitem states", logLevel, logPad);
+    //         // hasTask(taskItem)
+    //         const item = this.taskFiles.find(t =>  t.id === taskItemId);
+    //         if (item) {
+    //             log.write("   refreshing state on taskitem id " + item.id, logLevel, logPad + "   ");
+    //             item.refreshState(doLog, logPad + "   ", logLevel);
+    //         }
+    //         if (doLog) log.methodDone("refresh taskitem states", logLevel, logPad);
+    //     }
+    // }
 
 
     async saveTask(taskItem: TaskItem, logPad = "   ")
