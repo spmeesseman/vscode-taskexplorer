@@ -35,7 +35,7 @@ export default class TaskFolder extends TreeItem
     }
 
 
-    addTaskFile(taskFile: TaskFile|TaskItem)
+    async addTaskFile(taskFile: TaskFile|TaskItem)
     {
         this.taskFiles.push(taskFile);
     }

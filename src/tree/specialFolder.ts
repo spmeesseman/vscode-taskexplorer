@@ -19,7 +19,6 @@ import { commands, ConfigurationChangeEvent, Disposable, ExtensionContext, Input
 export default class SpecialTaskFolder extends TaskFolder
 {
 
-    private explorerName: string;
     private explorer: TaskTreeDataProvider;
     private disposables: Disposable[];
     private storeName: string;
@@ -40,7 +39,6 @@ export default class SpecialTaskFolder extends TaskFolder
         this.contextValue = label.toLowerCase().replace(/[\W \_\-]/g, "");
         this.iconPath = ThemeIcon.Folder;
         this.explorer = treeProvider;
-        this.explorerName = treeName;
         this.extensionContext = context;
         this.isFavorites = label === constants.FAV_TASKS_LABEL;
         this.storeName = this.isFavorites ? constants.FAV_TASKS_STORE : constants.LAST_TASKS_STORE;
@@ -69,7 +67,7 @@ export default class SpecialTaskFolder extends TaskFolder
     {
         if (this.store.includes(taskItem.id))
         {
-            log.methodStart(`add tree taskitem to ${this.label}`, 1, logPad);
+            log.methodStart(`add tree taskitem to ${this.label}`, 2, logPad);
 
             const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
             taskItem2.id = this.label + ":" + taskItem2.id; // note 'label:' + taskItem2.id === id
@@ -78,7 +76,7 @@ export default class SpecialTaskFolder extends TaskFolder
             this.insertTaskFile(taskItem2, 0);
             this.sort(logPad + "   ");
 
-            log.methodDone(`add tree taskitem to ${this.label}`, 1, logPad);
+            log.methodDone(`add tree taskitem to ${this.label}`, 2, logPad);
         }
     }
 
@@ -142,13 +140,12 @@ export default class SpecialTaskFolder extends TaskFolder
 
     async addRemoveRenamedLabel(taskItem: TaskItem)
     {
-console.log("aaaa");
         let removed = false,
             addRemoved = false,
             index = 0;
         const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
               id = this.getTaskItemId(taskItem);
-console.log("a");
+
         log.methodStart("add/remove rename special", 1, "", false, [[ "id", id ]]);
 
         for (const i in renames)
@@ -165,7 +162,7 @@ console.log("a");
                 ++index;
             }
         }
-console.log("b");
+
         if (!addRemoved)
         {
             const opts: InputBoxOptions = { prompt: "Enter favorites label" };
@@ -178,7 +175,7 @@ console.log("b");
                 }
             });
         }
-console.log("c");
+
         //
         // Update
         //

@@ -232,7 +232,7 @@ export const numFilesInDirectory = (dirPath: string): Promise<number> =>
 {
     return new Promise((resolve, reject) =>
     {
-        if (fs.existsSync(dirPath))
+        if (dirPath && fs.existsSync(dirPath))
         {
             fs.readdir(dirPath, (err, files) =>
             {   /* istanbul ignore else */
@@ -249,15 +249,19 @@ export const numFilesInDirectory = (dirPath: string): Promise<number> =>
 
 export const pathExists = (file: string): Promise<boolean> =>
 {
-    return new Promise<boolean>((resolve, reject) =>
+    return new Promise<boolean>((resolve) =>
     {
-        fs.access(path.resolve(cwd, file), (e) =>
+        if (file)
         {
-            if (e) {
-                resolve(false);
-            }
-            resolve(true);
-        });
+            fs.access(path.resolve(cwd, file), (e) =>
+            {
+                if (e) {
+                    resolve(false);
+                }
+                resolve(true);
+            });
+        }
+        else { resolve(false); }
     });
 };
 

@@ -75,10 +75,10 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
             if (e) {
                 if (e.stack) {
                     const stackFmt = e.stack.replace(/\n\n/g, "\n").replace(/\n/g, `\n${figure} `);
-                    write(figure + " " + stackFmt, 0, "", queueId, true);
+                    write((figure ? figure + " " : "") + stackFmt, 0, "", queueId, true);
                 }
                 else if (e.message) {
-                    write(figure + " " + e.message.trimEnd(), 0, "", queueId, true);
+                    write((figure ? figure + " " : "") + e.message.trimEnd(), 0, "", queueId, true);
                 }
             }
         };
@@ -92,6 +92,10 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
             }
             writeToConsole = false;
             enableFile = wtf;
+            if (enableFile && !enableFileSymbols) {
+                write(err, 0, "", undefined, true);
+                enableFile = false;
+            }
             enableOutputWindow = wto;
             write(sym2 + (err ? " " : "") + (err || ""), 0, "", queueId, true);
         };
@@ -102,9 +106,15 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
             enableOutputWindow = false;
             _writeErr(err, sym);
             writeToConsole = false;
-            enableFile = wtf;
             enableOutputWindow = wto;
+            if (enableFileSymbols) {
+                enableFile = wtf;
+            }
             _writeErr(err, sym2, queueId);
+            if (!enableFileSymbols) {
+                enableFile = wtf;
+                _writeErr(err, "");
+            }
         };
         const _writeError = (err: any, wto: boolean, wtf: boolean) =>
         {
@@ -187,6 +197,7 @@ export async function initLog(settingGrpName: string, dispName: string, context:
     logLevel = configuration.get<number>("logging.level", 1);
     enableOutputWindow = configuration.get<boolean>("logging.enableOutputWindow", true);
     enableFile = configuration.get<boolean>("logging.enableFile", false);
+    enableFileSymbols = configuration.get<boolean>("logging.enableFileSymbols", true);
     fileName = join(context.logUri.fsPath, getFileName());
     await createDir(dirname(fileName));
 

@@ -26,6 +26,7 @@ import {
 import { IExplorerApi, TaskMap } from "../interface/explorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
 import SpecialTaskFolder from "./specialFolder";
+import { TaskExplorerProvider } from "../providers/provider";
 
 
 /**
@@ -120,7 +121,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
     private async addRemoveSpecialTaskLabel(taskItem: TaskItem)
     {
-        /* istanbulignore else */
+        /* istanbul ignore else */
         if (taskItem.folder)
         {
             const folderName = util.lowerCaseFirstChar(taskItem.folder.label as string, true) as "favorites"|"lastTasks";
@@ -246,10 +247,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    private async buildGroupings(folders: Map<string, TaskFolder>, logPad: string, logLevel: number)
+    private async buildGroupings(folders: Map<string, TaskFolder|SpecialTaskFolder>, logPad: string, logLevel: number)
     {
-        log.methodStart("build tree node groupings", logLevel, logPad);
-
+        const groupWithSep = configuration.get<boolean>("groupWithSeparator");
+        log.methodStart("build tree node groupings", logLevel, logPad, false, [[ "group withseparator", groupWithSep ]]);
         //
         // Sort nodes.  By default the project folders are sorted in the same order as that
         // of the Explorer.  Sort TaskFile nodes and TaskItems nodes alphabetically, by default
@@ -260,7 +261,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         //
         for (const [ key, folder ] of folders)
         {
-            if (key === constants.LAST_TASKS_LABEL || key === constants.FAV_TASKS_LABEL) {
+            if (folder instanceof SpecialTaskFolder) {
+                log.write(`   skipping ${folder.label} folder for grouping`, logLevel, logPad);
                 continue;
             }
             sortTasks.sortTaskFolder(folder, logPad + "   ", logLevel + 1);
@@ -268,7 +270,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             // Create groupings by task type
             //
             /* istanbul ignore else */
-            if (configuration.get("groupWithSeparator")) // && key !== constants.USER_TASKS_LABEL)
+            if (groupWithSep) // && key !== constants.USER_TASKS_LABEL)
             {
                 await this.createTaskGroupings(folder, logPad + "   ", logLevel + 1);
             }
@@ -432,7 +434,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         //
         // Get task file node, this will create one of it doesn't exist
         //
-        const taskFile = this.getTaskFileNode(each, folder, files, relativePath, scopeName, logPad + "   ");
+        const taskFile = await this.getTaskFileNode(each, folder, files, relativePath, scopeName, logPad + "   ");
 
         //
         // Create and add task item to task file node
@@ -505,7 +507,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                         subfolder = new TaskFile(this.extensionContext, folder, node.task.definition,
                                                 each.taskSource, each.path, 0, true, undefined, "   ");
                         subfolders.set(id, subfolder);
-                        folder.addTaskFile(subfolder);
+                        await folder.addTaskFile(subfolder);
                         //
                         // Since we add the grouping when we find two or more equal group names, we are iterating
                         // over the 2nd one at this point, and need to add the previous iteration's TaskItem to the
@@ -944,7 +946,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         // Build task tree if not built already.
         //
         if (!this.taskTree || (this.taskTree.length === 1 && (this.taskTree[0].contextValue === "noscripts" || this.taskTree[0].contextValue === "initscripts")))
-        {   //
+        {
+            TaskExplorerProvider.logPad = logPad + "   ";
+            //
             // If 'tasks' is empty, then ask for all tasks.
             // If 'tasks' is non-empty, and 'currentInvalidation' is set, then only ask for tasks
             // of type specified by it's value.  The 'currentInvalidation' parameter is set by the
@@ -962,7 +966,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             if (!this.tasks || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
             {
                 log.write("   fetching all tasks via VSCode.fetchTasks", logLevel, logPad);
-                this.tasks = (await tasks.fetchTasks());
+                this.tasks = await tasks.fetchTasks();
                 // .filter((t) => !util.isWatchTask(t.source) || !util.isExcluded(t.definition.path, logPad + "   "));
             }
             else if (this.tasks && this.currentInvalidation)
@@ -973,10 +977,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 // all tasks of the type defined in 'currentInvalidation' from the tasks list cache,
                 // and add the new tasks from VSCode into the tasks list.
                 //
-                const taskItems = (await tasks.fetchTasks(
+                const taskItems = await tasks.fetchTasks(
                 {
                     type: this.currentInvalidation
-                }));
+                });
                 // .filter((t) => this.currentInvalidation !== "npm" || !util.isExcluded(t.definition.path, logPad + "   "));
                 //
                 // Remove tasks of type '' from the 'tasks'array
@@ -1003,6 +1007,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 log.write(`   adding ${taskItems.length} new ${this.currentInvalidation} tasks from cache`, logLevel + 1, logPad);
                 this.tasks.push(...taskItems);
             }
+
+            TaskExplorerProvider.logPad = "";
 
             /* istanbul ignore else */
             if (this.tasks)
@@ -1125,7 +1131,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    private getTaskFileNode(task: Task, folder: TaskFolder, files: any, relativePath: string, scopeName: string, logPad: string): TaskFile
+    private async getTaskFileNode(task: Task, folder: TaskFolder, files: any, relativePath: string, scopeName: string, logPad: string)
     {
         let taskFile: TaskFile;
         log.methodStart("get task file node", 2, logPad, false, [[ "relative path", relativePath ], [ "scope name", scopeName ]]);
@@ -1155,7 +1161,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         {
             log.value("   Add source file container", task.source, 2, logPad);
             taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath, 0, false, undefined, logPad + "   ");
-            folder.addTaskFile(taskFile);
+            await folder.addTaskFile(taskFile);
             files.set(id, taskFile);
         }
 
@@ -2167,8 +2173,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
 
     private async taskStartEvent(e: TaskStartEvent)
-    {
-        //
+    {   //
         // Clear debounce timeout if still pending.  VScode v1.57+ emits about a dozen task
         // start/end event for a task.  Sick of these damn bugs that keep getting introduced
         // seemingly every other version AT LEAST.
@@ -2181,11 +2186,29 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             this.taskIdStartEvents.delete(taskId);
         }
         //
+        // If taskMap is empty, then this view has not yet been made visible, an there's nothing
+        // to update.  The `taskTree` property should also be null.  We could probably do this
+        // before the timer check above, but hey, just in case taskMap goes empty between events
+        // for some un4seen reason.
+        //
+        if (util.isObjectEmpty(this.taskMap) || !this.taskMap[taskId]) {
+            /* istanbul ignore if */
+            if (this.taskTree && !this.taskMap[taskId]) {
+                log.error("The task map is empty but the task tree is non-null in the task finished event");
+            }
+            else {
+                log.error("The task map does not contain the task triggering the task finished event");
+            }
+            return;
+        }
+        //
         // Debounce!!  VScode v1.57+ emits about a dozen task start/end event for a task.  Sick
         // of these damn bugs that keep getting introduced seemingly every other version AT LEAST.
         //
-        taskTimerId = setTimeout(async () =>
+        taskTimerId = setTimeout(async(taskEvent) =>
         {
+            const task = taskEvent.execution.task,
+                  taskId = task.definition.taskItemId;
             try
             {   log.methodStart("task started event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ]]);
                 //
@@ -2197,7 +2220,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 log.methodDone("task started event", 1);
             }
             catch (e) { /* istanbul ignore next */ console.error(e); }
-        }, 50);
+        }, 50, e);
 
         this.taskIdStartEvents.set(taskId, taskTimerId);
     }
@@ -2221,13 +2244,33 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             this.babysitterTimer = undefined;
         }
         //
+        // If taskMap is empty, then this view has not yet been made visible, an there's nothing
+        // to update.  The `taskTree` property should also be null.  We could probably do this
+        // before the timer check above, but hey, just in case taskMap goes empty between events
+        // for some un4seen reason.  This willusually fall through when both the Explorer and
+        // SideBar views are enabled, but the sidebar hasn't received a visible event yet, i.e.
+        // it hasn't been opened yet by the user.
+        //
+        if (util.isObjectEmpty(this.taskMap) || !this.taskMap[taskId]) {
+            /* istanbul ignore if */
+            if (this.taskTree && !this.taskMap[taskId]) {
+                log.error("The task map is empty but the task tree is non-null in the task finished event");
+            }
+            else {
+                log.error("The task map does not contain the task referened in the task finished event");
+            }
+            return;
+        }
+        //
         // Debounce!!  VScode v1.57+ emits about a dozen task start/end event for a task.  Sick
         // of these damn bugs that keep getting introduced seemingly every other version AT LEAST.
         //
-        taskTimerId = setTimeout(async () =>
+        taskTimerId = setTimeout(async(taskEvent) =>
         {
+            const task = taskEvent.execution.task,
+                  taskId = task.definition.taskItemId;
             try
-            {   log.methodStart("task finished event", 1);
+            {   log.methodStart("task finished event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ]]);
                 //
                 // Hide status bar message (if ON in settings)
                 //
@@ -2237,7 +2280,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 log.methodDone("task finished event", 1);
             }
             catch (e) { /* istanbul ignore next */ console.error(e); }
-        }, 50);
+        }, 50, e);
 
         this.taskIdStopEvents.set(taskId, taskTimerId);
     }

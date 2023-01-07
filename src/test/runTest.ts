@@ -48,7 +48,7 @@ async function main(args: string[])
             extensionTestsEnv: { testArgs: args && args.length > 0 ? args.toString() : "" }
         });
         //
-        // Log file
+        // Log file - whats a good way to open it in the active vscode instance???
         //
         let logFile: string | undefined;
         if (testControl.logEnabled && testControl.logToFile && testControl.logOpenFileOnFinish)

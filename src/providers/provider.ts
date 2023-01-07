@@ -20,6 +20,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     public cachedTasks: Task[] | undefined;
     public invalidating = false;
     public providerName = "***";
+    public static logPad = "";
     private queue: Uri[];
     protected callCount = 0;
     protected logQueueId: string | undefined;
@@ -64,24 +65,24 @@ export abstract class TaskExplorerProvider implements TaskProvider
     {
         let rmvCount;
         this.logQueueId = this.providerName + (++this.callCount);
-        log.methodStart(`provide ${this.providerName} tasks`, 1, "", true, [[ "call count", ++this.callCount ]], this.logQueueId);
+        log.methodStart(`provide ${this.providerName} tasks`, 1, TaskExplorerProvider.logPad, true, [[ "call count", ++this.callCount ]], this.logQueueId);
         if (!this.cachedTasks)
         {
             const licMgr = getLicenseManager();
-            this.cachedTasks = await this.readTasks("      ");
+            this.cachedTasks = await this.readTasks(TaskExplorerProvider.logPad + "   ");
             if (licMgr && !licMgr.isLicensed())
             {
                 const maxTasks = licMgr.getMaxNumberOfTasksByType(this.providerName);
                 if (this.cachedTasks.length > maxTasks)
                 {
                     rmvCount = this.cachedTasks.length - maxTasks;
-                    log.write(`   removing ${rmvCount} tasks, max ${ this.providerName} task count reached (no license)`, 1, "   ", this.logQueueId);
+                    log.write(`   removing ${rmvCount} tasks, max ${ this.providerName} task count reached (no license)`, 1, TaskExplorerProvider.logPad + "   ", this.logQueueId);
                     this.cachedTasks.splice(maxTasks, rmvCount);
                     util.showMaxTasksReachedMessage(util.getTaskTypeFriendlyName(this.providerName, true));
                 }
             }
         }
-        log.methodDone(`provide ${this.providerName} tasks`, 1, "", false, [[ "# of tasks found", this.cachedTasks.length ]], this.logQueueId);
+        log.methodDone(`provide ${this.providerName} tasks`, 1, TaskExplorerProvider.logPad, false, [[ "# of tasks found", this.cachedTasks.length ]], this.logQueueId);
         log.dequeue(this.logQueueId);
         this.logQueueId = undefined;
         return this.cachedTasks;
