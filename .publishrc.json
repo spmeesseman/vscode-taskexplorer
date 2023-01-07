@@ -3,8 +3,10 @@
     "branch":                   "master",
     "buildCommand":             "npm run webpack-rebuild",
     "buildPostCommand": [
+        "npm run tsc-build_types",
         "npm run test-all",
-        "npm run webpack-rebuild"
+        "npm run webpack-rebuild",
+        "npm run publish:types"
     ],
     "changelogFile":            "CHANGELOG.md",
     "deployCommand":            "npx vsce publish",
@@ -22,5 +24,11 @@
     "repoType":                 "git",
     "skipChangelogEdits":       "N",
     "skipVersionEdits":         "Y",
-    "vcWebPath":                "https://github.com/spmeesseman/vscode-taskexplorer"
+    "vcWebPath":                "https://github.com/spmeesseman/vscode-taskexplorer",
+    "versionFiles": [{
+        "path": "types\\package.json"
+    },
+    {
+        "path": "types\\package.lock.json"
+    }]
 }
