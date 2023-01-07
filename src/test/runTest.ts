@@ -2,9 +2,9 @@ import { execSync } from "child_process";
 import * as path from "path";
 // import  runConfig from "./runConfig";
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { runTests } from "@vscode/test-electron";
+import { ConsoleReporter, runTests } from "@vscode/test-electron";
 import { testControl } from "./control";
-import { pathExists, readFileAsync, writeFile } from "../lib/utils/fs";
+import { findFiles, getDateModified, pathExists, readFileAsync, writeFile } from "../lib/utils/fs";
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import { runTests } from "vscode-test";
 
@@ -29,10 +29,10 @@ async function main(args: string[])
         //
         // Clear workspace settings file if it exists
         //
-        let settingsJsonOrig: string | undefined;
+        // let settingsJsonOrig: string | undefined;
         const settingsFile = path.join(extensionTestsWsPath, ".vscode", "settings.json");
         if (await pathExists(settingsFile)) {
-            settingsJsonOrig = await readFileAsync(settingsFile);
+            // settingsJsonOrig = await readFileAsync(settingsFile) || "{}";
             await writeFile(settingsFile, "{}");
         }
         // const runCfg = await runConfig();
@@ -48,33 +48,49 @@ async function main(args: string[])
             extensionTestsEnv: { testArgs: args && args.length > 0 ? args.toString() : "" }
         });
         //
+        // Log file
+        //
+        let logFile: string | undefined;
+        if (testControl.logEnabled && testControl.logToFile && testControl.logOpenFileOnFinish)
+        {
+            let lastDateModified: Date | undefined;
+            const tzOffset = (new Date()).getTimezoneOffset() * 60000,
+                  dateTag = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T")[0].replace(/[\-]/g, ""),
+                  vscodeLogPath = path.join(extensionDevelopmentPath, ".vscode-test", "user-data", "logs");
+            const paths = await findFiles(`**/spmeesseman.vscode-taskexplorer/taskexplorer-${dateTag}.log`,
+            {
+                nocase: false,
+                ignore: "**/node_modules/**",
+                cwd: vscodeLogPath
+            });
+            for (const relPath of paths)
+            {
+                const fullPath = path.join(vscodeLogPath, relPath),
+                      dateModified = await getDateModified(fullPath);
+                if (dateModified && (!lastDateModified || dateModified.getTime() > lastDateModified.getTime()))
+                {
+                    logFile = fullPath;
+                    lastDateModified = dateModified;
+                }
+            }
+            if (logFile) {
+
+            }
+        }
+        //
         // Restore
         //
         console.log("restore package.json activation event");
-        execSync("enable-full-coverage.sh --off", { cwd: "tools" });
-        if (settingsJsonOrig && !testControl.keepSettingsFileChanges) {
-            await writeFile(settingsFile, settingsJsonOrig);
+        execSync(`enable-full-coverage.sh --off${logFile ? ` --logfile "${logFile}` : ""}"`, { cwd: "tools" });
+        // if (settingsJsonOrig && !testControl.keepSettingsFileChanges) {
+        if (!testControl.keepSettingsFileChanges) {
+            // await writeFile(settingsFile, settingsJsonOrig);
+            await writeFile(settingsFile, "{\n    " +
+                                          "   \"taskExplorer.exclude\": [\n" +
+                                          "      \"**/tasks_test_ignore_/**\"\n" +
+                                          "   ]" +
+                                          "}");
         }
-        //
-        // Open log file
-        //
-        // if (testControl.logEnabled && testControl.logToFile && testControl.logOpenFileOnFinish)
-        // {
-        //     if (await pathExists(settingsFile))
-        //     {
-        //         try {
-        //             const settings = await readJsonAsync<any>(settingsFile);
-        //             if (settings.logFilePath) {
-        //                 try {
-        //                     const doc = await workspace.openTextDocument(Uri.file(logFilePath));
-        //                     await window.showTextDocument(doc);
-        //                 } catch (e) { console.error(e); }
-        //             }
-        //         }
-        //         catch {}
-        //         await writeFile(settingsFile, "{}");
-        //     }
-        // }
     }
     catch (err: any) {
         console.error(`Failed to run tests: ${err}\n${err.stack ?? "No call stack details found"}`);

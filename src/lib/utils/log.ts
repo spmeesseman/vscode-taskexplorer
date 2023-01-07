@@ -1,13 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
+import figures from "../figures";
 import { appendFileSync } from "fs";
 import { dirname, join } from "path";
 import { createDir } from "./fs";
 import { configuration } from "./configuration";
 import { isArray, isError, isFunction, isObject, isObjectEmpty, isString } from "./utils";
 import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
-import figures from "../figures";
 
 export interface IMsgQueueItem
 {
@@ -16,17 +16,20 @@ export interface IMsgQueueItem
     scope: any;
 }
 
+const tzOffset = (new Date()).getTimezoneOffset() * 60000;
 const logValueWhiteSpace = 45;
 const msgQueue: { [queueId: string]:  IMsgQueueItem[] } = {};
 
 let enable = false;
 let enableFile = false;
+let enableFileSymbols = false;
 let enableOutputWindow = false;
 let fileName = "";
 let isTests = false;
 let logLevel = -1;
 let writeToConsole = false;
 let writeToConsoleLevel = 2;
+let lastErrorMesage = "";
 let lastWriteWasBlank = false;
 let lastWriteWasBlankError = false;
 let lastWriteToConsoleWasBlank = false;
@@ -57,83 +60,115 @@ export function dequeue(queueId: string)
 
 export function error(msg: any, params?: (string|any)[][], queueId?: string)
 {
+    _error(msg, params, queueId);
+}
+
+
+function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: [ string, string ] = [ "", "" ])
+{
     if (msg)
     {
-        const currentWriteToConsole = writeToConsole;
-        const currentWriteToFile = enableFile;
-        const currentWriteToOutputWindow = enableOutputWindow;
-        writeToConsole = true;
-        const _write = (err: any) =>
+        const sym = symbols[0] || figures.color.error;
+        const sym2 = symbols[1] || figures.error;
+        const _writeErr = (e: Error | undefined, figure: string, queueId?: string) =>
+        {
+            if (e) {
+                if (e.stack) {
+                    const stackFmt = e.stack.replace(/\n/g, `\n${figure} `);
+                    write(figure + " " + stackFmt, 0, "", queueId, true);
+                }
+                else if (e.message) {
+                    write(figure + " " + e.message.trimEnd(), 0, "", queueId, true);
+                }
+            }
+        };
+        const _write = (err: any, wto: boolean, wtf: boolean) =>
+        {
+            if (err !== "" || !isTests) {
+                writeToConsole = true;
+                enableFile = false;
+                enableOutputWindow = false;
+                write(sym + (err ? " " : "") + (err || ""), 0, "", undefined, true);
+            }
+            writeToConsole = false;
+            enableFile = wtf;
+            enableOutputWindow = wto;
+            write(sym2 + (err ? " " : "") + (err || ""), 0, "", queueId, true);
+        };
+        const _write2 = (err: any, wto: boolean, wtf: boolean) =>
         {
             writeToConsole = true;
             enableFile = false;
             enableOutputWindow = false;
-            write(figures.color.error + (err ? " " : "") + (err || ""), 0, "");
+            _writeErr(err, sym);
             writeToConsole = false;
-            enableFile = currentWriteToFile;
-            enableOutputWindow = currentWriteToOutputWindow;
-            write(figures.error + (err ? " " : "") + (err || ""), 0, "", queueId);
+            enableFile = wtf;
+            enableOutputWindow = wto;
+            _writeErr(err, sym2, queueId);
         };
-        const _write2 = (err: any) =>
+        const _writeError = (err: any, wto: boolean, wtf: boolean) =>
         {
-            writeToConsole = true;
-            enableFile = false;
-            enableOutputWindow = false;
-            writeError(err, figures.color.error);
-            writeToConsole = false;
-            enableFile = currentWriteToFile;
-            enableOutputWindow = currentWriteToOutputWindow;
-            writeError(err, figures.error, queueId);
-        };
-        const _writeErr = (err: any) =>
-        {
+            if (!err) {
+                return;
+            }
             if (isString(err))
             {
-                _write(err);
+                _write(err, wto, wtf);
+                lastErrorMesage = err;
             }
             else if (isError(err))
             {
-                _write2(err);
+                _write2(err, wto, wtf);
             }
             else if (isArray(err))
             {
-                err.forEach((m: any) => _writeErr(m));
+                err.forEach((m: any) => _writeError(m, wto, wtf));
             }
             else if (isObject(err))
             {
                 if (err.messageX) {
-                    _write2(err.messageX);
+                    _write2(err.messageX, wto, wtf);
                 }
                 else if (err.message) {
-                    _write2(err.message);
+                    _write2(err.message, wto, wtf);
                 }
                 else if (isObjectEmpty(err)) {
-                    _write(figures.color.error + "{} (empty object)");
+                    _write(sym + "{} (empty object)", wto, wtf);
                 }
                 else if (isFunction(err.toString)) {
-                    _write(figures.color.error + " " + err.toString());
+                    _write(err.toString(), wto, wtf);
+                    lastErrorMesage = err.toString();
                 }
             }
-            else if (isFunction(err.toString)) {
-                _write(figures.color.error + " " + err.toString());
+            else if (err && isFunction(err.toString)) {
+                _write(err.toString(), wto, wtf);
+                lastErrorMesage = err.toString();
             }
         };
-        if (!lastWriteWasBlankError && !lastWriteToConsoleWasBlank) {
-            _write("");
-        }
-        _writeErr(msg);
-        if (params) {
-            for (const [ n, v, l ] of params) {
-                value(figures.color.error + "   " + n, v, 0, "", queueId);
+        if (lastErrorMesage !== msg)
+        {
+            const currentWriteToConsole = writeToConsole;
+            const currentWriteToFile = enableFile;
+            const currentWriteToOutputWindow = enableOutputWindow;
+            writeToConsole = true;
+            if (!lastWriteWasBlankError && !lastWriteToConsoleWasBlank) {
+                _write("", currentWriteToOutputWindow, currentWriteToFile);
             }
+            _writeError(msg, currentWriteToOutputWindow, currentWriteToFile);
+            if (params) {
+                for (const [ n, v, l ] of params) {
+                    value(sym + "   " + n, v, 0, "", queueId);
+                }
+            }
+            _write("", currentWriteToOutputWindow, currentWriteToFile);
+            // const isBlankError = /\[[0-9]{1,2}m[\W]{1}\[[0-9]{1,2}m/.test(msg);
+            lastWriteWasBlank = true;
+            lastWriteWasBlankError = true;
+            lastWriteToConsoleWasBlank = true;
+            writeToConsole = currentWriteToConsole;
+            enableFile = currentWriteToFile;
+            enableOutputWindow = currentWriteToOutputWindow;
         }
-        _write("");
-        lastWriteWasBlank = true;
-        lastWriteWasBlankError = true;
-        lastWriteToConsoleWasBlank = true;
-        writeToConsole = currentWriteToConsole;
-        enableFile = currentWriteToFile;
-        enableOutputWindow = currentWriteToOutputWindow;
     }
 }
 
@@ -176,8 +211,7 @@ export async function initLog(settingGrpName: string, dispName: string, context:
 
 function getFileName()
 {
-    const tzOffset = (new Date()).getTimezoneOffset() * 60000,
-          locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T")[0].replace(/[\-]/g, "");
+    const locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T")[0].replace(/[\-]/g, "");
     return `taskexplorer-${locISOTime}.log`;
 }
 
@@ -195,19 +229,16 @@ function logLogFileLocation()
         /* istanbul ignore else */
         if (logOutputChannel)
         {
-            logOutputChannel.appendLine("*************************************************************************************");
+            logOutputChannel.appendLine("***********************************************************************************************");
             logOutputChannel.appendLine(" Log File: " + fileName);
-            logOutputChannel.appendLine("*************************************************************************************");
-            logOutputChannel.appendLine(`${figures.color.pointer} ${withColor("*************************************************************************************", colors.grey)}`);
-            logOutputChannel.appendLine(`${figures.color.pointer} ${withColor(" Log File: " + fileName, colors.grey)}`);
-            logOutputChannel.appendLine(`${figures.color.pointer} ${withColor("*************************************************************************************", colors.grey)}`);
+            logOutputChannel.appendLine("***********************************************************************************************");
         }
         /* istanbul ignore else */
         if (isTests)
         {
-            console.log(`    ${figures.color.pointer} ${withColor("*************************************************************************************", colors.grey)}`);
-            console.log(`    ${figures.color.pointer} ${withColor(" Log File: " + fileName, colors.grey)}`);
-            console.log(`    ${figures.color.pointer} ${withColor("*************************************************************************************", colors.grey)}`);
+            console.log(`    ${figures.color.info} ${withColor("*************************************************************************************", colors.grey)}`);
+            console.log(`    ${figures.color.info} ${withColor(" Log File: " + fileName, colors.grey)}`);
+            console.log(`    ${figures.color.info} ${withColor("*************************************************************************************", colors.grey)}`);
         }
     }
 }
@@ -255,6 +286,10 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         if (enableFile) {
             window.showInformationMessage("Log file location: " + fileName);
         }
+    }
+    if (e.affectsConfiguration("taskExplorer.logging.enableFileSymbols"))
+    {
+        enableFileSymbols = configuration.get<boolean>("logging.enableFileSymbols", true);
     }
     if (e.affectsConfiguration("taskExplorer.logging.level"))
     {
@@ -337,23 +372,23 @@ export function values(level: number, logPad: string, params: any | (string|any)
 }
 
 
+export const warn = (msg: any, params?: (string|any)[][], queueId?: string) => _error(msg, params, queueId, [ figures.color.warning, figures.warning ]);
+
+
 export const withColor = figures.withColor;
 
 
-export function write(msg: string, level?: number, logPad = "", queueId?: string) // , color?: LogColor)
+export function write(msg: string, level?: number, logPad = "", queueId?: string, isError?: boolean) // , color?: LogColor)
 {
-    // const isBlankError = /\[[0-9]{1,2}m[\W]{1}\[[0-9]{1,2}m/.test(msg);
     if (msg === null || msg === undefined || (lastWriteWasBlank && msg === "")) {
         return;
     }
 
     if (enable)
     {
-        const ts = new Date().toISOString().replace(/[TZ]/g, " ");
-
-        const _write = (fn: (...fnArgs: any) => void, scope: any, isFile: boolean, ...args: any) =>
+        const _write = (fn: (...fnArgs: any) => void, scope: any,  ts: string, isFile: boolean, ...args: any) =>
         {
-            const msgs = msg.split("\n");
+            const msgs = msg.split("\n").filter(m => !!m);
             for (const m of msgs)
             {
                 const _msg = ts + logPad + m.trimEnd() + (isFile ? "\n" : "");
@@ -386,34 +421,42 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
             }
         };
 
-        if (enableOutputWindow && logOutputChannel && (!level || level <= (logLevel))) {
-            _write(logOutputChannel.appendLine, logOutputChannel, false);
+        const timeTags = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T");
+        if (enableOutputWindow && logOutputChannel && (!level || level <= (logLevel)))
+        {
+            const ts = !isError || !isTests ? timeTags.join(" ") + " " : "    ";
+            _write(logOutputChannel.appendLine, logOutputChannel, ts, false);
         }
-        if (writeToConsole) {
-            if (!level || level <= writeToConsoleLevel) {
+        if (writeToConsole)
+        {
+            if (!level || level <= writeToConsoleLevel)
+            {
+                const ts = !isError || !isTests ? timeTags[1] + " " + figures.pointer + " " : "    ";
                 msg = withColor(msg, colors.grey);
-                _write(console.log, console, false);
+                _write(console.log, console, ts, false);
                 lastWriteToConsoleWasBlank = false;
             }
         }
-        if (enableFile) {
-            if (!level || level <= logLevel) {
-                _write(appendFileSync, null, true, fileName);
+        if (enableFile)
+        {
+            if (!level || level <= logLevel)
+            {
+                let ts;
+                if (enableFileSymbols) {
+                    ts = !isError || !isTests ? timeTags[1]  + " " + figures.pointer + " " : "    ";
+                }
+                else {
+                    ts = !isError || !isTests ? timeTags[1]  + " " : "    ";
+                }
+                _write(appendFileSync, null, ts, true, fileName);
             }
         }
 
-        lastWriteWasBlankError = false;
         lastWriteWasBlank = (msg === "");
-    }
-}
-
-
-function writeError(e: Error, figure: string, queueId?: string)
-{
-    write(figure + " " + e.name, 0, "", queueId);
-    write(figure + " " + e.message, 0, "", queueId);
-    if (e.stack) {
-        const stackFmt = e.stack.replace(/\n/g, `\n${figure} `);
-        write(figure + " " + stackFmt, 0, "", queueId);
+        lastWriteToConsoleWasBlank = lastWriteWasBlank;
+        if (!isError) {
+            lastErrorMesage = "";
+            lastWriteWasBlankError = false;
+        }
     }
 }

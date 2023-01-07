@@ -1,5 +1,6 @@
 
 import * as fs from "fs";
+import * as glob from "glob";
 import * as path from "path";
 // import { isString } from "../../common/utils";
 
@@ -178,25 +179,50 @@ export const deleteFile = (file: string): Promise<void> =>
     });
 };
 
-/*
-export function getDateModified(file: string)
+
+/**
+ * @method findFiles
+ * @since 3.0.0
+ */
+export const findFiles = (pattern: string, options: any): Promise<string[]> =>
+{
+    return new Promise((resolve, reject) =>
+    {
+        glob(pattern, options, (err, files) =>
+        {
+            /* istanbul ignore else */
+            if (!err) {
+                resolve(files);
+            }
+            else {
+                reject(err);
+            }
+        });
+    });
+};
+
+
+
+export const getDateModified = (file: string) =>
 {
     return new Promise<Date|undefined>(async (resolve, reject) =>
     {
-        if (!await pathExists(file)) {
-            reject(new Error("Invalid file path"));
-            return;
-        }
-        fs.stat(file, { bigint: true }, (e, stats) =>
+        if (await pathExists(file))
         {
-            if (e) {
-                reject(e);
-            }
-            resolve(stats.mtime);
-        });
+            fs.stat(path.resolve(cwd, file), { bigint: true }, (e, stats) =>
+            {   /* istanbul ignore else */
+                if (e) {
+                    reject(e);
+                }
+                resolve(stats.mtime);
+            });
+        }
+        else {
+            resolve(undefined);
+        }
     });
-}
-*/
+};
+
 
 
 export const isDirectory = (dirPath: string) => fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory();
@@ -209,8 +235,7 @@ export const numFilesInDirectory = (dirPath: string): Promise<number> =>
         if (fs.existsSync(dirPath))
         {
             fs.readdir(dirPath, (err, files) =>
-            {
-                /* istanbul ignore else */
+            {   /* istanbul ignore else */
                 if (!err) {
                     resolve(files.length);
                 }

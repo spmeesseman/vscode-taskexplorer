@@ -8,9 +8,11 @@
 import * as assert from "assert";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, getWsPath, testControl, verifyTaskCount } from "../helper";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { PowershellTaskProvider } from "../../providers/powershell";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, executeSettingsUpdate, getWsPath,
+    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, testControl, verifyTaskCount
+} from "../helper";
 
 const testsName = "powershell";
 const startTaskCount = 1;
@@ -71,6 +73,7 @@ suite("Powershell Tests", () =>
         const provider = teApi.providers.get(testsName) as PowershellTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.ps1"))),
                "ScriptProvider type should return position 1");
+        logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs();
     });
 
 

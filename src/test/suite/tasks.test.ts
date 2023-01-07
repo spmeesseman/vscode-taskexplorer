@@ -228,7 +228,7 @@ suite("Task Tests", () =>
 
 async function startTask(taskItem: TaskItem)
 {
-    console.log(`    ${figures.info} Run ${taskItem.taskSource} task: ${taskItem.label}`);
+    console.log(`    ${figures.color.info} Run ${taskItem.taskSource} task: ${taskItem.label}`);
     console.log(`        Folder: ${taskItem.getFolder()?.name}`);
     await executeSettingsUpdate("taskButtons.clickAction", "Execute");
     // await executeSettingsUpdate("specialFolders.showLastTasks", (++runCount % 2) === 1);

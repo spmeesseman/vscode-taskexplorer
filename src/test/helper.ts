@@ -12,6 +12,7 @@ import constants from "../lib/constants";
 import { deleteFile, pathExists } from "../lib/utils/fs";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
+import { log } from "console";
 
 let activated = false;
 let teApi: ITaskExplorerApi;
@@ -66,17 +67,21 @@ export async function activate(instance?: any)
     if (instance) instance.timeout(60 * 1000);
 
     if (!activated)
-    {   //
+    {
+        console.log(`    ${figures.color.info}`);
+        console.log(`    ${figures.color.info} ${figures.withColor("Tests startup", figures.colors.grey)}`);
+        //
         // Init settings
         // Note that the '*' is removed from package.json[activationEvents] before the runTest() call
         //
+        console.log(`    ${figures.color.info} ${figures.withColor("Initializing settings", figures.colors.grey)}`);
         await initSettings();
         //
         // Activate extension
         //
         console.log(`    ${figures.color.info} ${figures.withColor("Activating extension 'spmeesseman.vscode-taskexplorer'", figures.colors.grey)}`);
         teApi = await ext.activate();
-        console.log(`    ${figures.color.success} ${figures.withColor("Extension 'spmeesseman.vscode-taskexplorer' successfully activated", figures.colors.grey)}`);
+        console.log(`    ${figures.color.info} ${figures.withColor("Extension 'spmeesseman.vscode-taskexplorer' successfully activated", figures.colors.grey)}`);
         //
         // Ensure extension initialized successfully
         //
@@ -87,10 +92,12 @@ export async function activate(instance?: any)
         //
         // _api pre-test suite will reset after disable/enable
         //
+        console.log(`    ${figures.color.info} ${figures.withColor("Settings tests active explorer instance", figures.colors.grey)}`);
         setExplorer(teApi.explorer);
         //
         // waitForIdle() added 1/2/03 - Tree loads in delay 'after' activate()
         //
+        console.log(`    ${figures.color.info} ${figures.withColor("Waiting for extension to initialize", figures.colors.grey)}`);
         teApi.waitForIdle();
         //
         // Write to console is just a tests feature, it's not controlled by settings, set it here if needed
@@ -100,7 +107,8 @@ export async function activate(instance?: any)
         // All done
         //
         activated = true;
-        console.log(`    ${figures.color.success} ${figures.withColor("Tests ready", figures.colors.grey)}`);
+        console.log(`    ${figures.color.info} ${figures.withColor("Tests ready", figures.colors.grey)}`);
+        console.log(`    ${figures.color.info}`);
     }
     return teApi;
 }
@@ -108,7 +116,20 @@ export async function activate(instance?: any)
 
 export async function cleanup()
 {
+    console.log(`    ${figures.color.info}`);
+    console.log(`    ${figures.color.info} ${figures.withColor("Tests complete, clean up", figures.colors.grey)}`);
+
+    if (testControl.logEnabled && testControl.logToFile && testControl.logOpenFileOnFinish)
+    {
+        console.log(`    ${figures.color.info}`);
+        console.log(`    ${figures.color.info} ${figures.withColor("Log File Location:", figures.colors.grey)}`);
+        console.log(`    ${figures.color.info} ${figures.withColor("   " + teApi.log.getLogFileName(), figures.colors.grey)}`);
+        console.log(`    ${figures.color.info}`);
+    }
+
+    console.log(`    ${figures.color.info} ${figures.withColor("Deactivating extension 'spmeesseman.vscode-taskexplorer'", figures.colors.grey)}`);
     await deactivate();
+    console.log(`    ${figures.color.info} ${figures.withColor("Extension 'spmeesseman.vscode-taskexplorer' successfully deactivated", figures.colors.grey)}`);
 
     window.showInputBox = originalShowInputBox;
     window.showInformationMessage = originalShowInfoBox;
@@ -127,12 +148,17 @@ export async function cleanup()
     //     } catch (e: any) { console.error(e.message); }
     // }
 
+    console.log(`    ${figures.color.info} ${figures.withColor("Removing any leftover temporary files", figures.colors.grey)}`);
     try {
         const packageLockFile = path.join(getWsPath("."), "package-lock.json");
         if (await pathExists(packageLockFile)) {
             await deleteFile(packageLockFile);
         }
     } catch (e) { console.error(e); }
+
+    console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
+    console.log(`    ${figures.color.info} ${figures.withColor("Exiting", figures.colors.grey)}`);
+    console.log(`    ${figures.color.info}`);
 }
 
 
@@ -316,6 +342,26 @@ function isReady(taskType?: string)
     }
     return !err ? true : err;
 }
+
+
+export const logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs = (willFail = true) =>
+{
+    if (willFail) {
+        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
+        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.up}  ${figures.withColor("  THESE ERRORS WERE SUPPOSED TO HAPPEN!!!  ", figures.colors.green)}  ` +
+                    `${figures.color.up}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
+        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
+                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
+    }
+};
 
 
 export function overrideNextShowInputBox(value: any)

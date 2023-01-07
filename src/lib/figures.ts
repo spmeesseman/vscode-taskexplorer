@@ -5,6 +5,8 @@ export default
     colors,
     withColor,
 
+    // figures: {
+
     success: "✔",
     info: "ℹ",
 	warning: "⚠",
@@ -18,6 +20,41 @@ export default
 	checkboxOff: "☐",
 	pointerSmall: "›",
 	bullet: "●",
+    up: "△",
+
+    color:
+    {
+        success: withColor("✔", colors.green),
+        info: withColor("ℹ", colors.magenta),
+        warning: withColor("⚠", colors.yellow),
+        error: withColor("✘", colors.red),
+        start: withColor("▶", colors.green),
+        end: withColor("◀", colors.green),
+        pointer: withColor("❯", colors.grey),
+        up: withColor("△", colors.green),
+    },
+
+    // }
+
+    // mocha:
+    // {
+    //     success: "✅",
+    //     warning: "⚠️",
+    //     error: "❌️"
+    // },
+
+    // emoji:
+    // {
+    //     cross: "✖️",
+    //     love: "😍",
+    //     happy: "😀",
+    //     heart: "💓",
+    //     success: "✔️",
+    //     red: "🟠",
+    //     yellow: "🟡",
+    //     green: "🟢",
+    //     purple: "🟣"
+    // },
 
     old:
     {
@@ -31,17 +68,7 @@ export default
         nodejs: "♦",
         checkboxOn: "[×]",
         checkboxOff: "[ ]",
-    },
-
-    color:
-    {
-        success: withColor("✔", colors.green),
-        info: withColor("ℹ", colors.magenta),
-        warning: withColor("⚠", colors.yellow),
-        error: withColor("✘", colors.red),
-        start: withColor("▶", colors.green),
-        end: withColor("◀", colors.green),
-        pointer: withColor("❯", colors.grey),
+        up: "∆"
     }
 
 };

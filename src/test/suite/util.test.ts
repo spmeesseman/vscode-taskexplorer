@@ -372,6 +372,8 @@ suite("Util Tests", () =>
 		await afs.getDateModified(join(__dirname, "folder1", "folder2", "folder3"));
 		await afs.getDateModified(join(__dirname, "hello.sh"));
 		await afs.getDateModified(__dirname);
+		await afs.getDateModified("");
+		await afs.getDateModified(null as unknown as string);
 	});
 
 

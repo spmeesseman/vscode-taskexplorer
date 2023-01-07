@@ -7,10 +7,10 @@ import { getLicenseManager, providers, providersExternal } from "./extension";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
 } from "vscode";
-import * as glob from "glob";
 import { join } from "path";
 import { ICacheItem } from "./interface/cacheItem";
 import { TaskExplorerProvider } from "./providers/provider";
+import { findFiles } from "./lib/utils/fs";
 
 
 let statusBarSpace: StatusBarItem;
@@ -112,7 +112,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                         }
                         log.write(`   Set max files to scan at ${maxFiles} files (no license)`, 2, logPad);
                     }
-                    const paths = await globAsync(glob, { nocase: true, ignore: getExcludesPatternGlob(), cwd: folder.fsPath  });
+                    const paths = await findFiles(glob, { nocase: true, ignore: getExcludesPatternGlob(), cwd: folder.fsPath  });
                     for (const fPath of paths)
                     {   /* istanbul ignore if */
                         if (cancel) {
@@ -508,28 +508,6 @@ const getTaskFileCount = (taskType?: string) =>
     });
     return count;
 };
-
-
-/**
- * @method globAsync
- * @since 3.0.0
- */
-export function globAsync(pattern: string, options: any): Promise<string[]>
-{
-    return new Promise(function (resolve, reject)
-    {
-        glob(pattern, options, function (err, files)
-        {
-            /* istanbul ignore else */
-            if (!err) {
-                resolve(files);
-            }
-            else {
-                reject(err);
-            }
-        });
-    });
-}
 
 
 function initMaps(taskType: string, project: string)

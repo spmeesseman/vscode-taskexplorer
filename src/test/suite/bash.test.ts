@@ -9,12 +9,12 @@ import * as assert from "assert";
 import * as path from "path";
 import { TaskExecution, Uri, workspace, WorkspaceFolder } from "vscode";
 import { BashTaskProvider } from "../../providers/bash";
+import { isObjectEmpty } from "../../lib/utils/utils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand2, getWsPath, testControl, treeUtils,
-    verifyTaskCount, waitForTaskExecution
+    activate, executeSettingsUpdate, executeTeCommand2, getWsPath, testControl, treeUtils, verifyTaskCount,
+    waitForTaskExecution, logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs,
 } from "../helper";
-import { isObjectEmpty } from "../../lib/utils/utils";
 
 const testsName = "bash";
 const startTaskCount = 1;
@@ -78,6 +78,7 @@ suite("Bash Tests", () =>
         const provider = teApi.providers.get(testsName) as BashTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("hello.sh"))),
                "ScriptProvider type should return position 1");
+        logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(true);
     });
 
 

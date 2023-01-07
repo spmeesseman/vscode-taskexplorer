@@ -8,9 +8,12 @@
 import * as assert from "assert";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { activate, executeSettingsUpdate, getWsPath, testControl, verifyTaskCount } from "../helper";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { PythonTaskProvider } from "../../providers/python";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import {
+    activate, executeSettingsUpdate, getWsPath,
+    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, testControl, verifyTaskCount
+} from "../helper";
 
 const testsName = "python";
 const startTaskCount = 2;
@@ -68,6 +71,7 @@ suite("Python Tests", () =>
         const provider = teApi.providers.get(testsName) as PythonTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.py"))),
                "ScriptProvider type should return position 1");
+        logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(true);
     });
 
 
