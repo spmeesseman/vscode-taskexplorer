@@ -1,16 +1,16 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as util from "./lib/utils/utils";
-import * as log from "./lib/utils/log";
-import { configuration } from "./lib/utils/configuration";
-import { getLicenseManager, providers, providersExternal } from "./extension";
+import * as log from "./utils/log";
+import * as util from "./utils/utils";
+import { join } from "path";
+import { findFiles } from "./utils/fs";
+import { configuration } from "./utils/configuration";
+import { getLicenseManager, providers, providersExternal } from "../extension";
+import { ICacheItem } from "../interface/cacheItem";
+import { TaskExplorerProvider } from "../providers/provider";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
 } from "vscode";
-import { join } from "path";
-import { ICacheItem } from "./interface/cacheItem";
-import { TaskExplorerProvider } from "./providers/provider";
-import { findFiles } from "./lib/utils/fs";
 
 
 let statusBarSpace: StatusBarItem;
@@ -19,7 +19,7 @@ let cancel = false;
 let projectFilesMap: { [project: string]:  { [taskType: string]: Uri[] }} = {};
 let projectToFileCountMap: { [project: string]:  { [taskType: string]: number }} = {};
 let taskGlobs: any = {};
-let taskFilesMap: { [taskType: string]:  ICacheItem[] } = {};  // will replace filesCache with this at some point
+let taskFilesMap: { [taskType: string]:  ICacheItem[] } = {};
 
 
 /**

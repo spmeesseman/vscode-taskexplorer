@@ -5,12 +5,12 @@ import { TaskTreeDataProvider } from "../tree/tree";
 import { ExtensionContext, window, TreeView, TreeItem } from "vscode";
 import { IExplorerApi, ITaskExplorerApi } from "../interface";
 
-const views: Map<string, TreeView<TreeItem>> = new Map();
+const views: { [taskType: string]: TreeView<TreeItem> | undefined } = {};
 
 
 export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext, enabled: boolean, teApi: ITaskExplorerApi, isActivation: boolean)
 {
-    let view = views.get(name);
+    let view = views[name];
     log.write("Register explorer view / tree provider '" + name + "'", 1, "   ");
 
     if (enabled)
@@ -20,8 +20,8 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
         {
             const treeDataProvider = new TaskTreeDataProvider(name, context, teApi.isTests()),
                   treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
-            views.set(name, treeView);
-            view = views.get(name);
+            views[name] = treeView;
+            view = views[name];
             /* istanbul ignore else */
             if (view)
             {
@@ -60,7 +60,7 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
                 teApi.sidebar = undefined;
                 teApi.sidebarView = undefined;
             }
-            views.delete(name);
+            views[name] = undefined;
             view.dispose();
         }
     }
