@@ -45,20 +45,23 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
     {
         const targets: string[] = [];
 
-        log.methodStart("find composer targets", 2, logPad, false, [[ "path", fsPath ]], this.logQueueId);
+        log.methodStart("find composer targets", 4, logPad, false, [[ "path", fsPath ]], this.logQueueId);
 
         try {
             const json = await readJsonAsync<any>(fsPath),
                   scripts = json.scripts;
             /* istanbul ignore else */
             if (scripts) {
-                Object.keys(scripts).forEach((k) => { targets.push(k); });
+                Object.keys(scripts).forEach((k) => {
+                    targets.push(k);
+                    log.value("   found composer task", k, 4, logPad, this.logQueueId);
+                });
             }
         } catch {
             log.error("Invalid JSON found in " + fsPath, undefined, this.logQueueId);
         }
 
-        log.methodDone("Find composer targets", 2, logPad, undefined, this.logQueueId);
+        log.methodDone("Find composer targets", 4, logPad, undefined, this.logQueueId);
         return targets;
     }
 
@@ -98,7 +101,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read composer file uri task", 1, logPad, false, [
+        log.methodStart("read composer file uri task", 3, logPad, false, [
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
 
@@ -110,7 +113,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
             result.push(task);
         }
 
-        log.methodDone("read composer file uri task", 1, logPad, [[ "#of tasks found", result.length ]], this.logQueueId);
+        log.methodDone("read composer file uri task", 3, logPad, [[ "#of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 

@@ -51,8 +51,9 @@ export class LicenseManager implements ILicenseManager
 
 	async setTasks(components: Task[], logPad = "   ")
 	{
-		let displayPopup = false;
+		let displayPopup = !this.licensed;
 		const storedVersion = storage.get<string>("version"),
+			  lastNag = storage.get<string>("lastLicenseNag"),
 			  versionChange = this.version !== storedVersion;
 
 		if (this.numTasks === components.length) {
@@ -68,8 +69,16 @@ export class LicenseManager implements ILicenseManager
 			[ "stored version", storedVersion ], [ "is licensed", this.licensed ]
 		]);
 
-		if (!this.licensed) { // only display the nag on startup when the version changes
-			displayPopup = !versionChange;
+		//
+		// Only display the nag on startup once every 30 days.  If the version
+		// changed, the webview will be shown instead regardless of the nag state.
+		//
+		if (!this.licensed && lastNag)
+		{
+			const now = Date.now();
+			let lastNagDate = now;
+			lastNagDate = parseInt(lastNag, 10);
+			displayPopup = ((now - lastNagDate)  / 1000 / 60 / 60 / 24) > 30;
 		}
 
 		if (versionChange)
@@ -120,6 +129,7 @@ export class LicenseManager implements ILicenseManager
 		else if (displayPopup)
 		{
 			const msg = "Purchase a license to unlock unlimited parsed tasks.";
+			await storage.update("lastLicenseNag", Date.now().toString());
 			window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now")
 			.then(async (action) =>
 			{

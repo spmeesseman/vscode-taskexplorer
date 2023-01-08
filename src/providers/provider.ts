@@ -96,7 +96,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
               paths = getTaskFiles(this.providerName),
               enabled = util.isTaskTypeEnabled(this.providerName);
 
-        log.methodStart(`read ${this.providerName} tasks`, 1, logPad, false, [[ "enabled", enabled ]], this.logQueueId);
+        log.methodStart(`read ${this.providerName} tasks`, 2, logPad, false, [[ "enabled", enabled ]], this.logQueueId);
 
         if (enabled && paths)
         {
@@ -106,15 +106,15 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 {
                     visitedFiles.push(fObj.uri.fsPath);
                     const tasks = (await this.readUriTasks(fObj.uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
-                    log.write(`   processed ${this.providerName} file`, 3, logPad, this.logQueueId);
-                    log.value("      file", fObj.uri.fsPath, 3, logPad, this.logQueueId);
-                    log.value("      targets in file", tasks.length, 3, logPad, this.logQueueId);
+                    log.write(`   processed ${this.providerName} file`, 2, logPad, this.logQueueId);
+                    log.value("      file", fObj.uri.fsPath, 2, logPad, this.logQueueId);
+                    log.value("      targets in file", tasks.length, 2, logPad, this.logQueueId);
                     allTasks.push(...tasks);
                 }
             }
         }
 
-        log.methodDone(`read ${this.providerName} tasks`, 1, logPad, [[ "# of tasks parsed", allTasks.length ]], this.logQueueId);
+        log.methodDone(`read ${this.providerName} tasks`, 2, logPad, [[ "# of tasks parsed", allTasks.length ]], this.logQueueId);
 
         return allTasks;
     }

@@ -6,34 +6,34 @@ import * as fs from "./lib/utils/fs";
 import * as log from "./lib/utils/log";
 import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerViewReportCommand from "./commands/viewReport";
+import { join } from "path";
 import { AntTaskProvider } from "./providers/ant";
-import { MakeTaskProvider } from "./providers/make";
-import { MavenTaskProvider } from "./providers/maven";
+import { AppPublisherTaskProvider } from "./providers/appPublisher";
+import { BashTaskProvider } from "./providers/bash";
+import { BatchTaskProvider } from "./providers/batch";
+import { ComposerTaskProvider } from "./providers/composer";
 import { GradleTaskProvider } from "./providers/gradle";
 import { GruntTaskProvider } from "./providers/grunt";
-import { ComposerTaskProvider } from "./providers/composer";
-import { PipenvTaskProvider } from "./providers/pipenv";
 import { GulpTaskProvider } from "./providers/gulp";
-import { AppPublisherTaskProvider } from "./providers/appPublisher";
+import { MakeTaskProvider } from "./providers/make";
+import { MavenTaskProvider } from "./providers/maven";
+import { NsisTaskProvider } from "./providers/nsis";
+import { PerlTaskProvider } from "./providers/perl";
+import { PipenvTaskProvider } from "./providers/pipenv";
+import { PowershellTaskProvider } from "./providers/powershell";
+import { PythonTaskProvider } from "./providers/python";
+import { RubyTaskProvider } from "./providers/ruby";
 import { configuration } from "./lib/utils/configuration";
 import { initStorage, storage } from "./lib/utils/storage";
 import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";
-import { ExternalExplorerProvider, IExplorerApi, ITaskExplorerApi } from "./interface";
 import { LicenseManager } from "./lib/licenseManager";
-import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
-import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
 import { ExtensionContext, tasks, commands } from "vscode";
-import { BatchTaskProvider } from "./providers/batch";
-import { BashTaskProvider } from "./providers/bash";
-import { NsisTaskProvider } from "./providers/nsis";
-import { PerlTaskProvider } from "./providers/perl";
-import { PowershellTaskProvider } from "./providers/powershell";
-import { PythonTaskProvider } from "./providers/python";
-import { RubyTaskProvider } from "./providers/ruby";
-import { join } from "path";
+import { ExternalExplorerProvider, IExplorerApi, ITaskExplorerApi } from "./interface";
+import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
+import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
 
 
 const isLicenseManagerActive = true;
@@ -71,7 +71,7 @@ export const teApi: ITaskExplorerApi =
 export async function activate(context: ExtensionContext) // , disposables: Disposable[]): Promise<ITaskExplorerApi>
 {
     tests = await fs.pathExists(join(__dirname, "test", "runTest.js"));
-    await log.initLog("taskExplorer", "Task Explorer", context, tests);
+    await log.initLog(context, tests);
     initStorage(context);
 
     log.write("");
@@ -311,9 +311,6 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
 {
     let waited = 0;
     let iterationsIdle = 0;
-    if (isBusy()) {
-        log.write("waiting for task explorer extension idle state...", 3, logPad);
-    }
     while ((iterationsIdle < 3 || isBusy()) && waited < maxWait)
     {
         await util.timeout(10);
@@ -327,8 +324,5 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
     if (minWait > waited) {
         /* istanbul ignore next */
         await util.timeout(minWait - waited);
-    }
-    if (waited > 0) {
-        log.write(`waited ${waited} milliseconds for idle state`, 4, logPad);
     }
 }

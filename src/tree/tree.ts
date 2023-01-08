@@ -417,7 +417,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         {   //
             // Create "tree item" node and add it to the owner "tree file" node
             //
-            const taskItem = new TaskItem(this.extensionContext, taskFile, each);
+            const taskItem = new TaskItem(this.extensionContext, taskFile, each, logPad + "   ");
             taskFile.addTreeNode(taskItem);
             this.taskMap[taskItem.id] = taskItem;
             //
@@ -1083,7 +1083,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         {
             log.methodStart("get tree item", 3, "", true, [[ "label", element.label ]]);
             log.write("   refresh task item state", 3);
-            element.refreshState(true);
+            element.refreshState("   ", 3);
             log.methodDone("get tree item", 3);
         }
         return element;
@@ -1386,7 +1386,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
         else {
             window.showInformationMessage("Executing task not found");
-            taskItem.refreshState(true, "   ", 1);
+            taskItem.refreshState("   ", 1);
             this.taskWatcher.fireTaskChangeEvents(taskItem, "   ", 1);
         }
 
@@ -2031,7 +2031,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
         else {
             window.showInformationMessage("Executing task not found");
-            taskItem.refreshState(true, "   ", 1);
+            taskItem.refreshState("   ", 1);
             this.taskWatcher.fireTaskChangeEvents(taskItem, "   ", 1);
         }
 

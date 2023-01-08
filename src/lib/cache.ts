@@ -509,10 +509,6 @@ function isFsChanged(taskType: string, project: string)
     {
         fsChanged = projectToFileCountMap[project][taskType] !== projectFilesMap[project][taskType].length;
     }
-    // else if (taskFilesMap[taskType])
-    // {
-    //     fsChanged = projectToFileCountMap[project][taskType] !== taskFilesMap[taskType].filter(f => f.folder.name === project).length;
-    // }
     return fsChanged;
 }
 

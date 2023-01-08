@@ -98,8 +98,8 @@ export default class TaskFile extends TreeItem
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group || false), TreeItemCollapsibleState.Collapsed);
 
         log.methodStart("construct tree file", 4, logPad, false, [
-            [ "label", this.label ], [ "source", source ], [ "relativePath", relativePath ], [ "task folder", folder.label ],
-            [ "groupLevel", groupLevel ], [ "group", group ], [ "label", label ?? source ], [ "taskDef cmd line", taskDef.cmdLine ],
+            [ "label", label ?? source ], [ "source", source ], [ "relativePath", relativePath ], [ "task folder", folder.label ],
+            [ "groupLevel", groupLevel ], [ "group", group ], [ "taskDef cmd line", taskDef.cmdLine ],
             [ "taskDef file name", taskDef.fileName ], [ "taskDef icon light", taskDef.icon ], [ "taskDef icon dark", taskDef.iconDark ],
             [ "taskDef script", taskDef.script ], [ "taskDef target", taskDef.target ], [ "taskDef path", taskDef.path ]
         ]);

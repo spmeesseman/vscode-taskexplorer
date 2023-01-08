@@ -37,8 +37,9 @@ export default class TaskItem extends TreeItem
     public command: Command;
 
 
-    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task)
+    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task, logPad = "")
     {
+        const taskDef = task.definition;
         const getDisplayName = (taskName: string): string =>
         {
             let displayName = taskName;
@@ -53,6 +54,12 @@ export default class TaskItem extends TreeItem
         // Construction
         //
         super(getDisplayName(task.name), TreeItemCollapsibleState.None);
+        log.methodStart("construct tree item", 5, logPad, false, [
+            [ "label", this.label ], [ "source", taskFile.taskSource ], [ "node path", taskFile.nodePath ], [ "task file", taskFile.label ],
+            [ "groupLevel", taskFile.groupLevel ], [ "taskDef cmd line", taskDef.cmdLine ],
+            [ "taskDef file name", taskDef.fileName ], [ "taskDef icon light", taskDef.icon ], [ "taskDef icon dark", taskDef.iconDark ],
+            [ "taskDef script", taskDef.script ], [ "taskDef target", taskDef.target ], [ "taskDef path", taskDef.path ]
+        ]);
         //
         // Save extension context, we need it in a few of the classes functions
         //
@@ -109,7 +116,12 @@ export default class TaskItem extends TreeItem
         //
         // Refresh state - sets context value, icon path from execution state
         //
-        this.refreshState(false);
+        this.refreshState("   ", 5);
+        log.methodDone("construct tree file", 5, logPad, [
+            [ "id", this.id ], [ "label", this.label ], [ "Node Path", this.nodePath ], [ "is usertask", this.isUser ],
+            [ "context value", this.contextValue ], [ "groupLevel", this.groupLevel ],
+            [ "resource uri path", this.taskFile.resourceUri.fsPath ], [ "path", this.taskFile.path  ]
+        ]);
     }
 
 
@@ -143,13 +155,15 @@ export default class TaskItem extends TreeItem
     }
 
 
-    refreshState(doLog?: boolean, logPad?: string, logLevel?: number)
+    refreshState(logPad: string, logLevel: number)
     {
         const isExecuting = !!this.isExecuting();
-        if (doLog) log.methodStart("refresh taskitem state", logLevel, logPad, false, [[ "is executing", isExecuting ]]);
+        log.methodStart("refresh taskitem state", logLevel, logPad, false, [
+            [ "label", this.label ], [ "is executing", isExecuting ]
+        ]);
+        log.value("id", this.id, logLevel + 1);
         this.setContextValue(this.task, isExecuting);
         this.setIconPath(this.context, isExecuting);
-        if (doLog) log.methodDone("refresh taskitem state", logLevel, logPad);
     }
 
 

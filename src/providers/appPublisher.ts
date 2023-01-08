@@ -56,7 +56,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
               groupSeparator = configuration.get<string>("groupSeparator");
 
-        log.methodStart("read app-publisher file uri task", 1, logPad, false, [
+        log.methodStart("read app-publisher file uri task", 3, logPad, false, [
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
 
@@ -65,7 +65,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         }
         catch (e: any)
         {   log.error(e, undefined, this.logQueueId);
-            log.methodDone("read app-publisher file uri tasks", 1, logPad, undefined, this.logQueueId);
+            log.methodDone("read app-publisher file uri tasks", 3, logPad, undefined, this.logQueueId);
             return [];
         }
 
@@ -204,7 +204,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
                                 `${def.label}${apFmtLabel}`, "apppublisher", exec, undefined));
         });
 
-        log.methodDone("read app-publisher file uri tasks", 1, logPad, [[ "# of tasks found", tasks.length ]], this.logQueueId);
+        log.methodDone("read app-publisher file uri tasks", 4, logPad, [[ "# of tasks found", tasks.length ]], this.logQueueId);
 
         return tasks;
     }

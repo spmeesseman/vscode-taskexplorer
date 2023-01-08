@@ -1,9 +1,9 @@
 
 import { Task } from "vscode";
-import * as path from "path";
 import * as json5 from "json5";
 import * as log from "./utils/log";
 import * as util from "./utils/utils";
+import { join } from "path";
 import { providersExternal } from "../extension";
 import { configuration } from "./utils/configuration";
 import { getTaskName } from "./getTaskName";
@@ -87,7 +87,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
             // in the task,, it[s definition, detail, anywhere.  Stupid. So we have to JSON parse
             // the tasks.json file to see if the hideproperty is set.
             //
-            const tasksFile = path.join(task.scope.uri.fsPath, ".vscode", "tasks.json");
+            const tasksFile = join(task.scope.uri.fsPath, ".vscode", "tasks.json");
 		    /* istanbul ignore else */
             if (existsSync(tasksFile))
             {

@@ -82,7 +82,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined
     {
-        log.methodStart("create script task", 2, logPad, false, [[ "target", target ], [ "cmd", cmd ], [ "path", uri.fsPath ]], this.logQueueId);
+        log.methodStart("create script task", 4, logPad, false, [[ "target", target ], [ "cmd", cmd ], [ "path", uri.fsPath ]], this.logQueueId);
 
         const extension = target.toLowerCase(),
               scriptDef = this.scriptTable[extension],
@@ -196,7 +196,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         const problemMatcher = "$msCompile";
 
 
-        log.methodDone("create script task", 2, logPad, undefined, this.logQueueId);
+        log.methodDone("create script task", 4, logPad, undefined, this.logQueueId);
         //
         // Create the shell execution object and task
         //
@@ -257,11 +257,11 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
-        log.methodStart("read script file uri task", 1, logPad, false, [
+        log.methodStart("read script file uri task", 3, logPad, false, [
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
         const task = this.createTask(path.extname(uri.fsPath).substring(1), undefined, folder, uri, undefined, logPad + "   ");
-        log.methodDone("read script file uri task", 1, logPad, [[ "# of tasks found", 1 ]], this.logQueueId);
+        log.methodDone("read script file uri task", 3, logPad, [[ "# of tasks found", 1 ]], this.logQueueId);
         /* istanbul ignore next */
         return task ? [ task ] : [];
     }

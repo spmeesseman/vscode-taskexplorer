@@ -113,7 +113,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     private async findTargets(fsPath: string, logPad: string)
     {
         const scripts: string[] = [];
-        log.methodStart("find makefile targets", 2, logPad, false, [[ "path", fsPath ]], this.logQueueId);
+        log.methodStart("find makefile targets", 4, logPad, false, [[ "path", fsPath ]], this.logQueueId);
 
         const contents = await readFileAsync(fsPath);
         let match;
@@ -129,13 +129,12 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             {   /* istanbul ignore else */
                 if (this.isNormalTarget(tgtName)) {
                     scripts.push(tgtName);
-                    log.write("   found makefile target", 3, logPad, this.logQueueId);
-                    log.value("      name", tgtName, 3, logPad, this.logQueueId);
+                    log.value("   found makefile task", tgtName, 4, logPad, this.logQueueId);
                 }
             }
         }
 
-        log.methodDone("find makefile targets", 2, logPad, undefined, this.logQueueId);
+        log.methodDone("find makefile targets", 4, logPad, undefined, this.logQueueId);
         return scripts;
     }
 
@@ -182,7 +181,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read make file uri tasks", 1, logPad, false, [
+        log.methodStart("read make file uri tasks", 3, logPad, false, [
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
         const scripts = await this.findTargets(uri.fsPath, logPad + "   ");
@@ -193,7 +192,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             result.push(task);
         }
 
-        log.methodDone("read make file uri tasks", 1, logPad, [[ "#of tasks found", result.length ]], this.logQueueId);
+        log.methodDone("read make file uri tasks", 3, logPad, [[ "#of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 

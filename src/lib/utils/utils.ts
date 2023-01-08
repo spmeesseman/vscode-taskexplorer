@@ -1,14 +1,14 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { WorkspaceFolder, Uri, workspace, window } from "vscode";
+import log from "./log";
 import * as minimatch from "minimatch";
-import { configuration } from "./configuration";
 import constants from "../constants";
-import * as path from "path";
-import * as os from "os";
-import * as log from "./log";
 import TaskItem from "../../tree/item";
+import { homedir } from "os";
+import { configuration } from "./configuration";
 import { pathExists, pathExistsSync } from "./fs";
+import { basename, dirname, extname, join, resolve, sep } from "path";
+import { WorkspaceFolder, Uri, workspace, window } from "vscode";
 
 
 /**
@@ -49,7 +49,7 @@ export function getCombinedGlobPattern(defaultPattern: string, globs: string[]):
 
 export function getCwd(uri: Uri): string
 {
-    return uri.fsPath.substring(0, uri.fsPath.lastIndexOf(path.sep) + 1);
+    return uri.fsPath.substring(0, uri.fsPath.lastIndexOf(sep) + 1);
 }
 
 
@@ -223,8 +223,8 @@ export function getHeaderContent()
 export async function getInstallPath()
 {
     let dir = __dirname;
-    while (dir.length > 3 && !(await pathExists(path.join(dir, "package.json")))) {
-        dir = path.dirname(dir);
+    while (dir.length > 3 && !(await pathExists(join(dir, "package.json")))) {
+        dir = dirname(dir);
     }
     return dir;
 }
@@ -242,7 +242,7 @@ export function getPortableDataPath(padding = "")
             if (pathExistsSync(uri.fsPath))
             {
                 try {
-                    const fullPath = path.join(uri.fsPath, "user-data", "User");
+                    const fullPath = join(uri.fsPath, "user-data", "User");
                     log.value(padding + "found portable user data path", fullPath, 4);
                     return fullPath;
                 }
@@ -350,7 +350,7 @@ export function getUserDataPath(platform?: string, padding = "")
         let argvIdx = process.argv.includes("--user-data-dir");
         /* istanbul ignore next */
         if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
-            userPath = path.resolve(process.argv[++argvIdx]);
+            userPath = resolve(process.argv[++argvIdx]);
             log.value(padding + "user path is", userPath, 4);
             return userPath;
         }
@@ -366,7 +366,7 @@ export function getUserDataPath(platform?: string, padding = "")
         //
         userPath = getDefaultUserDataPath(platform);
     }
-    userPath = path.resolve(userPath);
+    userPath = resolve(userPath);
     log.value(padding + "user path is", userPath, 4);
     return userPath;
 }
@@ -389,30 +389,30 @@ function getDefaultUserDataPath(platform?: string)
                 appDataPath = process.env.APPDATA;
                 if (!appDataPath) {
                     const userProfile = process.env.USERPROFILE || "";
-                    appDataPath = path.join(userProfile, "AppData", "Roaming");
+                    appDataPath = join(userProfile, "AppData", "Roaming");
                 }
                 break;
             case "darwin":
-                appDataPath = path.join(os.homedir(), "Library", "Application Support");
+                appDataPath = join(homedir(), "Library", "Application Support");
                 break;
             case "linux":
-                appDataPath = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config");
+                appDataPath = process.env.XDG_CONFIG_HOME || join(homedir(), ".config");
                 break;
             default:
                 return ".";
         }
     }
-    return path.join(appDataPath, "vscode");
+    return join(appDataPath, "vscode");
 }
 
 
 export function getWorkspaceProjectName(fsPath: string)
 {
-    let project = path.basename(fsPath);
+    let project = basename(fsPath);
     const wsf = workspace.getWorkspaceFolder(Uri.file(fsPath));
     /* istanbul ignore else */
     if (wsf) {
-        project = path.basename(wsf.uri.fsPath);
+        project = basename(wsf.uri.fsPath);
     }
     return project;
 }
@@ -455,9 +455,9 @@ export function isExcluded(uriPath: string, logPad = "")
             log.methodDone("Check exclusion", 4, logPad, [[ "excluded", "yes" ]]);
             return true;
         }
-        if (!path.extname(uriPath) && !uriPath.endsWith(path.sep))
+        if (!extname(uriPath) && !uriPath.endsWith(sep))
         {
-            if (testForExclusionPattern(uriPath + path.sep, pattern))
+            if (testForExclusionPattern(uriPath + sep, pattern))
             {
                 log.methodDone("Check exclusion", 4, logPad, [[ "excluded", "yes" ]]);
                 return true;

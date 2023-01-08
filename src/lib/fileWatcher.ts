@@ -62,7 +62,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
     /* istanbul ignore else */
     if (workspace.workspaceFolders) {
         if (enabled !== false){
-            await cache.buildCache(taskType, fileBlob, undefined, true, "   ");
+            await cache.buildCache(taskType, fileBlob, undefined, true, logPad + "   ");
         }
         else {
             cache.removeTaskTypeFromCache(taskType, logPad + "   ");

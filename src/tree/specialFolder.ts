@@ -66,16 +66,16 @@ export default class SpecialTaskFolder extends TaskFolder
     {
         if (this.store.includes(taskItem.id))
         {
-            log.methodStart(`add tree taskitem to ${this.label}`, 2, logPad);
+            log.methodStart(`add tree taskitem to ${this.label}`, 3, logPad);
 
-            const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
+            const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task, logPad + "   ");
             taskItem2.id = this.label + ":" + taskItem2.id; // note 'label:' + taskItem2.id === id
             taskItem2.label = this.getRenamedTaskName(taskItem2);
             taskItem2.folder = this;
             this.insertTaskFile(taskItem2, 0);
             this.sort(logPad + "   ");
 
-            log.methodDone(`add tree taskitem to ${this.label}`, 2, logPad);
+            log.methodDone(`add tree taskitem to ${this.label}`, 3, logPad);
         }
     }
 
@@ -254,7 +254,7 @@ export default class SpecialTaskFolder extends TaskFolder
             /* istanbul ignore else */
             if (taskItem2 && taskItem2 instanceof TaskItem && taskItem2.task)
             {
-                const taskItem3 = new TaskItem(this.extensionContext, taskItem2.taskFile, taskItem2.task);
+                const taskItem3 = new TaskItem(this.extensionContext, taskItem2.taskFile, taskItem2.task, logPad + "   ");
                 taskItem3.id = this.label + ":" + taskItem3.id;
                 taskItem3.label = this.getRenamedTaskName(taskItem3);
                 taskItem3.folder = this;
@@ -345,7 +345,7 @@ export default class SpecialTaskFolder extends TaskFolder
 
         if (!taskItem2)
         {
-            taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task);
+            taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task, logPad + "   ");
             taskItem2.id = taskId;
             taskItem2.label = this.getRenamedTaskName(taskItem2);
             taskItem2.folder = this;
@@ -417,7 +417,7 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
-    // refreshState(taskItemId: string, doLog?: boolean, logPad?: string, logLevel?: number)
+    // refreshState(taskItemId: string, logPad?: string, logLevel?: number)
     // {
     //     if (this.enabled)
     //     {
@@ -426,7 +426,7 @@ export default class SpecialTaskFolder extends TaskFolder
     //         const item = this.taskFiles.find(t =>  t.id === taskItemId);
     //         if (item) {
     //             log.write("   refreshing state on taskitem id " + item.id, logLevel, logPad + "   ");
-    //             item.refreshState(doLog, logPad + "   ", logLevel);
+    //             item.refreshState(logPad + "   ", logLevel);
     //         }
     //         if (doLog) log.methodDone("refresh taskitem states", logLevel, logPad);
     //     }

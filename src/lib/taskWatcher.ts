@@ -1,15 +1,15 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as log from "./utils/log";
 import * as util from "./utils/utils";
+import log from "./utils/log";
+import SpecialTaskFolder from "../tree/specialFolder";
+import TaskItem from "../tree/item";
 import { IExplorerApi } from "../interface";
 import { teApi } from "../extension";
-import TaskItem from "../tree/item";
 import {
     Disposable, ExtensionContext, WorkspaceFolder, tasks, TaskStartEvent,
     StatusBarItem, StatusBarAlignment, Task, window, TaskEndEvent
 } from "vscode";
-import SpecialTaskFolder from "../tree/specialFolder";
 
 
 export class TaskWatcher
@@ -62,8 +62,8 @@ export class TaskWatcher
         {
             if (t.isRunning())
             {   /* istanbul ignore if */
-                if (!t.isExecuting()) {
-                    // t.refreshState(false);
+                if (!t.isExecuting())
+                {
                     if (++this.babysitterCt >= 3)
                     {
                         this.babysitterCt = 0;

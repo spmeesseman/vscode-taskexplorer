@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
+import * as json5 from "json5";
 import figures from "../figures";
 import { appendFileSync } from "fs";
 import { dirname, join } from "path";
@@ -8,7 +9,6 @@ import { createDir } from "./fs";
 import { configuration } from "./configuration";
 import { isArray, isError, isFunction, isObject, isObjectEmpty, isString } from "./utils";
 import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
-import { stringify } from "json5";
 
 export interface IMsgQueueItem
 {
@@ -57,6 +57,26 @@ export function dequeue(queueId: string)
         delete msgQueue[queueId];
     }
 }
+
+
+/**
+ * @param enable If `false`, set all log function to empty functions.  If `true`, apply all log functions
+ */
+export const enableLog = (enable: boolean) =>
+{
+    Object.assign(logFunctions,
+    {
+        blank: enable ? blank : () => {},
+        dequeue: enable ? dequeue : () => {},
+        error: enable ? error : () => {},
+        methodStart: enable ? methodStart : () => {},
+        methodDone: enable ? methodDone : () => {},
+        value: enable ? value : () => {},
+        values: enable ? values : () => {},
+        write: enable ? write : () => {},
+        withColor: enable ? withColor : () => {}
+    });
+};
 
 
 export const error = (msg: any, params?: (string|any)[][], queueId?: string) => _error(msg, params, queueId);
@@ -224,7 +244,7 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
 }
 
 
-export async function initLog(settingGrpName: string, dispName: string, context: ExtensionContext, testsRunning: boolean)
+export async function initLog(context: ExtensionContext, testsRunning: boolean)
 {
     function showLogOutput(show: boolean)
     {
@@ -245,16 +265,29 @@ export async function initLog(settingGrpName: string, dispName: string, context:
     //
     // Set up a log in the Output window (even if enableOutputWindow is off)
     //
-    logOutputChannel = window.createOutputChannel(dispName);
+    logOutputChannel = window.createOutputChannel("Task Explorer");
     context.subscriptions.push(logOutputChannel);
     context.subscriptions.push(
-        commands.registerCommand(settingGrpName + ".showOutput", showLogOutput)
+        commands.registerCommand("taskExplorer.showOutput", showLogOutput)
     );
     const d = workspace.onDidChangeConfiguration(async e => {
         await processConfigChanges(context, e);
     });
     context.subscriptions.push(d);
     // showLogOutput(showLog || false);
+
+    //
+    // If logging isn't enabled,then set all log function to empty functions
+    //
+    enableLog(enable);
+
+    //
+    // This function should only be called once, so blank it in the export
+    //
+    Object.assign(logFunctions,
+    {
+        initLog: () => {},
+    });
 
     write("Log has been initialized", 1);
     logLogFileLocation();
@@ -326,6 +359,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     if (e.affectsConfiguration("taskExplorer.logging.enable"))
     {
         enable = configuration.get<boolean>("logging.enable", false);
+        enableLog(enable);
     }
     if (e.affectsConfiguration("taskExplorer.logging.enableOutputWindow"))
     {
@@ -380,7 +414,7 @@ export function value(msg: string, value: any, level?: number, logPad = "", queu
         else if (isObject(value))
         {
             try {
-                logMsg += JSON.stringify(value, null, 3);
+                logMsg += json5.stringify(value, null, 3);
             }
             catch {
                 logMsg += value.toString();
@@ -524,3 +558,25 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
     }
 
 }
+
+
+const logFunctions =
+{
+    blank,
+    colors,
+    dequeue,
+    enableLog,
+    error,
+    initLog,
+    getLogFileName,
+    isLoggingEnabled,
+    methodStart,
+    methodDone,
+    setWriteToConsole,
+    value,
+    values,
+    withColor,
+    write
+};
+
+export default logFunctions;

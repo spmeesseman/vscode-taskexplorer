@@ -45,7 +45,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
     {
         const scripts: string[] = [];
 
-        log.methodStart("find gradle targets", 2, logPad, false, [[ "path", fsPath ]], this.logQueueId);
+        log.methodStart("find gradle targets", 4, logPad, false, [[ "path", fsPath ]], this.logQueueId);
 
         const contents = await readFileAsync(fsPath);
         let idx = 0;
@@ -74,8 +74,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
                         if (tgtName)
                         {
                             scripts.push(tgtName);
-                            log.write("      found gradle target", 3, logPad, this.logQueueId);
-                            log.value("         name", tgtName, 3, logPad, this.logQueueId);
+                            log.value("   found gradle task", tgtName, 4, logPad, this.logQueueId);
                         }
                     }
                 }
@@ -85,7 +84,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             eol = contents.indexOf("\n", idx);
         }
 
-        log.methodDone("Find gradle targets", 2, logPad, undefined, this.logQueueId);
+        log.methodDone("Find gradle targets", 4, logPad, undefined, this.logQueueId);
         return scripts;
     }
 
@@ -115,7 +114,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         const result: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
 
-        log.methodStart("read gradle file uri task", 1, logPad, false, [
+        log.methodStart("read gradle file uri task", 3, logPad, false, [
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
 
@@ -127,7 +126,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             result.push(task);
         }
 
-        log.methodDone("read gradle file uri task", 1, logPad, [[ "#of tasks found", result.length ]], this.logQueueId);
+        log.methodDone("read gradle file uri task", 3, logPad, [[ "#of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 
