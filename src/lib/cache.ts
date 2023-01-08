@@ -92,11 +92,11 @@ export async function addFolderToCache(folder: Uri, logPad: string)
             /* istanbul ignore else */
             if (!providersExternal.get(providerName))
             {
-                log.write(`   adding new directory to '${providerName}' file cache`, 3, logPad);
+                let numFilesAdded = 0;
+                log.write(`   adding new directory to '${providerName}' file cache`, 2, logPad);
                 try
-                {   let maxFiles = Infinity,
-                        numFilesAdded = 0;
-                    log.write("   Start folder scan", 2, logPad);
+                {   let maxFiles = Infinity;
+                    log.write("      Start folder scan", 3, logPad);
                     if (licMgr && !licMgr.isLicensed())
                     {
                         const cachedFileCount = getTaskFileCount();
@@ -105,7 +105,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                             util.showMaxTasksReachedMessage();
                             return;
                         }
-                        log.write(`   Set max files to scan at ${maxFiles} files (no license)`, 2, logPad);
+                        log.write(`      Set max files to scan at ${maxFiles} files (no license)`, 2, logPad);
                     }
                     const paths = await findFiles(glob, { nocase: true, ignore: getExcludesPatternGlob(), cwd: folder.fsPath  });
                     for (const fPath of paths)
@@ -117,30 +117,19 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                         numFilesAdded += addToMappings(providerName, { uri: uriFile, folder: wsFolder }, logPad + "      ");
                     }
                     projectToFileCountMap[wsFolder.name][providerName] += numFilesAdded;
-                    log.write(`   Folder scan complete, found ${paths.length} file(s), added ${numFilesAdded} file(s)`, 2, logPad);
+                    log.write(`      Folder scan complete, found ${paths.length} file(s), added ${numFilesAdded} file(s)`, 3, logPad);
                 }
                 catch (e: any) { log.error(e); }
+                log.value("      # of files added", numFilesAdded, 3);
                 log.write(`   finished adding new directory to '${providerName}' file cache`, 3, logPad);
             }
             else {
-                await util.timeout(250);
+                await util.timeout(150);
             }
         }
     }
 
-    //
-    // Release status bar reserved space
-    //
     disposeStatusBarSpace(statusBarSpace);
-
-    /* istanbul ignore if */
-    if (cancel) {
-        log.write("Add folder to cache cancelled", 3, logPad);
-    }
-    else {
-        log.write("Add folder to cache complete", 3, logPad);
-    }
-
     cacheBuilding = false;
     cancel = false;
 
@@ -254,7 +243,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
  */
 function addToMappings(taskType: string, item: ICacheItem, logPad: string)
 {
-    log.methodStart("add item to mappings", 3, logPad, false, [[ "task type", taskType ], [ "file", item.uri.fsPath ]]);
+    log.methodStart("add item to mappings", 4, logPad, false, [[ "task type", taskType ], [ "file", item.uri.fsPath ]]);
 
     initMaps(taskType, item.folder.name);
     const added = {
@@ -284,7 +273,7 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
         log.write("   already exists in cache", 4, logPad);
     }
 
-    log.methodDone("add item to mappings", 3, logPad);
+    log.methodDone("add item to mappings", 4, logPad);
     return added.c1;
 }
 
