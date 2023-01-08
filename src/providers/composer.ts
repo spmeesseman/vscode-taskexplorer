@@ -58,7 +58,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
             log.error("Invalid JSON found in " + fsPath, undefined, this.logQueueId);
         }
 
-        log.methodDone("Find composer targets", 2, logPad, false, undefined, this.logQueueId);
+        log.methodDone("Find composer targets", 2, logPad, undefined, this.logQueueId);
         return targets;
     }
 
@@ -110,7 +110,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
             result.push(task);
         }
 
-        log.methodDone("read composer file uri task", 1, logPad, false, [[ "#of tasks found", result.length ]], this.logQueueId);
+        log.methodDone("read composer file uri task", 1, logPad, [[ "#of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 

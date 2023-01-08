@@ -310,12 +310,12 @@ export function methodStart(msg: string, level?: number, logPad = "", doLogBlank
 }
 
 
-export function methodDone(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][], queueId?: string)
+export function methodDone(msg: string, level?: number, logPad = "", params?: (string|any)[][], queueId?: string)
 {
     if (enable)
     {
         const lLevel = level || 1;
-        values(lLevel, logPad + "   ", params, doLogBlank, queueId);
+        values(lLevel, logPad + "   ", params, false, queueId);
         write("*done* " + msg, lLevel, logPad, queueId); // , LogColor.cyan);
     }
 }

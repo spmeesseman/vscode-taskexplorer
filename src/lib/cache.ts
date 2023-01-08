@@ -578,7 +578,7 @@ export function removeTaskTypeFromCache(taskType: string, logPad: string)
 {
     log.methodStart("remove task type from cache", 2, logPad, false, [[ "task type", taskType ]]);
     const count = removeFromMappings(taskType, undefined, true, logPad + "   ");
-    log.methodDone("remove task type from cache", 2, logPad, false, [[ "# of files removed", count ]]);
+    log.methodDone("remove task type from cache", 2, logPad, [[ "# of files removed", count ]]);
 }
 
 

@@ -215,7 +215,7 @@ export default class TaskFile extends TreeItem
 
         this.id = "id-" + folder.id.replace("fid-", ":") + this.nodePath + ":" + this.fileName + ":" + source;
 
-        log.methodDone("construct tree file", 4, logPad, false, [
+        log.methodDone("construct tree file", 4, logPad, [
             [ "id", this.id ], [ "label", this.label ], [ "Node Path", this.nodePath ], [ "is usertask", this.isUser ],
             [ "context value", this.contextValue ], [ "is group", this.isGroup ], [ "groupLevel", this.groupLevel ],
             [ "filename", this.fileName ], [ "resource uri path", this.resourceUri.fsPath ],

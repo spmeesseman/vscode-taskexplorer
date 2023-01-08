@@ -196,7 +196,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         const problemMatcher = "$msCompile";
 
 
-        log.methodDone("create script task", 2, logPad, false, undefined, this.logQueueId);
+        log.methodDone("create script task", 2, logPad, undefined, this.logQueueId);
         //
         // Create the shell execution object and task
         //
@@ -261,7 +261,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
         const task = this.createTask(path.extname(uri.fsPath).substring(1), undefined, folder, uri, undefined, logPad + "   ");
-        log.methodDone("read script file uri task", 1, logPad, false, [[ "# of tasks found", 1 ]], this.logQueueId);
+        log.methodDone("read script file uri task", 1, logPad, [[ "# of tasks found", 1 ]], this.logQueueId);
         /* istanbul ignore next */
         return task ? [ task ] : [];
     }

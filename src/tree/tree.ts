@@ -1080,7 +1080,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.refreshPending = false;
         this.currentInvalidation = undefined; // reset file modification task type flag
 
-        log.methodDone("get tree children", logLevel, logPad, false, [
+        log.methodDone("get tree children", logLevel, logPad, [
             [ "# of tasks total", this.tasks?.length ], [ "# of tree task items returned", items.length ]
         ]);
 
@@ -1167,7 +1167,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             files.set(id, taskFile);
         }
 
-        log.methodDone("get task file node", 2, logPad, false);
+        log.methodDone("get task file node", 2, logPad);
         return taskFile;
     }
 
@@ -1996,7 +1996,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             log.write("Task execution failed: " + err, 1, logPad);
         }
 
-        log.methodDone("run task", 1, logPad, false, [[ "success", !!exec ]]);
+        log.methodDone("run task", 1, logPad, [[ "success", !!exec ]]);
         return exec;
     }
 

@@ -65,7 +65,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         }
         catch (e: any)
         {   log.error(e, undefined, this.logQueueId);
-            log.methodDone("read app-publisher file uri tasks", 1, logPad, false, undefined, this.logQueueId);
+            log.methodDone("read app-publisher file uri tasks", 1, logPad, undefined, this.logQueueId);
             return [];
         }
 
@@ -204,7 +204,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
                                 `${def.label}${apFmtLabel}`, "apppublisher", exec, undefined));
         });
 
-        log.methodDone("read app-publisher file uri tasks", 1, logPad, false, [[ "# of tasks found", tasks.length ]], this.logQueueId);
+        log.methodDone("read app-publisher file uri tasks", 1, logPad, [[ "# of tasks found", tasks.length ]], this.logQueueId);
 
         return tasks;
     }

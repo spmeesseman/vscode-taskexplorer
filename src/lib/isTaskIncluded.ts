@@ -62,7 +62,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
             if ((new RegExp(rgxPattern)).test(task.name))
             {
                 log.write("   skipping this task (by 'excludeTask' setting)", 3, logPad, logQueueId);
-                log.methodDone("Check task inclusion", 3, logPad, false, undefined, logQueueId);
+                log.methodDone("Check task inclusion", 3, logPad, undefined, logQueueId);
                 return false;
             }
         }
@@ -97,7 +97,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
                     const wsTask = tasksJso.tasks.find((t: any) => t.label === task.name || t.script === task.name);
                     if (wsTask && wsTask.hide === true) {
                         log.write("   skipping this task (by 'showHiddenWsTasks' setting)", 2, logPad, logQueueId);
-                        log.methodDone("Check task inclusion", 2, logPad, false, undefined, logQueueId);
+                        log.methodDone("Check task inclusion", 2, logPad, undefined, logQueueId);
                         return false;
                     }
                 }
@@ -116,17 +116,17 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
     if ((srcEnabled || !isScopeWsFolder) && !isNpmInstall)
     {
         log.write("   Task is included", 3, logPad, logQueueId);
-        log.methodDone("Check task inclusion", 3, logPad, false, undefined, logQueueId);
+        log.methodDone("Check task inclusion", 3, logPad, undefined, logQueueId);
         return true;
     }
     if (isNpmInstall && srcEnabled) {
-        log.methodDone("Check task inclusion", 3, logPad, false, undefined, logQueueId);
+        log.methodDone("Check task inclusion", 3, logPad, undefined, logQueueId);
         return "npm-install";
     }
     /* istanbul ignore next */
     log.write("   skipping this task", 3, logPad, logQueueId);
     /* istanbul ignore next */
-    log.methodDone("Check task inclusion", 3, logPad, false, undefined, logQueueId);
+    log.methodDone("Check task inclusion", 3, logPad, undefined, logQueueId);
     /* istanbul ignore next */
     return false;
 };

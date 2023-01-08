@@ -130,7 +130,7 @@ export default class TaskItem extends TreeItem
         if (execs.length > 1) {
             log.error(`More than one task execution was found for '${this.task.name}' !!`);
         }
-        log.methodDone("is executing", 5, logPad, false, [
+        log.methodDone("is executing", 5, logPad, [
             [ "is executing", !!exec ], [ "task execution count", execs.length ], [ "total execution count", tasks.taskExecutions.length ]
         ]);
         return exec;

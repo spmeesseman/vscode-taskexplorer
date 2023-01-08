@@ -85,7 +85,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             eol = contents.indexOf("\n", idx);
         }
 
-        log.methodDone("Find gradle targets", 2, logPad, false, undefined, this.logQueueId);
+        log.methodDone("Find gradle targets", 2, logPad, undefined, this.logQueueId);
         return scripts;
     }
 
@@ -127,7 +127,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             result.push(task);
         }
 
-        log.methodDone("read gradle file uri task", 1, logPad, false, [[ "#of tasks found", result.length ]], this.logQueueId);
+        log.methodDone("read gradle file uri task", 1, logPad, [[ "#of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 

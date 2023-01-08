@@ -82,7 +82,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 }
             }
         }
-        log.methodDone(`provide ${this.providerName} tasks`, 1, TaskExplorerProvider.logPad, false, [[ "# of tasks found", this.cachedTasks.length ]], this.logQueueId);
+        log.methodDone(`provide ${this.providerName} tasks`, 1, TaskExplorerProvider.logPad, [[ "# of tasks found", this.cachedTasks.length ]], this.logQueueId);
         log.dequeue(this.logQueueId);
         this.logQueueId = undefined;
         return this.cachedTasks;
@@ -114,7 +114,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             }
         }
 
-        log.methodDone(`read ${this.providerName} tasks`, 1, logPad, false, [[ "# of tasks parsed", allTasks.length ]], this.logQueueId);
+        log.methodDone(`read ${this.providerName} tasks`, 1, logPad, [[ "# of tasks parsed", allTasks.length ]], this.logQueueId);
 
         return allTasks;
     }
@@ -191,7 +191,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             }
         }
 
-        log.methodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad, false, [
+        log.methodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad, [
             [ "new # of cached tasks", this.cachedTasks ? this.cachedTasks.length : 0 ]
         ]);
         this.invalidating = false;

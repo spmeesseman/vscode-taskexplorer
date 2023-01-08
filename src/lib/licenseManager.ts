@@ -45,7 +45,7 @@ export class LicenseManager implements ILicenseManager
 			}
 			catch {}
 		}
-		log.methodDone("Check license", 1, logPad, false, [[ "is valid license", this.licensed ]]);
+		log.methodDone("Check license", 1, logPad, [[ "is valid license", this.licensed ]]);
 	}
 
 
@@ -354,7 +354,7 @@ export class LicenseManager implements ILicenseManager
 					log.write("      licensed mode will be automatically enabled.");
 				}
 				else { log.error(e); }
-				log.methodDone("validate license", 1, logPad, false, [[ "licensed", this.licensed ]]);
+				log.methodDone("validate license", 1, logPad, [[ "licensed", this.licensed ]]);
 				resolve(!teApi.isTests());
 			};
 
@@ -375,7 +375,7 @@ export class LicenseManager implements ILicenseManager
 						if (licensed) {
 							await this.setLicenseKey(licenseKey);
 						}
-						log.methodDone("validate license", 1, logPad, false, [[ "is valid license", licensed ]]);
+						log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);
 						resolve(licensed);
 					}
 					catch (e) { /* istanbul ignore next */ _onError(e); }

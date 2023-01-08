@@ -63,7 +63,7 @@ export class ExternalTaskProvider extends ExternalExplorerProvider implements Ex
         task.group = TaskGroup.Build;
         result.push(task2);
 
-        log.methodDone("read external tasks", 1, "", true);
+        log.methodDone("read external tasks", 1, "");
         return result;
     }
 

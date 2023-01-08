@@ -74,7 +74,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         /* istanbul ignore next */
         const problemMatcher = extensions.getExtension("ms-vscode.cpptools") ? "$gcc" : "$gccte";
 
-        log.methodDone("create make task", 4, logPad, false, undefined, this.logQueueId);
+        log.methodDone("create make task", 4, logPad, undefined, this.logQueueId);
         return new Task(kind, folder, target, "make", execution, problemMatcher);
     }
 
@@ -135,7 +135,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             }
         }
 
-        log.methodDone("find makefile targets", 2, logPad, false, undefined, this.logQueueId);
+        log.methodDone("find makefile targets", 2, logPad, undefined, this.logQueueId);
         return scripts;
     }
 
@@ -193,7 +193,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             result.push(task);
         }
 
-        log.methodDone("read make file uri tasks", 1, logPad, false, [[ "#of tasks found", result.length ]], this.logQueueId);
+        log.methodDone("read make file uri tasks", 1, logPad, [[ "#of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 

@@ -131,7 +131,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             scripts = await this.parseGulpTasks(fsPath, logPad + "   ");
         }
 
-        log.methodDone("find gulp targets", 2, logPad, false, undefined, this.logQueueId);
+        log.methodDone("find gulp targets", 2, logPad, undefined, this.logQueueId);
         return scripts;
     }
 
@@ -286,7 +286,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             result.push(task);
         }
 
-        log.methodDone("read gulp file uri tasks", 1, logPad, false, [[ "#of tasks found", result.length ]], this.logQueueId);
+        log.methodDone("read gulp file uri tasks", 1, logPad, [[ "#of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 

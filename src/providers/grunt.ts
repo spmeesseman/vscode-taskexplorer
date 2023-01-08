@@ -91,7 +91,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
             eol = contents.indexOf("\n", idx);
         }
 
-        log.methodDone("find grunt targets", 2, logPad, false, undefined, this.logQueueId);
+        log.methodDone("find grunt targets", 2, logPad, undefined, this.logQueueId);
 
         return scripts;
     }
@@ -139,7 +139,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
             result.push(task);
         }
 
-        log.methodDone("read grunt file uri tasks", 1, logPad, false, [[ "#of tasks found", result.length ]], this.logQueueId);
+        log.methodDone("read grunt file uri tasks", 1, logPad, [[ "#of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 

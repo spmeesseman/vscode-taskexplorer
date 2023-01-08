@@ -461,7 +461,7 @@ export default class SpecialTaskFolder extends TaskFolder
 
         this.pushToTop(taskItem);
 
-        log.methodDone("save task", 1, logPad, false, [[ "new # of saved tasks", this.store.length ]]);
+        log.methodDone("save task", 1, logPad, [[ "new # of saved tasks", this.store.length ]]);
     }
 
 

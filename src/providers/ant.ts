@@ -89,7 +89,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         }
 
 
-        log.methodDone("find ant targets complete", 2, logPad, false, undefined, this.logQueueId);
+        log.methodDone("find ant targets complete", 2, logPad, undefined, this.logQueueId);
         return scripts;
     }
 
@@ -174,7 +174,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             taskMap[defaultTask === line ? line + " - Default" : line] = line;
         }
 
-        log.methodDone("find tasks with ant", 2, logPad, false, [[ "# of tasks", taskMap.size ]], this.logQueueId);
+        log.methodDone("find tasks with ant", 2, logPad, [[ "# of tasks", taskMap.size ]], this.logQueueId);
     }
 
 
@@ -215,7 +215,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             }
         }
 
-        log.methodDone("find tasks with xml2js", 2, logPad, false, [[ "# of tasks", taskMap.size ]], this.logQueueId);
+        log.methodDone("find tasks with xml2js", 2, logPad, [[ "# of tasks", taskMap.size ]], this.logQueueId);
 
         // return new Promise((resolve, reject) =>
         // {
@@ -225,7 +225,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         //     parseString(buffer, (err, text) =>
         //     {
         //         if (err){
-        //             log.methodDone("find tasks with xml2js", 3, logPad, false, [["error", err.toString()]]);
+        //             log.methodDone("find tasks with xml2js", 3, logPad, [["error", err.toString()]]);
         //             reject(err);
         //         }
         //         else {
@@ -244,7 +244,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         //                     }
         //                 }
         //             }
-        //             log.methodDone("find tasks with xml2js", 3, logPad, false, [["# of tasks", taskMap.size]]);
+        //             log.methodDone("find tasks with xml2js", 3, logPad, [["# of tasks", taskMap.size]]);
         //             resolve(taskMap);
         //         }
         //     });
@@ -314,7 +314,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             }
         }
 
-        log.methodDone("read ant file uri tasks", 1, logPad, false, [[ "# of tasks found", result.length ]], this.logQueueId);
+        log.methodDone("read ant file uri tasks", 1, logPad, [[ "# of tasks found", result.length ]], this.logQueueId);
         return result;
     }
 

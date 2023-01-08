@@ -78,7 +78,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
         }
         catch (e: any) {
             log.error(e, undefined, this.logQueueId);
-            log.methodDone("read maven file uri tasks", 1, logPad, false, [[ "#of tasks found", 0 ]], this.logQueueId);
+            log.methodDone("read maven file uri tasks", 1, logPad, [[ "#of tasks found", 0 ]], this.logQueueId);
             return [];
         }
 
@@ -150,7 +150,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
         const executionValidate = new ShellExecution(kindValidate.cmdLine as string, options);
         const executionVerify = new ShellExecution(kindVerify.cmdLine as string, options);
 
-        log.methodDone("read maven file uri tasks", 1, logPad, false, [[ "#of tasks found", 8 ]], this.logQueueId);
+        log.methodDone("read maven file uri tasks", 1, logPad, [[ "#of tasks found", 8 ]], this.logQueueId);
 
         return [ new Task(kindClean, folder, "Clean", "maven", executionClean, undefined),
                  new Task(kindCompile, folder, "Compile", "maven", executionCompile, undefined),

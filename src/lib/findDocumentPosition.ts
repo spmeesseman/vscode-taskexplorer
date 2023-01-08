@@ -92,7 +92,7 @@ const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): num
 
     visit(documentText, visitor);
 
-    log.methodDone("find json document position", 3, "   ", false, [[ "position", scriptOffset ]]);
+    log.methodDone("find json document position", 3, "   ", [[ "position", scriptOffset ]]);
     return scriptOffset;
 };
 
@@ -122,6 +122,6 @@ export const findDocumentPosition = (document: TextDocument, taskItem: TaskItem)
         scriptOffset = 0;
     }
 
-    log.methodDone("find task definition document position", 1, "", true, [[ "offset", scriptOffset ]]);
+    log.methodDone("find task definition document position", 1, "", [[ "offset", scriptOffset ]]);
     return scriptOffset;
 };

@@ -452,20 +452,20 @@ export function isExcluded(uriPath: string, logPad = "")
         log.value("   checking pattern", pattern, 5);
         if (testForExclusionPattern(uriPath, pattern))
         {
-            log.methodDone("Check exclusion", 4, logPad, false, [[ "excluded", "yes" ]]);
+            log.methodDone("Check exclusion", 4, logPad, [[ "excluded", "yes" ]]);
             return true;
         }
         if (!path.extname(uriPath) && !uriPath.endsWith(path.sep))
         {
             if (testForExclusionPattern(uriPath + path.sep, pattern))
             {
-                log.methodDone("Check exclusion", 4, logPad, false, [[ "excluded", "yes" ]]);
+                log.methodDone("Check exclusion", 4, logPad, [[ "excluded", "yes" ]]);
                 return true;
             }
         }
     }
 
-    log.methodDone("Check exclusion", 4, logPad, false, [[ "excluded", "no" ]]);
+    log.methodDone("Check exclusion", 4, logPad, [[ "excluded", "no" ]]);
     return false;
 }
 
