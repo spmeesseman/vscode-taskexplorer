@@ -3,7 +3,7 @@ import * as util from "../lib/utils/utils";
 import * as log from "../lib/utils/log";
 import constants from "../lib/constants";
 import { configuration } from "../lib/utils/configuration";
-import { getTaskFiles, removeFileFromCache } from "../cache";
+import { getTaskFiles, removeFileFromCache } from "../lib/cache";
 import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { getLicenseManager } from "../extension";

@@ -521,6 +521,9 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
     if (!isError) {
         lastErrorMesage = [];
         lastWriteWasBlankError = false;
+        if (isTests) {
+            lastWriteToConsoleWasBlank = false;
+        }
     }
 
 }

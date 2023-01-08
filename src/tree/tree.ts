@@ -8,7 +8,7 @@ import TaskFile from "./file";
 import TaskFolder from "./folder";
 import constants from "../lib/constants";
 import { storage } from "../lib/utils/storage";
-import { rebuildCache } from "../cache";
+import { rebuildCache } from "../lib/cache";
 import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { configuration } from "../lib/utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";

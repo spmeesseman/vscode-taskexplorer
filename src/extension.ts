@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as util from "./lib/utils/utils";
-import * as cache from "./cache";
+import * as cache from "./lib/cache";
 import * as fs from "./lib/utils/fs";
 import * as log from "./lib/utils/log";
 import registerEnterLicenseCommand from "./commands/enterLicense";
@@ -17,7 +17,6 @@ import { GulpTaskProvider } from "./providers/gulp";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
 import { configuration } from "./lib/utils/configuration";
 import { initStorage, storage } from "./lib/utils/storage";
-import { isCachingBusy } from "./cache";
 import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/licenseManager";
 import { ExternalExplorerProvider, IExplorerApi, ITaskExplorerApi } from "./interface";
@@ -228,7 +227,7 @@ async function initLicenseManager(context: ExtensionContext)
 /* istanbul ignore next */
 function isBusy()
 {   /* istanbul ignore next */
-    return !ready || isCachingBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
+    return !ready || cache.isCachingBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
            isProcessingFsEvent() || isProcessingConfigChange();
 }
 
