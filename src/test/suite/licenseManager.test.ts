@@ -304,7 +304,7 @@ suite("License Manager Tests", () =>
 
 	test("Start License Server", async function()
 	{
-		this.slow(testControl.slowTime.localStartLicenseServer + 3500);
+		this.slow(testControl.slowTime.licenseManagerLocalStartServer);
 		lsProcess = fork("spm-license-server.js", {
 			cwd: getWsPath("../../spm-license-server/bin"), detached: true,
 		});
@@ -314,7 +314,7 @@ suite("License Manager Tests", () =>
 
 	test("Enter License key on Startup (1st time, Server Live)", async function()
 	{
-		this.slow(testControl.slowTime.localLicenseCheck);
+		this.slow(testControl.slowTime.licenseManagerLocalCheck);
 		await storage.update("version", undefined);
 		const licenseKey = licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
@@ -326,7 +326,7 @@ suite("License Manager Tests", () =>
 
 	test("Enter License key on Startup (> 1st time, Server Live)", async function()
 	{
-		this.slow(testControl.slowTime.localLicenseCheck);
+		this.slow(testControl.slowTime.licenseManagerLocalCheck);
 		const licenseKey = licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
@@ -337,7 +337,7 @@ suite("License Manager Tests", () =>
 
 	test("Invalid License key (Server Live)", async function()
 	{
-		this.slow(testControl.slowTime.localLicenseCheck);
+		this.slow(testControl.slowTime.licenseManagerLocalCheck);
 		const licenseKey = licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-1234567");
 		await licMgr.checkLicense();

@@ -1402,10 +1402,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      * @param invalidate The invalidation event.
      * Can be one of the custom values:
      *     "tests"            (from unit tests)
-     *     "visible-event"
-     *     false|null|undefined
+     *     false
+     *     null
+     *     undefined
      *
-     * Can also be one of the task types FileSystemWatcher event):
+     * Or one of the task types (from FileSystemWatcher event):
      *
      *     "ant"
      *     "apppublisher"
