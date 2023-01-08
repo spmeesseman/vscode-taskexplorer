@@ -216,7 +216,7 @@ function createDirWatcher(context: ExtensionContext)
     dirWatcher.onDidDelete?.dispose();
     /* istanbul ignore next */
     dirWatcher.watcher?.dispose();
-
+    /* istanbul ignore else */
     if (workspace.workspaceFolders)
     {
         dirWatcher.watcher = workspace.createFileSystemWatcher(getDirWatchGlob(workspace.workspaceFolders));
@@ -289,6 +289,7 @@ async function onDirCreate(uri: Uri)
         if (isDirectory(uri.fsPath) && (await numFilesInDirectory(uri.fsPath)) > 0)
         {
             const wsf = workspace.getWorkspaceFolder(uri);
+            /* istanbul ignore else */
             if (!wsf || wsf.uri.fsPath !== uri.fsPath)
             {
                 if (processingFsEvent) {
@@ -310,6 +311,7 @@ async function onDirDelete(uri: Uri)
     // if (isDirectory(uri.fsPath)) // it's gone, so we can't lstat it
     {
         const wsf = workspace.getWorkspaceFolder(uri);
+        /* istanbul ignore else */
         if (wsf && wsf.uri.fsPath !== uri.fsPath)
         {
             if (processingFsEvent) {

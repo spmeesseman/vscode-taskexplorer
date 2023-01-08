@@ -100,7 +100,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
         if (enabled && paths)
         {
-            for (const fObj of paths.values())
+            for (const fObj of paths)
             {
                 if (!util.isExcluded(fObj.uri.path) && !visitedFiles.includes(fObj.uri.fsPath) && pathExistsSync(fObj.uri.fsPath))
                 {

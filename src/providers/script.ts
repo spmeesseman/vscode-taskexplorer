@@ -4,7 +4,6 @@ import * as util from "../lib/utils/utils";
 import * as log from "../lib/utils/log";
 import constants from "../lib/constants";
 import { configuration } from "../lib/utils/configuration";
-import { getTaskFiles } from "../cache";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
