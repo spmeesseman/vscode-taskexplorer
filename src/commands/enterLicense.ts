@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as log from "../lib/utils/log";
+import log from "../lib/utils/log";
 import { commands, ExtensionContext } from "vscode";
 import { getLicenseManager } from "../extension";
 

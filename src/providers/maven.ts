@@ -1,6 +1,6 @@
 
 import * as util from "../lib/utils/utils";
-import * as log from "../lib/utils/log";
+import log from "../lib/utils/log";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";

@@ -1,13 +1,13 @@
 
 import * as path from "path";
 import * as util from "../lib/utils/utils";
-import * as log from "../lib/utils/log";
+import constants from "../lib/constants";
+import log from "../lib/utils/log";
 import { execSync } from "child_process";
 import { parseStringPromise } from "xml2js";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
-import constants from "../lib/constants";
 import { pathExistsSync, readFileAsync } from "../lib/utils/fs";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace } from "vscode";
 

@@ -1,8 +1,8 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as cache from "./cache";
-import * as log from "./utils/log";
 import * as util from "./utils/utils";
+import log from "./utils/log";
 import { refreshTree } from "./refreshTree";
 import { isDirectory, numFilesInDirectory } from "./utils/fs";
 import { extname } from "path";

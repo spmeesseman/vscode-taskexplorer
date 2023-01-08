@@ -1,12 +1,12 @@
 
-import constants from "../lib/constants";
-import TaskItem from "./item";
-import { isString, removeFromArray } from "../lib/utils/utils";
-import TaskFolder from "./folder";
-import { storage } from "../lib/utils/storage";
-import * as log from "../lib/utils/log";
 import * as sortTasks from "../lib/sortTasks";
+import constants from "../lib/constants";
+import log from "../lib/utils/log";
+import TaskItem from "./item";
+import TaskFolder from "./folder";
+import { isString, removeFromArray } from "../lib/utils/utils";
 import { configuration } from "../lib/utils/configuration";
+import { storage } from "../lib/utils/storage";
 import { TaskTreeDataProvider } from "./tree";
 import { commands, ConfigurationChangeEvent, Disposable, ExtensionContext, InputBoxOptions, ThemeIcon, TreeItem, TreeItemCollapsibleState, window, workspace } from "vscode";
 

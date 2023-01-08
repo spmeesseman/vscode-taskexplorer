@@ -1,12 +1,13 @@
 
 import * as path from "path";
 import * as util from "../lib/utils/utils";
-import * as log from "../lib/utils/log";
 import * as sortTasks from "../lib/sortTasks";
+import constants from "../lib/constants";
+import log from "../lib/utils/log";
+import SpecialTaskFolder from "./specialFolder";
 import TaskItem from "./item";
 import TaskFile from "./file";
 import TaskFolder from "./folder";
-import constants from "../lib/constants";
 import { storage } from "../lib/utils/storage";
 import { rebuildCache } from "../lib/cache";
 import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
@@ -17,18 +18,17 @@ import { TaskExplorerDefinition } from "../interface";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import { getTerminal } from "../lib/getTerminal";
+import { IExplorerApi, TaskMap } from "../interface/explorer";
+import { enableConfigWatcher } from "../lib/configWatcher";
+import { TaskExplorerProvider } from "../providers/provider";
+import { pathExists } from "../lib/utils/fs";
+import { TaskWatcher } from "../lib/taskWatcher";
 import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
     ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, Disposable, TaskExecution
 } from "vscode";
-import { IExplorerApi, TaskMap } from "../interface/explorer";
-import { enableConfigWatcher } from "../lib/configWatcher";
-import SpecialTaskFolder from "./specialFolder";
-import { TaskExplorerProvider } from "../providers/provider";
-import { pathExists } from "../lib/utils/fs";
-import { TaskWatcher } from "../lib/taskWatcher";
 
 
 /**

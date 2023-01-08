@@ -1,5 +1,5 @@
 
-import * as log from "./utils/log";
+import log from "./utils/log";
 import TaskItem from "../tree/item";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";

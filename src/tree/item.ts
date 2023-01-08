@@ -1,14 +1,14 @@
 
-import * as log from "../lib/utils/log";
 import * as path from "path";
 import * as util from "../lib/utils/utils";
+import log from "../lib/utils/log";
 import TaskFile from "./file";
+import TaskFolder from "./folder";
 import { configuration } from "../lib/utils/configuration";
 import {
     Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks, Command
 }
 from "vscode";
-import TaskFolder from "./folder";
 
 
 /**

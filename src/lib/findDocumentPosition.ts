@@ -1,9 +1,9 @@
 
+import log from "./utils/log";
 import { visit, JSONVisitor } from "jsonc-parser";
 import { TextDocument } from "vscode";
 import { getTaskName } from "./getTaskName";
 import TaskItem from "../tree/item";
-import * as log from "./utils/log";
 import { providers, providersExternal } from "../extension";
 import { isWatchTask } from "./utils/utils";
 

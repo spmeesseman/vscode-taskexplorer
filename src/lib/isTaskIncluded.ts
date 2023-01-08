@@ -1,13 +1,13 @@
 
-import { Task } from "vscode";
 import * as json5 from "json5";
-import * as log from "./utils/log";
 import * as util from "./utils/utils";
+import log from "./utils/log";
 import { join } from "path";
 import { providersExternal } from "../extension";
 import { configuration } from "./utils/configuration";
 import { getTaskName } from "./getTaskName";
 import { existsSync, readFileSync } from "fs";
+import { Task } from "vscode";
 
 
 const isNpmInstallTask = (task: Task): boolean =>

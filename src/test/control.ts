@@ -8,9 +8,11 @@ export const testControl =
     // LOGGING DEFAULTS
     //
     logLevel: 2,
-    logEnabled: true,
+    logEnabled: false,
     logToConsole: false,
+    logToConsoleLevel: 3,
     logToFile: true,
+    logToFileSymbols: false,
     logToOutput: false,
     logOpenFileOnFinish: true, // not yet
     //

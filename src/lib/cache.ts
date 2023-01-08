@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as log from "./utils/log";
 import * as util from "./utils/utils";
+import log from "./utils/log";
 import { join } from "path";
 import { findFiles } from "./utils/fs";
 import { configuration } from "./utils/configuration";

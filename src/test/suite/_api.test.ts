@@ -17,14 +17,11 @@ suite("API Init and Tests", () =>
     {
         teApi = await activate(this);
         explorer = teApi.testsApi.explorer;
-        await executeSettingsUpdate("logging.enable", true);
     });
 
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate("logging.enable", testControl.logEnabled);
-        enableConfigWatcher(true); // in case misc test fails after setting to `false`.
     });
 
 

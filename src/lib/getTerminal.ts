@@ -1,6 +1,6 @@
 
+import log from "./utils/log";
 import TaskItem from "../tree/item";
-import * as log from "./utils/log";
 import { basename } from "path";
 import { window, Terminal } from "vscode";
 

@@ -1,7 +1,7 @@
 
 import * as path from "path";
 import * as util from "../lib/utils/utils";
-import * as log from "../lib/utils/log";
+import log from "../lib/utils/log";
 import constants from "../lib/constants";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";

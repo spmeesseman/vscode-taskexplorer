@@ -1,12 +1,12 @@
 
-import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } from "vscode";
-import * as log from "../lib/utils/log";
 import * as path from "path";
 import * as util from "../lib/utils/utils";
+import log from "../lib/utils/log";
 import TaskItem from "./item";
 import TaskFolder  from "./folder";
 import { TaskExplorerDefinition } from "../interface";
 import { pathExistsSync } from "../lib/utils/fs";
+import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } from "vscode";
 
 
 /**

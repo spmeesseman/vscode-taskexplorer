@@ -1,7 +1,7 @@
 
 import * as https from "http";
 // import * as https from "https";
-import * as log from "./utils/log";
+import log from "./utils/log";
 import { storage } from "./utils/storage";
 import { commands, ExtensionContext, InputBoxOptions, Task, ViewColumn, WebviewPanel,  window, workspace } from "vscode";
 import { ILicenseManager } from "../interface/licenseManager";

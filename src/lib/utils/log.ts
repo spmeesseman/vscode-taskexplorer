@@ -27,26 +27,26 @@ let enableFileSymbols = false;
 let enableOutputWindow = false;
 let fileName = "";
 let isTests = false;
-let logLevel = -1;
-let writeToConsole = false;
-let writeToConsoleLevel = 2;
 let lastErrorMesage: string[] = [];
 let lastWriteWasBlank = false;
 let lastWriteWasBlankError = false;
 let lastWriteToConsoleWasBlank = false;
+let logLevel = 1;
 let logOutputChannel: OutputChannel | undefined;
+let writeToConsole = false;
+let writeToConsoleLevel = 2;
 
 
-export function blank(level?: number, queueId?: string)
+const blank = (level?: number, queueId?: string) =>
 {
     write("", level, "", queueId);
-}
+};
 
 
-export const colors = figures.colors;
+const colors = figures.colors;
 
 
-export function dequeue(queueId: string)
+const dequeue = (queueId: string) =>
 {
     if (msgQueue[queueId])
     {
@@ -56,13 +56,13 @@ export function dequeue(queueId: string)
         });
         delete msgQueue[queueId];
     }
-}
+};
 
 
 /**
  * @param enable If `false`, set all log function to empty functions.  If `true`, apply all log functions
  */
-export const enableLog = (enable: boolean) =>
+const enableLog = (enable: boolean) =>
 {
     Object.assign(logFunctions,
     {
@@ -73,25 +73,26 @@ export const enableLog = (enable: boolean) =>
         methodDone: enable ? methodDone : () => {},
         value: enable ? value : () => {},
         values: enable ? values : () => {},
-        write: enable ? write : () => {},
-        withColor: enable ? withColor : () => {}
+        warn: enable ? warn : () => {},
+        withColor: enable ? withColor : () => {},
+        write: enable ? write : () => {}
     });
 };
 
 
-export const error = (msg: any, params?: (string|any)[][], queueId?: string) => _error(msg, params, queueId);
+const error = (msg: any, params?: (string|any)[][], queueId?: string) => _error(msg, params, queueId);
 
 
-function errorConsole(msg: string, symbols: [ string, string ], queueId?: string)
+const errorConsole = (msg: string, symbols: [ string, string ], queueId?: string) =>
 {
     writeToConsole = true;
     enableFile = false;
     enableOutputWindow = false;
     write(symbols[0] + " " + msg, 0, "", queueId, false, true);
-}
+};
 
 
-function errorFile(msg: string, symbols: [ string, string ])
+const errorFile = (msg: string, symbols: [ string, string ]) =>
 {
     writeToConsole = false;
     enableFile = true;
@@ -102,16 +103,16 @@ function errorFile(msg: string, symbols: [ string, string ])
     else if (msg) {
         write(msg, 0, "", undefined, false, true);
     }
-}
+};
 
 
-function errorOutputWindow(msg: string, symbols: [ string, string ])
+const errorOutputWindow = (msg: string, symbols: [ string, string ]) =>
 {
     writeToConsole = false;
     enableFile = false;
     enableOutputWindow = true;
     write(symbols[1] + " " + msg, 0, "", undefined, false, true);
-}
+};
 
 
 const errorWriteLogs = (lMsg: string | undefined, fileOn: boolean, outWinOn: boolean, symbols: [ string, string ], queueId?: string) =>
@@ -173,7 +174,7 @@ const errorParse = (err: any, symbols: [ string, string ], queueId?: string, cal
 };
 
 
-function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: [ string, string ] = [ "", "" ])
+const _error = (msg: any, params?: (string|any)[][], queueId?: string, symbols: [ string, string ] = [ "", "" ]) =>
 {
     if (!msg) {
         return;
@@ -241,10 +242,10 @@ function _error(msg: any, params?: (string|any)[][], queueId?: string, symbols: 
     lastWriteWasBlank = true;
     lastWriteWasBlankError = true;
     lastWriteToConsoleWasBlank = true;
-}
+};
 
 
-export async function initLog(context: ExtensionContext, testsRunning: boolean)
+const initLog = async(context: ExtensionContext, testsRunning: boolean) =>
 {
     function showLogOutput(show: boolean)
     {
@@ -279,8 +280,9 @@ export async function initLog(context: ExtensionContext, testsRunning: boolean)
     //
     // If logging isn't enabled,then set all log function to empty functions
     //
-    enableLog(enable);
-
+    if (!enable){
+        enableLog(enable);
+    }
     //
     // This function should only be called once, so blank it in the export
     //
@@ -291,23 +293,23 @@ export async function initLog(context: ExtensionContext, testsRunning: boolean)
 
     write("Log has been initialized", 1);
     logLogFileLocation();
-}
+};
 
 
-function getFileName()
+const getFileName = () =>
 {
     const locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T")[0].replace(/[\-]/g, "");
     return `taskexplorer-${locISOTime}.log`;
-}
+};
 
 
-export const getLogFileName = () => fileName;
+const getLogFileName = () => fileName;
 
 
-export const isLoggingEnabled = () => enable;
+const isLoggingEnabled = () => enable;
 
 
-function logLogFileLocation()
+const logLogFileLocation = () =>
 {
     if (enable && enableFile)
     {
@@ -326,10 +328,10 @@ function logLogFileLocation()
             console.log(`    ${figures.color.info} ${withColor("*************************************************************************************", colors.grey)}`);
         }
     }
-}
+};
 
 
-export function methodStart(msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][], queueId?: string) // , color?: LogColor)
+const methodStart = (msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][], queueId?: string) =>
 {
     if (enable)
     {
@@ -340,10 +342,10 @@ export function methodStart(msg: string, level?: number, logPad = "", doLogBlank
         write("*start* " + msg, lLevel, logPad, queueId); // , color);
         values(lLevel, logPad + "   ", params, queueId);
     }
-}
+};
 
 
-export function methodDone(msg: string, level?: number, logPad = "", params?: (string|any)[][], queueId?: string)
+const methodDone = (msg: string, level?: number, logPad = "", params?: (string|any)[][], queueId?: string) =>
 {
     if (enable)
     {
@@ -351,10 +353,10 @@ export function methodDone(msg: string, level?: number, logPad = "", params?: (s
         values(lLevel, logPad + "   ", params, queueId);
         write("*done* " + msg, lLevel, logPad, queueId); // , LogColor.cyan);
     }
-}
+};
 
 
-async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChangeEvent)
+const processConfigChanges = (ctx: ExtensionContext, e: ConfigurationChangeEvent) =>
 {
     if (e.affectsConfiguration("taskExplorer.logging.enable"))
     {
@@ -379,19 +381,19 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     }
     if (e.affectsConfiguration("taskExplorer.logging.level"))
     {
-        logLevel = configuration.get<number>("logging.level", -1);
+        logLevel = configuration.get<number>("logging.level", 1);
     }
-}
+};
 
 
-export function setWriteToConsole(set: boolean, level = 2)
+const setWriteToConsole = (set: boolean, level = 2) =>
 {
     writeToConsole = set;
     writeToConsoleLevel = level;
-}
+};
 
 
-export function value(msg: string, value: any, level?: number, logPad = "", queueId?: string)
+const value = (msg: string, value: any, level?: number, logPad = "", queueId?: string) =>
 {
     if (enable)
     {
@@ -434,10 +436,10 @@ export function value(msg: string, value: any, level?: number, logPad = "", queu
 
         write(logMsg, level, logPad, queueId, true);
     }
-}
+};
 
 
-export function values(level: number, logPad: string, params: any | (string|any)[][], queueId?: string)
+const values = (level: number, logPad: string, params: any | (string|any)[][], queueId?: string) =>
 {
     if (enable && params)
     {
@@ -445,16 +447,16 @@ export function values(level: number, logPad: string, params: any | (string|any)
             value(n, v, level, logPad, queueId);
         }
     }
-}
+};
 
 
-export const warn = (msg: any, params?: (string|any)[][], queueId?: string) => _error(msg, params, queueId, [ figures.color.warning, figures.warning ]);
+const warn = (msg: any, params?: (string|any)[][], queueId?: string) => _error(msg, params, queueId, [ figures.color.warning, figures.warning ]);
 
 
-export const withColor = figures.withColor;
+const withColor = figures.withColor;
 
 
-export function write(msg: string, level?: number, logPad = "", queueId?: string, isValue?: boolean, isError?: boolean) // , color?: LogColor)
+const write = (msg: string, level?: number, logPad = "", queueId?: string, isValue?: boolean, isError?: boolean) =>
 {
     if (!enable || msg === null || msg === undefined || (lastWriteWasBlank && msg === "")) {
         return;
@@ -557,7 +559,7 @@ export function write(msg: string, level?: number, logPad = "", queueId?: string
         }
     }
 
-}
+};
 
 
 const logFunctions =
@@ -575,6 +577,7 @@ const logFunctions =
     setWriteToConsole,
     value,
     values,
+    warn,
     withColor,
     write
 };

@@ -3,13 +3,13 @@
 /* tslint:disable */
 
 import * as assert from "assert";
-import * as log from "../../lib/utils/log";
+import * as afs from "../../lib/utils/fs";
 import * as util from "../../lib/utils/utils";
-import { workspace, WorkspaceFolder } from "vscode";
+import log from "../../lib/utils/log";
+import { join } from "path";
+import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { storage } from "../../lib/utils/storage";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import * as afs from "../../lib/utils/fs";
-import { join } from "path";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
 	logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs
@@ -19,7 +19,7 @@ const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
 
 let teApi: ITaskExplorerApi;
-let rootPath: string;
+let rootUri: Uri;
 
 
 suite("Util Tests", () =>
@@ -28,29 +28,26 @@ suite("Util Tests", () =>
 	suiteSetup(async function()
     {
         teApi = await activate(this);
-		rootPath = (workspace.workspaceFolders as WorkspaceFolder[])[0].uri.fsPath;
-        if (!rootPath) {
+		rootUri = (workspace.workspaceFolders as WorkspaceFolder[])[0].uri;
+        if (!rootUri) {
             assert.fail("        ✘ Workspace folder does not exist");
         }
+        await executeSettingsUpdate("logging.enable", true);
 	});
 
 
 	suiteTeardown(async function()
 	{
+		log.setWriteToConsole(testControl.logToConsole, testControl.logToConsoleLevel);
 		await executeSettingsUpdate("logging.enable", testControl.logEnabled);
-		await executeSettingsUpdate("logging.enableFile", false);
+		await executeSettingsUpdate("logging.enableFile", testControl.logToFile);
+		await executeSettingsUpdate("logging.enableOutputWindow", testControl.logToOutput);
+		await executeSettingsUpdate("logging.enableFileSymbols", testControl.logToFileSymbols);
 	});
 
 
     test("Logging", async function()
     {
-        const uri = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined;
-        if (!uri) {
-            assert.fail("         ✘ Workspace folder does not exist");
-        }
-
-        await executeSettingsUpdate("logging.enable", true);
-
         log.blank();
         log.write(`        ${creator}.${extension}`);
         log.value(`        ${creator}.${extension}`, "true");
@@ -151,7 +148,7 @@ suite("Util Tests", () =>
         util.removeFromArray(arr, 1);
         assert(arr.length === 3);
 
-        assert(util.getCwd(uri) !== undefined);
+        assert(util.getCwd(rootUri) !== undefined);
 
         assert(util.timeout(10));
 
@@ -364,9 +361,9 @@ suite("Util Tests", () =>
 		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
 		await afs.deleteDir(join(__dirname, "folder1"));
 		await afs.deleteFile(join(__dirname, "folder1", "file1.png"));
-		await afs.numFilesInDirectory(rootPath);
+		await afs.numFilesInDirectory(rootUri.fsPath);
 		try {
-			await afs.numFilesInDirectory(join(rootPath, "tasks_test_"));
+			await afs.numFilesInDirectory(join(rootUri.fsPath, "tasks_test_"));
 		}
 		catch {}
 		await afs.getDateModified(join(__dirname, "folder1", "folder2", "folder3"));

@@ -1,4 +1,91 @@
 {
-       "taskExplorer.exclude": [
-      "**/tasks_test_ignore_/**"
-   ]}
+    "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
+    "taskExplorer.enableExplorerView": true,
+    "taskExplorer.enableSideBar": false,
+    "taskExplorer.enabledTasks": {
+        "ant": true,
+        "apppublisher": true,
+        "bash": true,
+        "batch": true,
+        "composer": false,
+        "gradle": true,
+        "grunt": true,
+        "gulp": true,
+        "make": true,
+        "maven": true,
+        "npm": true,
+        "nsis": false,
+        "perl": false,
+        "pipenv": false,
+        "powershell": false,
+        "python": true,
+        "ruby": false,
+        "tsc": true,
+        "workspace": true
+    },
+    "taskExplorer.exclude": [
+        "**/tasks_test_ignore_/**",
+        "**/ant/**",
+        "/c:/Projects/vscode-taskexplorer/test-files/tasks_test_/test2.BAT",
+        "/c:/Projects/vscode-taskexplorer/test-files/GRUNTFILE.js",
+        "/c:/Projects/vscode-taskexplorer/test-files/tasks_test_/subfolder/GRUNTFILE.JS"
+    ],
+    "taskExplorer.includeAnt": [],
+    "taskExplorer.globPatternsAnt": [
+        "**/test.xml",
+        "**/emptytarget.xml",
+        "**/emptyproject.xml",
+        "**/hello.xml"
+    ],
+    "taskExplorer.groupSeparator": "-",
+    "taskExplorer.groupMaxLevel": 5,
+    "taskExplorer.groupWithSeparator": true,
+    "taskExplorer.keepTermOnStop": false,
+    "taskExplorer.logging.enable": false,
+    "taskExplorer.logging.level": 1,
+    "taskExplorer.logging.enableFile": true,
+    "taskExplorer.logging.enableOutputWindow": false,
+    "taskExplorer.pathToPrograms": {
+        "ant": "c:\\Projects\\vscode-taskexplorer\\tools\\ant\\bin\\ant.bat",
+        "appPublisher": "",
+        "ansicon": "",
+        "bash": "bash",
+        "composer": "composer",
+        "gradle": "gradle.bat",
+        "make": "nmake",
+        "maven": "mvn",
+        "nsis": "makensis",
+        "perl": "perl",
+        "pipenv": "pipenv",
+        "powershell": "powershell",
+        "python": "python",
+        "ruby": "ruby"
+    },
+    "taskExplorer.showHiddenWsTasks": true,
+    "taskExplorer.showRunningTask": true,
+    "taskExplorer.specialFolders.expanded": {
+        "lastTasks": true,
+        "favorites": true,
+        "userTasks": true,
+        "test-files": false
+    },
+    "taskExplorer.specialFolders.numLastTasks": 10,
+    "taskExplorer.specialFolders.showFavorites": true,
+    "taskExplorer.specialFolders.showLastTasks": true,
+    "taskExplorer.specialFolders.showUserTasks": true,
+    "taskExplorer.taskButtons.clickAction": "Execute",
+    "taskExplorer.taskButtons.showFavoritesButton": true,
+    "taskExplorer.useGulp": false,
+    "taskExplorer.useAnt": false,
+    "taskExplorer.visual.enableAnsiconForAnt": false,
+    "taskExplorer.visual.disableAnimatedIcons": false,
+    "taskExplorer.globPatternsBash": [],
+    "npm.packageManager": "auto",
+    "terminal.integrated.shell.osx": null,
+    "terminal.integrated.shell.linux": null,
+    "taskExplorer.excludeTask": [
+        "pre-launch[0-9]{2}\\.r(?:b|c)",
+        "upload2"
+    ],
+    "taskExplorer.logging.enableFileSymbols": false
+}
