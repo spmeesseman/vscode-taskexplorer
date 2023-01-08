@@ -28,6 +28,7 @@ import { enableConfigWatcher } from "../lib/configWatcher";
 import SpecialTaskFolder from "./specialFolder";
 import { TaskExplorerProvider } from "../providers/provider";
 import { pathExists } from "../lib/utils/fs";
+import { TaskWatcher } from "../lib/taskWatcher";
 
 
 /**
@@ -37,7 +38,7 @@ import { pathExists } from "../lib/utils/fs";
  */
 export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplorerApi
 {
-    private static statusBarSpace: StatusBarItem;
+    private name: string;
     private disposables: Disposable[];
     private subscriptionStartIndex: number;
     private tasks: Task[] | null = null;
@@ -48,15 +49,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     private enabled = false;
     private setEnableCalled = false;
     private busy = false;
+    private getChildrenLogPad = "";
+    private getChildrenLogLevel = 1;
     private extensionContext: ExtensionContext;
-    private name: string;
     private taskMap: TaskMap = {};
-    private babysitterCt = 0;
-    private babysitterTimer: NodeJS.Timeout | undefined;
-    private taskTree: TaskFolder[] | NoScripts[] | InitScripts[] | LoadScripts[] | undefined | null | void = null;
+    private taskTree: TaskFolder[] | NoScripts[] | undefined | null | void = null;
+    private taskWatcher: TaskWatcher;
     private currentInvalidation: string | undefined;
-    private taskIdStartEvents: Map<string, NodeJS.Timeout> = new Map();
-    private taskIdStopEvents: Map<string, NodeJS.Timeout> = new Map();
     private _onDidChangeTreeData: EventEmitter<TreeItem | undefined | null | void> = new EventEmitter<TreeItem | undefined | null | void>();
     readonly onDidChangeTreeData: Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
     public specialFolders: {
@@ -103,8 +102,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             lastTasks: new SpecialTaskFolder(context, name, this, constants.LAST_TASKS_LABEL, lastTaskExpanded)
         };
 
-        tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e));
-        tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e));
+        this.taskWatcher = new TaskWatcher(this, this.specialFolders, context);
     }
 
 
@@ -113,8 +111,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.disposables.forEach((d) => {
             d.dispose();
         });
-        this.specialFolders.favorites.dispose(context);
-        this.specialFolders.lastTasks.dispose(context);
+        this.taskWatcher.dispose(context);              // <-- must be in this order
+        this.specialFolders.favorites.dispose(context); // <-- must be in this order
+        this.specialFolders.lastTasks.dispose(context); // <-- must be in this order
         context.subscriptions.splice(this.subscriptionStartIndex, this.disposables.length);
         this.disposables = [];
     }
@@ -211,40 +210,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         enableConfigWatcher(true);
 
         log.methodDone("add to excludes", 1);
-    }
-
-
-    /**
-     * Used as a check to reset node state when a task 'hangs' or whatever it does sometimes
-     * when the task fails ad the vscode engine doesnt trigger the taskexec finished event.
-     * RUns every 2 seconds for each task that is launched.
-     *
-     * @param taskItem Task item
-     */
-    private babysitRunningTask(taskItem: TaskItem)
-    {
-        this.babysitterTimer = setTimeout((t: TaskItem) =>
-        {
-            if (t.isRunning())
-            {   /* istanbul ignore if */
-                if (!t.isExecuting()) {
-                    // t.refreshState(false);
-                    if (++this.babysitterCt >= 3)
-                    {
-                        this.babysitterCt = 0;
-                        log.write("task babysitter firing change event", 1);
-                        log.value("   task name", t.task.name, 1);
-                        this.fireTaskChangeEvents(t, "   ", 1);
-                    }
-                    else {
-                        this.babysitRunningTask(t);
-                    }
-                }
-                else {
-                    this.babysitRunningTask(t);
-                }
-            }
-        }, 1000, taskItem);
     }
 
 
@@ -745,81 +710,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    fireTreeRefreshEvent(taskItem?: TreeItem)
+    fireTreeRefreshEvent(taskFile?: TreeItem, logPad?: string, logLevel?: number)
     {
-        this._onDidChangeTreeData.fire(taskItem);
-    }
-
-
-    private fireTaskChangeEvents(taskItem: TaskItem, logPad?: string, logLevel?: number)
-    {
-        /* istanbul ignore if */
-        if (!taskItem || !taskItem.task || !taskItem.taskFile) {
-            log.error(`fire task change event type invalid, received ${typeof taskItem}`);
-            return;
-        }
-        /* istanbul ignore if */
-        if (!taskItem.task || !taskItem.taskFile) {
-            log.error(`fire task change event invalid (${!taskItem.task}/${!taskItem.taskFile})`);
-            return;
-        }
-
-        const isTaskItem = taskItem instanceof TaskItem;
-        log.methodStart("fire task change events", logLevel, logPad, false, [
-            [ "task name", taskItem.task.name ], [ "task type", taskItem.task.source ],
-            [ "resource path", taskItem.taskFile.resourceUri.fsPath ], [ "view", this.name ]
-        ]);
-
-        /* istanbul ignore if */
-        if (!this.taskTree) {
-            log.write("   no task tree!!", logLevel, logPad);
-            log.methodDone("fire task change events", logLevel, logPad);
-            return;
-        }
-
-        /* istanbul ignore if */
-        if (!isTaskItem) {
-            log.write("   change event object is not a taskitem!!", logLevel, logPad);
-            log.methodDone("fire task change events", logLevel, logPad);
-            return;
-        }
-
-        //
-        // Fire change event for parent folder.  Firing the change event for the task item itself
-        // does not cause the getTreeItem() callback to be called from VSCode Tree API.  Firing it
-        // on the parent folder (type TreeFile) works good though.  Pre v2, we refreshed the entire
-        // tree, so this is still good.  TODO possibly this gets fixed in the future to be able to
-        // invalidate just the TaskItem, so check back on this sometime.
-        //
-        this._onDidChangeTreeData.fire(taskItem.taskFile);
-
-        //
-        // Fire change event for the 'Last Tasks' folder if the task exists there
-        //
-        if (this.specialFolders.lastTasks.hasTask(taskItem))
-        {
-            if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.lastTasks.label)
-            {
-                this._onDidChangeTreeData.fire(this.taskTree[0]);
-            }
-        }
-
-        //
-        // Fire change event for the 'Favorites' folder if the task exists there
-        //
-        if (this.specialFolders.favorites.hasTask(taskItem))
-        {
-            if (this.taskTree[0] && this.taskTree[0].label === this.specialFolders.favorites.label)
-            {
-                this._onDidChangeTreeData.fire(this.taskTree[0]);
-            }
-            else if (this.taskTree[1] && this.taskTree[1].label === this.specialFolders.favorites.label)
-            {
-                this._onDidChangeTreeData.fire(this.taskTree[1]);
-            }
-        }
-
-        log.methodDone("fire task change events", logLevel, logPad);
+        this.getChildrenLogPad = logPad || "";
+        this.getChildrenLogLevel = logLevel || 1;
+        this._onDidChangeTreeData.fire(taskFile);
     }
 
 
@@ -1100,6 +995,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         id += file.resourceUri.fsPath.replace(/\W/gi, "");
         return folder.label + file.taskSource + id + treeLevel.toString();
     }
+
+
+    public getName = () => this.name;
 
 
     public getParent(element: TreeItem): TreeItem | null
@@ -1489,7 +1387,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         else {
             window.showInformationMessage("Executing task not found");
             taskItem.refreshState(true, "   ", 1);
-            this.fireTaskChangeEvents(taskItem);
+            this.taskWatcher.fireTaskChangeEvents(taskItem, "   ", 1);
         }
 
         log.methodDone("pause", 1);
@@ -1872,7 +1770,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             if (exec)
             {
                 await this.specialFolders.lastTasks.saveTask(taskItem, "   ");
-                this.babysitRunningTask(taskItem);
             }
         }
 
@@ -2039,7 +1936,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                     if (exec)
                     {
                         await this.specialFolders.lastTasks.saveTask(taskItem, logPad);
-                        this.babysitRunningTask(taskItem);
                     }
                 }
                 return exec;
@@ -2080,36 +1976,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             else {
                 this.setEnableCalled = enable;
                 this._onDidChangeTreeData.fire();
-            }
-        }
-    }
-
-
-    private showStatusMessage(task: Task)
-    {
-        if (task && configuration.get<boolean>("showRunningTask") === true)
-        {
-            const exec = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
-                         e.task.scope === task.scope && e.task.definition.path === task.definition.path);
-            if (exec)
-            {
-                if (!TaskTreeDataProvider.statusBarSpace) {
-                    TaskTreeDataProvider.statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
-                    TaskTreeDataProvider.statusBarSpace.tooltip = "Task Explorer running task";
-                }
-                let statusMsg = task.name;
-                /* istanbul ignore else */
-                if ((task.scope as WorkspaceFolder).name) {
-                    statusMsg += " (" + (task.scope as WorkspaceFolder).name + ")";
-                }
-                TaskTreeDataProvider.statusBarSpace.text = "$(loading~spin) " + statusMsg;
-                TaskTreeDataProvider.statusBarSpace.show();
-            }
-            else {
-                /* istanbul ignore else */
-                if (TaskTreeDataProvider.statusBarSpace) {
-                    TaskTreeDataProvider.statusBarSpace.dispose();
-                }
             }
         }
     }
@@ -2166,133 +2032,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         else {
             window.showInformationMessage("Executing task not found");
             taskItem.refreshState(true, "   ", 1);
-            this.fireTaskChangeEvents(taskItem);
+            this.taskWatcher.fireTaskChangeEvents(taskItem, "   ", 1);
         }
 
         log.methodDone("stop", 1);
-    }
-
-
-    private async taskStartEvent(e: TaskStartEvent)
-    {   //
-        // Clear debounce timeout if still pending.  VScode v1.57+ emits about a dozen task
-        // start/end event for a task.  Sick of these damn bugs that keep getting introduced
-        // seemingly every other version AT LEAST.
-        //
-        const task = e.execution.task,
-              taskId = task.definition.taskItemId;
-        let taskTimerId: NodeJS.Timeout | undefined;
-        if (taskTimerId = this.taskIdStartEvents.get(taskId)) {
-            clearTimeout(taskTimerId);
-            this.taskIdStartEvents.delete(taskId);
-        }
-        //
-        // If taskMap is empty, then this view has not yet been made visible, an there's nothing
-        // to update.  The `taskTree` property should also be null.  We could probably do this
-        // before the timer check above, but hey, just in case taskMap goes empty between events
-        // for some un4seen reason.
-        //
-        const isMapEmpty = util.isObjectEmpty(this.taskMap);
-        if (isMapEmpty || !this.taskMap[taskId])
-        {
-            /* istanbul ignore if */
-            if (this.taskTree && !this.taskMap[taskId] && this.taskTree.length > 0 && this.taskTree[0].contextValue !== "noscripts")
-            {
-                if (task.source === "npm" && task.definition.type === "npm" &&
-                   (task.name === "build" || task.name === "install" || task.name === "watch" || task.name.startsWith("update")  || task.name.startsWith("audit")))
-                {
-                    return;
-                }
-                log.error(`The task map is ${isMapEmpty ? "empty" : "missing the running task"} but ` +
-                          `the task tree is non-null and holds ${this.taskTree.length} folders (task start event)`,
-                          [[ "# of tasks in task map", Object.keys(this.taskMap).length ], [ "task name", task.name ],
-                          [ "task source", task.source ], [ "task type", task.definition.type ]]);
-            }
-            return;
-        }
-        //
-        // Debounce!!  VScode v1.57+ emits about a dozen task start/end event for a task.  Sick
-        // of these damn bugs that keep getting introduced seemingly every other version AT LEAST.
-        //
-        taskTimerId = setTimeout(async(taskEvent) =>
-        {
-            const task = taskEvent.execution.task,
-                  taskId = task.definition.taskItemId;
-            try
-            {   log.methodStart("task started event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.name ]]);
-                this.showStatusMessage(task);
-                const taskItem = this.taskMap[taskId] as TaskItem;
-                this.fireTaskChangeEvents(taskItem, "   ", 1);
-                log.methodDone("task started event", 1);
-            }
-            catch (e) { /* istanbul ignore next */ console.error(e); }
-        }, 50, e);
-
-        this.taskIdStartEvents.set(taskId, taskTimerId);
-    }
-
-
-    private async taskFinishedEvent(e: TaskEndEvent)
-    {   //
-        // Clear debounce timeout if still pending.  VScode v1.57+ emits about a dozen task
-        // start/end event for a task.  Sick of these damn bugs that keep getting introduced
-        // seemingly every other version AT LEAST.
-        //
-        const task = e.execution.task;
-        const taskId = task.definition.taskItemId;
-        let taskTimerId: NodeJS.Timeout | undefined;
-        if (taskTimerId = this.taskIdStopEvents.get(taskId)) {
-            clearTimeout(taskTimerId);
-            this.taskIdStopEvents.delete(taskId);
-        }
-        if (this.babysitterTimer) {
-            clearTimeout(this.babysitterTimer);
-            this.babysitterTimer = undefined;
-        }
-        //
-        // If taskMap is empty, then this view has not yet been made visible, an there's nothing
-        // to update.  The `taskTree` property should also be null.  We could probably do this
-        // before the timer check above, but hey, just in case taskMap goes empty between events
-        // for some un4seen reason.  This willusually fall through when both the Explorer and
-        // SideBar views are enabled, but the sidebar hasn't received a visible event yet, i.e.
-        // it hasn't been opened yet by the user.
-        //
-        const isMapEmpty = util.isObjectEmpty(this.taskMap);
-        if (isMapEmpty || !this.taskMap[taskId]) {
-            /* istanbul ignore if */
-            if (this.taskTree && !this.taskMap[taskId] && this.taskTree.length > 0 && this.taskTree[0].contextValue !== "noscripts")
-            {
-                if (task.source === "npm" && task.definition.type === "npm" &&
-                   (task.name === "build" || task.name === "install" || task.name === "watch" || task.name.startsWith("update")  || task.name.startsWith("audit")))
-                {
-                    return;
-                }
-                log.error(`The task map is ${isMapEmpty ? "empty" : "missing the running task"} but ` +
-                          `the task tree is non-null and holds ${this.taskTree.length} folders (task start event)`,
-                          [[ "# of tasks in task map", Object.keys(this.taskMap).length ], [ "task name", task.name ],
-                          [ "task source", task.source ], [ "task type", task.definition.type ]]);
-            }
-            return;
-        }
-        //
-        // Debounce!!  VScode v1.57+ emits about a dozen task start/end event for a task.  Sick
-        // of these damn bugs that keep getting introduced seemingly every other version AT LEAST.
-        //
-        taskTimerId = setTimeout(async(taskEvent) =>
-        {
-            const task = taskEvent.execution.task,
-                  taskId = task.definition.taskItemId;
-            try
-            {   log.methodStart("task finished event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.name ]]);
-                this.showStatusMessage(task); // hides
-                const taskItem = this.taskMap[taskId] as TaskItem;
-                this.fireTaskChangeEvents(taskItem, "   ", 1);
-                log.methodDone("task finished event", 1);
-            }
-            catch (e) { /* istanbul ignore next */ console.error(e); }
-        }, 50, e);
-
-        this.taskIdStopEvents.set(taskId, taskTimerId);
     }
 
 

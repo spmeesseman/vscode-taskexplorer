@@ -107,33 +107,12 @@ export default class SpecialTaskFolder extends TaskFolder
             await this.saveTask(taskItem, "   ");
         }
         else {
-           await this.removeTaskFile(id, true);
+           await this.removeTaskFile(id, true, "   ");
            removed = true;
         }
 
         log.methodDone("add/remove favorite", 1);
         return removed;
-    }
-
-
-    async removeTaskFile(taskFile: TaskItem|string, persist?: boolean)
-    {
-        const id = isString(taskFile) ? taskFile : taskFile.id, // getTaskItemId(taskFile);
-              idx = this.taskFiles.findIndex(f => f.id === id);
-        if (idx !== -1)
-        {
-            taskFile = this.taskFiles.splice(idx, 1)[0];
-            if (persist)
-            {
-                const idx = this.store.findIndex(f => f === id);
-                if (idx !== -1) {
-                    this.store.splice(idx, 1);
-                    await storage.update(constants.LAST_TASKS_STORE, this.store);
-                }
-            }
-            // await this.refresh(true, taskFile);
-            this.explorer.fireTreeRefreshEvent(this);
-        }
     }
 
 
@@ -357,11 +336,11 @@ export default class SpecialTaskFolder extends TaskFolder
         /* istanbul ignore else */
         if (taskItem2)
         {
-            this.removeTaskFile(taskItem2);
+            this.removeTaskFile(taskItem2, false, logPad + "   ");
         }
         else if (this.taskFiles.length >= configuration.get<number>("specialFolders.numLastTasks"))
         {
-            this.removeTaskFile(this.taskFiles[this.taskFiles.length - 1]);
+            this.removeTaskFile(this.taskFiles[this.taskFiles.length - 1], false, logPad + "   ");
         }
 
         if (!taskItem2)
@@ -374,7 +353,7 @@ export default class SpecialTaskFolder extends TaskFolder
 
         log.value(logPad + "   add item", taskItem2.id, 2);
         this.insertTaskFile(taskItem2, 0);
-        this.explorer.fireTreeRefreshEvent(this);
+        this.explorer.fireTreeRefreshEvent(this, "   ", 1);
     }
 
 
@@ -410,10 +389,31 @@ export default class SpecialTaskFolder extends TaskFolder
 
         /* istanbul ignore else */
         if (changed) {
-            this.explorer.fireTreeRefreshEvent();
+            this.explorer.fireTreeRefreshEvent(undefined, logPad + "   ", 1);
         }
 
         log.methodDone("show special tasks", 1, logPad);
+    }
+
+
+    async removeTaskFile(taskFile: TaskItem|string, persist?: boolean, logPad?: string)
+    {
+        const id = isString(taskFile) ? taskFile : taskFile.id, // getTaskItemId(taskFile);
+              idx = this.taskFiles.findIndex(f => f.id === id);
+        if (idx !== -1)
+        {
+            taskFile = this.taskFiles.splice(idx, 1)[0];
+            if (persist)
+            {
+                const idx = this.store.findIndex(f => f === id);
+                if (idx !== -1) {
+                    this.store.splice(idx, 1);
+                    await storage.update(constants.LAST_TASKS_STORE, this.store);
+                }
+            }
+            // await this.refresh(true, taskFile);
+            this.explorer.fireTreeRefreshEvent(this, logPad, 1);
+        }
     }
 
 
