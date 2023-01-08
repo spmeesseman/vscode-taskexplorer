@@ -2,11 +2,11 @@
 
 import * as log from "./utils/log";
 import * as util from "./utils/utils";
-import { IExplorerApi, ITaskExplorerApi } from "../interface";
+import { IExplorerApi } from "../interface";
 import { teApi } from "../extension";
 import TaskItem from "../tree/item";
 import {
-    Disposable, ExtensionContext, FileSystemWatcher, WorkspaceFolder, tasks, TaskStartEvent,
+    Disposable, ExtensionContext, WorkspaceFolder, tasks, TaskStartEvent,
     StatusBarItem, StatusBarAlignment, Task, window, TaskEndEvent
 } from "vscode";
 import SpecialTaskFolder from "../tree/specialFolder";
@@ -16,14 +16,10 @@ export class TaskWatcher
 {
     private static statusBarSpace: StatusBarItem;
     private tree: IExplorerApi;
-    private processingTaskEvent = false;
-    private eventQueue: any[] = [];
     private disposables: Disposable[];
     private subscriptionStartIndex: number;
     private babysitterCt = 0;
-    private babysitterTimer: NodeJS.Timeout | undefined;
-    private taskIdStartEvents: Map<string, NodeJS.Timeout> = new Map();
-    private taskIdStopEvents: Map<string, NodeJS.Timeout> = new Map();
+    private babysitterTimers: { [taskType: string]:  NodeJS.Timeout } = {};
     private specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder };
 
 
@@ -42,6 +38,7 @@ export class TaskWatcher
 
     dispose(context: ExtensionContext)
     {
+        this.fireAllBabySitters();
         this.disposables.forEach((d) => {
             d.dispose();
         });
@@ -59,7 +56,9 @@ export class TaskWatcher
      */
     private babysitRunningTask(taskItem: TaskItem)
     {
-        this.babysitterTimer = setTimeout((t: TaskItem) =>
+        const taskId = taskItem.task.definition.taskItemId; // taskItem.id
+        this.fireBabySitter(taskId);
+        const taskTimerId = setTimeout((t: TaskItem) =>
         {
             if (t.isRunning())
             {   /* istanbul ignore if */
@@ -81,6 +80,23 @@ export class TaskWatcher
                 }
             }
         }, 1000, taskItem);
+        this.babysitterTimers[taskId] = taskTimerId;
+    }
+
+
+    private fireAllBabySitters()
+    {
+        Object.keys(this.babysitterTimers).forEach((taskId) => this.fireBabySitter(taskId));
+    }
+
+
+    private fireBabySitter(taskId: string)
+    {
+        let taskTimerId: NodeJS.Timeout | undefined;
+        if (taskTimerId = this.babysitterTimers[taskId]) {
+            clearTimeout(taskTimerId);
+            delete this.babysitterTimers[taskId];
+        }
     }
 
 
@@ -189,31 +205,17 @@ export class TaskWatcher
 
     private async taskStartEvent(e: TaskStartEvent)
     {
-        const taskMap = this.tree.getTaskMap();
-        const taskTree = this.tree.getTaskTree();
-        //
-        // Clear debounce timeout if still pending.  VScode v1.57+ emits about a dozen task
-        // start/end event for a task.  Sick of these damn bugs that keep getting introduced
-        // seemingly every other version AT LEAST.
-        //
-        const task = e.execution.task,
-            taskId = task.definition.taskItemId;
-        let taskTimerId: NodeJS.Timeout | undefined;
-        if (taskTimerId = this.taskIdStartEvents.get(taskId)) {
-            clearTimeout(taskTimerId);
-            this.taskIdStartEvents.delete(taskId);
-        }
-        if (this.babysitterTimer) {
-            clearTimeout(this.babysitterTimer);
-            this.babysitterTimer = undefined;
-        }
+        const taskMap = this.tree.getTaskMap(),
+              taskTree = this.tree.getTaskTree(),
+              task = e.execution.task,
+              taskId = task.definition.taskItemId,
+              isMapEmpty = util.isObjectEmpty(taskMap);
         //
         // If taskMap is empty, then this view has not yet been made visible, an there's nothing
         // to update.  The `taskTree` property should also be null.  We could probably do this
         // before the timer check above, but hey, just in case taskMap goes empty between events
         // for some un4seen reason.
         //
-        const isMapEmpty = util.isObjectEmpty(taskMap);
         if (isMapEmpty || !taskMap[taskId])
         {
             /* istanbul ignore if */
@@ -231,49 +233,29 @@ export class TaskWatcher
             }
             return;
         }
-        //
-        // Debounce!!  VScode v1.57+ emits about a dozen task start/end event for a task.  Sick
-        // of these damn bugs that keep getting introduced seemingly every other version AT LEAST.
-        //
-        taskTimerId = setTimeout(async(taskEvent) =>
-        {
-            const task = taskEvent.execution.task,
-                taskId = task.definition.taskItemId;
-            try
-            {   log.methodStart("task started event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.tree.getName() ]]);
-                this.showStatusMessage(task);
-                const taskItem = taskMap[taskId] as TaskItem;
-                this.fireTaskChangeEvents(taskItem, "   ", 1);
-                this.babysitRunningTask(taskItem);
-                log.methodDone("task started event", 1);
-            }
-            catch (e) { /* istanbul ignore next */ console.error(e); }
-        }, 50, e);
 
-        this.taskIdStartEvents.set(taskId, taskTimerId);
+        try
+        {   log.methodStart("task started event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.tree.getName() ]]);
+            this.showStatusMessage(task);
+            const taskItem = taskMap[taskId] as TaskItem;
+            this.fireTaskChangeEvents(taskItem, "   ", 1);
+            this.babysitRunningTask(taskItem);
+            log.methodDone("task started event", 1);
+        }
+        catch (e) { /* istanbul ignore next */ console.error(e); }
     }
 
 
     private async taskFinishedEvent(e: TaskEndEvent)
     {
-        const taskMap = this.tree.getTaskMap();
-        const taskTree = this.tree.getTaskTree();
-        //
-        // Clear debounce timeout if still pending.  VScode v1.57+ emits about a dozen task
-        // start/end event for a task.  Sick of these damn bugs that keep getting introduced
-        // seemingly every other version AT LEAST.
-        //
-        const task = e.execution.task;
-        const taskId = task.definition.taskItemId;
-        let taskTimerId: NodeJS.Timeout | undefined;
-        if (taskTimerId = this.taskIdStopEvents.get(taskId)) {
-            clearTimeout(taskTimerId);
-            this.taskIdStopEvents.delete(taskId);
-        }
-        if (this.babysitterTimer) {
-            clearTimeout(this.babysitterTimer);
-            this.babysitterTimer = undefined;
-        }
+        const taskMap = this.tree.getTaskMap(),
+              taskTree = this.tree.getTaskTree(),
+              task = e.execution.task,
+              taskId = task.definition.taskItemId,
+              isMapEmpty = util.isObjectEmpty(taskMap);
+
+        this.fireBabySitter(taskId);
+
         //
         // If taskMap is empty, then this view has not yet been made visible, an there's nothing
         // to update.  The `taskTree` property should also be null.  We could probably do this
@@ -282,8 +264,8 @@ export class TaskWatcher
         // SideBar views are enabled, but the sidebar hasn't received a visible event yet, i.e.
         // it hasn't been opened yet by the user.
         //
-        const isMapEmpty = util.isObjectEmpty(taskMap);
-        if (isMapEmpty || !taskMap[taskId]) {
+        if (isMapEmpty || !taskMap[taskId])
+        {
             /* istanbul ignore if */
             if (taskTree && !taskMap[taskId] && taskTree.length > 0 && taskTree[0].contextValue !== "noscripts")
             {
@@ -299,25 +281,15 @@ export class TaskWatcher
             }
             return;
         }
-        //
-        // Debounce!!  VScode v1.57+ emits about a dozen task start/end event for a task.  Sick
-        // of these damn bugs that keep getting introduced seemingly every other version AT LEAST.
-        //
-        taskTimerId = setTimeout(async(taskEvent) =>
-        {
-            const task = taskEvent.execution.task,
-                taskId = task.definition.taskItemId;
-            try
-            {   log.methodStart("task finished event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.tree.getName() ]]);
-                this.showStatusMessage(task); // hides
-                const taskItem = taskMap[taskId] as TaskItem;
-                this.fireTaskChangeEvents(taskItem, "   ", 1);
-                log.methodDone("task finished event", 1);
-            }
-            catch (e) { /* istanbul ignore next */ console.error(e); }
-        }, 50, e);
 
-        this.taskIdStopEvents.set(taskId, taskTimerId);
+        try
+        {   log.methodStart("task finished event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.tree.getName() ]]);
+            this.showStatusMessage(task); // hides
+            const taskItem = taskMap[taskId] as TaskItem;
+            this.fireTaskChangeEvents(taskItem, "   ", 1);
+            log.methodDone("task finished event", 1);
+        }
+        catch (e) { /* istanbul ignore next */ console.error(e); }
     }
 
 }
