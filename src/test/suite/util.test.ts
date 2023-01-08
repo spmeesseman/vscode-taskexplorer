@@ -124,7 +124,6 @@ suite("Util Tests", () =>
 		log.value("Test4", undefined, 1);
 
 		log.values(1, "   ", [[ "Test5", "5" ]]);
-		log.values(1, "   ", [[ "Test6", "6" ]], true);
 
 		log.error("Test5 error");
 		log.error(new Error("Test error object"));

@@ -501,7 +501,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                     log.values(logLevel + 2, logPad, [
                         [ "   Add source file sub-container", each.path ],
                         [ "      id", id ]
-                    ], true);
+                    ]);
                     const node = each.treeNodes[0];
                     /* istanbul ignore else */
                     if (node instanceof TaskItem)

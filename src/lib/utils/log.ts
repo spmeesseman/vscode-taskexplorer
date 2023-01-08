@@ -305,7 +305,7 @@ export function methodStart(msg: string, level?: number, logPad = "", doLogBlank
             blank(lLevel, queueId);
         }
         write("*start* " + msg, lLevel, logPad, queueId); // , color);
-        values(lLevel, logPad + "   ", params, false, queueId);
+        values(lLevel, logPad + "   ", params, queueId);
     }
 }
 
@@ -315,7 +315,7 @@ export function methodDone(msg: string, level?: number, logPad = "", params?: (s
     if (enable)
     {
         const lLevel = level || 1;
-        values(lLevel, logPad + "   ", params, false, queueId);
+        values(lLevel, logPad + "   ", params, queueId);
         write("*done* " + msg, lLevel, logPad, queueId); // , LogColor.cyan);
     }
 }
@@ -403,13 +403,10 @@ export function value(msg: string, value: any, level?: number, logPad = "", queu
 }
 
 
-export function values(level: number, logPad: string, params: any | (string|any)[][], doLogBlank?: boolean, queueId?: string)
+export function values(level: number, logPad: string, params: any | (string|any)[][], queueId?: string)
 {
     if (enable && params)
     {
-        if (doLogBlank === true) {
-            blank(level, queueId);
-        }
         for (const [ n, v ] of params) {
             value(n, v, level, logPad, queueId);
         }
