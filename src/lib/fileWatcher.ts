@@ -13,11 +13,11 @@ import { Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFo
 let teApi: ITaskExplorerApi;
 let processingFsEvent = false;
 const eventQueue: any[] = [];
-const watchers: Map<string, FileSystemWatcher> = new Map();
-const watcherDisposables: Map<string, Disposable> = new Map();
+const watchers: { [taskType: string]: FileSystemWatcher } = {};
+const watcherDisposables: { [taskType: string]: Disposable } = {};
 let workspaceWatcher: Disposable | undefined;
 const dirWatcher: {
-    watcher?: FileSystemWatcher | undefined;
+    watcher?: FileSystemWatcher;
     onDidCreate?: Disposable;
     onDidDelete?: Disposable;
 } = {};
@@ -25,12 +25,12 @@ const dirWatcher: {
 
 export function disposeFileWatchers()
 {
-    for (const [ k, d ] of watcherDisposables) {
+    Object.values(watcherDisposables).forEach((d) => {
         d.dispose();
-    }
-    for (const [ k, w ] of watchers) {
+    });
+    Object.values(watchers).filter(w => !!w).forEach((w) => {
         w.dispose();
-    }
+    });
 }
 
 
@@ -59,13 +59,6 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
 {
     log.methodStart("Register file watcher for task type '" + taskType + "'", 1, logPad);
 
-    let watcher = watchers.get(taskType);
-    //
-    // Ignore modification events for some task types (script type, e.g. 'bash', 'python' etc)
-    // app-publisher and maven only get watched for invalid syntax.  they always have same # of tasks for a file.
-    //
-    const ignoreModify = util.isScriptType(taskType); // || taskType === "apppublisher" || taskType === "maven";
-
     /* istanbul ignore else */
     if (workspace.workspaceFolders) {
         if (enabled !== false){
@@ -76,27 +69,33 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
         }
     }
 
+    let watcher = watchers[taskType];
     if (watcher)
     {
-        const watcherDisposable = watcherDisposables.get(taskType);
+        const watcherDisposable = watcherDisposables[taskType];
         if (watcherDisposable)
         {
             watcherDisposable.dispose();
-            watcherDisposables.delete(taskType);
+            delete watcherDisposables[taskType];
         }
     }
 
     if (enabled !== false)
-    {
+    {   //
+        // Ignore modification events for some task types (script type, e.g. 'bash', 'python' etc)
+        // app-publisher and maven only get watched for invalid syntax.  they always have same # of tasks for a file.
+        //
+        const ignoreModify = util.isScriptType(taskType) || taskType === "apppublisher" || taskType === "maven" || taskType === "tsc";
+
         if (!watcher) {
             watcher = workspace.createFileSystemWatcher(fileBlob);
-            watchers.set(taskType, watcher);
+            watchers[taskType] = watcher;
             context.subscriptions.push(watcher);
         }
 
         if (!ignoreModify)
         {
-            watcherDisposables.set(taskType, watcher.onDidChange(async uri =>
+            watcherDisposables[taskType] = watcher.onDidChange(async uri =>
             {
                 if (!util.isExcluded(uri.fsPath))
                 {
@@ -108,10 +107,10 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
                         eventQueue.push({ fn: _procFileChangeEvent, args: [ taskType, uri, "   " ], event: "modify file" });
                     }
                 }
-            }));
+            });
         }
 
-        watcherDisposables.set(taskType, watcher.onDidDelete(async uri =>
+        watcherDisposables[taskType] = watcher.onDidDelete(async uri =>
         {
             if (!util.isExcluded(uri.fsPath))
             {
@@ -123,9 +122,9 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
                     eventQueue.push({ fn: _procFileDeleteEvent, args: [ taskType, uri, "   " ], event: "delete file" });
                 }
             }
-        }));
+        });
 
-        watcherDisposables.set(taskType, watcher.onDidCreate(async uri =>
+        watcherDisposables[taskType] = watcher.onDidCreate(async uri =>
         {
             if (!util.isExcluded(uri.fsPath))
             {
@@ -137,7 +136,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
                     eventQueue.push({ fn: _procFileCreateEvent, args: [ taskType, uri, "   " ], event: "create file" });
                 }
             }
-        }));
+        });
     }
 
     log.methodDone("Register file watcher for task type '" + taskType + "'", 1, logPad);

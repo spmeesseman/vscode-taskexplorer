@@ -125,7 +125,13 @@ suite("Maven Tests", () =>
             "</project\n"
         );
         await teApi.waitForIdle(testControl.waitTime.fsModifyEvent, 3000);
-        await verifyTaskCount(testsName, 0);
+        //
+        // See fileWatcher.ts, we ignore modify event because the task count will never change
+        // for this task type. So if there is invalid json after a save, the tasks will remain,
+        // but are actually invalid.
+        //
+        // await verifyTaskCount(testsName, 0);
+        await verifyTaskCount(testsName, startTaskCount);
         if (resetLogging) { // turn scary error logging off
             executeSettingsUpdate("logging.enable", true);
         }

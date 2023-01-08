@@ -171,7 +171,13 @@ suite("Typescript Tests", () =>
             "\n"
         );
         await teApi.waitForIdle(testControl.waitTime.fsModifyEvent, 3000);
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4); // I guess internal TSC must not invalidate tasks on bad syntax
+        //
+        // See fileWatcher.ts, we ignore modify event because the task count will never change
+        // for this task type. So if there is invalid json after a save, the tasks will remain,
+        // but are actually invalid.  TSC engine will report the old task count as well, so it
+        // doesn't event matter if we had the file modify event watcher on or not.
+        //
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         // if (resetLogging) { // turn scary error logging off
         //     executeSettingsUpdate("logging.enable", true);
         // }

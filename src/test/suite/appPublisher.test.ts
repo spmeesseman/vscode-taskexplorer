@@ -137,7 +137,13 @@ suite("App-Publisher Tests", () =>
             "\n"
         );
         await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
-        await verifyTaskCount(testsName, startTaskCount);
+        //
+        // See fileWatcher.ts, we ignore modify event because the task count will never change
+        // for this task type. So if there is invalid json after a save, the tasks will remain,
+        // but are actually invalid.
+        //
+        // await verifyTaskCount(testsName, startTaskCount);
+        await verifyTaskCount(testsName, startTaskCount + 21);
         if (resetLogging) { // turn scary error logging off
             executeSettingsUpdate("logging.enable", true);
         }

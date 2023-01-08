@@ -254,7 +254,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
  */
 function addToMappings(taskType: string, item: ICacheItem, logPad: string)
 {
-    log.methodStart("add item to mappings", 4, logPad, false, [[ "task type", taskType ], [ "file", item.uri.fsPath ]]);
+    log.methodStart("add item to mappings", 3, logPad, false, [[ "task type", taskType ], [ "file", item.uri.fsPath ]]);
 
     initMaps(taskType, item.folder.name);
     const added = {
@@ -284,7 +284,7 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
         log.write("   already exists in cache", 4, logPad);
     }
 
-    log.methodDone("add item to mappings", 4, logPad);
+    log.methodDone("add item to mappings", 3, logPad);
     return added.c1;
 }
 
@@ -588,8 +588,8 @@ export function removeFolderFromCache(uri: Uri, logPad: string)
 export function removeTaskTypeFromCache(taskType: string, logPad: string)
 {
     log.methodStart("remove task type from cache", 2, logPad, false, [[ "task type", taskType ]]);
-    removeFromMappings(taskType, undefined, true, logPad + "   ");
-    log.methodDone("remove task type from cache", 2, logPad);
+    const count = removeFromMappings(taskType, undefined, true, logPad + "   ");
+    log.methodDone("remove task type from cache", 2, logPad, false, [[ "# of files removed", count ]]);
 }
 
 
@@ -600,7 +600,7 @@ export function removeTaskTypeFromCache(taskType: string, logPad: string)
 function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: boolean, logPad: string)
 {
     let wsFolders: readonly WorkspaceFolder[];
-    log.methodStart("remove item from mappings", 2, logPad, false, [[ "task type", taskType ], [ "path", uri?.fsPath ]]);
+    log.methodStart("remove item from mappings", 3, logPad, false, [[ "task type", taskType ], [ "path", uri?.fsPath ]]);
 
     if (uri === undefined) {
         wsFolders = workspace.workspaceFolders as readonly WorkspaceFolder[];
@@ -610,7 +610,7 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
         wsFolders = [ wsf ];
     }
     const removed = {
-        c1: 0, c2: 0, c3: 0
+        c1: 0, c2: 0
     };
 
     for (const wsf of wsFolders)
@@ -628,7 +628,7 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
                     {
                         log.value(`   remove from project files map (${index})`, item.fsPath, 3, logPad);
                         projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
-                        ++removed.c2;
+                        ++removed.c1;
                     }
                 }
                 else
@@ -637,7 +637,7 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
                     {
                         log.value(`   remove from project files map (${index})`, item.fsPath, 3, logPad);
                         projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
-                        ++removed.c2;
+                        ++removed.c1;
                     }
                 }
             });
@@ -654,7 +654,7 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
                     {
                         log.value(`   remove from task files map (${index})`, item.uri.fsPath, 3, logPad);
                         taskFilesMap[taskType].splice(object.length - 1 - index, 1);
-                        ++removed.c3;
+                        ++removed.c2;
                     }
                 }
                 else
@@ -663,24 +663,31 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
                     {
                         log.value(`   remove from task files map (${index})`, item.uri.fsPath, 3, logPad);
                         projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
-                        ++removed.c3;
+                        ++removed.c2;
                     }
                 }
             });
         }
     }
 
+    log.values(4, logPad + "   ", [[ "cache1 rmv count", removed.c1 ], [ "cache2 rmv count", removed.c2 ]]);
+
     if (uri === undefined && taskFilesMap[taskType])
     {
-        log.write("   clear task files map", 3, logPad);
+        log.write("   clear task files map", 4, logPad);
         taskFilesMap[taskType] = [];
     }
+    else if (uri && removed.c1 > 0)
+    {
+        log.value("   removed from cache", uri.fsPath, 4, logPad);
+    }
+    /* istanbul ignore else */
+    else if (uri) {
+        log.write("   already exists in cache", 4, logPad);
+    }
 
-    log.values(4, logPad + "   ", [
-        [ "cache1 rmv count", removed.c1 ], [ "cache2 rmv count", removed.c2 ], [ "cache3 rmv count", removed.c3 ]
-    ]);
-
-    log.methodDone("remove item from mappings", 2, logPad);
+    log.methodDone("remove item from mappings", 3, logPad);
+    return removed.c1;
 }
 
 

@@ -29,7 +29,7 @@ General Todos:
         Differences in tray open/closed, switching views, vscode minimized, etc
 
     ☐ Folder/file create/delete events
-        DOnt process file if folder was just processed, and vice versa
+        Dont process file if folder was just processed, and vice versa
 
 Tests:
 
@@ -43,3 +43,6 @@ Tests:
         ☐ Perl
         ☐ Pipenv
         ☐ Ruby
+    
+    ☐ Tests for when license manager
+        i.e. limiting task counts and extension is running in non-licensed mode
