@@ -27,7 +27,7 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
     commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, Disposable, TaskExecution
+    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, Disposable, TaskExecution, Terminal
 } from "vscode";
 
 
@@ -78,7 +78,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.disposables.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => this.run(item, true, false), this));
         this.disposables.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args: string) => this.run(item, false, true, args), this));
         this.disposables.push(commands.registerCommand(name + ".runLastTask",  async () => this.runLastTask(), this));
-        this.disposables.push(commands.registerCommand(name + ".stop",  (item: TaskItem) => { this.stop(item); }, this));
+        this.disposables.push(commands.registerCommand(name + ".stop", async (item: TaskItem) => { await this.stop(item); }, this));
         this.disposables.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
         this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => { this.pause(item); }, this));
         this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick?: boolean) => { await this.open(item, itemClick); }, this));
@@ -1380,7 +1380,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             const terminal = getTerminal(taskItem, "   ");
             /* istanbul ignore else */
             if (terminal)
-            {
+            {   //
+                // TODO - see ticket.  I guess its not CTRL+C in some parts.
+                // so make the control chars a setting.  Also in stop().
+                //
                 if (taskItem.paused)
                 {
                     taskItem.paused = false;
@@ -1687,7 +1690,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             window.showInformationMessage("Busy, please wait...");
         }
         else {
-            this.stop(taskItem);
+            await this.stop(taskItem);
             await this.run(taskItem);
         }
         log.methodDone("restart task", 1);
@@ -1699,7 +1702,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         let exec: TaskExecution | undefined;
         log.methodStart("resume task", 1, "", true);
         const term = getTerminal(taskItem, "   ");
-        if (term) {
+        if (term)
+        {
             log.value("   send to terminal", "N", 1);
             term.sendText("N", true);
             taskItem.paused = false;
@@ -1998,7 +2002,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    private stop(taskItem: TaskItem)
+    private async stop(taskItem: TaskItem)
     {
         log.methodStart("stop", 1, "", true);
 
@@ -2012,13 +2016,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         const exec = taskItem.isExecuting();
         if (exec)
         {
-            if (configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
+            const terminal = getTerminal(taskItem, "   ");
+            /* istanbul ignore else */
+            if (terminal)
             {
-                const terminal = getTerminal(taskItem, "   ");
-                log.write("   keep terminal open", 1);
-                /* istanbul ignore else */
-                if (terminal)
+                if (configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
                 {
+                    log.write("   keep terminal open", 1);
+                    //
+                    // TODO - see ticket.  I guess its not CTRL+C in some parts.  so make the control
+                    //                     chars a setting.  Also in pause().
+                    //
                     if (taskItem.paused)
                     {
                         log.value("   send to terminal", "Y", 1);
@@ -2026,25 +2034,22 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                     }
                     else
                     {
-                        log.value("   send to terminal", "\\u0003", 1);
+                        log.value("   send sequence to terminal", "\\u0003", 1);
                         terminal.sendText("\u0003");
-                        setTimeout(() => {
-                            log.value("   send to terminal", "Y", 1);
-                            terminal.sendText("Y", true);
-                        }, 500);
+                        await util.timeout(50);
+                        log.value("   send to terminal", "Y", 1);
+                        // terminal = getTerminal(taskItem, "   ");
+                        try { if (getTerminal(taskItem, "   ")) terminal.sendText("Y", true); } catch {}
                     }
                     taskItem.paused = false;
                 }
                 else {
-                    window.showInformationMessage("Terminal not found");
+                    log.write("   kill task execution", 1);
+                    try { exec.terminate(); } catch {}
                 }
             }
             else {
-                log.write("   kill task execution", 1);
-                try {
-                    exec.terminate();
-                }
-                catch {}
+                window.showInformationMessage("Terminal not found");
             }
         }
         else {

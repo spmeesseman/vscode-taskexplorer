@@ -2,15 +2,16 @@ import { execSync } from "child_process";
 import * as path from "path";
 // import  runConfig from "./runConfig";
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { ConsoleReporter, runTests } from "@vscode/test-electron";
+import { runTests } from "@vscode/test-electron";
 import { testControl } from "./control";
-import { findFiles, getDateModified, pathExists, readFileAsync, writeFile } from "../lib/utils/fs";
+import { findFiles, getDateModified, pathExists, writeFile } from "../lib/utils/fs";
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import { runTests } from "vscode-test";
 
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 async function main(args: string[])
 {
+    let failed = false;
     //
     // The folder containing the Extension Manifest package.json
     // Passed to '--extensionDevelopmentPath'
@@ -55,7 +56,7 @@ async function main(args: string[])
     }
     catch (err: any) {
         console.error(`Failed to run tests: ${err}\n${err.stack ?? "No call stack details found"}`);
-        process.exit(1);
+        failed = true;
     }
     finally
     {   try //
@@ -95,18 +96,21 @@ async function main(args: string[])
             execSync(`enable-full-coverage.sh --off${logFile ? ` --logfile "${logFile}` : ""}"`, { cwd: "tools" });
             // if (settingsJsonOrig && !testControl.keepSettingsFileChanges) {
             if (!testControl.keepSettingsFileChanges)
-            {   //
-                // await writeFile(settingsFile, settingsJsonOrig);
-                await writeFile(settingsFile, "{\n" +
-                                              "    \"taskExplorer.exclude\": [\n" +
-                                              "        \"**/tasks_test_ignore_/**\"\n" +
-                                              "    ],\n" +
-                                              "    \"taskExplorer.globPatternsAnt\": [\n" +
-                                              "        \"**/hello.xml\"\n" +
-                                              "    ]\n" +
-                                              "}");
+            {
+                await writeFile(settingsFile, JSON.stringify(
+                {
+                    "taskExplorer.exclude": [
+                        "**/tasks_test_ignore_/**",
+                    ],
+                    "taskExplorer.globPatternsAnt": [
+                        "**/hello.xml"
+                    ]
+                }, null, 4));
             }
         } catch {}
+        if (failed) {
+            process.exit(1);
+        }
     }
 }
 

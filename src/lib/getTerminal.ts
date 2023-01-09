@@ -16,7 +16,7 @@ export const getTerminal = (taskItem: TaskItem, logPad = ""): Terminal | undefin
     if (!taskItem.task || !taskItem.label)
     {
         log.write("   no defined task on TaskItem", 2, logPad);
-        return term;
+        return;
     }
 
     /* istanbul ignore if */
@@ -25,6 +25,13 @@ export const getTerminal = (taskItem: TaskItem, logPad = ""): Terminal | undefin
         log.write("   zero terminals alive", 2, logPad);
         return term;
     }
+
+    // /* istanbul ignore if */
+    // if (window.terminals.length === 1)
+    // {
+    //     log.write("   return only terminal alive", 2, logPad);
+    //     return window.terminals[0];
+    // }
 
     const check = (taskName: string) =>
     {
