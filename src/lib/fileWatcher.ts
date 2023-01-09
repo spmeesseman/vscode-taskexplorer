@@ -213,13 +213,9 @@ function createDirWatcher(context: ExtensionContext)
 {   //
     // TODO - remove ignore tags when tests for adding/removing workspace is implemented
     //
-    /* istanbul ignore next */
     dirWatcher.onDidCreate?.dispose();
-    /* istanbul ignore next */
     dirWatcher.onDidDelete?.dispose();
-    /* istanbul ignore next */
     dirWatcher.watcher?.dispose();
-    /* istanbul ignore else */
     if (workspace.workspaceFolders)
     {
         dirWatcher.watcher = workspace.createFileSystemWatcher(getDirWatchGlob(workspace.workspaceFolders));
@@ -327,18 +323,14 @@ export const onWsFoldersChange = /* istanbul ignore next */ async(e: WorkspaceFo
     /* istanbul ignore next */
     processingFsEvent = true;
     try
-    {   /* istanbul ignore next */
+    {
         await cache.addWsFolders(e.added);
-        /* istanbul ignore next */
         await cache.removeWsFolders(e.removed);
-        /* istanbul ignore next */
         createDirWatcher(extContext);
-        /* istanbul ignore next */
         await refreshTree(teApi);
     }
     catch {}
     finally {
-        /* istanbul ignore next */
         processingFsEvent = false;
     }
 };

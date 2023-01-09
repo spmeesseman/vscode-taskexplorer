@@ -3,13 +3,14 @@
 
 import { join } from "path";
 import { activate, executeSettingsUpdate, getTestsPath, sleep, testControl, treeUtils } from "../helper";
-import { IExplorerApi, IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, IFilesystemApi, ITaskExplorerApi, TaskExplorerTestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let explorer: IExplorerApi;
+let testsApi: TaskExplorerTestsApi;
 let testsPath: string;
 let wsf1DirName: string;
 let wsf2DirName: string;
@@ -22,8 +23,9 @@ suite("Multi-Root Workspace Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        explorer = teApi.testsApi.explorer;
         fsApi = teApi.testsApi.fs;
+        testsApi = teApi.testsApi;
+        explorer = testsApi.explorer;
         testsPath = getTestsPath(".");
         wsf1DirName = join(testsPath, "wsf1");
         await fsApi.createDir(wsf1DirName);
@@ -92,7 +94,10 @@ suite("Multi-Root Workspace Tests", () =>
     test("Mimic Add WS Folders 2 and 3", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange()
         this.slow(testControl.slowTime.addWorkspaceFolder * 2);
-        await teApi.testsApi.fileCache.addWsFolders([ wsf[1], wsf[2] ]);
+        await testsApi.onWsFoldersChange({
+            added: [ wsf[1], wsf[2] ],
+            removed: []
+        });
         await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolder * 2);
     });
 
@@ -100,7 +105,10 @@ suite("Multi-Root Workspace Tests", () =>
     test("Mimic Add WS Folder 4", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange()
         this.slow(testControl.slowTime.addWorkspaceFolder);
-        await teApi.testsApi.fileCache.addWsFolders([ wsf[3] ]);
+        await testsApi.onWsFoldersChange({
+            added: [ wsf[3] ],
+            removed: []
+        });
         await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolder);
     });
 
@@ -116,7 +124,10 @@ suite("Multi-Root Workspace Tests", () =>
     test("Mimic Remove WS Folder 2 and 3", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange()
         this.slow(testControl.slowTime.removeWorkspaceFolder * 2);
-        await teApi.testsApi.fileCache.removeWsFolders([ wsf[1], wsf[2] ]);
+        await testsApi.onWsFoldersChange({
+            added: [],
+            removed: [ wsf[1], wsf[2] ]
+        });
         await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolder);
     });
 
@@ -124,7 +135,10 @@ suite("Multi-Root Workspace Tests", () =>
     test("Mimic Remove WS Folder 4", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange()
         this.slow(testControl.slowTime.removeWorkspaceFolder);
-        await teApi.testsApi.fileCache.removeWsFolders([ wsf[3] ]);
+        await testsApi.onWsFoldersChange({
+            added: [],
+            removed: [ wsf[3] ]
+        });
         await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolder);
     });
 
