@@ -61,6 +61,8 @@ suite("Util Tests", () =>
     test("Logging", async function()
     {
         log.blank();
+        log.blank(1);
+
         log.write(`        ${creator}.${extension}`);
         log.value(`        ${creator}.${extension}`, "true");
         log.value(`        ${creator}.${extension}`, null);
@@ -69,8 +71,19 @@ suite("Util Tests", () =>
         log.error([ `        ${creator}.${extension}`,
                     `        ${creator}.${extension}`,
                     `        ${creator}.${extension}` ]);
-		log.methodStart("message");
-		log.methodDone("message");
+
+		log.methodStart("methodName");
+		log.methodDone("methodName");
+		log.methodStart("methodName", 1);
+		log.methodDone("methodName", 1);
+		log.methodStart("methodName", 1, "");
+		log.methodDone("methodName", 1, "");
+		log.methodStart("methodName", 1, "", false);
+		log.methodDone("methodName", 1, "");
+		log.methodStart("methodName", 1, "", true);
+		log.methodDone("methodName", 1, "");
+		log.methodStart("methodName", 1, "", false, [[ "p1", "v1" ]]);
+		log.methodDone("methodName", 1, "", [[ "p2", "v2" ]]);
 
 		log.setWriteToConsole(true);
 		log.write("test");
@@ -78,8 +91,6 @@ suite("Util Tests", () =>
 		log.value("test", "1", 1);
 		log.value("test", "1", 5);
 		log.setWriteToConsole(false);
-		log.value(null as unknown as string, 1);
-		log.value(undefined as unknown as string, 1);
 
 		log.warn("test1");
 		log.warn("test1");
@@ -89,16 +100,21 @@ suite("Util Tests", () =>
 
 		log.write(null as unknown as string);
 		log.write(undefined as unknown as string);
-		log.blank();
 		log.write("");
 		log.write("");
 		log.value("object value", {
 			p1: 1,
 			p2: "test"
 		});
+
+		log.value(null as unknown as string, 1);
+		log.value(undefined as unknown as string, 1);
 		log.value("null value", null);
 		log.value("empty string value", "");
 		log.value("line break value", "line1\nline2");
+		log.value("", "");
+		log.value("", null);
+		log.value("", undefined);
 		log.value("undefined value 1", undefined);
 		log.value("undefined value 2", undefined, 1);
 
@@ -139,23 +155,8 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enable", false);
 
 		log.blank(1);
+
 		log.dequeue("");
-		log.warn("test1");
-		log.warn("test2");
-		log.withColor("test", log.colors.cyan);
-
-		log.write("test");
-		log.value("test", "1");
-		log.value(null as unknown as string, 1);
-		log.value(undefined as unknown as string, 1);
-
-		log.write("Test1", 1);
-		log.write("Test1", 1);
-		log.value("Test2", "value", 1);
-		log.value("Test3", null, 1);
-		log.value("Test4", undefined, 1);
-
-		log.values(1, "   ", [[ "Test5", "5" ]]);
 
 		log.error("Test5 error");
 		log.error("Test5 error");
@@ -165,6 +166,27 @@ suite("Util Tests", () =>
 		log.error([ "Test error 1",  new Error("Test error object") ]);
 		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
 		log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
+
+		log.methodStart("methodName");
+		log.methodDone("methodName");
+
+		log.value("test", "1");
+		log.value(null as unknown as string, 1);
+		log.value(undefined as unknown as string, 1);
+
+		log.warn("test1");
+		log.warn("test2");
+
+		log.withColor("test", log.colors.cyan);
+
+		log.write("test");
+		log.write("Test1", 1);
+		log.write("Test1", 1);
+		log.value("Test2", "value", 1);
+		log.value("Test3", null, 1);
+		log.value("Test4", undefined, 1);
+
+		log.values(1, "   ", [[ "Test5", "5" ]]);
 
 		//
 		// Re-enable logging
