@@ -631,12 +631,16 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
 }
 
 
-export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
+export async function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
 {
     //
     // TODO - Remove ignore tags when i figure out how to add ws folders in tests
     //
+    const needCancel = cacheBuilding === true;
     log.methodStart("remove workspace folder", 1, logPad);
+    if (needCancel) {
+        await cancelBuildCache();
+    }
     for (const f of wsf)
     {
         log.value("   workspace folder", f.name, 1, logPad);
@@ -648,10 +652,14 @@ export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
         Object.keys(taskFilesMap).forEach((taskType) =>
         {
             log.value("   start remove task files from cache", taskType, 2, logPad);
-            removeFromMappings(taskType, f.uri, true, logPad + "      ");
+            const removed = removeFromMappings(taskType, f.uri, true, logPad + "      ");
+            log.write(`      removed ${removed} files`, 2, logPad);
             log.value("   completed remove files from cache", taskType, 2, logPad);
         });
         log.write("   workspace folder removed", 1, logPad);
+    }
+    if (needCancel) {
+        await rebuildCache(logPad + "   ");
     }
     log.methodDone("remove workspace folder", 1, logPad);
 }

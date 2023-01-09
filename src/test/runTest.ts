@@ -48,7 +48,8 @@ async function main(args: string[])
             version: "1.60.1",
             extensionDevelopmentPath,
             extensionTestsPath,
-            launchArgs: [ "--disable-extensions", "--disable-workspace-trust", extensionTestsWsPath ],
+            launchArgs: [ extensionTestsWsPath, "--disable-extensions", "--disable-workspace-trust" ],
+            // launchArgs: [ "--add " + extensionTestsWsPath, "--disable-extensions", "--disable-workspace-trust" ],
             extensionTestsEnv: { testArgs: args && args.length > 0 ? args.toString() : "" }
         });
     }

@@ -15,6 +15,7 @@ let wsf1DirName: string;
 let wsf2DirName: string;
 let wsf3DirName: string;
 let wsf4DirName: string;
+let wsf: WorkspaceFolder[];
 
 suite("API Init and Tests", () =>
 {
@@ -32,6 +33,28 @@ suite("API Init and Tests", () =>
         await fsApi.createDir(wsf3DirName);
         wsf4DirName = join(testsPath, "wsf4");
         await fsApi.createDir(wsf4DirName);
+
+        wsf = [
+        {
+            uri: Uri.file(wsf1DirName),
+            name: "wsf1",
+            index: 0
+        },
+        {
+            uri: Uri.file(wsf2DirName),
+            name: "wsf2",
+            index: 1
+        },
+        {
+            uri: Uri.file(wsf3DirName),
+            name: "wsf3",
+            index: 2
+        },
+        {
+            uri: Uri.file(wsf4DirName),
+            name: "wsf4",
+            index: 3
+        }];
     });
 
 
@@ -44,15 +67,37 @@ suite("API Init and Tests", () =>
     });
 
 
-    test("Add WS Folder to File Cache", async function()
+    test("Mimic Add WS Folders", async function()
     {
         this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2) + 2500);
+
         await teApi.testsApi.fileCache.addWsFolders();
-        await teApi.testsApi.fileCache.addWsFolders(workspace.workspaceFolders as WorkspaceFolder[]);
+        await teApi.testsApi.fileCache.addWsFolders(wsf);
         await teApi.waitForIdle(2500, testControl.slowTime.refreshCommand + 5000);
     });
 
 
+    test("Mimic Remove WS Folder 1", async function()
+    {
+        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2) + 2500);
+        teApi.testsApi.fileCache.removeWsFolders([ wsf[0] ]);
+    });
+
+
+    test("Mimic Remove WS Folder 2 and 3", async function()
+    {
+        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2) + 2500);
+        teApi.testsApi.fileCache.removeWsFolders([ wsf[1], wsf[2] ]);
+    });
+
+
+    test("Mimic Remove WS Folder 4", async function()
+    {
+        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2) + 2500);
+        teApi.testsApi.fileCache.removeWsFolders([ wsf[3] ]);
+    });
+
+/*
     test("Add Workspace Folder 1", async function()
     {
         this.slow(testControl.slowTime.addWorkspaceFolderEmpty);
@@ -77,7 +122,7 @@ workspace.workspaceFolders?.forEach((wf) =>
     console.log("0: " + wf.index);
 });
     });
-
+*/
 /*
     test("Add Workspace Folder 2", async function()
     {
@@ -152,6 +197,5 @@ workspace.workspaceFolders?.forEach((wf)=>
         await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
     });
 */
-
 
 });

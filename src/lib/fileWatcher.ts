@@ -254,7 +254,7 @@ function createWorkspaceWatcher(context: ExtensionContext)
         processingFsEvent = true;
         try {
             await cache.addWsFolders(_e.added);
-            cache.removeWsFolders(_e.removed);
+            await cache.removeWsFolders(_e.removed);
             createDirWatcher(context);
             await refreshTree(teApi);
         }
