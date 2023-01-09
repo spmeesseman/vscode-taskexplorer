@@ -209,11 +209,8 @@ const _procFileDeleteEvent = async(taskType: string, uri: Uri, logPad = "") =>
 
 function createDirWatcher(context: ExtensionContext)
 {
-    /* istanbul ignore next */
     dirWatcher.onDidCreate?.dispose();
-    /* istanbul ignore next */
     dirWatcher.onDidDelete?.dispose();
-    /* istanbul ignore next */
     dirWatcher.watcher?.dispose();
     /* istanbul ignore else */
     if (workspace.workspaceFolders)
@@ -254,10 +251,15 @@ function createWorkspaceWatcher(context: ExtensionContext)
     //
     workspaceWatcher = workspace.onDidChangeWorkspaceFolders(async(_e) =>
     {
-        await cache.addWsFolders(_e.added);
-        cache.removeWsFolders(_e.removed);
-        createDirWatcher(context);
-        await refreshTree(teApi);
+        processingFsEvent = true;
+        try {
+            await cache.addWsFolders(_e.added);
+            cache.removeWsFolders(_e.removed);
+            createDirWatcher(context);
+            await refreshTree(teApi);
+        }
+        catch {}
+        finally { processingFsEvent = false; }
     });
     context.subscriptions.push(workspaceWatcher);
 }
