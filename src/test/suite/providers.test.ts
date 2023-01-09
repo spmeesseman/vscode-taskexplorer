@@ -513,13 +513,10 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Add WS Folder to File Cache", async function()
+    test("Disable Pipenv (Off by Default)", async function()
     {
-        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2) + 2500);
+        this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks.pipenv", false);
-        await teApi.testsApi.fileCache.addWsFolders();
-        await teApi.testsApi.fileCache.addWsFolders(workspace.workspaceFolders as WorkspaceFolder[]);
-        await teApi.waitForIdle(2500, testControl.slowTime.refreshCommand + 5000);
     });
 
 

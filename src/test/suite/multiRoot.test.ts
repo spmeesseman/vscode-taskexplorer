@@ -2,9 +2,9 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { join } from "path";
-import { activate, getTestsPath, sleep, testControl } from "../helper";
+import { activate, executeSettingsUpdate, getTestsPath, sleep, testControl } from "../helper";
 import { IExplorerApi, IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { Uri, workspace } from "vscode";
+import { Uri, workspace, WorkspaceFolder } from "vscode";
 
 
 let teApi: ITaskExplorerApi;
@@ -41,6 +41,15 @@ suite("API Init and Tests", () =>
         await fsApi.deleteDir(join(testsPath, "wsf2"));
         await fsApi.deleteDir(join(testsPath, "wsf3"));
         await fsApi.deleteDir(join(testsPath, "wsf4"));
+    });
+
+
+    test("Add WS Folder to File Cache", async function()
+    {
+        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2) + 2500);
+        await teApi.testsApi.fileCache.addWsFolders();
+        await teApi.testsApi.fileCache.addWsFolders(workspace.workspaceFolders as WorkspaceFolder[]);
+        await teApi.waitForIdle(2500, testControl.slowTime.refreshCommand + 5000);
     });
 
 
