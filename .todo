@@ -33,6 +33,9 @@ General Todos:
 
     ☐ Folder/file create/delete events
         Dont process file if folder was just processed, and vice versa
+    
+    ☐ Clean up interface file names
+        Remove trailing 'Api' from most except main TaskExplorerApi.  Just I[ClassName] I want now.
 
 Tests:
 
