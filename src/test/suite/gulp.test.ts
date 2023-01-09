@@ -3,10 +3,11 @@
 /* tslint:disable */
 
 import * as path from "path";
-import { Uri, workspace, WorkspaceFolder } from "vscode";
+import { expect } from "chai";
 import { activate, getWsPath, testControl, verifyTaskCount } from "../helper";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { GulpTaskProvider } from "../../providers/gulp";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { Uri } from "vscode";
 
 const testsName = "gulp";
 const startTaskCount = 17;
@@ -16,6 +17,7 @@ let fsApi: IFilesystemApi;
 let provider: GulpTaskProvider;
 let dirName: string;
 let fileUri: Uri;
+let successCount = 0;
 
 
 suite("Gulp Tests", () =>
@@ -28,44 +30,54 @@ suite("Gulp Tests", () =>
         provider = teApi.providers.get(testsName) as GulpTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "gulpfile.js"));
+        ++successCount;
     });
 
 
     test("Document Position", async function()
     {
+        expect(successCount).to.be.equal(1);
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
+        ++successCount;
     });
 
 
     test("Start", async function()
     {
+        expect(successCount).to.be.equal(2);
         this.slow(testControl.slowTime.verifyTaskCount);
         await verifyTaskCount(testsName, startTaskCount);
+        ++successCount;
     });
 
 
     test("Disable", async function()
     {
+        expect(successCount).to.be.equal(3);
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await teApi.config.updateWs("enabledTasks.gulp", false);
         await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
+        ++successCount;
     });
 
 
     test("Re-enable", async function()
     {
+        expect(successCount).to.be.equal(4);
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await teApi.config.updateWs("enabledTasks.gulp", true);
         await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
+        ++successCount;
     });
 
 
     test("Create File", async function()
     {
+        expect(successCount).to.be.equal(5);
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         if (!(await fsApi.pathExists(dirName))) {
             await fsApi.createDir(dirName);
@@ -84,11 +96,13 @@ suite("Gulp Tests", () =>
         );
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
+        ++successCount;
     });
 
 
     test("Add Task to file", async function()
     {
+        expect(successCount).to.be.equal(6);
         this.slow(testControl.slowTime.fsModifyEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -108,11 +122,13 @@ suite("Gulp Tests", () =>
         );
         await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 3);
+        ++successCount;
     });
 
 
     test("Remove 2 Tasks from file", async function()
     {
+        expect(successCount).to.be.equal(7);
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -124,21 +140,25 @@ suite("Gulp Tests", () =>
         );
         await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
+        ++successCount;
     });
 
 
     test("Delete File", async function()
     {
+        expect(successCount).to.be.equal(8);
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
+        ++successCount;
     });
 
 
     test("Gulp Parser", async function()
     {
+        expect(successCount).to.be.equal(9);
         // const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
         //       gulpFile = getWsPath("gulp\\gulpfile.js");
         //
@@ -157,6 +177,7 @@ suite("Gulp Tests", () =>
         // Reset
         //
         await teApi.config.updateWs("useGulp", false);
+        ++successCount;
     });
 
 });
