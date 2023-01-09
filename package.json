@@ -1824,7 +1824,7 @@
                             "type": "string",
                             "description": "%config.taskExplorer.pathToAnt%"
                         },
-                        "appPublisher": {
+                        "apppublisher": {
                             "type": "string",
                             "description": "%config.taskExplorer.pathToAppPublisher%"
                         },
@@ -1879,7 +1879,7 @@
                     },
                     "default": {
                         "ant": "ant.bat",
-                        "appPublisher": "",
+                        "apppublisher": "",
                         "ansicon": "",
                         "bash": "bash",
                         "composer": "composer",

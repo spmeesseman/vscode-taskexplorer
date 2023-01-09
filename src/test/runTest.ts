@@ -97,10 +97,10 @@ async function main(args: string[])
             if (!testControl.keepSettingsFileChanges)
             {   //
                 // await writeFile(settingsFile, settingsJsonOrig);
-                await writeFile(settingsFile, "{\n    " +
+                await writeFile(settingsFile, "{\n" +
                                               "    \"taskExplorer.exclude\": [\n" +
                                               "        \"**/tasks_test_ignore_/**\"\n" +
-                                              "    ]\n" +
+                                              "    ],\n" +
                                               "    \"taskExplorer.globPatternsAnt\": [\n" +
                                               "        \"**/hello.xml\"\n" +
                                               "    ]\n" +
