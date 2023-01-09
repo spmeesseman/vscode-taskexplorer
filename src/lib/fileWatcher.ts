@@ -216,6 +216,7 @@ function createDirWatcher(context: ExtensionContext)
     dirWatcher.onDidCreate?.dispose();
     dirWatcher.onDidDelete?.dispose();
     dirWatcher.watcher?.dispose();
+    /* istanbul ignore else */
     if (workspace.workspaceFolders)
     {
         dirWatcher.watcher = workspace.createFileSystemWatcher(getDirWatchGlob(workspace.workspaceFolders));
@@ -250,9 +251,20 @@ async function createFileWatchers(context: ExtensionContext)
 
 function createWorkspaceWatcher(context: ExtensionContext)
 {   //
-    // TODO - remove ignore tags when tests for adding/removing workspace is implemented
+    // TODO - Remove ignore tags when tests for adding/removing workspace is implemented
+    //        Te updateWorkSpaceFolders() call does not work when running tests, the testing
+    //        instance of VSCode even pops up an info message saying so.  So for now we mimic
+    //        as best we can by exporting onWsFoldersChange() to be added to the ITestsApi so
+    //        that the test suites can mimic the add ws folder event.  But...  When I first
+    //        started messing with the updateWorkspaceFolders() function, it saved the state
+    //        and on subsequent loads it was trying to load the ws folders that had "failed"
+    //        to be added.  Loading because of cache data in /.vscode-test.  And when it did
+    //        that, it opened as a multi-root ws, I could then keep that instance open (it also
+    //        launched the normal test instance), and, the ws folder adds succeed.  Unfortunately
+    //        i can;t figure out how to start tests using a multi-root workspace, doesn't seem
+    //        like its supported :(  SO this is the best we can do...
     //
-    workspaceWatcher = workspace.onDidChangeWorkspaceFolders(async (e) => { await onWsFoldersChange(e); });
+    workspaceWatcher = workspace.onDidChangeWorkspaceFolders(/* istanbul ignore next */async (e) => { await onWsFoldersChange(e); });
     context.subscriptions.push(workspaceWatcher);
 }
 
@@ -315,8 +327,20 @@ async function onDirDelete(uri: Uri)
     }
 }
 
-// Export for testsApi
-export const onWsFoldersChange = /* istanbul ignore next */ async(e: WorkspaceFoldersChangeEvent) =>
+// Note:  Exported for testsApi
+//        Te updateWorkSpaceFolders() call does not work when running tests, the testing
+//        instance of VSCode even pops up an info message saying so.  So for now we mimic
+//        as best we can by exporting onWsFoldersChange() to be added to the ITestsApi so
+//        that the test suites can mimic the add ws folder event.  But...  When I first
+//        started messing with the updateWorkspaceFolders() function, it saved the state
+//        and on subsequent loads it was trying to load the ws folders that had "failed"
+//        to be added.  Loading because of cache data in /.vscode-test.  And when it did
+//        that, it opened as a multi-root ws, I could then keep that instance open (it also
+//        launched the normal test instance), and, the ws folder adds succeed.  Unfortunately
+//        i can;t figure out how to start tests using a multi-root workspace, doesn't seem
+//        like its supported :(  SO this is the best we can do...
+//
+export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
 {   //
     // TODO - remove ignore tags when tests for adding/removing workspace is implemented
     //
@@ -330,9 +354,7 @@ export const onWsFoldersChange = /* istanbul ignore next */ async(e: WorkspaceFo
         await refreshTree(teApi);
     }
     catch {}
-    finally {
-        processingFsEvent = false;
-    }
+    finally { processingFsEvent = false; }
 };
 
 
