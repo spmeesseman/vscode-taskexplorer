@@ -115,14 +115,11 @@ const errorOutputWindow = (msg: string, symbols: [ string, string ]) =>
 };
 
 
-const errorWriteLogs = (lMsg: string | undefined, fileOn: boolean, outWinOn: boolean, symbols: [ string, string ], queueId?: string) =>
+const errorWriteLogs = (lMsg: string, fileOn: boolean, outWinOn: boolean, symbols: [ string, string ], queueId?: string) =>
 {
-    if (lMsg !== undefined)
-    {
-        errorConsole(lMsg, symbols, queueId);
-        if (fileOn) errorFile(lMsg, symbols);
-        if (outWinOn) errorOutputWindow(lMsg, symbols);
-    }
+    errorConsole(lMsg, symbols, queueId);
+    if (fileOn) errorFile(lMsg, symbols);
+    if (outWinOn) errorOutputWindow(lMsg, symbols);
 };
 
 
@@ -223,7 +220,7 @@ const _error = (msg: any, params?: (string|any)[][], queueId?: string, symbols: 
                 if (enableFileSymbols) {
                     value(symbols[1] + "   " + n, v, 0, "", queueId);
                 }
-                else if (msg) {
+                else {
                     value("   " + n, v, 0, "", queueId);
                 }
             }
@@ -526,7 +523,7 @@ const write = (msg: string, level?: number, logPad = "", queueId?: string, isVal
     {
         if (!level || level <= writeToConsoleLevel || isError)
         {
-            const ts = /* istanbul ignore next */ !isTests ? timeTags[1] + " " + figures.pointer + " " : "    ";
+            const ts = !isTests ? /* istanbul ignore next */timeTags[1] + " " + figures.pointer + " " : "    ";
             msg = withColor(msg, colors.grey);
             _write(console.log, console, ts, false);
             lastWriteToConsoleWasBlank = false;

@@ -225,17 +225,17 @@ suite("Util Tests", () =>
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
 		log.error("Test3 error");
-		log.error("Test4 error", [[ "p1", "e1" ]]);
 		log.error({});
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
+		log.error("Test4 error", [[ "p1", "e1" ]]);
 		await executeSettingsUpdate("logging.enableFileSymbols", false);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
 		log.error("Test2 error");
-		log.error("Test4 error", [[ "p1", "e1" ]]);
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
+		log.error("Test4 error", [[ "p1", "e1" ]]);
 		await executeSettingsUpdate("logging.enableFile", false);
 		await executeSettingsUpdate("logging.enableFileSymbols", true);
 		log.write("Test1", 1);
@@ -257,14 +257,15 @@ suite("Util Tests", () =>
 		log.error({});
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
+		log.error("Test4 error", [[ "p1", "e1" ]]);
 		await executeSettingsUpdate("logging.enableOutputWindow", false);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
 		log.error("Test5 error");
-		log.error(new Error("Test5 error"));
 		log.error({});
 		log.error(new Error("Test error object"));
-		log.error([ "Test error 1", "Test error 2" ])
+		log.error([ "Test error 1", "Test error 2" ]);
+		log.error("Test4 error", [[ "p1", "e1" ]]);
 		await executeSettingsUpdate("logging.enableOutputWindow", true);
 		log.value("Test3", "value3", 1);
 		await executeSettingsUpdate("logging.enableOutputWindow", false);
