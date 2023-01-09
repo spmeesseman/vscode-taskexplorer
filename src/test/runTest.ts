@@ -98,10 +98,13 @@ async function main(args: string[])
             {   //
                 // await writeFile(settingsFile, settingsJsonOrig);
                 await writeFile(settingsFile, "{\n    " +
-                                            "   \"taskExplorer.exclude\": [\n" +
-                                            "      \"**/tasks_test_ignore_/**\"\n" +
-                                            "   ]" +
-                                            "}");
+                                              "    \"taskExplorer.exclude\": [\n" +
+                                              "        \"**/tasks_test_ignore_/**\"\n" +
+                                              "    ]\n" +
+                                              "    \"taskExplorer.globPatternsAnt\": [\n" +
+                                              "        \"**/hello.xml\"\n" +
+                                              "    ]\n" +
+                                              "}");
             }
         } catch {}
     }
