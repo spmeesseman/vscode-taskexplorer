@@ -655,17 +655,17 @@ suite("Provider Tests", () =>
         //
         // Try a bunch of times to cover all of the hooks in the processing loops
         //
-        await teApi.testsApi.fileCache.cancelBuildCache(true);
+        await teApi.testsApi.fileCache.cancelBuildCache();
         teApi.testsApi.fileCache.rebuildCache();
-        await teApi.testsApi.fileCache.cancelBuildCache(true);
+        await teApi.testsApi.fileCache.cancelBuildCache();
         teApi.testsApi.fileCache.rebuildCache();
         await sleep(40);
-        await teApi.testsApi.fileCache.cancelBuildCache(true);
+        await teApi.testsApi.fileCache.cancelBuildCache();
         teApi.testsApi.fileCache.rebuildCache();
         await sleep(75);
-        await teApi.testsApi.fileCache.cancelBuildCache(true);
+        await teApi.testsApi.fileCache.cancelBuildCache();
         teApi.testsApi.fileCache.rebuildCache();
-        await teApi.testsApi.fileCache.cancelBuildCache(true);
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await teApi.testsApi.fileCache.rebuildCache();
     });
 

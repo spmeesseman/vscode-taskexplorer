@@ -204,7 +204,7 @@ async function tempRemapSettingsToNewLayout()
 export async function deactivate()
 {
     disposeFileWatchers();
-    await cache.cancelBuildCache(true);
+    await cache.cancelBuildCache();
 }
 
 
