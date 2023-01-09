@@ -60,10 +60,10 @@ suite("API Init and Tests", () =>
 
     suiteTeardown(async function()
     {
-        await fsApi.deleteDir(join(testsPath, "wsf1"));
-        await fsApi.deleteDir(join(testsPath, "wsf2"));
-        await fsApi.deleteDir(join(testsPath, "wsf3"));
-        await fsApi.deleteDir(join(testsPath, "wsf4"));
+        await fsApi.deleteDir(wsf1DirName);
+        await fsApi.deleteDir(wsf2DirName);
+        await fsApi.deleteDir(wsf3DirName);
+        await fsApi.deleteDir(wsf4DirName);
     });
 
 
@@ -72,29 +72,36 @@ suite("API Init and Tests", () =>
         this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2) + 2500);
 
         await teApi.testsApi.fileCache.addWsFolders();
-        await teApi.testsApi.fileCache.addWsFolders(wsf);
-        await teApi.waitForIdle(2500, testControl.slowTime.refreshCommand + 5000);
+        await teApi.testsApi.fileCache.addWsFolders([ wsf[0] ]);
+        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
+        await teApi.testsApi.fileCache.addWsFolders([ wsf[1], wsf[2] ]);
+        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty * 2);
+        await teApi.testsApi.fileCache.addWsFolders([ wsf[4] ]);
+        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
     });
 
 
     test("Mimic Remove WS Folder 1", async function()
     {
-        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2) + 2500);
-        teApi.testsApi.fileCache.removeWsFolders([ wsf[0] ]);
+        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty);
+        await teApi.testsApi.fileCache.removeWsFolders([ wsf[0] ]);
+        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
     });
 
 
     test("Mimic Remove WS Folder 2 and 3", async function()
     {
-        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2) + 2500);
-        teApi.testsApi.fileCache.removeWsFolders([ wsf[1], wsf[2] ]);
+        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty * 2);
+        await teApi.testsApi.fileCache.removeWsFolders([ wsf[1], wsf[2] ]);
+        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
     });
 
 
     test("Mimic Remove WS Folder 4", async function()
     {
-        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2) + 2500);
-        teApi.testsApi.fileCache.removeWsFolders([ wsf[3] ]);
+        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty);
+        await teApi.testsApi.fileCache.removeWsFolders([ wsf[3] ]);
+        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
     });
 
 /*

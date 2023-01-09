@@ -633,9 +633,6 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
 
 export async function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
 {
-    //
-    // TODO - Remove ignore tags when i figure out how to add ws folders in tests
-    //
     const needCancel = cacheBuilding === true;
     log.methodStart("remove workspace folder", 1, logPad);
     if (needCancel) {

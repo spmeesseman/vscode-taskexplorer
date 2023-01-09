@@ -8,8 +8,9 @@ import { isDirectory, numFilesInDirectory } from "./utils/fs";
 import { extname } from "path";
 import { ITaskExplorerApi } from "../interface";
 import { isString } from "./utils/utils";
-import { Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri } from "vscode";
+import { Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri, WorkspaceFoldersChangeEvent } from "vscode";
 
+let extContext: ExtensionContext;
 let teApi: ITaskExplorerApi;
 let processingFsEvent = false;
 const eventQueue: any[] = [];
@@ -40,6 +41,7 @@ export const isProcessingFsEvent = () => processingFsEvent;
 export async function registerFileWatchers(context: ExtensionContext, api: ITaskExplorerApi)
 {
     teApi = api;
+    extContext = context;
     //
     // Watch individual task type files within the project folder
     //
@@ -249,18 +251,7 @@ function createWorkspaceWatcher(context: ExtensionContext)
 {   //
     // TODO - remove ignore tags when tests for adding/removing workspace is implemented
     //
-    workspaceWatcher = workspace.onDidChangeWorkspaceFolders(async(_e) =>
-    {
-        processingFsEvent = true;
-        try {
-            await cache.addWsFolders(_e.added);
-            await cache.removeWsFolders(_e.removed);
-            createDirWatcher(context);
-            await refreshTree(teApi);
-        }
-        catch {}
-        finally { processingFsEvent = false; }
-    });
+    workspaceWatcher = workspace.onDidChangeWorkspaceFolders(async (e) => { await onWsFoldersChange(e); });
     context.subscriptions.push(workspaceWatcher);
 }
 
@@ -322,6 +313,20 @@ async function onDirDelete(uri: Uri)
         }
     }
 }
+
+
+const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
+{
+    processingFsEvent = true;
+    try {
+        await cache.addWsFolders(e.added);
+        await cache.removeWsFolders(e.removed);
+        createDirWatcher(extContext);
+        await refreshTree(teApi);
+    }
+    catch {}
+    finally { processingFsEvent = false; }
+};
 
 
 const processQueue = async () =>
