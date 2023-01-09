@@ -26,10 +26,8 @@ suite("API Init and Tests", () =>
     });
 
 
-    test("Hide / Show Log", async function()
+    test("Show Output Window", async function()
     {
-        await executeTeCommand("showOutput", 10, 50, false);
-        await executeTeCommand("showOutput", 10, 50, true);
         await executeTeCommand("showOutput", 10, 50, testControl.logEnabled && testControl.logToOutput);
     });
 

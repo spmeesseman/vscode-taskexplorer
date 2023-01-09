@@ -132,12 +132,14 @@ const errorParse = (err: any, symbols: [ string, string ], queueId?: string, cal
     if (!err) {
         return accumulated;
     }
+    /* istanbul ignore else */
     if (isString(err))
     {
         eMsg = err;
     }
     else if (isError(err))
     {
+        /* istanbul ignore else */
         if (err.stack) {
             eMsg = err.stack;
         }
@@ -150,6 +152,7 @@ const errorParse = (err: any, symbols: [ string, string ], queueId?: string, cal
     }
     else if (isObject(err))
     {
+        /* istanbul ignore else */
         if (err.messageX) {
             eMsg = err.messageX;
         }
@@ -166,6 +169,7 @@ const errorParse = (err: any, symbols: [ string, string ], queueId?: string, cal
     else if (err && isFunction(err.toString)) {
         eMsg = err.toString();
     }
+    /* istanbul ignore else */
     if (eMsg)
     {
         accumulated.push(eMsg);
@@ -280,6 +284,7 @@ const initLog = async(context: ExtensionContext, testsRunning: boolean) =>
     //
     // If logging isn't enabled,then set all log function to empty functions
     //
+    /* istanbul ignore else */
     if (!enable){
         enableLog(enable);
     }
@@ -288,7 +293,7 @@ const initLog = async(context: ExtensionContext, testsRunning: boolean) =>
     //
     Object.assign(logFunctions,
     {
-        initLog: () => {},
+        initLog: /* istanbul ignore next */() => {},
     });
 
     write("Log has been initialized", 1);
@@ -333,26 +338,20 @@ const logLogFileLocation = () =>
 
 const methodStart = (msg: string, level?: number, logPad = "", doLogBlank?: boolean, params?: (string|any)[][], queueId?: string) =>
 {
-    if (enable)
-    {
-        const lLevel = level || 1;
-        if (doLogBlank === true) {
-            blank(lLevel, queueId);
-        }
-        write("*start* " + msg, lLevel, logPad, queueId); // , color);
-        values(lLevel, logPad + "   ", params, queueId);
+    const lLevel = level || 1;
+    if (doLogBlank === true) {
+        blank(lLevel, queueId);
     }
+    write("*start* " + msg, lLevel, logPad, queueId); // , color);
+    values(lLevel, logPad + "   ", params, queueId);
 };
 
 
 const methodDone = (msg: string, level?: number, logPad = "", params?: (string|any)[][], queueId?: string) =>
 {
-    if (enable)
-    {
-        const lLevel = level || 1;
-        values(lLevel, logPad + "   ", params, queueId);
-        write("*done* " + msg, lLevel, logPad, queueId); // , LogColor.cyan);
-    }
+    const lLevel = level || 1;
+    values(lLevel, logPad + "   ", params, queueId);
+    write("*done* " + msg, lLevel, logPad, queueId); // , LogColor.cyan);
 };
 
 
@@ -395,47 +394,45 @@ const setWriteToConsole = (set: boolean, level = 2) =>
 
 const value = (msg: string, value: any, level?: number, logPad = "", queueId?: string) =>
 {
-    if (enable)
-    {
-        let logMsg = msg,
-            valuePad = "";
-        const spaces = msg && msg.length ? msg.length + logPad.length : (value === undefined ? 9 : 4);
-        for (let i = spaces; i < logValueWhiteSpace; i++) {
-            valuePad += " ";
-        }
-        logMsg += (valuePad + ": ");
+    let logMsg = msg,
+        valuePad = "";
+    const spaces = msg && msg.length ? msg.length + logPad.length : (value === undefined ? 9 : 4);
+    for (let i = spaces; i < logValueWhiteSpace; i++) {
+        valuePad += " ";
+    }
+    logMsg += (valuePad + ": ");
 
-        if (isString(value))
-        {
-            logMsg += value;
+    if (isString(value))
+    {
+        logMsg += value;
+    }
+    else if (isArray(value))
+    {
+        logMsg += `[ ${value.join(", ")} ]`;
+    }
+    else if (isObject(value))
+    {
+        try {
+            logMsg += json5.stringify(value, null, 3);
         }
-        else if (isArray(value))
-        {
-            logMsg += `[ ${value.join(", ")} ]`;
-        }
-        else if (isObject(value))
-        {
-            try {
-                logMsg += json5.stringify(value, null, 3);
-            }
-            catch {
-                logMsg += value.toString();
-            }
-        }
-        else if (value || value === 0 || value === "" || value === false)
-        {
+        catch {
+            /* istanbul ignore next */
             logMsg += value.toString();
         }
-        else if (value === undefined)
-        {
-            logMsg += "undefined";
-        }
-        else {
-            logMsg += "null";
-        }
-
-        write(logMsg, level, logPad, queueId, true);
     }
+    else if (value || value === 0 || value === "" || value === false)
+    {
+        logMsg += value.toString();
+    }
+    else if (value === undefined)
+    {
+        logMsg += "undefined";
+    }
+    else {
+        logMsg += "null";
+    }
+
+    write(logMsg, level, logPad, queueId, true);
 };
 
 
@@ -458,7 +455,7 @@ const withColor = figures.withColor;
 
 const write = (msg: string, level?: number, logPad = "", queueId?: string, isValue?: boolean, isError?: boolean) =>
 {
-    if (!enable || msg === null || msg === undefined || (lastWriteWasBlank && msg === "")) {
+    if (msg === null || msg === undefined || (lastWriteWasBlank && msg === "")) {
         return;
     }
 
@@ -500,13 +497,13 @@ const write = (msg: string, level?: number, logPad = "", queueId?: string, isVal
             }
             else {
                 if (!queueId) {
-                    fn.call(scope || window, _msg);
+                    fn.call(scope || /* istanbul ignore next */window, _msg);
                 }
                 else {
                     if (!msgQueue[queueId]) msgQueue[queueId] = [];
                     msgQueue[queueId].push({
                         fn,
-                        scope: scope || window,
+                        scope: scope || /* istanbul ignore next */window,
                         args: [ _msg ]
                     });
                 }
@@ -529,7 +526,7 @@ const write = (msg: string, level?: number, logPad = "", queueId?: string, isVal
     {
         if (!level || level <= writeToConsoleLevel || isError)
         {
-            const ts = !isTests ? timeTags[1] + " " + figures.pointer + " " : "    ";
+            const ts = /* istanbul ignore next */ !isTests ? timeTags[1] + " " + figures.pointer + " " : "    ";
             msg = withColor(msg, colors.grey);
             _write(console.log, console, ts, false);
             lastWriteToConsoleWasBlank = false;
@@ -554,6 +551,7 @@ const write = (msg: string, level?: number, logPad = "", queueId?: string, isVal
     if (!isError) {
         lastErrorMesage = [];
         lastWriteWasBlankError = false;
+        /* istanbul ignore else */
         if (isTests) {
             lastWriteToConsoleWasBlank = false;
         }

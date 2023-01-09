@@ -12,8 +12,10 @@ import { storage } from "../../lib/utils/storage";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
-	logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs
+	logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs,
+	executeTeCommand
 } from "../helper";
+import { expect } from "chai";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
@@ -34,6 +36,7 @@ suite("Util Tests", () =>
         }
         await executeSettingsUpdate("logging.enable", true);
         await executeSettingsUpdate("logging.enableOutputWindow", true);
+		await executeSettingsUpdate("logging.level", 3);
 	});
 
 
@@ -44,7 +47,15 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enableFile", testControl.logToFile);
 		await executeSettingsUpdate("logging.enableOutputWindow", testControl.logToOutput);
 		await executeSettingsUpdate("logging.enableFileSymbols", testControl.logToFileSymbols);
+		await executeSettingsUpdate("logging.level", testControl.logLevel);
 	});
+
+
+    test("Hide / Show Output Window", async function()
+    {
+        await executeTeCommand("showOutput", 10, 50, false);
+        await executeTeCommand("showOutput", 10, 50, true);
+    });
 
 
     test("Logging", async function()
@@ -58,7 +69,6 @@ suite("Util Tests", () =>
         log.error([ `        ${creator}.${extension}`,
                     `        ${creator}.${extension}`,
                     `        ${creator}.${extension}` ]);
-		// 1 param
 		log.methodStart("message");
 		log.methodDone("message");
 
@@ -71,20 +81,34 @@ suite("Util Tests", () =>
 		log.value(null as unknown as string, 1);
 		log.value(undefined as unknown as string, 1);
 
+		log.warn("test1");
+		log.warn("test1");
+		log.warn("test2");
+		log.warn("test3");
+		log.withColor("test", log.colors.cyan);
+
 		log.write(null as unknown as string);
 		log.write(undefined as unknown as string);
 		log.blank();
 		log.write("");
 		log.write("");
+		log.value("object value", {
+			p1: 1,
+			p2: "test"
+		});
 		log.value("null value", null);
 		log.value("empty string value", "");
-		log.value("undefined value", undefined, 1);
+		log.value("line break value", "line1\nline2");
+		log.value("undefined value 1", undefined);
+		log.value("undefined value 2", undefined, 1);
 
 		log.error("Test5 error");
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
 		log.error([ "Test error 3", null, "Test error 4", "" ]);
-		log.error([ "", "Test error 5", null, "Test error 6", "" ]);
+		log.error([ "Test error 3", "Test error 4" ]);
+		log.error([ "Test error 3", "Test error 4" ]);
+		log.error([ "", "Test error 5", undefined, "Test error 6", "" ]);
 		log.error([ "Test error 7", "", "Test error 8", "" ]);
 		log.error([ "Test error 9",  new Error("Test error object 10") ]);
 		log.error([ "Test error 11", "Test error 12" ], [[ "Test param error 13", "Test param value 14" ]]);
@@ -109,12 +133,15 @@ suite("Util Tests", () =>
 		logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(true);
 
 		//
-		// Disabled logging
+		// Disable logging
 		//
 
 		await executeSettingsUpdate("logging.enable", false);
 
-		log.warn("test");
+		log.blank(1);
+		log.dequeue("");
+		log.warn("test1");
+		log.warn("test2");
 		log.withColor("test", log.colors.cyan);
 
 		log.write("test");
@@ -131,8 +158,10 @@ suite("Util Tests", () =>
 		log.values(1, "   ", [[ "Test5", "5" ]]);
 
 		log.error("Test5 error");
+		log.error("Test5 error");
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
+		log.error([ "Test error 1", undefined, "Test error 2" ]);
 		log.error([ "Test error 1",  new Error("Test error object") ]);
 		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
 		log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
@@ -167,14 +196,27 @@ suite("Util Tests", () =>
 
 		util.lowerCaseFirstChar("s", true);
 		util.lowerCaseFirstChar("s", false);
-		util.lowerCaseFirstChar("S", true);
-		util.lowerCaseFirstChar("S", false);
-		util.lowerCaseFirstChar("scott meesseman", true);
-		util.lowerCaseFirstChar("scott meesseman", false);
-		util.lowerCaseFirstChar("TestApp", true);
-		util.lowerCaseFirstChar("testApp", false);
-		util.lowerCaseFirstChar("test App", true);
+		expect(util.lowerCaseFirstChar("S", true)).to.be.equal("s");
+		expect(util.lowerCaseFirstChar("S", false)).to.be.equal("s");
+		expect(util.lowerCaseFirstChar("scott meesseman", true)).to.be.equal("scottmeesseman");
+		expect(util.lowerCaseFirstChar("Scott meesseman", false)).to.be.equal("scott meesseman");
+		expect(util.lowerCaseFirstChar("TestApp", true)).to.be.equal("testApp");
+		expect(util.lowerCaseFirstChar("testApp", false)).to.be.equal("testApp");
+		expect(util.lowerCaseFirstChar("test App", true)).to.be.equal("testApp");
     });
+
+
+	test("Logging (Queue)", async function()
+    {
+		log.dequeue("queueTestId");
+		log.write("test1", 1, "", "queueTestId");
+		log.write("test2", 1, "", "queueTestId");
+		log.write("test3", 1, "", "queueTestId");
+		log.value("test3", "value1", 1, "", "queueTestId");
+		log.error("test4", undefined, "queueTestId");
+		log.error("test5", [[ "param1", 1 ]], "queueTestId");
+		log.dequeue("queueTestId");
+	});
 
 
 	test("Logging (File)", async function()
@@ -182,9 +224,18 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
+		log.error("Test3 error");
+		log.error("Test4 error", [[ "p1", "e1" ]]);
+		log.error({});
+		log.error(new Error("Test error object"));
+		log.error([ "Test error 1", "Test error 2" ]);
 		await executeSettingsUpdate("logging.enableFileSymbols", false);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
+		log.error("Test2 error");
+		log.error("Test4 error", [[ "p1", "e1" ]]);
+		log.error(new Error("Test error object"));
+		log.error([ "Test error 1", "Test error 2" ]);
 		await executeSettingsUpdate("logging.enableFile", false);
 		await executeSettingsUpdate("logging.enableFileSymbols", true);
 		log.write("Test1", 1);
@@ -192,6 +243,7 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.value("Test3", "value3", 1);
 		await executeSettingsUpdate("logging.enableFile", false);
+		log.getLogFileName();
 	});
 
 
@@ -200,9 +252,19 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enableOutputWindow", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
+		log.error("Test5 error");
+		log.error(new Error("Test5 error"));
+		log.error({});
+		log.error(new Error("Test error object"));
+		log.error([ "Test error 1", "Test error 2" ]);
 		await executeSettingsUpdate("logging.enableOutputWindow", false);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
+		log.error("Test5 error");
+		log.error(new Error("Test5 error"));
+		log.error({});
+		log.error(new Error("Test error object"));
+		log.error([ "Test error 1", "Test error 2" ])
 		await executeSettingsUpdate("logging.enableOutputWindow", true);
 		log.value("Test3", "value3", 1);
 		await executeSettingsUpdate("logging.enableOutputWindow", false);
