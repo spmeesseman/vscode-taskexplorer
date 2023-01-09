@@ -94,7 +94,7 @@
         "tsc-build_test": "npx tsc -p tsconfig.test.json",
         "tsc-build_types": "tsc -p ./types && cmd /c xcopy .\\types\\lib\\* .\\node_modules\\@spmeesseman\\vscode-taskexplorer-types\\lib /s /i /y",
         "tsc-rebuild": "rimraf dist && npm run tsc-build && npm run tsc-build_types",
-        "tsc-rebuild_test": "rimraf dist && npm run test:clearcache && npm run tsc-build_types && npm run tsc-build_test",
+        "tsc-rebuild_test": "rimraf dist && npm run tsc-build_types && npm run tsc-build_test",
         "tsc-rebuild_types": "rimraf types/types && rimraf types/lib npm run tsc-build_types",
         "tsc-watch": "tsc -watch -p ./",
         "webpack-watch": "webpack -w --env environment=dev --config ./webpack.config.js",

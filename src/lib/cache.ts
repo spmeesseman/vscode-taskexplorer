@@ -481,7 +481,11 @@ function isGlobChanged(taskType: string, fileGlob: string)
 
 export async function rebuildCache(logPad: string)
 {
+    const needCancel = cacheBuilding === true;
     log.methodStart("rebuild cache", 1, logPad, logPad === "");
+    if (needCancel) {
+        await cancelBuildCache();
+    }
     taskFilesMap = {};
     projectFilesMap = {};
     projectToFileCountMap = {};
@@ -537,17 +541,24 @@ export function removeTaskTypeFromCache(taskType: string, logPad: string)
  * @method removeFromMappings
  * @since 3.0.0
  */
-function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: boolean, logPad: string)
+function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undefined, isFolder: boolean, logPad: string)
 {
+    let folderUri: Uri | undefined;
     let wsFolders: readonly WorkspaceFolder[];
-    log.methodStart("remove item from mappings", 3, logPad, false, [[ "task type", taskType ], [ "path", uri?.fsPath ]]);
+    log.methodStart("remove item from mappings", 3, logPad, false, [[ "task type", taskType ]]);
 
     if (uri === undefined) {
         wsFolders = workspace.workspaceFolders as readonly WorkspaceFolder[];
     }
-    else {
+    else if (uri instanceof Uri) {
         const wsf = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
+        log.value("   path", uri.fsPath, 3);
         wsFolders = [ wsf ];
+        folderUri = uri;
+    }
+    else {
+        wsFolders = [ uri ];
+        folderUri = wsFolders[0].uri;
     }
     const removed = {
         c1: 0, c2: 0
@@ -562,9 +573,9 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
         {
             projectFilesMap[wsf.name][taskType].slice().reverse().forEach((item, index, object) =>
             {
-                if (uri !== undefined)
+                if (folderUri !== undefined)
                 {
-                    if (item.fsPath === uri.fsPath || (isFolder && item.fsPath.startsWith(uri.fsPath)))
+                    if (item.fsPath === folderUri.fsPath || (isFolder && item.fsPath.startsWith(folderUri.fsPath)))
                     {
                         log.value(`   remove from project files map (${index})`, item.fsPath, 3, logPad);
                         projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
@@ -588,9 +599,9 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
         {
             taskFilesMap[taskType].slice().reverse().forEach((item, index, object) =>
             {
-                if (uri !== undefined)
+                if (folderUri !== undefined)
                 {
-                    if (item.uri.fsPath === uri.fsPath || (isFolder && item.uri.fsPath.startsWith(uri.fsPath)))
+                    if (item.uri.fsPath === folderUri.fsPath || (isFolder && item.uri.fsPath.startsWith(folderUri.fsPath)))
                     {
                         log.value(`   remove from task files map (${index})`, item.uri.fsPath, 3, logPad);
                         taskFilesMap[taskType].splice(object.length - 1 - index, 1);
@@ -618,12 +629,12 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
         log.write("   clear task files map", 4, logPad);
         taskFilesMap[taskType] = [];
     }
-    else if (uri && removed.c1 > 0)
+    else if (folderUri && removed.c1 > 0)
     {
-        log.value("   removed from cache", uri.fsPath, 4, logPad);
+        log.value("   removed from cache", folderUri.fsPath, 4, logPad);
     }
-    else if (uri) {
-        log.write("   already exists in cache", 4, logPad);
+    else if (folderUri) {
+        log.write("   doesnt exists in cache", 4, logPad);
     }
 
     log.methodDone("remove item from mappings", 3, logPad);
@@ -641,18 +652,19 @@ export async function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = 
     for (const f of wsf)
     {
         log.value("   workspace folder", f.name, 1, logPad);
+        Object.keys(taskFilesMap).forEach((taskType) =>
+        {
+            log.value("   start remove task files from cache", taskType, 2, logPad);
+            const removed = removeFromMappings(taskType, f, true, logPad + "      ");
+            log.write(`      removed ${removed} files`, 2, logPad);
+            log.value("   completed remove files from cache", taskType, 2, logPad);
+        });
         delete projectToFileCountMap[f.name];
+        /* istanbul ignore else */
         if (projectFilesMap[f.name])
         {
             delete projectFilesMap[f.name];
         }
-        Object.keys(taskFilesMap).forEach((taskType) =>
-        {
-            log.value("   start remove task files from cache", taskType, 2, logPad);
-            const removed = removeFromMappings(taskType, f.uri, true, logPad + "      ");
-            log.write(`      removed ${removed} files`, 2, logPad);
-            log.value("   completed remove files from cache", taskType, 2, logPad);
-        });
         log.write("   workspace folder removed", 1, logPad);
     }
     if (needCancel) {

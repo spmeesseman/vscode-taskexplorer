@@ -24,7 +24,7 @@ export const testControl =
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)s
     //
     slowTime: {
-        addWorkspaceFolderEmpty: 1000,
+        addWorkspaceFolder: 12000,
         bashScript: 4000,
         batchScript: 8000,
         buildFileCache: 1500,
@@ -55,9 +55,9 @@ export const testControl =
         licenseManagerRemoteStartServer: 10000,
         npmCommand: 12500,
         refreshCommand: 10250,
-        rebuildFileCache: 14500,
+        rebuildFileCache: 15500,
         rebuildFileCacheCancel: 1750,
-        removeWorkspaceFolderEmpty: 1000,
+        removeWorkspaceFolder: 10000,
         runCommand: 5000,
         runPauseCommand: 2000,
         runStopCommand: 2000,
@@ -71,11 +71,13 @@ export const testControl =
         workspaceInvalidation: 15000
     },
     //
-    // MINIMUM WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME)
+    // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)
     //
     waitTime:
-    {
-        addWorkspaceFolderEmpty: 250,
+    {   //
+        // MINIMUM WAIT TIMES
+        //
+        addWorkspaceFolder: 250,
         buildTree: 5000,
         fsCreateEvent: 200,
         fsDeleteEvent: 200,
@@ -87,14 +89,15 @@ export const testControl =
         getTreeMin: 350,
         getTreeMax: 1800,
         npmCommandMin: 3000,
+        rebuildFileCacheCancel: 50,
         refreshCommand: 500,
         refreshTaskTypeCommand: 1000,
-        removeWorkspaceFolderEmpty: 250,
+        removeWorkspaceFolder: 250,
         runCommand: 3500,
-        max: 15000,
         //
         // MAXIMUM WAIT TIMES
         //
+        max: 15000,
         waitTimeForNpmCommandMax: 12000
     }
 };

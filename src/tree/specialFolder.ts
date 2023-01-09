@@ -9,6 +9,7 @@ import { configuration } from "../lib/utils/configuration";
 import { storage } from "../lib/utils/storage";
 import { TaskTreeDataProvider } from "./tree";
 import { commands, ConfigurationChangeEvent, Disposable, ExtensionContext, InputBoxOptions, ThemeIcon, TreeItem, TreeItemCollapsibleState, window, workspace } from "vscode";
+import { IExplorerApi } from "../interface";
 
 
 /**
@@ -19,8 +20,8 @@ import { commands, ConfigurationChangeEvent, Disposable, ExtensionContext, Input
 export default class SpecialTaskFolder extends TaskFolder
 {
 
-    private explorer: TaskTreeDataProvider;
-    private disposables: Disposable[];
+    public explorer: IExplorerApi;
+    public disposables: Disposable[];
     private storeName: string;
     private isFavorites: boolean;
     private extensionContext: ExtensionContext;
@@ -31,7 +32,7 @@ export default class SpecialTaskFolder extends TaskFolder
     private settingNameEnabled: string;
 
 
-    constructor(context: ExtensionContext, treeName: "taskExplorer"|"taskExplorerSideBar", treeProvider: TaskTreeDataProvider, label: string, state: TreeItemCollapsibleState = TreeItemCollapsibleState.Expanded)
+    constructor(context: ExtensionContext, treeName: "taskExplorer"|"taskExplorerSideBar", treeProvider: IExplorerApi, label: string, state: TreeItemCollapsibleState = TreeItemCollapsibleState.Expanded)
     {
         super(label, state);
         this.subscriptionStartIndex = -1;

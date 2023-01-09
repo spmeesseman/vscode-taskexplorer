@@ -61,7 +61,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     private currentInvalidation: string | undefined;
     private _onDidChangeTreeData: EventEmitter<TreeItem | undefined | null | void> = new EventEmitter<TreeItem | undefined | null | void>();
     readonly onDidChangeTreeData: Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
-    public specialFolders: {
+    private specialFolders: {
         favorites: SpecialTaskFolder;
         lastTasks: SpecialTaskFolder;
     };

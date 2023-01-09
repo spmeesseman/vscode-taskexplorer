@@ -2,7 +2,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { join } from "path";
-import { activate, executeSettingsUpdate, getTestsPath, sleep, testControl } from "../helper";
+import { activate, executeSettingsUpdate, getTestsPath, sleep, testControl, treeUtils } from "../helper";
 import { IExplorerApi, IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 
@@ -17,7 +17,7 @@ let wsf3DirName: string;
 let wsf4DirName: string;
 let wsf: WorkspaceFolder[];
 
-suite("API Init and Tests", () =>
+suite("Multi-Root Workspace Tests", () =>
 {
     suiteSetup(async function()
     {
@@ -67,70 +67,123 @@ suite("API Init and Tests", () =>
     });
 
 
-    test("Mimic Add WS Folders", async function()
+    test("Build Tree (View Collapsed)", async function()
     {
-        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.fsCreateEvent * 2) + 2500);
+        await treeUtils.buildTree(this);
+    });
 
+
+    test("Mimic Add WS Folder (Bad Call)", async function()
+    {   //  Mimic fileWatcher.onWsFoldersChange()
+        this.slow(testControl.slowTime.command);
         await teApi.testsApi.fileCache.addWsFolders();
+        await teApi.waitForIdle(testControl.waitTime.command);
+    });
+
+
+    test("Mimic Add WS Folder 1", async function()
+    {   //  Mimic fileWatcher.onWsFoldersChange()
+        this.slow(testControl.slowTime.addWorkspaceFolder);
         await teApi.testsApi.fileCache.addWsFolders([ wsf[0] ]);
-        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
+        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolder);
+    });
+
+
+    test("Mimic Add WS Folders 2 and 3", async function()
+    {   //  Mimic fileWatcher.onWsFoldersChange()
+        this.slow(testControl.slowTime.addWorkspaceFolder * 2);
         await teApi.testsApi.fileCache.addWsFolders([ wsf[1], wsf[2] ]);
-        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty * 2);
-        await teApi.testsApi.fileCache.addWsFolders([ wsf[4] ]);
-        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
+        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolder * 2);
+    });
+
+
+    test("Mimic Add WS Folder 4", async function()
+    {   //  Mimic fileWatcher.onWsFoldersChange()
+        this.slow(testControl.slowTime.addWorkspaceFolder);
+        await teApi.testsApi.fileCache.addWsFolders([ wsf[3] ]);
+        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolder);
     });
 
 
     test("Mimic Remove WS Folder 1", async function()
-    {
-        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty);
+    {   //  Mimic fileWatcher.onWsFoldersChange()
+        this.slow(testControl.slowTime.removeWorkspaceFolder);
         await teApi.testsApi.fileCache.removeWsFolders([ wsf[0] ]);
-        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
+        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolder);
     });
 
 
     test("Mimic Remove WS Folder 2 and 3", async function()
-    {
-        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty * 2);
+    {   //  Mimic fileWatcher.onWsFoldersChange()
+        this.slow(testControl.slowTime.removeWorkspaceFolder * 2);
         await teApi.testsApi.fileCache.removeWsFolders([ wsf[1], wsf[2] ]);
-        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
+        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolder);
     });
 
 
     test("Mimic Remove WS Folder 4", async function()
-    {
-        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty);
+    {   //  Mimic fileWatcher.onWsFoldersChange()
+        this.slow(testControl.slowTime.removeWorkspaceFolder);
         await teApi.testsApi.fileCache.removeWsFolders([ wsf[3] ]);
-        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
+        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolder);
+    });
+
+
+    test("Mimic Add WS Folder 1 (Cache Builder Busy)", async function()
+    {   //  Mimic fileWatcher.onWsFoldersChange()
+        this.slow(testControl.slowTime.addWorkspaceFolder + testControl.slowTime.rebuildFileCacheCancel + 100);
+        teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        await sleep(100);
+        await teApi.testsApi.fileCache.addWsFolders([ wsf[0] ]);
+        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolder + testControl.waitTime.rebuildFileCacheCancel);
+    });
+
+
+    test("Mimic Remove WS Folder 1 (Cache Builder Busy)", async function()
+    {   //  Mimic fileWatcher.onWsFoldersChange()
+        this.slow(testControl.slowTime.removeWorkspaceFolder + testControl.slowTime.rebuildFileCacheCancel + 100);
+        teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        await sleep(100);
+        await teApi.testsApi.fileCache.removeWsFolders([ wsf[0] ]);
+        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolder + testControl.waitTime.rebuildFileCacheCancel);
     });
 
 /*
+    *** Note *** Using the workspace.updateWorkspaceFolders() function:
+
+    VSCode pops up a message that says 'workspace cannot be modified in tests.  But I saw it work
+    when tests were going haywite opening up multiple instances.  The cache data in .vscode-test
+    was remembering the folders added, and opening up multi-root workspace extra  instances.  I think
+    when I closed the other instance and kept that one open, the whole thing worked.  But cant figure
+    outhow to actually start a multi-root workspace clean in tests.  Seems un-supported.  messing with
+    it in runtest.ts with the -add command line param, but no luck. Maybe try again another time.
+
     test("Add Workspace Folder 1", async function()
     {
         this.slow(testControl.slowTime.addWorkspaceFolderEmpty);
-console.log("file: " + wsf1DirName);
-console.log("file2: " + Uri.file(wsf1DirName).fsPath);
-console.log("file3: " + Uri.parse(wsf1DirName).fsPath);
-try {
-        const success = workspace.updateWorkspaceFolders(1, null, {
-            uri: Uri.file(wsf1DirName),
-            name: "wsf1"
+        console.log("file: " + wsf1DirName);
+        console.log("file2: " + Uri.file(wsf1DirName).fsPath);
+        console.log("file3: " + Uri.parse(wsf1DirName).fsPath);
+        try {
+            const success = workspace.updateWorkspaceFolders(1, null, {
+                uri: Uri.file(wsf1DirName),
+                name: "wsf1"
+            });
+            console.log("success: " + success);
+            await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
+        }
+        catch (e) {
+            console.log(e);
+        }
+        workspace.workspaceFolders?.forEach((wf) =>
+        {
+            console.log("0: " + wf.uri.fsPath);
+            console.log("0: " + wf.name);
+            console.log("0: " + wf.index);
         });
-console.log("success: " + success);
-        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
-    }
-    catch (e) {
-        console.log(e);
-    }
-workspace.workspaceFolders?.forEach((wf) =>
-{
-    console.log("0: " + wf.uri.fsPath);
-    console.log("0: " + wf.name);
-    console.log("0: " + wf.index);
-});
     });
-*/
-/*
+
+
     test("Add Workspace Folder 2", async function()
     {
         this.slow(testControl.slowTime.addWorkspaceFolderEmpty);
@@ -164,28 +217,27 @@ workspace.workspaceFolders?.forEach((wf) =>
         });
         await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
     });
-*/
-/*
+
+
     test("Remove Workspace Folder 1", async function()
     {
         this.slow(testControl.slowTime.removeWorkspaceFolderEmpty);
-workspace.workspaceFolders?.forEach((wf)=>
-{
-    console.log("1: " + wf.uri.fsPath);
-    console.log("1: " + wf.name);
-    console.log("1: " + wf.index);
-});
+        workspace.workspaceFolders?.forEach((wf)=>
+        {
+            console.log("1: " + wf.uri.fsPath);
+            console.log("1: " + wf.name);
+            console.log("1: " + wf.index);
+        });
         workspace.updateWorkspaceFolders(1, 1);
-workspace.workspaceFolders?.forEach((wf)=>
-{
-    console.log("2: " + wf.uri.fsPath);
-    console.log("2: " + wf.name);
-    console.log("2: " + wf.index);
-});
+        workspace.workspaceFolders?.forEach((wf)=>
+        {
+            console.log("2: " + wf.uri.fsPath);
+            console.log("2: " + wf.name);
+            console.log("2: " + wf.index);
+        });
         await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
     });
-*/
-/*
+
 
     test("Remove Workspace Folder 2 and 3", async function()
     {

@@ -210,9 +210,14 @@ const _procFileDeleteEvent = async(taskType: string, uri: Uri, logPad = "") =>
 
 
 function createDirWatcher(context: ExtensionContext)
-{
+{   //
+    // TODO - remove ignore tags when tests for adding/removing workspace is implemented
+    //
+    /* istanbul ignore next */
     dirWatcher.onDidCreate?.dispose();
+    /* istanbul ignore next */
     dirWatcher.onDidDelete?.dispose();
+    /* istanbul ignore next */
     dirWatcher.watcher?.dispose();
     /* istanbul ignore else */
     if (workspace.workspaceFolders)
@@ -315,17 +320,27 @@ async function onDirDelete(uri: Uri)
 }
 
 
-const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
-{
+const onWsFoldersChange = /* istanbul ignore next */ async(e: WorkspaceFoldersChangeEvent) =>
+{   //
+    // TODO - remove ignore tags when tests for adding/removing workspace is implemented
+    //
+    /* istanbul ignore next */
     processingFsEvent = true;
-    try {
+    try
+    {   /* istanbul ignore next */
         await cache.addWsFolders(e.added);
+        /* istanbul ignore next */
         await cache.removeWsFolders(e.removed);
+        /* istanbul ignore next */
         createDirWatcher(extContext);
+        /* istanbul ignore next */
         await refreshTree(teApi);
     }
     catch {}
-    finally { processingFsEvent = false; }
+    finally {
+        /* istanbul ignore next */
+        processingFsEvent = false;
+    }
 };
 
 

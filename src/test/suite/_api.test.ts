@@ -6,6 +6,7 @@ import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer
 import { activate, executeSettingsUpdate, executeTeCommand, setExplorer, testControl } from "../helper";
 import { getInstallPath } from "../../lib/utils/utils";
 import { enableConfigWatcher } from "../../lib/configWatcher";
+import { refreshTree } from "../../lib/refreshTree";
 
 let teApi: ITaskExplorerApi;
 let explorer: IExplorerApi;
@@ -48,12 +49,14 @@ suite("API Init and Tests", () =>
 
 
     test("Refresh for SideBar Coverage", async function()
-    {
+    {   //
+        // Twice for delayed init, 1st will be quick with 'Initializing...' message in treeview
+        //
         this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.configEvent);
-        await teApi.sidebar?.refresh();
-        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
-        await teApi.sidebar?.refresh();
-        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
+        await refreshTree(teApi);
+        await teApi.waitForIdle(testControl.waitTime.command);
+        await refreshTree(teApi);
+        await teApi.waitForIdle(testControl.waitTime.refreshCommand);
     });
 
 
