@@ -11,12 +11,12 @@ import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import constants from "../../lib/constants";
 import { expect } from "chai";
-import { workspace, tasks, Uri, WorkspaceFolder } from "vscode";
+import { workspace, tasks, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../lib/utils/utils";
 import { ITaskExplorerApi, IExplorerApi, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
-    focusExplorer, getTestsPath, getWsPath, sleep, testControl, treeUtils, verifyTaskCount
+    focusExplorer, getWsPath, sleep, testControl, treeUtils, verifyTaskCount
 } from "../helper";
 
 
@@ -26,7 +26,6 @@ let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let explorer: IExplorerApi;
 let rootPath: string;
-let testsPath: string;
 let dirName: string;
 let dirNameL2: string;
 let dirNameIgn: string;
@@ -44,7 +43,6 @@ suite("Provider Tests", () =>
         fsApi = teApi.testsApi.fs;
 
         rootPath = getWsPath(".");
-        testsPath = getTestsPath(".");
         dirName = path.join(rootPath, "tasks_test_");
         dirNameL2 = path.join(dirName, "subfolder");
         dirNameIgn = path.join(rootPath, "tasks_test_ignore_");
@@ -849,109 +847,9 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Add Workspace Folder 1", async function()
-    {
-        this.slow(testControl.slowTime.addWorkspaceFolderEmpty);
-        const wsDirName = path.join(testsPath, "wsf1");
-        await fsApi.createDir(wsDirName);
-console.log("file: " + wsDirName);
-console.log("file2: " + Uri.file(wsDirName).fsPath);
-console.log("file3: " + Uri.parse(wsDirName).fsPath);
-        workspace.updateWorkspaceFolders(1, null, {
-            uri: Uri.file(wsDirName),
-            name: "wsf1"
-        });
-        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
-        sleep(5000);
-workspace.workspaceFolders?.forEach((wf)=>
-{
-    console.log("0: " + wf.uri.fsPath);
-    console.log("0: " + wf.name);
-    console.log("0: " + wf.index);
-});
-    });
-
-/*
-    test("Add Workspace Folder 2", async function()
-    {
-        this.slow(testControl.slowTime.addWorkspaceFolderEmpty);
-        const wsDirName = path.join(testsPath, "wsf2");
-        await fsApi.createDir(wsDirName);
-        workspace.updateWorkspaceFolders(1, null, {
-            uri: Uri.file(wsDirName),
-            name: "wsf2"
-        });
-        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
-    });
-
-
-    test("Add Workspace Folder 3", async function()
-    {
-        this.slow(testControl.slowTime.addWorkspaceFolderEmpty);
-        const wsDirName = path.join(testsPath, "wsf3");
-        await fsApi.createDir(wsDirName);
-        workspace.updateWorkspaceFolders(1, null, {
-            uri: Uri.file(wsDirName),
-            name: "wsf3"
-        });
-        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
-    });
-
-
-    test("Add Workspace Folder 4", async function()
-    {
-        this.slow(testControl.slowTime.addWorkspaceFolderEmpty);
-        const wsDirName = path.join(testsPath, "wsf4");
-        await fsApi.createDir(wsDirName);
-        workspace.updateWorkspaceFolders(1, null, {
-            uri: Uri.file(wsDirName),
-            name: "wsf4"
-        });
-        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
-    });
-*/
-
-    test("Remove Workspace Folder 1", async function()
-    {
-        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty);
-workspace.workspaceFolders?.forEach((wf)=>
-{
-    console.log("1: " + wf.uri.fsPath);
-    console.log("1: " + wf.name);
-    console.log("1: " + wf.index);
-});
-        workspace.updateWorkspaceFolders(1, 1);
-workspace.workspaceFolders?.forEach((wf)=>
-{
-    console.log("2: " + wf.uri.fsPath);
-    console.log("2: " + wf.name);
-    console.log("2: " + wf.index);
-});
-        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
-    });
-/*
-
-    test("Remove Workspace Folder 2 and 3", async function()
-    {
-        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty * 2);
-        workspace.updateWorkspaceFolders(1, 1);
-        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
-        workspace.updateWorkspaceFolders(1, 1);
-        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
-    });
-
-
-    test("Remove Workspace Folder 4", async function()
-    {
-        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty);
-        workspace.updateWorkspaceFolders(1, 1);
-        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
-    });
-
-
     test("Remove Temporary Directories", async function()
     {
-        this.slow(testControl.slowTime.fsDeleteFolderEvent * 8 + (testControl.slowTime.fsDeleteEvent * 2));
+        this.slow(testControl.slowTime.fsDeleteFolderEvent * 3 + (testControl.slowTime.fsDeleteEvent * 2));
         if (tempFiles.length)
         {
             let file: string | undefined;
@@ -975,19 +873,9 @@ workspace.workspaceFolders?.forEach((wf)=>
             console.log(error);
         }
 
-        try {
-            await fsApi.deleteDir(path.join(testsPath, "wsf1"));
-            await fsApi.deleteDir(path.join(testsPath, "wsf2"));
-            await fsApi.deleteDir(path.join(testsPath, "wsf3"));
-            await fsApi.deleteDir(path.join(testsPath, "wsf4"));
-        }
-        catch(error) {
-            console.log(error);
-        }
-
         await teApi.waitForIdle(3000);
     });
-*/
+
 });
 
 
