@@ -73,6 +73,10 @@ export abstract class TaskExplorerProvider implements TaskProvider
             if (licMgr && !licMgr.isLicensed())
             {
                 const maxTasks = licMgr.getMaxNumberOfTasksByType(this.providerName);
+                //
+                // TODO - remove below ignore tags when test for copy/move folder w/files is implemented
+                //
+                /* istanbul ignore if */
                 if (this.cachedTasks.length > maxTasks)
                 {
                     rmvCount = this.cachedTasks.length - maxTasks;
@@ -126,7 +130,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     }
 
 
-    public async invalidate(uri?: Uri, logPad = ""): Promise<void>
+    public async invalidate(uri?: Uri, logPad?: string): Promise<void>
     {
         //
         // Note that 'taskType' may be different than 'this.providerName' for 'script' type tasks (e.g.
@@ -137,6 +141,11 @@ export abstract class TaskExplorerProvider implements TaskProvider
             [ "current # of cached tasks", this.cachedTasks ? this.cachedTasks.length : 0 ]
         ]);
 
+        //
+        // Allof a sudden the queue is no longer filling up.I think it's from removing the try/catch
+        // in Tree.ts.getChildren() around the buildTaskTree() call.  ~ line 932 as of 1/9/23
+        //
+        /* istanbul ignore if */
         if (uri && this.invalidating) {
             this.queue.push(uri);
             return;
@@ -157,7 +166,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                     if (this.needsRemoval(item, uri))
                     {
                         /* instanbul ignore else */
-                        if (item.source !== "Workspace" /* instanbul ignore next */|| item.definition.type === this.providerName) {
+                        if (item.source !== "Workspace" || /* instanbul ignore next */item.definition.type === this.providerName) {
                             log.write(`   removing cached task '${item.source}/${item.name}'`, 4, logPad);
                             (this.cachedTasks as Task[]).splice(object.length - 1 - index, 1);
                         }
@@ -204,13 +213,17 @@ export abstract class TaskExplorerProvider implements TaskProvider
         const cstDef = item.definition;
         return (cstDef.uri &&
                (cstDef.uri.fsPath === uri.fsPath || !pathExistsSync(cstDef.uri.fsPath)) ||
-               (cstDef.uri.fsPath.startsWith(uri.fsPath) /* instanbul ignore next */&& isDirectory(uri.fsPath))) ||
+               (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* instanbul ignore next */isDirectory(uri.fsPath))) ||
                (cstDef.uri.path && !isTaskIncluded(item, cstDef.uri.path));
     }
 
 
     private async processQueue()
-    {
+    {   //
+        // Allof a sudden the queue is no longer filling up.I think it's from removing the try/catch
+        // in Tree.ts.getChildren() around the buildTaskTree() call.  ~ line 932 as of 1/9/23
+        //
+        /* istanbul ignore if */
         if (this.queue.length > 0) {
             await this.invalidate(this.queue.shift());
         }

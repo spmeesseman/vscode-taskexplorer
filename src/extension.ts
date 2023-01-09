@@ -110,6 +110,11 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     registerConfigWatcher(context, teApi);
 
     //
+    // Create license manager instance
+    //
+    licenseManager = new LicenseManager(context);
+
+    //
     // Tired of VSCode complaining that the the expension was a startup hog. Performing the
     // initial scan after the extension has been instantiated stops it from getting all up
     // in stdout's business.  Displaying an 'Initializing...' message in the tree now on
@@ -117,10 +122,6 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     setTimeout(async(api: ITaskExplorerApi) =>
     {   //
-        // Create license manager instance
-        //
-        await initLicenseManager(context);
-        //
         // Register file type watchers
         // This also starts the file scan to build the file task file cache
         //
@@ -132,6 +133,10 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         api.explorer?.setEnabled(true);
         /* istanbul ignore next */
         api.sidebar?.setEnabled(true);
+        /* istanbul ignore else */
+        if (isLicenseManagerActive) {
+            await licenseManager.checkLicense("   ");
+        }
         //
         // Signal that first task load has completed
         //
@@ -212,16 +217,6 @@ export async function deactivate()
 export function getLicenseManager()
 {
     return licenseManager;
-}
-
-
-async function initLicenseManager(context: ExtensionContext)
-{
-    licenseManager = new LicenseManager(context);
-    /* istanbul ignore else */
-    if (isLicenseManagerActive) {
-        await licenseManager.checkLicense("   ");
-    }
 }
 
 

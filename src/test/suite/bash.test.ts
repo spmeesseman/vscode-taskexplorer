@@ -25,6 +25,7 @@ let pathToTaskProgram: string;
 let enableTaskType: boolean;
 let wsFolder: WorkspaceFolder;
 let dirName: string;
+let wasVisible: boolean;
 let fileUri: Uri;
 
 
@@ -62,6 +63,7 @@ suite("Bash Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
+        wasVisible = teApi.testsApi.explorer.isVisible();
         await treeUtils.buildTree(this);
     });
 
@@ -159,8 +161,8 @@ suite("Bash Tests", () =>
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
         //
         const taskMap = teApi.testsApi.explorer.getTaskMap();
-        if (isObjectEmpty(taskMap)) {
-            this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript + testControl.slowTime.refreshCommand);
+        if (isObjectEmpty(taskMap) || !wasVisible) {
+            this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript + testControl.slowTime.refreshCommand + testControl.slowTime.walkTaskTree);
         }
         else {
             this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript);

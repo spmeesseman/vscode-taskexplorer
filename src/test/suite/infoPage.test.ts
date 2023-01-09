@@ -3,12 +3,12 @@
 
 import { Uri } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {  activate, closeActiveDocument, executeTeCommand, focusExplorer, executeSettingsUpdate } from "../helper";
+import {  activate, closeActiveDocument, executeTeCommand, focusExplorer, executeSettingsUpdate, testControl } from "../helper";
 
 let teApi: ITaskExplorerApi;
 let userTasks: boolean;
 
-suite("Report Tests", () =>
+suite("Info Report Tests", () =>
 {
 	let projectUri: Uri;
 
@@ -34,6 +34,7 @@ suite("Report Tests", () =>
 
 	test("Report page single project 1", async function()
 	{
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder);
 		await executeSettingsUpdate("specialFolders.showUserTasks", false);
 		await executeTeCommand("viewReport", 100, 500, projectUri);
 		await closeActiveDocument();
@@ -42,6 +43,7 @@ suite("Report Tests", () =>
 
 	test("Report page single project 2", async function()
 	{
+		this.slow(testControl.slowTime.viewReport);
 	    await executeTeCommand("viewReport", 50, 500, projectUri, "");
 		await closeActiveDocument();
 	});
@@ -49,6 +51,7 @@ suite("Report Tests", () =>
 
 	test("Report page single project 3", async function()
 	{
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder);
 		await executeSettingsUpdate("specialFolders.showUserTasks", true);
 	    await executeTeCommand("viewReport", 50, 500, projectUri, "", 5);
 		await closeActiveDocument();
@@ -57,6 +60,7 @@ suite("Report Tests", () =>
 
 	test("Report page all projects", async function()
 	{
+		this.slow(testControl.slowTime.viewReport);
 	    await executeTeCommand("viewReport", 50, 500);
 		await closeActiveDocument();
 	});

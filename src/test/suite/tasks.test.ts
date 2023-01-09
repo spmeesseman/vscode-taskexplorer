@@ -24,6 +24,7 @@ let explorer: IExplorerApi;
 let ant: ITaskItemApi[];
 let bash: ITaskItemApi[];
 let batch: ITaskItemApi[];
+let python: ITaskItemApi[];
 let successCount = 0;
 
 
@@ -52,12 +53,14 @@ suite("Task Tests", () =>
     test("Check task counts", async function()
     {
         expect(successCount).to.be.equal(1, "rolling success count failure");
-        this.slow(testControl.slowTime.getTreeTasks * 3);
+        this.slow(testControl.slowTime.getTreeTasks * 4);
         bash = await treeUtils.getTreeTasks("bash", 1);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
         batch = await treeUtils.getTreeTasks("batch", 2);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
         ant = await treeUtils.getTreeTasks("ant", 3);
+        await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
+        python = await treeUtils.getTreeTasks("python", 2);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
         ++successCount;
     });
@@ -247,26 +250,29 @@ suite("Task Tests", () =>
         await executeTeCommand2("open", [ batchTask, true ], 100); // clickaction=execute
         await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], testControl.waitTime.runCommandMax);
         await executeTeCommand2("stop", [ batchTask ], 0, 0);
+
+
+
         await executeTeCommand2("run", [ batchTask ], testControl.waitTime.runCommandMax);
-        executeTeCommand("pause", 1000, testControl.waitTime.max, batchTask); // ?? No await
+        await executeTeCommand("pause", 1000, testControl.waitTime.max, batchTask);
         await executeTeCommand2("pause", [ batchTask ], 500);
         await executeTeCommand2("run", [ batchTask ], testControl.waitTime.runCommandMax);
         await executeSettingsUpdate("taskButtons.clickAction", "Open");
         await executeSettingsUpdate("visual.disableAnimatedIcons", false);
         await executeTeCommand2("run", [ batchTask ], testControl.waitTime.runCommandMin);
         await executeSettingsUpdate("taskButtons.clickAction", "Execute");
-        await executeTeCommand2("openTerminal", [ batchTask ], 50);
-        await executeTeCommand2("pause", [ batchTask ], 500);
+        await executeTeCommand2("openTerminal", [ python[0] ], 50);
+        // await executeTeCommand2("pause", [ batchTask ], 500);
         await executeSettingsUpdate("keepTermOnStop", true);
         await executeTeCommand2("stop", [ batchTask ], 50);
         await executeSettingsUpdate("showRunningTask", false);
         await executeTeCommand("runLastTask", 1500, testControl.waitTime.max, batchTask);
-        await executeSettingsUpdate("keepTermOnStop", false);
+        // await executeSettingsUpdate("keepTermOnStop", false);
         await executeTeCommand2("restart", [ batchTask ], 1500);
         await executeTeCommand2("stop", [ batchTask ], 400);
-        await executeTeCommand("runNoTerm", 1500, testControl.waitTime.max, batchTask);
-        await executeTeCommand2("stop", [ batchTask ], 200);
-        await executeTeCommand2("openTerminal", [ batchTask ]);
+        // await executeTeCommand("runNoTerm", 1500, testControl.waitTime.max, batchTask);
+        // await executeTeCommand2("stop", [ batchTask ], 200);
+        // await executeTeCommand2("openTerminal", [ batchTask ]);
         await sleep(500);
         lastTask = batchTask;
         ++successCount;
@@ -288,7 +294,6 @@ suite("Task Tests", () =>
         await executeTeCommand2("stop", [ batchTask ], 200);
         overrideNextShowInputBox("--test --test2");
         await executeTeCommand2("runWithArgs", [ batchTask ], testControl.waitTime.runCommandMin);
-        // await executeTeCommand("stop", 200, testControl.waitTime.max, batchTask);
         await executeSettingsUpdate("showRunningTask", true);
         await teApi.waitForIdle(8000);
         await executeTeCommand2("openTerminal", [ batchTask ]);

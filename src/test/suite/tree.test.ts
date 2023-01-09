@@ -315,7 +315,7 @@ suite("Tree Tests", () =>
     {
         this.slow(testControl.slowTime.command);
         overrideNextShowInputBox(undefined);
-        await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
+        await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
     });
 
 

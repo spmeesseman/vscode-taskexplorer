@@ -77,8 +77,11 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
             await parseStringPromise(buffer);
         }
         catch (e: any) {
+            /* istanbul ignore next */
             log.error(e, undefined, this.logQueueId);
+            /* istanbul ignore next */
             log.methodDone("read maven file uri tasks", 3, logPad, [[ "# of tasks found", 0 ]], this.logQueueId);
+            /* istanbul ignore next */
             return [];
         }
 

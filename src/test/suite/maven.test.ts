@@ -108,7 +108,9 @@ suite("Maven Tests", () =>
 
 
     test("Invalid XML", async function()
-    {
+    {   //
+        // Note: FileWatcher ignores mod event for this task type since # of tasks never changes
+        //
         let resetLogging = teApi.log.isLoggingEnabled();
         if (resetLogging) { // turn scary error logging off
             this.slow(testControl.slowTime.fsCreateEvent + (testControl.slowTime.configEvent * 2) + testControl.slowTime.verifyTaskCount);

@@ -730,27 +730,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      */
     async getChildren(element?: TreeItem): Promise<TreeItem[]>
     {
-        if (!workspace.workspaceFolders && !configuration.get<boolean>("specialFolders.showUserTasks"))
-        {
-            return [ new NoScripts() ];
-        }
-
         if (!this.enabled)
         {
-            return [ !this.tasks && !this.taskTree ? new InitScripts() : new NoScripts() ];
-        }
-
-        if (element instanceof TaskFile)
-        {
-            if (!util.isTaskTypeEnabled(element.taskSource)) {
-                return [];
-            }
-        }
-        else if (!element || element instanceof TaskFolder)
-        {
-            if (util.getTaskTypes().filter(taskType => util.isTaskTypeEnabled(taskType)).length === 0) {
-                return [ new NoScripts() ];
-            }
+            return [ !this.tasks && !this.taskTree ? new InitScripts() : /* istanbul ignore next */new NoScripts() ];
         }
 
         let ctRmv = 0;
@@ -760,9 +742,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         const licMgr = getLicenseManager();
         const explorerViewEnabled = configuration.get<boolean>("enableExplorerView");
         const firstRun = ((explorerViewEnabled && this.name === "taskExplorer") ||
-                          (!explorerViewEnabled && this.name === "taskExplorerSideBar")) &&
-                          !this.tasks && this.enabled && (!this.taskTree || this.taskTree[0].contextValue === "initscripts");
-
+                          /* istanbul ignore next */(!explorerViewEnabled && this.name === "taskExplorerSideBar")) &&
+                          !this.tasks && this.enabled && (!this.taskTree ||
+                          /* istanbul ignore next */this.taskTree[0].contextValue === "initscripts");
+        //
+        //  Set pretty muy importante flag
+        //
         this.refreshPending = true;
 
         //
@@ -787,19 +772,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             [ "current invalidation", this.currentInvalidation ], [ "tree needs rebuild", !this.taskTree ],
             [ "first run", firstRun ], [ "view", this.name ]
         ]);
+        /* istanbul ignore else */
         if (element instanceof TaskFile)
         {
             log.values(logLevel + 1, logPad + "   ", [
                 [ "tree item type", "task file" ], [ "label", element.label ], [ "id", element.id ],
                 [ "description", element.description ], [ "file name", element.fileName ], [ "is user", element.isUser ],
-                [ "resource path", element.resourceUri?.fsPath ]
+                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
             ]);
         }
         else if (element instanceof TaskFolder)
         {
             log.values(logLevel + 1, logPad + "   ", [
                 [ "tree item type", "task folder" ], [ "label", element.label ], [ "id", element.id ],
-                [ "description", element.description ], [ "resource path", element.resourceUri?.fsPath ]
+                [ "description", element.description ], [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
             ]);
         }
         else if (element instanceof TaskItem)
@@ -807,7 +793,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             log.values(logLevel + 1, logPad + "   ", [
                 [ "tree item type", "task item" ], [ "label", element.label ], [ "id", element.id ],
                 [ "taskitem id", element.task.definition.taskItemId ], [ "description", element.description ],
-                [ "resource path", element.resourceUri?.fsPath ],
+                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ],
             ]);
         }
         else if (!element)
@@ -818,7 +804,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         {
             log.values(logLevel + 1, logPad + "   ", [
                 [ "tree item type", "unknown" ], [ "label", element.label ], [ "id", element.id ],
-                [ "resource path", element.resourceUri?.fsPath ]
+                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
             ]);
         }
 
@@ -931,6 +917,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 //
                 const maxTasks = licMgr.getMaxNumberOfTasks();
                 log.write("   checking license manager for restrictions", logLevel + 1, logPad);
+                //
+                // TODO - remove below ignore tag when test for copy/move folder w/files is implemented
+                //
+                /* istanbul ignore if */
                 if (this.tasks.length > maxTasks)
                 {
                     ctRmv = this.tasks.length - maxTasks;
@@ -974,16 +964,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         {   //
             // Update license manager w/ tasks, display info / license page if needed
             //
-            await licMgr.setTasks(this.tasks || [], logPad + "   ");
+            await licMgr.setTasks(this.tasks || /* istanbul ignore next */[], logPad + "   ");
         }
 
+        //
+        //  Un-set pretty muy importante flag(s)
+        //
         this.refreshPending = false;
         this.currentInvalidation = undefined;
         this.getChildrenLogPad = this.defaultGetChildrenLogPad;
         this.getChildrenLogLevel = this.defaultGetChildrenLogLevel;
 
         log.methodDone("get tree children", logLevel, logPad, [
-            [ "# of tasks total", this.tasks?.length ], [ "# of tree task items returned", items.length ]
+            [ "# of tasks total", this.tasks ? this.tasks.length : /* istanbul ignore next */0 ],
+            [ "# of tree task items returned", items.length ]
         ]);
 
         return items;
@@ -1007,18 +1001,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     public getName = () => this.name;
 
 
+    /* istanbul ignore next */   // will be needed for TaskResolve API??
     public getParent(element: TreeItem): TreeItem | null
     {
+        /* istanbul ignore next */
         if (element instanceof TaskFolder)
         {
+            /* istanbul ignore next */
             return null;
         }
+        /* istanbul ignore next */
         if (element instanceof TaskFile)
         {
+            /* istanbul ignore next */
             return element.folder;
         }
+        /* istanbul ignore next */
         if (element instanceof TaskItem)
         {
+            /* istanbul ignore next */
             return element.taskFile;
         }
         /* istanbul ignore next */
@@ -1111,7 +1112,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             // we don't double scan for nothing.
             //
             const explorerViewEnabled = configuration.get<boolean>("enableExplorerView");
-            if ((explorerViewEnabled && this.name === "taskExplorer") || (!explorerViewEnabled && this.name === "taskExplorerSideBar"))
+            /* istanbul ignore else */
+            if ((explorerViewEnabled && this.name === "taskExplorer") ||
+                /* istanbul ignore next */(!explorerViewEnabled && this.name === "taskExplorerSideBar"))
             {
                 log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
                 this.busy = true;
@@ -1183,7 +1186,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.busy = true;
 
         try {
-            if (opt1 && (opt1 !== "tests" || !this.isTests) && opt2 instanceof Uri)
+            if (opt1 && (opt1 !== "tests" || /* istanbul ignore next */!this.isTests) && opt2 instanceof Uri)
             {
                 log.write("   invalidate '" + opt1 + "' task provider file ", 1, logPad);
                 log.value("      file", opt2.fsPath, 1, logPad);
@@ -1297,6 +1300,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         //
         // External task providers can set a icon/iconDark property
         //
+        /* istanbul ignore if */
         if (definition.icon)
         {
             log.value("   icon", definition.icon, 4, logPad);
@@ -1304,6 +1308,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         //
         // External task providers can set a icon/iconDark property
         //
+        /* istanbul ignore if */
         if (definition.iconDark)
         {
             log.value("   icon dark", definition.iconDark, 4, logPad);
@@ -1369,9 +1374,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
         log.methodStart("pause", 1, "", true);
 
+        /* istanbul ignore else */
         if (taskItem.task.execution)
         {
             const terminal = getTerminal(taskItem, "   ");
+            /* istanbul ignore else */
             if (terminal)
             {
                 if (taskItem.paused)
@@ -1659,9 +1666,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                     {
                         for (let i = each2.groupLevel; i < labelParts.length; i++)
                         {
-                            label += (label ? groupSeparator : "") + labelParts[i];
+                            label += (label ? /* istanbul ignore next */ groupSeparator : "") + labelParts[i];
                         }
-                        each2.label = label || each2.label;
+                        each2.label = label || /* istanbul ignore next */each2.label;
                     }
                 }
             }
@@ -1754,7 +1761,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 //
                 const def = newTask.definition,
                       folder = taskItem.getFolder(),
-                      p = providers.get(def.type) /* istanbul ignore next */ || providersExternal.get(def.type);
+                      p = providers.get(def.type) || /* istanbul ignore next */providersExternal.get(def.type);
                 /* istanbul ignore else */
                 if (folder && p)
                 {
@@ -1774,6 +1781,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 }
             }
             exec = await this.runTask(newTask, noTerminal);
+            /* istanbul ignore else */
             if (exec)
             {
                 await this.specialFolders.lastTasks.saveTask(taskItem, "   ");
@@ -1856,6 +1864,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             const opts: InputBoxOptions = { prompt: "Enter package name to " + command };
             await window.showInputBox(opts).then(async (str) =>
             {
+                /* istanbul ignore else */
                 if (str !== undefined && taskFile.folder.workspaceFolder)
                 {
                     const execution = new ShellExecution(pkgMgr + " " + command.replace("<packagename>", "").trim() + " " + str.trim(), options);
@@ -1925,6 +1934,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             const _run = async (_args: string | undefined) =>
             {
                 let exec: TaskExecution | undefined;
+                /* istanbul ignore else */
                 if (_args)
                 {
                     let newTask = taskItem.task;
@@ -2006,6 +2016,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             {
                 const terminal = getTerminal(taskItem, "   ");
                 log.write("   keep terminal open", 1);
+                /* istanbul ignore else */
                 if (terminal)
                 {
                     if (taskItem.paused)

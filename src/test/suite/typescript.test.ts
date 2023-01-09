@@ -140,7 +140,9 @@ suite("Typescript Tests", () =>
 
 
     test("Invalid JSON", async function()
-    {
+    {   //
+        // Note: FileWatcher ignores mod event for this task type since # of tasks never changes
+        //
         this.slow(testControl.slowTime.fsModifyEvent + testControl.slowTime.verifyTaskCount);
         // let resetLogging = teApi.log.isLoggingEnabled();
         // if (resetLogging) { // turn scary error logging off

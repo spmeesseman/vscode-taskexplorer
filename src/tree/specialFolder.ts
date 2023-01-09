@@ -32,7 +32,7 @@ export default class SpecialTaskFolder extends TaskFolder
     private settingNameEnabled: string;
 
 
-    constructor(context: ExtensionContext, treeName: "taskExplorer"|"taskExplorerSideBar", treeProvider: IExplorerApi, label: string, state: TreeItemCollapsibleState = TreeItemCollapsibleState.Expanded)
+    constructor(context: ExtensionContext, treeName: "taskExplorer"|"taskExplorerSideBar", treeProvider: IExplorerApi, label: string, state: TreeItemCollapsibleState)
     {
         super(label, state);
         this.subscriptionStartIndex = -1;
@@ -203,6 +203,13 @@ export default class SpecialTaskFolder extends TaskFolder
     async clearSavedTasks()
     {
         const choice = await window.showInformationMessage(`Clear all tasks from the \`${this.label}\` folder?`, "Yes", "No");
+        //
+        // TODO - Tests for clearSavedTasks()
+        //
+        // Can't do it until the workspace name or id or something is saved on the saved task.
+        // Otherwise it'll clear all my saved tasks in my real workspaces, as it is now.
+        //
+        /* istanbul ignore if */
         if (choice === "Yes")
         {
             this.taskFiles = [];
@@ -365,6 +372,7 @@ export default class SpecialTaskFolder extends TaskFolder
 
         log.methodStart("show special tasks", 1, logPad, false, [[ "is favorite", this.isFavorites ], [ "show", show ]]);
 
+        /* istanbul ignore if */
         if (!tree || tree.length === 0 || (tree.length === 1 &&
             (tree[0].contextValue === "noscripts" || tree[0].contextValue === "noworkspace" || tree[0].contextValue === "initscripts" || tree[0].contextValue === "loadscripts")))
         {
@@ -378,6 +386,7 @@ export default class SpecialTaskFolder extends TaskFolder
             changed = await this.build("   ");
         }
         else {
+            /* istanbul ignore else */
             if (tree[0].label === this.label) {
                 tree.splice(0, 1);
                 changed = true;
@@ -434,7 +443,7 @@ export default class SpecialTaskFolder extends TaskFolder
     // }
 
 
-    async saveTask(taskItem: TaskItem, logPad = "   ")
+    async saveTask(taskItem: TaskItem, logPad: string)
     {
         const taskId =  this.getTaskItemId(taskItem);
         const maxTasks = configuration.get<number>("specialFolders.numLastTasks");
@@ -481,8 +490,9 @@ export default class SpecialTaskFolder extends TaskFolder
     private sortLastTasks(items: TaskItem[] | undefined, lastTasks: string[], logPad: string, logLevel: number)
     {
         log.methodStart("sort last tasks", logLevel, logPad);
-        items?.sort((a: TaskItem, b: TaskItem) =>
-        {   /* istanbul ignore else */
+        items?./* istanbul ignore else */sort((a: TaskItem, b: TaskItem) =>
+        {
+            /* istanbul ignore else */
             if (a.id && b.id) {
                 const aIdx = lastTasks.indexOf(a.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
                 const bIdx = lastTasks.indexOf(b.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
