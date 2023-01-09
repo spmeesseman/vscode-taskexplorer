@@ -30,7 +30,7 @@ export const testControl =
         buildFileCache: 1500,
         buildFileCacheCancel: 1350,
         buildTree: 20000,
-        buildTreeNoTasks: 500,
+        buildTreeNoTasks: 600,
         command: 1450,
         commandFast: 550,
         configEvent: 300,

@@ -685,7 +685,6 @@ suite("Provider Tests", () =>
     {
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 25);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
-        await sleep(1);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await teApi.testsApi.fileCache.cancelBuildCache("");
         await sleep(25);
@@ -696,7 +695,6 @@ suite("Provider Tests", () =>
     {
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 40 + 25);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
-        await sleep(1);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(40);
         await teApi.testsApi.fileCache.cancelBuildCache("");
@@ -708,7 +706,6 @@ suite("Provider Tests", () =>
     {
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 75 + 25);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
-        await sleep(1);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(75);
         await teApi.testsApi.fileCache.cancelBuildCache("");
@@ -720,7 +717,6 @@ suite("Provider Tests", () =>
     {
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 100 + 25);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
-        await sleep(1);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
         await teApi.testsApi.fileCache.cancelBuildCache("");
@@ -732,7 +728,6 @@ suite("Provider Tests", () =>
     {
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 250 + 25);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
-        await sleep(1);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(250);
         await teApi.testsApi.fileCache.cancelBuildCache("");
@@ -744,7 +739,6 @@ suite("Provider Tests", () =>
     {
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 500 + 25);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
-        await sleep(1);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(500);
         await teApi.testsApi.fileCache.cancelBuildCache("");
@@ -756,7 +750,6 @@ suite("Provider Tests", () =>
     {
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 1000 + 25);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
-        await sleep(1);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(1000);
         await teApi.testsApi.fileCache.cancelBuildCache("");

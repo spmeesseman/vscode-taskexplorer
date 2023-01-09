@@ -20,6 +20,7 @@ export interface IExplorerApi
     isBusy (): boolean;
     isVisible(): boolean;
     invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad?: string): Promise<void>;
+    refresh(invalidate?: any, opt?: Uri | boolean, logPad?: string): Promise<void>;
     setEnabled(enable: boolean): void;
     waitForRefreshComplete(maxWait?: number): Promise<void>;
 }
