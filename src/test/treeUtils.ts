@@ -24,8 +24,8 @@ export const buildTree = async(instance: any,  rebuild?: boolean) =>
     const teApi = getTeApi();
     if (rebuild || !treeBuiltOnce)
     {
-        instance.slow(20000);
-        instance.timeout(30000);
+        instance.slow(testControl.slowTime.buildTree);
+        instance.timeout(testControl.slowTime.buildTree + 10000);
         await executeSettingsUpdate("groupWithSeparator", true);
         await executeSettingsUpdate("groupMaxLevel", 5);
         //

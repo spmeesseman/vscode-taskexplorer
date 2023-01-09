@@ -27,6 +27,9 @@ export const testControl =
         bashScript: 4000,
         batchScript: 8000,
         buildFileCache: 1500,
+        buildFileCacheCancel: 1350,
+        buildTree: 20000,
+        buildTreeNoTasks: 500,
         command: 1450,
         commandFast: 550,
         configEvent: 300,
@@ -51,7 +54,7 @@ export const testControl =
         licenseManagerRemoteStartServer: 10000,
         npmCommand: 12500,
         refreshCommand: 10250,
-        rebuildFileCache: 4500,
+        rebuildFileCache: 14500,
         rebuildFileCacheCancel: 1750,
         runCommand: 5000,
         runPauseCommand: 2000,
@@ -62,7 +65,7 @@ export const testControl =
         taskProviderReadUri: 100,
         verifyTaskCount: 875,
         walkTaskTree: 5500,
-        walkTaskTreeWithDocOpen: 30000,
+        walkTaskTreeWithDocOpen: 25000,
         workspaceInvalidation: 15000
     },
     //

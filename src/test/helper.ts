@@ -267,7 +267,7 @@ async function initSettings()
         bash: true,
         batch: true,
         composer: false,
-        gradle: true,
+        gradle: false,
         grunt: true,
         gulp: true,
         make: true,

@@ -84,53 +84,6 @@ suite("Tree Tests", () =>
     });
 
 
-    //
-    // The next two tests belong here in this suite but they're pretty embedded into
-    // provider.test.ts with the dumb task file runtime creation b4i knewhow the test
-    // fixtures worked. Will pull them into this suite someday.  Finding the taskitem
-    // node to hide is crappy.
-    //
-    // test("Add to Excludes - TaskFile", async function()
-    // {
-    //     const taskItems = await tasks.fetchTasks({ type: "grunt" }),
-    //           gruntCt = taskItems.length;
-    //     for (const map of taskMap)
-    //     {
-    //         const value = map[1];
-    //         if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
-    //         {
-    //             await commands.executeCommand("taskExplorer.addToExcludes", value.taskFile);
-    //             await sleep(500);
-    //             await waitForCache();
-    //             break;
-    //         }
-    //     }
-    //     await verifyTaskCount("grunt", gruntCt - 2);
-    // });
-    //
-    // test("Add to Excludes - TaskItem", async function()
-    // {
-    //     const taskItems = await tasks.fetchTasks({ type: "grunt" }),
-    //           gruntCt = taskItems.length;
-    //     for (const map of taskMap)
-    //     {
-    //         const value = map[1];
-    //         if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
-    //         {
-    //             const node = value.taskFile.treeNodes.find(n => n instanceof TaskItem);
-    //             if (node)
-    //             {
-    //                 await commands.executeCommand("taskExplorer.addToExcludes", node);
-    //                 await sleep(500);
-    //                 await waitForCache();
-    //                 break;
-    //             }
-    //         }
-    //     }
-    //     await verifyTaskCount("grunt", gruntCt - 1);
-    // });
-
-
     test("Add to Favorites", async function()
     {
         this.slow(testControl.slowTime.command * 4);
