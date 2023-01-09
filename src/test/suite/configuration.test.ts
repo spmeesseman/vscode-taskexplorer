@@ -2,7 +2,6 @@
 /* tslint:disable */
 
 import * as assert from "assert";
-import * as vscode from "vscode";
 import * as util from "../../lib/utils/utils";
 import { activate, executeSettingsUpdate, sleep, testControl } from "../helper";
 import { configuration } from "../../lib/utils/configuration";
@@ -311,8 +310,6 @@ suite("Configuration / Settings Tests", () =>
         this.slow(testControl.slowTime.configEvent * 4);
         await executeSettingsUpdate("logging.level", testControl.userLogLevel !== 3 ? 3 : 2);
         await executeSettingsUpdate("logging.level", testControl.userLogLevel);
-        await executeSettingsUpdate("pathToPrograms.ant", testControl.userPathToAnt !== "ant" ? "ant" : "ant.bat");
-        await executeSettingsUpdate("pathToPrograms.ant", testControl.userPathToAnt);
     });
 
 });
