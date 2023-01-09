@@ -38,6 +38,9 @@ import {
  */
 export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplorerApi
 {
+    private defaultGetChildrenLogLevel = 1;
+    private defaultGetChildrenLogPad = "";
+
     private name: string;
     private disposables: Disposable[];
     private subscriptionStartIndex: number;
@@ -49,8 +52,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     private enabled = false;
     private setEnableCalled = false;
     private busy = false;
-    private getChildrenLogPad = "";
-    private getChildrenLogLevel = 1;
+    private getChildrenLogLevel = this.defaultGetChildrenLogLevel;
+    private getChildrenLogPad = this.defaultGetChildrenLogPad;
     private extensionContext: ExtensionContext;
     private taskMap: TaskMap = {};
     private taskTree: TaskFolder[] | NoScripts[] | undefined | null | void = null;
@@ -710,10 +713,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    fireTreeRefreshEvent(taskFile?: TreeItem, logPad?: string, logLevel?: number)
+    fireTreeRefreshEvent(taskFile?: TreeItem, logPad = this.defaultGetChildrenLogPad, logLevel = this.defaultGetChildrenLogLevel)
     {
-        this.getChildrenLogPad = logPad || "";
-        this.getChildrenLogLevel = logLevel || 1;
+        this.getChildrenLogPad = logPad;
+        this.getChildrenLogLevel = logLevel;
         this._onDidChangeTreeData.fire(taskFile);
     }
 
@@ -725,7 +728,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      * @param logPad Log padding
      * @param logLevel Log level
      */
-    async getChildren(element?: TreeItem, logPad = "", logLevel = 1): Promise<TreeItem[]>
+    async getChildren(element?: TreeItem): Promise<TreeItem[]>
     {
         if (!workspace.workspaceFolders && !configuration.get<boolean>("specialFolders.showUserTasks"))
         {
@@ -752,6 +755,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
         let ctRmv = 0;
         let waited = 0;
+        const logPad = this.getChildrenLogPad;
+        const logLevel = this.getChildrenLogLevel;
         const licMgr = getLicenseManager();
         const explorerViewEnabled = configuration.get<boolean>("enableExplorerView");
         const firstRun = ((explorerViewEnabled && this.name === "taskExplorer") ||
@@ -973,7 +978,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
 
         this.refreshPending = false;
-        this.currentInvalidation = undefined; // reset file modification task type flag
+        this.currentInvalidation = undefined;
+        this.getChildrenLogPad = this.defaultGetChildrenLogPad;
+        this.getChildrenLogLevel = this.defaultGetChildrenLogLevel;
 
         log.methodDone("get tree children", logLevel, logPad, [
             [ "# of tasks total", this.tasks?.length ], [ "# of tree task items returned", items.length ]
@@ -1492,7 +1499,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
         else {
             log.write("   view is not visible, delay firing data change event", 1, logPad);
-            // this.getChildren();
             this.refreshPending = false;
         }
 
