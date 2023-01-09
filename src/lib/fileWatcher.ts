@@ -249,9 +249,9 @@ async function createFileWatchers(context: ExtensionContext)
 
 
 function createWorkspaceWatcher(context: ExtensionContext)
-{
-    // workspaceWatcher?.dispose(); // should only get called once
-    /* istanbul ignore next */
+{   //
+    // TODO - remove ignore tags when tests for adding/removing workspace is implemented
+    //
     workspaceWatcher = workspace.onDidChangeWorkspaceFolders(/* istanbul ignore next */ async(_e) =>
     {   /* istanbul ignore next */
         await cache.addWsFolders(_e.added);

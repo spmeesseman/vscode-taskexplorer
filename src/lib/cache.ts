@@ -53,18 +53,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
 
     log.methodStart("add folder to cache", 1, logPad, false, [[ "folder", folder.fsPath ]]);
 
-    //
-    // Wait for caches to get done building before proceeding
-    //
-    await waitForCache();
-    cacheBuilding = true;
-
-    //
-    // Status bar
-    //
-    statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
-    statusBarSpace.tooltip = "Task Explorer is building the task cache";
-    statusBarSpace.show();
+    await startCacheBuild();
 
     const taskProviders = ([ ...util.getTaskTypes(), ...providersExternal.keys() ]).sort((a, b) => {
         return util.getTaskTypeFriendlyName(a).localeCompare(util.getTaskTypeFriendlyName(b));
@@ -73,13 +62,16 @@ export async function addFolderToCache(folder: Uri, logPad: string)
     for (const providerName of taskProviders)
     {
         const externalProvider = providersExternal.get(providerName);
-
+        //
+        // TODO - remove below ignore tags when test for copy/move folder w/files is implemented
+        //
         if (!cancel && (externalProvider || util.isTaskTypeEnabled(providerName)))
         {
             let glob;
             if (!util.isWatchTask(providerName))
             {
                 const provider = providers.get(providerName) || /* istanbul ignore next */externalProvider;
+                /* istanbul ignore next */
                 glob = provider?.getGlobPattern();
             }
             if (!glob) {
@@ -97,6 +89,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                 try
                 {   let maxFiles = Infinity;
                     log.write("      Start folder scan", 3, logPad);
+                    /* istanbul ignore else */
                     if (licMgr && !licMgr.isLicensed())
                     {
                         const cachedFileCount = getTaskFileCount();
@@ -110,12 +103,16 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                     }
                     const paths = await findFiles(glob, { nocase: true, ignore: getExcludesPatternGlob(), cwd: folder.fsPath  });
                     for (const fPath of paths)
-                    {
-                        /* istanbul ignore if */
+                    {   //
+                        // TODO - remove below ignore tags when test for copy/move folder w/files is implemented
+                        //
+                        /* istanbul ignore next */
                         if (cancel) {
                             break;
                         }
+                        /* istanbul ignore next */
                         const uriFile = Uri.file(join(folder.fsPath, fPath));
+                        /* istanbul ignore next */
                         numFilesAdded += addToMappings(providerName, { uri: uriFile, folder: wsFolder }, logPad + "      ");
                     }
                     projectToFileCountMap[wsFolder.name][providerName] += numFilesAdded;
@@ -131,10 +128,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
         }
     }
 
-    disposeStatusBarSpace(statusBarSpace);
-    cacheBuilding = false;
-    cancel = false;
-
+    finishCacheBuild();
     log.methodDone("add folder to cache", 1, logPad);
 }
 
@@ -179,29 +173,21 @@ async function addWsFolderToCache(folder: WorkspaceFolder, logPad: string)
 
 export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, logPad = "")
 {
-    /* istanbul ignore else */
     if (wsf)
     {
         log.methodStart("add workspace project folders", 1, logPad, logPad === "");
-
-        await waitForCache();
-        cacheBuilding = true;
-        statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
-        statusBarSpace.tooltip = "Task Explorer is building the task cache";
-        statusBarSpace.show();
-
-        for (const f of wsf)
+        await startCacheBuild();
+        if (!cancel)
         {
-            await addWsFolderToCache(f, logPad + "   ");
-            if (cancel) {
-                break;
+            for (const f of wsf)
+            {
+                await addWsFolderToCache(f, logPad + "   ");
+                if (cancel) {
+                    break;
+                }
             }
         }
-
-        disposeStatusBarSpace(statusBarSpace);
-        cacheBuilding = false;
-        cancel = false;
-
+        finishCacheBuild();
         log.methodDone("add workspace project folders", 1, logPad);
     }
 }
@@ -256,39 +242,33 @@ export async function buildCache(taskType: string, fileGlob: string, wsFolder: W
         [ "task provider type", providerType ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
     ]);
 
-    if (setCacheBuilding)
-    {
-        await waitForCache();
-        cacheBuilding = true;
-        statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
-        statusBarSpace.tooltip = "Task Explorer is building the task cache";
-        statusBarSpace.show();
+    if (setCacheBuilding) {
+        await startCacheBuild();
     }
 
-    //
-    // If 'wsFolder' if falsey, build the entire cache.  If truthy, build the cache for the
-    // specified folder only
-    //
-    if (!wsFolder)
-    {
-        log.write("   Scan all projects for taskType '" + taskType + "' (" + providerType + ")", 1, logPad);
-        for (const folder of workspace.workspaceFolders as readonly WorkspaceFolder[])
+    if (!cancel)
+    {   //
+        // If 'wsFolder' if falsey, build the entire cache.  If truthy, build the cache for the
+        // specified folder only
+        //
+        if (!wsFolder)
         {
-            await buildFolderCache(folder, taskType, fileGlob, logPad + "   ");
-            if (cancel) {
-                break;
+            log.write("   Scan all projects for taskType '" + taskType + "' (" + providerType + ")", 1, logPad);
+            for (const folder of workspace.workspaceFolders as readonly WorkspaceFolder[])
+            {
+                await buildFolderCache(folder, taskType, fileGlob, logPad + "   ");
+                if (cancel) {
+                    break;
+                }
             }
         }
-    }
-    else {
-        await buildFolderCache(wsFolder, taskType, fileGlob, logPad + "   ");
+        else {
+            await buildFolderCache(wsFolder, taskType, fileGlob, logPad + "   ");
+        }
     }
 
-    if (setCacheBuilding)
-    {
-        disposeStatusBarSpace(statusBarSpace);
-        cacheBuilding = false;
-        cancel = false;
+    if (setCacheBuilding) {
+        finishCacheBuild();
     }
 
     log.methodDone("build file cache", 1, logPad);
@@ -320,6 +300,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
         try {
             let maxFiles = Infinity;
             log.write("   Start workspace folder scan", 3, logPad);
+            /* istanbul ignore else */
             if (licMgr && !licMgr.isLicensed())
             {
                 const cachedFileCount = getTaskFileCount();
@@ -361,8 +342,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
         }
         */
     }
-    /* istanbul ignore next */
-    else if (isExternal) {
+    else /* istanbul ignore next */if (isExternal) {
         await util.timeout(150);
     }
 
@@ -387,6 +367,14 @@ function disposeStatusBarSpace(statusBarSpace: StatusBarItem)
     statusBarSpace.hide();
     statusBarSpace.dispose();
 }
+
+
+const finishCacheBuild = () =>
+{
+    disposeStatusBarSpace(statusBarSpace);
+    cacheBuilding = false;
+    cancel = false;
+};
 
 
 /**
@@ -645,6 +633,9 @@ function removeFromMappings(taskType: string, uri: Uri | undefined, isFolder: bo
 
 export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
 {
+    //
+    // TODO - Remove ignore tags when i figure out how to add ws folders in tests
+    //
     log.methodStart("remove workspace folder", 1, logPad);
     for (const f of wsf)
     {   /* istanbul ignore next */
@@ -672,9 +663,16 @@ export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
 }
 
 
-export async function waitForCache()
+async function startCacheBuild()
 {
     while (cacheBuilding === true) {
         await util.timeout(100);
+    }
+    if (!cancel)
+    {
+        cacheBuilding = true;
+        statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
+        statusBarSpace.tooltip = "Task Explorer is building the file cache";
+        statusBarSpace.show();
     }
 }
