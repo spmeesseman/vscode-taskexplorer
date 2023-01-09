@@ -6,8 +6,59 @@
    <target name="hello">
          
       <echo message="Hello from spmeesseman"/>
-      <echo message="Your path is:"/>
-      <echo message="${env.Path}"/>
+      <echo message="I'm starting to fall to sleep!!"/>
+      <echo message="Sleeping in 3..."/>
+      <sleep milliseconds="25"/>
+      <sleep milliseconds="25"/>
+      <sleep/>
+      <sleep milliseconds="75"/>
+      <sleep milliseconds="75"/>
+      <sleep milliseconds="100"/>
+      <sleep/>
+      <sleep milliseconds="100"/>
+      <sleep milliseconds="25"/>
+      <sleep milliseconds="100"/>
+      <sleep milliseconds="100"/>
+      <sleep milliseconds="25"/>
+      <sleep/>
+      <sleep milliseconds="100"/>
+      <sleep milliseconds="250"/>
+      <echo message="Sleeping in 2..."/>
+      <sleep milliseconds="25"/>
+      <sleep milliseconds="250"/>
+      <sleep milliseconds="25"/>
+      <sleep/>
+      <sleep milliseconds="250"/>
+      <sleep milliseconds="25"/>  <!-- 1575 -->
+      <sleep milliseconds="250"/>
+      <sleep milliseconds="25"/> 
+      <sleep milliseconds="150"/> <!-- 2000 -->
+      <echo message="1..."/>
+      <sleep milliseconds="100"/>
+      <sleep/>
+      <sleep milliseconds="25"/>
+      <sleep milliseconds="100"/>
+      <sleep milliseconds="25"/>
+      <sleep milliseconds="100"/>
+      <sleep/>
+      <sleep milliseconds="25"/>
+      <sleep milliseconds="100"/>
+      <sleep milliseconds="25"/>  <!-- 2500 -->
+      <sleep milliseconds="10"/> 
+      <sleep milliseconds="10"/> 
+      <sleep milliseconds="400"/> 
+      <sleep/>
+      <sleep milliseconds="10"/> 
+      <sleep milliseconds="10"/> 
+      <sleep/>
+      <sleep milliseconds="10"/> 
+      <sleep milliseconds="15"/> 
+      <sleep milliseconds="10"/> 
+      <sleep milliseconds="15"/> 
+      <sleep/>
+      <sleep milliseconds="10"/> 
+      <sleep milliseconds="500"/> <!-- 3000 -->
+      <echo message="Out!!!"/>
 
    </target>
    
