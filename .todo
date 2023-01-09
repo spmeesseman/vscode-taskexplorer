@@ -22,6 +22,9 @@ Features:
 
     ☐ Log Viewer/ Decorator
         an extension `Log File Collapse`where start and end tags can be used an expanded/collapsedin vsCode editor window
+    
+    ☐ Enter external task types
+        some way for user to enter an external task provider name w/o using API
 
 General Todos:
 
@@ -46,3 +49,12 @@ Tests:
     
     ☐ Tests for when license manager
         i.e. limiting task counts and extension is running in non-licensed mode
+        adjust instanbul ignores in cache.ts
+
+    ☐ Tests for external provider (via API)
+        adjust instanbul ignores in cache.ts
+    
+    ☐ Tests for adding folder with files in it
+        i.e. a copy/move folder action by user, there's no other way.
+        may or may not be from in-workspace, or same-project
+        adjust instanbul ignores in cache.ts
