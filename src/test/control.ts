@@ -52,6 +52,7 @@ export const testControl =
         npmCommand: 12500,
         refreshCommand: 10250,
         rebuildFileCache: 4500,
+        rebuildFileCacheCancel: 1750,
         runCommand: 5000,
         runPauseCommand: 2000,
         runStopCommand: 2000,

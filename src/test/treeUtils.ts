@@ -22,23 +22,18 @@ let treeBuiltOnce = false;
 export const buildTree = async(instance: any,  rebuild?: boolean) =>
 {
     const teApi = getTeApi();
-
     if (rebuild || !treeBuiltOnce)
     {
         instance.slow(20000);
         instance.timeout(30000);
-
         await executeSettingsUpdate("groupWithSeparator", true);
         await executeSettingsUpdate("groupMaxLevel", 5);
-
         //
         // A special refresh() for test suite, will open all task files and open to position
         //
         await teApi.explorer?.refresh("tests");
     }
     await teApi.waitForIdle(testControl.waitTime.buildTree);
-    // teApi.explorer?.getTaskMap();
-    // return teApi.explorer?.getChildren();
     treeBuiltOnce = true;
 };
 
@@ -135,13 +130,13 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
          now = Date.now();
     let done = false;
 
-    let treeItems = await teApi.testsApi.explorer.getChildren(undefined, "", 5);
+    let treeItems = await teApi.testsApi.explorer.getChildren();
     if (!treeItems || treeItems.length === 0)
     {
         console.log(`    ${figures.color.warning} ${figures.withColor("No tree items!", figures.colors.grey)}`);
         if (Date.now() - now < 500) {
             console.log(`    ${figures.warning} ${figures.withColor("Trying again..." , figures.colors.grey)}`);
-            treeItems = await teApi.testsApi.explorer.getChildren(undefined, "", 5);
+            treeItems = await teApi.testsApi.explorer.getChildren();
         }
         if (!treeItems || treeItems.length === 0) {
             console.log(`    ${figures.color.error} No tree items!!`);
@@ -151,7 +146,7 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
 
     const processItem2g = async (pItem2: TaskFile) =>
     {
-        const treeFiles = await teApi.testsApi.explorer.getChildren(pItem2, "", 5);
+        const treeFiles = await teApi.testsApi.explorer.getChildren(pItem2);
         if (treeFiles.length > 0)
         {
             for (const item2 of treeFiles)
@@ -177,7 +172,7 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
 
     const processItem2 = async (pItem2: any) =>
     {
-        const treeTasks = await teApi.testsApi.explorer.getChildren(pItem2, "", 5);
+        const treeTasks = await teApi.testsApi.explorer.getChildren(pItem2);
         if (treeTasks.length > 0)
         {
             for (const item3 of treeTasks)
@@ -211,7 +206,7 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
 
     const processItem = async (pItem: any) =>
     {
-        const treeFiles = await teApi.testsApi.explorer.getChildren(pItem, "", 5);
+        const treeFiles = await teApi.testsApi.explorer.getChildren(pItem);
         if (treeFiles && treeFiles.length > 0)
         {
             for (const item2 of treeFiles)

@@ -79,8 +79,8 @@ export async function addFolderToCache(folder: Uri, logPad: string)
             let glob;
             if (!util.isWatchTask(providerName))
             {
-                const provider = providers.get(providerName) /* istanbul ignore next */|| externalProvider;
-                glob = provider/* istanbul ignore next */?.getGlobPattern();
+                const provider = providers.get(providerName) || /* istanbul ignore next */externalProvider;
+                glob = provider?.getGlobPattern();
             }
             if (!glob) {
                 glob = util.getGlobPattern(providerName);
@@ -101,6 +101,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                     {
                         const cachedFileCount = getTaskFileCount();
                         maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
+                        /* istanbul ignore if */
                         if (maxFiles <= 0) {
                             util.showMaxTasksReachedMessage();
                             return;
@@ -323,6 +324,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
             {
                 const cachedFileCount = getTaskFileCount();
                 maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
+                /* istanbul ignore if */
                 if (maxFiles <= 0) {
                     util.showMaxTasksReachedMessage();
                     return;
@@ -359,7 +361,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
         }
         */
     }
-    /* istanbul ignore if */
+    /* istanbul ignore next */
     else if (isExternal) {
         await util.timeout(150);
     }
@@ -489,7 +491,7 @@ function isGlobChanged(taskType: string, fileGlob: string)
 }
 
 
-export async function rebuildCache(logPad = "")
+export async function rebuildCache(logPad: string)
 {
     log.methodStart("rebuild cache", 1, logPad, logPad === "");
     taskFilesMap = {};
