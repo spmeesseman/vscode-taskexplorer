@@ -252,14 +252,11 @@ function createWorkspaceWatcher(context: ExtensionContext)
 {   //
     // TODO - remove ignore tags when tests for adding/removing workspace is implemented
     //
-    workspaceWatcher = workspace.onDidChangeWorkspaceFolders(/* istanbul ignore next */ async(_e) =>
-    {   /* istanbul ignore next */
+    workspaceWatcher = workspace.onDidChangeWorkspaceFolders(async(_e) =>
+    {
         await cache.addWsFolders(_e.added);
-        /* istanbul ignore next */
         cache.removeWsFolders(_e.removed);
-        /* istanbul ignore next */
         createDirWatcher(context);
-        /* istanbul ignore next */
         await refreshTree(teApi);
     });
     context.subscriptions.push(workspaceWatcher);

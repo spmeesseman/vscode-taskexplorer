@@ -221,6 +221,12 @@ export function getSpecialTaskItemId(taskItem: TaskItem)
 export const getTeApi = () => teApi;
 
 
+export const getTestsPath = (p: string) =>
+{
+	return path.normalize(path.resolve(__dirname, p));
+};
+
+
 export const getWsPath = (p: string) =>
 {
 	return path.normalize(path.resolve(__dirname, "../../test-files", p));

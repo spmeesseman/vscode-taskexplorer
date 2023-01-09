@@ -638,25 +638,19 @@ export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
     //
     log.methodStart("remove workspace folder", 1, logPad);
     for (const f of wsf)
-    {   /* istanbul ignore next */
+    {
         log.value("   workspace folder", f.name, 1, logPad);
-        /* istanbul ignore next */
         delete projectToFileCountMap[f.name];
-        /* istanbul ignore next */
         if (projectFilesMap[f.name])
-        {   /* istanbul ignore next */
+        {
             delete projectFilesMap[f.name];
         }
-        /* istanbul ignore next */
         Object.keys(taskFilesMap).forEach((taskType) =>
-        {   /* istanbul ignore next */
+        {
             log.value("   start remove task files from cache", taskType, 2, logPad);
-            /* istanbul ignore next */
             removeFromMappings(taskType, f.uri, true, logPad + "      ");
-            /* istanbul ignore next */
             log.value("   completed remove files from cache", taskType, 2, logPad);
         });
-        /* istanbul ignore next */
         log.write("   workspace folder removed", 1, logPad);
     }
     log.methodDone("remove workspace folder", 1, logPad);

@@ -19,11 +19,11 @@ let treeBuiltOnce = false;
  *
  * @param instance The test instance to set the timeout and slow time on.
  */
-export const buildTree = async(instance: any,  rebuild?: boolean) =>
+export const buildTree = async(instance: any) =>
 {
-    const teApi = getTeApi();
-    if (rebuild || !treeBuiltOnce)
+    if (!treeBuiltOnce)
     {
+        const teApi = getTeApi();
         instance.slow(testControl.slowTime.buildTree);
         instance.timeout(testControl.slowTime.buildTree + 10000);
         await executeSettingsUpdate("groupWithSeparator", true);
@@ -31,9 +31,10 @@ export const buildTree = async(instance: any,  rebuild?: boolean) =>
         //
         // A special refresh() for test suite, will open all task files and open to position
         //
-        await teApi.explorer?.refresh("tests");
+        await teApi.testsApi.explorer.refresh("tests");
+        await teApi.waitForIdle(testControl.waitTime.buildTree);
+        await teApi.waitForIdle(50);
     }
-    await teApi.waitForIdle(testControl.waitTime.buildTree);
     treeBuiltOnce = true;
 };
 

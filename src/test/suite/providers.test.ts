@@ -16,7 +16,7 @@ import { removeFromArray } from "../../lib/utils/utils";
 import { ITaskExplorerApi, IExplorerApi, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
-    focusExplorer, getWsPath, sleep, testControl, treeUtils, verifyTaskCount
+    focusExplorer, getTestsPath, getWsPath, sleep, testControl, treeUtils, verifyTaskCount
 } from "../helper";
 
 
@@ -26,9 +26,9 @@ let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let explorer: IExplorerApi;
 let rootPath: string;
+let testsPath: string;
 let dirName: string;
 let dirNameL2: string;
-let ws2DirName: string;
 let dirNameIgn: string;
 let batch: TaskItem[];
 let taskMap: TaskMap;
@@ -44,9 +44,9 @@ suite("Provider Tests", () =>
         fsApi = teApi.testsApi.fs;
 
         rootPath = getWsPath(".");
+        testsPath = getTestsPath(".");
         dirName = path.join(rootPath, "tasks_test_");
         dirNameL2 = path.join(dirName, "subfolder");
-        ws2DirName = path.join(rootPath, "ws2");
         dirNameIgn = path.join(rootPath, "tasks_test_ignore_");
         //
         // Add some excludes, use both config update and task explorer addExclude command
@@ -70,9 +70,9 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Create Temporary Directories", async function()
+    test("Create Empty Directories", async function()
     {
-        this.slow(10000);
+        this.slow(testControl.slowTime.fsCreateFolderEvent * 4);
          //
         // Create the temporary project dirs
         //
@@ -82,74 +82,15 @@ suite("Provider Tests", () =>
         if (!await fsApi.pathExists(dirNameL2)) {
             await fsApi.createDir(dirNameL2);
         }
-        if (!await fsApi.pathExists(ws2DirName)) {
-            await fsApi.createDir(ws2DirName);
-        }
         if (!await fsApi.pathExists(dirNameIgn)) {
             await fsApi.createDir(dirNameIgn);
         }
-
-        //
-        // New Workspace folders
-        //
-        let wsDirName = path.join(rootPath, "newA");
-        if (!await fsApi.pathExists(wsDirName)) {
-            await fsApi.createDir(wsDirName);
-        }
-        wsDirName = path.join(rootPath, "newB");
-        if (!await fsApi.pathExists(wsDirName)) {
-            await fsApi.createDir(wsDirName);
-        }
-        wsDirName = path.join(rootPath, "newC");
-        if (!await fsApi.pathExists(wsDirName)) {
-            await fsApi.createDir(wsDirName);
-        }
-        wsDirName = path.join(rootPath, "newD");
-        if (!await fsApi.pathExists(wsDirName)) {
-            await fsApi.createDir(wsDirName);
-        }
-
-        const wsf: WorkspaceFolder[] = [
-        {
-            uri: Uri.parse(ws2DirName),
-            name: "ws2",
-            index: 1
-        },
-        {
-            uri: Uri.parse(path.join(rootPath, "newC")),
-            name: "C Test Workspace",
-            index: 2
-        },
-        {
-            uri: Uri.parse(path.join(rootPath, "newB")),
-            name: "B Test Workspace",
-            index: 3
-        },
-        {
-            uri: Uri.parse(path.join(rootPath, "newA")),
-            name: "A Test Workspace",
-            index: 4
-        },
-        {
-            uri: Uri.parse(path.join(rootPath, "newD")),
-            name: "D Test Workspace",
-            index: 5
-        }];
-
-        //
-        // Merge VSCode ws folders
-        //
-        (workspace.workspaceFolders as WorkspaceFolder[]).concat(wsf);
-
-        await teApi.waitForIdle(3000);
     });
 
 
     test("Build Tree (View Collapsed)", async function()
     {
-        if (!explorer.isVisible()) {
-            await treeUtils.buildTree(this);
-        }
+        await treeUtils.buildTree(this);
     });
 
 
@@ -176,7 +117,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Ant", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent * 5);
         await setupAnt();
     });
 
@@ -190,35 +131,35 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Batch", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent * 3);
         await setupBatch();
     });
 
 
     test("Create Temporary Task Files - Gradle", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent * 3);
         await setupGradle();
     });
 
 
     test("Create Temporary Task Files - Grunt", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent * 4);
         await setupGrunt();
     });
 
 
     test("Create Temporary Task Files - Gulp", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent * 5);
         await setupGulp();
     });
 
 
     test("Create Temporary Task Files - Makefile", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent * 3);
         await setupMakefile();
     });
 
@@ -232,7 +173,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Typescript", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent * 2);
         await setupTsc();
     });
 
@@ -280,7 +221,6 @@ suite("Provider Tests", () =>
 
     test("Build Tree", async function()
     {
-        // this.slow() is called in treeutils.buildTree()
         await treeUtils.buildTree(this);
         //
         // Check VSCode provided task types for the hell of it
@@ -746,12 +686,33 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Cancel Rebuild Cache (Pending Build) (Busy 50s Delay)", async function()
+    test("Cancel Rebuild Cache (Pending Build) (No Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 50 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 25);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
-        await sleep(50);
+        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await sleep(25);
+    });
+
+
+    test("Cancel Rebuild Cache (Pending Build) (Busy 40s Delay)", async function()
+    {
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 40 + 25);
+        teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        await sleep(40);
+        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await sleep(25);
+    });
+
+
+    test("Cancel Rebuild Cache (Pending Build) (Busy 75s Delay)", async function()
+    {
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 75 + 25);
+        teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        await sleep(75);
         await teApi.testsApi.fileCache.cancelBuildCache("");
         await sleep(25);
     });
@@ -888,10 +849,103 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Mimic Add/Remove a Workspace Folder", async function()
+    test("Add Workspace Folder 1", async function()
     {
-        await teApi.testsApi.fileCache.addWsFolders(workspace.workspaceFolders);
-        teApi.testsApi.fileCache.removeWsFolders((workspace.workspaceFolders as WorkspaceFolder[]).filter(f =>  f.index > 0));
+        this.slow(testControl.slowTime.addWorkspaceFolderEmpty);
+        const wsDirName = path.join(testsPath, "wsf1");
+        await fsApi.createDir(wsDirName);
+console.log("file: " + wsDirName);
+console.log("file2: " + Uri.file(wsDirName).fsPath);
+console.log("file3: " + Uri.parse(wsDirName).fsPath);
+        workspace.updateWorkspaceFolders(1, null, {
+            uri: Uri.file(wsDirName),
+            name: "wsf1"
+        });
+        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
+        sleep(5000);
+workspace.workspaceFolders?.forEach((wf)=>
+{
+    console.log("0: " + wf.uri.fsPath);
+    console.log("0: " + wf.name);
+    console.log("0: " + wf.index);
+});
+    });
+
+/*
+    test("Add Workspace Folder 2", async function()
+    {
+        this.slow(testControl.slowTime.addWorkspaceFolderEmpty);
+        const wsDirName = path.join(testsPath, "wsf2");
+        await fsApi.createDir(wsDirName);
+        workspace.updateWorkspaceFolders(1, null, {
+            uri: Uri.file(wsDirName),
+            name: "wsf2"
+        });
+        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
+    });
+
+
+    test("Add Workspace Folder 3", async function()
+    {
+        this.slow(testControl.slowTime.addWorkspaceFolderEmpty);
+        const wsDirName = path.join(testsPath, "wsf3");
+        await fsApi.createDir(wsDirName);
+        workspace.updateWorkspaceFolders(1, null, {
+            uri: Uri.file(wsDirName),
+            name: "wsf3"
+        });
+        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
+    });
+
+
+    test("Add Workspace Folder 4", async function()
+    {
+        this.slow(testControl.slowTime.addWorkspaceFolderEmpty);
+        const wsDirName = path.join(testsPath, "wsf4");
+        await fsApi.createDir(wsDirName);
+        workspace.updateWorkspaceFolders(1, null, {
+            uri: Uri.file(wsDirName),
+            name: "wsf4"
+        });
+        await teApi.waitForIdle(testControl.waitTime.addWorkspaceFolderEmpty);
+    });
+*/
+
+    test("Remove Workspace Folder 1", async function()
+    {
+        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty);
+workspace.workspaceFolders?.forEach((wf)=>
+{
+    console.log("1: " + wf.uri.fsPath);
+    console.log("1: " + wf.name);
+    console.log("1: " + wf.index);
+});
+        workspace.updateWorkspaceFolders(1, 1);
+workspace.workspaceFolders?.forEach((wf)=>
+{
+    console.log("2: " + wf.uri.fsPath);
+    console.log("2: " + wf.name);
+    console.log("2: " + wf.index);
+});
+        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
+    });
+/*
+
+    test("Remove Workspace Folder 2 and 3", async function()
+    {
+        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty * 2);
+        workspace.updateWorkspaceFolders(1, 1);
+        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
+        workspace.updateWorkspaceFolders(1, 1);
+        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
+    });
+
+
+    test("Remove Workspace Folder 4", async function()
+    {
+        this.slow(testControl.slowTime.removeWorkspaceFolderEmpty);
+        workspace.updateWorkspaceFolders(1, 1);
+        await teApi.waitForIdle(testControl.waitTime.removeWorkspaceFolderEmpty);
     });
 
 
@@ -912,39 +966,20 @@ suite("Provider Tests", () =>
             }
         }
 
-        if (dirName && ws2DirName && dirNameIgn && dirNameL2)
-        {
-            try {
-                await fsApi.deleteDir(ws2DirName);
-                await fsApi.deleteDir(dirNameL2);
-                await fsApi.deleteDir(dirName);
-                await fsApi.deleteDir(dirNameIgn);
-            }
-            catch (error) {
-                console.log(error);
-            }
+        try {
+            await fsApi.deleteDir(dirNameL2);
+            await fsApi.deleteDir(dirName);
+            await fsApi.deleteDir(dirNameIgn);
+        }
+        catch (error) {
+            console.log(error);
         }
 
-        //
-        // Workspace folders
-        //
         try {
-            let wsDirName = path.join(rootPath, "newA");
-            if (await fsApi.pathExists(wsDirName)) {
-                await fsApi.deleteDir(wsDirName);
-            }
-            wsDirName = path.join(rootPath, "newB");
-            if (await fsApi.pathExists(wsDirName)) {
-                await fsApi.deleteDir(wsDirName);
-            }
-            wsDirName = path.join(rootPath, "newC");
-            if (await fsApi.pathExists(wsDirName)) {
-                await fsApi.deleteDir(wsDirName);
-            }
-            wsDirName = path.join(rootPath, "newD");
-            if (await fsApi.pathExists(wsDirName)) {
-                await fsApi.deleteDir(wsDirName);
-            }
+            await fsApi.deleteDir(path.join(testsPath, "wsf1"));
+            await fsApi.deleteDir(path.join(testsPath, "wsf2"));
+            await fsApi.deleteDir(path.join(testsPath, "wsf3"));
+            await fsApi.deleteDir(path.join(testsPath, "wsf4"));
         }
         catch(error) {
             console.log(error);
@@ -952,7 +987,7 @@ suite("Provider Tests", () =>
 
         await teApi.waitForIdle(3000);
     });
-
+*/
 });
 
 
@@ -1070,7 +1105,7 @@ async function setupAnt()
         "</project>\n"
     );
 
-    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent * 5);
 }
 
 
@@ -1116,7 +1151,7 @@ async function setupGradle()
         "}\n"
     );
 
-    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent * 2);
 }
 
 
@@ -1171,7 +1206,7 @@ async function setupTsc()
         "}\n"
     );
 
-    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent * 2);
 }
 
 
@@ -1275,7 +1310,7 @@ async function setupGulp()
         "});\n"
     );
 
-    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent * 4);
 }
 
 
@@ -1304,7 +1339,7 @@ async function setupMakefile()
         "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
     );
 
-    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent * 2);
 }
 
 
@@ -1347,7 +1382,7 @@ async function setupBash()
     await fsApi.writeFile(file2, "echo testing bash file 2\n");
     await fsApi.writeFile(file3, "echo testing bash file 3\n");
 
-    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent * 3);
 }
 
 
@@ -1392,7 +1427,7 @@ async function setupGrunt()
         "};\n"
     );
 
-    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+    await teApi.waitForIdle(testControl.waitTime.fsCreateEvent * 3);
 }
 
 
@@ -1433,7 +1468,7 @@ async function createAntFile()
                 '    <target name="test2" depends="init"></target>\n' +
                 "</project>\n"
             );
-            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         }
     }
 }
@@ -1460,7 +1495,7 @@ async function createAppPublisherFile()
                 '    "repoType": "svn"\n' +
                 "}\n"
             );
-            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         }
     }
 }
@@ -1481,7 +1516,7 @@ async function createMavenPomFile()
                 "    <modelVersion>4.0.0</modelVersion>\n" +
                 "</project>\n"
             );
-            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         }
     }
 }
@@ -1496,7 +1531,7 @@ async function createBatchFile()
         if (!await fsApi.pathExists(file))
         {
             await fsApi.writeFile(file, "@echo testing batch file\r\n");
-            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         }
     }
 }
@@ -1524,7 +1559,7 @@ async function createGradleFile()
                 "    with jar\n" +
                 "}\n"
             );
-            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         }
     }
 }
@@ -1546,7 +1581,7 @@ async function createGruntFile()
                 '    grunt.registerTask("upload", [\'s3\']);\n' +
                 "};\n"
             );
-            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         }
     }
 }
@@ -1572,7 +1607,7 @@ async function createGulpFile()
                 "    done();\n" +
                 "});\n"
             );
-            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         }
     }
 }
@@ -1591,7 +1626,7 @@ async function createMakeFile()
                 file,
                 "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
             );
-            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+            await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         }
     }
 }
