@@ -4,7 +4,6 @@ import * as path from "path";
 import * as assert from "assert";
 import * as treeUtils from "./treeUtils";
 import figures from "../lib/figures";
-import TaskItem from "../tree/item";
 import { deactivate } from "../extension";
 import { testControl } from "./control";
 import { configuration } from "../lib/utils/configuration";
@@ -12,7 +11,6 @@ import constants from "../lib/constants";
 import { deleteFile, pathExists } from "../lib/utils/fs";
 import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
-import { log } from "console";
 
 let activated = false;
 let teApi: ITaskExplorerApi;
@@ -251,11 +249,7 @@ async function initSettings()
 
     await configuration.updateVsWs("terminal.integrated.shell.windows",
                                    "C:\\Windows\\System32\\cmd.exe");
-    //
-    // Use update() here for coverage, since these two settings wont trigger any processing
-    //
     testControl.userLogLevel = configuration.get<number>("logging.level");
-    testControl.userPathToAnt = configuration.get<string>("pathToPrograms.ant");
     //
     // Enable views, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
@@ -288,28 +282,52 @@ async function initSettings()
         tsc: true,
         workspace: true
     });
-    await configuration.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
-    await configuration.updateWs("includeAnt", []); // Deprecated, use `globPatternsAnt`
-    await configuration.updateWs("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
+
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("groupMaxLevel", 1);
     await configuration.updateWs("groupWithSeparator", true);
     await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("keepTermOnStop", false);
+
+    // await configuration.updateWs("pathToPrograms.ant", testControl.userPathToAnt);
+    // await configuration.updateWs("pathToPrograms.ansicon", testControl.userPathToAnsicon);
+    await configuration.updateWs("pathToPrograms",
+    {
+        ant: "c:\\Code\\ant\\bin\\ant.bat",
+        apppublisher: "",
+        ansicon: "c:\\Code\\ansicon\\x64\\ansicon.exe",
+        bash: "bash",
+        composer: "composer",
+        gradle: "c:\\Code\\gradle\\bin\\gradle.bat",
+        make: "C:\\Code\\compilers\\c_c++\\9.0\\VC\\bin\\nmake.exe",
+        maven: "mvn",
+        nsis: "c:\\Code\\nsis\\makensis.exe",
+        perl: "perl",
+        pipenv: "pipenv",
+        powershell: "powershell",
+        python: "c:\\Code\\python\\python.exe",
+        ruby: "ruby"
+    });
+
     await configuration.updateWs("logging.enable", testControl.logEnabled);
     await configuration.updateWs("logging.level", testControl.logLevel);
     await configuration.updateWs("logging.enableFile", testControl.logToFile);
     await configuration.updateWs("logging.enableOutputWindow", testControl.logToOutput);
-    await configuration.updateWs("pathToPrograms", configuration.get<object>("pathToPrograms"));
-    await configuration.updateWs("showHiddenWsTasks", true);
-    await configuration.updateWs("showRunningTask", true);
+
     await configuration.updateWs("specialFolders.expanded", configuration.get<object>("specialFolders.expanded"));
     await configuration.updateWs("specialFolders.numLastTasks", 10);
     await configuration.updateWs("specialFolders.showFavorites", true);
     await configuration.updateWs("specialFolders.showLastTasks", true);
     await configuration.updateWs("specialFolders.showUserTasks", true);
+
     await configuration.updateWs("taskButtons.clickAction", "Open");
     await configuration.updateWs("taskButtons.showFavoritesButton", true);
+
+    await configuration.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
+    await configuration.updateWs("includeAnt", []); // Deprecated, use `globPatternsAnt`
+    await configuration.updateWs("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
+    await configuration.updateWs("keepTermOnStop", false);
+    await configuration.updateWs("showHiddenWsTasks", true);
+    await configuration.updateWs("showRunningTask", true);
     await configuration.updateWs("useGulp", false);
     await configuration.updateWs("useAnt", false);
 }
@@ -416,11 +434,15 @@ export async function verifyTaskCount(taskType: string, expectedCount: number)
 }
 
 
-export async function waitForTaskExecution(exec: TaskExecution | undefined)
+export async function waitForTaskExecution(exec: TaskExecution | undefined, maxWait?: number)
 {
-    if (exec) {
-        while (isExecuting(exec.task)) {
-            await sleep(25);
+    if (exec)
+    {
+        let waited = 0;
+        while (isExecuting(exec.task) && (!maxWait || waited < maxWait))
+        {
+            await sleep(50);
+            waited += 50;
         }
     }
 }

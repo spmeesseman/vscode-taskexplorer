@@ -319,8 +319,8 @@ async function onDirDelete(uri: Uri)
     }
 }
 
-
-const onWsFoldersChange = /* istanbul ignore next */ async(e: WorkspaceFoldersChangeEvent) =>
+// Export for testsApi
+export const onWsFoldersChange = /* istanbul ignore next */ async(e: WorkspaceFoldersChangeEvent) =>
 {   //
     // TODO - remove ignore tags when tests for adding/removing workspace is implemented
     //

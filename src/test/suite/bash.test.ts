@@ -166,7 +166,7 @@ suite("Bash Tests", () =>
             this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript);
         }
         const bash = await treeUtils.getTreeTasks("bash", startTaskCount);
-        const exec = await executeTeCommand2("run", [ bash[0] ], testControl.waitTime.runCommand) as TaskExecution | undefined;
+        const exec = await executeTeCommand2("run", [ bash[0] ], testControl.waitTime.runCommandMax) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
     });
 

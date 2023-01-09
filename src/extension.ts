@@ -33,7 +33,7 @@ import { registerExplorer } from "./lib/registerExplorer";
 import { ExtensionContext, tasks, commands } from "vscode";
 import { ExternalExplorerProvider, IExplorerApi, ITaskExplorerApi } from "./interface";
 import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
-import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/fileWatcher";
+import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/fileWatcher";
 
 
 const isLicenseManagerActive = true;
@@ -63,7 +63,8 @@ export const teApi: ITaskExplorerApi =
     testsApi: {
         fs,
         explorer: {} as IExplorerApi, // registerExplorer() will set
-        fileCache: cache
+        fileCache: cache,
+        onWsFoldersChange
     }
 };
 

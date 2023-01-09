@@ -20,6 +20,7 @@ export const testControl =
     //
     userLogLevel: 1,
     userPathToAnt: "c:\\Code\\ant\\bin\\ant.bat",
+    userPathToAnsicon: "c:\\Code\\ansicon\\x64\\ansicon.exe",
     //
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)s
     //
@@ -47,7 +48,7 @@ export const testControl =
         fsDeleteEvent: 950,
         fsDeleteFolderEvent: 1550,
         fsModifyEvent: 650,
-        getTreeTasks: 150,
+        getTreeTasks: 200,
         licenseMgrOpenPage: 1000,
         licenseManagerLocalCheck: 2000,
         licenseManagerLocalStartServer: 8500,
@@ -59,8 +60,11 @@ export const testControl =
         rebuildFileCacheCancel: 1750,
         removeWorkspaceFolder: 10000,
         runCommand: 5000,
+        runCommandNoWait: 3750,
         runPauseCommand: 2000,
+        runPauseCommandNoWait: 1750,
         runStopCommand: 2000,
+        runStopCommandNoWait: 2200,
         showHideSpecialFolder: 350,
         storageRead: 50,
         storageUpdate: 50,
@@ -88,16 +92,18 @@ export const testControl =
         commandFast: 50,
         getTreeMin: 350,
         getTreeMax: 1800,
+        getTreeTasks: 75,
         npmCommandMin: 3000,
         rebuildFileCacheCancel: 50,
         refreshCommand: 500,
         refreshTaskTypeCommand: 1000,
         removeWorkspaceFolder: 250,
-        runCommand: 3500,
+        runCommandMin: 1000,
         //
         // MAXIMUM WAIT TIMES
         //
         max: 15000,
+        runCommandMax: 3500,
         waitTimeForNpmCommandMax: 12000
     }
 };
