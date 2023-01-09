@@ -79,8 +79,8 @@ export async function addFolderToCache(folder: Uri, logPad: string)
             let glob;
             if (!util.isWatchTask(providerName))
             {
-                const provider = providers.get(providerName) || externalProvider;
-                glob = provider?.getGlobPattern();
+                const provider = providers.get(providerName) /* istanbul ignore next */|| externalProvider;
+                glob = provider/* istanbul ignore next */?.getGlobPattern();
             }
             if (!glob) {
                 glob = util.getGlobPattern(providerName);
@@ -109,7 +109,8 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                     }
                     const paths = await findFiles(glob, { nocase: true, ignore: getExcludesPatternGlob(), cwd: folder.fsPath  });
                     for (const fPath of paths)
-                    {   /* istanbul ignore if */
+                    {
+                        /* istanbul ignore if */
                         if (cancel) {
                             break;
                         }
@@ -139,9 +140,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
 
 async function addWsFolderToCache(folder: WorkspaceFolder, logPad: string)
 {
-    log.methodStart("add workspace project folder to cache", 2, logPad, logPad === "", [
-        [ "folder", !folder ? "entire workspace" : folder.name ]
-    ]);
+    log.methodStart("add workspace project folder to cache", 2, logPad, logPad === "", [[ "folder", folder.name ]]);
 
     const taskProviders = ([ ...util.getTaskTypes(), ...providersExternal.keys() ]).sort();
     for (const providerName of taskProviders)
@@ -193,7 +192,6 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         for (const f of wsf)
         {
             await addWsFolderToCache(f, logPad + "   ");
-            /* istanbul ignore if */
             if (cancel) {
                 break;
             }
@@ -337,7 +335,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
             {
                 addToMappings(taskType, { uri: fPath, folder }, logPad + "   ");
                 if (cancel) {
-                    return;
+                    break;
                 }
             }
             projectToFileCountMap[folder.name][taskType] = paths.length;
@@ -372,13 +370,12 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
 
 export async function cancelBuildCache()
 {
-    if (!cacheBuilding) {
-        return;
-        /* istanbul ignore else */
-    }
-    cancel = true;
-    while (cacheBuilding) {
-        await util.timeout(100);
+    if (cacheBuilding)
+    {
+        cancel = true;
+        while (cacheBuilding) {
+            await util.timeout(100);
+        }
     }
 }
 
