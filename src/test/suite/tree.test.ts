@@ -12,6 +12,7 @@ import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer,
     getSpecialTaskItemId, overrideNextShowInputBox, testControl, treeUtils
 } from "../helper";
+import SpecialTaskFolder from "../../tree/specialFolder";
 
 
 let teApi: ITaskExplorerApi;
@@ -20,6 +21,12 @@ let favTasks: string[];
 let lastTasks: string[];
 let ant: TaskItem[];
 let batch: TaskItem[];
+let cstItem1: TaskItem | undefined;
+let cstItem2: TaskItem | undefined;
+let cstItem3: TaskItem | undefined;
+let cstItem4: TaskItem | undefined;
+let cstItem5: TaskItem | undefined;
+let cstItem6: TaskItem | undefined;
 
 
 suite("Tree Tests", () =>
@@ -91,7 +98,6 @@ suite("Tree Tests", () =>
         if (removed) {
             await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         }
-
         removed = await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
         if (removed) {
             await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
@@ -110,90 +116,198 @@ suite("Tree Tests", () =>
     test("Add Custom Label 1", async function()
     {
         this.slow(testControl.slowTime.command);
-        overrideNextShowInputBox("Label 1");
-        await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
+        const taskTree = explorer.getTaskTree();
+        if(taskTree)
+        {
+            const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            if (sFolder)
+            {
+                cstItem1 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[0].id);
+                if (cstItem1)
+                {
+                    overrideNextShowInputBox("Label 1");
+                    const removed = await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
+                    if (removed) {
+                        await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
+                    }
+                }
+            }
+        }
     });
 
 
     test("Add Custom Label 2", async function()
     {
         this.slow(testControl.slowTime.command);
-        overrideNextShowInputBox("Label 2");
-        await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
+        const taskTree = explorer.getTaskTree();
+        if(taskTree)
+        {
+            const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            if (sFolder)
+            {
+                const cstItem2 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[0].id);
+                if (cstItem2)
+                {
+                    overrideNextShowInputBox("Label 2");
+                    const removed = await executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
+                    if (removed) {
+                        await executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
+                    }
+                }
+            }
+        }
     });
 
 
     test("Add Custom Label 3", async function()
     {
         this.slow(testControl.slowTime.command);
-        overrideNextShowInputBox("Label 3");
-        await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
+        const taskTree = explorer.getTaskTree();
+        if(taskTree)
+        {
+            const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            if (sFolder)
+            {
+                const cstItem3 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[1].id);
+                if (cstItem3)
+                {
+                    overrideNextShowInputBox("Label 3");
+                    const removed = await executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
+                    if (removed) {
+                        await executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
+                    }
+                }
+            }
+        }
     });
 
 
     test("Add Custom Label 4", async function()
     {
         this.slow(testControl.slowTime.command);
-        overrideNextShowInputBox("Label 4");
-        await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
+        const taskTree = explorer.getTaskTree();
+        if(taskTree)
+        {
+            const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            if (sFolder)
+            {
+                const cstItem4 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[1].id);
+                if (cstItem4)
+                {
+                    overrideNextShowInputBox("Label 4");
+                    const removed = await executeTeCommand2("addRemoveCustomLabel", [ cstItem4 ]);
+                    if (removed) {
+                        await executeTeCommand2("addRemoveCustomLabel", [ cstItem4 ]);
+                    }
+                }
+            }
+        }
     });
 
 
     test("Add Custom Label 5", async function()
     {
         this.slow(testControl.slowTime.command);
-        overrideNextShowInputBox("Label 5");
-        await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
+        const taskTree = explorer.getTaskTree();
+        if(taskTree)
+        {
+            const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            if (sFolder)
+            {
+                const cstItem5 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === ant[0].id);
+                if (cstItem5)
+                {
+                    overrideNextShowInputBox("Label 5");
+                    const removed = await executeTeCommand2("addRemoveCustomLabel", [ cstItem5 ]);
+                    if (removed) {
+                        await executeTeCommand2("addRemoveCustomLabel", [ cstItem5 ]);
+                    }
+                }
+            }
+        }
     });
 
 
     test("Add Custom Label 6", async function()
     {
         this.slow(testControl.slowTime.command);
-        overrideNextShowInputBox("Label 6");
-        await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
+        const taskTree = explorer.getTaskTree();
+        if (taskTree)
+        {
+            const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            if (sFolder)
+            {
+                const cstItem6 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === ant[0].id);
+                if (cstItem6)
+                {
+                    overrideNextShowInputBox("Label 6");
+                    const removed = await executeTeCommand2("addRemoveCustomLabel", [ cstItem6 ]);
+                    if (removed) {
+                        await executeTeCommand2("addRemoveCustomLabel", [ cstItem6 ]);
+                    }
+                }
+            }
+        }
     });
 
 
     test("Remove Custom Label 1", async function()
     {
-        this.slow(testControl.slowTime.command);
-        await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
+        if (cstItem1) {
+            this.slow(testControl.slowTime.command);
+            await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
+        }
     });
 
 
     test("Remove Custom Label 2", async function()
     {
-        this.slow(testControl.slowTime.command);
-        await executeTeCommand2("addRemoveCustomLabel", [ batch[0] ]);
+        if (cstItem2) {
+            this.slow(testControl.slowTime.command);
+            await executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
+        }
     });
 
 
     test("Remove Custom Label 3", async function()
     {
-        this.slow(testControl.slowTime.command);
-        await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
+        if (cstItem3) {
+            this.slow(testControl.slowTime.command);
+            await executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
+        }
     });
 
 
     test("Remove Custom Label 4", async function()
     {
-        this.slow(testControl.slowTime.command);
-        await executeTeCommand2("addRemoveCustomLabel", [ batch[1] ]);
+        if (cstItem4) {
+            this.slow(testControl.slowTime.command);
+            await executeTeCommand2("addRemoveCustomLabel", [ cstItem4 ]);
+        }
     });
 
 
     test("Remove Custom Label 5", async function()
     {
-        this.slow(testControl.slowTime.command);
-        await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
+        if (cstItem5) {
+            this.slow(testControl.slowTime.command);
+            await executeTeCommand2("addRemoveCustomLabel", [ cstItem5 ]);
+        }
     });
 
 
     test("Remove Custom Label 6", async function()
     {
-        this.slow(testControl.slowTime.command);
-        await executeTeCommand2("addRemoveCustomLabel", [ ant[0] ]);
+        if (cstItem6) {
+            this.slow(testControl.slowTime.command);
+            await executeTeCommand2("addRemoveCustomLabel", [ cstItem6 ]);
+        }
     });
 
 

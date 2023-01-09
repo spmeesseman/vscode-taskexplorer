@@ -14,6 +14,7 @@ import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, focusExplorer,
     treeUtils, overrideNextShowInfoBox, overrideNextShowInputBox, testControl
 } from "../helper";
+import SpecialTaskFolder from "../../tree/specialFolder";
 
 let lastTask: TaskItem | null = null;
 let teApi: ITaskExplorerApi;
@@ -271,13 +272,26 @@ async function startTask(taskItem: TaskItem)
     if (removed) {
         await executeTeCommand2("addRemoveFavorite", [ taskItem ]);
     }
-    overrideNextShowInputBox("test label");
-    removed = await executeTeCommand2("addRemoveCustomLabel", [ taskItem ]);
-    if (removed) {
-        await executeTeCommand2("addRemoveCustomLabel", [ taskItem ]);
-    }
-    if (lastTask) {
-        await executeTeCommand2("openTerminal", [ lastTask ]);
+    const taskTree = explorer.getTaskTree();
+    if(taskTree)
+    {
+        const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                       (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+        if (sFolder)
+        {
+            const sTaskItem = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === taskItem.id);
+            if (sTaskItem)
+            {
+                overrideNextShowInputBox("test label");
+                removed = await executeTeCommand2("addRemoveCustomLabel", [ sTaskItem ]);
+                if (removed) {
+                    await executeTeCommand2("addRemoveCustomLabel", [ sTaskItem ]);
+                }
+                if (lastTask) {
+                    await executeTeCommand2("openTerminal", [ lastTask ]);
+                }
+            }
+        }
     }
 }
 

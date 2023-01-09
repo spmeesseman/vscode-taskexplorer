@@ -96,10 +96,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.subscriptionStartIndex = context.subscriptions.length - (this.disposables.length + 1);
 
         const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
-        const favoritesExpanded = nodeExpandedeMap.lastTasks !== false ?
-                                  TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
+        const favoritesExpanded = nodeExpandedeMap.favorites !== false ?
+                                  TreeItemCollapsibleState.Expanded : /* istanbul ignore next */TreeItemCollapsibleState.Collapsed;
         const lastTaskExpanded = nodeExpandedeMap.lastTasks !== false ?
-                                TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
+                                TreeItemCollapsibleState.Expanded : /* istanbul ignore next */TreeItemCollapsibleState.Collapsed;
         this.specialFolders = {
             favorites: new SpecialTaskFolder(context, name, this, constants.FAV_TASKS_LABEL, favoritesExpanded),
             lastTasks: new SpecialTaskFolder(context, name, this, constants.LAST_TASKS_LABEL, lastTaskExpanded)
