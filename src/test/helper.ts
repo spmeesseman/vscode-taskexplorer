@@ -10,7 +10,7 @@ import { testControl } from "./control";
 import { configuration } from "../lib/utils/configuration";
 import constants from "../lib/constants";
 import { deleteFile, pathExists } from "../lib/utils/fs";
-import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import { log } from "console";
 
@@ -210,7 +210,7 @@ export async function focusExplorer(instance: any)
 }
 
 
-export function getSpecialTaskItemId(taskItem: TaskItem)
+export function getSpecialTaskItemId(taskItem: ITaskItemApi)
 {
     return taskItem.id.replace(constants.LAST_TASKS_LABEL + ":", "")
                       .replace(constants.FAV_TASKS_LABEL + ":", "")

@@ -1,6 +1,7 @@
 
 import TaskItem from "./item";
 import TaskFile from "./file";
+import { ITaskFolderApi } from "../interface";
 import { isString } from "../lib/utils/utils";
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder } from "vscode";
 
@@ -11,7 +12,7 @@ import { ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder } from "
  * A tree node that represents a workspace folder.
  * An item of this type is a "root folder" in the tree, it contains various TaskItem and TaskItem nodes.
  */
-export default class TaskFolder extends TreeItem
+export default class TaskFolder extends TreeItem implements ITaskFolderApi
 {
     public id: string;
     public taskFiles: (TaskFile|TaskItem)[] = [];

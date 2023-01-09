@@ -9,19 +9,19 @@ import TaskItem from "../../tree/item";
 import { expect } from "chai";
 import { storage } from "../../lib/utils/storage";
 import constants from "../../lib/constants";
-import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, focusExplorer,
     treeUtils, overrideNextShowInfoBox, overrideNextShowInputBox, testControl
 } from "../helper";
 import SpecialTaskFolder from "../../tree/specialFolder";
 
-let lastTask: TaskItem | null = null;
+let lastTask: ITaskItemApi | null = null;
 let teApi: ITaskExplorerApi;
 let explorer: IExplorerApi;
-let ant: TaskItem[];
-let bash: TaskItem[];
-let batch: TaskItem[];
+let ant: ITaskItemApi[];
+let bash: ITaskItemApi[];
+let batch: ITaskItemApi[];
 let successCount = 0;
 
 
@@ -191,9 +191,9 @@ suite("Task Tests", () =>
         this.slow(testControl.slowTime.runCommand + (testControl.slowTime.configEvent * 4) + (testControl.slowTime.command * 4));
         expect(successCount).to.be.equal(14);
         await executeSettingsUpdate("visual.disableAnimatedIcons", true);
-        await startTask(bash[0]);
+        await startTask(bash[0] as TaskItem);
         await executeTeCommand2("run", [ bash[0] ], testControl.waitTime.runCommand);
-        await endTask(bash[0]);
+        await endTask(bash[0] as TaskItem);
         lastTask = bash[0];
         ++successCount;
     });
@@ -208,7 +208,7 @@ suite("Task Tests", () =>
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
         const batchTask = batch[0];
-        await startTask(batchTask);
+        await startTask(batchTask as TaskItem);
         await executeSettingsUpdate("keepTermOnStop", false);
         await executeTeCommand2("open", [ batchTask, true ], 100); // clickaction=execute
         await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], testControl.waitTime.runCommand);
@@ -232,7 +232,7 @@ suite("Task Tests", () =>
         await executeTeCommand2("stop", [ batchTask ], 400);
         await executeTeCommand("runNoTerm", 1500, testControl.waitTime.max, batchTask);
         await executeTeCommand2("stop", [ batchTask ], 200);
-        await endTask(batchTask);
+        await endTask(batchTask as TaskItem);
         ++successCount;
     });
 
@@ -245,7 +245,7 @@ suite("Task Tests", () =>
         expect(successCount).to.be.equal(16);
         this.timeout(testControl.slowTime.runCommand * 7);
         const batchTask = batch[1];
-        await startTask(batchTask);
+        await startTask(batchTask as TaskItem);
         await executeSettingsUpdate("keepTermOnStop", false);
         await executeTeCommand2("open", [ batchTask, true ], 100); // clickaction=execute
         await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], testControl.waitTime.runCommand);
@@ -255,7 +255,7 @@ suite("Task Tests", () =>
         // await executeTeCommand("stop", 200, testControl.waitTime.max, batchTask);
         await executeSettingsUpdate("showRunningTask", true);
         await teApi.waitForIdle(8000);
-        await endTask(batchTask);
+        await endTask(batchTask as TaskItem);
         ++successCount;
     });
 

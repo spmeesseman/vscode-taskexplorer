@@ -95,14 +95,14 @@ suite("Provider Tests", () =>
     test("Check Existing Bash Task Counts", async function()
     {
         this.slow(testControl.slowTime.command);
-        batch = await treeUtils.getTreeTasks("bash", 1);
+        batch = await treeUtils.getTreeTasks("bash", 1) as TaskItem[];
     });
 
 
     test("Check Existing Batch Task Counts", async function()
     {
         this.slow(testControl.slowTime.command);
-        batch = await treeUtils.getTreeTasks("batch", 2);
+        batch = await treeUtils.getTreeTasks("batch", 2) as TaskItem[];
     });
 
 
@@ -227,7 +227,7 @@ suite("Provider Tests", () =>
         assert(nTasks.length > 0, "No grunt tasks registered");
         nTasks = await tasks.fetchTasks({ type: "gulp" });
         assert(nTasks.length > 0, "No gulp tasks registered");
-        batch = await treeUtils.getTreeTasks("batch", 4);
+        batch = await treeUtils.getTreeTasks("batch", 4) as TaskItem[];
     });
 
 

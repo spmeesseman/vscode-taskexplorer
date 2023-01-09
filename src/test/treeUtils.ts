@@ -5,7 +5,7 @@ import TaskItem from "../tree/item";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import { isObjectEmpty } from "../lib/utils/utils";
-import { TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskItemApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2, figures, getTeApi, sleep, testControl } from "./helper";
 
 let treeBuiltOnce = false;
@@ -67,7 +67,7 @@ export const findIdInTaskMap = (id: string, taskMap: TaskMap) =>
 export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 {
     const teApi = getTeApi();
-    const taskItems: TaskItem[] = [];
+    const taskItems: ITaskItemApi[] = [];
     const _getTaskMap = async(retries: number) =>
     {
         let taskMap = teApi.testsApi.explorer.getTaskMap();

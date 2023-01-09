@@ -4,6 +4,7 @@ import * as util from "../lib/utils/utils";
 import log from "../lib/utils/log";
 import TaskFile from "./file";
 import TaskFolder from "./folder";
+import { ITaskItemApi } from "../interface";
 import { configuration } from "../lib/utils/configuration";
 import {
     Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks, Command
@@ -17,7 +18,7 @@ from "vscode";
  * A tree node that represents a task.
  * An item of this type is always a child of type TaskFile in the tree.
  */
-export default class TaskItem extends TreeItem
+export default class TaskItem extends TreeItem implements ITaskItemApi
 {
     public readonly context: ExtensionContext; // Note:  Making this field private bombs the types
     public readonly taskSource: string;
@@ -167,7 +168,7 @@ export default class TaskItem extends TreeItem
     }
 
 
-    setContextValue(task: Task, running: boolean)
+    private setContextValue(task: Task, running: boolean)
     {   //
         // Context view controls the view parameters to the ui, see package.json /views/context node.
         //
@@ -203,7 +204,7 @@ export default class TaskItem extends TreeItem
     }
 
 
-    setIconPath(context: ExtensionContext, running: boolean)
+    private setIconPath(context: ExtensionContext, running: boolean)
     {   //
         // Type "$empty" is a composite tasks
         //

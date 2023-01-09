@@ -105,7 +105,7 @@ suite("NPM Tests", () =>
         // the tree under the VSCode tasks node, not the npm node)
         //
         tagLog("NPM", "Get NPM Task Items [DoWorkSon]");
-        npmTaskItems = await treeUtils.getTreeTasks(testsName, 2);
+        npmTaskItems = await treeUtils.getTreeTasks(testsName, 2) as TaskItem[];
         tagLog("NPM", "Get NPM Task Items [Complete]");
         ++successCount;
     });
