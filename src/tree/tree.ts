@@ -1499,7 +1499,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
         else {
             log.write("   view is not visible, delay firing data change event", 1, logPad);
-            this.refreshPending = false;
+            setTimeout(() => { this.refreshPending = false; }, 1);
         }
 
         log.methodDone("refresh task tree", 1, logPad);
