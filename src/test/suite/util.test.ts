@@ -33,6 +33,7 @@ suite("Util Tests", () =>
             assert.fail("        ✘ Workspace folder does not exist");
         }
         await executeSettingsUpdate("logging.enable", true);
+        await executeSettingsUpdate("logging.enableOutputWindow", true);
 	});
 
 
@@ -70,7 +71,6 @@ suite("Util Tests", () =>
 		log.value(null as unknown as string, 1);
 		log.value(undefined as unknown as string, 1);
 
-		// nullvalue
 		log.write(null as unknown as string);
 		log.write(undefined as unknown as string);
 		log.blank();
@@ -88,6 +88,7 @@ suite("Util Tests", () =>
 		log.error([ "Test error 7", "", "Test error 8", "" ]);
 		log.error([ "Test error 9",  new Error("Test error object 10") ]);
 		log.error([ "Test error 11", "Test error 12" ], [[ "Test param error 13", "Test param value 14" ]]);
+		log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
 		log.error(true);
 		log.error(undefined);
 		log.error({
@@ -107,8 +108,15 @@ suite("Util Tests", () =>
 		});
 		logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(true);
 
+		//
 		// Disabled logging
+		//
+
 		await executeSettingsUpdate("logging.enable", false);
+
+		log.warn("test");
+		log.withColor("test", log.colors.cyan);
+
 		log.write("test");
 		log.value("test", "1");
 		log.value(null as unknown as string, 1);
@@ -129,7 +137,10 @@ suite("Util Tests", () =>
 		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
 		log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
 
+		//
 		// Re-enable logging
+		//
+
 		await executeSettingsUpdate("logging.enable", true);
 
         assert(util.camelCase("taskexplorer", 4) === "taskExplorer");
@@ -171,12 +182,30 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
+		await executeSettingsUpdate("logging.enableFileSymbols", false);
+		log.write("Test1", 1);
+		log.value("Test2", "value", 1);
 		await executeSettingsUpdate("logging.enableFile", false);
+		await executeSettingsUpdate("logging.enableFileSymbols", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.value("Test3", "value3", 1);
 		await executeSettingsUpdate("logging.enableFile", false);
+	});
+
+
+	test("Logging (Output Window)", async function()
+    {
+		await executeSettingsUpdate("logging.enableOutputWindow", true);
+		log.write("Test1", 1);
+		log.value("Test2", "value", 1);
+		await executeSettingsUpdate("logging.enableOutputWindow", false);
+		log.write("Test1", 1);
+		log.value("Test2", "value", 1);
+		await executeSettingsUpdate("logging.enableOutputWindow", true);
+		log.value("Test3", "value3", 1);
+		await executeSettingsUpdate("logging.enableOutputWindow", false);
 	});
 
 

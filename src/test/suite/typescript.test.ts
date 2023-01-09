@@ -79,7 +79,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
     });
 
@@ -118,7 +118,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 

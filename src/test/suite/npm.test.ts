@@ -88,6 +88,7 @@ suite("NPM Tests", () =>
     test("Verify NPM Task Count", async function()
     {
         expect(successCount).to.be.equal(3);
+        this.slow(testControl.slowTime.verifyTaskCount);
         await verifyTaskCount(testsName, 5);
         ++successCount;
     });
@@ -114,6 +115,7 @@ suite("NPM Tests", () =>
     test("Get Package Manager", function()
     {
         expect(successCount).to.be.equal(5);
+        this.slow(testControl.slowTime.configEventFast);
         getPackageManager();
         ++successCount;
     });

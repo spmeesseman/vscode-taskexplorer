@@ -14,8 +14,9 @@ import {
 } from "../helper";
 
 const testsName = "ant";
+const slowTimeforAntParseFile = 1000;
 const slowTimeforAntRunTasks = (testControl.slowTime.fetchTasksCommand * 2) + (testControl.slowTime.configEvent * 3) +
-                               (testControl.slowTime.taskProviderReadUri * 2);
+                               (testControl.slowTime.taskProviderReadUri * 2) + slowTimeforAntParseFile;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;

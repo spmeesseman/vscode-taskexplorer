@@ -53,6 +53,7 @@ export default class TaskFolder extends TreeItem
     {
         const id = isString(taskFile) ? taskFile : taskFile.id;
         const idx = this.taskFiles.findIndex(f => f.id === id);
+        /* istanbul ignore else */
         if (idx !== -1) {
             this.taskFiles.splice(idx, 1);
         }

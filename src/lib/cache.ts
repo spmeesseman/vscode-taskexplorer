@@ -679,11 +679,8 @@ async function startCacheBuild()
     while (cacheBuilding === true) {
         await util.timeout(100);
     }
-    if (!cancel)
-    {
-        cacheBuilding = true;
-        statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
-        statusBarSpace.tooltip = "Task Explorer is building the file cache";
-        statusBarSpace.show();
-    }
+    cacheBuilding = true;
+    statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
+    statusBarSpace.tooltip = "Task Explorer is building the file cache";
+    statusBarSpace.show();
 }
