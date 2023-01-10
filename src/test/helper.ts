@@ -226,9 +226,9 @@ export function executeTeCommand2(command: string, args: any[], minWait?: number
 export async function focusExplorer(instance: any)
 {
     if (!teExplorer.isVisible()) {
-        instance.slow(testControl.slowTime.refreshCommand);
-        await executeTeCommand("focus", 500, testControl.slowTime.focusCommand);
-        await teApi.waitForIdle(500, testControl.slowTime.refreshCommand);
+        instance.slow(testControl.slowTime.focusCommand + testControl.slowTime.refreshCommand + (testControl.waitTime.focusCommand * 2));
+        await executeTeCommand("focus", testControl.waitTime.focusCommand);
+        await teApi.waitForIdle(testControl.waitTime.focusCommand);
     }
 }
 

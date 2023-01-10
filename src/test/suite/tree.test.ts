@@ -58,7 +58,7 @@ suite("Tree Tests", () =>
 
     test("Show Favorites", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2) + (testControl.waitTime.configEvent * 2) + (testControl.slowTime.getTreeTasks * 4) + testControl.slowTime.storageUpdate);
+        this.slow((testControl.slowTime.configSpecialFolderEvent * 2) + (testControl.waitTime.configEvent * 2) + (testControl.slowTime.getTreeTasks * 4) + testControl.slowTime.storageUpdate);
         ant = await treeUtils.getTreeTasks("ant", 3);
         bash = await treeUtils.getTreeTasks("bash", 1);
         batch = await treeUtils.getTreeTasks("batch", 2)
@@ -67,14 +67,14 @@ suite("Tree Tests", () =>
             getSpecialTaskItemId(batch[0]), getSpecialTaskItemId(batch[1]), getSpecialTaskItemId(ant[0]),
             getSpecialTaskItemId(bash[0]), getSpecialTaskItemId(python[0]), getSpecialTaskItemId(python[1])
         ]);
-        await executeSettingsUpdate("specialFolders.showFavorites", false);
-        await executeSettingsUpdate("specialFolders.showFavorites", true);
+        await executeSettingsUpdate("specialFolders.showFavorites", false, testControl.waitTime.configEvent);
+        await executeSettingsUpdate("specialFolders.showFavorites", true, testControl.waitTime.configEvent);
     });
 
 
     test("Show Last Tasks", async function()
     {
-        this.slow((testControl.slowTime.configEvent * 2) + (testControl.waitTime.configEvent * 2) + (testControl.slowTime.getTreeTasks * 2));
+        this.slow((testControl.slowTime.configSpecialFolderEvent * 2) + (testControl.waitTime.configEvent * 2) + (testControl.slowTime.getTreeTasks * 2));
         ant = await treeUtils.getTreeTasks("ant", 3);
         batch = await treeUtils.getTreeTasks("batch", 2);
         await storage.update(constants.LAST_TASKS_STORE, [
@@ -88,7 +88,7 @@ suite("Tree Tests", () =>
 
     test("Add to Favorites", async function()
     {
-        this.slow(testControl.slowTime.command * 12);
+        this.slow(testControl.slowTime.command * 13);
         let removed = await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         if (removed) {
             await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
@@ -113,12 +113,13 @@ suite("Tree Tests", () =>
         if (removed) {
             await executeTeCommand2("addRemoveFavorite", [ python[1] ]);
         }
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
     test("Add Custom Label 1", async function()
     {
-        this.slow(testControl.slowTime.command);
+        this.slow(testControl.slowTime.command + testControl.waitTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -134,6 +135,7 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
                     }
+                    await teApi.waitForIdle(testControl.waitTime.command);
                 }
             }
         }
@@ -142,7 +144,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 2", async function()
     {
-        this.slow(testControl.slowTime.command);
+        this.slow(testControl.slowTime.command + testControl.waitTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -158,6 +160,7 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
                     }
+                    await teApi.waitForIdle(testControl.waitTime.command);
                 }
             }
         }
@@ -166,7 +169,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 3", async function()
     {
-        this.slow(testControl.slowTime.command);
+        this.slow(testControl.slowTime.command + testControl.waitTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -182,6 +185,7 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
                     }
+                    await teApi.waitForIdle(testControl.waitTime.command);
                 }
             }
         }
@@ -190,7 +194,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 4", async function()
     {
-        this.slow(testControl.slowTime.command);
+        this.slow(testControl.slowTime.command + testControl.waitTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -206,6 +210,7 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await executeTeCommand2("addRemoveCustomLabel", [ cstItem4 ]);
                     }
+                    await teApi.waitForIdle(testControl.waitTime.command);
                 }
             }
         }
@@ -214,7 +219,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 5", async function()
     {
-        this.slow(testControl.slowTime.command);
+        this.slow(testControl.slowTime.command + testControl.waitTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -230,6 +235,7 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await executeTeCommand2("addRemoveCustomLabel", [ cstItem5 ]);
                     }
+                    await teApi.waitForIdle(testControl.waitTime.command);
                 }
             }
         }
@@ -238,7 +244,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 6", async function()
     {
-        this.slow(testControl.slowTime.command);
+        this.slow(testControl.slowTime.command + testControl.waitTime.command);
         const taskTree = explorer.getTaskTree();
         if (taskTree)
         {
@@ -254,6 +260,7 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await executeTeCommand2("addRemoveCustomLabel", [ cstItem6 ]);
                     }
+                    await teApi.waitForIdle(testControl.waitTime.command);
                 }
             }
         }
@@ -263,8 +270,9 @@ suite("Tree Tests", () =>
     test("Remove Custom Label 1", async function()
     {
         if (cstItem1) {
-            this.slow(testControl.slowTime.command);
+            this.slow(testControl.slowTime.command + testControl.waitTime.command);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
+            await teApi.waitForIdle(testControl.waitTime.command);
         }
     });
 
@@ -272,8 +280,9 @@ suite("Tree Tests", () =>
     test("Remove Custom Label 2", async function()
     {
         if (cstItem2) {
-            this.slow(testControl.slowTime.command);
+            this.slow(testControl.slowTime.command + testControl.waitTime.command);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
+            await teApi.waitForIdle(testControl.waitTime.command);
         }
     });
 
@@ -281,8 +290,9 @@ suite("Tree Tests", () =>
     test("Remove Custom Label 3", async function()
     {
         if (cstItem3) {
-            this.slow(testControl.slowTime.command);
+            this.slow(testControl.slowTime.command + testControl.waitTime.command);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
+            await teApi.waitForIdle(testControl.waitTime.command);
         }
     });
 
@@ -290,8 +300,9 @@ suite("Tree Tests", () =>
     test("Remove Custom Label 4", async function()
     {
         if (cstItem4) {
-            this.slow(testControl.slowTime.command);
+            this.slow(testControl.slowTime.command + testControl.waitTime.command);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem4 ]);
+            await teApi.waitForIdle(testControl.waitTime.command);
         }
     });
 
@@ -299,8 +310,9 @@ suite("Tree Tests", () =>
     test("Remove Custom Label 5", async function()
     {
         if (cstItem5) {
-            this.slow(testControl.slowTime.command);
+            this.slow(testControl.slowTime.command + testControl.waitTime.command);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem5 ]);
+            await teApi.waitForIdle(testControl.waitTime.command);
         }
     });
 
@@ -308,32 +320,35 @@ suite("Tree Tests", () =>
     test("Remove Custom Label 6", async function()
     {
         if (cstItem6) {
-            this.slow(testControl.slowTime.command);
+            this.slow(testControl.slowTime.command + testControl.waitTime.command);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem6 ]);
+            await teApi.waitForIdle(testControl.waitTime.command);
         }
     });
 
 
     test("Cancel Add Custom Label", async function()
-    {
-        this.slow(testControl.slowTime.command);
+    {;
+        this.slow(testControl.slowTime.command + testControl.waitTime.command);
         overrideNextShowInputBox(undefined);
         await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
     test("Remove from Favorites", async function()
     {
-        this.slow(testControl.slowTime.command * 3);
+        this.slow((testControl.slowTime.command * 3) + testControl.waitTime.command);
         await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
         await executeTeCommand2("addRemoveFavorite", [ ant[0] ]);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
     test("Hide Favorites", async function()
     {
-        this.slow(testControl.slowTime.showHideSpecialFolder);
+        this.slow((testControl.slowTime.showHideSpecialFolder * 2) + (testControl.waitTime.command * 2));
         await executeSettingsUpdate("specialFolders.showFavorites", false);
         await teApi.waitForIdle(testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
@@ -343,7 +358,7 @@ suite("Tree Tests", () =>
 
     test("Hide Last Tasks", async function()
     {
-        this.slow(testControl.slowTime.showHideSpecialFolder);
+        this.slow(testControl.slowTime.showHideSpecialFolder + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await teApi.waitForIdle(testControl.waitTime.command);
     });
@@ -351,14 +366,14 @@ suite("Tree Tests", () =>
 
     test("Refresh", async function()
     {
-        this.slow(testControl.slowTime.refreshCommand);
+        this.slow(testControl.slowTime.refreshCommand + testControl.waitTime.command);
         await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
     });
 
 
     test("Show Favorites", async function()
     {
-        this.slow(testControl.slowTime.configEnableEvent);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
         await teApi.waitForIdle(testControl.waitTime.command);
     });
@@ -366,7 +381,7 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
-        this.slow(testControl.slowTime.showHideSpecialFolder);
+        this.slow(testControl.slowTime.showHideSpecialFolder + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await teApi.waitForIdle(testControl.waitTime.command);
     });
@@ -374,7 +389,7 @@ suite("Tree Tests", () =>
 
     test("Show Favorite Tasks w/ Last Tasks", async function()
     {
-        this.slow((testControl.slowTime.showHideSpecialFolder * 4)  + (testControl.slowTime.configEvent * 4));
+        this.slow((testControl.slowTime.showHideSpecialFolder * 4)  + (testControl.waitTime.command * 4));
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await teApi.waitForIdle(testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
@@ -387,14 +402,14 @@ suite("Tree Tests", () =>
 
     test("Show Favorite Tasks Only", async function()
     {
-        this.slow(testControl.slowTime.showHideSpecialFolder + testControl.slowTime.configEvent);
+        this.slow(testControl.slowTime.showHideSpecialFolder + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
     });
 
 
     test("Hide Favorite and Last Tasks", async function()
     {
-        this.slow((testControl.slowTime.showHideSpecialFolder * 2) + (testControl.slowTime.configEvent *2));
+        this.slow((testControl.slowTime.showHideSpecialFolder * 2) + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
         await teApi.waitForIdle(testControl.waitTime.command);
@@ -403,7 +418,7 @@ suite("Tree Tests", () =>
 
     test("Show Favorite Tasks", async function()
     {
-        this.slow(testControl.slowTime.showHideSpecialFolder + testControl.slowTime.configEvent);
+        this.slow(testControl.slowTime.showHideSpecialFolder + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
         await teApi.waitForIdle(testControl.waitTime.command);
     });
@@ -411,7 +426,7 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
-        this.slow(testControl.slowTime.showHideSpecialFolder + testControl.slowTime.configEvent);
+        this.slow(testControl.slowTime.showHideSpecialFolder + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await teApi.waitForIdle(testControl.waitTime.command);
     });
@@ -425,11 +440,12 @@ suite("Tree Tests", () =>
 
     test("Clear Special Folders", async function()
     {
-        this.slow(testControl.slowTime.command * 2);
+        this.slow(testControl.slowTime.command * 3);
         overrideNextShowInputBox("Yes");
         await executeTeCommand("clearLastTasks");
         overrideNextShowInputBox("Yes");
         await executeTeCommand("clearFavorites");
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
