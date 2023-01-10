@@ -132,10 +132,14 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
                     const taskType = util.getTaskTypeRealName(p),
                           oldValue = pathToPrograms[p],
                           newValue = newPathToPrograms[p];
-                    if (newValue !== oldValue) {
+                    if (newValue !== oldValue)
+                    {
                         teApi.log.write(`   the 'pathToPrograms.${taskType}' setting has changed`, 1);
                         teApi.log.value("      new value", newValue, 2);
-                        registerChange(taskType);
+                        if (taskType !== "ansicon") {
+                            registerChange(taskType);
+                        }
+                        else { registerChange("ant"); }
                     }
                 }
             }
