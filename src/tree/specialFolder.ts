@@ -50,10 +50,10 @@ export default class SpecialTaskFolder extends TaskFolder
         if (this.isFavorites)
         {
             this.disposables.push(commands.registerCommand(treeName + ".addRemoveFavorite", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
-            this.disposables.push(commands.registerCommand(treeName + ".clearFavorites", async() => { await this.clearSavedTasks(); }, this));
+            this.disposables.push(commands.registerCommand(treeName + ".clearFavorites", () => this.clearSavedTasks(), this));
         }
         else {
-            this.disposables.push(commands.registerCommand(treeName + ".clearLastTasks", async() => { await this.clearSavedTasks(); }, this));
+            this.disposables.push(commands.registerCommand(treeName + ".clearLastTasks", () => this.clearSavedTasks(), this));
         }
         const d = workspace.onDidChangeConfiguration(async e => { await this.processConfigChanges(context, e); }, this);
         this.disposables.push(d);
@@ -118,46 +118,43 @@ export default class SpecialTaskFolder extends TaskFolder
 
     async addRemoveRenamedLabel(taskItem: TaskItem)
     {
-        let removed = false,
-            addRemoved = false;
         const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
               id = this.getTaskItemId(taskItem);
 
-        log.methodStart("add/remove rename special", 1, "", false, [[ "id", id ]]);
+        log.methodStart("add/remove rename special", 1, "", false, [[ "id", id ], [ "current # of items in store", renames.length ]]);
 
-        renames.slice().reverse().forEach((item, index, object) =>
+        //
+        // Removing an item?
+        //
+        const rmvIdx = renames.findIndex(r => r[0] === id);
+        if (rmvIdx !== -1)
         {
-            if (id === item[0] && !removed)
-            {
-                addRemoved = true;
-                removed = true;
-                renames.splice(object.length - 1 - index, 1);
-            }
-        });
-
-        if (!addRemoved)
-        {
+            renames.splice(rmvIdx, 1);
+            log.write("   removing item from 'rename' store", 1);
+            log.value("      index", 3);
+        }     //
+        else // Adding an item...
+        {   //
             const opts: InputBoxOptions = { prompt: "Enter favorites label" };
             const str = await window.showInputBox(opts);
             if (str !== undefined)
             {
-                addRemoved = true;
                 renames.push([ id, str ]);
+                log.value("   adding item to 'rename' store", str, 1);
+            }
+            else {
+                log.write("   user cancelled adding item to 'rename' store", 1);
             }
         }
 
         //
-        // Update
+        // Persist to storage and refresh this tree node
         //
-        if (addRemoved)
-        {
-            await storage.update(constants.TASKS_RENAME_STORE, renames);
-            // await this.refresh(true, "   ");
-            this.explorer.fireTreeRefreshEvent(this, "   ", 1);
-        }
+        await storage.update(constants.TASKS_RENAME_STORE, renames);
+        this.explorer.fireTreeRefreshEvent(this, "   ", 1);
 
-        log.methodDone("add/remove rename special", 1);
-        return removed;
+        log.methodDone("add/remove rename special", 1, "", [[ "new # of items in store", renames.length ]]);
+        return rmvIdx !== -1;
     }
 
 
