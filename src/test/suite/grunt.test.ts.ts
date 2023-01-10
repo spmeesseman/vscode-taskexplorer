@@ -5,38 +5,38 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
-import { GulpTaskProvider } from "../../providers/gulp";
+import { GruntTaskProvider } from "../../providers/grunt";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, testControl, treeUtils, verifyTaskCount } from "../helper";
+import { activate, executeTeCommand, getWsPath, testControl, treeUtils, verifyTaskCount } from "../helper";
 
-const testsName = "gulp";
-const startTaskCount = 17;
+const testsName = "grunt";
+const startTaskCount = 7;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let provider: GulpTaskProvider;
+let provider: GruntTaskProvider;
 let dirName: string;
 let fileUri: Uri;
 let successCount = 0;
 
 
-suite("Gulp Tests", () =>
+suite("Grunt Tests", () =>
 {
 
     suiteSetup(async function()
     {
         teApi = await activate(this);
         fsApi = teApi.testsApi.fs;
-        provider = teApi.providers.get(testsName) as GulpTaskProvider;
+        provider = teApi.providers.get(testsName) as GruntTaskProvider;
         dirName = getWsPath("tasks_test_");
-        fileUri = Uri.file(path.join(dirName, "gulpfile.js"));
+        fileUri = Uri.file(path.join(dirName, "gruntfile.js"));
         ++successCount;
     });
 
     suiteTeardown(async function()
     {
-        await configuration.updateVs("gulp.autoDetect", testControl.vsCodeAutoDetectGulp);
+        await configuration.updateVs("grunt.autoDetect", testControl.vsCodeAutoDetectGrunt);
     });
 
 
@@ -73,7 +73,7 @@ suite("Gulp Tests", () =>
     {
         expect(successCount).to.be.equal(4, "rolling success count failure");
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
-        await teApi.config.updateWs("enabledTasks.gulp", false);
+        await teApi.config.updateWs("enabledTasks.grunt", false);
         await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
         await teApi.waitForIdle(testControl.waitTime.min);
@@ -85,7 +85,7 @@ suite("Gulp Tests", () =>
     {
         expect(successCount).to.be.equal(5, "rolling success count failure");
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
-        await teApi.config.updateWs("enabledTasks.gulp", true);
+        await teApi.config.updateWs("enabledTasks.grunt", true);
         await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
@@ -102,15 +102,10 @@ suite("Gulp Tests", () =>
         }
         await fsApi.writeFile(
             fileUri.fsPath,
-            "var gulp = require('gulp');\n" +
-            "gulp.task('hello3', (done) => {\n" +
-            "    console.log('Hello3!');\n" +
-            "    done();\n" +
-            "});\n" +
-            'gulp.task(\n"hello4", (done) => {\n' +
-            "    console.log('Hello4!');\n" +
-            "    done();\n" +
-            "});\n"
+            "module.exports = function(grunt) {\n" +
+            '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
+            '    grunt.registerTask("upload2", ["s3"]);\n' +
+            "};\n"
         );
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
@@ -119,28 +114,23 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Add Task to File", async function()
+    test("Add 4 Tasks to File", async function()
     {
         expect(successCount).to.be.equal(7, "rolling success count failure");
         this.slow(testControl.slowTime.fsModifyEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
-            "var gulp = require('gulp');\n" +
-            "gulp.task('hello3', (done) => {\n" +
-            "    console.log('Hello3!');\n" +
-            "    done();\n" +
-            "});\n" +
-            'gulp.task(\n"hello4", (done) => {\n' +
-            "    console.log('Hello4!');\n" +
-            "    done();\n" +
-            "});\n" +
-            'gulp.task(\n"hello5", (done) => {\n' +
-            "    console.log('Hello5!');\n" +
-            "    done();\n" +
-            "});\n"
+            "module.exports = function(grunt) {\n" +
+            '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
+            '    grunt.registerTask("upload2", ["s3"]);\n' +
+            '    grunt.registerTask("upload3", ["s4"]);\n' +
+            '    grunt.registerTask("upload4", ["s5"]);\n' +
+            '    grunt.registerTask("upload5", ["s6"]);\n' +
+            '    grunt.registerTask("upload6", ["s7"]);\n' +
+            "};\n"
         );
         await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
-        await verifyTaskCount(testsName, startTaskCount + 3);
+        await verifyTaskCount(testsName, startTaskCount + 6);
         await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;
     });
@@ -152,14 +142,16 @@ suite("Gulp Tests", () =>
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
-            "var gulp = require('gulp');\n" +
-            "gulp.task('hello3', (done) => {\n" +
-            "    console.log('Hello3!');\n" +
-            "    done();\n" +
-            "});\n"
+            "module.exports = function(grunt) {\n" +
+            '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
+            '    grunt.registerTask("upload2", ["s3"]);\n' +
+            '    grunt.registerTask("upload5", ["s5"]);\n' +
+            '    grunt.registerTask("upload6", ["s7"]);\n' +
+            "};\n"
         );
         await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
-        await verifyTaskCount(testsName, startTaskCount + 1);
+        await verifyTaskCount(testsName, startTaskCount + 4);
+        await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -177,36 +169,11 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Gulp Parser", async function()
+    test("Turn VSCode Grunt Provider On", async function()
     {
         expect(successCount).to.be.equal(10, "rolling success count failure");
-        this.slow((testControl.slowTime.configEventFast * 2) + testControl.waitTime.min);
-        // const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
-        //       gulpFile = getWsPath("gulp\\gulpfile.js");
-        //
-        // Use Gulp
-        //
-        await executeSettingsUpdate("useGulp", true, testControl.waitTime.configEventFast);
-        // await teApi.explorer?.invalidateTasksCache(testsName);
-        // await tasks.fetchTasks({ type: testsName });
-        // gulpTasks = await provider.readUriTasks(Uri.file(buildXmlFile));
-        // assert(gulpTasks.length === 2, "# of Gulp tasks should be 2");
-        // gulpTasks = await provider.readUriTasks(Uri.file(buildXmlFile), rootWorkspace);
-        // assert(gulpTasks.length === 2, "# of Gulp tasks should be 2");
-        //
-        // Reset
-        //
-        await executeSettingsUpdate("useGulp", false, testControl.waitTime.configEventFast);
-        await teApi.waitForIdle(testControl.waitTime.min);
-        ++successCount;
-    });
-
-
-    test("Turn VSCode Gulp Provider On", async function()
-    {
-        expect(successCount).to.be.equal(11, "rolling success count failure");
         this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
-        await configuration.updateVs("gulp.autoDetect", "on");
+        await configuration.updateVs("grunt.autoDetect", "on");
         await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
@@ -214,12 +181,11 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Turn on VSCode Gulp Provider Off", async function()
+    test("Turn on VSCode Grunt Provider Off", async function()
     {
-        expect(successCount).to.be.equal(12);
-        this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand +
-                  testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
-        await configuration.updateVs("gulp.autoDetect", "off");
+        expect(successCount).to.be.equal(11);
+        this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
+        await configuration.updateVs("grunt.autoDetect", "off");
         await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);

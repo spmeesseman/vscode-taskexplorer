@@ -21,9 +21,9 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
     // We have our own provider for Gulp and Grunt tasks...
     // Ignore VSCode provided gulp and grunt tasks, which are always and only from a gulp/gruntfile
     // in a workspace folder root directory.  All internally provided tasks will have the 'uri' property
-    // set in its task definition,VSCode provided Grunt/Gulp tasks will not
+    // set in its task definition, VSCode provided Grunt/Gulp tasks will not
     //
-    if (!task.definition.uri && (task.source === "gulp" || task.source === "grunt"))
+    if (!task.definition.uri && (task.source === "grunt" || task.source === "gulp"))
     {
         log.write(`   skipping vscode provided ${task.source} task`, 4, logPad, logQueueId);
         return false;

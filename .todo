@@ -36,6 +36,9 @@ General Todos:
     
     ☐ Clean up interface file names
         Remove trailing 'Api' from most except main TaskExplorerApi.  Just I[ClassName] I want now.
+    
+    ☐ add info box maybe monthly nag if grunt/gulp tasks VSCode provider(s) are 'on'
+        Provide Yes/No to disable
 
 Tests:
 
