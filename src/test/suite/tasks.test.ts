@@ -55,13 +55,13 @@ suite("Task Tests", () =>
     {
         expect(successCount).to.be.equal(1, "rolling success count failure");
         this.slow(testControl.slowTime.getTreeTasks * 4);
-        bash = await treeUtils.getTreeTasks("bash", 1);
+        bash = await treeUtils.getTreeTasks("bash", 1, true);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
-        batch = await treeUtils.getTreeTasks("batch", 2);
+        batch = await treeUtils.getTreeTasks("batch", 2, false);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
-        ant = await treeUtils.getTreeTasks("ant", 3);
+        ant = await treeUtils.getTreeTasks("ant", 3, false);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
-        python = await treeUtils.getTreeTasks("python", 2);
+        python = await treeUtils.getTreeTasks("python", 2, false);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
         ++successCount;
     });

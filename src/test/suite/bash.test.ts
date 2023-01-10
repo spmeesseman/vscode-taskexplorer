@@ -13,7 +13,7 @@ import { isObjectEmpty } from "../../lib/utils/utils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand2, getWsPath, testControl, treeUtils, verifyTaskCount,
-    waitForTaskExecution, logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs,
+    waitForTaskExecution, logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, focusExplorer,
 } from "../helper";
 
 const testsName = "bash";
@@ -148,7 +148,14 @@ suite("Bash Tests", () =>
 
 
 	// test("Focus Task Explorer View for Tree Population", async function()
-	// {
+	// {   //
+    //     // Got running scripts/tasks to work without activating the view (making it visible),
+    //     // but it's pointeless since it'll never happen in real every day use.  We're running
+    //     // a task, so activate the view, f it, I tried keeping the old way (when I didn't know
+    //     // how to programatically activate the view, or it didn't exist in the API years ago),
+    //     // but it's not worth the headache as it isn't 100% reliable, 1 in 25 tests are still
+    //     // randomly failing.
+    //     //
 	//     await focusExplorer(this);
 	// });
 
@@ -156,20 +163,20 @@ suite("Bash Tests", () =>
     //
     // To run this we'd need to focus the tree and I don't want to yet until the infoPage test suite
     //
-    test("Run Shell Script", async function()
-    {   //
-        // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
-        //
-        const taskMap = teApi.testsApi.explorer.getTaskMap();
-        if (isObjectEmpty(taskMap) || !wasVisible) {
-            this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript + testControl.slowTime.refreshCommand + testControl.slowTime.walkTaskTree);
-        }
-        else {
-            this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript);
-        }
-        const bash = await treeUtils.getTreeTasks("bash", startTaskCount);
-        const exec = await executeTeCommand2("run", [ bash[0] ], testControl.waitTime.runCommandMax) as TaskExecution | undefined;
-        await waitForTaskExecution(exec);
-    });
+    // test("Run Shell Script", async function()
+    // {   //
+    //     // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
+    //     //
+    //     const taskMap = teApi.testsApi.explorer.getTaskMap();
+    //     if (isObjectEmpty(taskMap) || !wasVisible) {
+    //         this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript + testControl.slowTime.refreshCommand + testControl.slowTime.walkTaskTree);
+    //     }
+    //     else {
+    //         this.slow(testControl.slowTime.getTreeTasks + testControl.slowTime.bashScript);
+    //     }
+    //     const bash = await treeUtils.getTreeTasks("bash", startTaskCount, false);
+    //     const exec = await executeTeCommand2("run", [ bash[0] ], testControl.waitTime.runCommandMin) as TaskExecution | undefined;
+    //     await waitForTaskExecution(exec);
+    // });
 
 });
