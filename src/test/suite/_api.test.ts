@@ -41,8 +41,9 @@ suite("API Init and Tests", () =>
 
     test("Enable SideBar View", async function()
     {
-        this.slow(testControl.slowTime.configRegisterExplorerEvent);
+        this.slow(testControl.slowTime.explorerViewStartup + testControl.waitTime.explorerViewStartup);
         await executeSettingsUpdate("enableSideBar", true);
+        await teApi.waitForIdle(testControl.waitTime.explorerViewStartup);
     });
 
 
@@ -60,23 +61,26 @@ suite("API Init and Tests", () =>
 
     test("Disable Explorer Views", async function()
     {
-        this.slow(testControl.slowTime.configRegisterExplorerEvent);
+        this.slow(testControl.slowTime.configRegisterExplorerEvent + testControl.waitTime.configRegisterExplorerEvent);
         await executeSettingsUpdate("enableExplorerView", false, testControl.waitTime.configEnableEvent);
+        await teApi.waitForIdle(testControl.waitTime.configRegisterExplorerEvent);
     });
 
 
     test("Disable SideBar View", async function()
     {
-        this.slow(testControl.slowTime.configRegisterExplorerEvent);
+        this.slow(testControl.slowTime.configRegisterExplorerEvent + testControl.waitTime.configRegisterExplorerEvent);
         await executeSettingsUpdate("enableSideBar", false, testControl.waitTime.configEnableEvent);
+        await teApi.waitForIdle(testControl.waitTime.configRegisterExplorerEvent);
     });
 
 
     test("Re-enable Explorer View", async function()
     {
-        this.slow(testControl.slowTime.configRegisterExplorerEvent);
+        this.slow(testControl.slowTime.configRegisterExplorerEvent + testControl.waitTime.configRegisterExplorerEvent);
         await executeSettingsUpdate("enableExplorerView", true, testControl.waitTime.configEnableEvent);
         setExplorer(teApi.explorer as IExplorerApi);
+        await teApi.waitForIdle(testControl.waitTime.configRegisterExplorerEvent);
     });
 
 

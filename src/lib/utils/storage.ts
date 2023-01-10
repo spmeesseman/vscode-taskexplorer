@@ -39,6 +39,8 @@ class Storage
         return this.storage.get<T>(key);
     }
 
+
+    // update = (key: string, value: any) => this.storage.update(key, value);
     public async update(key: string, value: any)
     {
         await this.storage.update(key, value);

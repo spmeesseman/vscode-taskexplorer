@@ -7,7 +7,6 @@ import TaskFolder from "./folder";
 import { isString, removeFromArray } from "../lib/utils/utils";
 import { configuration } from "../lib/utils/configuration";
 import { storage } from "../lib/utils/storage";
-import { TaskTreeDataProvider } from "./tree";
 import { commands, ConfigurationChangeEvent, Disposable, ExtensionContext, InputBoxOptions, ThemeIcon, TreeItem, TreeItemCollapsibleState, window, workspace } from "vscode";
 import { IExplorerApi } from "../interface";
 
@@ -120,47 +119,41 @@ export default class SpecialTaskFolder extends TaskFolder
     async addRemoveRenamedLabel(taskItem: TaskItem)
     {
         let removed = false,
-            addRemoved = false,
-            index = 0;
+            addRemoved = false;
         const renames = storage.get<string[][]>(constants.TASKS_RENAME_STORE, []),
               id = this.getTaskItemId(taskItem);
 
         log.methodStart("add/remove rename special", 1, "", false, [[ "id", id ]]);
 
-        for (const i in renames)
-        {   /* istanbul ignore else */
-            if ([].hasOwnProperty.call(renames, i))
+        renames.slice().reverse().forEach((item, index, object) =>
+        {
+            if (id === item[0] && !removed)
             {
-                if (id === renames[i][0])
-                {
-                    addRemoved = true;
-                    removed = true;
-                    renames.splice(index, 1);
-                    break;
-                }
-                ++index;
+                addRemoved = true;
+                removed = true;
+                renames.splice(object.length - 1 - index, 1);
             }
-        }
+        });
 
         if (!addRemoved)
         {
             const opts: InputBoxOptions = { prompt: "Enter favorites label" };
-            await window.showInputBox(opts).then(async (str) =>
+            const str = await window.showInputBox(opts);
+            if (str !== undefined)
             {
-                if (str !== undefined)
-                {
-                    addRemoved = true;
-                    renames.push([ id, str ]);
-                }
-            });
+                addRemoved = true;
+                renames.push([ id, str ]);
+            }
         }
 
         //
         // Update
         //
-        if (addRemoved) {
+        if (addRemoved)
+        {
             await storage.update(constants.TASKS_RENAME_STORE, renames);
-            await this.refresh(true, "   ");
+            // await this.refresh(true, "   ");
+            this.explorer.fireTreeRefreshEvent(this, "   ", 1);
         }
 
         log.methodDone("add/remove rename special", 1);

@@ -11,6 +11,7 @@ import constants from "../lib/constants";
 import { deleteFile, pathExists } from "../lib/utils/fs";
 import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
+import { storage } from "../lib/utils/storage";
 
 let activated = false;
 let timeStarted: number;
@@ -93,6 +94,15 @@ export async function activate(instance?: any)
         if (!teApi.explorer) {
             assert.fail(`    ${figures.color.error} Explorer instance does not exist`);
         }
+        //
+        // Set persistent store names for tests so they don't f with my real stuff
+        //
+        constants.LAST_TASKS_STORE = "lastTasksTests";
+        constants.FAV_TASKS_STORE = "favoriteTasksTests";
+        constants.TASKS_RENAME_STORE = "RenamesTests";
+        await storage.update(constants.FAV_TASKS_STORE, []);
+        await storage.update(constants.LAST_TASKS_STORE, []);
+        await storage.update(constants.TASKS_RENAME_STORE, []);
         //
         // _api pre-test suite will reset after disable/enable
         //

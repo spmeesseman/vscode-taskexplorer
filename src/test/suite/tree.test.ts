@@ -14,13 +14,12 @@ import {
 } from "../helper";
 import SpecialTaskFolder from "../../tree/specialFolder";
 
-
 let teApi: ITaskExplorerApi;
 let explorer: IExplorerApi;
-let favTasks: string[];
-let lastTasks: string[];
 let ant: ITaskItemApi[];
+let bash: ITaskItemApi[];
 let batch: ITaskItemApi[];
+let python: ITaskItemApi[];
 let cstItem1: TaskItem | undefined;
 let cstItem2: TaskItem | undefined;
 let cstItem3: TaskItem | undefined;
@@ -36,15 +35,11 @@ suite("Tree Tests", () =>
     {
         teApi = await activate(this);
         explorer = teApi.testsApi.explorer;
-        favTasks = storage.get<string[]>(constants.FAV_TASKS_STORE, []);
-        lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
     });
 
 
     suiteTeardown(async function()
     {
-        await storage.update(constants.FAV_TASKS_STORE, favTasks);
-        await storage.update(constants.LAST_TASKS_STORE, lastTasks);
     });
 
 
@@ -63,14 +58,15 @@ suite("Tree Tests", () =>
 
     test("Show Favorites", async function()
     {
+        this.slow((testControl.slowTime.configEvent * 2) + (testControl.waitTime.configEvent * 2) + (testControl.slowTime.getTreeTasks * 4) + testControl.slowTime.storageUpdate);
         ant = await treeUtils.getTreeTasks("ant", 3);
-        batch = await treeUtils.getTreeTasks("batch", 2);
-        if (favTasks.length === 0)
-        {
-            await storage.update(constants.FAV_TASKS_STORE, [
-                getSpecialTaskItemId(batch[0]), getSpecialTaskItemId(batch[1]), getSpecialTaskItemId(ant[0])
-            ]);
-        }
+        bash = await treeUtils.getTreeTasks("bash", 1);
+        batch = await treeUtils.getTreeTasks("batch", 2)
+        python = await treeUtils.getTreeTasks("python", 2);
+        await storage.update(constants.FAV_TASKS_STORE, [
+            getSpecialTaskItemId(batch[0]), getSpecialTaskItemId(batch[1]), getSpecialTaskItemId(ant[0]),
+            getSpecialTaskItemId(bash[0]), getSpecialTaskItemId(python[0]), getSpecialTaskItemId(python[1])
+        ]);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
     });
@@ -78,22 +74,21 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
+        this.slow((testControl.slowTime.configEvent * 2) + (testControl.waitTime.configEvent * 2) + (testControl.slowTime.getTreeTasks * 2));
         ant = await treeUtils.getTreeTasks("ant", 3);
         batch = await treeUtils.getTreeTasks("batch", 2);
-        if (lastTasks.length === 0)
-        {
-            await storage.update(constants.LAST_TASKS_STORE, [
-                getSpecialTaskItemId(batch[0]), getSpecialTaskItemId(batch[1]), getSpecialTaskItemId(ant[0])
-            ]);
-        }
-        await executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await executeSettingsUpdate("specialFolders.showLastTasks", true);
+        await storage.update(constants.LAST_TASKS_STORE, [
+            getSpecialTaskItemId(batch[0]), getSpecialTaskItemId(batch[1]), getSpecialTaskItemId(ant[0]),
+            getSpecialTaskItemId(bash[0]), getSpecialTaskItemId(python[0]), getSpecialTaskItemId(python[1])
+        ]);
+        await executeSettingsUpdate("specialFolders.showLastTasks", false, testControl.waitTime.configEvent);
+        await executeSettingsUpdate("specialFolders.showLastTasks", true, testControl.waitTime.configEvent);
     });
 
 
     test("Add to Favorites", async function()
     {
-        this.slow(testControl.slowTime.command * 4);
+        this.slow(testControl.slowTime.command * 12);
         let removed = await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         if (removed) {
             await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
@@ -102,14 +97,22 @@ suite("Tree Tests", () =>
         if (removed) {
             await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
         }
-    });
-
-
-    test("Remove from Favorites", async function()
-    {
-        this.slow(testControl.slowTime.command * 2);
-        await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
-        await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
+        removed = await executeTeCommand2("addRemoveFavorite", [ ant[0] ]);
+        if (removed) {
+            await executeTeCommand2("addRemoveFavorite", [ ant[0] ]);
+        }
+        removed = await executeTeCommand2("addRemoveFavorite", [ bash[0] ]);
+        if (removed) {
+            await executeTeCommand2("addRemoveFavorite", [ bash[0] ]);
+        }
+        removed = await executeTeCommand2("addRemoveFavorite", [ python[0] ]);
+        if (removed) {
+            await executeTeCommand2("addRemoveFavorite", [ python[0] ]);
+        }
+        removed = await executeTeCommand2("addRemoveFavorite", [ python[1] ]);
+        if (removed) {
+            await executeTeCommand2("addRemoveFavorite", [ python[1] ]);
+        }
     });
 
 
@@ -147,7 +150,7 @@ suite("Tree Tests", () =>
                             (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
-                const cstItem2 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[0].id);
+                cstItem2 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[1].id);
                 if (cstItem2)
                 {
                     overrideNextShowInputBox("Label 2");
@@ -171,7 +174,7 @@ suite("Tree Tests", () =>
                             (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
-                const cstItem3 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[1].id);
+                cstItem3 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === bash[0].id);
                 if (cstItem3)
                 {
                     overrideNextShowInputBox("Label 3");
@@ -195,7 +198,7 @@ suite("Tree Tests", () =>
                             (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
-                const cstItem4 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[1].id);
+                cstItem4 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === python[0].id);
                 if (cstItem4)
                 {
                     overrideNextShowInputBox("Label 4");
@@ -219,7 +222,7 @@ suite("Tree Tests", () =>
                             (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
-                const cstItem5 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === ant[0].id);
+                cstItem5 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === python[1].id);
                 if (cstItem5)
                 {
                     overrideNextShowInputBox("Label 5");
@@ -243,7 +246,7 @@ suite("Tree Tests", () =>
                             (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
-                const cstItem6 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === ant[0].id);
+                cstItem6 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === ant[0].id);
                 if (cstItem6)
                 {
                     overrideNextShowInputBox("Label 6");
@@ -316,6 +319,15 @@ suite("Tree Tests", () =>
         this.slow(testControl.slowTime.command);
         overrideNextShowInputBox(undefined);
         await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
+    });
+
+
+    test("Remove from Favorites", async function()
+    {
+        this.slow(testControl.slowTime.command * 3);
+        await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
+        await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
+        await executeTeCommand2("addRemoveFavorite", [ ant[0] ]);
     });
 
 

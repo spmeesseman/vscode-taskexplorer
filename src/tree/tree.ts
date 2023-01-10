@@ -77,19 +77,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.disposables.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => this.run(item, true, false), this));
         this.disposables.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args: string) => this.run(item, false, true, args), this));
         this.disposables.push(commands.registerCommand(name + ".runLastTask",  async () => this.runLastTask(), this));
-        this.disposables.push(commands.registerCommand(name + ".stop", async (item: TaskItem) => { await this.stop(item); }, this));
-        this.disposables.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => { await this.restart(item); }, this));
-        this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => { this.pause(item); }, this));
-        this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick?: boolean) => { await this.open(item, itemClick); }, this));
-        this.disposables.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => { this.openTerminal(item); }, this));
+        this.disposables.push(commands.registerCommand(name + ".stop", async (item: TaskItem) => this.stop(item), this));
+        this.disposables.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => this.restart(item), this));
+        this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => this.pause(item), this));
+        this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick?: boolean) => this.open(item, itemClick), this));
+        this.disposables.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => this.openTerminal(item), this));
         this.disposables.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
         this.disposables.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "install"), this));
         this.disposables.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update"), this));
         this.disposables.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update <packagename>"), this));
         this.disposables.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit"), this));
         this.disposables.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit fix"), this));
-        this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem | string) => { await this.addToExcludes(taskFile); }, this));
-        this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", async(taskItem: TaskItem) => { await this.addRemoveSpecialTaskLabel(taskItem); }, this));
+        this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem | string) => this.addToExcludes(taskFile), this));
+        this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this));
 
         context.subscriptions.push(...this.disposables);
         this.subscriptionStartIndex = context.subscriptions.length - (this.disposables.length + 1);
@@ -128,7 +128,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         {
             const folderName = util.lowerCaseFirstChar(taskItem.folder.label as string, true) as "favorites"|"lastTasks";
             // await this.specialFolders[folderName].clearSavedTasks(); // don't know why i had this here, leaving commented for now
-            await this.specialFolders[folderName].addRemoveRenamedLabel(taskItem);
+            return this.specialFolders[folderName].addRemoveRenamedLabel(taskItem);
         }
     }
 

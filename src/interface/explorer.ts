@@ -10,7 +10,7 @@ export interface IExplorerApi
 {
     buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<ITaskFolderApi[] | TreeItem[]>;
     dispose(context: ExtensionContext): void;
-    fireTreeRefreshEvent(taskItem?: TreeItem, logPad?: string, logLevel?: number): void;
+    fireTreeRefreshEvent(taskFile?: TreeItem, logPad?: string, logLevel?: number): void;
     getChildren(element?: TreeItem): Promise<TreeItem[]>;
     getName(): string;
     getTasks(): Task[] | null;
