@@ -2,7 +2,6 @@
 import log from "./utils/log";
 import { visit, JSONVisitor } from "jsonc-parser";
 import { TextDocument } from "vscode";
-import { getTaskName } from "./getTaskName";
 import TaskItem from "../tree/item";
 import { providers, providersExternal } from "../extension";
 import { isWatchTask } from "./utils/utils";
@@ -60,9 +59,8 @@ const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): num
             }
             else if (inScripts && taskItem)
             {
-                const label = getTaskName(property, taskItem.task.definition.path);
-                log.value("   check object property", label, 4, "   ");
-                if (taskItem.task.name === label)
+                log.value("   check object property", property, 4, "   ");
+                if (taskItem.task.name === property || taskItem.task.name.startsWith(property + " - "))
                 {
                     scriptOffset = offset;
                 }

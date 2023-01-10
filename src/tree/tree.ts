@@ -360,12 +360,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             return;
         }
 
-        const isNpmInstallTask = include === "npm-install";
-        if (typeof include === "string" && !isNpmInstallTask) { // TSC tasks may have had their rel. pathchanged
-            relativePath = include;
-            log.value(logPad + "   set relative path", relativePath, 2);
-        }
-
         //
         // Set scope name and create the TaskFolder, a "user" task will have a TaskScope scope, not
         // a WorkspaceFolder scope.
@@ -416,6 +410,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         // found, but in doing so, if there were no npm "scripts" in the package.json, code execution
         // would not get far enough to create the "tree file" node for the context menu.
         //
+        const isNpmInstallTask = each.source === "npm" && each.name === "install" || each.name.startsWith("install - ");
         if (!isNpmInstallTask)
         {   //
             // Create "tree item" node and add it to the owner "tree file" node
@@ -1323,7 +1318,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         //
         log.methodStart("visibility event received", this.defaultGetChildrenLogLevel, this.getChildrenLogPad, true, [[ "is visible", visible ]]);
         this.visible = visible;
-        log.methodStart("visibility event received", this.defaultGetChildrenLogLevel, this.getChildrenLogPad);
+        log.methodDone("visibility event received", this.defaultGetChildrenLogLevel, this.getChildrenLogPad);
         log.blank(this.defaultGetChildrenLogLevel);
     }
 
