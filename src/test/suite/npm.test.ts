@@ -60,7 +60,7 @@ suite("NPM Tests", () =>
     {
         expect(successCount).to.be.equal(2);
         this.slow(testControl.slowTime.fsCreateEvent);
-        tagLog("NPM", "Create Package File (1: package.json)");
+        // tagLog("NPM", "Create Package File (1: package.json)");
         //
         // Create NPM package.json
         //
@@ -78,9 +78,9 @@ suite("NPM Tests", () =>
             "    }\r\n" +
             "}\r\n"
         );
-        tagLog("NPM", "Create Package File (2: package.json)");
+        // tagLog("NPM", "Create Package File (2: package.json)");
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
-        tagLog("NPM", "Create Package File (3: package.json)");
+        // tagLog("NPM", "Create Package File (3: package.json)");
         ++successCount;
     });
 
@@ -88,8 +88,9 @@ suite("NPM Tests", () =>
     test("Verify NPM Task Count", async function()
     {
         expect(successCount).to.be.equal(3);
-        this.slow(testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.verifyTaskCount * 3); // NPM getTasks just takes longer???
         await verifyTaskCount(testsName, 5);
+        await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -97,16 +98,17 @@ suite("NPM Tests", () =>
     test("Get NPM Task Items", async function()
     {
         expect(successCount).to.be.equal(4);
-        tagLog("NPM", "Get NPM Task Items [Start]");
+        this.slow(testControl.slowTime.getTreeTasks * 3); // NPM getTasks just takes longer???
+        // tagLog("NPM", "Get NPM Task Items [Start]");
         //
         // Get the explorer tree task items (three less task than above, one of them tree
         // does not display the 'install' task with the other tasks found, and two of them
         // are the 'build' and 'watch' tasks are registered in tasks.json and will show in
         // the tree under the VSCode tasks node, not the npm node)
         //
-        tagLog("NPM", "Get NPM Task Items [DoWorkSon]");
+        // tagLog("NPM", "Get NPM Task Items [DoWorkSon]");
         npmTaskItems = await treeUtils.getTreeTasks(testsName, 2) as TaskItem[];
-        tagLog("NPM", "Get NPM Task Items [Complete]");
+        // tagLog("NPM", "Get NPM Task Items [Complete]");
         ++successCount;
     });
 

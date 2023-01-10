@@ -15,7 +15,6 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
 
     if (enabled)
     {
-        /* istanbul ignore else */
         if (!view)
         {
             const treeDataProvider = new TaskTreeDataProvider(name, context, teApi.isTests()),
@@ -47,13 +46,13 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
     {
         if (view)
         {
+            /* istanbul ignore else */
             if (name === "taskExplorer" && teApi.explorer)
             {
                 teApi.explorer.dispose(context);
                 teApi.explorer = undefined;
                 teApi.explorerView = undefined;
             }
-            /* istanbul ignore else */
             else if (teApi.sidebar) // name === "taskExplorerSideBar"
             {
                 teApi.sidebar.dispose(context);
