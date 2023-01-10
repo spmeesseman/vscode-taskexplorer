@@ -19,8 +19,8 @@ let teApi: ITaskExplorerApi;
 let teExplorer: IExplorerApi;
 const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
-const overridesShowInputBox: any[] = [];
-const overridesShowInfoBox: any[] = [];
+let overridesShowInputBox: any[] = [];
+let overridesShowInfoBox: any[] = [];
 
 export { figures };
 export { testControl };
@@ -420,9 +420,21 @@ export function overrideNextShowInputBox(value: any)
 }
 
 
+export function clearOverrideShowInputBox()
+{
+    overridesShowInputBox = [];
+}
+
+
 export function overrideNextShowInfoBox(value: any)
 {
     overridesShowInfoBox.push(value);
+}
+
+
+export function clearOverrideShowInfoBox()
+{
+    overridesShowInfoBox = [];
 }
 
 

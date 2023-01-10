@@ -170,7 +170,6 @@ export default class SpecialTaskFolder extends TaskFolder
             this.collapsibleState =  nodeExpandedeMap.lastTasks !== false ?
                                      TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
         }
-
         //
         // The 'Favorites' folder will be 2nd in the tree (or 1st if configured to hide
         // the 'Last Tasks' folder)
@@ -188,27 +187,20 @@ export default class SpecialTaskFolder extends TaskFolder
      *
      * @param folder The TaskFolder representing either the "Last Tasks" or the "Favorites" folders.
      *
-     * @since v2.0.0
+     * @since 2.0.0
      */
     async clearSavedTasks()
     {
         const choice = await window.showInformationMessage(`Clear all tasks from the \`${this.label}\` folder?`, "Yes", "No");
-        //
-        // TODO - Tests for clearSavedTasks()
-        //
-        // Can't do it until the workspace name or id or something is saved on the saved task.
-        // Otherwise it'll clear all my saved tasks in my real workspaces, as it is now.
-        //
-        /* istanbul ignore if */
         if (choice === "Yes")
         {
             this.taskFiles = [];
-            if (this.label === constants.FAV_TASKS_LABEL) {
+            if (this.isFavorites) {
                 this.store = [];
                 await storage.update(constants.FAV_TASKS_STORE, this.store);
                 await this.refresh(true);
             }
-            else if (this.label === constants.LAST_TASKS_LABEL) {
+            else {
                 await storage.update(constants.LAST_TASKS_STORE, this.store);
                 await this.refresh(true);
             }
@@ -315,6 +307,7 @@ export default class SpecialTaskFolder extends TaskFolder
     {
         if (e.affectsConfiguration("taskExplorer." + this.settingNameEnabled))
         {
+            this.store = storage.get<string[]>(this.storeName, []);
             this.enabled = configuration.get<boolean>(this.settingNameEnabled);
             this.refresh(this.enabled);
         }

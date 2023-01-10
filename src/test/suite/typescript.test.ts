@@ -86,7 +86,9 @@ suite("Typescript Tests", () =>
 
 
     test("Document Position", async function()
-    {   //
+    {
+        this.slow(testControl.slowTime.getTreeTasks + (testControl.slowTime.command * 2));
+        //
         // Typescript 'open' just opens the document, doesnt find the task position
         //
         const tscItems = await treeUtils.getTreeTasks("tsc", startTaskCount + 2);

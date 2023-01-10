@@ -127,7 +127,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         if (taskItem.folder)
         {
             const folderName = util.lowerCaseFirstChar(taskItem.folder.label as string, true) as "favorites"|"lastTasks";
-            // await this.specialFolders[folderName].clearSavedTasks(); // don't know why i had this here, leaving commented for now
             return this.specialFolders[folderName].addRemoveRenamedLabel(taskItem);
         }
     }

@@ -82,7 +82,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     }
 
     //
-    // User Tasks
+    // User Tasks / specialFolders.showUserTasks
+    // Other specialFolder config events are process in tree/folderCache module
     //
     if (e.affectsConfiguration("taskExplorer.specialFolders.showUserTasks"))
     {

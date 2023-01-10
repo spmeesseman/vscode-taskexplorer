@@ -24,16 +24,17 @@ export const buildTree = async(instance: any) =>
     if (!treeBuiltOnce)
     {
         const teApi = getTeApi();
-        instance.slow(testControl.slowTime.buildTree);
-        instance.timeout(testControl.slowTime.buildTree + 10000);
+        instance.slow(testControl.slowTime.buildTree + testControl.waitTime.buildTree + (testControl.slowTime.configGroupingEvent * 2) + (testControl.waitTime.min * 2));
+        instance.timeout(testControl.slowTime.buildTree + testControl.waitTime.max);
         await executeSettingsUpdate("groupWithSeparator", true);
         await executeSettingsUpdate("groupMaxLevel", 5);
+        await teApi.waitForIdle(testControl.waitTime.min);
         //
         // A special refresh() for test suite, will open all task files and open to position
         //
         await teApi.testsApi.explorer.refresh("tests");
         await teApi.waitForIdle(testControl.waitTime.buildTree);
-        await teApi.waitForIdle(50);
+        await teApi.waitForIdle(testControl.waitTime.min);
     }
     treeBuiltOnce = true;
 };

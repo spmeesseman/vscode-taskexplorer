@@ -120,11 +120,11 @@ export const createDir = (dir: string): Promise<void> =>
             const baseDir = path.dirname(dir);
             if (!(await pathExists(baseDir)))
             {
-                try { await createDir(baseDir); } catch (e){ reject(e); return; };
+                try { await createDir(baseDir); } catch (e){ /* istanbul ignore next */reject(e); return; };
             }
             fs.mkdir(path.resolve(cwd, dir), { mode: 0o777 }, (err) =>
             {
-                // istanbul ignore if //
+                /* istanbul ignore if */
                 if (err) {
                     reject(err);
                 }
@@ -146,6 +146,7 @@ export const deleteDir = (dir: string): Promise<void> =>
         {
             fs.rmdir(path.resolve(cwd, dir), { recursive: true }, (e) =>
             {
+                /* istanbul ignore if */
                 if (e) {
                     reject(e);
                 }
@@ -167,6 +168,7 @@ export const deleteFile = (file: string): Promise<void> =>
         {
             fs.unlink(path.resolve(cwd, file), (e) =>
             {
+                /* istanbul ignore if */
                 if (e) {
                     reject(e);
                 }
@@ -210,7 +212,8 @@ export const getDateModified = (file: string) =>
         if (await pathExists(file))
         {
             fs.stat(path.resolve(cwd, file), { bigint: true }, (e, stats) =>
-            {   /* istanbul ignore else */
+            {
+                /* istanbul ignore else */
                 if (e) {
                     reject(e);
                 }
@@ -235,7 +238,8 @@ export const numFilesInDirectory = (dirPath: string): Promise<number> =>
         if (dirPath && fs.existsSync(dirPath))
         {
             fs.readdir(dirPath, (err, files) =>
-            {   /* istanbul ignore else */
+            {
+                /* istanbul ignore else */
                 if (!err) {
                     resolve(files.length);
                 }

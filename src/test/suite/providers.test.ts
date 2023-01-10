@@ -525,9 +525,9 @@ suite("Provider Tests", () =>
 
     test("Run Refresh Task", async function()
     {
-        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.configEvent * 2) + testControl.waitTime.min);
+        this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.configEvent * 2) + testControl.waitTime.min + testControl.waitTime.refreshCommand);
         await executeSettingsUpdate("specialFolders.expanded.test-files", true);
-        await executeTeCommand("refresh");
+        await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
         await teApi.waitForIdle(testControl.waitTime.min);
     });
@@ -535,16 +535,16 @@ suite("Provider Tests", () =>
 
     test("Invalidate Bash Tasks With New Bash Shell Setting", async function()
     {
-        this.slow(testControl.slowTime.buildFileCache + (testControl.slowTime.configEvent * 2) + testControl.waitTime.min);
+        this.slow(testControl.slowTime.buildFileCache + (testControl.slowTime.configEvent * 2) + testControl.waitTime.min + (testControl.waitTime.configEvent * 2));
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         await teApi.config.updateVsWs("terminal.integrated.shell.windows",
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
-        await teApi.waitForIdle(testControl.waitTime.configEvent, 1000);
+        await teApi.waitForIdle(testControl.waitTime.configEvent);
         await teApi.testsApi.fileCache.buildCache("bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
         await teApi.waitForIdle(testControl.waitTime.min);
-        await executeSettingsUpdate("specialFolders.expanded.test-files", false);
+        await executeSettingsUpdate("specialFolders.expanded.test-files", false, testControl.waitTime.configEvent);
     });
 
 
@@ -573,7 +573,7 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes After Grouping", async function()
     {
-        this.slow(testControl.slowTime.configExcludesEvent + testControl.slowTime.configGlobEvent + (testControl.slowTime.fetchTasksCommand * 2));
+        this.slow(testControl.slowTime.configExcludesEvent + testControl.slowTime.configGlobEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.waitTime.min);
         const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItemsB4.length;
         for (const taskItem of Object.values(taskMap))
@@ -604,220 +604,221 @@ suite("Provider Tests", () =>
     test("Cancel Rebuild Cache (Not Busy)", async function()
     {
         await teApi.testsApi.fileCache.cancelBuildCache();
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Busy No Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await teApi.testsApi.fileCache.cancelBuildCache();
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Busy 40ms Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 40 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 40 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(40);
         await teApi.testsApi.fileCache.cancelBuildCache();
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Busy 75ms Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 75 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 75 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(75);
         await teApi.testsApi.fileCache.cancelBuildCache();
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Busy 100ms Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 100 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 100 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Busy 250ms Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 250 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 250 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(250);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Busy 500ms Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 500 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 500 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(500);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Busy 750ms Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 750 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 750 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(750);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Busy 1s Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 1000 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 1000 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(1000);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Pending Build) (No Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Pending Build) (Busy 40s Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 40 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + (testControl.waitTime.min * 2));
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
-        await sleep(40);
+        await sleep(testControl.waitTime.min);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Pending Build) (Busy 75s Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 75 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 75 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(75);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Pending Build) (Busy 100s Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 100 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 100 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Pending Build) (Busy 250s Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 250 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 250 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(250);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Pending Build) (Busy 500s Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 500 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 500 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(500);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Rebuild Cache (Pending Build) (Busy 1s Delay)", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCacheCancel + 1000 + 25);
+        this.slow(testControl.slowTime.rebuildFileCacheCancel + 1000 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(1000);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Build Cache (FileWatcher Build) (No Delay)", async function()
     {
-        this.slow(testControl.slowTime.buildFileCacheCancel + 25);
+        this.slow(testControl.slowTime.buildFileCacheCancel + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildCache("gulp", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 40ms Delay)", async function()
     {
-        this.slow(testControl.slowTime.buildFileCacheCancel + 40 + 25);
+        this.slow(testControl.slowTime.buildFileCacheCancel + (testControl.waitTime.min * 2));
         teApi.testsApi.fileCache.buildCache("gulp", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
-        await sleep(40);
+        await sleep(testControl.waitTime.min);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 75ms Delay)", async function()
     {
-        this.slow(testControl.slowTime.buildFileCacheCancel + 75 + 25);
+        this.slow(testControl.slowTime.buildFileCacheCancel + 75 + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildCache("python", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await sleep(75);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 100ms Delay)", async function()
     {
-        this.slow(testControl.slowTime.buildFileCacheCancel + 100 + 25);
+        this.slow(testControl.slowTime.buildFileCacheCancel + 100 + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildCache("batch", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await sleep(100);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 250ms Delay)", async function()
     {
-        this.slow(testControl.slowTime.buildFileCacheCancel + 250 + 25);
+        this.slow(testControl.slowTime.buildFileCacheCancel + 250 + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildCache("bash", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await sleep(250);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 500ms Delay)", async function()
     {
-        this.slow(testControl.slowTime.buildFileCacheCancel + 500 + 25);
+        this.slow(testControl.slowTime.buildFileCacheCancel + 500 + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildCache("ant", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await sleep(500);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
@@ -827,25 +828,25 @@ suite("Provider Tests", () =>
         teApi.testsApi.fileCache.buildCache("npm", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await sleep(750);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 1s Delay)", async function()
     {
-        this.slow(testControl.slowTime.buildFileCacheCancel + 1000 + 25);
+        this.slow(testControl.slowTime.buildFileCacheCancel + 1000 + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildCache("grunt", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await sleep(1000);
         await teApi.testsApi.fileCache.cancelBuildCache("");
-        await sleep(25);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Rebuild Cache After Cancel", async function()
     {
-        this.slow(testControl.slowTime.rebuildFileCache + 25);
+        this.slow(testControl.slowTime.rebuildFileCache + testControl.waitTime.command);
         await teApi.testsApi.fileCache.rebuildCache();
-        await sleep(25);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 

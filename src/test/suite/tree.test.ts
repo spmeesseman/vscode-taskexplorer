@@ -9,8 +9,8 @@ import constants from "../../lib/constants";
 import { storage } from "../../lib/utils/storage";
 import TaskItem from "../../tree/item";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer,
-    getSpecialTaskItemId, overrideNextShowInputBox, testControl, treeUtils
+    activate, clearOverrideShowInfoBox, clearOverrideShowInputBox, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer,
+    getSpecialTaskItemId, overrideNextShowInfoBox, overrideNextShowInputBox, testControl, treeUtils
 } from "../helper";
 import SpecialTaskFolder from "../../tree/specialFolder";
 
@@ -58,10 +58,11 @@ suite("Tree Tests", () =>
 
     test("Show Favorites", async function()
     {
-        this.slow((testControl.slowTime.configSpecialFolderEvent * 2) + (testControl.waitTime.configEvent * 2) + (testControl.slowTime.getTreeTasks * 4) + testControl.slowTime.storageUpdate);
+        this.slow((testControl.slowTime.configSpecialFolderEvent * 2) + (testControl.waitTime.configEvent * 2) +
+                  (testControl.slowTime.getTreeTasks * 4) + testControl.slowTime.storageUpdate);
         ant = await treeUtils.getTreeTasks("ant", 3);
         bash = await treeUtils.getTreeTasks("bash", 1);
-        batch = await treeUtils.getTreeTasks("batch", 2)
+        batch = await treeUtils.getTreeTasks("batch", 2);
         python = await treeUtils.getTreeTasks("python", 2);
         await storage.update(constants.FAV_TASKS_STORE, [
             getSpecialTaskItemId(batch[0]), getSpecialTaskItemId(batch[1]), getSpecialTaskItemId(ant[0]),
@@ -69,6 +70,19 @@ suite("Tree Tests", () =>
         ]);
         await executeSettingsUpdate("specialFolders.showFavorites", false, testControl.waitTime.configEvent);
         await executeSettingsUpdate("specialFolders.showFavorites", true, testControl.waitTime.configEvent);
+    });
+
+
+    test("Remove from Favorites", async function()
+    {
+        this.slow((testControl.slowTime.command * 6) + testControl.waitTime.command);
+        await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
+        await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
+        await executeTeCommand2("addRemoveFavorite", [ ant[0] ]);
+        await executeTeCommand2("addRemoveFavorite", [ bash[0] ]);
+        await executeTeCommand2("addRemoveFavorite", [ python[0] ]);
+        await executeTeCommand2("addRemoveFavorite", [ python[1] ]);
+        await teApi.waitForIdle(testControl.waitTime.command);
     });
 
 
@@ -329,19 +343,21 @@ suite("Tree Tests", () =>
 
     test("Cancel Add Custom Label", async function()
     {;
-        this.slow(testControl.slowTime.command + testControl.waitTime.command);
+        this.slow((testControl.slowTime.command * 3) + (testControl.waitTime.command * 3));
         overrideNextShowInputBox(undefined);
         await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
         await teApi.waitForIdle(testControl.waitTime.command);
-    });
-
-
-    test("Remove from Favorites", async function()
-    {
-        this.slow((testControl.slowTime.command * 3) + testControl.waitTime.command);
-        await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
-        await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
-        await executeTeCommand2("addRemoveFavorite", [ ant[0] ]);
+        //
+        // There's come kind of timing issue I havent figured out yet, send a few to make sure we hit
+        //
+        clearOverrideShowInputBox();
+        overrideNextShowInputBox(undefined);
+        await executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
+        await teApi.waitForIdle(testControl.waitTime.command);
+        //
+        clearOverrideShowInputBox();
+        overrideNextShowInputBox(undefined);
+        await executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
         await teApi.waitForIdle(testControl.waitTime.command);
     });
 
@@ -434,16 +450,24 @@ suite("Tree Tests", () =>
 
     test("User tasks", async function()
     {
-        // const json = await readFileSync(".vscode/workspace.json");
+        // const json = await readFileSync(".vscode/workspace.json");fv
     });
 
 
     test("Clear Special Folders", async function()
     {
-        this.slow(testControl.slowTime.command * 3);
-        overrideNextShowInputBox("Yes");
+        clearOverrideShowInfoBox();
+        this.slow(testControl.slowTime.command * 4);
+        overrideNextShowInfoBox("No");
         await executeTeCommand("clearLastTasks");
-        overrideNextShowInputBox("Yes");
+        await teApi.waitForIdle(testControl.waitTime.command);
+        overrideNextShowInfoBox("No");
+        await executeTeCommand("clearFavorites");
+        await teApi.waitForIdle(testControl.waitTime.command);
+        overrideNextShowInfoBox("Yes");
+        await executeTeCommand("clearLastTasks");
+        await teApi.waitForIdle(testControl.waitTime.command);
+        overrideNextShowInfoBox("Yes");
         await executeTeCommand("clearFavorites");
         await teApi.waitForIdle(testControl.waitTime.command);
     });

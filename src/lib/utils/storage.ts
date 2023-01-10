@@ -31,6 +31,7 @@ class Storage
             // value, the VSCode memento does not return[]. It returns an empty string????
             // So perform a double check if the value is falsy.
             //
+            /* istanbul ignore if */
             if (!v) {
                 v = defaultValue;
             }
