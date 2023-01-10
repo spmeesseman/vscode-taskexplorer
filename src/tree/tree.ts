@@ -751,10 +751,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.refreshPending = true;
 
         //
-        // If this is just after activation, or the view getting enabled, setEnabled() will have been
-        // called, and the current displayed text in the view will be 'Scanning task files...'.  Reset
-        // the text 'Scanning task files...' to 'Building task tree...' for a nice status update, as
-        // the tree build can be a multi-second process as well depending on the size of the workspace
+        // If this is just after activation, or the view getting enabled, the current displayed text
+        // in the view will be 'Scanning task files...'.  Reset the text 'Scanning task files...' to
+        // 'Building task tree...' for a nice status update, as the tree build can be a multi-second
+        // process as well depending on the size of the workspace.
         //
         // Typically this.visible will be `true` if this function is called by the VSCode engine, but
         // our test suites will mimic tree loads calling this function directly, so we check the flag

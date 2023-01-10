@@ -27,7 +27,6 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
             {
                 view.onDidChangeVisibility(e => { treeDataProvider.onVisibilityChanged(e.visible); }, treeDataProvider);
                 context.subscriptions.push(view);
-                log.write("   Tree data provider registered'" + name + "'", 1, "   ");
             }
             if (name === "taskExplorer")
             {
@@ -41,6 +40,7 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
                 teApi.sidebar.setEnabled(!isActivation);
                 teApi.sidebarView = view;
             }
+            log.write("   Tree data provider '" + name + "' registered", 1, "   ");
         }
     }
     else
@@ -62,6 +62,7 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
             }
             views[name] = undefined;
             view.dispose();
+            log.write("   Tree data provider '" + name + "' un-registered", 1, "   ");
         }
     }
 

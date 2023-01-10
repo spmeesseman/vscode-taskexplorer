@@ -36,7 +36,6 @@ import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWat
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/fileWatcher";
 
 
-const isLicenseManagerActive = true;
 let licenseManager: ILicenseManager;
 let ready = false;
 let tests = false;
@@ -133,16 +132,16 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         api.explorer?.setEnabled(true);
         /* istanbul ignore next */
         api.sidebar?.setEnabled(true);
-        /* istanbul ignore else */
-        if (isLicenseManagerActive) {
-            await licenseManager.checkLicense("   ");
-        }
+        //
+        // Check license
+        //
+        await licenseManager.checkLicense("   ");
         //
         // Signal that first task load has completed
         //
         ready = true;
         //
-    }, 100, teApi);
+    }, 25, teApi);
 
     log.write("Task Explorer activated, tree construction pending");
 
