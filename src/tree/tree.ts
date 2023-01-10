@@ -759,7 +759,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         // Typically this.visible will be `true` if this function is called by the VSCode engine, but
         // our test suites will mimic tree loads calling this function directly, so we check the flag
         //
-        if (this.setEnableCalled && !this.taskTree && !element && this.visible)
+        if (this.setEnableCalled && !this.taskTree && !element) // && this.visible)
         {
             this.setEnableCalled = false;
             setTimeout(() => this._onDidChangeTreeData.fire(), 10);
@@ -1318,8 +1318,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
 
     public onVisibilityChanged(visible: boolean)
-    {
+    {   //
+        // VSCode engine calls getChildren() when the view changes to 'visible'
+        //
+        log.methodStart("visibility event received", this.defaultGetChildrenLogLevel, this.getChildrenLogPad, true, [[ "is visible", visible ]]);
         this.visible = visible;
+        log.methodStart("visibility event received", this.defaultGetChildrenLogLevel, this.getChildrenLogPad);
+        log.blank(this.defaultGetChildrenLogLevel);
     }
 
 
@@ -1503,12 +1508,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             this.taskMap = {};
         }
 
-        if (this.visible) {
+        if (this.visible) {// || (this.enabled && this.setEnableCalled === false)) {
             log.write("   fire tree data change event", 2, logPad);
             this._onDidChangeTreeData.fire();
         }
         else {
-            log.write("   view is not visible, delay firing data change event", 1, logPad);
+            log.write("   view is not visible or not initialized yet, delay firing data change event", 1, logPad);
             setTimeout(() => { this.refreshPending = false; }, 1);
         }
 
