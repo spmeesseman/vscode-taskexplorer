@@ -49,7 +49,7 @@ suite("NPM Tests", () =>
     });
 
 
-	test("Focus Task Explorer View for Tree Population", async function()
+	test("Activate Tree (Focus Explorer View)", async function()
 	{
         expect(successCount).to.be.equal(1);
         await focusExplorerView(this);

@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { GulpTaskProvider } from "../../providers/gulp";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, focusExplorerView, getWsPath, testControl, treeUtils, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand, focusExplorerView, getWsPath, sleep, testControl, treeUtils, verifyTaskCount } from "../helper";
 
 const testsName = "gulp";
 const startTaskCount = 17;
@@ -35,7 +35,11 @@ suite("Gulp Tests", () =>
     });
 
     suiteTeardown(async function()
-    {
+    {   //
+        // Reset both Grunt / Gulp VSCode internal task providers, which we enabled b4 extension
+        // activation in helper.test
+        //
+        await configuration.updateVs("grunt.autoDetect", testControl.vsCodeAutoDetectGrunt);
         await configuration.updateVs("gulp.autoDetect", testControl.vsCodeAutoDetectGulp);
     });
 
@@ -205,10 +209,9 @@ suite("Gulp Tests", () =>
     test("Turn VSCode Gulp Provider On", async function()
     {
         expect(successCount).to.be.equal(11, "rolling success count failure");
-        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
+        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 3000);
         await configuration.updateVs("gulp.autoDetect", "on");
-        await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
-        // await teApi.testsApi.fileCache.rebuildCache(""); // since the view isn't visible yet, mimic the file cache triggered build
+        await sleep(3000);
         await treeUtils.buildTree(this);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
@@ -216,21 +219,14 @@ suite("Gulp Tests", () =>
     });
 
 
-	test("Focus Task Explorer View for Tree Population", async function()
-	{
-		await focusExplorerView(this);
-	});
-
-
-    test("Turn on VSCode Gulp Provider Off", async function()
+    test("Turn VSCode Gulp Provider Off", async function()
     {
         expect(successCount).to.be.equal(12);
-        this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand +
-                  testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
+        this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 1500);
         await configuration.updateVs("gulp.autoDetect", "off");
-        await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
-        // await teApi.testsApi.fileCache.rebuildCache(""); // since the view isn't visible yet, mimic the file cache triggered build
-        await treeUtils.buildTree(this)
+        await sleep(1500);
+        // await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
+        await treeUtils.buildTree(this);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
     });

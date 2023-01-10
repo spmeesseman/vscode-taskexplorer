@@ -116,6 +116,8 @@ export const testControl =
         refreshTaskTypeCommand: 1000,
         removeWorkspaceFolder: 250,
         runCommandMin: 1000,
+        verifyTaskCountRetry: 150,
+        verifyTaskCountRetryInterval: 400,
         //
         // MAXIMUM WAIT TIMES
         //

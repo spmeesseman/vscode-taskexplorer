@@ -55,7 +55,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Focus Task Explorer View for Tree Population", async function()
+	test("Activate Tree (Focus Explorer View)", async function()
 	{
 		await focusExplorerView(this);
 	});

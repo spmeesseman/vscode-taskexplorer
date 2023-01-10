@@ -228,7 +228,6 @@ export const getDateModified = (file: string) =>
 };
 
 
-
 export const isDirectory = (dirPath: string) => fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory();
 
 

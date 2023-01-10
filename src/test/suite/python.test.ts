@@ -44,7 +44,7 @@ suite("Python Tests", () =>
         //
         pathToTaskProgram = teApi.config.get<string>("pathToPrograms." + testsName);
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
-        await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe");
+        await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe", testControl.waitTime.configEvent);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
     });
 
@@ -78,7 +78,7 @@ suite("Python Tests", () =>
     test("Start", async function()
     {
         this.slow(testControl.slowTime.verifyTaskCount);
-        await verifyTaskCount(testsName, startTaskCount);
+        await verifyTaskCount(testsName, startTaskCount, 3);
     });
 
 

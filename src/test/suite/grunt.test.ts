@@ -9,7 +9,7 @@ import { GruntTaskProvider } from "../../providers/grunt";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, getWsPath, testControl, treeUtils, verifyTaskCount
+    activate, executeSettingsUpdate, executeTeCommand, focusExplorerView, getWsPath, sleep, testControl, treeUtils, verifyTaskCount
 } from "../helper";
 
 const testsName = "grunt";
@@ -39,7 +39,6 @@ suite("Grunt Tests", () =>
 
     suiteTeardown(async function()
     {
-        await configuration.updateVs("grunt.autoDetect", testControl.vsCodeAutoDetectGrunt);
     });
 
 
@@ -175,10 +174,9 @@ suite("Grunt Tests", () =>
     test("Turn VSCode Grunt Provider On", async function()
     {
         expect(successCount).to.be.equal(10, "rolling success count failure");
-        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
+        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 3000);
         await configuration.updateVs("grunt.autoDetect", "on");
-        await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
-        // await teApi.testsApi.fileCache.rebuildCache(""); // since the view isn't visible yet, mimic the file cache triggered build
+        await sleep(3000);
         await treeUtils.buildTree(this);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
@@ -186,12 +184,24 @@ suite("Grunt Tests", () =>
     });
 
 
+    //
+    // *** FOCUS #1 ***   Moved up one suite from infoPage tests.
+    //
+    // Go ahead and focus the view.  Have done enough tests now with it not having received a visibility event yet.
+    // We need the visual loaded to scan VSCode provided and Grunt tasks and in the next suite Gulp tasks same thing.
+    //
+	test("Activate Tree (Focus Explorer View)", async function()
+	{
+		await focusExplorerView(this);
+	});
+
+
     test("Turn on VSCode Grunt Provider Off", async function()
     {
         expect(successCount).to.be.equal(11);
-        this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
+        this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 1500);
         await configuration.updateVs("grunt.autoDetect", "off");
-        await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
+        await sleep(1500);
         await treeUtils.buildTree(this);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);

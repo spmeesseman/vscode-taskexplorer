@@ -26,6 +26,8 @@ export const buildTree = async(instance: any, forceRebuild?: boolean) =>
         const teApi = getTeApi();
         instance.slow(testControl.slowTime.buildTree + testControl.waitTime.buildTree + (testControl.slowTime.configGroupingEvent * 2) + (testControl.waitTime.min * 2));
         instance.timeout(testControl.slowTime.buildTree + testControl.waitTime.max);
+        await executeSettingsUpdate("groupWithSeparator", true);
+        await executeSettingsUpdate("groupMaxLevel", 5);
         await teApi.waitForIdle(testControl.waitTime.min);
         //
         // A special refresh() for test suite, will open all task files and open to position
@@ -63,9 +65,8 @@ export const findIdInTaskMap = (id: string, taskMap: TaskMap) =>
 // }
 
 
-export const getTreeTasks = async(taskType: string, expectedCount: number, doTaskWalk = false) =>
+export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 {
-    let didTaskWalk = false;
     const teApi = getTeApi();
     const taskItems: ITaskItemApi[] = [];
 
@@ -81,12 +82,11 @@ export const getTreeTasks = async(taskType: string, expectedCount: number, doTas
 
         if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
-            if (retries === 0 && doTaskWalk) {
+            if (retries === 0) {
                 console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, fall back to walkTreeItems", figures.colors.grey)}`);
             }
-            if (retries % 10 === 0 && doTaskWalk)
+            if (retries % 10 === 0)
             {
-                didTaskWalk = true;
                 taskMap = await walkTreeItems(undefined);
             }
             if (!taskMap || isObjectEmpty(taskMap))
@@ -104,11 +104,7 @@ export const getTreeTasks = async(taskType: string, expectedCount: number, doTas
         return taskMap || {} as TaskMap;
     };
 
-    let taskMap = await _getTaskMap(0);
-    if (doTaskWalk && !didTaskWalk) {
-        taskMap = await walkTreeItems(undefined);
-    }
-
+    const taskMap = await _getTaskMap(0);
     const taskCount = taskMap ? findIdInTaskMap(`:${taskType}:`, taskMap) : 0;
     if (taskCount !== expectedCount)
     {

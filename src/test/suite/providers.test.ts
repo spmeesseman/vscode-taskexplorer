@@ -51,20 +51,20 @@ suite("Provider Tests", () =>
         // for full coverage.  The 'addExclude' command will add the setting globally though,
         // so add it to the workspace setting as well
         //
-        await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
-        await executeTeCommand2("addToExcludes", [ "**/tasks_test_ignore_/**" ]);
+        await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ], testControl.waitTime.configGlobEvent);
+        await executeTeCommand2("addToExcludes", [ "**/tasks_test_ignore_/**" ], testControl.waitTime.configGlobEvent);
 
     });
 
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate("logging.enable", testControl.logEnabled);
-        await executeSettingsUpdate("specialFolders.expanded.test-files", false);
-        await executeSettingsUpdate("enabledTasks.apppublisher", false); // off by default
-        await executeSettingsUpdate("enabledTasks.gradle", false);       // off by default
-        await executeSettingsUpdate("enabledTasks.maven", false);        // off by default
-        await executeSettingsUpdate("enabledTasks.pipenv", false);       // off by default
+        await executeSettingsUpdate("logging.enable", testControl.logEnabled, testControl.waitTime.configEvent);
+        await executeSettingsUpdate("specialFolders.expanded.test-files", false, testControl.waitTime.configEvent);
+        await executeSettingsUpdate("enabledTasks.apppublisher", false, testControl.waitTime.configEnableEvent); // off by default
+        await executeSettingsUpdate("enabledTasks.gradle", false, testControl.waitTime.configEnableEvent);       // off by default
+        await executeSettingsUpdate("enabledTasks.maven", false, testControl.waitTime.configEnableEvent);        // off by default
+        await executeSettingsUpdate("enabledTasks.pipenv", false, testControl.waitTime.configEnableEvent);       // off by default
     });
 
 
@@ -176,7 +176,7 @@ suite("Provider Tests", () =>
     });
 
 
-	test("Focus Task Explorer View for Tree Population", async function()
+	test("Activate Tree (Focus Explorer View)", async function()
 	{
         await focusExplorerView(this);
 	});

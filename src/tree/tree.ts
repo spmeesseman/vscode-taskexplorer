@@ -82,6 +82,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => this.pause(item), this));
         this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick?: boolean) => this.open(item, itemClick), this));
         this.disposables.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => this.openTerminal(item), this));
+        // this.disposables.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
         this.disposables.push(commands.registerCommand(name + ".refresh", async () => this.refresh(true, false), this));
         this.disposables.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "install"), this));
         this.disposables.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update"), this));
@@ -924,7 +925,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 log.write("   finished license manager restriction check", logLevel + 1, logPad);
                 //
                 // Build the entire task tree
-                // TODO - See notes above on the try/catch here
+                // TODO - See notes above on the try/catch here 12/21/22
+                // Note 1-10-23 - The sweet lil queue stopped being filled up in provider interfaces, and it
+                // might be because of this?  Need to learn what the try/catch is actually doing,
+                // thought I knew, maybe not
                 //
                 // try {
                     this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
@@ -960,9 +964,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             await licMgr.setTasks(this.tasks || /* istanbul ignore next */[], logPad + "   ");
         }
 
-        //
-        //  Un-set pretty muy importante flag(s)
-        //
         this.refreshPending = false;
         this.currentInvalidation = undefined;
         this.getChildrenLogPad = this.defaultGetChildrenLogPad;

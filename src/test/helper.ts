@@ -168,6 +168,10 @@ export async function cleanup()
         }
     } catch (e) { console.error(e); }
 
+    //
+    // Reset Grunt and Gulp VSCode internal task providers, which we enabled b4 extension activation.
+    // These get reset at the end of the Gulp suite's tests, but just in case we do it again here...
+    //
     console.log(`    ${figures.color.info} ${figures.withColor("Resetting modified global settings", figures.colors.grey)}`);
     await configuration.updateVs("grunt.autoDetect", testControl.vsCodeAutoDetectGrunt);
     await configuration.updateVs("gulp.autoDetect", testControl.vsCodeAutoDetectGulp);
@@ -267,11 +271,14 @@ async function initSettings()
 
 
     testControl.userLogLevel = configuration.get<number>("logging.level");
+    await configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
+    //
+    // Grunt / Gulp VSCode internal task providers. Gulp suite will disable when done.
+    //
     testControl.vsCodeAutoDetectGrunt = configuration.getVs<string>("grunt.autoDetect", "off");
     testControl.vsCodeAutoDetectGulp = configuration.getVs<string>("gulp.autoDetect", "off");
-    await configuration.updateVs("grunt.autoDetect", "off");
-    await configuration.updateVs("gulp.autoDetect", "off");
-    await configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
+    await configuration.updateVs("grunt.autoDetect", "on");
+    await configuration.updateVs("gulp.autoDetect", "on");
     //
     // Enable views, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
@@ -441,15 +448,24 @@ export function tagLog(test: string, suite: string)
     teApi.log.write("******************************************************************************************");
 }
 
-
-export async function verifyTaskCount(taskType: string, expectedCount: number)
+/**
+ * @param taskType Task type / source
+ * @param expectedCount Expected # of tasks
+ * @param retries Number of retries to make if expected count doesn'tmatch.  100ms sleep between each retry.
+ */
+export async function verifyTaskCount(taskType: string, expectedCount: number, retries = 0)
 {
     let tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
-    if (taskType === "Workspace") {
-        tTasks = tTasks.filter(t => t.source === "Workspace");
+    while (--retries >= 0 && tTasks.length !== expectedCount)
+    {
+        await sleep(testControl.waitTime.verifyTaskCountRetryInterval);
+        tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
+        if (taskType === "Workspace") {
+            tTasks = tTasks.filter(t => t.source === "Workspace");
+        }
     }
     try {
-        assert(tTasks && tTasks.length === expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
+        assert(tTasks.length === expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
     }
     catch (e) { throw e; }
 }

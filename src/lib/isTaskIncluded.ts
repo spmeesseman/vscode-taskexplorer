@@ -5,8 +5,8 @@ import log from "./utils/log";
 import { join } from "path";
 import { providersExternal } from "../extension";
 import { configuration } from "./utils/configuration";
-import { existsSync, readFileSync } from "fs";
 import { Task } from "vscode";
+import { pathExistsSync, readFileSync } from "./utils/fs";
 
 
 export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", logQueueId?: string): boolean | string =>
@@ -45,25 +45,24 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
     //
     // Check task excludes array
     //
-    const excludeTask = configuration.get<string[]>("excludeTask");
-    if (excludeTask && excludeTask.length > 0)
+    const excludeTask = configuration.get<string[]>("excludeTask", []),
+          fExcludeTasks = excludeTask.filter(et => !!et && util.isString(et) && et.length > 1);
+    for (const rgxPattern of fExcludeTasks)
     {
-
-        const fExcludeTasks = excludeTask.filter(et => !!et && util.isString(et) && et.length > 1);
-        for (const rgxPattern of fExcludeTasks)
+        if ((new RegExp(rgxPattern)).test(task.name))
         {
-            if ((new RegExp(rgxPattern)).test(task.name))
-            {
-                log.write("   skipping this task (by 'excludeTask' setting)", 4, logPad, logQueueId);
-                log.methodDone("Check task inclusion", 4, logPad, undefined, logQueueId);
-                return false;
-            }
+            log.write("   skipping this task (by 'excludeTask' setting)", 4, logPad, logQueueId);
+            log.methodDone("Check task inclusion", 4, logPad, undefined, logQueueId);
+            return false;
         }
     }
 
     //
     // External tasks registered via Task Explorer API
     //
+    // TODO - remove coverage ignore tags when external providers test suite can be done
+    //
+    /* istanbul ignore if */
     if (providersExternal.get(task.source)) {
         return !!task.definition && !!task.name && !!task.execution;
     }
@@ -82,7 +81,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
             //
             const tasksFile = join(task.scope.uri.fsPath, ".vscode", "tasks.json");
 		    /* istanbul ignore else */
-            if (existsSync(tasksFile))
+            if (pathExistsSync(tasksFile))
             {
                 try
                 {   const json = readFileSync(tasksFile).toString();
@@ -99,24 +98,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
         }
     }
 
-    //
-    // Check enabled and npm install task
-    // This will ignore tasks from other providers as well, unless it has registered
-    // as an external provider via Task Explorer API
-    //
-    const isNpmInstall = task.source === "npm" && task.name === "install" || task.name.startsWith("install - ");
-    log.value("   is npm install task", isNpmInstall, 4, logPad, logQueueId);
-    if (srcEnabled || !isScopeWsFolder || isNpmInstall)
-    {
-        log.write("   task is included", 4, logPad, logQueueId);
-        log.methodDone("Check task inclusion", 4, logPad, undefined, logQueueId);
-        return true;
-    }
-
-    /* istanbul ignore next */
-    log.write("   skipping this task", 4, logPad, logQueueId);
-    /* istanbul ignore next */
+    log.write("   task is included", 4, logPad, logQueueId);
     log.methodDone("Check task inclusion", 4, logPad, undefined, logQueueId);
-    /* istanbul ignore next */
-    return false;
+    return true;
 };

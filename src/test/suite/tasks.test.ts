@@ -45,7 +45,7 @@ suite("Task Tests", () =>
     });
 
 
-	test("Focus Task Explorer View for Tree Population", async function()
+	test("Activate Tree (Focus Explorer View)", async function()
 	{
         await focusExplorerView(this);
 	});
@@ -55,13 +55,13 @@ suite("Task Tests", () =>
     {
         expect(successCount).to.be.equal(1, "rolling success count failure");
         this.slow(testControl.slowTime.getTreeTasks * 4);
-        bash = await treeUtils.getTreeTasks("bash", 1, true);
+        bash = await treeUtils.getTreeTasks("bash", 1);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
-        batch = await treeUtils.getTreeTasks("batch", 2, false);
+        batch = await treeUtils.getTreeTasks("batch", 2);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
-        ant = await treeUtils.getTreeTasks("ant", 3, false);
+        ant = await treeUtils.getTreeTasks("ant", 3);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
-        python = await treeUtils.getTreeTasks("python", 2, false);
+        python = await treeUtils.getTreeTasks("python", 2);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
         ++successCount;
     });
