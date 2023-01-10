@@ -102,43 +102,43 @@ suite("Configuration / Settings Tests", () =>
 
     test("Ant Glob", async function()
     {
-        this.slow((testControl.slowTime.configEnableEvent * 2) + testControl.slowTime.configReadEvent);
+        this.slow((testControl.slowTime.configGlobEvent * 2) + testControl.slowTime.configReadEvent + testControl.waitTime.min);
         globPatterns = configuration.get<string[]>("globPatternsAnt");
         await configuration.updateWs("enabledTasks.ant", false);
         globPatterns.push("**/dummy.xml");
         await executeSettingsUpdate("globPatternsAnt", globPatterns, 50, 100);
-        await teApi.waitForIdle(20);
+        await teApi.waitForIdle(testControl.waitTime.min);
     });
 
 
     test("Ant Glob", async function()
     {
-        this.slow(testControl.slowTime.configEnableEvent * 2);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.configGlobEvent+ testControl.waitTime.min);
         await executeSettingsUpdate("enabledTasks.ant", true);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsAnt", globPatterns);
-        await teApi.waitForIdle(20);
+        await teApi.waitForIdle(testControl.waitTime.min);
     });
 
 
     test("Bash Glob", async function()
     {
-        this.slow((testControl.slowTime.configEnableEvent * 2) + testControl.slowTime.configReadEvent);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.configGlobEvent + testControl.slowTime.configReadEvent + testControl.waitTime.min);
         globPatterns = configuration.get<string[]>("globPatternsBash");
         await configuration.updateWs("enabledTasks.bash", false);
         globPatterns.push("**/extensionless/**");
         await executeSettingsUpdate("globPatternsBash", globPatterns);
-        await teApi.waitForIdle(20);
+        await teApi.waitForIdle(testControl.waitTime.min);
     });
 
 
     test("Bash Glob", async function()
     {
-        this.slow(testControl.slowTime.configEnableEvent * 2);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.configGlobEvent + testControl.waitTime.min);
         await executeSettingsUpdate("enabledTasks.bash", true);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsBash", globPatterns);
-        await teApi.waitForIdle(20);
+        await teApi.waitForIdle(testControl.waitTime.min);
     });
 
 
@@ -186,47 +186,47 @@ suite("Configuration / Settings Tests", () =>
 
     test("Change Default Shell - OSX", async function()
     {
-        this.slow(testControl.slowTime.configEvent + 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.osx", "/usr/bin/sh");
-        await sleep(50);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Change Default Shell - Linux", async function()
     {
-        this.slow(testControl.slowTime.configEvent + 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.linux", "/bin/sh");
-        await sleep(50);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Change Default Shell - Windows", async function()
     {
-        this.slow(testControl.slowTime.configEvent + 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
-        await sleep(50);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Reset Default Shell - OSX", async function()
     {
-        this.slow(testControl.slowTime.configEvent + 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.osx", shellOsx);
-        await sleep(50);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Reset Default Shell - Linux", async function()
     {
-        this.slow(testControl.slowTime.configEvent + 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.linux", shellLnx);
-        await sleep(50);
+        await sleep(testControl.waitTime.min);
     });
 
 
     test("Reset Default Shell - Coverage Hit", async function()
     {
-        this.slow(testControl.slowTime.configEnableEvent * 2);
+        this.slow((testControl.slowTime.configEnableEvent * 2) + testControl.waitTime.min);
         await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: false,
             batch: false,
@@ -236,15 +236,15 @@ suite("Configuration / Settings Tests", () =>
             python: false,
             ruby: false
         }), 25, 50);
-        await executeSettingsUpdate("enabledTasks.nsis", true, 25, 50); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
+        await executeSettingsUpdate("enabledTasks.nsis", true, testControl.waitTime.min, testControl.waitTime.min * 2); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
     });
 
 
     test("Reset Default Shell - Windows", async function()
     {
-        this.slow(testControl.slowTime.configEvent + 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.windows", shellW32);
-        await sleep(50);
+        await sleep(testControl.waitTime.min);
     });
 
 
@@ -259,57 +259,60 @@ suite("Configuration / Settings Tests", () =>
             powershell: false,
             python: false,
             ruby: false
-        }), 25, 50);
+        }), testControl.waitTime.min, testControl.waitTime.min * 2);
     });
 
 
     test("Path to Programs Set Bash", async function()
     {
-        this.slow(testControl.slowTime.configEvent);
-        await executeSettingsUpdate("pathToPrograms.bash", "c:\\unix\\sh.exe", 20, 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
+        await executeSettingsUpdate("pathToPrograms.bash", "c:\\unix\\sh.exe", testControl.waitTime.min, testControl.waitTime.min * 2);
     });
 
 
     test("Path to Programs Set Composer", async function()
     {
-        this.slow(testControl.slowTime.configEvent);
-        await executeSettingsUpdate("pathToPrograms.composer", "c:\\php5\\composer.exe", 20, 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
+        await executeSettingsUpdate("pathToPrograms.composer", "c:\\php5\\composer.exe", testControl.waitTime.min, testControl.waitTime.min * 2);
     });
 
 
     test("Path to Programs Clear Bash", async function()
     {
-        this.slow(testControl.slowTime.configEvent);
-        await executeSettingsUpdate("pathToPrograms.bash", undefined, 20, 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
+        await executeSettingsUpdate("pathToPrograms.bash", undefined, testControl.waitTime.min, testControl.waitTime.min * 2);
     });
 
 
     test("Path to Programs Clear Composer", async function()
     {
-        this.slow(testControl.slowTime.configEvent);
-        await executeSettingsUpdate("pathToPrograms.composer", undefined, 20, 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
+        await executeSettingsUpdate("pathToPrograms.composer", undefined, testControl.waitTime.min, testControl.waitTime.min * 2);
     });
 
 
     test("Path to Programs Restore Bash", async function()
     {
-        this.slow(testControl.slowTime.configEvent);
-        await executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash, 20, 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
+        await executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash, testControl.waitTime.min, testControl.waitTime.min * 2);
     });
 
 
     test("Path to Programs Restore Composer", async function()
     {
-        this.slow(testControl.slowTime.configEvent);
-        await executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer, 20, 50);
+        this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
+        await executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer, testControl.waitTime.min, testControl.waitTime.min * 2);
     });
 
 
     test("User Level Setting Update", async function()
     {
-        this.slow(testControl.slowTime.configEvent * 4);
-        await executeSettingsUpdate("logging.level", testControl.userLogLevel !== 3 ? 3 : 2);
-        await executeSettingsUpdate("logging.level", testControl.userLogLevel);
+        const logLevel = configuration.get<number>("logging.level");
+        this.slow(testControl.slowTime.configEnableEvent * 2 + (testControl.waitTime.min * 2) + (testControl.waitTime.configEnableEvent * 2));
+        await executeSettingsUpdate("logging.level", logLevel !== 3 ? 3 : 2, testControl.waitTime.configEnableEvent);
+        await teApi.waitForIdle(testControl.waitTime.min);
+        await executeSettingsUpdate("logging.level", logLevel, testControl.waitTime.configEnableEvent);
+        await teApi.waitForIdle(testControl.waitTime.min);
     });
 
 });

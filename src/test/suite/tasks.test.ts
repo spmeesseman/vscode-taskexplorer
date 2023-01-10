@@ -70,7 +70,7 @@ suite("Task Tests", () =>
     test("Empty TaskItem Parameter - Run", async function()
     {
         expect(successCount).to.be.equal(2, "rolling success count failure");
-        this.slow(testControl.slowTime.runCommandNoWait + testControl.waitTime.runCommandMin + endOfTestWaitTime);
+        this.slow(testControl.slowTime.runCommand + testControl.waitTime.runCommandMin + endOfTestWaitTime);
         expect(await executeTeCommand("run", testControl.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
         await teApi.waitForIdle(endOfTestWaitTime);
         ++successCount;
@@ -80,7 +80,7 @@ suite("Task Tests", () =>
     test("Empty TaskItem Parameter - Pause", async function()
     {
         expect(successCount).to.be.equal(3, "rolling success count failure");
-        this.slow(testControl.slowTime.runPauseCommandNoWait + testControl.waitTime.runCommandMin + endOfTestWaitTime);
+        this.slow(testControl.slowTime.runPauseCommand + testControl.waitTime.runCommandMin + endOfTestWaitTime);
         expect(await executeTeCommand("pause", testControl.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
         await teApi.waitForIdle(endOfTestWaitTime);
         ++successCount;
@@ -90,7 +90,7 @@ suite("Task Tests", () =>
     test("Empty TaskItem Parameter - Restart", async function()
     {
         expect(successCount).to.be.equal(4, "rolling success count failure");
-        this.slow(testControl.slowTime.runCommandNoWait + testControl.waitTime.runCommandMin + endOfTestWaitTime);
+        this.slow(testControl.slowTime.runCommand + testControl.waitTime.runCommandMin + endOfTestWaitTime);
         expect(await executeTeCommand("restart", testControl.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
         await teApi.waitForIdle(endOfTestWaitTime);
         ++successCount;
@@ -152,7 +152,7 @@ suite("Task Tests", () =>
     test("Trigger busy on run last task", async function()
     {
         expect(successCount).to.be.equal(8, "rolling success count failure");
-        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.runCommand + testControl.waitTime.runCommandMin + 2000);
+        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.runCommand + testControl.waitTime.runCommandMin + 2000 + endOfTestWaitTime);
         await executeTeCommand("refresh", endOfTestWaitTime, 2000);
         await executeTeCommand("runLastTask", testControl.waitTime.runCommandMin, testControl.waitTime.runCommandMax);
         await teApi.waitForIdle(testControl.waitTime.refreshCommand);
@@ -164,7 +164,7 @@ suite("Task Tests", () =>
     test("Resume task no terminal", async function()
     {
         expect(successCount).to.be.equal(9, "rolling success count failure");
-        this.slow(testControl.slowTime.runCommandNoWait + testControl.waitTime.runCommandMax + endOfTestWaitTime);
+        this.slow(testControl.slowTime.runCommand + testControl.waitTime.runCommandMax + endOfTestWaitTime);
         bash[0].paused = true;
         await executeTeCommand2("runLastTask", [ batch[0] ], testControl.waitTime.runCommandMax);
         bash[0].paused = false;
@@ -175,7 +175,7 @@ suite("Task Tests", () =>
 
     test("Pause", async function()
     {
-        this.slow(testControl.slowTime.runCommandNoWait + (testControl.waitTime.runCommandMin * 5) + testControl.waitTime.runCommandMax + endOfTestWaitTime);
+        this.slow(testControl.slowTime.runCommand + (testControl.waitTime.runCommandMin * 5) + testControl.waitTime.runCommandMax + endOfTestWaitTime);
         expect(successCount).to.be.equal(10, "rolling success count failure");
         await executeTeCommand2("run", [ batch[0] ], testControl.waitTime.runCommandMax);
         await teApi.waitForIdle(testControl.waitTime.runCommandMin);
@@ -243,9 +243,13 @@ suite("Task Tests", () =>
 
     test("Batch 1", async function()
     {
-        this.slow((testControl.slowTime.runCommand * 6) + (testControl.waitTime.runCommandMax * 3) + testControl.waitTime.runCommandMin + endOfTestWaitTime + 500 + 50 + 50 + 1500 + 100 + 1000 + 400 + 200);
+        const slowTime = (testControl.slowTime.runCommand * 6) + (testControl.slowTime.runStopCommand * 3) +
+                          testControl.slowTime.runPauseCommand + (testControl.waitTime.runCommandMax * 3) +
+                          testControl.waitTime.runCommandMin + (testControl.slowTime.configEvent * 2) +
+                          testControl.slowTime.command + endOfTestWaitTime + 4600;
         expect(successCount).to.be.equal(15, "rolling success count failure");
-        this.timeout(testControl.slowTime.runCommand * 8);
+        this.slow(slowTime);
+        this.timeout(slowTime + 15000);
         //
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
@@ -285,9 +289,12 @@ suite("Task Tests", () =>
     {   //
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
+        const slowTime = (testControl.slowTime.runCommand * 3) + endOfTestWaitTime + 8300 + testControl.waitTime.runCommandMax +
+                          testControl.waitTime.runCommandMin + testControl.slowTime.runStopCommand + testControl.slowTime.configEvent +
+                          (testControl.slowTime.command * 2);
         expect(successCount).to.be.equal(16, "rolling success count failure");
-        this.slow((testControl.slowTime.runCommand * 5) + endOfTestWaitTime + 8000 + 100 + 200 + testControl.waitTime.runCommandMax + testControl.waitTime.runCommandMin);
-        this.timeout(testControl.slowTime.runCommand * 7);
+        this.slow(slowTime);
+        this.timeout(slowTime + 15000);
         const batchTask = batch[1];
         await startTask(batchTask as TaskItem, true);
         await executeSettingsUpdate("keepTermOnStop", false);
