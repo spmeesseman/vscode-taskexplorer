@@ -307,12 +307,19 @@ suite("Configuration / Settings Tests", () =>
 
     test("User Level Setting Update", async function()
     {
+        this.slow(testControl.slowTime.configEvent * 2 + 50);
+        enableConfigWatcher(false);
         const logLevel = configuration.get<number>("logging.level");
-        this.slow(testControl.slowTime.configEnableEvent * 2 + (testControl.waitTime.min * 2) + (testControl.waitTime.configEnableEvent * 2));
-        await executeSettingsUpdate("logging.level", logLevel !== 3 ? 3 : 2, testControl.waitTime.configEnableEvent);
-        await teApi.waitForIdle(testControl.waitTime.min);
-        await executeSettingsUpdate("logging.level", logLevel, testControl.waitTime.configEnableEvent);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        const pathToPrograms = configuration.get<object>("pathToPrograms");
+        const pathToAnt = configuration.get<object>("pathToPrograms.ant");
+        await configuration.update("logging.level", logLevel);
+        await configuration.update("pathToPrograms.ant", pathToAnt);
+        await configuration.update("pathToPrograms", pathToPrograms);
+        enableConfigWatcher(true);
+        await configuration.update("logging.level", logLevel !== 3 ? 3 : 2);
+        teApi.waitForIdle(testControl.waitTime.configEvent);
+        await configuration.update("logging.level", logLevel);
+        teApi.waitForIdle(testControl.waitTime.configEvent);
     });
 
 });

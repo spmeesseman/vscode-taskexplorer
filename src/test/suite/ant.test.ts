@@ -159,10 +159,10 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant Parser no default", async function()
+    test("Ant Parser No Default", async function()
     {
         expect(successCount).to.be.equal(10);
-        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -177,10 +177,10 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Ant Parser invalid target", async function()
+    test("Ant Parser Invalid Target", async function()
     {
         expect(successCount).to.be.equal(11);
-        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -200,7 +200,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Target", async function()
     {
         expect(successCount).to.be.equal(12);
-        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -217,7 +217,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Project", async function()
     {
         expect(successCount).to.be.equal(13);
-        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -234,7 +234,7 @@ suite("Ant Tests", () =>
     test("Ant Parser Invalid Xml", async function()
     {
         expect(successCount).to.be.equal(14);
-        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +

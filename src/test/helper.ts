@@ -179,6 +179,10 @@ export async function cleanup()
         }
     } catch (e) { console.error(e); }
 
+    console.log(`    ${figures.color.info} ${figures.withColor("Resetting modified global settings", figures.colors.grey)}`);
+    await configuration.updateVs("grunt.autoDetect", testControl.vsCodeAutoDetectGrunt);
+    await configuration.updateVs("gulp.autoDetect", testControl.vsCodeAutoDetectGulp);
+
     console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Exiting", figures.colors.grey)}`);
     console.log(`    ${figures.color.info}`);
@@ -258,6 +262,9 @@ export const getWsPath = (p: string) =>
 
 async function initSettings()
 {   //
+    // This function runs BEFORE the extension is initialized, so any updates have no immediate
+    // effect.  All settings set here will get read on on extension activation, coming up next.
+    //
     // Create .vscode directory if it doesn't exist, so the we have perms to
     // remove it after tests are done
     //
@@ -272,9 +279,13 @@ async function initSettings()
     // }
     // await writeFile(settingsFile, "{}");
 
-    await configuration.updateVsWs("terminal.integrated.shell.windows",
-                                   "C:\\Windows\\System32\\cmd.exe");
+
     testControl.userLogLevel = configuration.get<number>("logging.level");
+    testControl.vsCodeAutoDetectGrunt = configuration.getVs<string>("grunt.autoDetect", "off");
+    testControl.vsCodeAutoDetectGulp = configuration.getVs<string>("gulp.autoDetect", "off");
+    await configuration.updateVs("grunt.autoDetect", "off");
+    await configuration.updateVs("gulp.autoDetect", "off");
+    await configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
     //
     // Enable views, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE

@@ -7,13 +7,12 @@
 //
 import * as assert from "assert";
 import * as path from "path";
-import { TaskExecution, Uri, workspace, WorkspaceFolder } from "vscode";
+import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { BashTaskProvider } from "../../providers/bash";
-import { isObjectEmpty } from "../../lib/utils/utils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand2, getWsPath, testControl, treeUtils, verifyTaskCount,
-    waitForTaskExecution, logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, focusExplorer,
+    activate, executeSettingsUpdate, getWsPath, testControl, treeUtils, verifyTaskCount,
+    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs,
 } from "../helper";
 
 const testsName = "bash";
@@ -25,7 +24,6 @@ let pathToTaskProgram: string;
 let enableTaskType: boolean;
 let wsFolder: WorkspaceFolder;
 let dirName: string;
-let wasVisible: boolean;
 let fileUri: Uri;
 
 
@@ -63,7 +61,6 @@ suite("Bash Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        wasVisible = teApi.testsApi.explorer.isVisible();
         await treeUtils.buildTree(this);
     });
 

@@ -22,6 +22,11 @@ export const testControl =
     userPathToAnt: "c:\\Code\\ant\\bin\\ant.bat",
     userPathToAnsicon: "c:\\Code\\ansicon\\x64\\ansicon.exe",
     //
+    // Global settings that will get set/unset
+    //
+    vsCodeAutoDetectGrunt: "off",
+    vsCodeAutoDetectGulp: "off",
+    //
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)s
     //
     slowTime: {
@@ -36,7 +41,7 @@ export const testControl =
         commandFast: 550,
         configEvent: 300,
         configEventFast: 90,
-        configRegisterExplorerEvent: 600,
+        configRegisterExplorerEvent: 750,
         configEnableEvent: 1575,
         configExcludesEvent: 475,
         configGlobEvent: 1940,
