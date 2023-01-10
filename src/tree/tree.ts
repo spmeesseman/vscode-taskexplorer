@@ -82,8 +82,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => this.pause(item), this));
         this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick?: boolean) => this.open(item, itemClick), this));
         this.disposables.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => this.openTerminal(item), this));
-        // this.disposables.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
-        this.disposables.push(commands.registerCommand(name + ".refresh", async () => this.refresh(true, false), this));
+        this.disposables.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
+        // this.disposables.push(commands.registerCommand(name + ".refresh", async () => this.refresh(true, false), this));
         this.disposables.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "install"), this));
         this.disposables.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update"), this));
         this.disposables.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update <packagename>"), this));

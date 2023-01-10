@@ -228,14 +228,14 @@ export const getDateModified = (file: string) =>
 };
 
 
-export const isDirectory = (dirPath: string) => fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory();
+export const isDirectory = (dirPath: string) => pathExistsSync(dirPath) && fs.lstatSync(dirPath).isDirectory();
 
 
-export const numFilesInDirectory = (dirPath: string): Promise<number> =>
+export const numFilesInDirectory = (dirPath: string) =>
 {
-    return new Promise((resolve, reject) =>
+    return new Promise<number>((resolve) =>
     {
-        if (dirPath && fs.existsSync(dirPath))
+        if (dirPath && pathExistsSync(dirPath))
         {
             fs.readdir(dirPath, (err, files) =>
             {
@@ -243,15 +243,15 @@ export const numFilesInDirectory = (dirPath: string): Promise<number> =>
                 if (!err) {
                     resolve(files.length);
                 }
-                else reject(err);
+                else resolve(0);
             });
         }
-        else { reject(new Error("Invalid directory does not exist")); }
+        else { resolve(0); /* (new Error("Invalid directory does not exist"));*/ }
     });
 };
 
 
-export const pathExists = (file: string): Promise<boolean> =>
+export const pathExists = (file: string) =>
 {
     return new Promise<boolean>((resolve) =>
     {

@@ -316,6 +316,8 @@ async function initSettings()
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("groupWithSeparator", true);
 
+    await configuration.updateWs("visual.enableAnsiconForAnt", true);
+
     // await configuration.updateWs("pathToPrograms.ant", testControl.userPathToAnt);
     // await configuration.updateWs("pathToPrograms.ansicon", testControl.userPathToAnsicon);
     await configuration.updateWs("pathToPrograms",

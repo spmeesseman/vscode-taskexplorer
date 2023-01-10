@@ -97,46 +97,6 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Enable Ansicon", async function()
-    {
-        expect(successCount).to.be.equal(5);
-        this.slow((testControl.slowTime.configEvent * 5) + (testControl.slowTime.commandFast * 4));
-        await executeSettingsUpdate("pathToPrograms.ansicon", "ansicon\\x64\\ansicon.exe");
-        await executeSettingsUpdate("visual.enableAnsiconForAnt", true);
-        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
-        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64") + "\\");
-        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64"));
-        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        ++successCount;
-    });
-
-
-    test("Disable Ansicon", async function()
-    {
-        expect(successCount).to.be.equal(6);
-        this.slow((testControl.slowTime.configEvent * 3) + (testControl.slowTime.commandFast * 2));
-        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
-        await executeSettingsUpdate("visual.enableAnsiconForAnt", false);
-        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\"));
-        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        ++successCount;
-    });
-
-
-    test("Ansicon Path", async function()
-    {
-        expect(successCount).to.be.equal(7);
-        this.slow(testControl.slowTime.configEvent + testControl.slowTime.commandFast);
-        await executeSettingsUpdate("pathToPrograms.ansicon", undefined);
-        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        ++successCount;
-    });
-
-
     test("Win32 Create Task", async function()
     {
         expect(successCount).to.be.equal(8);

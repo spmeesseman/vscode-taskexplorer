@@ -38,7 +38,7 @@ suite("Composer Tests", () =>
         //
         pathToProgram = teApi.config.get<string>(`pathToPrograms.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "php\\composer.exe");
-        await executeSettingsUpdate("groupMaxLevel", 3); // this is just a random spot to bump the grouping level
+        // await executeSettingsUpdate("groupMaxLevel", 3); // this is just a random spot to bump the grouping level
         ++successCount;
     });
 
