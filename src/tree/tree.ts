@@ -1,5 +1,4 @@
 
-import * as path from "path";
 import * as util from "../lib/utils/utils";
 import * as sortTasks from "../lib/sortTasks";
 import constants from "../lib/constants";
@@ -25,10 +24,10 @@ import { pathExists } from "../lib/utils/fs";
 import { TaskWatcher } from "../lib/taskWatcher";
 import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
-    TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, TaskStartEvent, TaskEndEvent,
-    commands, window, workspace, tasks, Selection, WorkspaceFolder, InputBoxOptions,
-    ShellExecution, StatusBarItem, StatusBarAlignment, CustomExecution, Disposable, TaskExecution, Terminal
+    TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, commands, window, workspace, tasks,
+    Selection, InputBoxOptions, ShellExecution, CustomExecution, Disposable, TaskExecution
 } from "vscode";
+import { dirname, join } from "path";
 
 
 /**
@@ -345,7 +344,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         {
             if (each.name.indexOf(" - ") !== -1 && each.name.indexOf(" - tsconfig.json") === -1)
             {
-                relativePath = path.dirname(each.name.substring(each.name.indexOf(" - ") + 3));
+                relativePath = dirname(each.name.substring(each.name.indexOf(" - ") + 3));
             }
         }
         //
@@ -585,13 +584,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 {   //
                     // Reference Ticket #?. Fixes never ending loop with specific case VSCode tasks.
                     //
-                    t.nodePath = path.join(".vscode", prevName[treeLevel]);
+                    t.nodePath = join(".vscode", prevName[treeLevel]);
                 }
                 else if (!t.nodePath) {
                     t.nodePath = prevName[treeLevel];
                 }
                 else {
-                    t.nodePath = path.join(cPath, prevName[treeLevel]);
+                    t.nodePath = join(cPath, prevName[treeLevel]);
                 }
                 log.value("      new", t.nodePath, logLevel + 2, logPad);
             }
@@ -1049,10 +1048,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         //
         const relPathAdj = task.source !== "Workspace" ? relativePath : ".vscode";
 
-        let id = task.source + ":" + path.join(scopeName, relPathAdj);
+        let id = task.source + ":" + join(scopeName, relPathAdj);
         if (task.definition.fileName && !task.definition.scriptFile)
         {
-            id = path.join(id, task.definition.fileName);
+            id = join(id, task.definition.fileName);
         }
 
         taskFile = files.get(id);
@@ -1845,13 +1844,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
               uri = taskFile.resourceUri;
 
         const options = {
-            cwd: path.dirname(uri.fsPath)
+            cwd: dirname(uri.fsPath)
         };
 
         const kind: TaskDefinition = {
             type: "npm",
             script: "install",
-            path: path.dirname(uri.fsPath)
+            path: dirname(uri.fsPath)
         };
 
         if (command.indexOf("<packagename>") === -1)
@@ -1978,12 +1977,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    //
-    // Tired of VSCode complaining that the the expension was a startup hog. Performing the
-    // initial scan after the extension has been instantiated stops it from getting all up
-    // in stdout's business.  Displaying an 'Initializing...' message in the tree now on
-    // startup resulting from this, looks kinda nice I guess, so oh well.
-    //
     public setEnabled(enable: boolean)
     {
         if (enable !== this.enabled)
