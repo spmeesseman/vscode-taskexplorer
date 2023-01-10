@@ -13,6 +13,7 @@ import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscod
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 
 let activated = false;
+let timeStarted: number;
 let teApi: ITaskExplorerApi;
 let teExplorer: IExplorerApi;
 const originalShowInputBox = window.showInputBox;
@@ -66,8 +67,13 @@ export async function activate(instance?: any)
 
     if (!activated)
     {
+        timeStarted = Date.now();
+        const tzOffset = (new Date()).getTimezoneOffset() * 60000,
+              locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
+
         console.log(`    ${figures.color.info}`);
         console.log(`    ${figures.color.info} ${figures.withColor("Tests startup", figures.colors.grey)}`);
+        console.log(`    ${figures.color.info} ${figures.withColor("Time started: " + locISOTime, figures.colors.grey)}`);
         //
         // Init settings
         // Note that the '*' is removed from package.json[activationEvents] before the runTest() call
@@ -114,8 +120,17 @@ export async function activate(instance?: any)
 
 export async function cleanup()
 {
+    const timeFinished = Date.now(),
+          m = Math.floor((timeFinished - timeStarted) / 1000 / 60),
+          s = (timeFinished - timeStarted) % 1000,
+          timeElapsed = `${m} minutes, ${s} seconds}`;
+    const tzOffset = (new Date()).getTimezoneOffset() * 60000,
+          locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
+
     console.log(`    ${figures.color.info}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Tests complete, clean up", figures.colors.grey)}`);
+    console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + locISOTime, figures.colors.grey)}`);
+    console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + timeElapsed, figures.colors.grey)}`);
 
     if (testControl.logEnabled && testControl.logToFile && testControl.logOpenFileOnFinish)
     {

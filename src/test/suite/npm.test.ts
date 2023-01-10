@@ -86,9 +86,9 @@ suite("NPM Tests", () =>
 
 
     test("Verify NPM Task Count", async function()
-    {
+    {   // npm task provider is slower than shit on a turtle
         expect(successCount).to.be.equal(3);
-        this.slow(testControl.slowTime.verifyTaskCount * 3); // NPM getTasks just takes longer???
+        this.slow(testControl.slowTime.verifyTaskCountNpm + testControl.waitTime.min);
         await verifyTaskCount(testsName, 5);
         await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;
@@ -96,9 +96,9 @@ suite("NPM Tests", () =>
 
 
     test("Get NPM Task Items", async function()
-    {
+    {   // npm task provider is slower than shit on a turtle
         expect(successCount).to.be.equal(4);
-        this.slow(testControl.slowTime.getTreeTasks * 3); // NPM getTasks just takes longer???
+        this.slow(testControl.slowTime.getTreeTasksNpm);
         // tagLog("NPM", "Get NPM Task Items [Start]");
         //
         // Get the explorer tree task items (three less task than above, one of them tree
@@ -137,8 +137,10 @@ suite("NPM Tests", () =>
     test("Install", async function()
     {
         expect(successCount).to.be.equal(7);
-        this.slow(testControl.slowTime.npmCommand);
-        const exec = await executeTeCommand2("runInstall", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
+        this.slow(testControl.slowTime.npmInstallCommand);
+        const exec = await executeTeCommand2(
+            "runInstall", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
+        ) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
         ++successCount;
     });
@@ -148,7 +150,9 @@ suite("NPM Tests", () =>
     {
         expect(successCount).to.be.equal(8);
         this.slow(testControl.slowTime.npmCommand);
-        const exec = await executeTeCommand2("runUpdate", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
+        const exec = await executeTeCommand2(
+            "runUpdate", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
+        ) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
         ++successCount;
     });
@@ -159,7 +163,9 @@ suite("NPM Tests", () =>
         expect(successCount).to.be.equal(9);
         this.slow(testControl.slowTime.npmCommand);
         overrideNextShowInputBox("@spmeesseman/app-publisher");
-        const exec = await executeTeCommand2("runUpdatePackage", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
+        const exec = await executeTeCommand2(
+            "runUpdatePackage", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
+        ) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
         ++successCount;
     });
@@ -169,7 +175,9 @@ suite("NPM Tests", () =>
     {
         expect(successCount).to.be.equal(10);
         this.slow(testControl.slowTime.npmCommand);
-        const exec = await executeTeCommand2("runAudit", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
+        const exec = await executeTeCommand2(
+            "runAudit", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
+        ) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
         ++successCount;
     });
@@ -179,7 +187,9 @@ suite("NPM Tests", () =>
     {
         expect(successCount).to.be.equal(11);
         this.slow(testControl.slowTime.npmCommand);
-        const exec = await executeTeCommand2("runAuditFix", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin) as TaskExecution | undefined;
+        const exec = await executeTeCommand2(
+            "runAuditFix", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
+        ) as TaskExecution | undefined;
         await waitForTaskExecution(exec);
         ++successCount;
     });

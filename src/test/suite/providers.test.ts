@@ -426,7 +426,7 @@ suite("Provider Tests", () =>
 
     test("App Publisher Delete / Add", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.waitTime.fsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.waitTime.fsDeleteEvent);
         const file = path.join(rootPath, ".publishrc.json");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -439,7 +439,7 @@ suite("Provider Tests", () =>
 
     test("Ant Delete / Add", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
         const file = path.join(dirName, "build.xml");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -450,7 +450,7 @@ suite("Provider Tests", () =>
 
     test("Gradle Delete / Add", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
         const file = path.join(dirName, "build.gradle");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -461,7 +461,7 @@ suite("Provider Tests", () =>
 
     test("Grunt Delete / Add", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
         const file = path.join(rootPath, "GRUNTFILE.js");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -472,7 +472,7 @@ suite("Provider Tests", () =>
 
     test("Gulp Delete / Add", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsDeleteEvent,);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
         const file = path.join(rootPath, "gulpfile.js");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -483,7 +483,7 @@ suite("Provider Tests", () =>
 
     test("Makefile Delete / Add", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.slowTime.configEvent + testControl.waitTime.fsDeleteEvent,);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.slowTime.configEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent,);
         const file = path.join(rootPath, "Makefile");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -495,7 +495,7 @@ suite("Provider Tests", () =>
 
     test("Maven Delete / Add", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
         const file = path.join(rootPath, "pom.xml");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -506,7 +506,7 @@ suite("Provider Tests", () =>
 
     test("Batch Delete / Add", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsDeleteEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
         const file = path.join(rootPath, "test.bat");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);

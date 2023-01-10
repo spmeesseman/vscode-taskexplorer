@@ -59,7 +59,7 @@ suite("Typescript Tests", () =>
 
     test("Create File", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsCreateEvent + testControl.slowTime.verifyTaskCount + 50);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -79,7 +79,8 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        // the 'create file 2' test fails 1/50 runs, so add a lil bit on to fsCreateEvent here too
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent + 50);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
     });
 
@@ -98,7 +99,7 @@ suite("Typescript Tests", () =>
 
     test("Create File 2", async function()
     {
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsCreateEvent + testControl.slowTime.verifyTaskCount + 100);
         await fsApi.writeFile(
             fileUri2.fsPath,
             "{\n" +
@@ -118,14 +119,15 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        // the 'create file 2' test fails 1/50 runs, so add a lil bit on to fsCreateEvent
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent + 100);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 
 
     test("Disable", async function()
     {
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configEnableEvent);
         await treeUtils.verifyTaskCountByTree(testsName, 0);
     });
@@ -133,7 +135,7 @@ suite("Typescript Tests", () =>
 
     test("Re-enable", async function()
     {
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
@@ -172,7 +174,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
         //
         // See fileWatcher.ts, we ignore modify event because the task count will never change
         // for this task type. So if there is invalid json after a save, the tasks will remain,
@@ -208,25 +210,25 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
     });
 
 
     test("Delete File 1", async function()
     {
-        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testControl.waitTime.command);
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount+ 2);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
     });
 
 
     test("Delete File 2", async function()
     {
-        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent);
         await fsApi.deleteFile(fileUri2.fsPath);
-        await teApi.waitForIdle(testControl.waitTime.command);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
     });
 

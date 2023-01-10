@@ -50,12 +50,14 @@ export const testControl =
         fsDeleteFolderEvent: 1650,
         fsModifyEvent: 810,
         getTreeTasks: 215,
+        getTreeTasksNpm: 750, // npm task provider is slower than shit on a turtle
         licenseMgrOpenPage: 1000,
         licenseManagerLocalCheck: 2000,
         licenseManagerLocalStartServer: 8500,
         licenseManagerRemoteCheck: 3000,
         licenseManagerRemoteStartServer: 10000,
-        npmCommand: 12500,
+        npmCommand: 11500,
+        npmInstallCommand: 14500,
         refreshCommand: 14250,
         rebuildFileCache: 15500,
         rebuildFileCacheCancel: 1750,
@@ -68,6 +70,7 @@ export const testControl =
         storageUpdate: 50,
         taskProviderReadUri: 100,
         verifyTaskCount: 875,
+        verifyTaskCountNpm: 3000, // npm task provider is slower than shit on a turtle
         viewReport: 1950,
         walkTaskTree: 5500,
         walkTaskTreeWithDocOpen: 25000,
