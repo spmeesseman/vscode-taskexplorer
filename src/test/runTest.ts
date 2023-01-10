@@ -4,7 +4,7 @@ import * as path from "path";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { runTests } from "@vscode/test-electron";
 import { testControl } from "./control";
-import { findFiles, getDateModified, pathExists, writeFile } from "../lib/utils/fs";
+import { deleteDir, findFiles, getDateModified, pathExists, writeFile } from "../lib/utils/fs";
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import { runTests } from "vscode-test";
 
@@ -97,6 +97,7 @@ async function main(args: string[])
             // if (settingsJsonOrig && !testControl.keepSettingsFileChanges) {
             if (!testControl.keepSettingsFileChanges)
             {
+                console.log("restore tests workspace settings file settings.json");
                 await writeFile(settingsFile, JSON.stringify(
                 {
                     "taskExplorer.exclude": [
@@ -107,7 +108,11 @@ async function main(args: string[])
                     ]
                 }, null, 4));
             }
+            console.log("delete any leftover temporary files and/or directories");
+            await deleteDir(path.join(extensionTestsWsPath, "tasks_test_"));
+            await deleteDir(path.join(extensionTestsWsPath, "tasks_test_ignore_"));
         } catch {}
+
         if (failed) {
             process.exit(1);
         }

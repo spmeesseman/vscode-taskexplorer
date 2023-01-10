@@ -64,7 +64,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
     /* istanbul ignore else */
     if (workspace.workspaceFolders) {
         if (enabled !== false){
-            await cache.buildCache(taskType, fileBlob, undefined, true, logPad + "   ");
+            await cache.buildTaskTypeCache(taskType, fileBlob, undefined, true, logPad + "   ");
         }
         else {
             cache.removeTaskTypeFromCache(taskType, logPad + "   ");
@@ -286,21 +286,18 @@ function getDirWatchGlob(wsFolders: readonly WorkspaceFolder[])
 
 async function onDirCreate(uri: Uri)
 {
-    if (!util.isExcluded(uri.fsPath))
+    if (isDirectory(uri.fsPath) && !util.isExcluded(uri.fsPath))
     {
-        if (isDirectory(uri.fsPath) && (await numFilesInDirectory(uri.fsPath)) > 0)
+        const wsf = workspace.getWorkspaceFolder(uri);
+        /* istanbul ignore else */
+        if (!wsf || wsf.uri.fsPath !== uri.fsPath)
         {
-            const wsf = workspace.getWorkspaceFolder(uri);
-            /* istanbul ignore else */
-            if (!wsf || wsf.uri.fsPath !== uri.fsPath)
-            {
-                if (processingFsEvent) {
-                    eventQueue.push({ fn: _procDirCreateEvent, args: [ uri, "   " ] });
-                }
-                else {
-                    processingFsEvent = true;
-                    await _procDirCreateEvent(uri);
-                }
+            if (processingFsEvent) {
+                eventQueue.push({ fn: _procDirCreateEvent, args: [ uri, "   " ] });
+            }
+            else {
+                processingFsEvent = true;
+                await _procDirCreateEvent(uri);
             }
         }
     }
@@ -349,7 +346,7 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     try
     {
         await cache.addWsFolders(e.added);
-        await cache.removeWsFolders(e.removed);
+        cache.removeWsFolders(e.removed);
         createDirWatcher(extContext);
         await refreshTree(teApi);
     }
