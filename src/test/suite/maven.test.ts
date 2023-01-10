@@ -7,7 +7,7 @@
 //
 import * as path from "path";
 import { Uri } from "vscode";
-import { activate, executeSettingsUpdate, focusExplorer, getWsPath, testControl, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, focusExplorerView, getWsPath, testControl, verifyTaskCount } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
 import { IFilesystemApi } from "../../interface/fsApi";
@@ -51,7 +51,7 @@ suite("Maven Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-        await focusExplorer(this);
+        await focusExplorerView(this);
 	});
 
 

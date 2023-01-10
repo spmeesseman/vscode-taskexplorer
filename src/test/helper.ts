@@ -13,6 +13,10 @@ import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscod
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import { storage } from "../lib/utils/storage";
 
+export { figures };
+export { testControl };
+export { treeUtils };
+
 let activated = false;
 let timeStarted: number;
 let teApi: ITaskExplorerApi;
@@ -22,43 +26,28 @@ const originalShowInfoBox = window.showInformationMessage;
 let overridesShowInputBox: any[] = [];
 let overridesShowInfoBox: any[] = [];
 
-export { figures };
-export { testControl };
-export { treeUtils };
-
 window.showInputBox = (...args: any[]) =>
 {
     let next = overridesShowInputBox.shift();
-    if (typeof next === "undefined")
-    {
+    if (typeof next === "undefined") {
         // return originalShowInputBox.call(null, args as any);
         // overrideNextShowInputBox("");
         next = undefined;
     }
-    return new Promise((resolve, reject) =>
-    {
-        resolve(next);
-    });
+    return new Promise((resolve, reject) => { resolve(next); });
 };
 
 window.showInformationMessage = (str: string, ...args: any[]) =>
 {
     let next = overridesShowInfoBox.shift();
-    if (typeof next === "undefined")
-    {
+    if (typeof next === "undefined") {
         next = undefined;
         // return originalShowInfoBox(str, args as any);
     }
-    return new Promise<string | undefined>((resolve, reject) =>
-    {
-        resolve(next);
-    });
+    return new Promise<string | undefined>((resolve, reject) => { resolve(next); });
 };
 
 
-/**
- * Activates the spmeesseman.vscode-taskexplorer extension
- */
 export async function activate(instance?: any)
 {
     const ext = extensions.getExtension("spmeesseman.vscode-taskexplorer");
@@ -189,6 +178,18 @@ export async function cleanup()
 }
 
 
+export function clearOverrideShowInputBox()
+{
+    overridesShowInputBox = [];
+}
+
+
+export function clearOverrideShowInfoBox()
+{
+    overridesShowInfoBox = [];
+}
+
+
 export async function closeActiveDocument()
 {
 	try {
@@ -196,10 +197,7 @@ export async function closeActiveDocument()
 			await commands.executeCommand("workbench.action.closeActiveEditor");
 		// }
 	}
-	catch (e) {
-		console.error(e);
-	}
-	// await waitForValidation();
+	catch (e) { console.error(e); }
 }
 
 
@@ -221,13 +219,10 @@ export async function executeTeCommand(command: string, minWait?: number, maxWai
 }
 
 
-export function executeTeCommand2(command: string, args: any[], minWait?: number, maxWait?: number)
-{
-    return executeTeCommand(command, minWait, maxWait, ...args);
-}
+export const executeTeCommand2 = (command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand(command, minWait, maxWait, ...args);
 
 
-export async function focusExplorer(instance: any)
+export async function focusExplorerView(instance: any)
 {
     if (!teExplorer.isVisible()) {
         instance.slow(testControl.slowTime.focusCommand + testControl.slowTime.refreshCommand + (testControl.waitTime.focusCommand * 2));
@@ -237,27 +232,18 @@ export async function focusExplorer(instance: any)
 }
 
 
-export function getSpecialTaskItemId(taskItem: ITaskItemApi)
-{
-    return taskItem.id.replace(constants.LAST_TASKS_LABEL + ":", "")
-                      .replace(constants.FAV_TASKS_LABEL + ":", "")
-                      .replace(constants.USER_TASKS_LABEL + ":", "");
-}
+export const getSpecialTaskItemId = (taskItem: ITaskItemApi) =>
+    taskItem.id.replace(constants.LAST_TASKS_LABEL + ":", "").replace(constants.FAV_TASKS_LABEL + ":", "")
+               .replace(constants.USER_TASKS_LABEL + ":", "");
 
 
 export const getTeApi = () => teApi;
 
 
-export const getTestsPath = (p: string) =>
-{
-	return path.normalize(path.resolve(__dirname, p));
-};
+export const getTestsPath = (p: string) => path.normalize(path.resolve(__dirname, p));
 
 
-export const getWsPath = (p: string) =>
-{
-	return path.normalize(path.resolve(__dirname, "../../test-files", p));
-};
+export const getWsPath = (p: string) => path.normalize(path.resolve(__dirname, "../../test-files", p));
 
 
 async function initSettings()
@@ -319,10 +305,9 @@ async function initSettings()
         workspace: true
     });
 
-    await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("groupMaxLevel", 1);
-    await configuration.updateWs("groupWithSeparator", true);
     await configuration.updateWs("groupSeparator", "-");
+    await configuration.updateWs("groupWithSeparator", true);
 
     // await configuration.updateWs("pathToPrograms.ant", testControl.userPathToAnt);
     // await configuration.updateWs("pathToPrograms.ansicon", testControl.userPathToAnsicon);
@@ -431,21 +416,9 @@ export function overrideNextShowInputBox(value: any)
 }
 
 
-export function clearOverrideShowInputBox()
-{
-    overridesShowInputBox = [];
-}
-
-
 export function overrideNextShowInfoBox(value: any)
 {
     overridesShowInfoBox.push(value);
-}
-
-
-export function clearOverrideShowInfoBox()
-{
-    overridesShowInfoBox = [];
 }
 
 

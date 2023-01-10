@@ -9,7 +9,7 @@ import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import {
 	activate, closeActiveDocument, overrideNextShowInfoBox,
-	overrideNextShowInputBox, sleep, executeTeCommand, focusExplorer, getWsPath
+	overrideNextShowInputBox, sleep, executeTeCommand, focusExplorerView, getWsPath
 } from "../helper";
 import { testControl } from "../control";
 
@@ -57,7 +57,7 @@ suite("License Manager Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-		await focusExplorer(this);
+		await focusExplorerView(this);
 	});
 
 

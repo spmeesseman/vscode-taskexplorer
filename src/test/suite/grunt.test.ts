@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { GruntTaskProvider } from "../../providers/grunt";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeTeCommand, getWsPath, testControl, treeUtils, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, testControl, treeUtils, verifyTaskCount } from "../helper";
 
 const testsName = "grunt";
 const startTaskCount = 7;
@@ -31,6 +31,7 @@ suite("Grunt Tests", () =>
         provider = teApi.providers.get(testsName) as GruntTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "gruntfile.js"));
+        await executeSettingsUpdate("groupMaxLevel", 5); // this is just a random spot to bump the grouping level
         ++successCount;
     });
 
@@ -175,6 +176,8 @@ suite("Grunt Tests", () =>
         this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
         await configuration.updateVs("grunt.autoDetect", "on");
         await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
+        // await teApi.testsApi.fileCache.rebuildCache(""); // since the view isn't visible yet, mimic the file cache triggered build
+        await treeUtils.buildTree(this);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;
@@ -187,6 +190,7 @@ suite("Grunt Tests", () =>
         this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
         await configuration.updateVs("grunt.autoDetect", "off");
         await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
+        await treeUtils.buildTree(this);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
     });

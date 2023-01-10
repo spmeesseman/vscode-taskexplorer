@@ -16,7 +16,7 @@ import { removeFromArray } from "../../lib/utils/utils";
 import { ITaskExplorerApi, IExplorerApi, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
-    focusExplorer, getWsPath, sleep, testControl, treeUtils, verifyTaskCount
+    focusExplorerView, getWsPath, sleep, testControl, treeUtils, verifyTaskCount
 } from "../helper";
 
 
@@ -178,7 +178,7 @@ suite("Provider Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-        await focusExplorer(this);
+        await focusExplorerView(this);
 	});
 
 

@@ -9,7 +9,7 @@ import constants from "../../lib/constants";
 import { storage } from "../../lib/utils/storage";
 import TaskItem from "../../tree/item";
 import {
-    activate, clearOverrideShowInfoBox, clearOverrideShowInputBox, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorer,
+    activate, clearOverrideShowInfoBox, clearOverrideShowInputBox, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView,
     getSpecialTaskItemId, overrideNextShowInfoBox, overrideNextShowInputBox, testControl, treeUtils
 } from "../helper";
 import SpecialTaskFolder from "../../tree/specialFolder";
@@ -45,7 +45,7 @@ suite("Tree Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-        await focusExplorer(this);
+        await focusExplorerView(this);
 	});
 
 

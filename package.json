@@ -70,6 +70,7 @@
         "test-bash": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js bash xDeactivate",
         "test-composer": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js composer xDeactivate",
         "test-configuration": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js configuration xDeactivate",
+        "test-grunt": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js grunt xDeactivate",
         "test-gulp": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js gulp xDeactivate",
         "test-infopage": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js infoPage xDeactivate",
         "test-licensemgr": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js licenseManager xDeactivate",

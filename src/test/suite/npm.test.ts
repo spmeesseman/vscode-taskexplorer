@@ -7,7 +7,7 @@ import { expect } from "chai";
 import { getPackageManager } from "../../lib/utils/utils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeTeCommand2, focusExplorer, treeUtils, getWsPath,
+    activate, executeTeCommand2, focusExplorerView, treeUtils, getWsPath,
     overrideNextShowInputBox, testControl, verifyTaskCount, waitForTaskExecution, tagLog
 } from "../helper";
 import { TaskExecution } from "vscode";
@@ -52,7 +52,7 @@ suite("NPM Tests", () =>
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
         expect(successCount).to.be.equal(1);
-        await focusExplorer(this);
+        await focusExplorerView(this);
         ++successCount;
 	});
 

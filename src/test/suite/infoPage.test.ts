@@ -3,7 +3,7 @@
 
 import { Uri } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {  activate, closeActiveDocument, executeTeCommand, focusExplorer, executeSettingsUpdate, testControl } from "../helper";
+import {  activate, closeActiveDocument, executeTeCommand, focusExplorerView, executeSettingsUpdate, testControl } from "../helper";
 
 let teApi: ITaskExplorerApi;
 let userTasks: boolean;
@@ -28,7 +28,7 @@ suite("Info Report Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-		await focusExplorer(this);
+		await focusExplorerView(this);
 	});
 
 

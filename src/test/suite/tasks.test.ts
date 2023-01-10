@@ -12,7 +12,7 @@ import { storage } from "../../lib/utils/storage";
 import constants from "../../lib/constants";
 import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, focusExplorer,
+    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, focusExplorerView,
     treeUtils, overrideNextShowInfoBox, overrideNextShowInputBox, testControl, waitForTaskExecution, sleep
 } from "../helper";
 import SpecialTaskFolder from "../../tree/specialFolder";
@@ -47,7 +47,7 @@ suite("Task Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-        await focusExplorer(this);
+        await focusExplorerView(this);
 	});
 
 

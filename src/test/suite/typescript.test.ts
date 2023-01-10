@@ -9,7 +9,7 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand2, focusExplorer,
+    activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand2, focusExplorerView,
     getWsPath, testControl, treeUtils
 } from "../helper";
 
@@ -53,7 +53,7 @@ suite("Typescript Tests", () =>
 
 	test("Focus Task Explorer View for Tree Population", async function()
 	{
-        await await focusExplorer(this);
+        await await focusExplorerView(this);
 	});
 
 

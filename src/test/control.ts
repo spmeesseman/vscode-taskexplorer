@@ -100,6 +100,7 @@ export const testControl =
         configEvent: 125,
         configEventFast: 50,
         configEnableEvent: 195,
+        configGlobEvent: 160,
         command: 150,
         commandFast: 60,
         configRegisterExplorerEvent: 275,
