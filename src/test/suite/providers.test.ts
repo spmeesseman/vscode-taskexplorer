@@ -785,7 +785,7 @@ suite("Provider Tests", () =>
     test("Cancel Build Cache (FileWatcher Build) (Busy 75ms Delay)", async function()
     {
         this.slow(testControl.slowTime.buildFileCacheCancel + 75 + testControl.waitTime.min);
-        teApi.testsApi.fileCache.buildCache("python", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
+        teApi.testsApi.fileCache.buildCache("python", constants.GLOB_PYTHON, undefined, true, ""); // Don't 'await'
         await sleep(75);
         await teApi.testsApi.fileCache.cancelBuildCache("");
         await sleep(testControl.waitTime.min);
@@ -795,7 +795,7 @@ suite("Provider Tests", () =>
     test("Cancel Build Cache (FileWatcher Build) (Busy 100ms Delay)", async function()
     {
         this.slow(testControl.slowTime.buildFileCacheCancel + 100 + testControl.waitTime.min);
-        teApi.testsApi.fileCache.buildCache("batch", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
+        teApi.testsApi.fileCache.buildCache("batch", constants.GLOB_BATCH, undefined, true, ""); // Don't 'await'
         await sleep(100);
         await teApi.testsApi.fileCache.cancelBuildCache("");
         await sleep(testControl.waitTime.min);
@@ -805,7 +805,7 @@ suite("Provider Tests", () =>
     test("Cancel Build Cache (FileWatcher Build) (Busy 250ms Delay)", async function()
     {
         this.slow(testControl.slowTime.buildFileCacheCancel + 250 + testControl.waitTime.min);
-        teApi.testsApi.fileCache.buildCache("bash", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
+        teApi.testsApi.fileCache.buildCache("bash", constants.GLOB_BASH, undefined, true, ""); // Don't 'await'
         await sleep(250);
         await teApi.testsApi.fileCache.cancelBuildCache("");
         await sleep(testControl.waitTime.min);
@@ -815,7 +815,7 @@ suite("Provider Tests", () =>
     test("Cancel Build Cache (FileWatcher Build) (Busy 500ms Delay)", async function()
     {
         this.slow(testControl.slowTime.buildFileCacheCancel + 500 + testControl.waitTime.min);
-        teApi.testsApi.fileCache.buildCache("ant", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
+        teApi.testsApi.fileCache.buildCache("ant", constants.GLOB_ANT, undefined, true, ""); // Don't 'await'
         await sleep(500);
         await teApi.testsApi.fileCache.cancelBuildCache("");
         await sleep(testControl.waitTime.min);
@@ -825,7 +825,7 @@ suite("Provider Tests", () =>
     test("Cancel Build Cache (FileWatcher Build) (Busy 750ms Delay)", async function()
     {
         this.slow(testControl.slowTime.buildFileCacheCancel + 750 + 25);
-        teApi.testsApi.fileCache.buildCache("npm", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
+        teApi.testsApi.fileCache.buildCache("npm", constants.GLOB_NPM, undefined, true, ""); // Don't 'await'
         await sleep(750);
         await teApi.testsApi.fileCache.cancelBuildCache("");
         await sleep(testControl.waitTime.min);
