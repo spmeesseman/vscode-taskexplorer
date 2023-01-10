@@ -64,27 +64,34 @@ export const findIdInTaskMap = (id: string, taskMap: TaskMap) =>
 // }
 
 
-export const getTreeTasks = async(taskType: string, expectedCount: number) =>
+export const getTreeTasks = async(taskType: string, expectedCount: number, doTaskWalk = false) =>
 {
+    let didTaskWalk = false;
     const teApi = getTeApi();
     const taskItems: ITaskItemApi[] = [];
+
     const _getTaskMap = async(retries: number) =>
     {
         let taskMap = teApi.testsApi.explorer.getTaskMap();
+
         if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
             await teApi.waitForIdle(testControl.waitTime.getTreeMin, testControl.waitTime.getTreeMax);
             taskMap = teApi.testsApi.explorer.getTaskMap();
         }
+
         if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
-            if (retries === 0) {
+            if (retries === 0 && doTaskWalk) {
                 console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, fall back to walkTreeItems", figures.colors.grey)}`);
             }
-            if (retries % 10 === 0) {
+            if (retries % 10 === 0 && doTaskWalk)
+            {
+                didTaskWalk = true;
                 taskMap = await walkTreeItems(undefined);
             }
-            if (!taskMap || isObjectEmpty(taskMap)) {
+            if (!taskMap || isObjectEmpty(taskMap))
+            {
                 if (retries === 40) {
                     console.log(`    ${figures.color.error} ${figures.withColor("Task map is empty, test will fail in 3, 2, 1...", figures.colors.grey)}`);
                 }
@@ -94,9 +101,15 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
                 }
             }
         }
+
         return taskMap || {} as TaskMap;
     };
-    const taskMap = await _getTaskMap(0);
+
+    let taskMap = await _getTaskMap(0);
+    if (doTaskWalk && !didTaskWalk) {
+        taskMap = await walkTreeItems(undefined);
+    }
+
     const taskCount = taskMap ? findIdInTaskMap(`:${taskType}:`, taskMap) : 0;
     if (taskCount !== expectedCount)
     {
@@ -105,12 +118,14 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
                     Object.keys(taskMap).join(`\n    ${figures.color.warning}    `), figures.colors.grey));
         assert.fail(`${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
     }
+
     Object.values(taskMap).forEach((taskItem) =>
     {
         if (taskItem && taskItem.taskSource === taskType) {
             taskItems.push(taskItem);
         }
     });
+
     return taskItems;
 };
 
