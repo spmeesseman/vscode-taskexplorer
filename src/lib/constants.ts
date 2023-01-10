@@ -1,12 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-interface IDictionary<TValue>
-{
-    [id: string]: TValue;
-}
-
-
-
 const constants: IDictionary<string> =
 {
     DEFAULT_SEPARATOR: "-",
