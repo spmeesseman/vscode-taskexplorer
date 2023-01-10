@@ -84,7 +84,7 @@ suite("Powershell Tests", () =>
 
     test("Start", async function()
     {
-        this.slow(testControl.slowTime.verifyTaskCount && testControl.waitTime.min);
+        this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
     });

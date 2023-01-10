@@ -8,7 +8,9 @@ import { expect } from "chai";
 import { GruntTaskProvider } from "../../providers/grunt";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, testControl, treeUtils, verifyTaskCount } from "../helper";
+import {
+    activate, executeSettingsUpdate, executeTeCommand, getWsPath, testControl, treeUtils, verifyTaskCount
+} from "../helper";
 
 const testsName = "grunt";
 const startTaskCount = 7;

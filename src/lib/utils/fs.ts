@@ -2,6 +2,7 @@
 import * as fs from "fs";
 import * as glob from "glob";
 import * as path from "path";
+import * as json5 from "json5";
 // import { isString } from "../../common/utils";
 
 const cwd = process.cwd();
@@ -315,7 +316,7 @@ export const readJsonAsync = <T>(file: string): Promise<T> =>
     {
         try {
             const json = await readFileAsync(file),
-                  jso = JSON.parse(json) as T;
+                  jso = json5.parse<T>(json);
             resolve(jso);
         }
         catch (e) { reject(e); }
