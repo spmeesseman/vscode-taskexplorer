@@ -71,8 +71,8 @@ suite("App-Publisher Tests", () =>
     test("Start", async function()
     {
         expect(successCount).to.be.equal(3, "rolling success count failure");
-        this.slow(testControl.slowTime.verifyTaskCount);
-        await verifyTaskCount(testsName, startTaskCount);
+        this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.verifyTaskCountRetryInterval);
+        await verifyTaskCount(testsName, startTaskCount, 5, testControl.waitTime.verifyTaskCountRetryInterval);
         ++successCount;
     });
 
