@@ -153,7 +153,9 @@ async function addWsFolderToCache(folder: WorkspaceFolder, logPad: string)
     log.methodStart("add workspace project folder to cache", 1, logPad, logPad === "", [[ "folder", folder.name ]]);
 
     let numFilesFound = 0;
-    const taskProviders = ([ ...util.getTaskTypes(), ...providersExternal.keys() ]).sort();
+    const taskProviders = ([ ...util.getTaskTypes(), ...providersExternal.keys() ]).sort((a, b) => {
+        return util.getTaskTypeFriendlyName(a).localeCompare(util.getTaskTypeFriendlyName(b));
+    });
 
     for (const providerName of taskProviders)
     {
@@ -210,6 +212,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         log.value("   was cancelled", cancel, 3);
         log.methodDone("add workspace project folders", 1, logPad, [[ "# of file found", numFilesFound ]]);
         finishCacheBuild();
+        return numFilesFound;
     }
 }
 
@@ -303,8 +306,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
     let numFilesFound = 0;
     const licMgr = getLicenseManager();
     const logMsg = "Scan project " + folder.name + " for " + taskType + " tasks",
-          dspTaskType = taskType !== "tsc" && taskType !== "apppublisher" ?
-                        util.properCase(taskType) : (taskType === "tsc" ? "Typescript" : "App-Publisher");
+          dspTaskType = util.getTaskTypeFriendlyName(taskType);
 
     log.methodStart(logMsg, 1, logPad);
     statusBarSpace.text = getStatusString(`Scanning for ${dspTaskType} tasks in project ${folder.name}`, 65);
@@ -324,6 +326,9 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
         try {
             let maxFiles = Infinity;
             log.write(`   Start workspace folder scan for ${taskType} files`, 3, logPad);
+            //
+            // TODO - Replace instanbul ignore tags when mic mgr test suite is done.  Several below.
+            //
             /* istanbul ignore else */
             if (licMgr && !licMgr.isLicensed())
             {
@@ -344,6 +349,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
                 if (cancel) {
                     break;
                 }
+                /* istanbul ignore if */
                 if (++numFilesFound === maxFiles) {
                     log.write(`   Max files to scan reached at ${licMgr.getMaxNumberOfTaskFiles()} files (no license)`, 3, logPad);
                     break;
@@ -390,6 +396,15 @@ export async function cancelBuildCache()
         }
     }
 }
+
+
+const clearMaps = () =>
+{
+    taskFilesMap = {};
+    projectFilesMap = {};
+    projectToFileCountMap = {};
+    taskGlobs = {};
+};
 
 
 function disposeStatusBarSpace(statusBarSpace: StatusBarItem)
@@ -511,16 +526,12 @@ function isGlobChanged(taskType: string, fileGlob: string)
 
 export async function rebuildCache(logPad: string)
 {
-    const needCancel = cacheBuilding === true;
     log.methodStart("rebuild cache", 1, logPad, logPad === "");
-    if (needCancel) {
-        await cancelBuildCache();
+    clearMaps();
+    if (await addWsFolders(workspace.workspaceFolders, logPad + "   ") === 0)
+    {
+        clearMaps();
     }
-    taskFilesMap = {};
-    projectFilesMap = {};
-    projectToFileCountMap = {};
-    taskGlobs = {};
-    await addWsFolders(workspace.workspaceFolders, logPad + "   ");
     log.methodDone("rebuild cache", 1, logPad);
 }
 
@@ -674,11 +685,7 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
 
 export async function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
 {
-    const needCancel = cacheBuilding === true;
     log.methodStart("remove workspace folder", 1, logPad);
-    if (needCancel) {
-        await cancelBuildCache();
-    }
     for (const f of wsf)
     {
         log.value("   workspace folder", f.name, 1, logPad);
@@ -696,9 +703,6 @@ export async function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = 
             delete projectFilesMap[f.name];
         }
         log.write("   workspace folder removed", 1, logPad);
-    }
-    if (needCancel) {
-        await rebuildCache(logPad + "   ");
     }
     log.methodDone("remove workspace folder", 1, logPad);
 }

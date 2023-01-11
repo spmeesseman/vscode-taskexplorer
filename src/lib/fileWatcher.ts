@@ -4,7 +4,7 @@ import * as cache from "./cache";
 import * as util from "./utils/utils";
 import log from "./utils/log";
 import { refreshTree } from "./refreshTree";
-import { isDirectory, numFilesInDirectory } from "./utils/fs";
+import { isDirectory } from "./utils/fs";
 import { extname } from "path";
 import { ITaskExplorerApi } from "../interface";
 import { isString } from "./utils/utils";

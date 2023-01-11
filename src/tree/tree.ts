@@ -28,6 +28,7 @@ import {
     Selection, InputBoxOptions, ShellExecution, CustomExecution, Disposable, TaskExecution
 } from "vscode";
 import { dirname, join } from "path";
+import { IEvent } from "../interface/IEvent";
 
 
 /**
@@ -39,7 +40,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 {
     private defaultGetChildrenLogLevel = 1;
     private defaultGetChildrenLogPad = "";
-
+    private eventQueue: IEvent[] = [];
     private name: string;
     private disposables: Disposable[];
     private subscriptionStartIndex: number;
@@ -711,7 +712,26 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     {
         this.getChildrenLogPad = logPad;
         this.getChildrenLogLevel = logLevel;
-        this._onDidChangeTreeData.fire(taskFile);
+
+        if (this.visible) // || (this.enabled && this.setEnableCalled === false)) {
+        {
+            log.write("   fire 'tree data changed' main event", 2, logPad);
+            this._onDidChangeTreeData.fire(taskFile);
+        }
+        else
+        {
+            const id = "pendingFireTreeRefreshEvent-" + (taskFile ? taskFile.id?.replace(/\W/g, "") : "g");
+            if (!this.eventQueue.find((e => e.id === id)))
+            {
+                this.eventQueue.push(
+                {
+                    id,
+                    fn: this.fireTreeRefreshEvent,
+                    args: [ taskFile ]
+                });
+            }
+            log.write("   view is not visible or not initialized yet, delay firing data change event", 1, logPad);
+        }
     }
 
 
@@ -724,6 +744,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      */
     async getChildren(element?: TreeItem): Promise<TreeItem[]>
     {
+
         if (!this.enabled)
         {
             return [ !this.tasks && !this.taskTree ? new InitScripts() : /* istanbul ignore next */new NoScripts() ];
@@ -964,6 +985,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             await licMgr.setTasks(this.tasks || /* istanbul ignore next */[], logPad + "   ");
         }
 
+        await this.processEventQueue(logPad + "   ", logLevel);
+
         this.refreshPending = false;
         this.currentInvalidation = undefined;
         this.getChildrenLogPad = this.defaultGetChildrenLogPad;
@@ -1095,11 +1118,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     private async handleFileWatcherEvent(invalidate: any, opt: boolean | Uri | undefined, logPad: string)
     {
         log.methodStart("handle filewatcher / settings change / test event", 1, logPad);
-        //
-        // invalidate=true means the refresh button was clicked (opt will be false)
-        // invalidate="tests" means this is being called from unit tests (opt will be undefined)
-        //
-        if ((invalidate === true || (invalidate === "tests" && this.isTests)) && !opt)
+        if (invalidate === true && !opt)
         {   //
             // The file cache oly needs to update once on any change, since this will get called through
             // twice if both the Explorer and Sidebar Views are enabled, do a lil check here to make sure
@@ -1111,20 +1130,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                 /* istanbul ignore next */(!explorerViewEnabled && this.name === "taskExplorerSideBar"))
             {
                 log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
-                this.busy = true;
+                this.busy = true; // reset in invalidateTasksCache
                 await rebuildCache(logPad + "   ");
                 log.write("   handling 'rebuild cache' eventcomplete", 1, logPad + "   ");
-                this.busy = !this.isTests || invalidate !== "tests";
             }
         }
         //
         // If this is not from unit testing, then invalidate the appropriate task cache/file
         //
-        if (!this.isTests || invalidate !== "tests")
-        {
-            log.write("   handling 'invalidate tasks cache' event", 1, logPad);
-            await this.invalidateTasksCache(invalidate !== true ? invalidate : undefined, opt, logPad + "   ");
-        }
+        log.write("   handling 'invalidate tasks cache' event", 1, logPad);
+        await this.invalidateTasksCache(invalidate !== true ? invalidate : undefined, opt, logPad + "   ");
         log.methodDone("   handle filewatcher / settings change / test event", 1, logPad);
     }
 
@@ -1167,7 +1182,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      *     "powershell"
      *     "python"
      *     "ruby"
-     *     "tests"
      *     "Workspace"
      * @param opt2 The uri of the file that contains/owns the task
      */
@@ -1180,7 +1194,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.busy = true;
 
         try {
-            if (opt1 && (opt1 !== "tests" || /* istanbul ignore next */!this.isTests) && opt2 instanceof Uri)
+            if (opt1 && opt2 instanceof Uri)
             {
                 log.write("   invalidate '" + opt1 + "' task provider file ", 1, logPad);
                 log.value("      file", opt2.fsPath, 1, logPad);
@@ -1311,12 +1325,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    public onVisibilityChanged(visible: boolean)
+    public async onVisibilityChanged(visible: boolean)
     {   //
         // VSCode engine calls getChildren() when the view changes to 'visible'
         //
         log.methodStart("visibility event received", this.defaultGetChildrenLogLevel, this.getChildrenLogPad, true, [[ "is visible", visible ]]);
         this.visible = visible;
+        if (this.visible)
+        {
+            await this.processEventQueue(this.getChildrenLogPad, this.defaultGetChildrenLogLevel);
+        }
         log.methodDone("visibility event received", this.defaultGetChildrenLogLevel, this.getChildrenLogPad);
         log.blank(this.defaultGetChildrenLogLevel);
     }
@@ -1410,6 +1428,43 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
+    private processEventQueue = async (logPad: string, logLevel: number) =>
+    {
+        log.methodStart("process task explorer main event queue", 1, logPad, true, [[ "# of queued events", this.eventQueue.length ]]);
+
+        if (this.eventQueue.length > 0)
+        {
+            const processedEvents: string[] = [],
+                  next = this.eventQueue.shift() as IEvent; // get the next event
+
+            if (!processedEvents.includes(next.id)) // Ensure no dups
+            {
+                log.write(`   process event # ${processedEvents.length + 1}`, logLevel, logPad);
+                log.values(logLevel, logPad + "      ", [
+                    [ "event id", next.id ], [ "arg1", util.isString(next.args[0]) ? next.args[0] : next.args[0].fsPath ],
+                    [ "arg2", next.args[1] instanceof Uri ? next.args[1].fsPath : "none (log padding)" ]
+                ]);
+                log.write(`      calling queued event method with ${next.args.length} args`, logLevel, logPad);
+
+                await next.fn.call(this, ...next.args);
+
+                processedEvents.push(next.id);
+                log.write(`   finished processing event # ${processedEvents.length}`, logLevel, logPad);
+            } //
+             // Reverse splice the array and removes this event and any duplicates if there are any
+            //
+            this.eventQueue.slice().reverse().forEach((item, index, object) =>
+            {
+                if (item.id === next.id) {
+                    this.eventQueue.splice(object.length - 1 - index, logLevel);
+                }
+            });
+        }
+
+        log.methodDone("process task explorer main event queue", logLevel, logPad);
+    };
+
+
     /**
      * Responsible for refreshing the tree content and tasks cache
      * This function is called each time and event occurs, whether its a modified or new
@@ -1417,7 +1472,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      *
      * @param invalidate The invalidation event.
      * Can be one of the custom values:
-     *     "tests"            (from unit tests)
      *     false
      *     null
      *     undefined
@@ -1438,7 +1492,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      *     "powershell"
      *     "python"
      *     "ruby"
-     *     "tests"
      *     "Workspace"
      *
      * If invalidate is false, then this is both an event as a result from adding to excludes list
@@ -1447,8 +1500,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      * npm, ant, workspace, etc.
      *
      * If invalidate is true and opt is false, then the refresh button was clicked
-     *
-     * If invalidate is "tests" and opt undefined, then extension.refreshTree() called in tests
      *
      * If task is truthy, then a task has started/stopped, opt will be the task definition's
      * 'uri' property, note that task types not internally provided will not contain this property.
@@ -1477,7 +1528,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
         }
 
-        if (opt !== false && util.isString(invalidate, true) && (!this.isTests || invalidate !== "tests"))
+        if (opt !== false && util.isString(invalidate, true))
         {
             log.write(`   invalidation is for type '${invalidate}'`, 1, logPad);
             //
@@ -1502,14 +1553,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             this.taskMap = {};
         }
 
-        if (this.visible) {// || (this.enabled && this.setEnableCalled === false)) {
-            log.write("   fire tree data change event", 2, logPad);
-            this._onDidChangeTreeData.fire();
-        }
-        else {
-            log.write("   view is not visible or not initialized yet, delay firing data change event", 1, logPad);
-            setTimeout(() => { this.refreshPending = false; }, 1);
-        }
+        log.write("   fire tree data change event", 2, logPad);
+        this.fireTreeRefreshEvent();
+        setTimeout(() => { this.refreshPending = false; }, 1);
 
         log.methodDone("refresh task tree", 1, logPad);
     }
