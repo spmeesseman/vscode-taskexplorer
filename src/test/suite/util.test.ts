@@ -2,25 +2,21 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import * as assert from "assert";
 import * as afs from "../../lib/utils/fs";
 import * as util from "../../lib/utils/utils";
 import log from "../../lib/utils/log";
+import { expect } from "chai";
 import { join } from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { storage } from "../../lib/utils/storage";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
-	logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs,
-	executeTeCommand
+	logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, executeTeCommand
 } from "../helper";
-import { expect } from "chai";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
 
-let teApi: ITaskExplorerApi;
 let rootUri: Uri;
 
 
@@ -29,11 +25,8 @@ suite("Util Tests", () =>
 
 	suiteSetup(async function()
     {
-        teApi = await activate(this);
+        await activate(this);
 		rootUri = (workspace.workspaceFolders as WorkspaceFolder[])[0].uri;
-        if (!rootUri) {
-            assert.fail("        ✘ Workspace folder does not exist");
-        }
         await executeSettingsUpdate("logging.enable", true);
         await executeSettingsUpdate("logging.enableOutputWindow", true);
 		await executeSettingsUpdate("logging.level", 3);
@@ -194,27 +187,27 @@ suite("Util Tests", () =>
 
 		await executeSettingsUpdate("logging.enable", true);
 
-        assert(util.camelCase("taskexplorer", 4) === "taskExplorer");
-        assert(util.camelCase(undefined, 4) === undefined);
-        assert(util.camelCase("testgreaterindex", 19) === "testgreaterindex");
-        assert(util.camelCase("test", -1) === "test");
+        expect(util.camelCase("taskexplorer", 4)).to.be.equal("taskExplorer");
+        expect(util.camelCase(undefined, 4)).to.be.equal(undefined);
+        expect(util.camelCase("testgreaterindex", 19)).to.be.equal("testgreaterindex");
+        expect(util.camelCase("test", -1)).to.be.equal("test");
 
-        assert(util.properCase("taskexplorer") === "Taskexplorer");
-        assert(util.properCase(undefined) === "");
+        expect(util.properCase("taskexplorer")).to.be.equal("Taskexplorer");
+        expect(util.properCase(undefined)).to.be.equal("");
 
-        assert(util.isScriptType("batch"));
-        assert(util.getScriptTaskTypes().length > 0);
+        expect(util.isScriptType("batch"));
+        expect(util.getScriptTaskTypes().length > 0);
 
         const arr = [ 1, 2, 3, 4, 5 ];
         util.removeFromArray(arr, 3);
         util.removeFromArray(arr, 1);
-        assert(arr.length === 3);
+        expect(arr.length).to.be.equal(3);
 
-        assert(util.getCwd(rootUri) !== undefined);
+        expect(util.getCwd(rootUri)).to.not.be.equal(undefined);
 
-        assert(util.timeout(10));
+        util.timeout(10);
 
-        assert (util.getGroupSeparator() === "-");
+        expect (util.getGroupSeparator()).to.be.equal("-");
 
 		util.lowerCaseFirstChar("s", true);
 		util.lowerCaseFirstChar("s", false);
@@ -333,6 +326,8 @@ suite("Util Tests", () =>
 		let dataPath: string | undefined = util.getUserDataPath("darwin");
 		dataPath = util.getUserDataPath("linux");
 
+		util.getPortableDataPath();
+
 		//
 		// Simulate --user-data-dir vscode command line option
 		//
@@ -364,7 +359,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "test";
 		dataPath = util.getUserDataPath("win32");
-		expect(dataPath).to.be.oneOf([ `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1`, "'C:\\Code\\data\\user-data\\User\\user-data\\User" ]);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\test\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
 		//
@@ -373,7 +368,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
 		dataPath = util.getUserDataPath("nothing");
-		expect(dataPath).to.be.oneOf([ `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1`, "'C:\\Code\\data\\user-data\\User\\user-data\\User" ]);
+		expect(dataPath).to.be.oneOf([ `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1`, "C:\\Code\\data\\user-data\\User\\user-data\\User" ]);
 		//
 		// Set environment variables for specific test
 		//
@@ -381,7 +376,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
 		dataPath = util.getUserDataPath("win32");
-		assert.strictEqual(dataPath, "C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
+		expect(dataPath).to.be.equal("C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
 		//
 		// Set environment variables for specific test
 		//
@@ -389,7 +384,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
 		dataPath = util.getUserDataPath("win32");
-		assert.strictEqual(dataPath, "C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
+		expect(dataPath).to.be.equal("C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
 		//
 		// Set environment variables for specific test
 		//
@@ -397,7 +392,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
 		dataPath = util.getUserDataPath("win32");
-		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
+		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
 		//
 		// Set environment variables for specific test
 		//
@@ -405,7 +400,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
 		dataPath = util.getUserDataPath("win32");
-		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode`);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
 		//
@@ -414,31 +409,31 @@ suite("Util Tests", () =>
 		process.env.USERPROFILE = "";
 		process.env.VSCODE_APPDATA = "";
 		dataPath = util.getUserDataPath("linux");
-		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\.config\\vscode`);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\.config\\vscode`);
 		dataPath = util.getUserDataPath("win32");
-		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode`);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\AppData\\Roaming\\vscode`);
 		dataPath = util.getUserDataPath("darwin");
-		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\Library\\Application Support\\vscode`);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1\\Library\\Application Support\\vscode`);
 		dataPath = util.getUserDataPath("invalid_platform");
-		assert.strictEqual(dataPath, `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1`);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-archive-1.60.1`);
 		//
 		// Set environment variables for specific test
 		//
 		process.env.VSCODE_APPDATA = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
 		dataPath = util.getUserDataPath("linux");
-		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
+		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
 		dataPath = util.getUserDataPath("win32");
-		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
+		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
 		dataPath = util.getUserDataPath("darwin");
-		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
+		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
 		dataPath = util.getUserDataPath("invalid_platform");
-		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
+		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
 		//
 		// Set portable / invalid platform
 		//
 		process.env.VSCODE_PORTABLE = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
 		dataPath = util.getUserDataPath("invalid_platform");
-		assert.strictEqual(dataPath, "C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
+		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
 		//
 		// Empty platform
 		//
@@ -458,13 +453,6 @@ suite("Util Tests", () =>
 		process.env.USERPROFILE = dataPath3;
 		process.env.VSCODE_APPDATA = dataPath4;
 	});
-
-
-    test("Get user data paths", function()
-    {
-        util.getPortableDataPath();
-        assert(util.getUserDataPath(), "✘ Could not find user data path");
-    });
 
 
 	test("Filesystem", async function()
@@ -493,12 +481,12 @@ suite("Util Tests", () =>
         if (storage)
         {
             await storage.update("TEST_KEY", "This is a test");
-            assert(storage.get<string>("TEST_KEY") === "This is a test");
-            assert(storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue") === "defValue");
+            expect(storage.get<string>("TEST_KEY")).to.be.equal("This is a test");
+            expect(storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
             await storage.update("TEST_KEY", "");
-            assert(storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue") === "defValue");
+            expect(storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
             await storage.update("TEST_KEY", undefined);
-			assert(storage.get<string>("TEST_KEY2_DOESNT_EXIST") === undefined);
+			expect(storage.get<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
         }
     });
 
