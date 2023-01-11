@@ -61,7 +61,7 @@ suite("Bash Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        await treeUtils.buildTree(this);
+        await treeUtils.refresh(this);
     });
 
 

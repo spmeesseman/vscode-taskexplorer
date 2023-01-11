@@ -63,7 +63,7 @@ suite("App-Publisher Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         expect(successCount).to.be.equal(2, "rolling success count failure");
-        await treeUtils.buildTree(this);
+        await treeUtils.refresh(this);
         ++successCount;
     });
 

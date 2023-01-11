@@ -99,7 +99,7 @@ suite("Ant Tests", () =>
 
     test("Win32 Create Task", async function()
     {
-        expect(successCount).to.be.equal(8);
+        expect(successCount).to.be.equal(5);
         this.slow((testControl.slowTime.configEvent * 2) + (testControl.slowTime.commandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -111,7 +111,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser", async function()
     {
-        expect(successCount).to.be.equal(9);
+        expect(successCount).to.be.equal(6);
         this.slow(slowTimeforAntRunTasks);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2, false, false);
@@ -121,7 +121,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Default", async function()
     {
-        expect(successCount).to.be.equal(10);
+        expect(successCount).to.be.equal(7);
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -139,7 +139,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser Invalid Target", async function()
     {
-        expect(successCount).to.be.equal(11);
+        expect(successCount).to.be.equal(8);
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -159,7 +159,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Target", async function()
     {
-        expect(successCount).to.be.equal(12);
+        expect(successCount).to.be.equal(9);
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -176,7 +176,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Project", async function()
     {
-        expect(successCount).to.be.equal(13);
+        expect(successCount).to.be.equal(10);
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -193,7 +193,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser Invalid Xml", async function()
     {
-        expect(successCount).to.be.equal(14);
+        expect(successCount).to.be.equal(11);
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,

@@ -47,7 +47,7 @@ suite("Gulp Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         expect(successCount).to.be.equal(1, "rolling success count failure");
-        await treeUtils.buildTree(this);
+        await treeUtils.refresh(this);
         ++successCount;
     });
 
@@ -212,7 +212,7 @@ suite("Gulp Tests", () =>
         this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 3000);
         await configuration.updateVs("gulp.autoDetect", "on");
         await sleep(3000);
-        await treeUtils.buildTree(this);
+        await treeUtils.refresh();
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;
@@ -226,7 +226,7 @@ suite("Gulp Tests", () =>
         await configuration.updateVs("gulp.autoDetect", "off");
         await sleep(1500);
         // await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
-        await treeUtils.buildTree(this);
+        await treeUtils.refresh(this);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
     });

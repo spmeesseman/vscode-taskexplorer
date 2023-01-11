@@ -45,7 +45,7 @@ suite("Grunt Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         expect(successCount).to.be.equal(1, "rolling success count failure");
-        await treeUtils.buildTree(this);
+        await treeUtils.refresh(this);
         ++successCount;
     });
 
@@ -177,7 +177,7 @@ suite("Grunt Tests", () =>
         this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 3000);
         await configuration.updateVs("grunt.autoDetect", "on");
         await sleep(3000);
-        await treeUtils.buildTree(this);
+        await treeUtils.refresh(this);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;
@@ -202,7 +202,7 @@ suite("Grunt Tests", () =>
         this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 1500);
         await configuration.updateVs("grunt.autoDetect", "off");
         await sleep(1500);
-        await treeUtils.buildTree(this);
+        await treeUtils.refresh(this);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
     });

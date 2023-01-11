@@ -6,9 +6,7 @@ import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import { isObjectEmpty } from "../lib/utils/utils";
 import { ITaskItemApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeSettingsUpdate, executeTeCommand2, figures, getTeApi, sleep, testControl } from "./helper";
-
-let treeBuiltOnce = false;
+import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, getTeApi, sleep, testControl } from "./helper";
 
 
 /**
@@ -19,24 +17,17 @@ let treeBuiltOnce = false;
  *
  * @param instance The test instance to set the timeout and slow time on.
  */
-export const buildTree = async(instance: any, forceRebuild?: boolean) =>
+export const refresh = async(instance?: any) =>
 {
-    if (!treeBuiltOnce || forceRebuild)
-    {
-        const teApi = getTeApi();
-        instance.slow(testControl.slowTime.buildTree + testControl.waitTime.buildTree + (testControl.slowTime.configGroupingEvent * 2) + (testControl.waitTime.min * 2));
-        instance.timeout(testControl.slowTime.buildTree + testControl.waitTime.max);
-        await executeSettingsUpdate("groupWithSeparator", true);
-        await executeSettingsUpdate("groupMaxLevel", 5);
-        await teApi.waitForIdle(testControl.waitTime.min);
-        //
-        // A special refresh() for test suite, will open all task files and open to position
-        //
-        await teApi.testsApi.explorer.refresh("tests");
-        await teApi.waitForIdle(testControl.waitTime.buildTree);
-        await teApi.waitForIdle(testControl.waitTime.min);
+    const teApi = getTeApi();
+    if (instance) {
+        instance.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.configGroupingEvent * 2) + (testControl.waitTime.min * 2));
+        instance.timeout((testControl.slowTime.refreshCommand  * 2) + (testControl.slowTime.configGroupingEvent * 2) + (testControl.waitTime.min * 2));
     }
-    treeBuiltOnce = true;
+    await executeSettingsUpdate("groupWithSeparator", true, testControl.waitTime.configGroupingEvent);
+    await executeSettingsUpdate("groupMaxLevel", 5, testControl.waitTime.configGroupingEvent);
+    await teApi.waitForIdle(testControl.waitTime.min);
+    await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
 };
 
 

@@ -35,7 +35,6 @@ export const testControl =
         batchScript: 8000,
         buildFileCache: 1500,
         buildFileCacheCancel: 1350,
-        buildTree: 20000,
         buildTreeNoTasks: 600,
         command: 1450,
         commandFast: 550,
@@ -93,7 +92,6 @@ export const testControl =
         // MINIMUM WAIT TIMES
         //
         addWorkspaceFolder: 250,
-        buildTree: 5000,
         fsCreateEvent: 200,
         fsDeleteEvent: 200,
         fsModifyEvent: 150,
@@ -103,6 +101,7 @@ export const testControl =
         configGlobEvent: 160,
         command: 150,
         commandFast: 60,
+        configGroupingEvent: 280,
         configRegisterExplorerEvent: 275,
         explorerViewStartup: 5000,
         focusCommand: 500,

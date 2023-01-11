@@ -88,7 +88,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        await treeUtils.buildTree(this);
+        await treeUtils.refresh(this);
     });
 
 
@@ -219,7 +219,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree", async function()
     {
-        await treeUtils.buildTree(this);
+        await treeUtils.refresh(this);
         //
         // Check VSCode provided task types for the hell of it
         //
