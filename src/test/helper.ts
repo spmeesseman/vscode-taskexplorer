@@ -455,12 +455,12 @@ export function tagLog(test: string, suite: string)
  * @param expectedCount Expected # of tasks
  * @param retries Number of retries to make if expected count doesn'tmatch.  100ms sleep between each retry.
  */
-export async function verifyTaskCount(taskType: string, expectedCount: number, retries = 0)
+export async function verifyTaskCount(taskType: string, expectedCount: number, retries = 0, retryWait = 250)
 {
     let tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
     while (--retries >= 0 && tTasks.length !== expectedCount)
     {
-        await sleep(testControl.waitTime.verifyTaskCountRetryInterval);
+        await sleep(retryWait > 0 ? retryWait : testControl.waitTime.verifyTaskCountRetryInterval);
         tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
         if (taskType === "Workspace") {
             tTasks = tTasks.filter(t => t.source === "Workspace");

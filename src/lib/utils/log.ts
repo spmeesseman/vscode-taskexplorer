@@ -7,8 +7,9 @@ import { appendFileSync } from "fs";
 import { dirname, join } from "path";
 import { createDir } from "./fs";
 import { configuration } from "./configuration";
-import { isArray, isError, isFunction, isObject, isObjectEmpty, isString } from "./utils";
+import { isArray, isBoolean, isError, isFunction, isObject, isObjectEmpty, isString } from "./utils";
 import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
+import { LogColor, LogColors } from "../../interface";
 
 export interface IMsgQueueItem
 {
@@ -16,6 +17,8 @@ export interface IMsgQueueItem
     args: any[];
     scope: any;
 }
+
+const colors = figures.colors;
 
 const tzOffset = (new Date()).getTimezoneOffset() * 60000;
 const logValueWhiteSpace = 45;
@@ -27,6 +30,7 @@ let enableFileSymbols = false;
 let enableOutputWindow = false;
 let fileName = "";
 let isTests = false;
+let isTestsBlockScaryColors = false;
 let lastErrorMesage: string[] = [];
 let lastWriteWasBlank = false;
 let lastWriteWasBlankError = false;
@@ -43,7 +47,6 @@ const blank = (level?: number, queueId?: string) =>
 };
 
 
-const colors = figures.colors;
 
 
 const dequeue = (queueId: string) =>
@@ -184,7 +187,7 @@ const _error = (msg: any, params?: (string|any)[][], queueId?: string, symbols: 
     const currentWriteToFile = enableFile;
     const currentWriteToOutputWindow = enableOutputWindow;
     const errMsgs = errorParse(msg, symbols, queueId);
-    if (!symbols || !symbols[0]) symbols = [ figures.color.error, figures.error ];
+    if (!symbols || !symbols[0]) symbols = [ !isTests || !isTestsBlockScaryColors ? figures.color.error : figures.color.errorTests, figures.error ];
 
     if (lastErrorMesage[0] === errMsgs[0])
     {
@@ -246,7 +249,7 @@ const _error = (msg: any, params?: (string|any)[][], queueId?: string, symbols: 
 };
 
 
-const initLog = async(context: ExtensionContext, testsRunning: boolean) =>
+const initLog = async(context: ExtensionContext, testsRunning: number) =>
 {
     function showLogOutput(show: boolean)
     {
@@ -255,7 +258,8 @@ const initLog = async(context: ExtensionContext, testsRunning: boolean) =>
         }
     }
 
-    isTests = testsRunning;
+    isTests = testsRunning > 0;
+    isTestsBlockScaryColors = testsRunning > 1;
     enable = configuration.get<boolean>("logging.enable", false);
     logLevel = configuration.get<number>("logging.level", 1);
     enableOutputWindow = configuration.get<boolean>("logging.enableOutputWindow", true);
@@ -444,7 +448,8 @@ const values = (level: number, logPad: string, params: any | (string|any)[][], q
 };
 
 
-const warn = (msg: any, params?: (string|any)[][], queueId?: string) => _error(msg, params, queueId, [ figures.color.warning, figures.warning ]);
+const warn = (msg: any, params?: (string|any)[][], queueId?: string) =>
+    _error(msg, params, queueId, [ !isTests || !isTestsBlockScaryColors ? figures.color.warning : figures.color.warningTests, figures.warning ]);
 
 
 const withColor = figures.withColor;
@@ -471,7 +476,7 @@ const write = (msg: string, level?: number, logPad = "", queueId?: string, isVal
             else if (isError && /\[[0-9]{1,2}m/.test(msg))
             {   // \[[0-9]{1,2}m[\W]{1}\[[0-9]{1,2}m/.test(msg)
                 for (let m = 1; m < msgs.length; m++) {
-                    msgs[m] = figures.color.error + " " + msgs[m];
+                    msgs[m] = (!isTests || !isTestsBlockScaryColors ? figures.color.error : figures.color.errorTests) + " " + msgs[m];
                 }
             }
         }

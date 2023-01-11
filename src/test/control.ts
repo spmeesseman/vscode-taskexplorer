@@ -9,14 +9,14 @@ export const testControl =
     //
     logLevel: 2,
     logEnabled: true,
-    logErrors: false,      // doesn't work yet - to help me stop crapping when all the expected red errors come through
-    logReadToGreen: true,  // doesn't work yet - to help me stop crapping when all the expected red errors come through
+    logErrors: false,
     logToConsole: false,
     logToConsoleLevel: 3,
     logToFile: true,
     logToFileSymbols: false,
     logToOutput: true,
     logOpenFileOnFinish: true, // not yet
+    logBlockScaryColors: true,
     //
     // These 2 properties are for using update() for coverage, see helper.initSettings
     //

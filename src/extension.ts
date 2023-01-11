@@ -71,7 +71,7 @@ export const teApi: ITaskExplorerApi =
 export async function activate(context: ExtensionContext) // , disposables: Disposable[]): Promise<ITaskExplorerApi>
 {
     tests = await fs.pathExists(join(__dirname, "test", "runTest.js"));
-    await log.initLog(context, tests);
+    await log.initLog(context, tests ? 2 : 0); // 0=off | 1=on w/red&yellow | 2=on w/ no red/yellow
     initStorage(context);
 
     log.write("");
