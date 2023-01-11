@@ -83,8 +83,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => this.pause(item), this));
         this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick?: boolean) => this.open(item, itemClick), this));
         this.disposables.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => this.openTerminal(item), this));
-        this.disposables.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
-        // this.disposables.push(commands.registerCommand(name + ".refresh", async () => this.refresh(true, false), this));
+        // this.disposables.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
+        this.disposables.push(commands.registerCommand(name + ".refresh", () => this.refresh(true, false), this));
         this.disposables.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "install"), this));
         this.disposables.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update"), this));
         this.disposables.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update <packagename>"), this));
@@ -1440,10 +1440,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             if (!processedEvents.includes(next.id)) // Ensure no dups
             {
                 log.write(`   process event # ${processedEvents.length + 1}`, logLevel, logPad);
-                log.values(logLevel, logPad + "      ", [
-                    [ "event id", next.id ], [ "arg1", util.isString(next.args[0]) ? next.args[0] : next.args[0].fsPath ],
-                    [ "arg2", next.args[1] instanceof Uri ? next.args[1].fsPath : "none (log padding)" ]
-                ]);
+                log.value("      event id", next.id, 1, logPad);
                 log.write(`      calling queued event method with ${next.args.length} args`, logLevel, logPad);
 
                 await next.fn.call(this, ...next.args);
