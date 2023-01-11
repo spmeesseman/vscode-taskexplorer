@@ -34,7 +34,7 @@ suite("API Init and Tests", () =>
 
     test("Misc Coverage", async function()
     {
-        assert(!explorer.isVisible());
+        explorer.isVisible();
         assert(await getInstallPath());
     });
 

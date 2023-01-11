@@ -8,12 +8,14 @@ export const testControl =
     // LOGGING DEFAULTS
     //
     logLevel: 2,
-    logEnabled: false,
+    logEnabled: true,
+    logErrors: false,      // doesn't work yet - to help me stop crapping when all the expected red errors come through
+    logReadToGreen: true,  // doesn't work yet - to help me stop crapping when all the expected red errors come through
     logToConsole: false,
     logToConsoleLevel: 3,
     logToFile: true,
     logToFileSymbols: false,
-    logToOutput: false,
+    logToOutput: true,
     logOpenFileOnFinish: true, // not yet
     //
     // These 2 properties are for using update() for coverage, see helper.initSettings
