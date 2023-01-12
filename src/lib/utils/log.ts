@@ -47,8 +47,6 @@ const blank = (level?: number, queueId?: string) =>
 };
 
 
-
-
 const dequeue = (queueId: string) =>
 {
     if (msgQueue[queueId])
@@ -91,7 +89,12 @@ const errorConsole = (msg: string, symbols: [ string, string ], queueId?: string
     writeToConsole = true;
     enableFile = false;
     enableOutputWindow = false;
-    write(symbols[0] + " " + msg, 0, "", queueId, false, true);
+    if (!isTestsBlockScaryColors) {
+        write(symbols[0] + " " + msg, 0, "", queueId, false, true);
+    }
+    else {
+        write(figures.withColor(symbols[0] + " " + msg, colors.grey), 0, "", queueId, false, true);
+    }
 };
 
 
