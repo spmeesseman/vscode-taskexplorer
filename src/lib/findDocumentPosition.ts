@@ -1,5 +1,5 @@
 
-import log from "./utils/log";
+import log from "./log/log";
 import { visit, JSONVisitor } from "jsonc-parser";
 import { TextDocument } from "vscode";
 import TaskItem from "../tree/item";

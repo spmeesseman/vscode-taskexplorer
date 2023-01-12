@@ -2,7 +2,7 @@
 
 import * as cache from "./cache";
 import * as util from "./utils/utils";
-import log from "./utils/log";
+import log from "./log/log";
 import { refreshTree } from "./refreshTree";
 import { isDirectory } from "./utils/fs";
 import { extname } from "path";

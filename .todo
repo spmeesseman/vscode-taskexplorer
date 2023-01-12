@@ -39,6 +39,9 @@ General Todos:
     
     ☐ add info box maybe monthly nag if grunt/gulp tasks VSCode provider(s) are 'on'
         Provide Yes/No to disable
+    
+    ☐ The 'use gulp' feature needs to use async exec
+        WHen used, VSCode complains Task Explorer used 100&% resource for x seconds
 
 Tests:
 

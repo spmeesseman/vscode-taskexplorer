@@ -1,7 +1,7 @@
 
 import * as https from "http";
 // import * as https from "https";
-import log from "./utils/log";
+import log from "./log/log";
 import { join } from "path";
 import { storage } from "./utils/storage";
 import { ILicenseManager } from "../interface/licenseManager";

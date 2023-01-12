@@ -1,7 +1,7 @@
 
 import * as path from "path";
 import * as util from "../lib/utils/utils";
-import log from "../lib/utils/log";
+import log from "../lib/log/log";
 import TaskFile from "./file";
 import TaskFolder from "./folder";
 import { ITaskItemApi } from "../interface";

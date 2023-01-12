@@ -3,7 +3,7 @@
 import * as util from "./lib/utils/utils";
 import * as cache from "./lib/cache";
 import * as fs from "./lib/utils/fs";
-import log from "./lib/utils/log";
+import log from "./lib/log/log";
 import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerViewReportCommand from "./commands/viewReport";
 import { join } from "path";

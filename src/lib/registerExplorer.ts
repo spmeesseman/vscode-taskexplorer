@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import log from "./utils/log";
+import log from "./log/log";
 import { TaskTreeDataProvider } from "../tree/tree";
 import { ExtensionContext, window, TreeView, TreeItem } from "vscode";
 import { IExplorerApi, ITaskExplorerApi } from "../interface";

@@ -1,7 +1,7 @@
 
 import * as path from "path";
 import * as util from "../lib/utils/utils";
-import log from "../lib/utils/log";
+import log from "../lib/log/log";
 import TaskFolder  from "./folder";
 import { ITaskFileApi, ITaskFolderApi, ITaskItemApi, TaskExplorerDefinition } from "../interface";
 import { pathExistsSync } from "../lib/utils/fs";

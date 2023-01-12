@@ -2,7 +2,7 @@
 import * as path from "path";
 import * as util from "../lib/utils/utils";
 import constants from "../lib/constants";
-import log from "../lib/utils/log";
+import log from "../lib/log/log";
 import { execSync } from "child_process";
 import { parseStringPromise } from "xml2js";
 import { configuration } from "../lib/utils/configuration";

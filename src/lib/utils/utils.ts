@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import log from "./log";
+import log from "../log/log";
 import * as minimatch from "minimatch";
 import constants from "../constants";
 import TaskItem from "../../tree/item";

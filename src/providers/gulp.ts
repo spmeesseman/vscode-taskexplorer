@@ -1,7 +1,7 @@
 
 import * as path from "path";
 import * as util from "../lib/utils/utils";
-import log from "../lib/utils/log";
+import log from "../lib/log/log";
 import { configuration } from "../lib/utils/configuration";
 import { execSync } from "child_process";
 import { TaskExplorerProvider } from "./provider";

@@ -4,7 +4,7 @@
 
 import * as afs from "../../lib/utils/fs";
 import * as util from "../../lib/utils/utils";
-import log from "../../lib/utils/log";
+import log from "../../lib/log/log";
 import { expect } from "chai";
 import { join } from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";

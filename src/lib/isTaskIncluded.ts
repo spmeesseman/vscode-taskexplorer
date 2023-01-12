@@ -1,7 +1,7 @@
 
 import * as json5 from "json5";
 import * as util from "./utils/utils";
-import log from "./utils/log";
+import log from "./log/log";
 import { join } from "path";
 import { providersExternal } from "../extension";
 import { configuration } from "./utils/configuration";

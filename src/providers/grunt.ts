@@ -1,7 +1,7 @@
 
 import * as path from "path";
 import * as util from "../lib/utils/utils";
-import log from "../lib/utils/log";
+import log from "../lib/log/log";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";

@@ -1,7 +1,7 @@
 
 import * as bombadil from "@sgarciac/bombadil";
 import * as util from "../lib/utils/utils";
-import log from "../lib/utils/log";
+import log from "../lib/log/log";
 import { TaskExplorerProvider } from "./provider";
 import { TaskExplorerDefinition } from "../interface/taskDefinition";
 import { configuration } from "../lib/utils/configuration";

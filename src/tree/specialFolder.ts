@@ -1,7 +1,7 @@
 
 import * as sortTasks from "../lib/sortTasks";
 import constants from "../lib/constants";
-import log from "../lib/utils/log";
+import log from "../lib/log/log";
 import TaskItem from "./item";
 import TaskFolder from "./folder";
 import { isString, removeFromArray } from "../lib/utils/utils";

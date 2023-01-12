@@ -1,6 +1,6 @@
 
 import * as path from "path";
-import log from "./utils/log";
+import log from "./log/log";
 import { teApi } from "../extension";
 import { Task, Uri, ViewColumn, WebviewPanel, window, workspace, WorkspaceFolder } from "vscode";
 import { getInstallPath, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "./utils/utils";

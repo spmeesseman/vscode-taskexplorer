@@ -10,4 +10,5 @@ export * from "./taskFile";
 export * from "./taskFolder";
 export * from "./taskitem";
 export * from "./IDictionary";
+export * from "./ILogQueueItem";
 export * from "./cacheItem";

@@ -2,7 +2,7 @@
 import * as util from "../lib/utils/utils";
 import * as sortTasks from "../lib/sortTasks";
 import constants from "../lib/constants";
-import log from "../lib/utils/log";
+import log from "../lib/log/log";
 import SpecialTaskFolder from "./specialFolder";
 import TaskItem from "./item";
 import TaskFile from "./file";

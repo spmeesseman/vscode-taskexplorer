@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as util from "./utils/utils";
-import log from "./utils/log";
+import log from "./log/log";
 import SpecialTaskFolder from "../tree/specialFolder";
 import TaskItem from "../tree/item";
 import { IExplorerApi } from "../interface";
