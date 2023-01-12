@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <!--
+        <meta
+            http-equiv="Content-Security-Policy" content="default-src 'self'; img-src \${webview.cspSource} https:; 
+            script-src \${webview.cspSource} 'self' 'unsafe-inline'; script-src-elem 'self' 'unsafe-inline';
+            style-src \${webview.cspSource}  'unsafe-inline' 'self';"
+        />
+        -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Task Explorer</title>
+        <style>
+            button {
+                background-color: var(--vscode-button-background);
+                color: var(--vscode-button-foreground);
+                padding: 8px 12px;
+            }
+            button:hover {
+                background-color: var(--vscode-button-hoverBackground)
+            }
+        </style>
+        <script type="text/javascript">
+            let vscode;
+            function getLicense()
+            {
+                vscode = vscode || acquireVsCodeApi();
+                vscode.postMessage({
+                    command: 'enterLicense',
+                    text: ''
+                });
+            }
+            function viewReport()
+            {
+                vscode = vscode || acquireVsCodeApi();
+                vscode.postMessage({
+                    command: 'viewReport',
+                    text: ''
+                });
+            }
+            // Handle message inside the webview
+            window.addEventListener('message', event => {
+                const message = event.data; // JSON data from tests
+                switch (message.command) {
+                    case 'viewReport':
+                        viewReport();
+                        break;
+                    case 'enterLicense':
+                        getLicense();
+                        break;
+                }
+            });
+        </script>
+    </head>
+    <body style="padding:20px">
+
+        <table align="center" width="900">
+
+            <!-- startBodyContent-->
+            <tr><td>
+
+                <table>
+                    <tr><td>
+                        <table><tr>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/gears-r-colors.png" height="50" />
+                            </td>
+                            <td valign="middle" style="font-size:40px;font-weight:bold"> &nbsp;<!-- title --></td>
+                        </tr></table>
+                    </td></tr>
+                    <tr><td>
+                        <table style="margin-top:15px"><tr>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/npm.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ant.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/yarn.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/grunt.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/gulp.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/composer.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/workspace.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/make.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ts.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bat.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ruby.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/powershell.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bash.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/python.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/nsis.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/perl.png" />
+                            </td>
+                            <td>
+                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/maven.png" />
+                            </td>
+                        </tr></table>
+                    </td></tr>
+                </table>
+
+            </td></tr>
+            <!-- endBodyContent -->
+
+            <!-- infoContent -->
+            <!-- startInfoContent -->
+            <tr><td>
+
+                <table style="margin-top:15px;display:flexbox;width:-webkit-fill-available">
+                    <tr>
+                    <td>
+                        <table>
+                        <tr>
+                            <td style="font-size:16px;font-weight:bold" nowrap>
+                                Task Explorer has parsed ${taskCounts.length} components in
+                                ${projects.length} project(s)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td nowrap>
+                                <ul>
+                                    <li>${tasks.length} Total tasks</li>
+                                    <li>${taskCounts.ant} Ant tasks</li>
+                                    <li>${taskCounts.apppublisher} App-Publisher tasks</li>
+                                    <li>${taskCounts.bash} Bash scripts</li>
+                                    <li>${taskCounts.batch} Batch scripts</li>
+                                    <li>${taskCounts.composer} Composer tasks</li>
+                                    <li>${taskCounts.gradle} Gradle tasks</li>
+                                    <li>${taskCounts.grunt} Grunt tasks</li>
+                                    <li>${taskCounts.gulp} Gulp tasks</li>
+                                    <li>${taskCounts.make} Make tasks</li>
+                                    <li>${taskCounts.maven} Maven tasks</li>
+                                    <li>${taskCounts.npm} NPM tasks</li>
+                                    <li>${taskCounts.nsis} NSIS tasks</li>
+                                    <li>${taskCounts.powershell} Powershell scripts</li>
+                                    <li>${taskCounts.python} Python scripts</li>
+                                    <li>${taskCounts.ruby} Ruby scripts</li>
+                                    <li>${taskCounts.tsc} Typescript tasks</li>
+                                    <li>${taskCounts.Workspace} VSCode tasks</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        </table>
+                    </td>
+                    <td valign="top" align="right" style="padding-left:100px;padding-top:7px;width:-webkit-fill-available">
+                        <div>
+                            <button style="cursor:pointer;width:150px" onclick="getLicense();">Get License Now</button>
+                        </div>
+                        <div  style="margin-top:10px">
+                            <button style="cursor:pointer;width:150px" onclick="viewReport();">View Parsing Report</button>
+                        </div>
+                    </td></tr>
+                </table>
+
+            </td></tr>
+            <!-- endInfoContent -->
+
+            <!-- startLicenseContent -->
+            <tr><td>
+
+                <table style="margin-top:15px;width:inherit">
+                    <tr><td style="font-weight:bold;font-size:14px">
+                        Licensing Note
+                    </td></tr>
+                    <tr><td>
+                        This extension is free to use but am considering a small license for an
+                        unlimited parsed component type of thing (e.g $10 - $20), as the time spent
+                        and functionality have went way beyond what was at first intended.
+                        <br><br>Hey Sencha, you can buy it and replace your own product if you want ;).
+                    </td></tr></table>
+                    <table style="margin-top:30px">
+                        <tr><td>You can view a detailed parsing report using the "<i>Task Explorer: View Parsing Report</i>"
+                        command in the Explorer context menu for any project.  It can alternatively be ran from the
+                        command pallette for "all projects".
+                        <tr><td height="20"></td></tr>
+                        <tr><td>
+                            <img src="https://raw.githubusercontent.com/spmeesseman/vscode-extjs/master/res/readme/ast-report.png">
+                        </td></tr>
+                    </table>
+
+            </td></tr>
+            <!-- endLicenseContent -->
+
+        </table>
+
+    </body>
+</html>
