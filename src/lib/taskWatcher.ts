@@ -14,7 +14,7 @@ import {
 
 export class TaskWatcher
 {
-    private static statusBarSpace: StatusBarItem;
+    private static statusBarSpace: StatusBarItem | undefined;
     private tree: IExplorerApi;
     private disposables: Disposable[];
     private subscriptionStartIndex: number;
@@ -86,7 +86,7 @@ export class TaskWatcher
 
     private fireAllBabySitters()
     {
-        Object.keys(this.babysitterTimers).forEach((taskId) => this.fireBabySitter(taskId));
+        Object.keys(this.babysitterTimers).forEach(/* istanbul ignore next */(taskId) => this.fireBabySitter(taskId));
     }
 
 
@@ -197,6 +197,7 @@ export class TaskWatcher
                 /* istanbul ignore else */
                 if (TaskWatcher.statusBarSpace) {
                     TaskWatcher.statusBarSpace.dispose();
+                    TaskWatcher.statusBarSpace = undefined;
                 }
             }
         }
