@@ -476,7 +476,7 @@ export const overrideNextShowInfoBox = (value: any) =>
 };
 
 
-const processSuiteTimes = () =>
+const processSuiteTimes = async () =>
 {
     Object.keys(testControl.tests.suiteResults).forEach(async (suite) =>
     {
@@ -518,8 +518,6 @@ const processTimes = async () =>
     console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + timeFinishedFmt, figures.colors.grey)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + timeElapsedFmt, figures.colors.grey)}`);
 
-    await storage.update("timeElapsed", timeElapsed);
-
     if (testControl.tests.numTestsFail === 0)
     {
         if (testControl.tests.numSuites > 4)  // > 4, sometimes i string the single test together temp
@@ -535,6 +533,11 @@ const processTimes = async () =>
             {
                 console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time  " + timeElapsedFmt, figures.colors.cyan)}`);
                 await storage.update("bestTimeElapsed", timeElapsed);
+                await storage.update("bestTimeElapsedFmt", timeElapsedFmt);
+            }
+            else {
+                const bestTimeElapsedFmt = storage.get<number>("bestTimeElapsedFmt", 0);
+                console.log(`    ${figures.color.info} ${figures.withColor("The  fastest time recorded with logging disabled is " + bestTimeElapsedFmt, figures.colors.grey)}`);
             }
             if (testControl.log.enabled)
             {
@@ -550,6 +553,11 @@ const processTimes = async () =>
                 {
                     console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time with Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
                     await storage.update("bestTimeElapsedLWithLogging", timeElapsed);
+                    await storage.update("bestTimeElapsedLWithLoggingFmt", timeElapsedFmt);
+                }
+                else {
+                    const bestTimeElapsedFmt = storage.get<number>("bestTimeElapsedLWithLoggingFmt", 0);
+                    console.log(`    ${figures.color.info} ${figures.withColor("The fastest time recorded with logging enabled is " + bestTimeElapsedFmt, figures.colors.grey)}`);
                 }
                 if (testControl.log.file)
                 {
@@ -565,6 +573,11 @@ const processTimes = async () =>
                     {
                         console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time with File Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
                         await storage.update("bestTimeElapsedWithLoggingFile", timeElapsed);
+                        await storage.update("bestTimeElapsedWithLoggingFileFmt", timeElapsedFmt);
+                    }
+                    else {
+                        const bestTimeElapsedFmt = storage.get<number>("bestTimeElapsedWithLoggingFileFmt", 0);
+                        console.log(`    ${figures.color.info} ${figures.withColor("The fastest time recorded with file logging enabled is " + bestTimeElapsedFmt, figures.colors.grey)}`);
                     }
                 }
                 if (testControl.log.output)
@@ -581,6 +594,11 @@ const processTimes = async () =>
                     {
                         console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time with Output Window Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
                         await storage.update("bestTimeElapsedWithLoggingOutput", timeElapsed);
+                        await storage.update("bestTimeElapsedWithLoggingOutputFmt", timeElapsedFmt);
+                    }
+                    else {
+                        const bestTimeElapsedFmt = storage.get<number>("bestTimeElapsedWithLoggingOutputFmt", 0);
+                        console.log(`    ${figures.color.info} ${figures.withColor("The fastest time recorded with output window logging enabled is " + bestTimeElapsedFmt, figures.colors.grey)}`);
                     }
                 }
                 if (testControl.log.console)
@@ -597,14 +615,19 @@ const processTimes = async () =>
                     {
                         console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time with Console Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
                         await storage.update("bestTimeElapsedWithLoggingConsole", timeElapsed);
+                        await storage.update("bestTimeElapsedWithLoggingConsoleFmt", timeElapsedFmt);
+                    }
+                    else {
+                        const bestTimeElapsedFmt = storage.get<number>("bestTimeElapsedWithLoggingConsoleFmt", 0);
+                        console.log(`    ${figures.color.info} ${figures.withColor("The fastest time recorded with console logging enabled is " + bestTimeElapsedFmt, figures.colors.grey)}`);
                     }
                 }
             }
-            processSuiteTimes();
+            await processSuiteTimes();
         }
         else if (testControl.tests.numSuites === 2) // 1 single-suite test, + xDeactivate, which always runs
         {
-            processSuiteTimes();
+            await processSuiteTimes();
         }
     }
     else {
