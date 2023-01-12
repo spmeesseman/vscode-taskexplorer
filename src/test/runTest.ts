@@ -63,7 +63,7 @@ async function main(args: string[])
         {   // Log file - whats a good way to open it in the active vscode instance???
             //
             let logFile: string | undefined;
-            if (testControl.logEnabled && testControl.logToFile && testControl.logOpenFileOnFinish)
+            if (testControl.log.enabled && testControl.log.file && testControl.log.openFileOnFinish)
             {
                 let lastDateModified: Date | undefined;
                 const tzOffset = (new Date()).getTimezoneOffset() * 60000,

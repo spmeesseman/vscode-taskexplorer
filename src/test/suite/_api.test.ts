@@ -28,7 +28,7 @@ suite("API Init and Tests", () =>
 
     test("Show Output Window", async function()
     {
-        await executeTeCommand("showOutput", 10, 50, testControl.logEnabled && testControl.logToOutput);
+        await executeTeCommand("showOutput", 10, 50, testControl.log.enabled && testControl.log.output);
     });
 
 

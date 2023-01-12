@@ -35,12 +35,12 @@ suite("Util Tests", () =>
 
 	suiteTeardown(async function()
 	{
-		log.setWriteToConsole(testControl.logToConsole, testControl.logToConsoleLevel);
-		await executeSettingsUpdate("logging.enable", testControl.logEnabled);
-		await executeSettingsUpdate("logging.enableFile", testControl.logToFile);
-		await executeSettingsUpdate("logging.enableOutputWindow", testControl.logToOutput);
-		await executeSettingsUpdate("logging.enableFileSymbols", testControl.logToFileSymbols);
-		await executeSettingsUpdate("logging.level", testControl.logLevel);
+		log.setWriteToConsole(testControl.log.console, testControl.log.consoleLevel);
+		await executeSettingsUpdate("logging.enable", testControl.log.enabled);
+		await executeSettingsUpdate("logging.enableFile", testControl.log.file);
+		await executeSettingsUpdate("logging.enableOutputWindow", testControl.log.output);
+		await executeSettingsUpdate("logging.enableFileSymbols", testControl.log.fileSymbols);
+		await executeSettingsUpdate("logging.level", testControl.log.level);
         suiteFinished(this);
 	});
 

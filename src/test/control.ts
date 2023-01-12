@@ -5,39 +5,45 @@ export const testControl =
     //
     keepSettingsFileChanges: false,
     //
-    // LOGGING DEFAULTS
-    //
-    logLevel: 2,
-    logEnabled: true,
-    logErrors: false,
-    logToConsole: false,
-    logToConsoleLevel: 3,
-    logToFile: true,
-    logToFileSymbols: false,
-    logToOutput: true,
-    logOpenFileOnFinish: true, // not yet
-    logBlockScaryColors: true,
-    //
-    // These 2 properties are for using update() for coverage, see helper.initSettings
-    //
-    userLogLevel: 1,
-    userPathToAnt: "c:\\Code\\ant\\bin\\ant.bat",
-    userPathToAnsicon: "c:\\Code\\ansicon\\x64\\ansicon.exe",
-    //
     // Global settings that will get set/unset
     //
     vsCodeAutoDetectGrunt: "off",
     vsCodeAutoDetectGulp: "off",
     //
+    // LOGGING DEFAULTS
+    //
+    log: {
+        level: 2,
+        enabled: false,
+        errors: false,
+        console: false,
+        consoleLevel: 3,
+        file: true,
+        fileSymbols: false,
+        output: false,
+        openFileOnFinish: true, // not yet
+        blockScaryColors: true
+    },
+    //
     // Rolling success count and failure flag
     //
-    testFailed: false,
-    numSuites: 0,
-    numSuitesFail: 0,
-    numSuitesSuccess: 0,
-    numTests: 0,
-    numTestsFail: 0,
-    numTestsSuccess: 0,
+    tests: {
+        numSuites: 0,
+        numSuitesFail: 0,
+        numSuitesSuccess: 0,
+        numTests: 0,
+        numTestsFail: 0,
+        numTestsSuccess: 0,
+        suiteResults: {}
+    },
+    //
+    // These 2 properties are for using update() for coverage, see helper.initSettings
+    //
+    user: {
+        logLevel: 1,
+        pathToAnt: "c:\\Code\\ant\\bin\\ant.bat",
+        pathToAnsicon: "c:\\Code\\ansicon\\x64\\ansicon.exe"
+    },
     //
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)s
     //

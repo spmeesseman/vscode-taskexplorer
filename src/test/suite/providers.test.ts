@@ -59,7 +59,7 @@ suite("Provider Tests", () =>
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate("logging.enable", testControl.logEnabled, testControl.waitTime.configEvent);
+        await executeSettingsUpdate("logging.enable", testControl.log.enabled, testControl.waitTime.configEvent);
         await executeSettingsUpdate("specialFolders.expanded.test-files", false, testControl.waitTime.configEvent);
         await executeSettingsUpdate("enabledTasks.apppublisher", false, testControl.waitTime.configDisableEvent); // off by default
         await executeSettingsUpdate("enabledTasks.gradle", false, testControl.waitTime.configDisableEvent);       // off by default
