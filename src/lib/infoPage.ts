@@ -3,8 +3,10 @@ import * as path from "path";
 import log from "./utils/log";
 import { teApi } from "../extension";
 import { Task, Uri, ViewColumn, WebviewPanel, window, workspace, WorkspaceFolder } from "vscode";
-import { getHeaderContent, getBodyContent, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "./utils/utils";
+import { getInstallPath, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "./utils/utils";
 import { IExplorerApi } from "../interface";
+import { readFileAsync } from "./utils/fs";
+import { join } from "path";
 
 
 let panel: WebviewPanel | undefined;
@@ -13,15 +15,6 @@ let panel: WebviewPanel | undefined;
 export const displayParsingReport = async(logPad: string, logLevel: number, uri?: Uri) =>
 {
     log.methodStart("display parsing report", logLevel, logPad);
-
-    let content = getHeaderContent();
-
-	content += "<table align=\"center\">";
-	content += ("<tr><td>" + getBodyContent("Welcome to Task Explorer") + "</td></tr>");
-	content += ("<tr><td>" + getInfoContent(logPad + "   ", logLevel + 1, uri) + "</td></tr>");
-	content += "</table>";
-    content += getFooterContent();
-
 	panel = window.createWebviewPanel(
 		"taskExplorer",                 // Identifies the type of the webview. Used internally
 		"Task Explorer Parsing Report", // Title of the panel displayed to the users
@@ -30,21 +23,34 @@ export const displayParsingReport = async(logPad: string, logLevel: number, uri?
 			enableScripts: true
 		}
 	);
-	panel.webview.html = content;
+	panel.webview.html = await getHtmlContent(logPad, logLevel, uri);
 	panel.reveal();
-
     log.methodDone("display parsing report", logLevel, logPad);
-
     return panel;
 };
 
 
-// function closeWebView()
-// {
-//     panel?.dispose();
-// }
+export const dispose = () =>
+{
+    panel?.dispose();
+};
 
-const getFooterContent = () => "</body></html>";
+
+const getHtmlContent = async (logPad: string, logLevel: number, uri?: Uri) =>
+{
+	const installPath = await getInstallPath();
+	const infoContent = "<tr><td>" + getInfoContent(logPad + "   ", logLevel + 1, uri) + "</td></tr>";
+	let html = await readFileAsync(join(installPath, "res/license-manager.html"));
+	html = html.replace("<!-- title -->", "Task Explorer");
+	// html = html.replace("<!-- infoContent -->", infoContent);
+	let idx1 = html.indexOf("<!-- startInfoContent -->");
+	let idx2 = html.indexOf("<!-- endInfoContent -->") + 23;
+	html = html.replace(html.slice(idx1, idx2), infoContent);
+	idx1 = html.indexOf("<!-- startLicenseContent -->");
+	idx2 = html.indexOf("<!-- endLicenseContent -->") + 26;
+	html = html.replace(html.slice(idx1, idx2), "");
+	return html;
+};
 
 
 const getInfoContent = (logPad: string, logLevel: number, uri?: Uri) =>

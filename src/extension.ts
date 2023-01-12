@@ -49,6 +49,7 @@ export const teApi: ITaskExplorerApi =
     explorerView: undefined,
     isBusy,
     isTests: () => tests,
+    setTests: (isTests) => { tests = isTests; },
     log,
     providers,
     providersExternal,
@@ -70,9 +71,20 @@ export const teApi: ITaskExplorerApi =
 
 export async function activate(context: ExtensionContext) // , disposables: Disposable[]): Promise<ITaskExplorerApi>
 {
+    //
+    // Set 'tests' flag if tests are running and this is not a user runtime
+    //
     tests = await fs.pathExists(join(__dirname, "test", "runTest.js"));
+
+    //
+    // Initialize logging
+    //
     await log.initLog(context, tests ? 2 : /* istanbul ignore next */ 0); // 0=off | 1=on w/red&yellow | 2=on w/ no red/yellow
-    initStorage(context);
+
+    //
+    // Initialize persistent storage
+    //
+    initStorage(context, tests);
 
     log.write("");
     log.write("Activate extension");

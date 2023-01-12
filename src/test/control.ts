@@ -60,7 +60,8 @@ export const testControl =
         fsModifyEvent: 810,
         getTreeTasks: 215,
         getTreeTasksNpm: 750, // npm task provider is slower than shit on a turtle
-        licenseMgrOpenPage: 1000,
+        licenseMgrOpenPage: 575,
+        licenseMgrOpenPageWithDetail: 990,
         licenseManagerLocalCheck: 2000,
         licenseManagerLocalStartServer: 8500,
         licenseManagerRemoteCheck: 3000,

@@ -20,6 +20,7 @@ async function viewReport(uri?: Uri, logPad = "   ", logLevel = 1)
         null, context.subscriptions);
     }
     log.methodDone("view report command", logLevel, logPad);
+    return panel;
 }
 
 
@@ -27,7 +28,7 @@ function registerViewReportCommand(ctx: ExtensionContext)
 {
     context = ctx;
 	context.subscriptions.push(
-        commands.registerCommand("taskExplorer.viewReport", async (uri?: Uri, logPad?: string, logLevel?: number) => { await viewReport(uri, logPad, logLevel); })
+        commands.registerCommand("taskExplorer.viewReport", async (uri?: Uri, logPad?: string, logLevel?: number) => viewReport(uri, logPad, logLevel))
     );
 }
 

@@ -3,11 +3,11 @@ import { Task, WebviewPanel } from "vscode";
 export interface ILicenseManager
 {
     checkLicense: (logPad?: string) => Promise<void>;
+    dispose: () => void;
     enterLicenseKey: () => Promise<void>;
     getLicenseKey: () => string | undefined;
-    getMaxNumberOfTasks: () => number;
+    getMaxNumberOfTasks: (taskType?: string) => number;
     getMaxNumberOfTaskFiles: () => number;
-    getMaxNumberOfTasksByType: (taskType: string) => number;
     getVersion: () => string;
     getWebviewPanel: () => WebviewPanel | undefined;
     isLicensed: () => boolean;

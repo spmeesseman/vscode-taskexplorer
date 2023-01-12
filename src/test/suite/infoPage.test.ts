@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { Uri } from "vscode";
+import { Uri, WebviewPanel } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {  activate, closeActiveDocument, executeTeCommand, focusExplorerView, executeSettingsUpdate, testControl } from "../helper";
 
@@ -36,7 +36,8 @@ suite("Info Report Tests", () =>
 	{
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder);
 		await executeSettingsUpdate("specialFolders.showUserTasks", false);
-		await executeTeCommand("viewReport", 100, 500, projectUri);
+		const panel = await executeTeCommand("viewReport", 100, 500, projectUri) as WebviewPanel;
+		panel.dispose();
 		await closeActiveDocument();
 	});
 
@@ -44,7 +45,8 @@ suite("Info Report Tests", () =>
 	test("Report page single project 2", async function()
 	{
 		this.slow(testControl.slowTime.viewReport);
-	    await executeTeCommand("viewReport", 50, 500, projectUri, "");
+	    const panel = await executeTeCommand("viewReport", 50, 500, projectUri, "") as WebviewPanel;
+		panel.dispose();
 		await closeActiveDocument();
 	});
 
@@ -53,7 +55,8 @@ suite("Info Report Tests", () =>
 	{
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder);
 		await executeSettingsUpdate("specialFolders.showUserTasks", true);
-	    await executeTeCommand("viewReport", 50, 500, projectUri, "", 5);
+	    const panel = await executeTeCommand("viewReport", 50, 500, projectUri, "", 5) as WebviewPanel;
+		panel.dispose();
 		await closeActiveDocument();
 	});
 
@@ -61,7 +64,8 @@ suite("Info Report Tests", () =>
 	test("Report page all projects", async function()
 	{
 		this.slow(testControl.slowTime.viewReport);
-	    await executeTeCommand("viewReport", 50, 500);
+	    const panel = await executeTeCommand("viewReport", 50, 500) as WebviewPanel;
+		panel.dispose();
 		await closeActiveDocument();
 	});
 

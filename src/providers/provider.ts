@@ -72,7 +72,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             this.cachedTasks = await this.readTasks(TaskExplorerProvider.logPad + "   ");
             if (licMgr && !licMgr.isLicensed())
             {
-                const maxTasks = licMgr.getMaxNumberOfTasksByType(this.providerName);
+                const maxTasks = licMgr.getMaxNumberOfTasks(this.providerName);
                 //
                 // TODO - remove below ignore tags when test for copy/move folder w/files is implemented
                 //

@@ -4,7 +4,7 @@ import * as path from "path";
 import * as assert from "assert";
 import * as treeUtils from "./treeUtils";
 import figures from "../lib/figures";
-import { deactivate } from "../extension";
+import { deactivate, getLicenseManager } from "../extension";
 import { testControl } from "./control";
 import { configuration } from "../lib/utils/configuration";
 import constants from "../lib/constants";
@@ -12,6 +12,7 @@ import { deleteFile, pathExists } from "../lib/utils/fs";
 import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import { storage } from "../lib/utils/storage";
+import { ILicenseManager } from "../interface/licenseManager";
 
 export { figures };
 export { testControl };
@@ -84,11 +85,9 @@ export async function activate(instance?: any)
             assert.fail(`    ${figures.color.error} Explorer instance does not exist`);
         }
         //
-        // Set persistent store names for tests so they don't f with my real stuff
+        // Clear persistent storage.  Storage is only available after extension activation.
         //
-        constants.LAST_TASKS_STORE = "lastTasksTests";
-        constants.FAV_TASKS_STORE = "favoriteTasksTests";
-        constants.TASKS_RENAME_STORE = "RenamesTests";
+        console.log(`    ${figures.color.info} ${figures.withColor("Clearing persistent storage", figures.colors.grey)}`);
         await storage.update(constants.FAV_TASKS_STORE, []);
         await storage.update(constants.LAST_TASKS_STORE, []);
         await storage.update(constants.TASKS_RENAME_STORE, []);
@@ -436,6 +435,14 @@ export function setExplorer(explorer: IExplorerApi)
     teExplorer = explorer;
 }
 
+
+export async function setLicensed(valid: boolean, licMgr: ILicenseManager)
+{
+    teApi.setTests(!valid);
+    await licMgr.setLicenseKey(valid ? "1234-5678-9098-7654321" : undefined);
+    await licMgr.checkLicense();
+    teApi.setTests(true);
+};
 
 export async function sleep(ms: number)
 {
