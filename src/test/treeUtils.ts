@@ -8,7 +8,6 @@ import { isObjectEmpty } from "../lib/utils/utils";
 import { ITaskItemApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, getTeApi, sleep, testControl } from "./helper";
 
-
 let didSetGroupLevel = false;
 
 
@@ -25,9 +24,8 @@ export const refresh = async(instance?: any) =>
     const teApi = getTeApi();
     if (instance) {
         instance.slow(testControl.slowTime.refreshCommand + testControl.waitTime.refreshCommand +
-                      (testControl.slowTime.configGroupingEvent * (didSetGroupLevel ? 0 : 2)) + (testControl.waitTime.min * (didSetGroupLevel ? 0 : 1)));
-        instance.timeout((testControl.slowTime.refreshCommand  * (didSetGroupLevel ? 0 : 2)) + (testControl.slowTime.configGroupingEvent * 2) +
-                        (testControl.waitTime.min * (didSetGroupLevel ? 0 : 1)));
+                      (testControl.waitTime.min * 2) + (!didSetGroupLevel ? (testControl.slowTime.configGroupingEvent * 2) : 0));
+        instance.timeout((testControl.slowTime.refreshCommand  * 2) + (!didSetGroupLevel ? (testControl.slowTime.configGroupingEvent * 2) : 0) + (testControl.waitTime.min * 2));
     }
     if (!didSetGroupLevel)
     {
@@ -37,6 +35,8 @@ export const refresh = async(instance?: any) =>
         didSetGroupLevel = true;
     }
     await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
+    // await sleep(testControl.waitTime.min);
+    // await executeTeCommand("refresh", testControl.waitTime.min);
 };
 
 

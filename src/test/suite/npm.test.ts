@@ -62,7 +62,7 @@ suite("NPM Tests", () =>
     test("Create Package File (package.json)", async function()
     {
         expect(successCount).to.be.equal(1, "rolling success count failure");
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsCreateEvent);
+        this.slow(testControl.slowTime.fsCreateEvent + (testControl.waitTime.fsCreateEvent * 2));
         // tagLog("NPM", "Create Package File (1: package.json)");
         //
         // Create NPM package.json
@@ -82,7 +82,7 @@ suite("NPM Tests", () =>
             "}\r\n"
         );
         // tagLog("NPM", "Create Package File (2: package.json)");
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent * 2);
         // tagLog("NPM", "Create Package File (3: package.json)");
         ++successCount;
     });

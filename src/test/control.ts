@@ -138,7 +138,7 @@ export const testControl =
         min: 50,
         npmCommandMin: 3000,
         rebuildFileCacheCancel: 50,
-        refreshCommand: 475,
+        refreshCommand: 500,
         refreshTaskTypeCommand: 1000,
         removeWorkspaceFolder: 250,
         runCommandMin: 1000,

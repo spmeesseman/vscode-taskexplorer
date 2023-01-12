@@ -53,10 +53,8 @@ suite("Python Tests", () =>
 
 
     suiteTeardown(async function()
-    {   //
-        // Reset settings
-        //
-        await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
+    {
+        await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram, testControl.waitTime.configEvent);
         await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTime.configEnableEvent);
         await fsApi.deleteDir(dirName);
         suiteFinished(this);
@@ -95,7 +93,7 @@ suite("Python Tests", () =>
     test("Disable", async function()
     {
         expect(successCount).to.be.equal(3, "rolling success count failure");
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
@@ -105,8 +103,19 @@ suite("Python Tests", () =>
     test("Re-enable", async function()
     {
         expect(successCount).to.be.equal(4, "rolling success count failure");
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.configEnableEvent+ testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
+        await verifyTaskCount(testsName, startTaskCount);
+        ++successCount;
+    });
+
+
+    test("Create Empty Directory", async function()
+    {
+        expect(successCount).to.be.equal(5, "rolling success count failure");
+        this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.waitTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount);
+        await fsApi.createDir(dirName);
+        await teApi.waitForIdle(testControl.waitTime.fsCreateFolderEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
@@ -114,9 +123,8 @@ suite("Python Tests", () =>
 
     test("Create File", async function()
     {
-        expect(successCount).to.be.equal(5, "rolling success count failure");
-        this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount);
-        await fsApi.createDir(dirName);
+        expect(successCount).to.be.equal(6, "rolling success count failure");
+        this.slow(testControl.waitTime.fsCreateEvent + testControl.waitTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
@@ -126,22 +134,19 @@ suite("Python Tests", () =>
 
     test("Delete File", async function()
     {
-        expect(successCount).to.be.equal(6, "rolling success count failure");
-        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
+        expect(successCount).to.be.equal(7, "rolling success count failure");
+        this.slow(testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent * 2);
-        await verifyTaskCount(testsName, startTaskCount);
-        await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
 
 
     test("Re-create File", async function()
     {
-        expect(successCount).to.be.equal(7, "rolling success count failure");
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
-        await fsApi.createDir(dirName);
+        expect(successCount).to.be.equal(8, "rolling success count failure");
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1, 1);
@@ -151,8 +156,8 @@ suite("Python Tests", () =>
 
     test("Delete Folder", async function()
     {
-        expect(successCount).to.be.equal(8, "rolling success count failure");
-        this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount);
+        expect(successCount).to.be.equal(9, "rolling success count failure");
+        this.slow(testControl.slowTime.fsDeleteFolderEvent + (testControl.waitTime.fsDeleteEvent * 2) + testControl.slowTime.verifyTaskCount);
         // await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent * 2);
