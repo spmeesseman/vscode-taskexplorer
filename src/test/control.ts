@@ -1,4 +1,7 @@
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
+
 export const testControl =
 {   //
     // KEEP SETTINGS FILE CHANGES (@ test-files/.vscode/workspace.json)
@@ -17,7 +20,7 @@ export const testControl =
         enabled: false,
         errors: false,
         console: false,
-        consoleLevel: 3,
+        consoleLevel: 1,
         file: true,
         fileSymbols: false,
         output: false,
@@ -28,13 +31,14 @@ export const testControl =
     // Rolling success count and failure flag
     //
     tests: {
+        clearBestTimes: false,
         numSuites: 0,
         numSuitesFail: 0,
         numSuitesSuccess: 0,
         numTests: 0,
         numTestsFail: 0,
         numTestsSuccess: 0,
-        suiteResults: {}
+        suiteResults: {} as IDictionary<any>
     },
     //
     // These 2 properties are for using update() for coverage, see helper.initSettings
@@ -134,7 +138,7 @@ export const testControl =
         min: 50,
         npmCommandMin: 3000,
         rebuildFileCacheCancel: 50,
-        refreshCommand: 500,
+        refreshCommand: 475,
         refreshTaskTypeCommand: 1000,
         removeWorkspaceFolder: 250,
         runCommandMin: 1000,

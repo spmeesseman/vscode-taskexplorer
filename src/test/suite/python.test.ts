@@ -7,6 +7,7 @@
 //
 import * as assert from "assert";
 import * as path from "path";
+import { expect } from "chai";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { PythonTaskProvider } from "../../providers/python";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
@@ -25,6 +26,7 @@ let enableTaskType: boolean;
 let wsFolder: WorkspaceFolder;
 let dirName: string;
 let fileUri: Uri;
+let successCount = -1;
 
 
 suite("Python Tests", () =>
@@ -46,6 +48,7 @@ suite("Python Tests", () =>
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe", testControl.waitTime.configEvent);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
+        ++successCount;
     });
 
 
@@ -62,81 +65,99 @@ suite("Python Tests", () =>
 
     test("Document Position", async function()
     {
+        expect(successCount).to.be.equal(0, "rolling success count failure");
         const provider = teApi.providers.get(testsName) as PythonTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
+        ++successCount;
     });
 
 
     test("Invalid ScriptProvider Type", async function()
     {
+        expect(successCount).to.be.equal(1, "rolling success count failure");
         const provider = teApi.providers.get(testsName) as PythonTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.py"))),
                "ScriptProvider type should return position 1");
         logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(true);
+        ++successCount;
     });
 
 
     test("Start", async function()
     {
+        expect(successCount).to.be.equal(2, "rolling success count failure");
         this.slow(testControl.slowTime.verifyTaskCount);
         await verifyTaskCount(testsName, startTaskCount, 3);
+        ++successCount;
     });
 
 
     test("Disable", async function()
     {
+        expect(successCount).to.be.equal(3, "rolling success count failure");
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
+        ++successCount;
     });
 
 
     test("Re-enable", async function()
     {
+        expect(successCount).to.be.equal(4, "rolling success count failure");
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
+        ++successCount;
     });
 
 
     test("Create File", async function()
     {
+        expect(successCount).to.be.equal(5, "rolling success count failure");
         this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
+        ++successCount;
     });
 
 
     test("Delete File", async function()
     {
+        expect(successCount).to.be.equal(6, "rolling success count failure");
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent * 2);
         await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        ++successCount;
     });
 
 
     test("Re-create File", async function()
     {
+        expect(successCount).to.be.equal(7, "rolling success count failure");
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
-        await verifyTaskCount(testsName, startTaskCount + 1);
+        await verifyTaskCount(testsName, startTaskCount + 1, 1);
+        ++successCount;
     });
 
 
     test("Delete Folder", async function()
     {
+        expect(successCount).to.be.equal(8, "rolling success count failure");
         this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount);
         // await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent * 2);
         await verifyTaskCount(testsName, startTaskCount);
+        ++successCount;
     });
 
 });

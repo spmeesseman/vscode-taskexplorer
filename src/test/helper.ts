@@ -13,7 +13,6 @@ import { storage } from "../lib/utils/storage";
 import { ILicenseManager } from "../interface/licenseManager";
 import { IExplorerApi, ITaskExplorerApi, ITaskItemApi, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
-import { log } from "console";
 
 export { figures };
 export { testControl };
@@ -386,18 +385,21 @@ async function initSettings()
     if (testControl.log.enabled)
     {
         const slowTimes = testControl.slowTime as IDictionary<number>;
-        const waitTimes = testControl.waitTime as IDictionary<number>;
+        // const waitTimes = testControl.waitTime as IDictionary<number>;
         let factor = 1.01;
         if (testControl.log.output) {
-            factor += 0.024;
+            factor += 0.026;
         }
         if (testControl.log.file) {
             factor += 0.035;
         }
-        Object.keys(waitTimes).forEach((k) =>
-        {
-            waitTimes[k] = Math.round(waitTimes[k] * factor);
-        });
+        if (testControl.log.console) {
+            factor += 0.051;
+        }
+        // Object.keys(waitTimes).forEach((k) =>
+        // {
+        //     waitTimes[k] = Math.round(waitTimes[k] * factor);
+        // });
         Object.keys(slowTimes).forEach((k) =>
         {
             slowTimes[k] = Math.round(slowTimes[k] * factor);
@@ -474,16 +476,36 @@ export const overrideNextShowInfoBox = (value: any) =>
 };
 
 
+const processSuiteTimes = () =>
+{
+    Object.keys(testControl.tests.suiteResults).forEach(async (suite) =>
+    {
+        const suiteTimeFinished = testControl.tests.suiteResults[suite].timeFinished;
+        const suiteTimeStarted = testControl.tests.suiteResults[suite].timeStarted;
+        if (suiteTimeFinished && suiteTimeStarted)
+        {
+            const storageKey = "bestTimeElapsedSuite" + suite.replace(/ \W/g, "");
+            const suiteTimeElapsed = suiteTimeFinished - suiteTimeStarted;
+            let bestTimeElapsedForSuite = storage.get<number>(storageKey, 0);
+            if (bestTimeElapsedForSuite === 0)
+            {
+                bestTimeElapsedForSuite = suiteTimeElapsed + 1;
+            }
+            if (suiteTimeElapsed < bestTimeElapsedForSuite)
+            {
+                const m = Math.floor(suiteTimeElapsed / 1000 / 60),
+                    s = Math.round(suiteTimeElapsed / 1000 % 60),
+                    suiteTimeElapsedFmt = `${m} minutes, ${s} seconds`;
+                console.log(`    ${figures.color.info} ${figures.withColor(`!!! New Fastest Time for Suite '${suite}' ${suiteTimeElapsedFmt}`, figures.colors.cyan)}`);
+                await storage.update(storageKey, suiteTimeElapsed);
+            }
+        }
+    });
+};
+
+
 const processTimes = async () =>
 {
-    // clear for debugging
-    // await storage.update("bestTimeElapsed", 0);
-    // await storage.update("bestTimeElapsedLWithLogging", 0);
-    // await storage.update("bestTimeElapsedWithLoggingFile", 0);
-    // await storage.update("bestTimeElapsedWithLoggingOutput", 0);
-    // await storage.update("bestTimeElapsedWithLoggingConsole", 0);
-
-    let bestTimeElapsed = storage.get<number>("bestTimeElapsed", 0);
     const timeFinished = Date.now(),
           timeElapsed = timeFinished - timeStarted,
           m = Math.floor(timeElapsed / 1000 / 60),
@@ -491,24 +513,34 @@ const processTimes = async () =>
           timeElapsedFmt = `${m} minutes, ${s} seconds`,
           tzOffset = (new Date()).getTimezoneOffset() * 60000,
           timeFinishedFmt = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
+
     console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + timeFinishedFmt, figures.colors.grey)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + timeElapsedFmt, figures.colors.grey)}`);
+
     await storage.update("timeElapsed", timeElapsed);
-    if (testControl.tests.numTestsFail === 0 && testControl.tests.numSuites > 3) // > 3, sometimes i string the single test together temp
+
+    if (testControl.tests.numTestsFail === 0)
     {
-        if (testControl.tests.numSuites > 3)
-        {
+        if (testControl.tests.numSuites > 4)  // > 4, sometimes i string the single test together temp
+        {                                     //      + xDeactivate, which always runs
+            if (testControl.tests.clearBestTimes) {
+                await storage.update("bestTimeElapsed", 0);
+            }
+            let bestTimeElapsed = storage.get<number>("bestTimeElapsed", 0);
             if (bestTimeElapsed === 0) {
                 bestTimeElapsed = timeElapsed + 1;
             }
             if (timeElapsed < bestTimeElapsed)
             {
-                console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time Elapsed  " + timeElapsedFmt, figures.colors.cyan)}`);
+                console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time  " + timeElapsedFmt, figures.colors.cyan)}`);
                 await storage.update("bestTimeElapsed", timeElapsed);
             }
             if (testControl.log.enabled)
             {
+                if (testControl.tests.clearBestTimes) {
+                    await storage.update("bestTimeElapsedLWithLogging", 0);
+                }
                 let bestTimeElapsedWithLogging = storage.get<number>("bestTimeElapsedLWithLogging", 0);
                 if (testControl.log.enabled && bestTimeElapsedWithLogging === 0)
                 {
@@ -516,11 +548,14 @@ const processTimes = async () =>
                 }
                 if (timeElapsed < bestTimeElapsedWithLogging)
                 {
-                    console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time Elapsed with Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
+                    console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time with Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
                     await storage.update("bestTimeElapsedLWithLogging", timeElapsed);
                 }
                 if (testControl.log.file)
                 {
+                    if (testControl.tests.clearBestTimes) {
+                        await storage.update("bestTimeElapsedWithLoggingFile", 0);
+                    }
                     let bestTimeElapsedWithLoggingFile = storage.get<number>("bestTimeElapsedWithLoggingFile", 0);
                     if (bestTimeElapsedWithLoggingFile === 0)
                     {
@@ -528,12 +563,15 @@ const processTimes = async () =>
                     }
                     if (timeElapsed < bestTimeElapsedWithLoggingFile)
                     {
-                        console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time Elapsed with File Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
+                        console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time with File Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
                         await storage.update("bestTimeElapsedWithLoggingFile", timeElapsed);
                     }
                 }
                 if (testControl.log.output)
                 {
+                    if (testControl.tests.clearBestTimes) {
+                        await storage.update("bestTimeElapsedWithLoggingOutput", 0);
+                    }
                     let bestTimeElapsedWithLoggingOutput = storage.get<number>("bestTimeElapsedWithLoggingOutput", 0);
                     if (bestTimeElapsedWithLoggingOutput === 0)
                     {
@@ -541,12 +579,15 @@ const processTimes = async () =>
                     }
                     if (timeElapsed < bestTimeElapsedWithLoggingOutput)
                     {
-                        console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time Elapsed with Output Window Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
+                        console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time with Output Window Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
                         await storage.update("bestTimeElapsedWithLoggingOutput", timeElapsed);
                     }
                 }
                 if (testControl.log.console)
                 {
+                    if (testControl.tests.clearBestTimes) {
+                        await storage.update("bestTimeElapsedWithLoggingsConsole", 0);
+                    }
                     let bestTimeElapsedWithLoggingConsole = storage.get<number>("bestTimeElapsedWithLoggingConsole", 0);
                     if (bestTimeElapsedWithLoggingConsole === 0)
                     {
@@ -554,38 +595,21 @@ const processTimes = async () =>
                     }
                     if (timeElapsed < bestTimeElapsedWithLoggingConsole)
                     {
-                        console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time Elapsed with Console Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
+                        console.log(`    ${figures.color.info} ${figures.withColor("!!! New Fastest Time with Console Logging Enabled  " + timeElapsedFmt, figures.colors.cyan)}`);
                         await storage.update("bestTimeElapsedWithLoggingConsole", timeElapsed);
                     }
                 }
             }
+            processSuiteTimes();
         }
-        else if (testControl.tests.numSuites === 1)
+        else if (testControl.tests.numSuites === 2) // 1 single-suite test, + xDeactivate, which always runs
         {
-            Object.keys(testControl.tests.suiteResults).forEach(async (suite) =>
-            {
-                const suiteTimeFinished = testControl.tests.suiteResults[suite].timeFinished;
-                const suiteTimeStarted = testControl.tests.suiteResults[suite].timeStarted;
-                if (timeFinished && timeStarted)
-                {
-                    const storageKey = "bestTimeElapsedSuite" + suite.replace(/ \W/g, "");
-                    const suiteTimeElapsed = suiteTimeFinished - suiteTimeStarted;
-                    let bestTimeElapsedForSuite = storage.get<number>(storageKey, 0);
-                    if (bestTimeElapsedForSuite === 0)
-                    {
-                        bestTimeElapsedForSuite = suiteTimeElapsed + 1;
-                    }
-                    if (suiteTimeElapsed < bestTimeElapsedForSuite)
-                    {
-                        const m = Math.floor(timeElapsed / 1000 / 60),
-                            s = Math.round(timeElapsed / 1000 % 60),
-                            suiteTimeElapsedFmt = `${m} minutes, ${s} seconds`;
-                        console.log(`    ${figures.color.info} ${figures.withColor(`!!! New Fastest Time Elapsed for Suite '${suite}' ${suiteTimeElapsedFmt}`, figures.colors.cyan)}`);
-                        await storage.update(storageKey, suiteTimeElapsed);
-                    }
-                }
-            });
+            processSuiteTimes();
         }
+    }
+    else {
+        const skipMsg = `There were ${testControl.tests.numTestsFail} failed tests, best time processing skipped  ${timeElapsedFmt}`;
+        console.log(`    ${figures.color.info} ${figures.withColor(skipMsg, figures.colors.grey)}`);
     }
 };
 
@@ -646,6 +670,7 @@ export const tagLog = (test: string, suite: string) =>
     teApi.log.write("******************************************************************************************");
 };
 
+
 /**
  * @param taskType Task type / source
  * @param expectedCount Expected # of tasks
@@ -681,4 +706,3 @@ export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxW
         }
     }
 };
-

@@ -18,7 +18,7 @@ let fsApi: IFilesystemApi;
 let provider: GulpTaskProvider;
 let dirName: string;
 let fileUri: Uri;
-let successCount = 0;
+let successCount = -1;
 
 
 suite("Gulp Tests", () =>
@@ -47,7 +47,7 @@ suite("Gulp Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        expect(successCount).to.be.equal(1, "rolling success count failure");
+        expect(successCount).to.be.equal(0, "rolling success count failure");
         await treeUtils.refresh(this);
         ++successCount;
     });
@@ -56,7 +56,7 @@ suite("Gulp Tests", () =>
 
     test("Document Position", async function()
     {
-        expect(successCount).to.be.equal(2, "rolling success count failure");
+        expect(successCount).to.be.equal(1, "rolling success count failure");
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
@@ -66,7 +66,7 @@ suite("Gulp Tests", () =>
 
     test("Start", async function()
     {
-        expect(successCount).to.be.equal(3, "rolling success count failure");
+        expect(successCount).to.be.equal(2, "rolling success count failure");
         this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
@@ -76,7 +76,7 @@ suite("Gulp Tests", () =>
 
     test("Disable", async function()
     {
-        expect(successCount).to.be.equal(4, "rolling success count failure");
+        expect(successCount).to.be.equal(3, "rolling success count failure");
         this.slow(testControl.slowTime.configDisableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configDisableEvent + testControl.waitTime.min);
         await teApi.config.updateWs("enabledTasks.gulp", false);
         await teApi.waitForIdle(testControl.waitTime.configDisableEvent);
@@ -88,7 +88,7 @@ suite("Gulp Tests", () =>
 
     test("Re-enable", async function()
     {
-        expect(successCount).to.be.equal(5, "rolling success count failure");
+        expect(successCount).to.be.equal(4, "rolling success count failure");
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
         await teApi.config.updateWs("enabledTasks.gulp", true);
         await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
@@ -100,7 +100,7 @@ suite("Gulp Tests", () =>
 
     test("Create File", async function()
     {
-        expect(successCount).to.be.equal(6, "rolling success count failure");
+        expect(successCount).to.be.equal(5, "rolling success count failure");
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsCreateEvent + testControl.waitTime.min);
         if (!(await fsApi.pathExists(dirName))) {
             await fsApi.createDir(dirName);
@@ -126,7 +126,7 @@ suite("Gulp Tests", () =>
 
     test("Add Task to File", async function()
     {
-        expect(successCount).to.be.equal(7, "rolling success count failure");
+        expect(successCount).to.be.equal(6, "rolling success count failure");
         this.slow(testControl.slowTime.fsModifyEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -153,7 +153,7 @@ suite("Gulp Tests", () =>
 
     test("Remove 2 Tasks from File", async function()
     {
-        expect(successCount).to.be.equal(8, "rolling success count failure");
+        expect(successCount).to.be.equal(7, "rolling success count failure");
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -171,7 +171,7 @@ suite("Gulp Tests", () =>
 
     test("Delete File", async function()
     {
-        expect(successCount).to.be.equal(9, "rolling success count failure");
+        expect(successCount).to.be.equal(8, "rolling success count failure");
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent + testControl.waitTime.min);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
@@ -184,7 +184,7 @@ suite("Gulp Tests", () =>
 
     test("Gulp Parser", async function()
     {
-        expect(successCount).to.be.equal(10, "rolling success count failure");
+        expect(successCount).to.be.equal(9, "rolling success count failure");
         this.slow((testControl.slowTime.configEventFast * 2) + testControl.waitTime.min + (testControl.waitTime.configEnableEvent * 2));
         // const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
         //       gulpFile = getWsPath("gulp\\gulpfile.js");
@@ -210,7 +210,7 @@ suite("Gulp Tests", () =>
 
     test("Turn VSCode Gulp Provider On", async function()
     {
-        expect(successCount).to.be.equal(11, "rolling success count failure");
+        expect(successCount).to.be.equal(10, "rolling success count failure");
         this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount +
                   testControl.waitTime.min + testControl.waitTime.configEnableEvent + 3000);
         await configuration.updateVs("gulp.autoDetect", "on");
@@ -225,7 +225,7 @@ suite("Gulp Tests", () =>
 
     test("Turn VSCode Gulp Provider Off", async function()
     {
-        expect(successCount).to.be.equal(12);
+        expect(successCount).to.be.equal(11);
         this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand +
                   testControl.slowTime.verifyTaskCount + testControl.waitTime.min + testControl.waitTime.configEnableEvent + 1500);
         await configuration.updateVs("gulp.autoDetect", "off");
@@ -235,6 +235,7 @@ suite("Gulp Tests", () =>
         await treeUtils.refresh(this);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
+        ++successCount;
     });
 
 });

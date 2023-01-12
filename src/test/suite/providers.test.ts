@@ -777,7 +777,7 @@ suite("Provider Tests", () =>
 
     test("Remove Temporary Directories", async function()
     {
-        this.slow((testControl.slowTime.fsDeleteFolderEvent * 3) + (testControl.slowTime.fsDeleteEvent * (tempFiles.length)) + 3000);
+        this.slow((testControl.slowTime.fsDeleteFolderEvent * 3) + (testControl.slowTime.fsDeleteEvent * (tempFiles.length)) + 4000);
         if (tempFiles.length)
         {
             let file: string | undefined;
@@ -800,6 +800,7 @@ suite("Provider Tests", () =>
             console.log(error);
         }
         await teApi.waitForIdle(3000);
+        await teApi.waitForIdle(1000);
     });
 
 });

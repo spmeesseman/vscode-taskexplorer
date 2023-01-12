@@ -11,6 +11,7 @@ import {
     activate, executeTeCommand2, focusExplorerView, treeUtils, getWsPath,
     overrideNextShowInputBox, testControl, verifyTaskCount, waitForTaskExecution, tagLog, suiteFinished
 } from "../helper";
+import { refresh } from "../treeUtils";
 
 const testsName = "npm";
 const startTaskCount = 0;
@@ -19,7 +20,7 @@ let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let packageJsonPath: string;
 let npmTaskItems: TaskItem[];
-let successCount = 0;
+let successCount = -1;
 
 
 suite("NPM Tests", () =>
@@ -52,7 +53,7 @@ suite("NPM Tests", () =>
 
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
-        expect(successCount).to.be.equal(1);
+        expect(successCount).to.be.equal(0, "rolling success count failure");
         await focusExplorerView(this);
         ++successCount;
 	});
@@ -60,7 +61,7 @@ suite("NPM Tests", () =>
 
     test("Create Package File (package.json)", async function()
     {
-        expect(successCount).to.be.equal(2);
+        expect(successCount).to.be.equal(1, "rolling success count failure");
         this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsCreateEvent);
         // tagLog("NPM", "Create Package File (1: package.json)");
         //
@@ -89,9 +90,9 @@ suite("NPM Tests", () =>
 
     test("Verify NPM Task Count", async function()
     {   // npm task provider is slower than shit on a turtle
-        expect(successCount).to.be.equal(startTaskCount + 3);
+        expect(successCount).to.be.equal(2, "rolling success count failure");
         this.slow(testControl.slowTime.verifyTaskCountNpm + testControl.waitTime.min);
-        await verifyTaskCount(testsName, startTaskCount + 5);
+        await verifyTaskCount(testsName, startTaskCount + 5, 2);
         await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;
     });
@@ -99,7 +100,7 @@ suite("NPM Tests", () =>
 
     test("Get NPM Task Items", async function()
     {   // npm task provider is slower than shit on a turtle
-        expect(successCount).to.be.equal(4);
+        expect(successCount).to.be.equal(3, "rolling success count failure");
         this.slow(testControl.slowTime.getTreeTasksNpm);
         // tagLog("NPM", "Get NPM Task Items [Start]");
         //
@@ -118,7 +119,7 @@ suite("NPM Tests", () =>
 
     test("Get Package Manager", function()
     {
-        expect(successCount).to.be.equal(5);
+        expect(successCount).to.be.equal(4, "rolling success count failure");
         this.slow(testControl.slowTime.configEventFast);
         getPackageManager();
         ++successCount;
@@ -127,7 +128,7 @@ suite("NPM Tests", () =>
 
     test("Document Position", async function()
     {
-        expect(successCount).to.be.equal(6);
+        expect(successCount).to.be.equal(5, "rolling success count failure");
         this.slow((testControl.slowTime.findDocumentPositionCommand * npmTaskItems.length) + testControl.waitTime.commandFast);
         for (const taskItem of npmTaskItems) {
             await executeTeCommand2("open", [ taskItem ], testControl.waitTime.commandFast);
@@ -138,7 +139,7 @@ suite("NPM Tests", () =>
 
     test("Install", async function()
     {
-        expect(successCount).to.be.equal(7);
+        expect(successCount).to.be.equal(6, "rolling success count failure");
         this.slow(testControl.slowTime.npmInstallCommand + testControl.waitTime.npmCommandMin);
         const exec = await executeTeCommand2(
             "runInstall", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
@@ -150,7 +151,7 @@ suite("NPM Tests", () =>
 
     test("Update", async function()
     {
-        expect(successCount).to.be.equal(8);
+        expect(successCount).to.be.equal(7, "rolling success count failure");
         this.slow(testControl.slowTime.npmCommand + testControl.waitTime.npmCommandMin);
         const exec = await executeTeCommand2(
             "runUpdate", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
@@ -162,7 +163,7 @@ suite("NPM Tests", () =>
 
     test("Update Specified Package", async function()
     {
-        expect(successCount).to.be.equal(9);
+        expect(successCount).to.be.equal(8, "rolling success count failure");
         this.slow(testControl.slowTime.npmCommandPkg + testControl.waitTime.npmCommandMin);
         overrideNextShowInputBox("@spmeesseman/app-publisher");
         const exec = await executeTeCommand2(
@@ -175,7 +176,7 @@ suite("NPM Tests", () =>
 
     test("Audit", async function()
     {
-        expect(successCount).to.be.equal(10);
+        expect(successCount).to.be.equal(9, "rolling success count failure");
         this.slow(testControl.slowTime.npmCommand + testControl.waitTime.npmCommandMin);
         const exec = await executeTeCommand2(
             "runAudit", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
@@ -187,7 +188,7 @@ suite("NPM Tests", () =>
 
     test("Audit Fix", async function()
     {
-        expect(successCount).to.be.equal(11);
+        expect(successCount).to.be.equal(10, "rolling success count failure");
         this.slow(testControl.slowTime.npmCommand + testControl.waitTime.npmCommandMin);
         const exec = await executeTeCommand2(
             "runAuditFix", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin

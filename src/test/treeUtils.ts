@@ -9,6 +9,9 @@ import { ITaskItemApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, getTeApi, sleep, testControl } from "./helper";
 
 
+let didSetGroupLevel = false;
+
+
 /**
  * Pretty much mimics the tree construction in cases when we want to construct it
  * when the tree view is collapsed and not updating automatically via GUI events.
@@ -22,12 +25,17 @@ export const refresh = async(instance?: any) =>
     const teApi = getTeApi();
     if (instance) {
         instance.slow(testControl.slowTime.refreshCommand + testControl.waitTime.refreshCommand +
-                      (testControl.slowTime.configGroupingEvent * 2) + (testControl.waitTime.min * 2));
-        instance.timeout((testControl.slowTime.refreshCommand  * 2) + (testControl.slowTime.configGroupingEvent * 2) + (testControl.waitTime.min * 2));
+                      (testControl.slowTime.configGroupingEvent * (didSetGroupLevel ? 0 : 2)) + (testControl.waitTime.min * (didSetGroupLevel ? 0 : 1)));
+        instance.timeout((testControl.slowTime.refreshCommand  * (didSetGroupLevel ? 0 : 2)) + (testControl.slowTime.configGroupingEvent * 2) +
+                        (testControl.waitTime.min * (didSetGroupLevel ? 0 : 1)));
     }
-    await executeSettingsUpdate("groupWithSeparator", true, testControl.waitTime.configGroupingEvent);
-    await executeSettingsUpdate("groupMaxLevel", 5, testControl.waitTime.configGroupingEvent);
-    await teApi.waitForIdle(testControl.waitTime.min);
+    if (!didSetGroupLevel)
+    {
+        await executeSettingsUpdate("groupWithSeparator", true, testControl.waitTime.configGroupingEvent);
+        await executeSettingsUpdate("groupMaxLevel", 5, testControl.waitTime.configGroupingEvent);
+        await teApi.waitForIdle(testControl.waitTime.min);
+        didSetGroupLevel = true;
+    }
     await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
 };
 
