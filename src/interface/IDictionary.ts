@@ -1,5 +1,5 @@
 
-interface IDictionary<TValue>
+export interface IDictionary<TValue>
 {
     [id: string]: TValue;
 }

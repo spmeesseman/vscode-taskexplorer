@@ -92,7 +92,7 @@ suite("App-Publisher Tests", () =>
     test("Create file", async function()
     {
         expect(successCount).to.be.equal(5, "rolling success count failure");
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -114,8 +114,8 @@ suite("App-Publisher Tests", () =>
     test("Disable", async function()
     {
         expect(successCount).to.be.equal(6, "rolling success count failure");
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configEnableEvent);
+        this.slow(testControl.slowTime.configDisableEvent + testControl.waitTime.configDisableEvent + testControl.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });
@@ -124,7 +124,7 @@ suite("App-Publisher Tests", () =>
     test("Re-enable", async function()
     {
         expect(successCount).to.be.equal(7, "rolling success count failure");
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
         ++successCount;
@@ -176,7 +176,7 @@ suite("App-Publisher Tests", () =>
     test("Fix Invalid JSON", async function()
     {
         expect(successCount).to.be.equal(9, "rolling success count failure");
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsModifyEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -189,7 +189,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent + testControl.slowTime.verifyTaskCount);
+        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
         ++successCount;
     });
@@ -198,7 +198,7 @@ suite("App-Publisher Tests", () =>
     test("Delete file", async function()
     {
         expect(successCount).to.be.equal(10, "rolling success count failure");
-        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -209,8 +209,8 @@ suite("App-Publisher Tests", () =>
     test("Disable (Default is OFF)", async function()
     {
         expect(successCount).to.be.equal(11, "rolling success count failure");
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configEnableEvent);
+        this.slow(testControl.slowTime.configDisableEvent + testControl.waitTime.configDisableEvent + testControl.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });

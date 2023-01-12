@@ -4,15 +4,15 @@ import * as path from "path";
 import * as assert from "assert";
 import * as treeUtils from "./treeUtils";
 import figures from "../lib/figures";
-import { deactivate, getLicenseManager } from "../extension";
+import { deactivate } from "../extension";
 import { testControl } from "./control";
 import { configuration } from "../lib/utils/configuration";
 import constants from "../lib/constants";
 import { deleteFile, pathExists } from "../lib/utils/fs";
-import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import { storage } from "../lib/utils/storage";
 import { ILicenseManager } from "../interface/licenseManager";
+import { IExplorerApi, ITaskExplorerApi, ITaskItemApi, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
+import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 
 export { figures };
 export { testControl };
@@ -120,7 +120,7 @@ export async function cleanup()
 {
     const timeFinished = Date.now(),
           m = Math.floor((timeFinished - timeStarted) / 1000 / 60),
-          s = (timeFinished - timeStarted) % 1000,
+          s = (timeFinished - timeStarted) / 1000 % 60,
           timeElapsed = `${m} minutes, ${s} seconds}`;
     const tzOffset = (new Date()).getTimezoneOffset() * 60000,
           locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
@@ -311,19 +311,11 @@ async function initSettings()
         workspace: true
     });
 
-    await configuration.updateWs("groupMaxLevel", 1);
-    await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("groupWithSeparator", true);
-
-    await configuration.updateWs("visual.enableAnsiconForAnt", true);
-
-    // await configuration.updateWs("pathToPrograms.ant", testControl.userPathToAnt);
-    // await configuration.updateWs("pathToPrograms.ansicon", testControl.userPathToAnsicon);
     await configuration.updateWs("pathToPrograms",
     {
-        ant: "c:\\Code\\ant\\bin\\ant.bat",
+        ant: getWsPath("..\\tools\\ant\\bin\\ant.bat"), // "c:\\Code\\ant\\bin\\ant.bat",
         apppublisher: "",
-        ansicon: "c:\\Code\\ansicon\\x64\\ansicon.exe",
+        ansicon: getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"), // "c:\\Code\\ansicon\\x64\\ansicon.exe",
         bash: "bash",
         composer: "composer",
         gradle: "c:\\Code\\gradle\\bin\\gradle.bat",
@@ -336,20 +328,37 @@ async function initSettings()
         python: "c:\\Code\\python\\python.exe",
         ruby: "ruby"
     });
+    // await configuration.updateWs("pathToPrograms.ant", testControl.userPathToAnt);
+    // await configuration.updateWs("pathToPrograms.ansicon", testControl.userPathToAnsicon);
 
     await configuration.updateWs("logging.enable", testControl.logEnabled);
     await configuration.updateWs("logging.level", testControl.logLevel);
     await configuration.updateWs("logging.enableFile", testControl.logToFile);
+    await configuration.updateWs("logging.enableFileSymbols", testControl.logToFileSymbols);
     await configuration.updateWs("logging.enableOutputWindow", testControl.logToOutput);
 
-    await configuration.updateWs("specialFolders.expanded", configuration.get<object>("specialFolders.expanded"));
     await configuration.updateWs("specialFolders.numLastTasks", 10);
     await configuration.updateWs("specialFolders.showFavorites", true);
     await configuration.updateWs("specialFolders.showLastTasks", true);
     await configuration.updateWs("specialFolders.showUserTasks", true);
+    // await configuration.updateWs("specialFolders.expanded", configuration.get<object>("specialFolders.expanded"));
+    await configuration.updateWs("specialFolders.expanded", {
+        favorites: true,
+        lastTasks: true,
+        userTasks: true
+    });
 
     await configuration.updateWs("taskButtons.clickAction", "Open");
     await configuration.updateWs("taskButtons.showFavoritesButton", true);
+    await configuration.updateWs("taskButtons.showExecuteWithArgumentsButton", false);
+    await configuration.updateWs("taskButtons.showExecuteWithNoTerminalButton", false);
+
+    await configuration.updateWs("visual.disableAnimatedIcons", true);
+    await configuration.updateWs("visual.enableAnsiconForAnt", false);
+
+    await configuration.updateWs("groupMaxLevel", 1);
+    await configuration.updateWs("groupSeparator", "-");
+    await configuration.updateWs("groupWithSeparator", true);
 
     await configuration.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
     await configuration.updateWs("includeAnt", []); // Deprecated, use `globPatternsAnt`
@@ -359,6 +368,27 @@ async function initSettings()
     await configuration.updateWs("showRunningTask", true);
     await configuration.updateWs("useGulp", false);
     await configuration.updateWs("useAnt", false);
+
+    if (testControl.logEnabled)
+    {
+        const slowTimes = testControl.slowTime as IDictionary<number>;
+        const waitTimes = testControl.waitTime as IDictionary<number>;
+        let factor = 1.01;
+        if (testControl.logToOutput) {
+            factor += 0.024;
+        }
+        if (testControl.logToFile) {
+            factor += 0.035;
+        }
+        Object.keys(waitTimes).forEach((k) =>
+        {
+            waitTimes[k] = Math.round(waitTimes[k] * factor);
+        });
+        Object.keys(slowTimes).forEach((k) =>
+        {
+            slowTimes[k] = Math.round(slowTimes[k] * factor);
+        });
+    }
 }
 
 
@@ -418,25 +448,25 @@ export const logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs = (w
 };
 
 
-export function overrideNextShowInputBox(value: any)
+export const overrideNextShowInputBox = (value: any) =>
 {
     overridesShowInputBox.push(value);
-}
+};
 
 
-export function overrideNextShowInfoBox(value: any)
+export const overrideNextShowInfoBox = (value: any) =>
 {
     overridesShowInfoBox.push(value);
-}
+};
 
 
-export function setExplorer(explorer: IExplorerApi)
+export const setExplorer = (explorer: IExplorerApi) =>
 {
     teExplorer = explorer;
-}
+};
 
 
-export async function setLicensed(valid: boolean, licMgr: ILicenseManager)
+export const setLicensed = async (valid: boolean, licMgr: ILicenseManager) =>
 {
     teApi.setTests(!valid);
     await licMgr.setLicenseKey(valid ? "1234-5678-9098-7654321" : undefined);
@@ -444,25 +474,26 @@ export async function setLicensed(valid: boolean, licMgr: ILicenseManager)
     teApi.setTests(true);
 };
 
-export async function sleep(ms: number)
+
+export const sleep = async (ms: number) =>
 {
 	return new Promise(resolve => setTimeout(resolve, ms));
-}
+};
 
 
-export function tagLog(test: string, suite: string)
+export const tagLog = (test: string, suite: string) =>
 {
     teApi.log.write("******************************************************************************************");
     teApi.log.write(" SUITE: " + suite.toUpperCase() + "  -  TEST : " + test);
     teApi.log.write("******************************************************************************************");
-}
+};
 
 /**
  * @param taskType Task type / source
  * @param expectedCount Expected # of tasks
  * @param retries Number of retries to make if expected count doesn'tmatch.  100ms sleep between each retry.
  */
-export async function verifyTaskCount(taskType: string, expectedCount: number, retries = 0, retryWait = 250)
+export const verifyTaskCount = async (taskType: string, expectedCount: number, retries = 0, retryWait = 250) =>
 {
     let tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
     while (--retries >= 0 && tTasks.length !== expectedCount)
@@ -477,10 +508,10 @@ export async function verifyTaskCount(taskType: string, expectedCount: number, r
         assert(tTasks.length === expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
     }
     catch (e) { throw e; }
-}
+};
 
 
-export async function waitForTaskExecution(exec: TaskExecution | undefined, maxWait?: number)
+export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxWait?: number) =>
 {
     if (exec)
     {
@@ -491,5 +522,5 @@ export async function waitForTaskExecution(exec: TaskExecution | undefined, maxW
             waited += 50;
         }
     }
-}
+};
 

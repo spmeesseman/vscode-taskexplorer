@@ -76,9 +76,9 @@ suite("Gulp Tests", () =>
     test("Disable", async function()
     {
         expect(successCount).to.be.equal(4, "rolling success count failure");
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.configDisableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configDisableEvent + testControl.waitTime.min);
         await teApi.config.updateWs("enabledTasks.gulp", false);
-        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
+        await teApi.waitForIdle(testControl.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);
         await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;
@@ -184,13 +184,14 @@ suite("Gulp Tests", () =>
     test("Gulp Parser", async function()
     {
         expect(successCount).to.be.equal(10, "rolling success count failure");
-        this.slow((testControl.slowTime.configEventFast * 2) + testControl.waitTime.min);
+        this.slow((testControl.slowTime.configEventFast * 2) + testControl.waitTime.min + (testControl.waitTime.configEnableEvent * 2));
         // const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
         //       gulpFile = getWsPath("gulp\\gulpfile.js");
         //
         // Use Gulp
         //
         await executeSettingsUpdate("useGulp", true, testControl.waitTime.configEventFast);
+        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
         // await teApi.explorer?.invalidateTasksCache(testsName);
         // await tasks.fetchTasks({ type: testsName });
         // gulpTasks = await provider.readUriTasks(Uri.file(buildXmlFile));
@@ -201,7 +202,7 @@ suite("Gulp Tests", () =>
         // Reset
         //
         await executeSettingsUpdate("useGulp", false, testControl.waitTime.configEventFast);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        await teApi.waitForIdle(testControl.waitTime.configDisableEvent);
         ++successCount;
     });
 
@@ -209,8 +210,10 @@ suite("Gulp Tests", () =>
     test("Turn VSCode Gulp Provider On", async function()
     {
         expect(successCount).to.be.equal(11, "rolling success count failure");
-        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 3000);
+        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount +
+                  testControl.waitTime.min + testControl.waitTime.configEnableEvent + 3000);
         await configuration.updateVs("gulp.autoDetect", "on");
+        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
         await sleep(3000);
         await treeUtils.refresh();
         await verifyTaskCount(testsName, startTaskCount);
@@ -222,8 +225,10 @@ suite("Gulp Tests", () =>
     test("Turn VSCode Gulp Provider Off", async function()
     {
         expect(successCount).to.be.equal(12);
-        this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 1500);
+        this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand +
+                  testControl.slowTime.verifyTaskCount + testControl.waitTime.min + testControl.waitTime.configEnableEvent + 1500);
         await configuration.updateVs("gulp.autoDetect", "off");
+        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
         await sleep(1500);
         // await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
         await treeUtils.refresh(this);

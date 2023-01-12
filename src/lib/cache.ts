@@ -6,8 +6,8 @@ import { join } from "path";
 import { findFiles, numFilesInDirectory } from "./utils/fs";
 import { configuration } from "./utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
-import { ICacheItem } from "../interface/cacheItem";
 import { TaskExplorerProvider } from "../providers/provider";
+import { IDictionary, ICacheItem } from "../interface";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
 } from "vscode";

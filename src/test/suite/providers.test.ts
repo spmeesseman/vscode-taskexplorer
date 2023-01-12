@@ -61,10 +61,10 @@ suite("Provider Tests", () =>
     {
         await executeSettingsUpdate("logging.enable", testControl.logEnabled, testControl.waitTime.configEvent);
         await executeSettingsUpdate("specialFolders.expanded.test-files", false, testControl.waitTime.configEvent);
-        await executeSettingsUpdate("enabledTasks.apppublisher", false, testControl.waitTime.configEnableEvent); // off by default
-        await executeSettingsUpdate("enabledTasks.gradle", false, testControl.waitTime.configEnableEvent);       // off by default
-        await executeSettingsUpdate("enabledTasks.maven", false, testControl.waitTime.configEnableEvent);        // off by default
-        await executeSettingsUpdate("enabledTasks.pipenv", false, testControl.waitTime.configEnableEvent);       // off by default
+        await executeSettingsUpdate("enabledTasks.apppublisher", false, testControl.waitTime.configDisableEvent); // off by default
+        await executeSettingsUpdate("enabledTasks.gradle", false, testControl.waitTime.configDisableEvent);       // off by default
+        await executeSettingsUpdate("enabledTasks.maven", false, testControl.waitTime.configDisableEvent);        // off by default
+        await executeSettingsUpdate("enabledTasks.pipenv", false, testControl.waitTime.configDisableEvent);       // off by default
     });
 
 
@@ -256,7 +256,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations - Favorites Collapsed", async function()
     {
-        this.slow((testControl.slowTime.buildTreeNoTasks * 2) + (testControl.slowTime.configEventFast * 4) + (testControl.slowTime.configEventFast * 2));
+        this.slow((testControl.slowTime.buildTreeNoTasks * 2) + (testControl.slowTime.configEventFast * 6) + (testControl.slowTime.configEventFast * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -279,7 +279,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations - Favorites Disabled", async function()
     {
-        this.slow((testControl.slowTime.buildTreeNoTasks * 2) + (testControl.slowTime.configEventFast * 4) + (testControl.slowTime.configEventFast * 4));
+        this.slow((testControl.slowTime.buildTreeNoTasks * 2) + (testControl.slowTime.configEvent * 8) + (testControl.slowTime.configEventFast * 4));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -304,7 +304,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations - Last Tasks Disabled", async function()
     {
-        this.slow((testControl.slowTime.buildTreeNoTasks * 2) + (testControl.slowTime.configEventFast * 4) + (testControl.slowTime.configEventFast * 2));
+        this.slow((testControl.slowTime.buildTreeNoTasks * 2) + (testControl.slowTime.configEvent * 6) + (testControl.slowTime.configEventFast * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -517,7 +517,7 @@ suite("Provider Tests", () =>
 
     test("Disable Pipenv (Off by Default)", async function()
     {
-        this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.configDisableEvent + testControl.waitTime.min);
         await executeSettingsUpdate("enabledTasks.pipenv", false);
         await teApi.waitForIdle(testControl.waitTime.min);
     });

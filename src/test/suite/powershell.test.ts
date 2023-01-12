@@ -125,13 +125,14 @@ suite("Powershell Tests", () =>
     });
 
 
-    test("Delete File 2", async function()
+    test("Delete File 2 and Folder", async function()
     {
-        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent);
+        this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.fsDeleteEvent +
+                  testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent + testControl.waitTime.fsDeleteFolderEvent);
         await fsApi.deleteFile(fileUri2.fsPath);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
-        await fsApi.deleteDir(dirName);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteFolderEvent);
     });
 
 
@@ -147,9 +148,9 @@ suite("Powershell Tests", () =>
 
     test("Delete Folder", async function()
     {
-        this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent);
+        this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteFolderEvent);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent * 2);
+        await teApi.waitForIdle(testControl.waitTime.fsDeleteFolderEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
     });
 

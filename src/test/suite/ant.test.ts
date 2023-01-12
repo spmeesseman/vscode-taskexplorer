@@ -9,8 +9,8 @@ import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
 import { IFilesystemApi } from "../../interface/fsApi";
 import {
-    activate, executeSettingsUpdate, figures, getWsPath,
-    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, testControl, verifyTaskCount
+    activate, executeSettingsUpdate, getWsPath, testControl, verifyTaskCount,
+    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs
 } from "../helper";
 
 const testsName = "ant";
@@ -97,9 +97,50 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Win32 Create Task", async function()
+    test("Enable Ansicon", async function()
     {
         expect(successCount).to.be.equal(5);
+        this.slow((testControl.slowTime.configEvent * 5) + (testControl.slowTime.commandFast * 4));
+        await executeSettingsUpdate("pathToPrograms.ansicon", "ansicon\\x64\\ansicon.exe");
+        await executeSettingsUpdate("visual.enableAnsiconForAnt", true);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
+        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
+        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64") + "\\");
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
+        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64"));
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
+        ++successCount;
+    });
+
+
+    test("Disable Ansicon", async function()
+    {
+        expect(successCount).to.be.equal(6);
+        this.slow((testControl.slowTime.configEvent * 3) + (testControl.slowTime.commandFast * 2));
+        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
+        await executeSettingsUpdate("visual.enableAnsiconForAnt", false);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
+        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\"));
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
+        ++successCount;
+    });
+
+
+    test("Ansicon Path", async function()
+    {
+        expect(successCount).to.be.equal(7);
+        this.slow(testControl.slowTime.configEvent + testControl.slowTime.commandFast);
+        await executeSettingsUpdate("pathToPrograms.ansicon", undefined);
+        provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
+        await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
+        ++successCount;
+    });
+
+
+    test("Win32 Create Task", async function()
+    {
+        expect(successCount).to.be.equal(8);
         this.slow((testControl.slowTime.configEvent * 2) + (testControl.slowTime.commandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -111,7 +152,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser", async function()
     {
-        expect(successCount).to.be.equal(6);
+        expect(successCount).to.be.equal(9);
         this.slow(slowTimeforAntRunTasks);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2, false, false);
@@ -121,7 +162,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Default", async function()
     {
-        expect(successCount).to.be.equal(7);
+        expect(successCount).to.be.equal(20);
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -139,7 +180,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser Invalid Target", async function()
     {
-        expect(successCount).to.be.equal(8);
+        expect(successCount).to.be.equal(11);
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -159,7 +200,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Target", async function()
     {
-        expect(successCount).to.be.equal(9);
+        expect(successCount).to.be.equal(13);
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -176,7 +217,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Project", async function()
     {
-        expect(successCount).to.be.equal(10);
+        expect(successCount).to.be.equal(13);
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -193,7 +234,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser Invalid Xml", async function()
     {
-        expect(successCount).to.be.equal(11);
+        expect(successCount).to.be.equal(14);
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,

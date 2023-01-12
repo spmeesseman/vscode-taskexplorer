@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
+import { IDictionary } from "../interface";
+
+
 const constants: IDictionary<string> =
 {
     DEFAULT_SEPARATOR: "-",
