@@ -119,16 +119,15 @@ export async function activate(instance?: any)
 export async function cleanup()
 {
     const timeFinished = Date.now(),
-          m = Math.floor((timeFinished - timeStarted) / 1000 / 60),
-          s = (timeFinished - timeStarted) / 1000 % 60,
-          timeElapsed = `${m} minutes, ${s} seconds}`;
-    const tzOffset = (new Date()).getTimezoneOffset() * 60000,
-          locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
+          timeElapsed = timeFinished - timeStarted,
+          m = Math.floor(timeElapsed / 1000 / 60),
+          s = Math.round(timeElapsed / 1000 % 60),
+          timeElapsedFmt = `${m} minutes, ${s} seconds}`,
+          tzOffset = (new Date()).getTimezoneOffset() * 60000,
+          timeFinishedFmt = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
 
     console.log(`    ${figures.color.info}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Tests complete, clean up", figures.colors.grey)}`);
-    console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + locISOTime, figures.colors.grey)}`);
-    console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + timeElapsed, figures.colors.grey)}`);
 
     if (testControl.logEnabled && testControl.logToFile && testControl.logOpenFileOnFinish)
     {
@@ -175,7 +174,33 @@ export async function cleanup()
     await configuration.updateVs("grunt.autoDetect", testControl.vsCodeAutoDetectGrunt);
     await configuration.updateVs("gulp.autoDetect", testControl.vsCodeAutoDetectGulp);
 
+    //
+    // Do best times (what a dork)
+    //
+    let bestTimeElapsed = storage.get<number>("bestTimeElapsed", 0),
+        bestTimeElapsedWithLogging = storage.get<number>("bestTimeElapsedLWithLogging", 0);
     console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
+    console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + timeFinishedFmt, figures.colors.grey)}`);
+    console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + timeElapsedFmt, figures.colors.grey)}`);
+    if (bestTimeElapsed === 0) {
+        bestTimeElapsed = timeElapsed + 1;
+    }
+    if (testControl.logEnabled && bestTimeElapsedWithLogging === 0) {
+        bestTimeElapsedWithLogging = timeElapsed + 1;
+    }
+    if (timeElapsed < bestTimeElapsed) {
+        console.log(`    ${figures.color.info} ${figures.withColor("   New Fastest Time Elapsed!!!" + timeElapsedFmt, figures.colors.cyan)}`);
+        await storage.update("bestTimeElapsed", timeElapsed);
+    }
+    if (testControl.logEnabled && timeElapsed < bestTimeElapsedWithLogging) {
+        console.log(`    ${figures.color.info} ${figures.withColor("   New Fastest Time Elapsed with Logging Enabled!!!" + timeElapsedFmt, figures.colors.cyan)}`);
+        await storage.update("bestTimeElapsedLWithLogging", timeElapsed);
+    }
+    await storage.update("timeElapsed", timeElapsed);
+
+    //
+    // Exit
+    //
     console.log(`    ${figures.color.info} ${figures.withColor("Exiting", figures.colors.grey)}`);
     console.log(`    ${figures.color.info}`);
 }
@@ -228,9 +253,12 @@ export const executeTeCommand2 = (command: string, args: any[], minWait?: number
 export async function focusExplorerView(instance: any)
 {
     if (!teExplorer.isVisible()) {
-        instance.slow(testControl.slowTime.focusCommand + testControl.slowTime.refreshCommand + (testControl.waitTime.focusCommand * 2));
+        instance.slow(testControl.slowTime.focusCommand + testControl.slowTime.refreshCommand +
+                      (testControl.waitTime.focusCommand * 2) + testControl.waitTime.min + 100);
         await executeTeCommand("focus", testControl.waitTime.focusCommand);
         await teApi.waitForIdle(testControl.waitTime.focusCommand);
+        sleep(100);
+        await teApi.waitForIdle(testControl.waitTime.min);
     }
 }
 
