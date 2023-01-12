@@ -154,7 +154,20 @@ const _procDirCreateEvent = async(uri: Uri, logPad = "") =>
         log.methodDone("directory 'create' event", 1, logPad);
     }
     catch (e) {}
-    finally { processingFsEvent = false; processQueue(); }
+    finally { processQueue(); }
+};
+
+
+const _procWsDirCreateEvent = async(e: WorkspaceFoldersChangeEvent) =>
+{
+    try
+    {   await cache.addWsFolders(e.added);
+        cache.removeWsFolders(e.removed);
+        createDirWatcher(extContext);
+        await refreshTree(teApi);
+    }
+    catch (e) {}
+    finally { processQueue(); }
 };
 
 
@@ -167,7 +180,7 @@ const _procDirDeleteEvent = async(uri: Uri, logPad = "") =>
         log.methodDone("directory 'delete' delete", 1, logPad);
     }
     catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'change' event error", e ]); }
-    finally { processingFsEvent = false; processQueue(); }
+    finally { processQueue(); }
 };
 
 
@@ -179,7 +192,7 @@ const _procFileChangeEvent = async(taskType: string, uri: Uri, logPad = "") =>
         log.methodDone("file 'change' event", 1, logPad);
     }
     catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'change' event error", e ]); }
-    finally { processingFsEvent = false; processQueue(); }
+    finally { processQueue(); }
 };
 
 
@@ -192,7 +205,7 @@ const _procFileCreateEvent = async(taskType: string, uri: Uri, logPad = "") =>
         log.methodDone("file 'create' event", 1, logPad);
     }
     catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'create' event error", e ]); }
-    finally { processingFsEvent = false; processQueue(); }
+    finally { processQueue(); }
 };
 
 
@@ -205,7 +218,7 @@ const _procFileDeleteEvent = async(taskType: string, uri: Uri, logPad = "") =>
         log.methodDone("file 'delete' event", 1, logPad);
     }
     catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'delete' event error", e ]); }
-    finally { processingFsEvent = false; processQueue(); }
+    finally { processQueue(); }
 };
 
 
@@ -342,16 +355,13 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     // TODO - remove ignore tags when tests for adding/removing workspace is implemented
     //
     /* istanbul ignore next */
-    processingFsEvent = true;
-    try
-    {
-        await cache.addWsFolders(e.added);
-        cache.removeWsFolders(e.removed);
-        createDirWatcher(extContext);
-        await refreshTree(teApi);
+    if (processingFsEvent) {
+        eventQueue.push({ fn: _procWsDirCreateEvent, args: [ e ] });
     }
-    catch {}
-    finally { processingFsEvent = false; }
+    else {
+        processingFsEvent = true;
+        await _procWsDirCreateEvent(e);
+    }
 };
 
 
@@ -368,5 +378,8 @@ const processQueue = async () =>
         processingFsEvent = true;
         await next.fn(...next.args);
         log.methodDone("file watcher event queue", 1, "");
+    }
+    else {
+        processingFsEvent = false;
     }
 };
