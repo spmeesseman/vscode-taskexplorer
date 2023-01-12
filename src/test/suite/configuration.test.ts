@@ -3,10 +3,10 @@
 
 import * as assert from "assert";
 import * as util from "../../lib/utils/utils";
-import { activate, executeSettingsUpdate, sleep, testControl } from "../helper";
 import { configuration } from "../../lib/utils/configuration";
 import { teApi } from "../../extension";
 import { enableConfigWatcher } from "../../lib/configWatcher";
+import { activate, executeSettingsUpdate, sleep, suiteFinished, testControl } from "../helper";
 
 let enabledTasks: any;
 let globPatterns: string[];
@@ -31,6 +31,7 @@ suite("Configuration / Settings Tests", () =>
     suiteTeardown(async function()
     {
         await executeSettingsUpdate("pathToPrograms", pathToPrograms);
+        suiteFinished(this);
     });
 
 

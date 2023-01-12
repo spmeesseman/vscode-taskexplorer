@@ -3,7 +3,7 @@
 
 import { Uri, WebviewPanel } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {  activate, closeActiveDocument, executeTeCommand, focusExplorerView, executeSettingsUpdate, testControl } from "../helper";
+import {  activate, closeActiveDocument, executeTeCommand, focusExplorerView, executeSettingsUpdate, testControl, suiteFinished } from "../helper";
 
 let teApi: ITaskExplorerApi;
 let userTasks: boolean;
@@ -23,6 +23,7 @@ suite("Info Report Tests", () =>
     {
 		await closeActiveDocument();
 		await executeSettingsUpdate("specialFolders.showUserTasks", userTasks);
+        suiteFinished(this);
 	});
 
 

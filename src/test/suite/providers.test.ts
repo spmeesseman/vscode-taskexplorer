@@ -16,7 +16,7 @@ import { removeFromArray } from "../../lib/utils/utils";
 import { ITaskExplorerApi, IExplorerApi, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
-    focusExplorerView, getWsPath, sleep, testControl, treeUtils, verifyTaskCount
+    focusExplorerView, getWsPath, sleep, suiteFinished, testControl, treeUtils, verifyTaskCount
 } from "../helper";
 
 
@@ -65,6 +65,7 @@ suite("Provider Tests", () =>
         await executeSettingsUpdate("enabledTasks.gradle", false, testControl.waitTime.configDisableEvent);       // off by default
         await executeSettingsUpdate("enabledTasks.maven", false, testControl.waitTime.configDisableEvent);        // off by default
         await executeSettingsUpdate("enabledTasks.pipenv", false, testControl.waitTime.configDisableEvent);       // off by default
+        suiteFinished(this);
     });
 
 

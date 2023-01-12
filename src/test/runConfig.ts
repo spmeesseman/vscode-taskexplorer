@@ -19,6 +19,10 @@ const NYC = require("nyc");
 import "ts-node/register";
 import "source-map-support/register";
 
+const sleep = (ms: number) =>
+{
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
 
 export default async() => {
     // const testsRoot = path.resolve(__dirname, "..", "..");
@@ -105,7 +109,10 @@ export default async() => {
     //
     const files = glob.sync(filesToTest, { cwd: testsRoot });
     // const files = glob.sync(`{**/_api.test.js,**/${fileToTest}.test.js}`, { cwd: testsRoot });
-    files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
+    files.forEach(async (f) => {
+        mocha.addFile(path.resolve(testsRoot, f));
+        await sleep(10);
+    });
 
     return {
         nyc,

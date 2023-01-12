@@ -3,7 +3,6 @@
 import * as path from "path";
 import * as util from "../../lib/utils/utils";
 import constants from "../../lib/constants";
-import log from "../../lib/utils/log";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 import { ExternalExplorerProvider, TaskExplorerDefinition } from "../../interface";
 // import { ExternalExplorerProvider, TaskExplorerDefinition } from "@spmeesseman/vscode-taskexplorer-types";
@@ -53,8 +52,6 @@ export class ExternalTaskProvider extends ExternalExplorerProvider implements Ex
               uri = Uri.file("/dummy_path"),
               folder = (workspace.workspaceFolders as WorkspaceFolder[])[0]; // for tests only!
 
-        log.methodStart("read external tasks", 1, "", true, [[ "path", uri.fsPath ], [ "project folder", folder.name ]]);
-
         const task = this.createTask("test_1_task_name", "test_1_task_name", folder, uri);
         task.group = TaskGroup.Build;
         result.push(task);
@@ -63,7 +60,6 @@ export class ExternalTaskProvider extends ExternalExplorerProvider implements Ex
         task.group = TaskGroup.Build;
         result.push(task2);
 
-        log.methodDone("read external tasks", 1, "");
         return result;
     }
 

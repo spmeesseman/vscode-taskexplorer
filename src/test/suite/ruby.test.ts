@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { RubyTaskProvider } from "../../providers/ruby";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, testControl, treeUtils, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, suiteFinished, testControl, treeUtils, verifyTaskCount } from "../helper";
 
 const testsName = "ruby";
 const startTaskCount = 7;
@@ -36,6 +36,7 @@ suite("Ruby Tests", () =>
 
     suiteTeardown(async function()
     {
+        suiteFinished(this);
     });
 
 

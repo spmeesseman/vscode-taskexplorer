@@ -7,7 +7,7 @@
 //
 import * as assert from "assert";
 import * as path from "path";
-import { activate, getWsPath } from "../helper";
+import { activate, getWsPath, suiteFinished } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MakeTaskProvider } from "../../providers/make";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
@@ -24,6 +24,12 @@ suite("Makefile Tests", () =>
     {
         teApi = await activate(this);
         provider = teApi.providers.get("make") as MakeTaskProvider;
+    });
+
+
+    suiteTeardown(async function()
+    {
+        suiteFinished(this);
     });
 
 

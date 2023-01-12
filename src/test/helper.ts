@@ -13,6 +13,7 @@ import { storage } from "../lib/utils/storage";
 import { ILicenseManager } from "../interface/licenseManager";
 import { IExplorerApi, ITaskExplorerApi, ITaskItemApi, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
+import { log } from "console";
 
 export { figures };
 export { testControl };
@@ -118,14 +119,6 @@ export async function activate(instance?: any)
 
 export async function cleanup()
 {
-    const timeFinished = Date.now(),
-          timeElapsed = timeFinished - timeStarted,
-          m = Math.floor(timeElapsed / 1000 / 60),
-          s = Math.round(timeElapsed / 1000 % 60),
-          timeElapsedFmt = `${m} minutes, ${s} seconds}`,
-          tzOffset = (new Date()).getTimezoneOffset() * 60000,
-          timeFinishedFmt = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
-
     console.log(`    ${figures.color.info}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Tests complete, clean up", figures.colors.grey)}`);
 
@@ -179,24 +172,39 @@ export async function cleanup()
     //
     let bestTimeElapsed = storage.get<number>("bestTimeElapsed", 0),
         bestTimeElapsedWithLogging = storage.get<number>("bestTimeElapsedLWithLogging", 0);
+    const timeFinished = Date.now(),
+          timeElapsed = timeFinished - timeStarted,
+          m = Math.floor(timeElapsed / 1000 / 60),
+          s = Math.round(timeElapsed / 1000 % 60),
+          timeElapsedFmt = `${m} minutes, ${s} seconds}`,
+          tzOffset = (new Date()).getTimezoneOffset() * 60000,
+          timeFinishedFmt = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
     console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + timeFinishedFmt, figures.colors.grey)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + timeElapsedFmt, figures.colors.grey)}`);
-    if (bestTimeElapsed === 0) {
-        bestTimeElapsed = timeElapsed + 1;
-    }
-    if (testControl.logEnabled && bestTimeElapsedWithLogging === 0) {
-        bestTimeElapsedWithLogging = timeElapsed + 1;
-    }
-    if (timeElapsed < bestTimeElapsed) {
-        console.log(`    ${figures.color.info} ${figures.withColor("   New Fastest Time Elapsed!!!" + timeElapsedFmt, figures.colors.cyan)}`);
-        await storage.update("bestTimeElapsed", timeElapsed);
-    }
-    if (testControl.logEnabled && timeElapsed < bestTimeElapsedWithLogging) {
-        console.log(`    ${figures.color.info} ${figures.withColor("   New Fastest Time Elapsed with Logging Enabled!!!" + timeElapsedFmt, figures.colors.cyan)}`);
-        await storage.update("bestTimeElapsedLWithLogging", timeElapsed);
-    }
     await storage.update("timeElapsed", timeElapsed);
+    if (!testControl.testFailed && testControl.numSuites > 3)
+    {
+        if (bestTimeElapsed === 0) {
+            bestTimeElapsed = timeElapsed + 1;
+        }
+        if (testControl.logEnabled && bestTimeElapsedWithLogging === 0) {
+            bestTimeElapsedWithLogging = timeElapsed + 1;
+        }
+        if (timeElapsed < bestTimeElapsed) {
+            console.log(`    ${figures.color.info} ${figures.withColor("   New Fastest Time Elapsed!!!" + timeElapsedFmt, figures.colors.cyan)}`);
+            await storage.update("bestTimeElapsed", timeElapsed);
+        }
+        if (testControl.logEnabled && timeElapsed < bestTimeElapsedWithLogging) {
+            console.log(`    ${figures.color.info} ${figures.withColor("   New Fastest Time Elapsed with Logging Enabled!!!" + timeElapsedFmt, figures.colors.cyan)}`);
+            await storage.update("bestTimeElapsedLWithLogging", timeElapsed);
+        }
+    }
+    //
+    // TODO - Trackbest/fastest times per suite
+    //
+    // if (!testControl.testFailed && testControl.numSuites === 1)
+    //
 
     //
     // Exit
@@ -506,6 +514,30 @@ export const setLicensed = async (valid: boolean, licMgr: ILicenseManager) =>
 export const sleep = async (ms: number) =>
 {
 	return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+
+export const suiteFinished = (instance: Mocha.Context) =>
+{
+    const suite = instance.currentTest?.parent;
+    if (suite)
+    {
+        const numTestsFailedThisSuite = suite.tests.filter(t => t.isFailed()).length;
+        testControl.numTestsFail += numTestsFailedThisSuite;
+        testControl.numTestsSuccess += suite.tests.filter(t => t.isPassed()).length;
+        testControl.numSuites++;
+        testControl.numTests += suite.tests.length;
+        if (numTestsFailedThisSuite > 0) {
+            testControl.testFailed = true;
+            testControl.numSuitesFail++;
+        }
+        else {
+            testControl.numSuitesSuccess++;
+        }
+    }
+    else {
+        teApi.log.warn("Suite Finished: Instance is undefined!");
+    }
 };
 
 

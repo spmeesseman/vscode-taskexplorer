@@ -10,7 +10,7 @@ import { storage } from "../../lib/utils/storage";
 import TaskItem from "../../tree/item";
 import {
     activate, clearOverrideShowInfoBox, clearOverrideShowInputBox, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView,
-    getSpecialTaskItemId, overrideNextShowInfoBox, overrideNextShowInputBox, testControl, treeUtils
+    getSpecialTaskItemId, overrideNextShowInfoBox, overrideNextShowInputBox, suiteFinished, testControl, treeUtils
 } from "../helper";
 import SpecialTaskFolder from "../../tree/specialFolder";
 
@@ -40,6 +40,7 @@ suite("Tree Tests", () =>
 
     suiteTeardown(async function()
     {
+        suiteFinished(this);
     });
 
 

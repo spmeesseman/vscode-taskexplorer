@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { GulpTaskProvider } from "../../providers/gulp";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, focusExplorerView, getWsPath, sleep, testControl, treeUtils, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand, focusExplorerView, getWsPath, sleep, suiteFinished, testControl, treeUtils, verifyTaskCount } from "../helper";
 
 const testsName = "gulp";
 const startTaskCount = 17;
@@ -41,6 +41,7 @@ suite("Gulp Tests", () =>
         //
         await configuration.updateVs("grunt.autoDetect", testControl.vsCodeAutoDetectGrunt);
         await configuration.updateVs("gulp.autoDetect", testControl.vsCodeAutoDetectGulp);
+        suiteFinished(this);
     });
 
 

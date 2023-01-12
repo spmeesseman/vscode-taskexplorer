@@ -5,12 +5,12 @@
 import TaskItem from "../../tree/item";
 import { expect } from "chai";
 import { getPackageManager } from "../../lib/utils/utils";
+import { TaskExecution } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeTeCommand2, focusExplorerView, treeUtils, getWsPath,
-    overrideNextShowInputBox, testControl, verifyTaskCount, waitForTaskExecution, tagLog
+    overrideNextShowInputBox, testControl, verifyTaskCount, waitForTaskExecution, tagLog, suiteFinished
 } from "../helper";
-import { TaskExecution } from "vscode";
 
 const testsName = "npm";
 const startTaskCount = 0;
@@ -46,6 +46,7 @@ suite("NPM Tests", () =>
             }
         }
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        suiteFinished(this);
     });
 
 

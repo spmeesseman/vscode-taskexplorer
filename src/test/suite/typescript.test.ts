@@ -10,7 +10,7 @@ import { Uri } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand2, focusExplorerView,
-    getWsPath, testControl, treeUtils
+    getWsPath, suiteFinished, testControl, treeUtils
 } from "../helper";
 
 
@@ -48,6 +48,7 @@ suite("Typescript Tests", () =>
         try {
             await fsApi.deleteDir(dirName);
         } catch {}
+        suiteFinished(this);
     });
 
 

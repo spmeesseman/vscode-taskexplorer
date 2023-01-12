@@ -9,7 +9,7 @@ import { GruntTaskProvider } from "../../providers/grunt";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, focusExplorerView, getWsPath, sleep, testControl, treeUtils, verifyTaskCount
+    activate, executeSettingsUpdate, executeTeCommand, focusExplorerView, getWsPath, sleep, suiteFinished, testControl, treeUtils, verifyTaskCount
 } from "../helper";
 
 const testsName = "grunt";
@@ -39,6 +39,7 @@ suite("Grunt Tests", () =>
 
     suiteTeardown(async function()
     {
+        suiteFinished(this);
     });
 
 

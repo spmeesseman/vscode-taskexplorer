@@ -11,7 +11,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { storage } from "../../lib/utils/storage";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
-	logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, executeTeCommand
+	logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, executeTeCommand, suiteFinished
 } from "../helper";
 
 const creator = "spmeesseman",
@@ -41,6 +41,7 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enableOutputWindow", testControl.logToOutput);
 		await executeSettingsUpdate("logging.enableFileSymbols", testControl.logToFileSymbols);
 		await executeSettingsUpdate("logging.level", testControl.logLevel);
+        suiteFinished(this);
 	});
 
 

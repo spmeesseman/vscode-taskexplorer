@@ -3,7 +3,7 @@
 /* tslint:disable */
 
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, testControl, treeUtils } from "../helper";
+import { activate, executeSettingsUpdate, suiteFinished, testControl, treeUtils } from "../helper";
 
 const testsName = "Workspace";
 const startTaskCount = 10;
@@ -26,6 +26,7 @@ suite("Workspace / VSCode Tests", () =>
     suiteTeardown(async function()
     {
         await teApi.config.updateWs("showHiddenWsTasks", wsEnable);
+        suiteFinished(this);
     });
 
 

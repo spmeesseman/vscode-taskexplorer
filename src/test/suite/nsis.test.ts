@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { NsisTaskProvider } from "../../providers/nsis";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, testControl, treeUtils, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, suiteFinished, testControl, treeUtils, verifyTaskCount } from "../helper";
 
 const testsName = "nsis";
 const startTaskCount = 7;
@@ -36,6 +36,7 @@ suite("Nullsoft NSIS Tests", () =>
 
     suiteTeardown(async function()
     {
+        suiteFinished(this);
     });
 
 

@@ -2,11 +2,10 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as assert from "assert";
-import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, setExplorer, testControl } from "../helper";
 import { getInstallPath } from "../../lib/utils/utils";
-import { enableConfigWatcher } from "../../lib/configWatcher";
 import { refreshTree } from "../../lib/refreshTree";
+import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, executeSettingsUpdate, executeTeCommand, setExplorer, suiteFinished, testControl } from "../helper";
 
 let teApi: ITaskExplorerApi;
 let explorer: IExplorerApi;
@@ -23,6 +22,7 @@ suite("API Init and Tests", () =>
 
     suiteTeardown(async function()
     {
+        suiteFinished(this);
     });
 
 

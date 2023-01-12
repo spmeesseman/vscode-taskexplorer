@@ -16,7 +16,7 @@
 //        like its supported :(  SO this is the best we can do...
 
 import { join } from "path";
-import { activate, getTestsPath, sleep, testControl, treeUtils } from "../helper";
+import { activate, getTestsPath, sleep, suiteFinished, testControl, treeUtils } from "../helper";
 import { IExplorerApi, IFilesystemApi, ITaskExplorerApi, TaskExplorerTestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, WorkspaceFolder } from "vscode";
 
@@ -78,6 +78,7 @@ suite("Multi-Root Workspace Tests", () =>
         await fsApi.deleteDir(wsf2DirName);
         await fsApi.deleteDir(wsf3DirName);
         await fsApi.deleteDir(wsf4DirName);
+        suiteFinished(this);
     });
 
 

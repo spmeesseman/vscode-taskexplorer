@@ -21,7 +21,8 @@ export const refresh = async(instance?: any) =>
 {
     const teApi = getTeApi();
     if (instance) {
-        instance.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.configGroupingEvent * 2) + (testControl.waitTime.min * 2));
+        instance.slow(testControl.slowTime.refreshCommand + testControl.waitTime.refreshCommand +
+                      (testControl.slowTime.configGroupingEvent * 2) + (testControl.waitTime.min * 2));
         instance.timeout((testControl.slowTime.refreshCommand  * 2) + (testControl.slowTime.configGroupingEvent * 2) + (testControl.waitTime.min * 2));
     }
     await executeSettingsUpdate("groupWithSeparator", true, testControl.waitTime.configGroupingEvent);

@@ -2,21 +2,17 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-//
-// Documentation on https://mochajs.org/ for help.
-//
-import * as assert from "assert";
+import constants from "../../lib/constants";
 import TaskItem from "../../tree/item";
+import SpecialTaskFolder from "../../tree/specialFolder";
 import { expect } from "chai";
 import { storage } from "../../lib/utils/storage";
-import constants from "../../lib/constants";
+import { TaskExecution } from "vscode";
 import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, focusExplorerView,
-    treeUtils, overrideNextShowInfoBox, overrideNextShowInputBox, testControl, waitForTaskExecution, sleep
+    treeUtils, overrideNextShowInfoBox, overrideNextShowInputBox, testControl, waitForTaskExecution, sleep, suiteFinished
 } from "../helper";
-import SpecialTaskFolder from "../../tree/specialFolder";
-import { TaskExecution } from "vscode";
 
 let lastTask: ITaskItemApi | null = null;
 let teApi: ITaskExplorerApi;
@@ -42,6 +38,7 @@ suite("Task Tests", () =>
 
     suiteTeardown(async function()
     {
+        suiteFinished(this);
     });
 
 

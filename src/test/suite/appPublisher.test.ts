@@ -6,11 +6,13 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as path from "path";
+import { expect } from "chai";
 import { Uri } from "vscode";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, getWsPath, testControl, treeUtils, verifyTaskCount } from "../helper";
-import { expect } from "chai";
+import {
+    activate, executeSettingsUpdate, getWsPath, suiteFinished, testControl, treeUtils, verifyTaskCount
+} from "../helper";
 
 const testsName = "apppublisher";
 const startTaskCount = 21;
@@ -47,7 +49,7 @@ suite("App-Publisher Tests", () =>
     {
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
         await fsApi.deleteFile(fileUri.fsPath);
-        ++successCount;
+        suiteFinished(this);
     });
 
 

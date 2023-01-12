@@ -6,7 +6,7 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import { activate, executeTeCommand, verifyTaskCount } from "../helper";
+import { activate, executeTeCommand, suiteFinished, verifyTaskCount } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ExternalTaskProvider } from "./externalTaskProvider";
@@ -36,6 +36,7 @@ suite("API Tests", () =>
     {
         dispose.dispose();
         dispose2.dispose();
+        suiteFinished(this);
     });
 
 

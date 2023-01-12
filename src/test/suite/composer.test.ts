@@ -9,9 +9,9 @@ import * as assert from "assert";
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
-import { activate, executeSettingsUpdate, getWsPath, testControl, verifyTaskCount } from "../helper";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { ComposerTaskProvider } from "../../providers/composer";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, executeSettingsUpdate, getWsPath, suiteFinished, testControl, verifyTaskCount } from "../helper";
 
 const testsName = "composer";
 const startTaskCount = 2;
@@ -48,6 +48,7 @@ suite("Composer Tests", () =>
         // Reset settings
         //
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
+        suiteFinished(this);
     });
 
 

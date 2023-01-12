@@ -11,7 +11,7 @@ import { testControl } from "../control";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, closeActiveDocument, overrideNextShowInfoBox, overrideNextShowInputBox,
-	sleep, executeTeCommand, focusExplorerView, getWsPath, setLicensed
+	sleep, executeTeCommand, focusExplorerView, getWsPath, setLicensed, suiteFinished
 } from "../helper";
 
 
@@ -60,6 +60,7 @@ suite("License Manager Tests", () =>
 		if (oVersion) {
 			await storage.update("version", oLicenseKey);
 		}
+        suiteFinished(this);
 	});
 
 

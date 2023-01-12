@@ -12,7 +12,7 @@ import { PythonTaskProvider } from "../../providers/python";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, getWsPath,
-    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, testControl, verifyTaskCount
+    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, suiteFinished, testControl, verifyTaskCount
 } from "../helper";
 
 const testsName = "python";
@@ -56,6 +56,7 @@ suite("Python Tests", () =>
         await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
         await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTime.configEnableEvent);
         await fsApi.deleteDir(dirName);
+        suiteFinished(this);
     });
 
 

@@ -10,7 +10,8 @@ import { AntTaskProvider } from "../../providers/ant";
 import { IFilesystemApi } from "../../interface/fsApi";
 import {
     activate, executeSettingsUpdate, getWsPath, testControl, verifyTaskCount,
-    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs
+    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs,
+    suiteFinished
 } from "../helper";
 
 const testsName = "ant";
@@ -48,6 +49,7 @@ suite("Ant Tests", () =>
     suiteTeardown(async function()
     {
         await fsApi.writeFile(buildXmlFileUri.fsPath, buildFileXml);
+        suiteFinished(this);
     });
 
 

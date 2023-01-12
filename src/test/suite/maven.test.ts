@@ -7,10 +7,10 @@
 //
 import * as path from "path";
 import { Uri } from "vscode";
-import { activate, executeSettingsUpdate, focusExplorerView, getWsPath, testControl, verifyTaskCount } from "../helper";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
 import { IFilesystemApi } from "../../interface/fsApi";
+import { activate, executeSettingsUpdate, focusExplorerView, getWsPath, suiteFinished, testControl, verifyTaskCount } from "../helper";
 
 const testsName = "maven";
 const startTaskCount = 8;
@@ -42,10 +42,9 @@ suite("Maven Tests", () =>
 
 
     suiteTeardown(async function()
-    {   //
-        // Reset settings
-        //
+    {
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
+        suiteFinished(this);
     });
 
 

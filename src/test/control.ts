@@ -29,6 +29,16 @@ export const testControl =
     vsCodeAutoDetectGrunt: "off",
     vsCodeAutoDetectGulp: "off",
     //
+    // Rolling success count and failure flag
+    //
+    testFailed: false,
+    numSuites: 0,
+    numSuitesFail: 0,
+    numSuitesSuccess: 0,
+    numTests: 0,
+    numTestsFail: 0,
+    numTestsSuccess: 0,
+    //
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)s
     //
     slowTime: {

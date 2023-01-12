@@ -12,7 +12,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { PowershellTaskProvider } from "../../providers/powershell";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeSettingsUpdate, getWsPath,
-    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, testControl, verifyTaskCount
+    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, suiteFinished, testControl, verifyTaskCount
 } from "../helper";
 
 const testsName = "powershell";
@@ -61,6 +61,7 @@ suite("Powershell Tests", () =>
         await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTime.configEnableEvent);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
+        suiteFinished(this);
     });
 
 
