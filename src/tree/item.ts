@@ -4,7 +4,7 @@ import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import TaskFile from "./file";
 import TaskFolder from "./folder";
-import { ITaskItemApi } from "../interface";
+import { ITaskItem } from "../interface";
 import { configuration } from "../lib/utils/configuration";
 import {
     Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks, Command
@@ -18,7 +18,7 @@ from "vscode";
  * A tree node that represents a task.
  * An item of this type is always a child of type TaskFile in the tree.
  */
-export default class TaskItem extends TreeItem implements ITaskItemApi
+export default class TaskItem extends TreeItem implements ITaskItem
 {
     public readonly context: ExtensionContext; // Note:  Making this field private bombs the types
     public readonly taskSource: string;

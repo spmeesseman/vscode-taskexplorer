@@ -5,7 +5,7 @@ import { WorkspaceFoldersChangeEvent } from "vscode";
 import { IFileCache } from "./IFileCache";
 import { IStorage } from "./IStorage";
 
-export interface TaskExplorerTestsApi
+export interface ITestsApi
 {
     explorer: IExplorerApi;
     fileCache: IFileCache; // for tests use only

@@ -7,19 +7,19 @@ import TaskItem from "../../tree/item";
 import SpecialTaskFolder from "../../tree/specialFolder";
 import { expect } from "chai";
 import { TaskExecution } from "vscode";
-import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, focusExplorerView,
     treeUtils, overrideNextShowInfoBox, overrideNextShowInputBox, testControl, waitForTaskExecution, sleep, suiteFinished
 } from "../utils/utils";
 
-let lastTask: ITaskItemApi | null = null;
+let lastTask: ITaskItem | null = null;
 let teApi: ITaskExplorerApi;
 let explorer: IExplorerApi;
-let ant: ITaskItemApi[];
-let bash: ITaskItemApi[];
-let batch: ITaskItemApi[];
-let python: ITaskItemApi[];
+let ant: ITaskItem[];
+let bash: ITaskItem[];
+let batch: ITaskItem[];
+let python: ITaskItem[];
 let successCount = 0;
 const endOfTestWaitTime = 750;
 

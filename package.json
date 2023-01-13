@@ -47,7 +47,9 @@
         "bash"
     ],
     "main": "./dist/extension",
-    "activationEvents": [],
+    "activationEvents": [
+        "*"
+    ],
     "scripts": {
         "clean": "rimraf dist && rimraf .nyc_output && rimraf coverage",
         "copy-build-to-code": "cmd /c xcopy .\\dist\\*.js ..\\..\\Code\\data\\extensions\\spmeesseman.vscode-taskexplorer-2.13.2\\dist /s /i /y",
@@ -94,7 +96,7 @@
         "tsc-build_types": "tsc -p ./types && cmd /c xcopy .\\types\\lib\\* .\\node_modules\\@spmeesseman\\vscode-taskexplorer-types\\lib /s /i /y",
         "tsc-rebuild": "rimraf dist && npm run tsc-build && npm run tsc-build_types",
         "tsc-rebuild_test": "rimraf dist && npm run tsc-build_types && npm run tsc-build_test",
-        "tsc-rebuild_types": "rimraf types/tsconfig.tsbuildinfo && rimraf types/lib npm run tsc-build_types",
+        "tsc-rebuild_types": "rimraf types/tsconfig.tsbuildinfo && rimraf types/lib && rimraf node_modules/@spmeesseman/vscode-taskexplorer-types/lib && npm run tsc-build_types",
         "tsc-watch": "tsc -watch -p ./",
         "webpack-watch": "webpack -w --env environment=dev --config ./webpack.config.js",
         "webpack-build": "npm run webpack-build:extension",

@@ -4,7 +4,7 @@ import TaskItem from "../tree/item";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import constants from "./constants";
-import { ITaskFileApi, ITaskItemApi } from "../interface";
+import { ITaskFile, ITaskItem } from "../interface";
 
 
 
@@ -51,10 +51,10 @@ export const sortTaskFolder = (folder: TaskFolder, logPad: string, logLevel: num
 };
 
 
-export const sortTasks = (items: (ITaskFileApi | ITaskItemApi)[] | undefined, logPad = "", logLevel = 1) =>
+export const sortTasks = (items: (ITaskFile | ITaskItem)[] | undefined, logPad = "", logLevel = 1) =>
 {
     log.methodStart("sort tasks", logLevel, logPad);
-    items?.sort((a: ITaskFileApi | ITaskItemApi, b: ITaskFileApi | ITaskItemApi) =>
+    items?.sort((a: ITaskFile | ITaskItem, b: ITaskFile | ITaskItem) =>
     {   /* istanbul ignore else */
         if (a.label && b.label)
         {

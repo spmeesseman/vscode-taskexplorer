@@ -13,7 +13,7 @@ import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { configuration } from "../lib/utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
-import { ITaskFileApi, ITaskFolderApi, ITaskItemApi, TaskExplorerDefinition } from "../interface";
+import { ITaskFile, ITaskFolder, ITaskItem, TaskExplorerDefinition } from "../interface";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import { getTerminal } from "../lib/getTerminal";
@@ -1014,7 +1014,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    private getGroupedId(folder: ITaskFolderApi, file: ITaskFileApi, label: string, treeLevel: number)
+    private getGroupedId(folder: ITaskFolder, file: ITaskFile, label: string, treeLevel: number)
     {
         const groupSeparator = util.getGroupSeparator();
         const labelSplit = label.split(groupSeparator);
@@ -1556,7 +1556,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             }
             else if (each.isGroup)
             {
-                const _rmv = (treeNodes: (ITaskFileApi | ITaskItemApi)[]) =>
+                const _rmv = (treeNodes: (ITaskFile | ITaskItem)[]) =>
                 {
                     for (const each2 of treeNodes)
                     {
@@ -1598,10 +1598,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      * @param subfolders Current tree subfolders map
      * @param level Current grouping level
      */
-    private removeTreeNodes(taskFile: ITaskFileApi, folder: TaskFolder, subfolders: Map<string, TaskFile>, level: number, logPad: string, logLevel: number)
+    private removeTreeNodes(taskFile: ITaskFile, folder: TaskFolder, subfolders: Map<string, TaskFile>, level: number, logPad: string, logLevel: number)
     {
         const me = this;
-        const taskTypesRmv: (ITaskFileApi | ITaskItemApi)[] = [];
+        const taskTypesRmv: (ITaskFile | ITaskItem)[] = [];
         const groupSeparator = util.getGroupSeparator();
 
         log.methodStart("remove scripts", logLevel, logPad, false);

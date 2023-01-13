@@ -6,7 +6,7 @@ import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import TaskFolder from "../../tree/folder";
 import { isObjectEmpty } from "../../lib/utils/utils";
-import { ITaskItemApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskItem, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 
 let didSetGroupLevel = false;
 
@@ -68,7 +68,7 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
     const teApi = utils.getTeApi(),
           figures = utils.figures,
           tc = utils.testControl,
-          taskItems: ITaskItemApi[] = [];
+          taskItems: ITaskItem[] = [];
 
     const _getTaskMap = async(retries: number) =>
     {

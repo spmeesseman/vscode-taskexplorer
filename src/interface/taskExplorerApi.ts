@@ -4,7 +4,7 @@ import { IConfigurationApi } from "./configurationApi";
 import { IExplorerApi } from "./explorer";
 import { ExternalExplorerProvider } from "./externalProvider";
 import { ILogApi } from "./logApi";
-import { TaskExplorerTestsApi } from "./testsApi";
+import { ITestsApi } from "./ITestsApi";
 // import { TaskExplorerProvider } from "../providers/provider";
 // import { TaskTreeDataProvider } from "../tree/tree";
 
@@ -19,7 +19,7 @@ export interface ITaskExplorerApi
     sidebarView: TreeView<TreeItem> | undefined;
     providers: Map<string, any>;
     providersExternal: Map<string, ExternalExplorerProvider>;
-    testsApi: TaskExplorerTestsApi;
+    testsApi: ITestsApi;
 
     isBusy(): boolean;
     isTests(): boolean;

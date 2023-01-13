@@ -4,7 +4,7 @@ import * as https from "http";
 import log from "./log/log";
 import { join } from "path";
 import { storage } from "./utils/storage";
-import { ILicenseManager } from "../interface/licenseManager";
+import { ILicenseManager } from "../interface/ILicenseManager";
 import { teApi } from "../extension";
 import { readFileAsync } from "./utils/fs";
 import { isScriptType, getInstallPath } from "./utils/utils";

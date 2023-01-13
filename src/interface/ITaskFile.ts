@@ -1,10 +1,10 @@
 
 import { TaskExplorerDefinition } from "./taskDefinition";
-import { ITaskFolderApi } from "./taskFolder";
-import { ITaskItemApi } from "./taskItem";
+import { ITaskFolder } from "./ITaskFolder";
+import { ITaskItem } from "./ITaskItem";
 import { TreeItem, Uri } from "vscode";
 
-export interface ITaskFileApi extends TreeItem
+export interface ITaskFile extends TreeItem
 {
     fileName: string;
     groupLevel: number;
@@ -12,9 +12,9 @@ export interface ITaskFileApi extends TreeItem
     path: string;
     resourceUri: Uri;
     readonly taskSource: string;
-    treeNodes: (ITaskItemApi|ITaskFileApi)[];
-    addTreeNode(treeNode: (ITaskFileApi | ITaskItemApi | undefined)): void;
-    getFileNameFromSource(source: string, folder: ITaskFolderApi, taskDef: TaskExplorerDefinition, incRelPathForCode?: boolean): string;
-    insertTreeNode(treeItem: ITaskFileApi|ITaskItemApi, index: number): void;
-    removeTreeNode(treeItem: (ITaskFileApi | ITaskItemApi)): void;
+    treeNodes: (ITaskItem|ITaskFile)[];
+    addTreeNode(treeNode: (ITaskFile | ITaskItem | undefined)): void;
+    getFileNameFromSource(source: string, folder: ITaskFolder, taskDef: TaskExplorerDefinition, incRelPathForCode?: boolean): string;
+    insertTreeNode(treeItem: ITaskFile|ITaskItem, index: number): void;
+    removeTreeNode(treeItem: (ITaskFile | ITaskItem)): void;
 }

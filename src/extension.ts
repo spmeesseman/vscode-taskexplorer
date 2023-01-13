@@ -26,7 +26,7 @@ import { RubyTaskProvider } from "./providers/ruby";
 import { configuration } from "./lib/utils/configuration";
 import { initStorage, storage } from "./lib/utils/storage";
 import { TaskExplorerProvider } from "./providers/provider";
-import { ILicenseManager } from "./interface/licenseManager";
+import { ILicenseManager } from "./interface/ILicenseManager";
 import { LicenseManager } from "./lib/licenseManager";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";

@@ -3,7 +3,7 @@
 
 import { expect } from "chai";
 import { ChildProcess, fork } from "child_process";
-import { ILicenseManager } from "../../interface/licenseManager";
+import { ILicenseManager } from "../../interface/ILicenseManager";
 import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import { testControl } from "../control";

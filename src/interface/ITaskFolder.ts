@@ -1,11 +1,11 @@
 
-import { ITaskFileApi } from "./taskFile";
-import { ITaskItemApi } from "./taskItem";
+import { ITaskFile } from "./ITaskFile";
+import { ITaskItem } from "./ITaskItem";
 import { TreeItem } from "vscode";
 
-export interface ITaskFolderApi extends TreeItem
+export interface ITaskFolder extends TreeItem
 {
-    addTaskFile(taskFile: ITaskFileApi|ITaskItemApi): Promise<void>;
-    insertTaskFile(taskFile: ITaskFileApi|ITaskItemApi, index: number): void;
-    removeTaskFile(taskFile: ITaskFileApi | ITaskItemApi | string, logPad: string): void;
+    addTaskFile(taskFile: ITaskFile|ITaskItem): Promise<void>;
+    insertTaskFile(taskFile: ITaskFile|ITaskItem, index: number): void;
+    removeTaskFile(taskFile: ITaskFile | ITaskItem | string, logPad: string): void;
 }

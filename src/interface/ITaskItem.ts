@@ -1,14 +1,14 @@
 
 import { TaskExecution, TreeItem } from "vscode";
-import { ITaskFileApi } from "./taskFile";
+import { ITaskFile } from "./ITaskFile";
 
-export interface ITaskItemApi extends TreeItem
+export interface ITaskItem extends TreeItem
 {
     groupLevel: number;
     id: string;
     isUser: boolean;
     paused: boolean;
-    taskFile: ITaskFileApi;
+    taskFile: ITaskFile;
     taskSource: string;
     isExecuting(logPad?: string): TaskExecution | undefined;
     isRunning(): boolean;

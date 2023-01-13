@@ -3,7 +3,7 @@ import * as path from "path";
 import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import TaskFolder  from "./folder";
-import { ITaskFileApi, ITaskFolderApi, ITaskItemApi, TaskExplorerDefinition } from "../interface";
+import { ITaskFile, ITaskFolder, ITaskItem, TaskExplorerDefinition } from "../interface";
 import { pathExistsSync } from "../lib/utils/fs";
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } from "vscode";
 
@@ -19,7 +19,7 @@ import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } 
  * The last TaskFile in a grouping will contain items of type TaskItem.  If not grouped,
  * the TaskFile node for each task type within each TaskFolder will contain items of type TaskItem.
  */
-export default class TaskFile extends TreeItem implements ITaskFileApi
+export default class TaskFile extends TreeItem implements ITaskFile
 {
     public path: string;
     /**
@@ -35,7 +35,7 @@ export default class TaskFile extends TreeItem implements ITaskFileApi
      * Child TaskItem or TaskFile nodes in the tree.  A TaskFile can own another TaskFile
      * if "Grouping" is turned on in settings.
      */
-    public treeNodes: (ITaskItemApi|ITaskFileApi)[] = [];
+    public treeNodes: (ITaskItem|ITaskFile)[] = [];
     /**
      * @property fileName
      *
@@ -227,7 +227,7 @@ export default class TaskFile extends TreeItem implements ITaskFileApi
      *
      * @param treeNode The node/item to add to this TaskFile node.
      */
-    public addTreeNode(treeNode: (ITaskFileApi | ITaskItemApi | undefined))
+    public addTreeNode(treeNode: (ITaskFile | ITaskItem | undefined))
     {
         /* istanbul ignore else */
         if (treeNode) {
@@ -312,7 +312,7 @@ export default class TaskFile extends TreeItem implements ITaskFileApi
      * @returns File name
      */
     // Note:  Making this function private bombs the types
-    public getFileNameFromSource(source: string, folder: ITaskFolderApi, taskDef: TaskExplorerDefinition, incRelPathForCode?: boolean)
+    public getFileNameFromSource(source: string, folder: ITaskFolder, taskDef: TaskExplorerDefinition, incRelPathForCode?: boolean)
     {
         //
         // Ant tasks or any tasks provided by this extension will have a "fileName" definition
@@ -355,7 +355,7 @@ export default class TaskFile extends TreeItem implements ITaskFileApi
      * @param treeNode The node/item to add to this TaskFile node.
      * @param index The index at which to insert into the array
      */
-    public insertTreeNode(treeItem: (ITaskFileApi | ITaskItemApi), index: number)
+    public insertTreeNode(treeItem: (ITaskFile | ITaskItem), index: number)
     {
         this.treeNodes.splice(index, 0, treeItem);
     }
@@ -366,7 +366,7 @@ export default class TaskFile extends TreeItem implements ITaskFileApi
      *
      * @param treeNode The node/item to remove from this TaskFile node.
      */
-    public removeTreeNode(treeItem: (ITaskFileApi | ITaskItemApi))
+    public removeTreeNode(treeItem: (ITaskFile | ITaskItem))
     {
         const idx = this.treeNodes.findIndex(tn => tn.id === treeItem.id);
         /* istanbul ignore else */

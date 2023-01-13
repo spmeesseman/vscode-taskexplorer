@@ -17,13 +17,13 @@
 
 import { join } from "path";
 import { activate, getTestsPath, sleep, suiteFinished, testControl, treeUtils } from "../utils/utils";
-import { IExplorerApi, IFilesystemApi, ITaskExplorerApi, TaskExplorerTestsApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, IFilesystemApi, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, WorkspaceFolder } from "vscode";
 
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let testsApi: TaskExplorerTestsApi;
+let testsApi: ITestsApi;
 let testsPath: string;
 let wsf1DirName: string;
 let wsf2DirName: string;

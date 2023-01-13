@@ -10,9 +10,9 @@ import { testControl } from "../control";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
 import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
-import { ILicenseManager } from "../../interface/licenseManager";
+import { ILicenseManager } from "../../interface/ILicenseManager";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
-import { IExplorerApi, ITaskExplorerApi, ITaskItemApi, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
+import { IExplorerApi, ITaskExplorerApi, ITaskItem, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 
 export { figures };
 export { testControl };
@@ -233,7 +233,7 @@ export const focusExplorerView = async (instance: any) =>
 };
 
 
-export const getSpecialTaskItemId = (taskItem: ITaskItemApi) =>
+export const getSpecialTaskItemId = (taskItem: ITaskItem) =>
     taskItem.id.replace(constants.LAST_TASKS_LABEL + ":", "").replace(constants.FAV_TASKS_LABEL + ":", "").replace(constants.USER_TASKS_LABEL + ":", "");
 
 
