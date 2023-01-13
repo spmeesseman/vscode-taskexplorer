@@ -7,7 +7,7 @@ import constants from "../../lib/constants";
 import figures from "../../lib/figures";
 import { deactivate } from "../../extension";
 import { testControl } from "../control";
-import { getSuiteKey, processTimes } from "./bestTimes";
+import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
 import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
 import { ILicenseManager } from "../../interface/licenseManager";
@@ -60,7 +60,8 @@ export const activate = async (instance?: Mocha.Context) =>
         const suite = instance.currentTest?.parent;
         if (suite)
         {
-            testControl.tests.suiteResults[getSuiteKey(suite.title)] = {
+            const suiteKey = getSuiteKey(suite.title);
+            testControl.tests.suiteResults[suiteKey] = {
                 timeStarted: Date.now(),
                 numTests: suite.tests.length,
                 suiteName: getSuiteFriendlyName(suite.title)
@@ -230,9 +231,6 @@ export const focusExplorerView = async (instance: any) =>
     }
     await teApi.waitForIdle(testControl.waitTime.min);
 };
-
-
-const getSuiteFriendlyName = (suiteName: string) => suiteName.replace(" Tests", "");
 
 
 export const getSpecialTaskItemId = (taskItem: ITaskItemApi) =>

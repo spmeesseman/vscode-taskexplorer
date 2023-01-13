@@ -6,18 +6,21 @@ import { testControl } from "../control";
 import { teApi } from "./utils";
 
 
-let bestTimeWasLogged = false;
+let bestTimeWasLoggedLast = false;
 
 
-const clearProcessTimeStorage = async (key: string) =>
+const clearProcessTimeStorage = async (key: string, force?: boolean) =>
 {
-    if (testControl.tests.clearBestTime || testControl.tests.clearAllBestTimes)
+    if (testControl.tests.clearBestTime || testControl.tests.clearAllBestTimes || force)
     {
         await teApi.testsApi.storage.update2(key, undefined);
         await teApi.testsApi.storage.update2(key + "Fmt", undefined);
         await teApi.testsApi.storage.update2(key + "NumTests", undefined);
     }
 };
+
+
+export const getSuiteFriendlyName = (suiteName: string) => suiteName.replace(" Tests", "");
 
 
 export const getSuiteKey = (suiteName: string, preKey = "") =>
@@ -49,15 +52,20 @@ const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: st
             msg = `!!! New Fastest Time with ${title} ${timeElapsedFmt}`;
         }
         else {
-            msg = `!!! New Fastest Time for Suite '${title}' ${timeElapsedFmt}`;
+            if (testControl.tests.numSuites > 1) {
+                msg = `!!! New Fastest Time for Suite '${title}' ${timeElapsedFmt}`;
+            }
+            else {
+                msg = `!!! New Fastest Time for Suite '${title}' (Single Test) ${timeElapsedFmt}`;
+            }
         }
     }
     else {
         msg = `!!! New Fastest Time ${timeElapsedFmt}`;
     }
-    if (!bestTimeWasLogged) {
+    if (!bestTimeWasLoggedLast) {
         console.log(`    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`);
-        bestTimeWasLogged = true;
+        bestTimeWasLoggedLast = true;
     }
     console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.cyan)}`);
     console.log(`    ${figures.color.info} ${figures.withColor(prevMsg, figures.colors.cyan)}`);
@@ -65,24 +73,30 @@ const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: st
 };
 
 
-
 const processBestTime = async (logTitle: string, storageKey: string, timeElapsed: number, numTests: number) =>
 {
     await clearProcessTimeStorage(storageKey);
+    const prevNumTests = await teApi.testsApi.storage.get2<number>(storageKey + "NumTests");
+    if (prevNumTests !== numTests) {
+        await clearProcessTimeStorage(storageKey, true);
+    }
     let bestTimeElapsed = await teApi.testsApi.storage.get2<number>(storageKey, 0);
     if (bestTimeElapsed === 0) {
         bestTimeElapsed = timeElapsed + 1;
     }
+    const timeElapsedFmt = getTimeElapsedFmt(timeElapsed);
     if (timeElapsed < bestTimeElapsed)
     {
-        const timeElapsedFmt = getTimeElapsedFmt(timeElapsed);
         await logBestTime(logTitle, storageKey, timeElapsedFmt);
         await saveProcessTimeToStorage(storageKey, timeElapsed, timeElapsedFmt, numTests);
     }
     else {
         const bestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
-              msg = `The fastest time recorded with ${logTitle.toLowerCase()} is ${bestTimeElapsedFmt}`;
-        console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
+              msg1 = `The time elapsed ${logTitle ? `for '${logTitle.toLowerCase()}' tests ` : ""} was ${bestTimeElapsedFmt}`,
+              msg2 = `The fastest time recorded ${logTitle ? `for '${logTitle.toLowerCase()} tests '` : ""} is ${bestTimeElapsedFmt}`;
+        console.log(`    ${figures.color.info} ${figures.withColor(msg1, figures.colors.grey)}`);
+        console.log(`    ${figures.color.info} ${figures.withColor(msg2, figures.colors.grey)}`);
+        bestTimeWasLoggedLast = false;
     }
 };
 
@@ -92,7 +106,8 @@ const processSuiteTimes = async () =>
     const suiteResults = Object.values(testControl.tests.suiteResults).filter(v => v.suiteName !== "Deactivate Extension");
     for (const suiteResult of suiteResults)
     {
-        const storageKey = getSuiteKey(suiteResult.suiteName, "bestTimeElapsedSuite");
+        const typeKey = testControl.tests.numSuites === 1 ? "Single" : "",
+              storageKey = getSuiteKey(suiteResult.suiteName, "bestTimeElapsedSuite" + typeKey);
         if (testControl.tests.clearAllBestTimes) {
             await clearProcessTimeStorage(storageKey);
         }
