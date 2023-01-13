@@ -1050,10 +1050,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    public getTasks()
-    {
-        return this.tasks;
-    }
+    public getTasks = () => this.tasks || [];
 
 
     private async getTaskFileNode(task: Task, folder: TaskFolder, files: any, relativePath: string, scopeName: string, logPad: string)

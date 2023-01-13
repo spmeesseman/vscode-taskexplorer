@@ -13,7 +13,7 @@ export interface IExplorerApi
     fireTreeRefreshEvent(taskFile?: TreeItem, logPad?: string, logLevel?: number): void;
     getChildren(element?: TreeItem): Promise<TreeItem[]>;
     getName(): string;
-    getTasks(): Task[] | null;
+    getTasks(): Task[];
     getTaskMap(): TaskMap;
     getTaskTree(): ITaskFolderApi[] | TreeItem[] | undefined | null | void;
     isBusy (): boolean;

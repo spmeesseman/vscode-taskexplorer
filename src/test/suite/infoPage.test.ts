@@ -1,21 +1,28 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
+import { expect } from "chai";
 import { Uri, WebviewPanel } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {  activate, closeActiveDocument, executeTeCommand, focusExplorerView, executeSettingsUpdate, testControl, suiteFinished } from "../helper";
+import {
+	activate, closeActiveDocument, executeTeCommand, focusExplorerView, executeSettingsUpdate,
+	testControl, suiteFinished, sleep, getWsPath
+} from "../helper";
 
 let teApi: ITaskExplorerApi;
+let projectUri: Uri;
 let userTasks: boolean;
+let successCount = -1;
+
 
 suite("Info Report Tests", () =>
 {
-	let projectUri: Uri;
-
 	suiteSetup(async function()
     {
 		teApi = await activate(this);
+		projectUri = Uri.file(getWsPath("."));
 		userTasks = teApi.config.get<boolean>("specialFolders.showUserTasks");
+        ++successCount;
 	});
 
 
@@ -29,45 +36,47 @@ suite("Info Report Tests", () =>
 
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
+        expect(successCount).to.be.equal(0, "rolling success count failure");
 		await focusExplorerView(this);
+        ++successCount;
 	});
 
 
-	test("Report page single project 1", async function()
+	test("Report Page Single Project (No UserTasks0", async function()
 	{
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder);
+        expect(successCount).to.be.equal(1, "rolling success count failure");
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder + testControl.waitTime.configEvent + testControl.waitTime.viewReport + 100);
 		await executeSettingsUpdate("specialFolders.showUserTasks", false);
-		const panel = await executeTeCommand("viewReport", 100, 500, projectUri) as WebviewPanel;
+		const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport, 500, projectUri) as WebviewPanel;
+		await sleep(100);
 		panel.dispose();
 		await closeActiveDocument();
+        ++successCount;
 	});
 
 
-	test("Report page single project 2", async function()
+	test("Report Page Single Project (w/ User Tasks)", async function()
 	{
-		this.slow(testControl.slowTime.viewReport);
-	    const panel = await executeTeCommand("viewReport", 50, 500, projectUri, "") as WebviewPanel;
-		panel.dispose();
-		await closeActiveDocument();
-	});
-
-
-	test("Report page single project 3", async function()
-	{
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder);
+        expect(successCount).to.be.equal(2, "rolling success count failure");
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder + testControl.waitTime.configEvent + testControl.waitTime.viewReport + 100);
 		await executeSettingsUpdate("specialFolders.showUserTasks", true);
-	    const panel = await executeTeCommand("viewReport", 50, 500, projectUri, "", 5) as WebviewPanel;
+	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport, 500, projectUri, "", 5) as WebviewPanel;
+		await sleep(100);
 		panel.dispose();
 		await closeActiveDocument();
+        ++successCount;
 	});
 
 
-	test("Report page all projects", async function()
+	test("Report Page All Projects", async function()
 	{
-		this.slow(testControl.slowTime.viewReport);
-	    const panel = await executeTeCommand("viewReport", 50, 500) as WebviewPanel;
+        expect(successCount).to.be.equal(3, "rolling success count failure");
+		this.slow(testControl.slowTime.viewReport + testControl.waitTime.viewReport + 100);
+	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport, 500) as WebviewPanel;
+		await sleep(100);
 		panel.dispose();
 		await closeActiveDocument();
+        ++successCount;
 	});
 
 });

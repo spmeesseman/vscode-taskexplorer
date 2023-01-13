@@ -30,12 +30,6 @@ export const displayParsingReport = async(logPad: string, logLevel: number, uri?
 };
 
 
-export const dispose = () =>
-{
-    panel?.dispose();
-};
-
-
 const getHtmlContent = async (logPad: string, logLevel: number, uri?: Uri) =>
 {
 	const installPath = await getInstallPath();
@@ -57,8 +51,7 @@ const getInfoContent = (logPad: string, logLevel: number, uri?: Uri) =>
 {
     log.methodStart("get body content", logLevel, logPad);
 
-	const api = (teApi.explorer || teApi.sidebar) as IExplorerApi;
-	/* istanbul ignore next */
+	const api = (teApi.explorer || /* istanbul ignore next */teApi.sidebar) as IExplorerApi;
 	let project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 
 	let details = `<table style="margin-top:15px" width="97%" align="center">
@@ -71,11 +64,11 @@ const getInfoContent = (logPad: string, logLevel: number, uri?: Uri) =>
 		<td style="padding-right:20px" nowrap>File</td>
 	</tr><tr><td colspan="6"><hr></td></tr>`;
 
-	const tasks = api.getTasks()?.filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
-                                         project === getWorkspaceProjectName(t.scope.uri.fsPath))),
+	const tasks = api.getTasks().filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
+                                        project === getWorkspaceProjectName(t.scope.uri.fsPath))),
 		  projects: string[] = [];
 
-	tasks?.forEach((t: Task) =>
+	tasks.forEach((t: Task) =>
 	{
 		let wsFolder;
 		/* istanbul ignore else */
@@ -131,7 +124,7 @@ const getInfoContent = (logPad: string, logLevel: number, uri?: Uri) =>
 
 	details += "</table>";
 
-	const summary = `# of Tasks: ${tasks?.length}<br><br>Projects: ${projects.join(", ")}`;
+	const summary = `# of Tasks: ${tasks.length}<br><br>Projects: ${projects.join(", ")}`;
 
 	log.methodDone("get body content", logLevel, logPad);
 

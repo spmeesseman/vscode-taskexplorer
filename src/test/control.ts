@@ -84,7 +84,7 @@ export const testControl =
         licenseMgrOpenPage: 575,
         licenseMgrOpenPageWithDetail: 990,
         licenseManagerLocalCheck: 2000,
-        licenseManagerLocalStartServer: 8500,
+        licenseManagerLocalStartServer: 4500,
         licenseManagerRemoteCheck: 3000,
         licenseManagerRemoteStartServer: 10000,
         npmCommand: 11925,
@@ -144,6 +144,7 @@ export const testControl =
         runCommandMin: 1000,
         verifyTaskCountRetry: 150,
         verifyTaskCountRetryInterval: 400,
+        viewReport: 120,
         //
         // MAXIMUM WAIT TIMES
         //

@@ -5,30 +5,19 @@ import { commands, ExtensionContext, Uri } from "vscode";
 import { displayParsingReport } from "../lib/infoPage";
 
 
-let context: ExtensionContext;
-
-
-async function viewReport(uri?: Uri, logPad = "   ", logLevel = 1)
+async function viewReport(uri?: Uri)
 {
-    log.methodStart("view report command", logLevel, logPad, true);
-    const panel = await displayParsingReport(logPad + "   ", logLevel, uri);
-    /* istanbul ignore else */
-    if (panel) {
-        panel.onDidDispose(() =>
-        {
-        },
-        null, context.subscriptions);
-    }
-    log.methodDone("view report command", logLevel, logPad);
+    log.methodStart("view report command", 1, "", true);
+    const panel = await displayParsingReport("   ", 1, uri);
+    log.methodDone("view report command", 1);
     return panel;
 }
 
 
 function registerViewReportCommand(ctx: ExtensionContext)
 {
-    context = ctx;
-	context.subscriptions.push(
-        commands.registerCommand("taskExplorer.viewReport", async (uri?: Uri, logPad?: string, logLevel?: number) => viewReport(uri, logPad, logLevel))
+	ctx.subscriptions.push(
+        commands.registerCommand("taskExplorer.viewReport", async (uri?: Uri) => viewReport(uri))
     );
 }
 
