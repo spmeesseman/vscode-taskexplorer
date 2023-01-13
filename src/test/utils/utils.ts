@@ -3,17 +3,16 @@
 import * as path from "path";
 import * as assert from "assert";
 import * as treeUtils from "./treeUtils";
+import constants from "../../lib/constants";
 import figures from "../../lib/figures";
 import { deactivate } from "../../extension";
 import { testControl } from "../control";
-import { configuration } from "../../lib/utils/configuration";
-import constants from "../../lib/constants";
-import { deleteFile, pathExists } from "../../lib/utils/fs";
-import { ILicenseManager } from "../../interface/licenseManager";
-import { IExplorerApi, ITaskExplorerApi, ITaskItemApi, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
-import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
-import { lowerCaseFirstChar, properCase } from "../../lib/utils/utils";
 import { getSuiteKey, processTimes } from "./bestTimes";
+import { deleteFile, pathExists } from "../../lib/utils/fs";
+import { configuration } from "../../lib/utils/configuration";
+import { ILicenseManager } from "../../interface/licenseManager";
+import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
+import { IExplorerApi, ITaskExplorerApi, ITaskItemApi, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 
 export { figures };
 export { testControl };
@@ -246,7 +245,7 @@ export const getTeApi = () => teApi;
 export const getTestsPath = (p: string) => path.normalize(path.resolve(__dirname, p));
 
 
-export const getWsPath = (p: string) => path.normalize(path.resolve(__dirname, "../../test-files", p));
+export const getWsPath = (p: string) => path.normalize(path.resolve(__dirname, "../../../test-files", p));
 
 
 const initSettings = async () =>

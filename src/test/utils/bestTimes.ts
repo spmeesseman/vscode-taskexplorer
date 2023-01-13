@@ -20,9 +20,6 @@ const clearProcessTimeStorage = async (key: string) =>
 };
 
 
-const getSuiteFriendlyName = (suiteName: string) => suiteName.replace(" Tests", "");
-
-
 export const getSuiteKey = (suiteName: string, preKey = "") =>
 {
     if (preKey) {

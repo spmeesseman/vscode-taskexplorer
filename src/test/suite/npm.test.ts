@@ -9,9 +9,8 @@ import { TaskExecution } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeTeCommand2, focusExplorerView, treeUtils, getWsPath,
-    overrideNextShowInputBox, testControl, verifyTaskCount, waitForTaskExecution, tagLog, suiteFinished
+    overrideNextShowInputBox, testControl, verifyTaskCount, waitForTaskExecution, suiteFinished
 } from "../utils/utils";
-import { refresh } from "../treeUtils";
 
 const testsName = "npm";
 const startTaskCount = 0;

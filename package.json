@@ -47,9 +47,7 @@
         "bash"
     ],
     "main": "./dist/extension",
-    "activationEvents": [
-        "*"
-    ],
+    "activationEvents": [],
     "scripts": {
         "clean": "rimraf dist && rimraf .nyc_output && rimraf coverage",
         "copy-build-to-code": "cmd /c xcopy .\\dist\\*.js ..\\..\\Code\\data\\extensions\\spmeesseman.vscode-taskexplorer-2.13.2\\dist /s /i /y",
