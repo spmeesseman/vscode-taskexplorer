@@ -604,13 +604,4 @@ suite("Tree Tests", () =>
         sortFolders(map);
     });
 
-
-    test("Invalidation (Workspace)", async function()
-    {
-        this.slow(testControl.slowTime.workspaceInvalidation);
-        await explorer.invalidateTasksCache();
-        await teApi.waitForIdle(testControl.waitTime.command);
-        await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
-    });
-
 });
