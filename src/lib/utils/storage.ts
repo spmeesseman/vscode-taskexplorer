@@ -1,6 +1,7 @@
 import {
     Memento, ExtensionContext
 } from "vscode";
+import { isNumber, isString } from "./utils";
 
 export let storage: Memento;
 
@@ -27,7 +28,7 @@ class Storage
 
     public get<T>(key: string, defaultValue?: T): T | undefined
     {
-        if (defaultValue)
+        if (defaultValue || (isString(defaultValue) && defaultValue === "") || (isNumber(defaultValue) && defaultValue === 0))
         {
             let v = this.storage.get<T>((!this.isTests ? /* istanbul ignore next */"" : "tests") + key, defaultValue);
             //

@@ -299,8 +299,15 @@ suite("Util Tests", () =>
 		util.getTaskTypeFriendlyName("ant");
 		util.getTaskTypeFriendlyName("ant", true);
 
-		util.isObjectEmpty({});
-		util.isObjectEmpty({ a: 1 });
+		expect(util.isNumber(10)).to.equal(true);
+		expect(util.isNumber(0)).to.equal(true);
+		expect(util.isNumber(undefined)).to.equal(false);
+		expect(util.isNumber("not a number")).to.equal(false);
+		expect(util.isNumber({ test: true })).to.equal(false);
+		expect(util.isNumber([ 1, 2 ])).to.equal(false);
+
+		expect(util.isObjectEmpty({})).to.equal(true);
+		expect(util.isObjectEmpty({ a: 1 })).to.equal(false);
 		util.isObjectEmpty([]);
 		util.isObjectEmpty([ 1, 2 ]);
 		util.isObjectEmpty("aaa" as unknown as object);

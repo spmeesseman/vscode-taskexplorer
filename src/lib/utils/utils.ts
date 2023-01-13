@@ -344,6 +344,9 @@ export function isFunction(value: any)
 }
 
 
+export const isNumber = (n: any): n is number => (n || n === 0) && typeof n === "number" && isFinite(n);
+
+
 export function isObject(value: any): value is { [key: string]: any }
 {
     return !!value && (value instanceof Object || typeof value === "object");
