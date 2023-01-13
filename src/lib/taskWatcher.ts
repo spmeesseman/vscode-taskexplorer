@@ -196,6 +196,7 @@ export class TaskWatcher
             else {
                 /* istanbul ignore else */
                 if (TaskWatcher.statusBarSpace) {
+                    TaskWatcher.statusBarSpace.hide();
                     TaskWatcher.statusBarSpace.dispose();
                     TaskWatcher.statusBarSpace = undefined;
                 }
