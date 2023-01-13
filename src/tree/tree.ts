@@ -1027,38 +1027,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     public getName = () => this.name;
 
 
-    /* istanbul ignore next */   // will be needed for TaskResolve API??
-    public getParent(element: TreeItem): TreeItem | null
-    {
-        /* istanbul ignore next */
-        if (element instanceof TaskFolder)
-        {
-            /* istanbul ignore next */
-            return null;
-        }
-        /* istanbul ignore next */
-        if (element instanceof TaskFile)
-        {
-            /* istanbul ignore next */
-            return element.folder;
-        }
-        /* istanbul ignore next */
-        if (element instanceof TaskItem)
-        {
-            /* istanbul ignore next */
-            return element.taskFile;
-        }
-        /* istanbul ignore next */
-        if (element instanceof NoScripts || element instanceof InitScripts || element instanceof LoadScripts)
-        {
-            /* istanbul ignore next */
-            return null;
-        }
-        /* istanbul ignore next */
-        return null;
-    }
-
-
     public getTasks = () => this.tasks || [];
 
 

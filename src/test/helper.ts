@@ -243,8 +243,11 @@ export const focusExplorerView = async (instance: any) =>
         await executeTeCommand("focus", testControl.waitTime.focusCommand);
         await teApi.waitForIdle(testControl.waitTime.focusCommand);
         sleep(100);
-        await teApi.waitForIdle(testControl.waitTime.min);
     }
+    else {
+        instance.slow(testControl.waitTime.min * 2);
+    }
+    await teApi.waitForIdle(testControl.waitTime.min);
 };
 
 
@@ -268,6 +271,15 @@ export const getTeApi = () => teApi;
 
 
 export const getTestsPath = (p: string) => path.normalize(path.resolve(__dirname, p));
+
+
+const getTimeElapsedFmt = (timeElapsed: number) =>
+{
+    const m = Math.floor(timeElapsed / 1000 / 60),
+          s = Math.round(timeElapsed / 1000 % 60),
+          ms = Math.round(timeElapsed % 1000);
+    return `${m} minutes, ${s} seconds ${ms} milliseconds`;
+};
 
 
 export const getWsPath = (p: string) => path.normalize(path.resolve(__dirname, "../../test-files", p));
@@ -508,8 +520,9 @@ export const overrideNextShowInfoBox = (value: any) =>
 };
 
 
-const processBestTime = async (logTitle: string, storageKey: string, timeElapsed: number, timeElapsedFmt: string, numTests: number) =>
+const processBestTime = async (logTitle: string, storageKey: string, timeElapsed: number, numTests: number) =>
 {
+    const timeElapsedFmt = getTimeElapsedFmt(timeElapsed);
     logBestTime(logTitle, timeElapsedFmt);
     await saveProcessTimeToStorage(storageKey, timeElapsed, timeElapsedFmt, numTests);
 };
@@ -530,23 +543,20 @@ const processSuiteTimes = async () =>
             if (testControl.tests.clearBestTime) {
                 await clearProcessTimeStorage(storageKey);
             }
-            let bestTimeElapsedForSuite = storage.get<number>(storageKey, 0);
-            if (bestTimeElapsedForSuite === 0) {
-                bestTimeElapsedForSuite = timeElapsed + 1;
+            let bestTimeElapsed = storage.get<number>(storageKey, 0);
+            if (bestTimeElapsed === 0) {
+                bestTimeElapsed = timeElapsed + 1;
             }
-            if (timeElapsed < bestTimeElapsedForSuite)
+            if (timeElapsed < bestTimeElapsed)
             {
-                const m = Math.floor(timeElapsed / 1000 / 60),
-                      s = Math.round(timeElapsed / 1000 % 60),
-                      timeElapsedFmt = `${m} minutes, ${s} seconds`;
-                await processBestTime(suiteResult.suiteName, storageKey, timeElapsed, timeElapsedFmt, testControl.tests.numTests);
+                await processBestTime(suiteResult.suiteName, storageKey, timeElapsed, testControl.tests.numTests);
             }
         }
     }
 };
 
 
-const processTime = async (timeElapsed: number, timeElapsedFmt: string) =>
+const processTime = async (timeElapsed: number) =>
 {
     await clearProcessTimeStorage("bestTimeElapsed");
     let bestTimeElapsed = storage.get<number>("bestTimeElapsed", 0);
@@ -555,7 +565,7 @@ const processTime = async (timeElapsed: number, timeElapsedFmt: string) =>
     }
     if (timeElapsed < bestTimeElapsed)
     {
-        await processBestTime("", "bestTimeElapsed", timeElapsed, timeElapsedFmt, testControl.tests.numTests);
+        await processBestTime("", "bestTimeElapsed", timeElapsed, testControl.tests.numTests);
     }
     else {
         const bestTimeElapsedFmt = storage.get<number>("bestTimeElapsedFmt", 0);
@@ -564,7 +574,7 @@ const processTime = async (timeElapsed: number, timeElapsedFmt: string) =>
 };
 
 
-const processTimeWithLogEnabled = async (logTitle: string, storageKey: string, timeElapsed: number, timeElapsedFmt: string) =>
+const processTimeWithLogEnabled = async (logTitle: string, storageKey: string, timeElapsed: number) =>
 {
     await clearProcessTimeStorage(storageKey);
     let bestTimeElapsed = storage.get<number>(storageKey, 0);
@@ -574,7 +584,7 @@ const processTimeWithLogEnabled = async (logTitle: string, storageKey: string, t
     }
     if (timeElapsed < bestTimeElapsed)
     {
-        await processBestTime(logTitle, storageKey, timeElapsed, timeElapsedFmt, testControl.tests.numTests);
+        await processBestTime(logTitle, storageKey, timeElapsed, testControl.tests.numTests);
     }
     else {
         const bestTimeElapsedFmt = storage.get<number>(storageKey + "Fmt", 0);
@@ -584,7 +594,7 @@ const processTimeWithLogEnabled = async (logTitle: string, storageKey: string, t
 };
 
 
-const processTimesWithLogEnabled = async (timeElapsed: number, timeElapsedFmt: string) =>
+const processTimesWithLogEnabled = async (timeElapsed: number) =>
 {
     if (testControl.tests.clearAllBestTimes)
     {
@@ -595,18 +605,18 @@ const processTimesWithLogEnabled = async (timeElapsed: number, timeElapsedFmt: s
     }
     if (testControl.log.enabled)
     {
-        await processTimeWithLogEnabled("Logging Enabled", "bestTimeElapsedWithLogging", timeElapsed, timeElapsedFmt);
+        await processTimeWithLogEnabled("Logging Enabled", "bestTimeElapsedWithLogging", timeElapsed);
         if (testControl.log.file)
         {
-            await processTimeWithLogEnabled("File Logging Enabled", "bestTimeElapsedWithLoggingFile", timeElapsed, timeElapsedFmt);
+            await processTimeWithLogEnabled("File Logging Enabled", "bestTimeElapsedWithLoggingFile", timeElapsed);
         }
         if (testControl.log.output)
         {
-            await processTimeWithLogEnabled("Output Window Logging Enabled", "bestTimeElapsedWithLoggingOutput", timeElapsed, timeElapsedFmt);
+            await processTimeWithLogEnabled("Output Window Logging Enabled", "bestTimeElapsedWithLoggingOutput", timeElapsed);
         }
         if (testControl.log.console)
         {
-            await processTimeWithLogEnabled("Console Logging Enabled", "bestTimeElapsedWithLoggingConsole", timeElapsed, timeElapsedFmt);
+            await processTimeWithLogEnabled("Console Logging Enabled", "bestTimeElapsedWithLoggingConsole", timeElapsed);
         }
     }
 };
@@ -616,21 +626,18 @@ const processTimes = async () =>
 {
     const timeFinished = Date.now(),
           timeElapsed = timeFinished - timeStarted,
-          m = Math.floor(timeElapsed / 1000 / 60),
-          s = Math.round(timeElapsed / 1000 % 60),
-          timeElapsedFmt = `${m} minutes, ${s} seconds`,
           tzOffset = (new Date()).getTimezoneOffset() * 60000,
           timeFinishedFmt = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
 
     console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + timeFinishedFmt, figures.colors.grey)}`);
-    console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + timeElapsedFmt, figures.colors.grey)}`);
+    console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + getTimeElapsedFmt(timeElapsed), figures.colors.grey)}`);
 
     if (testControl.tests.numTestsFail === 0)
     {
-        if (testControl.tests.numSuites > 3)  {              // > 3, sometimes i string the single test together with a few others temp
-            await processTime(timeElapsed, timeElapsedFmt);  // xDeactivate always runs but does not register itself with suiteFinished()
-            await processTimesWithLogEnabled(timeElapsed, timeElapsedFmt);
+        if (testControl.tests.numSuites > 3)  { // > 3, sometimes i string the single test together with a few others temp
+            await processTime(timeElapsed);     // xDeactivate always runs but does not register itself with suiteFinished()
+            await processTimesWithLogEnabled(timeElapsed);
         }
         await processSuiteTimes();
     }
