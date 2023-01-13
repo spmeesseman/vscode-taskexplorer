@@ -1,13 +1,13 @@
 
-import * as path from "path";
-import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
-import { configuration } from "../lib/utils/configuration";
+import { basename, dirname } from "path";
 import { execSync } from "child_process";
+import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
+import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
-import { readFileAsync } from "../lib/utils/fs";
+import { getRelativePath } from "../lib/utils/utils";
 
 
 export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -19,7 +19,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
     {
         const def = this.getDefaultDefinition(target, folder, uri);
-        const cwd = path.dirname(uri.fsPath);
+        const cwd = dirname(uri.fsPath);
         const args = [ "gulp", target ];
         const options = { cwd };
         const execution = new ShellExecution("npx", args, options);
@@ -107,7 +107,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             let stdout: Buffer | undefined;
             try {
                 stdout = execSync("npx gulp --tasks", {
-                    cwd: path.dirname(fsPath)
+                    cwd: dirname(fsPath)
                 });
             }
             catch (e: any) { log.error(e, undefined, this.logQueueId); }
@@ -143,8 +143,8 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             type: "gulp",
             script: target,
             target,
-            path: util.getRelativePath(folder, uri),
-            fileName: path.basename(uri.path),
+            path: getRelativePath(folder, uri),
+            fileName: basename(uri.path),
             uri
         };
         return def;

@@ -2,8 +2,8 @@
 
 import * as util from "./utils/utils";
 import log from "./log/log";
-import SpecialTaskFolder from "../tree/specialFolder";
 import TaskItem from "../tree/item";
+import SpecialTaskFolder from "../tree/specialFolder";
 import { IExplorerApi } from "../interface";
 import { teApi } from "../extension";
 import {

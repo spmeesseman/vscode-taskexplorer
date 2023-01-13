@@ -1,7 +1,7 @@
 
-import * as path from "path";
-import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
+import { basename, dirname } from "path";
+import { getRelativePath } from "../lib/utils/utils";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
@@ -32,7 +32,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
         };
 
         const def = this.getDefaultDefinition(target, folder, uri);
-        const cwd = path.dirname(uri.fsPath);
+        const cwd = dirname(uri.fsPath);
         const args = [ "run-script", target ];
         const options = { cwd };
         const execution = new ShellExecution(getCommand(), args, options);
@@ -72,8 +72,8 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
             type: "composer",
             script: target,
             target,
-            path: util.getRelativePath(folder, uri),
-            fileName: path.basename(uri.path),
+            path: getRelativePath(folder, uri),
+            fileName: basename(uri.path),
             uri
         };
         return def;

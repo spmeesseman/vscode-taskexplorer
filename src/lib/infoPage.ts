@@ -1,12 +1,12 @@
 
 import * as path from "path";
 import log from "./log/log";
-import { teApi } from "../extension";
-import { Task, Uri, ViewColumn, WebviewPanel, window, workspace, WorkspaceFolder } from "vscode";
-import { getInstallPath, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "./utils/utils";
-import { IExplorerApi } from "../interface";
-import { readFileAsync } from "./utils/fs";
 import { join } from "path";
+import { teApi } from "../extension";
+import { readFileAsync } from "./utils/fs";
+import { IExplorerApi } from "../interface";
+import { Task, Uri, ViewColumn, WebviewPanel, window } from "vscode";
+import { getInstallPath, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "./utils/utils";
 
 
 let panel: WebviewPanel | undefined;

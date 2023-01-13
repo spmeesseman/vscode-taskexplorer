@@ -1,14 +1,14 @@
 
-import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import constants from "../lib/constants";
-import { configuration } from "../lib/utils/configuration";
+import { extname } from "path";
 import { getTaskFiles } from "../lib/cache";
-import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
-import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { getLicenseManager } from "../extension";
 import { pathExistsSync } from "../lib/utils/fs";
-import { extname } from "path";
+import { isTaskIncluded } from "../lib/isTaskIncluded";
+import { configuration } from "../lib/utils/configuration";
+import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
+import { getTaskTypeFriendlyName, isExcluded, isTaskTypeEnabled, showMaxTasksReachedMessage } from "../lib/utils/utils";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
@@ -83,7 +83,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                     rmvCount = this.cachedTasks.length - maxTasks;
                     log.write(`   removing ${rmvCount} tasks, max ${ this.providerName} task count reached (no license)`, 1, TaskExplorerProvider.logPad + "   ", this.logQueueId);
                     this.cachedTasks.splice(maxTasks, rmvCount);
-                    util.showMaxTasksReachedMessage(util.getTaskTypeFriendlyName(this.providerName, true));
+                    showMaxTasksReachedMessage(getTaskTypeFriendlyName(this.providerName, true));
                 }
             }
         }
@@ -99,7 +99,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
         const allTasks: Task[] = [],
               visitedFiles: string[] = [],
               paths = getTaskFiles(this.providerName),
-              enabled = util.isTaskTypeEnabled(this.providerName);
+              enabled = isTaskTypeEnabled(this.providerName);
 
         log.methodStart(`read ${this.providerName} tasks`, 2, logPad, false, [[ "enabled", enabled ]], this.logQueueId);
 
@@ -107,7 +107,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
         {
             for (const fObj of paths)
             {
-                if (!util.isExcluded(fObj.uri.path) && !visitedFiles.includes(fObj.uri.fsPath) && pathExistsSync(fObj.uri.fsPath))
+                if (!isExcluded(fObj.uri.path) && !visitedFiles.includes(fObj.uri.fsPath) && pathExistsSync(fObj.uri.fsPath))
                 {
                     visitedFiles.push(fObj.uri.fsPath);
                     const tasks = (await this.readUriTasks(fObj.uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
@@ -155,7 +155,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
 
         if (this.cachedTasks)
         {
-            const enabled = util.isTaskTypeEnabled(this.providerName);
+            const enabled = isTaskTypeEnabled(this.providerName);
             if (enabled && uri)
             {
                 const pathExists = pathExistsSync(uri.fsPath);

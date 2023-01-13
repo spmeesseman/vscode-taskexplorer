@@ -1,17 +1,17 @@
 
 import * as json5 from "json5";
-import * as util from "./utils/utils";
 import log from "./log/log";
 import { join } from "path";
 import { providersExternal } from "../extension";
 import { configuration } from "./utils/configuration";
 import { Task } from "vscode";
 import { pathExistsSync, readFileSync } from "./utils/fs";
+import { isString, isTaskTypeEnabled, isWorkspaceFolder } from "./utils/utils";
 
 
 export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", logQueueId?: string): boolean | string =>
 {
-    const isScopeWsFolder = util.isWorkspaceFolder(task.scope);
+    const isScopeWsFolder = isWorkspaceFolder(task.scope);
 
     log.methodStart(`Check task inclusion for '${task.source}/${task.name}'`, 4, logPad, false, [
         [ "scope is ws folder", isScopeWsFolder ], [ "relative path", relativePath ]
@@ -34,7 +34,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
     // This will ignore tasks from other providers as well, unless it has registered
     // as an external provider via Task Explorer API
     //
-    const srcEnabled = util.isTaskTypeEnabled(task.source);
+    const srcEnabled = isTaskTypeEnabled(task.source);
     log.value("   enabled in settings", srcEnabled, 3, logPad, logQueueId);
     if (!srcEnabled)
     {
@@ -46,7 +46,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
     // Check task excludes array
     //
     const excludeTask = configuration.get<string[]>("excludeTask", []),
-          fExcludeTasks = excludeTask.filter(et => !!et && util.isString(et) && et.length > 1);
+          fExcludeTasks = excludeTask.filter(et => !!et && isString(et) && et.length > 1);
     for (const rgxPattern of fExcludeTasks)
     {
         if ((new RegExp(rgxPattern)).test(task.name))

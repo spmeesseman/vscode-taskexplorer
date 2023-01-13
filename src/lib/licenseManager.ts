@@ -13,7 +13,6 @@ import { commands, ExtensionContext, InputBoxOptions, Task, ViewColumn, WebviewP
 
 export class LicenseManager implements ILicenseManager
 {
-
 	private useGlobalLicense = true; // Temp
 	private maxFreeTasks = 500;
 	private maxFreeTaskFiles = 100;

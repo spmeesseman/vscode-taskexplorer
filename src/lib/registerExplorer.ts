@@ -2,8 +2,8 @@
 
 import log from "./log/log";
 import { TaskTreeDataProvider } from "../tree/tree";
-import { ExtensionContext, window, TreeView, TreeItem } from "vscode";
 import { IExplorerApi, ITaskExplorerApi } from "../interface";
+import { ExtensionContext, window, TreeView, TreeItem } from "vscode";
 
 const views: { [taskType: string]: TreeView<TreeItem> | undefined } = {};
 

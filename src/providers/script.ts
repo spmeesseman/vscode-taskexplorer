@@ -1,13 +1,13 @@
 
-import * as path from "path";
-import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import constants from "../lib/constants";
-import { configuration } from "../lib/utils/configuration";
+import { basename, dirname, sep, extname } from "path";
 import { TaskExplorerProvider } from "./provider";
+import { getRelativePath } from "../lib/utils/utils";
+import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
-import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 import { pathExistsSync, readFileSync } from "../lib/utils/fs";
+import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 
 
 /**
@@ -86,7 +86,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
         const extension = target.toLowerCase(),
               scriptDef = this.scriptTable[extension],
-              cwd = path.dirname(uri.fsPath),
+              cwd = dirname(uri.fsPath),
               def = this.getDefaultDefinition(target, folder, uri),
               options: ShellExecutionOptions = { cwd },
               args: string[] = [];
@@ -98,8 +98,8 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
         let isWinShell = false,
             exec: string = scriptDef.exec,
-            fileName = path.basename(uri.fsPath),
-            sep: string = path.sep;
+            fileName = basename(uri.fsPath),
+            separator: string = sep;
 
         //
         // If the default terminal cmd/powershell?  On linux and darwin, no, on windows, maybe...
@@ -111,7 +111,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             const winShell = configuration.getVs<string>("terminal.integrated.shell.windows", "");
             /* istanbul ignore if */ /* istanbul ignore next */
             if (winShell && winShell.includes("bash.exe")) {
-                sep = "/";
+                separator = "/";
                 isWinShell = false;
             }
         }
@@ -137,14 +137,14 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
                     bash = "bash.exe";
                 }
                 options.executable = bash;
-                sep = "/"; // convert path separator to unix-style
+                separator = "/"; // convert path separator to unix-style
             }
         }
 
         //
         // Identify the 'executable'
         //
-        const fileNamePathPre = "." + sep + fileName;
+        const fileNamePathPre = "." + separator + fileName;
         if (scriptDef.type === "bash")
         {
             exec = fileNamePathPre;
@@ -210,7 +210,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         /* istanbul ignore next */
         const tgt = target?.toLowerCase(),
               scriptDef = this.scriptTable[tgt],
-              fileName = path.basename(uri.fsPath);
+              fileName = basename(uri.fsPath);
 
         if (!scriptDef || !scriptDef.type) {
             return;
@@ -222,7 +222,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             target: tgt,
             fileName,
             scriptFile: true, // set scriptFile to true to include all scripts in folder instead of grouped at file
-            path: util.getRelativePath(folder, uri),
+            path: getRelativePath(folder, uri),
             takesArgs: false,
             uri
         };
@@ -260,7 +260,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
         log.methodStart("read script file uri task", 3, logPad, false, [
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
-        const task = this.createTask(path.extname(uri.fsPath).substring(1), undefined, folder, uri, undefined, logPad + "   ");
+        const task = this.createTask(extname(uri.fsPath).substring(1), undefined, folder, uri, undefined, logPad + "   ");
         log.methodDone("read script file uri task", 3, logPad, [[ "# of tasks found", 1 ]], this.logQueueId);
         /* istanbul ignore next */
         return task ? [ task ] : [];

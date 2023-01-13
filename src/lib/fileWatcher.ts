@@ -3,11 +3,11 @@
 import * as cache from "./cache";
 import * as util from "./utils/utils";
 import log from "./log/log";
-import { refreshTree } from "./refreshTree";
-import { isDirectory } from "./utils/fs";
 import { extname } from "path";
-import { ITaskExplorerApi } from "../interface";
+import { isDirectory } from "./utils/fs";
 import { isString } from "./utils/utils";
+import { refreshTree } from "./refreshTree";
+import { ITaskExplorerApi } from "../interface";
 import { Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri, WorkspaceFoldersChangeEvent } from "vscode";
 
 let extContext: ExtensionContext;

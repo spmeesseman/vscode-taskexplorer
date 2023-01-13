@@ -1,16 +1,15 @@
 
-import * as path from "path";
-import * as util from "../lib/utils/utils";
-import constants from "../lib/constants";
 import log from "../lib/log/log";
+import constants from "../lib/constants";
 import { execSync } from "child_process";
 import { parseStringPromise } from "xml2js";
-import { configuration } from "../lib/utils/configuration";
+import { basename, dirname, join } from "path";
 import { TaskExplorerProvider } from "./provider";
+import { getCombinedGlobPattern, getRelativePath } from "../lib/utils/utils";
+import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { pathExistsSync, readFileAsync } from "../lib/utils/fs";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace } from "vscode";
-
 
 interface StringMap { [s: string]: string }
 
@@ -23,7 +22,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
     public createTask(target: string, cmdName: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task
     {
-        const cwd = path.dirname(uri.fsPath),
+        const cwd = dirname(uri.fsPath),
               def = this.getDefaultDefinition(target, folder, uri);
         let args = [ target ],
             options: any = {  cwd };
@@ -39,7 +38,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             {
                 ansicon = ansiPath;
                 if (!ansicon.endsWith("ansicon.exe") && !ansicon.endsWith("\\")) {
-                    ansicon = path.join(ansicon, "ansicon.exe");
+                    ansicon = join(ansicon, "ansicon.exe");
                 }
                 else if (!ansicon.endsWith("ansicon.exe")) {
                     ansicon += "ansicon.exe";
@@ -277,8 +276,8 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             type: "ant",
             script: target,
             target,
-            path: util.getRelativePath(folder, uri),
-            fileName: path.basename(uri.path),
+            path: getRelativePath(folder, uri),
+            fileName: basename(uri.path),
             uri
         };
         return def;
@@ -287,9 +286,9 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
     public getGlobPattern()
     {
-        return util.getCombinedGlobPattern(constants.GLOB_ANT,
-                                           [ ...configuration.get<string[]>("includeAnt", []),
-                                            ...configuration.get<string[]>("globPatternsAnt", []) ]);
+        return getCombinedGlobPattern(constants.GLOB_ANT,
+                                      [ ...configuration.get<string[]>("includeAnt", []),
+                                      ...configuration.get<string[]>("globPatternsAnt", []) ]);
     }
 
 

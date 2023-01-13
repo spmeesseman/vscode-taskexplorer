@@ -1,11 +1,11 @@
 
-import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
-import { configuration } from "../lib/utils/configuration";
-import { TaskExplorerProvider } from "./provider";
-import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { parseStringPromise } from "xml2js";
 import { readFileAsync } from "../lib/utils/fs";
+import { TaskExplorerProvider } from "./provider";
+import { getRelativePath } from "../lib/utils/utils";
+import { configuration } from "../lib/utils/configuration";
+import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 import { basename, dirname } from "path";
 
@@ -31,7 +31,7 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
             script: target,
             target,
             fileName: basename(uri.fsPath),
-            path: util.getRelativePath(folder, uri),
+            path: getRelativePath(folder, uri),
             cmdLine: "mvn",
             takesArgs: false,
             uri

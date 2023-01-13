@@ -1,12 +1,12 @@
 
-import * as path from "path";
-import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
+import { getRelativePath } from "../lib/utils/utils";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 import { readFileAsync } from "../lib/utils/fs";
+import { basename, dirname } from "path";
 
 
 export class GradleTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -32,7 +32,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         };
 
         const def = this.getDefaultDefinition(target, folder, uri);
-        const cwd = path.dirname(uri.fsPath);
+        const cwd = dirname(uri.fsPath);
         const args = [ target ];
         const options = { cwd };
         const execution = new ShellExecution(getCommand(folder, cmd), args, options);
@@ -95,8 +95,8 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             type: "gradle",
             script: target,
             target,
-            path: util.getRelativePath(folder, uri),
-            fileName: path.basename(uri.path),
+            path: getRelativePath(folder, uri),
+            fileName: basename(uri.path),
             uri
         };
         return def;

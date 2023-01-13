@@ -1,11 +1,11 @@
 
 import * as bombadil from "@sgarciac/bombadil";
-import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
+import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
+import { getRelativePath } from "../lib/utils/utils";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { configuration } from "../lib/utils/configuration";
-import { readFileAsync } from "../lib/utils/fs";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 import { basename, dirname } from "path";
 
@@ -77,7 +77,7 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
             type: "pipenv",
             script: target,
             target,
-            path: util.getRelativePath(folder, uri),
+            path: getRelativePath(folder, uri),
             fileName: basename(uri.path),
             uri
         };

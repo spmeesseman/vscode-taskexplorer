@@ -1,14 +1,14 @@
 
-import * as path from "path";
-import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
-import { configuration } from "../lib/utils/configuration";
+import { basename, dirname } from "path";
+import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
+import { getRelativePath } from "../lib/utils/utils";
+import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import {
     Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions, extensions
 } from "vscode";
-import { readFileAsync } from "../lib/utils/fs";
 
 
 export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -64,7 +64,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
 
         const kind = this.getDefaultDefinition(target, folder, uri);
 
-        const cwd = path.dirname(uri.fsPath);
+        const cwd = dirname(uri.fsPath);
         const args = [ target ];
         const options: ShellExecutionOptions = {
             cwd
@@ -145,8 +145,8 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             type: "make",
             script: target,
             target,
-            path: util.getRelativePath(folder, uri),
-            fileName: path.basename(uri.path),
+            path: getRelativePath(folder, uri),
+            fileName: basename(uri.path),
             problemMatcher: "",
             uri
         };

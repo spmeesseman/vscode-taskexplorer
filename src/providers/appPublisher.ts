@@ -1,11 +1,11 @@
 
-import * as path from "path";
-import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
-import { TaskExplorerProvider } from "./provider";
-import { ITaskDefinition } from "../interface/ITaskDefinition";
-import { configuration } from "../lib/utils/configuration";
+import { basename, dirname } from "path";
 import { readJsonAsync } from "../lib/utils/fs";
+import { TaskExplorerProvider } from "./provider";
+import { getRelativePath } from "../lib/utils/utils";
+import { configuration } from "../lib/utils/configuration";
+import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 
 
@@ -28,8 +28,8 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
             type: "apppublisher",
             script: target,
             target,
-            fileName: path.basename(uri.fsPath),
-            path: util.getRelativePath(folder, uri),
+            fileName: basename(uri.fsPath),
+            path: getRelativePath(folder, uri),
             cmdLine: "npx app-publisher --no-ci",
             takesArgs: false,
             uri
@@ -52,7 +52,7 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
 
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
-        const cwd = path.dirname(uri.fsPath),
+        const cwd = dirname(uri.fsPath),
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
               groupSeparator = configuration.get<string>("groupSeparator");
 

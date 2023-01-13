@@ -42,24 +42,24 @@ const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: st
 {
     let msg: string;
     const prevBestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
-          prevMsg = `The previous fastest time recorded was ${prevBestTimeElapsedFmt}`,
+          prevMsg = ` The previous fastest time recorded was ${prevBestTimeElapsedFmt}`,
           preMsg = `    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`;
     if (title)
     {
         if (title.includes("Logging")) {
-            msg = `New Fastest Time with ${title} ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+            msg = ` New Fastest Time with ${title} ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
         }
         else {
             if (testControl.tests.numSuites > 1) {
-                msg = `New Fastest Time for Suite '${title}' ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+                msg = ` New Fastest Time for Suite '${title}' ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
             }
             else {
-                msg = `New Fastest Time for Suite '${title}' (Single Test) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+                msg = ` New Fastest Time for Suite '${title}' (Single Test) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
             }
         }
     }
     else {
-        msg = `New Fastest Time for 'All Tests' ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+        msg = ` New Fastest Time for 'All Tests' ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
     }
     console.log(preMsg);
     console.log(preMsg + figures.withColor(msg, figures.colors.grey));
@@ -95,7 +95,7 @@ const processBestTime = async (logTitle: string, storageKey: string, timeElapsed
               msg1 = `The time elapsed ${logTitle ? `for '${figures.withColor(logTitle.toLowerCase(), figures.colors.white)}' tests` : ""} was ${timeElapsedFmt}`,
               msg2 = `The fastest time recorded is ${bestTimeElapsedFmt}`;
         console.log(`    ${figures.color.info} ${figures.withColor(msg1, figures.colors.grey)}`);
-        console.log(`    ${figures.color.info}    ${figures.withColor(msg2, figures.colors.grey)}`);
+        console.log(`    ${figures.color.info} ${figures.withColor(msg2, figures.colors.grey)}`);
     }
 };
 

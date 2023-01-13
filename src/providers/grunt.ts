@@ -1,11 +1,11 @@
 
-import * as path from "path";
-import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
+import { basename, dirname } from "path";
+import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
+import { getRelativePath } from "../lib/utils/utils";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
-import { readFileAsync } from "../lib/utils/fs";
 
 
 export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -17,7 +17,7 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
     {
         const def = this.getDefaultDefinition(target, folder, uri),
-              cwd = path.dirname(uri.fsPath),
+              cwd = dirname(uri.fsPath),
               args = [ "grunt", target ],
               options = { cwd },
               execution = new ShellExecution("npx", args, options);
@@ -102,8 +102,8 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
             type: "grunt",
             script: target,
             target,
-            path: util.getRelativePath(folder, uri),
-            fileName: path.basename(uri.path),
+            path: getRelativePath(folder, uri),
+            fileName: basename(uri.path),
             uri
         };
         return def;
