@@ -341,7 +341,7 @@ suite("Provider Tests", () =>
     {
         const provider = teApi.providers.get("batch");
         assert(provider);
-        provider.resolveTask(batch[0]);
+        provider.resolveTask(batch[0].task);
     });
 
 

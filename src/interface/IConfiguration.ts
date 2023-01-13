@@ -1,5 +1,5 @@
 
-export interface IConfigurationApi
+export interface IConfiguration
 {
     get<T>(key: string, defaultValue?: T): T;
     getVs<T>(key: string, defaultValue?: T): T;

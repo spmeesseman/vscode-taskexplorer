@@ -61,10 +61,10 @@ const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: st
     else {
         msg = ` New Fastest Time for 'All Tests' ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
     }
-    console.log(preMsg);
+    // console.log(preMsg);
     console.log(preMsg + figures.withColor(msg, figures.colors.grey));
     console.log(preMsg + figures.withColor(prevMsg, figures.colors.grey));
-    console.log(preMsg);
+    // console.log(preMsg);
 };
 
 

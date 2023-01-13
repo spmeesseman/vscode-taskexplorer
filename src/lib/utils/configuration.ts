@@ -3,12 +3,12 @@ const pkgJsonCfgProps = require("../../../package.json").contributes.configurati
 import {
     ConfigurationChangeEvent, EventEmitter, workspace, WorkspaceConfiguration, ConfigurationTarget
 } from "vscode";
-import { IConfigurationApi } from "../../interface/configurationApi";
+import { IConfiguration } from "../../interface/IConfiguration";
 
 const extensionName = "taskExplorer";
 
 
-class Configuration implements IConfigurationApi
+class Configuration implements IConfiguration
 {
     // private pkgJsonCfgProps: any;
     private configuration: WorkspaceConfiguration;
