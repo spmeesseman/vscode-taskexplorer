@@ -12,7 +12,7 @@ import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplor
 import {
     activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand2, focusExplorerView,
     getWsPath, suiteFinished, testControl, treeUtils
-} from "../helper";
+} from "../utils";
 
 
 const testsName = "tsc";

@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { PerlTaskProvider } from "../../providers/perl";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, suiteFinished, testControl, treeUtils, verifyTaskCount } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, suiteFinished, testControl, treeUtils, verifyTaskCount } from "../utils";
 
 const testsName = "perl";
 const startTaskCount = 7;

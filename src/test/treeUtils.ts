@@ -1,15 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as assert from "assert";
+import * as utils from "./utils";
 import TaskItem from "../tree/item";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import { isObjectEmpty } from "../lib/utils/utils";
 import { ITaskItemApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, getTeApi, sleep, testControl } from "./helper";
 
 let didSetGroupLevel = false;
-
 
 /**
  * Pretty much mimics the tree construction in cases when we want to construct it
@@ -21,22 +20,21 @@ let didSetGroupLevel = false;
  */
 export const refresh = async(instance?: any) =>
 {
-    const teApi = getTeApi();
+    const teApi = utils.getTeApi(),
+          tc = utils.testControl;
     if (instance) {
-        instance.slow(testControl.slowTime.refreshCommand + testControl.waitTime.refreshCommand +
-                      (testControl.waitTime.min * 2) + (!didSetGroupLevel ? (testControl.slowTime.configGroupingEvent * 2) : 0));
-        instance.timeout((testControl.slowTime.refreshCommand  * 2) + (!didSetGroupLevel ? (testControl.slowTime.configGroupingEvent * 2) : 0) + (testControl.waitTime.min * 2));
+        instance.slow(tc.slowTime.refreshCommand + tc.waitTime.refreshCommand +
+                      (tc.waitTime.min * 2) + (!didSetGroupLevel ? (tc.slowTime.configGroupingEvent * 2) : 0));
+        instance.timeout((tc.slowTime.refreshCommand  * 2) + (!didSetGroupLevel ? (tc.slowTime.configGroupingEvent * 2) : 0) + (tc.waitTime.min * 2));
     }
     if (!didSetGroupLevel)
     {
-        await executeSettingsUpdate("groupWithSeparator", true, testControl.waitTime.configGroupingEvent);
-        await executeSettingsUpdate("groupMaxLevel", 5, testControl.waitTime.configGroupingEvent);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        await utils.executeSettingsUpdate("groupWithSeparator", true, tc.waitTime.configGroupingEvent);
+        await utils.executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.configGroupingEvent);
+        await teApi.waitForIdle(tc.waitTime.min);
         didSetGroupLevel = true;
     }
-    await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
-    // await sleep(testControl.waitTime.min);
-    // await executeTeCommand("refresh", testControl.waitTime.min);
+    await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
 };
 
 
@@ -67,8 +65,10 @@ export const findIdInTaskMap = (id: string, taskMap: TaskMap) =>
 
 export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 {
-    const teApi = getTeApi();
-    const taskItems: ITaskItemApi[] = [];
+    const teApi = utils.getTeApi(),
+          figures = utils.figures,
+          tc = utils.testControl,
+          taskItems: ITaskItemApi[] = [];
 
     const _getTaskMap = async(retries: number) =>
     {
@@ -76,7 +76,7 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 
         if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
-            await teApi.waitForIdle(testControl.waitTime.getTreeMin, testControl.waitTime.getTreeMax);
+            await teApi.waitForIdle(tc.waitTime.getTreeMin, tc.waitTime.getTreeMax);
             taskMap = teApi.testsApi.explorer.getTaskMap();
         }
 
@@ -95,7 +95,7 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
                     console.log(`    ${figures.color.error} ${figures.withColor("Task map is empty, test will fail in 3, 2, 1...", figures.colors.grey)}`);
                 }
                 else {
-                    await sleep(250);
+                    await utils.sleep(250);
                     taskMap = await _getTaskMap(++retries);
                 }
             }
@@ -136,9 +136,10 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
  */
 export const walkTreeItems = async(taskId: string | undefined, executeOpenForTests = false) =>
 {
-    const teApi = getTeApi(),
-         taskMap: TaskMap = {},
-         now = Date.now();
+    const teApi = utils.getTeApi(),
+          figures = utils.figures,
+          taskMap: TaskMap = {},
+          now = Date.now();
     let done = false;
 
     let treeItems = await teApi.testsApi.explorer.getChildren();
@@ -195,7 +196,7 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
                 if (item3 instanceof TaskItem)
                 {
                     if (executeOpenForTests) {
-                        await executeTeCommand2("open", [ item3 ], 5);
+                        await utils.executeTeCommand2("open", [ item3 ], 5);
                     }
                     if (item3.task && item3.task.definition)
                     {
@@ -256,7 +257,8 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
 
 export const verifyTaskCountByTree = async(taskType: string, expectedCount: number, taskMap?: TaskMap) =>
 {
-    const tasksMap = (taskMap || (await walkTreeItems(undefined))),
+    const figures = utils.figures,
+          tasksMap = (taskMap || (await walkTreeItems(undefined))),
     // const tasksMap = (teApi.explorer as IExplorerApi).getTaskMap(),
             taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
     assert(taskCount === expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);

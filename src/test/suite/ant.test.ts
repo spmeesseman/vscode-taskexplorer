@@ -12,7 +12,7 @@ import {
     activate, executeSettingsUpdate, getWsPath, testControl, verifyTaskCount,
     logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs,
     suiteFinished
-} from "../helper";
+} from "../utils";
 
 const testsName = "ant";
 const slowTimeforAntParseFile = 1000;

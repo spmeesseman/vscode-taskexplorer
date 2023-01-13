@@ -3,7 +3,7 @@
 /* tslint:disable */
 
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, suiteFinished, testControl, treeUtils } from "../helper";
+import { activate, executeSettingsUpdate, suiteFinished, testControl, treeUtils } from "../utils";
 
 const testsName = "Workspace";
 const startTaskCount = 10;

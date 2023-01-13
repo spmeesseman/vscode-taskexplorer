@@ -6,7 +6,7 @@ import * as util from "../../lib/utils/utils";
 import { configuration } from "../../lib/utils/configuration";
 import { teApi } from "../../extension";
 import { enableConfigWatcher } from "../../lib/configWatcher";
-import { activate, executeSettingsUpdate, sleep, suiteFinished, testControl } from "../helper";
+import { activate, executeSettingsUpdate, sleep, suiteFinished, testControl } from "../utils";
 
 let enabledTasks: any;
 let globPatterns: string[];

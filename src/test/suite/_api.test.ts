@@ -5,7 +5,7 @@ import * as assert from "assert";
 import { getInstallPath } from "../../lib/utils/utils";
 import { refreshTree } from "../../lib/refreshTree";
 import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, setExplorer, suiteFinished, testControl } from "../helper";
+import { activate, executeSettingsUpdate, executeTeCommand, setExplorer, suiteFinished, testControl } from "../utils";
 
 let teApi: ITaskExplorerApi;
 let explorer: IExplorerApi;

@@ -10,7 +10,7 @@ import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, focusExplorerView, getWsPath, sleep, suiteFinished, testControl, treeUtils, verifyTaskCount
-} from "../helper";
+} from "../utils";
 
 const testsName = "grunt";
 const startTaskCount = 7;

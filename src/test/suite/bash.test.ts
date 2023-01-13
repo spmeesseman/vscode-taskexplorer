@@ -15,7 +15,7 @@ import {
     activate, executeSettingsUpdate, getWsPath, testControl, treeUtils, verifyTaskCount,
     logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs,
     suiteFinished,
-} from "../helper";
+} from "../utils";
 
 const testsName = "bash";
 const startTaskCount = 1;

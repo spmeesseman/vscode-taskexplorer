@@ -7,7 +7,7 @@
 //
 import * as assert from "assert";
 import * as path from "path";
-import { activate, getWsPath, suiteFinished } from "../helper";
+import { activate, getWsPath, suiteFinished } from "../utils";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MakeTaskProvider } from "../../providers/make";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
