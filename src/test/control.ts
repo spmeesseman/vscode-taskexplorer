@@ -31,7 +31,8 @@ export const testControl =
     // Rolling success count and failure flag
     //
     tests: {
-        clearBestTimes: false,
+        clearBestTime: false,
+        clearAllBestTimes: false,
         numSuites: 0,
         numSuitesFail: 0,
         numSuitesSuccess: 0,
