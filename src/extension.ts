@@ -64,6 +64,7 @@ export const teApi: ITaskExplorerApi =
         fs,
         explorer: {} as IExplorerApi, // registerExplorer() will set
         fileCache: cache,
+        storage,
         onWsFoldersChange
     }
 };
@@ -84,7 +85,8 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     // Initialize persistent storage
     //
-    initStorage(context, tests);
+    await initStorage(context, tests);
+    teApi.testsApi.storage = storage;
 
     log.write("");
     log.write("Activate extension");
@@ -320,8 +322,8 @@ async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = " 
     let iterationsIdle = 0;
     while ((iterationsIdle < 3 || isBusy()) && waited < maxWait)
     {
-        await util.timeout(10);
-        waited += 10;
+        await util.timeout(20);
+        waited += 20;
         ++iterationsIdle;
         if (isBusy()) {
             iterationsIdle = 0;

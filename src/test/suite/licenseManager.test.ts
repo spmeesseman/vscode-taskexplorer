@@ -4,7 +4,6 @@
 import { expect } from "chai";
 import { ChildProcess, fork } from "child_process";
 import { ILicenseManager } from "../../interface/licenseManager";
-import { storage } from "../../lib/utils/storage";
 import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import { testControl } from "../control";
@@ -41,8 +40,8 @@ suite("License Manager Tests", () =>
 	{
         teApi = await activate(this);
         explorer = teApi.testsApi.explorer;
-		oLicenseKey = storage.get<string>("license_key");
-		oVersion = storage.get<string>("version");
+		oLicenseKey = teApi.testsApi.storage.get<string>("license_key");
+		oVersion = teApi.testsApi.storage.get<string>("version");
         ++successCount;
 	});
 
@@ -57,10 +56,10 @@ suite("License Manager Tests", () =>
 			await sleep(500);
 		}
 		if (oLicenseKey) {
-			await storage.update("license_key", oLicenseKey);
+			await teApi.testsApi.storage.update("license_key", oLicenseKey);
 		}
 		if (oVersion) {
-			await storage.update("version", oLicenseKey);
+			await teApi.testsApi.storage.update("version", oLicenseKey);
 		}
         suiteFinished(this);
 	});
@@ -168,8 +167,8 @@ suite("License Manager Tests", () =>
         expect(successCount).to.be.equal(9, "rolling success count failure");
 		this.slow(testControl.slowTime.licenseMgrOpenPageWithDetail + 1050 + (testControl.slowTime.storageUpdate * 2));
 		await setLicensed(false, licMgr);
-		await storage.update("version", undefined);
-		await storage.update("lastLicenseNag", undefined);
+		await teApi.testsApi.storage.update("version", undefined);
+		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		await setTasks();
 		await sleep(500);
 		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "viewReport" });
@@ -184,7 +183,7 @@ suite("License Manager Tests", () =>
 	{
         expect(successCount).to.be.equal(10, "rolling success count failure");
 		this.slow(testControl.slowTime.licenseMgrOpenPage + 550 + (testControl.slowTime.storageUpdate * 2));
-		await storage.update("version", undefined);
+		await teApi.testsApi.storage.update("version", undefined);
 		await setTasks();
 		await sleep(50);
 		overrideNextShowInputBox("1234-5678-9098-0000000");
@@ -224,7 +223,7 @@ suite("License Manager Tests", () =>
 		// If version is set, the prompt will show
 		//
 		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
-		await storage.update("lastLicenseNag", undefined);
+		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("1234-5678-9098-7654321");
 		await setTasks();
@@ -242,7 +241,7 @@ suite("License Manager Tests", () =>
 		// If version is set, the prompt will show
 		//
 		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
-		await storage.update("lastLicenseNag", undefined);
+		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("1111-2222-3333-4444-5555");
 		await setTasks();
@@ -260,7 +259,7 @@ suite("License Manager Tests", () =>
 		// If version is 'not' set, the lic page will show
 		//
 		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
-		await storage.update("version", undefined);
+		await teApi.testsApi.storage.update("version", undefined);
 		await licMgr.checkLicense();
 		await setTasks();
 		await sleep(400);
@@ -295,7 +294,7 @@ suite("License Manager Tests", () =>
 		const licenseKey = licMgr.getLicenseKey(),
 			  version = licMgr.getVersion(); // will be set on ext. startup
 		//
-		await storage.update("version", version);
+		await teApi.testsApi.storage.update("version", version);
 		await licMgr.checkLicense();
 		await setTasks();
 		await sleep(400);
@@ -305,7 +304,7 @@ suite("License Manager Tests", () =>
 		// Reset
 		//
 		await licMgr.setLicenseKey(licenseKey);
-		await storage.update("version", version);
+		await teApi.testsApi.storage.update("version", version);
         ++successCount;
 	});
 
@@ -317,7 +316,7 @@ suite("License Manager Tests", () =>
 		const licenseKey = licMgr.getLicenseKey(),
 			  version = licMgr.getVersion(); // will be set on ext. startup
 		//
-		await storage.update("version", version);
+		await teApi.testsApi.storage.update("version", version);
 		await licMgr.checkLicense();
 		await setTasks();
 		await sleep(400);
@@ -327,7 +326,7 @@ suite("License Manager Tests", () =>
 		// Reset
 		//
 		await licMgr.setLicenseKey(licenseKey);
-		await storage.update("version", version);
+		await teApi.testsApi.storage.update("version", version);
         ++successCount;
 	});
 
@@ -337,7 +336,7 @@ suite("License Manager Tests", () =>
         expect(successCount).to.be.equal(18, "rolling success count failure");
 		this.slow(testControl.slowTime.storageUpdate * 2);
 		await licMgr.setLicenseKey(licenseKey);
-		await storage.update("version", version);
+		await teApi.testsApi.storage.update("version", version);
         ++successCount;
 	});
 
@@ -347,7 +346,7 @@ suite("License Manager Tests", () =>
 	{
         expect(successCount).to.be.equal(19, "rolling success count failure");
 		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
-		await storage.update("lastLicenseNag", undefined);
+		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		const licenseKey = licMgr.getLicenseKey(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
 		overrideNextShowInfoBox("Info");
@@ -381,7 +380,7 @@ suite("License Manager Tests", () =>
 	{
         expect(successCount).to.be.equal(21, "rolling success count failure");
 		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
-		await storage.update("lastLicenseNag", undefined);
+		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		const licenseKey = licMgr.getLicenseKey(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
 		overrideNextShowInfoBox(undefined);
@@ -443,12 +442,12 @@ suite("License Manager Tests", () =>
 			// tasks.push(firstCmp);
 
 			// licMgr.setLicenseKey(undefined);
-			// await storage.update("version", undefined);
+			// await teApi.testsApi.storage.update("version", undefined);
 			// await licMgr.checkLicense();
 			// await sleep(1000);
 			// await closeActiveDocument();
 			// licMgr.setLicenseKey(licenseKey);
-			// await storage.update("version", version);
+			// await teApi.testsApi.storage.update("version", version);
 			// tasks.pop();
 		// }
         ++successCount;
@@ -471,7 +470,7 @@ suite("License Manager Tests", () =>
 	{
         expect(successCount).to.be.equal(26, "rolling success count failure");
 		this.slow(testControl.slowTime.licenseManagerLocalCheck);
-		await storage.update("version", undefined);
+		await teApi.testsApi.storage.update("version", undefined);
 		const licenseKey = licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();

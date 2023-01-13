@@ -8,7 +8,7 @@ import log from "../../lib/log/log";
 import { expect } from "chai";
 import { join } from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { storage } from "../../lib/utils/storage";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
 	logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, executeTeCommand, suiteFinished
@@ -18,6 +18,7 @@ const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
 
 let rootUri: Uri;
+let teApi: ITaskExplorerApi;
 
 
 suite("Util Tests", () =>
@@ -25,7 +26,7 @@ suite("Util Tests", () =>
 
 	suiteSetup(async function()
     {
-        await activate(this);
+        teApi = await activate(this);
 		rootUri = (workspace.workspaceFolders as WorkspaceFolder[])[0].uri;
         await executeSettingsUpdate("logging.enable", true);
         await executeSettingsUpdate("logging.enableOutputWindow", true);
@@ -486,15 +487,23 @@ suite("Util Tests", () =>
 
     test("Storage", async function()
     {
-        if (storage)
+        if (teApi.testsApi.storage)
         {
-            await storage.update("TEST_KEY", "This is a test");
-            expect(storage.get<string>("TEST_KEY")).to.be.equal("This is a test");
-            expect(storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
-            await storage.update("TEST_KEY", "");
-            expect(storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
-            await storage.update("TEST_KEY", undefined);
-			expect(storage.get<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
+            await teApi.testsApi.storage.update("TEST_KEY", "This is a test");
+            expect(teApi.testsApi.storage.get<string>("TEST_KEY")).to.be.equal("This is a test");
+            expect(teApi.testsApi.storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
+            await teApi.testsApi.storage.update("TEST_KEY", "");
+            expect(teApi.testsApi.storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
+            await teApi.testsApi.storage.update("TEST_KEY", undefined);
+			expect(teApi.testsApi.storage.get<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
+
+            await teApi.testsApi.storage.update2("TEST_KEY", "This is a test");
+            expect(await teApi.testsApi.storage.get2<string>("TEST_KEY")).to.be.equal("This is a test");
+            expect(await teApi.testsApi.storage.get2<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
+            await teApi.testsApi.storage.update2("TEST_KEY", "");
+            expect(await teApi.testsApi.storage.get2<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
+            await teApi.testsApi.storage.update2("TEST_KEY", undefined);
+			expect(await teApi.testsApi.storage.get2<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
         }
     });
 

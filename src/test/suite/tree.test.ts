@@ -6,7 +6,6 @@ import { sortFolders } from "../../lib/sortTasks";
 import TaskFolder from "../../tree/folder";
 import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import constants from "../../lib/constants";
-import { storage } from "../../lib/utils/storage";
 import TaskItem from "../../tree/item";
 import {
     activate, clearOverrideShowInfoBox, clearOverrideShowInputBox, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView,
@@ -65,7 +64,7 @@ suite("Tree Tests", () =>
         bash = await treeUtils.getTreeTasks("bash", 1);
         batch = await treeUtils.getTreeTasks("batch", 2);
         python = await treeUtils.getTreeTasks("python", 2);
-        await storage.update(constants.FAV_TASKS_STORE, [
+        await teApi.testsApi.storage.update(constants.FAV_TASKS_STORE, [
             getSpecialTaskItemId(batch[0]), getSpecialTaskItemId(batch[1]), getSpecialTaskItemId(ant[0]),
             getSpecialTaskItemId(bash[0]), getSpecialTaskItemId(python[0]), getSpecialTaskItemId(python[1])
         ]);
@@ -92,7 +91,7 @@ suite("Tree Tests", () =>
         this.slow((testControl.slowTime.configSpecialFolderEvent * 2) + (testControl.waitTime.configEvent * 2) + (testControl.slowTime.getTreeTasks * 2));
         ant = await treeUtils.getTreeTasks("ant", 3);
         batch = await treeUtils.getTreeTasks("batch", 2);
-        await storage.update(constants.LAST_TASKS_STORE, [
+        await teApi.testsApi.storage.update(constants.LAST_TASKS_STORE, [
             getSpecialTaskItemId(batch[0]), getSpecialTaskItemId(batch[1]), getSpecialTaskItemId(ant[0]),
             getSpecialTaskItemId(bash[0]), getSpecialTaskItemId(python[0]), getSpecialTaskItemId(python[1])
         ]);

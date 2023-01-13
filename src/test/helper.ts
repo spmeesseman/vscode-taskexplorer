@@ -9,7 +9,6 @@ import { testControl } from "./control";
 import { configuration } from "../lib/utils/configuration";
 import constants from "../lib/constants";
 import { deleteFile, pathExists } from "../lib/utils/fs";
-import { storage } from "../lib/utils/storage";
 import { ILicenseManager } from "../interface/licenseManager";
 import { IExplorerApi, ITaskExplorerApi, ITaskItemApi, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
@@ -99,13 +98,6 @@ export const activate = async (instance?: Mocha.Context) =>
             assert.fail(`    ${figures.color.error} Explorer instance does not exist`);
         }
         //
-        // Clear persistent storage.  Storage is only available after extension activation.
-        //
-        console.log(`    ${figures.color.info} ${figures.withColor("Clearing persistent storage", figures.colors.grey)}`);
-        await storage.update(constants.FAV_TASKS_STORE, []);
-        await storage.update(constants.LAST_TASKS_STORE, []);
-        await storage.update(constants.TASKS_RENAME_STORE, []);
-        //
         // _api pre-test suite will reset after disable/enable
         //
         console.log(`    ${figures.color.info} ${figures.withColor("Settings tests active explorer instance", figures.colors.grey)}`);
@@ -143,6 +135,12 @@ export const cleanup = async () =>
         console.log(`    ${figures.color.info}`);
     }
 
+    //
+    // Process execution timesand do the dorky best time thing that I forsome reason spent a whole
+    // day of my life coding.
+    //
+    try { await processTimes(); } catch (e) { console.error(e); }
+
     console.log(`    ${figures.color.info} ${figures.withColor("Deactivating extension 'spmeesseman.vscode-taskexplorer'", figures.colors.grey)}`);
     await deactivate();
     console.log(`    ${figures.color.info} ${figures.withColor("Extension 'spmeesseman.vscode-taskexplorer' successfully deactivated", figures.colors.grey)}`);
@@ -165,12 +163,6 @@ export const cleanup = async () =>
     console.log(`    ${figures.color.info} ${figures.withColor("Resetting modified global settings", figures.colors.grey)}`);
     await configuration.updateVs("grunt.autoDetect", testControl.vsCodeAutoDetectGrunt);
     await configuration.updateVs("gulp.autoDetect", testControl.vsCodeAutoDetectGulp);
-
-    //
-    // Process execution timesand do the dorky best time thing that I forsome reason spent a whole
-    // day of my life coding.
-    //
-    try { await processTimes(); } catch (e) { console.error(e); }
 
     //
     // Exit
@@ -196,9 +188,9 @@ const clearProcessTimeStorage = async (key: string) =>
 {
     if (testControl.tests.clearBestTime || testControl.tests.clearAllBestTimes)
     {
-        await storage.update(key, undefined);
-        await storage.update(key + "Fmt", undefined);
-        await storage.update(key + "NumTests", undefined);
+        await teApi.testsApi.storage.update2(key, undefined);
+        await teApi.testsApi.storage.update2(key + "Fmt", undefined);
+        await teApi.testsApi.storage.update2(key + "NumTests", undefined);
     }
 };
 
@@ -277,9 +269,9 @@ export const getTestsPath = (p: string) => path.normalize(path.resolve(__dirname
 const getTimeElapsedFmt = (timeElapsed: number) =>
 {
     const m = Math.floor(timeElapsed / 1000 / 60),
-          s = Math.round(timeElapsed / 1000 % 60),
+          s = Math.floor(timeElapsed / 1000 % 60),
           ms = Math.round(timeElapsed % 1000);
-    return `${m} minutes, ${s} seconds ${ms} milliseconds`;
+    return `${m} minutes, ${s} seconds, ${ms} milliseconds`;
 };
 
 
@@ -467,10 +459,10 @@ const isReady = (taskType?: string) =>
 };
 
 
-const logBestTime = (title: string, storageKey: string, timeElapsedFmt: string) =>
+const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: string) =>
 {
     let msg: string;
-    const prevBestTimeElapsedFmt = storage.get<string>(storageKey + "Fmt", ""),
+    const prevBestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
           prevMsg = `!!! The previous fastest time recorded was ${prevBestTimeElapsedFmt}`;
     if (title)
     {
@@ -530,18 +522,18 @@ export const overrideNextShowInfoBox = (value: any) =>
 const processBestTime = async (logTitle: string, storageKey: string, timeElapsed: number, numTests: number) =>
 {
     await clearProcessTimeStorage(storageKey);
-    let bestTimeElapsed = storage.get<number>(storageKey, 0);
+    let bestTimeElapsed = await teApi.testsApi.storage.get2<number>(storageKey, 0);
     if (bestTimeElapsed === 0) {
         bestTimeElapsed = timeElapsed + 1;
     }
     if (timeElapsed < bestTimeElapsed)
     {
         const timeElapsedFmt = getTimeElapsedFmt(timeElapsed);
-        logBestTime(logTitle, storageKey, timeElapsedFmt);
+        await logBestTime(logTitle, storageKey, timeElapsedFmt);
         await saveProcessTimeToStorage(storageKey, timeElapsed, timeElapsedFmt, numTests);
     }
     else {
-        const bestTimeElapsedFmt = storage.get<string>(storageKey + "Fmt", ""),
+        const bestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
               msg = `The fastest time recorded with ${logTitle.toLowerCase()} is ${bestTimeElapsedFmt}`;
         console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
     }
@@ -622,9 +614,9 @@ const processTimes = async () =>
 
 const saveProcessTimeToStorage = async (key: string, timeElapsed: number, timeElapseFmt: string, numTests: number) =>
 {
-    await storage.update(key, timeElapsed);
-    await storage.update(key + "Fmt", timeElapseFmt);
-    await storage.update(key + "NumTests", numTests);
+    await teApi.testsApi.storage.update2(key, timeElapsed);
+    await teApi.testsApi.storage.update2(key + "Fmt", timeElapseFmt);
+    await teApi.testsApi.storage.update2(key + "NumTests", numTests);
 };
 
 

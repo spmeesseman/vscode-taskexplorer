@@ -6,7 +6,6 @@ import constants from "../../lib/constants";
 import TaskItem from "../../tree/item";
 import SpecialTaskFolder from "../../tree/specialFolder";
 import { expect } from "chai";
-import { storage } from "../../lib/utils/storage";
 import { TaskExecution } from "vscode";
 import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
@@ -98,16 +97,16 @@ suite("Task Tests", () =>
     {
         expect(successCount).to.be.equal(5, "rolling success count failure");
         this.slow(testControl.slowTime.runCommand + (testControl.slowTime.storageUpdate * 2) + testControl.waitTime.runCommandMax + endOfTestWaitTime);
-        const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []),
+        const lastTasks = teApi.testsApi.storage.get<string[]>(constants.LAST_TASKS_STORE, []),
               hasLastTasks = lastTasks && lastTasks.length > 0;
         if (hasLastTasks)
         {
-            await storage.update(constants.LAST_TASKS_STORE, undefined);
+            await teApi.testsApi.storage.update(constants.LAST_TASKS_STORE, undefined);
         }
         expect(await executeTeCommand("runLastTask", testControl.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
         if (hasLastTasks)
         {
-            await storage.update(constants.LAST_TASKS_STORE, lastTasks);
+            await teApi.testsApi.storage.update(constants.LAST_TASKS_STORE, lastTasks);
         }
         await teApi.waitForIdle(endOfTestWaitTime);
         ++successCount;
