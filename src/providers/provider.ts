@@ -7,7 +7,8 @@ import { getTaskFiles, removeFileFromCache } from "../lib/cache";
 import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { getLicenseManager } from "../extension";
-import { isDirectory, pathExistsSync } from "../lib/utils/fs";
+import { pathExistsSync } from "../lib/utils/fs";
+import { extname } from "path";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
@@ -211,10 +212,20 @@ export abstract class TaskExplorerProvider implements TaskProvider
     private needsRemoval(item: Task, uri: Uri)
     {
         const cstDef = item.definition;
-        return (cstDef.uri &&
-               (cstDef.uri.fsPath === uri.fsPath || !pathExistsSync(cstDef.uri.fsPath)) ||
-               (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* instanbul ignore next */isDirectory(uri.fsPath))) ||
-               (cstDef.uri.path && !isTaskIncluded(item, cstDef.uri.path));
+        return !!(cstDef.uri &&
+                 (cstDef.uri.fsPath === uri.fsPath || !pathExistsSync(cstDef.uri.fsPath) ||
+                 //
+                 // If the directory wasdeleted, then isDirectory() fails, so for now rely on the fact
+                 // that of the path doesn't have an extension, it's probably a directory.  FileWatcher
+                 // does the same thing right now, ~ line 332.
+                 //
+                 // Might not even need this?  Depends if we remove when modify/add and I don't feel like
+                 // looking right now.  Harmless but the less calls the better.
+                 //
+                 // (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* instanbul ignore next */isDirectory(uri.fsPath)) ||
+                 (cstDef.uri.fsPath.startsWith(uri.fsPath) && !extname(uri.fsPath) /* ouch */) ||
+                 //
+                 !isTaskIncluded(item, cstDef.uri.path)));
     }
 
 

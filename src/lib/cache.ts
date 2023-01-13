@@ -109,7 +109,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                             /* istanbul ignore if */
                             if (maxFiles <= 0) {
                                 util.showMaxTasksReachedMessage();
-                                return;
+                                return numFilesFound;
                             }
                             log.write(`      Set max files to scan at ${maxFiles} files (no license)`, 2, logPad);
                         }
@@ -144,6 +144,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
     }
 
     log.methodDone("add folder to cache", 1, logPad, [[ "# of files in directory", numFiles ], [ "# of files matched", numFiles ]]);
+    return numFilesFound;
 }
 
 
@@ -194,9 +195,9 @@ async function addWsFolderToCache(folder: WorkspaceFolder, logPad: string)
 
 export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, logPad = "")
 {
+    let numFilesFound = 0;
     if (wsf)
     {
-        let numFilesFound = 0;
         log.methodStart("add workspace project folders", 1, logPad, logPad === "");
         await startCacheBuild();
         if (!cancel)
@@ -212,8 +213,8 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         log.value("   was cancelled", cancel, 3);
         log.methodDone("add workspace project folders", 1, logPad, [[ "# of file found", numFilesFound ]]);
         finishCacheBuild();
-        return numFilesFound;
     }
+    return numFilesFound;
 }
 
 
@@ -556,13 +557,15 @@ export function removeFileFromCache(taskType: string, uri: Uri, logPad: string)
  */
 export function removeFolderFromCache(uri: Uri, logPad: string)
 {
+    let numFilesRemoved = 0;
     log.methodStart("remove folder from cache", 2, logPad, false, [[ "folder", uri.fsPath ]]);
     Object.keys(taskFilesMap).forEach((taskType) =>
     {
         log.write(`   Processing files cached for ${taskType} tasks`, 2, logPad);
-        removeFromMappings(taskType, uri, true, logPad + "   ");
+        numFilesRemoved += removeFromMappings(taskType, uri, true, logPad + "   ");
     });
     log.methodDone("remove folder from cache", 1, logPad);
+    return numFilesRemoved;
 }
 
 
@@ -573,8 +576,9 @@ export function removeFolderFromCache(uri: Uri, logPad: string)
 export function removeTaskTypeFromCache(taskType: string, logPad: string)
 {
     log.methodStart("remove task type from cache", 2, logPad, false, [[ "task type", taskType ]]);
-    const count = removeFromMappings(taskType, undefined, true, logPad + "   ");
-    log.methodDone("remove task type from cache", 2, logPad, [[ "# of files removed", count ]]);
+    const numFilesRemoved = removeFromMappings(taskType, undefined, true, logPad + "   ");
+    log.methodDone("remove task type from cache", 2, logPad, [[ "# of files removed", numFilesRemoved ]]);
+    return numFilesRemoved;
 }
 
 
@@ -685,6 +689,7 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
 
 export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
 {
+    let numFilesRemoved = 0;
     log.methodStart("remove workspace folder", 1, logPad);
     for (const f of wsf)
     {
@@ -692,8 +697,8 @@ export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
         Object.keys(taskFilesMap).forEach((taskType) =>
         {
             log.value("   start remove task files from cache", taskType, 2, logPad);
-            const removed = removeFromMappings(taskType, f, true, logPad + "      ");
-            log.write(`      removed ${removed} files`, 2, logPad);
+            numFilesRemoved = removeFromMappings(taskType, f, true, logPad + "      ");
+            log.write(`      removed ${numFilesRemoved} files`, 2, logPad);
             log.value("   completed remove files from cache", taskType, 2, logPad);
         });
         delete projectToFileCountMap[f.name];
@@ -705,6 +710,7 @@ export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
         log.write("   workspace folder removed", 1, logPad);
     }
     log.methodDone("remove workspace folder", 1, logPad);
+    return numFilesRemoved;
 }
 
 

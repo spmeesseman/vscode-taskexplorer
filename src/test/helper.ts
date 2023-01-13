@@ -522,9 +522,22 @@ export const overrideNextShowInfoBox = (value: any) =>
 
 const processBestTime = async (logTitle: string, storageKey: string, timeElapsed: number, numTests: number) =>
 {
-    const timeElapsedFmt = getTimeElapsedFmt(timeElapsed);
-    logBestTime(logTitle, timeElapsedFmt);
-    await saveProcessTimeToStorage(storageKey, timeElapsed, timeElapsedFmt, numTests);
+    await clearProcessTimeStorage(storageKey);
+    let bestTimeElapsed = storage.get<number>(storageKey, 0);
+    if (bestTimeElapsed === 0) {
+        bestTimeElapsed = timeElapsed + 1;
+    }
+    if (timeElapsed < bestTimeElapsed)
+    {
+        const timeElapsedFmt = getTimeElapsedFmt(timeElapsed);
+        logBestTime(logTitle, timeElapsedFmt);
+        await saveProcessTimeToStorage(storageKey, timeElapsed, timeElapsedFmt, numTests);
+    }
+    else {
+        const bestTimeElapsedFmt = storage.get<number>(storageKey + "Fmt", 0),
+              msg = `The fastest time recorded with ${logTitle.toLowerCase()} is ${bestTimeElapsedFmt}`;
+        console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
+    }
 };
 
 
@@ -540,56 +553,8 @@ const processSuiteTimes = async () =>
         if (suiteResult.timeFinished && suiteResult.timeStarted)
         {
             const timeElapsed = suiteResult.timeFinished - suiteResult.timeStarted;
-            if (testControl.tests.clearBestTime) {
-                await clearProcessTimeStorage(storageKey);
-            }
-            let bestTimeElapsed = storage.get<number>(storageKey, 0);
-            if (bestTimeElapsed === 0) {
-                bestTimeElapsed = timeElapsed + 1;
-            }
-            if (timeElapsed < bestTimeElapsed)
-            {
-                await processBestTime(suiteResult.suiteName, storageKey, timeElapsed, testControl.tests.numTests);
-            }
+            await processBestTime(suiteResult.suiteName, storageKey, timeElapsed, testControl.tests.numTests);
         }
-    }
-};
-
-
-const processTime = async (timeElapsed: number) =>
-{
-    await clearProcessTimeStorage("bestTimeElapsed");
-    let bestTimeElapsed = storage.get<number>("bestTimeElapsed", 0);
-    if (bestTimeElapsed === 0) {
-        bestTimeElapsed = timeElapsed + 1;
-    }
-    if (timeElapsed < bestTimeElapsed)
-    {
-        await processBestTime("", "bestTimeElapsed", timeElapsed, testControl.tests.numTests);
-    }
-    else {
-        const bestTimeElapsedFmt = storage.get<number>("bestTimeElapsedFmt", 0);
-        console.log(`    ${figures.color.info} ${figures.withColor("The fastest time recorded with logging disabled is " + bestTimeElapsedFmt, figures.colors.grey)}`);
-    }
-};
-
-
-const processTimeWithLogEnabled = async (logTitle: string, storageKey: string, timeElapsed: number) =>
-{
-    await clearProcessTimeStorage(storageKey);
-    let bestTimeElapsed = storage.get<number>(storageKey, 0);
-    if (bestTimeElapsed === 0)
-    {
-        bestTimeElapsed = timeElapsed + 1;
-    }
-    if (timeElapsed < bestTimeElapsed)
-    {
-        await processBestTime(logTitle, storageKey, timeElapsed, testControl.tests.numTests);
-    }
-    else {
-        const bestTimeElapsedFmt = storage.get<number>(storageKey + "Fmt", 0);
-        const msg = `The fastest time recorded with ${logTitle.toLowerCase()} is ${bestTimeElapsedFmt}`;
-        console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
     }
 };
 
@@ -605,18 +570,18 @@ const processTimesWithLogEnabled = async (timeElapsed: number) =>
     }
     if (testControl.log.enabled)
     {
-        await processTimeWithLogEnabled("Logging Enabled", "bestTimeElapsedWithLogging", timeElapsed);
+        await processBestTime("Logging Enabled", "bestTimeElapsedWithLogging", timeElapsed, testControl.tests.numTests);
         if (testControl.log.file)
         {
-            await processTimeWithLogEnabled("File Logging Enabled", "bestTimeElapsedWithLoggingFile", timeElapsed);
+            await processBestTime("File Logging Enabled", "bestTimeElapsedWithLoggingFile", timeElapsed, testControl.tests.numTests);
         }
         if (testControl.log.output)
         {
-            await processTimeWithLogEnabled("Output Window Logging Enabled", "bestTimeElapsedWithLoggingOutput", timeElapsed);
+            await processBestTime("Output Window Logging Enabled", "bestTimeElapsedWithLoggingOutput", timeElapsed, testControl.tests.numTests);
         }
         if (testControl.log.console)
         {
-            await processTimeWithLogEnabled("Console Logging Enabled", "bestTimeElapsedWithLoggingConsole", timeElapsed);
+            await processBestTime("Console Logging Enabled", "bestTimeElapsedWithLoggingConsole", timeElapsed, testControl.tests.numTests);
         }
     }
 };
@@ -636,7 +601,7 @@ const processTimes = async () =>
     if (testControl.tests.numTestsFail === 0)
     {
         if (testControl.tests.numSuites > 3)  { // > 3, sometimes i string the single test together with a few others temp
-            await processTime(timeElapsed);     // xDeactivate always runs but does not register itself with suiteFinished()
+            await processBestTime("", "bestTimeElapsed", timeElapsed, testControl.tests.numTests);
             await processTimesWithLogEnabled(timeElapsed);
         }
         await processSuiteTimes();
