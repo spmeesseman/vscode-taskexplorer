@@ -16,7 +16,7 @@
 //        like its supported :(  SO this is the best we can do...
 
 import { join } from "path";
-import { activate, getTestsPath, sleep, suiteFinished, testControl, treeUtils } from "../utils";
+import { activate, getTestsPath, sleep, suiteFinished, testControl, treeUtils } from "../utils/utils";
 import { IExplorerApi, IFilesystemApi, ITaskExplorerApi, TaskExplorerTestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, WorkspaceFolder } from "vscode";
 

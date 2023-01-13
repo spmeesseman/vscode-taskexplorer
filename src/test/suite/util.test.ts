@@ -12,7 +12,7 @@ import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
 	logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, executeTeCommand, suiteFinished
-} from "../utils";
+} from "../utils/utils";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";

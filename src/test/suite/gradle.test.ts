@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { GradleTaskProvider } from "../../providers/gradle";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, testControl, treeUtils, verifyTaskCount } from "../utils";
+import { activate, executeSettingsUpdate, executeTeCommand, getWsPath, testControl, treeUtils, verifyTaskCount } from "../utils/utils";
 
 const testsName = "gradle";
 const startTaskCount = 7;

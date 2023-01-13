@@ -3,7 +3,7 @@
 import figures from "../../lib/figures";
 import { lowerCaseFirstChar, properCase } from "../../lib/utils/utils";
 import { testControl } from "../control";
-import { teApi } from "../utils";
+import { teApi } from "./utils";
 
 
 let bestTimeWasLogged = false;

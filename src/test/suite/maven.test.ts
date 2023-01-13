@@ -10,7 +10,7 @@ import { Uri } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
 import { IFilesystemApi } from "../../interface/fsApi";
-import { activate, executeSettingsUpdate, focusExplorerView, getWsPath, suiteFinished, testControl, verifyTaskCount } from "../utils";
+import { activate, executeSettingsUpdate, focusExplorerView, getWsPath, suiteFinished, testControl, verifyTaskCount } from "../utils/utils";
 
 const testsName = "maven";
 const startTaskCount = 8;

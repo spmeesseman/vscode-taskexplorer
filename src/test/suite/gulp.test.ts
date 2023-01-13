@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { GulpTaskProvider } from "../../providers/gulp";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, focusExplorerView, getWsPath, sleep, suiteFinished, testControl, treeUtils, verifyTaskCount } from "../utils";
+import { activate, executeSettingsUpdate, executeTeCommand, focusExplorerView, getWsPath, sleep, suiteFinished, testControl, treeUtils, verifyTaskCount } from "../utils/utils";
 
 const testsName = "gulp";
 const startTaskCount = 17;

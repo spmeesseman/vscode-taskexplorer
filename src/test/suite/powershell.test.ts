@@ -13,7 +13,7 @@ import { PowershellTaskProvider } from "../../providers/powershell";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeSettingsUpdate, getWsPath,
     logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, suiteFinished, testControl, verifyTaskCount
-} from "../utils";
+} from "../utils/utils";
 
 const testsName = "powershell";
 const startTaskCount = 1;

@@ -1,5 +1,5 @@
 
-import { activate, cleanup } from "../utils";
+import { activate, cleanup } from "../utils/utils";
 
 
 suite("Deactivate Extension", () =>

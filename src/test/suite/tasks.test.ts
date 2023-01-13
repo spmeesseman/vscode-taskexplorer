@@ -11,7 +11,7 @@ import { IExplorerApi, ITaskExplorerApi, ITaskItemApi } from "@spmeesseman/vscod
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, focusExplorerView,
     treeUtils, overrideNextShowInfoBox, overrideNextShowInputBox, testControl, waitForTaskExecution, sleep, suiteFinished
-} from "../utils";
+} from "../utils/utils";
 
 let lastTask: ITaskItemApi | null = null;
 let teApi: ITaskExplorerApi;

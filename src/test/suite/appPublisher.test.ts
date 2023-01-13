@@ -12,7 +12,7 @@ import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, getWsPath, suiteFinished, testControl, treeUtils, verifyTaskCount
-} from "../utils";
+} from "../utils/utils";
 
 const testsName = "apppublisher";
 const startTaskCount = 21;

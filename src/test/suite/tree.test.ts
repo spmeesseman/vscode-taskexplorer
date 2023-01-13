@@ -10,7 +10,7 @@ import TaskItem from "../../tree/item";
 import {
     activate, clearOverrideShowInfoBox, clearOverrideShowInputBox, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView,
     getSpecialTaskItemId, overrideNextShowInfoBox, overrideNextShowInputBox, suiteFinished, testControl, treeUtils
-} from "../utils";
+} from "../utils/utils";
 import SpecialTaskFolder from "../../tree/specialFolder";
 
 let teApi: ITaskExplorerApi;

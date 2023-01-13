@@ -17,7 +17,7 @@ import { ITaskExplorerApi, IExplorerApi, TaskMap, IFilesystemApi } from "@spmees
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
     focusExplorerView, getWsPath, sleep, suiteFinished, testControl, treeUtils, verifyTaskCount
-} from "../utils";
+} from "../utils/utils";
 
 
 const tempFiles: string[] = [];

@@ -11,7 +11,7 @@ import { Uri } from "vscode";
 import { expect } from "chai";
 import { ComposerTaskProvider } from "../../providers/composer";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, getWsPath, suiteFinished, testControl, verifyTaskCount } from "../utils";
+import { activate, executeSettingsUpdate, getWsPath, suiteFinished, testControl, verifyTaskCount } from "../utils/utils";
 
 const testsName = "composer";
 const startTaskCount = 2;

@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as assert from "assert";
-import * as utils from "../utils";
+import * as utils from "./utils";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import TaskFolder from "../../tree/folder";

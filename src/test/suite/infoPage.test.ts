@@ -7,7 +7,7 @@ import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, closeActiveDocument, executeTeCommand, focusExplorerView, executeSettingsUpdate,
 	testControl, suiteFinished, sleep, getWsPath
-} from "../utils";
+} from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
 let projectUri: Uri;

@@ -10,7 +10,7 @@ import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplor
 import {
     activate, executeTeCommand2, focusExplorerView, treeUtils, getWsPath,
     overrideNextShowInputBox, testControl, verifyTaskCount, waitForTaskExecution, tagLog, suiteFinished
-} from "../utils";
+} from "../utils/utils";
 import { refresh } from "../treeUtils";
 
 const testsName = "npm";

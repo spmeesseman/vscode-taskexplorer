@@ -11,7 +11,7 @@ import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer
 import {
 	activate, closeActiveDocument, overrideNextShowInfoBox, overrideNextShowInputBox,
 	sleep, executeTeCommand, focusExplorerView, getWsPath, setLicensed, suiteFinished
-} from "../utils";
+} from "../utils/utils";
 
 
 const licMgrMaxFreeTasks = 500;             // Should be set to what the constants are in lib/licenseManager

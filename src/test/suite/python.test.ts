@@ -14,7 +14,7 @@ import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplor
 import {
     activate, executeSettingsUpdate, getWsPath,
     logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, suiteFinished, testControl, verifyTaskCount
-} from "../utils";
+} from "../utils/utils";
 
 const testsName = "python";
 const startTaskCount = 2;
