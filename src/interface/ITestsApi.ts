@@ -1,6 +1,6 @@
 
 import { IExplorerApi } from "./explorer";
-import { IFilesystemApi } from "./fsApi";
+import { IFilesystemApi } from "./IFilesystemApi";
 import { WorkspaceFoldersChangeEvent } from "vscode";
 import { IFileCache } from "./IFileCache";
 import { IStorage } from "./IStorage";

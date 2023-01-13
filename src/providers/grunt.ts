@@ -3,7 +3,7 @@ import * as path from "path";
 import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 import { readFileAsync } from "../lib/utils/fs";
 
@@ -96,9 +96,9 @@ export class GruntTaskProvider extends TaskExplorerProvider implements TaskExplo
     }
 
 
-    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): ITaskDefinition
     {
-        const def: TaskExplorerDefinition = {
+        const def: ITaskDefinition = {
             type: "grunt",
             script: target,
             target,

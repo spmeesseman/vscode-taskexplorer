@@ -11,7 +11,7 @@ let teApi: ITaskExplorerApi;
 let explorer: IExplorerApi;
 
 
-suite("API Init and Tests", () =>
+suite("API and Initialization", () =>
 {
     suiteSetup(async function()
     {

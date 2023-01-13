@@ -4,7 +4,7 @@ import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { readJsonAsync } from "../lib/utils/fs";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 
@@ -66,9 +66,9 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
     }
 
 
-    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): ITaskDefinition
     {
-        const def: TaskExplorerDefinition = {
+        const def: ITaskDefinition = {
             type: "composer",
             script: target,
             target,

@@ -31,7 +31,7 @@ import { LicenseManager } from "./lib/licenseManager";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
 import { ExtensionContext, tasks, commands } from "vscode";
-import { ExternalExplorerProvider, IExplorerApi, ITaskExplorerApi } from "./interface";
+import { IExternalProvider, IExplorerApi, ITaskExplorerApi } from "./interface";
 import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/fileWatcher";
 
@@ -40,7 +40,7 @@ let licenseManager: ILicenseManager;
 let ready = false;
 let tests = false;
 export const providers: Map<string, TaskExplorerProvider> = new Map();
-export const providersExternal: Map<string, ExternalExplorerProvider> = new Map();
+export const providersExternal: Map<string, IExternalProvider> = new Map();
 
 export const teApi: ITaskExplorerApi =
 {
@@ -264,7 +264,7 @@ function registerCommands(context: ExtensionContext)
 }
 
 
-async function registerExternalProvider(providerName: string, provider: ExternalExplorerProvider, logPad: string)
+async function registerExternalProvider(providerName: string, provider: IExternalProvider, logPad: string)
 {
     providersExternal.set(providerName, provider);
     await refreshTree(teApi, providerName, undefined, logPad);

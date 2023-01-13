@@ -2,7 +2,7 @@
 import { ProviderResult, Task, TaskProvider, Uri, WorkspaceFolder } from "vscode";
 
 
-export abstract class ExternalExplorerProvider implements TaskProvider
+export abstract class IExternalProvider implements TaskProvider
 {
 
     abstract createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined;

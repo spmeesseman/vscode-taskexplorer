@@ -7,7 +7,7 @@ import { expect } from "chai";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
-import { IFilesystemApi } from "../../interface/fsApi";
+import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import {
     activate, executeSettingsUpdate, getWsPath, testControl, verifyTaskCount,
     logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs,

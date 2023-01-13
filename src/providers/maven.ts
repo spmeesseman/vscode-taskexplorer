@@ -3,7 +3,7 @@ import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { parseStringPromise } from "xml2js";
 import { readFileAsync } from "../lib/utils/fs";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
@@ -24,9 +24,9 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
     }
 
 
-    private getDefaultDefinition(target: string | undefined, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string | undefined, folder: WorkspaceFolder, uri: Uri): ITaskDefinition
     {
-        const def: TaskExplorerDefinition = {
+        const def: ITaskDefinition = {
             type: "maven",
             script: target,
             target,
@@ -85,56 +85,56 @@ export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplo
             return [];
         }
 
-        const kindClean: TaskExplorerDefinition = {
+        const kindClean: ITaskDefinition = {
             ...defaultDef,
             ...{
                 cmdLine: this.getCommand() + " clean -f " + defaultDef.fileName
             }
         };
 
-        const kindCompile: TaskExplorerDefinition = {
+        const kindCompile: ITaskDefinition = {
             ...defaultDef,
             ...{
                 cmdLine: this.getCommand() + " compile -f " + defaultDef.fileName
             }
         };
 
-        const kindDeploy: TaskExplorerDefinition = {
+        const kindDeploy: ITaskDefinition = {
             ...defaultDef,
             ...{
                 cmdLine: this.getCommand() + " deploy -f " + defaultDef.fileName
             }
         };
 
-        const kindInstall: TaskExplorerDefinition = {
+        const kindInstall: ITaskDefinition = {
             ...defaultDef,
             ...{
                 cmdLine: this.getCommand() + " install -f " + defaultDef.fileName,
             }
         };
 
-        const kindPackage: TaskExplorerDefinition = {
+        const kindPackage: ITaskDefinition = {
             ...defaultDef,
             ...{
                 cmdLine: this.getCommand() + " package -f " + defaultDef.fileName,
             }
         };
 
-        const kindTest: TaskExplorerDefinition = {
+        const kindTest: ITaskDefinition = {
             ...defaultDef,
             ...{
                 cmdLine: this.getCommand() + " test -f " + defaultDef.fileName,
             }
         };
 
-        const kindValidate: TaskExplorerDefinition = {
+        const kindValidate: ITaskDefinition = {
             ...defaultDef,
             ...{
                 cmdLine: this.getCommand() + " validate -f " + defaultDef.fileName,
             }
         };
 
-        const kindVerify: TaskExplorerDefinition = {
+        const kindVerify: ITaskDefinition = {
             ...defaultDef,
             ...{
                 cmdLine: this.getCommand() + " verify -f " + defaultDef.fileName,

@@ -4,7 +4,7 @@ import * as path from "path";
 import * as util from "../../lib/utils/utils";
 import constants from "../../lib/constants";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
-import { ExternalExplorerProvider, TaskExplorerDefinition } from "../../interface";
+import { IExternalProvider, ITaskDefinition } from "../../interface";
 // import { ExternalExplorerProvider, TaskExplorerDefinition } from "@spmeesseman/vscode-taskexplorer-types";
 //  Test bombs with this reference ^^^
 
@@ -12,14 +12,14 @@ import { ExternalExplorerProvider, TaskExplorerDefinition } from "../../interfac
 /**
  * Test class for external task providers
  */
-export class ExternalTaskProvider extends ExternalExplorerProvider implements ExternalExplorerProvider
+export class ExternalTaskProvider extends IExternalProvider implements IExternalProvider
 {
     public providerName = "external";
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
     {
-        const def: TaskExplorerDefinition = {
+        const def: ITaskDefinition = {
             type: "external",
             script: target,
             target,

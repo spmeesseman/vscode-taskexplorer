@@ -7,7 +7,7 @@ import { execSync } from "child_process";
 import { parseStringPromise } from "xml2js";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { pathExistsSync, readFileAsync } from "../lib/utils/fs";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace } from "vscode";
 
@@ -271,9 +271,9 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
-    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): ITaskDefinition
     {
-        const def: TaskExplorerDefinition = {
+        const def: ITaskDefinition = {
             type: "ant",
             script: target,
             target,

@@ -6,9 +6,6 @@ import { testControl } from "../control";
 import { teApi } from "./utils";
 
 
-let bestTimeWasLoggedLast = false;
-
-
 const clearProcessTimeStorage = async (key: string, force?: boolean) =>
 {
     if (testControl.tests.clearBestTime || testControl.tests.clearAllBestTimes || force)
@@ -45,36 +42,39 @@ const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: st
 {
     let msg: string;
     const prevBestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
-          prevMsg = `!!! The previous fastest time recorded was ${prevBestTimeElapsedFmt}`;
+          prevMsg = `The previous fastest time recorded was ${prevBestTimeElapsedFmt}`,
+          preMsg = `    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`;
     if (title)
     {
         if (title.includes("Logging")) {
-            msg = `!!! New Fastest Time with ${title} ${timeElapsedFmt}`;
+            msg = `New Fastest Time with ${title} ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
         }
         else {
             if (testControl.tests.numSuites > 1) {
-                msg = `!!! New Fastest Time for Suite '${title}' ${timeElapsedFmt}`;
+                msg = `New Fastest Time for Suite '${title}' ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
             }
             else {
-                msg = `!!! New Fastest Time for Suite '${title}' (Single Test) ${timeElapsedFmt}`;
+                msg = `New Fastest Time for Suite '${title}' (Single Test) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
             }
         }
     }
     else {
-        msg = `!!! New Fastest Time ${timeElapsedFmt}`;
+        msg = `New Fastest Time for 'All Tests' ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
     }
-    if (!bestTimeWasLoggedLast) {
-        console.log(`    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`);
-        bestTimeWasLoggedLast = true;
-    }
-    console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.cyan)}`);
-    console.log(`    ${figures.color.info} ${figures.withColor(prevMsg, figures.colors.cyan)}`);
-    console.log(`    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`);
+    console.log(preMsg);
+    console.log(preMsg + figures.withColor(msg, figures.colors.grey));
+    console.log(preMsg + figures.withColor(prevMsg, figures.colors.grey));
+    console.log(preMsg);
 };
+
+
+const timeSep = "--------------------------------------------------------------------------------";
 
 
 const processBestTime = async (logTitle: string, storageKey: string, timeElapsed: number, numTests: number) =>
 {
+    const msg = "------- " + (!logTitle || logTitle.includes("Logging") ? "All Tests " + logTitle : logTitle).toUpperCase() + ` ${timeSep}`;
+    console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.magenta)}`);
     await clearProcessTimeStorage(storageKey);
     const prevNumTests = await teApi.testsApi.storage.get2<number>(storageKey + "NumTests");
     if (prevNumTests !== numTests) {
@@ -92,11 +92,10 @@ const processBestTime = async (logTitle: string, storageKey: string, timeElapsed
     }
     else {
         const bestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
-              msg1 = `The time elapsed ${logTitle ? `for '${logTitle.toLowerCase()}' tests ` : ""} was ${bestTimeElapsedFmt}`,
-              msg2 = `The fastest time recorded ${logTitle ? `for '${logTitle.toLowerCase()} tests '` : ""} is ${bestTimeElapsedFmt}`;
+              msg1 = `The time elapsed ${logTitle ? `for '${figures.withColor(logTitle.toLowerCase(), figures.colors.white)}' tests` : ""} was ${timeElapsedFmt}`,
+              msg2 = `The fastest time recorded is ${bestTimeElapsedFmt}`;
         console.log(`    ${figures.color.info} ${figures.withColor(msg1, figures.colors.grey)}`);
-        console.log(`    ${figures.color.info} ${figures.withColor(msg2, figures.colors.grey)}`);
-        bestTimeWasLoggedLast = false;
+        console.log(`    ${figures.color.info}    ${figures.withColor(msg2, figures.colors.grey)}`);
     }
 };
 

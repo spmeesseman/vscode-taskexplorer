@@ -13,7 +13,7 @@ import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { configuration } from "../lib/utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
-import { ITaskFile, ITaskFolder, ITaskItem, TaskExplorerDefinition } from "../interface";
+import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import { getTerminal } from "../lib/getTerminal";
@@ -347,7 +347,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         ]);
         log.value("   scope", each.scope, 3, logPad);
 
-        const definition: TaskExplorerDefinition | TaskDefinition = each.definition;
+        const definition: ITaskDefinition | TaskDefinition = each.definition;
         let relativePath = definition.path ?? "";
         const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
         if (each.source === "tsc" && util.isWorkspaceFolder(each.scope))

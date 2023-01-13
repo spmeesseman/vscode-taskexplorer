@@ -3,7 +3,7 @@ import * as bombadil from "@sgarciac/bombadil";
 import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { configuration } from "../lib/utils/configuration";
 import { readFileAsync } from "../lib/utils/fs";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
@@ -71,9 +71,9 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): ITaskDefinition
     {
-        const def: TaskExplorerDefinition = {
+        const def: ITaskDefinition = {
             type: "pipenv",
             script: target,
             target,

@@ -3,7 +3,7 @@ import * as path from "path";
 import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import TaskFolder  from "./folder";
-import { ITaskFile, ITaskFolder, ITaskItem, TaskExplorerDefinition } from "../interface";
+import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface";
 import { pathExistsSync } from "../lib/utils/fs";
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } from "vscode";
 
@@ -91,7 +91,7 @@ export default class TaskFile extends TreeItem implements ITaskFile
      * @param label The display label.
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
-    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: TaskExplorerDefinition, source: string,
+    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: ITaskDefinition, source: string,
                 relativePath: string, groupLevel: number, group?: boolean, label?: string, logPad = "")
     {
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group || false), TreeItemCollapsibleState.Collapsed);
@@ -242,7 +242,7 @@ export default class TaskFile extends TreeItem implements ITaskFile
      *
      * @param treeNode The node/item to add to this TaskFile node.
      */
-    private static getLabel(taskDef: TaskExplorerDefinition, source: string, relativePath: string, group: boolean): string
+    private static getLabel(taskDef: ITaskDefinition, source: string, relativePath: string, group: boolean): string
     {
         let label = source;
         if (source === "Workspace")
@@ -312,7 +312,7 @@ export default class TaskFile extends TreeItem implements ITaskFile
      * @returns File name
      */
     // Note:  Making this function private bombs the types
-    public getFileNameFromSource(source: string, folder: ITaskFolder, taskDef: TaskExplorerDefinition, incRelPathForCode?: boolean)
+    public getFileNameFromSource(source: string, folder: ITaskFolder, taskDef: ITaskDefinition, incRelPathForCode?: boolean)
     {
         //
         // Ant tasks or any tasks provided by this extension will have a "fileName" definition

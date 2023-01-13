@@ -2,7 +2,7 @@
 import { Uri, TaskDefinition } from "vscode";
 
 
-export interface TaskExplorerDefinition extends TaskDefinition
+export interface ITaskDefinition extends TaskDefinition
 {
     /**
      * @property target

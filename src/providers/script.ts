@@ -5,7 +5,7 @@ import log from "../lib/log/log";
 import constants from "../lib/constants";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 import { pathExistsSync, readFileSync } from "../lib/utils/fs";
 
@@ -205,7 +205,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition | undefined
+    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): ITaskDefinition | undefined
     {
         /* istanbul ignore next */
         const tgt = target?.toLowerCase(),
@@ -216,7 +216,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             return;
         }
 
-        const def: TaskExplorerDefinition = {
+        const def: ITaskDefinition = {
             type: scriptDef.type,
             script: target.toLowerCase(),
             target: tgt,

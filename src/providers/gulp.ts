@@ -5,7 +5,7 @@ import log from "../lib/log/log";
 import { configuration } from "../lib/utils/configuration";
 import { execSync } from "child_process";
 import { TaskExplorerProvider } from "./provider";
-import { TaskExplorerDefinition } from "../interface/taskDefinition";
+import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 import { readFileAsync } from "../lib/utils/fs";
 
@@ -137,9 +137,9 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     }
 
 
-    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): TaskExplorerDefinition
+    private getDefaultDefinition(target: string, folder: WorkspaceFolder, uri: Uri): ITaskDefinition
     {
-        const def: TaskExplorerDefinition = {
+        const def: ITaskDefinition = {
             type: "gulp",
             script: target,
             target,

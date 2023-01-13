@@ -43,7 +43,7 @@ export const withColor = (msg: string, color: LogColor) =>
     return "\x1B[" + color[0] + "m" + msg + "\x1B[" + color[1] + "m";
 };
 
-export interface ILogApi
+export interface ILog
 {
     blank(level?: number, queueId?: string): void;
     dequeue(queueId: string): void;

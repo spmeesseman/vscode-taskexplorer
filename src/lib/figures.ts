@@ -1,4 +1,4 @@
-import { colors, withColor } from "../interface/logApi";
+import { colors, withColor } from "../interface/ILog";
 
 export default
 {
