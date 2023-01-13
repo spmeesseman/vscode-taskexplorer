@@ -2,7 +2,7 @@
 
 import * as path from "path";
 import * as assert from "assert";
-import * as treeUtils from "./treeUtils";
+import * as treeUtils from "./utils/treeUtils";
 import figures from "../lib/figures";
 import { deactivate } from "../extension";
 import { testControl } from "./control";
@@ -13,16 +13,16 @@ import { ILicenseManager } from "../interface/licenseManager";
 import { IExplorerApi, ITaskExplorerApi, ITaskItemApi, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import { lowerCaseFirstChar, properCase } from "../lib/utils/utils";
+import { getSuiteKey, processTimes } from "./utils/bestTimes";
 
 export { figures };
 export { testControl };
 export { treeUtils };
+export let teApi: ITaskExplorerApi;
 
 let activated = false;
-let bestTimeWasLogged = false;
-let timeStarted: number;
-let teApi: ITaskExplorerApi;
 let teExplorer: IExplorerApi;
+let timeStarted: number;
 const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
 let overridesShowInputBox: any[] = [];
@@ -135,12 +135,6 @@ export const cleanup = async () =>
         console.log(`    ${figures.color.info}`);
     }
 
-    //
-    // Process execution timesand do the dorky best time thing that I forsome reason spent a whole
-    // day of my life coding.
-    //
-    try { await processTimes(); } catch (e) { console.error(e); }
-
     console.log(`    ${figures.color.info} ${figures.withColor("Deactivating extension 'spmeesseman.vscode-taskexplorer'", figures.colors.grey)}`);
     await deactivate();
     console.log(`    ${figures.color.info} ${figures.withColor("Extension 'spmeesseman.vscode-taskexplorer' successfully deactivated", figures.colors.grey)}`);
@@ -165,6 +159,12 @@ export const cleanup = async () =>
     await configuration.updateVs("gulp.autoDetect", testControl.vsCodeAutoDetectGulp);
 
     //
+    // Process execution timesand do the dorky best time thing that I forsome reason spent a whole
+    // day of my life coding.
+    //
+    try { await processTimes(timeStarted); } catch (e) { console.error(e); }
+
+    //
     // Exit
     //
     console.log(`    ${figures.color.info} ${figures.withColor("Exiting", figures.colors.grey)}`);
@@ -181,17 +181,6 @@ export const clearOverrideShowInputBox = () =>
 export const clearOverrideShowInfoBox = () =>
 {
     overridesShowInfoBox = [];
-};
-
-
-const clearProcessTimeStorage = async (key: string) =>
-{
-    if (testControl.tests.clearBestTime || testControl.tests.clearAllBestTimes)
-    {
-        await teApi.testsApi.storage.update2(key, undefined);
-        await teApi.testsApi.storage.update2(key + "Fmt", undefined);
-        await teApi.testsApi.storage.update2(key + "NumTests", undefined);
-    }
 };
 
 
@@ -251,28 +240,10 @@ export const getSpecialTaskItemId = (taskItem: ITaskItemApi) =>
     taskItem.id.replace(constants.LAST_TASKS_LABEL + ":", "").replace(constants.FAV_TASKS_LABEL + ":", "").replace(constants.USER_TASKS_LABEL + ":", "");
 
 
-const getSuiteKey = (suiteName: string, preKey = "") =>
-{
-    if (preKey) {
-        return preKey + properCase(suiteName.replace(" Tests", "")).replace(/[ \W]/g, "");
-    }
-    return lowerCaseFirstChar(properCase(suiteName.replace(" Tests", "")), true).replace(/\W/g, "");
-};
-
-
 export const getTeApi = () => teApi;
 
 
 export const getTestsPath = (p: string) => path.normalize(path.resolve(__dirname, p));
-
-
-const getTimeElapsedFmt = (timeElapsed: number) =>
-{
-    const m = Math.floor(timeElapsed / 1000 / 60),
-          s = Math.floor(timeElapsed / 1000 % 60),
-          ms = Math.round(timeElapsed % 1000);
-    return `${m} minutes, ${s} seconds, ${ms} milliseconds`;
-};
 
 
 export const getWsPath = (p: string) => path.normalize(path.resolve(__dirname, "../../test-files", p));
@@ -459,33 +430,6 @@ const isReady = (taskType?: string) =>
 };
 
 
-const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: string) =>
-{
-    let msg: string;
-    const prevBestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
-          prevMsg = `!!! The previous fastest time recorded was ${prevBestTimeElapsedFmt}`;
-    if (title)
-    {
-        if (title.includes("Logging")) {
-            msg = `!!! New Fastest Time with ${title} ${timeElapsedFmt}`;
-        }
-        else {
-            msg = `!!! New Fastest Time for Suite '${title}' ${timeElapsedFmt}`;
-        }
-    }
-    else {
-        msg = `!!! New Fastest Time ${timeElapsedFmt}`;
-    }
-    if (!bestTimeWasLogged) {
-        console.log(`    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`);
-        bestTimeWasLogged = true;
-    }
-    console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.cyan)}`);
-    console.log(`    ${figures.color.info} ${figures.withColor(prevMsg, figures.colors.cyan)}`);
-    console.log(`    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`);
-};
-
-
 export const logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs = (willFail = true) =>
 {
     if (willFail && testControl.log.enabled && teApi.config.get<boolean>("logging.enabled"))
@@ -516,107 +460,6 @@ export const overrideNextShowInputBox = (value: any) =>
 export const overrideNextShowInfoBox = (value: any) =>
 {
     overridesShowInfoBox.push(value);
-};
-
-
-const processBestTime = async (logTitle: string, storageKey: string, timeElapsed: number, numTests: number) =>
-{
-    await clearProcessTimeStorage(storageKey);
-    let bestTimeElapsed = await teApi.testsApi.storage.get2<number>(storageKey, 0);
-    if (bestTimeElapsed === 0) {
-        bestTimeElapsed = timeElapsed + 1;
-    }
-    if (timeElapsed < bestTimeElapsed)
-    {
-        const timeElapsedFmt = getTimeElapsedFmt(timeElapsed);
-        await logBestTime(logTitle, storageKey, timeElapsedFmt);
-        await saveProcessTimeToStorage(storageKey, timeElapsed, timeElapsedFmt, numTests);
-    }
-    else {
-        const bestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
-              msg = `The fastest time recorded with ${logTitle.toLowerCase()} is ${bestTimeElapsedFmt}`;
-        console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
-    }
-};
-
-
-const processSuiteTimes = async () =>
-{
-    const suiteResults = Object.values(testControl.tests.suiteResults).filter(v => v.suiteName !== "Deactivate Extension");
-    for (const suiteResult of suiteResults)
-    {
-        const storageKey = getSuiteKey(suiteResult.suiteName, "bestTimeElapsedSuite");
-        if (testControl.tests.clearAllBestTimes) {
-            await clearProcessTimeStorage(storageKey);
-        }
-        if (suiteResult.timeFinished && suiteResult.timeStarted)
-        {
-            const timeElapsed = suiteResult.timeFinished - suiteResult.timeStarted;
-            await processBestTime(suiteResult.suiteName, storageKey, timeElapsed, testControl.tests.numTests);
-        }
-    }
-};
-
-
-const processTimesWithLogEnabled = async (timeElapsed: number) =>
-{
-    if (testControl.tests.clearAllBestTimes)
-    {
-        await clearProcessTimeStorage("bestTimeElapsedWithLogging");
-        await clearProcessTimeStorage("bestTimeElapsedWithLoggingFile");
-        await clearProcessTimeStorage("bestTimeElapsedWithLoggingOutput");
-        await clearProcessTimeStorage("bestTimeElapsedWithLoggingConsole");
-    }
-    if (testControl.log.enabled)
-    {
-        await processBestTime("Logging Enabled", "bestTimeElapsedWithLogging", timeElapsed, testControl.tests.numTests);
-        if (testControl.log.file)
-        {
-            await processBestTime("File Logging Enabled", "bestTimeElapsedWithLoggingFile", timeElapsed, testControl.tests.numTests);
-        }
-        if (testControl.log.output)
-        {
-            await processBestTime("Output Window Logging Enabled", "bestTimeElapsedWithLoggingOutput", timeElapsed, testControl.tests.numTests);
-        }
-        if (testControl.log.console)
-        {
-            await processBestTime("Console Logging Enabled", "bestTimeElapsedWithLoggingConsole", timeElapsed, testControl.tests.numTests);
-        }
-    }
-};
-
-
-const processTimes = async () =>
-{
-    const timeFinished = Date.now(),
-          timeElapsed = timeFinished - timeStarted,
-          tzOffset = (new Date()).getTimezoneOffset() * 60000,
-          timeFinishedFmt = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
-
-    console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
-    console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + timeFinishedFmt, figures.colors.grey)}`);
-    console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + getTimeElapsedFmt(timeElapsed), figures.colors.grey)}`);
-
-    if (testControl.tests.numTestsFail === 0)
-    {
-        if (testControl.tests.numSuites > 3)  { // > 3, sometimes i string the single test together with a few others temp
-            await processBestTime("", "bestTimeElapsed", timeElapsed, testControl.tests.numTests);
-            await processTimesWithLogEnabled(timeElapsed);
-        }
-        await processSuiteTimes();
-    }
-    else {
-        const skipMsg = `There were ${testControl.tests.numTestsFail} failed tests, best time processing skipped`;
-        console.log(`    ${figures.color.info} ${figures.withColor(skipMsg, figures.colors.grey)}`);
-    }
-};
-
-
-const saveProcessTimeToStorage = async (key: string, timeElapsed: number, timeElapseFmt: string, numTests: number) =>
-{
-    await teApi.testsApi.storage.update2(key, timeElapsed);
-    await teApi.testsApi.storage.update2(key + "Fmt", timeElapseFmt);
-    await teApi.testsApi.storage.update2(key + "NumTests", numTests);
 };
 
 

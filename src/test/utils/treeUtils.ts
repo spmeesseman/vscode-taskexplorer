@@ -1,11 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as assert from "assert";
-import * as utils from "./utils";
-import TaskItem from "../tree/item";
-import TaskFile from "../tree/file";
-import TaskFolder from "../tree/folder";
-import { isObjectEmpty } from "../lib/utils/utils";
+import * as utils from "../utils";
+import TaskItem from "../../tree/item";
+import TaskFile from "../../tree/file";
+import TaskFolder from "../../tree/folder";
+import { isObjectEmpty } from "../../lib/utils/utils";
 import { ITaskItemApi, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 
 let didSetGroupLevel = false;
