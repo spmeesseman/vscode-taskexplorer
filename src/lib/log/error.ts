@@ -112,7 +112,8 @@ const errorParse = (err: any, symbols: [ string, string ], queueId?: string, cal
 const shouldSkip = (msg: string) =>
 {
     let should = !msg;
-    if (!should && isString(msg) && msg.length <= 4) { // skip double '!!! ' and "*** " writes
+    if (!should && isString(msg) && msg.replace(/\[[0-9]{1,2}m/g, "").trim().length <= 3)
+    {   // skip double '!!! ' and "*** " writes
         should = msg === lastWriteMsg;
         lastWriteMsg = msg;
     }
