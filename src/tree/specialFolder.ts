@@ -272,6 +272,21 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
+    getLastRanId = () =>
+    {
+        let lastTaskId: string | undefined;
+        if (this.store && this.store.length > 0)
+        {
+            lastTaskId = this.store[this.store.length - 1];
+        }
+        if (!lastTaskId)
+        {
+            window.showInformationMessage("No saved tasks!");
+        }
+        return lastTaskId;
+    };
+
+
     private getRenamedTaskName(taskItem: TaskItem)
     {
         let label = taskItem.taskFile.folder.label + " - " + taskItem.taskSource;

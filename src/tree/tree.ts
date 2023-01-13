@@ -1820,18 +1820,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             return;
         }
 
-        let lastTaskId: string | undefined;
-        const lastTasks = storage.get<string[]>(constants.LAST_TASKS_STORE, []);
-        if (lastTasks && lastTasks.length > 0)
-        {
-            lastTaskId = lastTasks[lastTasks.length - 1];
-        }
-
-        if (!lastTaskId)
-        {
-            window.showInformationMessage("No saved tasks!");
-            return;
-        }
+        const lastTaskId = this.specialFolders.lastTasks.getLastRanId();
+        if (!lastTaskId) { return; }
 
         log.methodStart("run last task", 1, "", true, [[ "last task id", lastTaskId ]]);
 
@@ -1843,8 +1833,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         {
             exec = await this.run(taskItem);
         }
-        else
-        {
+        else {
             window.showInformationMessage("Task not found!  Check log for details");
             await this.specialFolders.lastTasks.removeTaskFile(lastTaskId, "   ");
         }
