@@ -1,28 +1,62 @@
-import {
-    Memento, ExtensionContext
-} from "vscode";
+
+import * as json5 from "json5";
+import { join } from "path";
+import { Memento, ExtensionContext } from "vscode";
+import { IDictionary } from "../../interface";
+import { IStorage } from "../../interface/IStorage";
+import { createDir, pathExists, readJsonAsync, writeFile } from "./fs";
 import { isNumber, isString } from "./utils";
 
-export let storage: Memento;
+export let storage: IStorage;
 
-export const initStorage = (context: ExtensionContext, isTests: boolean) =>
+
+export const initStorage = async (context: ExtensionContext, isTests: boolean) =>
 {
-    //
-    // Set up extension custom storage
-    //
-    storage = new Storage(context.globalState, isTests);
+    const storageFile = join(context.globalStorageUri.fsPath, "storage.json");
+    await createDir(context.globalStorageUri.fsPath);
+    if (!(await pathExists(storageFile))) {
+        await writeFile(storageFile, "{}");
+    }
+    storage = new Storage(context, storageFile, isTests);
 };
 
-class Storage
+
+class Storage implements IStorage, Memento
 {
     private storage: Memento;
     private isTests: boolean;
+    private storageFile: string;
 
 
-    constructor(storageMemento: Memento, isTests: boolean)
+    constructor(context: ExtensionContext, storageFile: string, isTests: boolean)
     {
-        this.storage = storageMemento;
+        this.storage = context.globalState;
         this.isTests = isTests;
+        this.storageFile = storageFile;
+    }
+
+
+    public async get2<T>(key: string, defaultValue?: T): Promise<T | undefined>
+    {
+        const store = await readJsonAsync<IDictionary<any>>(this.storageFile);
+        if (defaultValue || (isString(defaultValue) && defaultValue === "") || (isNumber(defaultValue) && defaultValue === 0))
+        {
+            let v = store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key];
+            /* istanbul ignore if */
+            if (!v) {
+                v = defaultValue;
+            }
+            return v;
+        }
+        return store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key];
+    }
+
+
+    public async update2(key: string, value: any)
+    {
+        const store = await readJsonAsync<IDictionary<any>>(this.storageFile);
+        store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key] = value;
+        await writeFile(this.storageFile, json5.stringify(store));
     }
 
 
