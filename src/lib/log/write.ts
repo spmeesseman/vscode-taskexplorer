@@ -5,6 +5,20 @@ import { appendFileSync } from "fs";
 import { window } from "vscode"; // TODO - this is used as scope but thought browser 'window' duh
 
 const colors = figures.colors;
+// let lastWriteMsg: string | undefined;
+
+
+// const shouldSkip = (msg: string) =>
+// {
+//     let should = msg === null || msg === undefined || (logControl.lastWriteWasBlank && msg === "");
+//     if (!should && (msg.includes("***") || msg.includes("!!!")))
+//     // if (!should && msg.replace(/(?:\[[0-9]{1,2}m|\[[0-9]{1,2}m[\W]{1}\[[0-9]{1,2}m)/g, "").trim().length <= 3)
+//     {   // skip double '!!! ' and "*** " writes
+//         should = msg === lastWriteMsg;
+//         lastWriteMsg = msg;
+//     }
+//     return should;
+// };
 
 
 const _write = (msg: string, logPad: string, queueId: string | undefined, isValue: boolean, isError: boolean,
@@ -21,7 +35,7 @@ const _write = (msg: string, logPad: string, queueId: string | undefined, isValu
             }
         }
         else if (isError && /\[[0-9]{1,2}m/.test(msg))
-        {   // \[[0-9]{1,2}m[\W]{1}\[[0-9]{1,2}m/.test(msg)
+        {   // / \[[0-9]{1,2}m[\W]{1}\[[0-9]{1,2}m/.test(msg)
             for (let m = 1; m < msgs.length; m++) {
                 msgs[m] = (!logControl.isTests || !logControl.isTestsBlockScaryColors ? figures.color.error : figures.color.errorTests) + " " + msgs[m];
             }
@@ -64,6 +78,7 @@ const _write = (msg: string, logPad: string, queueId: string | undefined, isValu
 
 const write = (msg: string, level?: number, logPad = "", queueId?: string, isValue?: boolean, isError?: boolean) =>
 {
+    // if (shouldSkip(msg)) {
     if (msg === null || msg === undefined || (logControl.lastWriteWasBlank && msg === "")) {
         return;
     }

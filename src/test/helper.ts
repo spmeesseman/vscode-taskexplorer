@@ -20,6 +20,7 @@ export { testControl };
 export { treeUtils };
 
 let activated = false;
+let bestTimeWasLogged = false;
 let timeStarted: number;
 let teApi: ITaskExplorerApi;
 let teExplorer: IExplorerApi;
@@ -466,9 +467,11 @@ const isReady = (taskType?: string) =>
 };
 
 
-const logBestTime = (title: string, timeElapsedFmt: string) =>
+const logBestTime = (title: string, storageKey: string, timeElapsedFmt: string) =>
 {
     let msg: string;
+    const prevBestTimeElapsedFmt = storage.get<string>(storageKey + "Fmt", ""),
+          prevMsg = `!!! The previous fastest time recorded was ${prevBestTimeElapsedFmt}`;
     if (title)
     {
         if (title.includes("Logging")) {
@@ -481,8 +484,12 @@ const logBestTime = (title: string, timeElapsedFmt: string) =>
     else {
         msg = `!!! New Fastest Time ${timeElapsedFmt}`;
     }
-    console.log(`    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`);
+    if (!bestTimeWasLogged) {
+        console.log(`    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`);
+        bestTimeWasLogged = true;
+    }
     console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.cyan)}`);
+    console.log(`    ${figures.color.info} ${figures.withColor(prevMsg, figures.colors.cyan)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`);
 };
 
@@ -530,11 +537,11 @@ const processBestTime = async (logTitle: string, storageKey: string, timeElapsed
     if (timeElapsed < bestTimeElapsed)
     {
         const timeElapsedFmt = getTimeElapsedFmt(timeElapsed);
-        logBestTime(logTitle, timeElapsedFmt);
+        logBestTime(logTitle, storageKey, timeElapsedFmt);
         await saveProcessTimeToStorage(storageKey, timeElapsed, timeElapsedFmt, numTests);
     }
     else {
-        const bestTimeElapsedFmt = storage.get<number>(storageKey + "Fmt", 0),
+        const bestTimeElapsedFmt = storage.get<string>(storageKey + "Fmt", ""),
               msg = `The fastest time recorded with ${logTitle.toLowerCase()} is ${bestTimeElapsedFmt}`;
         console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
     }

@@ -253,6 +253,10 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
     else {
         log.write("   already exists in cache", 4, logPad);
     }
+    /* istanbul ignore if */
+    if (added.c1 !== added.c2) {
+        log.error("   the 'added' counts in the mappings do not match, there is an issue in the file cache");
+    }
 
     log.methodDone("add item to mappings", 4, logPad);
     return added.c1;
@@ -679,11 +683,15 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
         log.value("   removed from cache", folderUri.fsPath, 4, logPad);
     }
     else if (folderUri) {
-        log.write("   doesnt exists in cache", 4, logPad);
+        log.write("   doesnt exist in cache", 4, logPad);
+    }
+    /* istanbul ignore if */
+    if (removed.c1 !== removed.c2) {
+        log.error("   the 'remove' counts in the mappings do not match, there is an issue in the file cache");
     }
 
     log.methodDone("remove item from mappings", 3, logPad);
-    return removed.c1;
+    return removed.c2;
 }
 
 
