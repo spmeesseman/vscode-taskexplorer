@@ -3,7 +3,7 @@ import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import constants from "../lib/constants";
 import { configuration } from "../lib/utils/configuration";
-import { getTaskFiles, removeFileFromCache } from "../lib/cache";
+import { getTaskFiles } from "../lib/cache";
 import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { getLicenseManager } from "../extension";
@@ -189,9 +189,6 @@ export abstract class TaskExplorerProvider implements TaskProvider
                     //
                     /* istanbul ignore next */
                     this.cachedTasks?.push(...tasks);
-                }
-                else if (!pathExists) {
-                    removeFileFromCache(this.providerName, uri, "   ");
                 }
 
                 this.cachedTasks = this.cachedTasks && this.cachedTasks.length > 0 ? this.cachedTasks : undefined;
