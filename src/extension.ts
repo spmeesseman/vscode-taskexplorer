@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as util from "./lib/utils/utils";
-import * as cache from "./lib/cache";
+import * as cache from "./lib/fileCache";
 import * as fs from "./lib/utils/fs";
 import log from "./lib/log/log";
 import registerEnterLicenseCommand from "./commands/enterLicense";
@@ -236,7 +236,7 @@ export function getLicenseManager()
 /* istanbul ignore next */
 function isBusy()
 {   /* istanbul ignore next */
-    return !ready || cache.isCachingBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
+    return !ready || cache.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
            isProcessingFsEvent() || isProcessingConfigChange();
 }
 

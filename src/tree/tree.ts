@@ -1,13 +1,15 @@
 
 import * as util from "../lib/utils/utils";
 import * as sortTasks from "../lib/sortTasks";
-import constants from "../lib/constants";
-import log from "../lib/log/log";
-import SpecialTaskFolder from "./specialFolder";
 import TaskItem from "./item";
 import TaskFile from "./file";
+import log from "../lib/log/log";
 import TaskFolder from "./folder";
-import { rebuildCache } from "../lib/cache";
+import constants from "../lib/constants";
+import SpecialTaskFolder from "./specialFolder";
+import { dirname, join } from "path";
+import { IEvent } from "../interface/IEvent";
+import { rebuildCache } from "../lib/fileCache";
 import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { configuration } from "../lib/utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
@@ -26,8 +28,6 @@ import {
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, commands, window, workspace, tasks,
     Selection, InputBoxOptions, ShellExecution, CustomExecution, Disposable, TaskExecution
 } from "vscode";
-import { dirname, join } from "path";
-import { IEvent } from "../interface/IEvent";
 
 
 /**

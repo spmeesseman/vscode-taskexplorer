@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as cache from "./cache";
+import * as cache from "./fileCache";
 import * as util from "./utils/utils";
 import log from "./log/log";
 import { extname } from "path";
@@ -151,7 +151,7 @@ const _procDirCreateEvent = async(uri: Uri, logPad = "") =>
 {
     try
     {   log.methodStart("directory 'create' event", 1, logPad, true, [[ "dir", uri.fsPath ]]);
-        const numFilesFound = await cache.addFolderToCache(uri, logPad + "   ");
+        const numFilesFound = await cache.addFolder(uri, logPad + "   ");
         if (numFilesFound > 0) {
             await refreshTree(teApi, undefined, uri, logPad + "   ");
         }

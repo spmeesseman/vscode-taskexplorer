@@ -5,7 +5,7 @@ Bugs:
     ✔ Use CRTL+C to kill tasks as opposed to killing the terminal @high @done(21-01-04 12:02)
     ✔ Saving package.json is throwing the 'tree node already exists' error @done(21-03-22 22:24)
     ✔ Swutching away from view while task is running, and switching back after task has ended, view still shows it as running, must refresh @done(20-10-09 02:41)
-    ☐ Damn son of bitch shit hole bug - '..... is already regsutered'
+    ✔ Damn son of bitch shit hole bug - '..... is already registered' @done(23-01-08 16:23)
 
 Features:
 
@@ -28,13 +28,13 @@ Features:
 
 General Todos:
 
-    ☐ Test visibility change event
+    ✔ Test visibility change event @done(23-01-13 22:22)
         Differences in tray open/closed, switching views, vscode minimized, etc
 
     ☐ Folder/file create/delete events
         Dont process file if folder was just processed, and vice versa
     
-    ☐ Clean up interface file names
+    ✔ Clean up interface file names @done(23-01-13 22:21)
         Remove trailing 'Api' from most except main TaskExplorerApi.  Just I[ClassName] I want now.
     
     ☐ add info box maybe monthly nag if grunt/gulp tasks VSCode provider(s) are 'on'

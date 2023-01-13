@@ -46,23 +46,18 @@ export function addFileToCache(taskType: string, uri: Uri, logPad: string)
  *
  * @since 3.0.0
  */
-export async function addFolderToCache(folder: Uri, logPad: string)
+export async function addFolder(folder: Uri, logPad: string)
 {
     let numFilesFound = 0;
     const licMgr = getLicenseManager();
     const wsFolder = workspace.getWorkspaceFolder(folder) as WorkspaceFolder;
-
-    // if (isCachingBusy()) {
-    //     queueJob(addFolderToCache, folder);
-    //     return;
-    // }
 
     log.methodStart("add folder to cache", 1, logPad, false, [[ "folder", folder.fsPath ]]);
 
     const numFiles = await numFilesInDirectory(folder.fsPath);
     if (numFiles > 0)
     {
-        await startCacheBuild();
+        await startBuild();
 
         const taskProviders = ([ ...util.getTaskTypes(), ...providersExternal.keys() ]).sort((a, b) => {
             return util.getTaskTypeFriendlyName(a).localeCompare(util.getTaskTypeFriendlyName(b));
@@ -140,7 +135,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
                 }
             }
         }
-        finishCacheBuild();
+        finishBuild();
     }
 
     log.methodDone("add folder to cache", 1, logPad, [[ "# of files in directory", numFiles ], [ "# of files matched", numFiles ]]);
@@ -148,8 +143,7 @@ export async function addFolderToCache(folder: Uri, logPad: string)
 }
 
 
-
-async function addWsFolderToCache(folder: WorkspaceFolder, logPad: string)
+async function addWsFolder(folder: WorkspaceFolder, logPad: string)
 {
     log.methodStart("add workspace project folder to cache", 1, logPad, logPad === "", [[ "folder", folder.name ]]);
 
@@ -199,12 +193,12 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
     if (wsf)
     {
         log.methodStart("add workspace project folders", 1, logPad, logPad === "");
-        await startCacheBuild();
+        await startBuild();
         if (!cancel)
         {
             for (const f of wsf)
             {
-                numFilesFound += await addWsFolderToCache(f, logPad + "   ");
+                numFilesFound += await addWsFolder(f, logPad + "   ");
                 if (cancel) {
                     break;
                 }
@@ -212,7 +206,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         }
         log.value("   was cancelled", cancel, 3);
         log.methodDone("add workspace project folders", 1, logPad, [[ "# of file found", numFilesFound ]]);
-        finishCacheBuild();
+        finishBuild();
     }
     return numFilesFound;
 }
@@ -273,7 +267,7 @@ export async function buildTaskTypeCache(taskType: string, fileGlob: string, wsF
     ]);
 
     if (setCacheBuilding) {
-        await startCacheBuild();
+        await startBuild();
     }
 
     if (!cancel)
@@ -298,7 +292,7 @@ export async function buildTaskTypeCache(taskType: string, fileGlob: string, wsF
     }
 
     if (setCacheBuilding) {
-        finishCacheBuild();
+        finishBuild();
     }
 
     log.methodDone("build file cache", 1, logPad);
@@ -419,7 +413,7 @@ function disposeStatusBarSpace(statusBarSpace: StatusBarItem)
 }
 
 
-const finishCacheBuild = () =>
+const finishBuild = () =>
 {
     disposeStatusBarSpace(statusBarSpace);
     cacheBuilding = false;
@@ -500,7 +494,7 @@ function initMaps(taskType: string, project: string)
 }
 
 
-export function isCachingBusy()
+export function isBusy()
 {
     return cacheBuilding === true;
 }
@@ -723,7 +717,7 @@ export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
 }
 
 
-async function startCacheBuild()
+async function startBuild()
 {
     while (cacheBuilding === true) {
         await util.timeout(100);

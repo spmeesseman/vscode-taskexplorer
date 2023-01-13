@@ -2,7 +2,7 @@
 import log from "../lib/log/log";
 import constants from "../lib/constants";
 import { extname } from "path";
-import { getTaskFiles } from "../lib/cache";
+import { getTaskFiles } from "../lib/fileCache";
 import { getLicenseManager } from "../extension";
 import { pathExistsSync } from "../lib/utils/fs";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
