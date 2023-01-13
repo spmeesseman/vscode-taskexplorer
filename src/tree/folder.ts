@@ -50,7 +50,7 @@ export default class TaskFolder extends TreeItem implements ITaskFolderApi
     }
 
 
-    removeTaskFile(taskFile: TaskFile|TaskItem|string)
+    removeTaskFile(taskFile: TaskFile|TaskItem|string, logPad: string)
     {
         const id = isString(taskFile) ? taskFile : taskFile.id;
         const idx = this.taskFiles.findIndex(f => f.id === id);

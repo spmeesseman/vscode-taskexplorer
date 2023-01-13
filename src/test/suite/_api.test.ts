@@ -52,9 +52,9 @@ suite("API Init and Tests", () =>
         // Twice for delayed init, 1st will be quick with 'Initializing...' message in treeview
         //
         this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.configEvent);
-        await refreshTree(teApi);
+        await refreshTree(teApi, undefined, undefined, "");
         await teApi.waitForIdle(testControl.waitTime.command);
-        await refreshTree(teApi);
+        await refreshTree(teApi, undefined, undefined, "");
         await teApi.waitForIdle(testControl.waitTime.refreshCommand);
     });
 

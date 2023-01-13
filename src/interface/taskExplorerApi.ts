@@ -23,9 +23,9 @@ export interface ITaskExplorerApi
 
     isBusy(): boolean;
     isTests(): boolean;
-    refresh(taskSource: string): Promise<void>;
-    register(taskSource: string, provider: ExternalExplorerProvider): Promise<void>;
+    refreshExternalProvider(taskSource: string, logPad: string): Promise<void>;
+    register(taskSource: string, provider: ExternalExplorerProvider, logPad: string): Promise<void>;
     setTests(isTests: boolean): void;
-    unregister(taskSource: string): Promise<void>;
+    unregister(taskSource: string, logPad: string): Promise<void>;
     waitForIdle(minWait?: number, maxWait?: number, logPad?: string): Promise<void>;
 }

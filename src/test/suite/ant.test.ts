@@ -71,7 +71,6 @@ suite("Ant Tests", () =>
     {
         expect(successCount).to.be.equal(2, "rolling success count failure");
         this.slow(testControl.slowTime.verifyTaskCount);
-        // await teApi.explorer?.invalidateTasksCache(testsName);
         await verifyTaskCount("ant", 3);
         ++successCount;
     });

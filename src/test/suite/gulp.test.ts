@@ -193,7 +193,6 @@ suite("Gulp Tests", () =>
         //
         await executeSettingsUpdate("useGulp", true, testControl.waitTime.configEventFast);
         await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
-        // await teApi.explorer?.invalidateTasksCache(testsName);
         // await tasks.fetchTasks({ type: testsName });
         // gulpTasks = await provider.readUriTasks(Uri.file(buildXmlFile));
         // assert(gulpTasks.length === 2, "# of Gulp tasks should be 2");

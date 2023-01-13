@@ -49,7 +49,7 @@ suite("API Tests", () =>
     test("Register external task provider", async function()
     {
         taskProvider.getDocumentPosition("test_1_task_name", "test_1_task_name");
-        await teApi.register("external", taskProvider);
+        await teApi.register("external", taskProvider, "");
         await teApi.waitForIdle(50);
         await verifyTaskCount("external", 2);
     });
@@ -79,7 +79,7 @@ suite("API Tests", () =>
 
     test("Unregister external task provider", async function()
     {
-        await teApi.unregister("external");
+        await teApi.unregister("external", "");
         await teApi.waitForIdle(50);
         await verifyTaskCount("external", 2);
     });

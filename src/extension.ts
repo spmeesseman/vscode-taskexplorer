@@ -53,7 +53,7 @@ export const teApi: ITaskExplorerApi =
     log,
     providers,
     providersExternal,
-    refresh: refreshExternalProvider,
+    refreshExternalProvider,
     register: registerExternalProvider,
     sidebar: undefined,
     sidebarView: undefined,
@@ -246,7 +246,7 @@ async function refreshExternalProvider(providerName: string)
     if (providersExternal.get(providerName))
     {
         /* istanbul ignore next */
-        await refreshTree(teApi, providerName);
+        await refreshTree(teApi, providerName, undefined, "");
     }
 }
 
@@ -262,10 +262,10 @@ function registerCommands(context: ExtensionContext)
 }
 
 
-async function registerExternalProvider(providerName: string, provider: ExternalExplorerProvider)
+async function registerExternalProvider(providerName: string, provider: ExternalExplorerProvider, logPad: string)
 {
     providersExternal.set(providerName, provider);
-    await refreshTree(teApi, providerName);
+    await refreshTree(teApi, providerName, undefined, logPad);
 }
 
 
@@ -307,10 +307,10 @@ function registerTaskProviders(context: ExtensionContext)
 }
 
 
-async function unregisterExternalProvider(providerName: string)
+async function unregisterExternalProvider(providerName: string, logPad: string)
 {
     providersExternal.delete(providerName);
-    await refreshTree(teApi, providerName);
+    await refreshTree(teApi, providerName, undefined, logPad);
 }
 
 

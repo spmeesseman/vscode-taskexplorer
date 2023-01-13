@@ -100,7 +100,7 @@ export class TaskWatcher
     }
 
 
-    fireTaskChangeEvents(taskItem: TaskItem, logPad?: string, logLevel?: number)
+    fireTaskChangeEvents(taskItem: TaskItem, logPad: string, logLevel: number)
     {
         const taskTree = this.tree.getTaskTree();
         /* istanbul ignore if */
@@ -141,7 +141,7 @@ export class TaskWatcher
         // tree, so this is still good.  TODO possibly this gets fixed in the future to be able to
         // invalidate just the TaskItem, so check back on this sometime.
         //
-        this.tree.fireTreeRefreshEvent(taskItem.taskFile, logPad + "   ", logLevel);
+        this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskItem.taskFile);
 
         //
         // Fire change event for the 'Last Tasks' folder if the task exists there
@@ -150,7 +150,7 @@ export class TaskWatcher
         {
             if (taskTree[0] && taskTree[0].label === this.specialFolders.lastTasks.label)
             {
-                this.tree.fireTreeRefreshEvent(taskTree[0], logPad + "   ", logLevel);
+                this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[0]);
             }
         }
 
@@ -161,11 +161,11 @@ export class TaskWatcher
         {
             if (taskTree[0] && taskTree[0].label === this.specialFolders.favorites.label)
             {
-                this.tree.fireTreeRefreshEvent(taskTree[0], logPad + "   ", logLevel);
+                this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[0]);
             }
             else if (taskTree[1] && taskTree[1].label === this.specialFolders.favorites.label)
             {
-                this.tree.fireTreeRefreshEvent(taskTree[1], logPad + "   ", logLevel);
+                this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[1]);
             }
         }
 

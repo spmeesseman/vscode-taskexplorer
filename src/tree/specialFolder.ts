@@ -107,7 +107,7 @@ export default class SpecialTaskFolder extends TaskFolder
             await this.saveTask(taskItem, "   ");
         }
         else {
-           await this.removeTaskFile(id, true, "   ");
+           await this.removeTaskFile(id, "   ", true);
            removed = true;
         }
 
@@ -151,7 +151,7 @@ export default class SpecialTaskFolder extends TaskFolder
         // Persist to storage and refresh this tree node
         //
         await storage.update(constants.TASKS_RENAME_STORE, renames);
-        this.explorer.fireTreeRefreshEvent(this, "   ", 1);
+        this.explorer.fireTreeRefreshEvent("   ", 1, this);
 
         log.methodDone("add/remove rename special", 1, "", [[ "new # of items in store", renames.length ]]);
         return rmvIdx !== -1;
@@ -327,11 +327,11 @@ export default class SpecialTaskFolder extends TaskFolder
         /* istanbul ignore else */
         if (taskItem2)
         {
-            this.removeTaskFile(taskItem2, false, logPad + "   ");
+            this.removeTaskFile(taskItem2, logPad + "   ", false);
         }
         else if (this.taskFiles.length >= configuration.get<number>("specialFolders.numLastTasks"))
         {
-            this.removeTaskFile(this.taskFiles[this.taskFiles.length - 1], false, logPad + "   ");
+            this.removeTaskFile(this.taskFiles[this.taskFiles.length - 1], logPad + "   ", false);
         }
 
         if (!taskItem2)
@@ -344,7 +344,7 @@ export default class SpecialTaskFolder extends TaskFolder
 
         log.value(logPad + "   add item", taskItem2.id, 2);
         this.insertTaskFile(taskItem2, 0);
-        this.explorer.fireTreeRefreshEvent(this, "   ", 1);
+        this.explorer.fireTreeRefreshEvent("   ", 1, this);
     }
 
 
@@ -382,14 +382,14 @@ export default class SpecialTaskFolder extends TaskFolder
 
         /* istanbul ignore else */
         if (changed) {
-            this.explorer.fireTreeRefreshEvent(undefined, logPad + "   ", 1);
+            this.explorer.fireTreeRefreshEvent(logPad + "   ", 1);
         }
 
         log.methodDone("show special tasks", 1, logPad);
     }
 
 
-    async removeTaskFile(taskFile: TaskItem|string, persist?: boolean, logPad?: string)
+    async removeTaskFile(taskFile: TaskItem|string, logPad: string, persist?: boolean)
     {
         const id = isString(taskFile) ? taskFile : taskFile.id, // getTaskItemId(taskFile);
               idx = this.taskFiles.findIndex(f => f.id === id);
@@ -405,7 +405,7 @@ export default class SpecialTaskFolder extends TaskFolder
                 }
             }
             // await this.refresh(true, taskFile);
-            this.explorer.fireTreeRefreshEvent(this, logPad, 1);
+            this.explorer.fireTreeRefreshEvent(logPad, 1, this);
         }
     }
 
