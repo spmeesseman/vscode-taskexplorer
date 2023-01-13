@@ -6,6 +6,7 @@ import { logControl } from "./log";
 import { isArray, isError, isFunction, isObject, isObjectEmpty, isString } from "../utils/utils";
 
 const colors = figures.colors;
+let lastWriteMsg: string | undefined;
 
 
 const error = (msg: any, params?: (string|any)[][], queueId?: string) => _error(msg, params, queueId);
@@ -108,9 +109,20 @@ const errorParse = (err: any, symbols: [ string, string ], queueId?: string, cal
 };
 
 
+const shouldSkip = (msg: string) =>
+{
+    let should = !msg;
+    if (!should && isString(msg) && msg.length <= 4) { // skip double '!!! ' and "*** " writes
+        should = msg === lastWriteMsg;
+        lastWriteMsg = msg;
+    }
+    return should;
+};
+
+
 export const _error = (msg: any, params?: (string|any)[][], queueId?: string, symbols: [ string, string ] = [ "", "" ]) =>
 {
-    if (!msg) {
+    if (shouldSkip(msg)) {
         return;
     }
     const currentWriteToConsole = logControl.writeToConsole;

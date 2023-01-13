@@ -35,6 +35,25 @@ import { IEvent } from "../interface/IEvent";
  * @class TaskTreeDataProvider
  *
  * Implements the VSCode TreeDataProvider API to build a tree of tasks to display within a view.
+ *
+ * The typical chain of events are:
+ *
+ *     1. A task starts and the TaskWatcher reacts too the event.  Or, the 'refresh' command was
+ *        received i.e. the refresh button was clicked on the tree ui.
+ *
+ *     2. The refresh() method is called
+ *
+ *     3. The refresh() method invalidates task caches as needed, then calls 'fireTreeRefreshEvent'
+ *        to fire the change event in VSCode.
+ *
+ *     4. The 'fireTreeRefreshEvent' fires the tree data event to VSCode if the UI/view is visible.
+ *        If not visible, the event is queued in 'eventQueue'.  The queue is processed when a
+ *       'visibility' event is processed in 'onVisibilityChanged', and is processed until empty
+ *        in the 'processEventQueue' function.
+ *
+ *     5. When a tree data change event is fired, VSCode engine will call 'getTreeChildren' to
+ *        refresh the tree ui, with the TreeItem that needs to be provided (or undefined/null if
+ *        asking to provide the entire tree).
  */
 export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplorerApi
 {
@@ -83,14 +102,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => this.pause(item), this));
         this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick?: boolean) => this.open(item, itemClick), this));
         this.disposables.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => this.openTerminal(item), this));
-        // this.disposables.push(commands.registerCommand(name + ".refresh", async () => { await this.refresh(true, false); }, this));
-        this.disposables.push(commands.registerCommand(name + ".refresh", () => this.refresh(true, false), this));
+        this.disposables.push(commands.registerCommand(name + ".refresh", () => this.refresh(true, false, ""), this));
         this.disposables.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "install"), this));
         this.disposables.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update"), this));
         this.disposables.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update <packagename>"), this));
         this.disposables.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit"), this));
         this.disposables.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit fix"), this));
-        this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem | string) => this.addToExcludes(taskFile), this));
+        this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem) => this.addToExcludes(taskFile), this));
         this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this));
 
         context.subscriptions.push(...this.disposables);
@@ -134,11 +152,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    private async addToExcludes(selection: TaskFile | TaskItem | string)
+    private async addToExcludes(selection: TaskFile | TaskItem)
     {
-        let pathValue = "";
-        let uri: Uri | undefined;
+        let uri: Uri | false;
         let excludesList = "exclude";
+        const pathValues: string[] = [];
 
         log.methodStart("add to excludes", 1, "", true, [[ "global", global ]]);
 
@@ -147,70 +165,61 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
             uri = selection.resourceUri;
             if (selection.isGroup)
             {
-                log.write("   file group");
-                pathValue = "";
+                log.value("   adding file group", uri.path, 2);
                 for (const each of selection.treeNodes)
                 {
                     if (each.resourceUri) {
-                        pathValue += each.resourceUri.path;
-                        pathValue += ",";
+                        log.value("      adding file path", each.resourceUri.path, 3);
+                        pathValues.push(each.resourceUri.path);
                     }
                 }
-                if (pathValue) {
-                    pathValue = pathValue.substring(0, pathValue.length - 1);
-                }
             }
-            else
-            {
-                log.value("   file glob", uri.path);
-                pathValue = uri.path;
+            else {
+                log.value("   adding file path", uri.path, 2);
+                pathValues.push(uri.path);
             }
         }
-        else if (selection instanceof TaskItem)
+        else // if (selection instanceof TaskItem)
         {
+            uri = false;
             if (util.isScriptType(selection.taskSource))
             {
                 /* istanbul ignore else */ /* istanbul ignore next */
                 if (selection.resourceUri) {
                     /* istanbul ignore next */
-                    log.value("   file glob", selection.resourceUri.path);
+                    log.value("   adding file path", selection.resourceUri.path, 2);
                     /* istanbul ignore next */
-                    pathValue = selection.resourceUri.path;
+                    pathValues.push(selection.resourceUri.path);
                 }
                 else if (selection.taskFile) {
-                    log.value("   file glob", selection.taskFile.resourceUri.path);
-                    pathValue = selection.taskFile.resourceUri.path;
+                    log.value("   adding file path", selection.taskFile.resourceUri.path, 2);
+                    pathValues.push(selection.taskFile.resourceUri.path);
                 }
             }
             else {
                 excludesList = "excludeTask";
-                pathValue = selection.task.name;
+                pathValues.push(selection.task.name);
             }
         }
-        else {
-            pathValue = selection;
-        }
 
-        if (!pathValue) {
-            return;
-        }
-        log.value("   path value", pathValue, 2);
-
-        const excludes = configuration.get<string[]>(excludesList),
-              paths = pathValue.split(",");
-        for (const s in paths) {
+        log.value("   path value(s)", pathValues.join(", "), 1);
+        if (pathValues.length > 0)
+        {
+            const excludes = configuration.get<string[]>(excludesList);
+            for (const p of pathValues) {
+                util.pushIfNotExists(excludes, p);
+            }
+            enableConfigWatcher(false);
             /* istanbul ignore else */
-            if ({}.hasOwnProperty.call(paths, s)) {
-                util.pushIfNotExists(excludes, paths[s]);
+            if (this.isTests) {
+                await configuration.updateWs(excludesList, excludes);
             }
+            else {
+                await configuration.update(excludesList, excludes);
+            }
+            await this.refresh(selection.taskSource, uri, "   ");
+            enableConfigWatcher(true);
         }
-
-        enableConfigWatcher(false);
-        await configuration.updateWs(excludesList, excludes);
-        // await configuration.update(excludesList, excludes);
-        await this.refresh(selection instanceof TaskItem || selection instanceof TaskFile ? selection.taskSource : false,
-                           !(selection instanceof TaskItem) ? uri : false);
-        enableConfigWatcher(true);
 
         log.methodDone("add to excludes", 1);
     }
@@ -708,7 +717,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    fireTreeRefreshEvent(logPad: string, logLevel: number, taskFile?: TreeItem)
+    public fireTreeRefreshEvent(logPad: string, logLevel: number, taskFile?: TreeItem)
     {
         this.getChildrenLogPad = logPad;
         this.getChildrenLogLevel = logLevel;
@@ -1489,25 +1498,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      *     "Workspace"
      *
      * If invalidate is false, then this is both an event as a result from adding to excludes list
-     * and the item being added is a file, not a group / set of files.  If theitem being added to
+     * and the item being added is a file, not a group / set of files.  If the item being added to
      * the excludes list is a group/folder, then invalidate will be set to the task source, i.e.
      * npm, ant, workspace, etc.
      *
-     * If invalidate is true and opt is false, then the refresh button was clicked
-     *
-     * If task is truthy, then a task has started/stopped, opt will be the task definition's
-     * 'uri' property, note that task types not internally provided will not contain this property.
+     * If invalidate is true and opt is false, then the refresh button was clicked i.e. the 'refresh'
+     * registered VSCode command was received
      *
      * If invalidate and opt are both truthy, then a filesystemwatcher event or a task just triggered
      *
      * If invalidate and opt are both undefined, then a configuration has changed
      *
-     * 2/10/2021 - Task start/finish events no longer call this function.  This means invalidate will
-     * only be false if it is set from the addToExcludes() function.
-     *
      * @param opt Uri of the invalidated resource
      */
-    public async refresh(invalidate?: any, opt?: Uri | boolean, logPad = ""): Promise<void>
+    public async refresh(invalidate: string | boolean | undefined, opt: Uri | false | undefined, logPad: string): Promise<void>
     {
         log.methodStart("refresh task tree", 1, logPad, logPad === "", [
             [ "invalidate", invalidate ], [ "opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a" ],

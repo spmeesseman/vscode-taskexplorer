@@ -3,11 +3,8 @@ import figures from "../figures";
 import { logControl } from "./log";
 import { appendFileSync } from "fs";
 import { window } from "vscode"; // TODO - this is used as scope but thought browser 'window' duh
-import { isString } from "../utils/utils";
 
-let lastWriteMsg: string | undefined;
 const colors = figures.colors;
-
 
 
 const _write = (msg: string, logPad: string, queueId: string | undefined, isValue: boolean, isError: boolean,
@@ -65,20 +62,11 @@ const _write = (msg: string, logPad: string, queueId: string | undefined, isValu
 };
 
 
-const shouldSkip = (msg: string) =>
-{
-    let should = msg === null || msg === undefined || (logControl.lastWriteWasBlank && msg === "");
-    if (!should && isString(msg) && msg.length <= 4) { // skip double '!!! ' and "*** " writes
-        should = msg === lastWriteMsg;
-        lastWriteMsg = msg;
-    }
-    return should;
-};
-
-
 const write = (msg: string, level?: number, logPad = "", queueId?: string, isValue?: boolean, isError?: boolean) =>
 {
-    if (shouldSkip(msg)) { return; }
+    if (msg === null || msg === undefined || (logControl.lastWriteWasBlank && msg === "")) {
+        return;
+    }
 
     const timeTags = (new Date(Date.now() - logControl.tzOffset)).toISOString().slice(0, -1).split("T");
 
