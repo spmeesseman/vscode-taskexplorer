@@ -31,7 +31,7 @@ import { LicenseManager } from "./lib/licenseManager";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
 import { ExtensionContext, tasks, commands } from "vscode";
-import { IExternalProvider, IExplorerApi, ITaskExplorerApi } from "./interface";
+import { IExternalProvider, ITaskExplorer, ITaskExplorerApi } from "./interface";
 import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/fileWatcher";
 
@@ -62,7 +62,7 @@ export const teApi: ITaskExplorerApi =
     waitForIdle: waitForTaskExplorerIdle,
     testsApi: {
         fs,
-        explorer: {} as IExplorerApi, // registerExplorer() will set
+        explorer: {} as ITaskExplorer, // registerExplorer() will set
         fileCache: cache,
         storage,
         onWsFoldersChange

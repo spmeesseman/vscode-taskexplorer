@@ -7,7 +7,7 @@ import { ILicenseManager } from "../../interface/ILicenseManager";
 import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import { testControl } from "../control";
-import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, closeActiveDocument, overrideNextShowInfoBox, overrideNextShowInputBox,
 	sleep, executeTeCommand, focusExplorerView, getWsPath, setLicensed, suiteFinished
@@ -20,7 +20,7 @@ const licMgrMaxFreeTasksForTaskType = 100;  // Should be set to what the constan
 const licMgrMaxFreeTasksForScriptType = 50; // Should be set to what the constants are in lib/licenseManager
 
 let teApi: ITaskExplorerApi;
-let explorer: IExplorerApi;
+let explorer: ITaskExplorer;
 let licMgr: ILicenseManager;
 let tasks: Task[] = [];
 let setTasksCallCount = 0;

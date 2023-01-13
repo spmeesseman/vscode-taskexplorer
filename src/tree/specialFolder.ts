@@ -8,7 +8,7 @@ import { isString, removeFromArray } from "../lib/utils/utils";
 import { configuration } from "../lib/utils/configuration";
 import { storage } from "../lib/utils/storage";
 import { commands, ConfigurationChangeEvent, Disposable, ExtensionContext, InputBoxOptions, ThemeIcon, TreeItem, TreeItemCollapsibleState, window, workspace } from "vscode";
-import { IExplorerApi } from "../interface";
+import { ITaskExplorer } from "../interface";
 
 
 /**
@@ -19,7 +19,7 @@ import { IExplorerApi } from "../interface";
 export default class SpecialTaskFolder extends TaskFolder
 {
 
-    public explorer: IExplorerApi;
+    public explorer: ITaskExplorer;
     public disposables: Disposable[];
     private storeName: string;
     private isFavorites: boolean;
@@ -31,7 +31,7 @@ export default class SpecialTaskFolder extends TaskFolder
     private settingNameEnabled: string;
 
 
-    constructor(context: ExtensionContext, treeName: "taskExplorer"|"taskExplorerSideBar", treeProvider: IExplorerApi, label: string, state: TreeItemCollapsibleState)
+    constructor(context: ExtensionContext, treeName: "taskExplorer"|"taskExplorerSideBar", treeProvider: ITaskExplorer, label: string, state: TreeItemCollapsibleState)
     {
         super(label, state);
         this.subscriptionStartIndex = -1;

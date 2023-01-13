@@ -4,7 +4,7 @@ import * as util from "./utils/utils";
 import log from "./log/log";
 import TaskItem from "../tree/item";
 import SpecialTaskFolder from "../tree/specialFolder";
-import { IExplorerApi } from "../interface";
+import { ITaskExplorer } from "../interface";
 import { teApi } from "../extension";
 import {
     Disposable, ExtensionContext, WorkspaceFolder, tasks, TaskStartEvent,
@@ -15,7 +15,7 @@ import {
 export class TaskWatcher
 {
     private static statusBarSpace: StatusBarItem | undefined;
-    private tree: IExplorerApi;
+    private tree: ITaskExplorer;
     private disposables: Disposable[];
     private subscriptionStartIndex: number;
     private babysitterCt = 0;
@@ -23,7 +23,7 @@ export class TaskWatcher
     private specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder };
 
 
-    constructor(tree: IExplorerApi, specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder }, context: ExtensionContext)
+    constructor(tree: ITaskExplorer, specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder }, context: ExtensionContext)
     {
         this.tree = tree;
         this.specialFolders = specialFolders;

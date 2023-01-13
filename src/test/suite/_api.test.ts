@@ -4,11 +4,11 @@
 import * as assert from "assert";
 import { getInstallPath } from "../../lib/utils/utils";
 import { refreshTree } from "../../lib/refreshTree";
-import { IExplorerApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeSettingsUpdate, executeTeCommand, setExplorer, suiteFinished, testControl } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
-let explorer: IExplorerApi;
+let explorer: ITaskExplorer;
 
 
 suite("API and Initialization", () =>
@@ -79,7 +79,7 @@ suite("API and Initialization", () =>
     {
         this.slow(testControl.slowTime.configRegisterExplorerEvent + testControl.waitTime.configRegisterExplorerEvent);
         await executeSettingsUpdate("enableExplorerView", true, testControl.waitTime.configEnableEvent);
-        setExplorer(teApi.explorer as IExplorerApi);
+        setExplorer(teApi.explorer as ITaskExplorer);
         await teApi.waitForIdle(testControl.waitTime.configRegisterExplorerEvent);
     });
 

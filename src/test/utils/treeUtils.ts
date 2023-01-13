@@ -259,7 +259,7 @@ export const verifyTaskCountByTree = async(taskType: string, expectedCount: numb
 {
     const figures = utils.figures,
           tasksMap = (taskMap || (await walkTreeItems(undefined))),
-    // const tasksMap = (teApi.explorer as IExplorerApi).getTaskMap(),
+    // const tasksMap = (teApi.explorer as ITaskExplorer).getTaskMap(),
             taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
     assert(taskCount === expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 };

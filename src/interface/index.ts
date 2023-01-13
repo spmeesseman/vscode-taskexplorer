@@ -1,8 +1,8 @@
 
 export * from "./IExternalProvider";
 export * from "./ITaskDefinition";
-export * from "./taskExplorerApi";
-export * from "./explorer";
+export * from "./ITaskExplorerApi";
+export * from "./ITaskExplorer";
 export * from "./IFilesystemApi";
 export * from "./ILog";
 export * from "./ITestsApi";

@@ -7,7 +7,7 @@ import TaskItem from "../../tree/item";
 import SpecialTaskFolder from "../../tree/specialFolder";
 import { expect } from "chai";
 import { TaskExecution } from "vscode";
-import { IExplorerApi, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, figures, focusExplorerView,
     treeUtils, overrideNextShowInfoBox, overrideNextShowInputBox, testControl, waitForTaskExecution, sleep, suiteFinished
@@ -15,7 +15,7 @@ import {
 
 let lastTask: ITaskItem | null = null;
 let teApi: ITaskExplorerApi;
-let explorer: IExplorerApi;
+let explorer: ITaskExplorer;
 let ant: ITaskItem[];
 let bash: ITaskItem[];
 let batch: ITaskItem[];

@@ -13,7 +13,7 @@ import constants from "../../lib/constants";
 import { expect } from "chai";
 import { workspace, tasks } from "vscode";
 import { removeFromArray } from "../../lib/utils/utils";
-import { ITaskExplorerApi, IExplorerApi, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
     focusExplorerView, getWsPath, sleep, suiteFinished, testControl, treeUtils, verifyTaskCount
@@ -24,7 +24,7 @@ const tempFiles: string[] = [];
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let explorer: IExplorerApi;
+let explorer: ITaskExplorer;
 let rootPath: string;
 let dirName: string;
 let dirNameL2: string;

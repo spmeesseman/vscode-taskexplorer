@@ -12,7 +12,7 @@ import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
-import { IExplorerApi, ITaskExplorerApi, ITaskItem, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorer, ITaskExplorerApi, ITaskItem, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 
 export { figures };
 export { testControl };
@@ -20,7 +20,7 @@ export { treeUtils };
 export let teApi: ITaskExplorerApi;
 
 let activated = false;
-let teExplorer: IExplorerApi;
+let teExplorer: ITaskExplorer;
 let timeStarted: number;
 const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
@@ -460,7 +460,7 @@ export const overrideNextShowInfoBox = (value: any) =>
 };
 
 
-export const setExplorer = (explorer: IExplorerApi) =>
+export const setExplorer = (explorer: ITaskExplorer) =>
 {
     teExplorer = explorer;
 };

@@ -6,7 +6,7 @@ import { ITaskItem } from "./ITaskItem";
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type TaskMap = { [id: string]: ITaskItem | undefined };
 
-export interface IExplorerApi
+export interface ITaskExplorer
 {
     buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<ITaskFolder[] | TreeItem[]>;
     dispose(context: ExtensionContext): void;

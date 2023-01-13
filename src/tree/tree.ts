@@ -7,7 +7,6 @@ import SpecialTaskFolder from "./specialFolder";
 import TaskItem from "./item";
 import TaskFile from "./file";
 import TaskFolder from "./folder";
-import { storage } from "../lib/utils/storage";
 import { rebuildCache } from "../lib/cache";
 import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { configuration } from "../lib/utils/configuration";
@@ -17,7 +16,7 @@ import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import { getTerminal } from "../lib/getTerminal";
-import { IExplorerApi, TaskMap } from "../interface/explorer";
+import { ITaskExplorer, TaskMap } from "../interface/ITaskExplorer";
 import { enableConfigWatcher } from "../lib/configWatcher";
 import { TaskExplorerProvider } from "../providers/provider";
 import { pathExists } from "../lib/utils/fs";
@@ -55,7 +54,7 @@ import { IEvent } from "../interface/IEvent";
  *        refresh the tree ui, with the TreeItem that needs to be provided (or undefined/null if
  *        asking to provide the entire tree).
  */
-export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplorerApi
+export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskExplorer
 {
     private defaultGetChildrenLogLevel = 1;
     private defaultGetChildrenLogPad = "";

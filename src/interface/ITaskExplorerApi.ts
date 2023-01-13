@@ -1,7 +1,7 @@
 
 import { ILog } from "./ILog";
 import { ITestsApi } from "./ITestsApi";
-import { IExplorerApi } from "./explorer";
+import { ITaskExplorer } from "./ITaskExplorer";
 import { TreeItem, TreeView } from "vscode";
 import { IConfiguration } from "./IConfiguration";
 import { IExternalProvider } from "./IExternalProvider";
@@ -14,9 +14,9 @@ export interface ITaskExplorerApi
     config: IConfiguration;
     log: ILog;
     utilities: any;
-    explorer: IExplorerApi | undefined;
+    explorer: ITaskExplorer | undefined;
     explorerView: TreeView<TreeItem> | undefined;
-    sidebar: IExplorerApi | undefined;
+    sidebar: ITaskExplorer | undefined;
     sidebarView: TreeView<TreeItem> | undefined;
     providers: Map<string, ITaskExplorerProvider>;
     providersExternal: Map<string, IExternalProvider>;

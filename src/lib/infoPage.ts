@@ -4,7 +4,7 @@ import log from "./log/log";
 import { join } from "path";
 import { teApi } from "../extension";
 import { readFileAsync } from "./utils/fs";
-import { IExplorerApi } from "../interface";
+import { ITaskExplorer } from "../interface";
 import { Task, Uri, ViewColumn, WebviewPanel, window } from "vscode";
 import { getInstallPath, getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "./utils/utils";
 
@@ -51,7 +51,7 @@ const getInfoContent = (logPad: string, logLevel: number, uri?: Uri) =>
 {
     log.methodStart("get body content", logLevel, logPad);
 
-	const api = (teApi.explorer || /* istanbul ignore next */teApi.sidebar) as IExplorerApi;
+	const api = (teApi.explorer || /* istanbul ignore next */teApi.sidebar) as ITaskExplorer;
 	let project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 
 	let details = `<table style="margin-top:15px" width="97%" align="center">

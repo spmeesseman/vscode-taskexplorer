@@ -17,7 +17,7 @@
 
 import { join } from "path";
 import { activate, getTestsPath, sleep, suiteFinished, testControl, treeUtils } from "../utils/utils";
-import { IExplorerApi, IFilesystemApi, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorer, IFilesystemApi, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { Uri, WorkspaceFolder } from "vscode";
 
 

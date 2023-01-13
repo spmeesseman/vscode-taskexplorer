@@ -4,7 +4,7 @@
 
 import { sortFolders } from "../../lib/sortTasks";
 import TaskFolder from "../../tree/folder";
-import { IExplorerApi, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import constants from "../../lib/constants";
 import TaskItem from "../../tree/item";
 import {
@@ -14,7 +14,7 @@ import {
 import SpecialTaskFolder from "../../tree/specialFolder";
 
 let teApi: ITaskExplorerApi;
-let explorer: IExplorerApi;
+let explorer: ITaskExplorer;
 let ant: ITaskItem[];
 let bash: ITaskItem[];
 let batch: ITaskItem[];
