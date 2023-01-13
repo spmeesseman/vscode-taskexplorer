@@ -163,7 +163,7 @@ suite("Powershell Tests", () =>
     });
 
 
-    test("Delete Empty Folder", async function()
+    test("Delete Folder w/ File", async function()
     {
         expect(successCount).to.be.equal(10, "rolling success count failure");
         this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteFolderEvent);

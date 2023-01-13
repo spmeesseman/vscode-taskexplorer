@@ -544,8 +544,9 @@ export async function rebuildCache(logPad: string)
 export function removeFileFromCache(taskType: string, uri: Uri, logPad: string)
 {
     log.methodStart("remove file from cache", 2, logPad, false, [[ "task type", taskType ], [ "path", uri.fsPath ]]);
-    removeFromMappings(taskType, uri, false, logPad + "   ");
+    const numFilesRemoved = removeFromMappings(taskType, uri, false, logPad + "   ");
     log.methodDone("remove file from cache", 2, logPad);
+    return numFilesRemoved;
 }
 
 
