@@ -535,7 +535,7 @@ suite("Provider Tests", () =>
         await teApi.config.updateVsWs("terminal.integrated.shell.windows",
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
         await teApi.waitForIdle(testControl.waitTime.configEvent);
-        await teApi.testsApi.fileCache.buildTaskTypeCache("bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true);
+        await teApi.testsApi.fileCache.buildTaskTypeCache("bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true, "");
         await teApi.waitForIdle(testControl.waitTime.min);
         await executeSettingsUpdate("specialFolders.expanded.test-files", false, testControl.waitTime.configEvent);
     });
@@ -547,7 +547,7 @@ suite("Provider Tests", () =>
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        await teApi.testsApi.fileCache.buildTaskTypeCache("gulp",constants.GLOB_GULP, workspace.workspaceFolders[0], true);
+        await teApi.testsApi.fileCache.buildTaskTypeCache("gulp",constants.GLOB_GULP, workspace.workspaceFolders[0], true, "");
         await teApi.waitForIdle(testControl.waitTime.min);
     });
 
@@ -635,7 +635,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 100 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -645,7 +645,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 250 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(250);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -655,7 +655,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 500 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(500);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -665,7 +665,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 750 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(750);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -675,7 +675,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.rebuildFileCacheCancel + 1000 + testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(1000);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -684,7 +684,7 @@ suite("Provider Tests", () =>
     {
         this.slow(testControl.slowTime.buildFileCacheCancel + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("gulp", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -694,7 +694,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.buildFileCacheCancel + (testControl.waitTime.min * 2));
         teApi.testsApi.fileCache.buildTaskTypeCache("gulp", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await sleep(testControl.waitTime.min);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -704,7 +704,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.buildFileCacheCancel + 75 + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("python", constants.GLOB_PYTHON, undefined, true, ""); // Don't 'await'
         await sleep(75);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -714,7 +714,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.buildFileCacheCancel + 100 + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("batch", constants.GLOB_BATCH, undefined, true, ""); // Don't 'await'
         await sleep(100);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -724,7 +724,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.buildFileCacheCancel + 250 + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("bash", constants.GLOB_BASH, undefined, true, ""); // Don't 'await'
         await sleep(250);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -734,7 +734,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.buildFileCacheCancel + 500 + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("ant", constants.GLOB_ANT, undefined, true, ""); // Don't 'await'
         await sleep(500);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -744,7 +744,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.buildFileCacheCancel + 750 + 25);
         teApi.testsApi.fileCache.buildTaskTypeCache("npm", constants.GLOB_NPM, undefined, true, ""); // Don't 'await'
         await sleep(750);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 
@@ -754,7 +754,7 @@ suite("Provider Tests", () =>
         this.slow(testControl.slowTime.buildFileCacheCancel + 1000 + testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("grunt", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await sleep(1000);
-        await teApi.testsApi.fileCache.cancelBuildCache("");
+        await teApi.testsApi.fileCache.cancelBuildCache();
         await sleep(testControl.waitTime.min);
     });
 

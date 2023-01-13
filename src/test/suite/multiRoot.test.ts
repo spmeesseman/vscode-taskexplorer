@@ -88,10 +88,10 @@ suite("Multi-Root Workspace Tests", () =>
     });
 
 
-    test("Mimic Add WS Folder (Bad Call)", async function()
+    test("Mimic Add WS Folder (Cover Undefined Workspace)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
         this.slow(testControl.slowTime.command);
-        await teApi.testsApi.fileCache.addWsFolders();
+        await teApi.testsApi.fileCache.addWsFolders(undefined);
         await teApi.waitForIdle(testControl.waitTime.command);
     });
 
