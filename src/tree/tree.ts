@@ -721,10 +721,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     {
         this.getChildrenLogPad = logPad;
         this.getChildrenLogLevel = logLevel;
-
+        log.methodStart("fire tree refresh event", logLevel, logPad, false, [[ "node id", taskFile ? taskFile.id : "all" ]]);
         if (this.visible) // || (this.enabled && this.setEnableCalled === false)) {
         {
-            log.write("   fire 'tree data changed' main event", 2, logPad);
+            log.write("   fire 'tree data changed' main event", logLevel, logPad);
             this._onDidChangeTreeData.fire(taskFile);
         }
         else
@@ -738,9 +738,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
                     fn: this.fireTreeRefreshEvent,
                     args: [ taskFile ]
                 });
+                log.write("   view is not visible or not initialized yet, delay firing data change event", logLevel, logPad);
             }
-            log.write("   view is not visible or not initialized yet, delay firing data change event", 1, logPad);
+            else {
+                log.write("   an event of this type has already been queued, skip firing data change event", logLevel, logPad);
+            }
         }
+        log.methodDone("fire tree refresh event", logLevel, logPad);
     }
 
 
@@ -786,7 +790,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         if (this.setEnableCalled && !this.taskTree && !element) // && this.visible)
         {
             this.setEnableCalled = false;
-            setTimeout(() => this._onDidChangeTreeData.fire(), 10);
+            setTimeout(() => this.fireTreeRefreshEvent("", 1), 10);
             return [ new LoadScripts() ];
         }
 
@@ -1159,7 +1163,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
      *     "Workspace"
      * @param opt2 The uri of the file that contains/owns the task
      */
-    public async invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad?: string)
+    private async invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad?: string)
     {
         log.methodStart("invalidate tasks cache", 1, logPad, false, [
             [ "opt1", opt1 ], [ "opt2", opt2 && opt2 instanceof Uri ? opt2.fsPath : opt2 ]
