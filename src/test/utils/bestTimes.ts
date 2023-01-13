@@ -5,6 +5,8 @@ import { lowerCaseFirstChar, properCase } from "../../lib/utils/utils";
 import { testControl } from "../control";
 import { teApi } from "./utils";
 
+const timeSep = "-----------------------------------------------------------------------------------------------";
+
 
 const clearProcessTimeStorage = async (key: string, force?: boolean) =>
 {
@@ -68,22 +70,26 @@ const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: st
 };
 
 
-const timeSep = "--------------------------------------------------------------------------------";
-
-
 const processBestTime = async (logTitle: string, storageKey: string, timeElapsed: number, numTests: number) =>
 {
-    const msg = "------- " + (!logTitle || logTitle.includes("Logging") ? "All Tests " + logTitle : logTitle).toUpperCase() + ` ${timeSep}`;
-    console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.magenta)}`);
+    const title = !logTitle || logTitle.includes("Logging") ? "All Tests " + logTitle : logTitle,
+          msg = (figures.withColor("-- ", figures.colors.magenta) +
+                 figures.withColor(title.toUpperCase(), figures.colors.white) +
+                 figures.withColor(` ${timeSep.substring(0, timeSep.length - title.length - 4)}`, figures.colors.magenta));
+    console.log(`    ${figures.color.info} ${msg}`);
+
     await clearProcessTimeStorage(storageKey);
+
     const prevNumTests = await teApi.testsApi.storage.get2<number>(storageKey + "NumTests");
     if (prevNumTests !== numTests) {
         await clearProcessTimeStorage(storageKey, true);
     }
+
     let bestTimeElapsed = await teApi.testsApi.storage.get2<number>(storageKey, 0);
     if (bestTimeElapsed === 0) {
         bestTimeElapsed = timeElapsed + 1;
     }
+
     const timeElapsedFmt = getTimeElapsedFmt(timeElapsed);
     if (timeElapsed < bestTimeElapsed)
     {
@@ -92,7 +98,7 @@ const processBestTime = async (logTitle: string, storageKey: string, timeElapsed
     }
     else {
         const bestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
-              msg1 = `The time elapsed ${logTitle ? `for '${figures.withColor(logTitle.toLowerCase(), figures.colors.white)}' tests` : ""} was ${timeElapsedFmt}`,
+              msg1 = `The time elapsed was ${timeElapsedFmt}`,
               msg2 = `The fastest time recorded is ${bestTimeElapsedFmt}`;
         console.log(`    ${figures.color.info} ${figures.withColor(msg1, figures.colors.grey)}`);
         console.log(`    ${figures.color.info} ${figures.withColor(msg2, figures.colors.grey)}`);
@@ -170,6 +176,8 @@ export const processTimes = async (timeStarted: number) =>
         const skipMsg = `There were ${testControl.tests.numTestsFail} failed tests, best time processing skipped`;
         console.log(`    ${figures.color.info} ${figures.withColor(skipMsg, figures.colors.grey)}`);
     }
+
+    console.log(`    ${figures.color.info} ${figures.withColor(timeSep, figures.colors.magenta)}`);
 };
 
 
