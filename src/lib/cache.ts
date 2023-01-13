@@ -683,7 +683,7 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
 }
 
 
-export async function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
+export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
 {
     log.methodStart("remove workspace folder", 1, logPad);
     for (const f of wsf)

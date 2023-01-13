@@ -10,7 +10,7 @@ export interface IExplorerApi
 {
     buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<ITaskFolderApi[] | TreeItem[]>;
     dispose(context: ExtensionContext): void;
-    fireTreeRefreshEvent(taskFile?: TreeItem, logPad?: string, logLevel?: number): void;
+    fireTreeRefreshEvent(logPad: string, logLevel: number, taskFile?: TreeItem): void;
     getChildren(element?: TreeItem): Promise<TreeItem[]>;
     getName(): string;
     getTasks(): Task[];
@@ -18,8 +18,7 @@ export interface IExplorerApi
     getTaskTree(): ITaskFolderApi[] | TreeItem[] | undefined | null | void;
     isBusy (): boolean;
     isVisible(): boolean;
-    invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad?: string): Promise<void>;
-    refresh(invalidate?: any, opt?: Uri | boolean, logPad?: string): Promise<void>;
+    refresh(invalidate: string | boolean | undefined, opt: Uri | false | undefined, logPad: string): Promise<void>;
     setEnabled(enable: boolean): void;
     waitForRefreshComplete(maxWait?: number): Promise<void>;
 }

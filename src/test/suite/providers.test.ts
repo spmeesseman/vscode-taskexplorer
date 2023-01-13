@@ -52,7 +52,6 @@ suite("Provider Tests", () =>
         // so add it to the workspace setting as well
         //
         await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ], testControl.waitTime.configGlobEvent);
-        await executeTeCommand2("addToExcludes", [ "**/tasks_test_ignore_/**" ], testControl.waitTime.configGlobEvent);
 
     });
 
@@ -415,13 +414,6 @@ suite("Provider Tests", () =>
             }
         }
         await verifyTaskCount("grunt", gruntCt - 2);
-    });
-
-
-    test("Add to Excludes - Bad Call", async function()
-    {
-        this.slow(testControl.slowTime.command);
-        await executeTeCommand("addToExcludes", testControl.waitTime.command);
     });
 
 

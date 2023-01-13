@@ -708,7 +708,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
     }
 
 
-    fireTreeRefreshEvent(taskFile?: TreeItem, logPad = this.defaultGetChildrenLogPad, logLevel = this.defaultGetChildrenLogLevel)
+    fireTreeRefreshEvent(logPad: string, logLevel: number, taskFile?: TreeItem)
     {
         this.getChildrenLogPad = logPad;
         this.getChildrenLogLevel = logLevel;
@@ -1548,7 +1548,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         }
 
         log.write("   fire tree data change event", 2, logPad);
-        this.fireTreeRefreshEvent();
+        this.fireTreeRefreshEvent(logPad + "   ", 1);
         setTimeout(() => { this.refreshPending = false; }, 1);
 
         log.methodDone("refresh task tree", 1, logPad);
@@ -1606,7 +1606,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
 
         for (const each of taskTypesRmv)
         {
-            folder.removeTaskFile(each);
+            folder.removeTaskFile(each, logPad + "   ");
         }
 
         log.methodDone("remove grouped tasks", logLevel, logPad);
@@ -1870,7 +1870,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, IExplor
         else
         {
             window.showInformationMessage("Task not found!  Check log for details");
-            await this.specialFolders.lastTasks.removeTaskFile(lastTaskId);
+            await this.specialFolders.lastTasks.removeTaskFile(lastTaskId, "   ");
         }
 
         log.methodDone("run last task", 1);

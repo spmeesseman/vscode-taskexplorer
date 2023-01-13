@@ -2,69 +2,83 @@
 import figures from "../figures";
 import { logControl } from "./log";
 import { appendFileSync } from "fs";
-import { window } from "vscode"; // TODO - this is used as scope but could usesomething else
+import { window } from "vscode"; // TODO - this is used as scope but thought browser 'window' duh
+import { isString } from "../utils/utils";
 
+let lastWriteMsg: string | undefined;
 const colors = figures.colors;
+
+
+
+const _write = (msg: string, logPad: string, queueId: string | undefined, isValue: boolean, isError: boolean,
+                fn: (...fnArgs: any) => void, scope: any,  ts: string, isFile: boolean, ...args: any) =>
+{
+    const msgs = msg.split("\n").filter(m => !!m.trim());
+    let firstLineDone = false,
+        valuePad = "";
+    if (msgs.length > 1)
+    {
+        if (isValue)  {
+            for (let i = 0; i < logControl.logValueWhiteSpace + 2; i++) {
+                valuePad += " ";
+            }
+        }
+        else if (isError && /\[[0-9]{1,2}m/.test(msg))
+        {   // \[[0-9]{1,2}m[\W]{1}\[[0-9]{1,2}m/.test(msg)
+            for (let m = 1; m < msgs.length; m++) {
+                msgs[m] = (!logControl.isTests || !logControl.isTestsBlockScaryColors ? figures.color.error : figures.color.errorTests) + " " + msgs[m];
+            }
+        }
+    }
+    for (const m of msgs)
+    {
+        const _logPad = isValue && firstLineDone ? valuePad : logPad;
+        const _msg = ts + _logPad + m.trimEnd() + (isFile ? "\n" : "");
+        if (args && args.length > 0) {
+            if (!queueId) {
+                fn.call(scope || window, ...args, _msg);
+            }
+            else {
+                if (!logControl.msgQueue[queueId]) logControl.msgQueue[queueId] = [];
+                logControl.msgQueue[queueId].push({
+                    fn,
+                    scope: scope || window,
+                    args: [ ...args, _msg ]
+                });
+            }
+        }
+        else {
+            if (!queueId) {
+                fn.call(scope || /* istanbul ignore next */window, _msg);
+            }
+            else {
+                if (!logControl.msgQueue[queueId]) logControl.msgQueue[queueId] = [];
+                logControl.msgQueue[queueId].push({
+                    fn,
+                    scope: scope || /* istanbul ignore next */window,
+                    args: [ _msg ]
+                });
+            }
+        }
+        firstLineDone = true;
+    }
+};
+
+
+const shouldSkip = (msg: string) =>
+{
+    let should = msg === null || msg === undefined || (logControl.lastWriteWasBlank && msg === "");
+    if (!should && isString(msg) && msg.length <= 4) { // skip double '!!! ' and "*** " writes
+        should = msg === lastWriteMsg;
+        lastWriteMsg = msg;
+    }
+    return should;
+};
 
 
 const write = (msg: string, level?: number, logPad = "", queueId?: string, isValue?: boolean, isError?: boolean) =>
 {
-    if (msg === null || msg === undefined || (logControl.lastWriteWasBlank && msg === "")) {
-        return;
-    }
-
-    const _write = (fn: (...fnArgs: any) => void, scope: any,  ts: string, isFile: boolean, ...args: any) =>
-    {
-        const msgs = msg.split("\n").filter(m => !!m.trim());
-        let firstLineDone = false,
-            valuePad = "";
-        if (msgs.length > 1)
-        {
-            if (isValue)  {
-                for (let i = 0; i < logControl.logValueWhiteSpace + 2; i++) {
-                    valuePad += " ";
-                }
-            }
-            else if (isError && /\[[0-9]{1,2}m/.test(msg))
-            {   // \[[0-9]{1,2}m[\W]{1}\[[0-9]{1,2}m/.test(msg)
-                for (let m = 1; m < msgs.length; m++) {
-                    msgs[m] = (!logControl.isTests || !logControl.isTestsBlockScaryColors ? figures.color.error : figures.color.errorTests) + " " + msgs[m];
-                }
-            }
-        }
-        for (const m of msgs)
-        {
-            const _logPad = isValue && firstLineDone ? valuePad : logPad;
-            const _msg = ts + _logPad + m.trimEnd() + (isFile ? "\n" : "");
-            if (args && args.length > 0) {
-                if (!queueId) {
-                    fn.call(scope || window, ...args, _msg);
-                }
-                else {
-                    if (!logControl.msgQueue[queueId]) logControl.msgQueue[queueId] = [];
-                    logControl.msgQueue[queueId].push({
-                        fn,
-                        scope: scope || window,
-                        args: [ ...args, _msg ]
-                    });
-                }
-            }
-            else {
-                if (!queueId) {
-                    fn.call(scope || /* istanbul ignore next */window, _msg);
-                }
-                else {
-                    if (!logControl.msgQueue[queueId]) logControl.msgQueue[queueId] = [];
-                    logControl.msgQueue[queueId].push({
-                        fn,
-                        scope: scope || /* istanbul ignore next */window,
-                        args: [ _msg ]
-                    });
-                }
-            }
-            firstLineDone = true;
-        }
-    };
+    if (shouldSkip(msg)) { return; }
 
     const timeTags = (new Date(Date.now() - logControl.tzOffset)).toISOString().slice(0, -1).split("T");
 
@@ -73,7 +87,7 @@ const write = (msg: string, level?: number, logPad = "", queueId?: string, isVal
         if (!level || level <= logControl.logLevel)
         {
             const ts = timeTags.join(" ") + " ";
-            _write(logControl.logOutputChannel.appendLine, logControl.logOutputChannel, ts, false);
+            _write(msg, logPad, queueId, !!isValue, !!isError, logControl.logOutputChannel.appendLine, logControl.logOutputChannel, ts, false);
         }
     }
     if (logControl.writeToConsole)
@@ -82,7 +96,7 @@ const write = (msg: string, level?: number, logPad = "", queueId?: string, isVal
         {
             const ts = !logControl.isTests ? /* istanbul ignore next */timeTags[1] + " " + figures.pointer + " " : "    ";
             msg = figures.withColor(msg, colors.grey);
-            _write(console.log, console, ts, false);
+            _write(msg, logPad, queueId, !!isValue, !!isError, console.log, console, ts, false);
             logControl.lastWriteToConsoleWasBlank = false;
         }
     }
@@ -97,7 +111,7 @@ const write = (msg: string, level?: number, logPad = "", queueId?: string, isVal
             else {
                 ts = timeTags[1]  + " ";
             }
-            _write(appendFileSync, null, ts, true, logControl.fileName);
+            _write(msg, logPad, queueId, !!isValue, !!isError, appendFileSync, null, ts, true, logControl.fileName);
         }
     }
 

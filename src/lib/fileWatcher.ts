@@ -161,10 +161,14 @@ const _procDirCreateEvent = async(uri: Uri, logPad = "") =>
 const _procWsDirCreateEvent = async(e: WorkspaceFoldersChangeEvent) =>
 {
     try
-    {   await cache.addWsFolders(e.added);
+    {   log.methodStart("workspace project folder 'create' event", 1, "", true, [
+            [ "# added", e.added.length ], [ "# removed", e.removed.length ]
+        ]);
+        await cache.addWsFolders(e.added);
         cache.removeWsFolders(e.removed);
         createDirWatcher(extContext);
-        await refreshTree(teApi);
+        await refreshTree(teApi, undefined, undefined, "   ");
+        log.methodDone("directory 'delete' delete", 1, "");
     }
     catch (e) {}
     finally { processQueue(); }
