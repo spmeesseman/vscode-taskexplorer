@@ -73,7 +73,7 @@ suite("Composer Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        const provider = teApi.providers.get(testsName) as ComposerTaskProvider;
+        const provider = teApi.providers[testsName] as ComposerTaskProvider;
         // provider.readTasks();
         assert (provider.getDocumentPosition(undefined, undefined) === 0);
         assert (provider.getDocumentPosition("test", undefined) === 0);

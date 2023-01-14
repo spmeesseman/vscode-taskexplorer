@@ -58,7 +58,7 @@ suite("External Provider Tests", () =>
 
     test("Access external task provider", async function()
     {
-        const provider = teApi.providersExternal.get("external") as ExternalTaskProvider;
+        const provider = teApi.providersExternal.external as ExternalTaskProvider;
         assert(provider);
         const task = provider.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
         provider.getDocumentPosition("test_1_task_name", "test_1_task_name");

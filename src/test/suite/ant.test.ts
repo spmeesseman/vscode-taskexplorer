@@ -37,7 +37,7 @@ suite("Ant Tests", () =>
     {
         teApi = await activate(this);
         fsApi = teApi.testsApi.fs;
-        provider = teApi.providers.get(testsName) as AntTaskProvider;
+        provider = teApi.providers[testsName] as AntTaskProvider;
         rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         buildXmlFile = getWsPath("build.xml");
         buildXmlFileUri = Uri.file(buildXmlFile);

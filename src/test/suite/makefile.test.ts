@@ -24,7 +24,7 @@ suite("Makefile Tests", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        provider = teApi.providers.get("make") as MakeTaskProvider;
+        provider = teApi.providers.make as MakeTaskProvider;
         ++successCount;
     });
 

@@ -60,7 +60,7 @@ suite("Powershell Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(0, successCount)) return;
-        const provider = teApi.providers.get(testsName) as PowershellTaskProvider;
+        const provider = teApi.providers[testsName] as PowershellTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
         ++successCount;
     });
@@ -69,7 +69,7 @@ suite("Powershell Tests", () =>
     test("Invalid ScriptProvider Type", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        const provider = teApi.providers.get(testsName) as PowershellTaskProvider;
+        const provider = teApi.providers[testsName] as PowershellTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.ps1"))),
                "ScriptProvider type should return position 1");
         logErrorsAreFine();

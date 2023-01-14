@@ -68,7 +68,7 @@ suite("Bash Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        const provider = teApi.providers.get(testsName) as BashTaskProvider;
+        const provider = teApi.providers[testsName] as BashTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
         successCount++;
     });
@@ -77,7 +77,7 @@ suite("Bash Tests", () =>
     test("Invalid ScriptProvider Type", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        const provider = teApi.providers.get(testsName) as BashTaskProvider;
+        const provider = teApi.providers[testsName] as BashTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("hello.sh"))),
                "ScriptProvider type should return position 1");
         logErrorsAreFine(true);

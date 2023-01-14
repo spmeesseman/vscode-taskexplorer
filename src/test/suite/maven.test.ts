@@ -93,7 +93,7 @@ suite("Maven Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        const provider = teApi.providers.get(testsName) as MavenTaskProvider;
+        const provider = teApi.providers[testsName] as MavenTaskProvider;
         // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);

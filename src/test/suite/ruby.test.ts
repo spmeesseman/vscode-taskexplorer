@@ -28,7 +28,7 @@ suite("Ruby Tests", () =>
     {
         teApi = await activate(this);
         fsApi = teApi.testsApi.fs;
-        provider = teApi.providers.get(testsName) as RubyTaskProvider;
+        provider = teApi.providers[testsName] as RubyTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "newscript.pl"));
         ++successCount;

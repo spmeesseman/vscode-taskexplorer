@@ -30,7 +30,7 @@ suite("Grunt Tests", () =>
     {
         teApi = await activate(this);
         fsApi = teApi.testsApi.fs;
-        provider = teApi.providers.get(testsName) as GruntTaskProvider;
+        provider = teApi.providers[testsName] as GruntTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "gruntfile.js"));
         // await executeSettingsUpdate("groupMaxLevel", 5); // this is just a random spot to bump the grouping level

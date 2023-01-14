@@ -81,7 +81,7 @@ suite("App-Publisher Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        const provider = teApi.providers.get(testsName) as AppPublisherTaskProvider;
+        const provider = teApi.providers[testsName] as AppPublisherTaskProvider;
         // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);

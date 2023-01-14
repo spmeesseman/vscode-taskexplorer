@@ -396,7 +396,7 @@ suite("Provider Tests", () =>
     test("Resolve Task", async function()
     {
         if (exitRollingCount(26, successCount)) return;
-        const provider = teApi.providers.get("batch");
+        const provider = teApi.providers.batch;
         assert(provider);
         provider.resolveTask(batch[0].task);
         ++successCount;

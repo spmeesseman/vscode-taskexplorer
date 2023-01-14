@@ -28,7 +28,7 @@ suite("Perl Tests", () =>
     {
         teApi = await activate(this);
         fsApi = teApi.testsApi.fs;
-        provider = teApi.providers.get(testsName) as PerlTaskProvider;
+        provider = teApi.providers[testsName] as PerlTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "newscript.pl"));
         ++successCount;
