@@ -6,7 +6,6 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import * as path from "path";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import constants from "../../lib/constants";
@@ -16,8 +15,10 @@ import { removeFromArray } from "../../lib/utils/utils";
 import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2,
+    exitRollingCount,
     focusExplorerView, getWsPath, sleep, suiteFinished, testControl, treeUtils, verifyTaskCount
 } from "../utils/utils";
+import { join } from "path";
 
 
 const tempFiles: string[] = [];
@@ -31,6 +32,7 @@ let dirNameL2: string;
 let dirNameIgn: string;
 let batch: TaskItem[];
 let taskMap: TaskMap;
+let successCount = -1;
 
 
 suite("Provider Tests", () =>
@@ -43,15 +45,16 @@ suite("Provider Tests", () =>
         fsApi = teApi.testsApi.fs;
 
         rootPath = getWsPath(".");
-        dirName = path.join(rootPath, "tasks_test_");
-        dirNameL2 = path.join(dirName, "subfolder");
-        dirNameIgn = path.join(rootPath, "tasks_test_ignore_");
+        dirName = join(rootPath, "tasks_test_");
+        dirNameL2 = join(dirName, "subfolder");
+        dirNameIgn = join(rootPath, "tasks_test_ignore_");
         //
         // Add some excludes, use both config update and task explorer addExclude command
         // for full coverage.  The 'addExclude' command will add the setting globally though,
         // so add it to the workspace setting as well
         //
         await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ], testControl.waitTime.configGlobEvent);
+        ++successCount;
 
     });
 
@@ -70,6 +73,7 @@ suite("Provider Tests", () =>
 
     test("Create Empty Directories", async function()
     {
+        if (exitRollingCount(0, successCount)) return;
         this.slow(testControl.slowTime.fsCreateFolderEvent * 4);
          //
         // Create the temporary project dirs
@@ -83,142 +87,182 @@ suite("Provider Tests", () =>
         if (!await fsApi.pathExists(dirNameIgn)) {
             await fsApi.createDir(dirNameIgn);
         }
+        ++successCount;
     });
 
 
     test("Build Tree (View Collapsed)", async function()
     {
+        if (exitRollingCount(1, successCount)) return;
         await treeUtils.refresh(this);
+        ++successCount;
     });
 
 
     test("Check Existing Bash Task Counts", async function()
     {
+        if (exitRollingCount(2, successCount)) return;
         this.slow(testControl.slowTime.command);
         batch = await treeUtils.getTreeTasks("bash", 1) as TaskItem[];
+        ++successCount;
     });
 
 
     test("Check Existing Batch Task Counts", async function()
     {
+        if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.command);
         batch = await treeUtils.getTreeTasks("batch", 2) as TaskItem[];
+        ++successCount;
     });
 
 
     test("Create Temporary Task Files - App Publisher", async function()
     {
+        if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent);
         await setupAppPublisher();
+        ++successCount;
     });
 
 
     test("Create Temporary Task Files - Ant", async function()
     {
+        if (exitRollingCount(5, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent * 5);
         await setupAnt();
+        ++successCount;
     });
 
 
     test("Create Temporary Task Files - Bash", async function()
     {
+        if (exitRollingCount(6, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent);
         await setupBash();
+        ++successCount;
     });
 
 
     test("Create Temporary Task Files - Batch", async function()
     {
+        if (exitRollingCount(7, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent * 3);
         await setupBatch();
+        ++successCount;
     });
 
 
     test("Create Temporary Task Files - Gradle", async function()
     {
+        if (exitRollingCount(8, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent * 3);
         await setupGradle();
+        ++successCount;
     });
 
 
     test("Create Temporary Task Files - Grunt", async function()
     {
+        if (exitRollingCount(9, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent * 4);
         await setupGrunt();
+        ++successCount;
     });
 
 
     test("Create Temporary Task Files - Gulp", async function()
     {
+        if (exitRollingCount(10, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent * 5);
         await setupGulp();
+        ++successCount;
     });
 
 
     test("Create Temporary Task Files - Makefile", async function()
     {
+        if (exitRollingCount(11, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent * 3);
         await setupMakefile();
+        ++successCount;
     });
 
 
     test("Create Temporary Task Files - Maven", async function()
     {
+        if (exitRollingCount(12, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent);
         await setupMaven();
+        ++successCount;
     });
 
 
     test("Create Temporary Task Files - Typescript", async function()
     {
+        if (exitRollingCount(13, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent * 2);
         await setupTsc();
+        ++successCount;
     });
 
 
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
+        if (exitRollingCount(14, successCount)) return;
         await focusExplorerView(this);
+        ++successCount;
 	});
 
 
     test("Enable App-Publisher Tasks (Off by Default)", async function()
     {
+        if (exitRollingCount(15, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks.apppublisher", true);
+        ++successCount;
     });
 
 
     test("Enable Gradle Tasks (Off by Default)", async function()
     {
+        if (exitRollingCount(16, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks.gradle", true);
+        ++successCount;
     });
 
 
     test("Enable Pipenv Tasks (Off by Default)", async function()
     {
+        if (exitRollingCount(17, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks.pipenv", true);
+        ++successCount;
     });
 
 
     test("Enable Maven Tasks (Off by Default)", async function()
     {
+        if (exitRollingCount(18, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks.maven", true);
+        ++successCount;
     });
 
 
     test("Enable Python Tasks (Turned Off in Configuration Suite)", async function()
     {
+        if (exitRollingCount(19, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks.python", true);
+        ++successCount;
     });
 
 
     test("Build Tree", async function()
     {
+        if (exitRollingCount(20, successCount)) return;
         await treeUtils.refresh(this);
         //
         // Check VSCode provided task types for the hell of it
@@ -228,11 +272,13 @@ suite("Provider Tests", () =>
         nTasks = await tasks.fetchTasks({ type: "gulp" });
         assert(nTasks.length > 0, "No gulp tasks registered");
         batch = await treeUtils.getTreeTasks("batch", 4) as TaskItem[];
+        ++successCount;
     });
 
 
     test("Build Tree Variations  - Last Tasks Collapsed", async function()
     {
+        if (exitRollingCount(21, successCount)) return;
         this.slow((testControl.slowTime.buildTreeNoTasks * 2) + (testControl.slowTime.configEventFast * 4) + (testControl.slowTime.configEventFast * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
@@ -251,11 +297,13 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
         }
+        ++successCount;
     });
 
 
     test("Build Tree Variations - Favorites Collapsed", async function()
     {
+        if (exitRollingCount(22, successCount)) return;
         this.slow((testControl.slowTime.buildTreeNoTasks * 2) + (testControl.slowTime.configEventFast * 6) + (testControl.slowTime.configEventFast * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
@@ -274,11 +322,13 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
         }
+        ++successCount;
     });
 
 
     test("Build Tree Variations - Favorites Disabled", async function()
     {
+        if (exitRollingCount(23, successCount)) return;
         this.slow((testControl.slowTime.buildTreeNoTasks * 2) + (testControl.slowTime.configEvent * 8) + (testControl.slowTime.configEventFast * 4));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
@@ -299,11 +349,13 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
         }
+        ++successCount;
     });
 
 
     test("Build Tree Variations - Last Tasks Disabled", async function()
     {
+        if (exitRollingCount(24, successCount)) return;
         this.slow((testControl.slowTime.buildTreeNoTasks * 2) + (testControl.slowTime.configEvent * 6) + (testControl.slowTime.configEventFast * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
@@ -322,11 +374,14 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
         }
+        ++successCount;
     });
 
 
     test("Open Tasks for Edit", async function()
-    {   //
+    {
+        if (exitRollingCount(25, successCount)) return;
+        //
         // The 3rd param `true` will open the task files and locate task positions while parsing the tree
         //
         this.slow(testControl.slowTime.walkTaskTreeWithDocOpen + testControl.waitTime.min);
@@ -334,19 +389,23 @@ suite("Provider Tests", () =>
         taskMap = await treeUtils.walkTreeItems(undefined, true);
         await teApi.waitForIdle(testControl.waitTime.min);
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10);
+        ++successCount;
     });
 
 
     test("Resolve Task", async function()
     {
+        if (exitRollingCount(26, successCount)) return;
         const provider = teApi.providers.get("batch");
         assert(provider);
         provider.resolveTask(batch[0].task);
+        ++successCount;
     });
 
 
     test("Add to Excludes - TaskItem", async function()
     {
+        if (exitRollingCount(27, successCount)) return;
         this.slow(testControl.slowTime.fetchTasksCommand + testControl.slowTime.verifyTaskCount + testControl.slowTime.configGlobEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
@@ -366,11 +425,13 @@ suite("Provider Tests", () =>
             }
         }
         await verifyTaskCount("grunt", gruntCt - 1);
+        ++successCount;
     });
 
 
     test("Add to Excludes - TaskItem (Script Type)", async function()
     {
+        if (exitRollingCount(28, successCount)) return;
         this.slow(testControl.slowTime.fetchTasksCommand + testControl.slowTime.verifyTaskCount + testControl.slowTime.configGlobEvent);
         const taskItems = await tasks.fetchTasks({ type: "batch" }),
               scriptCt = taskItems.length;
@@ -393,11 +454,13 @@ suite("Provider Tests", () =>
             }
         }
         await verifyTaskCount("batch", scriptCt - 1);
+        ++successCount;
     });
 
 
     test("Add to Excludes - TaskFile", async function()
     {
+        if (exitRollingCount(29, successCount)) return;
         this.slow(testControl.slowTime.fetchTasksCommand + testControl.slowTime.verifyTaskCount + testControl.slowTime.configGlobEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
@@ -414,120 +477,142 @@ suite("Provider Tests", () =>
             }
         }
         await verifyTaskCount("grunt", gruntCt - 2);
+        ++successCount;
     });
 
 
     test("App Publisher Delete / Add", async function()
     {
+        if (exitRollingCount(30, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.waitTime.fsDeleteEvent);
-        const file = path.join(rootPath, ".publishrc.json");
+        const file = join(rootPath, ".publishrc.json");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount("apppublisher", 21);
         await createAppPublisherFile();
         await verifyTaskCount("apppublisher", 42);
+        ++successCount;
     });
 
 
     test("Ant Delete / Add", async function()
     {
+        if (exitRollingCount(31, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
-        const file = path.join(dirName, "build.xml");
+        const file = join(dirName, "build.xml");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createAntFile();
+        ++successCount;
     });
 
 
     test("Gradle Delete / Add", async function()
     {
+        if (exitRollingCount(32, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
-        const file = path.join(dirName, "build.gradle");
+        const file = join(dirName, "build.gradle");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createGradleFile();
+        ++successCount;
     });
 
 
     test("Grunt Delete / Add", async function()
     {
+        if (exitRollingCount(33, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
-        const file = path.join(rootPath, "GRUNTFILE.js");
+        const file = join(rootPath, "GRUNTFILE.js");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createGruntFile();
+        ++successCount;
     });
 
 
     test("Gulp Delete / Add", async function()
     {
+        if (exitRollingCount(34, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
-        const file = path.join(rootPath, "gulpfile.js");
+        const file = join(rootPath, "gulpfile.js");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createGulpFile();
+        ++successCount;
     });
 
 
     test("Makefile Delete / Add", async function()
     {
+        if (exitRollingCount(35, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.slowTime.configEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent,);
-        const file = path.join(rootPath, "Makefile");
+        const file = join(rootPath, "Makefile");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createMakeFile();
         await teApi.config.updateWs("logging.enable", true); // hit tree.logTask()
+        ++successCount;
     });
 
 
     test("Maven Delete / Add", async function()
     {
+        if (exitRollingCount(36, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
-        const file = path.join(rootPath, "pom.xml");
+        const file = join(rootPath, "pom.xml");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createMavenPomFile();
+        ++successCount;
     });
 
 
     test("Batch Delete / Add", async function()
     {
+        if (exitRollingCount(37, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsCreateEvent + testControl.waitTime.fsDeleteEvent);
-        const file = path.join(rootPath, "test.bat");
+        const file = join(rootPath, "test.bat");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent, 1500);
         await createBatchFile();
+        ++successCount;
     });
 
 
     test("Disable Pipenv (Off by Default)", async function()
     {
+        if (exitRollingCount(38, successCount)) return;
         this.slow(testControl.slowTime.configDisableEvent + testControl.waitTime.min);
         await executeSettingsUpdate("enabledTasks.pipenv", false);
         await teApi.waitForIdle(testControl.waitTime.min);
+        ++successCount;
     });
 
 
     test("Run Refresh Task", async function()
     {
+        if (exitRollingCount(39, successCount)) return;
         this.slow(testControl.slowTime.refreshCommand + (testControl.slowTime.configEvent * 2) + testControl.waitTime.min + testControl.waitTime.refreshCommand);
         await executeSettingsUpdate("specialFolders.expanded.test-files", true);
         await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
         await teApi.waitForIdle(testControl.waitTime.min);
+        ++successCount;
     });
 
 
     test("Invalidate Bash Tasks With New Bash Shell Setting", async function()
     {
+        if (exitRollingCount(40, successCount)) return;
         this.slow(testControl.slowTime.buildFileCache + (testControl.slowTime.configEvent * 2) + testControl.waitTime.min + (testControl.waitTime.configEvent * 2));
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
@@ -538,22 +623,26 @@ suite("Provider Tests", () =>
         await teApi.testsApi.fileCache.buildTaskTypeCache("bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true, "");
         await teApi.waitForIdle(testControl.waitTime.min);
         await executeSettingsUpdate("specialFolders.expanded.test-files", false, testControl.waitTime.configEvent);
+        ++successCount;
     });
 
 
     test("Rebuild Gulp FileCache on Single Workspace Folder", async function()
     {
+        if (exitRollingCount(41, successCount)) return;
         this.slow(testControl.slowTime.buildFileCache + testControl.waitTime.min);
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         await teApi.testsApi.fileCache.buildTaskTypeCache("gulp",constants.GLOB_GULP, workspace.workspaceFolders[0], true, "");
         await teApi.waitForIdle(testControl.waitTime.min);
+        ++successCount;
     });
 
 
     test("Groups with Separator", async function()
     {
+        if (exitRollingCount(42, successCount)) return;
         this.slow((testControl.slowTime.configGroupingEvent * 3) + (testControl.waitTime.min * 3));
         await executeSettingsUpdate("groupWithSeparator", true);
         await teApi.waitForIdle(testControl.waitTime.min);
@@ -561,11 +650,13 @@ suite("Provider Tests", () =>
         await teApi.waitForIdle(testControl.waitTime.min);
         await executeSettingsUpdate("groupMaxLevel", 5);
         await teApi.waitForIdle(testControl.waitTime.min);
+        ++successCount;
     });
 
 
     test("Add to Excludes After Grouping", async function()
     {
+        if (exitRollingCount(43, successCount)) return;
         this.slow(testControl.slowTime.configExcludesEvent + testControl.slowTime.configGlobEvent + (testControl.slowTime.fetchTasksCommand * 2) + testControl.waitTime.min);
         const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItemsB4.length;
@@ -591,11 +682,13 @@ suite("Provider Tests", () =>
                         (gruntCt - 2).toString() + ")");
         }
         await teApi.waitForIdle(testControl.waitTime.min);
+        ++successCount;
     });
 
 
     test("Remove Temporary Directories", async function()
     {
+        if (exitRollingCount(44, successCount)) return;
         this.slow((testControl.slowTime.fsDeleteFolderEvent * 3) + (testControl.slowTime.fsDeleteEvent * (tempFiles.length)) + 4000);
         if (tempFiles.length)
         {
@@ -620,6 +713,7 @@ suite("Provider Tests", () =>
         }
         await teApi.waitForIdle(3000);
         await teApi.waitForIdle(1000);
+        ++successCount;
     });
 
 });
@@ -699,10 +793,10 @@ async function setupAnt()
 
     await createAntFile();
 
-    const file2 = path.join(dirName, "test.xml");
-    const file3 = path.join(dirName, "emptytarget.xml");
-    const file4 = path.join(dirName, "emptyproject.xml");
-    const file5 = path.join(dirNameIgn, "build.xml");
+    const file2 = join(dirName, "test.xml");
+    const file3 = join(dirName, "emptytarget.xml");
+    const file4 = join(dirName, "emptyproject.xml");
+    const file5 = join(dirNameIgn, "build.xml");
 
     tempFiles.push(file2);
     tempFiles.push(file3);
@@ -751,8 +845,8 @@ async function setupGradle()
 
     await createGradleFile();
 
-    const file2 = path.join(dirName, "TEST.GRADLE");
-    const file3 = path.join(dirNameIgn, "build.gradle");
+    const file2 = join(dirName, "TEST.GRADLE");
+    const file3 = join(dirNameIgn, "build.gradle");
 
     tempFiles.push(file2);
     tempFiles.push(file3);
@@ -795,9 +889,9 @@ async function setupTsc()
         assert.fail("        ✘ Workspace folder does not exist");
     }
 
-    const file = path.join(rootPath, "tsconfig.json");
+    const file = join(rootPath, "tsconfig.json");
     tempFiles.push(file);
-    const file2 = path.join(dirName, "tsconfig.json");
+    const file2 = join(dirName, "tsconfig.json");
     tempFiles.push(file2);
 
     await fsApi.writeFile(
@@ -852,16 +946,16 @@ async function setupGulp()
 
     await createGulpFile();
 
-    const file2 = path.join(dirName, "Gulpfile.js");
+    const file2 = join(dirName, "Gulpfile.js");
     tempFiles.push(file2);
 
-    const file3 = path.join(dirNameIgn, "gulpfile.js");
+    const file3 = join(dirNameIgn, "gulpfile.js");
     tempFiles.push(file3);
 
-    const file4 = path.join(dirName, "GULPFILE.MJS");
+    const file4 = join(dirName, "GULPFILE.MJS");
     tempFiles.push(file4);
 
-    const file5 = path.join(dirNameL2, "GULPFILE.js");
+    const file5 = join(dirNameL2, "GULPFILE.js");
     tempFiles.push(file5);
 
 
@@ -956,10 +1050,10 @@ async function setupMakefile()
 
     await createMakeFile();
 
-    const file2 = path.join(dirName, "Makefile");
+    const file2 = join(dirName, "Makefile");
     tempFiles.push(file2);
 
-    const file3 = path.join(dirNameIgn, "Makefile");
+    const file3 = join(dirNameIgn, "Makefile");
     tempFiles.push(file3);
 
     await fsApi.writeFile(
@@ -985,10 +1079,10 @@ async function setupBatch()
 
     await createBatchFile();
 
-    const file2 = path.join(dirName, "test2.BAT");
+    const file2 = join(dirName, "test2.BAT");
     tempFiles.push(file2);
 
-    const file3 = path.join(dirNameIgn, "test3.bat");
+    const file3 = join(dirNameIgn, "test3.bat");
     tempFiles.push(file3);
 
     await fsApi.writeFile(file2, "@echo testing batch file 2\r\nsleep /t 5\r\n");
@@ -1003,13 +1097,13 @@ async function setupBash()
         assert.fail("        ✘ Workspace folder does not exist");
     }
 
-    const file = path.join(rootPath, "test.sh");
+    const file = join(rootPath, "test.sh");
     tempFiles.push(file);
 
-    const file2 = path.join(dirName, "test2.SH");
+    const file2 = join(dirName, "test2.SH");
     tempFiles.push(file2);
 
-    const file3 = path.join(dirNameIgn, "test3.sh");
+    const file3 = join(dirNameIgn, "test3.sh");
     tempFiles.push(file3);
 
     await fsApi.writeFile(file, "echo testing bash file\n");
@@ -1028,13 +1122,13 @@ async function setupGrunt()
 
     await createGruntFile();
 
-    const file2 = path.join(dirName, "Gruntfile.js");
+    const file2 = join(dirName, "Gruntfile.js");
     tempFiles.push(file2);
 
-    const file3 = path.join(dirNameIgn, "Gruntfile.js");
+    const file3 = join(dirNameIgn, "Gruntfile.js");
     tempFiles.push(file3);
 
-    const file4 = path.join(dirNameL2, "GRUNTFILE.JS");
+    const file4 = join(dirNameL2, "GRUNTFILE.JS");
     tempFiles.push(file4);
 
     await fsApi.writeFile(
@@ -1087,7 +1181,7 @@ async function createAntFile()
 {
     if (dirName)
     {
-        const file = path.join(dirName, "build.xml");
+        const file = join(dirName, "build.xml");
         tempFiles.push(file);
 
         if (!await fsApi.pathExists(file))
@@ -1112,7 +1206,7 @@ async function createAppPublisherFile()
 {
     if (rootPath)
     {
-        const file = path.join(rootPath, ".publishrc.json");
+        const file = join(rootPath, ".publishrc.json");
         tempFiles.push(file);
 
         if (!await fsApi.pathExists(file))
@@ -1139,7 +1233,7 @@ async function createMavenPomFile()
 {
     if (rootPath)
     {
-        const file = path.join(rootPath, "pom.xml");
+        const file = join(rootPath, "pom.xml");
         tempFiles.push(file);
 
         if (!await fsApi.pathExists(file))
@@ -1160,7 +1254,7 @@ async function createBatchFile()
 {
     if (rootPath)
     {
-        const file = path.join(rootPath, "test.bat");
+        const file = join(rootPath, "test.bat");
         tempFiles.push(file);
         if (!await fsApi.pathExists(file))
         {
@@ -1175,7 +1269,7 @@ async function createGradleFile()
 {
     if (dirName)
     {
-        const file = path.join(dirName, "build.gradle");
+        const file = join(dirName, "build.gradle");
         tempFiles.push(file);
 
         if (!await fsApi.pathExists(file))
@@ -1203,7 +1297,7 @@ async function createGruntFile()
 {
     if (rootPath)
     {
-        const file = path.join(rootPath, "GRUNTFILE.js");
+        const file = join(rootPath, "GRUNTFILE.js");
         tempFiles.push(file);
 
         if (!await fsApi.pathExists(file))
@@ -1225,7 +1319,7 @@ async function createGulpFile()
 {
     if (rootPath)
     {
-        const file = path.join(rootPath, "gulpfile.js");
+        const file = join(rootPath, "gulpfile.js");
         tempFiles.push(file);
 
         if (!await fsApi.pathExists(file))
@@ -1251,7 +1345,7 @@ async function createMakeFile()
 {
     if (rootPath)
     {
-        const file = path.join(rootPath, "Makefile");
+        const file = join(rootPath, "Makefile");
         tempFiles.push(file);
 
         if (!await fsApi.pathExists(file))

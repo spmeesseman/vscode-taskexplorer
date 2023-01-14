@@ -32,17 +32,12 @@ suite("Bash Tests", () =>
 {
 
     suiteSetup(async function()
-    {   //
-        // Initialize
-        //
+    {
         teApi = await activate(this);
         fsApi = teApi.testsApi.fs;
         wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "test_provider.sh"));
-        //
-        // Store / set initial settings
-        //
         pathToTaskProgram = teApi.config.get<string>("pathToPrograms." + testsName);
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe");

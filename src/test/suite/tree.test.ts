@@ -8,7 +8,7 @@ import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-
 import constants from "../../lib/constants";
 import TaskItem from "../../tree/item";
 import {
-    activate, clearOverrideShowInfoBox, clearOverrideShowInputBox, executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView,
+    activate, clearOverrideShowInfoBox, clearOverrideShowInputBox, executeSettingsUpdate, executeTeCommand, executeTeCommand2, exitRollingCount, focusExplorerView,
     getSpecialTaskItemId, overrideNextShowInfoBox, overrideNextShowInputBox, suiteFinished, testControl, treeUtils
 } from "../utils/utils";
 import SpecialTaskFolder from "../../tree/specialFolder";
@@ -25,6 +25,7 @@ let cstItem3: TaskItem | undefined;
 let cstItem4: TaskItem | undefined;
 let cstItem5: TaskItem | undefined;
 let cstItem6: TaskItem | undefined;
+let successCount = -1;
 
 
 suite("Tree Tests", () =>
@@ -34,6 +35,7 @@ suite("Tree Tests", () =>
     {
         teApi = await activate(this);
         explorer = teApi.testsApi.explorer;
+        ++successCount;
     });
 
 
@@ -45,19 +47,24 @@ suite("Tree Tests", () =>
 
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
+        if (exitRollingCount(0, successCount)) return;
         await focusExplorerView(this);
+        ++successCount;
 	});
 
 
     test("Refresh", async function()
     {
+        if (exitRollingCount(1, successCount)) return;
         this.slow(testControl.slowTime.refreshCommand);
         await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
+        ++successCount;
     });
 
 
     test("Show Favorites", async function()
     {
+        if (exitRollingCount(2, successCount)) return;
         this.slow((testControl.slowTime.configSpecialFolderEvent * 2) + (testControl.waitTime.configEvent * 2) +
                   (testControl.slowTime.getTreeTasks * 4) + testControl.slowTime.storageUpdate);
         ant = await treeUtils.getTreeTasks("ant", 3);
@@ -70,11 +77,13 @@ suite("Tree Tests", () =>
         ]);
         await executeSettingsUpdate("specialFolders.showFavorites", false, testControl.waitTime.configEvent);
         await executeSettingsUpdate("specialFolders.showFavorites", true, testControl.waitTime.configEvent);
+        ++successCount;
     });
 
 
     test("Remove from Favorites", async function()
     {
+        if (exitRollingCount(3, successCount)) return;
         this.slow((testControl.slowTime.command * 6) + testControl.waitTime.command);
         await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
@@ -83,11 +92,13 @@ suite("Tree Tests", () =>
         await executeTeCommand2("addRemoveFavorite", [ python[0] ]);
         await executeTeCommand2("addRemoveFavorite", [ python[1] ]);
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
     test("Show Last Tasks", async function()
     {
+        if (exitRollingCount(4, successCount)) return;
         this.slow((testControl.slowTime.configSpecialFolderEvent * 2) + (testControl.waitTime.configEvent * 2) + (testControl.slowTime.getTreeTasks * 2));
         ant = await treeUtils.getTreeTasks("ant", 3);
         batch = await treeUtils.getTreeTasks("batch", 2);
@@ -97,11 +108,13 @@ suite("Tree Tests", () =>
         ]);
         await executeSettingsUpdate("specialFolders.showLastTasks", false, testControl.waitTime.configEvent);
         await executeSettingsUpdate("specialFolders.showLastTasks", true, testControl.waitTime.configEvent);
+        ++successCount;
     });
 
 
     test("Add to Favorites", async function()
     {
+        if (exitRollingCount(5, successCount)) return;
         this.slow(testControl.slowTime.command * 13);
         let removed = await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         if (removed) {
@@ -128,6 +141,7 @@ suite("Tree Tests", () =>
             await executeTeCommand2("addRemoveFavorite", [ python[1] ]);
         }
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
@@ -153,6 +167,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
+        ++successCount;
     });
 
 
@@ -178,6 +193,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
+        ++successCount;
     });
 
 
@@ -203,6 +219,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
+        ++successCount;
     });
 
 
@@ -228,6 +245,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
+        ++successCount;
     });
 
 
@@ -253,6 +271,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
+        ++successCount;
     });
 
 
@@ -278,6 +297,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
+        ++successCount;
     });
 
 
@@ -288,6 +308,7 @@ suite("Tree Tests", () =>
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
             await teApi.waitForIdle(testControl.waitTime.command);
         }
+        ++successCount;
     });
 
 
@@ -298,6 +319,7 @@ suite("Tree Tests", () =>
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
             await teApi.waitForIdle(testControl.waitTime.command);
         }
+        ++successCount;
     });
 
 
@@ -308,6 +330,7 @@ suite("Tree Tests", () =>
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
             await teApi.waitForIdle(testControl.waitTime.command);
         }
+        ++successCount;
     });
 
 
@@ -318,6 +341,7 @@ suite("Tree Tests", () =>
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem4 ]);
             await teApi.waitForIdle(testControl.waitTime.command);
         }
+        ++successCount;
     });
 
 
@@ -328,6 +352,7 @@ suite("Tree Tests", () =>
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem5 ]);
             await teApi.waitForIdle(testControl.waitTime.command);
         }
+        ++successCount;
     });
 
 
@@ -338,6 +363,7 @@ suite("Tree Tests", () =>
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem6 ]);
             await teApi.waitForIdle(testControl.waitTime.command);
         }
+        ++successCount;
     });
 
 
@@ -359,6 +385,7 @@ suite("Tree Tests", () =>
         overrideNextShowInputBox(undefined);
         await executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
@@ -369,6 +396,7 @@ suite("Tree Tests", () =>
         await teApi.waitForIdle(testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
@@ -377,6 +405,7 @@ suite("Tree Tests", () =>
         this.slow(testControl.slowTime.showHideSpecialFolder + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
@@ -384,6 +413,7 @@ suite("Tree Tests", () =>
     {
         this.slow(testControl.slowTime.refreshCommand + testControl.waitTime.command);
         await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
+        ++successCount;
     });
 
 
@@ -392,6 +422,7 @@ suite("Tree Tests", () =>
         this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
@@ -400,6 +431,7 @@ suite("Tree Tests", () =>
         this.slow(testControl.slowTime.showHideSpecialFolder + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
@@ -413,6 +445,7 @@ suite("Tree Tests", () =>
         await teApi.waitForIdle(testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
@@ -420,6 +453,7 @@ suite("Tree Tests", () =>
     {
         this.slow(testControl.slowTime.showHideSpecialFolder + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
+        ++successCount;
     });
 
 
@@ -429,6 +463,7 @@ suite("Tree Tests", () =>
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
         await executeSettingsUpdate("specialFolders.showFavorites", false);
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
@@ -437,6 +472,7 @@ suite("Tree Tests", () =>
         this.slow(testControl.slowTime.showHideSpecialFolder + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showFavorites", true);
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
@@ -445,12 +481,14 @@ suite("Tree Tests", () =>
         this.slow(testControl.slowTime.showHideSpecialFolder + testControl.waitTime.command);
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
     test("User tasks", async function()
     {
         // const json = await readFileSync(".vscode/workspace.json");fv
+        ++successCount;
     });
 
 
@@ -470,6 +508,7 @@ suite("Tree Tests", () =>
         overrideNextShowInfoBox("Yes");
         await executeTeCommand("clearFavorites");
         await teApi.waitForIdle(testControl.waitTime.command);
+        ++successCount;
     });
 
 
@@ -601,6 +640,7 @@ suite("Tree Tests", () =>
         map.set("tired", new TaskFolder("tired2"));
         map.set("dozing off", new TaskFolder("doze"));
         sortFolders(map);
+        ++successCount;
     });
 
 });

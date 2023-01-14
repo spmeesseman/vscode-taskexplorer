@@ -11,7 +11,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
-	logErrorsAreFine, executeTeCommand, suiteFinished
+	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount
 } from "../utils/utils";
 
 const creator = "spmeesseman",
@@ -19,6 +19,7 @@ const creator = "spmeesseman",
 
 let rootUri: Uri;
 let teApi: ITaskExplorerApi;
+let successCount = -1;
 
 
 suite("Util Tests", () =>
@@ -31,6 +32,7 @@ suite("Util Tests", () =>
         await executeSettingsUpdate("logging.enable", true);
         await executeSettingsUpdate("logging.enableOutputWindow", true);
 		await executeSettingsUpdate("logging.level", 3);
+        ++successCount;
 	});
 
 
@@ -48,13 +50,17 @@ suite("Util Tests", () =>
 
     test("Hide / Show Output Window", async function()
     {
+        if (exitRollingCount(0, successCount)) return;
         await executeTeCommand("showOutput", 10, 50, false);
         await executeTeCommand("showOutput", 10, 50, true);
+        ++successCount;
     });
 
 
     test("Logging", async function()
     {
+        if (exitRollingCount(1, successCount)) return;
+
         log.blank();
         log.blank(1);
 
@@ -220,11 +226,14 @@ suite("Util Tests", () =>
 		expect(util.lowerCaseFirstChar("TestApp", true)).to.be.equal("testApp");
 		expect(util.lowerCaseFirstChar("testApp", false)).to.be.equal("testApp");
 		expect(util.lowerCaseFirstChar("test App", true)).to.be.equal("testApp");
+
+        ++successCount;
     });
 
 
 	test("Logging (Queue)", async function()
     {
+        if (exitRollingCount(2, successCount)) return;
 		log.dequeue("queueTestId");
 		log.write("test1", 1, "", "queueTestId");
 		log.write("test2", 1, "", "queueTestId");
@@ -233,11 +242,13 @@ suite("Util Tests", () =>
 		log.error("test4", undefined, "queueTestId");
 		log.error("test5", [[ "param1", 1 ]], "queueTestId");
 		log.dequeue("queueTestId");
+        ++successCount;
 	});
 
 
 	test("Logging (File)", async function()
     {
+        if (exitRollingCount(3, successCount)) return;
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
@@ -261,11 +272,13 @@ suite("Util Tests", () =>
 		log.value("Test3", "value3", 1);
 		await executeSettingsUpdate("logging.enableFile", false);
 		log.getLogFileName();
+        ++successCount;
 	});
 
 
 	test("Logging (Output Window)", async function()
     {
+        if (exitRollingCount(4, successCount)) return;
 		await executeSettingsUpdate("logging.enableOutputWindow", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
@@ -286,11 +299,14 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enableOutputWindow", true);
 		log.value("Test3", "value3", 1);
 		await executeSettingsUpdate("logging.enableOutputWindow", false);
+        ++successCount;
 	});
 
 
     test("Miscellaneous", async function()
     {
+        if (exitRollingCount(5, successCount)) return;
+
 		util.getTaskTypeFriendlyName("Workspace");
 		util.getTaskTypeFriendlyName("Workspace", true);
 		util.getTaskTypeFriendlyName("apppublisher");
@@ -323,11 +339,15 @@ suite("Util Tests", () =>
 		util.showMaxTasksReachedMessage("gulp");
 		overrideNextShowInputBox("ok");
 		util.showMaxTasksReachedMessage("grunt");
+
+        ++successCount;
 	});
 
 
 	test("Data paths", async function()
-	{   //
+	{
+        if (exitRollingCount(6, successCount)) return;
+		//
 		// The fs module on dev test will run through win32 path get.  Simulate
 		// path get here for linux and mac for increased coverage since we're only
 		// running the tests in a windows machine for release right now with ap.
@@ -461,11 +481,14 @@ suite("Util Tests", () =>
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
 		process.env.VSCODE_APPDATA = dataPath4;
+
+        ++successCount;
 	});
 
 
 	test("Filesystem", async function()
     {
+        if (exitRollingCount(7, successCount)) return;
 		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
 		await afs.createDir(__dirname);
 		await afs.createDir(join(__dirname, "folder1", "folder2", "folder3", "folder4"));
@@ -482,11 +505,13 @@ suite("Util Tests", () =>
 		await afs.getDateModified(__dirname);
 		await afs.getDateModified("");
 		await afs.getDateModified(null as unknown as string);
+        ++successCount;
 	});
 
 
     test("Storage", async function()
     {
+        if (exitRollingCount(8, successCount)) return;
         if (teApi.testsApi.storage)
         {
             await teApi.testsApi.storage.update("TEST_KEY", "This is a test");
@@ -505,6 +530,7 @@ suite("Util Tests", () =>
             await teApi.testsApi.storage.update2("TEST_KEY", undefined);
 			expect(await teApi.testsApi.storage.get2<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
         }
+        ++successCount;
     });
 
 });

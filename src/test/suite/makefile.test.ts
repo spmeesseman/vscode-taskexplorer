@@ -62,7 +62,7 @@ suite("Makefile Tests", () =>
 
     test("Path to make", async function()
     {
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(1, successCount)) return;
         const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
               filePath = getWsPath(join("make", "makefile")),
               fileUri = Uri.file(filePath);
