@@ -1,5 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
+import * as json5 from "json5";
 import * as util from "./utils/utils";
 import log from "./log/log";
 import { join } from "path";
@@ -11,14 +12,16 @@ import { IDictionary, ICacheItem } from "../interface";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
 } from "vscode";
+import { storage } from "./utils/storage";
 
 
 let statusBarSpace: StatusBarItem;
 let cacheBuilding = false;
 let cancel = false;
+let firstRun = true;
 let taskGlobs: any = {};
 let taskFilesMap: IDictionary<ICacheItem[]> = {};
-let projectFilesMap: IDictionary<IDictionary<Uri[]>> = {};
+let projectFilesMap: IDictionary<IDictionary<string[]>> = {};
 let projectToFileCountMap: IDictionary<IDictionary<number>> = {};
 
 
@@ -30,7 +33,7 @@ export function addFileToCache(taskType: string, uri: Uri, logPad: string)
 {
     log.methodStart("add file to cache", 1, logPad);
     const wsf = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
-          item = { uri, folder: wsf };
+          item = { uri, project: wsf.name };
     addToMappings(taskType, item, logPad + "   ");
     log.methodDone("add file to cache", 1, logPad);
 }
@@ -120,7 +123,7 @@ export async function addFolder(folder: Uri, logPad: string)
                             /* istanbul ignore next */
                             const uriFile = Uri.file(join(folder.fsPath, fPath));
                             /* istanbul ignore next */
-                            numFilesAdded += addToMappings(providerName, { uri: uriFile, folder: wsFolder }, logPad + "      ");
+                            numFilesAdded += addToMappings(providerName, { uri: uriFile, project: wsFolder.name }, logPad + "      ");
                         }
                         projectToFileCountMap[wsFolder.name][providerName] += numFilesAdded;
                         log.write(`      Folder scan complete, found ${paths.length} ${providerName} file(s), added ${numFilesAdded} file(s)`, 3, logPad);
@@ -135,7 +138,7 @@ export async function addFolder(folder: Uri, logPad: string)
                 }
             }
         }
-        finishBuild();
+        await finishBuild();
     }
 
     log.methodDone("add folder to cache", 1, logPad, [[ "# of files in directory", numFiles ], [ "# of files matched", numFiles ]]);
@@ -206,7 +209,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         }
         log.value("   was cancelled", cancel, 3);
         log.methodDone("add workspace project folders", 1, logPad, [[ "# of file found", numFilesFound ]]);
-        finishBuild();
+        await finishBuild();
     }
     return numFilesFound;
 }
@@ -220,7 +223,7 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
 {
     log.methodStart("add item to mappings", 4, logPad, false, [[ "task type", taskType ], [ "file", item.uri.fsPath ]]);
 
-    initMaps(taskType, item.folder.name);
+    initMaps(taskType, item.project);
     const added = {
         c1: 0, c2: 0
     };
@@ -231,9 +234,9 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
         ++added.c1;
     }
 
-    if (!projectFilesMap[item.folder.name][taskType].find(i => i.fsPath.toLowerCase() === item.uri.fsPath.toLowerCase()))
+    if (!projectFilesMap[item.project][taskType].find(fsPath => fsPath.toLowerCase() === item.uri.fsPath.toLowerCase()))
     {
-        projectFilesMap[item.folder.name][taskType].push(item.uri);
+        projectFilesMap[item.project][taskType].push(item.uri.fsPath);
         ++added.c2;
     }
 
@@ -292,7 +295,7 @@ export async function buildTaskTypeCache(taskType: string, fileGlob: string, wsF
     }
 
     if (setCacheBuilding) {
-        finishBuild();
+        await finishBuild();
     }
 
     log.methodDone("build file cache", 1, logPad);
@@ -344,17 +347,16 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
                   paths = await workspace.findFiles(relativePattern, getExcludesPatternVsc(folder), maxFiles);
             for (const fPath of paths)
             {
-                addToMappings(taskType, { uri: fPath, folder }, logPad + "   ");
-                if (cancel) {
-                    break;
-                }
+                addToMappings(taskType, { uri: fPath, project: folder.name }, logPad + "   ");
                 /* istanbul ignore if */
                 if (++numFilesFound === maxFiles) {
                     log.write(`   Max files to scan reached at ${licMgr.getMaxNumberOfTaskFiles()} files (no license)`, 3, logPad);
                     break;
                 }
+                if (cancel) {
+                    break;
+                }
             }
-            // projectToFileCountMap[folder.name][taskType] = paths.length;
             projectToFileCountMap[folder.name][taskType] = numFilesFound;
             log.write(`   Workspace folder scan completed, found ${numFilesFound} ${taskType} files`, 3, logPad);
         }
@@ -410,11 +412,13 @@ function disposeStatusBarSpace(statusBarSpace: StatusBarItem)
 {
     statusBarSpace.hide();
     statusBarSpace.dispose();
+    statusBarSpace = undefined as unknown as StatusBarItem;
 }
 
 
-const finishBuild = () =>
+const finishBuild = async () =>
 {
+    await persistCache();
     disposeStatusBarSpace(statusBarSpace);
     cacheBuilding = false;
     cancel = false;
@@ -523,15 +527,71 @@ function isGlobChanged(taskType: string, fileGlob: string)
 }
 
 
+export const persistCache = async (clear?: boolean) =>
+{
+    if (clear !== true && configuration.get<boolean>("enablePersistentFileCaching"))
+    {
+        if (statusBarSpace) {
+            statusBarSpace.text = getStatusString("Persisting file cache to disk...", 65);
+        }
+        await storage.update2("fileCacheTaskFilesMap", taskFilesMap);
+        await storage.update2("fileCacheProjectFilesMap", projectFilesMap);
+        await storage.update2("fileCacheProjectFileToFileCountMap", projectToFileCountMap);
+    }
+    else if (clear === true)
+    {
+        await storage.update2("fileCacheTaskFilesMap", undefined);
+        await storage.update2("fileCacheProjectFilesMap", undefined);
+        await storage.update2("fileCacheProjectFileToFileCountMap", undefined);
+    }
+};
+
+
 export async function rebuildCache(logPad: string)
 {
+    let numFilesFound = 0,
+        loadedFromStorage = false,
+        persistEnabled = false;
+
     log.methodStart("rebuild cache", 1, logPad, logPad === "");
+
     clearMaps();
-    if (await addWsFolders(workspace.workspaceFolders, logPad + "   ") === 0)
+
+    if (firstRun)
     {
-        clearMaps();
+        persistEnabled = configuration.get<boolean>("enablePersistentFileCaching");
+        if (persistEnabled)
+        {
+            const fileCache = await storage.get2<IDictionary<ICacheItem[]>>("fileCacheTaskFilesMap", {});
+            const projectCache = await storage.get2<IDictionary<IDictionary<string[]>>>("fileCacheProjectFilesMap", {});
+            const fileCountCache = await storage.get2<IDictionary<IDictionary<number>>>("fileCacheProjectFileToFileCountMap", {});
+            if (!util.isObjectEmpty(fileCache) && !util.isObjectEmpty(projectCache) && !util.isObjectEmpty(fileCountCache))
+            {
+                taskFilesMap = fileCache;
+                projectFilesMap = projectCache;
+                projectToFileCountMap = fileCountCache;
+                numFilesFound = getTaskFileCount();
+                loadedFromStorage = true;
+            }
+        }
+        firstRun = false;
     }
+
+    if (!loadedFromStorage)
+    {
+        numFilesFound = await addWsFolders(workspace.workspaceFolders, logPad + "   ");
+        if (numFilesFound === 0)
+        {
+            clearMaps();
+        }
+        else if (persistEnabled)
+        {
+            await persistCache();
+        }
+    }
+
     log.methodDone("rebuild cache", 1, logPad);
+    return numFilesFound;
 }
 
 
@@ -615,22 +675,22 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
         /* istanbul ignore else */
         if (projectFilesMap[wsf.name] && projectFilesMap[wsf.name][taskType])
         {
-            projectFilesMap[wsf.name][taskType].slice().reverse().forEach((item, index, object) =>
+            projectFilesMap[wsf.name][taskType].slice().reverse().forEach((fsPath, index, object) =>
             {
                 if (folderUri !== undefined)
                 {
-                    if (item.fsPath === folderUri.fsPath || (isFolder && item.fsPath.startsWith(folderUri.fsPath)))
+                    if (fsPath === folderUri.fsPath || (isFolder && fsPath.startsWith(folderUri.fsPath)))
                     {
-                        log.value(`   remove from project files map (${index})`, item.fsPath, 3, logPad);
+                        log.value(`   remove from project files map (${index})`, fsPath, 3, logPad);
                         projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
                         ++removed.c1;
                     }
                 }
                 else
                 {   /* istanbul ignore else */
-                    if (item.fsPath.startsWith(wsf.uri.fsPath))
+                    if (fsPath.startsWith(wsf.uri.fsPath))
                     {
-                        log.value(`   remove from project files map (${index})`, item.fsPath, 3, logPad);
+                        log.value(`   remove from project files map (${index})`, fsPath, 3, logPad);
                         projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
                         ++removed.c1;
                     }
@@ -654,7 +714,7 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
                 }
                 else
                 {   /* istanbul ignore else */
-                    if (item.folder.name === wsf.name)
+                    if (item.project === wsf.name)
                     {
                         log.value(`   remove from task files map (${index})`, item.uri.fsPath, 3, logPad);
                         projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
