@@ -153,18 +153,17 @@ const processTimesWithLogEnabled = async (timeElapsed: number) =>
 };
 
 
-export const processTimes = async (timeStarted: number) =>
+export const processTimes = async (timeStarted: number, hadRollingCountError: boolean) =>
 {
     const timeFinished = Date.now(),
           timeElapsed = timeFinished - timeStarted,
           tzOffset = (new Date()).getTimezoneOffset() * 60000,
           timeFinishedFmt = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
 
-    console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + timeFinishedFmt, figures.colors.grey)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + getTimeElapsedFmt(timeElapsed), figures.colors.grey)}`);
 
-    if (testControl.tests.numTestsFail === 0)
+    if (testControl.tests.numTestsFail === 0 && !hadRollingCountError)
     {
         if (testControl.tests.numSuites > 3)  { // > 3, sometimes i string the single test together with a few others temp
             await processBestTime("", "bestTimeElapsed", timeElapsed, testControl.tests.numTests);
@@ -173,7 +172,9 @@ export const processTimes = async (timeStarted: number) =>
         await processSuiteTimes();
     }
     else {
-        const skipMsg = `There were ${testControl.tests.numTestsFail} failed tests, best time processing skipped`;
+        const skipMsg = testControl.tests.numTestsFail > 0 ?
+                            `There were ${testControl.tests.numTestsFail} failed tests, best time processing skipped` :
+                            "There was a rolling count failure, best time processing skipped";
         console.log(`    ${figures.color.info} ${figures.withColor(skipMsg, figures.colors.grey)}`);
     }
 

@@ -105,6 +105,7 @@ export const testControl: ITestControl =
         verifyTaskCount: 875,
         verifyTaskCountByTree: 850,
         verifyTaskCountNpm: 3075, // npm task provider is slower than shit on a turtle
+        verifyTaskCountWorkspace: 3500,
         viewReport: 1950,
         walkTaskTree: 5500,
         walkTaskTreeWithDocOpen: 25000,

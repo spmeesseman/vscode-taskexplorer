@@ -21,6 +21,7 @@ export { treeUtils };
 export let teApi: ITaskExplorerApi;
 
 let activated = false;
+let hasRollingCountError = false;
 let teExplorer: ITaskExplorer;
 let timeStarted: number;
 const originalShowInputBox = window.showInputBox;
@@ -159,11 +160,13 @@ export const cleanup = async () =>
     await configuration.updateVs("grunt.autoDetect", testControl.vsCodeAutoDetectGrunt);
     await configuration.updateVs("gulp.autoDetect", testControl.vsCodeAutoDetectGulp);
 
+    console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
+
     //
     // Process execution timesand do the dorky best time thing that I forsome reason spent a whole
     // day of my life coding.
     //
-    try { await processTimes(timeStarted); } catch (e) { console.error(e); }
+    try { await processTimes(timeStarted, hasRollingCountError); } catch (e) { console.error(e); }
 
     //
     // Exit
@@ -221,12 +224,16 @@ export const executeTeCommand2 = (command: string, args: any[], minWait?: number
 export const exitRollingCount = (expectedCount: number, successCount: number) =>
 {
     try {
+        if (hasRollingCountError) {
+            throw new Error("hasRollingCountError flag set");
+        }
         expect(successCount).to.be.equal(expectedCount);
     }
     catch {
         const msg = "skip test, rolling success count failure " + expectedCount;
         console.log(`    ${figures.color.warning} ${figures.withColor(msg, figures.colors.grey)}`);
-        return true;
+        hasRollingCountError = true;
+        return hasRollingCountError;
     }
     return false;
 };
@@ -540,6 +547,9 @@ export const tagLog = (test: string, suite: string) =>
 export const verifyTaskCount = async (taskType: string, expectedCount: number, retries = 0, retryWait = 250) =>
 {
     let tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
+    if (taskType === "Workspace") {
+        tTasks = tTasks.filter(t => t.source === "Workspace");
+    }
     while (--retries >= 0 && tTasks.length !== expectedCount)
     {
         await sleep(retryWait > 0 ? retryWait : testControl.waitTime.verifyTaskCountRetryInterval);
@@ -548,10 +558,7 @@ export const verifyTaskCount = async (taskType: string, expectedCount: number, r
             tTasks = tTasks.filter(t => t.source === "Workspace");
         }
     }
-    try {
-        assert(tTasks.length === expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
-    }
-    catch (e) { throw e; }
+    expect(tTasks.length === expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
 };
 
 

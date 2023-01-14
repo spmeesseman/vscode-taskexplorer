@@ -104,6 +104,7 @@ export interface ITestControl
         verifyTaskCount: number;
         verifyTaskCountByTree: number;
         verifyTaskCountNpm: number; // npm task provider is slower than shit on a turtle
+        verifyTaskCountWorkspace: number;
         viewReport: number;
         walkTaskTree: number;
         walkTaskTreeWithDocOpen: number;
