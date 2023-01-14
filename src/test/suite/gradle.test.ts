@@ -18,7 +18,7 @@ let fsApi: IFilesystemApi;
 let provider: GradleTaskProvider;
 let dirName: string;
 let fileUri: Uri;
-let successCount = 0;
+let successCount = -1;
 
 
 suite("Gradle Tests", () =>
@@ -41,7 +41,7 @@ suite("Gradle Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        expect(successCount).to.be.equal(1, "rolling success count failure");
+        expect(successCount).to.be.equal(0, "rolling success count failure");
         await treeUtils.refresh(this);
         ++successCount;
     });
@@ -50,7 +50,7 @@ suite("Gradle Tests", () =>
 
     test("Document Position", async function()
     {
-        expect(successCount).to.be.equal(2, "rolling success count failure");
+        expect(successCount).to.be.equal(1, "rolling success count failure");
         // provider.getDocumentPosition(undefined, undefined);
         // provider.getDocumentPosition("test", undefined);
         // provider.getDocumentPosition(undefined, "test");
@@ -60,7 +60,7 @@ suite("Gradle Tests", () =>
 
     test("Start", async function()
     {
-        expect(successCount).to.be.equal(3, "rolling success count failure");
+        expect(successCount).to.be.equal(2, "rolling success count failure");
         this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
         // await verifyTaskCount(testsName, startTaskCount);
         // await teApi.waitForIdle(testControl.waitTime.min);
@@ -70,7 +70,7 @@ suite("Gradle Tests", () =>
 
     test("Disable", async function()
     {
-        expect(successCount).to.be.equal(4, "rolling success count failure");
+        expect(successCount).to.be.equal(3, "rolling success count failure");
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.gradle", false);
         // await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
@@ -82,7 +82,7 @@ suite("Gradle Tests", () =>
 
     test("Re-enable", async function()
     {
-        expect(successCount).to.be.equal(5, "rolling success count failure");
+        expect(successCount).to.be.equal(4, "rolling success count failure");
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.gradle", true);
         // await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
@@ -94,7 +94,7 @@ suite("Gradle Tests", () =>
 
     test("Create File", async function()
     {
-        expect(successCount).to.be.equal(6, "rolling success count failure");
+        expect(successCount).to.be.equal(5, "rolling success count failure");
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsCreateEvent + testControl.waitTime.min);
         // if (!(await fsApi.pathExists(dirName))) {
         //     await fsApi.createDir(dirName);
@@ -115,7 +115,7 @@ suite("Gradle Tests", () =>
 
     test("Add 4 Tasks to File", async function()
     {
-        expect(successCount).to.be.equal(7, "rolling success count failure");
+        expect(successCount).to.be.equal(6, "rolling success count failure");
         this.slow(testControl.slowTime.fsModifyEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
         // await fsApi.writeFile(
         //     fileUri.fsPath,
@@ -137,7 +137,7 @@ suite("Gradle Tests", () =>
 
     test("Remove 2 Tasks from File", async function()
     {
-        expect(successCount).to.be.equal(8, "rolling success count failure");
+        expect(successCount).to.be.equal(7, "rolling success count failure");
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
         // await fsApi.writeFile(
         //     fileUri.fsPath,
@@ -157,7 +157,7 @@ suite("Gradle Tests", () =>
 
     test("Delete File", async function()
     {
-        expect(successCount).to.be.equal(9, "rolling success count failure");
+        expect(successCount).to.be.equal(8, "rolling success count failure");
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent + testControl.waitTime.min);
         // await fsApi.deleteFile(fileUri.fsPath);
         // await fsApi.deleteDir(dirName);
