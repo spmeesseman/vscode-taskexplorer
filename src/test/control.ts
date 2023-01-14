@@ -139,6 +139,7 @@ export const testControl: ITestControl =
         getTreeTasks: 75,
         min: 50,
         npmCommandMin: 3000,
+        rebuildFileCache: 15500,
         rebuildFileCacheCancel: 50,
         refreshCommand: 500,
         refreshTaskTypeCommand: 1000,

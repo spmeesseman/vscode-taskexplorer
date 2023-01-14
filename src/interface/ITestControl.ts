@@ -138,6 +138,7 @@ export interface ITestControl
         getTreeTasks: number;
         min: number;
         npmCommandMin: number;
+        rebuildFileCache: number;
         rebuildFileCacheCancel: number;
         refreshCommand: number;
         refreshTaskTypeCommand: number;

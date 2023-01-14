@@ -54,9 +54,10 @@ suite("File Cache Tests", () =>
     test("Rebuild File Cache", async function()
     {
         if (utils.exitRollingCount(3, successCount)) return;
-        this.slow(utils.testControl.slowTime.rebuildFileCache + 100 + utils.testControl.waitTime.min);
+        this.slow(utils.testControl.slowTime.rebuildFileCache + utils.testControl.waitTime.min);
         // await treeUtils.refresh(this);
         await teApi.testsApi.fileCache.rebuildCache("");
+        await utils.sleep(utils.testControl.waitTime.min);
         ++successCount;
     });
 
@@ -90,8 +91,10 @@ suite("File Cache Tests", () =>
     test("Rebuild File Cache", async function()
     {
         if (utils.exitRollingCount(6, successCount)) return;
+        this.slow(utils.testControl.slowTime.rebuildFileCache + utils.testControl.waitTime.min);
         // await treeUtils.refresh(this);
         await teApi.testsApi.fileCache.rebuildCache("");
+        await teApi.waitForIdle(utils.testControl.waitTime.commandFast);
         ++successCount;
     });
 
@@ -326,10 +329,11 @@ suite("File Cache Tests", () =>
 
 const checkTaskCounts = async (instance: Mocha.Context) =>
 {
-    instance.slow((4 * utils.testControl.slowTime.verifyTaskCount) + utils.testControl.slowTime.verifyTaskCountNpm);
+    instance.slow((5 * utils.testControl.slowTime.verifyTaskCount) + utils.testControl.slowTime.verifyTaskCountNpm);
     await utils.verifyTaskCount("bash", 1);
     await utils.verifyTaskCount("batch", 2);
     await utils.verifyTaskCount("npm", 2);
-    await utils.verifyTaskCount("python", 2);
+    await utils.verifyTaskCount("grunt", 7);
+    await utils.verifyTaskCount("gulp", 17);
     await utils.verifyTaskCount("Workspace", 10);
 };
