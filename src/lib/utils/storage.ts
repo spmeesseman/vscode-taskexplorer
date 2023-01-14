@@ -14,6 +14,7 @@ export const initStorage = async (context: ExtensionContext, isTests: boolean) =
 {
     const storageFile = join(context.globalStorageUri.fsPath, "storage.json");
     await createDir(context.globalStorageUri.fsPath);
+    /* istanbul ignore if */
     if (!(await pathExists(storageFile))) {
         await writeFile(storageFile, "{}");
     }
@@ -42,7 +43,6 @@ class Storage implements IStorage, Memento
         if (defaultValue || (isString(defaultValue) && defaultValue === "") || (isNumber(defaultValue) && defaultValue === 0))
         {
             let v = store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key];
-            /* istanbul ignore if */
             if (!v) {
                 v = defaultValue;
             }

@@ -120,7 +120,15 @@ export const createDir = (dir: string): Promise<void> =>
             const baseDir = path.dirname(dir);
             if (!(await pathExists(baseDir)))
             {
-                try { await createDir(baseDir); } catch (e){ /* istanbul ignore next */reject(e); return; };
+                try {
+                    await createDir(baseDir);
+                }
+                catch (e) {
+                    /* istanbul ignore next */
+                    reject(e);
+                    /* istanbul ignore next */
+                    return;
+                };
             }
             fs.mkdir(path.resolve(cwd, dir), { mode: 0o777 }, (err) =>
             {
@@ -213,7 +221,7 @@ export const getDateModified = (file: string) =>
         {
             fs.stat(path.resolve(cwd, file), { bigint: true }, (e, stats) =>
             {
-                /* istanbul ignore else */
+                /* istanbul ignore if */
                 if (e) {
                     reject(e);
                 }
@@ -425,6 +433,7 @@ export const writeFile = (file: string, data: string): Promise<void> =>
         {
             fs.writeFile(path.resolve(cwd, file), data, (err) =>
             {
+                /* istanbul ignore if */
                 if (err) {
                     reject(err);
                 }

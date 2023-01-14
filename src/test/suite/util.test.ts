@@ -11,7 +11,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
-	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount
+	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount, getWsPath
 } from "../utils/utils";
 
 const creator = "spmeesseman",
@@ -323,11 +323,23 @@ suite("Util Tests", () =>
 		expect(util.isNumber({ test: true })).to.equal(false);
 		expect(util.isNumber([ 1, 2 ])).to.equal(false);
 
+		util.properCase("dc is here", false);
+		util.properCase("dc is here");
+		util.properCase("dc is here", true);
+		util.properCase("dc is here");
+		util.properCase("dc was here", false);
+		util.properCase("dc was here", true);
+		expect(util.properCase(undefined)).to.equal("");
+		expect(util.properCase("")).to.equal("");
+
 		expect(util.isObjectEmpty({})).to.equal(true);
 		expect(util.isObjectEmpty({ a: 1 })).to.equal(false);
 		util.isObjectEmpty([]);
 		util.isObjectEmpty([ 1, 2 ]);
+		util.isObjectEmpty(this);
 		util.isObjectEmpty("aaa" as unknown as object);
+		util.isObjectEmpty("" as unknown as object);
+		util.isObjectEmpty(undefined as unknown as object);
 
 		overrideNextShowInputBox("ok");
 		util.showMaxTasksReachedMessage();
@@ -505,6 +517,10 @@ suite("Util Tests", () =>
 		await afs.getDateModified(__dirname);
 		await afs.getDateModified("");
 		await afs.getDateModified(null as unknown as string);
+		try {
+			await afs.writeFile(getWsPath("."), "its a dir");
+		}
+		catch {}
         ++successCount;
 	});
 
@@ -521,14 +537,19 @@ suite("Util Tests", () =>
             expect(teApi.testsApi.storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
             await teApi.testsApi.storage.update("TEST_KEY", undefined);
 			expect(teApi.testsApi.storage.get<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
+			expect(teApi.testsApi.storage.get<number>("TEST_KEY2_DOESNT_EXIST", 0)).to.be.equal(0);
+			expect(teApi.testsApi.storage.get<string>("TEST_KEY2_DOESNT_EXIST", "")).to.be.equal("");
 
             await teApi.testsApi.storage.update2("TEST_KEY", "This is a test");
             expect(await teApi.testsApi.storage.get2<string>("TEST_KEY")).to.be.equal("This is a test");
+            expect(await teApi.testsApi.storage.get2<string>("TEST_KEY", "some other value")).to.be.equal("This is a test");
             expect(await teApi.testsApi.storage.get2<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
             await teApi.testsApi.storage.update2("TEST_KEY", "");
             expect(await teApi.testsApi.storage.get2<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
             await teApi.testsApi.storage.update2("TEST_KEY", undefined);
 			expect(await teApi.testsApi.storage.get2<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
+			expect(await teApi.testsApi.storage.get2<number>("TEST_KEY2_DOESNT_EXIST", 0)).to.be.equal(0);
+			expect(await teApi.testsApi.storage.get2<string>("TEST_KEY2_DOESNT_EXIST", "")).to.be.equal("");
         }
         ++successCount;
     });

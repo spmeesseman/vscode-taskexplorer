@@ -158,56 +158,6 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
-    clearTaskItems()
-    {
-        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
-        this.taskFiles = [];
-        //
-        // The 'Last Tasks' folder will be 1st in the tree
-        //
-        if (configuration.get<boolean>("specialFolders.showLastTasks") === true)
-        {
-            this.collapsibleState =  nodeExpandedeMap.lastTasks !== false ?
-                                     TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
-        }
-        //
-        // The 'Favorites' folder will be 2nd in the tree (or 1st if configured to hide
-        // the 'Last Tasks' folder)
-        //
-        if (configuration.get<boolean>("specialFolders.showFavorites"))
-        {
-            this.collapsibleState =  nodeExpandedeMap.lastTasks !== false ?
-                                     TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
-        }
-    }
-
-
-    /**
-     * @method clearSpecialFolder
-     *
-     * @param folder The TaskFolder representing either the "Last Tasks" or the "Favorites" folders.
-     *
-     * @since 2.0.0
-     */
-    async clearSavedTasks()
-    {
-        const choice = await window.showInformationMessage(`Clear all tasks from the \`${this.label}\` folder?`, "Yes", "No");
-        if (choice === "Yes")
-        {
-            this.taskFiles = [];
-            if (this.isFavorites) {
-                this.store = [];
-                await storage.update(constants.FAV_TASKS_STORE, this.store);
-                await this.refresh(true);
-            }
-            else {
-                await storage.update(constants.LAST_TASKS_STORE, this.store);
-                await this.refresh(true);
-            }
-        }
-    }
-
-
     /**
      * @method build
      *
@@ -258,6 +208,56 @@ export default class SpecialTaskFolder extends TaskFolder
 
         log.methodDone("create special tasks folder", 3, logPad);
         return true;
+    }
+
+
+    clearTaskItems()
+    {
+        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
+        this.taskFiles = [];
+        //
+        // The 'Last Tasks' folder will be 1st in the tree
+        //
+        if (configuration.get<boolean>("specialFolders.showLastTasks") === true)
+        {
+            this.collapsibleState =  nodeExpandedeMap.lastTasks !== false ?
+                                     TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
+        }
+        //
+        // The 'Favorites' folder will be 2nd in the tree (or 1st if configured to hide
+        // the 'Last Tasks' folder)
+        //
+        if (configuration.get<boolean>("specialFolders.showFavorites"))
+        {
+            this.collapsibleState =  nodeExpandedeMap.lastTasks !== false ?
+                                     TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
+        }
+    }
+
+
+    /**
+     * @method clearSpecialFolder
+     *
+     * @param folder The TaskFolder representing either the "Last Tasks" or the "Favorites" folders.
+     *
+     * @since 2.0.0
+     */
+    async clearSavedTasks()
+    {
+        const choice = await window.showInformationMessage(`Clear all tasks from the \`${this.label}\` folder?`, "Yes", "No");
+        if (choice === "Yes")
+        {
+            this.taskFiles = [];
+            if (this.isFavorites) {
+                this.store = [];
+                await storage.update(constants.FAV_TASKS_STORE, this.store);
+                await this.refresh(true);
+            }
+            else {
+                await storage.update(constants.LAST_TASKS_STORE, this.store);
+                await this.refresh(true);
+            }
+        }
     }
 
 

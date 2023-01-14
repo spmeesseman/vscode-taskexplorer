@@ -463,6 +463,19 @@ export function properCase(name: string | undefined, removeSpaces?: boolean)
 }
 
 
+// export const removeFromArray = <T>(arr: T[], cb: (value: any, index: number, array: T[]) => void)
+// {
+//     const shallowReverse = arr.slice().reverse();
+//     for (const item of shallowReverse)
+//     {
+//         fn(item, index, object);
+//     }
+//     shallowReverse.forEach((item, index, object) =>
+//     {
+//         fn(item, index, object);
+//     });
+// };
+
 export function removeFromArray(arr: any[], item: any)
 {
     let idx = -1;
