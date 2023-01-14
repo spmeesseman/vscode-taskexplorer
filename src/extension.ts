@@ -1,8 +1,8 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as util from "./lib/utils/utils";
-import * as cache from "./lib/fileCache";
 import * as fs from "./lib/utils/fs";
+import * as fileCache from "./lib/fileCache";
 import log from "./lib/log/log";
 import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerViewReportCommand from "./commands/viewReport";
@@ -31,7 +31,7 @@ import { LicenseManager } from "./lib/licenseManager";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
 import { ExtensionContext, tasks, commands } from "vscode";
-import { IExternalProvider, ITaskExplorer, ITaskExplorerApi } from "./interface";
+import { IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITestsApi } from "./interface";
 import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/fileWatcher";
 
@@ -63,7 +63,7 @@ export const teApi: ITaskExplorerApi =
     testsApi: {
         fs,
         explorer: {} as ITaskExplorer, // registerExplorer() will set
-        fileCache: cache,
+        fileCache,
         storage,
         onWsFoldersChange
     }
@@ -76,6 +76,9 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     // Set 'tests' flag if tests are running and this is not a user runtime
     //
     tests = await fs.pathExists(join(__dirname, "test", "runTest.js"));
+    if (!tests) {
+         teApi.testsApi = null as unknown as ITestsApi;
+    }
 
     //
     // Initialize logging
@@ -139,6 +142,11 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         // This also starts the file scan to build the file task file cache
         //
         await registerFileWatchers(context, api);
+        //
+        // Build the file cache, thiskicks off the wholeprocess as refreshTree() will be called down
+        // the line in the initialization process.
+        //
+        await fileCache.rebuildCache("");
         //
         // TaskTreeDataProvider fires event for engine to make tree provider to refresh on setEnabled()
         //
@@ -223,7 +231,7 @@ async function tempRemapSettingsToNewLayout()
 export async function deactivate()
 {
     disposeFileWatchers();
-    await cache.cancelBuildCache();
+    await fileCache.cancelBuildCache();
 }
 
 
@@ -236,7 +244,7 @@ export function getLicenseManager()
 /* istanbul ignore next */
 function isBusy()
 {   /* istanbul ignore next */
-    return !ready || cache.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
+    return !ready || fileCache.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
            isProcessingFsEvent() || isProcessingConfigChange();
 }
 

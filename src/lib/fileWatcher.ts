@@ -57,12 +57,22 @@ export async function registerFileWatchers(context: ExtensionContext, api: ITask
 }
 
 
-export async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, enabled?: boolean, logPad = "")
+/**
+ * Registers file watchers for a specific task type using the specified glob pattern.
+ *
+ * @param context Extension context
+ * @param taskType Task type, i.e. 'ant', 'bash' 'python', etc...
+ * @param fileBlob The file blob to use for the watchers, defined in constants module for each task type
+ * @param firstRun Is first run (ins initializing)
+ * @param enabled Is enabled.  `false` if task type was disabled.
+ * @param logPad Log padding.
+ */
+export async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, firstRun: boolean, enabled?: boolean, logPad = "")
 {
     log.methodStart("Register file watcher for task type '" + taskType + "'", 1, logPad, false, [[ "enabled", enabled ]]);
 
-    /* istanbul ignore else */
-    if (workspace.workspaceFolders) {
+    if (!firstRun && workspace.workspaceFolders)
+    {
         if (enabled !== false) {
             const numFilesFound  = await cache.buildTaskTypeCache(taskType, fileBlob, undefined, true, logPad + "   ");
             log.write(`   ${numFilesFound} files were added to the file cache`, 1, logPad);
@@ -264,7 +274,7 @@ async function createFileWatchers(context: ExtensionContext)
         log.write(`   create file watchers for task type '${taskType}'`, 1, "   ");
         if (util.isTaskTypeEnabled(taskType))
         {
-            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), true, "      ");
+            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), true, true, "      ");
         }
         else {
             log.write(`   skip for task type '${taskType}' (disabled in settings)`, 1, "   ");
