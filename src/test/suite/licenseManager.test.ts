@@ -49,7 +49,7 @@ suite("License Manager Tests", () =>
 	suiteTeardown(async function()
     {
 		teApi.setTests(true);
-		licMgr.dispose();
+		licMgr?.dispose();
 		await closeActiveDocument();
 		if (lsProcess) {
 			lsProcess.send("close");

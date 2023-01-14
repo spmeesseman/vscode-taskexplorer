@@ -49,7 +49,7 @@ suite("Task Tests", () =>
 
     test("Check task counts", async function()
     {
-        if (exitRollingCount(1, successCount)) return;;
+        if (exitRollingCount(1, successCount)) return;
         this.slow(testControl.slowTime.getTreeTasks * 4);
         bash = await treeUtils.getTreeTasks("bash", 1);
         await teApi.waitForIdle(testControl.waitTime.getTreeTasks);
@@ -65,7 +65,7 @@ suite("Task Tests", () =>
 
     test("Empty TaskItem Parameter - Run", async function()
     {
-        if (exitRollingCount(2, successCount)) return;;
+        if (exitRollingCount(2, successCount)) return;
         this.slow(testControl.slowTime.runCommand + testControl.waitTime.runCommandMin + endOfTestWaitTime);
         expect(await executeTeCommand("run", testControl.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
         await teApi.waitForIdle(endOfTestWaitTime);
@@ -75,7 +75,7 @@ suite("Task Tests", () =>
 
     test("Empty TaskItem Parameter - Pause", async function()
     {
-        if (exitRollingCount(3, successCount)) return;;
+        if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.runPauseCommand + testControl.waitTime.runCommandMin + endOfTestWaitTime);
         expect(await executeTeCommand("pause", testControl.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
         await teApi.waitForIdle(endOfTestWaitTime);
@@ -85,7 +85,7 @@ suite("Task Tests", () =>
 
     test("Empty TaskItem Parameter - Restart", async function()
     {
-        if (exitRollingCount(4, successCount)) return;;
+        if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.runCommand + testControl.waitTime.runCommandMin + endOfTestWaitTime);
         expect(await executeTeCommand("restart", testControl.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
         await teApi.waitForIdle(endOfTestWaitTime);
@@ -95,7 +95,7 @@ suite("Task Tests", () =>
 
     test("Run non-existent last task", async function()
     {
-        if (exitRollingCount(5, successCount)) return;;
+        if (exitRollingCount(5, successCount)) return;
         this.slow(testControl.slowTime.runCommand + (testControl.slowTime.storageUpdate * 2) + testControl.waitTime.runCommandMax + endOfTestWaitTime);
         const lastTasks = teApi.testsApi.storage.get<string[]>(constants.LAST_TASKS_STORE, []),
               hasLastTasks = lastTasks && lastTasks.length > 0;
@@ -116,7 +116,7 @@ suite("Task Tests", () =>
     test("Keep Terminal on Stop (OFF)", async function()
     {
         const taskTime = 2000;
-        if (exitRollingCount(6, successCount)) return;;
+        if (exitRollingCount(6, successCount)) return;
         this.slow(testControl.slowTime.runCommand + testControl.slowTime.runStopCommand +
                   testControl.slowTime.configEvent + (testControl.waitTime.runCommandMin * 2) + taskTime + endOfTestWaitTime);
         await executeSettingsUpdate("keepTermOnStop", false);
@@ -132,7 +132,7 @@ suite("Task Tests", () =>
     test("Keep Terminal on Stop (ON)", async function()
     {
         const taskTime = 2000;
-        if (exitRollingCount(7, successCount)) return;;
+        if (exitRollingCount(7, successCount)) return;
         this.slow(testControl.slowTime.runCommand + testControl.slowTime.runStopCommand +
                   testControl.slowTime.configEvent + (testControl.waitTime.runCommandMin * 2) + taskTime + endOfTestWaitTime);
         await executeSettingsUpdate("keepTermOnStop", true);
@@ -147,7 +147,7 @@ suite("Task Tests", () =>
 
     test("Trigger busy on run last task", async function()
     {
-        if (exitRollingCount(8, successCount)) return;;
+        if (exitRollingCount(8, successCount)) return;
         this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.runCommand + testControl.waitTime.runCommandMin + 2000 + endOfTestWaitTime);
         await executeTeCommand("refresh", endOfTestWaitTime, 2000);
         await executeTeCommand("runLastTask", testControl.waitTime.runCommandMin, testControl.waitTime.runCommandMax);
@@ -159,7 +159,7 @@ suite("Task Tests", () =>
 
     test("Resume task no terminal", async function()
     {
-        if (exitRollingCount(9, successCount)) return;;
+        if (exitRollingCount(9, successCount)) return;
         this.slow(testControl.slowTime.runCommand + testControl.waitTime.runCommandMax + endOfTestWaitTime);
         bash[0].paused = true;
         await executeTeCommand2("runLastTask", [ batch[0] ], testControl.waitTime.runCommandMax);
@@ -172,7 +172,7 @@ suite("Task Tests", () =>
     test("Pause", async function()
     {
         this.slow(testControl.slowTime.runCommand + (testControl.waitTime.runCommandMin * 5) + testControl.waitTime.runCommandMax + endOfTestWaitTime);
-        if (exitRollingCount(10, successCount)) return;;
+        if (exitRollingCount(10, successCount)) return;
         await executeTeCommand2("run", [ batch[0] ], testControl.waitTime.runCommandMax);
         await teApi.waitForIdle(testControl.waitTime.runCommandMin);
         await executeTeCommand2("pause", [ batch[0] ], testControl.waitTime.runCommandMin);
@@ -186,7 +186,7 @@ suite("Task Tests", () =>
 
     test("Pause (No Task)", async function()
     {
-        if (exitRollingCount(11, successCount)) return;;
+        if (exitRollingCount(11, successCount)) return;
         this.slow(testControl.slowTime.commandFast + endOfTestWaitTime);
         overrideNextShowInfoBox(undefined);
         await executeTeCommand2("pause", [ batch[0] ], 50);
@@ -197,7 +197,7 @@ suite("Task Tests", () =>
 
     test("Resume (No Task)", async function()
     {
-        if (exitRollingCount(12, successCount)) return;;
+        if (exitRollingCount(12, successCount)) return;
         this.slow(testControl.slowTime.commandFast + endOfTestWaitTime);
         overrideNextShowInfoBox(undefined);
         await executeTeCommand2("pause", [ batch[0] ], 50);
@@ -209,7 +209,7 @@ suite("Task Tests", () =>
     test("Ant", async function()
     {
         const taskTime = 3000; // sleeps for 3s
-        if (exitRollingCount(13, successCount)) return;;
+        if (exitRollingCount(13, successCount)) return;
         this.slow(testControl.slowTime.runCommand + taskTime + testControl.waitTime.runCommandMax + endOfTestWaitTime);
         const antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
         expect(antTask).to.not.be.equal(undefined, "The 'hello' ant task was not found in the task tree");
@@ -226,8 +226,8 @@ suite("Task Tests", () =>
     {   //
         // There is only 1 bash file "task" - it sleeps for 3 seconds, 1 second at a time
         //
+        if (exitRollingCount(14, successCount)) return;
         this.slow(testControl.slowTime.runCommand + (testControl.slowTime.configEvent * 4) + (testControl.slowTime.command * 4));
-        expect(successCount).to.be.equal(14);
         await executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await startTask(bash[0] as TaskItem, true);
         await executeTeCommand2("run", [ bash[0] ], testControl.waitTime.runCommandMax);
@@ -239,11 +239,11 @@ suite("Task Tests", () =>
 
     test("Batch 1", async function()
     {
+        if (exitRollingCount(15, successCount)) return;
         const slowTime = (testControl.slowTime.runCommand * 6) + (testControl.slowTime.runStopCommand * 3) +
                           testControl.slowTime.runPauseCommand + (testControl.waitTime.runCommandMax * 3) +
                           testControl.waitTime.runCommandMin + (testControl.slowTime.configEvent * 2) +
                           testControl.slowTime.command + endOfTestWaitTime + 4600;
-        if (exitRollingCount(15, successCount)) return;;
         this.slow(slowTime);
         this.timeout(slowTime + 15000);
         //
@@ -282,13 +282,14 @@ suite("Task Tests", () =>
 
 
     test("Batch 2", async function()
-    {   //
+    {
+        if (exitRollingCount(16, successCount)) return;
+        //
         // There are 2 batch file "tasks" - they both sleep for 7 seconds, 1 second at a time
         //
         const slowTime = (testControl.slowTime.runCommand * 3) + endOfTestWaitTime + 8300 + testControl.waitTime.runCommandMax +
                           testControl.waitTime.runCommandMin + testControl.slowTime.runStopCommand + testControl.slowTime.configEvent +
                           (testControl.slowTime.command * 2);
-        if (exitRollingCount(16, successCount)) return;;
         this.slow(slowTime);
         this.timeout(slowTime + 15000);
         const batchTask = batch[1];

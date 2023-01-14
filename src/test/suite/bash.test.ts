@@ -64,7 +64,7 @@ suite("Bash Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        if (exitRollingCount(0, successCount)) return;;
+        if (exitRollingCount(0, successCount)) return;
         await treeUtils.refresh(this);
         successCount++;
     });
@@ -72,7 +72,7 @@ suite("Bash Tests", () =>
 
     test("Document Position", async function()
     {
-        if (exitRollingCount(1, successCount)) return;;
+        if (exitRollingCount(1, successCount)) return;
         const provider = teApi.providers.get(testsName) as BashTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
         successCount++;
@@ -81,7 +81,7 @@ suite("Bash Tests", () =>
 
     test("Invalid ScriptProvider Type", async function()
     {
-        if (exitRollingCount(2, successCount)) return;;
+        if (exitRollingCount(2, successCount)) return;
         const provider = teApi.providers.get(testsName) as BashTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("hello.sh"))),
                "ScriptProvider type should return position 1");
@@ -92,7 +92,7 @@ suite("Bash Tests", () =>
 
     test("Start", async function()
     {
-        if (exitRollingCount(3, successCount)) return;;
+        if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.verifyTaskCount);
         await verifyTaskCount(testsName, startTaskCount);
         successCount++;
@@ -101,7 +101,7 @@ suite("Bash Tests", () =>
 
     test("Disable", async function()
     {
-        if (exitRollingCount(4, successCount)) return;;
+        if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
@@ -111,7 +111,7 @@ suite("Bash Tests", () =>
 
     test("Re-enable", async function()
     {
-        if (exitRollingCount(5, successCount)) return;;
+        if (exitRollingCount(5, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -121,7 +121,7 @@ suite("Bash Tests", () =>
 
     test("Create File", async function()
     {
-        if (exitRollingCount(6, successCount)) return;;
+        if (exitRollingCount(6, successCount)) return;
         this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
@@ -133,7 +133,7 @@ suite("Bash Tests", () =>
 
     test("Delete File", async function()
     {
-        if (exitRollingCount(7, successCount)) return;;
+        if (exitRollingCount(7, successCount)) return;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
@@ -146,7 +146,7 @@ suite("Bash Tests", () =>
 
     test("Re-create File", async function()
     {
-        if (exitRollingCount(8, successCount)) return;;
+        if (exitRollingCount(8, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
@@ -158,7 +158,7 @@ suite("Bash Tests", () =>
 
     test("Delete Folder", async function()
     {
-        if (exitRollingCount(9, successCount)) return;;
+        if (exitRollingCount(9, successCount)) return;
         this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);

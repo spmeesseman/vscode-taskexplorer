@@ -45,7 +45,7 @@ suite("Grunt Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        if (exitRollingCount(1, successCount)) return;;
+        if (exitRollingCount(1, successCount)) return;
         await treeUtils.refresh(this);
         ++successCount;
     });
@@ -54,7 +54,7 @@ suite("Grunt Tests", () =>
 
     test("Document Position", async function()
     {
-        if (exitRollingCount(2, successCount)) return;;
+        if (exitRollingCount(2, successCount)) return;
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
@@ -64,7 +64,7 @@ suite("Grunt Tests", () =>
 
     test("Start", async function()
     {
-        if (exitRollingCount(3, successCount)) return;;
+        if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
@@ -74,7 +74,7 @@ suite("Grunt Tests", () =>
 
     test("Disable", async function()
     {
-        if (exitRollingCount(4, successCount)) return;;
+        if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
         await teApi.config.updateWs("enabledTasks.grunt", false);
         await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
@@ -86,7 +86,7 @@ suite("Grunt Tests", () =>
 
     test("Re-enable", async function()
     {
-        if (exitRollingCount(5, successCount)) return;;
+        if (exitRollingCount(5, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
         await teApi.config.updateWs("enabledTasks.grunt", true);
         await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
@@ -98,7 +98,7 @@ suite("Grunt Tests", () =>
 
     test("Create File", async function()
     {
-        if (exitRollingCount(6, successCount)) return;;
+        if (exitRollingCount(6, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsCreateEvent + testControl.waitTime.min);
         if (!(await fsApi.pathExists(dirName))) {
             await fsApi.createDir(dirName);
@@ -119,7 +119,7 @@ suite("Grunt Tests", () =>
 
     test("Add 4 Tasks to File", async function()
     {
-        if (exitRollingCount(7, successCount)) return;;
+        if (exitRollingCount(7, successCount)) return;
         this.slow(testControl.slowTime.fsModifyEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -141,7 +141,7 @@ suite("Grunt Tests", () =>
 
     test("Remove 2 Tasks from File", async function()
     {
-        if (exitRollingCount(8, successCount)) return;;
+        if (exitRollingCount(8, successCount)) return;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -161,7 +161,7 @@ suite("Grunt Tests", () =>
 
     test("Delete File", async function()
     {
-        if (exitRollingCount(9, successCount)) return;;
+        if (exitRollingCount(9, successCount)) return;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent + testControl.waitTime.min);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
@@ -174,7 +174,7 @@ suite("Grunt Tests", () =>
 
     test("Turn VSCode Grunt Provider On", async function()
     {
-        if (exitRollingCount(10, successCount)) return;;
+        if (exitRollingCount(10, successCount)) return;
         this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 3000);
         await configuration.updateVs("grunt.autoDetect", "on");
         await sleep(3000);
@@ -197,7 +197,7 @@ suite("Grunt Tests", () =>
 	});
 
 
-    test("Turn on VSCode Grunt Provider Off", async function()
+    test("Turn VSCode Grunt Provider Off", async function()
     {
         expect(successCount).to.be.equal(11);
         this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 1500);

@@ -40,7 +40,7 @@ suite("Gradle Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        if (exitRollingCount(0, successCount)) return;;
+        if (exitRollingCount(0, successCount)) return;
         await treeUtils.refresh(this);
         ++successCount;
     });
@@ -49,7 +49,7 @@ suite("Gradle Tests", () =>
 
     test("Document Position", async function()
     {
-        if (exitRollingCount(1, successCount)) return;;
+        if (exitRollingCount(1, successCount)) return;
         // provider.getDocumentPosition(undefined, undefined);
         // provider.getDocumentPosition("test", undefined);
         // provider.getDocumentPosition(undefined, "test");
@@ -59,7 +59,7 @@ suite("Gradle Tests", () =>
 
     test("Start", async function()
     {
-        if (exitRollingCount(2, successCount)) return;;
+        if (exitRollingCount(2, successCount)) return;
         this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
         // await verifyTaskCount(testsName, startTaskCount);
         // await teApi.waitForIdle(testControl.waitTime.min);
@@ -69,7 +69,7 @@ suite("Gradle Tests", () =>
 
     test("Disable", async function()
     {
-        if (exitRollingCount(3, successCount)) return;;
+        if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.gradle", false);
         // await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
@@ -81,7 +81,7 @@ suite("Gradle Tests", () =>
 
     test("Re-enable", async function()
     {
-        if (exitRollingCount(4, successCount)) return;;
+        if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.gradle", true);
         // await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
@@ -93,7 +93,7 @@ suite("Gradle Tests", () =>
 
     test("Create File", async function()
     {
-        if (exitRollingCount(5, successCount)) return;;
+        if (exitRollingCount(5, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsCreateEvent + testControl.waitTime.min);
         // if (!(await fsApi.pathExists(dirName))) {
         //     await fsApi.createDir(dirName);
@@ -114,7 +114,7 @@ suite("Gradle Tests", () =>
 
     test("Add 4 Tasks to File", async function()
     {
-        if (exitRollingCount(6, successCount)) return;;
+        if (exitRollingCount(6, successCount)) return;
         this.slow(testControl.slowTime.fsModifyEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
         // await fsApi.writeFile(
         //     fileUri.fsPath,
@@ -136,7 +136,7 @@ suite("Gradle Tests", () =>
 
     test("Remove 2 Tasks from File", async function()
     {
-        if (exitRollingCount(7, successCount)) return;;
+        if (exitRollingCount(7, successCount)) return;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
         // await fsApi.writeFile(
         //     fileUri.fsPath,
@@ -156,7 +156,7 @@ suite("Gradle Tests", () =>
 
     test("Delete File", async function()
     {
-        if (exitRollingCount(8, successCount)) return;;
+        if (exitRollingCount(8, successCount)) return;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent + testControl.waitTime.min);
         // await fsApi.deleteFile(fileUri.fsPath);
         // await fsApi.deleteDir(dirName);

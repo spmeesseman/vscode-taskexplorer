@@ -14,7 +14,7 @@ const startTaskCount = 0;
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let testControl: ITestControl;
-let packageJsonPath: string;
+let packageJsonPath: string | undefined;
 let npmTaskItems: TaskItem[];
 let successCount = -1;
 
@@ -33,24 +33,27 @@ suite("NPM Tests", () =>
 
     suiteTeardown(async function()
     {
-        const packageLockJsonPath = packageJsonPath.replace(".", "-lock.");
-        await fsApi.deleteFile(packageJsonPath);
-        if (await fsApi.pathExists(packageLockJsonPath)) {
-            try {
-                await fsApi.deleteFile(packageLockJsonPath);
+        if (packageJsonPath)
+        {
+            const packageLockJsonPath = packageJsonPath.replace(".", "-lock.");
+            await fsApi.deleteFile(packageJsonPath);
+            if (await fsApi.pathExists(packageLockJsonPath)) {
+                try {
+                    await fsApi.deleteFile(packageLockJsonPath);
+                }
+                catch (error) {
+                    console.log(error);
+                }
             }
-            catch (error) {
-                console.log(error);
-            }
+            await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         }
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
         utils.suiteFinished(this);
     });
 
 
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
-        if (utils.exitRollingCount(0, successCount)) return;;
+        if (utils.exitRollingCount(0, successCount)) return;
         await utils.focusExplorerView(this);
         ++successCount;
 	});
@@ -58,7 +61,7 @@ suite("NPM Tests", () =>
 
     test("Create Package File (package.json)", async function()
     {
-        if (utils.exitRollingCount(1, successCount)) return;;
+        if (utils.exitRollingCount(1, successCount)) return;
         this.slow(testControl.slowTime.fsCreateEvent + (testControl.waitTime.fsCreateEvent * 2));
         // tagLog("NPM", "Create Package File (1: package.json)");
         //
@@ -87,7 +90,7 @@ suite("NPM Tests", () =>
 
     test("Verify NPM Task Count", async function()
     {   // npm task provider is slower than shit on a turtle
-        if (utils.exitRollingCount(2, successCount)) return;;
+        if (utils.exitRollingCount(2, successCount)) return;
         this.slow(testControl.slowTime.verifyTaskCountNpm + testControl.waitTime.min);
         await utils.verifyTaskCount(testsName, startTaskCount + 5, 2);
         await teApi.waitForIdle(testControl.waitTime.min);
@@ -97,7 +100,7 @@ suite("NPM Tests", () =>
 
     test("Get NPM Task Items", async function()
     {   // npm task provider is slower than shit on a turtle
-        if (utils.exitRollingCount(3, successCount)) return;;
+        if (utils.exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.getTreeTasksNpm);
         // tagLog("NPM", "Get NPM Task Items [Start]");
         //
@@ -116,7 +119,7 @@ suite("NPM Tests", () =>
 
     test("Get Package Manager", function()
     {
-        if (utils.exitRollingCount(4, successCount)) return;;
+        if (utils.exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.configEventFast);
         getPackageManager();
         ++successCount;
@@ -125,7 +128,7 @@ suite("NPM Tests", () =>
 
     test("Document Position", async function()
     {
-        if (utils.exitRollingCount(5, successCount)) return;;
+        if (utils.exitRollingCount(5, successCount)) return;
         this.slow((testControl.slowTime.findDocumentPositionCommand * npmTaskItems.length) + testControl.waitTime.commandFast);
         for (const taskItem of npmTaskItems) {
             await utils.executeTeCommand2("open", [ taskItem ], testControl.waitTime.commandFast);
@@ -136,7 +139,7 @@ suite("NPM Tests", () =>
 
     test("Install", async function()
     {
-        if (utils.exitRollingCount(6, successCount)) return;;
+        if (utils.exitRollingCount(6, successCount)) return;
         this.slow(testControl.slowTime.npmInstallCommand + testControl.waitTime.npmCommandMin);
         const exec = await utils.executeTeCommand2(
             "runInstall", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
@@ -148,7 +151,7 @@ suite("NPM Tests", () =>
 
     test("Update", async function()
     {
-        if (utils.exitRollingCount(7, successCount)) return;;
+        if (utils.exitRollingCount(7, successCount)) return;
         this.slow(testControl.slowTime.npmCommand + testControl.waitTime.npmCommandMin);
         const exec = await utils.executeTeCommand2(
             "runUpdate", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
@@ -160,7 +163,7 @@ suite("NPM Tests", () =>
 
     test("Update Specified Package", async function()
     {
-        if (utils.exitRollingCount(8, successCount)) return;;
+        if (utils.exitRollingCount(8, successCount)) return;
         this.slow(testControl.slowTime.npmCommandPkg + testControl.waitTime.npmCommandMin);
         utils.overrideNextShowInputBox("@spmeesseman/app-publisher");
         const exec = await utils.executeTeCommand2(
@@ -173,7 +176,7 @@ suite("NPM Tests", () =>
 
     test("Audit", async function()
     {
-        if (utils.exitRollingCount(9, successCount)) return;;
+        if (utils.exitRollingCount(9, successCount)) return;
         this.slow(testControl.slowTime.npmCommand + testControl.waitTime.npmCommandMin);
         const exec = await utils.executeTeCommand2(
             "runAudit", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
@@ -185,7 +188,7 @@ suite("NPM Tests", () =>
 
     test("Audit Fix", async function()
     {
-        if (utils.exitRollingCount(10, successCount)) return;;
+        if (utils.exitRollingCount(10, successCount)) return;
         this.slow(testControl.slowTime.npmCommand + testControl.waitTime.npmCommandMin);
         const exec = await utils.executeTeCommand2(
             "runAuditFix", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
