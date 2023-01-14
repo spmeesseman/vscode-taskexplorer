@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
-        "module": "ES6",
-        "target": "es6",
+        "module": "commonjs",
+        //"module": "ES6",
+        "target": "es5",
         "outDir": "dist",
 		"rootDir": "src",
         "lib": [
@@ -10,7 +11,7 @@
         "sourceMap": true,
         "strict": true,   /* enable all strict type-checking options */
         "noUnusedLocals": false, /* Report errors on unused locals. */
-        "moduleResolution": "node"
+        //"moduleResolution": "node"
 		//"allowSyntheticDefaultImports":true,
         //"allowSyntheticDefaultImports": true,
         //"esModuleInterop": true,
