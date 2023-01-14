@@ -3,6 +3,7 @@
 import * as util from "./utils/utils";
 import log from "./log/log";
 import { join } from "path";
+import { storage } from "./utils/storage";
 import { findFiles, numFilesInDirectory } from "./utils/fs";
 import { configuration } from "./utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
@@ -11,7 +12,6 @@ import { IDictionary, ICacheItem } from "../interface";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
 } from "vscode";
-import { storage } from "./utils/storage";
 
 
 let statusBarSpace: StatusBarItem;

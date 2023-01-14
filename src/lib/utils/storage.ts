@@ -1,5 +1,5 @@
 
-import * as json5 from "json5";
+const JSON5 = require("json5/dist/index.js");
 import { join } from "path";
 import { Memento, ExtensionContext } from "vscode";
 import { IDictionary } from "../../interface";
@@ -56,7 +56,7 @@ class Storage implements IStorage, Memento
     {
         const store = await readJsonAsync<IDictionary<any>>(this.storageFile);
         store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key] = value;
-        await writeFile(this.storageFile, json5.stringify(store));
+        await writeFile(this.storageFile, JSON5.stringify(store));
     }
 
 

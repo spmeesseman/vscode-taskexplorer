@@ -1,5 +1,5 @@
 
-import * as json5 from "json5";
+const JSON5 = require("json5/dist/index.js");
 import log from "./log/log";
 import { join } from "path";
 import { providersExternal } from "../extension";
@@ -85,7 +85,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
             {
                 try
                 {   const json = readFileSync(tasksFile).toString();
-                    const tasksJso = json5.parse(json);
+                    const tasksJso = JSON5.parse(json);
                     const wsTask = tasksJso.tasks.find((t: any) => t.label === task.name || t.script === task.name);
                     if (wsTask && wsTask.hide === true) {
                         log.write("   skipping this task (by 'showHiddenWsTasks' setting)", 4, logPad, logQueueId);

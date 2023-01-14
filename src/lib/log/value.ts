@@ -1,5 +1,5 @@
 
-import * as json5 from "json5";
+const JSON5 = require("json5/dist/index.js");
 import write from "./write";
 import { logControl } from "./log";
 import { isArray, isObject, isString } from "../utils/utils";
@@ -26,7 +26,7 @@ export const value = (msg: string, value: any, level?: number, logPad = "", queu
     else if (isObject(value))
     {
         try {
-            logMsg += json5.stringify(value, null, 3);
+            logMsg += JSON5.stringify(value, null, 3);
         }
         catch {
             /* istanbul ignore next */
