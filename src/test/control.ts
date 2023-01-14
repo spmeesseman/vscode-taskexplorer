@@ -103,6 +103,7 @@ export const testControl =
         storageUpdate: 50,
         taskProviderReadUri: 100,
         verifyTaskCount: 875,
+        verifyTaskCountByTree: 850,
         verifyTaskCountNpm: 3075, // npm task provider is slower than shit on a turtle
         viewReport: 1950,
         walkTaskTree: 5500,

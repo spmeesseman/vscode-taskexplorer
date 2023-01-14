@@ -70,6 +70,7 @@
         "test-bash": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js bash xDeactivate",
         "test-composer": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js composer xDeactivate",
         "test-configuration": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js configuration xDeactivate",
+        "test-fileCache": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js fileCache xDeactivate",
         "test-grunt": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js grunt xDeactivate",
         "test-gulp": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js gulp xDeactivate",
         "test-infopage": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js infoPage xDeactivate",
@@ -1568,6 +1569,12 @@
                     "order": 1,
                     "description": "%config.taskExplorer.enableSideBar%"
                 },
+                "taskExplorer.enablePersistentFileCaching": {
+                    "type": "boolean",
+                    "default": false,
+                    "order": 1,
+                    "markdownDescription": "%config.taskExplorer.enablePersistentFileCaching%"
+                },
                 "taskExplorer.enabledTasks": {
                     "type": "object",
                     "order": 15,
@@ -1778,6 +1785,18 @@
                     "type": "boolean",
                     "default": true,
                     "description": "%config.taskExplorer.groupStripTaskLabel%"
+                },
+                "taskExplorer.groupMaxLevel": {
+                    "type": "number",
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                    ],
+                    "default": 1,
+                    "description": "%config.taskExplorer.groupMaxLevel%"
                 },
                 "taskExplorer.logging.enable": {
                     "type": "boolean",
@@ -2017,18 +2036,6 @@
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "%config.taskExplorer.visual.enableAnsiconForAnt%"
-                },
-                "taskExplorer.groupMaxLevel": {
-                    "type": "number",
-                    "enum": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5
-                    ],
-                    "default": 1,
-                    "description": "%config.taskExplorer.groupMaxLevel%"
                 },
                 "taskExplorer.useAnt": {
                     "type": "boolean",

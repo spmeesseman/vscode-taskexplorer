@@ -217,6 +217,12 @@ export const executeTeCommand = async (command: string, minWait?: number, maxWai
 export const executeTeCommand2 = (command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand(command, minWait, maxWait, ...args);
 
 
+export const exitRollingCount = (expectedCount: number) =>
+{
+    console.log(`    ${figures.color.warning} ${figures.withColor("rolling success count failure " + expectedCount, figures.colors.grey)}`);
+};
+
+
 export const focusExplorerView = async (instance: any) =>
 {
     if (!teExplorer.isVisible()) {
