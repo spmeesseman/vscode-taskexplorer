@@ -1,6 +1,5 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as json5 from "json5";
 import * as util from "./utils/utils";
 import log from "./log/log";
 import { join } from "path";

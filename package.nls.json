@@ -6,7 +6,7 @@
 	"config.taskExplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
 	"config.taskExplorer.enableSideBar": "Add a task explorer to the the sidebar.",
 
-	"config.taskExplorer.enablePersistentFileCaching": "Enable Persistent File Caching **BETA**",
+	"config.taskExplorer.enablePersistentFileCaching": "Enable Persistent File Caching  `Experimental`",
 
 	"config.taskExplorer.enabledTaskTypes": "Enabled task types to display in the task tree",
 	"config.taskExplorer.enableAnt": "Ant",
