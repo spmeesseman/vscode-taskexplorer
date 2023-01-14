@@ -7,8 +7,9 @@
 //
 import * as utils from "../utils/utils";
 import { Uri } from "vscode";
-import { IFilesystemApi, ITaskExplorerApi, ITestControl } from "@spmeesseman/vscode-taskexplorer-types";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { join } from "path";
+import { ITestControl } from "../control";
 
 
 const testsName = "tsc";

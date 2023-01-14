@@ -6,7 +6,8 @@ import * as utils from "../utils/utils";
 import TaskItem from "../../tree/item";
 import { TaskExecution } from "vscode";
 import { getPackageManager } from "../../lib/utils/utils";
-import { IFilesystemApi, ITaskExplorerApi, ITestControl } from "@spmeesseman/vscode-taskexplorer-types";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITestControl } from "../control";
 
 const testsName = "npm";
 const startTaskCount = 0;

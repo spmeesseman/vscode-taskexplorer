@@ -13,4 +13,3 @@ export * from "./IDictionary";
 export * from "./IFileCache";
 export * from "./ILogQueueItem";
 export * from "./ICacheItem";
-export * from "./ITestControl";

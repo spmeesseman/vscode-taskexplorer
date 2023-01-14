@@ -255,7 +255,7 @@ export const focusExplorerView = async (instance: any) =>
         sleep(100);
     }
     else {
-        instance.slow(testControl.waitTime.min * 2);
+        instance.slow(testControl.slowTime.focusCommandAlreadyFocused);
     }
     await teApi.waitForIdle(testControl.waitTime.min);
 };

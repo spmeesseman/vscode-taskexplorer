@@ -20,7 +20,7 @@ let taskProvider: ExternalTaskProvider;
 let taskProvider2: ExternalTaskProviderBase;
 
 
-suite("API Tests", () =>
+suite("External Provider Tests", () =>
 {
 
     suiteSetup(async function()

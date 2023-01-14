@@ -47,11 +47,11 @@ suite("API and Initialization", () =>
     });
 
 
-    test("Refresh for SideBar Coverage", async function()
+    test("Refresh Trees", async function()
     {   //
         // Twice for delayed init, 1st will be quick with 'Initializing...' message in treeview
         //
-        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.configEvent);
+        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.configEnableEvent + testControl.waitTime.command + testControl.waitTime.refreshCommand);
         await refreshTree(teApi, undefined, undefined, "");
         await teApi.waitForIdle(testControl.waitTime.command);
         await refreshTree(teApi, undefined, undefined, "");
@@ -61,9 +61,17 @@ suite("API and Initialization", () =>
 
     test("Disable Explorer Views", async function()
     {
-        this.slow(testControl.slowTime.configRegisterExplorerEvent + testControl.waitTime.configRegisterExplorerEvent);
+        this.slow(testControl.slowTime.configRegisterExplorerEvent + testControl.waitTime.configRegisterExplorerEvent + testControl.waitTime.configEnableEvent);
         await executeSettingsUpdate("enableExplorerView", false, testControl.waitTime.configEnableEvent);
         await teApi.waitForIdle(testControl.waitTime.configRegisterExplorerEvent);
+    });
+
+
+    test("Refresh SideBar Tree", async function()
+    {
+        this.slow(testControl.slowTime.refreshCommand + testControl.waitTime.refreshCommand);
+        await refreshTree(teApi, undefined, undefined, "");
+        await teApi.waitForIdle(testControl.waitTime.refreshCommand);
     });
 
 
@@ -84,10 +92,10 @@ suite("API and Initialization", () =>
     });
 
 
-    test("Refresh", async function()
+    test("Refresh Explorer Tree", async function()
     {
-        this.slow(testControl.slowTime.refreshCommand);
-        await executeTeCommand("refresh", testControl.waitTime.refreshCommand);
+        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.refreshCommand);
+        await refreshTree(teApi, undefined, undefined, "");
     });
 
 });
