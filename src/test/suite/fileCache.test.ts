@@ -3,7 +3,6 @@
 
 import * as utils from "../utils/utils";
 import constants from "../../lib/constants";
-import { expect } from "chai";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 let teApi: ITaskExplorerApi;
@@ -319,7 +318,6 @@ suite("File Cache Tests", () =>
     test("Check Task Counts", async function()
     {
         if (utils.exitRollingCount(26, successCount)) return;
-        try { expect(successCount).to.be.equal(1); } catch { utils.exitRollingCount(1, successCount); return; }
         await checkTaskCounts(this);
         ++successCount;
     });

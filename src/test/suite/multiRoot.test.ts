@@ -199,7 +199,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Remove WS Folder 1 (Cache Builder Busy)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(9, successCount)) return;
         this.slow(testControl.slowTime.removeWorkspaceFolder + testControl.slowTime.rebuildFileCacheCancel + 100);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);

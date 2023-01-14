@@ -6,15 +6,16 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import * as path from "path";
-import { activate, getWsPath, suiteFinished } from "../utils/utils";
+import { activate, exitRollingCount, getWsPath, suiteFinished } from "../utils/utils";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MakeTaskProvider } from "../../providers/make";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
+import { join } from "path";
 
 
 let teApi: ITaskExplorerApi;
 let provider: MakeTaskProvider;
+let successCount = -1;
 
 
 suite("Makefile Tests", () =>
@@ -24,6 +25,7 @@ suite("Makefile Tests", () =>
     {
         teApi = await activate(this);
         provider = teApi.providers.get("make") as MakeTaskProvider;
+        ++successCount;
     });
 
 
@@ -35,6 +37,7 @@ suite("Makefile Tests", () =>
 
     test("Document Position", async function()
     {
+        if (exitRollingCount(0, successCount)) return;
         // provider.readTasks();
         let index = provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
@@ -53,15 +56,16 @@ suite("Makefile Tests", () =>
         assert(index === 730, `clean3 task position should be 730 (actual ${index}`);
         index = provider.getDocumentPosition("rule_does_not_exist", makefileContent);
         assert(index === 0, `rule_does_not_exist task position should be 0 (actual ${index}`);
+        ++successCount;
     });
 
 
     test("Path to make", async function()
     {
+        if (exitRollingCount(0, successCount)) return;
         const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
-              filePath = getWsPath(path.join("make", "makefile")),
+              filePath = getWsPath(join("make", "makefile")),
               fileUri = Uri.file(filePath);
-
         const pathToMake = teApi.config.get<string>("pathToPrograms.make", "nmake");
         await teApi.config.updateWs("pathToPrograms.make", "nmake");
         provider.createTask("test", "test", rootWorkspace, fileUri, []);
@@ -69,8 +73,8 @@ suite("Makefile Tests", () =>
         provider.createTask("test", "test", rootWorkspace, fileUri, []);
         await teApi.config.updateWs("pathToPrograms.make", undefined);
         provider.createTask("test", "test", rootWorkspace, fileUri, []);
-
         await teApi.config.updateWs("pathToPrograms.make", pathToMake);
+        ++successCount;
     });
 
 

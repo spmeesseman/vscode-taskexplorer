@@ -6,12 +6,13 @@ import * as util from "../../lib/utils/utils";
 import { configuration } from "../../lib/utils/configuration";
 import { teApi } from "../../extension";
 import { enableConfigWatcher } from "../../lib/configWatcher";
-import { activate, executeSettingsUpdate, sleep, suiteFinished, testControl } from "../utils/utils";
+import { activate, executeSettingsUpdate, exitRollingCount, sleep, suiteFinished, testControl } from "../utils/utils";
 
 let enabledTasks: any;
 let globPatterns: string[];
 let pathToPrograms: any;
 let shellW32: string, shellLnx: string, shellOsx: string, pkgMgr: string;
+let successCount = -1;
 
 
 suite("Configuration / Settings Tests", () =>
@@ -25,6 +26,7 @@ suite("Configuration / Settings Tests", () =>
         shellW32 = configuration.getVs<string>("terminal.integrated.shell.windows");
         shellLnx = configuration.getVs<string>("terminal.integrated.shell.linux");
         shellOsx = configuration.getVs<string>("terminal.integrated.shell.osx");
+        successCount++;
     });
 
 
@@ -37,6 +39,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Multi-Dot", async function()
     {
+        if (exitRollingCount(0, successCount)) return;
         this.slow(testControl.slowTime.configEventFast * 10);
         //
         // Multi-part settings updates (behavior differs when value is an object)
@@ -98,135 +101,165 @@ suite("Configuration / Settings Tests", () =>
         // Re-enable config watcher
         //
         enableConfigWatcher(true);
+        successCount++;
     });
 
 
     test("Ant Glob", async function()
     {
+        if (exitRollingCount(1, successCount)) return;
         this.slow((testControl.slowTime.configGlobEvent * 2) + testControl.slowTime.configReadEvent + testControl.waitTime.min);
         globPatterns = configuration.get<string[]>("globPatternsAnt");
         await configuration.updateWs("enabledTasks.ant", false);
         globPatterns.push("**/dummy.xml");
         await executeSettingsUpdate("globPatternsAnt", globPatterns, 50, 100);
         await teApi.waitForIdle(testControl.waitTime.min);
+        successCount++;
     });
 
 
     test("Ant Glob", async function()
     {
+        if (exitRollingCount(2, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.configGlobEvent+ testControl.waitTime.min);
         await executeSettingsUpdate("enabledTasks.ant", true);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsAnt", globPatterns);
         await teApi.waitForIdle(testControl.waitTime.min);
+        successCount++;
     });
 
 
     test("Bash Glob", async function()
     {
+        if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.configGlobEvent + testControl.slowTime.configReadEvent + testControl.waitTime.min);
         globPatterns = configuration.get<string[]>("globPatternsBash");
         await configuration.updateWs("enabledTasks.bash", false);
         globPatterns.push("**/extensionless/**");
         await executeSettingsUpdate("globPatternsBash", globPatterns);
         await teApi.waitForIdle(testControl.waitTime.min);
+        successCount++;
     });
 
 
     test("Bash Glob", async function()
     {
+        if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.configGlobEvent + testControl.waitTime.min);
         await executeSettingsUpdate("enabledTasks.bash", true);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsBash", globPatterns);
         await teApi.waitForIdle(testControl.waitTime.min);
+        successCount++;
     });
 
 
     test("Package Manager - Yarn", async function()
     {
+        if (exitRollingCount(5, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.slowTime.configReadEvent);
         pkgMgr = configuration.getVs<string>("npm.packageManager");
         await configuration.updateVsWs("npm.packageManager", "yarn");
         assert(util.getPackageManager() === "yarn");
+        successCount++;
     });
 
 
     test("Package Manager - NPM Explicit", async function()
     {
+        if (exitRollingCount(6, successCount)) return;
         this.slow(testControl.slowTime.configEvent);
         await configuration.updateVsWs("npm.packageManager", "npm");
         assert(util.getPackageManager() === "npm");
+        successCount++;
     });
 
 
     test("Package Manager - NPM Implicit", async function()
     {
+        if (exitRollingCount(7, successCount)) return;
         this.slow(testControl.slowTime.configEvent);
         await configuration.updateVsWs("npm.packageManager", "");
         assert(util.getPackageManager() === "npm");
+        successCount++;
     });
 
 
     test("Package Manager - Auto", async function()
     {
+        if (exitRollingCount(8, successCount)) return;
         this.slow(testControl.slowTime.configEvent);
         await configuration.updateVsWs("npm.packageManager", "auto");
         assert(util.getPackageManager() === "npm");
+        successCount++;
     });
 
 
     test("Package Manager - Reset", async function()
     {
+        if (exitRollingCount(9, successCount)) return;
         this.slow(testControl.slowTime.configEvent);
         await configuration.updateVsWs("npm.packageManager", pkgMgr);
         await configuration.updateVs("npm.packageManager", pkgMgr); // cover global
         assert(util.getPackageManager() === (pkgMgr === "auto" ? "npm" : pkgMgr));
+        successCount++;
     });
 
 
     test("Change Default Shell - OSX", async function()
     {
+        if (exitRollingCount(10, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.osx", "/usr/bin/sh");
         await sleep(testControl.waitTime.min);
+        successCount++;
     });
 
 
     test("Change Default Shell - Linux", async function()
     {
+        if (exitRollingCount(11, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.linux", "/bin/sh");
         await sleep(testControl.waitTime.min);
+        successCount++;
     });
 
 
     test("Change Default Shell - Windows", async function()
     {
+        if (exitRollingCount(12, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
         await sleep(testControl.waitTime.min);
+        successCount++;
     });
 
 
     test("Reset Default Shell - OSX", async function()
     {
+        if (exitRollingCount(13, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.osx", shellOsx);
         await sleep(testControl.waitTime.min);
+        successCount++;
     });
 
 
     test("Reset Default Shell - Linux", async function()
     {
+        if (exitRollingCount(14, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.linux", shellLnx);
         await sleep(testControl.waitTime.min);
+        successCount++;
     });
 
 
     test("Reset Default Shell - Coverage Hit", async function()
     {
+        if (exitRollingCount(15, successCount)) return;
         this.slow((testControl.slowTime.configEnableEvent * 2) + testControl.waitTime.min);
         await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: false,
@@ -238,19 +271,23 @@ suite("Configuration / Settings Tests", () =>
             ruby: false
         }), 25, 50);
         await executeSettingsUpdate("enabledTasks.nsis", true, testControl.waitTime.min, testControl.waitTime.min * 2); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
+        successCount++;
     });
 
 
     test("Reset Default Shell - Windows", async function()
     {
+        if (exitRollingCount(16, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await configuration.updateVsWs("terminal.integrated.shell.windows", shellW32);
         await sleep(testControl.waitTime.min);
+        successCount++;
     });
 
 
     test("Reset Coverage Hit", async function()
     {
+        if (exitRollingCount(17, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: true,
@@ -261,53 +298,67 @@ suite("Configuration / Settings Tests", () =>
             python: false,
             ruby: false
         }), testControl.waitTime.min, testControl.waitTime.min * 2);
+        successCount++;
     });
 
 
     test("Path to Programs Set Bash", async function()
     {
+        if (exitRollingCount(18, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.bash", "c:\\unix\\sh.exe", testControl.waitTime.min, testControl.waitTime.min * 2);
+        successCount++;
     });
 
 
     test("Path to Programs Set Composer", async function()
     {
+        if (exitRollingCount(19, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.composer", "c:\\php5\\composer.exe", testControl.waitTime.min, testControl.waitTime.min * 2);
+        successCount++;
     });
 
 
     test("Path to Programs Clear Bash", async function()
     {
+        if (exitRollingCount(20, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.bash", undefined, testControl.waitTime.min, testControl.waitTime.min * 2);
+        successCount++;
     });
 
 
     test("Path to Programs Clear Composer", async function()
     {
+        if (exitRollingCount(21, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.composer", undefined, testControl.waitTime.min, testControl.waitTime.min * 2);
+        successCount++;
     });
 
 
     test("Path to Programs Restore Bash", async function()
     {
+        if (exitRollingCount(22, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash, testControl.waitTime.min, testControl.waitTime.min * 2);
+        successCount++;
     });
 
 
     test("Path to Programs Restore Composer", async function()
     {
+        if (exitRollingCount(23, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer, testControl.waitTime.min, testControl.waitTime.min * 2);
+        successCount++;
     });
 
 
     test("User Level Setting Update", async function()
     {
+        if (exitRollingCount(24, successCount)) return;
         this.slow(testControl.slowTime.configEvent * 2 + 50);
         enableConfigWatcher(false);
         const logLevel = configuration.get<number>("logging.level");
@@ -321,6 +372,7 @@ suite("Configuration / Settings Tests", () =>
         teApi.waitForIdle(testControl.waitTime.configEvent);
         await configuration.update("logging.level", logLevel);
         teApi.waitForIdle(testControl.waitTime.configEvent);
+        successCount++;
     });
 
 });

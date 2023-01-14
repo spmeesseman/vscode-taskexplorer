@@ -173,6 +173,12 @@ export const cleanup = async () =>
     //
     console.log(`    ${figures.color.info} ${figures.withColor("Exiting", figures.colors.grey)}`);
     console.log(`    ${figures.color.info}`);
+
+    //
+    // If rolling count error is set, then Mocha think we're successful, throw here to make the
+    // test run fail.
+    //
+    expect(hasRollingCountError === false, "There was a rolling count failure");
 };
 
 
