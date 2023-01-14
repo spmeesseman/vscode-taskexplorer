@@ -132,8 +132,7 @@ const externals = (wpConfig) =>
 		// the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot
 		// be webpack'ed, -> https://webpack.js.org/configuration/externals/
 		//
-		vscode: 'commonjs vscode' // ,
-		// json5: 'json5'
+		vscode: 'commonjs vscode'
 	};
 };
 
@@ -322,22 +321,17 @@ const rules = (wpConfig) =>
 			use: [{
 				loader: 'ts-loader'
 			}]
-		} // ,
+		},
 		// {
-		// 	test: /json5[\\/]dist[\\/]index\.mjs$/,
-		// 	loader: "string-replace-loader",
-		// 	options: {
-		// 		search: "var parse = function parse",
-		// 		replace: () => "var parse = function"
-		// 	}
+		// 	test: /\.mjs$/,
+		// 	resolve: { mainFields: [ "browser", "module", "main" ] }
 		// },
 		// {
-		// 	test: /json5[\\/]dist[\\/]index\.mjs$/,
-		// 	loader: "string-replace-loader",
+		// 	exclude: [ /.(js|jsx|mjs|html|json)$/],
+		// 	loader: 'file-loader',
 		// 	options: {
-		// 		search: "var stringify = function stringify",
-		// 		replace: () => "var stringify = function"
-		// 	}
+		// 		// name: config.mediaChunkFileName
+		// 	},
 		// }
 		]
 	};
