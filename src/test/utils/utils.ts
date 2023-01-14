@@ -5,6 +5,7 @@ import * as assert from "assert";
 import * as treeUtils from "./treeUtils";
 import constants from "../../lib/constants";
 import figures from "../../lib/figures";
+import { expect } from "chai";
 import { deactivate } from "../../extension";
 import { testControl } from "../control";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
@@ -219,7 +220,15 @@ export const executeTeCommand2 = (command: string, args: any[], minWait?: number
 
 export const exitRollingCount = (expectedCount: number) =>
 {
-    console.log(`    ${figures.color.warning} ${figures.withColor("rolling success count failure " + expectedCount, figures.colors.grey)}`);
+    try {
+        expect(expectedCount).to.be.equal(expectedCount);
+    }
+    catch {
+        const msg = "skip test, rolling success count failure " + expectedCount;
+        console.log(`    ${figures.color.warning} ${figures.withColor(msg, figures.colors.grey)}`);
+        return false;
+    }
+    return true;
 };
 
 
