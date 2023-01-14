@@ -7,7 +7,7 @@
 //
 import * as utils from "../utils/utils";
 import { Uri } from "vscode";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IFilesystemApi, ITaskExplorerApi, ITestControl } from "@spmeesseman/vscode-taskexplorer-types";
 import { join } from "path";
 
 
@@ -16,7 +16,7 @@ const startTaskCount = 0;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let testControl: any;
+let testControl: ITestControl;
 let rootPath: string;
 let dirName: string;
 let fileUri: Uri;

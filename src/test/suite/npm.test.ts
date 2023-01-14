@@ -4,15 +4,16 @@
 
 import * as utils from "../utils/utils";
 import TaskItem from "../../tree/item";
-import { getPackageManager } from "../../lib/utils/utils";
 import { TaskExecution } from "vscode";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { getPackageManager } from "../../lib/utils/utils";
+import { IFilesystemApi, ITaskExplorerApi, ITestControl } from "@spmeesseman/vscode-taskexplorer-types";
 
 const testsName = "npm";
 const startTaskCount = 0;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
+let testControl: ITestControl;
 let packageJsonPath: string;
 let npmTaskItems: TaskItem[];
 let successCount = -1;
@@ -20,8 +21,6 @@ let successCount = -1;
 
 suite("NPM Tests", () =>
 {
-
-    let testControl: any;
 
     suiteSetup(async function()
     {
@@ -89,7 +88,7 @@ suite("NPM Tests", () =>
     test("Verify NPM Task Count", async function()
     {   // npm task provider is slower than shit on a turtle
         if (utils.exitRollingCount(2, successCount)) return;;
-        this.slow(testControl.slowTime.utils.verifyTaskCountNpm + testControl.waitTime.min);
+        this.slow(testControl.slowTime.verifyTaskCountNpm + testControl.waitTime.min);
         await utils.verifyTaskCount(testsName, startTaskCount + 5, 2);
         await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;

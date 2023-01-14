@@ -1,8 +1,8 @@
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
+import { IDictionary, ITestControl } from "@spmeesseman/vscode-taskexplorer-types";
 
-export const testControl =
+export const testControl: ITestControl =
 {   //
     // KEEP SETTINGS FILE CHANGES (@ test-files/.vscode/workspace.json)
     //

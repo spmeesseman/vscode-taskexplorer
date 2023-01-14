@@ -5,7 +5,7 @@ import { lowerCaseFirstChar, properCase } from "../../lib/utils/utils";
 import { testControl } from "../control";
 import { teApi } from "./utils";
 
-const timeSep = "-----------------------------------------------------------------------------------------------";
+const timeSep = "----------------------------------------------------------------------------------------------------";
 
 
 const clearProcessTimeStorage = async (key: string, force?: boolean) =>

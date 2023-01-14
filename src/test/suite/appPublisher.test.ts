@@ -5,7 +5,7 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as path from "path";
+import { join } from "path";
 import { Uri } from "vscode";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
@@ -34,7 +34,7 @@ suite("App-Publisher Tests", () =>
         teApi = await activate(this);
         fsApi = teApi.testsApi.fs;
         rootPath = getWsPath(".");
-        fileUri = Uri.file(path.join(rootPath, ".publishrc.json"));
+        fileUri = Uri.file(join(rootPath, ".publishrc.json"));
         //
         // Store / set initial settings
         //

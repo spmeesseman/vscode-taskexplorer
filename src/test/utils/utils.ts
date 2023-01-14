@@ -226,9 +226,9 @@ export const exitRollingCount = (expectedCount: number, successCount: number) =>
     catch {
         const msg = "skip test, rolling success count failure " + expectedCount;
         console.log(`    ${figures.color.warning} ${figures.withColor(msg, figures.colors.grey)}`);
-        return false;
+        return true;
     }
-    return true;
+    return false;
 };
 
 
@@ -286,8 +286,8 @@ const initSettings = async () =>
     //
     // Grunt / Gulp VSCode internal task providers. Gulp suite will disable when done.
     //
-    testControl.vsCodeAutoDetectGrunt = configuration.getVs<string>("grunt.autoDetect", "off");
-    testControl.vsCodeAutoDetectGulp = configuration.getVs<string>("gulp.autoDetect", "off");
+    testControl.vsCodeAutoDetectGrunt = configuration.getVs<string>("grunt.autoDetect", "off") as "on" | "off";
+    testControl.vsCodeAutoDetectGulp = configuration.getVs<string>("gulp.autoDetect", "off") as "on" | "off";
     await configuration.updateVs("grunt.autoDetect", "on");
     await configuration.updateVs("gulp.autoDetect", "on");
     //
