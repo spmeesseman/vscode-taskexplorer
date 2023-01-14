@@ -14,7 +14,7 @@ import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { configuration } from "../lib/utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ScriptTaskProvider } from "../providers/script";
-import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface";
+import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition, IDictionary } from "../interface";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import { getTerminal } from "../lib/getTerminal";
@@ -224,7 +224,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     }
 
 
-    private async buildGroupings(folders: Map<string, TaskFolder|SpecialTaskFolder>, logPad: string, logLevel: number)
+    private async buildGroupings(folders: IDictionary<TaskFolder|SpecialTaskFolder>, logPad: string, logLevel: number)
     {
         const groupWithSep = configuration.get<boolean>("groupWithSeparator");
         log.methodStart("build tree node groupings", logLevel, logPad, false, [[ "group withseparator", groupWithSep ]]);
@@ -236,7 +236,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         // After the initial sort, create any task groupings based on the task group separator.
         // 'folders' are the project/workspace folders.
         //
-        for (const [ key, folder ] of folders)
+        for (const [ key, folder ] of Object.entries(folders))
         {
             if (folder instanceof SpecialTaskFolder) {
                 log.write(`   skipping ${folder.label} folder for grouping`, logLevel, logPad);
@@ -260,8 +260,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     public async buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<TaskFolder[]|NoScripts[]>
     {
         let taskCt = 0;
-        const folders: Map<string, TaskFolder> = new Map();
-        const files: Map<string, TaskFile> = new Map();
+        const folders: IDictionary<TaskFolder> = {};
+        const files: IDictionary<TaskFile> = {};
 
         log.methodStart("build task tree", logLevel, logPad);
 
@@ -279,7 +279,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         this.specialFolders.lastTasks.clearTaskItems();
         if (this.specialFolders.lastTasks.isEnabled())
         {
-            folders.set(this.specialFolders.lastTasks.label as string, this.specialFolders.lastTasks);
+            folders[this.specialFolders.lastTasks.label as string] = this.specialFolders.lastTasks;
         }
 
         //
@@ -289,7 +289,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         this.specialFolders.favorites.clearTaskItems();
         if (this.specialFolders.favorites.isEnabled())
         {
-            folders.set(this.specialFolders.favorites.label as string, this.specialFolders.favorites);
+            folders[this.specialFolders.favorites.label as string] = this.specialFolders.favorites;
         }
 
         //
@@ -335,7 +335,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      * @param favTasks List of Task ID's currently in the "Favorites" TaskFolder.
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
-    private async buildTaskTreeList(each: Task, folders: Map<string, TaskFolder>, files: Map<string, TaskFile>, logPad: string)
+    private async buildTaskTreeList(each: Task, folders: IDictionary<TaskFolder>, files: IDictionary<TaskFile>, logPad: string)
     {
         let folder: TaskFolder | undefined,
             scopeName: string;
@@ -376,24 +376,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         if (util.isWorkspaceFolder(each.scope))
         {
             scopeName = each.scope.name;
-            folder = folders.get(scopeName);
+            folder = folders[scopeName];
             if (!folder)
             {
                 folder = new TaskFolder(each.scope, nodeExpandedeMap[util.lowerCaseFirstChar(scopeName, true)] !== false ?
                                                     TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
-                folders.set(scopeName, folder);
+                folders[scopeName] = folder;
                 log.value("constructed tree taskfolder", `${scopeName} (${folder.id})`, 3, logPad + "   ");
             }
         }     //
         else // User Task (not related to a ws or project)
         {   //
             scopeName = constants.USER_TASKS_LABEL;
-            folder = folders.get(scopeName);
+            folder = folders[scopeName];
             if (!folder)
             {
                 folder = new TaskFolder(scopeName, nodeExpandedeMap[util.lowerCaseFirstChar(scopeName, true)] !== false ?
                                                 TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
-                folders.set(scopeName, folder);
+                folders[scopeName] = folder;
                 log.value("constructed tree user taskfolder", `${scopeName} (${folder.id})`, 3, logPad + "   ");
             }
         }
@@ -448,7 +448,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     private async createTaskGroupings(folder: TaskFolder, logPad: string, logLevel: number)
     {
         let prevTaskFile: TaskItem | TaskFile | undefined;
-        const subfolders: Map<string, TaskFile> = new Map();
+        const subfolders: IDictionary<TaskFile> = {};
 
         log.methodStart("create tree node folder grouping", logLevel, logPad, true, [[ "project folder", folder.label ]]);
 
@@ -466,7 +466,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             if (prevTaskFile && prevTaskFile.taskSource === each.taskSource)
             {
                 const id = folder.label + each.taskSource;
-                let subfolder: TaskFile | undefined = subfolders.get(id);
+                let subfolder: TaskFile | undefined = subfolders[id];
                 if (!subfolder)
                 {
                     log.values(logLevel + 2, logPad, [
@@ -479,7 +479,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     {
                         subfolder = new TaskFile(this.extensionContext, folder, node.task.definition,
                                                 each.taskSource, each.path, 0, true, undefined, "   ");
-                        subfolders.set(id, subfolder);
+                        subfolders[id] = subfolder;
                         await folder.addTaskFile(subfolder);
                         //
                         // Since we add the grouping when we find two or more equal group names, we are iterating
@@ -568,7 +568,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      * @param subfolders Tree taskfile map
      * @param groupSeparator The group separator
      */
-    private async createTaskGroupingsBySep(folder: TaskFolder, taskFile: TaskFile, subfolders: Map<string, TaskFile>, treeLevel: number, logPad: string, logLevel: number)
+    private async createTaskGroupingsBySep(folder: TaskFolder, taskFile: TaskFile, subfolders: IDictionary<TaskFile>, treeLevel: number, logPad: string, logLevel: number)
     {
         let prevName: string[] | undefined;
         let prevTaskItem: TaskItem | undefined;
@@ -664,7 +664,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 // when split by the separator character is the same...
                 //
                 const id = this.getGroupedId(folder, taskFile, label, treeLevel);
-                subfolder = subfolders.get(id);
+                subfolder = subfolders[id];
 
                 if (!subfolder)
                 {   //
@@ -674,7 +674,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     //
                     subfolder = new TaskFile(this.extensionContext, folder, each.task.definition, taskFile.taskSource,
                                              each.taskFile.path, treeLevel, true, prevName[treeLevel], logPad);
-                    subfolders.set(id, subfolder);
+                    subfolders[id] = subfolder;
                     _setNodePath(prevTaskItem, each.nodePath);
                     //
                     // Since we add the grouping when we find two or more equal group names, we are iterating
@@ -1033,7 +1033,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     public getTasks = () => this.tasks || [];
 
 
-    private async getTaskFileNode(task: Task, folder: TaskFolder, files: any, relativePath: string, scopeName: string, logPad: string)
+    private async getTaskFileNode(task: Task, folder: TaskFolder, files: IDictionary<TaskFile>, relativePath: string, scopeName: string, logPad: string)
     {
         let taskFile: TaskFile;
         log.methodStart("get task file node", 2, logPad, false, [[ "relative path", relativePath ], [ "scope name", scopeName ]]);
@@ -1054,7 +1054,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             id = join(id, task.definition.fileName);
         }
 
-        taskFile = files.get(id);
+        taskFile = files[id];
 
         //
         // Create taskfile node if needed
@@ -1064,7 +1064,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             log.value("   Add source file container", task.source, 2, logPad);
             taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath, 0, false, undefined, logPad + "   ");
             await folder.addTaskFile(taskFile);
-            files.set(id, taskFile);
+            files[id] = taskFile;
         }
 
         log.methodDone("get task file node", 2, logPad);
@@ -1175,8 +1175,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             {
                 log.write("   invalidate '" + opt1 + "' task provider file ", 1, logPad);
                 log.value("      file", opt2.fsPath, 1, logPad);
-                const provider = providers.get(opt1) ||
-                                 providersExternal.get(opt1);
+                const provider = providers[opt1] ||
+                                 providersExternal[opt1];
                 // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
                 await provider?.invalidate(opt2, logPad + "   ");
             }
@@ -1186,7 +1186,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 if (!opt1)
                 {
                     log.write("   invalidate all providers", 1, logPad);
-                    for (const [ key, p ] of providers)
+                    for (const [ key, p ] of Object.entries(providers))
                     {
                         log.write("   invalidate '" + key + "' task provider", 1, logPad);
                         await p.invalidate(undefined, logPad + "   ");
@@ -1194,8 +1194,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 }
                 else { // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
                     log.write("   invalidate '" + opt1 + "' task provider", 1, logPad);
-                    const provider = providers.get(opt1) ||
-                                     providersExternal.get(opt1);
+                    const provider = providers[opt1] || providersExternal[opt1];
                     provider?.invalidate(undefined, logPad + "   ");
                 }
             }
@@ -1530,7 +1529,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     }
 
 
-    private removeGroupedTasks(folder: TaskFolder, subfolders: Map<string, TaskFile>, logPad: string, logLevel: number)
+    private removeGroupedTasks(folder: TaskFolder, subfolders: IDictionary<TaskFile>, logPad: string, logLevel: number)
     {
         const taskTypesRmv: TaskFile[] = [];
 
@@ -1545,11 +1544,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             const id = folder.label + each.taskSource;
             const id2 = this.getGroupedId(folder, each, each.label.toString(), each.groupLevel);
 
-            if (!each.isGroup && subfolders.get(id))
+            if (!each.isGroup && subfolders[id])
             {
                 taskTypesRmv.push(each);
             }
-            else if (id2 && !each.isGroup && subfolders.get(id2))
+            else if (id2 && !each.isGroup && subfolders[id2])
             {
                 taskTypesRmv.push(each);
             }
@@ -1597,7 +1596,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      * @param subfolders Current tree subfolders map
      * @param level Current grouping level
      */
-    private removeTreeNodes(taskFile: ITaskFile, folder: TaskFolder, subfolders: Map<string, TaskFile>, level: number, logPad: string, logLevel: number)
+    private removeTreeNodes(taskFile: ITaskFile, folder: TaskFolder, subfolders: IDictionary<TaskFile>, level: number, logPad: string, logLevel: number)
     {
         const me = this;
         const taskTypesRmv: (ITaskFile | ITaskItem)[] = [];
@@ -1619,7 +1618,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             {
                 if (label.split(groupSeparator).length > 1 && labelPart)
                 {
-                    if (subfolders.get(id))
+                    if (subfolders[id])
                     {
                         taskTypesRmv.push(each);
                     }
@@ -1779,7 +1778,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 //
                 const def = newTask.definition,
                       folder = taskItem.getFolder(),
-                      p = providers.get(def.type) || /* istanbul ignore next */providersExternal.get(def.type);
+                      p = providers[def.type] || /* istanbul ignore next */providersExternal[def.type];
                 /* istanbul ignore else */
                 if (folder && p)
                 {

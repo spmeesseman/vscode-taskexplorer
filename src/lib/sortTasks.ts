@@ -4,13 +4,13 @@ import TaskItem from "../tree/item";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import constants from "./constants";
-import { ITaskFile, ITaskItem } from "../interface";
+import { IDictionary, ITaskFile, ITaskItem } from "../interface";
 
 
 
-export const sortFolders = (folders: Map<string, TaskFolder>): TaskFolder[] =>
+export const sortFolders = (folders: IDictionary<TaskFolder>): TaskFolder[] =>
 {
-    return [ ...folders.values() ].sort((a: TaskFolder, b: TaskFolder) =>
+    return [ ...Object.values(folders) ].sort((a: TaskFolder, b: TaskFolder) =>
     {
         if (a.label === constants.LAST_TASKS_LABEL) {
             return -1;

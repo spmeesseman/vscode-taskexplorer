@@ -61,13 +61,13 @@ export async function addFolder(folder: Uri, logPad: string)
     {
         await startBuild();
 
-        const taskProviders = ([ ...util.getTaskTypes(), ...providersExternal.keys() ]).sort((a, b) => {
+        const taskProviders = ([ ...util.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
             return util.getTaskTypeFriendlyName(a).localeCompare(util.getTaskTypeFriendlyName(b));
         });
 
         for (const providerName of taskProviders)
         {
-            const externalProvider = providersExternal.get(providerName);
+            const externalProvider = providersExternal[providerName];
             //
             // TODO - remove below ignore tags when test for copy/move folder w/files is implemented
             //
@@ -76,7 +76,7 @@ export async function addFolder(folder: Uri, logPad: string)
                 let glob;
                 if (!util.isWatchTask(providerName))
                 {
-                    const provider = providers.get(providerName) || /* istanbul ignore next */externalProvider;
+                    const provider = providers[providerName] || /* istanbul ignore next */externalProvider;
                     /* istanbul ignore next */
                     glob = provider?.getGlobPattern();
                 }
@@ -88,7 +88,7 @@ export async function addFolder(folder: Uri, logPad: string)
                 statusBarSpace.text = getStatusString(`Scanning for ${dspTaskType} tasks in project ${wsFolder.name}`, 65);
 
                 /* istanbul ignore else */
-                if (!providersExternal.get(providerName))
+                if (!providersExternal[providerName])
                 {
                     let numFilesAdded = 0;
                     log.write(`   adding new directory to '${providerName}' file cache`, 2, logPad);
@@ -150,20 +150,20 @@ async function addWsFolder(folder: WorkspaceFolder, logPad: string)
     log.methodStart("add workspace project folder to cache", 1, logPad, logPad === "", [[ "folder", folder.name ]]);
 
     let numFilesFound = 0;
-    const taskProviders = ([ ...util.getTaskTypes(), ...providersExternal.keys() ]).sort((a, b) => {
+    const taskProviders = ([ ...util.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
         return util.getTaskTypeFriendlyName(a).localeCompare(util.getTaskTypeFriendlyName(b));
     });
 
     for (const providerName of taskProviders)
     {
-        const externalProvider = providersExternal.get(providerName);
+        const externalProvider = providersExternal[providerName];
         if (!cancel && (externalProvider || util.isTaskTypeEnabled(providerName)))
         {
             let glob;
             if (!util.isWatchTask(providerName))
             {
-                const provider = providers.get(providerName) || /* istanbul ignore next */externalProvider;
-                glob = (provider as TaskExplorerProvider).getGlobPattern();
+                const provider = providers[providerName] || /* istanbul ignore next */externalProvider;
+                glob = provider.getGlobPattern();
             }
             if (!glob) {
                 glob = util.getGlobPattern(providerName);
@@ -314,7 +314,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
 
     initMaps(taskType, folder.name);
 
-    const isExternal = providersExternal.get(taskType),
+    const isExternal = providersExternal[taskType],
           fsChanged = isFsChanged(taskType, folder.name),
           globChanged = isGlobChanged(taskType, fileGlob);
 

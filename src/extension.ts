@@ -31,7 +31,7 @@ import { LicenseManager } from "./lib/licenseManager";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
 import { ExtensionContext, tasks, commands } from "vscode";
-import { IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITestsApi } from "./interface";
+import { IDictionary, IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITestsApi } from "./interface";
 import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/fileWatcher";
 
@@ -39,8 +39,8 @@ import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFol
 let licenseManager: ILicenseManager;
 let ready = false;
 let tests = false;
-export const providers: Map<string, TaskExplorerProvider> = new Map();
-export const providersExternal: Map<string, IExternalProvider> = new Map();
+export const providers: IDictionary<TaskExplorerProvider> = {};
+export const providersExternal: IDictionary<IExternalProvider> = {};
 
 export const teApi: ITaskExplorerApi =
 {
@@ -257,7 +257,7 @@ function isBusy()
 async function refreshExternalProvider(providerName: string)
 {
     /* istanbul ignore next */
-    if (providersExternal.get(providerName))
+    if (providersExternal[providerName])
     {
         /* istanbul ignore next */
         await refreshTree(teApi, providerName, undefined, "");
@@ -278,7 +278,7 @@ function registerCommands(context: ExtensionContext)
 
 async function registerExternalProvider(providerName: string, provider: IExternalProvider, logPad: string)
 {
-    providersExternal.set(providerName, provider);
+    providersExternal[providerName] = provider;
     await refreshTree(teApi, providerName, undefined, logPad);
 }
 
@@ -287,7 +287,7 @@ async function registerExternalProvider(providerName: string, provider: IExterna
 function registerTaskProvider(providerName: string, provider: TaskExplorerProvider, context: ExtensionContext)
 {
     context.subscriptions.push(tasks.registerTaskProvider(providerName, provider));
-    providers.set(providerName, provider);
+    providers[providerName] = provider;
 }
 
 
@@ -323,7 +323,7 @@ function registerTaskProviders(context: ExtensionContext)
 
 async function unregisterExternalProvider(providerName: string, logPad: string)
 {
-    providersExternal.delete(providerName);
+    delete providersExternal[providerName];
     await refreshTree(teApi, providerName, undefined, logPad);
 }
 

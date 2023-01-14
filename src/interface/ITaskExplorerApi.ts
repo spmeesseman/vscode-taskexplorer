@@ -6,8 +6,7 @@ import { TreeItem, TreeView } from "vscode";
 import { IConfiguration } from "./IConfiguration";
 import { IExternalProvider } from "./IExternalProvider";
 import { ITaskExplorerProvider } from "./ITaskProvider";
-// import { TaskExplorerProvider } from "../providers/provider";
-// import { TaskTreeDataProvider } from "../tree/tree";
+import { IDictionary } from "./IDictionary";
 
 export interface ITaskExplorerApi
 {
@@ -18,8 +17,8 @@ export interface ITaskExplorerApi
     explorerView: TreeView<TreeItem> | undefined;
     sidebar: ITaskExplorer | undefined;
     sidebarView: TreeView<TreeItem> | undefined;
-    providers: Map<string, ITaskExplorerProvider>;
-    providersExternal: Map<string, IExternalProvider>;
+    providers: IDictionary<ITaskExplorerProvider>;
+    providersExternal: IDictionary<IExternalProvider>;
     testsApi: ITestsApi;
 
     isBusy(): boolean;

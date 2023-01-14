@@ -112,7 +112,7 @@ export const findDocumentPosition = (document: TextDocument, taskItem: TaskItem)
     }
     else if (!isWatchTask(taskItem.taskSource))
     {
-        const provider = providers.get(def.type) || providersExternal.get(def.type);
+        const provider = providers[def.type] || providersExternal[def.type];
         scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || -1;
     }
 

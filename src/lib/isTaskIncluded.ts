@@ -63,7 +63,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
     // TODO - remove coverage ignore tags when external providers test suite can be done
     //
     /* istanbul ignore if */
-    if (providersExternal.get(task.source)) {
+    if (providersExternal[task.source]) {
         return !!task.definition && !!task.name && !!task.execution;
     }
 
