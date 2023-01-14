@@ -65,5 +65,8 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
         }
     }
 
-    teApi.testsApi.explorer = teApi.explorer /* istanbul ignore next */|| teApi.sidebar || {} as ITaskExplorer;
+    /* istanbul ignore else */
+    if (teApi.testsApi) {
+        teApi.testsApi.explorer = teApi.explorer /* istanbul ignore next */|| teApi.sidebar || {} as ITaskExplorer;
+    }
 }

@@ -76,6 +76,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     // Set 'tests' flag if tests are running and this is not a user runtime
     //
     tests = await fs.pathExists(join(__dirname, "test", "runTest.js"));
+    /* istanbul ignore if */
     if (!tests) {
          teApi.testsApi = null as unknown as ITestsApi;
     }
@@ -89,7 +90,10 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     // Initialize persistent storage
     //
     await initStorage(context, tests);
-    teApi.testsApi.storage = storage;
+    /* istanbul ignore else */
+    if (tests) {
+        teApi.testsApi.storage = storage;
+    }
 
     log.write("");
     log.write("Activate extension");
