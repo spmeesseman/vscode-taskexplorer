@@ -7,12 +7,11 @@
 //
 import * as assert from "assert";
 import * as path from "path";
-import { expect } from "chai";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { PowershellTaskProvider } from "../../providers/powershell";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, getWsPath,
-    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, suiteFinished, testControl, verifyTaskCount
+import { activate, executeSettingsUpdate, exitRollingCount, getWsPath,
+    logErrorsAreFine, suiteFinished, testControl, verifyTaskCount
 } from "../utils/utils";
 
 const testsName = "powershell";
@@ -60,7 +59,7 @@ suite("Powershell Tests", () =>
 
     test("Document Position", async function()
     {
-        expect(successCount).to.be.equal(0, "rolling success count failure");
+        if (exitRollingCount(0, successCount)) return;;
         const provider = teApi.providers.get(testsName) as PowershellTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
         ++successCount;
@@ -69,18 +68,18 @@ suite("Powershell Tests", () =>
 
     test("Invalid ScriptProvider Type", async function()
     {
-        expect(successCount).to.be.equal(1, "rolling success count failure");
+        if (exitRollingCount(1, successCount)) return;;
         const provider = teApi.providers.get(testsName) as PowershellTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.ps1"))),
                "ScriptProvider type should return position 1");
-        logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs();
+        logErrorsAreFine();
         ++successCount;
     });
 
 
     test("Start", async function()
     {
-        expect(successCount).to.be.equal(2, "rolling success count failure");
+        if (exitRollingCount(2, successCount)) return;;
         this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
         await verifyTaskCount(testsName, startTaskCount);
         await teApi.waitForIdle(testControl.waitTime.min);
@@ -90,7 +89,7 @@ suite("Powershell Tests", () =>
 
     test("Disable", async function()
     {
-        expect(successCount).to.be.equal(3, "rolling success count failure");
+        if (exitRollingCount(3, successCount)) return;;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
@@ -100,7 +99,7 @@ suite("Powershell Tests", () =>
 
     test("Re-enable", async function()
     {
-        expect(successCount).to.be.equal(4, "rolling success count failure");
+        if (exitRollingCount(4, successCount)) return;;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -110,7 +109,7 @@ suite("Powershell Tests", () =>
 
     test("Create File", async function()
     {
-        expect(successCount).to.be.equal(5, "rolling success count failure");
+        if (exitRollingCount(5, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsCreateEvent);
         await fsApi.writeFile(fileUri.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
@@ -121,7 +120,7 @@ suite("Powershell Tests", () =>
 
     test("Create Empty Directory", async function()
     {
-        expect(successCount).to.be.equal(6, "rolling success count failure");
+        if (exitRollingCount(6, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.waitTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await teApi.waitForIdle(testControl.waitTime.fsCreateFolderEvent);
@@ -132,7 +131,7 @@ suite("Powershell Tests", () =>
 
     test("Create File 2", async function()
     {
-        expect(successCount).to.be.equal(7, "rolling success count failure");
+        if (exitRollingCount(7, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(fileUri2.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
@@ -143,7 +142,7 @@ suite("Powershell Tests", () =>
 
     test("Delete File 2", async function()
     {
-        expect(successCount).to.be.equal(8, "rolling success count failure");
+        if (exitRollingCount(8, successCount)) return;;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent);
         await fsApi.deleteFile(fileUri2.fsPath);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
@@ -154,7 +153,7 @@ suite("Powershell Tests", () =>
 
     test("Re-create File 2", async function()
     {
-        expect(successCount).to.be.equal(9, "rolling success count failure");
+        if (exitRollingCount(9, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsCreateEvent);
         await fsApi.writeFile(fileUri2.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
@@ -165,7 +164,7 @@ suite("Powershell Tests", () =>
 
     test("Delete Folder w/ File", async function()
     {
-        expect(successCount).to.be.equal(10, "rolling success count failure");
+        if (exitRollingCount(10, successCount)) return;;
         this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteFolderEvent);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteFolderEvent);
@@ -176,7 +175,7 @@ suite("Powershell Tests", () =>
 
     test("Delete File", async function()
     {
-        expect(successCount).to.be.equal(11, "rolling success count failure");
+        if (exitRollingCount(11, successCount)) return;;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);

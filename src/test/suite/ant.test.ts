@@ -10,8 +10,9 @@ import { AntTaskProvider } from "../../providers/ant";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import {
     activate, executeSettingsUpdate, getWsPath, testControl, verifyTaskCount,
-    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs,
-    suiteFinished
+    logErrorsAreFine,
+    suiteFinished,
+    exitRollingCount
 } from "../utils/utils";
 
 const testsName = "ant";
@@ -55,7 +56,7 @@ suite("Ant Tests", () =>
 
     test("Document Position", async function()
     {
-        expect(successCount).to.be.equal(1, "rolling success count failure");
+        if (exitRollingCount(1, successCount)) return;
         const xml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
@@ -69,7 +70,7 @@ suite("Ant Tests", () =>
 
     test("Start", async function()
     {
-        expect(successCount).to.be.equal(2, "rolling success count failure");
+        if (exitRollingCount(2, successCount)) return;
         this.slow(testControl.slowTime.verifyTaskCount);
         await verifyTaskCount("ant", 3);
         ++successCount;
@@ -78,7 +79,7 @@ suite("Ant Tests", () =>
 
     test("Disable", async function()
     {
-        expect(successCount).to.be.equal(3, "rolling success count failure");
+        if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", false);
         await teApi.waitForIdle(testControl.waitTime.configEvent);
@@ -89,7 +90,7 @@ suite("Ant Tests", () =>
 
     test("Re-enable", async function()
     {
-        expect(successCount).to.be.equal(4, "rolling success count failure");
+        if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", true);
         await teApi.waitForIdle(testControl.waitTime.configEvent);
@@ -100,7 +101,7 @@ suite("Ant Tests", () =>
 
     test("Enable Ansicon", async function()
     {
-        expect(successCount).to.be.equal(5, "rolling success count failure");
+        if (exitRollingCount(5, successCount)) return;
         this.slow((testControl.slowTime.configEvent * 5) + (testControl.slowTime.commandFast * 4));
         await executeSettingsUpdate("pathToPrograms.ansicon", "ansicon\\x64\\ansicon.exe");
         await executeSettingsUpdate("visual.enableAnsiconForAnt", true);
@@ -117,7 +118,7 @@ suite("Ant Tests", () =>
 
     test("Disable Ansicon", async function()
     {
-        expect(successCount).to.be.equal(6, "rolling success count failure");
+        if (exitRollingCount(6, successCount)) return;
         this.slow((testControl.slowTime.configEvent * 3) + (testControl.slowTime.commandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
         await executeSettingsUpdate("visual.enableAnsiconForAnt", false);
@@ -130,7 +131,7 @@ suite("Ant Tests", () =>
 
     test("Ansicon Path", async function()
     {
-        expect(successCount).to.be.equal(7, "rolling success count failure");
+        if (exitRollingCount(7, successCount)) return;
         this.slow(testControl.slowTime.configEvent + testControl.slowTime.commandFast);
         await executeSettingsUpdate("pathToPrograms.ansicon", undefined);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -141,7 +142,7 @@ suite("Ant Tests", () =>
 
     test("Win32 Create Task", async function()
     {
-        expect(successCount).to.be.equal(8, "rolling success count failure");
+        if (exitRollingCount(8, successCount)) return;
         this.slow((testControl.slowTime.configEvent * 2) + (testControl.slowTime.commandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -153,7 +154,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser", async function()
     {
-        expect(successCount).to.be.equal(9, "rolling success count failure");
+        if (exitRollingCount(9, successCount)) return;
         this.slow(slowTimeforAntRunTasks);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2, false, false);
@@ -163,7 +164,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Default", async function()
     {
-        expect(successCount).to.be.equal(10, "rolling success count failure");
+        if (exitRollingCount(10, successCount)) return;
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -181,7 +182,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser Invalid Target", async function()
     {
-        expect(successCount).to.be.equal(11, "rolling success count failure");
+        if (exitRollingCount(11, successCount)) return;
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -201,7 +202,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Target", async function()
     {
-        expect(successCount).to.be.equal(12, "rolling success count failure");
+        if (exitRollingCount(12, successCount)) return;
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -218,7 +219,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Project", async function()
     {
-        expect(successCount).to.be.equal(13, "rolling success count failure");
+        if (exitRollingCount(13, successCount)) return;
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -235,7 +236,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser Invalid Xml", async function()
     {
-        expect(successCount).to.be.equal(14, "rolling success count failure");
+        if (exitRollingCount(14, successCount)) return;
         this.slow(slowTimeforAntRunTasks + testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -274,7 +275,7 @@ async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAn
     assert(antTasks.length === noAnt1, `Did not read ${noAnt1} ant tasks(1)(actual ${antTasks ? antTasks.length : 0})`);
     antTasks = await provider.readUriTasks(buildXmlFileUri, "");
     assert(antTasks.length === noAnt2, `Did not read ${noAnt2} ant tasks (2)(actual ${antTasks ? antTasks.length : 0})`);
-    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(xml2jsWillFail);
+    logErrorsAreFine(xml2jsWillFail);
     //
     // Use Ant
     //
@@ -283,7 +284,7 @@ async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAn
     assert(antTasks.length === withAnt1, `Did not read ${withAnt1} ant tasks (3)(actual ${antTasks ? antTasks.length : 0})`);
     antTasks = await provider.readUriTasks(buildXmlFileUri, "");
     assert(antTasks.length === withAnt2, `Did not read ${withAnt2} ant tasks (4)(actual ${antTasks ? antTasks.length : 0})`);
-    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(antWillFail);
+    logErrorsAreFine(antWillFail);
     //
     // Reset
     //

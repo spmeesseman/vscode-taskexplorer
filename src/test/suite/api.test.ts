@@ -6,11 +6,11 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as assert from "assert";
-import { activate, executeTeCommand, suiteFinished, verifyTaskCount } from "../utils/utils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ExternalTaskProvider } from "./externalTaskProvider";
 import { ExternalTaskProviderBase } from "./externalTaskProviderBase";
+import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, executeTeCommand, suiteFinished, verifyTaskCount } from "../utils/utils";
 
 
 let teApi: ITaskExplorerApi;
@@ -31,6 +31,7 @@ suite("API Tests", () =>
         dispose = tasks.registerTaskProvider("external", taskProvider);
         dispose2 = tasks.registerTaskProvider("external2", taskProvider2);
     });
+
 
     suiteTeardown(async function()
     {

@@ -28,7 +28,7 @@ suite("File Cache Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        if (utils.exitRollingCount(0)) return;
+        if (utils.exitRollingCount(0, successCount)) return;
         await utils.treeUtils.refresh(this);
         ++successCount;
     });
@@ -36,7 +36,7 @@ suite("File Cache Tests", () =>
 
     test("Check Task Counts", async function()
     {
-        if (utils.exitRollingCount(1)) return;
+        if (utils.exitRollingCount(1, successCount)) return;
         await checkTaskCounts(this);
         ++successCount;
     });
@@ -44,7 +44,7 @@ suite("File Cache Tests", () =>
 
     test("Enable Persistent Cache", async function()
     {
-        if (utils.exitRollingCount(2)) return;
+        if (utils.exitRollingCount(2, successCount)) return;
         this.slow(utils.testControl.slowTime.configEvent);
         await utils.executeSettingsUpdate("enablePersistentFileCaching", true);
         ++successCount;
@@ -53,7 +53,7 @@ suite("File Cache Tests", () =>
 
     test("Rebuild File Cache", async function()
     {
-        if (utils.exitRollingCount(3)) return;
+        if (utils.exitRollingCount(3, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCache + 100 + utils.testControl.waitTime.min);
         // await treeUtils.refresh(this);
         await teApi.testsApi.fileCache.rebuildCache("");
@@ -63,7 +63,7 @@ suite("File Cache Tests", () =>
 
     test("Check Task Counts", async function()
     {
-        if (utils.exitRollingCount(4)) return;
+        if (utils.exitRollingCount(4, successCount)) return;
         await checkTaskCounts(this);
         ++successCount;
     });
@@ -71,7 +71,7 @@ suite("File Cache Tests", () =>
 
     test("Disable Persistent Cache", async function()
     {
-        if (utils.exitRollingCount(5)) return;
+        if (utils.exitRollingCount(5, successCount)) return;
         this.slow(utils.testControl.slowTime.configEvent);
         await utils.executeSettingsUpdate("enablePersistentFileCaching", false);
         ++successCount;
@@ -89,7 +89,7 @@ suite("File Cache Tests", () =>
 
     test("Rebuild File Cache", async function()
     {
-        if (utils.exitRollingCount(6)) return;
+        if (utils.exitRollingCount(6, successCount)) return;
         // await treeUtils.refresh(this);
         await teApi.testsApi.fileCache.rebuildCache("");
         ++successCount;
@@ -98,7 +98,7 @@ suite("File Cache Tests", () =>
 
     test("Check Task Counts", async function()
     {
-        if (utils.exitRollingCount(7)) return;
+        if (utils.exitRollingCount(7, successCount)) return;
         await checkTaskCounts(this);
         ++successCount;
     });
@@ -106,7 +106,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Rebuild Cache (Not Busy)", async function()
     {
-        if (utils.exitRollingCount(8)) return;
+        if (utils.exitRollingCount(8, successCount)) return;
         await teApi.testsApi.fileCache.cancelBuildCache();
         await utils.sleep(utils.testControl.waitTime.min);
         ++successCount;
@@ -115,7 +115,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Rebuild Cache (Busy No Delay)", async function()
     {
-        if (utils.exitRollingCount(9)) return;
+        if (utils.exitRollingCount(9, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCacheCancel + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await teApi.testsApi.fileCache.cancelBuildCache();
@@ -299,7 +299,7 @@ suite("File Cache Tests", () =>
 
     test("Check Task Counts", async function()
     {
-        try { expect(successCount).to.be.equal(1); } catch { utils.exitRollingCount(1); return; }
+        try { expect(successCount).to.be.equal(1); } catch { utils.exitRollingCount(1, successCount); return; }
         await checkTaskCounts(this);
         ++successCount;
     });

@@ -2,15 +2,11 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
+import * as utils from "../utils/utils";
 import TaskItem from "../../tree/item";
-import { expect } from "chai";
 import { getPackageManager } from "../../lib/utils/utils";
 import { TaskExecution } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {
-    activate, executeTeCommand2, focusExplorerView, treeUtils, getWsPath,
-    overrideNextShowInputBox, testControl, verifyTaskCount, waitForTaskExecution, suiteFinished
-} from "../utils/utils";
 
 const testsName = "npm";
 const startTaskCount = 0;
@@ -25,10 +21,13 @@ let successCount = -1;
 suite("NPM Tests", () =>
 {
 
+    let testControl: any;
+
     suiteSetup(async function()
     {
-        teApi = await activate(this);
+        teApi = await utils.activate(this);
         fsApi = teApi.testsApi.fs;
+        testControl = utils.testControl;
         ++successCount;
     });
 
@@ -46,27 +45,27 @@ suite("NPM Tests", () =>
             }
         }
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
-        suiteFinished(this);
+        utils.suiteFinished(this);
     });
 
 
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
-        expect(successCount).to.be.equal(0, "rolling success count failure");
-        await focusExplorerView(this);
+        if (utils.exitRollingCount(0, successCount)) return;;
+        await utils.focusExplorerView(this);
         ++successCount;
 	});
 
 
     test("Create Package File (package.json)", async function()
     {
-        expect(successCount).to.be.equal(1, "rolling success count failure");
+        if (utils.exitRollingCount(1, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateEvent + (testControl.waitTime.fsCreateEvent * 2));
         // tagLog("NPM", "Create Package File (1: package.json)");
         //
         // Create NPM package.json
         //
-        packageJsonPath = getWsPath("package.json");
+        packageJsonPath = utils.getWsPath("package.json");
         await fsApi.writeFile(
             packageJsonPath,
             "{\r\n" +
@@ -89,9 +88,9 @@ suite("NPM Tests", () =>
 
     test("Verify NPM Task Count", async function()
     {   // npm task provider is slower than shit on a turtle
-        expect(successCount).to.be.equal(2, "rolling success count failure");
-        this.slow(testControl.slowTime.verifyTaskCountNpm + testControl.waitTime.min);
-        await verifyTaskCount(testsName, startTaskCount + 5, 2);
+        if (utils.exitRollingCount(2, successCount)) return;;
+        this.slow(testControl.slowTime.utils.verifyTaskCountNpm + testControl.waitTime.min);
+        await utils.verifyTaskCount(testsName, startTaskCount + 5, 2);
         await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;
     });
@@ -99,7 +98,7 @@ suite("NPM Tests", () =>
 
     test("Get NPM Task Items", async function()
     {   // npm task provider is slower than shit on a turtle
-        expect(successCount).to.be.equal(3, "rolling success count failure");
+        if (utils.exitRollingCount(3, successCount)) return;;
         this.slow(testControl.slowTime.getTreeTasksNpm);
         // tagLog("NPM", "Get NPM Task Items [Start]");
         //
@@ -109,7 +108,7 @@ suite("NPM Tests", () =>
         // the tree under the VSCode tasks node, not the npm node)
         //
         // tagLog("NPM", "Get NPM Task Items [DoWorkSon]");
-        npmTaskItems = await treeUtils.getTreeTasks(testsName, 2) as TaskItem[];
+        npmTaskItems = await utils.treeUtils.getTreeTasks(testsName, 2) as TaskItem[];
         // tagLog("NPM", "Get NPM Task Items [Complete]");
         ++successCount;
     });
@@ -118,7 +117,7 @@ suite("NPM Tests", () =>
 
     test("Get Package Manager", function()
     {
-        expect(successCount).to.be.equal(4, "rolling success count failure");
+        if (utils.exitRollingCount(4, successCount)) return;;
         this.slow(testControl.slowTime.configEventFast);
         getPackageManager();
         ++successCount;
@@ -127,10 +126,10 @@ suite("NPM Tests", () =>
 
     test("Document Position", async function()
     {
-        expect(successCount).to.be.equal(5, "rolling success count failure");
+        if (utils.exitRollingCount(5, successCount)) return;;
         this.slow((testControl.slowTime.findDocumentPositionCommand * npmTaskItems.length) + testControl.waitTime.commandFast);
         for (const taskItem of npmTaskItems) {
-            await executeTeCommand2("open", [ taskItem ], testControl.waitTime.commandFast);
+            await utils.executeTeCommand2("open", [ taskItem ], testControl.waitTime.commandFast);
         }
         ++successCount;
     });
@@ -138,61 +137,61 @@ suite("NPM Tests", () =>
 
     test("Install", async function()
     {
-        expect(successCount).to.be.equal(6, "rolling success count failure");
+        if (utils.exitRollingCount(6, successCount)) return;;
         this.slow(testControl.slowTime.npmInstallCommand + testControl.waitTime.npmCommandMin);
-        const exec = await executeTeCommand2(
+        const exec = await utils.executeTeCommand2(
             "runInstall", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
         ) as TaskExecution | undefined;
-        await waitForTaskExecution(exec);
+        await utils.waitForTaskExecution(exec);
         ++successCount;
     });
 
 
     test("Update", async function()
     {
-        expect(successCount).to.be.equal(7, "rolling success count failure");
+        if (utils.exitRollingCount(7, successCount)) return;;
         this.slow(testControl.slowTime.npmCommand + testControl.waitTime.npmCommandMin);
-        const exec = await executeTeCommand2(
+        const exec = await utils.executeTeCommand2(
             "runUpdate", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
         ) as TaskExecution | undefined;
-        await waitForTaskExecution(exec);
+        await utils.waitForTaskExecution(exec);
         ++successCount;
     });
 
 
     test("Update Specified Package", async function()
     {
-        expect(successCount).to.be.equal(8, "rolling success count failure");
+        if (utils.exitRollingCount(8, successCount)) return;;
         this.slow(testControl.slowTime.npmCommandPkg + testControl.waitTime.npmCommandMin);
-        overrideNextShowInputBox("@spmeesseman/app-publisher");
-        const exec = await executeTeCommand2(
+        utils.overrideNextShowInputBox("@spmeesseman/app-publisher");
+        const exec = await utils.executeTeCommand2(
             "runUpdatePackage", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
         ) as TaskExecution | undefined;
-        await waitForTaskExecution(exec);
+        await utils.waitForTaskExecution(exec);
         ++successCount;
     });
 
 
     test("Audit", async function()
     {
-        expect(successCount).to.be.equal(9, "rolling success count failure");
+        if (utils.exitRollingCount(9, successCount)) return;;
         this.slow(testControl.slowTime.npmCommand + testControl.waitTime.npmCommandMin);
-        const exec = await executeTeCommand2(
+        const exec = await utils.executeTeCommand2(
             "runAudit", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
         ) as TaskExecution | undefined;
-        await waitForTaskExecution(exec);
+        await utils.waitForTaskExecution(exec);
         ++successCount;
     });
 
 
     test("Audit Fix", async function()
     {
-        expect(successCount).to.be.equal(10, "rolling success count failure");
+        if (utils.exitRollingCount(10, successCount)) return;;
         this.slow(testControl.slowTime.npmCommand + testControl.waitTime.npmCommandMin);
-        const exec = await executeTeCommand2(
+        const exec = await utils.executeTeCommand2(
             "runAuditFix", [ npmTaskItems[0].taskFile ], testControl.waitTime.npmCommandMin, testControl.waitTime.npmCommandMin
         ) as TaskExecution | undefined;
-        await waitForTaskExecution(exec);
+        await utils.waitForTaskExecution(exec);
         ++successCount;
     });
 

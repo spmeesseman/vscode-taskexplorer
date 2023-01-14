@@ -7,14 +7,12 @@
 //
 import * as assert from "assert";
 import * as path from "path";
-import { expect } from "chai";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { BashTaskProvider } from "../../providers/bash";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, getWsPath, testControl, treeUtils, verifyTaskCount,
-    logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs,
-    suiteFinished,
+    logErrorsAreFine, suiteFinished, exitRollingCount
 } from "../utils/utils";
 
 const testsName = "bash";
@@ -66,7 +64,7 @@ suite("Bash Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        expect(successCount).to.be.equal(1, "rolling success count failure");
+        if (exitRollingCount(1, successCount)) return;;
         await treeUtils.refresh(this);
         successCount++;
     });
@@ -74,7 +72,7 @@ suite("Bash Tests", () =>
 
     test("Document Position", async function()
     {
-        expect(successCount).to.be.equal(2, "rolling success count failure");
+        if (exitRollingCount(2, successCount)) return;;
         const provider = teApi.providers.get(testsName) as BashTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
         successCount++;
@@ -83,18 +81,18 @@ suite("Bash Tests", () =>
 
     test("Invalid ScriptProvider Type", async function()
     {
-        expect(successCount).to.be.equal(3, "rolling success count failure");
+        if (exitRollingCount(3, successCount)) return;;
         const provider = teApi.providers.get(testsName) as BashTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("hello.sh"))),
                "ScriptProvider type should return position 1");
-        logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(true);
+        logErrorsAreFine(true);
         successCount++;
     });
 
 
     test("Start", async function()
     {
-        expect(successCount).to.be.equal(4, "rolling success count failure");
+        if (exitRollingCount(4, successCount)) return;;
         this.slow(testControl.slowTime.verifyTaskCount);
         await verifyTaskCount(testsName, startTaskCount);
         successCount++;
@@ -103,7 +101,7 @@ suite("Bash Tests", () =>
 
     test("Disable", async function()
     {
-        expect(successCount).to.be.equal(5, "rolling success count failure");
+        if (exitRollingCount(5, successCount)) return;;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
@@ -113,7 +111,7 @@ suite("Bash Tests", () =>
 
     test("Re-enable", async function()
     {
-        expect(successCount).to.be.equal(6, "rolling success count failure");
+        if (exitRollingCount(6, successCount)) return;;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -123,7 +121,7 @@ suite("Bash Tests", () =>
 
     test("Create File", async function()
     {
-        expect(successCount).to.be.equal(7, "rolling success count failure");
+        if (exitRollingCount(7, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
@@ -135,7 +133,7 @@ suite("Bash Tests", () =>
 
     test("Delete File", async function()
     {
-        expect(successCount).to.be.equal(8, "rolling success count failure");
+        if (exitRollingCount(8, successCount)) return;;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
@@ -148,7 +146,7 @@ suite("Bash Tests", () =>
 
     test("Re-create File", async function()
     {
-        expect(successCount).to.be.equal(9, "rolling success count failure");
+        if (exitRollingCount(9, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
@@ -160,7 +158,7 @@ suite("Bash Tests", () =>
 
     test("Delete Folder", async function()
     {
-        expect(successCount).to.be.equal(10, "rolling success count failure");
+        if (exitRollingCount(10, successCount)) return;;
         this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteDir(dirName);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);

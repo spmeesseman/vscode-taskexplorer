@@ -6,12 +6,11 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as path from "path";
-import { expect } from "chai";
 import { Uri } from "vscode";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, getWsPath, suiteFinished, testControl, treeUtils, verifyTaskCount
+    activate, executeSettingsUpdate, exitRollingCount, getWsPath, suiteFinished, testControl, treeUtils, verifyTaskCount
 } from "../utils/utils";
 
 const testsName = "apppublisher";
@@ -55,7 +54,7 @@ suite("App-Publisher Tests", () =>
 
     test("Enable (Off by Default)", async function()
     {
-        expect(successCount).to.be.equal(1, "rolling success count failure");
+        if (exitRollingCount(1, successCount)) return;;
         this.slow(testControl.slowTime.configEnableEvent);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
         ++successCount;
@@ -64,7 +63,7 @@ suite("App-Publisher Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        expect(successCount).to.be.equal(2, "rolling success count failure");
+        if (exitRollingCount(2, successCount)) return;;
         await treeUtils.refresh(this);
         ++successCount;
     });
@@ -72,7 +71,7 @@ suite("App-Publisher Tests", () =>
 
     test("Start", async function()
     {
-        expect(successCount).to.be.equal(3, "rolling success count failure");
+        if (exitRollingCount(3, successCount)) return;;
         this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.verifyTaskCountRetryInterval);
         await verifyTaskCount(testsName, startTaskCount, 5, testControl.waitTime.verifyTaskCountRetryInterval);
         ++successCount;
@@ -81,7 +80,7 @@ suite("App-Publisher Tests", () =>
 
     test("Document Position", async function()
     {
-        expect(successCount).to.be.equal(4, "rolling success count failure");
+        if (exitRollingCount(4, successCount)) return;;
         const provider = teApi.providers.get(testsName) as AppPublisherTaskProvider;
         // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);
@@ -93,7 +92,7 @@ suite("App-Publisher Tests", () =>
 
     test("Create file", async function()
     {
-        expect(successCount).to.be.equal(5, "rolling success count failure");
+        if (exitRollingCount(5, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -115,7 +114,7 @@ suite("App-Publisher Tests", () =>
 
     test("Disable", async function()
     {
-        expect(successCount).to.be.equal(6, "rolling success count failure");
+        if (exitRollingCount(6, successCount)) return;;
         this.slow(testControl.slowTime.configDisableEvent + testControl.waitTime.configDisableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);
@@ -125,7 +124,7 @@ suite("App-Publisher Tests", () =>
 
     test("Re-enable", async function()
     {
-        expect(successCount).to.be.equal(7, "rolling success count failure");
+        if (exitRollingCount(7, successCount)) return;;
         this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
@@ -135,7 +134,7 @@ suite("App-Publisher Tests", () =>
 
     test("Invalid JSON", async function()
     {
-        expect(successCount).to.be.equal(8, "rolling success count failure");
+        if (exitRollingCount(8, successCount)) return;;
         //
         // Note: FileWatcher ignores mod event for this task type since # of tasks never changes
         //
@@ -177,7 +176,7 @@ suite("App-Publisher Tests", () =>
 
     test("Fix Invalid JSON", async function()
     {
-        expect(successCount).to.be.equal(9, "rolling success count failure");
+        if (exitRollingCount(9, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsModifyEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -199,7 +198,7 @@ suite("App-Publisher Tests", () =>
 
     test("Delete file", async function()
     {
-        expect(successCount).to.be.equal(10, "rolling success count failure");
+        if (exitRollingCount(10, successCount)) return;;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
@@ -210,7 +209,7 @@ suite("App-Publisher Tests", () =>
 
     test("Disable (Default is OFF)", async function()
     {
-        expect(successCount).to.be.equal(11, "rolling success count failure");
+        if (exitRollingCount(11, successCount)) return;;
         this.slow(testControl.slowTime.configDisableEvent + testControl.waitTime.configDisableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);

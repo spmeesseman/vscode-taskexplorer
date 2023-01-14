@@ -11,7 +11,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
-	logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs, executeTeCommand, suiteFinished
+	logErrorsAreFine, executeTeCommand, suiteFinished
 } from "../utils/utils";
 
 const creator = "spmeesseman",
@@ -141,7 +141,7 @@ suite("Util Tests", () =>
 		log.error({
 			status: false
 		});
-		logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs(true);
+		logErrorsAreFine(true);
 
 		//
 		// Disable logging

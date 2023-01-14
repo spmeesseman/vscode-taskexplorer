@@ -218,10 +218,10 @@ export const executeTeCommand = async (command: string, minWait?: number, maxWai
 export const executeTeCommand2 = (command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand(command, minWait, maxWait, ...args);
 
 
-export const exitRollingCount = (expectedCount: number) =>
+export const exitRollingCount = (expectedCount: number, successCount: number) =>
 {
     try {
-        expect(expectedCount).to.be.equal(expectedCount);
+        expect(successCount).to.be.equal(expectedCount);
     }
     catch {
         const msg = "skip test, rolling success count failure " + expectedCount;
@@ -442,7 +442,7 @@ const isReady = (taskType?: string) =>
 };
 
 
-export const logItsSupposedToHappenSoICanStopShittingMyselfOverRedErrorMsgs = (willFail = true) =>
+export const logErrorsAreFine = (willFail = true) =>
 {
     if (willFail && testControl.log.enabled && teApi.config.get<boolean>("logging.enabled"))
     {

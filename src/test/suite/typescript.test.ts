@@ -5,14 +5,10 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as path from "path";
-import { expect } from "chai";
+import * as utils from "../utils/utils";
 import { Uri } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {
-    activate, closeActiveDocument, executeSettingsUpdate, executeTeCommand2, focusExplorerView,
-    getWsPath, suiteFinished, testControl, treeUtils
-} from "../utils/utils";
+import { join } from "path";
 
 
 const testsName = "tsc";
@@ -20,6 +16,7 @@ const startTaskCount = 0;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
+let testControl: any;
 let rootPath: string;
 let dirName: string;
 let fileUri: Uri;
@@ -32,57 +29,58 @@ suite("Typescript Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await activate(this);
+        teApi = await utils.activate(this);
         fsApi = teApi.testsApi.fs;
-        rootPath = getWsPath(".");
-        dirName = path.join(rootPath, "tasks_test_ts_");
-        fileUri = Uri.file(path.join(rootPath, "tsconfig.json"));
-        fileUri2 = Uri.file(path.join(dirName, "tsconfig.json"));
+        testControl = utils.testControl;
+        rootPath = utils.getWsPath(".");
+        dirName = join(rootPath, "tasks_test_ts_");
+        fileUri = Uri.file(join(rootPath, "tsconfig.json"));
+        fileUri2 = Uri.file(join(dirName, "tsconfig.json"));
         successCount++;
     });
 
 
     suiteTeardown(async function()
     {
-        await closeActiveDocument();
+        await utils.closeActiveDocument();
         try {
             await fsApi.deleteDir(dirName);
         } catch {}
-        suiteFinished(this);
+        utils.suiteFinished(this);
     });
 
 
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
-        expect(successCount).to.be.equal(0, "rolling success count failure");
-        await focusExplorerView(this);
+        if (utils.exitRollingCount(0, successCount)) return;;
+        await utils.focusExplorerView(this);
         successCount++;
 	});
 
 
     test("Start", async function()
     {
-        expect(successCount).to.be.equal(1, "rolling success count failure");
+        if (utils.exitRollingCount(1, successCount)) return;;
         this.slow(testControl.slowTime.verifyTaskCountByTree);
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
+        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
         successCount++;
     });
 
 
     test("Create Empty Directory", async function()
     {
-        expect(successCount).to.be.equal(2, "rolling success count failure");
+        if (utils.exitRollingCount(2, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.waitTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCountByTree);
         await fsApi.createDir(dirName);
         await teApi.waitForIdle(testControl.waitTime.fsCreateFolderEvent);
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
+        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
         successCount++;
     });
 
 
     test("Create File", async function()
     {
-        expect(successCount).to.be.equal(3, "rolling success count failure");
+        if (utils.exitRollingCount(3, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsCreateEvent + testControl.slowTime.verifyTaskCountByTree + 50);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -105,30 +103,30 @@ suite("Typescript Tests", () =>
         );
         // the 'create file 2' test fails 1/50 runs, so add a lil bit on to fsCreateEvent here too
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent + 50);
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
+        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
         successCount++;
     });
 
 
     test("Document Position", async function()
     {
-        expect(successCount).to.be.equal(4, "rolling success count failure");
+        if (utils.exitRollingCount(4, successCount)) return;;
         this.slow(testControl.slowTime.getTreeTasks + (testControl.slowTime.command * 2));
         //
         // Typescript 'open' just opens the document, doesnt find the task position
         //
-        const tscItems = await treeUtils.getTreeTasks("tsc", startTaskCount + 2);
-        await executeTeCommand2("open", [ tscItems[0] ]);
-        await closeActiveDocument();
-        await executeTeCommand2("open", [ tscItems[1] ]);
-        await closeActiveDocument();
+        const tscItems = await utils.treeUtils.getTreeTasks("tsc", startTaskCount + 2);
+        await utils.executeTeCommand2("open", [ tscItems[0] ]);
+        await utils.closeActiveDocument();
+        await utils.executeTeCommand2("open", [ tscItems[1] ]);
+        await utils.closeActiveDocument();
         successCount++;
     });
 
 
     test("Create File 2", async function()
     {
-        expect(successCount).to.be.equal(5, "rolling success count failure");
+        if (utils.exitRollingCount(5, successCount)) return;;
         this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsCreateEvent + testControl.slowTime.verifyTaskCountByTree + 100);
         await fsApi.writeFile(
             fileUri2.fsPath,
@@ -151,34 +149,34 @@ suite("Typescript Tests", () =>
         );
         // the 'create file 2' test fails 1/50 runs, so add a lil bit on to fsCreateEvent
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent + 100);
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
+        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         successCount++;
     });
 
 
     test("Disable", async function()
     {
-        expect(successCount).to.be.equal(6, "rolling success count failure");
+        if (utils.exitRollingCount(6, successCount)) return;;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCountByTree + testControl.waitTime.configEnableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configEnableEvent);
-        await treeUtils.verifyTaskCountByTree(testsName, 0);
+        await utils.executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configEnableEvent);
+        await utils.treeUtils.verifyTaskCountByTree(testsName, 0);
         successCount++;
     });
 
 
     test("Re-enable", async function()
     {
-        expect(successCount).to.be.equal(7, "rolling success count failure");
+        if (utils.exitRollingCount(7, successCount)) return;;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCountByTree + testControl.waitTime.configEnableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
+        await utils.executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
+        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         successCount++;
     });
 
 
     test("Invalid JSON", async function()
     {
-        expect(successCount).to.be.equal(8, "rolling success count failure");
+        if (utils.exitRollingCount(8, successCount)) return;;
         //
         // Note: FileWatcher ignores mod event for this task type since # of tasks never changes
         //
@@ -218,7 +216,7 @@ suite("Typescript Tests", () =>
         // but are actually invalid.  TSC engine will report the old task count as well, so it
         // doesn't event matter if we had the file modify event watcher on or not.
         //
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
+        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         // if (resetLogging) { // turn scary error logging off
         //     executeSettingsUpdate("logging.enable", true);
         // }
@@ -228,7 +226,7 @@ suite("Typescript Tests", () =>
 
     test("Fix Invalid JSON", async function()
     {
-        expect(successCount).to.be.equal(9, "rolling success count failure");
+        if (utils.exitRollingCount(9, successCount)) return;;
         this.slow(testControl.slowTime.fsModifyEvent + testControl.waitTime.fsCreateEvent + testControl.slowTime.verifyTaskCountByTree);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -250,29 +248,29 @@ suite("Typescript Tests", () =>
             "}\n"
         );
         await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
+        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         successCount++;
     });
 
 
     test("Delete File 1", async function()
     {
-        expect(successCount).to.be.equal(10, "rolling success count failure");
+        if (utils.exitRollingCount(10, successCount)) return;;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCountByTree + testControl.waitTime.fsDeleteEvent);
         await fsApi.deleteFile(fileUri.fsPath);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
+        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
         successCount++;
     });
 
 
     test("Delete File 2", async function()
     {
-        expect(successCount).to.be.equal(11, "rolling success count failure");
+        if (utils.exitRollingCount(11, successCount)) return;;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCountByTree + testControl.waitTime.fsDeleteEvent);
         await fsApi.deleteFile(fileUri2.fsPath);
         await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
+        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
         successCount++;
     });
 

@@ -1,12 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { expect } from "chai";
 import { Uri, WebviewPanel } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, closeActiveDocument, executeTeCommand, focusExplorerView, executeSettingsUpdate,
-	testControl, suiteFinished, sleep, getWsPath
+	testControl, suiteFinished, sleep, getWsPath, exitRollingCount
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
@@ -36,7 +35,7 @@ suite("Info Report Tests", () =>
 
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
-        expect(successCount).to.be.equal(0, "rolling success count failure");
+        if (exitRollingCount(0, successCount)) return;
 		await focusExplorerView(this);
         ++successCount;
 	});
@@ -44,7 +43,7 @@ suite("Info Report Tests", () =>
 
 	test("Report Page Single Project (No UserTasks0", async function()
 	{
-        expect(successCount).to.be.equal(1, "rolling success count failure");
+        if (exitRollingCount(1, successCount)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder + testControl.waitTime.configEvent + testControl.waitTime.viewReport + 100);
 		await executeSettingsUpdate("specialFolders.showUserTasks", false);
 		const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport, 500, projectUri) as WebviewPanel;
@@ -57,7 +56,7 @@ suite("Info Report Tests", () =>
 
 	test("Report Page Single Project (w/ User Tasks)", async function()
 	{
-        expect(successCount).to.be.equal(2, "rolling success count failure");
+        if (exitRollingCount(2, successCount)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder + testControl.waitTime.configEvent + testControl.waitTime.viewReport + 100);
 		await executeSettingsUpdate("specialFolders.showUserTasks", true);
 	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport, 500, projectUri, "", 5) as WebviewPanel;
@@ -70,7 +69,7 @@ suite("Info Report Tests", () =>
 
 	test("Report Page All Projects", async function()
 	{
-        expect(successCount).to.be.equal(3, "rolling success count failure");
+        if (exitRollingCount(3, successCount)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.waitTime.viewReport + 100);
 	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport, 500) as WebviewPanel;
 		await sleep(100);
