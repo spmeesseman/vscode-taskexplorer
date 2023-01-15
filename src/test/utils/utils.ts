@@ -24,10 +24,12 @@ let activated = false;
 let hasRollingCountError = false;
 let teExplorer: ITaskExplorer;
 let timeStarted: number;
-const originalShowInputBox = window.showInputBox;
-const originalShowInfoBox = window.showInformationMessage;
 let overridesShowInputBox: any[] = [];
 let overridesShowInfoBox: any[] = [];
+
+const tc = testControl;
+const originalShowInputBox = window.showInputBox;
+const originalShowInfoBox = window.showInformationMessage;
 
 window.showInputBox = (...args: any[]) =>
 {
@@ -63,7 +65,7 @@ export const activate = async (instance?: Mocha.Context) =>
         if (suite)
         {
             const suiteKey = getSuiteKey(suite.title);
-            testControl.tests.suiteResults[suiteKey] = {
+            tc.tests.suiteResults[suiteKey] = {
                 timeStarted: Date.now(),
                 numTests: suite.tests.length,
                 suiteName: getSuiteFriendlyName(suite.title)
@@ -112,7 +114,7 @@ export const activate = async (instance?: Mocha.Context) =>
         //
         // Write to console is just a tests feature, it's not controlled by settings, set it here if needed
         //
-        teApi.log.setWriteToConsole(testControl.log.console, testControl.log.level);
+        teApi.log.setWriteToConsole(tc.log.console, tc.log.level);
         //
         // All done
         //
@@ -129,7 +131,7 @@ export const cleanup = async () =>
     console.log(`    ${figures.color.info}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Tests complete, clean up", figures.colors.grey)}`);
 
-    if (testControl.log.enabled && testControl.log.file && testControl.log.openFileOnFinish)
+    if (tc.log.enabled && tc.log.file && tc.log.openFileOnFinish)
     {
         console.log(`    ${figures.color.info}`);
         console.log(`    ${figures.color.info} ${figures.withColor("Log File Location:", figures.colors.grey)}`);
@@ -157,8 +159,8 @@ export const cleanup = async () =>
     // These get reset at the end of the Gulp suite's tests, but just in case we do it again here...
     //
     console.log(`    ${figures.color.info} ${figures.withColor("Resetting modified global settings", figures.colors.grey)}`);
-    await configuration.updateVs("grunt.autoDetect", testControl.vsCodeAutoDetectGrunt);
-    await configuration.updateVs("gulp.autoDetect", testControl.vsCodeAutoDetectGulp);
+    await configuration.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
+    await configuration.updateVs("gulp.autoDetect", tc.vsCodeAutoDetectGulp);
 
     console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
 
@@ -209,8 +211,8 @@ export const closeActiveDocument = async () =>
 export const executeSettingsUpdate = async (key: string, value?: any, minWait?: number, maxWait?: number) =>
 {
     const rc = await teApi.config.updateWs(key, value);
-    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testControl.waitTime.configEvent),
-                            maxWait === 0 ? maxWait : (maxWait || testControl.waitTime.max));
+    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.configEvent),
+                            maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;
 };
 
@@ -218,8 +220,8 @@ export const executeSettingsUpdate = async (key: string, value?: any, minWait?: 
 export const executeTeCommand = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
     const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
-    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || testControl.waitTime.command),
-                            maxWait === 0 ? maxWait : (maxWait || testControl.waitTime.max));
+    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
+                            maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;
 };
 
@@ -248,16 +250,16 @@ export const exitRollingCount = (expectedCount: number, successCount: number) =>
 export const focusExplorerView = async (instance: any) =>
 {
     if (!teExplorer.isVisible()) {
-        instance.slow(testControl.slowTime.focusCommand + testControl.slowTime.refreshCommand +
-                      (testControl.waitTime.focusCommand * 2) + testControl.waitTime.min + 100);
-        await executeTeCommand("focus", testControl.waitTime.focusCommand);
-        await teApi.waitForIdle(testControl.waitTime.focusCommand);
+        instance.slow(tc.slowTime.focusCommand + tc.slowTime.refreshCommand +
+                      (tc.waitTime.focusCommand * 2) + tc.waitTime.min + 100);
+        await executeTeCommand("focus", tc.waitTime.focusCommand);
+        await teApi.waitForIdle(tc.waitTime.focusCommand);
         sleep(100);
     }
     else {
-        instance.slow(testControl.slowTime.focusCommandAlreadyFocused);
+        instance.slow(tc.slowTime.focusCommandAlreadyFocused);
     }
-    await teApi.waitForIdle(testControl.waitTime.min);
+    await teApi.waitForIdle(tc.waitTime.min);
 };
 
 
@@ -294,13 +296,13 @@ const initSettings = async () =>
     // await writeFile(settingsFile, "{}");
 
 
-    testControl.user.logLevel = configuration.get<number>("logging.level");
+    tc.user.logLevel = configuration.get<number>("logging.level");
     await configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
     //
     // Grunt / Gulp VSCode internal task providers. Gulp suite will disable when done.
     //
-    testControl.vsCodeAutoDetectGrunt = configuration.getVs<string>("grunt.autoDetect", "off") as "on" | "off";
-    testControl.vsCodeAutoDetectGulp = configuration.getVs<string>("gulp.autoDetect", "off") as "on" | "off";
+    tc.vsCodeAutoDetectGrunt = configuration.getVs<string>("grunt.autoDetect", "off") as "on" | "off";
+    tc.vsCodeAutoDetectGulp = configuration.getVs<string>("gulp.autoDetect", "off") as "on" | "off";
     await configuration.updateVs("grunt.autoDetect", "on");
     await configuration.updateVs("gulp.autoDetect", "on");
     //
@@ -353,14 +355,14 @@ const initSettings = async () =>
         python: "c:\\Code\\python\\python.exe",
         ruby: "ruby"
     });
-    // await configuration.updateWs("pathToPrograms.ant", testControl.userPathToAnt);
-    // await configuration.updateWs("pathToPrograms.ansicon", testControl.userPathToAnsicon);
+    // await configuration.updateWs("pathToPrograms.ant", tc.userPathToAnt);
+    // await configuration.updateWs("pathToPrograms.ansicon", tc.userPathToAnsicon);
 
-    await configuration.updateWs("logging.enable", testControl.log.enabled);
-    await configuration.updateWs("logging.level", testControl.log.level);
-    await configuration.updateWs("logging.enableFile", testControl.log.file);
-    await configuration.updateWs("logging.enableFileSymbols", testControl.log.fileSymbols);
-    await configuration.updateWs("logging.enableOutputWindow", testControl.log.output);
+    await configuration.updateWs("logging.enable", tc.log.enabled);
+    await configuration.updateWs("logging.level", tc.log.level);
+    await configuration.updateWs("logging.enableFile", tc.log.file);
+    await configuration.updateWs("logging.enableFileSymbols", tc.log.fileSymbols);
+    await configuration.updateWs("logging.enableOutputWindow", tc.log.output);
 
     await configuration.updateWs("specialFolders.numLastTasks", 10);
     await configuration.updateWs("specialFolders.showFavorites", true);
@@ -394,18 +396,18 @@ const initSettings = async () =>
     await configuration.updateWs("useGulp", false);
     await configuration.updateWs("useAnt", false);
 
-    if (testControl.log.enabled)
+    if (tc.log.enabled)
     {
-        const slowTimes = testControl.slowTime as IDictionary<number>;
-        // const waitTimes = testControl.waitTime as IDictionary<number>;
+        const slowTimes = tc.slowTime as IDictionary<number>;
+        // const waitTimes = tc.waitTime as IDictionary<number>;
         let factor = 1.01;
-        if (testControl.log.output) {
+        if (tc.log.output) {
             factor += 0.026;
         }
-        if (testControl.log.file) {
+        if (tc.log.file) {
             factor += 0.035;
         }
-        if (testControl.log.console) {
+        if (tc.log.console) {
             factor += 0.051;
         }
         // Object.keys(waitTimes).forEach((k) =>
@@ -457,7 +459,7 @@ const isReady = (taskType?: string) =>
 
 export const logErrorsAreFine = (willFail = true) =>
 {
-    if (willFail && testControl.log.enabled && teApi.config.get<boolean>("logging.enabled"))
+    if (willFail && tc.log.enabled && teApi.config.get<boolean>("logging.enabled"))
     {
         console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
                     `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
@@ -513,18 +515,18 @@ export const suiteFinished = (instance: Mocha.Context) =>
     {
         const numTestsFailedThisSuite = suite.tests.filter(t => t.isFailed()).length,
               suiteKey = getSuiteKey(suite.title),
-              suiteResults = testControl.tests.suiteResults[suiteKey] || {};
-        testControl.tests.numTestsFail += numTestsFailedThisSuite;
-        testControl.tests.numTestsSuccess += suite.tests.filter(t => t.isPassed()).length;
-        testControl.tests.numSuites++;
-        testControl.tests.numTests += suite.tests.length;
+              suiteResults = tc.tests.suiteResults[suiteKey] || {};
+        tc.tests.numTestsFail += numTestsFailedThisSuite;
+        tc.tests.numTestsSuccess += suite.tests.filter(t => t.isPassed()).length;
+        tc.tests.numSuites++;
+        tc.tests.numTests += suite.tests.length;
         if (numTestsFailedThisSuite > 0) {
-            testControl.tests.numSuitesFail++;
+            tc.tests.numSuitesFail++;
         }
         else {
-            testControl.tests.numSuitesSuccess++;
+            tc.tests.numSuitesSuccess++;
         }
-        testControl.tests.suiteResults[suiteKey] = Object.assign(suiteResults,
+        tc.tests.suiteResults[suiteKey] = Object.assign(suiteResults,
         {
             success: numTestsFailedThisSuite === 0,
             timeFinished: Date.now(),
@@ -558,7 +560,7 @@ export const verifyTaskCount = async (taskType: string, expectedCount: number, r
     }
     while (--retries >= 0 && tTasks.length !== expectedCount)
     {
-        await sleep(retryWait > 0 ? retryWait : testControl.waitTime.verifyTaskCountRetryInterval);
+        await sleep(retryWait > 0 ? retryWait : tc.waitTime.verifyTaskCountRetryInterval);
         tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
         if (taskType === "Workspace") {
             tTasks = tTasks.filter(t => t.source === "Workspace");
