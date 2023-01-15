@@ -173,14 +173,16 @@ export class TaskWatcher
     }
 
 
-    private showStatusMessage(task: Task)
+    private showStatusMessage(task: Task, logPad: string)
     {
+        log.methodStart("task start/stop show/hide message", 2, logPad);
         if (task && teApi.config.get<boolean>("showRunningTask") === true)
         {
             const exec = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
                          e.task.scope === task.scope && e.task.definition.path === task.definition.path);
             if (exec)
             {
+                log.methodStart("   found running task, show status message", 2, logPad);
                 if (!TaskWatcher.statusBarSpace) {
                     TaskWatcher.statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
                     TaskWatcher.statusBarSpace.tooltip = "Task Explorer running task";
@@ -194,6 +196,7 @@ export class TaskWatcher
                 TaskWatcher.statusBarSpace.show();
             }
             else {
+                log.methodStart("   found idle/stopped task, hide status message", 2, logPad);
                 /* istanbul ignore else */
                 if (TaskWatcher.statusBarSpace) {
                     TaskWatcher.statusBarSpace.hide();
@@ -202,6 +205,7 @@ export class TaskWatcher
                 }
             }
         }
+        log.methodDone("task start/stop show/hide message", 2, logPad);
     }
 
 
@@ -212,6 +216,9 @@ export class TaskWatcher
               task = e.execution.task,
               taskId = task.definition.taskItemId,
               isMapEmpty = util.isObjectEmpty(taskMap);
+
+        log.methodStart("task started event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.tree.getName() ]]);
+
         //
         // If taskMap is empty, then this view has not yet been made visible, an there's nothing
         // to update.  The `taskTree` property should also be null.  We could probably do this
@@ -229,22 +236,20 @@ export class TaskWatcher
                     return;
                 }
                 log.error(`The task map is ${isMapEmpty ? "empty" : "missing the running task"} but ` +
-                        `the task tree is non-null and holds ${taskTree.length} folders (task start event)`,
-                        [[ "# of tasks in task map", Object.keys(taskMap).length ], [ "task name", task.name ],
-                        [ "task source", task.source ], [ "task type", task.definition.type ]]);
+                          `the task tree is non-null and holds ${taskTree.length} folders (task start event)`,
+                          [[ "# of tasks in task map", Object.keys(taskMap).length ], [ "task name", task.name ],
+                          [ "task source", task.source ], [ "task type", task.definition.type ]]);
             }
-            return;
         }
-
-        try
-        {   log.methodStart("task started event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.tree.getName() ]]);
-            this.showStatusMessage(task);
+        else
+        {
             const taskItem = taskMap[taskId] as TaskItem;
+            this.showStatusMessage(task, "   ");
             this.fireTaskChangeEvents(taskItem, "   ", 1);
             this.babysitRunningTask(taskItem);
-            log.methodDone("task started event", 1);
         }
-        catch (e) { /* istanbul ignore next */ console.error(e); }
+
+        log.methodDone("task started event", 1);
     }
 
 
@@ -256,15 +261,19 @@ export class TaskWatcher
               taskId = task.definition.taskItemId,
               isMapEmpty = util.isObjectEmpty(taskMap);
 
-        this.fireBabySitter(taskId);
+        log.methodStart("task finished event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.tree.getName() ]]);
+
+        this.fireBabySitter(taskId);        // fire the babysitter
+        this.showStatusMessage(task, "  "); // hides
 
         //
-        // If taskMap is empty, then this view has not yet been made visible, an there's nothing
-        // to update.  The `taskTree` property should also be null.  We could probably do this
-        // before the timer check above, but hey, just in case taskMap goes empty between events
-        // for some un4seen reason.  This willusually fall through when both the Explorer and
-        // SideBar views are enabled, but the sidebar hasn't received a visible event yet, i.e.
-        // it hasn't been opened yet by the user.
+        // If taskMap is empty, then this view has not yet been made visible or an event fired
+        // that caused the tree to refresh (e.g. when tests end and the package.json file is
+        // restored, both the file hanged and task finished events fire at the same time from
+        // VSCode). So there's nothing to update in the tree right now in these cases.  The
+        // `taskTree` property should also be null.  This will usually fall through when both
+        // the Explorer and SideBar views are enabled, but the sidebar hasn't received a visible
+        // event yet, i.e. it hasn't been opened yet by the user.
         //
         if (isMapEmpty || !taskMap[taskId])
         {
@@ -277,21 +286,17 @@ export class TaskWatcher
                     return;
                 }
                 log.error(`The task map is ${isMapEmpty ? "empty" : "missing the running task"} but ` +
-                        `the task tree is non-null and holds ${taskTree.length} folders (task start event)`,
-                        [[ "# of tasks in task map", Object.keys(taskMap).length ], [ "task name", task.name ],
-                        [ "task source", task.source ], [ "task type", task.definition.type ]]);
+                          `the task tree is non-null and holds ${taskTree.length} folders (task start event)`,
+                          [[ "# of tasks in task map", Object.keys(taskMap).length ], [ "task name", task.name ],
+                          [ "task source", task.source ], [ "task type", task.definition.type ]]);
             }
             return;
         }
-
-        try
-        {   log.methodStart("task finished event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.tree.getName() ]]);
-            this.showStatusMessage(task); // hides
-            const taskItem = taskMap[taskId] as TaskItem;
-            this.fireTaskChangeEvents(taskItem, "   ", 1);
-            log.methodDone("task finished event", 1);
+        else {
+            this.fireTaskChangeEvents(taskMap[taskId] as TaskItem, "   ", 1);
         }
-        catch (e) { /* istanbul ignore next */ console.error(e); }
+
+        log.methodDone("task finished event", 1);
     }
 
 }
