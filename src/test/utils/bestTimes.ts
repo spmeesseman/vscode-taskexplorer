@@ -5,16 +5,27 @@ import { lowerCaseFirstChar, properCase } from "../../lib/utils/utils";
 import { testControl } from "../control";
 import { teApi } from "./utils";
 
+const tct = testControl.tests;
 const timeSep = "----------------------------------------------------------------------------------------------------";
 
 
-const clearProcessTimeStorage = async (key: string, force?: boolean) =>
+const clearProcessTimeStorage = async (storageKey: string, numTests: number) =>
 {
-    if (testControl.tests.clearBestTime || testControl.tests.clearAllBestTimes || force)
+    const _clr = async () => {
+        await teApi.testsApi.storage.update2(storageKey, undefined);
+        await teApi.testsApi.storage.update2(storageKey + "Fmt", undefined);
+        await teApi.testsApi.storage.update2(storageKey + "NumTests", undefined);
+    };
+    if (tct.clearBestTime || tct.clearAllBestTimes)
     {
-        await teApi.testsApi.storage.update2(key, undefined);
-        await teApi.testsApi.storage.update2(key + "Fmt", undefined);
-        await teApi.testsApi.storage.update2(key + "NumTests", undefined);
+        await _clr();
+    }
+    else if (tct.clearBestTimesOnTestCountChange)
+    {
+        const prevNumTests = await teApi.testsApi.storage.get2<number>(storageKey + "NumTests");
+        if (prevNumTests !== numTests) {
+            await _clr();
+        }
     }
 };
 
@@ -52,7 +63,7 @@ const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: st
             msg = ` New Fastest Time with ${title} ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
         }
         else {
-            if (testControl.tests.numSuites > 1) {
+            if (tct.numSuites > 1) {
                 msg = ` New Fastest Time for Suite '${title}' ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
             }
             else {
@@ -78,12 +89,7 @@ const processBestTime = async (logTitle: string, storageKey: string, timeElapsed
                  figures.withColor(` ${timeSep.substring(0, timeSep.length - title.length - 4)}`, figures.colors.magenta));
     console.log(`    ${figures.color.info} ${msg}`);
 
-    await clearProcessTimeStorage(storageKey);
-
-    const prevNumTests = await teApi.testsApi.storage.get2<number>(storageKey + "NumTests");
-    if (prevNumTests !== numTests) {
-        await clearProcessTimeStorage(storageKey, true);
-    }
+    await clearProcessTimeStorage(storageKey, numTests);
 
     let bestTimeElapsed = await teApi.testsApi.storage.get2<number>(storageKey, 0);
     if (bestTimeElapsed === 0) {
@@ -108,18 +114,18 @@ const processBestTime = async (logTitle: string, storageKey: string, timeElapsed
 
 const processSuiteTimes = async () =>
 {
-    const suiteResults = Object.values(testControl.tests.suiteResults).filter(v => v.suiteName !== "Deactivate Extension");
+    const suiteResults = Object.values(tct.suiteResults).filter(v => v.suiteName !== "Deactivate Extension");
     for (const suiteResult of suiteResults)
     {
-        const typeKey = testControl.tests.numSuites === 1 ? "Single" : "",
+        const typeKey = tct.numSuites === 1 ? "Single" : "",
               storageKey = getSuiteKey(suiteResult.suiteName, "bestTimeElapsedSuite" + typeKey);
-        if (testControl.tests.clearAllBestTimes) {
-            await clearProcessTimeStorage(storageKey);
+        if (tct.clearAllBestTimes) {
+            await clearProcessTimeStorage(storageKey, tct.numTests);
         }
         if (suiteResult.timeFinished && suiteResult.timeStarted)
         {
             const timeElapsed = suiteResult.timeFinished - suiteResult.timeStarted;
-            await processBestTime(suiteResult.suiteName, storageKey, timeElapsed, testControl.tests.numTests);
+            await processBestTime(suiteResult.suiteName, storageKey, timeElapsed, tct.numTests);
         }
     }
 };
@@ -127,27 +133,27 @@ const processSuiteTimes = async () =>
 
 const processTimesWithLogEnabled = async (timeElapsed: number) =>
 {
-    if (testControl.tests.clearAllBestTimes)
+    if (tct.clearAllBestTimes)
     {
-        await clearProcessTimeStorage("bestTimeElapsedWithLogging");
-        await clearProcessTimeStorage("bestTimeElapsedWithLoggingFile");
-        await clearProcessTimeStorage("bestTimeElapsedWithLoggingOutput");
-        await clearProcessTimeStorage("bestTimeElapsedWithLoggingConsole");
+        await clearProcessTimeStorage("bestTimeElapsedWithLogging", tct.numTests);
+        await clearProcessTimeStorage("bestTimeElapsedWithLoggingFile", tct.numTests);
+        await clearProcessTimeStorage("bestTimeElapsedWithLoggingOutput", tct.numTests);
+        await clearProcessTimeStorage("bestTimeElapsedWithLoggingConsole", tct.numTests);
     }
     if (testControl.log.enabled)
     {
-        await processBestTime("Logging Enabled", "bestTimeElapsedWithLogging", timeElapsed, testControl.tests.numTests);
+        await processBestTime("Logging Enabled", "bestTimeElapsedWithLogging", timeElapsed, tct.numTests);
         if (testControl.log.file)
         {
-            await processBestTime("File Logging Enabled", "bestTimeElapsedWithLoggingFile", timeElapsed, testControl.tests.numTests);
+            await processBestTime("File Logging Enabled", "bestTimeElapsedWithLoggingFile", timeElapsed, tct.numTests);
         }
         if (testControl.log.output)
         {
-            await processBestTime("Output Window Logging Enabled", "bestTimeElapsedWithLoggingOutput", timeElapsed, testControl.tests.numTests);
+            await processBestTime("Output Window Logging Enabled", "bestTimeElapsedWithLoggingOutput", timeElapsed, tct.numTests);
         }
         if (testControl.log.console)
         {
-            await processBestTime("Console Logging Enabled", "bestTimeElapsedWithLoggingConsole", timeElapsed, testControl.tests.numTests);
+            await processBestTime("Console Logging Enabled", "bestTimeElapsedWithLoggingConsole", timeElapsed, tct.numTests);
         }
     }
 };
@@ -163,17 +169,17 @@ export const processTimes = async (timeStarted: number, hadRollingCountError: bo
     console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + timeFinishedFmt, figures.colors.grey)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + getTimeElapsedFmt(timeElapsed), figures.colors.grey)}`);
 
-    if (testControl.tests.numTestsFail === 0 && !hadRollingCountError)
+    if (tct.numTestsFail === 0 && !hadRollingCountError)
     {
-        if (testControl.tests.numSuites > 3)  { // > 3, sometimes i string the single test together with a few others temp
-            await processBestTime("", "bestTimeElapsed", timeElapsed, testControl.tests.numTests);
+        if (tct.numSuites > 3)  { // > 3, sometimes i string the single test together with a few others temp
+            await processBestTime("", "bestTimeElapsed", timeElapsed, tct.numTests);
             await processTimesWithLogEnabled(timeElapsed);
         }
         await processSuiteTimes();
     }
     else {
-        const skipMsg = testControl.tests.numTestsFail > 0 ?
-                            `There were ${testControl.tests.numTestsFail} failed tests, best time processing skipped` :
+        const skipMsg = tct.numTestsFail > 0 ?
+                            `There were ${tct.numTestsFail} failed tests, best time processing skipped` :
                             "There was a rolling count failure, best time processing skipped";
         console.log(`    ${figures.color.info} ${figures.withColor(skipMsg, figures.colors.grey)}`);
     }
