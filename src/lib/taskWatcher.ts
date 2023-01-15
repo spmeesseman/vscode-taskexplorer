@@ -14,7 +14,7 @@ import {
 
 export class TaskWatcher
 {
-    private static statusBarSpace: StatusBarItem | undefined;
+    private static statusBarSpace: StatusBarItem;
     private tree: ITaskExplorer;
     private disposables: Disposable[];
     private subscriptionStartIndex: number;
@@ -27,7 +27,12 @@ export class TaskWatcher
     {
         this.tree = tree;
         this.specialFolders = specialFolders;
+        if (!TaskWatcher.statusBarSpace) {
+            TaskWatcher.statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
+            TaskWatcher.statusBarSpace.tooltip = "Task Explorer Running Task";
+        }
         this.disposables = [
+            TaskWatcher.statusBarSpace,
             tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e)),
             tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e))
         ];
@@ -147,24 +152,25 @@ export class TaskWatcher
         // Fire change event for the 'Last Tasks' folder if the task exists there
         //
         if (this.specialFolders.lastTasks.hasTask(taskItem))
-        {
-            if (taskTree[0] && taskTree[0].label === this.specialFolders.lastTasks.label)
-            {
-                this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[0]);
-            }
+        {   //
+            // 'Last Tasks' folder, if enabled, will always be the 1st tree item
+            //
+            this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[0]);
         }
 
         //
         // Fire change event for the 'Favorites' folder if the task exists there
         //
         if (this.specialFolders.favorites.hasTask(taskItem))
-        {
+        {   //
+            // 'Favorites' folder, if enabled, can be the 1st tree item or 2d, depending on if
+            // the 'Last Tasks' folder is enabled, which is always the 1st item in the tree if enabled
+            //
             if (taskTree[0] && taskTree[0].label === this.specialFolders.favorites.label)
             {
                 this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[0]);
             }
-            else if (taskTree[1] && taskTree[1].label === this.specialFolders.favorites.label)
-            {
+            else {
                 this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[1]);
             }
         }
@@ -183,10 +189,6 @@ export class TaskWatcher
             if (exec)
             {
                 log.methodStart("   found running task, show status message", 2, logPad);
-                if (!TaskWatcher.statusBarSpace) {
-                    TaskWatcher.statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
-                    TaskWatcher.statusBarSpace.tooltip = "Task Explorer running task";
-                }
                 let statusMsg = task.name;
                 /* istanbul ignore else */
                 if ((task.scope as WorkspaceFolder).name) {
@@ -197,12 +199,7 @@ export class TaskWatcher
             }
             else {
                 log.methodStart("   found idle/stopped task, hide status message", 2, logPad);
-                /* istanbul ignore else */
-                if (TaskWatcher.statusBarSpace) {
-                    TaskWatcher.statusBarSpace.hide();
-                    TaskWatcher.statusBarSpace.dispose();
-                    TaskWatcher.statusBarSpace = undefined;
-                }
+                TaskWatcher.statusBarSpace.hide();
             }
         }
         log.methodDone("task start/stop show/hide message", 2, logPad);
