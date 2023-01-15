@@ -14,6 +14,9 @@ suite("File Cache Tests", () =>
     suiteSetup(async function()
     {
         teApi = await utils.activate(this);
+        await teApi.testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
+        await teApi.testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
+        await teApi.testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
         ++successCount;
     });
 
@@ -21,6 +24,9 @@ suite("File Cache Tests", () =>
     suiteTeardown(async function()
     {
         await utils.executeSettingsUpdate("enablePersistentFileCaching", false);
+        await teApi.testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
+        await teApi.testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
+        await teApi.testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
         utils.suiteFinished(this);
     });
 
@@ -44,18 +50,18 @@ suite("File Cache Tests", () =>
     test("Enable Persistent Cache", async function()
     {
         if (utils.exitRollingCount(2, successCount)) return;
-        this.slow(utils.testControl.slowTime.configEvent);
-        await utils.executeSettingsUpdate("enablePersistentFileCaching", true);
+        this.slow(utils.testControl.slowTime.configEvent + utils.testControl.slowTime.fileCachePersist);
+        await utils.executeSettingsUpdate("enablePersistentFileCaching", true); // enabling setting willpersist *now*
         ++successCount;
     });
 
 
-    test("Rebuild File Cache", async function()
+    test("Rebuild File Cache (Mimic Startup)", async function()
     {
         if (utils.exitRollingCount(3, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCache + utils.testControl.waitTime.min);
         // await treeUtils.refresh(this);
-        await teApi.testsApi.fileCache.rebuildCache("");
+        await teApi.testsApi.fileCache.rebuildCache("", true);
         await utils.sleep(utils.testControl.waitTime.min);
         ++successCount;
     });
@@ -69,9 +75,23 @@ suite("File Cache Tests", () =>
     });
 
 
-    test("Disable Persistent Cache", async function()
+    test("Rebuild File Cache w Empty Persisted Cache (Mimic Startup)", async function()
     {
         if (utils.exitRollingCount(5, successCount)) return;
+        this.slow(utils.testControl.slowTime.rebuildFileCache + (utils.testControl.slowTime.configEventFast * 3) + utils.testControl.waitTime.min);
+        await teApi.testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
+        await teApi.testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
+        await teApi.testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
+        await teApi.testsApi.fileCache.rebuildCache("", true);
+        await utils.sleep(utils.testControl.waitTime.min);
+        await checkTaskCounts(this);
+        ++successCount;
+    });
+
+
+    test("Disable Persistent Cache", async function()
+    {
+        if (utils.exitRollingCount(6, successCount)) return;
         this.slow(utils.testControl.slowTime.configEvent);
         await utils.executeSettingsUpdate("enablePersistentFileCaching", false);
         ++successCount;
@@ -87,12 +107,12 @@ suite("File Cache Tests", () =>
     // });
 
 
-    test("Rebuild File Cache", async function()
+    test("Rebuild File Cache (Mimic Startup)", async function()
     {
-        if (utils.exitRollingCount(6, successCount)) return;
+        if (utils.exitRollingCount(7, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCache + utils.testControl.waitTime.min);
         // await treeUtils.refresh(this);
-        await teApi.testsApi.fileCache.rebuildCache("");
+        await teApi.testsApi.fileCache.rebuildCache("", true);
         await teApi.waitForIdle(utils.testControl.waitTime.commandFast);
         ++successCount;
     });
@@ -100,7 +120,7 @@ suite("File Cache Tests", () =>
 
     test("Check Task Counts", async function()
     {
-        if (utils.exitRollingCount(7, successCount)) return;
+        if (utils.exitRollingCount(8, successCount)) return;
         await checkTaskCounts(this);
         ++successCount;
     });
@@ -108,7 +128,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Rebuild Cache (Not Busy)", async function()
     {
-        if (utils.exitRollingCount(8, successCount)) return;
+        if (utils.exitRollingCount(9, successCount)) return;
         await teApi.testsApi.fileCache.cancelBuildCache();
         await utils.sleep(utils.testControl.waitTime.min);
         ++successCount;
@@ -117,7 +137,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Rebuild Cache (Busy No Delay)", async function()
     {
-        if (utils.exitRollingCount(9, successCount)) return;
+        if (utils.exitRollingCount(10, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCacheCancel + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await teApi.testsApi.fileCache.cancelBuildCache();
@@ -128,7 +148,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Rebuild Cache (Busy 40ms Delay)", async function()
     {
-        if (utils.exitRollingCount(10, successCount)) return;
+        if (utils.exitRollingCount(11, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCacheCancel + 40 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(40);
@@ -140,7 +160,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Rebuild Cache (Busy 75ms Delay)", async function()
     {
-        if (utils.exitRollingCount(11, successCount)) return;
+        if (utils.exitRollingCount(12, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCacheCancel + 75 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(75);
@@ -152,7 +172,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Rebuild Cache (Busy 100ms Delay)", async function()
     {
-        if (utils.exitRollingCount(12, successCount)) return;
+        if (utils.exitRollingCount(13, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCacheCancel + 100 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(100);
@@ -164,7 +184,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Rebuild Cache (Busy 250ms Delay)", async function()
     {
-        if (utils.exitRollingCount(13, successCount)) return;
+        if (utils.exitRollingCount(14, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCacheCancel + 250 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(250);
@@ -176,7 +196,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Rebuild Cache (Busy 500ms Delay)", async function()
     {
-        if (utils.exitRollingCount(14, successCount)) return;
+        if (utils.exitRollingCount(15, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCacheCancel + 500 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(500);
@@ -188,7 +208,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Rebuild Cache (Busy 750ms Delay)", async function()
     {
-        if (utils.exitRollingCount(15, successCount)) return;
+        if (utils.exitRollingCount(16, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCacheCancel + 750 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(750);
@@ -200,7 +220,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Rebuild Cache (Busy 1s Delay)", async function()
     {
-        if (utils.exitRollingCount(16, successCount)) return;
+        if (utils.exitRollingCount(17, successCount)) return;
         this.slow(utils.testControl.slowTime.rebuildFileCacheCancel + 1000 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(1000);
@@ -212,7 +232,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Build Cache (FileWatcher Build) (No Delay)", async function()
     {
-        if (utils.exitRollingCount(17, successCount)) return;
+        if (utils.exitRollingCount(18, successCount)) return;
         this.slow(utils.testControl.slowTime.buildFileCacheCancel + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("gulp", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await teApi.testsApi.fileCache.cancelBuildCache();
@@ -223,7 +243,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 40ms Delay)", async function()
     {
-        if (utils.exitRollingCount(18, successCount)) return;
+        if (utils.exitRollingCount(19, successCount)) return;
         this.slow(utils.testControl.slowTime.buildFileCacheCancel + (utils.testControl.waitTime.min * 2));
         teApi.testsApi.fileCache.buildTaskTypeCache("gulp", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await utils.sleep(utils.testControl.waitTime.min);
@@ -235,7 +255,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 75ms Delay)", async function()
     {
-        if (utils.exitRollingCount(19, successCount)) return;
+        if (utils.exitRollingCount(20, successCount)) return;
         this.slow(utils.testControl.slowTime.buildFileCacheCancel + 75 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("python", constants.GLOB_PYTHON, undefined, true, ""); // Don't 'await'
         await utils.sleep(75);
@@ -247,7 +267,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 100ms Delay)", async function()
     {
-        if (utils.exitRollingCount(20, successCount)) return;
+        if (utils.exitRollingCount(21, successCount)) return;
         this.slow(utils.testControl.slowTime.buildFileCacheCancel + 100 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("batch", constants.GLOB_BATCH, undefined, true, ""); // Don't 'await'
         await utils.sleep(100);
@@ -259,7 +279,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 250ms Delay)", async function()
     {
-        if (utils.exitRollingCount(21, successCount)) return;
+        if (utils.exitRollingCount(22, successCount)) return;
         this.slow(utils.testControl.slowTime.buildFileCacheCancel + 250 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("bash", constants.GLOB_BASH, undefined, true, ""); // Don't 'await'
         await utils.sleep(250);
@@ -271,7 +291,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 500ms Delay)", async function()
     {
-        if (utils.exitRollingCount(22, successCount)) return;
+        if (utils.exitRollingCount(23, successCount)) return;
         this.slow(utils.testControl.slowTime.buildFileCacheCancel + 500 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("ant", constants.GLOB_ANT, undefined, true, ""); // Don't 'await'
         await utils.sleep(500);
@@ -283,7 +303,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 750ms Delay)", async function()
     {
-        if (utils.exitRollingCount(23, successCount)) return;
+        if (utils.exitRollingCount(24, successCount)) return;
         this.slow(utils.testControl.slowTime.buildFileCacheCancel + 750 + 25);
         teApi.testsApi.fileCache.buildTaskTypeCache("npm", constants.GLOB_NPM, undefined, true, ""); // Don't 'await'
         await utils.sleep(750);
@@ -295,7 +315,7 @@ suite("File Cache Tests", () =>
 
     test("Cancel Build Cache (FileWatcher Build) (Busy 1s Delay)", async function()
     {
-        if (utils.exitRollingCount(24, successCount)) return;
+        if (utils.exitRollingCount(25, successCount)) return;
         this.slow(utils.testControl.slowTime.buildFileCacheCancel + 1000 + utils.testControl.waitTime.min);
         teApi.testsApi.fileCache.buildTaskTypeCache("grunt", constants.GLOB_GULP, undefined, true, ""); // Don't 'await'
         await utils.sleep(1000);
@@ -307,7 +327,7 @@ suite("File Cache Tests", () =>
 
     test("Rebuild Cache and Invaldate Providers after Cancel", async function()
     {
-        if (utils.exitRollingCount(25, successCount)) return;
+        if (utils.exitRollingCount(26, successCount)) return;
         this.slow(utils.testControl.slowTime.refreshCommand + 100);
         await utils.executeTeCommand("refresh", utils.testControl.waitTime.refreshCommand);
         await utils.sleep(100);
@@ -317,7 +337,7 @@ suite("File Cache Tests", () =>
 
     test("Check Task Counts", async function()
     {
-        if (utils.exitRollingCount(26, successCount)) return;
+        if (utils.exitRollingCount(27, successCount)) return;
         await checkTaskCounts(this);
         ++successCount;
     });

@@ -16,6 +16,7 @@ import {
 
 let statusBarSpace: StatusBarItem;
 let cacheBuilding = false;
+let cacheBusy = false;
 let cancel = false;
 let firstRun = true;
 let taskGlobs: any = {};
@@ -497,10 +498,7 @@ function initMaps(taskType: string, project: string)
 }
 
 
-export function isBusy()
-{
-    return cacheBuilding === true;
-}
+export const isBusy = () => cacheBuilding === true ||  cacheBusy === true;
 
 
 function isFsChanged(taskType: string, project: string)
@@ -546,17 +544,17 @@ export const persistCache = async (clear?: boolean) =>
 };
 
 
-export async function rebuildCache(logPad: string)
+export async function rebuildCache(logPad: string, forceForTests?: boolean)
 {
     let numFilesFound = 0,
         loadedFromStorage = false,
         persistEnabled = false;
 
     log.methodStart("rebuild cache", 1, logPad, logPad === "");
-
+    cacheBusy = true;
     clearMaps();
 
-    if (firstRun)
+    if (firstRun || forceForTests)
     {
         persistEnabled = configuration.get<boolean>("enablePersistentFileCaching");
         if (persistEnabled)
@@ -589,6 +587,7 @@ export async function rebuildCache(logPad: string)
         }
     }
 
+    cacheBusy = false;
     log.methodDone("rebuild cache", 1, logPad);
     return numFilesFound;
 }

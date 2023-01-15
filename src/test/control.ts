@@ -31,8 +31,9 @@ export const testControl: ITestControl =
     // Rolling success count and failure flag
     //
     tests: {
-        clearBestTime: false,
         clearAllBestTimes: false,
+        clearBestTime: false,
+        clearBestTimesOnTestCountChange: true,
         numSuites: 0,
         numSuitesFail: 0,
         numSuitesSuccess: 0,
@@ -73,6 +74,7 @@ export const testControl: ITestControl =
         configReadEvent: 25,
         explorerViewStartup: 17800,
         fetchTasksCommand: 3000,
+        fileCachePersist: 470,
         findDocumentPositionCommand: 850,
         focusCommand: 3400,
         focusCommandAlreadyFocused: 125,
@@ -189,8 +191,9 @@ export interface ITestControl
     // Rolling success count and failure flag
     //
     tests: {
-        clearBestTime: boolean;
         clearAllBestTimes: boolean;
+        clearBestTime: boolean;
+        clearBestTimesOnTestCountChange: boolean;
         numSuites: number;
         numSuitesFail: number;
         numSuitesSuccess: number;
@@ -231,6 +234,7 @@ export interface ITestControl
         configReadEvent: number;
         explorerViewStartup: number;
         fetchTasksCommand: number;
+        fileCachePersist: number;
         findDocumentPositionCommand: number;
         focusCommand: number;
         focusCommandAlreadyFocused: number;
