@@ -99,13 +99,14 @@ export const testControl: ITestControl =
         rebuildFileCache: 15500,
         rebuildFileCacheCancel: 1810,
         removeWorkspaceFolder: 10000,
-        runCommand: 5000,
+        runCommand: 8500,
         runPauseCommand: 2000,
         runStopCommand: 2000,
         showHideSpecialFolder: 440,
         storageRead: 50,
         storageUpdate: 50,
         taskProviderReadUri: 100,
+        taskCommand: 1600,
         verifyTaskCount: 875,
         verifyTaskCountByTree: 850,
         verifyTaskCountNpm: 3075, // npm task provider is slower than shit on a turtle
@@ -267,6 +268,7 @@ export interface ITestControl
         showHideSpecialFolder: number;
         storageRead: number;
         storageUpdate: number;
+        taskCommand: number;
         taskProviderReadUri: number;
         verifyTaskCount: number;
         verifyTaskCountByTree: number;

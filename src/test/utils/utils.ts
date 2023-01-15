@@ -232,8 +232,7 @@ export const executeTeCommand2 = (command: string, args: any[], minWait?: number
 export const exitRollingCount = (expectedCount: number, successCount: number) =>
 {
 
-    if (hasRollingCountError)
-    {
+    if (hasRollingCountError) {
         const msg = "skip test, rolling success count failure " + expectedCount;
         console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
         return hasRollingCountError;
@@ -242,10 +241,14 @@ export const exitRollingCount = (expectedCount: number, successCount: number) =>
         expect(successCount).to.be.equal(expectedCount);
     }
     catch (e) {
+        const msg = "skip test, rolling success count failure " + expectedCount;
+        console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
         hasRollingCountError = true;
-        throw e;
+        if (tc.tests.numTestsFail === 0) {
+            throw new Error("Rolling count error but no failed tests recorded, previous text failed but passed?");
+        }
     }
-    return false;
+    return hasRollingCountError;
 };
 
 
@@ -572,14 +575,14 @@ export const verifyTaskCount = async (taskType: string, expectedCount: number, r
 };
 
 
-export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxWait?: number, useMinWait= true) =>
+export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxWait?: number) =>
 {
     if (exec)
     {
         let waited = 0;
         let hasExec = false;
         let isExec = !!isExecuting(exec.task);
-        while ((isExec && (!maxWait || waited < maxWait)) || (useMinWait && !isExec && !hasExec && waited < 500))
+        while ((isExec && (maxWait === undefined || waited < maxWait)) || (maxWait && !isExec && !hasExec && waited < tc.slowTime.taskCommand))
         {
             await sleep(50);
             waited += 50;

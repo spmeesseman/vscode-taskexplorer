@@ -22,8 +22,8 @@ const clearProcessTimeStorage = async (storageKey: string, numTests: number) =>
     }
     else if (tct.clearBestTimesOnTestCountChange)
     {
-        const prevNumTests = await teApi.testsApi.storage.get2<number>(storageKey + "NumTests");
-        if (prevNumTests !== numTests) {
+        const prevNumTests = await teApi.testsApi.storage.get2<number>(storageKey + "NumTests", 0);
+        if (prevNumTests < numTests) {
             await _clr();
         }
     }
