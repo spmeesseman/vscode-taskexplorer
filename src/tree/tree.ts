@@ -94,7 +94,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         this.disposables = [];
         this.disposables.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => this.run(item), this));
         this.disposables.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => this.run(item, true, false), this));
-        this.disposables.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args: string) => this.run(item, false, true, args), this));
+        this.disposables.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args?: string) => this.run(item, false, true, args), this));
         this.disposables.push(commands.registerCommand(name + ".runLastTask",  async () => this.runLastTask(), this));
         this.disposables.push(commands.registerCommand(name + ".stop", async (item: TaskItem) => this.stop(item), this));
         this.disposables.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => this.restart(item), this));
@@ -823,11 +823,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ],
             ]);
         }
-        else if (!element)
+        else /* istanbul ignore else */ if (!element)
         {
             log.value("tree item type", "asking for all (null)", logLevel + 1, logPad + "   ");
         }
-        /* istanbul ignore next */
         else
         {
             log.values(logLevel + 1, logPad + "   ", [
@@ -884,8 +883,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 this.tasks = await tasks.fetchTasks();
                 // .filter((t) => !util.isWatchTask(t.source) || !util.isExcluded(t.definition.path, logPad + "   "));
             }
-            /* istanbul ignore else */
-            else if (this.tasks && this.currentInvalidation)
+            else /* istanbul ignore else */ if (this.tasks && this.currentInvalidation)
             {
                 log.write(`   fetching ${this.currentInvalidation} tasks via VSCode.fetchTasks`, logLevel, logPad);
                 //
@@ -998,9 +996,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             await licMgr.setTasks(this.tasks || /* istanbul ignore next */[], logPad + "   ");
         }
 
-        await this.processEventQueue(logPad + "   ", logLevel);
-
-        this.refreshPending = false;
+        this.refreshPending = this.processEventQueue();
         this.currentInvalidation = undefined;
         this.getChildrenLogPad = this.defaultGetChildrenLogPad;
         this.getChildrenLogLevel = this.defaultGetChildrenLogLevel;
@@ -1057,10 +1053,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
         taskFile = files[id];
 
-        //
-        // Create taskfile node if needed
-        //
-        if (!taskFile)
+        if (!taskFile) // Create taskfile node if needed
         {
             log.value("   Add source file container", task.source, 2, logPad);
             taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath, 0, false, undefined, logPad + "   ");
@@ -1302,7 +1295,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     }
 
 
-    public async onVisibilityChanged(visible: boolean)
+    public onVisibilityChanged(visible: boolean)
     {   //
         // VSCode engine calls getChildren() when the view changes to 'visible'
         //
@@ -1310,7 +1303,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         this.visible = visible;
         if (this.visible)
         {
-            await this.processEventQueue(this.getChildrenLogPad, this.defaultGetChildrenLogLevel);
+            this.processEventQueue();
         }
         log.methodDone("visibility event received", this.defaultGetChildrenLogLevel, this.getChildrenLogPad);
         log.blank(this.defaultGetChildrenLogLevel);
@@ -1405,37 +1398,33 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     }
 
 
-    private processEventQueue = async (logPad: string, logLevel: number) =>
+    private processEventQueue = () =>
     {
-        log.methodStart("process task explorer main event queue", 1, logPad, true, [[ "# of queued events", this.eventQueue.length ]]);
+        const delay = 1;
+        let firedEvent = false;
+        log.methodStart("process task explorer event queue", 1, "", true, [[ "# of queued events", this.eventQueue.length ]]);
 
         if (this.eventQueue.length > 0)
         {
-            const processedEvents: string[] = [],
-                  next = this.eventQueue.shift() as IEvent; // get the next event
+            const next = this.eventQueue.shift() as IEvent; // get the next event
+            log.value("   event id", next.id, 1);
+            log.write(`   firing queued event task with ${next.args.length} args`);
 
-            if (!processedEvents.includes(next.id)) // Ensure no dups
-            {
-                log.write(`   process event # ${processedEvents.length + 1}`, logLevel, logPad);
-                log.value("      event id", next.id, 1, logPad);
-                log.write(`      calling queued event method with ${next.args.length} args`, logLevel, logPad);
+            setTimeout(async () => { await next.fn.call(this, ...next.args); }, delay);
 
-                await next.fn.call(this, ...next.args);
-
-                processedEvents.push(next.id);
-                log.write(`   finished processing event # ${processedEvents.length}`, logLevel, logPad);
-            } //
-             // Reverse splice the array and removes this event and any duplicates if there are any
-            //
             this.eventQueue.slice().reverse().forEach((item, index, object) =>
             {
                 if (item.id === next.id) {
-                    this.eventQueue.splice(object.length - 1 - index, logLevel);
+                    this.eventQueue.splice(object.length - 1 - index);
                 }
             });
+
+            log.write(`   fired queued event with ${delay}ms delay`, 1);
+            firedEvent = true;
         }
 
-        log.methodDone("process task explorer main event queue", logLevel, logPad);
+        log.methodDone("process task explorer main event queue", 1);
+        return firedEvent;
     };
 
 
@@ -1935,7 +1924,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         /* istanbul ignore else */
         if (taskItem.task && !(taskItem.task.execution instanceof CustomExecution))
         {
-            const me = this;
             const opts: InputBoxOptions = { prompt: "Enter command line arguments separated by spaces"};
 
             const _run = async (_args: string | undefined) =>
@@ -1957,8 +1945,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     }
                     exec = await this.runTask(newTask, noTerminal, logPad + "   ");
                     /* istanbul ignore else */
-                    if (exec)
-                    {
+                    if (exec) {
                         await this.specialFolders.lastTasks.saveTask(taskItem, logPad);
                     }
                 }
