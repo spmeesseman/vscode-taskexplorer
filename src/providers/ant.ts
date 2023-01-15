@@ -9,7 +9,7 @@ import { getCombinedGlobPattern, getRelativePath } from "../lib/utils/utils";
 import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { pathExistsSync, readFileAsync } from "../lib/utils/fs";
-import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace } from "vscode";
+import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace, ShellExecutionOptions } from "vscode";
 
 interface StringMap { [s: string]: string }
 
@@ -25,7 +25,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         const cwd = dirname(uri.fsPath),
               def = this.getDefaultDefinition(target, folder, uri);
         let args = [ target ],
-            options: any = {  cwd };
+            options: ShellExecutionOptions = { cwd };
 
         //
         // Ansicon for Windows
@@ -288,7 +288,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     {
         return getCombinedGlobPattern(constants.GLOB_ANT,
                                       [ ...configuration.get<string[]>("includeAnt", []),
-                                      ...configuration.get<string[]>("globPatternsAnt", []) ]);
+                                        ...configuration.get<string[]>("globPatternsAnt", []) ]);
     }
 
 

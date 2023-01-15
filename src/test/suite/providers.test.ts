@@ -59,6 +59,8 @@ suite("Provider Tests", () =>
 
     suiteTeardown(async function()
     {
+        await teApi.config.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
+        await waitForTeIdle(tc.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", tc.log.enabled, tc.waitTime.configEvent);
         await executeSettingsUpdate("specialFolders.expanded.test-files", false, tc.waitTime.configEvent);
         await executeSettingsUpdate("enabledTasks.apppublisher", false, tc.waitTime.configDisableEvent); // off by default
@@ -612,16 +614,19 @@ suite("Provider Tests", () =>
     test("Invalidate Bash Tasks With New Bash Shell Setting", async function()
     {
         if (exitRollingCount(40, successCount)) return;
-        this.slow(tc.slowTime.buildFileCache + (tc.slowTime.configEvent * 2) + tc.waitTime.min + (tc.waitTime.configEvent * 2));
+        this.slow(tc.slowTime.buildFileCache + tc.slowTime.configEvent + tc.waitTime.min + tc.waitTime.configEvent +
+                  (tc.slowTime.refreshCommand* 2) + (tc.waitTime.refreshCommand* 2));
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
         await teApi.config.updateVsWs("terminal.integrated.shell.windows",
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
-        await waitForTeIdle(tc.waitTime.configEvent);
+        await waitForTeIdle(tc.waitTime.refreshCommand);
         await teApi.testsApi.fileCache.buildTaskTypeCache("bash", workspace.workspaceFolders[0], true, "");
         await waitForTeIdle(tc.waitTime.min);
         await executeSettingsUpdate("specialFolders.expanded.test-files", false, tc.waitTime.configEvent);
+        await teApi.config.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
+        await waitForTeIdle(tc.waitTime.refreshCommand);
         ++successCount;
     });
 

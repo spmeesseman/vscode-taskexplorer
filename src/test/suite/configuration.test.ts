@@ -35,6 +35,11 @@ suite("Configuration / Settings Tests", () =>
     suiteTeardown(async function()
     {
         await executeSettingsUpdate("pathToPrograms", pathToPrograms);
+        // await executeSettingsUpdate("terminal.integrated.shell.windows", shellW32);
+        // await executeSettingsUpdate("terminal.integrated.shell.linux", shellLnx);
+        // await executeSettingsUpdate("terminal.integrated.shell.osx", shellOsx);
+        await configuration.updateVsWs("terminal.integrated.shell.windows", undefined);
+        await waitForTeIdle(tc.waitTime.refreshCommand);
         suiteFinished(this);
     });
 
@@ -232,9 +237,9 @@ suite("Configuration / Settings Tests", () =>
     test("Change Default Shell - Windows", async function()
     {
         if (exitRollingCount(12, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.configEvent + tc.waitTime.refreshCommand);
         await configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
-        await sleep(tc.waitTime.min);
+        await waitForTeIdle(tc.waitTime.refreshCommand);
         successCount++;
     });
 
@@ -262,7 +267,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - Coverage Hit", async function()
     {
         if (exitRollingCount(15, successCount)) return;
-        this.slow((tc.slowTime.configEnableEvent * 2) + tc.waitTime.min);
+        this.slow((tc.slowTime.configEnableEvent * 2) + tc.waitTime.min + tc.waitTime.refreshCommand);
         await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: false,
             batch: false,
@@ -273,6 +278,7 @@ suite("Configuration / Settings Tests", () =>
             ruby: false
         }), 25, 50);
         await executeSettingsUpdate("enabledTasks.nsis", true, tc.waitTime.min, tc.waitTime.min * 2); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
+        await waitForTeIdle(tc.waitTime.refreshCommand);
         successCount++;
     });
 
@@ -280,9 +286,9 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - Windows", async function()
     {
         if (exitRollingCount(16, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.configEvent + tc.waitTime.refreshCommand);
         await configuration.updateVsWs("terminal.integrated.shell.windows", shellW32);
-        await sleep(tc.waitTime.min);
+        await waitForTeIdle(tc.waitTime.refreshCommand);
         successCount++;
     });
 
@@ -290,7 +296,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Coverage Hit", async function()
     {
         if (exitRollingCount(17, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent);
+        this.slow(tc.waitTime.refreshCommand + tc.slowTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: true,
             batch: true,
@@ -300,6 +306,7 @@ suite("Configuration / Settings Tests", () =>
             python: false,
             ruby: false
         }), tc.waitTime.min, tc.waitTime.min * 2);
+        await waitForTeIdle(tc.waitTime.refreshCommand);
         successCount++;
     });
 

@@ -412,16 +412,16 @@ suite("License Manager Tests", () =>
 	test("Enter License Key by Command Pallette", async function()
 	{
         if (exitRollingCount(23, successCount)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage * 3);
+		this.slow((testControl.slowTime.licenseMgrOpenPage * 3) + (testControl.waitTime.command * 6));
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("1234-5678-9098-7654321");
-		await executeTeCommand("enterLicense", 400, 1100);
+		await executeTeCommand("enterLicense", testControl.waitTime.command * 2);
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("");
-		await executeTeCommand("enterLicense", 400, 1100, "   ");
+		await executeTeCommand("enterLicense", testControl.waitTime.command * 2, 1100, "   ");
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("");
-		await executeTeCommand("enterLicense", 400, 1100, "   ", 1);
+		await executeTeCommand("enterLicense", testControl.waitTime.command * 2, 1100, "   ", 1);
         ++successCount;
 	});
 
@@ -457,7 +457,7 @@ suite("License Manager Tests", () =>
 	test("Start License Server", async function()
 	{
         if (exitRollingCount(25, successCount)) return;
-		this.slow(testControl.slowTime.licenseManagerLocalStartServer + 4000);
+		this.slow(testControl.slowTime.licenseManagerLocalStartServer + (4000 * 2));
 		lsProcess = fork("spm-license-server.js", {
 			cwd: getWsPath("../../spm-license-server/bin"), detached: true,
 		});
