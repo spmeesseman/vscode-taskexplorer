@@ -8,7 +8,79 @@ import { isArray, isError, isFunction, isObject, isObjectEmpty, isString } from 
 const colors = figures.colors;
 
 
-const error = (msg: any, params?: (string|any)[][], queueId?: string) => _error(msg, params, queueId);
+const error = (msg: any, params?: (string|any)[][], queueId?: string, symbols: [ string, string ] = [ "", "" ]) =>
+{
+    if (!msg) { return; }
+
+    const currentWriteToConsole = logControl.writeToConsole;
+    const currentWriteToFile = logControl.enableFile;
+    const currentWriteToOutputWindow = logControl.enableOutputWindow;
+
+    if (!symbols || !symbols[0]) {
+        const symbol1 = !logControl.isTests || !logControl.isTestsBlockScaryColors ? figures.color.error : figures.color.errorTests;
+        symbols = [ symbol1, figures.error ];
+    }
+
+    const errMsgs = errorParse(msg, symbols, queueId);
+
+    if (logControl.lastErrorMesage[0] === errMsgs[0])
+    {
+        if (!isArray(msg)) {
+            return;
+        }
+        if (errMsgs[1] === logControl.lastErrorMesage[1] && errMsgs.length === logControl.lastErrorMesage.length) {
+            return;
+        }
+    }
+    logControl.lastErrorMesage = errMsgs;
+
+    if (!logControl.lastWriteWasBlankError && !logControl.lastWriteToConsoleWasBlank)
+    {
+        errorWriteLogs("", currentWriteToFile, currentWriteToOutputWindow, symbols, queueId);
+    }
+
+    errMsgs.forEach((m) => errorWriteLogs(m, currentWriteToFile, currentWriteToOutputWindow, symbols, queueId));
+
+    if (params)
+    {
+        for (const [ n, v, l ] of params)
+        {
+            logControl.enableFile = false;
+            logControl.writeToConsole = true;
+            logControl.enableOutputWindow = false;
+            value(symbols[0] + "   " + n, v, 0, "", queueId);
+            if (currentWriteToFile)
+            {
+                logControl.enableFile = true;
+                logControl.writeToConsole = false;
+                logControl.enableOutputWindow = false;
+                if (logControl.enableFileSymbols) {
+                    value(symbols[1] + "   " + n, v, 0, "", queueId);
+                }
+                else {
+                    value("   " + n, v, 0, "", queueId);
+                }
+            }
+            if (currentWriteToOutputWindow)
+            {
+                logControl.enableFile = false;
+                logControl.writeToConsole = false;
+                logControl.enableOutputWindow = true;
+                value(symbols[1] + "   " + n, v, 0, "", queueId);
+            }
+        }
+    }
+
+    errorWriteLogs("", currentWriteToFile, currentWriteToOutputWindow, symbols, queueId);
+
+    logControl.writeToConsole = currentWriteToConsole;
+    logControl.enableFile = currentWriteToFile;
+    logControl.enableOutputWindow = currentWriteToOutputWindow;
+
+    logControl.lastWriteWasBlank = true;
+    logControl.lastWriteWasBlankError = true;
+    logControl.lastWriteToConsoleWasBlank = true;
+};
 
 
 const errorConsole = (msg: string, symbols: [ string, string ], queueId?: string) =>
@@ -69,7 +141,6 @@ const errorParse = (err: any, symbols: [ string, string ], queueId?: string, cal
     }
     else if (isError(err))
     {
-        /* istanbul ignore else */
         if (err.stack) {
             eMsg = err.stack;
         }
@@ -107,75 +178,5 @@ const errorParse = (err: any, symbols: [ string, string ], queueId?: string, cal
     return accumulated;
 };
 
-
-export const _error = (msg: any, params?: (string|any)[][], queueId?: string, symbols: [ string, string ] = [ "", "" ]) =>
-{
-    if (!msg) {
-        return;
-    }
-    const currentWriteToConsole = logControl.writeToConsole;
-    const currentWriteToFile = logControl.enableFile;
-    const currentWriteToOutputWindow = logControl.enableOutputWindow;
-    const errMsgs = errorParse(msg, symbols, queueId);
-    if (!symbols || !symbols[0]) symbols = [ !logControl.isTests || !logControl.isTestsBlockScaryColors ? figures.color.error : figures.color.errorTests, figures.error ];
-
-    if (logControl.lastErrorMesage[0] === errMsgs[0])
-    {
-        if (!isArray(msg)) {
-            return;
-        }
-        if (errMsgs[1] === logControl.lastErrorMesage[1] && errMsgs.length === logControl.lastErrorMesage.length) {
-            return;
-        }
-    }
-    logControl.lastErrorMesage = errMsgs;
-
-    if (!logControl.lastWriteWasBlankError && !logControl.lastWriteToConsoleWasBlank)
-    {
-        errorWriteLogs("", currentWriteToFile, currentWriteToOutputWindow, symbols, queueId);
-    }
-
-    errMsgs.forEach((m) => errorWriteLogs(m, currentWriteToFile, currentWriteToOutputWindow, symbols, queueId));
-
-    if (params)
-    {
-        for (const [ n, v, l ] of params)
-        {
-            logControl.enableFile = false;
-            logControl.writeToConsole = true;
-            logControl.enableOutputWindow = false;
-            value(symbols[0] + "   " + n, v, 0, "", queueId);
-            if (currentWriteToFile)
-            {
-                logControl.enableFile = true;
-                logControl.writeToConsole = false;
-                logControl.enableOutputWindow = false;
-                if (logControl.enableFileSymbols) {
-                    value(symbols[1] + "   " + n, v, 0, "", queueId);
-                }
-                else {
-                    value("   " + n, v, 0, "", queueId);
-                }
-            }
-            if (currentWriteToOutputWindow)
-            {
-                logControl.enableFile = false;
-                logControl.writeToConsole = false;
-                logControl.enableOutputWindow = true;
-                value(symbols[1] + "   " + n, v, 0, "", queueId);
-            }
-        }
-    }
-
-    errorWriteLogs("", currentWriteToFile, currentWriteToOutputWindow, symbols, queueId);
-
-    logControl.writeToConsole = currentWriteToConsole;
-    logControl.enableFile = currentWriteToFile;
-    logControl.enableOutputWindow = currentWriteToOutputWindow;
-
-    logControl.lastWriteWasBlank = true;
-    logControl.lastWriteWasBlankError = true;
-    logControl.lastWriteToConsoleWasBlank = true;
-};
 
 export default error;

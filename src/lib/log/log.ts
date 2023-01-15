@@ -30,6 +30,8 @@ interface ILogControl
     logValueWhiteSpace: number;
     msgQueue: IDictionary<ILogQueueItem[]>;
     tzOffset: number;
+    useTags: boolean;
+    useTagsMaxLength: number;
     writeToConsole: boolean;
     writeToConsoleLevel: number;
 };
@@ -51,6 +53,8 @@ export const logControl: ILogControl =
     logOutputChannel: undefined,
     logValueWhiteSpace: 45,
     msgQueue: {},
+    useTags: true,
+    useTagsMaxLength: 8,
     tzOffset: (new Date()).getTimezoneOffset() * 60000,
     writeToConsole: false,
     writeToConsoleLevel: 2
