@@ -21,38 +21,13 @@ export function appendFile(file: string, data: string): Promise<void>
         });
     });
 }
+*/
 
-
-export function copyFile(src: string, dst: string)
-{
-    return new Promise<void>(async (resolve, reject) =>
-    {
-        const srcFile = path.resolve(cwd, src);
-        if (!await pathExists(srcFile)) {
-            reject(new Error("Invalid source file path"));
-        }
-        //
-        // If dst is a directory, a new file with the same name will be created
-        //
-        let fullPath = path.resolve(cwd, dst);
-        if (await pathExists(fullPath))
-        {
-            if (fs.lstatSync(fullPath).isDirectory()) {
-                fullPath = path.join(fullPath, path.basename(src));
-            }
-        }
-        fs.copyFile(srcFile, fullPath, (err) =>
-        {
-            if (err) {
-                reject(err);
-            }
-            resolve();
-        });
-    });
-}
-
-
-export function copyDir(src: string, dst: string, filter?: RegExp, copyWithBaseFolder = false)
+//
+// TODO - 'copyDir' and 'copyFile' are only used in tests.  If ever used in the application,
+//        remove all istanbul ignore tags and cover these functions 100%
+//
+export const copyDir = (src: string, dst: string, filter?: RegExp, copyWithBaseFolder = false) =>
 {
     return new Promise<boolean>(async (resolve, reject) =>
     {
@@ -78,7 +53,7 @@ export function copyDir(src: string, dst: string, filter?: RegExp, copyWithBaseF
         }
         if (!await pathExists(tgtDir))
         {
-            try { await createDir(tgtDir); } catch (e){ reject(e); return; };
+            try { await createDir(tgtDir); } catch (e){ /* istanbul ignore next */reject(e); /* istanbul ignore next */return; };
         }
         //
         // Copy
@@ -87,6 +62,7 @@ export function copyDir(src: string, dst: string, filter?: RegExp, copyWithBaseF
         for (const file of files)
         {
             const newSrc = path.join(srcDir, file);
+            /* istanbul ignore if */
             if (fs.existsSync(newSrc) && fs.lstatSync(newSrc).isDirectory())
             {
                 await copyDir(newSrc, tgtDir, filter, true);
@@ -106,8 +82,43 @@ export function copyDir(src: string, dst: string, filter?: RegExp, copyWithBaseF
 
         resolve(true);
     });
-}
-*/
+};
+
+
+//
+// TODO - 'copyDir' and 'copyFile' are only used in tests.  If ever used in the application,
+//        remove all istanbul ignore tags and cover these functions 100%
+//
+export const copyFile = (src: string, dst: string) =>
+{
+    return new Promise<void>(async (resolve, reject) =>
+    {
+        const srcFile = path.resolve(cwd, src);
+        if (!await pathExists(srcFile)) {
+            reject(new Error("Invalid source file path"));
+        }
+        //
+        // If dst is a directory, a new file with the same name will be created
+        //
+        let fullPath = path.resolve(cwd, dst);
+        /* istanbul ignore else */
+        if (await pathExists(fullPath))
+        {
+            /* istanbul ignore else */
+            if (fs.lstatSync(fullPath).isDirectory()) {
+                fullPath = path.join(fullPath, path.basename(src));
+            }
+        }
+        fs.copyFile(srcFile, fullPath, (err) =>
+        {
+            /* istanbul ignore if */
+            if (err) {
+                reject(err);
+            }
+            resolve();
+        });
+    });
+};
 
 
 export const createDir = (dir: string): Promise<void> =>
