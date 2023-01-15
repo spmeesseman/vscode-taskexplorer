@@ -12,7 +12,7 @@ import { BashTaskProvider } from "../../providers/bash";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, getWsPath, testControl, treeUtils, verifyTaskCount,
-    logErrorsAreFine, suiteFinished, exitRollingCount
+    logErrorsAreFine, suiteFinished, exitRollingCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "bash";
@@ -120,7 +120,7 @@ suite("Bash Tests", () =>
         this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        await waitForTeIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
         successCount++;
     });
@@ -131,10 +131,10 @@ suite("Bash Tests", () =>
         if (exitRollingCount(7, successCount)) return;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        await waitForTeIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        await waitForTeIdle(testControl.waitTime.fsDeleteEvent);
         successCount++;
     });
 
@@ -145,7 +145,7 @@ suite("Bash Tests", () =>
         this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        await waitForTeIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
         successCount++;
     });
@@ -156,7 +156,7 @@ suite("Bash Tests", () =>
         if (exitRollingCount(9, successCount)) return;
         this.slow(testControl.slowTime.fsDeleteFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        await waitForTeIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         successCount++;
     });

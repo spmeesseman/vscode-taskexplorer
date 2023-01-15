@@ -10,7 +10,7 @@ import { ExternalTaskProvider } from "./externalTaskProvider";
 import { ExternalTaskProviderBase } from "./externalTaskProviderBase";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeTeCommand, exitRollingCount, suiteFinished, testControl, verifyTaskCount } from "../utils/utils";
+import { activate, executeTeCommand, exitRollingCount, suiteFinished, testControl, verifyTaskCount, waitForTeIdle } from "../utils/utils";
 
 
 let teApi: ITaskExplorerApi;
@@ -57,7 +57,7 @@ suite("External Provider Tests", () =>
         this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         taskProvider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         await teApi.register("external", taskProvider, "");
-        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
+        await waitForTeIdle(testControl.waitTime.configEnableEvent);
         await verifyTaskCount("external", 2);
         ++successCount;
     });
@@ -96,7 +96,7 @@ suite("External Provider Tests", () =>
         if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.configEvent + testControl.slowTime.verifyTaskCount);
         await teApi.unregister("external", "");
-        await teApi.waitForIdle(testControl.waitTime.configEvent);
+        await waitForTeIdle(testControl.waitTime.configEvent);
         await verifyTaskCount("external", 2);
     });
 

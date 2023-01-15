@@ -4,12 +4,12 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
-import { expect } from "chai";
 import { GruntTaskProvider } from "../../providers/grunt";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, exitRollingCount, focusExplorerView, getWsPath, sleep, suiteFinished, testControl, treeUtils, verifyTaskCount
+    activate, exitRollingCount, focusExplorerView, getWsPath, sleep, suiteFinished, testControl as tc,
+    treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "grunt";
@@ -65,9 +65,9 @@ suite("Grunt Tests", () =>
     test("Start", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
+        this.slow(tc.slowTime.verifyTaskCount + tc.waitTime.min);
         await verifyTaskCount(testsName, startTaskCount);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        await waitForTeIdle(tc.waitTime.min);
         ++successCount;
     });
 
@@ -75,11 +75,11 @@ suite("Grunt Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
+        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount + tc.waitTime.configEnableEvent + tc.waitTime.min);
         await teApi.config.updateWs("enabledTasks.grunt", false);
-        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
+        await waitForTeIdle(tc.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        await waitForTeIdle(tc.waitTime.min);
         ++successCount;
     });
 
@@ -87,11 +87,11 @@ suite("Grunt Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
+        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount + tc.waitTime.configEnableEvent + tc.waitTime.min);
         await teApi.config.updateWs("enabledTasks.grunt", true);
-        await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
+        await waitForTeIdle(tc.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        await waitForTeIdle(tc.waitTime.min);
         ++successCount;
     });
 
@@ -99,7 +99,7 @@ suite("Grunt Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsCreateEvent + testControl.waitTime.min);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.verifyTaskCount + tc.waitTime.fsCreateEvent + tc.waitTime.min);
         if (!(await fsApi.pathExists(dirName))) {
             await fsApi.createDir(dirName);
         }
@@ -110,9 +110,9 @@ suite("Grunt Tests", () =>
             '    grunt.registerTask("upload2", ["s3"]);\n' +
             "};\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        await waitForTeIdle(tc.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        await waitForTeIdle(tc.waitTime.min);
         ++successCount;
     });
 
@@ -120,7 +120,7 @@ suite("Grunt Tests", () =>
     test("Add 4 Tasks to File", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(testControl.slowTime.fsModifyEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
+        this.slow(tc.slowTime.fsModifyEvent + tc.slowTime.verifyTaskCount + tc.waitTime.fsModifyEvent + tc.waitTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
             "module.exports = function(grunt) {\n" +
@@ -132,9 +132,9 @@ suite("Grunt Tests", () =>
             '    grunt.registerTask("upload6", ["s7"]);\n' +
             "};\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 6);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        await waitForTeIdle(tc.waitTime.min);
         ++successCount;
     });
 
@@ -142,7 +142,7 @@ suite("Grunt Tests", () =>
     test("Remove 2 Tasks from File", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsModifyEvent + testControl.waitTime.min);
+        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount + tc.waitTime.fsModifyEvent + tc.waitTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
             "module.exports = function(grunt) {\n" +
@@ -152,9 +152,9 @@ suite("Grunt Tests", () =>
             '    grunt.registerTask("upload6", ["s7"]);\n' +
             "};\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 4);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        await waitForTeIdle(tc.waitTime.min);
         ++successCount;
     });
 
@@ -162,12 +162,12 @@ suite("Grunt Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent + testControl.waitTime.min);
+        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount + tc.waitTime.fsDeleteEvent + tc.waitTime.min);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        await waitForTeIdle(tc.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        await waitForTeIdle(tc.waitTime.min);
         ++successCount;
     });
 
@@ -175,12 +175,12 @@ suite("Grunt Tests", () =>
     test("Turn VSCode Grunt Provider On", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 3000);
+        this.slow(tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.waitTime.min + 3000);
         await configuration.updateVs("grunt.autoDetect", "on");
         await sleep(3000);
         await treeUtils.refresh(this);
         await verifyTaskCount(testsName, startTaskCount);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        await waitForTeIdle(tc.waitTime.min);
         ++successCount;
     });
 
@@ -200,12 +200,12 @@ suite("Grunt Tests", () =>
     test("Turn VSCode Grunt Provider Off", async function()
     {
         if (exitRollingCount(11, successCount)) return;
-        this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 1500);
+        this.slow(tc.slowTime.configEventFast +  tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.waitTime.min + 1500);
         await configuration.updateVs("grunt.autoDetect", "off");
         await sleep(1500);
         await treeUtils.refresh(this);
         await verifyTaskCount(testsName, startTaskCount);
-        await teApi.waitForIdle(testControl.waitTime.min);
+        await waitForTeIdle(tc.waitTime.min);
     });
 
 });

@@ -10,7 +10,10 @@ import { Uri } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
-import { activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, focusExplorerView, getWsPath, sleep, suiteFinished, testControl as tc, verifyTaskCount } from "../utils/utils";
+import {
+    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, focusExplorerView,
+    getWsPath, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
+} from "../utils/utils";
 
 const testsName = "maven";
 const startTaskCount = 8;
@@ -68,7 +71,7 @@ suite("Maven Tests", () =>
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project>\n"
         );
-        await teApi.waitForIdle(tc.waitTime.fsCreateEvent, 3000);
+        await waitForTeIdle(tc.waitTime.fsCreateEvent, 3000);
         ++successCount;
     });
 
@@ -132,7 +135,7 @@ suite("Maven Tests", () =>
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project\n"
         );
-        await teApi.waitForIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fsModifyEvent);
         //
         // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
         // file is always 21. Force a task invalidation to cover the invalid json fix check
@@ -153,7 +156,7 @@ suite("Maven Tests", () =>
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project>\n"
         );
-        await teApi.waitForIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fsModifyEvent);
         //
         // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
         // file is always 21. Force a task invalidation to cover the invalid json fix check
@@ -169,7 +172,7 @@ suite("Maven Tests", () =>
         if (exitRollingCount(9, successCount)) return;
         this.slow(tc.slowTime.fsDeleteEvent + tc.waitTime.fsDeleteEvent + tc.slowTime.verifyTaskCount);
         await fs.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(tc.waitTime.fsDeleteEvent);
+        await waitForTeIdle(tc.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });

@@ -4,7 +4,7 @@
 
 import * as afs from "../../lib/utils/fs";
 import * as util from "../../lib/utils/utils";
-import log from "../../lib/log/log";
+import log, { logControl } from "../../lib/log/log";
 import { expect } from "chai";
 import { join } from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
@@ -57,98 +57,9 @@ suite("Util Tests", () =>
     });
 
 
-    test("Logging", async function()
-    {
-        if (exitRollingCount(1, successCount)) return;
-
-        log.blank();
-        log.blank(1);
-
-        log.write(`        ${creator}.${extension}`);
-        log.value(`        ${creator}.${extension}`, "true");
-        log.value(`        ${creator}.${extension}`, null);
-        log.value(`        ${creator}.${extension}`, undefined);
-
-		log.methodStart("methodName");
-		log.methodDone("methodName");
-		log.methodStart("methodName", 1);
-		log.methodDone("methodName", 1);
-		log.methodStart("methodName", 1, "");
-		log.methodDone("methodName", 1, "");
-		log.methodStart("methodName", 1, "", false);
-		log.methodDone("methodName", 1, "");
-		log.methodStart("methodName", 1, "", true);
-		log.methodDone("methodName", 1, "");
-		log.methodStart("methodName", 1, "", false, [[ "p1", "v1" ]]);
-		log.methodDone("methodName", 1, "", [[ "p2", "v2" ]]);
-
-		log.setWriteToConsole(true);
-		log.write("test");
-		log.value("test", "1");
-		log.value("test", "1", 1);
-		log.value("test", "1", 5);
-		log.setWriteToConsole(false);
-
-		log.warn("test1");
-		log.warn("test1");
-		log.warn("test2");
-		log.warn("test3");
-		log.withColor("test", log.colors.cyan);
-
-		log.write(null as unknown as string);
-		log.write(undefined as unknown as string);
-		log.write("");
-		log.write("");
-		log.value("object value", {
-			p1: 1,
-			p2: "test"
-		});
-
-		log.value(null as unknown as string, 1);
-		log.value(undefined as unknown as string, 1);
-		log.value("null value", null);
-		log.value("empty string value", "");
-		log.value("line break value", "line1\nline2");
-		log.value("", "");
-		log.value("", null);
-		log.value("", undefined);
-		log.value("undefined value 1", undefined);
-		log.value("undefined value 2", undefined, 1);
-
-		//
-		// Disable logging
-		//
-		await executeSettingsUpdate("logging.enable", false);
-
-		log.blank(1);
-		log.dequeue("");
-		log.methodStart("methodName");
-		log.methodDone("methodName");
-		log.value("test", "1");
-		log.value(null as unknown as string, 1);
-		log.value(undefined as unknown as string, 1);
-		log.warn("test1");
-		log.warn("test2");
-		log.withColor("test", log.colors.cyan);
-		log.write("test");
-		log.write("Test1", 1);
-		log.write("Test1", 1);
-		log.value("Test2", "value", 1);
-		log.value("Test3", null, 1);
-		log.value("Test4", undefined, 1);
-		log.values(1, "   ", [[ "Test5", "5" ]]);
-
-		//
-		// Re-enable logging
-		//
-		await executeSettingsUpdate("logging.enable", true);
-        ++successCount;
-    });
-
-
     test("Logging (Error)", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(1, successCount)) return;
 
         log.error(`        ${creator}.${extension}`);
         log.error([ `        ${creator}.${extension}`,
@@ -186,13 +97,17 @@ suite("Util Tests", () =>
 		log.error({
 			status: false
 		});
+		const scaryOff = logControl.isTestsBlockScaryColors;
+		logControl.isTestsBlockScaryColors = false;
+		log.error("Scary error");
+		logControl.isTestsBlockScaryColors = true;
+		log.error("Scary error");
+		logControl.isTestsBlockScaryColors = scaryOff;
 		logErrorsAreFine(true);
-
 		//
 		// Disable logging
 		//
 		await executeSettingsUpdate("logging.enable", false);
-
 		log.error("Test5 error");
 		log.error("Test5 error");
 		log.error(new Error("Test error object"));
@@ -204,19 +119,17 @@ suite("Util Tests", () =>
 		const err2 = new Error("Test error object");
 		err2.stack = undefined;
 		log.error(err2);
-
 		//
 		// Re-enable logging
 		//
 		await executeSettingsUpdate("logging.enable", true);
-
         ++successCount;
     });
 
 
 	test("Logging (File)", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(2, successCount)) return;
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
@@ -236,12 +149,43 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enableFileSymbols", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
+		log.error("Error1");
+		log.warn("Warning1");
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.value("Test3", "value3", 1);
 		await executeSettingsUpdate("logging.enableFile", false);
 		log.getLogFileName();
         ++successCount;
 	});
+
+
+    test("Logging (Method)", async function()
+    {
+        if (exitRollingCount(3, successCount)) return;
+		log.methodStart("methodName");
+		log.methodDone("methodName");
+		log.methodStart("methodName", 1);
+		log.methodDone("methodName", 1);
+		log.methodStart("methodName", 1, "");
+		log.methodDone("methodName", 1, "");
+		log.methodStart("methodName", 1, "", false);
+		log.methodDone("methodName", 1, "");
+		log.methodStart("methodName", 1, "", true);
+		log.methodDone("methodName", 1, "");
+		log.methodStart("methodName", 1, "", false, [[ "p1", "v1" ]]);
+		log.methodDone("methodName", 1, "", [[ "p2", "v2" ]]);
+		//
+		// Disable logging
+		//
+		await executeSettingsUpdate("logging.enable", false);
+		log.methodStart("methodName");
+		log.methodDone("methodName");
+		//
+		// Re-enable logging
+		//
+		await executeSettingsUpdate("logging.enable", true);
+        ++successCount;
+    });
 
 
 	test("Logging (Output Window)", async function()
@@ -264,14 +208,11 @@ suite("Util Tests", () =>
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
 		log.error("Test4 error", [[ "p1", "e1" ]]);
-		await executeSettingsUpdate("logging.enableOutputWindow", true);
-		log.value("Test3", "value3", 1);
-		await executeSettingsUpdate("logging.enableOutputWindow", false);
         ++successCount;
 	});
 
 
-	test("Logging (Queue)", async function()
+	test("Logging (Queue)", function()
     {
         if (exitRollingCount(5, successCount)) return;
 		log.dequeue("queueTestId");
@@ -286,9 +227,129 @@ suite("Util Tests", () =>
 	});
 
 
-    test("Miscellaneous", async function()
+    test("Logging (Value)", async function()
     {
         if (exitRollingCount(6, successCount)) return;
+        log.value(`        ${creator}.${extension}`, null);
+        log.value(`        ${creator}.${extension}`, undefined);
+		log.value(null as unknown as string, 1);
+		log.value(undefined as unknown as string, 1);
+		log.value("null value", null);
+		log.value("empty string value", "");
+		log.value("line break lf value", "line1\nline2");
+		log.value("line break crlf value", "line1\r\nline2");
+		await executeSettingsUpdate("logging.enableOutputWindow", false);
+		log.value("null value", null);
+		log.value("Test3", "value3", 1);
+		await executeSettingsUpdate("logging.enableOutputWindow", true);
+		log.value("", "");
+		log.value("", null);
+		log.value("", undefined);
+		log.value("undefined value 1", undefined);
+		log.value("undefined value 2", undefined, 1);
+		log.values(1, "   ", [[ "Test5", "5" ]]);
+		log.value("object value", {
+			p1: 1,
+			p2: "test"
+		});
+		//
+		// Console On
+		//
+		log.setWriteToConsole(true);
+		log.value("test", "1");
+		log.value("test", "1", 1);
+		log.value("test", "1", 5);
+		//
+		// Console Off
+		//
+		log.setWriteToConsole(false);
+		//
+		// Disable logging
+		//
+		await executeSettingsUpdate("logging.enable", false);
+		log.value("test", "1");
+		log.value(null as unknown as string, 1);
+		log.value(undefined as unknown as string, 1);
+		log.write("test");
+		log.write("Test1", 1);
+		log.write("Test1", 1);
+		log.value("Test2", "value", 1);
+		log.value("Test3", null, 1);
+		log.value("Test4", undefined, 1);
+		log.values(1, "   ", [[ "Test5", "5" ]]);
+		//
+		// Re-enable logging
+		//
+		await executeSettingsUpdate("logging.enable", true);
+        ++successCount;
+    });
+
+
+    test("Logging (Warn)", async function()
+    {
+        if (exitRollingCount(7, successCount)) return;
+		log.warn("test1");
+		log.warn("test2");
+		const scaryOff = logControl.isTestsBlockScaryColors;
+		logControl.isTestsBlockScaryColors = false;
+		log.warn("test3");
+		logControl.isTestsBlockScaryColors = true;
+		log.warn("test3");
+		logControl.isTestsBlockScaryColors = scaryOff;
+		//
+		// Disable logging
+		//
+		await executeSettingsUpdate("logging.enable", false);
+		log.warn("test1");
+		log.warn("test2");
+		//
+		// Re-enable logging
+		//
+		await executeSettingsUpdate("logging.enable", true);
+        ++successCount;
+    });
+
+
+    test("Logging (Write)", async function()
+    {
+        if (exitRollingCount(8, successCount)) return;
+        log.blank();
+        log.blank(1);
+		log.withColor("test", log.colors.cyan);
+		log.write(null as unknown as string);
+		log.write(undefined as unknown as string);
+		log.write("");
+		log.write("");
+		//
+		// Console On
+		//
+		log.setWriteToConsole(true);
+		log.write("test");
+		//
+		// Console Off
+		//
+		log.setWriteToConsole(false);
+		//
+		// Disable logging
+		//
+		await executeSettingsUpdate("logging.enable", false);
+		log.blank(1);
+		log.dequeue("");
+		log.withColor("test", log.colors.cyan);
+		log.write("test");
+		log.write("Test1", 1);
+		log.write("Test1", 1);
+		//
+		// Re-enable logging
+		//
+		await executeSettingsUpdate("logging.enable", true);
+        ++successCount;
+    });
+
+
+    test("Utilities", async function()
+    {
+        if (exitRollingCount(9, successCount)) return;
 
         util.timeout(10);
 
@@ -349,6 +410,10 @@ suite("Util Tests", () =>
 		util.isObjectEmpty([]);
 		util.isObjectEmpty([ 1, 2 ]);
 		util.isObjectEmpty(this);
+		util.isObjectEmpty(workspace);
+		util.isObjectEmpty(Object.setPrototypeOf({}, { a: 1}));
+		util.isObjectEmpty(Object.setPrototypeOf({ a: 1 }, { b: 1}));
+		util.isObjectEmpty({ ...Object.setPrototypeOf({ a: 1 }, { b: 1}) });
 		util.isObjectEmpty("aaa" as unknown as object);
 		util.isObjectEmpty("" as unknown as object);
 		util.isObjectEmpty(undefined as unknown as object);
@@ -368,9 +433,9 @@ suite("Util Tests", () =>
 	});
 
 
-	test("Data paths", async function()
+	test("Data Paths", async function()
 	{
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(10, successCount)) return;
 		//
 		// The fs module on dev test will run through win32 path get.  Simulate
 		// path get here for linux and mac for increased coverage since we're only
@@ -510,9 +575,9 @@ suite("Util Tests", () =>
 	});
 
 
-	test("Filesystem", async function()
+	test("File System", async function()
     {
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(11, successCount)) return;
 		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
 		await afs.createDir(__dirname);
 		await afs.createDir(join(__dirname, "folder1", "folder2", "folder3", "folder4"));
@@ -539,7 +604,7 @@ suite("Util Tests", () =>
 
     test("Storage", async function()
     {
-        if (exitRollingCount(9, successCount)) return;
+        if (exitRollingCount(12, successCount)) return;
         if (teApi.testsApi.storage)
         {
             await teApi.testsApi.storage.update("TEST_KEY", "This is a test");
@@ -563,7 +628,6 @@ suite("Util Tests", () =>
 			expect(await teApi.testsApi.storage.get2<number>("TEST_KEY2_DOESNT_EXIST", 0)).to.be.equal(0);
 			expect(await teApi.testsApi.storage.get2<string>("TEST_KEY2_DOESNT_EXIST", "")).to.be.equal("");
         }
-        ++successCount;
     });
 
 });

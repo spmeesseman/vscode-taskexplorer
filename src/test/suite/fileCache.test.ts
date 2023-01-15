@@ -113,7 +113,7 @@ suite("File Cache Tests", () =>
         this.slow(utils.testControl.slowTime.rebuildFileCache + utils.testControl.waitTime.min);
         // await treeUtils.refresh(this);
         await teApi.testsApi.fileCache.rebuildCache("", true);
-        await teApi.waitForIdle(utils.testControl.waitTime.commandFast);
+        await utils.waitForTeIdle(utils.testControl.waitTime.commandFast);
         ++successCount;
     });
 

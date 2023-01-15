@@ -11,7 +11,7 @@ import { Uri } from "vscode";
 import { ComposerTaskProvider } from "../../providers/composer";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, getWsPath, suiteFinished, testControl, verifyTaskCount
+    activate, executeSettingsUpdate, exitRollingCount, getWsPath, suiteFinished, testControl, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "composer";
@@ -123,7 +123,7 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        await waitForTeIdle(testControl.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 3);
         ++successCount;
     });
@@ -147,7 +147,7 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(testControl.waitTime.fsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 4);
         ++successCount;
     });
@@ -169,7 +169,7 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(testControl.waitTime.fsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
         ++successCount;
     });
@@ -199,7 +199,7 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(testControl.waitTime.fsModifyEvent);
         await verifyTaskCount(testsName, startTaskCount);
         if (resetLogging) { // turn scary error logging off
             executeSettingsUpdate("logging.enable", true);
@@ -215,7 +215,7 @@ suite("Composer Tests", () =>
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        await waitForTeIdle(testControl.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });

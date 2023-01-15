@@ -9,10 +9,8 @@ import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import {
-    activate, executeSettingsUpdate, getWsPath, testControl, verifyTaskCount,
-    logErrorsAreFine,
-    suiteFinished,
-    exitRollingCount
+    activate, executeSettingsUpdate, getWsPath, testControl, verifyTaskCount, logErrorsAreFine,
+    suiteFinished, exitRollingCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "ant";
@@ -82,7 +80,7 @@ suite("Ant Tests", () =>
         if (exitRollingCount(2, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", false);
-        await teApi.waitForIdle(testControl.waitTime.configEvent);
+        await waitForTeIdle(testControl.waitTime.configEvent);
         await verifyTaskCount("ant", 0);
         ++successCount;
     });
@@ -93,7 +91,7 @@ suite("Ant Tests", () =>
         if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", true);
-        await teApi.waitForIdle(testControl.waitTime.configEvent);
+        await waitForTeIdle(testControl.waitTime.configEvent);
         await verifyTaskCount("ant", 3);
         ++successCount;
     });
@@ -174,7 +172,7 @@ suite("Ant Tests", () =>
             "    <target name='test-build'></target>\n" +
             "</project>\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(testControl.waitTime.fsModifyEvent);
         await runCheck(2, 1, 2, 1, false, false);
         ++successCount;
     });
@@ -194,7 +192,7 @@ suite("Ant Tests", () =>
             '    <target namee="test5"></target>\n' + // incorrectly spelled 'name' property
             "</project>\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(testControl.waitTime.fsModifyEvent);
         await runCheck(4, 3, 1, 0, true, false);
         ++successCount;
     });
@@ -211,7 +209,7 @@ suite("Ant Tests", () =>
             '    <property name="testProp" value="test2" />\n' +
             "</project>\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(testControl.waitTime.fsModifyEvent);
         await runCheck(1, 0, 1, 0, false, false);
         ++successCount;
     });
@@ -228,7 +226,7 @@ suite("Ant Tests", () =>
             '    <property name="testProp" value="test2" />\n' +
             "</some_node>\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(testControl.waitTime.fsModifyEvent);
         await runCheck(1, 0, 1, 0, true, false);
         ++successCount;
     });
@@ -249,7 +247,7 @@ suite("Ant Tests", () =>
             '    <target namee="test5"</target>\n' + // incorrect XML test5"</
             "</project>\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(testControl.waitTime.fsModifyEvent);
         await runCheck(1, 0, 1, 0, true, true);
         ++successCount;
     });

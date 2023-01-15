@@ -60,6 +60,7 @@ export const testControl: ITestControl =
         buildFileCache: 1500,
         buildFileCacheCancel: 1350,
         buildTreeNoTasks: 600,
+        closeActiveDocument: 25,
         command: 1450,
         commandFast: 550,
         configEvent: 315,
@@ -220,6 +221,7 @@ export interface ITestControl
         buildFileCache: number;
         buildFileCacheCancel: number;
         buildTreeNoTasks: number;
+        closeActiveDocument: number;
         command: number;
         commandFast: number;
         configEvent: number;

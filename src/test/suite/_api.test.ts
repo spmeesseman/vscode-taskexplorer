@@ -5,7 +5,9 @@ import * as assert from "assert";
 import { getInstallPath } from "../../lib/utils/utils";
 import { refreshTree } from "../../lib/refreshTree";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, setExplorer, suiteFinished, testControl as tc } from "../utils/utils";
+import {
+    activate, executeSettingsUpdate, executeTeCommand, setExplorer, suiteFinished, testControl as tc, waitForTeIdle
+} from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
 let explorer: ITaskExplorer;
@@ -43,7 +45,7 @@ suite("API and Initialization", () =>
     {
         this.slow(tc.slowTime.explorerViewStartup + tc.waitTime.explorerViewStartup);
         await executeSettingsUpdate("enableSideBar", true);
-        await teApi.waitForIdle(tc.waitTime.explorerViewStartup);
+        await waitForTeIdle(tc.waitTime.explorerViewStartup);
     });
 
 
@@ -53,9 +55,9 @@ suite("API and Initialization", () =>
         //
         this.slow(tc.slowTime.refreshCommand + tc.slowTime.configEnableEvent + tc.waitTime.command + tc.waitTime.refreshCommand);
         await refreshTree(teApi, undefined, undefined, "");
-        await teApi.waitForIdle(tc.waitTime.command);
+        await waitForTeIdle(tc.waitTime.command);
         await refreshTree(teApi, undefined, undefined, "");
-        await teApi.waitForIdle(tc.waitTime.refreshCommand);
+        await waitForTeIdle(tc.waitTime.refreshCommand);
     });
 
 
@@ -63,7 +65,7 @@ suite("API and Initialization", () =>
     {
         this.slow(tc.slowTime.configRegisterExplorerEvent + tc.waitTime.configRegisterExplorerEvent + tc.waitTime.configEnableEvent);
         await executeSettingsUpdate("enableExplorerView", false, tc.waitTime.configEnableEvent);
-        await teApi.waitForIdle(tc.waitTime.configRegisterExplorerEvent);
+        await waitForTeIdle(tc.waitTime.configRegisterExplorerEvent);
     });
 
 
@@ -71,7 +73,7 @@ suite("API and Initialization", () =>
     {
         this.slow(tc.slowTime.refreshCommand + tc.waitTime.refreshCommand);
         await refreshTree(teApi, undefined, undefined, "");
-        await teApi.waitForIdle(tc.waitTime.refreshCommand);
+        await waitForTeIdle(tc.waitTime.refreshCommand);
     });
 
 
@@ -79,7 +81,7 @@ suite("API and Initialization", () =>
     {
         this.slow(tc.slowTime.configRegisterExplorerEvent + tc.waitTime.configRegisterExplorerEvent);
         await executeSettingsUpdate("enableSideBar", false, tc.waitTime.configEnableEvent);
-        await teApi.waitForIdle(tc.waitTime.configRegisterExplorerEvent);
+        await waitForTeIdle(tc.waitTime.configRegisterExplorerEvent);
     });
 
 
@@ -88,7 +90,7 @@ suite("API and Initialization", () =>
         this.slow(tc.slowTime.configRegisterExplorerEvent + tc.waitTime.configRegisterExplorerEvent);
         await executeSettingsUpdate("enableExplorerView", true, tc.waitTime.configEnableEvent);
         setExplorer(teApi.explorer as ITaskExplorer);
-        await teApi.waitForIdle(tc.waitTime.configRegisterExplorerEvent);
+        await waitForTeIdle(tc.waitTime.configRegisterExplorerEvent);
     });
 
 

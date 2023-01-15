@@ -31,7 +31,7 @@ export const refresh = async(instance?: any) =>
     {
         await utils.executeSettingsUpdate("groupWithSeparator", true, tc.waitTime.configGroupingEvent);
         await utils.executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.configGroupingEvent);
-        await teApi.waitForIdle(tc.waitTime.min);
+        await utils.waitForTeIdle(tc.waitTime.min);
         didSetGroupLevel = true;
     }
     await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
@@ -76,7 +76,7 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 
         if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
-            await teApi.waitForIdle(tc.waitTime.getTreeMin, tc.waitTime.getTreeMax);
+            await utils.waitForTeIdle(tc.waitTime.getTreeMin, tc.waitTime.getTreeMax);
             taskMap = teApi.testsApi.explorer.getTaskMap();
         }
 

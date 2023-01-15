@@ -73,7 +73,7 @@ suite("Typescript Tests", () =>
         if (utils.exitRollingCount(2, successCount)) return;
         this.slow(testControl.slowTime.fsCreateFolderEvent + testControl.waitTime.fsCreateFolderEvent + testControl.slowTime.verifyTaskCountByTree);
         await fsApi.createDir(dirName);
-        await teApi.waitForIdle(testControl.waitTime.fsCreateFolderEvent);
+        await utils.waitForTeIdle(testControl.waitTime.fsCreateFolderEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
         successCount++;
     });
@@ -103,7 +103,7 @@ suite("Typescript Tests", () =>
             "}\n"
         );
         // the 'create file 2' test fails 1/50 runs, so add a lil bit on to fsCreateEvent here too
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent + 50);
+        await utils.waitForTeIdle(testControl.waitTime.fsCreateEvent + 50);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
         successCount++;
     });
@@ -149,7 +149,7 @@ suite("Typescript Tests", () =>
             "}\n"
         );
         // the 'create file 2' test fails 1/50 runs, so add a lil bit on to fsCreateEvent
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent + 100);
+        await utils.waitForTeIdle(testControl.waitTime.fsCreateEvent + 100);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         successCount++;
     });
@@ -210,7 +210,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await utils.waitForTeIdle(testControl.waitTime.fsModifyEvent);
         //
         // See fileWatcher.ts, we ignore modify event because the task count will never change
         // for this task type. So if there is invalid json after a save, the tasks will remain,
@@ -248,7 +248,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        await utils.waitForTeIdle(testControl.waitTime.fsCreateEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         successCount++;
     });
@@ -259,7 +259,7 @@ suite("Typescript Tests", () =>
         if (utils.exitRollingCount(10, successCount)) return;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCountByTree + testControl.waitTime.fsDeleteEvent);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        await utils.waitForTeIdle(testControl.waitTime.fsDeleteEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
         successCount++;
     });
@@ -270,7 +270,7 @@ suite("Typescript Tests", () =>
         if (utils.exitRollingCount(11, successCount)) return;
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCountByTree + testControl.waitTime.fsDeleteEvent);
         await fsApi.deleteFile(fileUri2.fsPath);
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        await utils.waitForTeIdle(testControl.waitTime.fsDeleteEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
         successCount++;
     });

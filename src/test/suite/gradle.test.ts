@@ -7,7 +7,10 @@ import { Uri } from "vscode";
 import { GradleTaskProvider } from "../../providers/gradle";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, testControl, treeUtils, verifyTaskCount } from "../utils/utils";
+import {
+    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath,
+    testControl, treeUtils, verifyTaskCount
+} from "../utils/utils";
 
 const testsName = "gradle";
 const startTaskCount = 7;
@@ -62,7 +65,7 @@ suite("Gradle Tests", () =>
         if (exitRollingCount(2, successCount)) return;
         this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
         // await verifyTaskCount(testsName, startTaskCount);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -72,9 +75,9 @@ suite("Gradle Tests", () =>
         if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.gradle", false);
-        // await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
+        // await waitForTeIdle(testControl.waitTime.configEnableEvent);
         // await verifyTaskCount(testsName, 0);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -84,9 +87,9 @@ suite("Gradle Tests", () =>
         if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.gradle", true);
-        // await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
+        // await waitForTeIdle(testControl.waitTime.configEnableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -105,9 +108,9 @@ suite("Gradle Tests", () =>
         //     '    gradle.registerTask("upload2", ["s3"]);\n' +
         //     "};\n"
         // );
-        // await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        // await waitForTeIdle(testControl.waitTime.fsCreateEvent);
         // await verifyTaskCount(testsName, startTaskCount + 2);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -127,9 +130,9 @@ suite("Gradle Tests", () =>
         //     '    gradle.registerTask("upload6", ["s7"]);\n' +
         //     "};\n"
         // );
-        // await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        // await waitForTeIdle(testControl.waitTime.fsModifyEvent);
         // await verifyTaskCount(testsName, startTaskCount + 6);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -147,9 +150,9 @@ suite("Gradle Tests", () =>
         //     '    gradle.registerTask("upload6", ["s7"]);\n' +
         //     "};\n"
         // );
-        // await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        // await waitForTeIdle(testControl.waitTime.fsModifyEvent);
         // await verifyTaskCount(testsName, startTaskCount + 4);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -160,9 +163,9 @@ suite("Gradle Tests", () =>
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent + testControl.waitTime.min);
         // await fsApi.deleteFile(fileUri.fsPath);
         // await fsApi.deleteDir(dirName);
-        // await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        // await waitForTeIdle(testControl.waitTime.fsDeleteEvent);
         // await verifyTaskCount(testsName, startTaskCount);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 

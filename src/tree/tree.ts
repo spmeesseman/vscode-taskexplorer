@@ -1687,6 +1687,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
     private async restart(taskItem: TaskItem)
     {
+        let exec: TaskExecution | undefined;
         log.methodStart("restart task", 1, "", true);
         if (this.isBusy() || !taskItem)
         {
@@ -1694,9 +1695,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
         else {
             await this.stop(taskItem);
-            await this.run(taskItem);
+            exec = await this.run(taskItem);
         }
         log.methodDone("restart task", 1);
+        return exec;
     }
 
 

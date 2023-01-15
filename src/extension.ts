@@ -59,7 +59,6 @@ export const teApi: ITaskExplorerApi =
     sidebarView: undefined,
     unregister: unregisterExternalProvider,
     utilities: util,
-    waitForIdle: waitForTaskExplorerIdle,
     testsApi: {
         fs,
         explorer: {} as ITaskExplorer, // registerExplorer() will set
@@ -330,25 +329,4 @@ async function unregisterExternalProvider(providerName: string, logPad: string)
 {
     delete providersExternal[providerName];
     await refreshTree(teApi, providerName, undefined, logPad);
-}
-
-
-async function waitForTaskExplorerIdle(minWait = 1, maxWait = 15000, logPad = "   ")
-{
-    let waited = 0;
-    let iterationsIdle = 0;
-    while ((iterationsIdle < 3 || isBusy()) && waited < maxWait)
-    {
-        await util.timeout(20);
-        waited += 20;
-        ++iterationsIdle;
-        if (isBusy()) {
-            iterationsIdle = 0;
-        }
-    }
-    /* istanbul ignore next */
-    if (minWait > waited) {
-        /* istanbul ignore next */
-        await util.timeout(minWait - waited);
-    }
 }

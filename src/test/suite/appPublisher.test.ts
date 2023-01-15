@@ -10,8 +10,8 @@ import { Uri } from "vscode";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, sleep,
-    suiteFinished, testControl as tc, treeUtils, verifyTaskCount
+    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath,
+    suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "apppublisher";
@@ -107,7 +107,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(tc.waitTime.fsCreateEvent);
+        await waitForTeIdle(tc.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
         ++successCount;
     });
@@ -149,7 +149,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn""\n' +
             "\n"
         );
-        await teApi.waitForIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fsModifyEvent);
         //
         // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
         // file is always 21. Force a task invalidation to cover the invalid json check
@@ -176,7 +176,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fsModifyEvent);
         //
         // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
         // file is always 21. Force a task invalidation to cover the invalid json fix check
@@ -192,7 +192,7 @@ suite("App-Publisher Tests", () =>
         if (exitRollingCount(10, successCount)) return;
         this.slow(tc.slowTime.fsDeleteEvent + tc.waitTime.fsDeleteEvent + tc.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(tc.waitTime.fsDeleteEvent);
+        await waitForTeIdle(tc.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });

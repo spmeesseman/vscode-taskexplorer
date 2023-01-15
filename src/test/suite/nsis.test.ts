@@ -64,7 +64,7 @@ suite("Nullsoft NSIS Tests", () =>
         if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
         // await verifyTaskCount(testsName, startTaskCount);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -74,9 +74,9 @@ suite("Nullsoft NSIS Tests", () =>
         if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.nsis", false);
-        // await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
+        // await waitForTeIdle(testControl.waitTime.configEnableEvent);
         // await verifyTaskCount(testsName, 0);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -86,9 +86,9 @@ suite("Nullsoft NSIS Tests", () =>
         if (exitRollingCount(5, successCount)) return;
         this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.nsis", true);
-        // await teApi.waitForIdle(testControl.waitTime.configEnableEvent);
+        // await waitForTeIdle(testControl.waitTime.configEnableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -107,9 +107,9 @@ suite("Nullsoft NSIS Tests", () =>
         //     '    nsis.registerTask("upload2", ["s3"]);\n' +
         //     "};\n"
         // );
-        // await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        // await waitForTeIdle(testControl.waitTime.fsCreateEvent);
         // await verifyTaskCount(testsName, startTaskCount + 2);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -120,9 +120,9 @@ suite("Nullsoft NSIS Tests", () =>
         this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fsDeleteEvent + testControl.waitTime.min);
         // await fsApi.deleteFile(fileUri.fsPath);
         // await fsApi.deleteDir(dirName);
-        // await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        // await waitForTeIdle(testControl.waitTime.fsDeleteEvent);
         // await verifyTaskCount(testsName, startTaskCount);
-        // await teApi.waitForIdle(testControl.waitTime.min);
+        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 

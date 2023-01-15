@@ -110,7 +110,7 @@ export const activate = async (instance?: Mocha.Context) =>
         // waitForIdle() added 1/2/03 - Tree loads in delay 'after' activate()
         //
         console.log(`    ${figures.color.info} ${figures.withColor("Waiting for extension to initialize", figures.colors.grey)}`);
-        teApi.waitForIdle();
+        waitForTeIdle();
         //
         // Write to console is just a tests feature, it's not controlled by settings, set it here if needed
         //
@@ -211,7 +211,7 @@ export const closeActiveDocument = async () =>
 export const executeSettingsUpdate = async (key: string, value?: any, minWait?: number, maxWait?: number) =>
 {
     const rc = await teApi.config.updateWs(key, value);
-    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.configEvent),
+    await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.configEvent),
                             maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;
 };
@@ -220,7 +220,7 @@ export const executeSettingsUpdate = async (key: string, value?: any, minWait?: 
 export const executeTeCommand = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
     const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
-    await teApi.waitForIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
+    await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
                             maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;
 };
@@ -255,13 +255,13 @@ export const focusExplorerView = async (instance: any) =>
         instance.slow(tc.slowTime.focusCommand + tc.slowTime.refreshCommand +
                       (tc.waitTime.focusCommand * 2) + tc.waitTime.min + 100);
         await executeTeCommand("focus", tc.waitTime.focusCommand);
-        await teApi.waitForIdle(tc.waitTime.focusCommand);
+        await waitForTeIdle(tc.waitTime.focusCommand);
         sleep(100);
     }
     else {
         instance.slow(tc.slowTime.focusCommandAlreadyFocused);
     }
-    await teApi.waitForIdle(tc.waitTime.min);
+    await waitForTeIdle(tc.waitTime.min);
 };
 
 
@@ -582,5 +582,26 @@ export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxW
             await sleep(50);
             waited += 50;
         }
+    }
+};
+
+
+export const waitForTeIdle = async (minWait = 1, maxWait = 15000, logPad = "   ") =>
+{
+    let waited = 0;
+    let iterationsIdle = 0;
+    while ((iterationsIdle < 3 || teApi.isBusy()) && waited < maxWait)
+    {
+        await sleep(20);
+        waited += 20;
+        ++iterationsIdle;
+        if (teApi.isBusy()) {
+            iterationsIdle = 0;
+        }
+    }
+    /* istanbul ignore next */
+    if (minWait > waited) {
+        /* istanbul ignore next */
+        await sleep(minWait - waited);
     }
 };
