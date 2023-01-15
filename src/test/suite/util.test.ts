@@ -13,6 +13,7 @@ import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
 	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount, getWsPath
 } from "../utils/utils";
+import { InitScripts } from "../../lib/noScripts";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
@@ -138,23 +139,32 @@ suite("Util Tests", () =>
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
 		log.error("Test4 error", [[ "p1", "e1" ]]);
-		await executeSettingsUpdate("logging.enableFileSymbols", false);
+		await executeSettingsUpdate("logging.enableFileSymbols", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
 		log.error("Test2 error");
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
 		log.error("Test4 error", [[ "p1", "e1" ]]);
-		await executeSettingsUpdate("logging.enableFile", false);
-		await executeSettingsUpdate("logging.enableFileSymbols", true);
+		await executeSettingsUpdate("logging.enableFileSymbols", false);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
+		logErrorsAreFine(true);
 		log.error("Error1");
 		log.warn("Warning1");
-		await executeSettingsUpdate("logging.enableFile", true);
 		log.value("Test3", "value3", 1);
 		await executeSettingsUpdate("logging.enableFile", false);
 		log.getLogFileName();
+		//
+		// Disable logging
+		//
+		await executeSettingsUpdate("logging.enable", false);
+		log.error("Error1");
+		log.warn("Warning1");
+		//
+		// Re-enable logging
+		//
+		await executeSettingsUpdate("logging.enable", true);
         ++successCount;
 	});
 
@@ -358,9 +368,17 @@ suite("Util Tests", () =>
     });
 
 
-    test("Utilities", async function()
+    test("Miscellaneous", async function()
     {
         if (exitRollingCount(9, successCount)) return;
+        new InitScripts(); // it won't cover since no focus the view until after a bunch of test suites
+        ++successCount;
+    });
+
+
+    test("Utilities", async function()
+    {
+        if (exitRollingCount(10, successCount)) return;
 
         util.timeout(10);
 
@@ -446,7 +464,7 @@ suite("Util Tests", () =>
 
 	test("Data Paths", async function()
 	{
-        if (exitRollingCount(10, successCount)) return;
+        if (exitRollingCount(11, successCount)) return;
 		//
 		// The fs module on dev test will run through win32 path get.  Simulate
 		// path get here for linux and mac for increased coverage since we're only
@@ -588,7 +606,7 @@ suite("Util Tests", () =>
 
 	test("File System", async function()
     {
-        if (exitRollingCount(11, successCount)) return;
+        if (exitRollingCount(12, successCount)) return;
 		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
 		await afs.createDir(__dirname);
 		await afs.createDir(join(__dirname, "folder1", "folder2", "folder3", "folder4"));
@@ -615,7 +633,7 @@ suite("Util Tests", () =>
 
     test("Storage", async function()
     {
-        if (exitRollingCount(12, successCount)) return;
+        if (exitRollingCount(13, successCount)) return;
         if (teApi.testsApi.storage)
         {
             await teApi.testsApi.storage.update("TEST_KEY", "This is a test");

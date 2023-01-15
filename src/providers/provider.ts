@@ -144,8 +144,9 @@ export abstract class TaskExplorerProvider implements TaskProvider
         ]);
 
         //
-        // Allof a sudden the queue is no longer filling up.I think it's from removing the try/catch
-        // in Tree.ts.getChildren() around the buildTaskTree() call.  ~ line 932 as of 1/9/23
+        // All of a sudden the queue is no longer filling up.  I think it's from removing the try/catch
+        // in Tree.ts.getChildren() around the buildTaskTree() call.  ~ line 932 as of 1/9/23.
+        // 1/15 - Nope, it's not that. Hmmmm...
         //
         /* istanbul ignore if */
         if (uri && this.invalidating) {
@@ -165,13 +166,10 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 //
                 this.cachedTasks.slice().reverse().forEach((item, index, object) =>
                 {
-                    if (this.needsRemoval(item, uri))
+                    if (this.needsRemoval(item, uri) && (item.source !== "Workspace" || /* instanbul ignore next */item.definition.type === this.providerName))
                     {
-                        /* instanbul ignore else */
-                        if (item.source !== "Workspace" || /* instanbul ignore next */item.definition.type === this.providerName) {
-                            log.write(`   removing cached task '${item.source}/${item.name}'`, 4, logPad);
-                            (this.cachedTasks as Task[]).splice(object.length - 1 - index, 1);
-                        }
+                        log.write(`   removing cached task '${item.source}/${item.name}'`, 4, logPad);
+                        (this.cachedTasks as Task[]).splice(object.length - 1 - index, 1);
                     }
                 });
 
@@ -221,7 +219,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                  // looking right now.  Harmless but the less calls the better.
                  //
                  // (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* instanbul ignore next */isDirectory(uri.fsPath)) ||
-                 (cstDef.uri.fsPath.startsWith(uri.fsPath) && !extname(uri.fsPath) /* ouch */) ||
+                 (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* instanbul ignore next */!extname(uri.fsPath) /* ouch */) ||
                  //
                  !isTaskIncluded(item, cstDef.uri.path)));
     }
