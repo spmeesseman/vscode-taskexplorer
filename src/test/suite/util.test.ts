@@ -615,7 +615,9 @@ suite("Util Tests", () =>
 		try {
 			await afs.copyFile(join(__dirname, "folder1", "noFile.txt"), join(__dirname, "folder2"));
 		} catch {}
-		await afs.copyDir(join(getWsPath("."), "hello.bat"), join(__dirname, "folder2"));
+		try {
+			await afs.copyDir(join(getWsPath("."), "hello.bat"), join(__dirname, "folder2"));
+		} catch {}
 		await afs.createDir(join(__dirname, "folder1", "folder2", "folder3", "folder4"));
 		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
 		await afs.deleteDir(join(__dirname, "folder1"));
