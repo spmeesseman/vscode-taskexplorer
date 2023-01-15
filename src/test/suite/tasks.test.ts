@@ -180,8 +180,8 @@ suite("Task Tests", () =>
         //
         const taskTime= 3000;
         if (utils.exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.runCommand + tc.waitTime.runCommandMin + tc.waitTime.command + tc.slowTime.configEvent +
-                  startTaskSlowTime + endOfTestWaitTime + (taskTime * 2));
+        this.slow(tc.slowTime.runCommand + tc.waitTime.runCommandMin + tc.waitTime.command + tc.slowTime.command + tc.slowTime.configEvent +
+                  tc.waitTime.configEvent + startTaskSlowTime + endOfTestWaitTime + (taskTime * 2));
         await utils.executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await startTask(bash[0] as TaskItem, true);
         const exec = await utils.executeTeCommand2("run", [ bash[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;

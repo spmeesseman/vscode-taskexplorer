@@ -89,7 +89,7 @@ export const testControl: ITestControl =
         licenseMgrOpenPage: 575,
         licenseMgrOpenPageWithDetail: 990,
         licenseManagerLocalCheck: 2000,
-        licenseManagerLocalStartServer: 4500,
+        licenseManagerLocalStartServer: 5010,
         licenseManagerRemoteCheck: 3000,
         licenseManagerRemoteStartServer: 10000,
         npmCommand: 11925,
@@ -113,7 +113,7 @@ export const testControl: ITestControl =
         verifyTaskCountWorkspace: 3500,
         viewReport: 1950,
         walkTaskTree: 5500,
-        walkTaskTreeWithDocOpen: 25000,
+        walkTaskTreeWithDocOpen: 26000,
         workspaceInvalidation: 15000
     },
     //
