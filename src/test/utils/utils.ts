@@ -231,17 +231,19 @@ export const executeTeCommand2 = (command: string, args: any[], minWait?: number
 
 export const exitRollingCount = (expectedCount: number, successCount: number) =>
 {
+
+    if (hasRollingCountError)
+    {
+        const msg = "skip test, rolling success count failure " + expectedCount;
+        console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
+        return hasRollingCountError;
+    }
     try {
-        if (hasRollingCountError) {
-            throw new Error("hasRollingCountError flag set");
-        }
         expect(successCount).to.be.equal(expectedCount);
     }
-    catch {
-        const msg = "skip test, rolling success count failure " + expectedCount;
-        console.log(`    ${figures.color.warning} ${figures.withColor(msg, figures.colors.grey)}`);
+    catch (e) {
         hasRollingCountError = true;
-        return hasRollingCountError;
+        throw e;
     }
     return false;
 };

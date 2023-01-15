@@ -199,7 +199,7 @@ suite("Grunt Tests", () =>
 
     test("Turn VSCode Grunt Provider Off", async function()
     {
-        expect(successCount).to.be.equal(11);
+        if (exitRollingCount(11, successCount)) return;
         this.slow(testControl.slowTime.configEventFast +  testControl.slowTime.refreshCommand + testControl.slowTime.verifyTaskCount + testControl.waitTime.min + 1500);
         await configuration.updateVs("grunt.autoDetect", "off");
         await sleep(1500);

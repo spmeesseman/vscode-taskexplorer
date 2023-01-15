@@ -68,10 +68,6 @@ suite("Util Tests", () =>
         log.value(`        ${creator}.${extension}`, "true");
         log.value(`        ${creator}.${extension}`, null);
         log.value(`        ${creator}.${extension}`, undefined);
-        log.error(`        ${creator}.${extension}`);
-        log.error([ `        ${creator}.${extension}`,
-                    `        ${creator}.${extension}`,
-                    `        ${creator}.${extension}` ]);
 
 		log.methodStart("methodName");
 		log.methodDone("methodName");
@@ -119,6 +115,46 @@ suite("Util Tests", () =>
 		log.value("undefined value 1", undefined);
 		log.value("undefined value 2", undefined, 1);
 
+		//
+		// Disable logging
+		//
+		await executeSettingsUpdate("logging.enable", false);
+
+		log.blank(1);
+		log.dequeue("");
+		log.methodStart("methodName");
+		log.methodDone("methodName");
+		log.value("test", "1");
+		log.value(null as unknown as string, 1);
+		log.value(undefined as unknown as string, 1);
+		log.warn("test1");
+		log.warn("test2");
+		log.withColor("test", log.colors.cyan);
+		log.write("test");
+		log.write("Test1", 1);
+		log.write("Test1", 1);
+		log.value("Test2", "value", 1);
+		log.value("Test3", null, 1);
+		log.value("Test4", undefined, 1);
+		log.values(1, "   ", [[ "Test5", "5" ]]);
+
+		//
+		// Re-enable logging
+		//
+		await executeSettingsUpdate("logging.enable", true);
+        ++successCount;
+    });
+
+
+    test("Logging (Error)", async function()
+    {
+        if (exitRollingCount(2, successCount)) return;
+
+        log.error(`        ${creator}.${extension}`);
+        log.error([ `        ${creator}.${extension}`,
+                    `        ${creator}.${extension}`,
+                    `        ${creator}.${extension}` ]);
+
 		log.error("Test5 error");
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
@@ -130,6 +166,9 @@ suite("Util Tests", () =>
 		log.error([ "Test error 9",  new Error("Test error object 10") ]);
 		log.error([ "Test error 11", "Test error 12" ], [[ "Test param error 13", "Test param value 14" ]]);
 		log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
+		const err = new Error("Test error object");
+		err.stack = undefined;
+		log.error(err);
 		log.error(true);
 		log.error(undefined);
 		log.error({
@@ -152,12 +191,7 @@ suite("Util Tests", () =>
 		//
 		// Disable logging
 		//
-
 		await executeSettingsUpdate("logging.enable", false);
-
-		log.blank(1);
-
-		log.dequeue("");
 
 		log.error("Test5 error");
 		log.error("Test5 error");
@@ -167,83 +201,17 @@ suite("Util Tests", () =>
 		log.error([ "Test error 1",  new Error("Test error object") ]);
 		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
 		log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
-
-		log.methodStart("methodName");
-		log.methodDone("methodName");
-
-		log.value("test", "1");
-		log.value(null as unknown as string, 1);
-		log.value(undefined as unknown as string, 1);
-
-		log.warn("test1");
-		log.warn("test2");
-
-		log.withColor("test", log.colors.cyan);
-
-		log.write("test");
-		log.write("Test1", 1);
-		log.write("Test1", 1);
-		log.value("Test2", "value", 1);
-		log.value("Test3", null, 1);
-		log.value("Test4", undefined, 1);
-
-		log.values(1, "   ", [[ "Test5", "5" ]]);
+		const err2 = new Error("Test error object");
+		err2.stack = undefined;
+		log.error(err2);
 
 		//
 		// Re-enable logging
 		//
-
 		await executeSettingsUpdate("logging.enable", true);
-
-        expect(util.camelCase("taskexplorer", 4)).to.be.equal("taskExplorer");
-        expect(util.camelCase(undefined, 4)).to.be.equal(undefined);
-        expect(util.camelCase("testgreaterindex", 19)).to.be.equal("testgreaterindex");
-        expect(util.camelCase("test", -1)).to.be.equal("test");
-
-        expect(util.properCase("taskexplorer")).to.be.equal("Taskexplorer");
-        expect(util.properCase(undefined)).to.be.equal("");
-
-        expect(util.isScriptType("batch"));
-        expect(util.getScriptTaskTypes().length > 0);
-
-        const arr = [ 1, 2, 3, 4, 5 ];
-        util.removeFromArray(arr, 3);
-        util.removeFromArray(arr, 1);
-        expect(arr.length).to.be.equal(3);
-
-        expect(util.getCwd(rootUri)).to.not.be.equal(undefined);
-
-        util.timeout(10);
-
-        expect (util.getGroupSeparator()).to.be.equal("-");
-
-		util.lowerCaseFirstChar("s", true);
-		util.lowerCaseFirstChar("s", false);
-		expect(util.lowerCaseFirstChar("S", true)).to.be.equal("s");
-		expect(util.lowerCaseFirstChar("S", false)).to.be.equal("s");
-		expect(util.lowerCaseFirstChar("scott meesseman", true)).to.be.equal("scottmeesseman");
-		expect(util.lowerCaseFirstChar("Scott meesseman", false)).to.be.equal("scott meesseman");
-		expect(util.lowerCaseFirstChar("TestApp", true)).to.be.equal("testApp");
-		expect(util.lowerCaseFirstChar("testApp", false)).to.be.equal("testApp");
-		expect(util.lowerCaseFirstChar("test App", true)).to.be.equal("testApp");
 
         ++successCount;
     });
-
-
-	test("Logging (Queue)", async function()
-    {
-        if (exitRollingCount(2, successCount)) return;
-		log.dequeue("queueTestId");
-		log.write("test1", 1, "", "queueTestId");
-		log.write("test2", 1, "", "queueTestId");
-		log.write("test3", 1, "", "queueTestId");
-		log.value("test3", "value1", 1, "", "queueTestId");
-		log.error("test4", undefined, "queueTestId");
-		log.error("test5", [[ "param1", 1 ]], "queueTestId");
-		log.dequeue("queueTestId");
-        ++successCount;
-	});
 
 
 	test("Logging (File)", async function()
@@ -303,9 +271,62 @@ suite("Util Tests", () =>
 	});
 
 
-    test("Miscellaneous", async function()
+	test("Logging (Queue)", async function()
     {
         if (exitRollingCount(5, successCount)) return;
+		log.dequeue("queueTestId");
+		log.write("test1", 1, "", "queueTestId");
+		log.write("test2", 1, "", "queueTestId");
+		log.write("test3", 1, "", "queueTestId");
+		log.value("test3", "value1", 1, "", "queueTestId");
+		log.error("test4", undefined, "queueTestId");
+		log.error("test5", [[ "param1", 1 ]], "queueTestId");
+		log.dequeue("queueTestId");
+        ++successCount;
+	});
+
+
+    test("Miscellaneous", async function()
+    {
+        if (exitRollingCount(6, successCount)) return;
+
+        util.timeout(10);
+
+        expect(util.camelCase("taskexplorer", 4)).to.be.equal("taskExplorer");
+        expect(util.camelCase(undefined, 4)).to.be.equal(undefined);
+        expect(util.camelCase("testgreaterindex", 19)).to.be.equal("testgreaterindex");
+        expect(util.camelCase("test", -1)).to.be.equal("test");
+
+        expect(util.properCase("taskexplorer")).to.be.equal("Taskexplorer");
+        expect(util.properCase(undefined)).to.be.equal("");
+		expect(util.properCase("dc is here", true)).to.be.equal("DcIsHere");
+		expect(util.properCase("dc is here", false)).to.be.equal("Dc Is Here");
+		expect(util.properCase("dc is here")).to.be.equal("Dc Is Here");
+		expect(util.properCase("dc was here", true)).to.be.equal("DcWasHere");
+		expect(util.properCase("dc was here", false)).to.be.equal("Dc Was Here");
+		expect(util.properCase(undefined)).to.equal("");
+		expect(util.properCase("")).to.equal("");
+
+        expect(util.isScriptType("batch"));
+        expect(util.getScriptTaskTypes().length > 0);
+
+        const arr = [ 1, 2, 3, 4, 5 ];
+        util.removeFromArray(arr, 3);
+        util.removeFromArray(arr, 1);
+        expect(arr.length).to.be.equal(3);
+
+        expect(util.getCwd(rootUri)).to.not.be.equal(undefined);
+        expect (util.getGroupSeparator()).to.be.equal("-");
+
+		expect(util.lowerCaseFirstChar("s", true)).to.be.equal("s");
+		expect(util.lowerCaseFirstChar("s", false)).to.be.equal("s");
+		expect(util.lowerCaseFirstChar("S", true)).to.be.equal("s");
+		expect(util.lowerCaseFirstChar("S", false)).to.be.equal("s");
+		expect(util.lowerCaseFirstChar("scott meesseman", true)).to.be.equal("scottmeesseman");
+		expect(util.lowerCaseFirstChar("Scott meesseman", false)).to.be.equal("scott meesseman");
+		expect(util.lowerCaseFirstChar("TestApp", true)).to.be.equal("testApp");
+		expect(util.lowerCaseFirstChar("testApp", false)).to.be.equal("testApp");
+		expect(util.lowerCaseFirstChar("test App", true)).to.be.equal("testApp");
 
 		util.getTaskTypeFriendlyName("Workspace");
 		util.getTaskTypeFriendlyName("Workspace", true);
@@ -322,15 +343,6 @@ suite("Util Tests", () =>
 		expect(util.isNumber("not a number")).to.equal(false);
 		expect(util.isNumber({ test: true })).to.equal(false);
 		expect(util.isNumber([ 1, 2 ])).to.equal(false);
-
-		util.properCase("dc is here", false);
-		util.properCase("dc is here");
-		util.properCase("dc is here", true);
-		util.properCase("dc is here");
-		util.properCase("dc was here", false);
-		util.properCase("dc was here", true);
-		expect(util.properCase(undefined)).to.equal("");
-		expect(util.properCase("")).to.equal("");
 
 		expect(util.isObjectEmpty({})).to.equal(true);
 		expect(util.isObjectEmpty({ a: 1 })).to.equal(false);
@@ -358,7 +370,7 @@ suite("Util Tests", () =>
 
 	test("Data paths", async function()
 	{
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(7, successCount)) return;
 		//
 		// The fs module on dev test will run through win32 path get.  Simulate
 		// path get here for linux and mac for increased coverage since we're only
@@ -500,7 +512,7 @@ suite("Util Tests", () =>
 
 	test("Filesystem", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(8, successCount)) return;
 		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
 		await afs.createDir(__dirname);
 		await afs.createDir(join(__dirname, "folder1", "folder2", "folder3", "folder4"));
@@ -527,7 +539,7 @@ suite("Util Tests", () =>
 
     test("Storage", async function()
     {
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(9, successCount)) return;
         if (teApi.testsApi.storage)
         {
             await teApi.testsApi.storage.update("TEST_KEY", "This is a test");
