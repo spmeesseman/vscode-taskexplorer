@@ -718,29 +718,44 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
     public fireTreeRefreshEvent(logPad: string, logLevel: number, taskFile?: TreeItem)
     {
+        const id = "pendingFireTreeRefreshEvent-" + (taskFile ? taskFile.id?.replace(/\W/g, "") : "g");
         this.getChildrenLogPad = logPad;
         this.getChildrenLogLevel = logLevel;
-        log.methodStart("fire tree refresh event", logLevel, logPad, false, [[ "node id", taskFile ? taskFile.id : "all" ]]);
+        log.methodStart("fire tree refresh event", logLevel, logPad, false, [[ "node id", id ]]);
         if (this.visible) // || (this.enabled && this.setEnableCalled === false)) {
         {
-            log.write("   fire 'tree data changed' main event", logLevel, logPad);
             this._onDidChangeTreeData.fire(taskFile);
+            log.write("   refresh event fired", logLevel, logPad);
         }
         else
         {
-            const id = "pendingFireTreeRefreshEvent-" + (taskFile ? taskFile.id?.replace(/\W/g, "") : "g");
-            if (!this.eventQueue.find((e => e.id === id)))
+            if (!this.eventQueue.find((e => e.type === "refresh" && e.id === id)))
             {
-                this.eventQueue.push(
+                if (!taskFile || !this.eventQueue.find(e => e.type === "refresh" && !e.args[0]))
                 {
-                    id,
-                    fn: this.fireTreeRefreshEvent,
-                    args: [ taskFile ]
-                });
-                log.write("   view is not visible or not initialized yet, delay firing data change event", logLevel, logPad);
+                    if (!taskFile)
+                    {   // if this is a global refresh, remove all other refresh events from the q
+                        this.eventQueue.slice().reverse().forEach((value, index, obj) => {
+                            if (value.type === "refresh") {
+                                this.eventQueue.splice(obj.length - 1 - index, 1);
+                            }
+                        });
+                    }
+                    this.eventQueue.push(
+                    {
+                        id,
+                        fn: this.fireTreeRefreshEvent,
+                        args: [ taskFile ],
+                        type: "refresh"
+                    });
+                    log.write("   refresh event has been queued", logLevel, logPad);
+                }
+                else {
+                    log.write("   a global refresh event has already been queued, skip", logLevel, logPad);
+                }
             }
             else {
-                log.write("   an event of this type has already been queued, skip firing data change event", logLevel, logPad);
+                log.write("   a refresh event for this item has already been queued, skip", logLevel, logPad);
             }
         }
         log.methodDone("fire tree refresh event", logLevel, logPad);
@@ -1319,8 +1334,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         // to re-register the handler when the setting changes, we just re-route the request here
         //
         if (clickAction === "Execute" && itemClick === true) {
-            await this.run(selection);
-            return;
+            return this.run(selection);
         }
 
         const uri = !util.isScriptType(selection.taskSource) ?
@@ -1353,7 +1367,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
     private pause(taskItem: TaskItem)
     {
-        if (this.isBusy() || !taskItem)
+        if (this.isBusy())
         {
             window.showInformationMessage("Busy, please wait...");
             return;
@@ -1374,7 +1388,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 if (taskItem.paused)
                 {
                     taskItem.paused = false;
-                    log.value("   send to terminal", "Y", 1);
+                    log.value("   send to terminal", "N", 1);
                     terminal.sendText("N");
                 }
                 else
@@ -1390,8 +1404,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
         else {
             window.showInformationMessage("Executing task not found");
-            taskItem.refreshState("   ", 1);
-            this.taskWatcher.fireTaskChangeEvents(taskItem, "   ", 1);
         }
 
         log.methodDone("pause", 1);
@@ -1689,7 +1701,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     {
         let exec: TaskExecution | undefined;
         log.methodStart("restart task", 1, "", true);
-        if (this.isBusy() || !taskItem)
+        if (this.isBusy())
         {
             window.showInformationMessage("Busy, please wait...");
         }
@@ -1711,12 +1723,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         {
             log.value("   send to terminal", "N", 1);
             term.sendText("N", true);
-            taskItem.paused = false;
             exec = taskItem.execution;
         }
         else {
             window.showInformationMessage("Terminal not found");
         }
+        taskItem.paused = false;
         log.methodDone("resume task", 1);
         return exec;
     }
@@ -1737,7 +1749,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     {
         let exec: TaskExecution | undefined;
 
-        if (this.isBusy() || !taskItem)
+        if (this.isBusy())
         {
             window.showInformationMessage("Busy, please wait...");
             return exec;
@@ -1992,8 +2004,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     {
         log.methodStart("stop", 1, "", true);
 
-        /* istanbul ignore if */
-        if (this.isBusy() || !taskItem)
+        if (this.isBusy())
         {
             window.showInformationMessage("Busy, please wait...");
             return;
@@ -2012,9 +2023,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     //
                     // TODO - see ticket.  I guess its not CTRL+C in some parts.  so make the control
                     //                     chars a setting.  Also in pause().
-                    //
                     if (taskItem.paused)
                     {
+                        taskItem.paused = false;
                         log.value("   send to terminal", "Y", 1);
                         terminal.sendText("Y");
                     }
@@ -2025,7 +2036,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                         await util.timeout(50);
                         log.value("   send to terminal", "Y", 1);
                         // terminal = getTerminal(taskItem, "   ");
-                        try { if (getTerminal(taskItem, "   ")) terminal.sendText("Y", true); } catch {}
+                        try { /* istanbul ignore else */if (getTerminal(taskItem, "   ")) terminal.sendText("Y", true); } catch {}
                     }
                     taskItem.paused = false;
                 }
@@ -2040,8 +2051,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
         else {
             window.showInformationMessage("Executing task not found");
-            taskItem.refreshState("   ", 1);
-            this.taskWatcher.fireTaskChangeEvents(taskItem, "   ", 1);
         }
 
         log.methodDone("stop", 1);
