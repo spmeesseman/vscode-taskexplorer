@@ -224,7 +224,7 @@ export class TaskWatcher
         //
         if (isMapEmpty || !taskMap[taskId])
         {
-            /* istanbul ignore if */
+            /* istanbul ignore if */ /* istanbul ignore next */
             if (taskTree && !taskMap[taskId] && taskTree.length > 0 && taskTree[0].contextValue !== "noscripts")
             {
                 if (task.source === "npm" && task.definition.type === "npm" &&
@@ -274,7 +274,7 @@ export class TaskWatcher
         //
         if (isMapEmpty || !taskMap[taskId])
         {
-            /* istanbul ignore if */
+            /* istanbul ignore if */ /* istanbul ignore next */
             if (taskTree && !taskMap[taskId] && taskTree.length > 0 && taskTree[0].contextValue !== "noscripts")
             {
                 if (task.source === "npm" && task.definition.type === "npm" &&
@@ -287,7 +287,6 @@ export class TaskWatcher
                           [[ "# of tasks in task map", Object.keys(taskMap).length ], [ "task name", task.name ],
                           [ "task source", task.source ], [ "task type", task.definition.type ]]);
             }
-            return;
         }
         else {
             this.fireTaskChangeEvents(taskMap[taskId] as TaskItem, "   ", 1);

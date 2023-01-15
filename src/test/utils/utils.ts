@@ -302,7 +302,7 @@ const initSettings = async () =>
 
 
     tc.user.logLevel = configuration.get<number>("logging.level");
-    await configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
+    await configuration.updateVsWs("terminal.integrated.shell.windows", testControl.defaultWindowsShell);
     //
     // Grunt / Gulp VSCode internal task providers. Gulp suite will disable when done.
     //

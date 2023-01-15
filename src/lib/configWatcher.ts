@@ -3,7 +3,7 @@
 import * as util from "./utils/utils";
 import constants from "./constants";
 import { configuration } from "./utils/configuration";
-import { ExtensionContext, ConfigurationChangeEvent, workspace } from "vscode";
+import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "vscode";
 import { registerFileWatcher } from "./fileWatcher";
 import { refreshTree } from "./refreshTree";
 import { registerExplorer } from "./registerExplorer";
@@ -17,7 +17,7 @@ const enabledTasks = configuration.get<any>("enabledTasks", {});
 const pathToPrograms = configuration.get<any>("pathToPrograms", {});
 
 
-export function enableConfigWatcher(enable = true)
+export function enableConfigWatcher(enable: boolean)
 {
     watcherEnabled = enable;
 }
@@ -161,7 +161,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         }
 
         //
-        // Extra Apache Globs (for non- build.xml files)s
+        // Extra Apache Ant Globs (for non- build.xml files)s
         //
         if (e.affectsConfiguration("taskExplorer.includeAnt") || e.affectsConfiguration("taskExplorer.globPatternsAnt"))
         {   /* istanbul ignore else */
@@ -171,6 +171,19 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
                 await registerFileWatcher(ctx, "ant", false, configuration.get<boolean>("enabledTasks.ant"), "   ");
                 registerChange("ant");
             }
+        }
+
+        //
+        // Whether or not to use 'ansicon'when running 'ant' tasks
+        //
+        if (e.affectsConfiguration("taskExplorer.visual.enableAnsiconForAnt")) {
+            const newValue = configuration.get<boolean>("visual.enableAnsiconForAnt");
+            teApi.log.write("   the 'visual.enableAnsiconForAnt' setting has changed", 1);
+            teApi.log.value("      new value", newValue, 1);
+            if (newValue) {
+                window.showInformationMessage("For Ant/Ansicon configuration change to take effect, close all open terminals");
+            }
+            registerChange("ant");
         }
 
         //

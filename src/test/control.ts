@@ -13,6 +13,11 @@ export const testControl: ITestControl =
     vsCodeAutoDetectGrunt: "off",
     vsCodeAutoDetectGulp: "off",
     //
+    // Default command shell to use
+    //
+    defaultWindowsShell: undefined,
+    // defaultWindowsShell: "C:\\Windows\\System32\\cmd.exe",
+    //
     // LOGGING DEFAULTS
     //
     log: {
@@ -51,7 +56,9 @@ export const testControl: ITestControl =
         pathToAnsicon: "c:\\Code\\ansicon\\x64\\ansicon.exe"
     },
     //
-    // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)s
+    // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)
+    // Slow times are generally 2x the amount of time the command "should" take.  Mocha
+    // considers slow at 50% of MochaContext.slow() for each test instance.
     //
     slowTime: {
         addWorkspaceFolder: 13750,
@@ -89,17 +96,17 @@ export const testControl: ITestControl =
         licenseMgrOpenPage: 575,
         licenseMgrOpenPageWithDetail: 990,
         licenseManagerLocalCheck: 2000,
-        licenseManagerLocalStartServer: 5010,
+        licenseManagerLocalStartServer: 1090,
         licenseManagerRemoteCheck: 3000,
-        licenseManagerRemoteStartServer: 10000,
+        licenseManagerRemoteStartServer: 3850,
         npmCommand: 11925,
         npmCommandPkg: 9300,
         npmInstallCommand: 19650,
-        refreshCommand: 18850,
+        refreshCommand: 18950,
         rebuildFileCache: 15500,
         rebuildFileCacheCancel: 1810,
         removeWorkspaceFolder: 10000,
-        runCommand: 8500,
+        runCommand: 8700,
         runPauseCommand: 2000,
         runStopCommand: 2000,
         showHideSpecialFolder: 440,
@@ -107,8 +114,9 @@ export const testControl: ITestControl =
         storageUpdate: 50,
         taskProviderReadUri: 100,
         taskCommand: 1600,
-        verifyTaskCount: 875,
+        verifyTaskCount: 825,
         verifyTaskCountByTree: 850,
+        verifyTaskCountFirstCall: 1350,
         verifyTaskCountNpm: 3075, // npm task provider is slower than shit on a turtle
         verifyTaskCountWorkspace: 3500,
         viewReport: 1950,
@@ -175,6 +183,10 @@ export interface ITestControl
     //
     vsCodeAutoDetectGrunt: "on" | "off";
     vsCodeAutoDetectGulp: "on" | "off";
+    //
+    //
+    //
+    defaultWindowsShell: string | undefined;
     //
     // LOGGING DEFAULTS
     //
@@ -272,6 +284,7 @@ export interface ITestControl
         taskProviderReadUri: number;
         verifyTaskCount: number;
         verifyTaskCountByTree: number;
+        verifyTaskCountFirstCall: number;
         verifyTaskCountNpm: number; // npm task provider is slower than shit on a turtle
         verifyTaskCountWorkspace: number;
         viewReport: number;
