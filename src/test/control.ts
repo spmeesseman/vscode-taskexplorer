@@ -123,11 +123,6 @@ export const testControl: ITestControl =
         // MINIMUM WAIT TIMES
         //
         addWorkspaceFolder: 250,
-        fsCreateEvent: 200,
-        fsCreateFolderEvent: 250,
-        fsDeleteEvent: 200,
-        fsDeleteFolderEvent: 250,
-        fsModifyEvent: 150,
         configEvent: 125,
         configEventFast: 50,
         configDisableEvent: 160,
@@ -139,6 +134,11 @@ export const testControl: ITestControl =
         configRegisterExplorerEvent: 245,
         explorerViewStartup: 5000,
         focusCommand: 500,
+        fsCreateEvent: 200,
+        fsCreateFolderEvent: 250,
+        fsDeleteEvent: 200,
+        fsDeleteFolderEvent: 250,
+        fsModifyEvent: 150,
         getTreeMin: 350,
         getTreeMax: 1800,
         getTreeTasks: 75,
@@ -150,6 +150,7 @@ export const testControl: ITestControl =
         refreshTaskTypeCommand: 1000,
         removeWorkspaceFolder: 250,
         runCommandMin: 1000,
+        taskCommand: 625,
         verifyTaskCountRetry: 150,
         verifyTaskCountRetryInterval: 400,
         viewReport: 120,
@@ -311,6 +312,7 @@ export interface ITestControl
         refreshTaskTypeCommand: number;
         removeWorkspaceFolder: number;
         runCommandMin: number;
+        taskCommand: number;
         verifyTaskCountRetry: number;
         verifyTaskCountRetryInterval: number;
         viewReport: number;

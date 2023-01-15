@@ -330,6 +330,17 @@ suite("Util Tests", () =>
 		//
 		log.setWriteToConsole(false);
 		//
+		// Tags
+		//
+		const useTags = logControl.useTags;
+		logControl.useTags = false;
+		log.blank(2);
+		log.write("test1");
+		logControl.useTags = true;
+		log.blank(3);
+		log.write("test1", 1);
+		logControl.useTags = useTags;
+		//
 		// Disable logging
 		//
 		await executeSettingsUpdate("logging.enable", false);

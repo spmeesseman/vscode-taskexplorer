@@ -572,15 +572,19 @@ export const verifyTaskCount = async (taskType: string, expectedCount: number, r
 };
 
 
-export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxWait?: number) =>
+export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxWait?: number, useMinWait= true) =>
 {
     if (exec)
     {
         let waited = 0;
-        while (isExecuting(exec.task) && (!maxWait || waited < maxWait))
+        let hasExec = false;
+        let isExec = !!isExecuting(exec.task);
+        while ((isExec && (!maxWait || waited < maxWait)) || (useMinWait && !isExec && !hasExec && waited < 500))
         {
             await sleep(50);
             waited += 50;
+            isExec = !!isExecuting(exec.task);
+            if (isExec) { hasExec = isExec; }
         }
     }
 };
