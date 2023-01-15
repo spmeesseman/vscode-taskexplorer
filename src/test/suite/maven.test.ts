@@ -10,7 +10,7 @@ import { Uri } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
-import { activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, suiteFinished, testControl, verifyTaskCount } from "../utils/utils";
+import { activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, focusExplorerView, getWsPath, sleep, suiteFinished, testControl as tc, verifyTaskCount } from "../utils/utils";
 
 const testsName = "maven";
 const startTaskCount = 8;
@@ -61,14 +61,14 @@ suite("Maven Tests", () =>
     test("Create file", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        this.slow(testControl.slowTime.fsCreateEvent);
+        this.slow(tc.slowTime.fsCreateEvent);
         await fs.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project>\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent, 3000);
+        await teApi.waitForIdle(tc.waitTime.fsCreateEvent, 3000);
         ++successCount;
     });
 
@@ -76,7 +76,7 @@ suite("Maven Tests", () =>
     test("Enable (Off by Default)", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent);
+        this.slow(tc.slowTime.configEnableEvent);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true);
         ++successCount;
     });
@@ -105,8 +105,8 @@ suite("Maven Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(testControl.slowTime.configDisableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configDisableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configDisableEvent);
+        this.slow(tc.slowTime.configDisableEvent + tc.slowTime.verifyTaskCount + tc.waitTime.configDisableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });
@@ -115,8 +115,8 @@ suite("Maven Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
+        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount + tc.waitTime.configEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
@@ -125,36 +125,20 @@ suite("Maven Tests", () =>
     test("Invalid XML", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        //
-        // Note: FileWatcher ignores mod event for this task type since # of tasks never changes
-        //
-        let resetLogging = teApi.log.isLoggingEnabled();
-        if (resetLogging) { // turn scary error logging off
-            this.slow(testControl.slowTime.fsCreateEvent + (testControl.slowTime.configEvent * 2) +
-                      testControl.waitTime.fsModifyEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEvent);
-            executeSettingsUpdate("logging.enable", false);
-            resetLogging = true;
-        }
-        else {
-            this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
-        }
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + tc.slowTime.verifyTaskCount);
         await fs.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent, 3000);
+        await teApi.waitForIdle(tc.waitTime.fsModifyEvent);
         //
-        // See fileWatcher.ts, we ignore modify event because the task count will never change
-        // for this task type. So if there is invalid json after a save, the tasks will remain,
-        // but are actually invalid.
+        // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
+        // file is always 21. Force a task invalidation to cover the invalid json fix check
         //
-        // await verifyTaskCount(testsName, 0);
-        await verifyTaskCount(testsName, startTaskCount);
-        if (resetLogging) { // turn scary error logging off
-            executeSettingsUpdate("logging.enable", true);
-        }
+        await executeTeCommand("refresh", tc.waitTime.refreshCommand);
+        await verifyTaskCount(testsName, 0);
         ++successCount;
     });
 
@@ -162,14 +146,19 @@ suite("Maven Tests", () =>
     test("Fix Invalid XML", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsModifyEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + tc.slowTime.verifyTaskCount);
         await fs.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project>\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent, 3000);
+        await teApi.waitForIdle(tc.waitTime.fsModifyEvent);
+        //
+        // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
+        // file is always 21. Force a task invalidation to cover the invalid json fix check
+        //
+        await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
@@ -178,9 +167,9 @@ suite("Maven Tests", () =>
     test("Delete file", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsDeleteEvent + tc.waitTime.fsDeleteEvent + tc.slowTime.verifyTaskCount);
         await fs.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        await teApi.waitForIdle(tc.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });
@@ -189,8 +178,8 @@ suite("Maven Tests", () =>
     test("Disable (Default is OFF)", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(testControl.slowTime.configDisableEvent + testControl.waitTime.configDisableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configDisableEvent);
+        this.slow(tc.slowTime.configDisableEvent + tc.waitTime.configDisableEvent + tc.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });

@@ -136,7 +136,7 @@ suite("App-Publisher Tests", () =>
     test("Invalid JSON", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + 100 + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -155,7 +155,6 @@ suite("App-Publisher Tests", () =>
         // file is always 21. Force a task invalidation to cover the invalid json check
         //
         await executeTeCommand("refresh", tc.waitTime.refreshCommand);
-        await sleep(100);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
@@ -164,7 +163,7 @@ suite("App-Publisher Tests", () =>
     test("Fix Invalid JSON", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + 100 + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -183,7 +182,6 @@ suite("App-Publisher Tests", () =>
         // file is always 21. Force a task invalidation to cover the invalid json fix check
         //
         await executeTeCommand("refresh", tc.waitTime.refreshCommand);
-        await sleep(100);
         await verifyTaskCount(testsName, startTaskCount + 21);
         ++successCount;
     });
