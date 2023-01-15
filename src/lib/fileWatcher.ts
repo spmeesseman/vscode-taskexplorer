@@ -8,7 +8,9 @@ import { isDirectory } from "./utils/fs";
 import { isString } from "./utils/utils";
 import { refreshTree } from "./refreshTree";
 import { ITaskExplorerApi } from "../interface";
-import { Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri, WorkspaceFoldersChangeEvent } from "vscode";
+import {
+    Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri, WorkspaceFoldersChangeEvent
+} from "vscode";
 
 let extContext: ExtensionContext;
 let teApi: ITaskExplorerApi;
@@ -67,14 +69,14 @@ export async function registerFileWatchers(context: ExtensionContext, api: ITask
  * @param enabled Is enabled.  `false` if task type was disabled.
  * @param logPad Log padding.
  */
-export async function registerFileWatcher(context: ExtensionContext, taskType: string, fileBlob: string, firstRun: boolean, enabled?: boolean, logPad = "")
+export async function registerFileWatcher(context: ExtensionContext, taskType: string, firstRun: boolean, enabled?: boolean, logPad = "")
 {
     log.methodStart("Register file watcher for task type '" + taskType + "'", 1, logPad, false, [[ "enabled", enabled ]]);
 
     if (!firstRun && workspace.workspaceFolders)
     {
         if (enabled !== false) {
-            const numFilesFound  = await cache.buildTaskTypeCache(taskType, fileBlob, undefined, true, logPad + "   ");
+            const numFilesFound  = await cache.buildTaskTypeCache(taskType, undefined, true, logPad + "   ");
             log.write(`   ${numFilesFound} files were added to the file cache`, 1, logPad);
         }
         else {
@@ -102,7 +104,7 @@ export async function registerFileWatcher(context: ExtensionContext, taskType: s
         const ignoreModify = util.isScriptType(taskType) || taskType === "apppublisher" || taskType === "maven" || taskType === "tsc";
 
         if (!watcher) {
-            watcher = workspace.createFileSystemWatcher(fileBlob);
+            watcher = workspace.createFileSystemWatcher(util.getGlobPattern(taskType));
             watchers[taskType] = watcher;
             context.subscriptions.push(watcher);
         }
@@ -274,7 +276,7 @@ async function createFileWatchers(context: ExtensionContext)
         log.write(`   create file watchers for task type '${taskType}'`, 1, "   ");
         if (util.isTaskTypeEnabled(taskType))
         {
-            await registerFileWatcher(context, taskType, util.getGlobPattern(taskType), true, true, "      ");
+            await registerFileWatcher(context, taskType, true, true, "      ");
         }
         else {
             log.write(`   skip for task type '${taskType}' (disabled in settings)`, 1, "   ");

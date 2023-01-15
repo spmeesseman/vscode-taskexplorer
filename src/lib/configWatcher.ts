@@ -110,7 +110,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
                 {
                     teApi.log.write(`   the 'enabledTasks.${taskType}' setting has changed`, 1);
                     teApi.log.value("      new value", newValue, 1);
-                    await registerFileWatcher(ctx, taskType, util.getGlobPattern(taskType), false, newValue, "   ");
+                    await registerFileWatcher(ctx, taskType, false, newValue, "   ");
                     registerChange(taskType);
                 }
             }
@@ -154,13 +154,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         {   /* istanbul ignore else */
             if (refreshTaskTypes.includes("bash") === false)
             {
-                const newValue = configuration.get<string[]>("globPatternsBash", []);
-                const newGlob = util.getCombinedGlobPattern(constants.GLOB_BASH, newValue);
                 teApi.log.write("   the 'globPatternsBash' setting has changed", 1);
-                teApi.log.value("      new glob", newGlob, 2);
-                await registerFileWatcher(ctx, "bash",
-                                          newGlob, false,
-                                          configuration.get<boolean>("enabledTasks.bash"), "   ");
+                await registerFileWatcher(ctx, "bash", false, configuration.get<boolean>("enabledTasks.bash"), "   ");
                 registerChange("bash");
             }
         }
@@ -172,11 +167,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         {   /* istanbul ignore else */
             if (refreshTaskTypes.includes("ant") === false)
             {
-                const antGlobs = [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ];
-                const newGlob = util.getCombinedGlobPattern(constants.GLOB_ANT, antGlobs);
                 teApi.log.write("   the 'globPatternsAnt' setting has changed", 1);
-                teApi.log.value("      new glob", newGlob, 2);
-                await registerFileWatcher(ctx, "ant", newGlob, false, configuration.get<boolean>("enabledTasks.ant"), "   ");
+                await registerFileWatcher(ctx, "ant", false, configuration.get<boolean>("enabledTasks.ant"), "   ");
                 registerChange("ant");
             }
         }
@@ -290,7 +282,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         }
     }
     catch (e) {
-        /* istanbul-ignore-next */
+        /* istanbul ignore next */
         teApi.log.error(e);
     }
 
@@ -305,13 +297,3 @@ export const registerConfigWatcher = (context: ExtensionContext, api: ITaskExplo
     const d = workspace.onDidChangeConfiguration(async e => { await processConfigChanges(context, e); });
     context.subscriptions.push(d);
 };
-
-
-// const queue: ConfigurationChangeEvent[] = [];
-// async function processQueue()
-// {
-//     const next= queue.shift();
-//     if (next) {
-//         await processConfigChanges(context, next);
-//     }
-// }

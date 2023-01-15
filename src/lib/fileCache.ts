@@ -7,10 +7,9 @@ import { storage } from "./utils/storage";
 import { findFiles, numFilesInDirectory } from "./utils/fs";
 import { configuration } from "./utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
-import { TaskExplorerProvider } from "../providers/provider";
 import { IDictionary, ICacheItem } from "../interface";
 import {
-    workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem
+    workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem, ExtensionContext
 } from "vscode";
 
 
@@ -146,36 +145,16 @@ export async function addFolder(folder: Uri, logPad: string)
 }
 
 
-async function addWsFolder(folder: WorkspaceFolder, logPad: string)
+async function addWsFolder(folder: WorkspaceFolder, taskType: string, logPad: string)
 {
+    let numFilesFound = 0;
     log.methodStart("add workspace project folder to cache", 1, logPad, logPad === "", [[ "folder", folder.name ]]);
 
-    let numFilesFound = 0;
-    const taskProviders = ([ ...util.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
-        return util.getTaskTypeFriendlyName(a).localeCompare(util.getTaskTypeFriendlyName(b));
-    });
-
-    for (const providerName of taskProviders)
+    const externalProvider = providersExternal[taskType];
+    if (!cancel && (externalProvider || util.isTaskTypeEnabled(taskType)))
     {
-        const externalProvider = providersExternal[providerName];
-        if (!cancel && (externalProvider || util.isTaskTypeEnabled(providerName)))
-        {
-            let glob;
-            if (!util.isWatchTask(providerName))
-            {
-                const provider = providers[providerName] || /* istanbul ignore next */externalProvider;
-                glob = provider.getGlobPattern();
-            }
-            if (!glob) {
-                glob = util.getGlobPattern(providerName);
-            }
-
-            log.value("   building workspace project cache for provider", providerName, 3, logPad);
-            numFilesFound += await buildTaskTypeCache(providerName, glob, folder, false, logPad + "   ");
-            if (cancel) {
-                break;
-            }
-        }
+        log.value("   building workspace project cache for provider", taskType, 3, logPad);
+        numFilesFound += await buildTaskTypeCache(taskType, folder, false, logPad + "   ");
     }
 
     if (cancel) {
@@ -199,17 +178,24 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         await startBuild();
         if (!cancel)
         {
-            for (const f of wsf)
+            const taskProviders = ([ ...util.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
+                return util.getTaskTypeFriendlyName(a).localeCompare(util.getTaskTypeFriendlyName(b));
+            });
+
+            for (const tasktype of taskProviders)
             {
-                numFilesFound += await addWsFolder(f, logPad + "   ");
-                if (cancel) {
-                    break;
+                for (const f of wsf)
+                {
+                    numFilesFound += await addWsFolder(f, tasktype, logPad + "   ");
+                    if (cancel) {
+                        break;
+                    }
                 }
             }
         }
+        await finishBuild();
         log.value("   was cancelled", cancel, 3);
         log.methodDone("add workspace project folders", 1, logPad, [[ "# of file found", numFilesFound ]]);
-        await finishBuild();
     }
     return numFilesFound;
 }
@@ -260,13 +246,13 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
 }
 
 
-export async function buildTaskTypeCache(taskType: string, fileGlob: string, wsFolder: WorkspaceFolder | undefined, setCacheBuilding: boolean, logPad: string)
+export async function buildTaskTypeCache(taskType: string, wsFolder: WorkspaceFolder | undefined, setCacheBuilding: boolean, logPad: string)
 {
     let numFilesFound = 0;
     const providerType = util.isScriptType(taskType) ? "script" : taskType;
     log.methodStart("build file cache", 1, logPad, false, [
         [ "folder", !wsFolder ? "entire workspace" : wsFolder.name ], [ "task type", taskType ],
-        [ "task provider type", providerType ], [ "glob", fileGlob ], [ "setCacheBuilding", setCacheBuilding.toString() ]
+        [ "task provider type", providerType ], [ "setCacheBuilding", setCacheBuilding.toString() ]
     ]);
 
     if (setCacheBuilding) {
@@ -274,7 +260,21 @@ export async function buildTaskTypeCache(taskType: string, fileGlob: string, wsF
     }
 
     if (!cancel)
-    {   //
+    {
+        // const glob = util.getGlobPattern(taskType);
+        let glob;
+        if (!util.isWatchTask(taskType))
+        {
+            const externalProvider = providersExternal[taskType];
+            const provider = providers[taskType] || /* istanbul ignore next */externalProvider;
+            glob = provider.getGlobPattern();
+        }
+        if (!glob) {
+            glob = util.getGlobPattern(taskType);
+        }
+        log.value("glob", glob, 1);
+
+        //
         // If 'wsFolder' if falsey, build the entire cache.  If truthy, build the cache for the
         // specified folder only
         //
@@ -283,14 +283,14 @@ export async function buildTaskTypeCache(taskType: string, fileGlob: string, wsF
             log.write("   Scan all projects for taskType '" + taskType + "' (" + providerType + ")", 1, logPad);
             for (const folder of workspace.workspaceFolders as readonly WorkspaceFolder[])
             {
-                numFilesFound += await buildFolderCache(folder, taskType, fileGlob, logPad + "   ");
+                numFilesFound += await buildFolderCache(folder, taskType, glob, logPad + "   ");
                 if (cancel) {
                     break;
                 }
             }
         }
         else {
-            numFilesFound = await buildFolderCache(wsFolder, taskType, fileGlob, logPad + "   ");
+            numFilesFound = await buildFolderCache(wsFolder, taskType, glob, logPad + "   ");
         }
     }
 
@@ -408,18 +408,10 @@ const clearMaps = () =>
 };
 
 
-function disposeStatusBarSpace(statusBarSpace: StatusBarItem)
-{
-    statusBarSpace.hide();
-    statusBarSpace.dispose();
-    statusBarSpace = undefined as unknown as StatusBarItem;
-}
-
-
 const finishBuild = async () =>
 {
     await persistCache();
-    disposeStatusBarSpace(statusBarSpace);
+    statusBarSpace.hide();
     cacheBuilding = false;
     cancel = false;
 };
@@ -528,12 +520,12 @@ export const persistCache = async (clear?: boolean) =>
 {
     if (clear !== true && configuration.get<boolean>("enablePersistentFileCaching"))
     {
-        if (statusBarSpace) {
-            statusBarSpace.text = getStatusString("Persisting file cache to disk...", 65);
-        }
+        const text = statusBarSpace.text;
+        statusBarSpace.text = "Persisting file cache...";
         await storage.update2("fileCacheTaskFilesMap", taskFilesMap);
         await storage.update2("fileCacheProjectFilesMap", projectFilesMap);
         await storage.update2("fileCacheProjectFileToFileCountMap", projectToFileCountMap);
+        statusBarSpace.text = text;
     }
     else if (clear === true)
     {
@@ -544,11 +536,18 @@ export const persistCache = async (clear?: boolean) =>
 };
 
 
+export const registerFileCache = (context: ExtensionContext) =>
+{
+    statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
+    statusBarSpace.tooltip = "Task Explorer Status";
+    context.subscriptions.push(statusBarSpace);
+};
+
+
 export async function rebuildCache(logPad: string, forceForTests?: boolean)
 {
     let numFilesFound = 0,
-        loadedFromStorage = false,
-        persistEnabled = false;
+        loadedFromStorage = false;
 
     log.methodStart("rebuild cache", 1, logPad, logPad === "");
     cacheBusy = true;
@@ -556,8 +555,7 @@ export async function rebuildCache(logPad: string, forceForTests?: boolean)
 
     if (firstRun || forceForTests)
     {
-        persistEnabled = configuration.get<boolean>("enablePersistentFileCaching");
-        if (persistEnabled)
+        if (configuration.get<boolean>("enablePersistentFileCaching"))
         {
             const fileCache = await storage.get2<IDictionary<ICacheItem[]>>("fileCacheTaskFilesMap", {});
             const projectCache = await storage.get2<IDictionary<IDictionary<string[]>>>("fileCacheProjectFilesMap", {});
@@ -577,13 +575,8 @@ export async function rebuildCache(logPad: string, forceForTests?: boolean)
     if (!loadedFromStorage)
     {
         numFilesFound = await addWsFolders(workspace.workspaceFolders, logPad + "   ");
-        if (numFilesFound === 0)
-        {
+        if (numFilesFound === 0) {
             clearMaps();
-        }
-        else if (persistEnabled)
-        {
-            await persistCache();
         }
     }
 
@@ -781,7 +774,5 @@ async function startBuild()
         await util.timeout(100);
     }
     cacheBuilding = true;
-    statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
-    statusBarSpace.tooltip = "Task Explorer is building the file cache";
     statusBarSpace.show();
 }

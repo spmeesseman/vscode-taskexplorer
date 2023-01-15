@@ -108,6 +108,11 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
 
     //
+    // Register file cache
+    //
+    fileCache.registerFileCache(context);
+
+    //
     // Register internal task providers.  Npm, VScode type tasks are provided
     // by VSCode, not internally.
     //

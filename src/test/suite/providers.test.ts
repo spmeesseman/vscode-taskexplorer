@@ -620,7 +620,7 @@ suite("Provider Tests", () =>
         await teApi.config.updateVsWs("terminal.integrated.shell.windows",
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
         await teApi.waitForIdle(testControl.waitTime.configEvent);
-        await teApi.testsApi.fileCache.buildTaskTypeCache("bash", constants.GLOB_BASH, workspace.workspaceFolders[0], true, "");
+        await teApi.testsApi.fileCache.buildTaskTypeCache("bash", workspace.workspaceFolders[0], true, "");
         await teApi.waitForIdle(testControl.waitTime.min);
         await executeSettingsUpdate("specialFolders.expanded.test-files", false, testControl.waitTime.configEvent);
         ++successCount;
@@ -634,7 +634,7 @@ suite("Provider Tests", () =>
         if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
             assert.fail("        ✘ Task Explorer tree instance does not exist");
         }
-        await teApi.testsApi.fileCache.buildTaskTypeCache("gulp",constants.GLOB_GULP, workspace.workspaceFolders[0], true, "");
+        await teApi.testsApi.fileCache.buildTaskTypeCache("gulp",workspace.workspaceFolders[0], true, "");
         await teApi.waitForIdle(testControl.waitTime.min);
         ++successCount;
     });
