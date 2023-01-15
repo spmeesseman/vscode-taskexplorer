@@ -7,14 +7,12 @@ import TaskItem from "../../tree/item";
 import { TaskExecution } from "vscode";
 import { getPackageManager } from "../../lib/utils/utils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { ITestControl } from "../control";
 
 const testsName = "npm";
 const startTaskCount = 0;
-
+const tc = utils.testControl;
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let tc: ITestControl;
 let packageJsonPath: string | undefined;
 let npmTaskItems: TaskItem[];
 let successCount = -1;
@@ -27,7 +25,6 @@ suite("NPM Tests", () =>
     {
         teApi = await utils.activate(this);
         fsApi = teApi.testsApi.fs;
-        tc = utils.testControl;
         ++successCount;
     });
 

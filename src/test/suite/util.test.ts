@@ -609,6 +609,13 @@ suite("Util Tests", () =>
         if (exitRollingCount(12, successCount)) return;
 		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
 		await afs.createDir(__dirname);
+		try {
+			await afs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder2"));
+		} catch {}
+		try {
+			await afs.copyFile(join(__dirname, "folder1", "noFile.txt"), join(__dirname, "folder2"));
+		} catch {}
+		await afs.copyDir(join(getWsPath("."), "hello.bat"), join(__dirname, "folder2"));
 		await afs.createDir(join(__dirname, "folder1", "folder2", "folder3", "folder4"));
 		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
 		await afs.deleteDir(join(__dirname, "folder1"));

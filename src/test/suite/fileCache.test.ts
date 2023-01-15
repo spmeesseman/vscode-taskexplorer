@@ -2,7 +2,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as utils from "../utils/utils";
-import constants from "../../lib/constants";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 let teApi: ITaskExplorerApi;

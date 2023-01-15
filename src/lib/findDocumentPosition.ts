@@ -17,9 +17,10 @@ const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): num
     log.methodStart("find json document position", 3, "   ", false, [[ "task name", taskItem.task.name ]]);
 
     const visitor: JSONVisitor =
-    {   /* instanbul ignore next */
-        onError: () =>
+    {
+        onError: /* instanbul ignore next */() =>
         {
+            /* instanbul ignore next */
             return scriptOffset;
         },
         onObjectEnd: () =>
@@ -33,15 +34,13 @@ const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): num
         {
             if (inTaskLabel)
             {
-                if (typeof value === "string")
+                /* instanbul ignore else */
+                if (typeof value === "string" && (inTaskLabel === "label" || /* instanbul ignore next */inTaskLabel === "script"))
                 {
-                    if (inTaskLabel === "label" || inTaskLabel === "script")
+                    log.value("   check string property", value, 4, "   ");
+                    if (taskItem.task.name === value)
                     {
-                        log.value("   check string property", value, 4, "   ");
-                        if (taskItem.task.name === value)
-                        {
-                            scriptOffset = offset;
-                        }
+                        scriptOffset = offset;
                     }
                 }
                 inTaskLabel = undefined;
@@ -52,10 +51,6 @@ const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): num
             if (property === "scripts")
             {
                 inScripts = true;
-                if (!taskItem)
-                { // select the script section
-                    scriptOffset = offset;
-                }
             }
             else if (inScripts && taskItem)
             {
@@ -68,6 +63,7 @@ const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): num
             else if (property === "tasks")
             {
                 inTasks = true;
+                /* istanbul ignore else */
                 if (!inTaskLabel)
                 { // select the script section
                     scriptOffset = offset;
@@ -76,10 +72,6 @@ const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): num
             else if ((property === "label" || property === "script") && inTasks && !inTaskLabel)
             {
                 inTaskLabel = "label";
-                if (!inTaskLabel)
-                { // select the script section
-                    scriptOffset = offset;
-                }
             }
             else
             { // nested object which is invalid, ignore the script

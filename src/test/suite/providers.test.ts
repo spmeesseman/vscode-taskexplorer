@@ -261,6 +261,7 @@ suite("Provider Tests", () =>
     test("Build Tree", async function()
     {
         if (exitRollingCount(20, successCount)) return;
+        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.fetchTasksCommand * 2) + tc.slowTime.getTreeTasks);
         await treeUtils.refresh(this);
         //
         // Check VSCode provided task types for the hell of it
@@ -549,13 +550,13 @@ suite("Provider Tests", () =>
     test("Makefile Delete / Add", async function()
     {
         if (exitRollingCount(35, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent + tc.slowTime.configEvent + tc.waitTime.fsCreateEvent + tc.waitTime.fsDeleteEvent,);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent + tc.slowTime.configEvent + tc.waitTime.fsCreateEvent + tc.waitTime.fsDeleteEvent);
         const file = join(rootPath, "Makefile");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
         await createMakeFile();
-        await teApi.config.updateWs("logging.enable", true); // hit tree.logTask()
+        await executeSettingsUpdate("logging.enable", true); // hit tree.logTask()
         ++successCount;
     });
 
