@@ -10,7 +10,8 @@ import { Uri } from "vscode";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, getWsPath, suiteFinished, testControl, treeUtils, verifyTaskCount
+    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, sleep,
+    suiteFinished, testControl as tc, treeUtils, verifyTaskCount
 } from "../utils/utils";
 
 const testsName = "apppublisher";
@@ -55,8 +56,8 @@ suite("App-Publisher Tests", () =>
     test("Enable (Off by Default)", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
+        this.slow(tc.slowTime.configEnableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.configEnableEvent);
         ++successCount;
     });
 
@@ -72,8 +73,8 @@ suite("App-Publisher Tests", () =>
     test("Start", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.verifyTaskCountRetryInterval);
-        await verifyTaskCount(testsName, startTaskCount, 5, testControl.waitTime.verifyTaskCountRetryInterval);
+        this.slow(tc.slowTime.verifyTaskCount + tc.waitTime.verifyTaskCountRetryInterval);
+        await verifyTaskCount(testsName, startTaskCount, 5, tc.waitTime.verifyTaskCountRetryInterval);
         ++successCount;
     });
 
@@ -93,7 +94,7 @@ suite("App-Publisher Tests", () =>
     test("Create file", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsCreateEvent + tc.waitTime.fsCreateEvent + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -106,7 +107,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsCreateEvent);
+        await teApi.waitForIdle(tc.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
         ++successCount;
     });
@@ -115,8 +116,8 @@ suite("App-Publisher Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(testControl.slowTime.configDisableEvent + testControl.waitTime.configDisableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configDisableEvent);
+        this.slow(tc.slowTime.configDisableEvent + tc.waitTime.configDisableEvent + tc.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });
@@ -125,8 +126,8 @@ suite("App-Publisher Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
+        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent + tc.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
         ++successCount;
     });
@@ -135,18 +136,7 @@ suite("App-Publisher Tests", () =>
     test("Invalid JSON", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        //
-        // Note: FileWatcher ignores mod event for this task type since # of tasks never changes
-        //
-        let resetLogging = teApi.log.isLoggingEnabled();
-        if (resetLogging) { // turn scary error logging off
-            this.slow(testControl.slowTime.fsCreateEvent + (testControl.slowTime.configEvent * 2));
-            executeSettingsUpdate("logging.enable", false);
-            resetLogging = true;
-        }
-        else {
-            this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
-        }
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + 100 + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -159,17 +149,14 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn""\n' +
             "\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await teApi.waitForIdle(tc.waitTime.fsModifyEvent);
         //
-        // See fileWatcher.ts, we ignore modify event because the task count will never change
-        // for this task type. So if there is invalid json after a save, the tasks will remain,
-        // but are actually invalid.
+        // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
+        // file is always 21. Force a task invalidation to cover the invalid json check
         //
-        // await verifyTaskCount(testsName, startTaskCount);
-        await verifyTaskCount(testsName, startTaskCount + 21);
-        if (resetLogging) { // turn scary error logging off
-            executeSettingsUpdate("logging.enable", true);
-        }
+        await executeTeCommand("refresh", tc.waitTime.refreshCommand);
+        await sleep(100);
+        await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
 
@@ -177,7 +164,7 @@ suite("App-Publisher Tests", () =>
     test("Fix Invalid JSON", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.waitTime.fsModifyEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + 100 + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -190,7 +177,13 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await teApi.waitForIdle(testControl.waitTime.fsModifyEvent);
+        await teApi.waitForIdle(tc.waitTime.fsModifyEvent);
+        //
+        // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
+        // file is always 21. Force a task invalidation to cover the invalid json fix check
+        //
+        await executeTeCommand("refresh", tc.waitTime.refreshCommand);
+        await sleep(100);
         await verifyTaskCount(testsName, startTaskCount + 21);
         ++successCount;
     });
@@ -199,9 +192,9 @@ suite("App-Publisher Tests", () =>
     test("Delete file", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(testControl.slowTime.fsDeleteEvent + testControl.waitTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsDeleteEvent + tc.waitTime.fsDeleteEvent + tc.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await teApi.waitForIdle(testControl.waitTime.fsDeleteEvent);
+        await teApi.waitForIdle(tc.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
@@ -210,8 +203,8 @@ suite("App-Publisher Tests", () =>
     test("Disable (Default is OFF)", async function()
     {
         if (exitRollingCount(11, successCount)) return;
-        this.slow(testControl.slowTime.configDisableEvent + testControl.waitTime.configDisableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configDisableEvent);
+        this.slow(tc.slowTime.configDisableEvent + tc.waitTime.configDisableEvent + tc.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });

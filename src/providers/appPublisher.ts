@@ -63,14 +63,10 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
         try { // Validate JSON
             await readJsonAsync(uri.fsPath);
         }
-        /* istanbul ignore next */
         catch (e: any)
         {
-            /* istanbul ignore next */
             log.error(e, undefined, this.logQueueId);
-            /* istanbul ignore next */
             log.methodDone("read app-publisher file uri tasks", 3, logPad, undefined, this.logQueueId);
-            /* istanbul ignore next */
             return [];
         }
 
