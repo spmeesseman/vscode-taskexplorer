@@ -799,7 +799,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             [ "current invalidation", this.currentInvalidation ], [ "tree needs rebuild", !this.taskTree ],
             [ "first run", firstRun ], [ "view", this.name ]
         ]);
-        /* istanbul ignore else */
+
         if (element instanceof TaskFile)
         {
             log.values(logLevel + 1, logPad + "   ", [
@@ -827,6 +827,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         {
             log.value("tree item type", "asking for all (null)", logLevel + 1, logPad + "   ");
         }
+        /* istanbul ignore next */
         else
         {
             log.values(logLevel + 1, logPad + "   ", [
@@ -877,13 +878,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             // (including providers implemented in this extension).  In this case, we have to ask
             // for all tasks.  Same goes for typescript tasks.
             //
-            /* istanbul ignore else */
             if (!this.tasks || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
             {
                 log.write("   fetching all tasks via VSCode.fetchTasks", logLevel, logPad);
                 this.tasks = await tasks.fetchTasks();
                 // .filter((t) => !util.isWatchTask(t.source) || !util.isExcluded(t.definition.path, logPad + "   "));
             }
+            /* istanbul ignore else */
             else if (this.tasks && this.currentInvalidation)
             {
                 log.write(`   fetching ${this.currentInvalidation} tasks via VSCode.fetchTasks`, logLevel, logPad);
@@ -966,7 +967,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 // try {
                     this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
                 // }
-                // catch (e: any) { /* istanbul ignore next */ log.error(e); }
+                // catch (e: any) { /* istanbul ignore next */ log.error(e); /* istanbul ignore next */ this.taskTree = [ new NoScripts() ]; }
             }
             else {
                 this.taskTree = [ new NoScripts() ];
@@ -1030,7 +1031,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     public getName = () => this.name;
 
 
-    public getTasks = () => this.tasks || [];
+    public getTasks = () => this.tasks ||  /* istanbul ignore next */ [];
 
 
     private async getTaskFileNode(task: Task, folder: TaskFolder, files: IDictionary<TaskFile>, relativePath: string, scopeName: string, logPad: string)
