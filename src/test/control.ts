@@ -100,7 +100,7 @@ export const testControl: ITestControl =
         npmCommand: 11925,
         npmCommandPkg: 9300,
         npmInstallCommand: 19650,
-        refreshCommand: 18950,
+        refreshCommand: 18960,
         rebuildFileCache: 15500,
         rebuildFileCacheCancel: 1810,
         removeWorkspaceFolder: 10000,
@@ -114,7 +114,7 @@ export const testControl: ITestControl =
         taskCommand: 1600,
         tasks: {
             antParser: 800,
-            antTask: 4100,
+            antTask: 4200,
             bashScript: 4000,
             batchScript: 8000,
             gulpParser: 3900
@@ -126,8 +126,7 @@ export const testControl: ITestControl =
         verifyTaskCountWorkspace: 3500,
         viewReport: 1950,
         walkTaskTree: 5500,
-        walkTaskTreeWithDocOpen: 27850,
-        workspaceInvalidation: 15000
+        walkTaskTreeWithDocOpen: 27850
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)
@@ -136,36 +135,36 @@ export const testControl: ITestControl =
     {   //
         // MINIMUM WAIT TIMES
         //
-        addWorkspaceFolder: 250,
-        configEvent: 125,
-        configEventFast: 50,
-        configDisableEvent: 160,
-        configEnableEvent: 195,
-        configGlobEvent: 160,
-        command: 150,
+        addWorkspaceFolder: 230,
+        configEvent: 105,
+        configEventFast: 45,
+        configDisableEvent: 140,
+        configEnableEvent: 175,
+        configGlobEvent: 140,
+        command: 130,
         commandFast: 60,
-        configGroupingEvent: 280,
-        configRegisterExplorerEvent: 245,
-        explorerViewStartup: 5000,
-        focusCommand: 500,
-        fsCreateEvent: 200,
-        fsCreateFolderEvent: 250,
-        fsDeleteEvent: 200,
-        fsDeleteFolderEvent: 250,
-        fsModifyEvent: 150,
-        getTreeMin: 350,
-        getTreeMax: 1800,
-        getTreeTasks: 75,
-        min: 50,
-        npmCommandMin: 3000,
-        refreshCommand: 500,
-        refreshTaskTypeCommand: 1000,
-        removeWorkspaceFolder: 250,
-        runCommandMin: 1000,
-        taskCommand: 625,
-        verifyTaskCountRetry: 150,
-        verifyTaskCountRetryInterval: 400,
-        viewReport: 120,
+        configGroupingEvent: 240,
+        configRegisterExplorerEvent: 225,
+        explorerViewStartup: 4000,
+        focusCommand: 400,
+        fsCreateEvent: 180,
+        fsCreateFolderEvent: 230,
+        fsDeleteEvent: 180,
+        fsDeleteFolderEvent: 230,
+        fsModifyEvent: 135,
+        getTreeMin: 330,
+        getTreeMax: 1700,
+        getTreeTasks: 65,
+        min: 40,
+        npmCommandMin: 2200,
+        refreshCommand: 400,
+        refreshTaskTypeCommand: 800,
+        removeWorkspaceFolder: 220,
+        runCommandMin: 750,
+        taskCommand: 525,
+        verifyTaskCountRetry: 130,
+        verifyTaskCountRetryInterval: 320,
+        viewReport: 100,
         //
         // MAXIMUM WAIT TIMES
         //
@@ -298,7 +297,6 @@ export interface ITestControl
         viewReport: number;
         walkTaskTree: number;
         walkTaskTreeWithDocOpen: number;
-        workspaceInvalidation: number;
     };
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME; OR waitTime.max)
