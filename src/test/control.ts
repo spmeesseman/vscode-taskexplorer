@@ -62,8 +62,6 @@ export const testControl: ITestControl =
     //
     slowTime: {
         addWorkspaceFolder: 13750,
-        bashScript: 4000,
-        batchScript: 8000,
         buildFileCache: 1500,
         buildFileCacheCancel: 1350,
         buildTreeNoTasks: 600,
@@ -114,6 +112,12 @@ export const testControl: ITestControl =
         storageUpdate: 50,
         taskProviderReadUri: 100,
         taskCommand: 1600,
+        tasks: {
+            antTask: 4000,
+            bashScript: 4000,
+            batchScript: 8000,
+            gulpParser: 3900
+        },
         verifyTaskCount: 825,
         verifyTaskCountByTree: 850,
         verifyTaskCountFirstCall: 1350,
@@ -230,8 +234,6 @@ export interface ITestControl
     //
     slowTime: {
         addWorkspaceFolder: number;
-        bashScript: number;
-        batchScript: number;
         buildFileCache: number;
         buildFileCacheCancel: number;
         buildTreeNoTasks: number;
@@ -282,6 +284,12 @@ export interface ITestControl
         storageUpdate: number;
         taskCommand: number;
         taskProviderReadUri: number;
+        tasks: {
+            antTask: number;
+            bashScript: number;
+            batchScript: number;
+            gulpParser: number;
+        };
         verifyTaskCount: number;
         verifyTaskCountByTree: number;
         verifyTaskCountFirstCall: number;
