@@ -757,7 +757,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             else {
                 log.write("   a refresh event for this item has already been queued, skip", logLevel, logPad);
             }
-            setTimeout(() => { this.refreshPending = false; }, 50);
         }
         log.methodDone("fire tree refresh event", logLevel, logPad);
     }
@@ -792,7 +791,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         //  Set pretty muy importante flag
         //
         this.refreshPending = true;
-console.log("getChildren1: " + this.currentInvalidation);
 
         //
         // If this is just after activation, or the view getting enabled, the current displayed text
@@ -902,7 +900,6 @@ console.log("getChildren1: " + this.currentInvalidation);
             }
             else /* istanbul ignore else */ if (this.tasks && this.currentInvalidation)
             {
-console.log("getChildren2:  " + this.currentInvalidation);
                 log.write(`   fetching ${this.currentInvalidation} tasks via VSCode.fetchTasks`, logLevel, logPad);
                 //
                 // Get all tasks of the type defined in 'currentInvalidation' from VSCode, remove
@@ -1528,7 +1525,7 @@ console.log("getChildren2:  " + this.currentInvalidation);
 
         log.write("   fire tree data change event", 2, logPad);
         this.fireTreeRefreshEvent(logPad + "   ", 1);
-        // setTimeout(() => { this.refreshPending = false; }, 1);
+        setTimeout(() => { this.refreshPending = false; }, 1);
 
         log.methodDone("refresh task tree", 1, logPad);
     }
