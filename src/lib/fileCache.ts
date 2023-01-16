@@ -329,7 +329,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
             let maxFiles = Infinity;
             log.write(`   Start workspace folder scan for ${taskType} files`, 3, logPad);
             //
-            // TODO - Replace instanbul ignore tags when mic mgr test suite is done.  Several below.
+            // TODO - Replace istanbul ignore tags when mic mgr test suite is done.  Several below.
             //
             /* istanbul ignore else */
             if (licMgr && !licMgr.isLicensed())

@@ -218,8 +218,8 @@ export abstract class TaskExplorerProvider implements TaskProvider
                  // Might not even need this?  Depends if we remove when modify/add and I don't feel like
                  // looking right now.  Harmless but the less calls the better.
                  //
-                 // (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* instanbul ignore next */isDirectory(uri.fsPath)) ||
-                 (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* instanbul ignore next */!extname(uri.fsPath) /* ouch */) ||
+                 // (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* istanbul ignore next */isDirectory(uri.fsPath)) ||
+                 (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* istanbul ignore next */!extname(uri.fsPath) /* ouch */) ||
                  //
                  !isTaskIncluded(item, cstDef.uri.path)));
     }

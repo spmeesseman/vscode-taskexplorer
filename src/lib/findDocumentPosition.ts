@@ -18,9 +18,9 @@ const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): num
 
     const visitor: JSONVisitor =
     {
-        onError: /* instanbul ignore next */() =>
+        onError: /* istanbul ignore next */() =>
         {
-            /* instanbul ignore next */
+            /* istanbul ignore next */
             return scriptOffset;
         },
         onObjectEnd: () =>
@@ -34,8 +34,8 @@ const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): num
         {
             if (inTaskLabel)
             {
-                /* instanbul ignore else */
-                if (typeof value === "string" && (inTaskLabel === "label" || /* instanbul ignore next */inTaskLabel === "script"))
+                /* istanbul ignore else */
+                if (typeof value === "string" && (inTaskLabel === "label" || /* istanbul ignore next */inTaskLabel === "script"))
                 {
                     log.value("   check string property", value, 4, "   ");
                     if (taskItem.task.name === value)
@@ -104,7 +104,7 @@ export const findDocumentPosition = (document: TextDocument, taskItem: TaskItem)
     }
     else if (!isWatchTask(taskItem.taskSource))
     {
-        const provider = providers[def.type] || providersExternal[def.type];
+        const provider = providers[def.type] || /* istanbul ignore next */providersExternal[def.type];
         scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || -1;
     }
 
