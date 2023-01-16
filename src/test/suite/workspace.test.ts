@@ -75,7 +75,7 @@ suite("Workspace / VSCode Tests", () =>
     test("Re-show VSCode Tasks Marked Hidden", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.configEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
         await executeSettingsUpdate("showHiddenWsTasks", true);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
     });

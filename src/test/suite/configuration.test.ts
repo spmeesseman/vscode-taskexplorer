@@ -237,7 +237,7 @@ suite("Configuration / Settings Tests", () =>
     test("Change Default Shell - Windows", async function()
     {
         if (exitRollingCount(12, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.refreshCommand);
+        this.slow(tc.slowTime.configEvent + (tc.waitTime.refreshCommand * 2));
         await configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
         await waitForTeIdle(tc.waitTime.refreshCommand);
         successCount++;
@@ -286,7 +286,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - Windows", async function()
     {
         if (exitRollingCount(16, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.refreshCommand);
+        this.slow(tc.slowTime.configEvent + (tc.waitTime.refreshCommand * 2));
         await configuration.updateVsWs("terminal.integrated.shell.windows", shellW32);
         await waitForTeIdle(tc.waitTime.refreshCommand);
         successCount++;
@@ -296,7 +296,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Coverage Hit", async function()
     {
         if (exitRollingCount(17, successCount)) return;
-        this.slow(tc.waitTime.refreshCommand + tc.slowTime.configEnableEvent);
+        this.slow((tc.waitTime.refreshCommand * 2) + (tc.slowTime.configEnableEvent * 2) + tc.waitTime.configEnableEvent);
         await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: true,
             batch: true,

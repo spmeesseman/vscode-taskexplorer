@@ -404,7 +404,7 @@ suite("Tree Tests", () =>
     test("Hide Favorites", async function()
     {
         if (utils.exitRollingCount(19, successCount)) return;
-        this.slow((tc.slowTime.showHideSpecialFolder * 2) + (tc.waitTime.command * 2));
+        this.slow((tc.slowTime.showHideSpecialFolder * 2) + (tc.waitTime.command * 2) + (tc.waitTime.configEvent  * 2));
         await utils.executeSettingsUpdate("specialFolders.showFavorites", false);
         await utils.waitForTeIdle(tc.waitTime.command);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true);
@@ -416,7 +416,7 @@ suite("Tree Tests", () =>
     test("Hide Last Tasks", async function()
     {
         if (utils.exitRollingCount(20, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder + tc.waitTime.command);
+        this.slow(tc.slowTime.showHideSpecialFolder + tc.waitTime.command + tc.waitTime.configEvent);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
         await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
@@ -435,7 +435,7 @@ suite("Tree Tests", () =>
     test("Show Favorites", async function()
     {
         if (utils.exitRollingCount(22, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.command);
+        this.slow(tc.slowTime.showHideSpecialFolder + tc.waitTime.configEvent + tc.waitTime.command);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true);
         await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
@@ -445,7 +445,7 @@ suite("Tree Tests", () =>
     test("Show Last Tasks", async function()
     {
         if (utils.exitRollingCount(23, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder + tc.waitTime.command);
+        this.slow(tc.slowTime.showHideSpecialFolder + tc.waitTime.configEvent + tc.waitTime.command);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
         await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;

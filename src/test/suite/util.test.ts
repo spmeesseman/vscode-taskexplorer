@@ -11,7 +11,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
-	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount, getWsPath
+	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount, getWsPath, sleep
 } from "../utils/utils";
 import { InitScripts } from "../../lib/noScripts";
 
@@ -61,6 +61,7 @@ suite("Util Tests", () =>
     test("Logging (Error)", async function()
     {
         if (exitRollingCount(1, successCount)) return;
+		this.slow(850);
 
         log.error(`        ${creator}.${extension}`);
         log.error([ `        ${creator}.${extension}`,
@@ -131,6 +132,8 @@ suite("Util Tests", () =>
 	test("Logging (File)", async function()
     {
         if (exitRollingCount(2, successCount)) return;
+		this.slow(2300);
+		await executeSettingsUpdate("logging.enableFile", false);
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
@@ -172,6 +175,8 @@ suite("Util Tests", () =>
     test("Logging (Method)", async function()
     {
         if (exitRollingCount(3, successCount)) return;
+		this.slow(600);
+
 		log.methodStart("methodName");
 		log.methodDone("methodName");
 		log.methodStart("methodName", 1);
@@ -201,6 +206,7 @@ suite("Util Tests", () =>
 	test("Logging (Output Window)", async function()
     {
         if (exitRollingCount(4, successCount)) return;
+		this.slow(600);
 		await executeSettingsUpdate("logging.enableOutputWindow", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
@@ -240,6 +246,7 @@ suite("Util Tests", () =>
     test("Logging (Value)", async function()
     {
         if (exitRollingCount(6, successCount)) return;
+		this.slow(1220);
         log.value(`        ${creator}.${extension}`, null);
         log.value(`        ${creator}.${extension}`, undefined);
 		log.value(null as unknown as string, 1);
@@ -298,6 +305,7 @@ suite("Util Tests", () =>
     test("Logging (Warn)", async function()
     {
         if (exitRollingCount(7, successCount)) return;
+		this.slow(625);
 		log.warn("test1");
 		log.warn("test2");
 		const scaryOff = logControl.isTestsBlockScaryColors;
@@ -323,6 +331,8 @@ suite("Util Tests", () =>
     test("Logging (Write)", async function()
     {
         if (exitRollingCount(8, successCount)) return;
+		this.slow(610);
+
         log.blank();
         log.blank(1);
 		log.withColor("test", log.colors.cyan);

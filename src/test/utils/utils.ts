@@ -364,6 +364,10 @@ const initSettings = async () =>
     // await configuration.updateWs("pathToPrograms.ansicon", tc.userPathToAnsicon);
 
     await configuration.updateWs("logging.enable", tc.log.enabled);
+    if (!tc.log.enabled){
+        tc.log.file = false;
+        tc.log.output = false;
+    }
     await configuration.updateWs("logging.level", tc.log.level);
     await configuration.updateWs("logging.enableFile", tc.log.file);
     await configuration.updateWs("logging.enableFileSymbols", tc.log.fileSymbols);
