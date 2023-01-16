@@ -47,6 +47,8 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     private async findTargets(fsPath: string, logPad: string)
     {
+        let gulpTasks: string[] = [];
+
         log.methodStart("find gulp targets", 4, logPad, false, [[ "path", fsPath ]], this.logQueueId);
         //
         // Try running 'gulp' itself to get the targets.  If fail, just custom parse
@@ -101,44 +103,36 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
 
         if (configuration.get("useGulp") === true)
         {
-            return new Promise<string[]>((resolve, reject) =>
-            {
-                const gulpTasks: string[] = [];
-                let stdout: Buffer | undefined;
-                try {
-                    stdout = execSync("npx gulp --tasks -f " + basename(fsPath), { cwd: dirname(fsPath) });
-                }
-                catch (e: any) {
-                    /* istanbul ignore next */
-                    log.error(e, undefined, this.logQueueId);
-                    /* istanbul ignore next */
-                    reject(e);
-                }
-                //
-                // Loop through all the lines and extract the task names
-                //
-                const contents = stdout?.toString().split("\n");
-                if (contents)
+            let stdout: Buffer | undefined;
+            try {
+                stdout = execSync("npx gulp --tasks -f " + basename(fsPath), {
+                    cwd: dirname(fsPath)
+                });
+            }
+            catch (e: any) { log.error(e, undefined, this.logQueueId); }
+            //
+            // Loop through all the lines and extract the task names
+            //
+            const contents = stdout?.toString().split("\n");
+            if (contents) {
+                for (const c of contents)
                 {
-                    for (const c of contents)
+                    const line = c.match(/(\[[\w\W][^\]]+\][ ](├─┬|├──|└──|└─┬) )([\w\-]+)/i);
+                    if (line && line.length > 3 && line[3])
                     {
-                        const line = c.match(/(\[[\w\W][^\]]+\][ ](├─┬|├──|└──|└─┬) )([\w\-]+)/i);
-                        if (line && line.length > 3 && line[3])
-                        {
-                            gulpTasks.push(line[3].toString());
-                            log.write("found gulp task", 4, logPad, this.logQueueId);
-                            log.value("   name", line[3].toString(), 4, logPad, this.logQueueId);
-                        }
+                        gulpTasks.push(line[3].toString());
+                        log.write("found gulp task", 4, logPad, this.logQueueId);
+                        log.value("   name", line[3].toString(), 4, logPad, this.logQueueId);
                     }
                 }
-                log.methodDone("find gulp targets", 4, logPad, undefined, this.logQueueId);
-                resolve(gulpTasks);
-            });
+            }
         }
         else {
-            log.methodDone("find gulp targets", 4, logPad, undefined, this.logQueueId);
-            return this.parseGulpTasks(fsPath, logPad + "   ");
+            gulpTasks = await this.parseGulpTasks(fsPath, logPad + "   ");
         }
+
+        log.methodDone("find gulp targets", 4, logPad, undefined, this.logQueueId);
+        return gulpTasks;
     }
 
 
@@ -176,9 +170,26 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                 {
                     tgtName = this.parseGulpExport(line);
                 }
-                else if (/^[a-zA-Z0-9_\-]\.?task +\(+/.test(line.toLowerCase().trimLeft()))
+                else if (/[a-z0-9_\-]*\.?task *\( */.test(line.toLowerCase().trimLeft()))
                 {
                     tgtName = this.parseGulpTask(line, contents, eol);
+                }
+                else if (/export +(?:const|let|var) +([a-zA-Z0-9_\-]+)/.test(line.toLowerCase().trimLeft()))
+                {
+                    const match = line.match(/export +(?:const|let|var) +([a-zA-Z0-9_\-]+)/);
+                    if (match && match.length > 1 && match[1]) {
+                        tgtName =  match[1];
+                    }
+                }
+                else if (/export +\{ +([a-zA-Z0-9_\-]+) *as *([a-zA-Z0-9_\-]+) *\}/.test(line.toLowerCase().trimLeft()))
+                {
+                    const match = line.match(/export +\{ +([a-zA-Z0-9_\-]+) *as *([a-zA-Z0-9_\-]+) *\}/);
+                    if (match && match.length > 2 && match[2]) {
+                        tgtName =  match[2];
+                    }
+                    else if (match && match.length > 1 && match[1]) {
+                        tgtName =  match[1];
+                    }
                 }
                 if (tgtName) {
                     scripts.push(tgtName);
