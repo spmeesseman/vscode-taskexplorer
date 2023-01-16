@@ -47,8 +47,6 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     private async findTargets(fsPath: string, logPad: string)
     {
-        let gulpTasks: string[] = [];
-
         log.methodStart("find gulp targets", 4, logPad, false, [[ "path", fsPath ]], this.logQueueId);
         //
         // Try running 'gulp' itself to get the targets.  If fail, just custom parse
@@ -101,39 +99,46 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         //     [12:28:59]         └── buildJS
         //
 
-        /* istanbul ignore if */
         if (configuration.get("useGulp") === true)
         {
-            let stdout: Buffer | undefined;
-            try {
-                stdout = execSync("npx gulp --tasks", {
-                    cwd: dirname(fsPath)
-                });
-            }
-            catch (e: any) { log.error(e, undefined, this.logQueueId); }
-            //
-            // Loop through all the lines and extract the task names
-            //
-            const contents = stdout?.toString().split("\n");
-            if (contents) {
-                for (const c of contents)
+            return new Promise<string[]>((resolve, reject) =>
+            {
+                const gulpTasks: string[] = [];
+                let stdout: Buffer | undefined;
+                try {
+                    stdout = execSync("npx gulp --tasks -f " + basename(fsPath), { cwd: dirname(fsPath) });
+                }
+                catch (e: any) {
+                    /* istanbul ignore next */
+                    log.error(e, undefined, this.logQueueId);
+                    /* istanbul ignore next */
+                    reject(e);
+                }
+                //
+                // Loop through all the lines and extract the task names
+                //
+                const contents = stdout?.toString().split("\n");
+                if (contents)
                 {
-                    const line = c.match(/(\[[\w\W][^\]]+\][ ](├─┬|├──|└──|└─┬) )([\w\-]+)/i);
-                    if (line && line.length > 3 && line[3])
+                    for (const c of contents)
                     {
-                        gulpTasks.push(line[3].toString());
-                        log.write("found gulp task", 4, logPad, this.logQueueId);
-                        log.value("   name", line[3].toString(), 4, logPad, this.logQueueId);
+                        const line = c.match(/(\[[\w\W][^\]]+\][ ](├─┬|├──|└──|└─┬) )([\w\-]+)/i);
+                        if (line && line.length > 3 && line[3])
+                        {
+                            gulpTasks.push(line[3].toString());
+                            log.write("found gulp task", 4, logPad, this.logQueueId);
+                            log.value("   name", line[3].toString(), 4, logPad, this.logQueueId);
+                        }
                     }
                 }
-            }
+                log.methodDone("find gulp targets", 4, logPad, undefined, this.logQueueId);
+                resolve(gulpTasks);
+            });
         }
         else {
-            gulpTasks = await this.parseGulpTasks(fsPath, logPad + "   ");
+            log.methodDone("find gulp targets", 4, logPad, undefined, this.logQueueId);
+            return this.parseGulpTasks(fsPath, logPad + "   ");
         }
-
-        log.methodDone("find gulp targets", 4, logPad, undefined, this.logQueueId);
-        return gulpTasks;
     }
 
 
@@ -171,7 +176,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                 {
                     tgtName = this.parseGulpExport(line);
                 }
-                else if (line.toLowerCase().trimLeft().startsWith("gulp.task"))
+                else if (/^[a-zA-Z0-9_\-]\.?task +\(+/.test(line.toLowerCase().trimLeft()))
                 {
                     tgtName = this.parseGulpTask(line, contents, eol);
                 }
