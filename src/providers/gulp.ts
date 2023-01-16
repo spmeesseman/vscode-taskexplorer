@@ -10,8 +10,6 @@ import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 import { getRelativePath, timeout } from "../lib/utils/utils";
 
-const execAsync = promisify(exec);
-
 
 export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
@@ -51,63 +49,12 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
     private async findTargets(fsPath: string, logPad: string)
     {
         let gulpTasks: string[] = [];
-
         log.methodStart("find gulp targets", 4, logPad, false, [[ "path", fsPath ]], this.logQueueId);
-        //
-        // Try running 'gulp' itself to get the targets.  If fail, just custom parse
-        //
-        // Sample Output of gulp --tasks :
-        //
-        //     [13:17:46] Tasks for C:\Projects\vscode-taskexplorer\test-files\gulpfile.js
-        //     [13:17:46] ├── hello
-        //     [13:17:46] └── build:test
-        //
-        //     Tasks for C:\Projects\.....\gulpfile.js
-        //     [12:28:59] ├─┬ lint
-        //     [12:28:59] │ └─┬ <series>
-        //     [12:28:59] │   └── lintSCSS
-        //     [12:28:59] ├─┬ watch
-        //     [12:28:59] │ └─┬ <parallel>
-        //     [12:28:59] │   ├── cssWatcher
-        //     [12:28:59] │   ├── jsWatcher
-        //     [12:28:59] │   └── staticWatcher
-        //     [12:28:59] ├── clean
-        //     [12:28:59] ├─┬ build
-        //     [12:28:59] │ └─┬ <series>
-        //     [12:28:59] │   ├── buildCSS
-        //     [12:28:59] │   ├── buildStatic
-        //     [12:28:59] │   └── buildJS
-        //     [12:28:59] ├── init
-        //     [12:28:59] ├─┬ dist:copy
-        //     [12:28:59] │ └─┬ <series>
-        //     [12:28:59] │   ├── cleanDistLibs
-        //     [12:28:59] │   └── copyLibs
-        //     [12:28:59] ├── dist:normalize
-        //     [12:28:59] ├─┬ dev
-        //     [12:28:59] │ └─┬ <parallel>
-        //     [12:28:59] │   ├─┬ watch
-        //     [12:28:59] │   │ └─┬ <parallel>
-        //     [12:28:59] │   │   ├── cssWatcher
-        //     [12:28:59] │   │   ├── jsWatcher
-        //     [12:28:59] │   │   └── staticWatcher
-        //     [12:28:59] │   └── devServer
-        //     [12:28:59] └─┬ default
-        //     [12:28:59]   └─┬ <series>
-        //     [12:28:59]     ├─┬ lint
-        //     [12:28:59]     │ └─┬ <series>
-        //     [12:28:59]     │   └── lintSCSS
-        //     [12:28:59]     ├── clean
-        //     [12:28:59]     └─┬ build
-        //     [12:28:59]       └─┬ <series>
-        //     [12:28:59]         ├── buildCSS
-        //     [12:28:59]         ├── buildStatic
-        //     [12:28:59]         └── buildJS
-        //
 
         if (configuration.get<boolean>("useGulp") === true)
         {
             try
-            {   const out = await execAsync("npx gulp --tasks -f " + basename(fsPath), { cwd: dirname(fsPath) });
+            {   const out = await promisify(exec)("npx gulp --tasks -f " + basename(fsPath), { cwd: dirname(fsPath) });
                 const stdout = out.stdout;
                 await timeout(10);
                 gulpTasks = this.parseGulpStdOut(stdout, logPad + "   ");
@@ -239,7 +186,56 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
 
 
     private parseGulpStdOut(stdout: string, logPad: string)
-    {
+    {   //
+        // Ran 'gulp' itself to get the targets.
+        //
+        // Sample Output of gulp --tasks :
+        //
+        //     [13:17:46] Tasks for C:\Projects\vscode-taskexplorer\test-files\gulpfile.js
+        //     [13:17:46] ├── hello
+        //     [13:17:46] └── build:test
+        //
+        //     Tasks for C:\Projects\.....\gulpfile.js
+        //     [12:28:59] ├─┬ lint
+        //     [12:28:59] │ └─┬ <series>
+        //     [12:28:59] │   └── lintSCSS
+        //     [12:28:59] ├─┬ watch
+        //     [12:28:59] │ └─┬ <parallel>
+        //     [12:28:59] │   ├── cssWatcher
+        //     [12:28:59] │   ├── jsWatcher
+        //     [12:28:59] │   └── staticWatcher
+        //     [12:28:59] ├── clean
+        //     [12:28:59] ├─┬ build
+        //     [12:28:59] │ └─┬ <series>
+        //     [12:28:59] │   ├── buildCSS
+        //     [12:28:59] │   ├── buildStatic
+        //     [12:28:59] │   └── buildJS
+        //     [12:28:59] ├── init
+        //     [12:28:59] ├─┬ dist:copy
+        //     [12:28:59] │ └─┬ <series>
+        //     [12:28:59] │   ├── cleanDistLibs
+        //     [12:28:59] │   └── copyLibs
+        //     [12:28:59] ├── dist:normalize
+        //     [12:28:59] ├─┬ dev
+        //     [12:28:59] │ └─┬ <parallel>
+        //     [12:28:59] │   ├─┬ watch
+        //     [12:28:59] │   │ └─┬ <parallel>
+        //     [12:28:59] │   │   ├── cssWatcher
+        //     [12:28:59] │   │   ├── jsWatcher
+        //     [12:28:59] │   │   └── staticWatcher
+        //     [12:28:59] │   └── devServer
+        //     [12:28:59] └─┬ default
+        //     [12:28:59]   └─┬ <series>
+        //     [12:28:59]     ├─┬ lint
+        //     [12:28:59]     │ └─┬ <series>
+        //     [12:28:59]     │   └── lintSCSS
+        //     [12:28:59]     ├── clean
+        //     [12:28:59]     └─┬ build
+        //     [12:28:59]       └─┬ <series>
+        //     [12:28:59]         ├── buildCSS
+        //     [12:28:59]         ├── buildStatic
+        //     [12:28:59]         └── buildJS
+        //
         const gulpTasks: string[] = [];
         //
         // Loop through all the lines and extract the task names
@@ -258,6 +254,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         }
         return gulpTasks;
     }
+
 
     private parseGulpTask(line: string, contents: string, eol: number)
     {
