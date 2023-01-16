@@ -14,7 +14,6 @@ import {
 
 const testsName = "gulp";
 const startTaskCount = 17;
-const gulpTaskTime = 3800;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -242,7 +241,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(11, successCount)) return;
         this.slow((tc.slowTime.configEnableEvent * 2) + (tc.waitTime.configEvent * 2) + tc.waitTime.configEnableEvent +
-                  tc.waitTime.configDisableEvent + (tc.slowTime.verifyTaskCount * 2) + (gulpTaskTime * 4));
+                  tc.waitTime.configDisableEvent + (tc.slowTime.verifyTaskCount * 2) + (tc.slowTime.tasks.gulpParser * 4));
         //
         // Use Gulp to parse tasks. The configuration change will cause gulp tasks to be invalidated and refreshed
         //

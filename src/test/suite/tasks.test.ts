@@ -162,10 +162,9 @@ suite("Task Tests", () =>
 
     test("Run Ant Task (w/ Ansicon)", async function()
     {
-        const taskTime = 3000; // utils.sleeps for 3s
         if (utils.exitRollingCount(7, successCount)) return;
         this.slow((tc.slowTime.configEnableEvent * 2) + (tc.waitTime.configEnableEvent * 2) + tc.slowTime.runCommand +
-                  tc.waitTime.runCommandMin + endOfTestWaitTime + (taskTime * 2) + (tc.waitTime.configEvent * 2));
+                  tc.waitTime.runCommandMin + endOfTestWaitTime + (tc.slowTime.tasks.antTask * 2) + (tc.waitTime.configEvent * 2));
         antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
         expect(antTask).to.not.be.equal(undefined, "The 'hello' ant task was not found in the task tree");
         await utils.executeSettingsUpdate("pathToPrograms.ansicon", utils.getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
@@ -184,10 +183,9 @@ suite("Task Tests", () =>
 
     test("Run Ant Task (w/o Ansicon)", async function()
     {
-        const taskTime = 3000; // utils.sleeps for 3s
         if (utils.exitRollingCount(8, successCount)) return;
         this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent +tc.slowTime.runCommand +
-                  tc.waitTime.runCommandMin + endOfTestWaitTime + (taskTime * 2) + (tc.waitTime.configEvent * 2));
+                  tc.waitTime.runCommandMin + endOfTestWaitTime + (tc.slowTime.tasks.antTask * 2) + (tc.waitTime.configEvent * 2));
         await utils.executeSettingsUpdate("visual.enableAnsiconForAnt", false);
         await utils.waitForTeIdle(tc.waitTime.configEnableEvent);
         await startTask(antTask, false);
@@ -203,10 +201,9 @@ suite("Task Tests", () =>
     {   //
         // There is only 1 bash file "task" - it utils.sleeps for 3 seconds, 1 second at a time
         //
-        const taskTime= 3000;
         if (utils.exitRollingCount(9, successCount)) return;
         this.slow(tc.slowTime.runCommand + tc.waitTime.runCommandMin + tc.waitTime.command + tc.slowTime.command + (tc.slowTime.configEvent * 3) +
-                  (tc.waitTime.configEvent * 3) + tc.slowTime.configSpecialFolderEvent+ startTaskSlowTime + endOfTestWaitTime + (taskTime * 2));
+                  (tc.waitTime.configEvent * 3) + tc.slowTime.configSpecialFolderEvent+ startTaskSlowTime + endOfTestWaitTime + (tc.slowTime.tasks.bashScript * 2));
         await utils.executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
         await utils.executeSettingsUpdate("keepTermOnStop", true);
@@ -224,13 +221,12 @@ suite("Task Tests", () =>
     {   //
         // There are 2 batch file "tasks" - they both utils.sleep for 7 seconds, 1 second at a time
         //
-        const taskTime= 7000;
         if (utils.exitRollingCount(10, successCount)) return;
         const slowTime = (tc.slowTime.runCommand * 1) + (tc.slowTime.runStopCommand * 2) + 7000 + // wait for task exec
                           startTaskSlowTime + tc.slowTime.runPauseCommand + (tc.waitTime.runCommandMin * 6) + (tc.slowTime.configEvent * 4) +
-                          (tc.slowTime.command * 2) + tc.slowTime.closeActiveDocument + endOfTestWaitTime + (taskTime * 2) + (tc.waitTime.command * 4);
+                          (tc.slowTime.command * 2) + tc.slowTime.closeActiveDocument + endOfTestWaitTime + (tc.slowTime.tasks.batchScript * 2) + (tc.waitTime.command * 4);
         this.slow(slowTime);
-        this.timeout(slowTime + (taskTime * 2) + 40000);
+        this.timeout(45000);
         const batchTask = batch[0];
         await startTask(batchTask as TaskItem, true);
         await utils.executeSettingsUpdate("keepTermOnStop", false);
@@ -294,13 +290,12 @@ suite("Task Tests", () =>
     {   //
         // There are 2 batch file "tasks" - they both utils.sleep for 7 seconds, 1 second at a time
         //
-        const taskTime= 7000;
         if (utils.exitRollingCount(11, successCount)) return;
-        const slowTime = (tc.slowTime.runCommand * 1) + endOfTestWaitTime + taskTime + (tc.waitTime.runCommandMin * 2) + 2500 + // wait for task exec
+        const slowTime = (tc.slowTime.runCommand * 1) + endOfTestWaitTime + (tc.waitTime.runCommandMin * 2) + 2500 + // wait for task exec
                           startTaskSlowTime + tc.slowTime.runStopCommand + (tc.slowTime.command * 2) + (tc.slowTime.configEvent * 4) +
-                          (taskTime * 2) + 1000 + tc.slowTime.configSpecialFolderEvent;
+                          (tc.slowTime.tasks.batchScript * 2) + 1000 + tc.slowTime.configSpecialFolderEvent;
         this.slow(slowTime);
-        this.timeout(slowTime + (taskTime * 2));
+        this.timeout(35000);
         const batchTask = batch[1];
         await startTask(batchTask as TaskItem, true);
         await utils.executeSettingsUpdate("keepTermOnStop", false);
@@ -323,9 +318,8 @@ suite("Task Tests", () =>
 
     test("Run Batch Task (No Terminal)", async function()
     {
-        const taskTime= 7000;
         if (utils.exitRollingCount(12, successCount)) return;
-        this.slow(tc.slowTime.runCommand + endOfTestWaitTime + (taskTime * 2) + tc.waitTime.runCommandMin);
+        this.slow(tc.slowTime.runCommand + endOfTestWaitTime + (tc.slowTime.tasks.batchScript * 2) + tc.waitTime.runCommandMin);
         const batchTask = batch[0];
         await startTask(batchTask as TaskItem, false);
         const exec = await utils.executeTeCommand2("runNoTerm", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
