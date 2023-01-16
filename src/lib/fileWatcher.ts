@@ -69,7 +69,7 @@ export async function registerFileWatchers(context: ExtensionContext, api: ITask
  * @param enabled Is enabled.  `false` if task type was disabled.
  * @param logPad Log padding.
  */
-export async function registerFileWatcher(context: ExtensionContext, taskType: string, firstRun: boolean, enabled?: boolean, logPad = "")
+export async function registerFileWatcher(context: ExtensionContext, taskType: string, firstRun: boolean, enabled: boolean, logPad: string)
 {
     log.methodStart("Register file watcher for task type '" + taskType + "'", 1, logPad, false, [[ "enabled", enabled ]]);
 

@@ -51,7 +51,7 @@ export const sortTaskFolder = (folder: TaskFolder, logPad: string, logLevel: num
 };
 
 
-export const sortTasks = (items: (ITaskFile | ITaskItem)[] | undefined, logPad = "", logLevel = 1) =>
+export const sortTasks = (items: (ITaskFile | ITaskItem)[] | undefined, logPad: string, logLevel: number) =>
 {
     log.methodStart("sort tasks", logLevel, logPad);
     items?.sort((a: ITaskFile | ITaskItem, b: ITaskFile | ITaskItem) =>
