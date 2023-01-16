@@ -168,13 +168,13 @@ export default class SpecialTaskFolder extends TaskFolder
      * @param sort Whether or not to sort any existing items in the folder.
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
-    private async build(logPad: string)
+    private build(logPad: string)
     {
         log.methodStart("create special tasks folder", 1, logPad, false, [[ "name", this.label ]]);
 
-        const tree = this.explorer.getTaskTree();
+        const tree = this.explorer.getTaskTree() as TreeItem[]; // Guaranted not to be undefined - checked in .refresh()
         const showLastTasks = configuration.get<boolean>("specialFolders.showLastTasks");
-        if (!tree || (!showLastTasks && !this.isFavorites)) { // && !forceChange) {
+        if ((!showLastTasks && !this.isFavorites)) { // && !forceChange) {
             return false;
         }
 
@@ -190,7 +190,7 @@ export default class SpecialTaskFolder extends TaskFolder
 
         for (const tId of this.store)
         {
-            const taskItem2 = await this.explorer.getTaskMap()[tId];
+            const taskItem2 = this.explorer.getTaskMap()[tId];
             /* istanbul ignore else */
             if (taskItem2 && taskItem2 instanceof TaskItem && taskItem2.task)
             {
@@ -251,11 +251,11 @@ export default class SpecialTaskFolder extends TaskFolder
             if (this.isFavorites) {
                 this.store = [];
                 await storage.update(constants.FAV_TASKS_STORE, this.store);
-                await this.refresh(true);
+                this.refresh(true);
             }
             else {
                 await storage.update(constants.LAST_TASKS_STORE, this.store);
-                await this.refresh(true);
+                this.refresh(true);
             }
         }
     }
@@ -363,7 +363,7 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
-    private async refresh(show: boolean, logPad = "")
+    private refresh(show: boolean, logPad = "")
     {
         let changed = false;
         const tree = this.explorer.getTaskTree();
@@ -381,7 +381,7 @@ export default class SpecialTaskFolder extends TaskFolder
 
         if (show)
         {
-            changed = await this.build("   ");
+            changed = this.build("   ");
         }
         else {
             /* istanbul ignore else */
