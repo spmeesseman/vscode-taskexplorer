@@ -78,7 +78,7 @@
 	"config.taskExplorer.sortProjectFoldersAlpha": "Sort project folders alphabetically.  If not set, folders appear in the same order as the File Explorer View.",
 
 	"config.taskExplorer.useAnt": "Use the `ant` program itself to find it's tasks.",
-	"config.taskExplorer.useGulp": "Use the `gulp` program itself to find it's tasks.",
+	"config.taskExplorer.useGulp": "Use the `gulp` program itself to find it's tasks.  Note this is **extremely slow** as npx/gulp takes ~1s to parse only 1 single file.",
 
 	"config.taskExplorer.specialFolders.expanded": "Specify tree node expansion states on startup for special folders and project folders.  Property names of new items should be **camel cased** with **no spaces**.  A value of `true` indicates the folder should be expanded on startup, `false` indicates the folder should be collapsed.",
 	"config.taskExplorer.specialFolders.numLastTasks": "The number of tasks to store in the `Last Tasks` tree folder node",

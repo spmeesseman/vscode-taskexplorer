@@ -91,7 +91,7 @@
         "test:dev": "rimraf c:\\code\\data\\user-data\\cacheddata && npm run test",
         "test:after": "npm run test-coverage-full_off",
         "test:before": "npm run tsc-rebuild_test && npm run test-coverage-full_on",
-        "test:openreport": "npm run coverage-open_report",
+        "test:openreport": "npm run test-coverage-open_report",
         "test:clearcache": "rimraf .vscode-test\\user-data",
         "tsc-build": "npx tsc -p ./",
         "tsc-build_test": "npx tsc -p tsconfig.test.json",
