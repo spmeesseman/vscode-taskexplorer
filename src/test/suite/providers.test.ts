@@ -994,27 +994,25 @@ async function setupGulp()
 
     await fsApi.writeFile(
         file4,
-        "var gulp = require('gulp');\n" +
-        "gulp.task('group-test-build-ui-one', (done) => {\n" +
-        "    console.log('Hello3!');\n" +
-        "    done();\n" +
-        "});\n" +
-        'gulp.task(\n"group-test-build-ui-two", (done) => {\n' +
-        "    console.log('Hello4!');\n" +
-        "    done();\n" +
-        "});\n" +
-        "gulp.task('group-test-build-ui-three', (done) => {\n" +
-        "    console.log('Hello3!');\n" +
-        "    done();\n" +
-        "});\n" +
-        "gulp.task('group-test-build-ui-four', (done) => {\n" +
-        "    console.log('Hello3!');\n" +
-        "    done();\n" +
-        "});\n" +
-        "gulp.task('group-test-build-ui-five', (done) => {\n" +
-        "    console.log('Hello3!');\n" +
-        "    done();\n" +
-        "});\n"
+        "import pkg from 'gulp';\n" +
+        "const { task, series } = pkg;\n" +
+        "function clean2(cb) {\n" +
+        "    console.log('clean2!!!');\n" +
+        "    cb();\n" +
+        "}\n" +
+        "function build2(cb) {\n" +
+        "    console.log('build2!!!');\n" +
+        "    cb();\n" +
+        "}\n" +
+        "const _build1 = build2;\n" +
+        "const _build2 = build2;\n" +
+        "const build3 = build2;\n" +
+        "const build4 = build2;\n" +
+        "export { _build1 as build1 };\n" +
+        "export { _build2 as build2 };\n" +
+        "export { build3 };\n" +
+        "export { build4 };\n" +
+        "export const default123 = series(clean2, build2);\n"
     );
 
     await fsApi.writeFile(

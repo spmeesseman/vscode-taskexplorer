@@ -80,7 +80,7 @@ export const testControl: ITestControl =
         configGroupingEvent: 700,
         configSpecialFolderEvent: 475,
         configReadEvent: 25,
-        explorerViewStartup: 17800,
+        explorerViewStartup: 18600,
         fetchTasksCommand: 3000,
         fileCachePersist: 470,
         findDocumentPositionCommand: 850,
