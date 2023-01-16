@@ -14,9 +14,8 @@ import {
 } from "../utils/utils";
 
 const testsName = "ant";
-const slowTimeforAntParseFile = 800;
 const slowTimeforAntRunTasks = (testControl.slowTime.fetchTasksCommand * 2) + (testControl.slowTime.configEvent * 3) +
-                               (testControl.slowTime.taskProviderReadUri * 2) + slowTimeforAntParseFile;
+                               (testControl.slowTime.taskProviderReadUri * 2) + testControl.slowTime.tasks.antParser;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;

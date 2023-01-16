@@ -30,6 +30,7 @@ let dirNameL2: string;
 let dirNameIgn: string;
 let batch: TaskItem[];
 let taskMap: TaskMap;
+let tempDirsDeleted = false;
 let successCount = -1;
 
 
@@ -67,6 +68,9 @@ suite("Provider Tests", () =>
         await executeSettingsUpdate("enabledTasks.gradle", false, tc.waitTime.configDisableEvent);       // off by default
         await executeSettingsUpdate("enabledTasks.maven", false, tc.waitTime.configDisableEvent);        // off by default
         await executeSettingsUpdate("enabledTasks.pipenv", false, tc.waitTime.configDisableEvent);       // off by default
+        if (!tempDirsDeleted) {
+            await deleteTempFilesAndDirectories();
+        }
         suiteFinished(this);
     });
 
@@ -690,33 +694,11 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Remove Temporary Directories", async function()
+    test("Remove Temporary Files and Directories", async function()
     {
         if (exitRollingCount(44, successCount)) return;
         this.slow((tc.slowTime.fsDeleteFolderEvent * 3) + (tc.slowTime.fsDeleteEvent * (tempFiles.length)) + 4000);
-        if (tempFiles.length)
-        {
-            let file: string | undefined;
-            while ((file = tempFiles.shift()))
-            {
-                try {
-                    await fsApi.deleteFile(file);
-                }
-                catch (error) {
-                    console.log(error);
-                }
-            }
-        }
-        try {
-            await fsApi.deleteDir(dirNameL2);
-            await fsApi.deleteDir(dirName);
-            await fsApi.deleteDir(dirNameIgn);
-        }
-        catch (error) {
-            console.log(error);
-        }
-        await waitForTeIdle(3000);
-        await waitForTeIdle(1000);
+        await deleteTempFilesAndDirectories();
         ++successCount;
     });
 
@@ -786,6 +768,35 @@ function checkTasks(ant: number, ap: number, bash: number, bat: number, gradle: 
     if (taskCount !== vsc) {
         assert.fail(`Unexpected VSCode task count (Found ${taskCount} of ${vsc})`);
     }
+}
+
+
+async function deleteTempFilesAndDirectories()
+{
+    if (tempFiles.length)
+    {
+        let file: string | undefined;
+        while ((file = tempFiles.shift()))
+        {
+            try {
+                await fsApi.deleteFile(file);
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
+    }
+    try {
+        await fsApi.deleteDir(dirNameL2);
+        await fsApi.deleteDir(dirName);
+        await fsApi.deleteDir(dirNameIgn);
+    }
+    catch (error) {
+        console.log(error);
+    }
+    await waitForTeIdle(3000);
+    await waitForTeIdle(1000);
+    tempDirsDeleted = true;
 }
 
 

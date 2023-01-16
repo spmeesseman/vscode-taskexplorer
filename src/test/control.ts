@@ -83,7 +83,7 @@ export const testControl: ITestControl =
         fileCachePersist: 470,
         findDocumentPositionCommand: 850,
         focusCommand: 3400,
-        focusCommandAlreadyFocused: 125,
+        focusCommandAlreadyFocused: 130,
         fsCreateEvent: 1680,
         fsCreateFolderEvent: 1970,
         fsDeleteEvent: 1450,
@@ -113,6 +113,7 @@ export const testControl: ITestControl =
         taskProviderReadUri: 100,
         taskCommand: 1600,
         tasks: {
+            antParser: 800,
             antTask: 4000,
             bashScript: 4000,
             batchScript: 8000,
@@ -125,7 +126,7 @@ export const testControl: ITestControl =
         verifyTaskCountWorkspace: 3500,
         viewReport: 1950,
         walkTaskTree: 5500,
-        walkTaskTreeWithDocOpen: 28000,
+        walkTaskTreeWithDocOpen: 27700,
         workspaceInvalidation: 15000
     },
     //
@@ -285,6 +286,7 @@ export interface ITestControl
         taskCommand: number;
         taskProviderReadUri: number;
         tasks: {
+            antParser: number;
             antTask: number;
             bashScript: number;
             batchScript: number;

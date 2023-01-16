@@ -109,24 +109,23 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
 
             if (line.length > 0)
             {
+                let match: RegExpMatchArray | null;
                 if (line.toLowerCase().trimLeft().startsWith("exports"))
                 {
                     tgtName = this.parseGulpExport(line);
                 }
-                else if (/[a-z0-9_\-]*\.?task *\( */.test(line.toLowerCase().trimLeft()))
+                else if (/[a-zA-Z0-9_\-]*\.?task *\( */.test(line.trimLeft()))
                 {
                     tgtName = this.parseGulpTask(line, contents, eol);
                 }
-                else if (/export +(?:const|let|var) +([a-zA-Z0-9_\-]+)/.test(line.toLowerCase().trimLeft()))
+                else if (match = line.match(/export +(?:const|let|var) +([a-zA-Z0-9_\-]+)/))
                 {
-                    const match = line.match(/export +(?:const|let|var) +([a-zA-Z0-9_\-]+)/);
                     if (match && match.length > 1 && match[1]) {
                         tgtName =  match[1];
                     }
                 }
-                else if (/export +\{ +([a-zA-Z0-9_\-]+) *as *([a-zA-Z0-9_\-]+) *\}/.test(line.toLowerCase().trimLeft()))
+                else if (match = line.match(/export +\{ +([a-zA-Z0-9_\-]+)(?: *as *([a-zA-Z0-9_\-]+))? *\}/))
                 {
-                    const match = line.match(/export +\{ +([a-zA-Z0-9_\-]+) *as *([a-zA-Z0-9_\-]+) *\}/);
                     if (match && match.length > 2 && match[2]) {
                         tgtName =  match[2];
                     }

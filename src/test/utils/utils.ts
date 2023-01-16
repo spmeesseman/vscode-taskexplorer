@@ -410,7 +410,7 @@ const initSettings = async () =>
 
     if (tc.log.enabled)
     {
-        const slowTimes = tc.slowTime as IDictionary<number>;
+        const slowTimes = tc.slowTime as IDictionary<any>;
         // const waitTimes = tc.waitTime as IDictionary<number>;
         let factor = 1.01;
         if (tc.log.output) {
