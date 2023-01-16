@@ -399,9 +399,9 @@ const initSettings = async () =>
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("groupWithSeparator", true);
 
-    await configuration.updateWs("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ]);
+    await configuration.updateWs("exclude", []);
     await configuration.updateWs("includeAnt", []); // Deprecated, use `globPatternsAnt`
-    await configuration.updateWs("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
+    await configuration.updateWs("globPatternsAnt", []);
     await configuration.updateWs("keepTermOnStop", false);
     await configuration.updateWs("showHiddenWsTasks", true);
     await configuration.updateWs("showRunningTask", true);

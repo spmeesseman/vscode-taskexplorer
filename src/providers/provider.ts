@@ -166,7 +166,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 //
                 this.cachedTasks.slice().reverse().forEach((item, index, object) =>
                 {
-                    if (this.needsRemoval(item, uri) && (item.source !== "Workspace" || /* instanbul ignore next */item.definition.type === this.providerName))
+                    if (this.needsRemoval(item, uri) && (item.source !== "Workspace" || /* istanbul ignore next */item.definition.type === this.providerName))
                     {
                         log.write(`   removing cached task '${item.source}/${item.name}'`, 4, logPad);
                         (this.cachedTasks as Task[]).splice(object.length - 1 - index, 1);

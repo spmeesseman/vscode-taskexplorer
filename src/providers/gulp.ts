@@ -120,6 +120,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                 }
                 else if (match = line.match(/export +(?:const|let|var) +([a-zA-Z0-9_\-]+)/))
                 {
+                    /* istanbul ignore else */
                     if (match && match.length > 1 && match[1]) {
                         tgtName =  match[1];
                     }
@@ -129,7 +130,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                     if (match && match.length > 2 && match[2]) {
                         tgtName =  match[2];
                     }
-                    else if (match && match.length > 1 && match[1]) {
+                    else /* istanbul ignore else */if (match && match.length > 1 && match[1]) {
                         tgtName =  match[1];
                     }
                 }

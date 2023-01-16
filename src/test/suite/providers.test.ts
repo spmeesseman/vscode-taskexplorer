@@ -42,17 +42,12 @@ suite("Provider Tests", () =>
         teApi = await activate(this);
         explorer = teApi.testsApi.explorer;
         fsApi = teApi.testsApi.fs;
-
         rootPath = getWsPath(".");
         dirName = join(rootPath, "tasks_test_");
         dirNameL2 = join(dirName, "subfolder");
         dirNameIgn = join(rootPath, "tasks_test_ignore_");
-        //
-        // Add some excludes, use both config update and task explorer addExclude command
-        // for full coverage.  The 'addExclude' command will add the setting globally though,
-        // so add it to the workspace setting as well
-        //
         await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ], tc.waitTime.configGlobEvent);
+        await waitForTeIdle(tc.waitTime.configGlobEvent);
         ++successCount;
 
     });
@@ -79,9 +74,6 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(0, successCount)) return;
         this.slow(tc.slowTime.fsCreateFolderEvent * 4);
-         //
-        // Create the temporary project dirs
-        //
         if (!await fsApi.pathExists(dirName)) {
             await fsApi.createDir(dirName);
         }

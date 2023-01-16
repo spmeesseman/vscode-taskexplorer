@@ -78,14 +78,14 @@ export const testControl: ITestControl =
         configGroupingEvent: 700,
         configSpecialFolderEvent: 475,
         configReadEvent: 25,
-        explorerViewStartup: 18600,
+        explorerViewStartup: 19050,
         fetchTasksCommand: 3000,
         fileCachePersist: 470,
         findDocumentPositionCommand: 850,
         focusCommand: 3400,
         focusCommandAlreadyFocused: 130,
-        fsCreateEvent: 1680,
-        fsCreateFolderEvent: 1970,
+        fsCreateEvent: 1660,
+        fsCreateFolderEvent: 1940,
         fsDeleteEvent: 1450,
         fsDeleteFolderEvent: 1750,
         fsModifyEvent: 810,
@@ -114,7 +114,7 @@ export const testControl: ITestControl =
         taskCommand: 1600,
         tasks: {
             antParser: 800,
-            antTask: 4000,
+            antTask: 4100,
             bashScript: 4000,
             batchScript: 8000,
             gulpParser: 3900
@@ -126,7 +126,7 @@ export const testControl: ITestControl =
         verifyTaskCountWorkspace: 3500,
         viewReport: 1950,
         walkTaskTree: 5500,
-        walkTaskTreeWithDocOpen: 27700,
+        walkTaskTreeWithDocOpen: 27850,
         workspaceInvalidation: 15000
     },
     //
@@ -158,8 +158,6 @@ export const testControl: ITestControl =
         getTreeTasks: 75,
         min: 50,
         npmCommandMin: 3000,
-        rebuildFileCache: 15500,
-        rebuildFileCacheCancel: 50,
         refreshCommand: 500,
         refreshTaskTypeCommand: 1000,
         removeWorkspaceFolder: 250,
@@ -331,8 +329,6 @@ export interface ITestControl
         getTreeTasks: number;
         min: number;
         npmCommandMin: number;
-        rebuildFileCache: number;
-        rebuildFileCacheCancel: number;
         refreshCommand: number;
         refreshTaskTypeCommand: number;
         removeWorkspaceFolder: number;
