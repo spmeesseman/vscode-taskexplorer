@@ -43,6 +43,7 @@ const getStamp = () =>
     if (logControl.useTags)
     {
         const err = new Error();
+        /* istanbul ignore else*/
         if (err.stack)
         {
             let stackline = "";
@@ -87,7 +88,8 @@ const getStamp = () =>
  * @param scope Scope to call the logging function on. If empty, `vscode.window` is used.
  * @param ts The message timestamp
  * @param isFile This call is a file write.
- * @param args The function arguments to use in the `fn` call.
+ * @param args The function arguments to use in the `fn` call.  As of v3.0, the only caller to use this args
+ * parameter is write() when file logging is enabled, and 'args' is the filename to be written.
  */
 const _write = (msg: string, logPad: string, queueId: string | undefined, isValue: boolean, isError: boolean,
                 fn: (...fnArgs: any) => void, scope: any,  ts: string, isFile: boolean, ...args: any) =>
