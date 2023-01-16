@@ -165,7 +165,7 @@ suite("Task Tests", () =>
         const taskTime = 3000; // utils.sleeps for 3s
         if (utils.exitRollingCount(7, successCount)) return;
         this.slow((tc.slowTime.configEnableEvent * 2) + (tc.waitTime.configEnableEvent * 2) + tc.slowTime.runCommand +
-                  tc.waitTime.runCommandMin + endOfTestWaitTime + (taskTime * 2));
+                  tc.waitTime.runCommandMin + endOfTestWaitTime + (taskTime * 2) + (tc.waitTime.configEvent * 2));
         antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
         expect(antTask).to.not.be.equal(undefined, "The 'hello' ant task was not found in the task tree");
         await utils.executeSettingsUpdate("pathToPrograms.ansicon", utils.getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
@@ -186,7 +186,8 @@ suite("Task Tests", () =>
     {
         const taskTime = 3000; // utils.sleeps for 3s
         if (utils.exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent +tc.slowTime.runCommand + tc.waitTime.runCommandMin + endOfTestWaitTime + (taskTime * 2));
+        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent +tc.slowTime.runCommand +
+                  tc.waitTime.runCommandMin + endOfTestWaitTime + (taskTime * 2) + (tc.waitTime.configEvent * 2));
         await utils.executeSettingsUpdate("visual.enableAnsiconForAnt", false);
         await utils.waitForTeIdle(tc.waitTime.configEnableEvent);
         await startTask(antTask, false);
@@ -227,7 +228,7 @@ suite("Task Tests", () =>
         if (utils.exitRollingCount(10, successCount)) return;
         const slowTime = (tc.slowTime.runCommand * 1) + (tc.slowTime.runStopCommand * 2) + 7000 + // wait for task exec
                           startTaskSlowTime + tc.slowTime.runPauseCommand + (tc.waitTime.runCommandMin * 6) + (tc.slowTime.configEvent * 4) +
-                          (tc.slowTime.command * 2) + tc.slowTime.closeActiveDocument + endOfTestWaitTime + (taskTime * 2) + (tc.waitTime.command * 2);
+                          (tc.slowTime.command * 2) + tc.slowTime.closeActiveDocument + endOfTestWaitTime + (taskTime * 2) + (tc.waitTime.command * 4);
         this.slow(slowTime);
         this.timeout(slowTime + (taskTime * 2) + 40000);
         const batchTask = batch[0];
@@ -324,7 +325,7 @@ suite("Task Tests", () =>
     {
         const taskTime= 7000;
         if (utils.exitRollingCount(12, successCount)) return;
-        this.slow(tc.slowTime.runCommand + endOfTestWaitTime + (taskTime * 2));
+        this.slow(tc.slowTime.runCommand + endOfTestWaitTime + (taskTime * 2) + tc.waitTime.runCommandMin);
         const batchTask = batch[0];
         await startTask(batchTask as TaskItem, false);
         const exec = await utils.executeTeCommand2("runNoTerm", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
