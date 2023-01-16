@@ -132,12 +132,15 @@ const initLog = async(context: ExtensionContext, testsRunning: number) =>
     // showLogOutput(showLog || false);
 
     //
-    // If logging isn't enabled,then set all log function to empty functions
+    // If logging isn't enabled, then set all log function to empty functions. This
+    // function should only be called once, so don't let istanbul pop it
     //
-    /* istanbul ignore else */
+    /* istanbul ignore next */
     if (!logControl.enable){
+        /* istanbul ignore next */
         enableLog(logControl.enable);
     }
+
     //
     // This function should only be called once, so blank it in the export
     //
