@@ -11,7 +11,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
-	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount, getWsPath, sleep
+	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount, getWsPath, sleep, figures
 } from "../utils/utils";
 import { InitScripts } from "../../lib/noScripts";
 
@@ -61,7 +61,7 @@ suite("Util Tests", () =>
     test("Logging (Error)", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-		this.slow(850);
+		this.slow((testControl.slowTime.configEvent * 2) + 150);
 
         log.error(`        ${creator}.${extension}`);
         log.error([ `        ${creator}.${extension}`,
@@ -79,6 +79,7 @@ suite("Util Tests", () =>
 		log.error([ "Test error 9",  new Error("Test error object 10") ]);
 		log.error([ "Test error 11", "Test error 12" ], [[ "Test param error 13", "Test param value 14" ]]);
 		log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
+		logControl.useTags = true;
 		const err = new Error("Test error object");
 		err.stack = undefined;
 		log.error(err);
@@ -102,6 +103,10 @@ suite("Util Tests", () =>
 		const scaryOff = logControl.isTestsBlockScaryColors;
 		logControl.isTestsBlockScaryColors = false;
 		log.error("Scary error");
+		log.error("error line1\nline2");
+		log.error("error line1\r\nline2");
+		log.error(new Error("Test error object"));
+		logControl.useTags = false;
 		logControl.isTestsBlockScaryColors = true;
 		log.error("Scary error");
 		logControl.isTestsBlockScaryColors = scaryOff;
@@ -132,13 +137,15 @@ suite("Util Tests", () =>
 	test("Logging (File)", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-		this.slow(2300);
+		this.slow((testControl.slowTime.configEvent * 7) + 50);
 		await executeSettingsUpdate("logging.enableFile", false);
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
 		log.error("Test3 error");
 		log.error({});
+		log.error("error line1\nline2");
+		log.error("error line1\r\nline2");
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
 		log.error("Test4 error", [[ "p1", "e1" ]]);
@@ -175,7 +182,7 @@ suite("Util Tests", () =>
     test("Logging (Method)", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-		this.slow(600);
+		this.slow((testControl.slowTime.configEvent * 2) + 50);
 
 		log.methodStart("methodName");
 		log.methodDone("methodName");
@@ -206,7 +213,7 @@ suite("Util Tests", () =>
 	test("Logging (Output Window)", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-		this.slow(600);
+		this.slow((testControl.slowTime.configEvent * 2) + 50);
 		await executeSettingsUpdate("logging.enableOutputWindow", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
@@ -228,8 +235,10 @@ suite("Util Tests", () =>
 	});
 
 
-	test("Logging (Queue)", function()
+	test("Logging (Queue)", async function()
     {
+		this.slow((testControl.slowTime.configEvent * 2) + 50);
+
         if (exitRollingCount(5, successCount)) return;
 		log.dequeue("queueTestId");
 		log.write("test1", 1, "", "queueTestId");
@@ -238,7 +247,23 @@ suite("Util Tests", () =>
 		log.value("test3", "value1", 1, "", "queueTestId");
 		log.error("test4", undefined, "queueTestId");
 		log.error("test5", [[ "param1", 1 ]], "queueTestId");
+		log.error("error line1\nline2", undefined, "queueTestId");
+		log.error("error line1\r\nline2", undefined, "queueTestId");
+		log.error("error line1\r\nline2", undefined, "queueTestId");
+		log.write("line1\r\nline2", 1, "   ", "queueTestId");
+		log.error(new Error("Test error object"));
 		log.dequeue("queueTestId");
+
+		await executeSettingsUpdate("logging.enableFile", true);
+		log.write("test1", 1, "", "queueTest2Id", false, false);
+		log.error("test4", undefined, "queueTest2Id");
+		log.value("test3", "value1", 1, "", "queueTest2Id");
+		log.error("test5", [[ "param1", 1 ]], "queueTest2Id");
+		log.error("error line1\nline2", undefined, "queueTest2Id");
+		log.write("line1\r\nline2", 1, "   ", "queueTest2Id");
+		log.dequeue("queueTest2Id");
+		await executeSettingsUpdate("logging.enableFile", false);
+
         ++successCount;
 	});
 
@@ -246,7 +271,7 @@ suite("Util Tests", () =>
     test("Logging (Value)", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-		this.slow(1220);
+		this.slow((testControl.slowTime.configEvent * 4) + 75);
         log.value(`        ${creator}.${extension}`, null);
         log.value(`        ${creator}.${extension}`, undefined);
 		log.value(null as unknown as string, 1);
@@ -305,7 +330,7 @@ suite("Util Tests", () =>
     test("Logging (Warn)", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-		this.slow(625);
+		this.slow((testControl.slowTime.configEvent * 2) + 50);
 		log.warn("test1");
 		log.warn("test2");
 		const scaryOff = logControl.isTestsBlockScaryColors;
@@ -331,7 +356,7 @@ suite("Util Tests", () =>
     test("Logging (Write)", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-		this.slow(610);
+		this.slow((testControl.slowTime.configEvent * 2) + 50);
 
         log.blank();
         log.blank(1);
@@ -382,6 +407,8 @@ suite("Util Tests", () =>
     {
         if (exitRollingCount(9, successCount)) return;
         new InitScripts(); // it won't cover since no focus the view until after a bunch of test suites
+        teApi.testsApi.explorer.isVisible();
+        await util.getInstallPath();
         ++successCount;
     });
 

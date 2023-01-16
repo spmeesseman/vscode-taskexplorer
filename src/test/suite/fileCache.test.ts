@@ -77,7 +77,7 @@ suite("File Cache Tests", () =>
     test("Rebuild File Cache w Empty Persisted Cache (Mimic Startup)", async function()
     {
         if (utils.exitRollingCount(5, successCount)) return;
-        this.slow(utils.testControl.slowTime.rebuildFileCache + (utils.testControl.slowTime.configEventFast * 3) + utils.testControl.waitTime.min);
+        this.slow(utils.testControl.slowTime.rebuildFileCache + (utils.testControl.slowTime.configEvent * 3) + utils.testControl.waitTime.min);
         await teApi.testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
         await teApi.testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
         await teApi.testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
@@ -91,7 +91,7 @@ suite("File Cache Tests", () =>
     test("Disable Persistent Cache", async function()
     {
         if (utils.exitRollingCount(6, successCount)) return;
-        this.slow(utils.testControl.slowTime.configEvent);
+        this.slow(utils.testControl.slowTime.configEvent + utils.testControl.waitTime.configEvent);
         await utils.executeSettingsUpdate("enablePersistentFileCaching", false);
         ++successCount;
     });

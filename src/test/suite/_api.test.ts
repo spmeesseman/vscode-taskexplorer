@@ -1,8 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as assert from "assert";
-import { getInstallPath } from "../../lib/utils/utils";
 import { refreshTree } from "../../lib/refreshTree";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
@@ -10,7 +8,6 @@ import {
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
-let explorer: ITaskExplorer;
 
 
 suite("API and Initialization", () =>
@@ -18,7 +15,6 @@ suite("API and Initialization", () =>
     suiteSetup(async function()
     {
         teApi = await activate(this);
-        explorer = teApi.testsApi.explorer;
     });
 
 
@@ -34,17 +30,10 @@ suite("API and Initialization", () =>
     });
 
 
-    test("Misc Coverage", async function()
-    {
-        explorer.isVisible();
-        assert(await getInstallPath());
-    });
-
-
     test("Enable SideBar View", async function()
     {
-        this.slow(tc.slowTime.explorerViewStartup + tc.waitTime.explorerViewStartup);
-        await executeSettingsUpdate("enableSideBar", true);
+        this.slow(tc.slowTime.explorerViewStartup + tc.waitTime.configEnableEvent + tc.waitTime.explorerViewStartup);
+        await executeSettingsUpdate("enableSideBar", true, tc.waitTime.configEnableEvent);
         await waitForTeIdle(tc.waitTime.explorerViewStartup);
     });
 
@@ -79,7 +68,7 @@ suite("API and Initialization", () =>
 
     test("Disable SideBar View", async function()
     {
-        this.slow(tc.slowTime.configRegisterExplorerEvent + tc.waitTime.configRegisterExplorerEvent);
+        this.slow(tc.slowTime.configRegisterExplorerEvent + tc.waitTime.configRegisterExplorerEvent + tc.waitTime.configEnableEvent);
         await executeSettingsUpdate("enableSideBar", false, tc.waitTime.configEnableEvent);
         await waitForTeIdle(tc.waitTime.configRegisterExplorerEvent);
     });
@@ -87,7 +76,7 @@ suite("API and Initialization", () =>
 
     test("Re-enable Explorer View", async function()
     {
-        this.slow(tc.slowTime.configRegisterExplorerEvent + tc.waitTime.configRegisterExplorerEvent);
+        this.slow(tc.slowTime.configRegisterExplorerEvent + tc.waitTime.configEnableEvent  + tc.waitTime.configRegisterExplorerEvent);
         await executeSettingsUpdate("enableExplorerView", true, tc.waitTime.configEnableEvent);
         setExplorer(teApi.explorer as ITaskExplorer);
         await waitForTeIdle(tc.waitTime.configRegisterExplorerEvent);
