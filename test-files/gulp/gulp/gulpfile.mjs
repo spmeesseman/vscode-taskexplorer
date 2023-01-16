@@ -1,13 +1,14 @@
-var gulp = require('gulp');
-gulp.task('group-test2-build-ui-one', (done) => {
+import gulp from 'gulp';
+const { task, series } = gulp;
+task('group-test2-build-ui-one', (done) => {
     console.log('Hello1!');
     done();
 });
-gulp.task("group-test2-build-ui-two", (done) => {
+task("group-test2-build-ui-two", (done) => {
     console.log('Hello2!');
     done();
 });
-gulp.task('group-test2-build-ui-three', (done) => {
+task('group-test2-build-ui-three', (done) => {
     console.log('Hello3!');
     done();
 });

@@ -368,6 +368,9 @@ const initSettings = async () =>
         tc.log.file = false;
         tc.log.output = false;
     }
+    else if (!tc.log.output && !tc.log.file && !tc.log.console) {
+        tc.log.output = true;
+    }
     await configuration.updateWs("logging.level", tc.log.level);
     await configuration.updateWs("logging.enableFile", tc.log.file);
     await configuration.updateWs("logging.enableFileSymbols", tc.log.fileSymbols);

@@ -8,7 +8,7 @@ import { GulpTaskProvider } from "../../providers/gulp";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, getWsPath, sleep, suiteFinished, testControl as tc,
+    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, sleep, suiteFinished, testControl as tc,
     treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
@@ -47,13 +47,12 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Build Tree (View Collapsed)", async function()
-    {
+	test("Activate Tree (Focus Explorer View)", async function()
+	{
         if (exitRollingCount(0, successCount)) return;
-        await treeUtils.refresh(this);
+		await focusExplorerView(this);
         ++successCount;
-    });
-
+	});
 
 
     test("Document Position", async function()
@@ -187,24 +186,22 @@ suite("Gulp Tests", () =>
     test("Gulp Parser", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow((tc.slowTime.configEventFast * 2) + tc.waitTime.min + (tc.waitTime.configEnableEvent * 2));
-        // const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
-        //       gulpFile = getWsPath("gulp\\gulpfile.js");
+        this.slow((tc.slowTime.configEnableEvent * 2) + (tc.waitTime.configEvent * 2) + tc.waitTime.configEnableEvent +
+                  tc.waitTime.configDisableEvent + (tc.slowTime.verifyTaskCount * 2) + (50 * 2));
         //
-        // Use Gulp
+        // Use Gulp to parse tasks. The configuration change will cause gulp tasks to be invalidated and refreshed
         //
-        await executeSettingsUpdate("useGulp", true, tc.waitTime.configEventFast);
+        await configuration.updateVs("gulp.autoDetect", "off");
         await waitForTeIdle(tc.waitTime.configEnableEvent);
-        // await tasks.fetchTasks({ type: testsName });
-        // gulpTasks = await provider.readUriTasks(Uri.file(buildXmlFile));
-        // assert(gulpTasks.length === 2, "# of Gulp tasks should be 2");
-        // gulpTasks = await provider.readUriTasks(Uri.file(buildXmlFile), rootWorkspace);
-        // assert(gulpTasks.length === 2, "# of Gulp tasks should be 2");
+        await executeSettingsUpdate("useGulp", true, tc.waitTime.configEvent);
+        await waitForTeIdle(tc.waitTime.configEnableEvent);
+        await verifyTaskCount(testsName, startTaskCount);
         //
-        // Reset
+        // Reset to Basic Parser. The configuration change will cause gulp tasks to be invalidated and refreshed
         //
-        await executeSettingsUpdate("useGulp", false, tc.waitTime.configEventFast);
+        await executeSettingsUpdate("useGulp", false, tc.waitTime.configEvent);
         await waitForTeIdle(tc.waitTime.configDisableEvent);
+        await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
 

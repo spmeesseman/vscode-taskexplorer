@@ -193,19 +193,22 @@ suite("Grunt Tests", () =>
     //
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
+        if (exitRollingCount(11, successCount)) return;
 		await focusExplorerView(this);
+        ++successCount;
 	});
 
 
     test("Turn VSCode Grunt Provider Off", async function()
     {
-        if (exitRollingCount(11, successCount)) return;
+        if (exitRollingCount(12, successCount)) return;
         this.slow(tc.slowTime.configEventFast +  tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.waitTime.min + 1500);
         await configuration.updateVs("grunt.autoDetect", "off");
         await sleep(1500);
         await treeUtils.refresh(this);
         await verifyTaskCount(testsName, startTaskCount);
         await waitForTeIdle(tc.waitTime.min);
+        ++successCount;
     });
 
 });

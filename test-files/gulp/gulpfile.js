@@ -14,5 +14,5 @@ function build3(cb) {
   cb();
 }
 
-exports.build3 = build;
-exports.default3 = series(clean, build);
+exports.build33 = build3;
+exports.default33 = series(clean3, build3);

@@ -47,7 +47,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     private async findTargets(fsPath: string, logPad: string)
     {
-        let scripts: string[] = [];
+        let gulpTasks: string[] = [];
 
         log.methodStart("find gulp targets", 4, logPad, false, [[ "path", fsPath ]], this.logQueueId);
         //
@@ -121,7 +121,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
                     const line = c.match(/(\[[\w\W][^\]]+\][ ](├─┬|├──|└──|└─┬) )([\w\-]+)/i);
                     if (line && line.length > 3 && line[3])
                     {
-                        scripts.push(line[3].toString());
+                        gulpTasks.push(line[3].toString());
                         log.write("found gulp task", 4, logPad, this.logQueueId);
                         log.value("   name", line[3].toString(), 4, logPad, this.logQueueId);
                     }
@@ -129,11 +129,11 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
             }
         }
         else {
-            scripts = await this.parseGulpTasks(fsPath, logPad + "   ");
+            gulpTasks = await this.parseGulpTasks(fsPath, logPad + "   ");
         }
 
         log.methodDone("find gulp targets", 4, logPad, undefined, this.logQueueId);
-        return scripts;
+        return gulpTasks;
     }
 
 

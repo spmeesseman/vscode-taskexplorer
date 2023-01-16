@@ -22,14 +22,14 @@ export const testControl: ITestControl =
     //
     log: {
         level: 2,
-        enabled: false,
-        errors: false,
+        enabled: true,
+        errors: true,           // print errors to console regardless if logging is enabled or not
         console: false,
         consoleLevel: 1,
         file: true,
         fileSymbols: false,
-        output: false,
-        openFileOnFinish: true, // not yet
+        output: false,          // enabled automatically if enabled is `true` and all 3 output flags are `false`
+        openFileOnFinish: true, // nope. not yet
         blockScaryColors: true
     },
     //
