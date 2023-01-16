@@ -1,13 +1,16 @@
 
 import log from "../lib/log/log";
+import { exec } from "child_process";
 import { basename, dirname } from "path";
-import { execSync } from "child_process";
+import { promisify } from "util";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
 import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
-import { getRelativePath } from "../lib/utils/utils";
+import { getRelativePath, timeout } from "../lib/utils/utils";
+
+const execAsync = promisify(exec);
 
 
 export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
@@ -101,31 +104,24 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         //     [12:28:59]         └── buildJS
         //
 
-        if (configuration.get("useGulp") === true)
+        if (configuration.get<boolean>("useGulp") === true)
         {
-            let stdout: Buffer | undefined;
-            try {
-                stdout = execSync("npx gulp --tasks -f " + basename(fsPath), {
-                    cwd: dirname(fsPath)
-                });
+            try
+            {   const out = await execAsync("npx gulp --tasks -f " + basename(fsPath), { cwd: dirname(fsPath) });
+                const stdout = out.stdout;
+                await timeout(10);
+                gulpTasks = this.parseGulpStdOut(stdout, logPad + "   ");
             }
-            catch (e: any) { log.error(e, undefined, this.logQueueId); }
-            //
-            // Loop through all the lines and extract the task names
-            //
-            const contents = stdout?.toString().split("\n");
-            if (contents) {
-                for (const c of contents)
-                {
-                    const line = c.match(/(\[[\w\W][^\]]+\][ ](├─┬|├──|└──|└─┬) )([\w\-]+)/i);
-                    if (line && line.length > 3 && line[3])
-                    {
-                        gulpTasks.push(line[3].toString());
-                        log.write("found gulp task", 4, logPad, this.logQueueId);
-                        log.value("   name", line[3].toString(), 4, logPad, this.logQueueId);
-                    }
-                }
-            }
+            catch (e: any) { /* istanbul ignore next */ log.error(e, undefined, this.logQueueId); }
+            // return new Promise<string[]>(async (resolve) => {
+            //     const proc = exec("npx gulp --tasks -f " + basename(fsPath), { cwd: dirname(fsPath) });
+            //     let result = "";
+            //     proc.stdout?.on("data", (data: string) => { result = data; });
+            //     proc.stderr?.on("data", (data: string) => { /* istanbul ignore next */ log.error(data, undefined, this.logQueueId); });
+            //     proc.on("exit", () => {
+            //         resolve(this.parseGulpStdOut(result, logPad + "   "));
+            //     });
+            // });
         }
         else {
             gulpTasks = await this.parseGulpTasks(fsPath, logPad + "   ");
@@ -241,6 +237,27 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         return tgtName;
     }
 
+
+    private parseGulpStdOut(stdout: string, logPad: string)
+    {
+        const gulpTasks: string[] = [];
+        //
+        // Loop through all the lines and extract the task names
+        //
+        const contents = stdout.split("\n");
+        // const contents = stdout?.toString().split("\n");
+        for (const c of contents)
+        {
+            const line = c.match(/(\[[\w\W][^\]]+\][ ](├─┬|├──|└──|└─┬) )([\w\-]+)/i);
+            if (line && line.length > 3 && line[3])
+            {
+                gulpTasks.push(line[3].toString());
+                log.write("found gulp task", 4, logPad, this.logQueueId);
+                log.value("   name", line[3].toString(), 4, logPad, this.logQueueId);
+            }
+        }
+        return gulpTasks;
+    }
 
     private parseGulpTask(line: string, contents: string, eol: number)
     {
