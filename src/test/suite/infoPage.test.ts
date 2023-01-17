@@ -41,7 +41,7 @@ suite("Info Report Tests", () =>
 	});
 
 
-	test("Report Page Single Project (No UserTasks0", async function()
+	test("Report Page Single Project (No User Tasks)", async function()
 	{
         if (exitRollingCount(1, successCount)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder + testControl.waitTime.config.event + testControl.waitTime.viewReport + 100);

@@ -937,7 +937,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             {   //
                 // Remove User tasks if they're not enabled
                 //
-                if (!configuration.get<boolean>("specialFolders.showUserTasks")) // && util.isTaskTypeEnabled("workspace"))
+                if (!configuration.get<boolean>("specialFolders.showUserTasks"))
                 {
                     this.tasks.slice().reverse().forEach((item, index, object) =>
                     {
