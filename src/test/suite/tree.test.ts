@@ -7,9 +7,8 @@ import constants from "../../lib/constants";
 import TaskItem from "../../tree/item";
 import TaskFolder from "../../tree/folder";
 import SpecialTaskFolder from "../../tree/specialFolder";
-import { sortFolders, sortTasks } from "../../lib/sortTasks";
-import { IDictionary, ITaskExplorer, ITaskExplorerApi, ITaskFile, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
-import TaskFile from "../../tree/file";
+import { sortFolders } from "../../lib/sortTasks";
+import { IDictionary, ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 
 const tc = utils.testControl;
 let teApi: ITaskExplorerApi;

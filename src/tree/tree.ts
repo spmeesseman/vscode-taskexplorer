@@ -1830,14 +1830,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         const taskItem = this.taskMap[lastTaskId];
         let exec: TaskExecution | undefined;
 
-        /* istanbul ignore else */
         if (taskItem && taskItem instanceof TaskItem)
         {
             exec = await this.run(taskItem);
         }
         else {
             window.showInformationMessage("Task not found!  Check log for details");
-            await this.specialFolders.lastTasks.removeTaskFile(lastTaskId, "   ");
+            await this.specialFolders.lastTasks.removeTaskFile(lastTaskId, "   ", true);
         }
 
         log.methodDone("run last task", 1);

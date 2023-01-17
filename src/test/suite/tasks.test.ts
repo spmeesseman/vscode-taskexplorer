@@ -332,6 +332,33 @@ suite("Task Tests", () =>
         ++successCount;
     });
 
+
+    test("Run non-existent last task 2", async function()
+    {
+        if (utils.exitRollingCount(13, successCount)) return;
+        this.slow(tc.slowTime.runCommand + (tc.slowTime.storageUpdate * 2) + endOfTestWaitTime);
+        const tree = teApi.testsApi.explorer.getTaskTree() as any;
+        expect(tree).to.not.be.oneOf([ undefined, null ]);
+        const lastTasksFolder = tree[0] as SpecialTaskFolder;
+        const lastTasksStore = lastTasksFolder.getStore();
+        const item = lastTasksFolder.taskFiles[0];
+        expect(item).to.not.equal(undefined, "The 'Last Tasks' folder has no taskitems");
+        try
+        {   const tempId = item.id + "_noId";
+            item.id = tempId;
+            utils.overrideNextShowInfoBox(undefined);
+            lastTasksStore.push(tempId);
+            expect(await utils.executeTeCommand("runLastTask", tc.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
+            await utils.waitForTeIdle(endOfTestWaitTime);
+        }
+        catch (e) { throw e; }
+        finally {
+            item.id = item.id.replace("_noId", "");
+            lastTasksStore.pop();
+        }
+        ++successCount;
+    });
+
 });
 
 

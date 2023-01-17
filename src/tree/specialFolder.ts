@@ -1,9 +1,9 @@
 
-import * as sortTasks from "../lib/sortTasks";
 import constants from "../lib/constants";
 import log from "../lib/log/log";
 import TaskItem from "./item";
 import TaskFolder from "./folder";
+import { sortTasks } from "../lib/sortTasks";
 import { isString, removeFromArray } from "../lib/utils/utils";
 import { configuration } from "../lib/utils/configuration";
 import { storage } from "../lib/utils/storage";
@@ -172,22 +172,19 @@ export default class SpecialTaskFolder extends TaskFolder
     {
         log.methodStart("create special tasks folder", 1, logPad, false, [[ "name", this.label ]]);
 
-        const tree = this.explorer.getTaskTree() as TreeItem[]; // Guaranted not to be undefined - checked in .refresh()
-        const showLastTasks = configuration.get<boolean>("specialFolders.showLastTasks");
-        if ((!showLastTasks && !this.isFavorites)) { // && !forceChange) {
-            return false;
-        }
+        const tree = this.explorer.getTaskTree() as TreeItem[], // Guaranted not to be undefined - checked in .refresh
+              showLastTasks = configuration.get<boolean>("specialFolders.showLastTasks"),
+              favIdx = showLastTasks ? 1 : 0,
+              treeIdx = !this.isFavorites ? 0 : favIdx;
 
-        const favIdx = showLastTasks ? 1 : 0;
-        const treeIdx = !this.isFavorites ? 0 : favIdx;
+        log.values(2, logPad + "   ", [[ "tree index", treeIdx ], [ "showLastTasks setting", showLastTasks ]]);
+
         if (tree[treeIdx].label === this.label) {
+            log.write("   folder is already built", 1);
             return false;
         }
 
-        log.values(3, logPad + "   ", [[ "tree index", treeIdx ], [ "showLastTasks setting", showLastTasks ]]);
-
-        this.taskFiles = [];
-
+        this.taskFiles = []; // insertTaskFile() rebuilds
         for (const tId of this.store)
         {
             const taskItem2 = this.explorer.getTaskMap()[tId];
@@ -242,7 +239,7 @@ export default class SpecialTaskFolder extends TaskFolder
      *
      * @since 2.0.0
      */
-    async clearSavedTasks()
+    private async clearSavedTasks()
     {
         const choice = await window.showInformationMessage(`Clear all tasks from the \`${this.label}\` folder?`, "Yes", "No");
         if (choice === "Yes")
@@ -302,6 +299,9 @@ export default class SpecialTaskFolder extends TaskFolder
         }
         return taskItem.label + " (" + label + ")";
     }
+
+
+    getStore = () => this.store; // for 'tasks' tests
 
 
     getTaskItemId(taskItem: TaskItem)
@@ -419,7 +419,6 @@ export default class SpecialTaskFolder extends TaskFolder
                     await storage.update(constants.LAST_TASKS_STORE, this.store);
                 }
             }
-            // await this.refresh(true, taskFile);
             this.explorer.fireTreeRefreshEvent(logPad, 1, this);
         }
     }
@@ -480,7 +479,7 @@ export default class SpecialTaskFolder extends TaskFolder
             this.sortLastTasks(this.taskFiles, this.store, logPad, 4);
         }
         else {
-            sortTasks.sortTasks(this.taskFiles, logPad, 4);
+            sortTasks(this.taskFiles, logPad, 4);
         }
     }
 

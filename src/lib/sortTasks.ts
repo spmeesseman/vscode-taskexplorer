@@ -41,12 +41,9 @@ export const sortFolders = (folders: IDictionary<TaskFolder>): TaskFolder[] =>
 export const sortTaskFolder = (folder: TaskFolder, logPad: string, logLevel: number) =>
 {
     sortTasks(folder.taskFiles, logPad, logLevel);
-    for (const each of folder.taskFiles)
+    for (const each of folder.taskFiles.filter(t => t instanceof TaskFile) as TaskFile[])
     {
-        /* istanbul ignore else */
-        if ((each instanceof TaskFile)) { // && each.isGroup) {
-            sortTasks(each.treeNodes, logPad, logLevel);
-        }
+        sortTasks(each.treeNodes, logPad, logLevel);
     }
 };
 
@@ -61,11 +58,10 @@ export const sortTasks = (items: (ITaskFile | ITaskItem)[] | undefined, logPad: 
         {
             if ((a instanceof TaskFile && b instanceof TaskFile || a instanceof TaskItem && b instanceof TaskItem)) {
                 return a.label?.toString()?.localeCompare(b.label?.toString());
-            }
+            } //
+             // TaskFiles we keep at the top, like a folder in Windows Explorer
             //
-            // TaskFiles we keep at the top, like a folder in Windows Explorer
-            //
-            else /* istanbul ignore if */if (a instanceof TaskFile && b instanceof TaskItem)
+            else /* istanbul ignore if */if (a instanceof TaskFile && /* istanbul ignore next */b instanceof TaskItem)
             {
                 return -1;
             }
