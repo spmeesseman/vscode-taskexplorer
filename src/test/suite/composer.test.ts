@@ -30,8 +30,7 @@ suite("Composer Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await activate(this);
-        fsApi = teApi.testsApi.fs;
+        ({ teApi, fsApi } = await activate(this));
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "composer.json"));
         //

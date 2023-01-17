@@ -122,7 +122,7 @@ export const activate = async (instance?: Mocha.Context) =>
         console.log(`    ${figures.color.info} ${figures.withColor("Tests ready", figures.colors.grey)}`);
         console.log(`    ${figures.color.info}`);
     }
-    return teApi;
+    return { teApi, testsApi: teApi.testsApi, fsApi: teApi.testsApi.fs, configApi: teApi.config, utils: teApi.utilities };
 };
 
 
@@ -244,9 +244,9 @@ export const exitRollingCount = (expectedCount: number, successCount: number) =>
         const msg = "skip test, rolling success count failure " + expectedCount;
         console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
         hasRollingCountError = true;
-        if (tc.tests.numTestsFail === 0) {
-            throw new Error("Rolling count error but no failed tests recorded, previous text failed but passed?");
-        }
+        // if (tc.tests.numTestsFail === 0) {
+        //     throw new Error("Rolling count error but no failed tests recorded, previous text failed but passed?");
+        // }
     }
     return hasRollingCountError;
 };

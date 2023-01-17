@@ -26,7 +26,7 @@ suite("External Provider Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await activate(this);
+        ({ teApi } = await activate(this));
         taskProvider = new ExternalTaskProvider();
         taskProvider2 = new ExternalTaskProviderBase();
         dispose = tasks.registerTaskProvider("external", taskProvider);

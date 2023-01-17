@@ -26,8 +26,7 @@ suite("Nullsoft NSIS Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await activate(this);
-        fsApi = teApi.testsApi.fs;
+        ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as NsisTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "new_build.nsi"));

@@ -28,7 +28,7 @@ suite("Util Tests", () =>
 
 	suiteSetup(async function()
     {
-        teApi = await activate(this);
+        ({ teApi } = await activate(this));
 		rootUri = (workspace.workspaceFolders as WorkspaceFolder[])[0].uri;
         await executeSettingsUpdate("logging.enable", true);
         await executeSettingsUpdate("logging.enableOutputWindow", true);

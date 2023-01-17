@@ -4,6 +4,7 @@ import {
     ConfigurationChangeEvent, EventEmitter, workspace, WorkspaceConfiguration, ConfigurationTarget
 } from "vscode";
 import { IConfiguration } from "../../interface/IConfiguration";
+import { isObject } from "./utils";
 
 const extensionName = "taskExplorer";
 
@@ -109,6 +110,11 @@ class Configuration implements IConfiguration
             v[settingKeys.vKey] = value;
             value = v;
         }
+        else if (isObject(value))
+        {
+            const v = this.get<any>(settingKeys.pKey);
+            value = Object.assign(v, value);
+        }
         return this.configuration.update(settingKeys.pKey, value, ConfigurationTarget.Global);
     }
 
@@ -121,6 +127,11 @@ class Configuration implements IConfiguration
             const v = this.get<any>(settingKeys.pKey);
             v[settingKeys.vKey] = value;
             value = v;
+        }
+        else if (isObject(value))
+        {
+            const v = this.get<any>(settingKeys.pKey);
+            value = Object.assign(v, value);
         }
         return this.configuration.update(settingKeys.pKey, value, ConfigurationTarget.Workspace);
     }

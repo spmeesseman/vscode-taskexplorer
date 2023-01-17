@@ -32,7 +32,7 @@ suite("Tree Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await utils.activate(this);
+        ({ teApi } = await utils.activate(this));
         explorer = teApi.testsApi.explorer;
         ++successCount;
     });

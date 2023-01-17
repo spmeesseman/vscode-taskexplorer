@@ -30,8 +30,7 @@ suite("Typescript Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await utils.activate(this);
-        fsApi = teApi.testsApi.fs;
+        ({ teApi, fsApi } = await utils.activate(this));
         testControl = utils.testControl;
         rootPath = utils.getWsPath(".");
         dirName = join(rootPath, "tasks_test_ts_");

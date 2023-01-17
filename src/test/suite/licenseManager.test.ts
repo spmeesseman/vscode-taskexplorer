@@ -38,7 +38,7 @@ suite("License Manager Tests", () =>
 
 	suiteSetup(async function()
 	{
-        teApi = await activate(this);
+        ({ teApi } = await activate(this));
         explorer = teApi.testsApi.explorer;
 		oLicenseKey = teApi.testsApi.storage.get<string>("license_key");
 		oVersion = teApi.testsApi.storage.get<string>("version");

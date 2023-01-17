@@ -100,7 +100,8 @@ export const testControl: ITestControl =
         npmCommand: 11925,
         npmCommandPkg: 9300,
         npmInstallCommand: 19650,
-        refreshCommand: 18960,
+        refreshCommand: 19025,
+        refreshCommandNoChanges: 500,
         rebuildFileCache: 15500,
         rebuildFileCacheCancel: 1810,
         removeWorkspaceFolder: 10000,
@@ -114,10 +115,11 @@ export const testControl: ITestControl =
         taskCommand: 1600,
         tasks: {
             antParser: 800,
-            antTask: 4200,
+            antTask: 4300,
+            antTaskWithAnsicon: 4500,
             bashScript: 4000,
             batchScript: 8000,
-            gulpParser: 3900
+            gulpParser: 3850
         },
         verifyTaskCount: 825,
         verifyTaskCountByTree: 850,
@@ -158,6 +160,7 @@ export const testControl: ITestControl =
         min: 40,
         npmCommandMin: 2200,
         refreshCommand: 400,
+        refreshCommandNoChanges: 100,
         refreshTaskTypeCommand: 800,
         removeWorkspaceFolder: 220,
         runCommandMin: 750,
@@ -271,6 +274,7 @@ export interface ITestControl
         npmCommandPkg: number;
         npmInstallCommand: number;
         refreshCommand: number;
+        refreshCommandNoChanges: number;
         rebuildFileCache: number;
         rebuildFileCacheCancel: number;
         removeWorkspaceFolder: number;
@@ -285,6 +289,7 @@ export interface ITestControl
         tasks: {
             antParser: number;
             antTask: number;
+            antTaskWithAnsicon: number;
             bashScript: number;
             batchScript: number;
             gulpParser: number;
@@ -328,6 +333,7 @@ export interface ITestControl
         min: number;
         npmCommandMin: number;
         refreshCommand: number;
+        refreshCommandNoChanges: number;
         refreshTaskTypeCommand: number;
         removeWorkspaceFolder: number;
         runCommandMin: number;

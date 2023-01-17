@@ -32,7 +32,7 @@ import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
 import { ExtensionContext, tasks, commands } from "vscode";
 import { IDictionary, IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITestsApi } from "./interface";
-import { isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
+import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/fileWatcher";
 
 
@@ -59,11 +59,12 @@ export const teApi: ITaskExplorerApi =
     sidebarView: undefined,
     unregister: unregisterExternalProvider,
     utilities: util,
-    testsApi: {
+    testsApi: { // Will get removed on activation if not tests environment
         fs,
         explorer: {} as ITaskExplorer, // registerExplorer() will set
         fileCache,
         storage,
+        enableConfigWatcher,
         onWsFoldersChange
     }
 };

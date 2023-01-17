@@ -35,8 +35,7 @@ suite("Python Tests", () =>
     {   //
         // Initialize
         //
-        teApi = await activate(this);
-        fsApi = teApi.testsApi.fs;
+        ({ teApi, fsApi } = await activate(this));
         wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "test2.py"));

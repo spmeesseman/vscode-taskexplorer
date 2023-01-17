@@ -14,7 +14,7 @@ suite("API and Initialization", () =>
 {
     suiteSetup(async function()
     {
-        teApi = await activate(this);
+        ({ teApi } = await activate(this));
     });
 
 

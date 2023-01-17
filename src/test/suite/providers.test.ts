@@ -39,17 +39,15 @@ suite("Provider Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await activate(this);
+        ({ teApi, fsApi } = await activate(this));
         explorer = teApi.testsApi.explorer;
-        fsApi = teApi.testsApi.fs;
         rootPath = getWsPath(".");
         dirName = join(rootPath, "tasks_test_");
         dirNameL2 = join(dirName, "subfolder");
         dirNameIgn = join(rootPath, "tasks_test_ignore_");
         await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ], tc.waitTime.configGlobEvent);
-        await waitForTeIdle(tc.waitTime.configGlobEvent);
+        await executeSettingsUpdate("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ], tc.waitTime.configGlobEvent);
         ++successCount;
-
     });
 
 
@@ -58,11 +56,19 @@ suite("Provider Tests", () =>
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
         await waitForTeIdle(tc.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", tc.log.enabled, tc.waitTime.configEvent);
-        await executeSettingsUpdate("specialFolders.expanded.test-files", false, tc.waitTime.configEvent);
         await executeSettingsUpdate("enabledTasks.apppublisher", false, tc.waitTime.configDisableEvent); // off by default
         await executeSettingsUpdate("enabledTasks.gradle", false, tc.waitTime.configDisableEvent);       // off by default
         await executeSettingsUpdate("enabledTasks.maven", false, tc.waitTime.configDisableEvent);        // off by default
         await executeSettingsUpdate("enabledTasks.pipenv", false, tc.waitTime.configDisableEvent);       // off by default
+        // await executeSettingsUpdate("enabledTasks", {
+        //     apppublisher: false,
+        //     batch: false,
+        //     nsis: false,
+        //     maven: false,
+        //     gradle: false,
+        //     pipenv: false,
+        //     ruby: false
+        // });
         if (!tempDirsDeleted) {
             await deleteTempFilesAndDirectories();
         }

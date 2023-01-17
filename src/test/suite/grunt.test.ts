@@ -28,8 +28,7 @@ suite("Grunt Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await activate(this);
-        fsApi = teApi.testsApi.fs;
+        ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as GruntTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "gruntfile.js"));

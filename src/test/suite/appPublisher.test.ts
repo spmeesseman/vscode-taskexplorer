@@ -32,8 +32,7 @@ suite("App-Publisher Tests", () =>
     {   //
         // Initialize
         //
-        teApi = await activate(this);
-        fsApi = teApi.testsApi.fs;
+        ({ teApi, fsApi } = await activate(this));
         rootPath = getWsPath(".");
         fileUri = Uri.file(join(rootPath, ".publishrc.json"));
         //

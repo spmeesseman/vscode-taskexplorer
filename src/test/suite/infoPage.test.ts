@@ -18,7 +18,7 @@ suite("Info Report Tests", () =>
 {
 	suiteSetup(async function()
     {
-		teApi = await activate(this);
+        ({ teApi } = await activate(this));
 		projectUri = Uri.file(getWsPath("."));
 		userTasks = teApi.config.get<boolean>("specialFolders.showUserTasks");
         ++successCount;

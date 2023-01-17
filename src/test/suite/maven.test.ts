@@ -19,7 +19,7 @@ const testsName = "maven";
 const startTaskCount = 8;
 
 let teApi: ITaskExplorerApi;
-let fs: IFilesystemApi;
+let fsApi: IFilesystemApi;
 let pathToProgram: string;
 let rootPath: string;
 let fileUri: Uri;
@@ -33,8 +33,7 @@ suite("Maven Tests", () =>
     {   //
         // Initialize
         //
-        teApi = await activate(this);
-        fs = teApi.testsApi.fs;
+        ({ teApi, fsApi } = await activate(this));
         rootPath = getWsPath(".");
         fileUri = Uri.file(path.join(rootPath, "pom.xml"));
         //
@@ -65,7 +64,7 @@ suite("Maven Tests", () =>
     {
         if (exitRollingCount(1, successCount)) return;
         this.slow(tc.slowTime.fsCreateEvent);
-        await fs.writeFile(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
@@ -129,7 +128,7 @@ suite("Maven Tests", () =>
     {
         if (exitRollingCount(7, successCount)) return;
         this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + tc.slowTime.verifyTaskCount);
-        await fs.writeFile(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
@@ -150,7 +149,7 @@ suite("Maven Tests", () =>
     {
         if (exitRollingCount(8, successCount)) return;
         this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + tc.slowTime.verifyTaskCount);
-        await fs.writeFile(
+        await fsApi.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
@@ -171,7 +170,7 @@ suite("Maven Tests", () =>
     {
         if (exitRollingCount(9, successCount)) return;
         this.slow(tc.slowTime.fsDeleteEvent + tc.waitTime.fsDeleteEvent + tc.slowTime.verifyTaskCount);
-        await fs.deleteFile(fileUri.fsPath);
+        await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;

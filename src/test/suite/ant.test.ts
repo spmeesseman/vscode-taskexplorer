@@ -32,7 +32,7 @@ suite("Ant Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await activate(this);
+        ({ teApi } = await activate(this));
         fsApi = teApi.testsApi.fs;
         provider = teApi.providers[testsName] as AntTaskProvider;
         rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0];
@@ -40,8 +40,7 @@ suite("Ant Tests", () =>
         buildXmlFileUri = Uri.file(buildXmlFile);
         buildFileXml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
         await executeSettingsUpdate("useAnt", false);
-        await executeSettingsUpdate("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
-        await waitForTeIdle(tc.waitTime.configGlobEvent);
+        await executeSettingsUpdate("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ], tc.waitTime.configGlobEvent);
         ++successCount;
     });
 

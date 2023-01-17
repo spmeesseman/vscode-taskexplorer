@@ -31,7 +31,7 @@ suite("Task Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await utils.activate(this);
+        ({ teApi } = await utils.activate(this));
         explorer = teApi.testsApi.explorer;
         clickAction = teApi.config.get<string>("taskButtons.clickAction");
         ++successCount;
@@ -164,7 +164,7 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(7, successCount)) return;
         this.slow((tc.slowTime.configEnableEvent * 2) + (tc.waitTime.configEnableEvent * 2) + tc.slowTime.runCommand +
-                  tc.waitTime.runCommandMin + endOfTestWaitTime + (tc.slowTime.tasks.antTask * 2) + (tc.waitTime.configEvent * 2));
+                  tc.waitTime.runCommandMin + endOfTestWaitTime + (tc.slowTime.tasks.antTaskWithAnsicon * 2) + (tc.waitTime.configEvent * 2));
         antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
         expect(antTask).to.not.be.equal(undefined, "The 'hello' ant task was not found in the task tree");
         await utils.executeSettingsUpdate("pathToPrograms.ansicon", utils.getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));

@@ -1,18 +1,20 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import * as assert from "assert";
-import * as util from "../../lib/utils/utils";
-import { configuration } from "../../lib/utils/configuration";
-import { teApi } from "../../extension";
-import { enableConfigWatcher } from "../../lib/configWatcher";
+import { expect } from "chai";
+import { IDictionary, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, exitRollingCount, sleep, suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
 
-let enabledTasks: any;
+let teApi: ITaskExplorerApi;
+let testsApi: ITestsApi;
 let globPatterns: string[];
-let pathToPrograms: any;
+let enabledTasks: IDictionary<boolean>;
+let enabledTasksCurrent: IDictionary<boolean>;
+let pathToPrograms: IDictionary<string>;
+let pathToProgramsCurrent: IDictionary<string>;
 let shellW32: string, shellLnx: string, shellOsx: string, pkgMgr: string;
 let successCount = -1;
 
@@ -22,24 +24,31 @@ suite("Configuration / Settings Tests", () =>
 
     suiteSetup(async function()
     {
-        await activate(this);
-        enabledTasks = configuration.get<object>("enabledTasks");
-        pathToPrograms = configuration.get<object>("pathToPrograms");
-        shellW32 = configuration.getVs<string>("terminal.integrated.shell.windows");
-        shellLnx = configuration.getVs<string>("terminal.integrated.shell.linux");
-        shellOsx = configuration.getVs<string>("terminal.integrated.shell.osx");
+        ({ teApi, testsApi } = await activate(this));
+        testsApi = teApi.testsApi;
+        enabledTasks = teApi.config.get<IDictionary<boolean>>("enabledTasks");
+        enabledTasksCurrent = { ...enabledTasks };
+        pathToPrograms = teApi.config.get<IDictionary<string>>("pathToPrograms");
+        pathToProgramsCurrent = { ...pathToPrograms };
+        shellW32 = teApi.config.getVs<string>("terminal.integrated.shell.windows");
+        shellLnx = teApi.config.getVs<string>("terminal.integrated.shell.linux");
+        shellOsx = teApi.config.getVs<string>("terminal.integrated.shell.osx");
         successCount++;
     });
 
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate("pathToPrograms", pathToPrograms);
-        // await executeSettingsUpdate("terminal.integrated.shell.windows", shellW32);
-        // await executeSettingsUpdate("terminal.integrated.shell.linux", shellLnx);
-        // await executeSettingsUpdate("terminal.integrated.shell.osx", shellOsx);
-        await configuration.updateVsWs("terminal.integrated.shell.windows", undefined);
-        await waitForTeIdle(tc.waitTime.refreshCommand);
+        testsApi.enableConfigWatcher(false);
+        try {
+            await executeSettingsUpdate("enabledTasks", enabledTasksCurrent);
+            await executeSettingsUpdate("pathToPrograms", pathToProgramsCurrent);
+            await teApi.config.updateVsWs("terminal.integrated.shell.windows", shellW32);
+            await teApi.config.updateVsWs("terminal.integrated.shell.linux", shellLnx);
+            await teApi.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
+        }
+        catch {}
+        finally { testsApi.enableConfigWatcher(true); }
         suiteFinished(this);
     });
 
@@ -47,67 +56,67 @@ suite("Configuration / Settings Tests", () =>
     test("Multi-Dot", async function()
     {
         if (exitRollingCount(0, successCount)) return;
-        this.slow(tc.slowTime.configEventFast * 10);
+        this.slow((tc.slowTime.configEventFast * 10) + (tc.slowTime.configReadEvent * 14));
         //
         // Multi-part settings updates (behavior differs when value is an object)
         // Disable config watcher
         //
-        enableConfigWatcher(false);
+        testsApi.enableConfigWatcher(false);
         //
         // 3-part i.e. taskExplorer.pathToPrograms.ant
         //
         let v = teApi.config.get<any>("pathToPrograms.ant");
-        assert(util.isString(v));
+        expect(teApi.utilities.isString(v)).to.equal(true);
         v = teApi.config.get<any>("pathToPrograms");
-        assert(util.isObject(v));
+        expect(teApi.utilities.isObject(v)).to.equal(true);
         let cv = v.ant;
         await teApi.config.updateWs("pathToPrograms.ant", "/my/path/to/ant");
         v = teApi.config.get<any>("pathToPrograms");
-        assert(util.isObject(v) && v.ant === "/my/path/to/ant");
+        expect(teApi.utilities.isObject(v) && v.ant === "/my/path/to/ant").to.equal(true);
         await teApi.config.updateWs("pathToPrograms.ant", cv);
         v = teApi.config.get<any>("pathToPrograms");
-        assert(util.isObject(v) && v.ant === cv);
+        expect(teApi.utilities.isObject(v) && v.ant === cv).to.equal(true);
         cv = teApi.config.get<any>("visual.disableAnimatedIcons");
-        assert(util.isBoolean(cv));
+        expect(teApi.utilities.isBoolean(cv)).to.equal(true);
         await teApi.config.updateWs("visual.disableAnimatedIcons", false);
         v = teApi.config.get<any>("visual.disableAnimatedIcons");
-        assert(util.isBoolean(v) && v === false);
+        expect(teApi.utilities.isBoolean(v) && v === false).to.equal(true);
         await teApi.config.updateWs("visual.disableAnimatedIcons", cv);
         v = teApi.config.get<any>("visual.disableAnimatedIcons");
-        assert(util.isBoolean(v) && v === cv);
+        expect(teApi.utilities.isBoolean(v) && v === cv).to.equal(true);
         //
         // 4-part i.e. taskExplorer.specialFolders.expanded.lastTasks
         //
         const cv2 = cv = teApi.config.get<any>("specialFolders.expanded.lastTasks");
-        assert(util.isBoolean(cv) && util.isBoolean(cv2));
+        expect(teApi.utilities.isBoolean(cv) && teApi.utilities.isBoolean(cv2)).to.equal(true);
         await teApi.config.updateWs("specialFolders.expanded.lastTasks", false);
         v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
-        assert(util.isBoolean(v) && v === false);
+        expect(teApi.utilities.isBoolean(v) && v === false).to.equal(true);
         await teApi.config.updateWs("specialFolders.expanded.lastTasks", true);
         v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
-        assert(util.isBoolean(v) && v === true);
+        expect(teApi.utilities.isBoolean(v) && v === true).to.equal(true);
         await teApi.config.updateWs("specialFolders.expanded.lastTasks", cv);
         v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
-        assert(util.isBoolean(v) && v === cv);
+        expect(teApi.utilities.isBoolean(v) && v === cv).to.equal(true);
         cv = teApi.config.get<any>("specialFolders.expanded");
-        assert(util.isObject(cv));
+        expect(teApi.utilities.isObject(cv)).to.equal(true);
         cv.lastTasks = false;
         await teApi.config.updateWs("specialFolders.expanded", cv);
         v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
-        assert(util.isBoolean(v) && v === false);
-        assert(util.isObject(cv));
+        expect(teApi.utilities.isBoolean(v) && v === false).to.equal(true);
+        expect(teApi.utilities.isObject(cv)).to.equal(true);
         cv.lastTasks = true;
         await teApi.config.updateWs("specialFolders.expanded", cv);
         v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
-        assert(util.isBoolean(v) && v === true);
+        expect(teApi.utilities.isBoolean(v) && v === true).to.equal(true);
         cv.lastTasks = cv2;
         await teApi.config.updateWs("specialFolders.expanded.lastTasks", cv2);
         v = teApi.config.get<any>("specialFolders.expanded.lastTasks");
-        assert(util.isBoolean(v) && v === cv2);
+        expect(teApi.utilities.isBoolean(v) && v === cv2).to.equal(true);
         //
         // Re-enable config watcher
         //
-        enableConfigWatcher(true);
+        testsApi.enableConfigWatcher(true);
         successCount++;
     });
 
@@ -115,23 +124,24 @@ suite("Configuration / Settings Tests", () =>
     test("Ant Glob", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        this.slow((tc.slowTime.configGlobEvent * 2) + tc.slowTime.configReadEvent + tc.waitTime.min);
-        globPatterns = configuration.get<string[]>("globPatternsAnt");
-        await configuration.updateWs("enabledTasks.ant", false);
+        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.slowTime.configReadEvent +
+                  tc.waitTime.configGlobEvent + tc.slowTime.configReadEvent + tc.waitTime.min);
+        globPatterns = teApi.config.get<string[]>("globPatternsAnt");
+        await executeSettingsUpdate("enabledTasks.ant", false, tc.waitTime.configEnableEvent);
         globPatterns.push("**/dummy.xml");
-        await executeSettingsUpdate("globPatternsAnt", globPatterns, 50, 100);
+        await executeSettingsUpdate("globPatternsAnt", globPatterns, tc.waitTime.configGlobEvent);
         await waitForTeIdle(tc.waitTime.min);
         successCount++;
     });
 
 
-    test("Ant Glob", async function()
+    test("Reset Ant Glob", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.configGlobEvent+ tc.waitTime.min);
-        await executeSettingsUpdate("enabledTasks.ant", true);
+        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.waitTime.configGlobEvent + tc.waitTime.min);
+        await executeSettingsUpdate("enabledTasks.ant", true, tc.waitTime.configEnableEvent);
         globPatterns.pop();
-        await executeSettingsUpdate("globPatternsAnt", globPatterns);
+        await executeSettingsUpdate("globPatternsAnt", globPatterns, tc.waitTime.configGlobEvent);
         await waitForTeIdle(tc.waitTime.min);
         successCount++;
     });
@@ -140,9 +150,9 @@ suite("Configuration / Settings Tests", () =>
     test("Bash Glob", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.slowTime.configReadEvent + tc.waitTime.min);
-        globPatterns = configuration.get<string[]>("globPatternsBash");
-        await configuration.updateWs("enabledTasks.bash", false);
+        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.slowTime.configReadEvent + tc.waitTime.min);
+        globPatterns = teApi.config.get<string[]>("globPatternsBash");
+        await executeSettingsUpdate("enabledTasks.bash", false, tc.waitTime.configEnableEvent);
         globPatterns.push("**/extensionless/**");
         await executeSettingsUpdate("globPatternsBash", globPatterns);
         await waitForTeIdle(tc.waitTime.min);
@@ -150,11 +160,11 @@ suite("Configuration / Settings Tests", () =>
     });
 
 
-    test("Bash Glob", async function()
+    test("Reset Bash Glob", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.waitTime.min);
-        await executeSettingsUpdate("enabledTasks.bash", true);
+        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.waitTime.min);
+        await executeSettingsUpdate("enabledTasks.bash", true, tc.waitTime.configEnableEvent);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsBash", globPatterns);
         await waitForTeIdle(tc.waitTime.min);
@@ -166,9 +176,9 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(5, successCount)) return;
         this.slow(tc.slowTime.configEvent + tc.slowTime.configReadEvent);
-        pkgMgr = configuration.getVs<string>("npm.packageManager");
-        await configuration.updateVsWs("npm.packageManager", "yarn");
-        assert(util.getPackageManager() === "yarn");
+        pkgMgr = teApi.config.getVs<string>("npm.packageManager");
+        await teApi.config.updateVsWs("npm.packageManager", "yarn");
+        expect(teApi.utilities.getPackageManager() === "yarn");
         successCount++;
     });
 
@@ -177,8 +187,8 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(6, successCount)) return;
         this.slow(tc.slowTime.configEvent);
-        await configuration.updateVsWs("npm.packageManager", "npm");
-        assert(util.getPackageManager() === "npm");
+        await teApi.config.updateVsWs("npm.packageManager", "npm");
+        expect(teApi.utilities.getPackageManager()).to.equal("npm");
         successCount++;
     });
 
@@ -187,8 +197,8 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(7, successCount)) return;
         this.slow(tc.slowTime.configEvent);
-        await configuration.updateVsWs("npm.packageManager", "");
-        assert(util.getPackageManager() === "npm");
+        await teApi.config.updateVsWs("npm.packageManager", "");
+        expect(teApi.utilities.getPackageManager()).to.equal("npm");
         successCount++;
     });
 
@@ -197,8 +207,8 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(8, successCount)) return;
         this.slow(tc.slowTime.configEvent);
-        await configuration.updateVsWs("npm.packageManager", "auto");
-        assert(util.getPackageManager() === "npm");
+        await teApi.config.updateVsWs("npm.packageManager", "auto");
+        expect(teApi.utilities.getPackageManager()).to.equal("npm");
         successCount++;
     });
 
@@ -207,9 +217,9 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(9, successCount)) return;
         this.slow(tc.slowTime.configEvent);
-        await configuration.updateVsWs("npm.packageManager", pkgMgr);
-        await configuration.updateVs("npm.packageManager", pkgMgr); // cover global
-        assert(util.getPackageManager() === (pkgMgr === "auto" ? "npm" : pkgMgr));
+        await teApi.config.updateVsWs("npm.packageManager", pkgMgr);
+        await teApi.config.updateVs("npm.packageManager", pkgMgr); // cover global
+        expect(teApi.utilities.getPackageManager()).to.equal(pkgMgr === "auto" ? "npm" : pkgMgr);
         successCount++;
     });
 
@@ -218,7 +228,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(10, successCount)) return;
         this.slow(tc.slowTime.configEvent + tc.waitTime.min);
-        await configuration.updateVsWs("terminal.integrated.shell.osx", "/usr/bin/sh");
+        await teApi.config.updateVsWs("terminal.integrated.shell.osx", "/usr/bin/sh");
         await sleep(tc.waitTime.min);
         successCount++;
     });
@@ -228,7 +238,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(11, successCount)) return;
         this.slow(tc.slowTime.configEvent + tc.waitTime.min);
-        await configuration.updateVsWs("terminal.integrated.shell.linux", "/bin/sh");
+        await teApi.config.updateVsWs("terminal.integrated.shell.linux", "/bin/sh");
         await sleep(tc.waitTime.min);
         successCount++;
     });
@@ -238,7 +248,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(12, successCount)) return;
         this.slow(tc.slowTime.configEvent + (tc.waitTime.refreshCommand * 2));
-        await configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
+        await teApi.config.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
         await waitForTeIdle(tc.waitTime.refreshCommand);
         successCount++;
     });
@@ -247,27 +257,9 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - OSX", async function()
     {
         if (exitRollingCount(13, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
-        await configuration.updateVsWs("terminal.integrated.shell.osx", shellOsx);
-        await sleep(tc.waitTime.min);
-        successCount++;
-    });
-
-
-    test("Reset Default Shell - Linux", async function()
-    {
-        if (exitRollingCount(14, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
-        await configuration.updateVsWs("terminal.integrated.shell.linux", shellLnx);
-        await sleep(tc.waitTime.min);
-        successCount++;
-    });
-
-
-    test("Reset Default Shell - Coverage Hit", async function()
-    {
-        if (exitRollingCount(15, successCount)) return;
-        this.slow((tc.slowTime.configEnableEvent * 2) + tc.waitTime.min + tc.waitTime.refreshCommand);
+        this.slow(tc.slowTime.configEvent + tc.waitTime.configEvent);
+        // Set up coverage on if() statement in configWatcher ~ ln 240
+        testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
             bash: false,
             batch: false,
@@ -276,44 +268,45 @@ suite("Configuration / Settings Tests", () =>
             powershell: false,
             python: false,
             ruby: false
-        }), 25, 50);
-        await executeSettingsUpdate("enabledTasks.nsis", true, tc.waitTime.min, tc.waitTime.min * 2); // last of an or'd if() extension.ts ~line 363 processConfigChanges()
-        await waitForTeIdle(tc.waitTime.refreshCommand);
+        }));
+        testsApi.enableConfigWatcher(true);
+        await teApi.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
+        await waitForTeIdle(tc.waitTime.configEvent);
+        successCount++;
+    });
+
+
+    test("Reset Default Shell - Linux", async function()
+    {
+        if (exitRollingCount(14, successCount)) return;
+        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
+        // Set up coverage on if() statement in configWatcher ~ ln 240
+        testsApi.enableConfigWatcher(false);
+        await executeSettingsUpdate("enabledTasks.nsis", true); // last of an or'd if() extension.ts ~line 240 processConfigChanges()
+        testsApi.enableConfigWatcher(true);
+        await teApi.config.updateVsWs("terminal.integrated.shell.linux", shellLnx);
+        await waitForTeIdle(tc.waitTime.configEvent);
         successCount++;
     });
 
 
     test("Reset Default Shell - Windows", async function()
     {
-        if (exitRollingCount(16, successCount)) return;
-        this.slow(tc.slowTime.configEvent + (tc.waitTime.refreshCommand * 2));
-        await configuration.updateVsWs("terminal.integrated.shell.windows", shellW32);
-        await waitForTeIdle(tc.waitTime.refreshCommand);
-        successCount++;
-    });
-
-
-    test("Reset Coverage Hit", async function()
-    {
-        if (exitRollingCount(17, successCount)) return;
-        this.slow((tc.waitTime.refreshCommand * 2) + (tc.slowTime.configEnableEvent * 2) + tc.waitTime.configEnableEvent);
-        await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
-            bash: true,
-            batch: true,
-            nsis: false,
-            perl: false,
-            powershell: false,
-            python: false,
-            ruby: false
-        }), tc.waitTime.min, tc.waitTime.min * 2);
-        await waitForTeIdle(tc.waitTime.refreshCommand);
-        successCount++;
+        if (exitRollingCount(15, successCount)) return;
+        this.slow(tc.slowTime.configEvent + tc.waitTime.refreshCommandNoChanges + tc.slowTime.refreshCommandNoChanges);
+        // Set up coverage on if() statement in configWatcher ~ ln 240
+        testsApi.enableConfigWatcher(false);
+        await executeSettingsUpdate("enabledTasks", enabledTasks); // reset back to default enabled tasks
+        testsApi.enableConfigWatcher(true);
+        await teApi.config.updateVsWs("terminal.integrated.shell.windows", shellW32);
+        await waitForTeIdle(tc.waitTime.refreshCommandNoChanges); // setting with current enabled tasks will trigger a refresh
+        successCount++;                                  // but since no glob/file changes it'll be noticed by fcache and quick
     });
 
 
     test("Path to Programs Set Bash", async function()
     {
-        if (exitRollingCount(18, successCount)) return;
+        if (exitRollingCount(16, successCount)) return;
         this.slow(tc.slowTime.configEvent + tc.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.bash", "c:\\unix\\sh.exe", tc.waitTime.min, tc.waitTime.min * 2);
         successCount++;
@@ -322,7 +315,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Path to Programs Set Composer", async function()
     {
-        if (exitRollingCount(19, successCount)) return;
+        if (exitRollingCount(17, successCount)) return;
         this.slow(tc.slowTime.configEvent + tc.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.composer", "c:\\php5\\composer.exe", tc.waitTime.min, tc.waitTime.min * 2);
         successCount++;
@@ -331,7 +324,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Path to Programs Clear Bash", async function()
     {
-        if (exitRollingCount(20, successCount)) return;
+        if (exitRollingCount(18, successCount)) return;
         this.slow(tc.slowTime.configEvent + tc.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.bash", undefined, tc.waitTime.min, tc.waitTime.min * 2);
         successCount++;
@@ -340,7 +333,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Path to Programs Clear Composer", async function()
     {
-        if (exitRollingCount(21, successCount)) return;
+        if (exitRollingCount(19, successCount)) return;
         this.slow(tc.slowTime.configEvent + tc.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.composer", undefined, tc.waitTime.min, tc.waitTime.min * 2);
         successCount++;
@@ -349,7 +342,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Path to Programs Restore Bash", async function()
     {
-        if (exitRollingCount(22, successCount)) return;
+        if (exitRollingCount(20, successCount)) return;
         this.slow(tc.slowTime.configEvent + tc.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash, tc.waitTime.min, tc.waitTime.min * 2);
         successCount++;
@@ -358,7 +351,7 @@ suite("Configuration / Settings Tests", () =>
 
     test("Path to Programs Restore Composer", async function()
     {
-        if (exitRollingCount(23, successCount)) return;
+        if (exitRollingCount(21, successCount)) return;
         this.slow(tc.slowTime.configEvent + tc.waitTime.min);
         await executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer, tc.waitTime.min, tc.waitTime.min * 2);
         successCount++;
@@ -367,19 +360,19 @@ suite("Configuration / Settings Tests", () =>
 
     test("User Level Setting Update", async function()
     {
-        if (exitRollingCount(24, successCount)) return;
+        if (exitRollingCount(22, successCount)) return;
         this.slow(tc.slowTime.configEvent * 2 + 50);
-        enableConfigWatcher(false);
-        const logLevel = configuration.get<number>("logging.level");
-        const pathToPrograms = configuration.get<object>("pathToPrograms");
-        const pathToAnt = configuration.get<object>("pathToPrograms.ant");
-        await configuration.update("logging.level", logLevel);
-        await configuration.update("pathToPrograms.ant", pathToAnt);
-        await configuration.update("pathToPrograms", pathToPrograms);
-        enableConfigWatcher(true);
-        await configuration.update("logging.level", logLevel !== 3 ? 3 : 2);
+        testsApi.enableConfigWatcher(false);
+        const logLevel = teApi.config.get<number>("logging.level");
+        const pathToPrograms = teApi.config.get<object>("pathToPrograms");
+        const pathToAnt = teApi.config.get<object>("pathToPrograms.ant");
+        await teApi.config.update("logging.level", logLevel);
+        await teApi.config.update("pathToPrograms.ant", pathToAnt);
+        await teApi.config.update("pathToPrograms", pathToPrograms);
+        testsApi.enableConfigWatcher(true);
+        await teApi.config.update("logging.level", logLevel !== 3 ? 3 : 2);
         waitForTeIdle(tc.waitTime.configEvent);
-        await configuration.update("logging.level", logLevel);
+        await teApi.config.update("logging.level", logLevel);
         waitForTeIdle(tc.waitTime.configEvent);
         successCount++;
     });

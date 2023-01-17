@@ -42,9 +42,7 @@ suite("Multi-Root Workspace Tests", () =>
 {
     suiteSetup(async function()
     {
-        teApi = await activate(this);
-        fsApi = teApi.testsApi.fs;
-        testsApi = teApi.testsApi;
+        ({ teApi, fsApi, testsApi } = await activate(this));
         testsPath = getTestsPath(".");
         wsf1DirName = join(testsPath, "wsf1");
         await fsApi.createDir(wsf1DirName);

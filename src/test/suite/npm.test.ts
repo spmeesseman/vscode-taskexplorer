@@ -23,8 +23,7 @@ suite("NPM Tests", () =>
 
     suiteSetup(async function()
     {
-        teApi = await utils.activate(this);
-        fsApi = teApi.testsApi.fs;
+        ({ teApi, fsApi } = await utils.activate(this));
         ++successCount;
     });
 

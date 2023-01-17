@@ -12,5 +12,6 @@ export interface ITestsApi
     fs: IFilesystemApi;
     storage: IStorage;
 
-    onWsFoldersChange: (e: WorkspaceFoldersChangeEvent) => Promise<void>;
+    enableConfigWatcher(enable: boolean): void;
+    onWsFoldersChange(e: WorkspaceFoldersChangeEvent): Promise<void>;
 }
