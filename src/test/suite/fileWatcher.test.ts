@@ -213,6 +213,7 @@ suite("File Watcher Tests", () =>
         await utils.waitForTeIdle(tc.waitTime.fsCreateFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2);
         await fsApi.copyDir(outsideWsDir, insideWsDir); // copies files only within outsideWsDir
+        await fsApi.copyDir(outsideWsDir, insideWsDir, /Gulpfile/); // cover filter yielding 0 files
         await utils.waitForTeIdle(tc.waitTime.fsCreateFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 4);
         ++successCount;
