@@ -184,7 +184,7 @@ export default class SpecialTaskFolder extends TaskFolder
             return false;
         }
 
-        this.taskFiles = []; // insertTaskFile() rebuilds
+        this.taskFiles = []; // insertTaskFile() rebuilds this.taskFiles
         for (const tId of this.store)
         {
             const taskItem2 = this.explorer.getTaskMap()[tId];
@@ -367,14 +367,13 @@ export default class SpecialTaskFolder extends TaskFolder
     {
         let changed = false;
         const tree = this.explorer.getTaskTree();
-
+        const empty = !tree || tree.length === 0 || (tree[0].contextValue === "noscripts" || tree[0].contextValue === "initscripts" || tree[0].contextValue === "loadscripts");
         log.methodStart("show special tasks", 1, logPad, false, [[ "is favorite", this.isFavorites ], [ "show", show ]]);
 
         /* istanbul ignore if */
-        if (!tree || tree.length === 0 || (tree.length === 1 &&
-            (tree[0].contextValue === "noscripts" || tree[0].contextValue === "noworkspace" || tree[0].contextValue === "initscripts" || tree[0].contextValue === "loadscripts")))
+        if (empty)
         {
-            log.write("   no tasks found in tree", 1, logPad);
+            log.write("   there are no tasks in tree to sort", 1, logPad);
             log.methodDone("show special tasks", 1, logPad);
             return;
         }
