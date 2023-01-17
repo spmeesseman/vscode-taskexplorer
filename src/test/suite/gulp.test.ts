@@ -83,9 +83,9 @@ suite("Gulp Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(tc.slowTime.configDisableEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.config.disableEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await teApi.config.updateWs("enabledTasks.gulp", false);
-        await waitForTeIdle(tc.waitTime.configDisableEvent);
+        await waitForTeIdle(tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -95,9 +95,9 @@ suite("Gulp Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await teApi.config.updateWs("enabledTasks.gulp", true);
-        await waitForTeIdle(tc.waitTime.configEnableEvent);
+        await waitForTeIdle(tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -239,21 +239,21 @@ suite("Gulp Tests", () =>
     test("Gulp Parser", async function()
     {
         if (exitRollingCount(11, successCount)) return;
-        this.slow((tc.slowTime.configEnableEvent * 2) + (tc.waitTime.configEvent * 2) +
-                  tc.waitTime.configDisableEvent + (tc.slowTime.verifyTaskCount * 2) + (tc.slowTime.tasks.gulpParser * 4));
+        this.slow((tc.slowTime.config.enableEvent * 2) + (tc.waitTime.config.event * 2) +
+                  tc.waitTime.config.disableEvent + (tc.slowTime.verifyTaskCount * 2) + (tc.slowTime.tasks.gulpParser * 4));
         //
         // Use Gulp to parse tasks. The configuration change will cause gulp tasks to be invalidated and refreshed
         //
         await configuration.updateVs("gulp.autoDetect", "off");
-        await waitForTeIdle(tc.waitTime.configEnableEvent);
-        await executeSettingsUpdate("useGulp", true, tc.waitTime.configEvent);
-        await waitForTeIdle(tc.waitTime.configEnableEvent);
+        await waitForTeIdle(tc.waitTime.config.enableEvent);
+        await executeSettingsUpdate("useGulp", true, tc.waitTime.config.event);
+        await waitForTeIdle(tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         //
         // Reset to Basic Parser. The configuration change will cause gulp tasks to be invalidated and refreshed
         //
-        await executeSettingsUpdate("useGulp", false, tc.waitTime.configEvent);
-        await waitForTeIdle(tc.waitTime.configDisableEvent);
+        await executeSettingsUpdate("useGulp", false, tc.waitTime.config.event);
+        await waitForTeIdle(tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
@@ -264,7 +264,7 @@ suite("Gulp Tests", () =>
         if (exitRollingCount(12, successCount)) return;
         this.slow(tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.slowTime.min + 3000);
         await configuration.updateVs("gulp.autoDetect", "on");
-        await waitForTeIdle(tc.waitTime.configEnableEvent);
+        await waitForTeIdle(tc.waitTime.config.enableEvent);
         await sleep(3000);
         await treeUtils.refresh();
         await verifyTaskCount(testsName, startTaskCount);
@@ -276,9 +276,9 @@ suite("Gulp Tests", () =>
     test("Turn VSCode Gulp Provider Off", async function()
     {
         if (exitRollingCount(13, successCount)) return;
-        this.slow(tc.slowTime.configEventFast +  tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.slowTime.min + 1500);
+        this.slow(tc.slowTime.config.eventFast +  tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.slowTime.min + 1500);
         await configuration.updateVs("gulp.autoDetect", "off");
-        await waitForTeIdle(tc.waitTime.configEnableEvent);
+        await waitForTeIdle(tc.waitTime.config.enableEvent);
         await sleep(1500);
         // await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await treeUtils.refresh(this);

@@ -157,8 +157,8 @@ suite("Typescript Tests", () =>
     test("Disable", async function()
     {
         if (utils.exitRollingCount(6, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCountByTree + testControl.waitTime.configEnableEvent);
-        await utils.executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configEnableEvent);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCountByTree + testControl.waitTime.config.enableEvent);
+        await utils.executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.config.enableEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, 0);
         successCount++;
     });
@@ -167,8 +167,8 @@ suite("Typescript Tests", () =>
     test("Re-enable", async function()
     {
         if (utils.exitRollingCount(7, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCountByTree + testControl.waitTime.configEnableEvent);
-        await utils.executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCountByTree + testControl.waitTime.config.enableEvent);
+        await utils.executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.config.enableEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         successCount++;
     });
@@ -183,7 +183,7 @@ suite("Typescript Tests", () =>
         this.slow(testControl.slowTime.fsModifyEvent + testControl.waitTime.fsModifyEvent + testControl.slowTime.verifyTaskCountByTree);
         // let resetLogging = teApi.log.isLoggingEnabled();
         // if (resetLogging) { // turn scary error logging off
-        //     this.slow(testControl.slowTime.FsCreateEvent + (testControl.slowTime.ConfigEvent * 2));
+        //     this.slow(testControl.slowTime.FsCreateEvent + (testControl.slowTime.config.event * 2));
         //     executeSettingsUpdate("logging.enable", false);
         //     resetLogging = true;
         // }

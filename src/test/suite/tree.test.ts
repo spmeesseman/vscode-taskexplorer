@@ -64,7 +64,7 @@ suite("Tree Tests", () =>
     test("Show Favorites", async function()
     {
         if (utils.exitRollingCount(2, successCount)) return;
-        this.slow((tc.slowTime.configSpecialFolderEvent * 2) + (tc.waitTime.configEvent * 2) +
+        this.slow((tc.slowTime.config.specialFolderEvent * 2) + (tc.waitTime.config.event * 2) +
                   (tc.slowTime.getTreeTasks * 4) + tc.slowTime.storageUpdate);
         ant = await utils.treeUtils.getTreeTasks("ant", 3);
         bash = await utils.treeUtils.getTreeTasks("bash", 1);
@@ -74,8 +74,8 @@ suite("Tree Tests", () =>
             utils.getSpecialTaskItemId(batch[0]), utils.getSpecialTaskItemId(batch[1]), utils.getSpecialTaskItemId(ant[0]),
             utils.getSpecialTaskItemId(bash[0]), utils.getSpecialTaskItemId(python[0]), utils.getSpecialTaskItemId(python[1])
         ]);
-        await utils.executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.configEvent);
-        await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.configEvent);
+        await utils.executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.event);
+        await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.event);
         ++successCount;
     });
 
@@ -97,15 +97,15 @@ suite("Tree Tests", () =>
     test("Show Last Tasks", async function()
     {
         if (utils.exitRollingCount(4, successCount)) return;
-        this.slow((tc.slowTime.configSpecialFolderEvent * 2) + (tc.waitTime.configEvent * 2) + (tc.slowTime.getTreeTasks * 2));
+        this.slow((tc.slowTime.config.specialFolderEvent * 2) + (tc.waitTime.config.event * 2) + (tc.slowTime.getTreeTasks * 2));
         ant = await utils.treeUtils.getTreeTasks("ant", 3);
         batch = await utils.treeUtils.getTreeTasks("batch", 2);
         await teApi.testsApi.storage.update(constants.LAST_TASKS_STORE, [
             utils.getSpecialTaskItemId(batch[0]), utils.getSpecialTaskItemId(batch[1]), utils.getSpecialTaskItemId(ant[0]),
             utils.getSpecialTaskItemId(bash[0]), utils.getSpecialTaskItemId(python[0]), utils.getSpecialTaskItemId(python[1])
         ]);
-        await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.configEvent);
-        await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.configEvent);
+        await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.event);
+        await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.event);
         ++successCount;
     });
 
@@ -387,7 +387,7 @@ suite("Tree Tests", () =>
     test("Hide Favorites", async function()
     {
         if (utils.exitRollingCount(19, successCount)) return;
-        this.slow((tc.slowTime.showHideSpecialFolder * 2) + (tc.waitTime.configEvent  * 2));
+        this.slow((tc.slowTime.showHideSpecialFolder * 2) + (tc.waitTime.config.event  * 2));
         await utils.executeSettingsUpdate("specialFolders.showFavorites", false);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true);
         ++successCount;

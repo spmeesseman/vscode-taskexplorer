@@ -44,7 +44,7 @@ suite("Info Report Tests", () =>
 	test("Report Page Single Project (No UserTasks0", async function()
 	{
         if (exitRollingCount(1, successCount)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder + testControl.waitTime.configEvent + testControl.waitTime.viewReport + 100);
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder + testControl.waitTime.config.event + testControl.waitTime.viewReport + 100);
 		await executeSettingsUpdate("specialFolders.showUserTasks", false);
 		const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport, 500, projectUri) as WebviewPanel;
 		await sleep(100);
@@ -57,7 +57,7 @@ suite("Info Report Tests", () =>
 	test("Report Page Single Project (w/ User Tasks)", async function()
 	{
         if (exitRollingCount(2, successCount)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder + testControl.waitTime.configEvent + testControl.waitTime.viewReport + 100);
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.showHideSpecialFolder + testControl.waitTime.config.event + testControl.waitTime.viewReport + 100);
 		await executeSettingsUpdate("specialFolders.showUserTasks", true);
 	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport, 500, projectUri, "", 5) as WebviewPanel;
 		await sleep(100);

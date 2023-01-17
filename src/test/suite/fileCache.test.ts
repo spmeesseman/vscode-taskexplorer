@@ -8,6 +8,7 @@ let teApi: ITaskExplorerApi;
 let testsApi: ITestsApi;
 let successCount = -1;
 const tc = utils.testControl;
+const checkTaskCountsTime = (4 * tc.slowTime.verifyTaskCount) + tc.slowTime.verifyTaskCountNpm + tc.slowTime.verifyTaskCountWorkspace;
 
 
 suite("File Cache Tests", () =>
@@ -51,7 +52,7 @@ suite("File Cache Tests", () =>
     test("Enable Persistent Cache", async function()
     {
         if (utils.exitRollingCount(2, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.slowTime.fileCachePersist);
+        this.slow(tc.slowTime.config.event + tc.slowTime.fileCachePersist);
         await utils.executeSettingsUpdate("enablePersistentFileCaching", true); // enabling setting willpersist *now*
         ++successCount;
     });
@@ -79,13 +80,13 @@ suite("File Cache Tests", () =>
     test("Rebuild File Cache w Empty Persisted Cache (Mimic Startup)", async function()
     {
         if (utils.exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.rebuildFileCache + (tc.slowTime.configEvent * 3) + tc.slowTime.min);
+        this.slow(tc.slowTime.rebuildFileCache + (tc.slowTime.config.event * 3) + tc.slowTime.min + checkTaskCountsTime);
         await testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
         await testsApi.fileCache.rebuildCache("", true);
         await utils.sleep(tc.waitTime.min);
-        await checkTaskCounts(this);
+        await checkTaskCounts();
         ++successCount;
     });
 
@@ -93,7 +94,7 @@ suite("File Cache Tests", () =>
     test("Disable Persistent Cache", async function()
     {
         if (utils.exitRollingCount(6, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.slowTime.configEvent);
+        this.slow(tc.slowTime.config.event + tc.slowTime.config.event);
         await utils.executeSettingsUpdate("enablePersistentFileCaching", false);
         ++successCount;
     });
@@ -337,9 +338,11 @@ suite("File Cache Tests", () =>
 });
 
 
-const checkTaskCounts = async (instance: Mocha.Context) =>
+const checkTaskCounts = async (instance?: Mocha.Context) =>
 {
-    instance.slow((4 * tc.slowTime.verifyTaskCount) + tc.slowTime.verifyTaskCountNpm + tc.slowTime.verifyTaskCountWorkspace);
+    if (instance) {
+        instance.slow(checkTaskCountsTime);
+    }
     await utils.verifyTaskCount("bash", 1);
     await utils.verifyTaskCount("batch", 2);
     await utils.verifyTaskCount("npm", 2);

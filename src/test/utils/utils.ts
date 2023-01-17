@@ -211,7 +211,7 @@ export const closeActiveDocument = async () =>
 export const executeSettingsUpdate = async (key: string, value?: any, minWait?: number, maxWait?: number) =>
 {
     const rc = await teApi.config.updateWs(key, value);
-    await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.configEvent),
+    await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.config.event),
                             maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;
 };

@@ -74,9 +74,9 @@ suite("Grunt Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await teApi.config.updateWs("enabledTasks.grunt", false);
-        await waitForTeIdle(tc.waitTime.configEnableEvent);
+        await waitForTeIdle(tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -86,9 +86,9 @@ suite("Grunt Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await teApi.config.updateWs("enabledTasks.grunt", true);
-        await waitForTeIdle(tc.waitTime.configEnableEvent);
+        await waitForTeIdle(tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -201,7 +201,7 @@ suite("Grunt Tests", () =>
     test("Turn VSCode Grunt Provider Off", async function()
     {
         if (exitRollingCount(12, successCount)) return;
-        this.slow(tc.slowTime.configEventFast +  tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.slowTime.min + 1500);
+        this.slow(tc.slowTime.config.eventFast +  tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.slowTime.min + 1500);
         await configuration.updateVs("grunt.autoDetect", "off");
         await sleep(1500);
         await treeUtils.refresh(this);

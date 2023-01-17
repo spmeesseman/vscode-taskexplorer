@@ -61,7 +61,7 @@ suite("Util Tests", () =>
     test("Logging (Error)", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-		this.slow((testControl.slowTime.configEvent * 2) + 150);
+		this.slow((testControl.slowTime.config.event * 2) + 150);
 
         log.error(`        ${creator}.${extension}`);
         log.error([ `        ${creator}.${extension}`,
@@ -137,7 +137,7 @@ suite("Util Tests", () =>
 	test("Logging (File)", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-		this.slow((testControl.slowTime.configEvent * 7) + 50);
+		this.slow((testControl.slowTime.config.event * 7) + 50);
 		await executeSettingsUpdate("logging.enableFile", false);
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.write("Test1", 1);
@@ -182,7 +182,7 @@ suite("Util Tests", () =>
     test("Logging (Method)", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-		this.slow((testControl.slowTime.configEvent * 2) + 50);
+		this.slow((testControl.slowTime.config.event * 2) + 50);
 
 		log.methodStart("methodName");
 		log.methodDone("methodName");
@@ -213,7 +213,7 @@ suite("Util Tests", () =>
 	test("Logging (Output Window)", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-		this.slow((testControl.slowTime.configEvent * 2) + 50);
+		this.slow((testControl.slowTime.config.event * 2) + 50);
 		await executeSettingsUpdate("logging.enableOutputWindow", true);
 		log.write("Test1", 1);
 		log.value("Test2", "value", 1);
@@ -237,7 +237,7 @@ suite("Util Tests", () =>
 
 	test("Logging (Queue)", async function()
     {
-		this.slow((testControl.slowTime.configEvent * 2) + 50);
+		this.slow((testControl.slowTime.config.event * 2) + 50);
 
         if (exitRollingCount(5, successCount)) return;
 		log.dequeue("queueTestId");
@@ -271,7 +271,7 @@ suite("Util Tests", () =>
     test("Logging (Value)", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-		this.slow((testControl.slowTime.configEvent * 4) + 75);
+		this.slow((testControl.slowTime.config.event * 4) + 75);
         log.value(`        ${creator}.${extension}`, null);
         log.value(`        ${creator}.${extension}`, undefined);
 		log.value(null as unknown as string, 1);
@@ -330,7 +330,7 @@ suite("Util Tests", () =>
     test("Logging (Warn)", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-		this.slow((testControl.slowTime.configEvent * 2) + 50);
+		this.slow((testControl.slowTime.config.event * 2) + 50);
 		log.warn("test1");
 		log.warn("test2");
 		const scaryOff = logControl.isTestsBlockScaryColors;
@@ -356,7 +356,7 @@ suite("Util Tests", () =>
     test("Logging (Write)", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-		this.slow((testControl.slowTime.configEvent * 2) + 50);
+		this.slow((testControl.slowTime.config.event * 2) + 50);
 
         log.blank();
         log.blank(1);

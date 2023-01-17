@@ -33,7 +33,7 @@ suite("File Watcher Tests", () =>
         insideWsDirIgn = join(rootPath, "fwTestIgnore");
         outsideWsDir = utils.getTestsPath("testA");
         excludes = configApi.get<string[]>("exclude");
-        await utils.executeSettingsUpdate("exclude", [ ...excludes, ...[ "**/fwTestIgnore/**" ] ], tc.waitTime.configGlobEvent);
+        await utils.executeSettingsUpdate("exclude", [ ...excludes, ...[ "**/fwTestIgnore/**" ] ], tc.waitTime.config.globEvent);
         ++successCount;
     });
 
@@ -45,7 +45,7 @@ suite("File Watcher Tests", () =>
         await fsApi.deleteDir(insideWsDirIgn);
         await utils.waitForTeIdle(tc.waitTime.fsDeleteFolderEvent);
         await fsApi.deleteDir(outsideWsDir);
-        await utils.executeSettingsUpdate("exclude", excludes, tc.waitTime.configGlobEvent);
+        await utils.executeSettingsUpdate("exclude", excludes, tc.waitTime.config.globEvent);
         utils.suiteFinished(this);
     });
 

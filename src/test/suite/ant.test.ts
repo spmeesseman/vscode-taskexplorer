@@ -14,7 +14,7 @@ import {
 } from "../utils/utils";
 
 const testsName = "ant";
-const slowTimeforAntRunTasks = (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.configEvent * 3) +
+const slowTimeforAntRunTasks = (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.config.event * 3) +
                                (tc.slowTime.taskProviderReadUri * 2) + tc.slowTime.tasks.antParser;
 
 let teApi: ITaskExplorerApi;
@@ -85,9 +85,9 @@ suite("Ant Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", false);
-        await waitForTeIdle(tc.waitTime.configEvent);
+        await waitForTeIdle(tc.waitTime.config.event);
         await verifyTaskCount("ant", 0);
         ++successCount;
     });
@@ -96,9 +96,9 @@ suite("Ant Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", true);
-        await waitForTeIdle(tc.waitTime.configEvent);
+        await waitForTeIdle(tc.waitTime.config.event);
         await verifyTaskCount("ant", 3);
         ++successCount;
     });
@@ -107,7 +107,7 @@ suite("Ant Tests", () =>
     test("Enable Ansicon", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow((tc.slowTime.configEvent * 5) + (tc.slowTime.commandFast * 4));
+        this.slow((tc.slowTime.config.event * 5) + (tc.slowTime.commandFast * 4));
         await executeSettingsUpdate("pathToPrograms.ansicon", "ansicon\\x64\\ansicon.exe");
         overrideNextShowInfoBox(undefined);
         await executeSettingsUpdate("visual.enableAnsiconForAnt", true);
@@ -125,7 +125,7 @@ suite("Ant Tests", () =>
     test("Disable Ansicon", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow((tc.slowTime.configEvent * 3) + (tc.slowTime.commandFast * 2));
+        this.slow((tc.slowTime.config.event * 3) + (tc.slowTime.commandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
         await executeSettingsUpdate("visual.enableAnsiconForAnt", false);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -138,7 +138,7 @@ suite("Ant Tests", () =>
     test("Ansicon Path", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.slowTime.commandFast);
+        this.slow(tc.slowTime.config.event + tc.slowTime.commandFast);
         await executeSettingsUpdate("pathToPrograms.ansicon", undefined);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
@@ -149,7 +149,7 @@ suite("Ant Tests", () =>
     test("Win32 Create Task", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow((tc.slowTime.configEvent * 2) + (tc.slowTime.commandFast * 2));
+        this.slow((tc.slowTime.config.event * 2) + (tc.slowTime.commandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant"));
@@ -161,7 +161,7 @@ suite("Ant Tests", () =>
     test("Ant Parser", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.configPathToProgramsEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.config.pathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2, false, false);
         ++successCount;

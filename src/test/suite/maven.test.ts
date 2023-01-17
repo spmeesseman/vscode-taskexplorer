@@ -78,7 +78,7 @@ suite("Maven Tests", () =>
     test("Enable (Off by Default)", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent);
+        this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true);
         ++successCount;
     });
@@ -107,8 +107,8 @@ suite("Maven Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.configDisableEvent + tc.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.configDisableEvent);
+        this.slow(tc.slowTime.config.disableEvent + tc.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });
@@ -117,8 +117,8 @@ suite("Maven Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.configEnableEvent);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
@@ -180,8 +180,8 @@ suite("Maven Tests", () =>
     test("Disable (Default is OFF)", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.configDisableEvent + tc.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.configDisableEvent);
+        this.slow(tc.slowTime.config.disableEvent + tc.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });

@@ -66,19 +66,22 @@ export const testControl: ITestControl =
         buildFileCacheCancel: 1350,
         buildTreeNoTasks: 600,
         closeActiveDocument: 25,
-        command: 1450,
-        commandFast: 550,
-        configEvent: 315,
-        configEventFast: 120,
-        configRegisterExplorerEvent: 700,
-        configDisableEvent: 1575,
-        configEnableEvent: 2280,
-        configExcludesEvent: 475,
-        configGlobEvent: 1940,
-        configGroupingEvent: 700,
-        configPathToProgramsEvent: 725,
-        configSpecialFolderEvent: 475,
-        configReadEvent: 25,
+        command: 1470,
+        commandFast: 560,
+        config: {
+            event: 315,
+            eventFast: 120,
+            registerExplorerEvent: 700,
+            disableEvent: 1575,
+            enableEvent: 2325,
+            excludesEvent: 2750,
+            globEvent: 1940,
+            groupingEvent: 700,
+            pathToProgramsEvent: 725,
+            specialFolderEvent: 475,
+            readEvent: 25
+        },
+        excludeCommand: 2300,
         explorerViewStartup: 19050,
         fetchTasksCommand: 3000,
         fileCachePersist: 470,
@@ -87,7 +90,7 @@ export const testControl: ITestControl =
         focusCommandAlreadyFocused: 130,
         fsCreateEvent: 1840,
         fsCreateFolderEvent: 2170,
-        fsDeleteEvent: 1630,
+        fsDeleteEvent: 1680,
         fsDeleteFolderEvent: 1980,
         fsModifyEvent: 945,
         getTreeTasks: 215,
@@ -99,10 +102,7 @@ export const testControl: ITestControl =
         licenseManagerRemoteCheck: 3000,
         licenseManagerRemoteStartServer: 3850,
         min: 50,
-        npmCommand: 11925,
-        npmCommandPkg: 9300,
-        npmInstallCommand: 19650,
-        refreshCommand: 19025,
+        refreshCommand: 19325,
         refreshCommandNoChanges: 500,
         rebuildFileCache: 15500,
         rebuildFileCacheCancel: 1810,
@@ -117,11 +117,14 @@ export const testControl: ITestControl =
         taskCommand: 1600,
         tasks: {
             antParser: 820,
-            antTask: 4300,
+            antTask: 4350,
             antTaskWithAnsicon: 4500,
             bashScript: 4000,
             batchScript: 8000,
-            gulpParser: 3875
+            gulpParser: 3975,
+            npmCommand: 13925,
+            npmCommandPkg: 11300,
+            npmInstallCommand: 21650
         },
         verifyTaskCount: 825,
         verifyTaskCountByTree: 850,
@@ -140,15 +143,17 @@ export const testControl: ITestControl =
         // MINIMUM WAIT TIMES
         //
         addWorkspaceFolder: 230,
-        configEvent: 105,
-        configEventFast: 45,
-        configDisableEvent: 140,
-        configEnableEvent: 175,
-        configGlobEvent: 140,
+        config: {
+            event: 105,
+            eventFast: 45,
+            disableEvent: 140,
+            enableEvent: 175,
+            globEvent: 140,
+            groupingEvent: 240,
+            registerExplorerEvent: 225
+        },
         command: 150,
         commandFast: 70,
-        configGroupingEvent: 240,
-        configRegisterExplorerEvent: 225,
         explorerViewStartup: 4000,
         focusCommand: 400,
         fsCreateEvent: 180,
@@ -243,17 +248,20 @@ export interface ITestControl
         closeActiveDocument: number;
         command: number;
         commandFast: number;
-        configEvent: number;
-        configEventFast: number;
-        configRegisterExplorerEvent: number;
-        configDisableEvent: number;
-        configEnableEvent: number;
-        configExcludesEvent: number;
-        configGlobEvent: number;
-        configGroupingEvent: number;
-        configPathToProgramsEvent: number;
-        configSpecialFolderEvent: number;
-        configReadEvent: number;
+        config: {
+            event: number;
+            eventFast: number;
+            registerExplorerEvent: number;
+            disableEvent: number;
+            enableEvent: number;
+            excludesEvent: number;
+            globEvent: number;
+            groupingEvent: number;
+            pathToProgramsEvent: number;
+            specialFolderEvent: number;
+            readEvent: number;
+        };
+        excludeCommand: number;
         explorerViewStartup: number;
         fetchTasksCommand: number;
         fileCachePersist: number;
@@ -274,9 +282,6 @@ export interface ITestControl
         licenseManagerRemoteCheck: number;
         licenseManagerRemoteStartServer: number;
         min: number;
-        npmCommand: number;
-        npmCommandPkg: number;
-        npmInstallCommand: number;
         refreshCommand: number;
         refreshCommandNoChanges: number;
         rebuildFileCache: number;
@@ -297,6 +302,9 @@ export interface ITestControl
             bashScript: number;
             batchScript: number;
             gulpParser: number;
+            npmCommand: number;
+            npmCommandPkg: number;
+            npmInstallCommand: number;
         };
         verifyTaskCount: number;
         verifyTaskCountByTree: number;
@@ -320,15 +328,17 @@ export interface ITestControl
         fsDeleteEvent: number;
         fsDeleteFolderEvent: number;
         fsModifyEvent: number;
-        configEvent: number;
-        configEventFast: number;
-        configDisableEvent: number;
-        configEnableEvent: number;
-        configGlobEvent: number;
+        config: {
+            event: number;
+            eventFast: number;
+            disableEvent: number;
+            enableEvent: number;
+            globEvent: number;
+            groupingEvent: number;
+            registerExplorerEvent: number;
+        };
         command: number;
         commandFast: number;
-        configGroupingEvent: number;
-        configRegisterExplorerEvent: number;
         explorerViewStartup: number;
         focusCommand: number;
         getTreeMin: number;

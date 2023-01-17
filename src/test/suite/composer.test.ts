@@ -55,8 +55,8 @@ suite("Composer Tests", () =>
     test("Enable (Off by Default)", async function()
     {
         if (exitRollingCount(0, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
+        this.slow(testControl.slowTime.config.enableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.config.enableEvent);
         ++successCount;
     });
 
@@ -85,8 +85,8 @@ suite("Composer Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configEnableEvent);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });
@@ -95,8 +95,8 @@ suite("Composer Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.configEnableEvent);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
@@ -179,7 +179,7 @@ suite("Composer Tests", () =>
         if (exitRollingCount(8, successCount)) return;
         let resetLogging = teApi.log.isLoggingEnabled();
         if (resetLogging) { // turn scary error logging off
-            this.slow(testControl.slowTime.fsCreateEvent + (testControl.slowTime.configEvent * 2) + testControl.slowTime.verifyTaskCount);
+            this.slow(testControl.slowTime.fsCreateEvent + (testControl.slowTime.config.event * 2) + testControl.slowTime.verifyTaskCount);
             executeSettingsUpdate("logging.enable", false);
             resetLogging = true;
         }
@@ -223,8 +223,8 @@ suite("Composer Tests", () =>
     test("Disable (Default is OFF)", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.configEnableEvent);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });

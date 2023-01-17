@@ -40,7 +40,7 @@ suite("Bash Tests", () =>
         pathToTaskProgram = teApi.config.get<string>("pathToPrograms." + testsName);
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe");
-        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.config.enableEvent);
         successCount++;
     });
 
@@ -50,7 +50,7 @@ suite("Bash Tests", () =>
         // Reset settings
         //
         await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
-        await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTime.configEnableEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTime.config.enableEvent);
         await fsApi.deleteDir(dirName);
         suiteFinished(this);
     });
@@ -96,8 +96,8 @@ suite("Bash Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.configEnableEvent);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount);
+        await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
         successCount++;
     });
@@ -106,8 +106,8 @@ suite("Bash Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
-        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.configEnableEvent);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         successCount++;
     });

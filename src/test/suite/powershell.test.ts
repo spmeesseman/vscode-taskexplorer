@@ -40,16 +40,16 @@ suite("Powershell Tests", () =>
         fileUri2 = Uri.file(path.join(dirName, "test2.ps1"));
         pathToTaskProgram = teApi.config.get<string>("pathToPrograms." + testsName);
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
-        await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe", tc.waitTime.configGlobEvent);
-        await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.configEnableEvent);
+        await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe", tc.waitTime.config.globEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
         ++successCount;
     });
 
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram, tc.waitTime.configGlobEvent);
-        await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, tc.waitTime.configEnableEvent);
+        await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram, tc.waitTime.config.globEvent);
+        await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, tc.waitTime.config.enableEvent);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
         suiteFinished(this);
@@ -89,8 +89,8 @@ suite("Powershell Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount);
-        await executeSettingsUpdate("enabledTasks." + testsName, false, tc.waitTime.configEnableEvent);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount);
+        await executeSettingsUpdate("enabledTasks." + testsName, false, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });
@@ -99,8 +99,8 @@ suite("Powershell Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount);
-        await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.configEnableEvent);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });

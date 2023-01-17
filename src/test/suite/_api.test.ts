@@ -32,8 +32,8 @@ suite("API and Initialization", () =>
 
     test("Enable SideBar View", async function()
     {
-        this.slow(tc.slowTime.explorerViewStartup + tc.slowTime.configEnableEvent);
-        await executeSettingsUpdate("enableSideBar", true, tc.waitTime.configEnableEvent);
+        this.slow(tc.slowTime.explorerViewStartup + tc.slowTime.config.enableEvent);
+        await executeSettingsUpdate("enableSideBar", true, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.explorerViewStartup);
     });
 
@@ -42,7 +42,7 @@ suite("API and Initialization", () =>
     {   //
         // Twice for delayed init, 1st will be quick with 'Initializing...' message in treeview
         //
-        this.slow(tc.slowTime.refreshCommand + tc.slowTime.configEnableEvent + tc.slowTime.command);
+        this.slow(tc.slowTime.refreshCommand + tc.slowTime.config.enableEvent + tc.slowTime.command);
         await refreshTree(teApi, undefined, undefined, "");
         await waitForTeIdle(tc.waitTime.command);
         await refreshTree(teApi, undefined, undefined, "");
@@ -52,9 +52,9 @@ suite("API and Initialization", () =>
 
     test("Disable Explorer Views", async function()
     {
-        this.slow(tc.slowTime.configRegisterExplorerEvent + tc.slowTime.configEnableEvent);
-        await executeSettingsUpdate("enableExplorerView", false, tc.waitTime.configEnableEvent);
-        await waitForTeIdle(tc.waitTime.configRegisterExplorerEvent);
+        this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
+        await executeSettingsUpdate("enableExplorerView", false, tc.waitTime.config.enableEvent);
+        await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
     });
 
 
@@ -68,18 +68,18 @@ suite("API and Initialization", () =>
 
     test("Disable SideBar View", async function()
     {
-        this.slow(tc.slowTime.configRegisterExplorerEvent + tc.slowTime.configEnableEvent);
-        await executeSettingsUpdate("enableSideBar", false, tc.waitTime.configEnableEvent);
-        await waitForTeIdle(tc.waitTime.configRegisterExplorerEvent);
+        this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
+        await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
+        await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
     });
 
 
     test("Re-enable Explorer View", async function()
     {
-        this.slow(tc.slowTime.configRegisterExplorerEvent + tc.slowTime.configEnableEvent);
-        await executeSettingsUpdate("enableExplorerView", true, tc.waitTime.configEnableEvent);
+        this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
+        await executeSettingsUpdate("enableExplorerView", true, tc.waitTime.config.enableEvent);
         setExplorer(teApi.explorer as ITaskExplorer);
-        await waitForTeIdle(tc.waitTime.configRegisterExplorerEvent);
+        await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
     });
 
 

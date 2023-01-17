@@ -54,10 +54,10 @@ suite("External Provider Tests", () =>
     test("Register external task provider", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.configEnableEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.enableEvent + testControl.slowTime.verifyTaskCount);
         taskProvider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         await teApi.register("external", taskProvider, "");
-        await waitForTeIdle(testControl.waitTime.configEnableEvent);
+        await waitForTeIdle(testControl.waitTime.config.enableEvent);
         await verifyTaskCount("external", 2);
         ++successCount;
     });
@@ -66,7 +66,7 @@ suite("External Provider Tests", () =>
     test("Access external task provider", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent);
+        this.slow(testControl.slowTime.config.enableEvent);
         const provider = teApi.providersExternal.external as ExternalTaskProvider;
         assert(provider);
         const task = provider.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
@@ -79,7 +79,7 @@ suite("External Provider Tests", () =>
     test("Access base external task provider", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent);
+        this.slow(testControl.slowTime.config.enableEvent);
         const task = taskProvider2.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
         try {
             taskProvider2.resolveTask(task);
@@ -94,9 +94,9 @@ suite("External Provider Tests", () =>
     test("Unregister external task provider", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.waitTime.configEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.event + testControl.slowTime.verifyTaskCount);
         await teApi.unregister("external", "");
-        await waitForTeIdle(testControl.waitTime.configEvent);
+        await waitForTeIdle(testControl.waitTime.config.event);
         await verifyTaskCount("external", 2);
     });
 

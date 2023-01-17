@@ -8,7 +8,10 @@ import { expect } from "chai";
 import { PerlTaskProvider } from "../../providers/perl";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, suiteFinished, testControl, treeUtils, verifyTaskCount } from "../utils/utils";
+import {
+    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, suiteFinished,
+    testControl, treeUtils, verifyTaskCount
+} from "../utils/utils";
 
 const testsName = "perl";
 const startTaskCount = 7;
@@ -71,9 +74,9 @@ suite("Perl Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.perl", false);
-        // await waitForTeIdle(testControl.waitTime.configEnableEvent);
+        // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, 0);
         // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
@@ -83,9 +86,9 @@ suite("Perl Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.perl", true);
-        // await waitForTeIdle(testControl.waitTime.configEnableEvent);
+        // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;

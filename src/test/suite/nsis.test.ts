@@ -71,9 +71,9 @@ suite("Nullsoft NSIS Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.nsis", false);
-        // await waitForTeIdle(testControl.waitTime.configEnableEvent);
+        // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, 0);
         // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
@@ -83,9 +83,9 @@ suite("Nullsoft NSIS Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(testControl.slowTime.configEnableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.configEnableEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.nsis", true);
-        // await waitForTeIdle(testControl.waitTime.configEnableEvent);
+        // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;

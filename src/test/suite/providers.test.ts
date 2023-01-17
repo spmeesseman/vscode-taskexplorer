@@ -44,7 +44,7 @@ suite("Provider Tests", () =>
         dirName = join(rootPath, "tasks_test_");
         dirNameL2 = join(dirName, "subfolder");
         dirNameIgn = join(rootPath, "tasks_test_ignore_");
-        await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ], tc.waitTime.configGlobEvent);
+        await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ], tc.waitTime.config.globEvent);
         ++successCount;
     });
 
@@ -53,7 +53,7 @@ suite("Provider Tests", () =>
     {
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
         await waitForTeIdle(tc.waitTime.refreshCommand);
-        await executeSettingsUpdate("logging.enable", tc.log.enabled, tc.waitTime.configEvent);
+        await executeSettingsUpdate("logging.enable", tc.log.enabled, tc.waitTime.config.event);
         await executeSettingsUpdate("enabledTasks", {
             apppublisher: false, // off by default
             gradle: false,       // off by default
@@ -211,7 +211,7 @@ suite("Provider Tests", () =>
     test("Enable App-Publisher Tasks (Off by Default)", async function()
     {
         if (exitRollingCount(15, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent);
+        this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.apppublisher", true);
         ++successCount;
     });
@@ -220,7 +220,7 @@ suite("Provider Tests", () =>
     test("Enable Gradle Tasks (Off by Default)", async function()
     {
         if (exitRollingCount(16, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent);
+        this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.gradle", true);
         ++successCount;
     });
@@ -229,7 +229,7 @@ suite("Provider Tests", () =>
     test("Enable Pipenv Tasks (Off by Default)", async function()
     {
         if (exitRollingCount(17, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent);
+        this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.pipenv", true);
         ++successCount;
     });
@@ -238,7 +238,7 @@ suite("Provider Tests", () =>
     test("Enable Maven Tasks (Off by Default)", async function()
     {
         if (exitRollingCount(18, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent);
+        this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.maven", true);
         ++successCount;
     });
@@ -247,7 +247,7 @@ suite("Provider Tests", () =>
     test("Enable Python Tasks (Turned Off in Configuration Suite)", async function()
     {
         if (exitRollingCount(19, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent);
+        this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.python", true);
         ++successCount;
     });
@@ -273,7 +273,7 @@ suite("Provider Tests", () =>
     test("Build Tree Variations  - Last Tasks Collapsed", async function()
     {
         if (exitRollingCount(21, successCount)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.configEventFast * 4) + (tc.slowTime.configEventFast * 2));
+        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 4) + (tc.slowTime.config.eventFast * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -298,7 +298,7 @@ suite("Provider Tests", () =>
     test("Build Tree Variations - Favorites Collapsed", async function()
     {
         if (exitRollingCount(22, successCount)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.configEventFast * 6) + (tc.slowTime.configEventFast * 2));
+        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 6) + (tc.slowTime.config.eventFast * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -323,7 +323,7 @@ suite("Provider Tests", () =>
     test("Build Tree Variations - Favorites Disabled", async function()
     {
         if (exitRollingCount(23, successCount)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.configEvent * 8) + (tc.slowTime.configEventFast * 4));
+        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.event * 8) + (tc.slowTime.config.eventFast * 4));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -350,7 +350,7 @@ suite("Provider Tests", () =>
     test("Build Tree Variations - Last Tasks Disabled", async function()
     {
         if (exitRollingCount(24, successCount)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.configEvent * 6) + (tc.slowTime.configEventFast * 2));
+        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.event * 6) + (tc.slowTime.config.eventFast * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -399,7 +399,7 @@ suite("Provider Tests", () =>
     test("Add to Excludes - TaskItem", async function()
     {
         if (exitRollingCount(27, successCount)) return;
-        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.configGlobEvent);
+        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.excludeCommand);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
         for (const taskItem of Object.values(taskMap))
@@ -412,7 +412,7 @@ suite("Provider Tests", () =>
                 ) as TaskItem;
                 if (node)
                 {
-                    await executeTeCommand("addToExcludes", tc.waitTime.configEvent, 3000, node);
+                    await executeTeCommand("addToExcludes", tc.waitTime.config.event, 3000, node);
                     break;
                 }
             }
@@ -425,7 +425,7 @@ suite("Provider Tests", () =>
     test("Add to Excludes - TaskItem (Script Type)", async function()
     {
         if (exitRollingCount(28, successCount)) return;
-        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.configGlobEvent);
+        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.excludeCommand);
         const taskItems = await tasks.fetchTasks({ type: "batch" }),
               scriptCt = taskItems.length;
         for (const property in taskMap)
@@ -454,7 +454,7 @@ suite("Provider Tests", () =>
     test("Add to Excludes - TaskFile", async function()
     {
         if (exitRollingCount(29, successCount)) return;
-        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.configGlobEvent);
+        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.config.excludesEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
         for (const property in taskMap)
@@ -544,7 +544,7 @@ suite("Provider Tests", () =>
     test("Makefile Delete / Add", async function()
     {
         if (exitRollingCount(35, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent + tc.slowTime.configEvent);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent + tc.slowTime.config.event);
         const file = join(rootPath, "Makefile");
         removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
@@ -584,7 +584,7 @@ suite("Provider Tests", () =>
     test("Disable Pipenv (Off by Default)", async function()
     {
         if (exitRollingCount(38, successCount)) return;
-        this.slow(tc.slowTime.configDisableEvent);
+        this.slow(tc.slowTime.config.disableEvent);
         await executeSettingsUpdate("enabledTasks.pipenv", false);
         ++successCount;
     });
@@ -593,7 +593,7 @@ suite("Provider Tests", () =>
     test("Run Refresh Task", async function()
     {
         if (exitRollingCount(39, successCount)) return;
-        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.configEvent * 2));
+        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.config.event * 2));
         await executeSettingsUpdate("specialFolders.expanded.test-files", true);
         await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
@@ -604,14 +604,14 @@ suite("Provider Tests", () =>
     test("Invalidate Bash Tasks With New Bash Shell Setting", async function()
     {
         if (exitRollingCount(40, successCount)) return;
-        this.slow(tc.slowTime.buildFileCache + tc.slowTime.configEvent + tc.slowTime.min +
+        this.slow(tc.slowTime.buildFileCache + tc.slowTime.config.event + tc.slowTime.min +
                   (tc.slowTime.refreshCommand* 2) + (tc.waitTime.refreshCommand* 2));
         await teApi.config.updateVsWs("terminal.integrated.shell.windows",
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
         await waitForTeIdle(tc.waitTime.refreshCommand);
         await teApi.testsApi.fileCache.buildTaskTypeCache("bash", (workspace.workspaceFolders as WorkspaceFolder[])[0], true, "");
         await waitForTeIdle(tc.waitTime.min);
-        await executeSettingsUpdate("specialFolders.expanded.test-files", false, tc.waitTime.configEvent);
+        await executeSettingsUpdate("specialFolders.expanded.test-files", false, tc.waitTime.config.event);
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
         await waitForTeIdle(tc.waitTime.refreshCommand);
         ++successCount;
@@ -631,7 +631,7 @@ suite("Provider Tests", () =>
     test("Groups with Separator", async function()
     {
         if (exitRollingCount(42, successCount)) return;
-        this.slow(tc.slowTime.configGroupingEvent * 3);
+        this.slow(tc.slowTime.config.groupingEvent * 3);
         await executeSettingsUpdate("groupWithSeparator", true);
         await executeSettingsUpdate("groupSeparator", "-");
         await executeSettingsUpdate("groupMaxLevel", 5);
@@ -642,7 +642,7 @@ suite("Provider Tests", () =>
     test("Add to Excludes After Grouping", async function()
     {
         if (exitRollingCount(43, successCount)) return;
-        this.slow(tc.slowTime.configExcludesEvent + tc.slowTime.configGlobEvent + (tc.slowTime.fetchTasksCommand * 2) + tc.slowTime.min);
+        this.slow(tc.slowTime.config.event + tc.slowTime.config.globEvent + (tc.slowTime.fetchTasksCommand * 2) + tc.slowTime.min);
         const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItemsB4.length;
         for (const taskItem of Object.values(taskMap))

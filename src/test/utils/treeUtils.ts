@@ -24,13 +24,13 @@ export const refresh = async(instance?: any) =>
           tc = utils.testControl;
     if (instance) {
         instance.slow(tc.slowTime.refreshCommand + tc.waitTime.refreshCommand +
-                      (tc.waitTime.min * 2) + (!didSetGroupLevel ? (tc.slowTime.configGroupingEvent * 2) : 0));
-        instance.timeout((tc.slowTime.refreshCommand  * 2) + (!didSetGroupLevel ? (tc.slowTime.configGroupingEvent * 2) : 0) + (tc.waitTime.min * 2));
+                      (tc.waitTime.min * 2) + (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0));
+        instance.timeout((tc.slowTime.refreshCommand  * 2) + (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0) + (tc.waitTime.min * 2));
     }
     if (!didSetGroupLevel)
     {
-        await utils.executeSettingsUpdate("groupWithSeparator", true, tc.waitTime.configGroupingEvent);
-        await utils.executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.configGroupingEvent);
+        await utils.executeSettingsUpdate("groupWithSeparator", true, tc.waitTime.config.groupingEvent);
+        await utils.executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.config.groupingEvent);
         await utils.waitForTeIdle(tc.waitTime.min);
         didSetGroupLevel = true;
     }
