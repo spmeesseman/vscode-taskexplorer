@@ -92,7 +92,7 @@ export default class TaskFile extends TreeItem implements ITaskFile
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
     constructor(context: ExtensionContext, folder: TaskFolder, taskDef: ITaskDefinition, source: string,
-                relativePath: string, groupLevel: number, group?: boolean, label?: string, logPad = "")
+                relativePath: string, groupLevel: number, group: boolean, label: string | undefined, logPad: string)
     {
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group || false), TreeItemCollapsibleState.Collapsed);
 
@@ -154,15 +154,14 @@ export default class TaskFile extends TreeItem implements ITaskFile
         if (!group)
         {
             this.contextValue = "taskFile" + util.properCase(this.taskSource);
-        }
-        else { //
-              // When a grouped node is created, the definition for the first task is passed to this
-             // function.  Remove the filename part of tha path for this resource
-            //
-            this.fileName = "group";      // change to name of directory
+        }       //
+        else { // When a grouped node is created, the definition for the first task is passed
+              // to this function. Remove the filename part of tha path for this resource.
+             //
+            this.fileName = "group"; // change to name of directory
             // Use a custom toolip (default is to display resource uri)
             const taskName = util.getTaskTypeFriendlyName(source, true);
-            this.tooltip = `A tree item representing a ${taskName} task file${group ? " grouping" : ""}`;
+            this.tooltip = `A tree item representing a ${taskName} task file grouping`;
             this.contextValue = "taskGroup" + util.properCase(this.taskSource);
             this.groupLevel = groupLevel;
         }
