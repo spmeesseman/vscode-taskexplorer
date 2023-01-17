@@ -97,6 +97,7 @@ export const testControl: ITestControl =
         licenseManagerLocalStartServer: 1150,
         licenseManagerRemoteCheck: 3000,
         licenseManagerRemoteStartServer: 3850,
+        min: 50,
         npmCommand: 11925,
         npmCommandPkg: 9300,
         npmInstallCommand: 19650,
@@ -270,6 +271,7 @@ export interface ITestControl
         licenseManagerLocalStartServer: number;
         licenseManagerRemoteCheck: number;
         licenseManagerRemoteStartServer: number;
+        min: number;
         npmCommand: number;
         npmCommandPkg: number;
         npmInstallCommand: number;

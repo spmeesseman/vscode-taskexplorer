@@ -171,7 +171,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Default", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent + tc.waitTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -189,7 +189,7 @@ suite("Ant Tests", () =>
     test("Ant Parser Invalid Target", async function()
     {
         if (exitRollingCount(11, successCount)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent + tc.waitTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -209,7 +209,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Target", async function()
     {
         if (exitRollingCount(12, successCount)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent + tc.waitTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -226,7 +226,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Project", async function()
     {
         if (exitRollingCount(13, successCount)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent + tc.waitTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -243,7 +243,7 @@ suite("Ant Tests", () =>
     test("Ant Parser Invalid Xml", async function()
     {
         if (exitRollingCount(14, successCount)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent + tc.waitTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +

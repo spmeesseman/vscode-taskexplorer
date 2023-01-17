@@ -72,8 +72,8 @@ suite("App-Publisher Tests", () =>
     test("Start", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(tc.slowTime.verifyTaskCount + tc.waitTime.verifyTaskCountRetryInterval);
-        await verifyTaskCount(testsName, startTaskCount, 5, tc.waitTime.verifyTaskCountRetryInterval);
+        this.slow(tc.slowTime.verifyTaskCount);
+        await verifyTaskCount(testsName, startTaskCount, 5);
         ++successCount;
     });
 
@@ -93,7 +93,7 @@ suite("App-Publisher Tests", () =>
     test("Create file", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.waitTime.fsCreateEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -115,7 +115,7 @@ suite("App-Publisher Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(tc.slowTime.configDisableEvent + tc.waitTime.configDisableEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.configDisableEvent + tc.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
@@ -125,7 +125,7 @@ suite("App-Publisher Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
         ++successCount;
@@ -135,7 +135,7 @@ suite("App-Publisher Tests", () =>
     test("Invalid JSON", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -162,7 +162,7 @@ suite("App-Publisher Tests", () =>
     test("Fix Invalid JSON", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.waitTime.fsModifyEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -189,7 +189,7 @@ suite("App-Publisher Tests", () =>
     test("Delete file", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteEvent + tc.waitTime.fsDeleteEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -200,7 +200,7 @@ suite("App-Publisher Tests", () =>
     test("Disable (Default is OFF)", async function()
     {
         if (exitRollingCount(11, successCount)) return;
-        this.slow(tc.slowTime.configDisableEvent + tc.waitTime.configDisableEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.configDisableEvent + tc.slowTime.verifyTaskCount);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;

@@ -91,7 +91,7 @@ suite("Python Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, false, tc.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
@@ -101,7 +101,7 @@ suite("Python Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent+ tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
@@ -111,7 +111,7 @@ suite("Python Tests", () =>
     test("Create Empty Directory", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.fsCreateFolderEvent + tc.waitTime.fsCreateFolderEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsCreateFolderEvent + tc.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fsCreateFolderEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -122,7 +122,7 @@ suite("Python Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(tc.waitTime.fsCreateEvent + tc.waitTime.fsCreateFolderEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.waitTime.fsCreateEvent + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await waitForTeIdle(tc.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
@@ -133,7 +133,7 @@ suite("Python Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteEvent + tc.waitTime.fsDeleteEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -144,7 +144,7 @@ suite("Python Tests", () =>
     test("Re-create File", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.waitTime.fsCreateEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await waitForTeIdle(tc.waitTime.fsCreateEvent);
         await verifyTaskCount(testsName, startTaskCount + 1, 1);

@@ -132,8 +132,8 @@ suite("Configuration / Settings Tests", () =>
     test("Ant Glob", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.slowTime.configReadEvent +
-                  tc.waitTime.configGlobEvent + tc.slowTime.configReadEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.slowTime.configReadEvent +
+                  tc.waitTime.configGlobEvent + tc.slowTime.configReadEvent + tc.slowTime.min);
         globPatterns = teApi.config.get<string[]>("globPatternsAnt");
         await executeSettingsUpdate("enabledTasks.ant", false, tc.waitTime.configEnableEvent);
         globPatterns.push("**/dummy.xml");
@@ -146,7 +146,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Ant Glob", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.waitTime.configGlobEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.slowTime.min);
         await executeSettingsUpdate("enabledTasks.ant", true, tc.waitTime.configEnableEvent);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsAnt", globPatterns, tc.waitTime.configGlobEvent);
@@ -158,7 +158,7 @@ suite("Configuration / Settings Tests", () =>
     test("Bash Glob", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.slowTime.configReadEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.slowTime.configReadEvent + tc.slowTime.min);
         globPatterns = teApi.config.get<string[]>("globPatternsBash");
         await executeSettingsUpdate("enabledTasks.bash", false, tc.waitTime.configEnableEvent);
         globPatterns.push("**/extensionless/**");
@@ -171,7 +171,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Bash Glob", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.waitTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.configGlobEvent + tc.slowTime.min);
         await executeSettingsUpdate("enabledTasks.bash", true, tc.waitTime.configEnableEvent);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsBash", globPatterns);
@@ -235,7 +235,7 @@ suite("Configuration / Settings Tests", () =>
     test("Change Default Shell - OSX", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.configEvent + tc.slowTime.min);
         await teApi.config.updateVsWs("terminal.integrated.shell.osx", "/usr/bin/sh");
         await sleep(tc.waitTime.min);
         successCount++;
@@ -245,7 +245,7 @@ suite("Configuration / Settings Tests", () =>
     test("Change Default Shell - Linux", async function()
     {
         if (exitRollingCount(11, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.configEvent + tc.slowTime.min);
         await teApi.config.updateVsWs("terminal.integrated.shell.linux", "/bin/sh");
         await sleep(tc.waitTime.min);
         successCount++;
@@ -265,7 +265,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - OSX", async function()
     {
         if (exitRollingCount(13, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.configEvent);
+        this.slow(tc.slowTime.configEvent);
         // Set up coverage on if() statement in configWatcher ~ ln 240
         testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks", {
@@ -301,7 +301,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - Windows", async function()
     {
         if (exitRollingCount(15, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.refreshCommandNoChanges + tc.slowTime.refreshCommandNoChanges);
+        this.slow(tc.slowTime.configEvent + tc.slowTime.refreshCommandNoChanges);
         // Set up coverage on if() statement in configWatcher ~ ln 240
         testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks", enabledTasks); // reset back to default enabled tasks
@@ -315,8 +315,8 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Set Bash", async function()
     {
         if (exitRollingCount(16, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
-        await executeSettingsUpdate("pathToPrograms.bash", "c:\\unix\\sh.exe", tc.waitTime.min, tc.waitTime.min * 2);
+        this.slow(tc.slowTime.configEvent);
+        await executeSettingsUpdate("pathToPrograms.bash", "c:\\unix\\sh.exe");
         successCount++;
     });
 
@@ -324,8 +324,8 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Set Composer", async function()
     {
         if (exitRollingCount(17, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
-        await executeSettingsUpdate("pathToPrograms.composer", "c:\\php5\\composer.exe", tc.waitTime.min, tc.waitTime.min * 2);
+        this.slow(tc.slowTime.configEvent);
+        await executeSettingsUpdate("pathToPrograms.composer", "c:\\php5\\composer.exe");
         successCount++;
     });
 
@@ -333,8 +333,8 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Clear Bash", async function()
     {
         if (exitRollingCount(18, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
-        await executeSettingsUpdate("pathToPrograms.bash", undefined, tc.waitTime.min, tc.waitTime.min * 2);
+        this.slow(tc.slowTime.configEvent);
+        await executeSettingsUpdate("pathToPrograms.bash", undefined);
         successCount++;
     });
 
@@ -342,8 +342,8 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Clear Composer", async function()
     {
         if (exitRollingCount(19, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
-        await executeSettingsUpdate("pathToPrograms.composer", undefined, tc.waitTime.min, tc.waitTime.min * 2);
+        this.slow(tc.slowTime.configEvent);
+        await executeSettingsUpdate("pathToPrograms.composer", undefined);
         successCount++;
     });
 
@@ -351,8 +351,8 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Restore Bash", async function()
     {
         if (exitRollingCount(20, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
-        await executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash, tc.waitTime.min, tc.waitTime.min * 2);
+        this.slow(tc.slowTime.configEvent);
+        await executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash);
         successCount++;
     });
 
@@ -360,8 +360,8 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Restore Composer", async function()
     {
         if (exitRollingCount(21, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
-        await executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer, tc.waitTime.min, tc.waitTime.min * 2);
+        this.slow(tc.slowTime.configEvent);
+        await executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer);
         successCount++;
     });
 

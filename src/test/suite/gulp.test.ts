@@ -73,7 +73,7 @@ suite("Gulp Tests", () =>
     test("Start", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        this.slow(tc.slowTime.verifyTaskCount + tc.waitTime.min);
+        this.slow(tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await verifyTaskCount(testsName, startTaskCount);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -83,7 +83,7 @@ suite("Gulp Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(tc.slowTime.configDisableEvent + tc.slowTime.verifyTaskCount + tc.waitTime.configDisableEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.configDisableEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await teApi.config.updateWs("enabledTasks.gulp", false);
         await waitForTeIdle(tc.waitTime.configDisableEvent);
         await verifyTaskCount(testsName, 0);
@@ -95,7 +95,7 @@ suite("Gulp Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount + tc.waitTime.configEnableEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.configEnableEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await teApi.config.updateWs("enabledTasks.gulp", true);
         await waitForTeIdle(tc.waitTime.configEnableEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -107,7 +107,7 @@ suite("Gulp Tests", () =>
     test("Create JS File", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.verifyTaskCount + tc.waitTime.fsCreateEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         if (!(await fsApi.pathExists(dirName))) {
             await fsApi.createDir(dirName);
         }
@@ -133,7 +133,7 @@ suite("Gulp Tests", () =>
     test("Add Task to JS File", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(tc.slowTime.fsModifyEvent + tc.slowTime.verifyTaskCount + tc.waitTime.fsModifyEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.fsModifyEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
@@ -160,7 +160,7 @@ suite("Gulp Tests", () =>
     test("Remove 2 Tasks from JS File", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount + tc.waitTime.fsModifyEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
@@ -178,7 +178,7 @@ suite("Gulp Tests", () =>
     test("Delete JS File", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount + tc.waitTime.fsDeleteEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -190,7 +190,7 @@ suite("Gulp Tests", () =>
     test("Create MJS File", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.verifyTaskCount + tc.waitTime.fsCreateEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         if (!(await fsApi.pathExists(dirName))) {
             await fsApi.createDir(dirName);
         }
@@ -226,7 +226,7 @@ suite("Gulp Tests", () =>
     test("Delete Directory w/ MJS File", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteFolderEvent + tc.slowTime.verifyTaskCount + tc.waitTime.fsDeleteEvent + (tc.waitTime.min * 2));
+        this.slow(tc.slowTime.fsDeleteFolderEvent + tc.slowTime.verifyTaskCount + (tc.waitTime.min * 2));
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -239,7 +239,7 @@ suite("Gulp Tests", () =>
     test("Gulp Parser", async function()
     {
         if (exitRollingCount(11, successCount)) return;
-        this.slow((tc.slowTime.configEnableEvent * 2) + (tc.waitTime.configEvent * 2) + tc.waitTime.configEnableEvent +
+        this.slow((tc.slowTime.configEnableEvent * 2) + (tc.waitTime.configEvent * 2) +
                   tc.waitTime.configDisableEvent + (tc.slowTime.verifyTaskCount * 2) + (tc.slowTime.tasks.gulpParser * 4));
         //
         // Use Gulp to parse tasks. The configuration change will cause gulp tasks to be invalidated and refreshed
@@ -262,8 +262,7 @@ suite("Gulp Tests", () =>
     test("Turn VSCode Gulp Provider On", async function()
     {
         if (exitRollingCount(12, successCount)) return;
-        this.slow(tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount +
-                  tc.waitTime.min + tc.waitTime.configEnableEvent + 3000);
+        this.slow(tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.slowTime.min + 3000);
         await configuration.updateVs("gulp.autoDetect", "on");
         await waitForTeIdle(tc.waitTime.configEnableEvent);
         await sleep(3000);
@@ -277,8 +276,7 @@ suite("Gulp Tests", () =>
     test("Turn VSCode Gulp Provider Off", async function()
     {
         if (exitRollingCount(13, successCount)) return;
-        this.slow(tc.slowTime.configEventFast +  tc.slowTime.refreshCommand +
-                  tc.slowTime.verifyTaskCount + tc.waitTime.min + tc.waitTime.configEnableEvent + 1500);
+        this.slow(tc.slowTime.configEventFast +  tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.slowTime.min + 1500);
         await configuration.updateVs("gulp.autoDetect", "off");
         await waitForTeIdle(tc.waitTime.configEnableEvent);
         await sleep(1500);

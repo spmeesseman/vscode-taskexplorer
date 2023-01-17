@@ -83,14 +83,13 @@ suite("Tree Tests", () =>
     test("Remove from Favorites", async function()
     {
         if (utils.exitRollingCount(3, successCount)) return;
-        this.slow((tc.slowTime.command * 6) + tc.waitTime.command);
+        this.slow(tc.slowTime.command * 6);
         await utils.executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         await utils.executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
         await utils.executeTeCommand2("addRemoveFavorite", [ ant[0] ]);
         await utils.executeTeCommand2("addRemoveFavorite", [ bash[0] ]);
         await utils.executeTeCommand2("addRemoveFavorite", [ python[0] ]);
         await utils.executeTeCommand2("addRemoveFavorite", [ python[1] ]);
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 
@@ -139,7 +138,6 @@ suite("Tree Tests", () =>
         if (removed) {
             await utils.executeTeCommand2("addRemoveFavorite", [ python[1] ]);
         }
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 
@@ -147,7 +145,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 1", async function()
     {
         if (utils.exitRollingCount(6, successCount)) return;
-        this.slow(tc.slowTime.command + tc.waitTime.command);
+        this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -163,7 +161,6 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
                     }
-                    await utils.waitForTeIdle(tc.waitTime.command);
                 }
             }
         }
@@ -174,7 +171,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 2", async function()
     {
         if (utils.exitRollingCount(7, successCount)) return;
-        this.slow(tc.slowTime.command + tc.waitTime.command);
+        this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -190,7 +187,6 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
                     }
-                    await utils.waitForTeIdle(tc.waitTime.command);
                 }
             }
         }
@@ -201,7 +197,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 3", async function()
     {
         if (utils.exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.command + tc.waitTime.command);
+        this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -217,7 +213,6 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
                     }
-                    await utils.waitForTeIdle(tc.waitTime.command);
                 }
             }
         }
@@ -228,7 +223,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 4", async function()
     {
         if (utils.exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.command + tc.waitTime.command);
+        this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -244,7 +239,6 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem4 ]);
                     }
-                    await utils.waitForTeIdle(tc.waitTime.command);
                 }
             }
         }
@@ -255,7 +249,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 5", async function()
     {
         if (utils.exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.command + tc.waitTime.command);
+        this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -271,7 +265,6 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem5 ]);
                     }
-                    await utils.waitForTeIdle(tc.waitTime.command);
                 }
             }
         }
@@ -282,7 +275,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 6", async function()
     {
         if (utils.exitRollingCount(11, successCount)) return;
-        this.slow(tc.slowTime.command + tc.waitTime.command);
+        this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if (taskTree)
         {
@@ -298,7 +291,6 @@ suite("Tree Tests", () =>
                     if (removed) {
                         await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem6 ]);
                     }
-                    await utils.waitForTeIdle(tc.waitTime.command);
                 }
             }
         }
@@ -310,9 +302,8 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(12, successCount)) return;
         if (cstItem1) {
-            this.slow(tc.slowTime.command + tc.waitTime.command);
+            this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
-            await utils.waitForTeIdle(tc.waitTime.command);
         }
         ++successCount;
     });
@@ -322,9 +313,8 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(13, successCount)) return;
         if (cstItem2) {
-            this.slow(tc.slowTime.command + tc.waitTime.command);
+            this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
-            await utils.waitForTeIdle(tc.waitTime.command);
         }
         ++successCount;
     });
@@ -334,9 +324,8 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(14, successCount)) return;
         if (cstItem3) {
-            this.slow(tc.slowTime.command + tc.waitTime.command);
+            this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
-            await utils.waitForTeIdle(tc.waitTime.command);
         }
         ++successCount;
     });
@@ -346,9 +335,8 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(15, successCount)) return;
         if (cstItem4) {
-            this.slow(tc.slowTime.command + tc.waitTime.command);
+            this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem4 ]);
-            await utils.waitForTeIdle(tc.waitTime.command);
         }
         ++successCount;
     });
@@ -358,9 +346,8 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(16, successCount)) return;
         if (cstItem5) {
-            this.slow(tc.slowTime.command + tc.waitTime.command);
+            this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem5 ]);
-            await utils.waitForTeIdle(tc.waitTime.command);
         }
         ++successCount;
     });
@@ -370,9 +357,8 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(17, successCount)) return;
         if (cstItem6) {
-            this.slow(tc.slowTime.command + tc.waitTime.command);
+            this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem6 ]);
-            await utils.waitForTeIdle(tc.waitTime.command);
         }
         ++successCount;
     });
@@ -384,19 +370,16 @@ suite("Tree Tests", () =>
         this.slow((tc.slowTime.command * 3) + (tc.waitTime.command * 3));
         utils.overrideNextShowInputBox(undefined);
         await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
-        await utils.waitForTeIdle(tc.waitTime.command);
         //
         // There's come kind of timing issue I havent figured out yet, send a few to make sure we hit
         //
         utils.clearOverrideShowInputBox();
         utils.overrideNextShowInputBox(undefined);
         await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
-        await utils.waitForTeIdle(tc.waitTime.command);
         //
         utils.clearOverrideShowInputBox();
         utils.overrideNextShowInputBox(undefined);
         await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 
@@ -404,11 +387,9 @@ suite("Tree Tests", () =>
     test("Hide Favorites", async function()
     {
         if (utils.exitRollingCount(19, successCount)) return;
-        this.slow((tc.slowTime.showHideSpecialFolder * 2) + (tc.waitTime.command * 2) + (tc.waitTime.configEvent  * 2));
+        this.slow((tc.slowTime.showHideSpecialFolder * 2) + (tc.waitTime.configEvent  * 2));
         await utils.executeSettingsUpdate("specialFolders.showFavorites", false);
-        await utils.waitForTeIdle(tc.waitTime.command);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true);
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 
@@ -416,9 +397,8 @@ suite("Tree Tests", () =>
     test("Hide Last Tasks", async function()
     {
         if (utils.exitRollingCount(20, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder + tc.waitTime.command + tc.waitTime.configEvent);
+        this.slow(tc.slowTime.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 
@@ -426,7 +406,7 @@ suite("Tree Tests", () =>
     test("Refresh", async function()
     {
         if (utils.exitRollingCount(21, successCount)) return;
-        this.slow(tc.slowTime.refreshCommand + tc.waitTime.command);
+        this.slow(tc.slowTime.refreshCommand);
         await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
         ++successCount;
     });
@@ -435,9 +415,8 @@ suite("Tree Tests", () =>
     test("Show Favorites", async function()
     {
         if (utils.exitRollingCount(22, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder + tc.waitTime.configEvent + tc.waitTime.command);
+        this.slow(tc.slowTime.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true);
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 
@@ -445,9 +424,8 @@ suite("Tree Tests", () =>
     test("Show Last Tasks", async function()
     {
         if (utils.exitRollingCount(23, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder + tc.waitTime.configEvent + tc.waitTime.command);
+        this.slow(tc.slowTime.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 
@@ -455,14 +433,11 @@ suite("Tree Tests", () =>
     test("Show Favorite Tasks w/ Last Tasks", async function()
     {
         if (utils.exitRollingCount(24, successCount)) return;
-        this.slow((tc.slowTime.showHideSpecialFolder * 4)  + (tc.waitTime.command * 4));
+        this.slow((tc.slowTime.showHideSpecialFolder * 4));
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await utils.waitForTeIdle(tc.waitTime.command);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", false);
-        await utils.waitForTeIdle(tc.waitTime.command);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true);
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 
@@ -470,7 +445,7 @@ suite("Tree Tests", () =>
     test("Show Favorite Tasks Only", async function()
     {
         if (utils.exitRollingCount(25, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder + tc.waitTime.command);
+        this.slow(tc.slowTime.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
         ++successCount;
     });
@@ -479,10 +454,9 @@ suite("Tree Tests", () =>
     test("Hide Favorite and Last Tasks", async function()
     {
         if (utils.exitRollingCount(26, successCount)) return;
-        this.slow((tc.slowTime.showHideSpecialFolder * 2) + tc.waitTime.command);
+        this.slow((tc.slowTime.showHideSpecialFolder * 2));
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", false);
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 
@@ -490,9 +464,8 @@ suite("Tree Tests", () =>
     test("Show Favorite Tasks", async function()
     {
         if (utils.exitRollingCount(27, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder + tc.waitTime.command);
+        this.slow(tc.slowTime.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true);
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 
@@ -500,9 +473,8 @@ suite("Tree Tests", () =>
     test("Show Last Tasks", async function()
     {
         if (utils.exitRollingCount(28, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder + tc.waitTime.command);
+        this.slow(tc.slowTime.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 
@@ -522,16 +494,12 @@ suite("Tree Tests", () =>
         this.slow(tc.slowTime.command * 4);
         utils.overrideNextShowInfoBox("No");
         await utils.executeTeCommand("clearLastTasks");
-        await utils.waitForTeIdle(tc.waitTime.command);
         utils.overrideNextShowInfoBox("No");
         await utils.executeTeCommand("clearFavorites");
-        await utils.waitForTeIdle(tc.waitTime.command);
         utils.overrideNextShowInfoBox("Yes");
         await utils.executeTeCommand("clearLastTasks");
-        await utils.waitForTeIdle(tc.waitTime.command);
         utils.overrideNextShowInfoBox("Yes");
         await utils.executeTeCommand("clearFavorites");
-        await utils.waitForTeIdle(tc.waitTime.command);
         ++successCount;
     });
 

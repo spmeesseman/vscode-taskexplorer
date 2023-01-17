@@ -471,6 +471,11 @@ suite("Util Tests", () =>
 		expect(util.isNumber({ test: true })).to.equal(false);
 		expect(util.isNumber([ 1, 2 ])).to.equal(false);
 
+		expect(util.isObject("1")).to.equal(false);
+		expect(util.isObject(1)).to.equal(false);
+		expect(util.isObject([])).to.equal(false);
+		expect(util.isObject([ "1" ])).to.equal(false);
+		expect(util.isObject({ a: 1 })).to.equal(true);
 		expect(util.isObjectEmpty({})).to.equal(true);
 		expect(util.isObjectEmpty({ a: 1 })).to.equal(false);
 		util.isObjectEmpty([]);
