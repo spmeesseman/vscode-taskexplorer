@@ -15,7 +15,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
 {
     private suffixRuleTargets = /^(\.\w+|\.\w+\.\w+)$/;
     private patternRuleTargets = /^(%\.\w+|%)$/;
-    private ruleTargetExp = /^([\w-.\/ ]+)\s*:[^=]/mg;  // note does not disallow leading '.', this must be checked separately.
+    private ruleTargetExp = /^((?:\/|)[\w\-. ]+)\s*:[^=]/gm;  // note does not disallow leading '.', this must be checked separately.
     // See: https://www.gnu.org/software/make/manual/html_node/Special-Targets.html
     private specialTargets = new Set([
         ".PHONY",
