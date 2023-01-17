@@ -823,17 +823,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 [ "description", element.description ], [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
             ]);
         }
+        else if (element instanceof TaskItem)
+        {
+            log.values(logLevel + 1, logPad + "   ", [
+                [ "tree item type", "task item" ], [ "label", element.label ], [ "id", element.id ],
+                [ "taskitem id", element.task.definition.taskItemId ], [ "description", element.description ],
+                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ],
+            ]);
+        }
         else /* istanbul ignore else */ if (!element)
         {
             log.value("tree item type", "asking for all (null)", logLevel + 1, logPad + "   ");
         }
-        // else
-        // {
-        //     log.values(logLevel + 1, logPad + "   ", [
-        //         [ "tree item type", "unknown" ], [ "label", element.label ], [ "id", element.id ],
-        //         [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
-        //     ]);
-        // }
+        else
+        {
+            log.values(logLevel + 1, logPad + "   ", [
+                [ "tree item type", "unknown" ], [ "label", element.label ], [ "id", element.id ],
+                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
+            ]);
+        }
 
         //
         // The vscode task engine processing will call back in multiple time while we are awaiting
