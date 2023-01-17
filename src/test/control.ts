@@ -85,7 +85,8 @@ export const testControl: ITestControl =
         explorerViewStartup: 19050,
         fetchTasksCommand: 3000,
         fileCachePersist: 470,
-        findDocumentPositionCommand: 870,
+        findTaskPosition: 870,
+        findTaskPositionDocOpen: 115,
         focusCommand: 3400,
         focusCommandAlreadyFocused: 130,
         focusCommandChangeViews: 130,
@@ -132,9 +133,7 @@ export const testControl: ITestControl =
         verifyTaskCountFirstCall: 1350,
         verifyTaskCountNpm: 3175, // internal vscode npm task provider is slower than shit wtf
         verifyTaskCountWorkspace: 3500,
-        viewReport: 1950,
-        walkTaskTree: 5500,
-        walkTaskTreeWithDocOpen: 28850
+        viewReport: 1950
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)
@@ -266,7 +265,8 @@ export interface ITestControl
         explorerViewStartup: number;
         fetchTasksCommand: number;
         fileCachePersist: number;
-        findDocumentPositionCommand: number;
+        findTaskPosition: number;
+        findTaskPositionDocOpen: number;
         focusCommand: number;
         focusCommandAlreadyFocused: number;
         focusCommandChangeViews: number;
@@ -314,8 +314,6 @@ export interface ITestControl
         verifyTaskCountNpm: number; // npm task provider is slower than shit on a turtle
         verifyTaskCountWorkspace: number;
         viewReport: number;
-        walkTaskTree: number;
-        walkTaskTreeWithDocOpen: number;
     };
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME; OR waitTime.max)

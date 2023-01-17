@@ -380,14 +380,11 @@ suite("Provider Tests", () =>
     test("Open Tasks for Edit", async function()
     {
         if (exitRollingCount(25, successCount)) return;
-        //
-        // The 3rd param `true` will open the task files and locate task positions while parsing the tree
-        //
-        this.slow(tc.slowTime.walkTaskTreeWithDocOpen + tc.slowTime.min);
-        this.timeout(tc.slowTime.walkTaskTreeWithDocOpen * 2);
-        taskMap = await treeUtils.walkTreeItems(undefined, true);
-        await waitForTeIdle(tc.waitTime.min);
+        let numOpened: number;
+        let numFilesOpened: number;
+        ({ taskMap, numOpened, numFilesOpened } = await treeUtils.walkTreeItems(undefined, true));
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10);
+        this.slow((numFilesOpened * tc.slowTime.findTaskPosition) + ((numOpened - numFilesOpened) * tc.slowTime.findTaskPositionDocOpen));
         ++successCount;
     });
 

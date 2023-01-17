@@ -126,7 +126,7 @@ suite("NPM Tests", () =>
     test("Document Position", async function()
     {
         if (utils.exitRollingCount(5, successCount)) return;
-        this.slow((tc.slowTime.findDocumentPositionCommand * npmTaskItems.length) + tc.slowTime.commandFast);
+        this.slow((tc.slowTime.findTaskPosition * npmTaskItems.length) + tc.slowTime.commandFast);
         for (const taskItem of npmTaskItems) {
             await utils.executeTeCommand2("open", [ taskItem ], tc.waitTime.commandFast);
         }

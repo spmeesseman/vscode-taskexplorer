@@ -85,7 +85,7 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
             }
             if (retries % 10 === 0)
             {
-                taskMap = await walkTreeItems(undefined);
+                ({ taskMap } = await walkTreeItems(undefined));
             }
             if (!taskMap || isObjectEmpty(taskMap))
             {
@@ -137,8 +137,11 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
     const teApi = utils.getTeApi(),
           figures = utils.figures,
           taskMap: TaskMap = {},
-          now = Date.now();
-    let done = false;
+          now = Date.now(),
+          filesOpened: string[] = [];
+    let done = false,
+        numOpened = 0,
+        numFilesOpened = 0;
 
     let treeItems = await teApi.testsApi.explorer.getChildren();
     if (!treeItems || treeItems.length === 0)
@@ -150,7 +153,11 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
         }
         if (!treeItems || treeItems.length === 0) {
             console.log(`    ${figures.color.error} No tree items!!`);
-            return taskMap;
+            return {
+                taskMap,
+                numOpened,
+                numFilesOpened
+            };
         }
     }
 
@@ -194,7 +201,12 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
                 if (item3 instanceof TaskItem)
                 {
                     if (executeOpenForTests) {
-                        await utils.executeTeCommand2("open", [ item3 ], 5);
+                        await utils.executeTeCommand2("open", [ item3 ], 4);
+                        if (!filesOpened.includes(item3.taskFile.resourceUri.fsPath)) {
+                            filesOpened.push(item3.taskFile.resourceUri.fsPath);
+                            ++numFilesOpened;
+                        }
+                        ++numOpened;
                     }
                     if (item3.task && item3.task.definition)
                     {
@@ -242,22 +254,22 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
 
     for (const item of treeItems.filter(i => i instanceof TaskFolder))
     {
-        // let isFav = false, isLast = false, isUser = false;
-        // isFav = (item.label as string).includes(constants.FAV_TASKS_LABEL);
-        // isLast = (item.label as string).includes(constants.LAST_TASKS_LABEL);
-        // isUser = (item.label as string).includes(constants.USER_TASKS_LABEL);
         await processItem(item);
     }
 
-    return taskMap;
+    return {
+        taskMap,
+        numOpened,
+        numFilesOpened
+    };
 };
 
 
 export const verifyTaskCountByTree = async(taskType: string, expectedCount: number, taskMap?: TaskMap) =>
 {
     const figures = utils.figures,
-          tasksMap = (taskMap || (await walkTreeItems(undefined))),
-    // const tasksMap = (teApi.explorer as ITaskExplorer).getTaskMap(),
-            taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
+          tasksMap = (taskMap || (await walkTreeItems(undefined)).taskMap),
+          // const tasksMap = (teApi.explorer as ITaskExplorer).getTaskMap(),
+          taskCount = findIdInTaskMap(`:${taskType}:`, tasksMap);
     assert(taskCount === expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 };
