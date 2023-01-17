@@ -76,6 +76,7 @@ export const testControl: ITestControl =
         configExcludesEvent: 475,
         configGlobEvent: 1940,
         configGroupingEvent: 700,
+        configPathToProgramsEvent: 725,
         configSpecialFolderEvent: 475,
         configReadEvent: 25,
         explorerViewStartup: 19050,
@@ -115,7 +116,7 @@ export const testControl: ITestControl =
         taskProviderReadUri: 100,
         taskCommand: 1600,
         tasks: {
-            antParser: 800,
+            antParser: 820,
             antTask: 4300,
             antTaskWithAnsicon: 4500,
             bashScript: 4000,
@@ -250,6 +251,7 @@ export interface ITestControl
         configExcludesEvent: number;
         configGlobEvent: number;
         configGroupingEvent: number;
+        configPathToProgramsEvent: number;
         configSpecialFolderEvent: number;
         configReadEvent: number;
         explorerViewStartup: number;

@@ -161,7 +161,7 @@ suite("Ant Tests", () =>
     test("Ant Parser", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(slowTimeforAntRunTasks);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.configPathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2, false, false);
         ++successCount;
