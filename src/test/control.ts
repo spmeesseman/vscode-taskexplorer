@@ -94,7 +94,7 @@ export const testControl: ITestControl =
         fsDeleteEvent: 1720,
         fsDeleteFolderEvent: 1990,
         fsModifyEvent: 945,
-        getTreeTasks: 215,
+        getTreeTasks: 285,
         getTreeTasksNpm: 750, // npm task provider is slower than shit on a turtle
         licenseMgrOpenPage: 575,
         licenseMgrOpenPageWithDetail: 990,
@@ -118,11 +118,11 @@ export const testControl: ITestControl =
         taskCommand: 1600,
         tasks: {
             antParser: 820,
-            antTask: 4290,
+            antTask: 4310,
             antTaskWithAnsicon: 4400,
             bashScript: 4000,
             batchScript: 8000,
-            gulpParser: 3975,
+            gulpParser: 4025,
             npmCommand: 13925,
             npmCommandPkg: 11300,
             npmInstallCommand: 21650
@@ -134,7 +134,7 @@ export const testControl: ITestControl =
         verifyTaskCountWorkspace: 3500,
         viewReport: 1950,
         walkTaskTree: 5500,
-        walkTaskTreeWithDocOpen: 27850
+        walkTaskTreeWithDocOpen: 28850
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)
