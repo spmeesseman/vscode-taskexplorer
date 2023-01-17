@@ -11,10 +11,10 @@ import {
 let teApi: ITaskExplorerApi;
 let testsApi: ITestsApi;
 let globPatterns: string[];
+let globPatternsAnt: string[];
+let globPatternsBash: string[];
 let enabledTasks: IDictionary<boolean>;
-let enabledTasksCurrent: IDictionary<boolean>;
 let pathToPrograms: IDictionary<string>;
-let pathToProgramsCurrent: IDictionary<string>;
 let shellW32: string, shellLnx: string, shellOsx: string, pkgMgr: string;
 let successCount = -1;
 
@@ -27,12 +27,12 @@ suite("Configuration / Settings Tests", () =>
         ({ teApi, testsApi } = await activate(this));
         testsApi = teApi.testsApi;
         enabledTasks = teApi.config.get<IDictionary<boolean>>("enabledTasks");
-        enabledTasksCurrent = { ...enabledTasks };
         pathToPrograms = teApi.config.get<IDictionary<string>>("pathToPrograms");
-        pathToProgramsCurrent = { ...pathToPrograms };
         shellW32 = teApi.config.getVs<string>("terminal.integrated.shell.windows");
         shellLnx = teApi.config.getVs<string>("terminal.integrated.shell.linux");
         shellOsx = teApi.config.getVs<string>("terminal.integrated.shell.osx");
+        globPatternsAnt = teApi.config.get<string[]>("globPatternsAnt");
+        globPatternsBash = teApi.config.get<string[]>("globPatternsBash");
         successCount++;
     });
 
@@ -41,11 +41,19 @@ suite("Configuration / Settings Tests", () =>
     {
         testsApi.enableConfigWatcher(false);
         try {
-            await executeSettingsUpdate("enabledTasks", enabledTasksCurrent);
-            await executeSettingsUpdate("pathToPrograms", pathToProgramsCurrent);
-            await teApi.config.updateVsWs("terminal.integrated.shell.windows", shellW32);
-            await teApi.config.updateVsWs("terminal.integrated.shell.linux", shellLnx);
-            await teApi.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
+            if (successCount < 3) {
+                await executeSettingsUpdate("globPatternsAnt", globPatternsAnt);
+                await executeSettingsUpdate("globPatternsBash", globPatternsBash);
+            }
+            if(successCount >= 13) {
+                await teApi.config.updateVsWs("terminal.integrated.shell.windows", shellW32);
+                await teApi.config.updateVsWs("terminal.integrated.shell.linux", shellLnx);
+                await teApi.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
+                if(successCount >= 16) {
+                    await executeSettingsUpdate("enabledTasks", enabledTasks);
+                    await executeSettingsUpdate("pathToPrograms", pathToPrograms);
+                }
+            }
         }
         catch {}
         finally { testsApi.enableConfigWatcher(true); }
@@ -260,7 +268,7 @@ suite("Configuration / Settings Tests", () =>
         this.slow(tc.slowTime.configEvent + tc.waitTime.configEvent);
         // Set up coverage on if() statement in configWatcher ~ ln 240
         testsApi.enableConfigWatcher(false);
-        await executeSettingsUpdate("enabledTasks", Object.assign(enabledTasks, {
+        await executeSettingsUpdate("enabledTasks", {
             bash: false,
             batch: false,
             nsis: false,
@@ -268,7 +276,7 @@ suite("Configuration / Settings Tests", () =>
             powershell: false,
             python: false,
             ruby: false
-        }));
+        });
         testsApi.enableConfigWatcher(true);
         await teApi.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
         await waitForTeIdle(tc.waitTime.configEvent);
@@ -279,13 +287,13 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - Linux", async function()
     {
         if (exitRollingCount(14, successCount)) return;
-        this.slow(tc.slowTime.configEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.configEvent + tc.slowTime.refreshCommandNoChanges + tc.slowTime.refreshCommandNoChanges);
         // Set up coverage on if() statement in configWatcher ~ ln 240
         testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks.nsis", true); // last of an or'd if() extension.ts ~line 240 processConfigChanges()
         testsApi.enableConfigWatcher(true);
         await teApi.config.updateVsWs("terminal.integrated.shell.linux", shellLnx);
-        await waitForTeIdle(tc.waitTime.configEvent);
+        await waitForTeIdle(tc.waitTime.refreshCommandNoChanges);
         successCount++;
     });
 

@@ -40,7 +40,6 @@ suite("Ant Tests", () =>
         buildXmlFileUri = Uri.file(buildXmlFile);
         buildFileXml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
         await executeSettingsUpdate("useAnt", false);
-        await executeSettingsUpdate("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ], tc.waitTime.configGlobEvent);
         ++successCount;
     });
 

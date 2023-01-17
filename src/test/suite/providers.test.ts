@@ -5,12 +5,11 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as assert from "assert";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import { join } from "path";
 import { expect } from "chai";
-import { workspace, tasks } from "vscode";
+import { workspace, tasks, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../lib/utils/utils";
 import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
@@ -46,7 +45,6 @@ suite("Provider Tests", () =>
         dirNameL2 = join(dirName, "subfolder");
         dirNameIgn = join(rootPath, "tasks_test_ignore_");
         await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ], tc.waitTime.configGlobEvent);
-        await executeSettingsUpdate("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ], tc.waitTime.configGlobEvent);
         ++successCount;
     });
 
@@ -56,19 +54,12 @@ suite("Provider Tests", () =>
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
         await waitForTeIdle(tc.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", tc.log.enabled, tc.waitTime.configEvent);
-        await executeSettingsUpdate("enabledTasks.apppublisher", false, tc.waitTime.configDisableEvent); // off by default
-        await executeSettingsUpdate("enabledTasks.gradle", false, tc.waitTime.configDisableEvent);       // off by default
-        await executeSettingsUpdate("enabledTasks.maven", false, tc.waitTime.configDisableEvent);        // off by default
-        await executeSettingsUpdate("enabledTasks.pipenv", false, tc.waitTime.configDisableEvent);       // off by default
-        // await executeSettingsUpdate("enabledTasks", {
-        //     apppublisher: false,
-        //     batch: false,
-        //     nsis: false,
-        //     maven: false,
-        //     gradle: false,
-        //     pipenv: false,
-        //     ruby: false
-        // });
+        await executeSettingsUpdate("enabledTasks", {
+            apppublisher: false, // off by default
+            gradle: false,       // off by default
+            maven: false,        // off by default
+            pipenv: false,       // off by default
+        });
         if (!tempDirsDeleted) {
             await deleteTempFilesAndDirectories();
         }
@@ -271,9 +262,9 @@ suite("Provider Tests", () =>
         // Check VSCode provided task types for the hell of it
         //
         let nTasks = await tasks.fetchTasks({ type: "grunt" });
-        assert(nTasks.length > 0, "No grunt tasks registered");
+        expect(nTasks.length).to.be.a("number").that.is.greaterThan(0, "No grunt tasks registered");
         nTasks = await tasks.fetchTasks({ type: "gulp" });
-        assert(nTasks.length > 0, "No gulp tasks registered");
+        expect(nTasks.length).to.be.a("number").that.is.greaterThan(0, "No gulp tasks registered");
         batch = await treeUtils.getTreeTasks("batch", 4) as TaskItem[];
         ++successCount;
     });
@@ -400,7 +391,6 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(26, successCount)) return;
         const provider = teApi.providers.batch;
-        assert(provider);
         provider.resolveTask(batch[0].task);
         ++successCount;
     });
@@ -618,13 +608,10 @@ suite("Provider Tests", () =>
         if (exitRollingCount(40, successCount)) return;
         this.slow(tc.slowTime.buildFileCache + tc.slowTime.configEvent + tc.waitTime.min + tc.waitTime.configEvent +
                   (tc.slowTime.refreshCommand* 2) + (tc.waitTime.refreshCommand* 2));
-        if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
         await teApi.config.updateVsWs("terminal.integrated.shell.windows",
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
         await waitForTeIdle(tc.waitTime.refreshCommand);
-        await teApi.testsApi.fileCache.buildTaskTypeCache("bash", workspace.workspaceFolders[0], true, "");
+        await teApi.testsApi.fileCache.buildTaskTypeCache("bash", (workspace.workspaceFolders as WorkspaceFolder[])[0], true, "");
         await waitForTeIdle(tc.waitTime.min);
         await executeSettingsUpdate("specialFolders.expanded.test-files", false, tc.waitTime.configEvent);
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
@@ -637,10 +624,7 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(41, successCount)) return;
         this.slow(tc.slowTime.buildFileCache + tc.waitTime.min);
-        if (!teApi || !teApi.explorer || !workspace.workspaceFolders) {
-            assert.fail("        ✘ Task Explorer tree instance does not exist");
-        }
-        await teApi.testsApi.fileCache.buildTaskTypeCache("gulp",workspace.workspaceFolders[0], true, "");
+        await teApi.testsApi.fileCache.buildTaskTypeCache("gulp", (workspace.workspaceFolders as WorkspaceFolder[])[0], true, "");
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
     });
@@ -683,10 +667,7 @@ suite("Provider Tests", () =>
             }
         }
         const taskItems = await tasks.fetchTasks({ type: "grunt" });
-        if (taskItems.length !== gruntCt - 2) { // grunt file that just got ignored had 7 tasks
-            assert.fail("Unexpected grunt task count (Found " + taskItems.length + " of " +
-                        (gruntCt - 2).toString() + ")");
-        }
+        expect(taskItems.length).to.be.equal(gruntCt - 2, `Unexpected grunt task count (Found ${taskItems.length} of ${gruntCt - 2})`);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
     });
@@ -709,63 +690,43 @@ function checkTasks(ant: number, ap: number, bash: number, bat: number, gradle: 
 
     let taskCount = treeUtils.findIdInTaskMap(":ant", taskMap);
     console.log("      Ant           : " + taskCount.toString());
-    if (taskCount !== ant) {
-        assert.fail(`Unexpected Ant task count (Found ${taskCount} of ${ant})`);
-    }
+    expect(taskCount).to.be.equal(ant, `Unexpected Ant task count (Found ${taskCount} of ${ant})`);
 
     taskCount = treeUtils.findIdInTaskMap(":apppublisher:", taskMap);
     console.log("      App-Publisher : " + taskCount.toString());
-    if (taskCount !== ap) {
-        assert.fail(`Unexpected AppPublisher task count (Found ${taskCount} of ${ap})`);
-    }
+    expect(taskCount).to.be.equal(ap, `Unexpected App-Publisher task count (Found ${taskCount} of ${ap})`);
 
     taskCount = treeUtils.findIdInTaskMap(":bash:", taskMap);
     console.log("      Bash          : " + taskCount.toString());
-    if (taskCount !== bash) {
-        assert.fail(`Unexpected Bash task count (Found ${taskCount} of ${bash})`);
-    }
+    expect(taskCount).to.be.equal(bash, `Unexpected Bash task count (Found ${taskCount} of ${bash})`);
 
     taskCount = treeUtils.findIdInTaskMap(":batch:", taskMap);
     console.log("      Batch         : " + taskCount.toString());
-    if (taskCount !== bat) {
-        assert.fail(`Unexpected Batch task count (Found ${taskCount} of ${bat})`);
-    }
+    expect(taskCount).to.be.equal(bat, `Unexpected Batch task count (Found ${taskCount} of ${bat})`);
 
     taskCount = treeUtils.findIdInTaskMap(":gradle:", taskMap);
     console.log("      Gradle        : " + taskCount.toString());
-    if (taskCount !== gradle) {
-        assert.fail(`Unexpected Gradle task count (Found ${taskCount} of ${gradle})`);
-    }
+    expect(taskCount).to.be.equal(gradle, `Unexpected Gradle task count (Found ${taskCount} of ${gradle})`);
 
     taskCount = treeUtils.findIdInTaskMap(":grunt:", taskMap);
     console.log("      Grunt         : " + taskCount.toString());
-    if (taskCount !== grunt) {
-        assert.fail(`Unexpected Grunt task count (Found ${taskCount} of ${grunt})`);
-    }
+    expect(taskCount).to.be.equal(grunt, `Unexpected Grunt task count (Found ${taskCount} of ${grunt})`);
 
     taskCount = treeUtils.findIdInTaskMap(":gulp:", taskMap);
     console.log("      Gulp          : " + taskCount.toString());
-    if (taskCount !== gulp) {
-        assert.fail(`Unexpected Gulp task count (Found ${taskCount} of ${gulp})`);
-    }
+    expect(taskCount).to.be.equal(gulp, `Unexpected Gulp task count (Found ${taskCount} of ${gulp})`);
 
     taskCount = treeUtils.findIdInTaskMap(":python:", taskMap);
     console.log("      Python        : " + taskCount.toString());
-    if (taskCount !== python) {
-        assert.fail(`Unexpected Python task count (Found ${taskCount} of ${python})`);
-    }
+    expect(taskCount).to.be.equal(python, `Unexpected Python task count (Found ${taskCount} of ${python})`);
 
     taskCount = treeUtils.findIdInTaskMap(":tsc:", taskMap);
     console.log("      TypeScript    : " + taskCount.toString());
-    if (taskCount !== tsc) {
-        assert.fail(`Unexpected Typescript task count (Found ${taskCount} of ${tsc})`);
-    }
+    expect(taskCount).to.be.equal(tsc, `Unexpected Typescript task count (Found ${taskCount} of ${tsc})`);
 
     taskCount = treeUtils.findIdInTaskMap(":Workspace:", taskMap);
     console.log("      VSCode        : " + taskCount.toString());
-    if (taskCount !== vsc) {
-        assert.fail(`Unexpected VSCode task count (Found ${taskCount} of ${vsc})`);
-    }
+    expect(taskCount).to.be.equal(vsc, `Unexpected VSCode task count (Found ${taskCount} of ${vsc})`);
 }
 
 
@@ -800,10 +761,6 @@ async function deleteTempFilesAndDirectories()
 
 async function setupAnt()
 {
-    if (!rootPath || !dirNameIgn || !dirName) {
-        assert.fail("        ✘ Workspace folder does not exist");
-    }
-
     await createAntFile();
 
     const file2 = join(dirName, "test.xml");
@@ -852,10 +809,6 @@ async function setupAnt()
 
 async function setupGradle()
 {
-    if (!rootPath || !dirNameIgn || !dirName) {
-        assert.fail("        ✘ Workspace folder does not exist");
-    }
-
     await createGradleFile();
 
     const file2 = join(dirName, "TEST.GRADLE");
@@ -898,10 +851,6 @@ async function setupGradle()
 
 async function setupTsc()
 {
-    if (!rootPath || !dirName) {
-        assert.fail("        ✘ Workspace folder does not exist");
-    }
-
     const file = join(rootPath, "tsconfig.json");
     tempFiles.push(file);
     const file2 = join(dirName, "tsconfig.json");
@@ -953,10 +902,6 @@ async function setupTsc()
 
 async function setupGulp()
 {
-    if (!rootPath || !dirNameIgn || !dirName || !dirNameL2) {
-        assert.fail("        ✘ Workspace folder does not exist");
-    }
-
     await createGulpFile();
 
     const file2 = join(dirName, "Gulpfile.js");
@@ -1055,10 +1000,6 @@ async function setupGulp()
 
 async function setupMakefile()
 {
-    if (!rootPath || !dirNameIgn || !dirName) {
-        assert.fail("        ✘ Workspace folder does not exist");
-    }
-
     await createMakeFile();
 
     const file2 = join(dirName, "Makefile");
@@ -1084,10 +1025,6 @@ async function setupMakefile()
 
 async function setupBatch()
 {
-    if (!rootPath || !dirNameIgn || !dirName) {
-        assert.fail("        ✘ Workspace folder does not exist");
-    }
-
     await createBatchFile();
 
     const file2 = join(dirName, "test2.BAT");
@@ -1104,10 +1041,6 @@ async function setupBatch()
 
 async function setupBash()
 {
-    if (!rootPath || !dirNameIgn || !dirName) {
-        assert.fail("        ✘ Workspace folder does not exist");
-    }
-
     const file = join(rootPath, "test.sh");
     tempFiles.push(file);
 
@@ -1127,10 +1060,6 @@ async function setupBash()
 
 async function setupGrunt()
 {
-    if (!rootPath || !dirName || !dirNameIgn || !dirNameL2) {
-        assert.fail("        ✘ Workspace folder does not exist");
-    }
-
     await createGruntFile();
 
     const file2 = join(dirName, "Gruntfile.js");
@@ -1172,18 +1101,12 @@ async function setupGrunt()
 
 async function setupAppPublisher()
 {
-    if (!rootPath) {
-        assert.fail("        ✘ Workspace folder does not exist");
-    }
     await createAppPublisherFile();
 }
 
 
 async function setupMaven()
 {
-    if (!rootPath) {
-        assert.fail("        ✘ Workspace folder does not exist");
-    }
     await createMavenPomFile();
 }
 

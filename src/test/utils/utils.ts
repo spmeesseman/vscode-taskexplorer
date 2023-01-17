@@ -233,7 +233,7 @@ export const exitRollingCount = (expectedCount: number, successCount: number) =>
 {
 
     if (hasRollingCountError) {
-        const msg = "skip test, rolling success count failure " + expectedCount;
+        const msg = `skip test ${expectedCount} due to rolling success count failure`;
         console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
         return hasRollingCountError;
     }
@@ -401,7 +401,7 @@ const initSettings = async () =>
 
     await configuration.updateWs("exclude", []);
     await configuration.updateWs("includeAnt", []); // Deprecated, use `globPatternsAnt`
-    await configuration.updateWs("globPatternsAnt", []);
+    await configuration.updateWs("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
     await configuration.updateWs("keepTermOnStop", false);
     await configuration.updateWs("showHiddenWsTasks", true);
     await configuration.updateWs("showRunningTask", true);

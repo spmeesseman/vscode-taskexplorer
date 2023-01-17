@@ -94,7 +94,7 @@ export const testControl: ITestControl =
         licenseMgrOpenPage: 575,
         licenseMgrOpenPageWithDetail: 990,
         licenseManagerLocalCheck: 2000,
-        licenseManagerLocalStartServer: 1125,
+        licenseManagerLocalStartServer: 1150,
         licenseManagerRemoteCheck: 3000,
         licenseManagerRemoteStartServer: 3850,
         npmCommand: 11925,
@@ -119,12 +119,12 @@ export const testControl: ITestControl =
             antTaskWithAnsicon: 4500,
             bashScript: 4000,
             batchScript: 8000,
-            gulpParser: 3850
+            gulpParser: 3875
         },
         verifyTaskCount: 825,
         verifyTaskCountByTree: 850,
         verifyTaskCountFirstCall: 1350,
-        verifyTaskCountNpm: 3075, // npm task provider is slower than shit on a turtle
+        verifyTaskCountNpm: 3175, // internal vscode npm task provider is slower than shit wtf
         verifyTaskCountWorkspace: 3500,
         viewReport: 1950,
         walkTaskTree: 5500,
@@ -143,8 +143,8 @@ export const testControl: ITestControl =
         configDisableEvent: 140,
         configEnableEvent: 175,
         configGlobEvent: 140,
-        command: 130,
-        commandFast: 60,
+        command: 150,
+        commandFast: 70,
         configGroupingEvent: 240,
         configRegisterExplorerEvent: 225,
         explorerViewStartup: 4000,
@@ -164,7 +164,7 @@ export const testControl: ITestControl =
         refreshTaskTypeCommand: 800,
         removeWorkspaceFolder: 220,
         runCommandMin: 750,
-        taskCommand: 525,
+        taskCommand: 625,
         verifyTaskCountRetry: 130,
         verifyTaskCountRetryInterval: 320,
         viewReport: 100,

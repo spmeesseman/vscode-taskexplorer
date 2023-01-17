@@ -22,7 +22,7 @@ let bash: ITaskItem[];
 let batch: ITaskItem[];
 let python: ITaskItem[];
 let antTask: TaskItem;
-let successCount = 0;
+let successCount = -1;
 let clickAction: string;
 
 
@@ -47,7 +47,9 @@ suite("Task Tests", () =>
 
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
+        if (utils.exitRollingCount(0, successCount)) return;
         await utils.focusExplorerView(this);
+        ++successCount;
 	});
 
 
