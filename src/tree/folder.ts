@@ -52,7 +52,7 @@ export default class TaskFolder extends TreeItem implements ITaskFolder
 
     removeTaskFile(taskFile: TaskFile|TaskItem|string, logPad: string)
     {
-        const id = isString(taskFile) ? taskFile : taskFile.id;
+        const id = isString(taskFile) ? /* istanbul ignore next */ taskFile : taskFile.id;
         const idx = this.taskFiles.findIndex(f => f.id === id);
         /* istanbul ignore else */
         if (idx !== -1) {

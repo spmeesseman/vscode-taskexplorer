@@ -70,7 +70,7 @@ export const testControl: ITestControl =
         commandFast: 560,
         config: {
             event: 315,
-            eventFast: 120,
+            eventFast: 110,
             registerExplorerEvent: 700,
             disableEvent: 1575,
             enableEvent: 2325,
@@ -88,6 +88,7 @@ export const testControl: ITestControl =
         findDocumentPositionCommand: 870,
         focusCommand: 3400,
         focusCommandAlreadyFocused: 130,
+        focusCommandChangeViews: 130,
         fsCreateEvent: 1860,
         fsCreateFolderEvent: 2170,
         fsDeleteEvent: 1720,
@@ -102,7 +103,7 @@ export const testControl: ITestControl =
         licenseManagerRemoteCheck: 3000,
         licenseManagerRemoteStartServer: 3850,
         min: 50,
-        refreshCommand: 20625,
+        refreshCommand: 17625,
         refreshCommandNoChanges: 400,
         rebuildFileCache: 15500,
         rebuildFileCacheCancel: 1810,
@@ -117,8 +118,8 @@ export const testControl: ITestControl =
         taskCommand: 1600,
         tasks: {
             antParser: 820,
-            antTask: 4390,
-            antTaskWithAnsicon: 4500,
+            antTask: 4290,
+            antTaskWithAnsicon: 4400,
             bashScript: 4000,
             batchScript: 8000,
             gulpParser: 3975,
@@ -268,6 +269,7 @@ export interface ITestControl
         findDocumentPositionCommand: number;
         focusCommand: number;
         focusCommandAlreadyFocused: number;
+        focusCommandChangeViews: number;
         fsCreateEvent: number;
         fsCreateFolderEvent: number;
         fsDeleteEvent: number;

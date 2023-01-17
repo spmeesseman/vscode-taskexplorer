@@ -488,14 +488,9 @@ export default class SpecialTaskFolder extends TaskFolder
         log.methodStart("sort last tasks", logLevel, logPad);
         items?./* istanbul ignore else */sort((a: TaskItem, b: TaskItem) =>
         {
-            let rc = 0;
-            /* istanbul ignore else */
-            if (a.id && b.id) {
-                const aIdx = lastTasks.indexOf(a.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
-                const bIdx = lastTasks.indexOf(b.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
-                rc = (aIdx < bIdx ? 1 : (bIdx < aIdx ? -1 : 0));
-            }
-            return rc;
+            const aIdx = lastTasks.indexOf(a.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
+            const bIdx = lastTasks.indexOf(b.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
+            return aIdx < bIdx ? 1 : -1;
         });
         log.methodDone("sort last tasks", logLevel, logPad);
     }

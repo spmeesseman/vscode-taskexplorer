@@ -23,15 +23,13 @@ export const refresh = async(instance?: any) =>
     const teApi = utils.getTeApi(),
           tc = utils.testControl;
     if (instance) {
-        instance.slow(tc.slowTime.refreshCommand + tc.waitTime.refreshCommand +
-                      (tc.waitTime.min * 2) + (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0));
-        instance.timeout((tc.slowTime.refreshCommand  * 2) + (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0) + (tc.waitTime.min * 2));
+        instance.slow(tc.slowTime.refreshCommand + (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0));
+        instance.timeout((tc.slowTime.refreshCommand  * 2) + (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0));
     }
     if (!didSetGroupLevel)
     {
         await utils.executeSettingsUpdate("groupWithSeparator", true, tc.waitTime.config.groupingEvent);
         await utils.executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.config.groupingEvent);
-        await utils.waitForTeIdle(tc.waitTime.min);
         didSetGroupLevel = true;
     }
     await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);

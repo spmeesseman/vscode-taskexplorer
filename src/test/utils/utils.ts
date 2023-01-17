@@ -252,20 +252,26 @@ export const exitRollingCount = (expectedCount: number, successCount: number) =>
 };
 
 
-export const focusExplorerView = async (instance: any) =>
+export const focusExplorerView = async (instance?: any) =>
 {
-    if (!teExplorer.isVisible()) {
-        instance.slow(tc.slowTime.focusCommand + tc.slowTime.refreshCommand +
-                      (tc.waitTime.focusCommand * 2) + tc.waitTime.min + 100);
+    if (!teExplorer.isVisible())
+    {
+        if (instance) {
+            instance.slow(tc.slowTime.focusCommand + tc.slowTime.refreshCommand +
+                        (tc.waitTime.focusCommand * 2) + tc.waitTime.min + 100);
+        }
         await executeTeCommand("focus", tc.waitTime.focusCommand);
         await waitForTeIdle(tc.waitTime.focusCommand);
         sleep(100);
     }
-    else {
+    else if (instance) {
         instance.slow(tc.slowTime.focusCommandAlreadyFocused);
     }
     await waitForTeIdle(tc.waitTime.min);
 };
+
+
+export const focusSearchView = () => commands.executeCommand("workbench.view.search.focus", tc.waitTime.focusCommand) as Thenable<void>;
 
 
 export const getSpecialTaskItemId = (taskItem: ITaskItem) =>

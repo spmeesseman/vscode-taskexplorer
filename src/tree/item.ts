@@ -7,7 +7,7 @@ import TaskFolder from "./folder";
 import { ITaskItem } from "../interface";
 import { configuration } from "../lib/utils/configuration";
 import {
-    Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks, Command
+    Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks, Command, Uri
 }
 from "vscode";
 
@@ -36,6 +36,7 @@ export default class TaskItem extends TreeItem implements ITaskItem
     public groupLevel: number;
     public id: string;
     public command: Command;
+    // public resourceUri?: Uri;
 
 
     constructor(context: ExtensionContext, taskFile: TaskFile, task: Task, logPad: string)
@@ -75,6 +76,9 @@ export default class TaskItem extends TreeItem implements ITaskItem
         // 'Script' type tasks will set the file 'uri' and the 'scriptFile' flag on the task definition
         //
         const fsPath = !task.definition.scriptFile ? taskFile.resourceUri.fsPath : task.definition.uri.fsPath;
+        if (task.definition.scriptFile) {
+            this.resourceUri = Uri.file(fsPath);
+        }
         this.id = fsPath + ":" + task.source + ":" + task.name + ":"; // <- leave trailing ':' for backwards compat
         this.paused = false;                // paused flag used by start/stop/pause task functionality
         this.taskFile = taskFile;           // Save a reference to the TaskFile that this TaskItem belongs to

@@ -7,7 +7,7 @@ import constants from "../../lib/constants";
 import TaskItem from "../../tree/item";
 import SpecialTaskFolder from "../../tree/specialFolder";
 import { expect } from "chai";
-import { TaskExecution } from "vscode";
+import { commands, TaskExecution } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 const tc = utils.testControl;
@@ -148,7 +148,7 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(6, successCount)) return;
         this.slow(tc.slowTime.runCommand + tc.slowTime.runPauseCommand + tc.slowTime.runStopCommand + tc.slowTime.config.event +
-                 (tc.waitTime.taskCommand * 2) + endOfTestWaitTime + 1000 + 2000 + 1000);
+                  endOfTestWaitTime + 1000 + 2000);
         await utils.executeSettingsUpdate("keepTermOnStop", false);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 2000);
@@ -165,16 +165,16 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(7, successCount)) return;
         this.slow((tc.slowTime.config.enableEvent * 2) + (tc.waitTime.config.enableEvent * 2) + tc.slowTime.runCommand +
-                  tc.waitTime.runCommandMin + endOfTestWaitTime + (tc.slowTime.tasks.antTaskWithAnsicon * 2) + (tc.waitTime.config.event * 2));
+                  endOfTestWaitTime + (tc.slowTime.tasks.antTaskWithAnsicon * 2) + 500 + tc.slowTime.focusCommandChangeViews);
         antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
         expect(antTask).to.not.be.equal(undefined, "The 'hello' ant task was not found in the task tree");
-        await utils.executeSettingsUpdate("pathToPrograms.ansicon", utils.getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
-        await utils.waitForTeIdle(tc.waitTime.config.enableEvent);
+        await utils.executeSettingsUpdate("pathToPrograms.ansicon", utils.getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"), tc.waitTime.config.enableEvent);
         utils.overrideNextShowInfoBox(undefined);
-        await utils.executeSettingsUpdate("visual.enableAnsiconForAnt", true);
-        await utils.waitForTeIdle(tc.waitTime.config.enableEvent);
+        await utils.executeSettingsUpdate("visual.enableAnsiconForAnt", true, tc.waitTime.config.enableEvent);
         await startTask(antTask, false);
         const exec = await utils.executeTeCommand2("run", [ antTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
+        await utils.sleep(250);
+        await utils.focusSearchView(); // randomly show/hide view to test refresh event queue in tree/tree.ts
         await utils.waitForTaskExecution(exec);
         lastTask = antTask;
         await utils.waitForTeIdle(endOfTestWaitTime);
@@ -187,8 +187,7 @@ suite("Task Tests", () =>
         if (utils.exitRollingCount(8, successCount)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.runCommand +
                   endOfTestWaitTime + (tc.slowTime.tasks.antTask * 2) + (tc.waitTime.config.event * 2));
-        await utils.executeSettingsUpdate("visual.enableAnsiconForAnt", false);
-        await utils.waitForTeIdle(tc.waitTime.config.enableEvent);
+        await utils.executeSettingsUpdate("visual.enableAnsiconForAnt", false, tc.waitTime.config.enableEvent);
         await startTask(antTask, false);
         const exec = await utils.executeTeCommand2("run", [ antTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec);
@@ -203,8 +202,9 @@ suite("Task Tests", () =>
         // There is only 1 bash file "task" - it utils.sleeps for 3 seconds, 1 second at a time
         //
         if (utils.exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.command + (tc.slowTime.config.event * 3) +
+        this.slow(tc.slowTime.runCommand + tc.slowTime.command + (tc.slowTime.config.event * 3) + tc.slowTime.focusCommandChangeViews +
                   tc.slowTime.config.specialFolderEvent+ startTaskSlowTime + endOfTestWaitTime + (tc.slowTime.tasks.bashScript * 2));
+        utils.focusExplorerView(); // randomly show/hide view to test refresh event queue in tree/tree.ts
         await utils.executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
         await utils.executeSettingsUpdate("keepTermOnStop", true);

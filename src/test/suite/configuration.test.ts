@@ -265,7 +265,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - OSX", async function()
     {
         if (exitRollingCount(13, successCount)) return;
-        this.slow(tc.slowTime.config.event);
+        this.slow(tc.slowTime.config.eventFast + tc.slowTime.config.event);
         // Set up coverage on if() statement in configWatcher ~ ln 240
         testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks", {
@@ -287,7 +287,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - Linux", async function()
     {
         if (exitRollingCount(14, successCount)) return;
-        this.slow(tc.slowTime.config.event + tc.slowTime.refreshCommandNoChanges + tc.slowTime.refreshCommandNoChanges);
+        this.slow(tc.slowTime.config.event + tc.slowTime.refreshCommandNoChanges);
         // Set up coverage on if() statement in configWatcher ~ ln 240
         testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks.nsis", true); // last of an or'd if() extension.ts ~line 240 processConfigChanges()

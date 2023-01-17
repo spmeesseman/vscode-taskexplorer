@@ -165,12 +165,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             if (selection.isGroup)
             {
                 log.value("   adding file group", uri.path, 2);
-                for (const each of selection.treeNodes)
+                for (const each of selection.treeNodes.filter(n => !!n.resourceUri))
                 {
-                    if (each.resourceUri) {
-                        log.value("      adding file path", each.resourceUri.path, 3);
-                        pathValues.push(each.resourceUri.path);
-                    }
+                    const  uri = each.resourceUri as Uri;
+                    log.value("      adding file path", uri.path, 3);
+                    pathValues.push(uri.path);
                 }
             }
             else {
@@ -183,17 +182,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             uri = false;
             if (util.isScriptType(selection.taskSource))
             {
-                /* istanbul ignore else */ /* istanbul ignore next */
-                if (selection.resourceUri) {
-                    /* istanbul ignore next */
-                    log.value("   adding file path", selection.resourceUri.path, 2);
-                    /* istanbul ignore next */
-                    pathValues.push(selection.resourceUri.path);
-                }
-                else if (selection.taskFile) {
-                    log.value("   adding file path", selection.taskFile.resourceUri.path, 2);
-                    pathValues.push(selection.taskFile.resourceUri.path);
-                }
+                const resourceUri = selection.resourceUri as Uri;
+                log.value("   adding file path", resourceUri.path, 2);
+                pathValues.push(resourceUri.path);
             }
             else {
                 excludesList = "excludeTask";
@@ -202,24 +193,25 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         log.value("   path value(s)", pathValues.join(", "), 1);
-        if (pathValues.length > 0)
-        {
-            const excludes = configuration.get<string[]>(excludesList);
-            for (const p of pathValues) {
-                util.pushIfNotExists(excludes, p);
-            }
-            enableConfigWatcher(false);
-            /* istanbul ignore else */
-            if (this.isTests) {
-                await configuration.updateWs(excludesList, excludes);
-            }
-            else {
-                await configuration.update(excludesList, excludes);
-            }
-            await this.refresh(selection.taskSource, uri, "   ");
-            enableConfigWatcher(true);
+
+        const excludes = configuration.get<string[]>(excludesList);
+        for (const p of pathValues) {
+            util.pushIfNotExists(excludes, p);
         }
 
+        enableConfigWatcher(false);
+
+        /* istanbul ignore else */
+        if (this.isTests) {
+            await configuration.updateWs(excludesList, excludes);
+        }
+        else {
+            await configuration.update(excludesList, excludes);
+        }
+
+        await this.refresh(selection.taskSource, uri, "   ");
+
+        enableConfigWatcher(true);
         log.methodDone("add to excludes", 1);
     }
 
@@ -418,7 +410,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         // found, but in doing so, if there were no npm "scripts" in the package.json, code execution
         // would not get far enough to create the "tree file" node for the context menu.
         //
-        const isNpmInstallTask = each.source === "npm" && each.name === "install" || each.name.startsWith("install - ");
+        const isNpmInstallTask = each.source === "npm" && (each.name === "install" || each.name.startsWith("install - "));
         if (!isNpmInstallTask)
         {   //
             // Create "tree item" node and add it to the owner "tree file" node
@@ -736,7 +728,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     if (!taskFile)
                     {   // if this is a global refresh, remove all other refresh events from the q
                         this.eventQueue.slice().reverse().forEach((value, index, obj) => {
-                            if (value.type === "refresh") {
+                            /* istanbul ignore else */
+                            if (value.type === "refresh") { // As of v3.0, there's only one event type, "refresh"
                                 this.eventQueue.splice(obj.length - 1 - index, 1);
                             }
                         });
@@ -830,25 +823,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 [ "description", element.description ], [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
             ]);
         }
-        else if (element instanceof TaskItem)
-        {
-            log.values(logLevel + 1, logPad + "   ", [
-                [ "tree item type", "task item" ], [ "label", element.label ], [ "id", element.id ],
-                [ "taskitem id", element.task.definition.taskItemId ], [ "description", element.description ],
-                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ],
-            ]);
-        }
         else /* istanbul ignore else */ if (!element)
         {
             log.value("tree item type", "asking for all (null)", logLevel + 1, logPad + "   ");
         }
-        else
-        {
-            log.values(logLevel + 1, logPad + "   ", [
-                [ "tree item type", "unknown" ], [ "label", element.label ], [ "id", element.id ],
-                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
-            ]);
-        }
+        // else
+        // {
+        //     log.values(logLevel + 1, logPad + "   ", [
+        //         [ "tree item type", "unknown" ], [ "label", element.label ], [ "id", element.id ],
+        //         [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
+        //     ]);
+        // }
 
         //
         // The vscode task engine processing will call back in multiple time while we are awaiting

@@ -11,7 +11,7 @@ import { join } from "path";
 import { expect } from "chai";
 import { workspace, tasks, WorkspaceFolder } from "vscode";
 import { removeFromArray } from "../../lib/utils/utils";
-import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, exitRollingCount, focusExplorerView,
     getWsPath, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
@@ -28,8 +28,11 @@ let dirName: string;
 let dirNameL2: string;
 let dirNameIgn: string;
 let batch: TaskItem[];
+let grunt: TaskItem[];
 let taskMap: TaskMap;
 let tempDirsDeleted = false;
+
+
 let successCount = -1;
 
 
@@ -256,8 +259,8 @@ suite("Provider Tests", () =>
     test("Build Tree", async function()
     {
         if (exitRollingCount(20, successCount)) return;
-        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.fetchTasksCommand * 2) + tc.slowTime.getTreeTasks);
-        await treeUtils.refresh(this);
+        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.getTreeTasks * 2));
+        await treeUtils.refresh();
         //
         // Check VSCode provided task types for the hell of it
         //
@@ -266,6 +269,8 @@ suite("Provider Tests", () =>
         nTasks = await tasks.fetchTasks({ type: "gulp" });
         expect(nTasks.length).to.be.a("number").that.is.greaterThan(0, "No gulp tasks registered");
         batch = await treeUtils.getTreeTasks("batch", 4) as TaskItem[];
+        grunt = await treeUtils.getTreeTasks("grunt", 13) as TaskItem[];
+
         ++successCount;
     });
 
@@ -401,22 +406,9 @@ suite("Provider Tests", () =>
         if (exitRollingCount(27, successCount)) return;
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.excludeCommand);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
-              gruntCt = taskItems.length;
-        for (const taskItem of Object.values(taskMap))
-        {
-            const value = taskItem as TaskItem;
-            if (value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
-            {
-                const node = value.taskFile.treeNodes.find(
-                    n => n instanceof TaskItem && n.task.name && n.task.name.includes("upload2")
-                ) as TaskItem;
-                if (node)
-                {
-                    await executeTeCommand("addToExcludes", tc.waitTime.config.event, 3000, node);
-                    break;
-                }
-            }
-        }
+              gruntCt = taskItems.length,
+              taskItem = grunt.find(t => t.taskSource === "grunt" && !t.taskFile.path.startsWith("grunt"));
+        await executeTeCommand2("addToExcludes", [ taskItem ]);
         await verifyTaskCount("grunt", gruntCt - 1);
         ++successCount;
     });
@@ -427,25 +419,9 @@ suite("Provider Tests", () =>
         if (exitRollingCount(28, successCount)) return;
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.excludeCommand);
         const taskItems = await tasks.fetchTasks({ type: "batch" }),
-              scriptCt = taskItems.length;
-        for (const property in taskMap)
-        {
-            if ({}.hasOwnProperty.call(taskMap, property))
-            {
-                const value= taskMap[property];
-                if (value && value.taskSource === "batch" && value.taskFile.fileName.toLowerCase().includes("test2.bat"))
-                {
-                    const node = value.taskFile.treeNodes.find(
-                        n => n instanceof TaskItem && n.task.name && n.task.name.toLowerCase().includes("test2.bat")
-                    ) as TaskItem;
-                    if (node)
-                    {
-                        await executeTeCommand("addToExcludes", 500, 3000, node);
-                        break;
-                    }
-                }
-            }
-        }
+              scriptCt = taskItems.length,
+              taskItem = batch.find(t => t.taskSource === "batch" && t.taskFile.fileName.toLowerCase().includes("test2.bat"));
+        await executeTeCommand2("addToExcludes", [ taskItem ]);
         await verifyTaskCount("batch", scriptCt - 1);
         ++successCount;
     });
@@ -457,16 +433,12 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.config.excludesEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
-        for (const property in taskMap)
+        for (const value of Object.values(taskMap))
         {
-            if ({}.hasOwnProperty.call(taskMap, property))
+            if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
             {
-                const value= taskMap[property];
-                if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
-                {
-                    await executeTeCommand2("addToExcludes", [ value.taskFile ], tc.waitTime.command);
-                    break;
-                }
+                await executeTeCommand2("addToExcludes", [ value.taskFile ]);
+                break;
             }
         }
         await verifyTaskCount("grunt", gruntCt - 2);
@@ -590,7 +562,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Run Refresh Task", async function()
+    test("Refresh Tree", async function()
     {
         if (exitRollingCount(39, successCount)) return;
         this.slow(tc.slowTime.refreshCommand + (tc.slowTime.config.event * 2));
