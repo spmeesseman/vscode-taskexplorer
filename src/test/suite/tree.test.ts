@@ -478,10 +478,11 @@ suite("Tree Tests", () =>
     });
 
 
-    test("User tasks", async function()
+    test("Hide User tasks", async function()
     {
         if (utils.exitRollingCount(29, successCount)) return;
-        // const json = await readFileSync(".vscode/workspace.json");fv
+        this.slow(tc.slowTime.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showUserTasks", false);
         ++successCount;
     });
 

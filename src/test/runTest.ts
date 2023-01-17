@@ -4,7 +4,7 @@ import * as path from "path";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { runTests } from "@vscode/test-electron";
 import { testControl } from "./control";
-import { deleteDir, findFiles, getDateModified, pathExists, writeFile } from "../lib/utils/fs";
+import { copyFile, deleteDir, findFiles, getDateModified, pathExists, writeFile } from "../lib/utils/fs";
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import { runTests } from "vscode-test";
 
@@ -23,6 +23,7 @@ async function main(args: string[])
     //
     const extensionTestsPath = path.resolve(__dirname, "./suite/index");
     const extensionTestsWsPath = path.resolve(__dirname, "../../test-files");
+    const vscodeTestUserDataPath = path.join(extensionDevelopmentPath, ".vscode-test", "user-data");
     //
     // Setting file to clear and restore
     //
@@ -36,10 +37,12 @@ async function main(args: string[])
         // Clear workspace settings file if it exists
         //
         // let settingsJsonOrig: string | undefined;
-        if (await pathExists(settingsFile)) {
-            // settingsJsonOrig = await readFileAsync(settingsFile) || "{}";
-            await writeFile(settingsFile, "{}");
-        }
+        await writeFile(settingsFile, "{}");
+        //
+        // Copy a "User Tasks" file
+        //
+        await copyFile("C:\\Code\\data\\user-data\\User\\tasks.json", path.join(vscodeTestUserDataPath, "User"));
+        //
         // const runCfg = await runConfig();
         //
         // Download VS Code, unzip it and run the integration test
@@ -68,7 +71,7 @@ async function main(args: string[])
                 let lastDateModified: Date | undefined;
                 const tzOffset = (new Date()).getTimezoneOffset() * 60000,
                     dateTag = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T")[0].replace(/[\-]/g, ""),
-                    vscodeLogPath = path.join(extensionDevelopmentPath, ".vscode-test", "user-data", "logs");
+                    vscodeLogPath = path.join(vscodeTestUserDataPath, "logs");
                 const paths = await findFiles(`**/spmeesseman.vscode-taskexplorer/taskexplorer-${dateTag}.log`,
                 {
                     nocase: false,
