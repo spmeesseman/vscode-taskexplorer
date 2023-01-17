@@ -38,7 +38,7 @@ export default class TaskItem extends TreeItem implements ITaskItem
     public command: Command;
 
 
-    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task, logPad = "")
+    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task, logPad: string)
     {
         const taskDef = task.definition;
         const getDisplayName = (taskName: string): string =>
@@ -140,6 +140,7 @@ export default class TaskItem extends TreeItem implements ITaskItem
                                                   e.task.scope === task.scope && e.task.definition.path === task.definition.path);
         const exec = execs.find(e => e.task.name === task.name && e.task.source === task.source &&
                                 e.task.scope === task.scope && e.task.definition.path === task.definition.path);
+        /* istanbul ignore if */
         if (execs.length > 1) {
             log.error(`More than one task execution was found for '${this.task.name}' !!`);
         }
