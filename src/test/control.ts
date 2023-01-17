@@ -102,7 +102,7 @@ export const testControl: ITestControl =
         licenseManagerRemoteCheck: 3000,
         licenseManagerRemoteStartServer: 3850,
         min: 50,
-        refreshCommand: 19825,
+        refreshCommand: 20625,
         refreshCommandNoChanges: 400,
         rebuildFileCache: 15500,
         rebuildFileCacheCancel: 1810,

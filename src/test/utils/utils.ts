@@ -122,7 +122,7 @@ export const activate = async (instance?: Mocha.Context) =>
         console.log(`    ${figures.color.info} ${figures.withColor("Tests ready", figures.colors.grey)}`);
         console.log(`    ${figures.color.info}`);
     }
-    return { teApi, testsApi: teApi.testsApi, fsApi: teApi.testsApi.fs, configApi: teApi.config, utils: teApi.utilities };
+    return { teApi, testsApi: teApi.testsApi, fsApi: teApi.testsApi.fs, configApi: teApi.config, explorer: teApi.testsApi.explorer, utils: teApi.utilities };
 };
 
 

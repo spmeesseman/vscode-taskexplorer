@@ -7,23 +7,23 @@ import constants from "../../lib/constants";
 import TaskItem from "../../tree/item";
 import SpecialTaskFolder from "../../tree/specialFolder";
 import { expect } from "chai";
-import { Task, TaskExecution, TaskPanelKind, TaskRevealKind, WorkspaceFolder } from "vscode";
-import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
-import { providers } from "../../extension";
+import { TaskExecution } from "vscode";
+import { ITaskExplorer, ITaskExplorerApi, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 const tc = utils.testControl;
 const endOfTestWaitTime = 750;
 const startTaskSlowTime = tc.slowTime.config.event + (tc.slowTime.showHideSpecialFolder * 2) + (tc.slowTime.command * 2);
-let lastTask: ITaskItem | null = null;
 let teApi: ITaskExplorerApi;
 let explorer: ITaskExplorer;
+let testsApi: ITestsApi;
+let lastTask: ITaskItem | null = null;
 let ant: ITaskItem[];
 let bash: ITaskItem[];
 let batch: ITaskItem[];
 let python: ITaskItem[];
 let antTask: TaskItem;
-let successCount = -1;
 let clickAction: string;
+let successCount = -1;
 
 
 suite("Task Tests", () =>
@@ -31,8 +31,7 @@ suite("Task Tests", () =>
 
     suiteSetup(async function()
     {
-        ({ teApi } = await utils.activate(this));
-        explorer = teApi.testsApi.explorer;
+        ({ teApi, testsApi, explorer } = await utils.activate(this));
         clickAction = teApi.config.get<string>("taskButtons.clickAction");
         ++successCount;
     });
@@ -73,16 +72,16 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(2, successCount)) return;
         this.slow(tc.slowTime.runCommand + (tc.slowTime.storageUpdate * 2) + endOfTestWaitTime);
-        const lastTasks = teApi.testsApi.storage.get<string[]>(constants.LAST_TASKS_STORE, []),
+        const lastTasks = testsApi.storage.get<string[]>(constants.LAST_TASKS_STORE, []),
               hasLastTasks = lastTasks && lastTasks.length > 0;
         if (hasLastTasks)
         {
-            await teApi.testsApi.storage.update(constants.LAST_TASKS_STORE, undefined);
+            await testsApi.storage.update(constants.LAST_TASKS_STORE, undefined);
         }
         expect(await utils.executeTeCommand("runLastTask", tc.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
         if (hasLastTasks)
         {
-            await teApi.testsApi.storage.update(constants.LAST_TASKS_STORE, lastTasks);
+            await testsApi.storage.update(constants.LAST_TASKS_STORE, lastTasks);
         }
         await utils.waitForTeIdle(endOfTestWaitTime);
         ++successCount;
@@ -337,7 +336,7 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(13, successCount)) return;
         this.slow(tc.slowTime.runCommand + (tc.slowTime.storageUpdate * 2) + endOfTestWaitTime);
-        const tree = teApi.testsApi.explorer.getTaskTree() as any;
+        const tree = explorer.getTaskTree() as any;
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as SpecialTaskFolder;
         const lastTasksStore = lastTasksFolder.getStore();
@@ -355,6 +354,35 @@ suite("Task Tests", () =>
         finally {
             item.id = item.id.replace("_noId", "");
             lastTasksStore.pop();
+        }
+        ++successCount;
+    });
+
+
+    test("Surpass Max Last Tasks", async function()
+    {
+        if (utils.exitRollingCount(14, successCount)) return;
+        this.slow(tc.slowTime.runCommand + (tc.slowTime.storageUpdate * 2) + endOfTestWaitTime);
+        const tree = explorer.getTaskTree() as any;
+        expect(tree).to.not.be.oneOf([ undefined, null ]);
+        const lastTasksFolder = tree[0] as SpecialTaskFolder;
+        const maxLastTasks = teApi.config.get<number>("specialFolders.numLastTasks");
+        testsApi.enableConfigWatcher(false);
+        await utils.executeSettingsUpdate("specialFolders.numLastTasks", 6);
+        try {
+            lastTasksFolder.saveTask(ant[0] as TaskItem, "");
+            lastTasksFolder.saveTask(ant[1] as TaskItem, "");
+            lastTasksFolder.saveTask(ant[2] as TaskItem, "");
+            lastTasksFolder.saveTask(bash[0] as TaskItem, "");
+            lastTasksFolder.saveTask(batch[0] as TaskItem, "");
+            lastTasksFolder.saveTask(batch[1] as TaskItem, "");
+            lastTasksFolder.saveTask(python[0] as TaskItem, "");
+            lastTasksFolder.saveTask(python[1] as TaskItem, "");
+        }
+        catch (e) { throw e; }
+        finally {
+            await utils.executeSettingsUpdate("specialFolders.numLastTasks", maxLastTasks);
+            testsApi.enableConfigWatcher(true);
         }
         ++successCount;
     });

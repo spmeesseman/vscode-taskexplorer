@@ -414,6 +414,7 @@ export default class SpecialTaskFolder extends TaskFolder
             if (persist)
             {
                 const idx = this.store.findIndex(f => f === id);
+                /* istanbul ignore else */
                 if (idx !== -1) {
                     this.store.splice(idx, 1);
                     await storage.update(constants.LAST_TASKS_STORE, this.store);
@@ -456,11 +457,9 @@ export default class SpecialTaskFolder extends TaskFolder
         //
         removeFromArray(this.store, taskId);
 
-        if (maxTasks > 0) {
-            while (this.store.length >= maxTasks)
-            {
-                this.store.shift();
-            }
+        while (this.store.length >= maxTasks)
+        {
+            this.store.shift();
         }
 
         this.store.push(taskId);
@@ -489,13 +488,14 @@ export default class SpecialTaskFolder extends TaskFolder
         log.methodStart("sort last tasks", logLevel, logPad);
         items?./* istanbul ignore else */sort((a: TaskItem, b: TaskItem) =>
         {
+            let rc = 0;
             /* istanbul ignore else */
             if (a.id && b.id) {
                 const aIdx = lastTasks.indexOf(a.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
                 const bIdx = lastTasks.indexOf(b.id.replace(constants.LAST_TASKS_LABEL + ":", ""));
-                return (aIdx < bIdx ? 1 : (bIdx < aIdx ? -1 : 0));
+                rc = (aIdx < bIdx ? 1 : (bIdx < aIdx ? -1 : 0));
             }
-            return 0;
+            return rc;
         });
         log.methodDone("sort last tasks", logLevel, logPad);
     }
