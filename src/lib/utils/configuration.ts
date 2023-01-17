@@ -112,7 +112,7 @@ class Configuration implements IConfiguration
         }
         else if (isObject(value))
         {
-            const v = this.get<any>(settingKeys.pKey);
+            const v = this.get<object>(settingKeys.pKey, {});
             value = Object.assign(v, value);
         }
         return this.configuration.update(settingKeys.pKey, value, ConfigurationTarget.Global);
@@ -130,7 +130,7 @@ class Configuration implements IConfiguration
         }
         else if (isObject(value))
         {
-            const v = this.get<any>(settingKeys.pKey);
+            const v = this.get<object>(settingKeys.pKey, {});
             value = Object.assign(v, value);
         }
         return this.configuration.update(settingKeys.pKey, value, ConfigurationTarget.Workspace);
