@@ -349,7 +349,7 @@ export const isNumber = (n: any): n is number => (n || n === 0) && typeof n === 
 
 export function isObject(value: any): value is { [key: string]: any }
 {
-    return !!value && (value instanceof Object || typeof value === "object");
+    return !!value && (value instanceof Object || typeof value === "object") && !isArray(value);
 }
 
 
