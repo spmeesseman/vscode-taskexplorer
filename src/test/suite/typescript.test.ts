@@ -70,9 +70,9 @@ suite("Typescript Tests", () =>
     test("Create Empty Directory", async function()
     {
         if (utils.exitRollingCount(2, successCount)) return;
-        this.slow(testControl.slowTime.fs.createFoldereEvent + testControl.waitTime.fs.createFoldereEvent + testControl.slowTime.verifyTaskCountByTree);
+        this.slow(testControl.slowTime.fs.createFolderEvent + testControl.waitTime.fs.createFolderEvent + testControl.slowTime.verifyTaskCountByTree);
         await fsApi.createDir(dirName);
-        await utils.waitForTeIdle(testControl.waitTime.fs.createFoldereEvent);
+        await utils.waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
         successCount++;
     });

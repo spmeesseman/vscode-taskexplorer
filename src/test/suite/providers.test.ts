@@ -71,7 +71,7 @@ suite("Provider Tests", () =>
     test("Create Empty Directories", async function()
     {
         if (exitRollingCount(0, successCount)) return;
-        this.slow(tc.slowTime.fs.createFoldereEvent * 4);
+        this.slow(tc.slowTime.fs.createFolderEvent * 4);
         if (!await fsApi.pathExists(dirName)) {
             await fsApi.createDir(dirName);
         }

@@ -109,7 +109,7 @@ suite("Powershell Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.fs.createFoldereEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(fileUri.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
@@ -120,9 +120,9 @@ suite("Powershell Tests", () =>
     test("Create Empty Directory", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(tc.slowTime.fs.createFoldereEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.verifyTaskCount);
         await fsApi.createDir(dirName);
-        await waitForTeIdle(tc.waitTime.fs.createFoldereEvent);
+        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
         ++successCount;
     });
@@ -153,7 +153,7 @@ suite("Powershell Tests", () =>
     test("Re-create File 2", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fs.createFoldereEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(fileUri2.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);

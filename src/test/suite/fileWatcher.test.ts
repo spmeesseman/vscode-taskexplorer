@@ -69,9 +69,9 @@ suite("File Watcher Tests", () =>
     test("Create Folder", async function()
     {
         if (utils.exitRollingCount(2, successCount)) return;
-        this.slow(tc.slowTime.fs.createFoldereEvent);
+        this.slow(tc.slowTime.fs.createFolderEvent);
         await fsApi.createDir(insideWsDir);
-        await utils.waitForTeIdle(tc.waitTime.fs.createFoldereEvent);
+        await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         ++successCount;
     });
 
@@ -145,9 +145,9 @@ suite("File Watcher Tests", () =>
     test("Add Ignored Folder", async function()
     {
         if (utils.exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.fs.createFoldereEvent);
+        this.slow(tc.slowTime.fs.createFolderEvent);
         await fsApi.createDir(insideWsDirIgn);
-        await utils.waitForTeIdle(tc.waitTime.fs.createFoldereEvent);
+        await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         ++successCount;
     });
 
@@ -199,7 +199,7 @@ suite("File Watcher Tests", () =>
     test("Add a Non-Empty Folder to Workspace Folder", async function()
     {
         if (utils.exitRollingCount(12, successCount)) return;
-        this.slow((tc.slowTime.fs.createFoldereEvent * 2) + (tc.waitTime.fs.createFoldereEvent * 2) +
+        this.slow((tc.slowTime.fs.createFolderEvent * 2) + (tc.waitTime.fs.createFolderEvent * 2) +
                   tc.slowTime.fs.createEvent + (tc.slowTime.verifyTaskCount * 2));
         await fsApi.createDir(outsideWsDir);
         await fsApi.writeFile(
@@ -210,11 +210,11 @@ suite("File Watcher Tests", () =>
             "};\n"
         );
         await fsApi.copyDir(outsideWsDir, insideWsDir, /Gruntfile\.js/, true); // copy folder
-        await utils.waitForTeIdle(tc.waitTime.fs.createFoldereEvent);
+        await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2);
         await fsApi.copyDir(outsideWsDir, insideWsDir); // copies files only within outsideWsDir
         await fsApi.copyDir(outsideWsDir, insideWsDir, /Gulpfile/); // cover filter yielding 0 files
-        await utils.waitForTeIdle(tc.waitTime.fs.createFoldereEvent);
+        await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 4);
         ++successCount;
     });
