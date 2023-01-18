@@ -106,7 +106,7 @@ suite("Makefile Tests", () =>
     test("Start", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount);
         successCount++;
     });
@@ -115,7 +115,7 @@ suite("Makefile Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
         successCount++;
@@ -125,7 +125,7 @@ suite("Makefile Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         successCount++;
@@ -135,7 +135,7 @@ suite("Makefile Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(testControl.slowTime.fs.createFolderEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -160,7 +160,7 @@ suite("Makefile Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -173,7 +173,7 @@ suite("Makefile Tests", () =>
     test("Re-create File", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.fs.createFolderEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
         await fsApi.writeFile(
@@ -199,7 +199,7 @@ suite("Makefile Tests", () =>
     test("Delete Folder", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(testControl.slowTime.fs.deleteFolderEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fs.deleteFolderEvent + testControl.slowTime.taskCount.verify);
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);

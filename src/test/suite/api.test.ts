@@ -55,7 +55,7 @@ suite("External Provider Tests", () =>
     test("Register external task provider", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.enableEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         taskProvider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         await teApi.register("external", taskProvider, "");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
@@ -94,7 +94,7 @@ suite("External Provider Tests", () =>
     test("Unregister external task provider", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.event + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.event + testControl.slowTime.taskCount.verify);
         await teApi.unregister("external", "");
         await waitForTeIdle(testControl.waitTime.config.event);
         await verifyTaskCount("external", 2);

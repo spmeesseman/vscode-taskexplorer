@@ -62,7 +62,7 @@ suite("Ant Tests", () =>
     test("Start", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        this.slow(tc.slowTime.verifyTaskCountFirstCall);
+        this.slow(tc.slowTime.taskCount.verifyFirstCall);
         await verifyTaskCount("ant", 3);
         ++successCount;
     });
@@ -85,7 +85,7 @@ suite("Ant Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.ant", false);
         await verifyTaskCount("ant", 0);
         ++successCount;
@@ -95,7 +95,7 @@ suite("Ant Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.ant", true);
         await verifyTaskCount("ant", 3);
         ++successCount;

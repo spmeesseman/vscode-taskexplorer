@@ -88,7 +88,7 @@ suite("NPM Tests", () =>
     test("Verify NPM Task Count", async function()
     {   // npm task provider is slower than shit on a turtle
         if (utils.exitRollingCount(2, successCount)) return;
-        this.slow(tc.slowTime.verifyTaskCountNpm + tc.slowTime.min);
+        this.slow(tc.slowTime.taskCount.verifyNpm + tc.slowTime.min);
         await utils.verifyTaskCount(testsName, startTaskCount + 5, 2);
         await utils.waitForTeIdle(tc.waitTime.min);
         ++successCount;

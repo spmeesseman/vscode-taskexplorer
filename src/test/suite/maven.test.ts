@@ -107,7 +107,7 @@ suite("Maven Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.config.disableEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
@@ -117,7 +117,7 @@ suite("Maven Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
@@ -127,7 +127,7 @@ suite("Maven Tests", () =>
     test("Invalid XML", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
@@ -148,7 +148,7 @@ suite("Maven Tests", () =>
     test("Fix Invalid XML", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
@@ -169,7 +169,7 @@ suite("Maven Tests", () =>
     test("Delete file", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, 0);
@@ -180,7 +180,7 @@ suite("Maven Tests", () =>
     test("Disable (Default is OFF)", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.config.disableEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;

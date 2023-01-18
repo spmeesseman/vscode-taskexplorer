@@ -399,7 +399,7 @@ suite("Provider Tests", () =>
     test("Add to Excludes - TaskItem", async function()
     {
         if (exitRollingCount(27, successCount)) return;
-        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.config.excludeTasksEvent);
+        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.config.excludeTasksEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length,
               taskItem = grunt.find(t => t.taskSource === "grunt" && !t.taskFile.path.startsWith("grunt"));
@@ -412,7 +412,7 @@ suite("Provider Tests", () =>
     test("Add to Excludes - TaskItem (Script Type)", async function()
     {
         if (exitRollingCount(28, successCount)) return;
-        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.excludeCommand);
+        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.excludeCommand);
         const taskItems = await tasks.fetchTasks({ type: "batch" }),
               scriptCt = taskItems.length,
               taskItem = batch.find(t => t.taskSource === "batch" && t.taskFile.fileName.toLowerCase().includes("test2.bat"));
@@ -425,7 +425,7 @@ suite("Provider Tests", () =>
     test("Add to Excludes - TaskFile", async function()
     {
         if (exitRollingCount(29, successCount)) return;
-        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.config.excludesEvent);
+        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.config.excludesEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
         for (const value of Object.values(taskMap))
@@ -571,7 +571,7 @@ suite("Provider Tests", () =>
     test("Invalidate Bash Tasks With New Bash Shell Setting", async function()
     {
         if (exitRollingCount(40, successCount)) return;
-        this.slow(tc.slowTime.buildFileCache + tc.slowTime.config.event + tc.slowTime.min +
+        this.slow(tc.slowTime.cache.build + tc.slowTime.config.event + tc.slowTime.min +
                   (tc.slowTime.refreshCommand* 2) + (tc.waitTime.refreshCommand* 2));
         await teApi.config.updateVsWs("terminal.integrated.shell.windows",
                                        "C:\\Program Files\\Git\\bin\\bash.exe");
@@ -588,7 +588,7 @@ suite("Provider Tests", () =>
     test("Rebuild Gulp FileCache on Single Workspace Folder", async function()
     {
         if (exitRollingCount(41, successCount)) return;
-        this.slow(tc.slowTime.buildFileCache + tc.slowTime.min);
+        this.slow(tc.slowTime.cache.build + tc.slowTime.min);
         await teApi.testsApi.fileCache.buildTaskTypeCache("gulp", (workspace.workspaceFolders as WorkspaceFolder[])[0], true, "");
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;

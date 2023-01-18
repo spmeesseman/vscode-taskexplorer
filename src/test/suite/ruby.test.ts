@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { RubyTaskProvider } from "../../providers/ruby";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, suiteFinished, testControl, treeUtils, verifyTaskCount } from "../utils/utils";
+import { activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, suiteFinished, testControl, treeUtils } from "../utils/utils";
 
 const testsName = "ruby";
 const startTaskCount = 7;
@@ -61,7 +61,7 @@ suite("Ruby Tests", () =>
     test("Start", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
+        this.slow(testControl.slowTime.taskCount.verify + testControl.waitTime.min);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
@@ -71,7 +71,7 @@ suite("Ruby Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.ruby", false);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, 0);
@@ -83,7 +83,7 @@ suite("Ruby Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.ruby", true);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
@@ -95,7 +95,7 @@ suite("Ruby Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fs.createEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.createEvent + testControl.waitTime.min);
         // if (!(await fsApi.pathExists(dirName))) {
         //     await fsApi.createDir(dirName);
         // }
@@ -116,7 +116,7 @@ suite("Ruby Tests", () =>
     test("Add 4 Tasks to File", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(testControl.slowTime.fs.modifyEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fs.modifyEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.fs.modifyEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.modifyEvent + testControl.waitTime.min);
         // await fsApi.writeFile(
         //     fileUri.fsPath,
         //     "module.exports = function(ruby) {\n" +
@@ -138,7 +138,7 @@ suite("Ruby Tests", () =>
     test("Remove 2 Tasks from File", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fs.modifyEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.modifyEvent + testControl.waitTime.min);
         // await fsApi.writeFile(
         //     fileUri.fsPath,
         //     "module.exports = function(ruby) {\n" +
@@ -158,7 +158,7 @@ suite("Ruby Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fs.deleteEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.deleteEvent + testControl.waitTime.min);
         // await fsApi.deleteFile(fileUri.fsPath);
         // await fsApi.deleteDir(dirName);
         // await waitForTeIdle(testControl.waitTime.fs.deleteEvent);

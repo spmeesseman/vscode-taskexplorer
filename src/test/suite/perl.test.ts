@@ -64,7 +64,7 @@ suite("Perl Tests", () =>
     test("Start", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
+        this.slow(testControl.slowTime.taskCount.verify + testControl.waitTime.min);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
@@ -74,7 +74,7 @@ suite("Perl Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.perl", false);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, 0);
@@ -86,7 +86,7 @@ suite("Perl Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.perl", true);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
@@ -98,7 +98,7 @@ suite("Perl Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fs.createEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.createEvent + testControl.waitTime.min);
         // if (!(await fsApi.pathExists(dirName))) {
         //     await fsApi.createDir(dirName);
         // }
@@ -119,7 +119,7 @@ suite("Perl Tests", () =>
     test("Add 4 Tasks to File", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(testControl.slowTime.fs.modifyEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fs.modifyEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.fs.modifyEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.modifyEvent + testControl.waitTime.min);
         // await fsApi.writeFile(
         //     fileUri.fsPath,
         //     "module.exports = function(perl) {\n" +
@@ -141,7 +141,7 @@ suite("Perl Tests", () =>
     test("Remove 2 Tasks from File", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fs.modifyEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.modifyEvent + testControl.waitTime.min);
         // await fsApi.writeFile(
         //     fileUri.fsPath,
         //     "module.exports = function(perl) {\n" +
@@ -161,7 +161,7 @@ suite("Perl Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.fs.deleteEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.deleteEvent + testControl.waitTime.min);
         // await fsApi.deleteFile(fileUri.fsPath);
         // await fsApi.deleteDir(dirName);
         // await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
