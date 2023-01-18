@@ -233,10 +233,10 @@ suite("Multi-Root Workspace Tests", () =>
     test("Mimic Add WS Folder 1 (Cache Builder Busy)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.rebuildFileCacheCancel + 100 + tc.slowTime.min);
+        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.rebuildFileCache + 100 + tc.slowTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
-        await testsApi.onWsFoldersChange({
+        await testsApi.onWsFoldersChange({ // event will wait for previous fil cache build
             added: [ wsf[0] ],
             removed: []
         });
@@ -248,10 +248,10 @@ suite("Multi-Root Workspace Tests", () =>
     test("Mimic Remove WS Folder 1 (Cache Builder Busy)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
         if (exitRollingCount(11, successCount)) return;
-        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.rebuildFileCacheCancel + 100 + tc.slowTime.min);
+        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.rebuildFileCacheNoChanges + 100 + tc.slowTime.min);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
-        await testsApi.onWsFoldersChange({
+        await testsApi.onWsFoldersChange({ // event will wait for previous fil cache build
             added: [],
             removed: [ wsf[0] ]
         });

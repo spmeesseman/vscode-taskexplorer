@@ -85,7 +85,7 @@ export const testControl: ITestControl =
         explorerViewStartup: 19050,
         fetchTasksCommand: 3000,
         fileCachePersist: 470,
-        findTaskPosition: 870,
+        findTaskPosition: 875,
         findTaskPositionDocOpen: 115,
         focusCommand: 3400,
         focusCommandAlreadyFocused: 360,
@@ -104,10 +104,11 @@ export const testControl: ITestControl =
         licenseManagerRemoteCheck: 3000,
         licenseManagerRemoteStartServer: 3850,
         min: 50,
-        refreshCommand: 17625,
+        refreshCommand: 18625,
         refreshCommandNoChanges: 400,
-        rebuildFileCache: 15500,
+        rebuildFileCache: 14500,
         rebuildFileCacheCancel: 1810,
+        rebuildFileCacheNoChanges: 3400,
         removeWorkspaceFolder: 10000,
         runCommand: 8900,
         runPauseCommand: 2030,
@@ -124,7 +125,7 @@ export const testControl: ITestControl =
             antTaskWithAnsicon: 8890,
             bashScript: 4000,
             batchScript: 8075,
-            gulpParser: 4075,
+            gulpParser: 4080,
             npmCommand: 13925,
             npmCommandPkg: 11300,
             npmInstallCommand: 21650
@@ -161,7 +162,7 @@ export const testControl: ITestControl =
         fsCreateFolderEvent: 220,
         fsDeleteEvent: 170,
         fsDeleteFolderEvent: 220,
-        fsModifyEvent: 130,
+        fsModifyEvent: 145,
         getTreeMin: 320,
         getTreeMax: 1680,
         getTreeTasks: 65,
@@ -289,6 +290,7 @@ export interface ITestControl
         refreshCommandNoChanges: number;
         rebuildFileCache: number;
         rebuildFileCacheCancel: number;
+        rebuildFileCacheNoChanges: number;
         removeWorkspaceFolder: number;
         runCommand: number;
         runPauseCommand: number;

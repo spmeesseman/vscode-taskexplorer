@@ -46,7 +46,8 @@ suite("External Provider Tests", () =>
     test("Get API Command", async function()
     {
         if (exitRollingCount(0, successCount)) return;
-        assert(await executeTeCommand("getApi", 0, 200));
+        this.slow(testControl.slowTime.config.eventFast);
+        assert(await executeTeCommand("getApi"));
         ++successCount;
     });
 
