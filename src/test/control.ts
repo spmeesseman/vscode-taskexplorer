@@ -134,8 +134,8 @@ export const testControl: ITestControl =
         taskProviderReadUri: 100,
         tasks: {
             antParser: 810,
-            antTask: 8870,
-            antTaskWithAnsicon: 8915,
+            antTask: 8900,
+            antTaskWithAnsicon: 8940,
             bashScript: 3990,
             batchScript: 8065,
             gulpParser: 4110,
@@ -159,40 +159,40 @@ export const testControl: ITestControl =
     {   //
         // MINIMUM WAIT TIMES
         //
-        addWorkspaceFolder: 180,
+        addWorkspaceFolder: 170,
         config: {
             event: 85,
             eventFast: 35,
             disableEvent: 105,
-            enableEvent: 130,
+            enableEvent: 120,
             globEvent: 110,
-            groupingEvent: 105,
-            registerExplorerEvent: 155
+            groupingEvent: 100,
+            registerExplorerEvent: 150
         },
-        command: 90,
-        commandFast: 55,
-        explorerViewStartup: 3100,
-        focusCommand: 310,
+        command: 85,
+        commandFast: 50,
+        explorerViewStartup: 3000,
+        focusCommand: 250,
         fs: {
-            createEvent: 135,
-            createFolderEvent: 185,
-            deleteEvent: 135,
-            deleteFolderEvent: 180,
-            modifyEvent: 125
+            createEvent: 125,
+            createFolderEvent: 165,
+            deleteEvent: 125,
+            deleteFolderEvent: 160,
+            modifyEvent: 115
         },
-        getTreeMin: 290,
+        getTreeMin: 200,
         getTreeMax: 1600,
         getTreeTasks: 55,
         min: 40,
         npmCommandMin: 1500,
-        refreshCommand: 225,
+        refreshCommand: 175,
         refreshCommandNoChanges: 80,
-        refreshTaskTypeCommand: 220,
-        removeWorkspaceFolder: 160,
-        runCommandMin: 670,
-        taskCommand: 570,
-        verifyTaskCountRetry: 90,
-        verifyTaskCountRetryInterval: 200,
+        refreshTaskTypeCommand: 150,
+        removeWorkspaceFolder: 140,
+        runCommandMin: 620,
+        taskCommand: 520,
+        verifyTaskCountRetry: 75,
+        verifyTaskCountRetryInterval: 150,
         viewReport: 90,
         //
         // MAXIMUM WAIT TIMES
