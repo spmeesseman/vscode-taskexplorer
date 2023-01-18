@@ -139,7 +139,7 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(6, successCount)) return;
         this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand +
-                  tc.slowTime.config.event + (tc.waitTime.runCommandMin * 2) + 3000 + endOfTestWaitTime);
+                  tc.slowTime.config.event + 4000 + endOfTestWaitTime);
         await utils.executeSettingsUpdate("keepTermOnStop", true);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         expect(exec).to.not.be.equal(undefined, "Starting the 'batch0' task did not return a valid TaskExecution");

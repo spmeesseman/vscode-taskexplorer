@@ -14,7 +14,7 @@ import {
 } from "../utils/utils";
 
 const testsName = "ant";
-const slowTimeforAntRunTasks = (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.config.event * 3) +
+const slowTimeforAntRunTasks = (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.config.event * 2) +
                                (tc.slowTime.taskProviderReadUri * 2) + tc.slowTime.tasks.antParser;
 
 let teApi: ITaskExplorerApi;
@@ -47,6 +47,7 @@ suite("Ant Tests", () =>
     suiteTeardown(async function()
     {
         await fsApi.writeFile(buildXmlFileUri.fsPath, buildFileXml);
+        await executeSettingsUpdate("useAnt", false);
         suiteFinished(this);
     });
 
@@ -289,8 +290,4 @@ async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAn
     antTasks = await provider.readUriTasks(buildXmlFileUri, "");
     assert(antTasks.length === withAnt2, `Did not read ${withAnt2} ant tasks (4)(actual ${antTasks ? antTasks.length : 0})`);
     logErrorsAreFine(antWillFail);
-    //
-    // Reset
-    //
-    await executeSettingsUpdate("useAnt", false);
 }
