@@ -8,7 +8,7 @@ import TaskItem from "../../tree/item";
 import SpecialTaskFolder from "../../tree/specialFolder";
 import { expect } from "chai";
 import { commands, TaskExecution } from "vscode";
-import { ITaskExplorer, ITaskExplorerApi, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorer, ITaskExplorerApi, ITaskFolder, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 const tc = utils.testControl;
 const endOfTestWaitTime = 750;
@@ -48,11 +48,12 @@ suite("Task Tests", () =>
 	{
         if (utils.exitRollingCount(0, successCount)) return;
         await utils.focusExplorerView(this);
+        await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
         ++successCount;
 	});
 
 
-    test("Check task counts", async function()
+    test("Check Task Counts", async function()
     {
         if (utils.exitRollingCount(1, successCount)) return;
         this.slow(tc.slowTime.getTreeTasks * 4);
@@ -68,21 +69,15 @@ suite("Task Tests", () =>
     });
 
 
-    test("Run non-existent last task", async function()
+    test("Run Non-Existent Last Task", async function()
     {
         if (utils.exitRollingCount(2, successCount)) return;
-        this.slow(tc.slowTime.runCommand + (tc.slowTime.storageUpdate * 2) + endOfTestWaitTime);
-        const lastTasks = testsApi.storage.get<string[]>(constants.LAST_TASKS_STORE, []),
-              hasLastTasks = lastTasks && lastTasks.length > 0;
-        if (hasLastTasks)
-        {
-            await testsApi.storage.update(constants.LAST_TASKS_STORE, undefined);
-        }
+        this.slow(tc.slowTime.runCommand + tc.slowTime.storageUpdate + endOfTestWaitTime);
+        const tree = explorer.getTaskTree() as ITaskFolder[];
+        expect(tree).to.not.be.oneOf([ undefined, null ]);
+        const lastTasksFolder = tree[0] as SpecialTaskFolder;
+        lastTasksFolder.clearTaskItems();
         expect(await utils.executeTeCommand("runLastTask", tc.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
-        if (hasLastTasks)
-        {
-            await testsApi.storage.update(constants.LAST_TASKS_STORE, lastTasks);
-        }
         await utils.waitForTeIdle(endOfTestWaitTime);
         ++successCount;
     });
@@ -91,18 +86,23 @@ suite("Task Tests", () =>
     test("Keep Terminal on Stop (OFF)", async function()
     {
         if (utils.exitRollingCount(3, successCount)) return;
-        this.slow((tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.config.event +
-                  (tc.waitTime.runCommandMin * 2) + 2000 + 1000 + endOfTestWaitTime);
-        await utils.executeSettingsUpdate("keepTermOnStop", false);
-        const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
+        this.slow((tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + (5700 * 2) + endOfTestWaitTime);
+        let exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         expect(exec).to.not.be.equal(undefined, "Starting the 'batch0' task did not return a valid TaskExecution");
         await utils.waitForTaskExecution(exec, 2000);
         await utils.executeTeCommand2("stop", [ batch[0] ], tc.waitTime.taskCommand);
-        // Cover, w/ no term
         batch[0].paused = true;
         utils.overrideNextShowInfoBox(undefined);
-        await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
-        utils.executeTeCommand2("stop", [ batch[0] ], 0); // don't await
+        await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.taskCommand);
+        batch[0].paused = false;
+        await utils.sleep(200);
+        exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
+        await utils.waitForTaskExecution(exec, 2000);
+        await utils.executeTeCommand2("pause", [ batch[0] ], tc.waitTime.taskCommand);
+        await utils.sleep(500);
+        await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.taskCommand);
+        await utils.waitForTaskExecution(exec, 1000);
+        await utils.executeTeCommand2("stop", [ batch[0] ]);
         await utils.waitForTeIdle(endOfTestWaitTime);
         ++successCount;
     });
@@ -139,6 +139,8 @@ suite("Task Tests", () =>
         utils.executeTeCommand2("restart", [ batch[0] ], 0);        // don't await
         utils.overrideNextShowInfoBox(undefined);
         utils.executeTeCommand2("stop", [ batch[0] ], 0);           // don't await
+        utils.overrideNextShowInfoBox(undefined);
+        utils.executeTeCommand2("pause", [ batch[0] ], 0);           // don't await
         await utils.waitForTeIdle(tc.waitTime.refreshCommand);      // now wait for refresh
         ++successCount;
     });
@@ -332,11 +334,11 @@ suite("Task Tests", () =>
     });
 
 
-    test("Run non-existent last task 2", async function()
+    test("Run Non-Existent Last Task 2", async function()
     {
         if (utils.exitRollingCount(13, successCount)) return;
         this.slow(tc.slowTime.runCommand + (tc.slowTime.storageUpdate * 2) + endOfTestWaitTime);
-        const tree = explorer.getTaskTree() as any;
+        const tree = explorer.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as SpecialTaskFolder;
         const lastTasksStore = lastTasksFolder.getStore();
@@ -363,7 +365,7 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(14, successCount)) return;
         this.slow(tc.slowTime.runCommand + (tc.slowTime.storageUpdate * 2) + endOfTestWaitTime);
-        const tree = explorer.getTaskTree() as any;
+        const tree = explorer.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as SpecialTaskFolder;
         const maxLastTasks = teApi.config.get<number>("specialFolders.numLastTasks");
