@@ -5,6 +5,7 @@ import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
 import constants from "./constants";
 import { IDictionary, ITaskFile, ITaskItem } from "../interface";
+import { configuration } from "./utils/configuration";
 
 
 
@@ -31,6 +32,9 @@ export const sortFolders = (folders: IDictionary<TaskFolder>): TaskFolder[] =>
             return 1;
         }
         if (a.label && b.label) {
+            if (!configuration.get<boolean>("sortProjectFoldersAlpha")) {
+                return -1;
+            }
             return a.label.toString().localeCompare(b.label.toString());
         }
         return 0;
