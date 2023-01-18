@@ -7,12 +7,13 @@ import { storage } from "./utils/storage";
 import { findFiles, numFilesInDirectory } from "./utils/fs";
 import { configuration } from "./utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
-import { IDictionary, ICacheItem } from "../interface";
+import { IDictionary, ICacheItem, ITaskExplorerApi } from "../interface";
 import {
     workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem, ExtensionContext
 } from "vscode";
 
 
+let teApi: ITaskExplorerApi;
 let statusBarSpace: StatusBarItem;
 let cacheBuilding = false;
 let cacheBusy = false;
@@ -518,7 +519,7 @@ function isGlobChanged(taskType: string, fileGlob: string)
 
 export const persistCache = async (clear?: boolean) =>
 {
-    if (clear !== true && configuration.get<boolean>("enablePersistentFileCaching"))
+    if (clear !== true && (!teApi.isTests() || configuration.get<boolean>("enablePersistentFileCaching")))
     {
         const text = statusBarSpace.text;
         statusBarSpace.text = "Persisting file cache...";
@@ -536,8 +537,9 @@ export const persistCache = async (clear?: boolean) =>
 };
 
 
-export const registerFileCache = (context: ExtensionContext) =>
+export const registerFileCache = (context: ExtensionContext, api: ITaskExplorerApi) =>
 {
+    teApi = api;
     statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
     statusBarSpace.tooltip = "Task Explorer Status";
     context.subscriptions.push(statusBarSpace);

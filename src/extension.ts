@@ -111,7 +111,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     // Register file cache
     //
-    fileCache.registerFileCache(context);
+    fileCache.registerFileCache(context, teApi);
 
     //
     // Register internal task providers.  Npm, VScode type tasks are provided
@@ -166,7 +166,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         // can quickly restore the tree.  A LOT quicker in large workspaces.
         //
         /* istanbul ignore else */
-        if (tests || (now < lastDeactivated + 4000 && now < lastWsFolderRemove + 4000))
+        if (tests || /* istanbul ignore next */(now < lastDeactivated + 4000 && now < lastWsFolderRemove + 4000))
         {
             await fileCache.rebuildCache("");
         }
