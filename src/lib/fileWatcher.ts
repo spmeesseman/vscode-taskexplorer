@@ -384,9 +384,9 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     // Detect when a folder move occurs and the ext is about to deactivate/re-activate.  A
     // folder remove will trigger added/removed folders unfortunately.
     //
-    if (e.removed.length > 0) {
-        await storage.update2("lastWsFolderRemove", Date.now());
-    }
+    // if (e.removed.length > 0) {
+    //     await storage.update2("lastWsFolderRemove", Date.now());
+    // }
     // const wsFolders = workspace.workspaceFolders || /* istanbul ignore next */[];
     // if (wsFolders.length !== currentNumWorkspaceFolders) // moving folders doesnt change anything
     // {   // ^ vscode 1.70+ Wtf, whole ext restarts on a folder move now & the call abruptly ends ^

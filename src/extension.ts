@@ -166,7 +166,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         // can quickly restore the tree.  A LOT quicker in large workspaces.
         //
         /* istanbul ignore else */
-        if (now < lastDeactivated + 4000 && now < lastWsFolderRemove + 4000)
+        if (tests || (now < lastDeactivated + 4000 && now < lastWsFolderRemove + 4000))
         {
             await fileCache.rebuildCache("");
         }

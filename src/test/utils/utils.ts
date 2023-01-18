@@ -323,6 +323,11 @@ const initSettings = async () =>
     await configuration.updateWs("enableExplorerView", true);
     await configuration.updateWs("enableSideBar", false);
     //
+    // Persistent file caching off.  Pretty intensive when enabled in tests.  Adds 1+
+    // minute to overall tests completion time if set `true`.  Default is `false`.
+    //
+    await configuration.updateWs("enablePersistentFileCaching", false);
+    //
     // Set misc settings, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
@@ -404,6 +409,7 @@ const initSettings = async () =>
     await configuration.updateWs("groupMaxLevel", 1);
     await configuration.updateWs("groupSeparator", "-");
     await configuration.updateWs("groupWithSeparator", true);
+    await configuration.updateWs("groupStripTaskLabel", true);
 
     await configuration.updateWs("exclude", []);
     await configuration.updateWs("includeAnt", []); // Deprecated, use `globPatternsAnt`
