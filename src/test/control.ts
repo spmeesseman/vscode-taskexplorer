@@ -115,12 +115,13 @@ export const testControl: ITestControl =
         showHideSpecialFolder: 440,
         storageRead: 50,
         storageUpdate: 50,
-        taskProviderReadUri: 100,
         taskCommand: 1600,
+        taskCommandStartupMax: 5000,
+        taskProviderReadUri: 100,
         tasks: {
             antParser: 820,
-            antTask: 4390,
-            antTaskWithAnsicon: 4435,
+            antTask: 8840,
+            antTaskWithAnsicon: 8890,
             bashScript: 4000,
             batchScript: 8075,
             gulpParser: 4075,
@@ -296,6 +297,7 @@ export interface ITestControl
         storageRead: number;
         storageUpdate: number;
         taskCommand: number;
+        taskCommandStartupMax: number;
         taskProviderReadUri: number;
         tasks: {
             antParser: number;

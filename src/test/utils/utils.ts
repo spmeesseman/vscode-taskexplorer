@@ -592,16 +592,26 @@ export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxW
 {
     if (exec)
     {
-        let waited = 0;
-        let hasExec = false;
-        let isExec = !!isExecuting(exec.task);
-        while ((isExec && (maxWait === undefined || waited < maxWait)) || (maxWait && !isExec && !hasExec && waited < tc.slowTime.taskCommand))
+        const taskName = exec.task.name;
+        let waitedAfterStarted = 0,
+            waitedHasNotStarted = 0,
+            hasExec = false,
+            isExec = !!isExecuting(exec.task);
+        console.log(`    ${figures.color.infoTask}   ${figures.withColor(`Waiting for '${taskName}' task execution`, figures.colors.grey)}`);
+        while ((isExec && (maxWait === undefined || waitedAfterStarted < maxWait)) || (!isExec && !hasExec && waitedHasNotStarted < tc.slowTime.taskCommandStartupMax))
         {
             await sleep(50);
-            waited += 50;
             isExec = !!isExecuting(exec.task);
-            if (isExec) { hasExec = isExec; }
+            if (isExec) {
+                if (!hasExec) {
+                    console.log(`    ${figures.color.infoTask}     ${figures.withColor(`Task execution started, waited ${waitedHasNotStarted + waitedHasNotStarted} ms`, figures.colors.grey)}`);
+                }
+                hasExec = isExec;
+                waitedAfterStarted += 50;
+            }
+            else if (!hasExec) { waitedHasNotStarted += 50; }
         }
+        console.log(`    ${figures.color.infoTask}     ${figures.withColor(`Task execution wait finished, waited ${waitedHasNotStarted + waitedHasNotStarted} ms`, figures.colors.grey)}`);
     }
 };
 
