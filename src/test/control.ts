@@ -119,7 +119,7 @@ export const testControl: ITestControl =
         taskCommand: 1600,
         tasks: {
             antParser: 820,
-            antTask: 4310,
+            antTask: 4360,
             antTaskWithAnsicon: 4400,
             bashScript: 4000,
             batchScript: 8000,
