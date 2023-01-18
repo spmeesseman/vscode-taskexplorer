@@ -84,7 +84,8 @@ export const testControl: ITestControl =
             eventFast: 110,
             registerExplorerEvent: 690,
             disableEvent: 1570,
-            enableEvent: 2350,
+            enableEvent: 2370,
+            enableEventWorkspace: 2835,
             excludesEvent: 2730,
             excludeTasksEvent: 4225,
             globEvent: 1920,
@@ -123,9 +124,9 @@ export const testControl: ITestControl =
         refreshCommand: 20805,
         refreshCommandNoChanges: 380,
         removeWorkspaceFolder: 9970,
-        runCommand: 8600,
-        runPauseCommand: 2460,
-        runStopCommand: 2480,
+        runCommand: 8610,
+        runPauseCommand: 2480,
+        runStopCommand: 2500,
         showHideSpecialFolder: 430,
         storageRead: 50,
         storageUpdate: 50,
@@ -169,7 +170,7 @@ export const testControl: ITestControl =
             groupingEvent: 100,
             registerExplorerEvent: 150
         },
-        command: 85,
+        command: 90,
         commandFast: 50,
         explorerViewStartup: 3000,
         focusCommand: 250,
@@ -280,6 +281,7 @@ export interface ITestControl
             registerExplorerEvent: number;
             disableEvent: number;
             enableEvent: number;
+            enableEventWorkspace: number;
             excludesEvent: number;
             excludeTasksEvent: number;
             globEvent: number;

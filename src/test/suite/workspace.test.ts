@@ -65,7 +65,7 @@ suite("Workspace / VSCode Tests", () =>
     test("Re-enable Workspace Tasks", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
+        this.slow(testControl.slowTime.config.enableEventWorkspace + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.workspace", true);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount - 1);
         successCount++;
