@@ -9,6 +9,7 @@ import { configuration } from "./configuration";
 import { pathExists, pathExistsSync } from "./fs";
 import { basename, dirname, extname, join, resolve, sep } from "path";
 import { WorkspaceFolder, Uri, workspace, window } from "vscode";
+import TaskFile from "../../tree/file";
 
 
 /**
@@ -387,6 +388,9 @@ export function isString(value: any, notEmpty = false): value is string
 {
     return (!!value || (value === "" && !notEmpty)) && (value instanceof String || typeof value === "string");
 }
+
+
+export const isTaskFile = (t: any): t is TaskFile => t instanceof TaskFile;
 
 
 /**

@@ -47,9 +47,7 @@
         "bash"
     ],
     "main": "./dist/extension",
-    "activationEvents": [
-        "*"
-    ],
+    "activationEvents": [],
     "scripts": {
         "clean": "rimraf dist && rimraf .nyc_output && rimraf coverage",
         "copy-build-to-code": "cmd /c xcopy .\\dist\\*.js ..\\..\\Code\\data\\extensions\\spmeesseman.vscode-taskexplorer-2.13.2\\dist /s /i /y",
@@ -85,6 +83,7 @@
         "test-python": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js python xDeactivate",
         "test-tasks": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js tasks xDeactivate",
         "test-tree": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js tree xDeactivate",
+        "test-treeGrouping": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js treeGrouping xDeactivate",
         "test-typescript": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js typescript xDeactivate",
         "test-workspace": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js workspace xDeactivate",
         "test-util": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js util xDeactivate",
@@ -1780,6 +1779,12 @@
                 },
                 "taskExplorer.groupSeparator": {
                     "type": "string",
+                    "enum": [
+                        "-",
+                        "_",
+                        ":",
+                        "|"
+                    ],
                     "default": "-",
                     "description": "%config.taskExplorer.groupSeparator%"
                 },

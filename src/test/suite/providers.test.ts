@@ -10,8 +10,7 @@ import TaskFile from "../../tree/file";
 import { join } from "path";
 import { expect } from "chai";
 import { workspace, tasks, WorkspaceFolder } from "vscode";
-import { removeFromArray } from "../../lib/utils/utils";
-import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, exitRollingCount, focusExplorerView,
     getWsPath, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
@@ -41,8 +40,7 @@ suite("Provider Tests", () =>
 
     suiteSetup(async function()
     {
-        ({ teApi, fsApi } = await activate(this));
-        explorer = teApi.testsApi.explorer;
+        ({ teApi, fsApi, explorer } = await activate(this));
         rootPath = getWsPath(".");
         dirName = join(rootPath, "tasks_test_");
         dirNameL2 = join(dirName, "subfolder");
@@ -448,7 +446,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(30, successCount)) return;
         this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent + (tc.slowTime.fetchTasksCommand * 2));
         const file = join(rootPath, ".publishrc.json");
-        removeFromArray(tempFiles, file);
+        teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent);
         await verifyTaskCount("apppublisher", 21);
@@ -463,7 +461,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(31, successCount)) return;
         this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
         const file = join(dirName, "build.xml");
-        removeFromArray(tempFiles, file);
+        teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
         await createAntFile();
@@ -476,7 +474,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(32, successCount)) return;
         this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
         const file = join(dirName, "build.gradle");
-        removeFromArray(tempFiles, file);
+        teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
         await createGradleFile();
@@ -489,7 +487,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(33, successCount)) return;
         this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
         const file = join(rootPath, "GRUNTFILE.js");
-        removeFromArray(tempFiles, file);
+        teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
         await createGruntFile();
@@ -502,7 +500,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(34, successCount)) return;
         this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
         const file = join(rootPath, "gulpfile.js");
-        removeFromArray(tempFiles, file);
+        teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
         await createGulpFile();
@@ -515,7 +513,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(35, successCount)) return;
         this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent + tc.slowTime.config.event);
         const file = join(rootPath, "Makefile");
-        removeFromArray(tempFiles, file);
+        teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
         await createMakeFile();
@@ -529,7 +527,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(36, successCount)) return;
         this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
         const file = join(rootPath, "pom.xml");
-        removeFromArray(tempFiles, file);
+        teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
         await createMavenPomFile();
@@ -542,7 +540,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(37, successCount)) return;
         this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
         const file = join(rootPath, "test.bat");
-        removeFromArray(tempFiles, file);
+        teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
         await createBatchFile();

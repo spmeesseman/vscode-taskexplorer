@@ -76,7 +76,7 @@ export const testControl: ITestControl =
             enableEvent: 2325,
             excludesEvent: 2750,
             globEvent: 1940,
-            groupingEvent: 700,
+            groupingEvent: 1575,
             pathToProgramsEvent: 725,
             specialFolderEvent: 475,
             readEvent: 25

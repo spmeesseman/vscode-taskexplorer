@@ -103,6 +103,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     // !!! Remove sometime down the road (from 12/22/22) !!!
     //
     await tempRemapSettingsToNewLayout();
+    await tempResetGroupingSep();
     //
     // !!! End temporary !!!
     //
@@ -179,6 +180,21 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     return teApi;
 }
 
+
+//
+// !!! Temporary                                     !!!
+// !!! Remove sometime down the road (from 1/18/22)  !!!
+// !!! Remove call in method activate() too          !!!
+//
+const tempResetGroupingSep = async () =>
+{
+    const groupSep = configuration.get<string>("groupSeparator", "-");
+    /* istanbul ignore next */
+    if (groupSep !== "-" && groupSep !== "_" && groupSep !== ":" && groupSep !== "|") {
+        /* istanbul ignore next */
+        await configuration.update("groupSeparator", "-");
+    }
+};
 
 //
 // !!! Temporary after settings layout redo / rename !!!
