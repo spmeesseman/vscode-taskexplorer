@@ -133,12 +133,11 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(1, successCount)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.config.globEvent + tc.slowTime.config.readEvent +
-                  tc.waitTime.config.globEvent + tc.slowTime.config.readEvent + tc.slowTime.min);
+                  tc.waitTime.config.globEvent + tc.slowTime.config.readEvent);
         globPatterns = teApi.config.get<string[]>("globPatternsAnt");
         await executeSettingsUpdate("enabledTasks.ant", false, tc.waitTime.config.enableEvent);
         globPatterns.push("**/dummy.xml");
         await executeSettingsUpdate("globPatternsAnt", globPatterns, tc.waitTime.config.globEvent);
-        await waitForTeIdle(tc.waitTime.min);
         successCount++;
     });
 
@@ -146,11 +145,10 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Ant Glob", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.config.globEvent + tc.slowTime.min);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.config.globEvent);
         await executeSettingsUpdate("enabledTasks.ant", true, tc.waitTime.config.enableEvent);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsAnt", globPatterns, tc.waitTime.config.globEvent);
-        await waitForTeIdle(tc.waitTime.min);
         successCount++;
     });
 
@@ -158,12 +156,11 @@ suite("Configuration / Settings Tests", () =>
     test("Bash Glob", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.config.globEvent + tc.slowTime.config.readEvent + tc.slowTime.min);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.config.globEvent + tc.slowTime.config.readEvent);
         globPatterns = teApi.config.get<string[]>("globPatternsBash");
         await executeSettingsUpdate("enabledTasks.bash", false, tc.waitTime.config.enableEvent);
         globPatterns.push("**/extensionless/**");
         await executeSettingsUpdate("globPatternsBash", globPatterns);
-        await waitForTeIdle(tc.waitTime.min);
         successCount++;
     });
 
@@ -171,11 +168,10 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Bash Glob", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.config.globEvent + tc.slowTime.min);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.config.globEvent);
         await executeSettingsUpdate("enabledTasks.bash", true, tc.waitTime.config.enableEvent);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsBash", globPatterns);
-        await waitForTeIdle(tc.waitTime.min);
         successCount++;
     });
 

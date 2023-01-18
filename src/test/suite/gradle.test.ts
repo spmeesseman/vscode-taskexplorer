@@ -62,9 +62,8 @@ suite("Gradle Tests", () =>
     test("Start", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        this.slow(testControl.slowTime.verifyTaskCount + testControl.waitTime.min);
+        this.slow(testControl.slowTime.verifyTaskCount);
         // await verifyTaskCount(testsName, startTaskCount);
-        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -72,11 +71,9 @@ suite("Gradle Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
-        // await teApi.config.updateWs("enabledTasks.gradle", false);
-        // await waitForTeIdle(testControl.waitTime.config.enableEvent);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent);
+        // await executeSettingsUpdate("enabledTasks.gradle", false, slowTime.config.enable);
         // await verifyTaskCount(testsName, 0);
-        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 
@@ -84,11 +81,10 @@ suite("Gradle Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.verifyTaskCount + testControl.waitTime.config.enableEvent);
         // await teApi.config.updateWs("enabledTasks.gradle", true);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
-        // await waitForTeIdle(testControl.waitTime.min);
         ++successCount;
     });
 

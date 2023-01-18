@@ -172,7 +172,7 @@ suite("File Watcher Tests", () =>
     test("Modify File in Ignored Folder", async function()
     {
         if (utils.exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.verifyTaskCount);
+        this.slow((tc.slowTime.fs.modifyEvent * 2) + (tc.slowTime.verifyTaskCount * 2) + 200);
         await fsApi.writeFile(
             join(insideWsDirIgn, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
@@ -181,6 +181,16 @@ suite("File Watcher Tests", () =>
         );
         await utils.waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
+        await utils.sleep(100);
+        await fsApi.writeFile(
+            join(insideWsDirIgn, "Gruntfile.js"),
+            "module.exports = function(grunt) {\n" +
+            '    grunt.registerTask(\n"default20", ["jshint:myproject"]);\n' +
+            "};\n"
+        );
+        await utils.waitForTeIdle(tc.waitTime.fs.modifyEvent);
+        await utils.verifyTaskCount("grunt", startTaskCountGrunt);
+        await utils.sleep(100);
         ++successCount;
     });
 

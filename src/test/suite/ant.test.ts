@@ -87,7 +87,6 @@ suite("Ant Tests", () =>
         if (exitRollingCount(3, successCount)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", false);
-        await waitForTeIdle(tc.waitTime.config.event);
         await verifyTaskCount("ant", 0);
         ++successCount;
     });
@@ -98,7 +97,6 @@ suite("Ant Tests", () =>
         if (exitRollingCount(4, successCount)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.verifyTaskCount);
         await executeSettingsUpdate("enabledTasks.ant", true);
-        await waitForTeIdle(tc.waitTime.config.event);
         await verifyTaskCount("ant", 3);
         ++successCount;
     });

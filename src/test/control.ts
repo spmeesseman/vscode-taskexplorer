@@ -94,10 +94,10 @@ export const testControl: ITestControl =
         focusCommandChangeViews: 130,
         fs: {
             createEvent: 1890,
-            createEventTsc: 2160,
+            createEventTsc: 2360,
             createFolderEvent: 2210,
             deleteEvent: 1760,
-            deleteEventTsc: 2160,
+            deleteEventTsc: 2380,
             deleteFolderEvent: 2015,
             modifyEvent: 945,
         },
@@ -110,7 +110,7 @@ export const testControl: ITestControl =
         licenseManagerRemoteCheck: 3000,
         licenseManagerRemoteStartServer: 3850,
         min: 50,
-        refreshCommand: 19625,
+        refreshCommand: 19825,
         refreshCommandNoChanges: 400,
         rebuildFileCache: 14500,
         rebuildFileCacheCancel: 1810,
@@ -131,14 +131,14 @@ export const testControl: ITestControl =
             antTaskWithAnsicon: 8890,
             bashScript: 4000,
             batchScript: 8075,
-            gulpParser: 4085,
+            gulpParser: 4100,
             npmCommand: 13925,
             npmCommandPkg: 11300,
             npmInstallCommand: 21650
         },
         verifyTaskCount: 825,
         verifyTaskCountByTree: 850,
-        verifyTaskCountFirstCall: 1350,
+        verifyTaskCountFirstCall: 1370,
         verifyTaskCountNpm: 3175, // internal vscode npm task provider is slower than shit wtf
         verifyTaskCountWorkspace: 3500,
         viewReport: 1950
