@@ -1360,7 +1360,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
     private pause(taskItem: TaskItem)
     {
-        if (this.isBusy())
+        if (taskItem.paused || this.isBusy())
         {
             window.showInformationMessage("Busy, please wait...");
             return;
@@ -1378,18 +1378,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 // TODO - see ticket.  I guess its not CTRL+C in some parts.
                 // so make the control chars a setting.  Also in stop().
                 //
-                if (taskItem.paused)
-                {
-                    taskItem.paused = false;
-                    log.value("   send to terminal", "N", 1);
-                    terminal.sendText("N");
-                }
-                else
-                {
-                    taskItem.paused = true;
-                    log.value("   send to terminal", "\\u0003", 1);
-                    terminal.sendText("\u0003");
-                }
+                taskItem.paused = true;
+                log.value("   send to terminal", "\\u0003", 1);
+                terminal.sendText("\u0003");
             }
             else {
                 window.showInformationMessage("Terminal not found");
@@ -1713,7 +1704,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         log.methodStart("resume task", 1, "", true);
         const term = getTerminal(taskItem, "   ");
         if (term)
-        {
+        {   //
+            // TODO - see ticket.  I guess its not CTRL+C in some parts.
+            // so make the control chars a setting.  Also in stop().
+            //
             log.value("   send to terminal", "N", 1);
             term.sendText("N", true);
             exec = taskItem.execution;

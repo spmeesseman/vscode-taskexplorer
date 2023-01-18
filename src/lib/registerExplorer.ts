@@ -49,12 +49,14 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
         {
             if (name === "taskExplorer" && teApi.explorer)
             {
+                teApi.explorer.setEnabled(false);
                 teApi.explorer.dispose(context);
                 teApi.explorer = undefined;
                 teApi.explorerView = undefined;
             }
             else /* istanbul ignore else */if (teApi.sidebar) // name === "taskExplorerSideBar"
             {
+                teApi.sidebar.setEnabled(false);
                 teApi.sidebar.dispose(context);
                 teApi.sidebar = undefined;
                 teApi.sidebarView = undefined;
