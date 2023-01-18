@@ -164,9 +164,9 @@ suite("Powershell Tests", () =>
     test("Delete Folder w/ File", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.fs.deleteFoldereEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.verifyTaskCount);
         await fsApi.deleteDir(dirName);
-        await waitForTeIdle(tc.waitTime.fs.deleteFoldereEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
         ++successCount;
     });

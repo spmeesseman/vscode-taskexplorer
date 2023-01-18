@@ -41,9 +41,9 @@ suite("File Watcher Tests", () =>
     suiteTeardown(async function()
     {
         await fsApi.deleteDir(insideWsDir);
-        await utils.waitForTeIdle(tc.waitTime.fs.deleteFoldereEvent);
+        await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await fsApi.deleteDir(insideWsDirIgn);
-        await utils.waitForTeIdle(tc.waitTime.fs.deleteFoldereEvent);
+        await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await fsApi.deleteDir(outsideWsDir);
         await utils.executeSettingsUpdate("exclude", excludes, tc.waitTime.config.globEvent);
         utils.suiteFinished(this);
@@ -134,9 +134,9 @@ suite("File Watcher Tests", () =>
     test("Delete Folder", async function()
     {
         if (utils.exitRollingCount(7, successCount)) return;
-        this.slow(tc.slowTime.fs.deleteFoldereEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.verifyTaskCount);
         await fsApi.deleteDir(insideWsDir);
-        await utils.waitForTeIdle(tc.waitTime.fs.deleteFoldereEvent);
+        await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
         ++successCount;
     });
@@ -223,11 +223,11 @@ suite("File Watcher Tests", () =>
     test("Delete Folders", async function()
     {
         if (utils.exitRollingCount(13, successCount)) return;
-        this.slow(tc.slowTime.fs.deleteFoldereEvent + (tc.slowTime.verifyTaskCount * 6));
+        this.slow(tc.slowTime.fs.deleteFolderEvent + (tc.slowTime.verifyTaskCount * 6));
         await fsApi.deleteDir(outsideWsDir);
         await fsApi.deleteDir(insideWsDir);
         await fsApi.deleteDir(insideWsDirIgn);
-        await utils.waitForTeIdle(tc.waitTime.fs.deleteFoldereEvent);
+        await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await checkTaskCounts(this);
         ++successCount;
     });

@@ -638,7 +638,7 @@ suite("Provider Tests", () =>
     test("Remove Temporary Files and Directories", async function()
     {
         if (exitRollingCount(44, successCount)) return;
-        this.slow((tc.slowTime.fs.deleteFoldereEvent * 3) + (tc.slowTime.fs.deleteEvent * (tempFiles.length)) + 4000);
+        this.slow((tc.slowTime.fs.deleteFolderEvent * 3) + (tc.slowTime.fs.deleteEvent * (tempFiles.length)) + 4000);
         await deleteTempFilesAndDirectories();
         ++successCount;
     });

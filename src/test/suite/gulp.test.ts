@@ -226,7 +226,7 @@ suite("Gulp Tests", () =>
     test("Delete Directory w/ MJS File", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.fs.deleteFoldereEvent + tc.slowTime.verifyTaskCount + (tc.waitTime.min * 2));
+        this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.verifyTaskCount + (tc.waitTime.min * 2));
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);

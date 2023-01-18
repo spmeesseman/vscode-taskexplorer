@@ -155,7 +155,7 @@ suite("Python Tests", () =>
     test("Delete Folder", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fs.deleteFoldereEvent + (tc.waitTime.fs.deleteEvent * 2) + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.deleteFolderEvent + (tc.waitTime.fs.deleteEvent * 2) + tc.slowTime.verifyTaskCount);
         // await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent * 2);

@@ -199,7 +199,7 @@ suite("Makefile Tests", () =>
     test("Delete Folder", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(testControl.slowTime.fs.deleteFoldereEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fs.deleteFolderEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
