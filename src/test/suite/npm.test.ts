@@ -42,7 +42,7 @@ suite("NPM Tests", () =>
                     console.log(error);
                 }
             }
-            await utils.waitForTeIdle(tc.waitTime.fsDeleteEvent);
+            await utils.waitForTeIdle(tc.waitTime.fs.deleteEvent);
         }
         utils.suiteFinished(this);
     });
@@ -59,7 +59,7 @@ suite("NPM Tests", () =>
     test("Create Package File (package.json)", async function()
     {
         if (utils.exitRollingCount(1, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + (tc.waitTime.fsCreateEvent * 2));
+        this.slow(tc.slowTime.fs.createEvent + (tc.waitTime.fs.createEvent * 2));
         // tagLog("NPM", "Create Package File (1: package.json)");
         //
         // Create NPM package.json
@@ -79,7 +79,7 @@ suite("NPM Tests", () =>
             "}\r\n"
         );
         // tagLog("NPM", "Create Package File (2: package.json)");
-        await utils.waitForTeIdle(tc.waitTime.fsCreateEvent * 2);
+        await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
         // tagLog("NPM", "Create Package File (3: package.json)");
         ++successCount;
     });

@@ -93,7 +93,7 @@ suite("App-Publisher Tests", () =>
     test("Create file", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -106,7 +106,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await waitForTeIdle(tc.waitTime.fsCreateEvent);
+        await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
         ++successCount;
     });
@@ -135,7 +135,7 @@ suite("App-Publisher Tests", () =>
     test("Invalid JSON", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -148,7 +148,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn""\n' +
             "\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         //
         // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
         // file is always 21. Force a task invalidation to cover the invalid json check
@@ -162,7 +162,7 @@ suite("App-Publisher Tests", () =>
     test("Fix Invalid JSON", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -175,7 +175,7 @@ suite("App-Publisher Tests", () =>
             '    "repoType": "svn"\n' +
             "}\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         //
         // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
         // file is always 21. Force a task invalidation to cover the invalid json fix check
@@ -189,9 +189,9 @@ suite("App-Publisher Tests", () =>
     test("Delete file", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });

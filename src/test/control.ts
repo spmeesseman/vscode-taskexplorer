@@ -91,11 +91,13 @@ export const testControl: ITestControl =
         focusCommand: 3400,
         focusCommandAlreadyFocused: 360,
         focusCommandChangeViews: 130,
-        fsCreateEvent: 1890,
-        fsCreateFolderEvent: 2210,
-        fsDeleteEvent: 1760,
-        fsDeleteFolderEvent: 2015,
-        fsModifyEvent: 945,
+        fs: {
+            createEvent: 1890,
+            createFolderEvent: 2210,
+            deleteEvent: 1760,
+            deleteFolderEvent: 2015,
+            modifyEvent: 945,
+        },
         getTreeTasks: 295,
         getTreeTasksNpm: 750, // npm task provider is slower than shit on a turtle
         licenseMgrOpenPage: 575,
@@ -159,11 +161,13 @@ export const testControl: ITestControl =
         commandFast: 70,
         explorerViewStartup: 4000,
         focusCommand: 400,
-        fsCreateEvent: 170,
-        fsCreateFolderEvent: 220,
-        fsDeleteEvent: 170,
-        fsDeleteFolderEvent: 220,
-        fsModifyEvent: 145,
+        fs: {
+            createEvent: 1890,
+            createFolderEvent: 2210,
+            deleteEvent: 1760,
+            deleteFolderEvent: 2015,
+            modifyEvent: 945,
+        },
         getTreeMin: 320,
         getTreeMax: 1680,
         getTreeTasks: 65,
@@ -274,11 +278,13 @@ export interface ITestControl
         focusCommand: number;
         focusCommandAlreadyFocused: number;
         focusCommandChangeViews: number;
-        fsCreateEvent: number;
-        fsCreateFolderEvent: number;
-        fsDeleteEvent: number;
-        fsDeleteFolderEvent: number;
-        fsModifyEvent: number;
+        fs: {
+            createEvent: number;
+            createFolderEvent: number;
+            deleteEvent: number;
+            deleteFolderEvent: number;
+            modifyEvent: number;
+        };
         getTreeTasks: number;
         getTreeTasksNpm: number; // npm task provider is slower than shit on a turtle
         licenseMgrOpenPage: number;
@@ -329,11 +335,6 @@ export interface ITestControl
         // MINIMUM WAIT TIMES
         //
         addWorkspaceFolder: number;
-        fsCreateEvent: number;
-        fsCreateFolderEvent: number;
-        fsDeleteEvent: number;
-        fsDeleteFolderEvent: number;
-        fsModifyEvent: number;
         config: {
             event: number;
             eventFast: number;
@@ -347,6 +348,13 @@ export interface ITestControl
         commandFast: number;
         explorerViewStartup: number;
         focusCommand: number;
+        fs: {
+            createEvent: number;
+            createFolderEvent: number;
+            deleteEvent: number;
+            deleteFolderEvent: number;
+            modifyEvent: number;
+        };
         getTreeMin: number;
         getTreeMax: number;
         getTreeTasks: number;

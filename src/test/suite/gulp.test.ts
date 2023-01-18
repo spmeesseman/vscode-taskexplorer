@@ -107,7 +107,7 @@ suite("Gulp Tests", () =>
     test("Create JS File", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         if (!(await fsApi.pathExists(dirName))) {
             await fsApi.createDir(dirName);
         }
@@ -123,7 +123,7 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-        await waitForTeIdle(tc.waitTime.fsCreateEvent);
+        await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -133,7 +133,7 @@ suite("Gulp Tests", () =>
     test("Add Task to JS File", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(tc.slowTime.fsModifyEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
@@ -150,7 +150,7 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 3);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -160,7 +160,7 @@ suite("Gulp Tests", () =>
     test("Remove 2 Tasks from JS File", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
@@ -169,7 +169,7 @@ suite("Gulp Tests", () =>
             "    done();\n" +
             "});\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
         ++successCount;
     });
@@ -178,9 +178,9 @@ suite("Gulp Tests", () =>
     test("Delete JS File", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await fsApi.deleteFile(fileUri.fsPath);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -190,7 +190,7 @@ suite("Gulp Tests", () =>
     test("Create MJS File", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         if (!(await fsApi.pathExists(dirName))) {
             await fsApi.createDir(dirName);
         }
@@ -216,7 +216,7 @@ suite("Gulp Tests", () =>
             "export { build4 };\n" +
             "export const default123 = series(clean2, build2);\n"
         );
-        await waitForTeIdle(tc.waitTime.fsCreateEvent);
+        await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 5);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -226,9 +226,9 @@ suite("Gulp Tests", () =>
     test("Delete Directory w/ MJS File", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteFolderEvent + tc.slowTime.verifyTaskCount + (tc.waitTime.min * 2));
+        this.slow(tc.slowTime.fs.deleteFoldereEvent + tc.slowTime.verifyTaskCount + (tc.waitTime.min * 2));
         await fsApi.deleteDir(dirName);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await waitForTeIdle(tc.waitTime.min);
         await waitForTeIdle(tc.waitTime.min);

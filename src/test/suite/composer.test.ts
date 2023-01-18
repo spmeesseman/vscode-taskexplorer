@@ -105,7 +105,7 @@ suite("Composer Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.verifyTaskCount);
         if (!await fsApi.pathExists(dirName)) {
             await fsApi.createDir(dirName);
         }
@@ -122,7 +122,7 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await waitForTeIdle(testControl.waitTime.fsCreateEvent);
+        await waitForTeIdle(testControl.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 3);
         ++successCount;
     });
@@ -131,7 +131,7 @@ suite("Composer Tests", () =>
     test("Add Task to File", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -146,7 +146,7 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await waitForTeIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(testControl.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 4);
         ++successCount;
     });
@@ -155,7 +155,7 @@ suite("Composer Tests", () =>
     test("Remove 2 Tasks from File", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(testControl.slowTime.fsCreateEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -168,7 +168,7 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await waitForTeIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(testControl.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
         ++successCount;
     });
@@ -179,12 +179,12 @@ suite("Composer Tests", () =>
         if (exitRollingCount(8, successCount)) return;
         let resetLogging = teApi.log.isLoggingEnabled();
         if (resetLogging) { // turn scary error logging off
-            this.slow(testControl.slowTime.fsCreateEvent + (testControl.slowTime.config.event * 2) + testControl.slowTime.verifyTaskCount);
+            this.slow(testControl.slowTime.fs.createEvent + (testControl.slowTime.config.event * 2) + testControl.slowTime.verifyTaskCount);
             executeSettingsUpdate("logging.enable", false);
             resetLogging = true;
         }
         else {
-            this.slow(testControl.slowTime.fsCreateEvent);
+            this.slow(testControl.slowTime.fs.createEvent);
         }
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -198,7 +198,7 @@ suite("Composer Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "\n"
         );
-        await waitForTeIdle(testControl.waitTime.fsModifyEvent);
+        await waitForTeIdle(testControl.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount);
         if (resetLogging) { // turn scary error logging off
             executeSettingsUpdate("logging.enable", true);
@@ -211,10 +211,10 @@ suite("Composer Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(testControl.slowTime.fsDeleteEvent + testControl.slowTime.verifyTaskCount);
+        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
-        await waitForTeIdle(testControl.waitTime.fsDeleteEvent);
+        await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });

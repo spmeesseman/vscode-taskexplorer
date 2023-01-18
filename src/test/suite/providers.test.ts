@@ -71,7 +71,7 @@ suite("Provider Tests", () =>
     test("Create Empty Directories", async function()
     {
         if (exitRollingCount(0, successCount)) return;
-        this.slow(tc.slowTime.fsCreateFolderEvent * 4);
+        this.slow(tc.slowTime.fs.createFoldereEvent * 4);
         if (!await fsApi.pathExists(dirName)) {
             await fsApi.createDir(dirName);
         }
@@ -114,7 +114,7 @@ suite("Provider Tests", () =>
     test("Create Temporary Task Files - App Publisher", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent);
+        this.slow(tc.slowTime.fs.createEvent);
         await setupAppPublisher();
         ++successCount;
     });
@@ -123,7 +123,7 @@ suite("Provider Tests", () =>
     test("Create Temporary Task Files - Ant", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent * 5);
+        this.slow(tc.slowTime.fs.createEvent * 5);
         await setupAnt();
         ++successCount;
     });
@@ -132,7 +132,7 @@ suite("Provider Tests", () =>
     test("Create Temporary Task Files - Bash", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent);
+        this.slow(tc.slowTime.fs.createEvent);
         await setupBash();
         ++successCount;
     });
@@ -141,7 +141,7 @@ suite("Provider Tests", () =>
     test("Create Temporary Task Files - Batch", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent * 3);
+        this.slow(tc.slowTime.fs.createEvent * 3);
         await setupBatch();
         ++successCount;
     });
@@ -150,7 +150,7 @@ suite("Provider Tests", () =>
     test("Create Temporary Task Files - Gradle", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent * 3);
+        this.slow(tc.slowTime.fs.createEvent * 3);
         await setupGradle();
         ++successCount;
     });
@@ -159,7 +159,7 @@ suite("Provider Tests", () =>
     test("Create Temporary Task Files - Grunt", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent * 4);
+        this.slow(tc.slowTime.fs.createEvent * 4);
         await setupGrunt();
         ++successCount;
     });
@@ -168,7 +168,7 @@ suite("Provider Tests", () =>
     test("Create Temporary Task Files - Gulp", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent * 5);
+        this.slow(tc.slowTime.fs.createEvent * 5);
         await setupGulp();
         ++successCount;
     });
@@ -177,7 +177,7 @@ suite("Provider Tests", () =>
     test("Create Temporary Task Files - Makefile", async function()
     {
         if (exitRollingCount(11, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent * 3);
+        this.slow(tc.slowTime.fs.createEvent * 3);
         await setupMakefile();
         ++successCount;
     });
@@ -186,7 +186,7 @@ suite("Provider Tests", () =>
     test("Create Temporary Task Files - Maven", async function()
     {
         if (exitRollingCount(12, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent);
+        this.slow(tc.slowTime.fs.createEvent);
         await setupMaven();
         ++successCount;
     });
@@ -195,7 +195,7 @@ suite("Provider Tests", () =>
     test("Create Temporary Task Files - Typescript", async function()
     {
         if (exitRollingCount(13, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent * 2);
+        this.slow(tc.slowTime.fs.createEvent * 2);
         await setupTsc();
         ++successCount;
     });
@@ -444,11 +444,11 @@ suite("Provider Tests", () =>
     test("App Publisher Delete / Add", async function()
     {
         if (exitRollingCount(30, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent + (tc.slowTime.fetchTasksCommand * 2));
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent + (tc.slowTime.fetchTasksCommand * 2));
         const file = join(rootPath, ".publishrc.json");
         teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount("apppublisher", 21);
         await createAppPublisherFile();
         await verifyTaskCount("apppublisher", 42);
@@ -459,11 +459,11 @@ suite("Provider Tests", () =>
     test("Ant Delete / Add", async function()
     {
         if (exitRollingCount(31, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(dirName, "build.xml");
         teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createAntFile();
         ++successCount;
     });
@@ -472,11 +472,11 @@ suite("Provider Tests", () =>
     test("Gradle Delete / Add", async function()
     {
         if (exitRollingCount(32, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(dirName, "build.gradle");
         teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createGradleFile();
         ++successCount;
     });
@@ -485,11 +485,11 @@ suite("Provider Tests", () =>
     test("Grunt Delete / Add", async function()
     {
         if (exitRollingCount(33, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "GRUNTFILE.js");
         teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createGruntFile();
         ++successCount;
     });
@@ -498,11 +498,11 @@ suite("Provider Tests", () =>
     test("Gulp Delete / Add", async function()
     {
         if (exitRollingCount(34, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "gulpfile.js");
         teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createGulpFile();
         ++successCount;
     });
@@ -511,11 +511,11 @@ suite("Provider Tests", () =>
     test("Makefile Delete / Add", async function()
     {
         if (exitRollingCount(35, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent + tc.slowTime.config.event);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent + tc.slowTime.config.event);
         const file = join(rootPath, "Makefile");
         teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createMakeFile();
         await executeSettingsUpdate("logging.enable", true); // hit tree.logTask()
         ++successCount;
@@ -525,11 +525,11 @@ suite("Provider Tests", () =>
     test("Maven Delete / Add", async function()
     {
         if (exitRollingCount(36, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "pom.xml");
         teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createMavenPomFile();
         ++successCount;
     });
@@ -538,11 +538,11 @@ suite("Provider Tests", () =>
     test("Batch Delete / Add", async function()
     {
         if (exitRollingCount(37, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.fsDeleteEvent);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "test.bat");
         teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent, 1500);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createBatchFile();
         ++successCount;
     });
@@ -638,7 +638,7 @@ suite("Provider Tests", () =>
     test("Remove Temporary Files and Directories", async function()
     {
         if (exitRollingCount(44, successCount)) return;
-        this.slow((tc.slowTime.fsDeleteFolderEvent * 3) + (tc.slowTime.fsDeleteEvent * (tempFiles.length)) + 4000);
+        this.slow((tc.slowTime.fs.deleteFoldereEvent * 3) + (tc.slowTime.fs.deleteEvent * (tempFiles.length)) + 4000);
         await deleteTempFilesAndDirectories();
         ++successCount;
     });
@@ -765,7 +765,7 @@ async function setupAnt()
         "</project>\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fsCreateEvent * 5);
+    await waitForTeIdle(tc.waitTime.fs.createEvent * 5);
 }
 
 
@@ -807,7 +807,7 @@ async function setupGradle()
         "}\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fsCreateEvent * 2);
+    await waitForTeIdle(tc.waitTime.fs.createEvent * 2);
 }
 
 
@@ -858,7 +858,7 @@ async function setupTsc()
         "}\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fsCreateEvent * 2);
+    await waitForTeIdle(tc.waitTime.fs.createEvent * 2);
 }
 
 
@@ -956,7 +956,7 @@ async function setupGulp()
         "});\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fsCreateEvent * 4);
+    await waitForTeIdle(tc.waitTime.fs.createEvent * 4);
 }
 
 
@@ -981,7 +981,7 @@ async function setupMakefile()
         "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fsCreateEvent * 2);
+    await waitForTeIdle(tc.waitTime.fs.createEvent * 2);
 }
 
 
@@ -997,7 +997,7 @@ async function setupBatch()
 
     await fsApi.writeFile(file2, "@echo testing batch file 2\r\nsleep /t 5\r\n");
     await fsApi.writeFile(file3, "@echo testing batch file 3\r\n");
-    await waitForTeIdle(tc.waitTime.fsCreateEvent);
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
 }
 
 
@@ -1016,7 +1016,7 @@ async function setupBash()
     await fsApi.writeFile(file2, "echo testing bash file 2\n");
     await fsApi.writeFile(file3, "echo testing bash file 3\n");
 
-    await waitForTeIdle(tc.waitTime.fsCreateEvent * 3);
+    await waitForTeIdle(tc.waitTime.fs.createEvent * 3);
 }
 
 
@@ -1057,7 +1057,7 @@ async function setupGrunt()
         "};\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fsCreateEvent * 3);
+    await waitForTeIdle(tc.waitTime.fs.createEvent * 3);
 }
 
 
@@ -1092,7 +1092,7 @@ async function createAntFile()
                 '    <target name="test2" depends="init"></target>\n' +
                 "</project>\n"
             );
-            await waitForTeIdle(tc.waitTime.fsCreateEvent);
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
         }
     }
 }
@@ -1119,7 +1119,7 @@ async function createAppPublisherFile()
                 '    "repoType": "svn"\n' +
                 "}\n"
             );
-            await waitForTeIdle(tc.waitTime.fsCreateEvent);
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
         }
     }
 }
@@ -1140,7 +1140,7 @@ async function createMavenPomFile()
                 "    <modelVersion>4.0.0</modelVersion>\n" +
                 "</project>\n"
             );
-            await waitForTeIdle(tc.waitTime.fsCreateEvent);
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
         }
     }
 }
@@ -1155,7 +1155,7 @@ async function createBatchFile()
         if (!await fsApi.pathExists(file))
         {
             await fsApi.writeFile(file, "@echo testing batch file\r\n");
-            await waitForTeIdle(tc.waitTime.fsCreateEvent);
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
         }
     }
 }
@@ -1183,7 +1183,7 @@ async function createGradleFile()
                 "    with jar\n" +
                 "}\n"
             );
-            await waitForTeIdle(tc.waitTime.fsCreateEvent);
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
         }
     }
 }
@@ -1205,7 +1205,7 @@ async function createGruntFile()
                 '    grunt.registerTask("upload", [\'s3\']);\n' +
                 "};\n"
             );
-            await waitForTeIdle(tc.waitTime.fsCreateEvent);
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
         }
     }
 }
@@ -1231,7 +1231,7 @@ async function createGulpFile()
                 "    done();\n" +
                 "});\n"
             );
-            await waitForTeIdle(tc.waitTime.fsCreateEvent);
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
         }
     }
 }
@@ -1250,7 +1250,7 @@ async function createMakeFile()
                 file,
                 "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
             );
-            await waitForTeIdle(tc.waitTime.fsCreateEvent);
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
         }
     }
 }

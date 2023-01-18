@@ -189,7 +189,7 @@ suite("Multi-Root Workspace Tests", () =>
     test("Mimic Add WS Folder 1 (w/ File)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
         if (exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.fsCreateEvent + tc.slowTime.min + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.fs.createEvent + tc.slowTime.min + tc.slowTime.verifyTaskCount);
         gruntCt = teApi.testsApi.fileCache.getTaskFiles("grunt").length;
         await fsApi.writeFile(
             join(wsf[0].uri.fsPath, "Gruntfile.js"),
@@ -198,7 +198,7 @@ suite("Multi-Root Workspace Tests", () =>
             '    grunt.registerTask("upload2", ["s3"]);\n' +
             "};\n"
         );
-        await waitForTeIdle(tc.waitTime.fsCreateEvent);
+        await waitForTeIdle(tc.waitTime.fs.createEvent);
         workspace.getWorkspaceFolder = (uri: Uri) =>
         {
             return wsf[0];
@@ -216,14 +216,14 @@ suite("Multi-Root Workspace Tests", () =>
     test("Mimic Remove WS Folder 1 (w/ File)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.fsDeleteEvent + tc.slowTime.min + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.fs.deleteEvent + tc.slowTime.min + tc.slowTime.verifyTaskCount);
         await testsApi.onWsFoldersChange({
             added: [],
             removed: [ wsf[0] ]
         });
         await waitForTeIdle(tc.waitTime.min); // awaiting onWsFoldersChange() should finish the event
         await fsApi.deleteFile(join(wsf[0].uri.fsPath, "Gruntfile.js"));
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
         await verifyTaskCount("grunt", gruntCt);
         ++successCount;

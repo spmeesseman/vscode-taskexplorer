@@ -98,7 +98,7 @@ suite("Grunt Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         if (!(await fsApi.pathExists(dirName))) {
             await fsApi.createDir(dirName);
         }
@@ -109,7 +109,7 @@ suite("Grunt Tests", () =>
             '    grunt.registerTask("upload2", ["s3"]);\n' +
             "};\n"
         );
-        await waitForTeIdle(tc.waitTime.fsCreateEvent);
+        await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -119,7 +119,7 @@ suite("Grunt Tests", () =>
     test("Add 4 Tasks to File", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(tc.slowTime.fsModifyEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
             "module.exports = function(grunt) {\n" +
@@ -131,7 +131,7 @@ suite("Grunt Tests", () =>
             '    grunt.registerTask("upload6", ["s7"]);\n' +
             "};\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 6);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -141,7 +141,7 @@ suite("Grunt Tests", () =>
     test("Remove 2 Tasks from File", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await fsApi.writeFile(
             fileUri.fsPath,
             "module.exports = function(grunt) {\n" +
@@ -151,7 +151,7 @@ suite("Grunt Tests", () =>
             '    grunt.registerTask("upload6", ["s7"]);\n' +
             "};\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 4);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;
@@ -161,10 +161,10 @@ suite("Grunt Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.verifyTaskCount + tc.slowTime.min);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteDir(dirName);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await waitForTeIdle(tc.waitTime.min);
         ++successCount;

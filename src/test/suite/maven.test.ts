@@ -63,14 +63,14 @@ suite("Maven Tests", () =>
     test("Create file", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent);
+        this.slow(tc.slowTime.fs.createEvent);
         await fsApi.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project>\n"
         );
-        await waitForTeIdle(tc.waitTime.fsCreateEvent, 3000);
+        await waitForTeIdle(tc.waitTime.fs.createEvent, 3000);
         ++successCount;
     });
 
@@ -127,14 +127,14 @@ suite("Maven Tests", () =>
     test("Invalid XML", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         //
         // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
         // file is always 21. Force a task invalidation to cover the invalid json fix check
@@ -148,14 +148,14 @@ suite("Maven Tests", () =>
     test("Fix Invalid XML", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(tc.slowTime.fsCreateEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount);
         await fsApi.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project>\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         //
         // The 'modify' event is ignored for app-publisher tasks, since the # of tasks for any.publishrc
         // file is always 21. Force a task invalidation to cover the invalid json fix check
@@ -169,9 +169,9 @@ suite("Maven Tests", () =>
     test("Delete file", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fsDeleteEvent + tc.slowTime.verifyTaskCount);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.verifyTaskCount);
         await fsApi.deleteFile(fileUri.fsPath);
-        await waitForTeIdle(tc.waitTime.fsDeleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, 0);
         ++successCount;
     });

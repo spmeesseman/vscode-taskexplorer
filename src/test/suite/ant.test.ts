@@ -171,7 +171,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Default", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -180,7 +180,7 @@ suite("Ant Tests", () =>
             "    <target name='test-build'></target>\n" +
             "</project>\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await runCheck(2, 1, 2, 1, false, false);
         ++successCount;
     });
@@ -189,7 +189,7 @@ suite("Ant Tests", () =>
     test("Ant Parser Invalid Target", async function()
     {
         if (exitRollingCount(11, successCount)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -200,7 +200,7 @@ suite("Ant Tests", () =>
             '    <target namee="test5"></target>\n' + // incorrectly spelled 'name' property
             "</project>\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await runCheck(4, 3, 1, 0, true, false);
         ++successCount;
     });
@@ -209,7 +209,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Target", async function()
     {
         if (exitRollingCount(12, successCount)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -217,7 +217,7 @@ suite("Ant Tests", () =>
             '    <property name="testProp" value="test2" />\n' +
             "</project>\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await runCheck(1, 0, 1, 0, false, false);
         ++successCount;
     });
@@ -226,7 +226,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Project", async function()
     {
         if (exitRollingCount(13, successCount)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -234,7 +234,7 @@ suite("Ant Tests", () =>
             '    <property name="testProp" value="test2" />\n' +
             "</some_node>\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await runCheck(1, 0, 1, 0, true, false);
         ++successCount;
     });
@@ -243,7 +243,7 @@ suite("Ant Tests", () =>
     test("Ant Parser Invalid Xml", async function()
     {
         if (exitRollingCount(14, successCount)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fsModifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -255,7 +255,7 @@ suite("Ant Tests", () =>
             '    <target namee="test5"</target>\n' + // incorrect XML test5"</
             "</project>\n"
         );
-        await waitForTeIdle(tc.waitTime.fsModifyEvent);
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await runCheck(1, 0, 1, 0, true, true);
         ++successCount;
     });
