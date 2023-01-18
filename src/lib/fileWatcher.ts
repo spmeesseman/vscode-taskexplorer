@@ -4,6 +4,7 @@ import * as cache from "./fileCache";
 import * as util from "./utils/utils";
 import log from "./log/log";
 import { extname } from "path";
+import { storage } from "./utils/storage";
 import { isDirectory } from "./utils/fs";
 import { isString } from "./utils/utils";
 import { refreshTree } from "./refreshTree";
@@ -15,6 +16,7 @@ import {
 let extContext: ExtensionContext;
 let teApi: ITaskExplorerApi;
 let processingFsEvent = false;
+// let currentNumWorkspaceFolders =  0;
 const eventQueue: any[] = [];
 const watchers: { [taskType: string]: FileSystemWatcher } = {};
 const watcherDisposables: { [taskType: string]: Disposable } = {};
@@ -44,6 +46,7 @@ export async function registerFileWatchers(context: ExtensionContext, api: ITask
 {
     teApi = api;
     extContext = context;
+    // currentNumWorkspaceFolders = workspace.workspaceFolders?.length || 0;
     //
     // Watch individual task type files within the project folder
     //
@@ -301,7 +304,7 @@ function createWorkspaceWatcher(context: ExtensionContext)
     //        i can;t figure out how to start tests using a multi-root workspace, doesn't seem
     //        like its supported :(  SO this is the best we can do...
     //
-    workspaceWatcher = workspace.onDidChangeWorkspaceFolders(/* istanbul ignore next */async (e) => { await onWsFoldersChange(e); });
+    workspaceWatcher = workspace.onDidChangeWorkspaceFolders(/* istanbul ignore next */(e) => onWsFoldersChange(e));
     context.subscriptions.push(workspaceWatcher);
 }
 
@@ -378,14 +381,25 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
 {   //
     // TODO - remove ignore tags when tests for adding/removing workspace is implemented
     //
-    /* istanbul ignore next */
-    if (processingFsEvent) {
-        eventQueue.push({ fn: _procWsDirCreateDeleteEvent, args: [ e ] });
+    // Detect when a folder move occurs and the ext is about to deactivate/re-activate.  A
+    // folder remove will trigger added/removed folders unfortunately.
+    //
+    if (e.removed.length > 0) {
+        await storage.update2("lastWsFolderRemove", Date.now());
     }
-    else {
-        processingFsEvent = true;
-        await _procWsDirCreateDeleteEvent(e);
-    }
+    // const wsFolders = workspace.workspaceFolders || /* istanbul ignore next */[];
+    // if (wsFolders.length !== currentNumWorkspaceFolders) // moving folders doesnt change anything
+    // {   // ^ vscode 1.70+ Wtf, whole ext restarts on a folder move now & the call abruptly ends ^
+        /* istanbul ignore next */
+        if (processingFsEvent) {
+            eventQueue.push({ fn: _procWsDirCreateDeleteEvent, args: [ e ] });
+        }
+        else {
+            processingFsEvent = true;
+            await _procWsDirCreateDeleteEvent(e);
+        }
+        // currentNumWorkspaceFolders = (workspace.workspaceFolders as WorkspaceFolder[]).length;
+    // }
 };
 
 

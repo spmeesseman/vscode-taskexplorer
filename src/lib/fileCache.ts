@@ -518,7 +518,7 @@ function isGlobChanged(taskType: string, fileGlob: string)
 
 export const persistCache = async (clear?: boolean) =>
 {
-    if (clear !== true && configuration.get<boolean>("enablePersistentFileCaching"))
+    if (clear !== true)// && configuration.get<boolean>("enablePersistentFileCaching"))
     {
         const text = statusBarSpace.text;
         statusBarSpace.text = "Persisting file cache...";
@@ -527,7 +527,7 @@ export const persistCache = async (clear?: boolean) =>
         await storage.update2("fileCacheProjectFileToFileCountMap", projectToFileCountMap);
         statusBarSpace.text = text;
     }
-    else if (clear === true)
+    else// if (clear === true)
     {
         await storage.update2("fileCacheTaskFilesMap", undefined);
         await storage.update2("fileCacheProjectFilesMap", undefined);

@@ -156,7 +156,29 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         // Build the file cache, thiskicks off the wholeprocess as refreshTree() will be called down
         // the line in the initialization process.
         //
-        await fileCache.rebuildCache("");
+        const now = Date.now(),
+              lastDeactivated = await storage.get2<number>("deactivated", 0),
+              lastWsFolderRemove = await storage.get2<number>("lastWsFolderRemove", 0);
+        //
+        // On a workspace folder move, VSCode restarts the extension, not sure why.  To make the tree
+        // reload pain as light as possible, we now always persist the file cache regardless if the
+        // user settings has activated it or not.  Then on extension restart after a folder move, we
+        // can quickly restore the tree.  A LOT quicker in large workspaces.
+        //
+        /* istanbul ignore else */
+        if (now < lastDeactivated + 4000 && now < lastWsFolderRemove + 4000)
+        {
+            await fileCache.rebuildCache("");
+        }
+        else
+        {
+            const enablePersistentFileCaching = configuration.get<boolean>("enablePersistentFileCaching");
+            enableConfigWatcher(false);
+            await configuration.update("enablePersistentFileCaching", true);
+            await fileCache.rebuildCache("");
+            await configuration.update("enablePersistentFileCaching", enablePersistentFileCaching);
+            enableConfigWatcher(true);
+        }
         //
         // TaskTreeDataProvider fires event for engine to make tree provider to refresh on setEnabled()
         //
@@ -257,6 +279,7 @@ export async function deactivate()
 {
     disposeFileWatchers();
     await fileCache.cancelBuildCache();
+    await storage.update2("deactivated", Date.now());
 }
 
 

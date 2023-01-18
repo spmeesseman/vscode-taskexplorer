@@ -39,7 +39,11 @@ class Storage implements IStorage, Memento
 
     public async get2<T>(key: string, defaultValue?: T): Promise<T | undefined>
     {
-        const store = await readJsonAsync<IDictionary<any>>(this.storageFile);
+        let store: IDictionary<any>;
+        try {
+            store = await readJsonAsync<IDictionary<any>>(this.storageFile);
+        }
+        catch { /* istanbul ignore next */store = {}; }
         if (defaultValue || (isString(defaultValue) && defaultValue === "") || (isNumber(defaultValue) && defaultValue === 0))
         {
             let v = store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key];
@@ -54,9 +58,18 @@ class Storage implements IStorage, Memento
 
     public async update2(key: string, value: any)
     {
-        const store = await readJsonAsync<IDictionary<any>>(this.storageFile);
-        store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key] = value;
-        await writeFile(this.storageFile, JSON5.stringify(store));
+        let store: IDictionary<any>;
+        try {
+            store = await readJsonAsync<IDictionary<any>>(this.storageFile);
+        }
+        catch { /* istanbul ignore next */store = {}; }
+        try {
+            JSON5.stringify(value); // Ensure json compatible value
+            store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key] = value;
+            const newJson = JSON5.stringify(store);
+            await writeFile(this.storageFile, newJson);
+        }
+        catch {}
     }
 
 
