@@ -1631,12 +1631,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
     private async renameGroupedTasks(taskFile: TaskFile)
     {
-        if (!configuration.get<boolean>("groupStripTaskLabel", true) || !taskFile.label) {
+        const groupStripTaskLabel = configuration.get<boolean>("groupStripTaskLabel", true);
+        if (!groupStripTaskLabel || !taskFile.label) {
             return;
         }
 
         const groupSeparator = util.getGroupSeparator();
-        let rmvLbl = taskFile.label.toString();
+        let rmvLbl = taskFile.label as string;
         rmvLbl = rmvLbl.replace(/\(/gi, "\\(").replace(/\[/gi, "\\[");
         rmvLbl = rmvLbl.replace(/\)/gi, "\\)").replace(/\]/gi, "\\]");
 
@@ -1645,21 +1646,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             if (each2 instanceof TaskItem)
             {
                 const rgx = new RegExp(rmvLbl + groupSeparator, "i");
-                each2.label = (each2.label as string).toString().replace(rgx, "");
+                each2.label = (each2.label as string).replace(rgx, "");
 
                 if (each2.groupLevel > 0)
                 {
                     let label = "";
                     const labelParts = each2.label.split(groupSeparator);
-                    /* istanbul ignore else */
-                    if (labelParts)
+                    for (let i = each2.groupLevel; i < labelParts.length; i++)
                     {
-                        for (let i = each2.groupLevel; i < labelParts.length; i++)
-                        {
-                            label += (label ? /* istanbul ignore next */ groupSeparator : "") + labelParts[i];
-                        }
-                        each2.label = label || /* istanbul ignore next */each2.label;
+                        label += (label ? groupSeparator : "") + labelParts[i];
                     }
+                    each2.label = label || /* istanbul ignore next */each2.label;
                 }
             }
             else {

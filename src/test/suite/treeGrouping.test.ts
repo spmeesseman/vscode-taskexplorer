@@ -89,7 +89,7 @@ suite("Tree Grouping Tests", () =>
     {
         if (exitRollingCount(5, successCount)) return;
         this.slow(tc.slowTime.config.groupingEvent);
-        await executeSettingsUpdate("groupStripTaskLabel", true, tc.waitTime.config.groupingEvent);
+        await executeSettingsUpdate("groupStripTaskLabel", false, tc.waitTime.config.groupingEvent);
         ++successCount;
     });
 
