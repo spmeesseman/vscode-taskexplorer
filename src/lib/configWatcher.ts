@@ -32,6 +32,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     processingConfigEvent = true;
 
     let refresh = false;
+    let refresh2 = false; // Uses 1st param 'false' in refresh(), for cases where task files have not changed
     const refreshTaskTypes: string[] = [];
 
     const registerChange = (taskType: string) => {
@@ -65,20 +66,6 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         teApi.log.write("   the 'exclude/excludeTask' setting has changed", 1);
         teApi.log.value("      exclude changed", e.affectsConfiguration("taskExplorer.exclude"), 1);
         teApi.log.value("      excludeTask changed", e.affectsConfiguration("taskExplorer.excludeTask"), 1);
-        refresh = true;
-    }
-
-    //
-    // Groupings changes require global refresh
-    //
-    if (!refresh && (e.affectsConfiguration("taskExplorer.groupWithSeparator") || e.affectsConfiguration("taskExplorer.groupSeparator") ||
-        e.affectsConfiguration("taskExplorer.groupMaxLevel") || e.affectsConfiguration("taskExplorer.groupStripTaskLabel")))
-    {
-        teApi.log.write("   A tree grouping setting has changed", 1);
-        teApi.log.value("      groupWithSeparator changed", configuration.get<boolean>("groupWithSeparator"), 1);
-        teApi.log.value("      groupSeparator changed", configuration.get<boolean>("groupSeparator"), 1);
-        teApi.log.value("      groupMaxLevel changed", configuration.get<boolean>("groupMaxLevel"), 1);
-        teApi.log.value("      groupStripTaskLabel changed", configuration.get<boolean>("groupStripTaskLabel"), 1);
         refresh = true;
     }
 
@@ -123,6 +110,20 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     if (!refresh)
     {
+        //
+        // Groupings changes require global refresh
+        //
+        if (!refresh && (e.affectsConfiguration("taskExplorer.groupWithSeparator") || e.affectsConfiguration("taskExplorer.groupSeparator") ||
+            e.affectsConfiguration("taskExplorer.groupMaxLevel") || e.affectsConfiguration("taskExplorer.groupStripTaskLabel")))
+        {
+            teApi.log.write("   A tree grouping setting has changed", 1);
+            teApi.log.value("      groupWithSeparator changed", configuration.get<boolean>("groupWithSeparator"), 1);
+            teApi.log.value("      groupSeparator changed", configuration.get<boolean>("groupSeparator"), 1);
+            teApi.log.value("      groupMaxLevel changed", configuration.get<boolean>("groupMaxLevel"), 1);
+            teApi.log.value("      groupStripTaskLabel changed", configuration.get<boolean>("groupStripTaskLabel"), 1);
+            refresh2 = true;
+        }
+
         if (e.affectsConfiguration("taskExplorer.pathToPrograms"))
         {
             const newPathToPrograms = configuration.get<any>("pathToPrograms");
@@ -289,6 +290,9 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
             for (const t of refreshTaskTypes) {
                 await refreshTree(teApi, t, undefined, "   ");
             }
+        }
+        else if (refresh2) {
+            await refreshTree(teApi, false, undefined, "   ");
         }
         else {
             teApi.log.write("   Current changes require no processing", 1);

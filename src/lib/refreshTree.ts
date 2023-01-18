@@ -2,7 +2,7 @@ import { Uri } from "vscode";
 import { ITaskExplorerApi } from "../interface";
 
 
-export const refreshTree = async(teApi: ITaskExplorerApi, taskType: string | undefined, uri: Uri | undefined, logPad: string) =>
+export const refreshTree = async(teApi: ITaskExplorerApi, taskType: string | undefined | false, uri: Uri | undefined, logPad: string) =>
 {   //
     // Refresh tree(s)
     //

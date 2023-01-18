@@ -1458,9 +1458,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      *
      * If invalidate and opt are both undefined, then a configuration has changed
      *
+     * invalidate can be false when a grouping settingshas changed, where the tree needs to be rebuilt
+     * but the file cache does not need to rebuild and  do not need to invalidate any task providers
+     *
      * @param opt Uri of the invalidated resource
      */
-    public async refresh(invalidate: string | true | undefined, opt: Uri | false | undefined, logPad: string): Promise<void>
+    public async refresh(invalidate: string | boolean | undefined, opt: Uri | false | undefined, logPad: string): Promise<void>
     {
         log.methodStart("refresh task tree", 1, logPad, logPad === "", [
             [ "invalidate", invalidate ], [ "opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a" ],
@@ -1470,7 +1473,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         await this.waitForRefreshComplete();
         this.refreshPending = true;
 
-        await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
+        if (invalidate !== false) {
+            await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
+        }
 
         if (opt !== false && util.isString(invalidate, true))
         {
@@ -1511,46 +1516,40 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
         log.methodStart("remove grouped tasks", logLevel, logPad);
 
-        for (const each of folder.taskFiles)
+        for (const each of folder.taskFiles.filter(t => util.isTaskFile(t) && !!t.label))
         {
-            /* istanbul ignore if */
-            if (!(each instanceof TaskFile) || !each.label) {
-                continue;
-            }
-            const id = folder.label + each.taskSource;
-            const id2 = this.getGroupedId(folder, each, each.label.toString(), each.groupLevel);
+            const taskFile = each as TaskFile,
+                  taskFileLabel = taskFile.label as string,
+                  id = folder.label + taskFile.taskSource,
+                  id2 = this.getGroupedId(folder, taskFile, taskFileLabel, taskFile.groupLevel);
 
-            if (!each.isGroup && subfolders[id])
+            if (!taskFile.isGroup && subfolders[id])
             {
-                taskTypesRmv.push(each);
+                taskTypesRmv.push(taskFile);
             }
-            else if (id2 && !each.isGroup && subfolders[id2])
+            else if (id2 && !taskFile.isGroup && subfolders[id2])
             {
-                taskTypesRmv.push(each);
+                taskTypesRmv.push(taskFile);
             }
-            else if (each.isGroup)
+            else if (taskFile.isGroup)
             {
-                const _rmv = (treeNodes: (ITaskFile | ITaskItem)[]) =>
+                for (const each2 of taskFile.treeNodes)
                 {
-                    for (const each2 of treeNodes)
+                    this.removeTreeNodes(each2 as TaskFile, folder, subfolders, 0, logPad, logLevel + 1);
+                    if (util.isTaskFile(each2) && each2.isGroup && each2.groupLevel > 0)
                     {
-                        this.removeTreeNodes(each2 as TaskFile, folder, subfolders, 0, logPad, logLevel + 1);
-                        if (each2 instanceof TaskFile && each2.isGroup && each2.groupLevel > 0)
+                        for (const each3 of each2.treeNodes)
                         {
-                            for (const each3 of each2.treeNodes)
+                            if (each3 instanceof TaskFile)
                             {
-                                if (each3 instanceof TaskFile)
-                                {
-                                    this.removeTreeNodes(each3, folder, subfolders, 0, logPad, logLevel + 1);
-                                }
+                                this.removeTreeNodes(each3, folder, subfolders, 0, logPad, logLevel + 1);
                             }
                         }
                     }
-                };
-                _rmv(each.treeNodes);
+                }
             }
             else {
-                this.removeTreeNodes(each, folder, subfolders, 0, logPad, logLevel + 1);
+                this.removeTreeNodes(taskFile, folder, subfolders, 0, logPad, logLevel + 1);
             }
         }
 
@@ -1632,7 +1631,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
     private async renameGroupedTasks(taskFile: TaskFile)
     {
-        /* istanbul ignore if */
         if (!configuration.get<boolean>("groupStripTaskLabel", true) || !taskFile.label) {
             return;
         }
