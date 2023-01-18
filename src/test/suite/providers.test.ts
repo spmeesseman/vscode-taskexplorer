@@ -716,7 +716,6 @@ async function deleteTempFilesAndDirectories()
         console.log(error);
     }
     await waitForTeIdle(3000);
-    await waitForTeIdle(1000);
     tempDirsDeleted = true;
 }
 
@@ -765,7 +764,7 @@ async function setupAnt()
         "</project>\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fs.createEvent * 5);
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
 }
 
 
@@ -807,7 +806,7 @@ async function setupGradle()
         "}\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fs.createEvent * 2);
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
 }
 
 
@@ -858,7 +857,7 @@ async function setupTsc()
         "}\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fs.createEvent * 2);
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
 }
 
 
@@ -956,7 +955,7 @@ async function setupGulp()
         "});\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fs.createEvent * 4);
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
 }
 
 
@@ -981,7 +980,7 @@ async function setupMakefile()
         "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fs.createEvent * 2);
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
 }
 
 
@@ -1016,7 +1015,7 @@ async function setupBash()
     await fsApi.writeFile(file2, "echo testing bash file 2\n");
     await fsApi.writeFile(file3, "echo testing bash file 3\n");
 
-    await waitForTeIdle(tc.waitTime.fs.createEvent * 3);
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
 }
 
 
@@ -1057,7 +1056,7 @@ async function setupGrunt()
         "};\n"
     );
 
-    await waitForTeIdle(tc.waitTime.fs.createEvent * 3);
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
 }
 
 

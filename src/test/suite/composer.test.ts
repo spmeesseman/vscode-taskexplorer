@@ -19,7 +19,6 @@ const startTaskCount = 2;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let pathToProgram: string;
 let dirName: string;
 let fileUri: Uri;
 let successCount = -1;
@@ -33,21 +32,12 @@ suite("Composer Tests", () =>
         ({ teApi, fsApi } = await activate(this));
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "composer.json"));
-        //
-        // Store / set initial settings
-        //
-        pathToProgram = teApi.config.get<string>(`pathToPrograms.${testsName}`);
-        await executeSettingsUpdate(`pathToPrograms.${testsName}`, "php\\composer.exe");
-        // await executeSettingsUpdate("groupMaxLevel", 3); // this is just a random spot to bump the grouping level
         ++successCount;
     });
 
 
     suiteTeardown(async function()
-    {   //
-        // Reset settings
-        //
-        await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
+    {
         suiteFinished(this);
     });
 

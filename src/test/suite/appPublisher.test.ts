@@ -35,18 +35,12 @@ suite("App-Publisher Tests", () =>
         ({ teApi, fsApi } = await activate(this));
         rootPath = getWsPath(".");
         fileUri = Uri.file(join(rootPath, ".publishrc.json"));
-        //
-        // Store / set initial settings
-        //
-        pathToProgram = teApi.config.get<string>(`pathToPrograms.${testsName}`);
-        await executeSettingsUpdate(`pathToPrograms.${testsName}`, "app-publisher");
         ++successCount;
     });
 
 
     suiteTeardown(async function()
     {
-        await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
         await fsApi.deleteFile(fileUri.fsPath);
         suiteFinished(this);
     });

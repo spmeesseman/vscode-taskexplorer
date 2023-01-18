@@ -39,7 +39,6 @@ suite("Ant Tests", () =>
         buildXmlFile = getWsPath("build.xml");
         buildXmlFileUri = Uri.file(buildXmlFile);
         buildFileXml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
-        await executeSettingsUpdate("useAnt", false);
         ++successCount;
     });
 

@@ -20,7 +20,6 @@ const startTaskCount = 1;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let pathToTaskProgram: string;
 let enableTaskType: boolean;
 let wsFolder: WorkspaceFolder;
 let dirName: string;
@@ -37,9 +36,7 @@ suite("Bash Tests", () =>
         wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "test_provider.sh"));
-        pathToTaskProgram = teApi.config.get<string>("pathToPrograms." + testsName);
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
-        await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe");
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.config.enableEvent);
         successCount++;
     });
@@ -49,7 +46,6 @@ suite("Bash Tests", () =>
     {   //
         // Reset settings
         //
-        await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram);
         await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTime.config.enableEvent);
         await fsApi.deleteDir(dirName);
         suiteFinished(this);
