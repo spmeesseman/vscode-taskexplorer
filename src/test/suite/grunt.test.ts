@@ -174,7 +174,7 @@ suite("Grunt Tests", () =>
     test("Turn VSCode Grunt Provider On", async function()
     {
         if (exitRollingCount(10, successCount)) return;
-        this.slow(tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.slowTime.min + 3000);
+        this.slow(tc.slowTime.config.eventFast + tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.slowTime.min + (3000 * 2));
         await configuration.updateVs("grunt.autoDetect", "on");
         await sleep(3000);
         await treeUtils.refresh(this);
@@ -201,7 +201,7 @@ suite("Grunt Tests", () =>
     test("Turn VSCode Grunt Provider Off", async function()
     {
         if (exitRollingCount(12, successCount)) return;
-        this.slow(tc.slowTime.config.eventFast +  tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.slowTime.min + 1500);
+        this.slow(tc.slowTime.config.eventFast +  tc.slowTime.refreshCommand + tc.slowTime.verifyTaskCount + tc.slowTime.min + (1500 * 2));
         await configuration.updateVs("grunt.autoDetect", "off");
         await sleep(1500);
         await treeUtils.refresh(this);

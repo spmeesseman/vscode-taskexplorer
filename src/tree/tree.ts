@@ -1982,7 +1982,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             if (!enable) {
                 this.tasks = null;
                 this.taskTree = null;
-                this.setEnableCalled = true;
+                this.taskMap = {};
             }
             else {
                 this.setEnableCalled = enable;
