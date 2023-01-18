@@ -70,7 +70,7 @@ suite("Maven Tests", () =>
             "    <modelVersion>4.0.0</modelVersion>\n" +
             "</project>\n"
         );
-        await waitForTeIdle(tc.waitTime.fs.createEvent, 3000);
+        await waitForTeIdle(tc.waitTime.fs.createEvent);
         ++successCount;
     });
 
