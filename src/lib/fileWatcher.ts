@@ -16,6 +16,7 @@ import {
 let extContext: ExtensionContext;
 let teApi: ITaskExplorerApi;
 let processingFsEvent = false;
+// let rootPath: string | undefined;
 // let currentNumWorkspaceFolders =  0;
 const eventQueue: any[] = [];
 const watchers: { [taskType: string]: FileSystemWatcher } = {};
@@ -46,6 +47,7 @@ export async function registerFileWatchers(context: ExtensionContext, api: ITask
 {
     teApi = api;
     extContext = context;
+    // rootPath = workspace.rootPath;
     // currentNumWorkspaceFolders = workspace.workspaceFolders?.length || 0;
     //
     // Watch individual task type files within the project folder
@@ -382,14 +384,20 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     // TODO - remove ignore tags when tests for adding/removing workspace is implemented
     //
     // Detect when a folder move occurs and the ext is about to deactivate/re-activate.  A
-    // folder remove will trigger added/removed folders unfortunately.
+    // folder move that changes the first workspace folder will restart the extension
+    // unfortunately.  Changing the first workspace folder modified the  deprecated `rootPath`
+    // and I think that's why the reload is needed or happens.
     //
-    if (e.removed.length > 0) {
-        await storage.update2("lastWsFolderRemove", Date.now());
-    }
+    /* istanbul ignore if */
+    // if (rootPath !== workspace.rootPath) {
+    //     await storage.update2("lastWsRootPathChange", Date.now());
+    //     return; // Extension is about to be deactivated and re-activated by VSCode, just return
+    // }
+    // if (e.removed.length > 0 || e.added.length > 0) // If not a standard folder move (not involving the 1st folder)
+    // {
     // const wsFolders = workspace.workspaceFolders || /* istanbul ignore next */[];
     // if (wsFolders.length !== currentNumWorkspaceFolders) // moving folders doesnt change anything
-    // {   // ^ vscode 1.70+ Wtf, whole ext restarts on a folder move now & the call abruptly ends ^
+    // {
         /* istanbul ignore next */
         if (processingFsEvent) {
             eventQueue.push({ fn: _procWsDirCreateDeleteEvent, args: [ e ] });
@@ -399,6 +407,14 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
             await _procWsDirCreateDeleteEvent(e);
         }
         // currentNumWorkspaceFolders = (workspace.workspaceFolders as WorkspaceFolder[]).length;
+    // }
+    // }
+    // else // Folders weremoved/re-ordered but the 1st folder `rootPath` did not change
+    // {
+    //     if (!configuration.get<boolean>("sortProjectFoldersAlpha"))
+    //     {
+    //         // TODO - !sortProjectFoldersAlpha on workspace folder move
+    //     }
     // }
 };
 

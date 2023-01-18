@@ -519,7 +519,8 @@ function isGlobChanged(taskType: string, fileGlob: string)
 
 export const persistCache = async (clear?: boolean) =>
 {
-    if (clear !== true && (!teApi.isTests() || configuration.get<boolean>("enablePersistentFileCaching")))
+    if (clear !== true && configuration.get<boolean>("enablePersistentFileCaching"))
+    // if (clear !== true && (!teApi.isTests() || configuration.get<boolean>("enablePersistentFileCaching")))
     {
         const text = statusBarSpace.text;
         statusBarSpace.text = "Persisting file cache...";
