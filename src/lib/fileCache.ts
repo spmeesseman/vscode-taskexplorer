@@ -188,6 +188,9 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
                         break;
                     }
                 }
+                if (cancel) {
+                    break;
+                }
             }
         }
         await finishBuild();

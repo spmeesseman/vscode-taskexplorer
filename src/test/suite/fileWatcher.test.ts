@@ -169,7 +169,7 @@ suite("File Watcher Tests", () =>
     });
 
 
-    test("Modify File in Ignored FOlder", async function()
+    test("Modify File in Ignored Folder", async function()
     {
         if (utils.exitRollingCount(10, successCount)) return;
         this.slow(tc.slowTime.fsModifyEvent + tc.slowTime.verifyTaskCount);
@@ -185,7 +185,7 @@ suite("File Watcher Tests", () =>
     });
 
 
-    test("Delete File in Ignored FOlder", async function()
+    test("Delete File in Ignored Folder", async function()
     {
         if (utils.exitRollingCount(11, successCount)) return;
         this.slow(tc.slowTime.fsModifyEvent + tc.slowTime.verifyTaskCount);

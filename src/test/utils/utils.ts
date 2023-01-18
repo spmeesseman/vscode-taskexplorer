@@ -604,14 +604,14 @@ export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxW
             isExec = !!isExecuting(exec.task);
             if (isExec) {
                 if (!hasExec) {
-                    console.log(`    ${figures.color.infoTask}     ${figures.withColor(`Task execution started, waited ${waitedHasNotStarted + waitedHasNotStarted} ms`, figures.colors.grey)}`);
+                    console.log(`    ${figures.color.infoTask}     ${figures.withColor(`Task execution started, waited ${waitedAfterStarted + waitedHasNotStarted} ms`, figures.colors.grey)}`);
                 }
                 hasExec = isExec;
                 waitedAfterStarted += 50;
             }
             else if (!hasExec) { waitedHasNotStarted += 50; }
         }
-        console.log(`    ${figures.color.infoTask}     ${figures.withColor(`Task execution wait finished, waited ${waitedHasNotStarted + waitedHasNotStarted} ms`, figures.colors.grey)}`);
+        console.log(`    ${figures.color.infoTask}     ${figures.withColor(`Task execution wait finished, waited ${waitedAfterStarted + waitedHasNotStarted} ms`, figures.colors.grey)}`);
     }
 };
 

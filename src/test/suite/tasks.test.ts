@@ -105,14 +105,15 @@ suite("Task Tests", () =>
     test("Run Pause and Run", async function()
     {
         if (utils.exitRollingCount(4, successCount)) return;
-        this.slow((tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 3500 + endOfTestWaitTime);
+        this.slow((tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 4500 + endOfTestWaitTime);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
-        await utils.waitForTaskExecution(exec, 2000);
+        await utils.waitForTaskExecution(exec, 3000);
         await utils.executeTeCommand2("pause", [ batch[0] ], tc.waitTime.taskCommand);
         await utils.sleep(500);
-        await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.taskCommand);
+        await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.taskCommand) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 1000);
         await utils.executeTeCommand2("stop", [ batch[0] ]);
+        await utils.waitForTaskExecution(exec, 500);
         await utils.waitForTeIdle(endOfTestWaitTime);
         ++successCount;
     });
@@ -121,13 +122,14 @@ suite("Task Tests", () =>
     test("Run Pause and Stop (Keep Terminal on Stop OFF)", async function()
     {
         if (utils.exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 3500 + endOfTestWaitTime);
+        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 4500 + endOfTestWaitTime);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 3000);
         await utils.executeTeCommand2("pause", [ batch[0] ], tc.waitTime.taskCommand);
         await utils.sleep(500);
         await utils.waitForTaskExecution(exec, 500);
         await utils.executeTeCommand2("stop", [ batch[0] ]);
+        await utils.waitForTaskExecution(exec, 500);
         await utils.waitForTeIdle(endOfTestWaitTime);
         ++successCount;
     });
@@ -143,7 +145,7 @@ suite("Task Tests", () =>
         expect(exec).to.not.be.equal(undefined, "Starting the 'batch0' task did not return a valid TaskExecution");
         await utils.waitForTaskExecution(exec, 3000);
         await utils.executeTeCommand2("stop", [ batch[0] ], tc.waitTime.runCommandMin);
-        await utils.waitForTaskExecution(exec, 0);
+        await utils.waitForTaskExecution(exec, 1000);
         await utils.waitForTeIdle(endOfTestWaitTime);
         ++successCount;
     });

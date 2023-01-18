@@ -265,7 +265,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - OSX", async function()
     {
         if (exitRollingCount(13, successCount)) return;
-        this.slow(tc.slowTime.config.eventFast + tc.slowTime.config.event);
+        this.slow(tc.slowTime.config.event * 2);
         // Set up coverage on if() statement in configWatcher ~ ln 240
         testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks", {

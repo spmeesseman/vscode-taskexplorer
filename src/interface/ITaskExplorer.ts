@@ -18,7 +18,7 @@ export interface ITaskExplorer
     getTaskTree(): ITaskFolder[] | TreeItem[] | undefined | null | void;
     isBusy (): boolean;
     isVisible(): boolean;
-    refresh(invalidate: string | boolean | undefined, opt: Uri | false | undefined, logPad: string): Promise<void>;
+    refresh(invalidate: string | true | undefined, opt: Uri | false | undefined, logPad: string): Promise<void>;
     setEnabled(enable: boolean): void;
     waitForRefreshComplete(maxWait?: number): Promise<void>;
 }

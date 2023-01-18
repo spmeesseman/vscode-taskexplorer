@@ -868,7 +868,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         //
         // Build task tree if not built already.
         //
-        if (!this.taskTree || (this.taskTree.length === 1 && (this.taskTree[0].contextValue === "noscripts" || this.taskTree[0].contextValue === "initscripts")))
+        if (!this.taskTree || /* istanbul ignore next */(this.taskTree.length === 1 && (this.taskTree[0].contextValue === "noscripts" || this.taskTree[0].contextValue === "initscripts")))
         {
             TaskExplorerProvider.logPad = logPad + "   ";
             //
@@ -1405,16 +1405,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             const next = this.eventQueue.shift() as IEvent; // get the next event
             log.value("   event id", next.id, 1);
             log.write(`   firing queued event task with ${next.args.length} args`);
-
-            setTimeout(async () => { await next.fn.call(this, ...next.args); }, delay);
-
-            this.eventQueue.slice().reverse().forEach((item, index, object) =>
-            {
-                if (item.id === next.id) {
-                    this.eventQueue.splice(object.length - 1 - index);
-                }
-            });
-
+            setTimeout(async () => {
+                await next.fn.call(this, ...next.args);
+            }, delay);
             log.write(`   fired queued event with ${delay}ms delay`, 1);
             firedEvent = true;
         }
@@ -1461,13 +1454,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      * If invalidate is true and opt is false, then the refresh button was clicked i.e. the 'refresh'
      * registered VSCode command was received
      *
-     * If invalidate and opt are both truthy, then a filesystemwatcher event or a task just triggered
+     * If invalidate is a string and opt is a Uri, then a filesystemwatcher event or a task just triggered
      *
      * If invalidate and opt are both undefined, then a configuration has changed
      *
      * @param opt Uri of the invalidated resource
      */
-    public async refresh(invalidate: string | boolean | undefined, opt: Uri | false | undefined, logPad: string): Promise<void>
+    public async refresh(invalidate: string | true | undefined, opt: Uri | false | undefined, logPad: string): Promise<void>
     {
         log.methodStart("refresh task tree", 1, logPad, logPad === "", [
             [ "invalidate", invalidate ], [ "opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a" ],
@@ -1477,10 +1470,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         await this.waitForRefreshComplete();
         this.refreshPending = true;
 
-        if (invalidate !== false) // if anything but 'add to excludes'
-        {
-            await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
-        }
+        await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
 
         if (opt !== false && util.isString(invalidate, true))
         {
@@ -2024,12 +2014,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                         // terminal = getTerminal(taskItem, "   ");
                         try { /* istanbul ignore else */if (getTerminal(taskItem, "   ")) terminal.sendText("Y", true); } catch {}
                     }
-                    taskItem.paused = false;
                 }
                 else {
                     log.write("   kill task execution", 1);
                     try { exec.terminate(); } catch {}
                 }
+                taskItem.paused = false;
             }
             else {
                 window.showInformationMessage("Terminal not found");
