@@ -97,7 +97,7 @@ export const testControl: ITestControl =
             createEventTsc: 2360,
             createFolderEvent: 2210,
             deleteEvent: 1760,
-            deleteEventTsc: 2380,
+            deleteEventTsc: 2395,
             deleteFolderEvent: 2015,
             modifyEvent: 945,
         },
@@ -136,11 +136,13 @@ export const testControl: ITestControl =
             npmCommandPkg: 11300,
             npmInstallCommand: 21650
         },
-        verifyTaskCount: 825,
-        verifyTaskCountByTree: 850,
-        verifyTaskCountFirstCall: 1370,
-        verifyTaskCountNpm: 3175, // internal vscode npm task provider is slower than shit wtf
-        verifyTaskCountWorkspace: 3500,
+        taskCount: {
+            verify: 825,
+            verifyByTree: 850,
+            verifyFirstCall: 1370,
+            verifyNpm: 3175, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 3500,
+        },
         viewReport: 1950
     },
     //
@@ -152,13 +154,13 @@ export const testControl: ITestControl =
         //
         addWorkspaceFolder: 210,
         config: {
-            event: 100,
+            event: 95,
             eventFast: 40,
-            disableEvent: 130,
-            enableEvent: 165,
-            globEvent: 130,
-            groupingEvent: 230,
-            registerExplorerEvent: 215
+            disableEvent: 125,
+            enableEvent: 155,
+            globEvent: 125,
+            groupingEvent: 210,
+            registerExplorerEvent: 200
         },
         command: 130,
         commandFast: 65,
@@ -175,15 +177,15 @@ export const testControl: ITestControl =
         getTreeMax: 1660,
         getTreeTasks: 60,
         min: 40,
-        npmCommandMin: 2100,
-        refreshCommand: 345,
-        refreshCommandNoChanges: 95,
-        refreshTaskTypeCommand: 330,
-        removeWorkspaceFolder: 200,
-        runCommandMin: 710,
-        taskCommand: 605,
-        verifyTaskCountRetry: 115,
-        verifyTaskCountRetryInterval: 290,
+        npmCommandMin: 2050,
+        refreshCommand: 315,
+        refreshCommandNoChanges: 90,
+        refreshTaskTypeCommand: 300,
+        removeWorkspaceFolder: 190,
+        runCommandMin: 700,
+        taskCommand: 600,
+        verifyTaskCountRetry: 100,
+        verifyTaskCountRetryInterval: 250,
         viewReport: 100,
         //
         // MAXIMUM WAIT TIMES
@@ -325,11 +327,13 @@ export interface ITestControl
             npmCommandPkg: number;
             npmInstallCommand: number;
         };
-        verifyTaskCount: number;
-        verifyTaskCountByTree: number;
-        verifyTaskCountFirstCall: number;
-        verifyTaskCountNpm: number; // npm task provider is slower than shit on a turtle
-        verifyTaskCountWorkspace: number;
+        taskCount: {
+            verify: number;
+            verifyByTree: number;
+            verifyFirstCall: number;
+            verifyNpm: number; // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: number;
+        };
         viewReport: number;
     };
     //
