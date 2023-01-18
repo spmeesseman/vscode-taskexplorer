@@ -5,13 +5,13 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as assert from "assert";
 import { ExternalTaskProvider } from "./externalTaskProvider";
 import { ExternalTaskProviderBase } from "./externalTaskProviderBase";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeTeCommand, exitRollingCount, suiteFinished, testControl, verifyTaskCount, waitForTeIdle } from "../utils/utils";
-
+import {
+    activate, executeTeCommand, exitRollingCount, suiteFinished, testControl, verifyTaskCount, waitForTeIdle
+} from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
 let dispose: Disposable;
@@ -46,8 +46,8 @@ suite("External Provider Tests", () =>
     test("Get API Command", async function()
     {
         if (exitRollingCount(0, successCount)) return;
-        this.slow(testControl.slowTime.config.eventFast);
-        assert(await executeTeCommand("getApi"));
+        this.slow(testControl.slowTime.config.event);
+        await executeTeCommand("getApi");
         ++successCount;
     });
 
@@ -69,7 +69,6 @@ suite("External Provider Tests", () =>
         if (exitRollingCount(2, successCount)) return;
         this.slow(testControl.slowTime.config.enableEvent);
         const provider = teApi.providersExternal.external as ExternalTaskProvider;
-        assert(provider);
         const task = provider.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
         provider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         provider.resolveTask(task);

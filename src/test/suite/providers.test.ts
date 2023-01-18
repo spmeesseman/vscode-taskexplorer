@@ -399,7 +399,7 @@ suite("Provider Tests", () =>
     test("Add to Excludes - TaskItem", async function()
     {
         if (exitRollingCount(27, successCount)) return;
-        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.excludeCommand);
+        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.verifyTaskCount + tc.slowTime.config.excludeTasksEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length,
               taskItem = grunt.find(t => t.taskSource === "grunt" && !t.taskFile.path.startsWith("grunt"));

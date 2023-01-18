@@ -75,6 +75,7 @@ export const testControl: ITestControl =
             disableEvent: 1575,
             enableEvent: 2325,
             excludesEvent: 2750,
+            excludeTasksEvent: 4225,
             globEvent: 1940,
             groupingEvent: 1595,
             pathToProgramsEvent: 725,
@@ -125,7 +126,7 @@ export const testControl: ITestControl =
             antTaskWithAnsicon: 8890,
             bashScript: 4000,
             batchScript: 8075,
-            gulpParser: 4080,
+            gulpParser: 4085,
             npmCommand: 13925,
             npmCommandPkg: 11300,
             npmInstallCommand: 21650
@@ -205,11 +206,11 @@ export interface ITestControl
     // LOGGING DEFAULTS
     //
     log: {
-        level: 0 | 1 | 2 | 3 | 4 | number;
+        level: 1 | 2 | 3 | 4 | 5;
         enabled: boolean;
         errors: boolean;
         console: boolean;
-        consoleLevel: 0 | 1 | 2 | 3 | 4 | number;
+        consoleLevel: 1 | 2 | 3 | 4 | 5;
         file: boolean;
         fileSymbols: boolean;
         output: boolean;
@@ -257,6 +258,7 @@ export interface ITestControl
             disableEvent: number;
             enableEvent: number;
             excludesEvent: number;
+            excludeTasksEvent: number;
             globEvent: number;
             groupingEvent: number;
             pathToProgramsEvent: number;
