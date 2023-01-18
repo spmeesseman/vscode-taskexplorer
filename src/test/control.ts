@@ -58,7 +58,8 @@ export const testControl: ITestControl =
     //
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)
     // Slow times are generally 2x the amount of time the command "should" take.  Mocha
-    // considers slow at 50% of MochaContext.slow() for each test instance.
+    // considers slow at 50% of MochaContext.slow() for each test instance, and coverage
+    // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
         addWorkspaceFolder: 13750,
@@ -83,7 +84,7 @@ export const testControl: ITestControl =
             readEvent: 25
         },
         excludeCommand: 2350,
-        explorerViewStartup: 19050,
+        explorerViewStartup: 21020,
         fetchTasksCommand: 3000,
         fileCachePersist: 470,
         findTaskPosition: 875,
@@ -93,8 +94,10 @@ export const testControl: ITestControl =
         focusCommandChangeViews: 130,
         fs: {
             createEvent: 1890,
+            createEventTsc: 2160,
             createFolderEvent: 2210,
             deleteEvent: 1760,
+            deleteEventTsc: 2160,
             deleteFolderEvent: 2015,
             modifyEvent: 945,
         },
@@ -107,7 +110,7 @@ export const testControl: ITestControl =
         licenseManagerRemoteCheck: 3000,
         licenseManagerRemoteStartServer: 3850,
         min: 50,
-        refreshCommand: 18625,
+        refreshCommand: 19625,
         refreshCommandNoChanges: 400,
         rebuildFileCache: 14500,
         rebuildFileCacheCancel: 1810,
@@ -162,11 +165,11 @@ export const testControl: ITestControl =
         explorerViewStartup: 4000,
         focusCommand: 400,
         fs: {
-            createEvent: 1890,
-            createFolderEvent: 2210,
-            deleteEvent: 1760,
-            deleteFolderEvent: 2015,
-            modifyEvent: 945,
+            createEvent: 170,
+            createFolderEvent: 220,
+            deleteEvent: 170,
+            deleteFolderEvent: 220,
+            modifyEvent: 145
         },
         getTreeMin: 320,
         getTreeMax: 1680,
@@ -280,8 +283,10 @@ export interface ITestControl
         focusCommandChangeViews: number;
         fs: {
             createEvent: number;
+            createEventTsc: number;
             createFolderEvent: number;
             deleteEvent: number;
+            deleteEventTsc: number;
             deleteFolderEvent: number;
             modifyEvent: number;
         };

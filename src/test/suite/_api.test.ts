@@ -39,13 +39,12 @@ suite("API and Initialization", () =>
 
 
     test("Refresh Trees", async function()
-    {   //
-        // Twice for delayed init, 1st will be quick with 'Initializing...' message in treeview
-        //
-        this.slow(tc.slowTime.refreshCommand + tc.slowTime.config.enableEvent + tc.slowTime.command);
+    {
+        this.slow((tc.slowTime.refreshCommandNoChanges * 2) + tc.slowTime.config.enableEvent + tc.slowTime.command);
         await refreshTree(teApi, undefined, undefined, "");
         await waitForTeIdle(tc.waitTime.command);
-        await refreshTree(teApi, undefined, undefined, "");
+        // await refreshTree(teApi, false, undefined, ""); // 'false' will not rebuild file cache
+        await refreshTree(teApi, undefined, undefined, ""); // 'false' will not rebuild file cache
         await waitForTeIdle(tc.waitTime.refreshCommand);
     });
 

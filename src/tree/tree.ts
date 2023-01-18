@@ -446,31 +446,26 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
         for (const each of folder.taskFiles)
         {   //
-            // Only processitems of type 'TaskFile'
-            //
-            /* istanbul ignore if */
-            if (!(each instanceof TaskFile)) {
-                continue;
-            }
-            //
+            const taskFile = each as TaskFile; // Guaranteed to be TaskFile, only SpecialFolder can have TaskItem
+            //                                 // and SpecialFolder is skipped in caller .buildGroupings()
             // Check if current taskfile source is equal to previous (i.e. ant, npm, vscode, etc)
             //
-            if (prevTaskFile && prevTaskFile.taskSource === each.taskSource)
+            if (prevTaskFile && prevTaskFile.taskSource === taskFile.taskSource)
             {
-                const id = folder.label + each.taskSource;
+                const id = folder.label + taskFile.taskSource;
                 let subfolder: TaskFile | undefined = subfolders[id];
                 if (!subfolder)
                 {
                     log.values(logLevel + 2, logPad, [
-                        [ "   Add source file sub-container", each.path ],
+                        [ "   Add source file sub-container", taskFile.path ],
                         [ "      id", id ]
                     ]);
-                    const node = each.treeNodes[0];
+                    const node = taskFile.treeNodes[0];
                     /* istanbul ignore else */
                     if (node instanceof TaskItem)
                     {
                         subfolder = new TaskFile(this.extensionContext, folder, node.task.definition,
-                                                each.taskSource, each.path, 0, true, undefined, "   ");
+                                                 taskFile.taskSource, taskFile.path, 0, true, undefined, "   ");
                         subfolders[id] = subfolder;
                         await folder.addTaskFile(subfolder);
                         //
@@ -482,15 +477,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     }
                 }
                 /* istanbul ignore else */
-                if (subfolder && subfolder.nodePath !== each.nodePath) {
-                    subfolder.addTreeNode(each); // addScript will set the group level on the TaskItem
+                if (subfolder && subfolder.nodePath !== taskFile.nodePath) {
+                    subfolder.addTreeNode(taskFile); // addScript will set the group level on the TaskItem
                 }
             }
-            prevTaskFile = each;
+            prevTaskFile = taskFile;
             //
             // Create the grouping
             //
-            await this.createTaskGroupingsBySep(folder, each, subfolders, 0, logPad + "   ", logLevel + 1);
+            await this.createTaskGroupingsBySep(folder, taskFile, subfolders, 0, logPad + "   ", logLevel + 1);
         }
 
         //
@@ -1527,7 +1522,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             {
                 taskTypesRmv.push(taskFile);
             }
-            else if (id2 && !taskFile.isGroup && subfolders[id2])
+            else /* istanbul ignore if */if (id2 && !taskFile.isGroup && subfolders[id2])
             {
                 taskTypesRmv.push(taskFile);
             }
@@ -1536,14 +1531,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 for (const each2 of taskFile.treeNodes)
                 {
                     this.removeTreeNodes(each2 as TaskFile, folder, subfolders, 0, logPad, logLevel + 1);
+                    /* istanbul ignore if */ /* istanbul ignore next */
                     if (util.isTaskFile(each2) && each2.isGroup && each2.groupLevel > 0)
                     {
-                        for (const each3 of each2.treeNodes)
+                        for (const each3 of each2.treeNodes.filter(e => util.isTaskFile(e)))
                         {
-                            if (each3 instanceof TaskFile)
-                            {
-                                this.removeTreeNodes(each3, folder, subfolders, 0, logPad, logLevel + 1);
-                            }
+                            this.removeTreeNodes(each3 as TaskFile, folder, subfolders, 0, logPad, logLevel + 1);
                         }
                     }
                 }
@@ -1577,7 +1570,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         const taskTypesRmv: (ITaskFile | ITaskItem)[] = [];
         const groupSeparator = util.getGroupSeparator();
 
-        log.methodStart("remove scripts", logLevel, logPad, false);
+        log.methodStart("remove tree nodes", logLevel, logPad, false);
 
         for (const each of taskFile.treeNodes)
         {   /* istanbul ignore if */
@@ -1625,7 +1618,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             taskFile.removeTreeNode(each2);
         }
 
-        log.methodDone("remove scripts", logLevel, logPad);
+        log.methodDone("remove tree nodes", logLevel, logPad);
     }
 
 
@@ -2014,7 +2007,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     log.write("   kill task execution", 1);
                     try { exec.terminate(); } catch {}
                 }
-                taskItem.paused = false;
             }
             else {
                 window.showInformationMessage("Terminal not found");
@@ -2024,6 +2016,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             window.showInformationMessage("Executing task not found");
         }
 
+        taskItem.paused = false;
         log.methodDone("stop", 1);
     }
 
