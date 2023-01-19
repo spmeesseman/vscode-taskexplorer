@@ -20,6 +20,10 @@
             button:hover {
                 background-color: var(--vscode-button-hoverBackground)
             }
+            .task-count {
+                font-size: 46px;
+                padding-left: 10px;
+            }
         </style>
         <script type="text/javascript">
             let vscode;
@@ -129,7 +133,6 @@
             </td></tr>
             <!-- endBodyContent -->
 
-            <!-- infoContent -->
             <!-- startInfoContent -->
             <tr><td>
 
@@ -137,36 +140,127 @@
                     <tr>
                     <td>
                         <table>
-                        <tr>
-                            <td style="font-size:16px;font-weight:bold" nowrap>
-                                Task Explorer has parsed ${taskCounts.length} components in
-                                ${projects.length} project(s)
-                            </td>
-                        </tr>
-                        <tr>
-                            <td nowrap>
-                                <ul>
-                                    <li>${tasks.length} Total tasks</li>
-                                    <li>${taskCounts.ant} Ant tasks</li>
-                                    <li>${taskCounts.apppublisher} App-Publisher tasks</li>
-                                    <li>${taskCounts.bash} Bash scripts</li>
-                                    <li>${taskCounts.batch} Batch scripts</li>
-                                    <li>${taskCounts.composer} Composer tasks</li>
-                                    <li>${taskCounts.gradle} Gradle tasks</li>
-                                    <li>${taskCounts.grunt} Grunt tasks</li>
-                                    <li>${taskCounts.gulp} Gulp tasks</li>
-                                    <li>${taskCounts.make} Make tasks</li>
-                                    <li>${taskCounts.maven} Maven tasks</li>
-                                    <li>${taskCounts.npm} NPM tasks</li>
-                                    <li>${taskCounts.nsis} NSIS tasks</li>
-                                    <li>${taskCounts.powershell} Powershell scripts</li>
-                                    <li>${taskCounts.python} Python scripts</li>
-                                    <li>${taskCounts.ruby} Ruby scripts</li>
-                                    <li>${taskCounts.tsc} Typescript tasks</li>
-                                    <li>${taskCounts.Workspace} VSCode tasks</li>
-                                </ul>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td style="font-size:16px;font-weight:bold" nowrap>
+                                    Task Explorer parsed ${taskCounts.length} tasks and ${taskTypes.length} task types in ${taskFiles.length} files found in ${projects.length} project(s)
+                                </td>
+                            </tr>
+                            <tr><td><table>
+                                <tr>
+                                    <td width="10%">
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ant.png" />
+                                    </td>
+                                    <td class="task-count" width="15%">
+                                        ${taskCounts.ant}
+                                    </td>
+                                    <td width="10%">
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/app-publisher.png" />
+                                    </td>
+                                    <td class="task-count" width="15%">
+                                        ${taskCounts.apppublisher}
+                                    </td>
+                                    <td width="10%">
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bash.png" />
+                                    </td>
+                                    <td class="task-count" width="15%">
+                                        ${taskCounts.bash}
+                                    </td>
+                                    <td width="10%">
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bat.png" />
+                                    </td>
+                                    <td class="task-count" width="15%">
+                                        ${taskCounts.batch}
+                                    </td>
+                                </tr><tr>
+                                    <td width="10%">
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/composer.png" />
+                                    </td>
+                                    <td class="task-count" width="15%">
+                                        ${taskCounts.composer}
+                                    </td>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/grunt.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.grunt}
+                                    </td>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/gulp.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.gulp}
+                                    </td>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/make.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.make}
+                                    </td>
+                                </tr><tr>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/maven.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.maven}
+                                    </td>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/npm.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.npm}
+                                    </td>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/nsis.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.nsis}
+                                    </td>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/powershell.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.powershell}
+                                    </td>
+                                </tr><tr>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/python.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.python}
+                                    </td>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/perl.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.perl}
+                                    </td>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ruby.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.ruby}
+                                    </td>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ts.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.tsc}
+                                    </td>
+                                </tr><tr>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/workspace.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.Workspace}
+                                    </td>
+                                    <td>
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/yarn.png" />
+                                    </td>
+                                    <td class="task-count">
+                                        ${taskCounts.yarn}
+                                    </td>
+                                </tr>
+                            </table></td></tr>
                         </table>
                     </td>
                     <td valign="top" align="right" style="padding-left:100px;padding-top:7px;width:-webkit-fill-available">
@@ -181,6 +275,8 @@
 
             </td></tr>
             <!-- endInfoContent -->
+
+            <!-- infoContent -->
 
             <!-- startLicenseContent -->
             <tr><td>

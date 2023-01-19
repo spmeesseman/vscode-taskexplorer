@@ -6,7 +6,7 @@ import * as fileCache from "./lib/fileCache";
 import log from "./lib/log/log";
 import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerViewReportCommand from "./commands/viewReport";
-import { join } from "path";
+import { basename, join } from "path";
 import { AntTaskProvider } from "./providers/ant";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
 import { BashTaskProvider } from "./providers/bash";
@@ -39,6 +39,7 @@ import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFol
 let licenseManager: ILicenseManager;
 let ready = false;
 let tests = false;
+let dev = false;
 export const providers: IDictionary<TaskExplorerProvider> = {};
 export const providersExternal: IDictionary<IExternalProvider> = {};
 
@@ -82,6 +83,11 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     }
 
     //
+    // Set 'dev' flag if running a debugging session
+    //
+    dev = !tests && basename(__dirname) === "dist";
+
+    //
     // Initialize logging
     //
     await log.initLog(context, tests ? 2 : /* istanbul ignore next */ 0); // 0=off | 1=on w/red&yellow | 2=on w/ no red/yellow
@@ -89,7 +95,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     // Initialize persistent storage
     //
-    await initStorage(context, tests);
+    await initStorage(context, dev, tests);
     /* istanbul ignore else */
     if (tests) {
         teApi.testsApi.storage = storage;
@@ -331,7 +337,7 @@ async function refreshExternalProvider(providerName: string)
 function registerCommands(context: ExtensionContext)
 {
     registerEnterLicenseCommand(context);
-    registerViewReportCommand(context);
+    registerViewReportCommand(context, teApi);
     //
     // Register GetAPI task
     //

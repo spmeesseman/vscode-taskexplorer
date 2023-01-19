@@ -2,13 +2,12 @@
 import * as https from "http";
 // import * as https from "https";
 import log from "./log/log";
-import { join } from "path";
-import { storage } from "./utils/storage";
-import { ILicenseManager } from "../interface/ILicenseManager";
 import { teApi } from "../extension";
-import { readFileAsync } from "./utils/fs";
-import { isScriptType, getInstallPath } from "./utils/utils";
-import { commands, ExtensionContext, InputBoxOptions, Task, ViewColumn, WebviewPanel,  window, workspace } from "vscode";
+import { storage } from "./utils/storage";
+import { isScriptType } from "./utils/utils";
+import { ILicenseManager } from "../interface/ILicenseManager";
+import { commands, ExtensionContext, InputBoxOptions, Task, WebviewPanel,  window } from "vscode";
+import { displayLicenseReport } from "./report/licensePage";
 
 
 export class LicenseManager implements ILicenseManager
@@ -65,20 +64,10 @@ export class LicenseManager implements ILicenseManager
 		}
 		this.numTasks = tasks.length;
 
-		// if (this.numTasks < this.maxFreeTasks) {
-		// 	return;
-		// }
-
 		log.methodStart("license manager set tasks", 1, logPad, false, [
 			[ "is licensed", this.licensed ], [ "stored version", storedVersion ], [ "current version", storedVersion ],
 			[ "is version change", versionChange ], [ "# of tasks", this.numTasks ], [ "last nag", lastNag ]
 		]);
-
-		// if (this.numTasks !== 0)
-		// {
-		// 	// task count changed
-		// 	return;
-		// }
 
 		//
 		// Only display the nag on startup once every 30 days.  If the version
@@ -94,35 +83,9 @@ export class LicenseManager implements ILicenseManager
 
 		if (versionChange)
 		{
-			this.panel = this.panel || window.createWebviewPanel(
-				"taskExplorer",   // Identifies the type of the webview. Used internally
-				"Task Explorer",  // Title of the panel displayed to the users
-				ViewColumn.One,   // Editor column to show the new webview panel in.
-				{
-					enableScripts: true
-				}
-			);
-
-			this.panel.webview.html = await this.getHtmlContent(tasks);
-			this.panel.reveal();
+			this.panel = await displayLicenseReport(tasks, this.licensed, this.context.subscriptions, "   ");
 			await storage.update("version", this.version);
 			await storage.update("lastLicenseNag", Date.now().toString());
-
-			this.panel.webview.onDidReceiveMessage
-			(
-				message =>
-				{
-					switch (message.command)
-					{
-						case "enterLicense":
-							commands.executeCommand("taskExplorer.enterLicense");
-							return;
-						case "viewReport":
-							commands.executeCommand("taskExplorer.viewReport");
-							return;
-					}
-				}, undefined, this.context.subscriptions
-			);
 		}
 		else if (displayPopup)
 		{
@@ -175,72 +138,6 @@ export class LicenseManager implements ILicenseManager
 
 	/* istanbul ignore next */
 	getLicenseKey = () => !this.useGlobalLicense || teApi.isTests() ? storage.get<string>("license_key") : "1234-5678-9098-7654321";
-
-
-	private getHtmlContent = async (tasks: Task[]) =>
-	{
-		const installPath = await getInstallPath();
-		let html = await readFileAsync(join(installPath, "res/license-manager.html"));
-
-		const projects: string[] = [];
-		const taskCounts: any = {
-			ant: 0,
-			apppublisher: 0,
-			bash: 0,
-			batch: 0,
-			composer: 0,
-			gradle: 0,
-			grunt: 0,
-			gulp: 0,
-			make: 0,
-			maven: 0,
-			npm: 0,
-			nsis: 0,
-			powershell: 0,
-			python: 0,
-			ruby: 0,
-			tsc: 0,
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			Workspace: 0
-		};
-
-		tasks.forEach((t) =>
-		{
-			if (!taskCounts[t.source]) {
-				taskCounts[t.source] = 0;
-			}
-			taskCounts[t.source]++;
-		});
-
-		/* istanbul ignore else */
-		if (workspace.workspaceFolders)
-		{
-			for (const wf of workspace.workspaceFolders)
-			{
-				projects.push(wf.name);
-			}
-		}
-
-		html = html.replace("<!-- title -->", "Welcome to Task Explorer");
-		Object.keys(taskCounts).forEach((tcKey) =>
-		{
-			html = html.replace(`\${taskCounts.${tcKey}}`, taskCounts[tcKey]);
-		});
-		// if (!versionChange)
-		// {
-		// 	const idx1 = html.indexOf("<!-- startInfoContent -->");
-		// 	const idx2 = html.indexOf("<!-- endInfoContent -->") + 23;
-		// 	html = html.replace(html.slice(idx1, idx2), "");
-		// }
-		if (this.licensed)
-		{
-			const idx1 = html.indexOf("<!-- startLicenseContent -->");
-			const idx2 = html.indexOf("<!-- endLicenseContent -->") + 26;
-			html = html.replace(html.slice(idx1, idx2), "");
-		}
-
-		return html;
-	};
 
 
 	getMaxNumberOfTasks = (taskType?: string) =>

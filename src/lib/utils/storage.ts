@@ -9,7 +9,7 @@ import { isNumber, isString } from "./utils";
 export let storage: IStorage;
 
 
-export const initStorage = async (context: ExtensionContext, isTests: boolean) =>
+export const initStorage = async (context: ExtensionContext, isDev: boolean, isTests: boolean) =>
 {
     const storageFile = join(context.globalStorageUri.fsPath, "storage.json");
     await createDir(context.globalStorageUri.fsPath);
@@ -17,23 +17,28 @@ export const initStorage = async (context: ExtensionContext, isTests: boolean) =
     if (!(await pathExists(storageFile))) {
         await writeFile(storageFile, "{}");
     }
-    storage = new Storage(context, storageFile, isTests);
+    storage = new Storage(context, storageFile, isDev, isTests);
 };
 
 
 class Storage implements IStorage, Memento
 {
     private storage: Memento;
+    private isDev: boolean;
     private isTests: boolean;
     private storageFile: string;
 
 
-    constructor(context: ExtensionContext, storageFile: string, isTests: boolean)
+    constructor(context: ExtensionContext, storageFile: string, isDev: boolean, isTests: boolean)
     {
         this.storage = context.globalState;
+        this.isDev = isDev;
         this.isTests = isTests;
         this.storageFile = storageFile;
     }
+
+
+    private getKey = (key: string) => (!this.isTests ? /* istanbul ignore next */"" : (this.isDev ? /* istanbul ignore next */"dev" : "tests")) + key;
 
 
     public async get2<T>(key: string, defaultValue?: T): Promise<T | undefined>
@@ -45,7 +50,7 @@ class Storage implements IStorage, Memento
         catch { /* istanbul ignore next */store = {}; }
         if (defaultValue || (isString(defaultValue) && defaultValue === "") || (isNumber(defaultValue) && defaultValue === 0))
         {
-            let v = store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key];
+            let v = store[this.getKey(key)];
             if (!v) {
                 v = defaultValue;
             }
@@ -64,7 +69,7 @@ class Storage implements IStorage, Memento
         catch  { /* istanbul ignore next */store = {}; }
         try {
             JSON.stringify(value); // Ensure json compatible value
-            store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key] = value;
+            store[this.getKey(key)] = value;
             const newJson = JSON.stringify(store);
             await writeFile(this.storageFile, newJson);
         }
@@ -81,7 +86,7 @@ class Storage implements IStorage, Memento
         catch { /* istanbul ignore next */store = {}; }
         try {
             JSON.stringify(value); // Ensure json compatible value
-            store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key] = value;
+            store[this.getKey(key)] = value;
             const newJson = JSON.stringify(store);
             writeFileSync(this.storageFile, newJson);
         }
@@ -93,7 +98,7 @@ class Storage implements IStorage, Memento
     {
         if (defaultValue || (isString(defaultValue) && defaultValue === "") || (isNumber(defaultValue) && defaultValue === 0))
         {
-            let v = this.storage.get<T>((!this.isTests ? /* istanbul ignore next */"" : "tests") + key, defaultValue);
+            let v = this.storage.get<T>(this.getKey(key), defaultValue);
             //
             // why have to do this?  In one case, passing a default of [] for a non-existent
             // value, the VSCode memento does not return[]. It returns an empty string????
@@ -105,7 +110,7 @@ class Storage implements IStorage, Memento
             }
             return v;
         }
-        return this.storage.get<T>((!this.isTests ? /* istanbul ignore next */"" : "tests") + key);
+        return this.storage.get<T>(this.getKey(key));
     }
 
 
