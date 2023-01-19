@@ -138,7 +138,7 @@ export async function addFolder(folder: Uri, logPad: string)
                 }
             }
         }
-        await finishBuild();
+        finishBuild();
     }
 
     log.methodDone("add folder to cache", 1, logPad, [[ "# of files in directory", numFiles ], [ "# of files matched", numFiles ]]);
@@ -194,7 +194,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
                 }
             }
         }
-        await finishBuild();
+        finishBuild();
         log.value("   was cancelled", cancel, 3);
         log.methodDone("add workspace project folders", 1, logPad, [[ "# of file found", numFilesFound ]]);
     }
@@ -273,7 +273,7 @@ export async function buildTaskTypeCache(taskType: string, wsFolder: WorkspaceFo
         if (!glob) {
             glob = util.getGlobPattern(taskType);
         }
-        log.value("glob", glob, 1);
+        log.value("   glob", glob, 1, logPad);
 
         //
         // If 'wsFolder' if falsey, build the entire cache.  If truthy, build the cache for the
@@ -296,7 +296,7 @@ export async function buildTaskTypeCache(taskType: string, wsFolder: WorkspaceFo
     }
 
     if (setCacheBuilding) {
-        await finishBuild();
+        finishBuild();
     }
 
     log.methodDone("build file cache", 1, logPad);
@@ -389,7 +389,11 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
 
 
 export async function cancelBuildCache()
-{
+{   //
+    // Note 1/21/23.  This may not be needed anymore, as we now wait for any caching
+    // operation to finish in the main extension module's `deactivate` function as
+    // opposed to cancelling it.
+    //
     if (cacheBuilding)
     {
         cancel = true;
@@ -409,9 +413,9 @@ const clearMaps = () =>
 };
 
 
-const finishBuild = async () =>
+const finishBuild = () =>
 {
-    await persistCache();
+    persistCache();
     statusBarSpace.hide();
     cacheBuilding = false;
     cancel = false;
@@ -517,23 +521,29 @@ function isGlobChanged(taskType: string, fileGlob: string)
 }
 
 
-export const persistCache = async (clear?: boolean) =>
-{
-    if (clear !== true && configuration.get<boolean>("enablePersistentFileCaching"))
+export const persistCache = (clear?: boolean, force?: boolean) =>
+{   //
+    // This all has to be synchronous because if it's not, the updates do not
+    // work when called from the extension's deactivate() method. Dumb.  And the
+    // docs say the deactivate() method can be async.  BS.  THere was some weird
+    // stuff going on when this was all started as async and then added to the
+    // deactivate() method.
+    //
+    if (clear !== true && (force || configuration.get<boolean>("enablePersistentFileCaching")))
     // if (clear !== true && (!teApi.isTests() || configuration.get<boolean>("enablePersistentFileCaching")))
     {
         const text = statusBarSpace.text;
         statusBarSpace.text = "Persisting file cache...";
-        await storage.update2("fileCacheTaskFilesMap", taskFilesMap);
-        await storage.update2("fileCacheProjectFilesMap", projectFilesMap);
-        await storage.update2("fileCacheProjectFileToFileCountMap", projectToFileCountMap);
+        storage.update2Sync("fileCacheTaskFilesMap", taskFilesMap);
+        storage.update2Sync("fileCacheProjectFilesMap", projectFilesMap);
+        storage.update2Sync("fileCacheProjectFileToFileCountMap", projectToFileCountMap);
         statusBarSpace.text = text;
     }
     else if (clear === true)
     {
-        await storage.update2("fileCacheTaskFilesMap", undefined);
-        await storage.update2("fileCacheProjectFilesMap", undefined);
-        await storage.update2("fileCacheProjectFileToFileCountMap", undefined);
+        storage.update2Sync("fileCacheTaskFilesMap", undefined);
+        storage.update2Sync("fileCacheProjectFilesMap", undefined);
+        storage.update2Sync("fileCacheProjectFileToFileCountMap", undefined);
     }
 };
 
@@ -555,7 +565,6 @@ export async function rebuildCache(logPad: string, forceForTests?: boolean)
     log.methodStart("rebuild cache", 1, logPad, logPad === "");
     cacheBusy = true;
     clearMaps();
-
     if (firstRun || forceForTests)
     {
         if (configuration.get<boolean>("enablePersistentFileCaching"))
@@ -645,10 +654,12 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
     let wsFolders: readonly WorkspaceFolder[];
     log.methodStart("remove item from mappings", 3, logPad, false, [[ "task type", taskType ]]);
 
-    if (uri === undefined) {
+    if (uri === undefined)
+    {
         wsFolders = workspace.workspaceFolders as readonly WorkspaceFolder[];
     }
-    else if (uri instanceof Uri) {
+    else if (uri instanceof Uri)
+    {
         const wsf = workspace.getWorkspaceFolder(uri) as WorkspaceFolder;
         log.value("   path", uri.fsPath, 3);
         wsFolders = [ wsf ];
@@ -658,6 +669,7 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
         wsFolders = [ uri ];
         folderUri = wsFolders[0].uri;
     }
+
     const removed = {
         c1: 0, c2: 0
     };

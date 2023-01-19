@@ -1,4 +1,3 @@
-import { Memento } from "vscode";
 
 export interface IStorage // extends Memento
 {
@@ -8,4 +7,5 @@ export interface IStorage // extends Memento
     get2<T>(key: string): Promise<T | undefined>;
     get2<T>(key: string, defaultValue?: T): Promise<T>;
     update2(key: string, value: any): Promise<void>;
+    update2Sync(key: string, value: any): void;
 }

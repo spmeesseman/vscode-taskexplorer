@@ -11,7 +11,8 @@ const views: { [taskType: string]: TreeView<TreeItem> | undefined } = {};
 export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext, enabled: boolean, teApi: ITaskExplorerApi, isActivation: boolean)
 {
     let view = views[name];
-    log.write("Register explorer view / tree provider '" + name + "'", 1, "   ");
+    const logPad = "   ";
+    log.methodStart("register explorer view / tree provider", 1, logPad, false, [[ "name", name ]]);
 
     if (enabled)
     {
@@ -31,16 +32,16 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
             if (name === "taskExplorer")
             {
                 teApi.explorer = treeDataProvider;
-                teApi.explorer.setEnabled(!isActivation);
+                teApi.explorer.setEnabled(!isActivation, logPad + "   ");
                 teApi.explorerView = view;
             }
             else // name === "taskExplorerSideBar"
             {
                 teApi.sidebar = treeDataProvider;
-                teApi.sidebar.setEnabled(!isActivation);
+                teApi.sidebar.setEnabled(!isActivation, logPad + "   ");
                 teApi.sidebarView = view;
             }
-            log.write("   Tree data provider '" + name + "' registered", 1, "   ");
+            log.write("   tree data provider '" + name + "' registered", 1, logPad);
         }
     }
     else
@@ -49,21 +50,21 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
         {
             if (name === "taskExplorer" && teApi.explorer)
             {
-                teApi.explorer.setEnabled(false);
+                teApi.explorer.setEnabled(false, logPad + "   ");
                 teApi.explorer.dispose(context);
                 teApi.explorer = undefined;
                 teApi.explorerView = undefined;
             }
             else /* istanbul ignore else */if (teApi.sidebar) // name === "taskExplorerSideBar"
             {
-                teApi.sidebar.setEnabled(false);
+                teApi.sidebar.setEnabled(false, logPad + "   ");
                 teApi.sidebar.dispose(context);
                 teApi.sidebar = undefined;
                 teApi.sidebarView = undefined;
             }
             views[name] = undefined;
             view.dispose();
-            log.write("   Tree data provider '" + name + "' un-registered", 1, "   ");
+            log.write("   tree data provider '" + name + "' un-registered", 1, "   ");
         }
     }
 
@@ -71,4 +72,6 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
     if (teApi.testsApi) {
         teApi.testsApi.explorer = teApi.explorer /* istanbul ignore next */|| teApi.sidebar || {} as ITaskExplorer;
     }
+
+    log.methodDone("register explorer view / tree provider", 1, logPad);
 }

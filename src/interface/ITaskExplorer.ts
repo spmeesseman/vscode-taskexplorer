@@ -19,6 +19,6 @@ export interface ITaskExplorer
     isBusy (): boolean;
     isVisible(): boolean;
     refresh(invalidate: string | boolean | undefined, opt: Uri | false | undefined, logPad: string): Promise<void>;
-    setEnabled(enable: boolean): void;
+    setEnabled(enable: boolean, logPad: string): void;
     waitForRefreshComplete(maxWait?: number): Promise<void>;
 }

@@ -112,17 +112,30 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         // Groupings changes require global refresh
         //
-        if (!refresh && (e.affectsConfiguration("taskExplorer.groupWithSeparator") || e.affectsConfiguration("taskExplorer.groupSeparator") ||
-            e.affectsConfiguration("taskExplorer.groupMaxLevel") || e.affectsConfiguration("taskExplorer.groupStripTaskLabel")))
+        if (e.affectsConfiguration("taskExplorer.groupWithSeparator") || e.affectsConfiguration("taskExplorer.groupSeparator") ||
+            e.affectsConfiguration("taskExplorer.groupMaxLevel") || e.affectsConfiguration("taskExplorer.groupStripTaskLabel"))
         {
             teApi.log.write("   A tree grouping setting has changed", 1);
             teApi.log.value("      groupWithSeparator changed", configuration.get<boolean>("groupWithSeparator"), 1);
             teApi.log.value("      groupSeparator changed", configuration.get<boolean>("groupSeparator"), 1);
             teApi.log.value("      groupMaxLevel changed", configuration.get<boolean>("groupMaxLevel"), 1);
             teApi.log.value("      groupStripTaskLabel changed", configuration.get<boolean>("groupStripTaskLabel"), 1);
-            refresh2 = true;
+            refresh2 = true; // refresh2 will rebuild the tree but won't trigger a file cache build and/or task provider invalidation
         }
 
+        //
+        // Workspace/project folder sorting
+        //
+        if (e.affectsConfiguration("taskExplorer.sortProjectFoldersAlpha"))
+        {
+            teApi.log.write("   the 'sortProjectFoldersAlpha' setting has changed", 1);
+            teApi.log.value("      new value", configuration.get<boolean>("sortProjectFoldersAlpha"), 1);
+            refresh2 = true; // refresh2 will rebuild the tree but won't trigger a file cache build and/or task provider invalidation
+        }
+
+        //
+        // Program paths
+        //
         if (e.affectsConfiguration("taskExplorer.pathToPrograms"))
         {
             const newPathToPrograms = configuration.get<any>("pathToPrograms");
@@ -273,7 +286,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         const newValue = configuration.get<boolean>("enablePersistentFileCaching");
         teApi.log.write("   the 'enablePersistentFileCaching' setting has changed", 1);
         teApi.log.value("      new value", newValue, 1);
-        await persistCache(!newValue);
+        persistCache(!newValue);
     }
 
     //

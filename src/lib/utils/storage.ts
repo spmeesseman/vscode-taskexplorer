@@ -1,10 +1,9 @@
 
-const JSON5 = require("json5/dist/index.js");
 import { join } from "path";
 import { Memento, ExtensionContext } from "vscode";
 import { IDictionary } from "../../interface";
 import { IStorage } from "../../interface/IStorage";
-import { createDir, pathExists, readJsonAsync, writeFile } from "./fs";
+import { createDir, pathExists, readJsonAsync, readJsonSync, writeFile, writeFileSync } from "./fs";
 import { isNumber, isString } from "./utils";
 
 export let storage: IStorage;
@@ -62,12 +61,29 @@ class Storage implements IStorage, Memento
         try {
             store = await readJsonAsync<IDictionary<any>>(this.storageFile);
         }
+        catch  { /* istanbul ignore next */store = {}; }
+        try {
+            JSON.stringify(value); // Ensure json compatible value
+            store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key] = value;
+            const newJson = JSON.stringify(store);
+            await writeFile(this.storageFile, newJson);
+        }
+        catch {}
+    }
+
+
+    public update2Sync(key: string, value: any)
+    {
+        let store: IDictionary<any>;
+        try {
+            store = readJsonSync<IDictionary<any>>(this.storageFile);
+        }
         catch { /* istanbul ignore next */store = {}; }
         try {
-            JSON5.stringify(value); // Ensure json compatible value
+            JSON.stringify(value); // Ensure json compatible value
             store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key] = value;
-            const newJson = JSON5.stringify(store);
-            await writeFile(this.storageFile, newJson);
+            const newJson = JSON.stringify(store);
+            writeFileSync(this.storageFile, newJson);
         }
         catch {}
     }

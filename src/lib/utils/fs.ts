@@ -1,5 +1,4 @@
 
-const JSON5 = require("json5/dist/index.js");
 import * as fs from "fs";
 import * as glob from "glob";
 import * as path from "path";
@@ -333,11 +332,22 @@ export const readJsonAsync = <T>(file: string): Promise<T> =>
     {
         try {
             const json = await readFileAsync(file),
-                  jso = JSON5.parse(json);
+                  jso = JSON.parse(json);
             resolve(jso);
         }
         catch (e) { reject(e); }
     });
+};
+
+
+export const readJsonSync = <T>(file: string): T =>
+{
+    try {
+        const json = fs.readFileSync(path.resolve(process.cwd(), file)).toString(),
+              jso = JSON.parse(json);
+        return jso;
+    }
+    catch { /* istanbul ignore next */ return {} as T; }
 };
 
 
@@ -455,4 +465,16 @@ export const writeFile = (file: string, data: string): Promise<void> =>
             reject(new Error("Specified path is a directory"));
         }
     });
+};
+
+
+export const writeFileSync = (file: string, data: string): void =>
+{
+    if (!isDirectory(file))
+    {
+        fs.writeFileSync(path.resolve(cwd, file), data);
+    }
+    else {
+        throw new Error("Specified path is a directory");
+    }
 };

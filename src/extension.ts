@@ -95,8 +95,8 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         teApi.testsApi.storage = storage;
     }
 
-    log.write("");
-    log.write("Activate extension");
+    log.blank(1);
+    log.methodStart("activation", 1);
 
     //
     // !!! Temporary after settings layout redo / rename !!!
@@ -131,76 +131,80 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     registerExplorer("taskExplorerSideBar", context, configuration.get<boolean>("enableSideBar", false), teApi, true);
 
     //
-    // Register configurations/settings change watcher
-    //
-    registerConfigWatcher(context, teApi);
-
-    //
     // Create license manager instance
     //
     licenseManager = new LicenseManager(context);
 
     //
-    // Tired of VSCode complaining that the the expension was a startup hog. Performing the
-    // initial scan after the extension has been instantiated stops it from getting all up
-    // in stdout's business.  Displaying an 'Initializing...' message in the tree now on
-    // startup resulting from this, looks kinda nice I guess, so oh well.
+    // Use a delayed initialization so we can display an 'Initializing...' message
+    // in the tree on startup.  Really no good way to do that w/o this.
     //
-    setTimeout(async(api: ITaskExplorerApi) =>
-    {   //
-        // Register file type watchers
-        // This also starts the file scan to build the file task file cache
-        //
-        await registerFileWatchers(context, api);
-        //
-        // Build the file cache, thiskicks off the wholeprocess as refreshTree() will be called down
-        // the line in the initialization process.
-        //
-        // const now = Date.now(),
-        //       lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
-        //       lastWsRootPathChange = await storage.get2<number>("lastWsRootPathChange", 0);
-        //
-        // On a workspace folder move, VSCode restarts the extension, not sure why.  To make the tree
-        // reload pain as light as possible, we now always persist the file cache regardless if the
-        // user settings has activated it or not.  Then on extension restart after a folder move, we
-        // can quickly restore the tree.  A LOT quicker in large workspaces.
-        //
-        /* istanbul ignore else */
-        // if (tests || /* istanbul ignore next */now > lastDeactivated + 4000 ||  /* istanbul ignore next */now > lastWsRootPathChange + 4000)
-        // {
-            await fileCache.rebuildCache("");
-        // }
-        // else
-        // {
-        //     const enablePersistentFileCaching = configuration.get<boolean>("enablePersistentFileCaching");
-        //     enableConfigWatcher(false);
-        //     await configuration.update("enablePersistentFileCaching", true);
-        //     await fileCache.rebuildCache("");
-        //     await configuration.update("enablePersistentFileCaching", enablePersistentFileCaching);
-        //     enableConfigWatcher(true);
-        // }
-        //
-        // TaskTreeDataProvider fires event for engine to make tree provider to refresh on setEnabled()
-        //
-        /* istanbul ignore next */
-        api.explorer?.setEnabled(true);
-        /* istanbul ignore next */
-        api.sidebar?.setEnabled(true);
-        //
-        // Check license
-        //
-        await licenseManager.checkLicense("   ");
-        //
-        // Signal that first task load has completed
-        //
-        ready = true;
-        //
-    }, 25, teApi);
+    setTimeout(initialize, 25, context, teApi);
 
-    log.write("Task Explorer activated, tree construction pending");
+    log.write("   activation completed successfully, initialization pending", 1);
+    log.methodDone("activation", 1);
 
     return teApi;
 }
+
+
+const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
+{
+    log.methodStart("initialization");
+    //
+    // Register file type watchers
+    // This also starts the file scan to build the file task file cache
+    //
+    await registerFileWatchers(context, api, "   ");
+    //
+    // Build the file cache, this kicks off the whole process as refreshTree() will be called down
+    // the line in the initialization process.
+    //
+    const now = Date.now(),
+          lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
+          lastWsRootPathChange = await storage.get2<number>("lastWsRootPathChange", 0);
+    //
+    // On a workspace folder move that changes the 1st folder, VSCode restarts the extension.
+    // To make the tree reload pain as light as possible, we now always persist the file cache
+    // regardless if the user settings has activated it or not when the extension deactivates
+    // in this scenario. So check this case and proceed as necessary.
+    //
+    /* istanbul ignore else */
+    const rootFolderChanged  = now < lastDeactivated + 5000 && now < lastWsRootPathChange + 5000;
+    if (tests || /* istanbul ignore next */!rootFolderChanged)
+    {
+        await fileCache.rebuildCache("   ");
+    }
+    else
+    {
+        const enablePersistentFileCaching = configuration.get<boolean>("enablePersistentFileCaching");
+        await configuration.update("enablePersistentFileCaching", true);
+        await fileCache.rebuildCache("   ");
+        await configuration.update("enablePersistentFileCaching", enablePersistentFileCaching);
+    }
+    await storage.update2("lastDeactivated", 0);
+    await storage.update2("lastWsRootPathChange", 0);
+    //
+    // Register configurations/settings change watcher
+    //
+    registerConfigWatcher(context, teApi);
+    //
+    // TaskTreeDataProvider fires event for engine to make tree provider to refresh on setEnabled()
+    //
+    /* istanbul ignore next */
+    api.explorer?.setEnabled(true, "   ");
+    /* istanbul ignore next */
+    api.sidebar?.setEnabled(true, "   ");
+    //
+    // Check license
+    //
+    await licenseManager.checkLicense("   ");
+    //
+    // Signal that first task load has completed
+    //
+    ready = true;
+    log.methodDone("initialization");
+};
 
 
 //
@@ -276,11 +280,25 @@ async function tempRemapSettingsToNewLayout()
 
 
 export async function deactivate()
-{
+{   //
+    // Do some cleanup.  Most of the cleanup will have or will be done  internally by
+    // VSCode as we registered all disposables during initialization.
+    //
     disposeFileWatchers();
-    await fileCache.cancelBuildCache();
-    // await fileCache.persistCache();
-    // await storage.update2("lastDeactivated", Date.now());
+    //
+    // Detect when a folder move occurs and the ext is about to deactivate/re-activate.  A
+    // folder move that changes the first workspace folder will restart the extension
+    // unfortunately.  Changing the first workspace folder modifies the deprecated `rootPath`
+    // and I think that's why the reload is needed or happens.  A timesptamp is set by the
+    // fileWatcher module in the workspaceFolderChanged event on extension activation that and
+    // the below `lastDeactivated' flag is used to determine if it is being activated because
+    // of this scenario, in which case we'll load from this stored file cache so that the tree
+    // reload is much quicker, especially in large workspaces.
+    //
+    if (!fileCache.isBusy() && !configuration.get<boolean>("enablePersistentFileCaching")) {
+        fileCache.persistCache(false, true);
+    }
+    storage.update2Sync("lastDeactivated", Date.now());
 }
 
 
