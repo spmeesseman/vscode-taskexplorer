@@ -37,5 +37,18 @@ export class ExternalTaskProviderBase extends IExternalProvider implements IExte
     {
         return constants.GLOB_EXTERNAL;
     }
+
+
+    public async getTasks()
+    {
+        return undefined;
+    }
+
+
+    async invalidate(uri?: Uri, logPad?: string): Promise<void>
+    {
+        return undefined;
+    }
+
 }
 

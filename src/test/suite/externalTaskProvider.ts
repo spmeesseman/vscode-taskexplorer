@@ -46,7 +46,7 @@ export class ExternalTaskProvider extends IExternalProvider implements IExternal
     }
 
 
-    public async provideTasks()
+    public async getTasks()
     {
         const result: Task[] = [],
               uri = Uri.file("/dummy_path"),
@@ -63,9 +63,9 @@ export class ExternalTaskProvider extends IExternalProvider implements IExternal
         return result;
     }
 
-
-    public resolveTask(_task: Task): Task | undefined
+    async invalidate(uri?: Uri, logPad?: string): Promise<void>
     {
-        return undefined;
+        return;
     }
+
 }
