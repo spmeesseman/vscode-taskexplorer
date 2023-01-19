@@ -27,11 +27,19 @@
         </style>
         <script type="text/javascript">
             let vscode;
-            function getLicense()
+            function enterLicense()
             {
                 vscode = vscode || acquireVsCodeApi();
                 vscode.postMessage({
                     command: 'enterLicense',
+                    text: ''
+                });
+            }
+            function viewLicense()
+            {
+                vscode = vscode || acquireVsCodeApi();
+                vscode.postMessage({
+                    command: 'viewLicense',
                     text: ''
                 });
             }
@@ -133,6 +141,8 @@
             </td></tr>
             <!-- endBodyContent -->
 
+            <!-- addtlContentTop -->
+
             <!-- startInfoContent -->
             <tr><td>
 
@@ -154,7 +164,7 @@
                                         ${taskCounts.ant}
                                     </td>
                                     <td width="10%">
-                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/app-publisher.png" />
+                                        <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/apppublisher.png" />
                                     </td>
                                     <td class="task-count" width="15%">
                                         ${taskCounts.apppublisher}
@@ -264,45 +274,28 @@
                         </table>
                     </td>
                     <td valign="top" align="right" style="padding-left:100px;padding-top:7px;width:-webkit-fill-available">
+                        <!-- startEnterLicenseButton -->
                         <div>
-                            <button style="cursor:pointer;width:150px" onclick="getLicense();">Get License Now</button>
+                            <button style="cursor:pointer;width:150px" onclick="enterLicense();">Enter License Key</button>
                         </div>
-                        <div  style="margin-top:10px">
+                        <!-- endEnterLicenseButton -->
+                        <!-- startViewLicenseButton -->
+                        <div style="margin-top:10px">
+                            <button style="cursor:pointer;width:150px" onclick="viewLicense();">View License Info</button>
+                        </div>
+                        <!-- endViewLicenseButton -->
+                        <!-- startParsingReportButton -->
+                        <div style="margin-top:10px">
                             <button style="cursor:pointer;width:150px" onclick="viewReport();">View Parsing Report</button>
                         </div>
+                        <!-- endParsingReportButton -->
                     </td></tr>
                 </table>
 
             </td></tr>
             <!-- endInfoContent -->
 
-            <!-- infoContent -->
-
-            <!-- startLicenseContent -->
-            <tr><td>
-
-                <table style="margin-top:15px;width:inherit">
-                    <tr><td style="font-weight:bold;font-size:14px">
-                        Licensing Note
-                    </td></tr>
-                    <tr><td>
-                        This extension is free to use but am considering a small license for an
-                        unlimited parsed component type of thing (e.g $10 - $20), as the time spent
-                        and functionality have went way beyond what was at first intended.
-                        <br><br>Hey Sencha, you can buy it and replace your own product if you want ;).
-                    </td></tr></table>
-                    <table style="margin-top:30px">
-                        <tr><td>You can view a detailed parsing report using the "<i>Task Explorer: View Parsing Report</i>"
-                        command in the Explorer context menu for any project.  It can alternatively be ran from the
-                        command pallette for "all projects".
-                        <tr><td height="20"></td></tr>
-                        <tr><td>
-                            <img src="https://raw.githubusercontent.com/spmeesseman/vscode-extjs/master/res/readme/ast-report.png">
-                        </td></tr>
-                    </table>
-
-            </td></tr>
-            <!-- endLicenseContent -->
+            <!-- addtlContent -->
 
         </table>
 

@@ -2,12 +2,12 @@
 import * as https from "http";
 // import * as https from "https";
 import log from "./log/log";
-import { teApi } from "../extension";
 import { storage } from "./utils/storage";
 import { isScriptType } from "./utils/utils";
 import { ILicenseManager } from "../interface/ILicenseManager";
 import { commands, ExtensionContext, InputBoxOptions, Task, WebviewPanel,  window } from "vscode";
 import { displayLicenseReport } from "./report/licensePage";
+import { ITaskExplorerApi } from "../interface";
 
 
 export class LicenseManager implements ILicenseManager
@@ -21,15 +21,17 @@ export class LicenseManager implements ILicenseManager
 	private version: string;
 	private numTasks = 0;
 	private panel: WebviewPanel | undefined;
+	private teApi: ITaskExplorerApi;
 	private context: ExtensionContext;
 
 
-	constructor(context: ExtensionContext)
+	constructor(context: ExtensionContext, api: ITaskExplorerApi)
     {
 		this.context = context;
+		this.teApi = api;
         //
         // Store extension version
-		// Note context.extension is only in VSCode 1.55+
+		// Note that `context.extension` is only in VSCode 1.55+
         //
         this.version = context.extension.packageJSON.version;
     }
@@ -83,7 +85,7 @@ export class LicenseManager implements ILicenseManager
 
 		if (versionChange)
 		{
-			this.panel = await displayLicenseReport(tasks, this.licensed, this.context.subscriptions, "   ");
+			this.panel = await displayLicenseReport(this.teApi, this.context.subscriptions, "   ", tasks);
 			await storage.update("version", this.version);
 			await storage.update("lastLicenseNag", Date.now().toString());
 		}
@@ -137,7 +139,7 @@ export class LicenseManager implements ILicenseManager
 
 
 	/* istanbul ignore next */
-	getLicenseKey = () => !this.useGlobalLicense || teApi.isTests() ? storage.get<string>("license_key") : "1234-5678-9098-7654321";
+	getLicenseKey = () => !this.useGlobalLicense || this.teApi.isTests() ? storage.get<string>("license_key") : "1234-5678-9098-7654321";
 
 
 	getMaxNumberOfTasks = (taskType?: string) =>
@@ -189,13 +191,13 @@ export class LicenseManager implements ILicenseManager
 				if (e.message && e.message.includes("ECONNREFUSED"))
 				{
 					log.write("   it appears that the license server is down or offline", 1, logPad);
-					if (!teApi.isTests()) {
+					if (!this.teApi.isTests()) {
 						log.write("      licensed mode will be automatically enabled", 1, logPad);
 					}
 				}
 				else { log.error(e); }
-				log.methodDone("validate license", 1, logPad, [[ "is valid license", !teApi.isTests() ]]);
-				resolve(!teApi.isTests());
+				log.methodDone("validate license", 1, logPad, [[ "is valid license", !this.teApi.isTests() ]]);
+				resolve(!this.teApi.isTests());
 			};
 
 			log.write("   send validation request", 1, logPad);

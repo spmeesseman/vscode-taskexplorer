@@ -1,12 +1,13 @@
 import { join } from "path";
-import { commands, Disposable, Task, ViewColumn, window, workspace } from "vscode";
+import { ITaskExplorerApi } from "../../interface";
 import { getTaskFiles } from "../fileCache";
 import { configuration } from "../utils/configuration";
 import { readFileAsync } from "../utils/fs";
-import { getInstallPath, getTaskTypes } from "../utils/utils";
+import { getInstallPath, getTaskTypes, lowerCaseFirstChar } from "../utils/utils";
+import { commands, Disposable, Task, ViewColumn, window, workspace } from "vscode";
 
 
-export const createTaskCountTable = async (tasks: Task[], title: string, project?: string) =>
+export const createTaskCountTable = async (api: ITaskExplorerApi, tasks: Task[], title: string, project?: string) =>
 {
     const projects: string[] = [];
     const installPath = await getInstallPath();
@@ -84,35 +85,34 @@ export const createTaskCountTable = async (tasks: Task[], title: string, project
     html = html.replace(/\$\{taskTypes.length\}/g, Object.keys(taskCounts).length.toString());
     html = html.replace(/\$\{taskFiles.length\}/g, fileCount.toString());
 
+    if (api.isLicensed())
+    {
+        const idx1 = html.indexOf("<!-- startEnterLicenseButton -->"),
+              idx2 = html.indexOf("<!-- endEnterLicenseButton -->") + 30;
+        html = html.replace(html.slice(idx1, idx2), "");
+    }
+
     return html;
 };
 
 
-export const createWebviewPanel = async(html: string, disposables: Disposable[]) =>
+export const createWebviewPanel = async(title: string, html: string, disposables: Disposable[]) =>
 {
     const panel = window.createWebviewPanel(
-		"taskExplorer",   // Identifies the type of the webview. Used internally
-		"Task Explorer",  // Title of the panel displayed to the users
-		ViewColumn.One,   // Editor column to show the new webview panel in.
-		{
-			enableScripts: true
-		}
+		lowerCaseFirstChar(title, true), // Identifies the type of the webview. Used internally
+		title,                           // Title of the panel displayed to the users
+		ViewColumn.One,                  // Editor column to show the new webview panel in.
+		{ enableScripts: true }
 	);
 	panel.webview.html = html;
 	panel.webview.onDidReceiveMessage
 	(
-		message =>
-		{
-			switch (message.command)
-			{
-				case "enterLicense":
-					commands.executeCommand("taskExplorer.enterLicense");
-					return;
-				case "viewReport":
-					commands.executeCommand("taskExplorer.viewReport");
-					return;
-			}
-		}, undefined, disposables
+		message => {
+            // don't await?
+			commands.executeCommand("taskExplorer." + message.command);
+		},
+        undefined,
+        disposables
 	);
 	panel.reveal();
     disposables.push(panel);

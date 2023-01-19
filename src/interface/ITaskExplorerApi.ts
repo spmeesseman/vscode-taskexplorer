@@ -22,6 +22,7 @@ export interface ITaskExplorerApi
     testsApi: ITestsApi;
 
     isBusy(): boolean;
+    isLicensed(): boolean;
     isTests(): boolean;
     refreshExternalProvider(taskSource: string, logPad: string): Promise<void>;
     register(taskSource: string, provider: IExternalProvider, logPad: string): Promise<void>;

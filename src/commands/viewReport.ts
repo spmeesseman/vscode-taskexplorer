@@ -8,6 +8,7 @@ import { ITaskExplorerApi } from "../interface";
 let context: ExtensionContext;
 let teApi: ITaskExplorerApi;
 
+
 async function viewReport(uri?: Uri)
 {
     log.methodStart("view report command", 1, "", true);

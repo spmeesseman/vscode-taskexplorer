@@ -6,7 +6,7 @@ import * as fileCache from "./lib/fileCache";
 import log from "./lib/log/log";
 import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerViewReportCommand from "./commands/viewReport";
-import { basename, join } from "path";
+import { basename, join, resolve } from "path";
 import { AntTaskProvider } from "./providers/ant";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
 import { BashTaskProvider } from "./providers/bash";
@@ -34,6 +34,7 @@ import { ExtensionContext, tasks, commands } from "vscode";
 import { IDictionary, IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITestsApi } from "./interface";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/fileWatcher";
+import registerViewLicenseCommand from "./commands/viewLicense";
 
 
 let licenseManager: ILicenseManager;
@@ -49,6 +50,7 @@ export const teApi: ITaskExplorerApi =
     explorer: undefined,
     explorerView: undefined,
     isBusy,
+    isLicensed: () => licenseManager.isLicensed(),
     isTests: () => tests,
     setTests: (isTests) => { tests = isTests; },
     log,
@@ -85,7 +87,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     // Set 'dev' flag if running a debugging session
     //
-    dev = !tests && basename(__dirname) === "dist";
+    dev = !tests && await fs.pathExists(resolve(__dirname, "..", "src"));
 
     //
     // Initialize logging
@@ -139,7 +141,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     // Create license manager instance
     //
-    licenseManager = new LicenseManager(context);
+    licenseManager = new LicenseManager(context, teApi);
 
     //
     // Use a delayed initialization so we can display an 'Initializing...' message
@@ -337,6 +339,7 @@ async function refreshExternalProvider(providerName: string)
 function registerCommands(context: ExtensionContext)
 {
     registerEnterLicenseCommand(context);
+    registerViewLicenseCommand(context, teApi);
     registerViewReportCommand(context, teApi);
     //
     // Register GetAPI task

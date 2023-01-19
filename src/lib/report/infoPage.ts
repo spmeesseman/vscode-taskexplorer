@@ -12,14 +12,14 @@ let panel: WebviewPanel | undefined;
 export const displayParsingReport = async(api: ITaskExplorerApi, disposables: Disposable[], logPad: string, uri?: Uri) =>
 {
     log.methodStart("display parsing report", 1, logPad);
-	const html = await getHtmlContent(api, logPad, uri);
-	panel = await createWebviewPanel(html, disposables);
+	const html = await getPageContent(api, logPad, uri);
+	panel = await createWebviewPanel("Task Explorer", html, disposables);
     log.methodDone("display parsing report", 1, logPad);
     return panel;
 };
 
 
-const getHtmlContent = async (api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
+const getPageContent = async (api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
 {
 	let html = "";
 	const project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
@@ -31,15 +31,13 @@ const getHtmlContent = async (api: ITaskExplorerApi, logPad: string, uri?: Uri) 
 		const tasks = explorer.getTasks()
 							  .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
 					 			  				   project === getWorkspaceProjectName(t.scope.uri.fsPath)));
-		html = await createTaskCountTable(tasks, "Task Explorer", project);
+		html = await createTaskCountTable(api, tasks, "Task Explorer", project);
 
-		const infoContent = "<tr><td>" +
-								getInfoContent(tasks, logPad + "   ", uri) +
-							"</td></tr>";
-		html = html.replace("<!-- infoContent -->", infoContent);
+		const infoContent = getExtraContent(tasks, logPad + "   ", uri);
+		html = html.replace("<!-- addtlContent -->", infoContent);
 
-		const idx1 = html.indexOf("<!-- startLicenseContent -->"),
-			  idx2 = html.indexOf("<!-- endLicenseContent -->") + 26;
+		const idx1 = html.indexOf("<!-- startParsingReportButton -->"),
+			  idx2 = html.indexOf("<!-- endParsingReportButton -->") + 31;
 		html = html.replace(html.slice(idx1, idx2), "");
 	}
 
@@ -47,7 +45,7 @@ const getHtmlContent = async (api: ITaskExplorerApi, logPad: string, uri?: Uri) 
 };
 
 
-const getInfoContent = (tasks: Task[], logPad: string, uri?: Uri) =>
+const getExtraContent = (tasks: Task[], logPad: string, uri?: Uri) =>
 {
     log.methodStart("get body content", 1, logPad);
 
@@ -125,5 +123,5 @@ const getInfoContent = (tasks: Task[], logPad: string, uri?: Uri) =>
 
 	log.methodDone("get body content", 1, logPad);
 
-	return `<table><tr><td>${summary}</td><?tr></table><table><tr><td>${details}</td><?tr></table>`;
+	return `<tr><td><table><tr><td>${summary}</td></tr></table><table><tr><td>${details}</td></tr></table></td></tr>`;
 };
