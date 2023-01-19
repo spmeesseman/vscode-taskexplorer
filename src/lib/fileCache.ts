@@ -756,7 +756,7 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
 }
 
 
-export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad = "")
+export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad: string)
 {
     let numFilesRemoved = 0;
     log.methodStart("remove workspace folder", 1, logPad);

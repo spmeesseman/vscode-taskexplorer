@@ -1,10 +1,11 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import log from "./log/log";
-import { views } from "./views";
 import { TaskTreeDataProvider } from "../tree/tree";
-import { ITaskExplorer, ITaskExplorerApi } from "../interface";
-import { ExtensionContext, window } from "vscode";
+import { IDictionary, ITaskExplorer, ITaskExplorerApi } from "../interface";
+import { ExtensionContext, window, TreeView, TreeItem } from "vscode";
+
+const views: IDictionary<TreeView<TreeItem> | undefined> = {};
 
 
 export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext, enabled: boolean, teApi: ITaskExplorerApi, isActivation: boolean)

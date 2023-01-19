@@ -3,26 +3,26 @@ import * as util from "../lib/utils/utils";
 import * as sortTasks from "../lib/sortTasks";
 import TaskItem from "./item";
 import TaskFile from "./file";
-import log from "../lib/log/log";
 import TaskFolder from "./folder";
+import log from "../lib/log/log";
 import constants from "../lib/constants";
 import SpecialTaskFolder from "./specialFolder";
 import { dirname, join } from "path";
 import { IEvent } from "../interface/IEvent";
+import { pathExists } from "../lib/utils/fs";
 import { rebuildCache } from "../lib/fileCache";
-import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
-import { configuration } from "../lib/utils/configuration";
-import { getLicenseManager, providers, providersExternal } from "../extension";
-import { ScriptTaskProvider } from "../providers/script";
-import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition, IDictionary } from "../interface";
-import { isTaskIncluded } from "../lib/isTaskIncluded";
-import { findDocumentPosition } from "../lib/findDocumentPosition";
+import { TaskWatcher } from "../lib/taskWatcher";
 import { getTerminal } from "../lib/getTerminal";
-import { ITaskExplorer, TaskMap } from "../interface/ITaskExplorer";
+import { isTaskIncluded } from "../lib/isTaskIncluded";
+import { ScriptTaskProvider } from "../providers/script";
+import { configuration } from "../lib/utils/configuration";
 import { enableConfigWatcher } from "../lib/configWatcher";
 import { TaskExplorerProvider } from "../providers/provider";
-import { pathExists } from "../lib/utils/fs";
-import { TaskWatcher } from "../lib/taskWatcher";
+import { findDocumentPosition } from "../lib/findDocumentPosition";
+import { ITaskExplorer, TaskMap } from "../interface/ITaskExplorer";
+import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
+import { getLicenseManager, providers, providersExternal } from "../extension";
+import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition, IDictionary } from "../interface";
 import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
     TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, commands, window, workspace, tasks,
