@@ -41,13 +41,8 @@ class Storage implements IStorage, Memento
     private getKey = (key: string) => (!this.isTests ? /* istanbul ignore next */"" : (this.isDev ? /* istanbul ignore next */"dev" : "tests")) + key;
 
 
-    public async get2<T>(key: string, defaultValue?: T): Promise<T | undefined>
+    private _get2<T>(key: string, store: IDictionary<T>, defaultValue?: T): T | undefined
     {
-        let store: IDictionary<any>;
-        try {
-            store = await readJsonAsync<IDictionary<any>>(this.storageFile);
-        }
-        catch { /* istanbul ignore next */store = {}; }
         if (defaultValue || (isString(defaultValue) && defaultValue === "") || (isNumber(defaultValue) && defaultValue === 0))
         {
             let v = store[this.getKey(key)];
@@ -57,6 +52,28 @@ class Storage implements IStorage, Memento
             return v;
         }
         return store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key];
+    }
+
+
+    public async get2<T>(key: string, defaultValue?: T): Promise<T | undefined>
+    {
+        let store: IDictionary<any>;
+        try {
+            store = await readJsonAsync<IDictionary<any>>(this.storageFile);
+        }
+        catch { /* istanbul ignore next */store = {}; }
+        return this._get2(key, store, defaultValue);
+    }
+
+
+    public get2Sync<T>(key: string, defaultValue?: T): T | undefined
+    {
+        let store: IDictionary<any>;
+        try {
+            store = readJsonSync<IDictionary<any>>(this.storageFile);
+        }
+        catch { /* istanbul ignore next */store = {}; }
+        return this._get2(key, store, defaultValue);
     }
 
 
