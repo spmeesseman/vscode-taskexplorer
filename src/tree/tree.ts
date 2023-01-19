@@ -58,6 +58,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 {
     private defaultGetChildrenLogLevel = 1;
     private defaultGetChildrenLogPad = "";
+    private currentRefreshEvent: string | undefined;
     private eventQueue: IEvent[] = [];
     private name: string;
     private disposables: Disposable[];
@@ -77,6 +78,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     private taskTree: TaskFolder[] | NoScripts[] | undefined | null | void = null;
     private taskWatcher: TaskWatcher;
     private currentInvalidation: string | undefined;
+    private onTreeDataChangeEventComplete: any;
     private _onDidChangeTreeData: EventEmitter<TreeItem | undefined | null | void> = new EventEmitter<TreeItem | undefined | null | void>();
     readonly onDidChangeTreeData: Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
     private specialFolders: {
@@ -706,17 +708,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     public fireTreeRefreshEvent(logPad: string, logLevel: number, taskFile?: TreeItem)
     {
         const id = "pendingFireTreeRefreshEvent-" + (taskFile ? taskFile.id?.replace(/\W/g, "") : "g");
-        this.getChildrenLogPad = logPad;
-        this.getChildrenLogLevel = logLevel;
         log.methodStart("fire tree refresh event", logLevel, logPad, false, [[ "node id", id ]]);
-        if (this.visible) // || (this.enabled && this.setEnableCalled === false)) {
+        if (this.visible)
         {
+            this.getChildrenLogPad = logPad;
+            this.getChildrenLogLevel = logLevel;
+            this.currentRefreshEvent = id;
             this._onDidChangeTreeData.fire(taskFile);
             log.write("   refresh event fired", logLevel, logPad);
+            this.onTreeDataChangeEventComplete = () => {
+                log.write("fire tree refresh event has been processed", logLevel, logPad);
+            };
         }
         else
-        {
-            if (!this.eventQueue.find((e => e.type === "refresh" && e.id === id)))
+        {   // if (!this.eventQueue.find((e => e.type === "refresh" && e.id === id)))
+            if (id !== this.currentRefreshEvent && !this.eventQueue.find((e => e.type === "refresh" && e.id === id)))
             {
                 if (!taskFile || !this.eventQueue.find(e => e.type === "refresh" && !e.args[0]))
                 {
@@ -739,11 +745,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     log.write("   refresh event has been queued", logLevel, logPad);
                 }
                 else {
-                    log.write("   a global refresh event has already been queued, skip", logLevel, logPad);
+                    log.write("   a global refresh event is already queued, skip", logLevel, logPad);
                 }
             }
             else {
-                log.write("   a refresh event for this item has already been queued, skip", logLevel, logPad);
+                log.write("   a refresh event for this item is already running or queued, skip", logLevel, logPad);
             }
         }
         log.methodDone("fire tree refresh event", logLevel, logPad);
@@ -999,8 +1005,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             await licMgr.setTasks(this.tasks || /* istanbul ignore next */[], logPad + "   ");
         }
 
-        this.refreshPending = this.processEventQueue();
+        this.refreshPending = this.processEventQueue(logPad + "   ");
         this.currentInvalidation = undefined;
+        this.currentRefreshEvent = undefined;
         this.getChildrenLogPad = this.defaultGetChildrenLogPad;
         this.getChildrenLogLevel = this.defaultGetChildrenLogLevel;
 
@@ -1008,6 +1015,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             [ "# of tasks total", this.tasks ? this.tasks.length : /* istanbul ignore next */0 ],
             [ "# of tree task items returned", items.length ]
         ]);
+
+        if (this.onTreeDataChangeEventComplete) {
+            this.onTreeDataChangeEventComplete();
+            this.onTreeDataChangeEventComplete = undefined;
+        }
 
         return items;
     }
@@ -1302,13 +1314,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     {   //
         // VSCode engine calls getChildren() when the view changes to 'visible'
         //
-        log.methodStart("visibility event received", this.defaultGetChildrenLogLevel, this.getChildrenLogPad, true, [[ "is visible", visible ]]);
+        log.methodStart("visibility event received", 1, "", true, [[ "is visible", visible ]]);
         this.visible = visible;
         if (this.visible)
         {
-            this.processEventQueue();
+            this.processEventQueue("   ");
         }
-        log.methodDone("visibility event received", this.defaultGetChildrenLogLevel, this.getChildrenLogPad);
+        log.methodDone("visibility event received", 1, "");
         log.blank(this.defaultGetChildrenLogLevel);
     }
 
@@ -1389,25 +1401,26 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     }
 
 
-    private processEventQueue = () =>
+    private processEventQueue = (logPad: string) =>
     {
         const delay = 1;
         let firedEvent = false;
-        log.methodStart("process task explorer event queue", 1, "", true, [[ "# of queued events", this.eventQueue.length ]]);
+        log.methodStart("process task explorer event queue", 1, logPad, true, [[ "# of queued events", this.eventQueue.length ]]);
 
         if (this.eventQueue.length > 0)
         {
             const next = this.eventQueue.shift() as IEvent; // get the next event
-            log.value("   event id", next.id, 1);
-            log.write(`   firing queued event task with ${next.args.length} args`);
+            log.value("   event id", next.id, 1, logPad);
+            log.write(`   firing queued event task with ${next.args.length} args`, 1, logPad);
             setTimeout(async () => {
+                this.currentRefreshEvent = next.id;
                 await next.fn.call(this, ...next.args);
             }, delay);
-            log.write(`   fired queued event with ${delay}ms delay`, 1);
+            log.write(`   fired queued event with ${delay}ms delay`, 1, logPad);
             firedEvent = true;
         }
 
-        log.methodDone("process task explorer main event queue", 1);
+        log.methodDone("process task explorer main event queue", 1, logPad);
         return firedEvent;
     };
 
@@ -1486,7 +1499,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             this.currentInvalidation = invalidate;     // 'invalidate' will be taskType if 'opt' is uri
             this.taskTree = null;                      // see todo above
             this.taskMap = {};                         //
-            // this._onDidChangeTreeData.fire();       // see todo above // task.definition.treeItem
+            // this.fireTreeRefreshEvent(logPad, 1);;  // see todo above // task.definition.treeItem
         }                                              // not sure if its even possible
         else //                                        //
         {   // Re-ask for all tasks from all providers and rebuild tree
@@ -1946,8 +1959,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     }
 
 
-    public setEnabled(enable: boolean)
+    public setEnabled(enable: boolean, logPad: string)
     {
+        log.methodStart("set tree enabled", 1, logPad, false, [[ "enable", enable ]]);
         if (enable !== this.enabled)
         {
             this.enabled = enable;
@@ -1958,9 +1972,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             }
             else {
                 this.setEnableCalled = enable;
-                this._onDidChangeTreeData.fire();
+                this.fireTreeRefreshEvent(logPad + "   ", 1);
             }
         }
+        log.methodDone("set tree enabled", 1, logPad);
     }
 
 
