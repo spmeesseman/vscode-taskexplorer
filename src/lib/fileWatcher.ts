@@ -19,6 +19,7 @@ let teApi: ITaskExplorerApi;
 let processingFsEvent = false;
 let rootPath: string | undefined;
 let currentNumWorkspaceFolders: number | undefined;
+let currentEvent: any;
 const eventQueue: any[] = [];
 const watchers: { [taskType: string]: FileSystemWatcher } = {};
 const watcherDisposables: { [taskType: string]: Disposable } = {};
@@ -99,6 +100,13 @@ export function disposeFileWatchers()
         w.dispose();
     });
 }
+
+
+const eventNeedsProcessing = (eventKind: string, uri: Uri) =>
+{
+    return !currentEvent || (!eventQueue.find(e => e.event === eventKind && e.fsPath === uri.fsPath) &&
+                             currentEvent.event !== eventKind && currentEvent.fsPath !== uri.fsPath);
+};
 
 
 function getDirWatchGlob(wsFolders: readonly WorkspaceFolder[])
@@ -191,7 +199,7 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     // cache so that the tree reload is much quicker, especially in large workspaces.  We'll do
     // it regardless of the 'enablePersistentFileCaching' settings.
     //
-    /* istanbul ignore if */
+    /* istanbul ignore if */ /* istanbul ignore else */
     if (rootPath !== workspace.rootPath)
     {
         log.write("   workspace deprecated 'root path' has changed", 1);
@@ -248,7 +256,7 @@ const processQueue = async () =>
 {
     if (eventQueue.length > 0)
     {
-        const next = eventQueue.shift();
+        const next = currentEvent = eventQueue.shift();
         log.methodStart("file watcher event queue", 1, "", true, [
             [ "event", next.event ], [ "arg1", isString(next.args[0]) ? next.args[0] : next.args[0].fsPath ],
             [ "arg2", next.args[1] instanceof Uri ? next.args[1].fsPath : "none (log padding)" ],
@@ -259,6 +267,7 @@ const processQueue = async () =>
         log.methodDone("file watcher event queue", 1, "");
     }
     else {
+        currentEvent = undefined;
         processingFsEvent = false;
     }
 };
@@ -320,12 +329,22 @@ export const registerFileWatcher = async(context: ExtensionContext, taskType: st
             {
                 if (!util.isExcluded(uri.fsPath))
                 {
-                    if (!processingFsEvent) {
+                    const e = {
+                        fn: _procFileChangeEvent,
+                        args: [ taskType, uri, "   " ],
+                        event: "modify file",
+                        timestamp: Date.now(),
+                        fsPath: uri.fsPath
+                    };
+                    if (!processingFsEvent)
+                    {
+                        currentEvent = e;
                         processingFsEvent = true;
                         await _procFileChangeEvent(taskType, uri, "");
                     }
-                    else {
-                        eventQueue.push({ fn: _procFileChangeEvent, args: [ taskType, uri, "   " ], event: "modify file" });
+                    else if (eventNeedsProcessing("modify file", uri))
+                    {
+                        eventQueue.push(e);
                     }
                 }
             });
@@ -335,12 +354,22 @@ export const registerFileWatcher = async(context: ExtensionContext, taskType: st
         {
             if (!util.isExcluded(uri.fsPath))
             {
-                if (!processingFsEvent) {
+                const e = {
+                    fn: _procFileDeleteEvent,
+                    args: [ taskType, uri, "   " ],
+                    event: "delete file",
+                    timestamp: Date.now(),
+                    fsPath: uri.fsPath
+                };
+                if (!processingFsEvent)
+                {
+                    currentEvent = e;
                     processingFsEvent = true;
                     await _procFileDeleteEvent(taskType, uri, "");
                 }
-                else {
-                    eventQueue.push({ fn: _procFileDeleteEvent, args: [ taskType, uri, "   " ], event: "delete file" });
+                else if (eventNeedsProcessing("delete file", uri))
+                {
+                    eventQueue.push(e);
                 }
             }
         });
@@ -349,12 +378,22 @@ export const registerFileWatcher = async(context: ExtensionContext, taskType: st
         {
             if (!util.isExcluded(uri.fsPath))
             {
-                if (!processingFsEvent) {
+                const e = {
+                    fn: _procFileCreateEvent,
+                    args: [ taskType, uri, "   " ],
+                    event: "create file",
+                    timestamp: Date.now(),
+                    fsPath: uri.fsPath
+                };
+                if (!processingFsEvent)
+                {
+                    currentEvent = e;
                     processingFsEvent = true;
                     await _procFileCreateEvent(taskType, uri, "");
                 }
-                else {
-                    eventQueue.push({ fn: _procFileCreateEvent, args: [ taskType, uri, "   " ], event: "create file" });
+                else if (eventNeedsProcessing("create file", uri))
+                {
+                    eventQueue.push(e);
                 }
             }
         });
@@ -379,8 +418,8 @@ export const registerFileWatchers = async(context: ExtensionContext, api: ITaskE
     currentNumWorkspaceFolders = workspace.workspaceFolders?.length;
     log.values(1, "   ", [
         [ "workspace root path (deprecated)", workspace.rootPath ],
-        [ "workspace root folder[0] name", workspace.workspaceFolders ? workspace.workspaceFolders[0].name : "undefined" ],
-        [ "workspace root folder[0] path", workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : "undefined" ],
+        [ "workspace root folder[0] name", workspace.workspaceFolders ? workspace.workspaceFolders[0].name : /* istanbul ignore next */"undefined" ],
+        [ "workspace root folder[0] path", workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : /* istanbul ignore next */"undefined" ],
         [ "current # of workspace folders", currentNumWorkspaceFolders ]
     ]);
     //
