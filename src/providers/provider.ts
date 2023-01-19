@@ -9,7 +9,6 @@ import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { configuration } from "../lib/utils/configuration";
 import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
 import { getTaskTypeFriendlyName, isExcluded, isTaskTypeEnabled, showMaxTasksReachedMessage } from "../lib/utils/utils";
-import { ICacheItem } from "../interface";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider
@@ -100,7 +99,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     {
         const allTasks: Task[] = [],
               visitedFiles: string[] = [],
-              paths = getTaskFiles(this.providerName) as ICacheItem[],
+              paths = getTaskFiles(this.providerName),
               enabled = isTaskTypeEnabled(this.providerName);
 
         log.methodStart(`read ${this.providerName} tasks`, 2, logPad, false, [[ "enabled", enabled ]], this.logQueueId);
