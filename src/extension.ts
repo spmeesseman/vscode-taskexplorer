@@ -85,9 +85,9 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     }
 
     //
-    // Set 'dev' flag if running a debugging session
+    // Set 'dev' flag if running a debugging session from vSCode
     //
-    dev = !tests && await fs.pathExists(resolve(__dirname, "..", "src"));
+    dev = !tests && /* istanbul ignore next */await fs.pathExists(resolve(__dirname, "..", "src"));
 
     //
     // Initialize logging
@@ -103,8 +103,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         teApi.testsApi.storage = storage;
     }
 
-    log.blank(1);
-    log.methodStart("activation", 1);
+    log.methodStart("activation", 1, "", true);
 
     //
     // !!! Temporary after settings layout redo / rename !!!
@@ -139,6 +138,11 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     registerExplorer("taskExplorerSideBar", context, configuration.get<boolean>("enableSideBar", false), teApi, true);
 
     //
+    // Register configurations/settings change watcher
+    //
+    registerConfigWatcher(context, teApi);
+
+    //
     // Create license manager instance
     //
     licenseManager = new LicenseManager(context, teApi);
@@ -158,7 +162,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
 
 const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
 {
-    log.methodStart("initialization");
+    log.methodStart("initialization", 1, "", true);
     //
     // Register file type watchers
     // This also starts the file scan to build the file task file cache
@@ -177,8 +181,8 @@ const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
     // regardless if the user settings has activated it or not when the extension deactivates
     // in this scenario. So check this case and proceed as necessary.
     //
+    const rootFolderChanged  = now < lastDeactivated + 5000 && /* istanbul ignore next */now < lastWsRootPathChange + 5000;
     /* istanbul ignore else */
-    const rootFolderChanged  = now < lastDeactivated + 5000 && now < lastWsRootPathChange + 5000;
     if (tests || /* istanbul ignore next */!rootFolderChanged)
     {
         await fileCache.rebuildCache("   ");
@@ -186,16 +190,14 @@ const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
     else
     {
         const enablePersistentFileCaching = configuration.get<boolean>("enablePersistentFileCaching");
+        enableConfigWatcher(false);
         await configuration.update("enablePersistentFileCaching", true);
         await fileCache.rebuildCache("   ");
         await configuration.update("enablePersistentFileCaching", enablePersistentFileCaching);
+        enableConfigWatcher(true);
     }
     await storage.update2("lastDeactivated", 0);
     await storage.update2("lastWsRootPathChange", 0);
-    //
-    // Register configurations/settings change watcher
-    //
-    registerConfigWatcher(context, teApi);
     //
     // TaskTreeDataProvider fires event for engine to make tree provider to refresh on setEnabled()
     //
@@ -303,8 +305,15 @@ export async function deactivate()
     // of this scenario, in which case we'll load from this stored file cache so that the tree
     // reload is much quicker, especially in large workspaces.
     //
-    if (!fileCache.isBusy() && !configuration.get<boolean>("enablePersistentFileCaching")) {
-        fileCache.persistCache(false, true);
+    /* istanbul ignore else */
+    if (!fileCache.isBusy() && !configuration.get<boolean>("enablePersistentFileCaching"))
+    {
+        const now = Date.now(),
+              lastWsRootPathChange = storage.get2Sync<number>("lastWsRootPathChange", 0);
+        if (now < lastWsRootPathChange + 3000)
+        {
+            fileCache.persistCache(false, true);
+        }
     }
     storage.update2Sync("lastDeactivated", Date.now());
 }
@@ -324,13 +333,10 @@ function isBusy()
 }
 
 
-/* istanbul ignore next */
 async function refreshExternalProvider(providerName: string)
 {
-    /* istanbul ignore next */
     if (providersExternal[providerName])
     {
-        /* istanbul ignore next */
         await refreshTree(teApi, providerName, undefined, "");
     }
 }
