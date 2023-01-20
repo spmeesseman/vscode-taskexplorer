@@ -6,12 +6,11 @@ import * as utils from "../utils/utils";
 import TaskItem from "../../tree/item";
 import { TaskExecution } from "vscode";
 import { getPackageManager } from "../../lib/utils/utils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 const testsName = "npm";
 const startTaskCount = 0;
 const tc = utils.testControl;
-let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let packageJsonPath: string | undefined;
 let npmTaskItems: TaskItem[];
@@ -23,7 +22,7 @@ suite("NPM Tests", () =>
 
     suiteSetup(async function()
     {
-        ({ teApi, fsApi } = await utils.activate(this));
+        ({ fsApi } = await utils.activate(this));
         ++successCount;
     });
 
@@ -51,7 +50,9 @@ suite("NPM Tests", () =>
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
         if (utils.exitRollingCount(0, successCount)) return;
-        await utils.focusExplorerView(this);
+        if (utils.needsTreeBuild()) {
+            await utils.focusExplorerView(this);
+        }
         ++successCount;
 	});
 

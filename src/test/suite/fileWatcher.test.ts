@@ -3,7 +3,7 @@
 
 import * as utils from "../utils/utils";
 import { join } from "path";
-import { IFilesystemApi, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { IConfiguration } from "@spmeesseman/vscode-taskexplorer-types/lib/IConfiguration";
 
 const tc = utils.testControl;
@@ -12,7 +12,7 @@ const startTaskCountBatch = 2;
 const startTaskCountNpm = 2;
 const startTaskCountGrunt = 7;
 const startTaskCountGulp = 17;
-const startTaskCountWs = 10;
+const startTaskCountWs = 13; // 10 + 3 User Tasks
 let fsApi: IFilesystemApi;
 let configApi: IConfiguration;
 let insideWsDir: string;
@@ -53,7 +53,9 @@ suite("File Watcher Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         if (utils.exitRollingCount(0, successCount)) return;
-        await utils.treeUtils.refresh(this);
+        if (utils.needsTreeBuild()) {
+            await utils.treeUtils.refresh(this);
+        }
         ++successCount;
     });
 

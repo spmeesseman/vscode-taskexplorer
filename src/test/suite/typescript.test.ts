@@ -10,6 +10,7 @@ import { Uri } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { join } from "path";
 import { ITestControl } from "../control";
+import { pathExists } from "../../lib/utils/fs";
 
 
 const testsName = "tsc";
@@ -43,9 +44,14 @@ suite("Typescript Tests", () =>
     suiteTeardown(async function()
     {
         await utils.closeActiveDocument();
-        try {
+        if (await pathExists(fileUri.fsPath)) {
+            await fsApi.deleteFile(fileUri.fsPath);
+            await utils.waitForTeIdle(testControl.waitTime.fs.deleteEvent);
+        }
+        if (await pathExists(dirName)) {
             await fsApi.deleteDir(dirName);
-        } catch {}
+            await utils.waitForTeIdle(testControl.waitTime.fs.deleteFolderEvent);
+        }
         utils.suiteFinished(this);
     });
 
@@ -81,7 +87,7 @@ suite("Typescript Tests", () =>
     test("Create File", async function()
     {
         if (utils.exitRollingCount(3, successCount)) return;
-        this.slow(testControl.slowTime.fs.createEventTsc + testControl.slowTime.taskCount.verifyByTree + 50);
+        this.slow(testControl.slowTime.fs.createEventTsc + testControl.slowTime.taskCount.verifyByTree);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -102,7 +108,7 @@ suite("Typescript Tests", () =>
             "}\n"
         );
         // the 'create file 2' test fails 1/50 runs, so add a lil bit on to fs.createEvent here too
-        await utils.waitForTeIdle(testControl.waitTime.fs.createEvent + 50);
+        await utils.waitForTeIdle(testControl.waitTime.fs.createEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
         successCount++;
     });
@@ -111,7 +117,7 @@ suite("Typescript Tests", () =>
     test("Document Position", async function()
     {
         if (utils.exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.getTreeTasks + (testControl.slowTime.command * 2));
+        this.slow(testControl.slowTime.getTreeTasks + (testControl.slowTime.findTaskPosition * 2));
         //
         // Typescript 'open' just opens the document, doesnt find the task position
         //

@@ -9,7 +9,7 @@ import { NsisTaskProvider } from "../../providers/nsis";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, suiteFinished,
+    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished,
     testControl, treeUtils, verifyTaskCount
 } from "../utils/utils";
 
@@ -45,7 +45,9 @@ suite("Nullsoft NSIS Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        await treeUtils.refresh(this);
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
         ++successCount;
     });
 

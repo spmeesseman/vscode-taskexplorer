@@ -7,13 +7,9 @@
 //
 import { ITaskExplorerApi, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand2, exitRollingCount, focusExplorerView,
-    suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
+    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, needsTreeBuild,
+    suiteFinished, testControl as tc
 } from "../utils/utils";
-
-
-let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
 
 
 let successCount = -1;
@@ -24,7 +20,7 @@ suite("Tree Grouping Tests", () =>
 
     suiteSetup(async function()
     {
-        ({ teApi, fsApi } = await activate(this));
+        await activate(this);
         ++successCount;
     });
 
@@ -44,7 +40,9 @@ suite("Tree Grouping Tests", () =>
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
         if (exitRollingCount(0, successCount)) return;
-        await focusExplorerView(this);
+        if (needsTreeBuild()) {
+            await focusExplorerView(this);
+        }
         ++successCount;
 	});
 

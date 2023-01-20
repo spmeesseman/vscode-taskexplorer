@@ -2,9 +2,8 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as utils from "../utils/utils";
-import { ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 
-let teApi: ITaskExplorerApi;
 let testsApi: ITestsApi;
 let successCount = -1;
 const tc = utils.testControl;
@@ -15,10 +14,11 @@ suite("File Cache Tests", () =>
 {
     suiteSetup(async function()
     {
-        ({ teApi, testsApi } = await utils.activate(this));
+        ({ testsApi } = await utils.activate(this));
         await testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
+        // await utils.executeSettingsUpdate("specialFolders.showUserTasks", false);
         ++successCount;
     });
 
@@ -36,7 +36,9 @@ suite("File Cache Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         if (utils.exitRollingCount(0, successCount)) return;
-        await utils.treeUtils.refresh(this);
+        if (utils.needsTreeBuild()) {
+            await utils.treeUtils.refresh(this);
+        }
         ++successCount;
     });
 
@@ -348,5 +350,5 @@ const checkTaskCounts = async (instance?: Mocha.Context) =>
     await utils.verifyTaskCount("npm", 2);
     await utils.verifyTaskCount("grunt", 7);
     await utils.verifyTaskCount("gulp", 17);
-    await utils.verifyTaskCount("Workspace", 10);
+    await utils.verifyTaskCount("Workspace", 13); // 10 + 3 User Tasks
 };

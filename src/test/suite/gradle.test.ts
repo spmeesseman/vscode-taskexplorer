@@ -5,10 +5,9 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { GradleTaskProvider } from "../../providers/gradle";
-import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath,
+    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, needsTreeBuild,
     testControl, treeUtils, verifyTaskCount
 } from "../utils/utils";
 
@@ -43,7 +42,9 @@ suite("Gradle Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         if (exitRollingCount(0, successCount)) return;
-        await treeUtils.refresh(this);
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
         ++successCount;
     });
 

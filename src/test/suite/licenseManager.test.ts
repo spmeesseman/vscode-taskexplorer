@@ -165,12 +165,12 @@ suite("License Manager Tests", () =>
 	test("License Info Page - View Report (From Webview)", async function()
 	{
         if (exitRollingCount(9, successCount)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPageWithDetail + 1050 + (testControl.slowTime.storageUpdate * 2));
+		this.slow(testControl.slowTime.licenseMgrOpenPageWithDetail + 550 + (testControl.slowTime.storageUpdate * 2));
 		await setLicensed(false, licMgr);
 		await teApi.testsApi.storage.update("version", undefined);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		await setTasks();
-		await sleep(500);
+		await sleep(50);
 		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "viewReport" });
 		await sleep(500);
 		licMgr.dispose();

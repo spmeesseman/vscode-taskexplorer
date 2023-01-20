@@ -6,7 +6,7 @@ import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, executeSettingsUpdate, exitRollingCount, suiteFinished, testControl, treeUtils } from "../utils/utils";
 
 const testsName = "Workspace";
-const startTaskCount = 10;
+const startTaskCount = 13; // 10 + 3 'User' Tasks
 
 let teApi: ITaskExplorerApi;
 let wsEnable: boolean;
@@ -52,9 +52,19 @@ suite("Workspace / VSCode Tests", () =>
     });
 
 
-    test("Disable Workspace Tasks", async function()
+    test("Disable User Tasks", async function()
     {
         if (exitRollingCount(2, successCount)) return;
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
+        await executeSettingsUpdate("specialFolders.showUserTasks", false);
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount - 4);
+        successCount++;
+    });
+
+
+    test("Disable Workspace Tasks", async function()
+    {
+        if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.workspace", false);
         await treeUtils.verifyTaskCountByTree(testsName, 0);
@@ -64,20 +74,30 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Re-enable Workspace Tasks", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.config.enableEventWorkspace + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.workspace", true);
-        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount - 1);
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount - 4);
         successCount++;
     });
 
 
     test("Re-show VSCode Tasks Marked Hidden", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(5, successCount)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("showHiddenWsTasks", true);
+        await treeUtils.verifyTaskCountByTree(testsName, startTaskCount - 3);
+    });
+
+
+    test("Re-enable User Tasks", async function()
+    {
+        if (exitRollingCount(6, successCount)) return;
+        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
+        await executeSettingsUpdate("specialFolders.showUserTasks", true);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
+        successCount++;
     });
 
 });

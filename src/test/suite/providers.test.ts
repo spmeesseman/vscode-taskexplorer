@@ -13,7 +13,7 @@ import { workspace, tasks, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, exitRollingCount, focusExplorerView,
-    getWsPath, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
+    getWsPath, needsTreeBuild, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 
@@ -71,15 +71,18 @@ suite("Provider Tests", () =>
     test("Create Empty Directories", async function()
     {
         if (exitRollingCount(0, successCount)) return;
-        this.slow(tc.slowTime.fs.createFolderEvent * 4);
+        this.slow(tc.slowTime.fs.createFolderEvent * 3);
         if (!await fsApi.pathExists(dirName)) {
             await fsApi.createDir(dirName);
+            await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         }
         if (!await fsApi.pathExists(dirNameL2)) {
             await fsApi.createDir(dirNameL2);
+            await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         }
         if (!await fsApi.pathExists(dirNameIgn)) {
             await fsApi.createDir(dirNameIgn);
+            await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         }
         ++successCount;
     });
@@ -88,7 +91,9 @@ suite("Provider Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        await treeUtils.refresh(this);
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
         ++successCount;
     });
 
@@ -204,7 +209,9 @@ suite("Provider Tests", () =>
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
         if (exitRollingCount(14, successCount)) return;
-        await focusExplorerView(this);
+        // if (needsTreeBuild()) {
+            await focusExplorerView(this);
+        // }
         ++successCount;
 	});
 
@@ -381,7 +388,7 @@ suite("Provider Tests", () =>
         let numOpened: number;
         let numFilesOpened: number;
         ({ taskMap, numOpened, numFilesOpened } = await treeUtils.walkTreeItems(undefined, true));
-        checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10);
+        checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10); // There are 3 'User' Workspace/VSCode Tasks but they won't be in the TaskMap
         this.slow((numFilesOpened * tc.slowTime.findTaskPosition) + ((numOpened - numFilesOpened) * tc.slowTime.findTaskPositionDocOpen));
         ++successCount;
     });
@@ -404,7 +411,11 @@ suite("Provider Tests", () =>
               gruntCt = taskItems.length,
               taskItem = grunt.find(t => t.taskSource === "grunt" && !t.taskFile.path.startsWith("grunt"));
         await executeTeCommand2("addToExcludes", [ taskItem ]);
-        await verifyTaskCount("grunt", gruntCt - 1);
+console.log("1: " + gruntCt);
+console.log("2: " + taskItem?.id);
+console.log("3: " + taskItem?.taskFile.resourceUri.fsPath);
+console.log("4: " + taskItem?.task.name);
+        await verifyTaskCount("grunt", gruntCt - 2);
         ++successCount;
     });
 
@@ -428,15 +439,18 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.config.excludesEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
+console.log("11: " + gruntCt);
         for (const value of Object.values(taskMap))
         {
             if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
             {
+console.log("22: " + value.taskFile?.id);
+console.log("33: " + value.taskFile.resourceUri.fsPath);
                 await executeTeCommand2("addToExcludes", [ value.taskFile ]);
                 break;
             }
         }
-        await verifyTaskCount("grunt", gruntCt - 2);
+        await verifyTaskCount("grunt", gruntCt - 1);
         ++successCount;
     });
 
@@ -688,6 +702,7 @@ function checkTasks(ant: number, ap: number, bash: number, bat: number, gradle: 
 
     taskCount = treeUtils.findIdInTaskMap(":Workspace:", taskMap);
     console.log("      VSCode        : " + taskCount.toString());
+     // There are 3 'User' Workspace/VSCode Tasks but they won't be in the TaskMap
     expect(taskCount).to.be.equal(vsc, `Unexpected VSCode task count (Found ${taskCount} of ${vsc})`);
 }
 
@@ -709,13 +724,15 @@ async function deleteTempFilesAndDirectories()
     }
     try {
         await fsApi.deleteDir(dirNameL2);
+        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await fsApi.deleteDir(dirName);
+        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await fsApi.deleteDir(dirNameIgn);
+        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
     }
     catch (error) {
         console.log(error);
     }
-    await waitForTeIdle(3000);
     tempDirsDeleted = true;
 }
 

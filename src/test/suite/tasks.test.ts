@@ -12,6 +12,7 @@ import { ITaskExplorer, ITaskExplorerApi, ITaskFolder, ITaskItem, ITestsApi } fr
 
 const tc = utils.testControl;
 const startTaskSlowTime = tc.slowTime.config.event + (tc.slowTime.showHideSpecialFolder * 2) + (tc.slowTime.command * 2);
+
 let teApi: ITaskExplorerApi;
 let explorer: ITaskExplorer;
 let testsApi: ITestsApi;
@@ -32,6 +33,7 @@ suite("Task Tests", () =>
     {
         ({ teApi, testsApi, explorer } = await utils.activate(this));
         clickAction = teApi.config.get<string>("taskButtons.clickAction");
+        await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
         ++successCount;
     });
 
@@ -46,8 +48,9 @@ suite("Task Tests", () =>
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
         if (utils.exitRollingCount(0, successCount)) return;
-        await utils.focusExplorerView(this);
-        await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
+        if (utils.needsTreeBuild()) {
+            await utils.focusExplorerView(this);
+        }
         ++successCount;
 	});
 

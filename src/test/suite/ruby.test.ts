@@ -4,11 +4,11 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
-import { expect } from "chai";
 import { RubyTaskProvider } from "../../providers/ruby";
-import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, suiteFinished, testControl, treeUtils } from "../utils/utils";
+import { activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, needsTreeBuild,
+    suiteFinished, testControl, treeUtils
+} from "../utils/utils";
 
 const testsName = "ruby";
 const startTaskCount = 7;
@@ -42,7 +42,9 @@ suite("Ruby Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         if (exitRollingCount(0, successCount)) return;
-        await treeUtils.refresh(this);
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
         ++successCount;
     });
 

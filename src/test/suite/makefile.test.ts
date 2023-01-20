@@ -12,8 +12,8 @@ import { MakeTaskProvider } from "../../providers/make";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, suiteFinished, testControl,
-    verifyTaskCount, waitForTeIdle
+    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, needsTreeBuild,
+    sleep, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "make";
@@ -35,7 +35,7 @@ suite("Makefile Tests", () =>
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as MakeTaskProvider;
         dirName = getWsPath("tasks_test_");
-        fileUri = Uri.file(join(dirName, "test_provider.sh"));
+        fileUri = Uri.file(join(dirName, "makefile"));
         ++successCount;
     });
 
@@ -49,7 +49,9 @@ suite("Makefile Tests", () =>
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
         if (exitRollingCount(0, successCount)) return;
-        await focusExplorerView(this);
+        if (needsTreeBuild()) {
+            await focusExplorerView(this);
+        }
         ++successCount;
 	});
 
@@ -82,7 +84,7 @@ suite("Makefile Tests", () =>
     test("Path to make", async function()
     {
         if (exitRollingCount(2, successCount)) return;
-        this.slow(testControl.slowTime.config.pathToProgramsEvent * 4);
+        this.slow(tc.slowTime.config.pathToProgramsEvent * 4);
         const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
               filePath = getWsPath(join(testsName, "makefile")),
               fileUri = Uri.file(filePath);
@@ -106,7 +108,7 @@ suite("Makefile Tests", () =>
     test("Start", async function()
     {
         if (exitRollingCount(3, successCount)) return;
-        this.slow(testControl.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount);
         successCount++;
     });
@@ -115,8 +117,8 @@ suite("Makefile Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(4, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
-        await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.config.enableEvent);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
+        await executeSettingsUpdate("enabledTasks." + testsName, false, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
         successCount++;
     });
@@ -125,8 +127,8 @@ suite("Makefile Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
-        await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.config.enableEvent);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
+        await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         successCount++;
     });
@@ -135,8 +137,9 @@ suite("Makefile Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
+        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await fsApi.writeFile(
             fileUri.fsPath,
             "copy_dependencies                         :\n" +
@@ -149,9 +152,21 @@ suite("Makefile Tests", () =>
             "clean_obj                                : $(OBJ_DIRECTORY)\n" +
             "   rd /q /s $(OBJ_DIRECTORY)  \n" +
             "clean                                    : $(OUTPUT_DIRECTORY)\n" +
-            "   rd /q /s $(OUTPUT_DIRECTORY)\n"
+            "   rd /q /s $(OUTPUT_DIRECTORY)\n" +
+            "   rd /q /s $(OBJ_DIRECTORY)  \n" +
+            "clean                                    : $(OUTPUT_DIRECTORY)\n" + // cover duplicate
+            "   rd /q /s $(OUTPUT_DIRECTORY)\n" +
+            ".PHONY                                   : $(OUTPUT_DIRECTORY)\n" + // cover specialTargets
+            "   rd /q /s $(OUTPUT_DIRECTORY)\n" +
+            ".record.test                             : $(OUTPUT_DIRECTORY)\n" + // cover suffixRuleTargets
+            "   console.write(\"test\")\n" +
+            ".%SPECIAL                                : $(OUTPUT_DIRECTORY)\n" + // cover leading .
+            "   console.write(\"special\")\n" +
+            "%.done                                   : $(OUTPUT_DIRECTORY)\n" + // cover patternRuleTargets
+            "   console.write(\"done\")\n"
         );
-        await waitForTeIdle(testControl.waitTime.fs.createEvent);
+        await waitForTeIdle(tc.waitTime.fs.createEvent);
+        await sleep(1000);
         await verifyTaskCount(testsName, startTaskCount + 3);
         successCount++;
     });
@@ -160,12 +175,12 @@ suite("Makefile Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(7, successCount)) return;
-        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify);
+        this.slow(tc.waitTime.fs.deleteFolderEvent + tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
-        await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
-        await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         successCount++;
     });
 
@@ -173,9 +188,9 @@ suite("Makefile Tests", () =>
     test("Re-create File", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
-        await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
+        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await fsApi.writeFile(
             fileUri.fsPath,
             "copy_dependencies                         :\n" +
@@ -188,9 +203,20 @@ suite("Makefile Tests", () =>
             "clean_obj                                : $(OBJ_DIRECTORY)\n" +
             "   rd /q /s $(OBJ_DIRECTORY)  \n" +
             "clean                                    : $(OUTPUT_DIRECTORY)\n" +
-            "   rd /q /s $(OUTPUT_DIRECTORY)\n"
+            "   rd /q /s $(OUTPUT_DIRECTORY)\n" +
+            "   rd /q /s $(OBJ_DIRECTORY)  \n" +
+            "clean                                    : $(OUTPUT_DIRECTORY)\n" + // cover duplicate
+            "   rd /q /s $(OUTPUT_DIRECTORY)\n" +
+            ".PHONY                                   : $(OUTPUT_DIRECTORY)\n" + // cover specialTargets
+            "   rd /q /s $(OUTPUT_DIRECTORY)\n" +
+            ".record.test                             : $(OUTPUT_DIRECTORY)\n" + // cover suffixRuleTargets
+            "   console.write(\"test\")\n" +
+            ".%SPECIAL                                : $(OUTPUT_DIRECTORY)\n" + // cover leading .
+            "   console.write(\"special\")\n" +
+            "%.done                                   : $(OUTPUT_DIRECTORY)\n" + // cover patternRuleTargets
+            "   console.write(\"done\")\n"
         );
-        await waitForTeIdle(testControl.waitTime.fs.createEvent);
+        await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 3);
         successCount++;
     });
@@ -199,9 +225,9 @@ suite("Makefile Tests", () =>
     test("Delete Folder", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(testControl.slowTime.fs.deleteFolderEvent + testControl.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteDir(dirName);
-        await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         successCount++;
     });

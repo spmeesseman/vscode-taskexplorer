@@ -12,7 +12,7 @@ import { MavenTaskProvider } from "../../providers/maven";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import {
     activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, focusExplorerView,
-    getWsPath, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
+    getWsPath, needsTreeBuild, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "maven";
@@ -55,7 +55,9 @@ suite("Maven Tests", () =>
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
         if (exitRollingCount(0, successCount)) return;
-        await focusExplorerView(this);
+        if (needsTreeBuild()) {
+            await focusExplorerView(this);
+        }
         ++successCount;
 	});
 

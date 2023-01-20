@@ -8,8 +8,8 @@ import { GruntTaskProvider } from "../../providers/grunt";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, sleep, suiteFinished, testControl as tc,
-    treeUtils, verifyTaskCount, waitForTeIdle
+    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, needsTreeBuild,
+    sleep, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "grunt";
@@ -45,7 +45,9 @@ suite("Grunt Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        await treeUtils.refresh(this);
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
         ++successCount;
     });
 
@@ -93,10 +95,9 @@ suite("Grunt Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(6, successCount)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        if (!(await fsApi.pathExists(dirName))) {
-            await fsApi.createDir(dirName);
-        }
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
+        await fsApi.createDir(dirName);
+        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await fsApi.writeFile(
             fileUri.fsPath,
             "module.exports = function(grunt) {\n" +
@@ -153,10 +154,11 @@ suite("Grunt Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
-        await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
+        await fsApi.deleteDir(dirName);
+        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });

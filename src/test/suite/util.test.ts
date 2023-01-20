@@ -674,10 +674,8 @@ suite("Util Tests", () =>
 		await afs.getDateModified(__dirname);
 		await afs.getDateModified("");
 		await afs.getDateModified(null as unknown as string);
-		try {
-			await afs.writeFile(getWsPath("."), "its a dir");
-		}
-		catch {}
+		try { await afs.writeFile(getWsPath("."), "its a dir"); } catch {}
+		try { afs.writeFileSync(getWsPath("."), "its a dir"); } catch {}
         ++successCount;
 	});
 

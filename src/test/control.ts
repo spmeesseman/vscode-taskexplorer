@@ -28,7 +28,7 @@ export const testControl: ITestControl =
         consoleLevel: 1,
         file: false,
         fileSymbols: false,
-        output: false,          // enabled automatically if enabled is `true` and all 3 output flags are `false`
+        output: true,          // enabled automatically if enabled is `true` and all 3 output flags are `false`
         openFileOnFinish: true, // nope. not yet
         blockScaryColors: true
     },
@@ -134,7 +134,7 @@ export const testControl: ITestControl =
         taskCommandStartupMax: 4950,
         taskProviderReadUri: 100,
         tasks: {
-            antParser: 810,
+            antParser: 820,
             antTask: 8900,
             antTaskWithAnsicon: 8940,
             bashScript: 3990,
@@ -175,14 +175,13 @@ export const testControl: ITestControl =
         explorerViewStartup: 3000,
         focusCommand: 250,
         fs: {
-            createEvent: 185,
-            createFolderEvent: 200,
-            deleteEvent: 180,
-            deleteFolderEvent: 195,
-            modifyEvent: 180
+            createEvent: 195,
+            createFolderEvent: 210,
+            deleteEvent: 190,
+            deleteFolderEvent: 205,
+            modifyEvent: 190
         },
         getTreeMin: 200,
-        getTreeMax: 1600,
         getTreeTasks: 55,
         min: 40,
         npmCommandMin: 1500,
@@ -381,7 +380,6 @@ export interface ITestControl
             modifyEvent: number;
         };
         getTreeMin: number;
-        getTreeMax: number;
         getTreeTasks: number;
         min: number;
         npmCommandMin: number;

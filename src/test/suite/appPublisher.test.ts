@@ -10,7 +10,7 @@ import { Uri } from "vscode";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath,
+    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, needsTreeBuild,
     suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
@@ -19,10 +19,9 @@ const startTaskCount = 21;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let pathToProgram: string;
 let rootPath: string;
 let fileUri: Uri;
-let successCount = 0;
+let successCount = -1;
 
 
 suite("App-Publisher Tests", () =>
@@ -48,7 +47,7 @@ suite("App-Publisher Tests", () =>
 
     test("Enable (Off by Default)", async function()
     {
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(0, successCount)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.config.enableEvent);
         ++successCount;
@@ -57,15 +56,17 @@ suite("App-Publisher Tests", () =>
 
     test("Build Tree (View Collapsed)", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
-        await treeUtils.refresh(this);
+        if (exitRollingCount(1, successCount)) return;
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
         ++successCount;
     });
 
 
     test("Start", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(2, successCount)) return;
         this.slow(tc.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount, 5);
         ++successCount;
@@ -74,7 +75,7 @@ suite("App-Publisher Tests", () =>
 
     test("Document Position", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(3, successCount)) return;
         const provider = teApi.providers[testsName] as AppPublisherTaskProvider;
         // provider.readTasks();
         provider.getDocumentPosition(undefined, undefined);
@@ -86,7 +87,7 @@ suite("App-Publisher Tests", () =>
 
     test("Create file", async function()
     {
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(4, successCount)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -108,7 +109,7 @@ suite("App-Publisher Tests", () =>
 
     test("Disable", async function()
     {
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(5, successCount)) return;
         this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
@@ -118,7 +119,7 @@ suite("App-Publisher Tests", () =>
 
     test("Re-enable", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(6, successCount)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
@@ -128,7 +129,7 @@ suite("App-Publisher Tests", () =>
 
     test("Invalid JSON", async function()
     {
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(7, successCount)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -155,7 +156,7 @@ suite("App-Publisher Tests", () =>
 
     test("Fix Invalid JSON", async function()
     {
-        if (exitRollingCount(9, successCount)) return;
+        if (exitRollingCount(8, successCount)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -182,7 +183,7 @@ suite("App-Publisher Tests", () =>
 
     test("Delete file", async function()
     {
-        if (exitRollingCount(10, successCount)) return;
+        if (exitRollingCount(9, successCount)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
@@ -193,7 +194,7 @@ suite("App-Publisher Tests", () =>
 
     test("Disable (Default is OFF)", async function()
     {
-        if (exitRollingCount(11, successCount)) return;
+        if (exitRollingCount(10, successCount)) return;
         this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);

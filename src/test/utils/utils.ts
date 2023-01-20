@@ -3,8 +3,8 @@
 import * as path from "path";
 import * as assert from "assert";
 import * as treeUtils from "./treeUtils";
-import constants from "../../lib/constants";
 import figures from "../../lib/figures";
+import constants from "../../lib/constants";
 import { expect } from "chai";
 import { deactivate } from "../../extension";
 import { testControl } from "../control";
@@ -14,6 +14,7 @@ import { configuration } from "../../lib/utils/configuration";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi, ITaskItem, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
+import { isObject } from "../../lib/utils/utils";
 
 export { figures };
 export { testControl };
@@ -212,16 +213,27 @@ export const executeSettingsUpdate = async (key: string, value?: any, minWait?: 
 {
     const rc = await teApi.config.updateWs(key, value);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.config.event),
-                            maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
+                        maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;
 };
+
+
+export const executeTeCommandAsync = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
+{
+    commands.executeCommand(`taskExplorer.${command}`, ...args);
+    await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
+                        maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
+};
+
+
+export const executeTeCommand2Async = (command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommandAsync(command, minWait, maxWait, ...args);
 
 
 export const executeTeCommand = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
     const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
-                            maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
+                        maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;
 };
 
@@ -258,16 +270,15 @@ export const focusExplorerView = async (instance?: any) =>
     {
         if (instance) {
             instance.slow(tc.slowTime.focusCommand + tc.slowTime.refreshCommand +
-                        (tc.waitTime.focusCommand * 2) + tc.waitTime.min + 100);
+                          (tc.waitTime.focusCommand * 2) + tc.waitTime.min + 100);
         }
         await executeTeCommand("focus", tc.waitTime.focusCommand);
         await waitForTeIdle(tc.waitTime.focusCommand);
-        sleep(100);
     }
     else if (instance) {
         instance.slow(tc.slowTime.focusCommandAlreadyFocused);
+        await waitForTeIdle(tc.waitTime.min);
     }
-    await waitForTeIdle(tc.waitTime.min);
 };
 
 
@@ -440,7 +451,15 @@ const initSettings = async () =>
         // });
         Object.keys(slowTimes).forEach((k) =>
         {
-            slowTimes[k] = Math.round(slowTimes[k] * factor);
+            if (!isObject(slowTimes[k])) {
+                slowTimes[k] = Math.round(slowTimes[k] * factor);
+            }
+            else {
+                Object.keys(slowTimes[k]).forEach((k2) =>
+                {
+                    slowTimes[k][k2] = Math.round(slowTimes[k][k2] * factor);
+                });
+            }
         });
     }
 };
@@ -454,6 +473,9 @@ const isExecuting = (task: Task) =>
                             e.task.scope === task.scope && e.task.definition.path === task.definition.path);
     return exec;
 };
+
+
+export const needsTreeBuild = () => true; // tc.tests.numSuites === 0 || !treeUtils.hasRefreshed();
 
 
 const isReady = (taskType?: string) =>
@@ -590,7 +612,7 @@ export const verifyTaskCount = async (taskType: string, expectedCount: number, r
             tTasks = tTasks.filter(t => t.source === "Workspace");
         }
     }
-    expect(tTasks.length === expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
+    expect(tTasks.length).to.be.equal(expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
 };
 
 
@@ -622,22 +644,32 @@ export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxW
 };
 
 
-export const waitForTeIdle = async (minWait = 1, maxWait = 15000, logPad = "   ") =>
+export const waitForTeIdle = async (minWait = 1, maxWait = 15000) =>
 {
     let waited = 0;
-    let iterationsIdle = 0;
-    while ((iterationsIdle < 3 || teApi.isBusy()) && waited < maxWait)
+    const _wait = async (iterationsIdle: number) =>
     {
-        await sleep(20);
-        waited += 20;
-        ++iterationsIdle;
-        if (teApi.isBusy()) {
-            iterationsIdle = 0;
+        // let gotNotIdle = false;
+        while (((iterationsIdle < 3 && waited < minWait /* && !gotNotIdle */) || teApi.isBusy()) && waited < maxWait)
+        {
+            await sleep(20);
+            waited += 20;
+            ++iterationsIdle;
+            if (teApi.isBusy()) {
+                // gotNotIdle = true;
+                iterationsIdle = 0;
+            }
         }
-    }
-    /* istanbul ignore next */
-    if (minWait > waited) {
-        /* istanbul ignore next */
-        await sleep(minWait - waited);
+    };
+    await _wait(3);
+    await sleep(1);
+    await _wait(3);
+    if (minWait > waited)
+    {
+        const sleepTime = Math.round((minWait - waited) / 3);
+        while (minWait > waited) {
+            await sleep(sleepTime);
+            waited += sleepTime;
+        }
     }
 };

@@ -10,7 +10,8 @@ import { ExternalTaskProviderBase } from "./externalTaskProviderBase";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeTeCommand, exitRollingCount, suiteFinished, testControl, verifyTaskCount, waitForTeIdle
+    activate, executeTeCommand, exitRollingCount, needsTreeBuild, suiteFinished, testControl, treeUtils,
+    verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
@@ -43,18 +44,28 @@ suite("External Provider Tests", () =>
     });
 
 
-    test("Get API Command", async function()
+    test("Build Tree (View Collapsed)", async function()
     {
         if (exitRollingCount(0, successCount)) return;
-        this.slow(testControl.slowTime.config.event);
-        await executeTeCommand("getApi");
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
         ++successCount;
     });
 
 
-    test("Register external task provider", async function()
+    test("Get API", async function()
     {
         if (exitRollingCount(1, successCount)) return;
+        this.slow(testControl.slowTime.commandFast + 75);
+        teApi = await executeTeCommand("getApi") as ITaskExplorerApi;
+        ++successCount;
+    });
+
+
+    test("Register External Task Provider", async function()
+    {
+        if (exitRollingCount(2, successCount)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         taskProvider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         await teApi.register("external", taskProvider, "");
@@ -64,9 +75,9 @@ suite("External Provider Tests", () =>
     });
 
 
-    test("Access external task provider", async function()
+    test("Access External Task Provider", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(3, successCount)) return;
         this.slow(testControl.slowTime.config.enableEvent);
         const provider = teApi.providersExternal.external as ExternalTaskProvider;
         const task = provider.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
@@ -76,9 +87,9 @@ suite("External Provider Tests", () =>
     });
 
 
-    test("Access base external task provider", async function()
+    test("Access Base External Task Provider", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.config.enableEvent);
         const task = taskProvider2.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
         try {
@@ -91,13 +102,33 @@ suite("External Provider Tests", () =>
     });
 
 
-    test("Unregister external task provider", async function()
+    test("Refresh External Task Provider", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(5, successCount)) return;
+        this.slow(testControl.slowTime.refreshCommandNoChanges + testControl.slowTime.taskCount.verify);
+        await teApi.refreshExternalProvider("external", "");
+        await waitForTeIdle(testControl.waitTime.config.enableEvent);
+        await verifyTaskCount("external", 2);
+        ++successCount;
+    });
+
+
+    test("Unregister External Task Provider", async function()
+    {
+        if (exitRollingCount(6, successCount)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.event + testControl.slowTime.taskCount.verify);
         await teApi.unregister("external", "");
         await waitForTeIdle(testControl.waitTime.config.event);
-        await verifyTaskCount("external", 2);
+        await verifyTaskCount("external", 0);
+        ++successCount;
+    });
+
+
+    test("Refresh Non-Existent External Task Provider", async function()
+    {
+        if (exitRollingCount(7, successCount)) return;
+        await teApi.refreshExternalProvider("external_no_exist", ""); // cover
+        ++successCount;
     });
 
 });

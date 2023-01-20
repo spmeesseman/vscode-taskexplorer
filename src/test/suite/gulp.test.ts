@@ -8,8 +8,8 @@ import { GulpTaskProvider } from "../../providers/gulp";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, sleep, suiteFinished, testControl as tc,
-    treeUtils, verifyTaskCount, waitForTeIdle
+    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, needsTreeBuild,
+    sleep, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "gulp";
@@ -55,7 +55,9 @@ suite("Gulp Tests", () =>
 	test("Activate Tree (Focus Explorer View)", async function()
 	{
         if (exitRollingCount(0, successCount)) return;
-		await focusExplorerView(this);
+		if (needsTreeBuild()) {
+            await focusExplorerView(this);
+        }
         ++successCount;
 	});
 
@@ -104,10 +106,9 @@ suite("Gulp Tests", () =>
     test("Create JS File", async function()
     {
         if (exitRollingCount(5, successCount)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        if (!(await fsApi.pathExists(dirName))) {
-            await fsApi.createDir(dirName);
-        }
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
+        await fsApi.createDir(dirName);
+        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
@@ -184,10 +185,9 @@ suite("Gulp Tests", () =>
     test("Create MJS File", async function()
     {
         if (exitRollingCount(9, successCount)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        if (!(await fsApi.pathExists(dirName))) {
-            await fsApi.createDir(dirName);
-        }
+        this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
+        await fsApi.createDir(dirName);
+        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await fsApi.writeFile(
             file2Uri.fsPath,
             "import pkg from 'gulp';\n" +

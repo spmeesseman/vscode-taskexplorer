@@ -138,8 +138,9 @@ suite("Bash Tests", () =>
     test("Re-create File", async function()
     {
         if (exitRollingCount(8, successCount)) return;
-        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify);
+        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
+        await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
         await waitForTeIdle(testControl.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);

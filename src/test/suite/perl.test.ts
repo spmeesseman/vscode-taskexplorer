@@ -4,12 +4,10 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
-import { expect } from "chai";
 import { PerlTaskProvider } from "../../providers/perl";
-import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, suiteFinished,
+    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished,
     testControl, treeUtils, verifyTaskCount
 } from "../utils/utils";
 
@@ -45,7 +43,9 @@ suite("Perl Tests", () =>
     test("Build Tree (View Collapsed)", async function()
     {
         if (exitRollingCount(1, successCount)) return;
-        await treeUtils.refresh(this);
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
         ++successCount;
     });
 

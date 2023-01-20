@@ -11,7 +11,8 @@ import { Uri } from "vscode";
 import { ComposerTaskProvider } from "../../providers/composer";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, getWsPath, suiteFinished, testControl, verifyTaskCount, waitForTeIdle
+    activate, executeSettingsUpdate, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished,
+    testControl, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "composer";
@@ -38,6 +39,9 @@ suite("Composer Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (successCount < 13) {
+            await fsApi.deleteDir(dirName);
+        }
         suiteFinished(this);
     });
 
@@ -51,9 +55,19 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Start", async function()
+    test("Build Tree (View Collapsed)", async function()
     {
         if (exitRollingCount(1, successCount)) return;
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
+        ++successCount;
+    });
+
+
+    test("Start", async function()
+    {
+        if (exitRollingCount(2, successCount)) return;
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
@@ -61,7 +75,7 @@ suite("Composer Tests", () =>
 
     test("Document Position", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(3, successCount)) return;
         const provider = teApi.providers[testsName] as ComposerTaskProvider;
         // provider.readTasks();
         assert (provider.getDocumentPosition(undefined, undefined) === 0);
@@ -74,7 +88,7 @@ suite("Composer Tests", () =>
 
     test("Disable", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(4, successCount)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
@@ -84,7 +98,7 @@ suite("Composer Tests", () =>
 
     test("Re-enable", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(5, successCount)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -92,13 +106,21 @@ suite("Composer Tests", () =>
     });
 
 
+    test("Create Empty Directory", async function()
+    {
+        if (exitRollingCount(6, successCount)) return;
+        this.slow(testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verify);
+        await fsApi.createDir(dirName);
+        await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
+        await verifyTaskCount(testsName, startTaskCount);
+        ++successCount;
+    });
+
+
     test("Create File", async function()
     {
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(7, successCount)) return;
         this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify);
-        if (!await fsApi.pathExists(dirName)) {
-            await fsApi.createDir(dirName);
-        }
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -120,7 +142,7 @@ suite("Composer Tests", () =>
 
     test("Add Task to File", async function()
     {
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(8, successCount)) return;
         this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -144,7 +166,7 @@ suite("Composer Tests", () =>
 
     test("Remove 2 Tasks from File", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(9, successCount)) return;
         this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -166,7 +188,7 @@ suite("Composer Tests", () =>
 
     test("Invalid JSON", async function()
     {
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(10, successCount)) return;
         let resetLogging = teApi.log.isLoggingEnabled();
         if (resetLogging) { // turn scary error logging off
             this.slow(testControl.slowTime.fs.createEvent + (testControl.slowTime.config.event * 2) + testControl.slowTime.taskCount.verify);
@@ -197,14 +219,23 @@ suite("Composer Tests", () =>
     });
 
 
-
     test("Delete File", async function()
     {
-        if (exitRollingCount(9, successCount)) return;
+        if (exitRollingCount(11, successCount)) return;
         this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
-        await fsApi.deleteDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
+        await verifyTaskCount(testsName, startTaskCount);
+        ++successCount;
+    });
+
+
+    test("Delete Directory", async function()
+    {
+        if (exitRollingCount(12, successCount)) return;
+        this.slow(testControl.slowTime.fs.deleteFolderEvent + testControl.slowTime.taskCount.verify);
+        await fsApi.deleteDir(dirName);
+        await waitForTeIdle(testControl.waitTime.fs.deleteFolderEvent);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
     });
@@ -212,7 +243,7 @@ suite("Composer Tests", () =>
 
     test("Disable (Default is OFF)", async function()
     {
-        if (exitRollingCount(10, successCount)) return;
+        if (exitRollingCount(13, successCount)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
