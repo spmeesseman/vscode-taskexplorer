@@ -161,25 +161,25 @@ export const testControl: ITestControl =
         // MINIMUM WAIT TIMES
         //
         addWorkspaceFolder: 170,
-        config: {
-            event: 85,
-            eventFast: 35,
-            disableEvent: 105,
-            enableEvent: 120,
-            globEvent: 110,
-            groupingEvent: 100,
-            registerExplorerEvent: 150
-        },
         command: 90,
         commandFast: 50,
+        config: {
+            event: 95,
+            eventFast: 45,
+            disableEvent: 125,
+            enableEvent: 150,
+            globEvent: 120,
+            groupingEvent: 110,
+            registerExplorerEvent: 160
+        },
         explorerViewStartup: 3000,
         focusCommand: 250,
         fs: {
-            createEvent: 125,
-            createFolderEvent: 165,
-            deleteEvent: 125,
-            deleteFolderEvent: 160,
-            modifyEvent: 115
+            createEvent: 185,
+            createFolderEvent: 200,
+            deleteEvent: 180,
+            deleteFolderEvent: 195,
+            modifyEvent: 180
         },
         getTreeMin: 200,
         getTreeMax: 1600,
@@ -360,6 +360,8 @@ export interface ITestControl
         // MINIMUM WAIT TIMES
         //
         addWorkspaceFolder: number;
+        command: number;
+        commandFast: number;
         config: {
             event: number;
             eventFast: number;
@@ -369,8 +371,6 @@ export interface ITestControl
             groupingEvent: number;
             registerExplorerEvent: number;
         };
-        command: number;
-        commandFast: number;
         explorerViewStartup: number;
         focusCommand: number;
         fs: {
