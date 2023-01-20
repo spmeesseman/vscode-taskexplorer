@@ -1512,7 +1512,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
         log.write("   fire tree data change event", 2, logPad);
         this.fireTreeRefreshEvent(logPad + "   ", 1);
-        setTimeout(() => { this.refreshPending = false; }, 1);
+        if (!this.visible) {
+            setTimeout(() => { this.refreshPending = false; }, 1);
+        }
 
         log.methodDone("refresh task tree", 1, logPad);
     }
