@@ -39,7 +39,7 @@ suite("Ruby Tests", () =>
     });
 
 
-    test("Build Tree (View Collapsed)", async function()
+    test("Build Tree", async function()
     {
         if (exitRollingCount(0, successCount)) return;
         if (needsTreeBuild()) {

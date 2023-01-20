@@ -40,7 +40,7 @@ suite("Perl Tests", () =>
     });
 
 
-    test("Build Tree (View Collapsed)", async function()
+    test("Build Tree", async function()
     {
         if (exitRollingCount(1, successCount)) return;
         if (needsTreeBuild()) {

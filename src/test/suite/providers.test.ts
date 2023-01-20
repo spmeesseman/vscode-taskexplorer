@@ -10,7 +10,7 @@ import TaskFile from "../../tree/file";
 import { join } from "path";
 import { expect } from "chai";
 import { workspace, tasks, WorkspaceFolder } from "vscode";
-import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi, ITaskFile } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, exitRollingCount, focusExplorerView,
     getWsPath, needsTreeBuild, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
@@ -22,6 +22,7 @@ const tempFiles: string[] = [];
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let explorer: ITaskExplorer;
+let taskFile: ITaskFile | undefined;
 let rootPath: string;
 let dirName: string;
 let dirNameL2: string;
@@ -88,7 +89,7 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Build Tree (View Collapsed)", async function()
+    test("Build Tree", async function()
     {
         if (exitRollingCount(1, successCount)) return;
         if (needsTreeBuild()) {
@@ -206,7 +207,7 @@ suite("Provider Tests", () =>
     });
 
 
-	test("Activate Tree (Focus Explorer View)", async function()
+	test("Focus Tree View", async function()
 	{
         if (exitRollingCount(14, successCount)) return;
         // if (needsTreeBuild()) {
@@ -409,13 +410,10 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.config.excludeTasksEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length,
-              taskItem = grunt.find(t => t.taskSource === "grunt" && !t.taskFile.path.startsWith("grunt"));
-        await executeTeCommand2("addToExcludes", [ taskItem ]);
-console.log("1: " + gruntCt);
-console.log("2: " + taskItem?.id);
-console.log("3: " + taskItem?.taskFile.resourceUri.fsPath);
-console.log("4: " + taskItem?.task.name);
-        await verifyTaskCount("grunt", gruntCt - 2);
+              taskItem = grunt.find(t => t.taskSource === "grunt" && !t.taskFile.path.startsWith("grunt") && t.task.name === "default" && t.taskFile.fileName === "GRUNTFILE.js");
+        await executeTeCommand2("addToExcludes", [ taskItem ], tc.waitTime.config.excludeTasksEvent);
+        await verifyTaskCount("grunt", gruntCt - 2); // there are 3 tasks that would getmasked by the task name regex 'default'
+        taskFile = taskItem?.taskFile;               // but oe of them is already ignored as it is in an ignored folder
         ++successCount;
     });
 
@@ -427,7 +425,7 @@ console.log("4: " + taskItem?.task.name);
         const taskItems = await tasks.fetchTasks({ type: "batch" }),
               scriptCt = taskItems.length,
               taskItem = batch.find(t => t.taskSource === "batch" && t.taskFile.fileName.toLowerCase().includes("test2.bat"));
-        await executeTeCommand2("addToExcludes", [ taskItem ]);
+        await executeTeCommand2("addToExcludes", [ taskItem ], tc.waitTime.config.globEvent);
         await verifyTaskCount("batch", scriptCt - 1);
         ++successCount;
     });
@@ -439,26 +437,19 @@ console.log("4: " + taskItem?.task.name);
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.config.excludesEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
-console.log("11: " + gruntCt);
-        for (const value of Object.values(taskMap))
-        {
-            if (value && value.taskSource === "grunt" && !value.taskFile.path.startsWith("grunt"))
-            {
-console.log("22: " + value.taskFile?.id);
-console.log("33: " + value.taskFile.resourceUri.fsPath);
-                await executeTeCommand2("addToExcludes", [ value.taskFile ]);
-                break;
-            }
+        if (taskFile) {
+            await executeTeCommand2("addToExcludes", [ taskFile ], tc.waitTime.config.globEvent);
         }
-        await verifyTaskCount("grunt", gruntCt - 1);
-        ++successCount;
+        taskFile = undefined;
+        await verifyTaskCount("grunt", gruntCt - 1); // there's just oe more task left in the file we just ignored
+        ++successCount;                              // after excluding the task name regex 'default' a few tests above
     });
 
 
     test("App Publisher Delete / Add", async function()
     {
         if (exitRollingCount(30, successCount)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent + (tc.slowTime.fetchTasksCommand * 2));
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent + (tc.slowTime.taskCount.verify * 2));
         const file = join(rootPath, ".publishrc.json");
         teApi.utilities.removeFromArray(tempFiles, file);
         await fsApi.deleteFile(file);

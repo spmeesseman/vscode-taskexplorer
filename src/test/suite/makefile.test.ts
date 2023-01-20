@@ -46,7 +46,7 @@ suite("Makefile Tests", () =>
     });
 
 
-	test("Activate Tree (Focus Explorer View)", async function()
+	test("Focus Tree View", async function()
 	{
         if (exitRollingCount(0, successCount)) return;
         if (needsTreeBuild()) {

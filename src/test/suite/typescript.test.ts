@@ -56,10 +56,12 @@ suite("Typescript Tests", () =>
     });
 
 
-	test("Activate Tree (Focus Explorer View)", async function()
+	test("Focus Tree View", async function()
 	{
         if (utils.exitRollingCount(0, successCount)) return;
-        await utils.focusExplorerView(this);
+        if (utils.needsTreeBuild()) {
+            await utils.focusExplorerView(this);
+        }
         successCount++;
 	});
 

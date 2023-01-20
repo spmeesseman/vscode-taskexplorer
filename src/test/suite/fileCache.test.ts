@@ -33,7 +33,7 @@ suite("File Cache Tests", () =>
     });
 
 
-    test("Build Tree (View Collapsed)", async function()
+    test("Build Tree", async function()
     {
         if (utils.exitRollingCount(0, successCount)) return;
         if (utils.needsTreeBuild()) {

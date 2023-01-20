@@ -208,6 +208,10 @@
                 "title": "Task Explorer: Enter License Key"
             },
             {
+                "command": "taskExplorer.viewLicense",
+                "title": "Task Explorer: View License Information"
+            },
+            {
                 "command": "taskExplorer.getApi",
                 "title": "%command.getApi%",
                 "enablement": "false"

@@ -28,7 +28,7 @@ export const testControl: ITestControl =
         consoleLevel: 1,
         file: false,
         fileSymbols: false,
-        output: true,          // enabled automatically if enabled is `true` and all 3 output flags are `false`
+        output: false,          // enabled automatically if enabled is `true` and all 3 output flags are `false`
         openFileOnFinish: true, // nope. not yet
         blockScaryColors: true
     },
@@ -87,7 +87,7 @@ export const testControl: ITestControl =
             enableEvent: 2370,
             enableEventWorkspace: 2835,
             excludesEvent: 2730,
-            excludeTasksEvent: 4225,
+            excludeTasksEvent: 4375,
             globEvent: 1920,
             groupingEvent: 1575,
             pathToProgramsEvent: 705,
@@ -101,13 +101,13 @@ export const testControl: ITestControl =
         findTaskPosition: 855,
         findTaskPositionDocOpen: 105,
         focusCommand: 3350,
-        focusCommandAlreadyFocused: 360,
+        focusCommandAlreadyFocused: 370,
         focusCommandChangeViews: 120,
         fs: {
-            createEvent: 1900,
+            createEvent: 1910,
             createEventTsc: 2350,
             createFolderEvent: 2200,
-            deleteEvent: 1780,
+            deleteEvent: 1790,
             deleteEventTsc: 2385,
             deleteFolderEvent: 2005,
             modifyEvent: 1445,
@@ -125,8 +125,8 @@ export const testControl: ITestControl =
         refreshCommandNoChanges: 380,
         removeWorkspaceFolder: 9970,
         runCommand: 8610,
-        runPauseCommand: 2480,
-        runStopCommand: 2500,
+        runPauseCommand: 2485,
+        runStopCommand: 2505,
         showHideSpecialFolder: 430,
         storageRead: 50,
         storageUpdate: 50,
@@ -134,8 +134,8 @@ export const testControl: ITestControl =
         taskCommandStartupMax: 4950,
         taskProviderReadUri: 100,
         tasks: {
-            antParser: 820,
-            antTask: 8900,
+            antParser: 840,
+            antTask: 8910,
             antTaskWithAnsicon: 8940,
             bashScript: 3990,
             batchScript: 8065,
@@ -166,6 +166,8 @@ export const testControl: ITestControl =
         config: {
             event: 95,
             eventFast: 45,
+            excludesEvent: 120,
+            excludeTasksEvent: 170,
             disableEvent: 125,
             enableEvent: 150,
             globEvent: 120,
@@ -366,6 +368,8 @@ export interface ITestControl
             eventFast: number;
             disableEvent: number;
             enableEvent: number;
+            excludesEvent: number;
+            excludeTasksEvent: number;
             globEvent: number;
             groupingEvent: number;
             registerExplorerEvent: number;
