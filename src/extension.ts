@@ -310,6 +310,7 @@ export async function deactivate()
     {
         const now = Date.now(),
               lastWsRootPathChange = storage.get2Sync<number>("lastWsRootPathChange", 0);
+        /* istanbul ignore if */
         if (now < lastWsRootPathChange + 3000)
         {
             fileCache.persistCache(false, true);
@@ -325,9 +326,8 @@ export function getLicenseManager()
 }
 
 
-/* istanbul ignore next */
 function isBusy()
-{   /* istanbul ignore next */
+{
     return !ready || fileCache.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
            isProcessingFsEvent() || isProcessingConfigChange();
 }
