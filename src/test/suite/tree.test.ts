@@ -388,9 +388,9 @@ suite("Tree Tests", () =>
     test("Hide Favorites", async function()
     {
         if (utils.exitRollingCount(19, successCount)) return;
-        this.slow((tc.slowTime.showHideSpecialFolder * 2) + (tc.waitTime.config.event  * 2));
-        await utils.executeSettingsUpdate("specialFolders.showFavorites", false);
-        await utils.executeSettingsUpdate("specialFolders.showFavorites", true);
+        this.slow((tc.slowTime.config.showHideSpecialFolder * 2) + (tc.waitTime.config.event  * 2));
+        await utils.executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
     });
 
@@ -398,8 +398,8 @@ suite("Tree Tests", () =>
     test("Hide Last Tasks", async function()
     {
         if (utils.exitRollingCount(20, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder);
-        await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
+        this.slow(tc.slowTime.config.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
     });
 
@@ -416,8 +416,8 @@ suite("Tree Tests", () =>
     test("Show Favorites", async function()
     {
         if (utils.exitRollingCount(22, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder);
-        await utils.executeSettingsUpdate("specialFolders.showFavorites", true);
+        this.slow(tc.slowTime.config.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
     });
 
@@ -425,8 +425,8 @@ suite("Tree Tests", () =>
     test("Show Last Tasks", async function()
     {
         if (utils.exitRollingCount(23, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder);
-        await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
+        this.slow(tc.slowTime.config.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
     });
 
@@ -434,11 +434,11 @@ suite("Tree Tests", () =>
     test("Show Favorite Tasks w/ Last Tasks", async function()
     {
         if (utils.exitRollingCount(24, successCount)) return;
-        this.slow((tc.slowTime.showHideSpecialFolder * 4));
-        await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
-        await utils.executeSettingsUpdate("specialFolders.showFavorites", false);
-        await utils.executeSettingsUpdate("specialFolders.showFavorites", true);
+        this.slow((tc.slowTime.config.showHideSpecialFolder * 4));
+        await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
     });
 
@@ -446,8 +446,8 @@ suite("Tree Tests", () =>
     test("Show Favorite Tasks Only", async function()
     {
         if (utils.exitRollingCount(25, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder);
-        await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
+        this.slow(tc.slowTime.config.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
     });
 
@@ -455,9 +455,9 @@ suite("Tree Tests", () =>
     test("Hide Favorite and Last Tasks", async function()
     {
         if (utils.exitRollingCount(26, successCount)) return;
-        this.slow((tc.slowTime.showHideSpecialFolder * 2));
-        await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await utils.executeSettingsUpdate("specialFolders.showFavorites", false);
+        this.slow((tc.slowTime.config.showHideSpecialFolder * 2));
+        await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
     });
 
@@ -465,8 +465,8 @@ suite("Tree Tests", () =>
     test("Show Favorite Tasks", async function()
     {
         if (utils.exitRollingCount(27, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder);
-        await utils.executeSettingsUpdate("specialFolders.showFavorites", true);
+        this.slow(tc.slowTime.config.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
     });
 
@@ -474,8 +474,8 @@ suite("Tree Tests", () =>
     test("Show Last Tasks", async function()
     {
         if (utils.exitRollingCount(28, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder);
-        await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
+        this.slow(tc.slowTime.config.showHideSpecialFolder);
+        await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
     });
 
@@ -483,8 +483,8 @@ suite("Tree Tests", () =>
     test("Hide User tasks", async function()
     {
         if (utils.exitRollingCount(29, successCount)) return;
-        this.slow(tc.slowTime.showHideSpecialFolder);
-        await utils.executeSettingsUpdate("specialFolders.showUserTasks", false);
+        this.slow(tc.slowTime.config.showHideUserTasks);
+        await utils.executeSettingsUpdate("specialFolders.showUserTasks", false, tc.waitTime.config.showHideUserTasks);
         ++successCount;
     });
 
@@ -506,9 +506,27 @@ suite("Tree Tests", () =>
     });
 
 
-    test("Sort Folders", function()
+    test("Folder Sort Type Explorer Order", async function()
     {
         if (utils.exitRollingCount(31, successCount)) return;
+        this.slow(tc.slowTime.config.sortingEvent);
+        await utils.executeSettingsUpdate("sortProjectFoldersAlpha", false, tc.waitTime.config.sortingEvent);
+        ++successCount;
+    });
+
+
+    test("Folder Sort Type Alphabetic Order", async function()
+    {
+        if (utils.exitRollingCount(32, successCount)) return;
+        this.slow(tc.slowTime.config.sortingEvent);
+        await utils.executeSettingsUpdate("sortProjectFoldersAlpha", true, tc.waitTime.config.sortingEvent);
+        ++successCount;
+    });
+
+
+    test("Misc Sort Folders", function()
+    {
+        if (utils.exitRollingCount(33, successCount)) return;
         let map: IDictionary<TaskFolder>= {};
         map.frank = new TaskFolder("frank");
         map["richard face"] = new TaskFolder("richard face");
