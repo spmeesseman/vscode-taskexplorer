@@ -11,7 +11,7 @@ import { TaskExecution } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi, ITaskFolder, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 const tc = utils.testControl;
-const startTaskSlowTime = tc.slowTime.config.event + (tc.slowTime.showHideSpecialFolder * 2) + (tc.slowTime.command * 2);
+const startTaskSlowTime = tc.slowTime.config.event + (tc.slowTime.config.showHideSpecialFolder * 2) + (tc.slowTime.command * 2);
 
 let teApi: ITaskExplorerApi;
 let explorer: ITaskExplorer;
@@ -202,7 +202,7 @@ suite("Task Tests", () =>
     test("Run Ant Task (w/ Ansicon)", async function()
     {
         if (utils.exitRollingCount(10, successCount)) return;
-        this.slow((tc.slowTime.config.enableEvent * 2) + (tc.waitTime.config.enableEvent * 2) + tc.slowTime.runCommand +
+        this.slow((tc.slowTime.config.enableEvent * 2) + tc.slowTime.runCommand +
                   tc.slowTime.tasks.antTaskWithAnsicon + 250 + tc.slowTime.focusCommandChangeViews);
         antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
         expect(antTask).to.not.be.equal(undefined, "The 'hello' ant task was not found in the task tree");

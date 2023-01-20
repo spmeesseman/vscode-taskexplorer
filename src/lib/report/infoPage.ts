@@ -25,10 +25,9 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, uri?: Uri) 
 	const project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 	const explorer = api.explorer || api.sidebar;
 
-	/* istanbul ignore else */
 	if (explorer)
 	{
-		const tasks = explorer.getTasks()
+		const tasks = explorer.getTasks() // Filter out 'User' tasks for project/folder reports
 							  .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
 					 			  				   project === getWorkspaceProjectName(t.scope.uri.fsPath)));
 		html = await createTaskCountTable(api, tasks, "Task Explorer", project);

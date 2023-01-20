@@ -24,7 +24,6 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Tas
 	if (!tasks)
 	{
 		const explorer = api.explorer || api.sidebar;
-		/* istanbul ignore else */
 		if (explorer) {
 			tasks = explorer.getTasks();
 		}

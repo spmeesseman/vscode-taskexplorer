@@ -51,7 +51,7 @@ suite("License Manager Tests", () =>
 		teApi.setTests(true);
 		licMgr?.dispose();
 		await closeActiveDocument();
-		if (lsProcess) {
+		if (lsProcess) { // shut down local server
 			lsProcess.send("close");
 			await sleep(500);
 		}

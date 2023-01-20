@@ -52,14 +52,19 @@
                 });
             }
             // Handle message inside the webview
-            window.addEventListener('message', event => {
+            window.addEventListener('message', event =>
+            {
                 const message = event.data; // JSON data from tests
-                switch (message.command) {
+                switch (message.command)
+                {
+                    case 'enterLicense':
+                        enterLicense();
+                        break;
+                    case 'viewLicense':
+                        viewLicense();
+                        break;
                     case 'viewReport':
                         viewReport();
-                        break;
-                    case 'enterLicense':
-                        getLicense();
                         break;
                 }
             });

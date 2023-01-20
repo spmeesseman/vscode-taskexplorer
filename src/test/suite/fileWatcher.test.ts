@@ -217,8 +217,8 @@ suite("File Watcher Tests", () =>
         await fsApi.writeFile(
             join(outsideWsDir, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
-            '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
-            '    grunt.registerTask("upload2", ["s3"]);\n' +
+            '    grunt.registerTask(\n"default13", ["jshint:myproject"]);\n' +
+            '    grunt.registerTask("upload13", ["s3"]);\n' +
             "};\n"
         );
         await fsApi.copyDir(outsideWsDir, insideWsDir, /Gruntfile\.js/, true); // copy folder

@@ -31,10 +31,7 @@ export const sortFolders = (folders: IDictionary<TaskFolder>): TaskFolder[] =>
         else if (b.label === constants.USER_TASKS_LABEL) {
             return 1;
         }
-        if (a.label && b.label) {
-            if (!configuration.get<boolean>("sortProjectFoldersAlpha")) {
-                return -1;
-            }
+        if (a.label && b.label && configuration.get<boolean>("sortProjectFoldersAlpha")) {
             return a.label.toString().localeCompare(b.label.toString());
         }
         return 0;

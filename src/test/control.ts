@@ -91,8 +91,11 @@ export const testControl: ITestControl =
             globEvent: 1920,
             groupingEvent: 1575,
             pathToProgramsEvent: 705,
+            showHideSpecialFolder: 430,
+            showHideUserTasks: 1550,
             specialFolderEvent: 455,
-            readEvent: 25
+            readEvent: 25,
+            sortingEvent: 1500
         },
         excludeCommand: 2330,
         explorerViewStartup: 21000,
@@ -127,14 +130,13 @@ export const testControl: ITestControl =
         runCommand: 8610,
         runPauseCommand: 2485,
         runStopCommand: 2505,
-        showHideSpecialFolder: 430,
         storageRead: 50,
         storageUpdate: 50,
         taskCommand: 1575,
         taskCommandStartupMax: 4950,
         taskProviderReadUri: 100,
         tasks: {
-            antParser: 840,
+            antParser: 860,
             antTask: 8910,
             antTaskWithAnsicon: 8940,
             bashScript: 3990,
@@ -172,7 +174,10 @@ export const testControl: ITestControl =
             enableEvent: 150,
             globEvent: 120,
             groupingEvent: 110,
-            registerExplorerEvent: 160
+            registerExplorerEvent: 160,
+            showHideSpecialFolder: 100,
+            showHideUserTasks: 125,
+            sortingEvent: 125
         },
         explorerViewStartup: 3000,
         focusCommand: 250,
@@ -288,8 +293,11 @@ export interface ITestControl
             globEvent: number;
             groupingEvent: number;
             pathToProgramsEvent: number;
-            specialFolderEvent: number;
             readEvent: number;
+            showHideSpecialFolder: number;
+            showHideUserTasks: number;
+            sortingEvent: number;
+            specialFolderEvent: number;
         };
         excludeCommand: number;
         explorerViewStartup: number;
@@ -327,7 +335,6 @@ export interface ITestControl
         runCommand: number;
         runPauseCommand: number;
         runStopCommand: number;
-        showHideSpecialFolder: number;
         storageRead: number;
         storageUpdate: number;
         taskCommand: number;
@@ -373,6 +380,9 @@ export interface ITestControl
             globEvent: number;
             groupingEvent: number;
             registerExplorerEvent: number;
+            showHideSpecialFolder: number;
+            showHideUserTasks: number;
+            sortingEvent: number;
         };
         explorerViewStartup: number;
         focusCommand: number;
