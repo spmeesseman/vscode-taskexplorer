@@ -2,9 +2,9 @@
 
 import * as util from "./utils/utils";
 import log from "./log/log";
-import { join } from "path";
+// import { join } from "path";
 import { storage } from "./utils/storage";
-import { findFiles, numFilesInDirectory } from "./utils/fs";
+// import { findFiles, numFilesInDirectory } from "./utils/fs";
 import { configuration } from "./utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { IDictionary, ICacheItem, ITaskExplorerApi } from "../interface";
@@ -417,15 +417,15 @@ const finishBuild = () =>
 };
 
 
-/**
- * @method getExcludesPatternGlob
- * @since 3.0.0
- */
-function getExcludesPatternGlob()
-{
-    const excludes: string[] = configuration.get("exclude");
-    return [ "**/node_modules/**", "**/work/**", ...excludes ];
-}
+// /**
+//  * @method getExcludesPatternGlob
+//  * @since 3.0.0
+//  */
+// function getExcludesPatternGlob()
+// {
+//     const excludes: string[] = configuration.get("exclude");
+//     return [ "**/node_modules/**", "**/work/**", ...excludes ];
+// }
 
 
 function getExcludesPatternVsc(folder: string | WorkspaceFolder): RelativePattern
