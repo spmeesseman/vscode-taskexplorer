@@ -42,10 +42,10 @@ function createDirWatcher(context: ExtensionContext)
     if (workspace.workspaceFolders)
     {
         dirWatcher.watcher = workspace.createFileSystemWatcher(getDirWatchGlob(workspace.workspaceFolders));
-        dirWatcher.onDidCreate = dirWatcher.watcher.onDidCreate(async (e) => { await onDirCreate(e); }, null);
+        // dirWatcher.onDidCreate = dirWatcher.watcher.onDidCreate(async (e) => { await onDirCreate(e); }, null);
         dirWatcher.onDidDelete = dirWatcher.watcher.onDidDelete(async (e) => { await onDirDelete(e); }, null);
 
-        context.subscriptions.push(dirWatcher.onDidCreate);
+        // context.subscriptions.push(dirWatcher.onDidCreate);
         context.subscriptions.push(dirWatcher.onDidDelete);
         context.subscriptions.push(dirWatcher.watcher);
     }
@@ -127,24 +127,24 @@ function getDirWatchGlob(wsFolders: readonly WorkspaceFolder[])
 export const isProcessingFsEvent = () => processingFsEvent;
 
 
-async function onDirCreate(uri: Uri)
-{
-    if (isDirectory(uri.fsPath) && !util.isExcluded(uri.fsPath))
-    {
-        const wsf = workspace.getWorkspaceFolder(uri);
-        /* istanbul ignore else */
-        if (!wsf || wsf.uri.fsPath !== uri.fsPath)
-        {
-            if (processingFsEvent) {
-                eventQueue.push({ fn: _procDirCreateEvent, args: [ uri, "   " ] });
-            }
-            else {
-                processingFsEvent = true;
-                await _procDirCreateEvent(uri, "");
-            }
-        }
-    }
-}
+// async function onDirCreate(uri: Uri)
+// {
+//     if (isDirectory(uri.fsPath) && !util.isExcluded(uri.fsPath))
+//     {
+//         const wsf = workspace.getWorkspaceFolder(uri);
+//         /* istanbul ignore else */
+//         if (!wsf || wsf.uri.fsPath !== uri.fsPath)
+//         {
+//             if (processingFsEvent) {
+//                 eventQueue.push({ fn: _procDirCreateEvent, args: [ uri, "   " ] });
+//             }
+//             else {
+//                 processingFsEvent = true;
+//                 await _procDirCreateEvent(uri, "");
+//             }
+//         }
+//     }
+// }
 
 
 async function onDirDelete(uri: Uri)
@@ -166,6 +166,81 @@ async function onDirDelete(uri: Uri)
         }
     }
 }
+
+
+const onFileChange = async(taskType: string, uri: Uri) =>
+{
+    if (!util.isExcluded(uri.fsPath))
+    {
+        const e = {
+            fn: _procFileChangeEvent,
+            args: [ taskType, uri, "   " ],
+            event: "modify file",
+            timestamp: Date.now(),
+            fsPath: uri.fsPath
+        };
+        if (!processingFsEvent)
+        {
+            currentEvent = e;
+            processingFsEvent = true;
+            await _procFileChangeEvent(taskType, uri, "");
+        }
+        else /* istanbul ignore next */if (eventNeedsProcessing("modify file", uri))
+        {
+            eventQueue.push(e);
+        }
+    }
+};
+
+
+const onFileCreate = async(taskType: string, uri: Uri) =>
+{
+    if (!util.isExcluded(uri.fsPath))
+    {
+        const e = {
+            fn: _procFileCreateEvent,
+            args: [ taskType, uri, "   " ],
+            event: "create file",
+            timestamp: Date.now(),
+            fsPath: uri.fsPath
+        };
+        if (!processingFsEvent)
+        {
+            currentEvent = e;
+            processingFsEvent = true;
+            await _procFileCreateEvent(taskType, uri, "");
+        }
+        else /* istanbul ignore if */if (eventNeedsProcessing("create file", uri))
+        {
+            eventQueue.push(e);
+        }
+    }
+};
+
+
+const onFileDelete = async(taskType: string, uri: Uri) =>
+{
+    if (!util.isExcluded(uri.fsPath))
+    {
+        const e = {
+            fn: _procFileDeleteEvent,
+            args: [ taskType, uri, "   " ],
+            event: "delete file",
+            timestamp: Date.now(),
+            fsPath: uri.fsPath
+        };
+        if (!processingFsEvent)
+        {
+            currentEvent = e;
+            processingFsEvent = true;
+            await _procFileDeleteEvent(taskType, uri, "");
+        }
+        else if (eventNeedsProcessing("delete file", uri))
+        {
+            eventQueue.push(e);
+        }
+    }
+};
 
 
 // Note:  Exported for testsApi
@@ -199,16 +274,23 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     // cache so that the tree reload is much quicker, especially in large workspaces.  We'll do
     // it regardless of the 'enablePersistentFileCaching' settings.
     //
-    /* istanbul ignore if */ /* istanbul ignore else */
+    /* istanbul ignore next */
     if (rootPath !== workspace.rootPath)
     {
+        /* istanbul ignore next */
         log.write("   workspace deprecated 'root path' has changed", 1);
+        /* istanbul ignore next */
         log.values(1, "   ", [[ "new root path", workspace.rootPath ], [ "previous root path", rootPath ]]);
+        /* istanbul ignore next */
         if (rootPath === undefined) {
+            /* istanbul ignore next */
             log.write("   changing to a multi-root workspace");
         }
+        /* istanbul ignore next */
         log.write("   vscode will deactivate and re-activate the extension", 1);
+        /* istanbul ignore next */
         rootPath = workspace.rootPath;
+        /* istanbul ignore next */
         storage.update2Sync("lastWsRootPathChange", Date.now());
     }
 
@@ -316,87 +398,16 @@ export const registerFileWatcher = async(context: ExtensionContext, taskType: st
         // app-publisher and maven only get watched for invalid syntax.  they always have same # of tasks for a file.
         //
         const ignoreModify = util.isScriptType(taskType) || taskType === "apppublisher" || taskType === "maven" || taskType === "tsc";
-
         if (!watcher) {
             watcher = workspace.createFileSystemWatcher(util.getGlobPattern(taskType));
             watchers[taskType] = watcher;
             context.subscriptions.push(watcher);
         }
-
-        if (!ignoreModify)
-        {
-            watcherDisposables[taskType] = watcher.onDidChange(async uri =>
-            {
-                if (!util.isExcluded(uri.fsPath))
-                {
-                    const e = {
-                        fn: _procFileChangeEvent,
-                        args: [ taskType, uri, "   " ],
-                        event: "modify file",
-                        timestamp: Date.now(),
-                        fsPath: uri.fsPath
-                    };
-                    if (!processingFsEvent)
-                    {
-                        currentEvent = e;
-                        processingFsEvent = true;
-                        await _procFileChangeEvent(taskType, uri, "");
-                    }
-                    else if (eventNeedsProcessing("modify file", uri))
-                    {
-                        eventQueue.push(e);
-                    }
-                }
-            });
+        watcherDisposables[taskType] = watcher.onDidDelete(async uri => onFileDelete(taskType, uri));
+        watcherDisposables[taskType] = watcher.onDidCreate(async uri => onFileCreate(taskType, uri));
+        if (!ignoreModify) {
+            watcherDisposables[taskType] = watcher.onDidChange(async uri => onFileChange(taskType, uri));
         }
-
-        watcherDisposables[taskType] = watcher.onDidDelete(async uri =>
-        {
-            if (!util.isExcluded(uri.fsPath))
-            {
-                const e = {
-                    fn: _procFileDeleteEvent,
-                    args: [ taskType, uri, "   " ],
-                    event: "delete file",
-                    timestamp: Date.now(),
-                    fsPath: uri.fsPath
-                };
-                if (!processingFsEvent)
-                {
-                    currentEvent = e;
-                    processingFsEvent = true;
-                    await _procFileDeleteEvent(taskType, uri, "");
-                }
-                else if (eventNeedsProcessing("delete file", uri))
-                {
-                    eventQueue.push(e);
-                }
-            }
-        });
-
-        watcherDisposables[taskType] = watcher.onDidCreate(async uri =>
-        {
-            if (!util.isExcluded(uri.fsPath))
-            {
-                const e = {
-                    fn: _procFileCreateEvent,
-                    args: [ taskType, uri, "   " ],
-                    event: "create file",
-                    timestamp: Date.now(),
-                    fsPath: uri.fsPath
-                };
-                if (!processingFsEvent)
-                {
-                    currentEvent = e;
-                    processingFsEvent = true;
-                    await _procFileCreateEvent(taskType, uri, "");
-                }
-                else if (eventNeedsProcessing("create file", uri))
-                {
-                    eventQueue.push(e);
-                }
-            }
-        });
     }
 
     log.methodDone("register file watcher for task type '" + taskType + "'", 1, logPad);
@@ -438,19 +449,19 @@ export const registerFileWatchers = async(context: ExtensionContext, api: ITaskE
 };
 
 
-const _procDirCreateEvent = async(uri: Uri, logPad: string) =>
-{
-    try
-    {   log.methodStart("[event] directory 'create'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
-        const numFilesFound = await cache.addFolder(uri, logPad + "   ");
-        if (numFilesFound > 0) {
-            await refreshTree(teApi, undefined, uri, logPad + "   ");
-        }
-        log.methodDone("[event] directory 'create'", 1, logPad);
-    }
-    catch (e) {}
-    finally { processQueue(); }
-};
+// const _procDirCreateEvent = async(uri: Uri, logPad: string) =>
+// {
+//     try
+//     {   log.methodStart("[event] directory 'create'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
+//         const numFilesFound = await cache.addFolder(uri, logPad + "   ");
+//         if (numFilesFound > 0) {
+//             await refreshTree(teApi, undefined, uri, logPad + "   ");
+//         }
+//         log.methodDone("[event] directory 'create'", 1, logPad);
+//     }
+//     catch (e) {}
+//     finally { processQueue(); }
+// };
 
 
 const _procDirDeleteEvent = async(uri: Uri, logPad: string) =>
