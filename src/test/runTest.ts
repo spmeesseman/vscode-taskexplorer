@@ -4,7 +4,7 @@ import * as path from "path";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { runTests } from "@vscode/test-electron";
 import { testControl } from "./control";
-import { copyFile, deleteDir, findFiles, getDateModified, pathExists, writeFile } from "../lib/utils/fs";
+import { copyFile, deleteDir, writeFile } from "../lib/utils/fs";
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import { runTests } from "vscode-test";
 
@@ -65,38 +65,39 @@ async function main(args: string[])
     {   try //
         {   // Log file - whats a good way to open it in the active vscode instance???
             //
-            let logFile: string | undefined;
-            if (testControl.log.enabled && testControl.log.file && testControl.log.openFileOnFinish)
-            {
-                let lastDateModified: Date | undefined;
-                const tzOffset = (new Date()).getTimezoneOffset() * 60000,
-                    dateTag = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T")[0].replace(/[\-]/g, ""),
-                    vscodeLogPath = path.join(vscodeTestUserDataPath, "logs");
-                const paths = await findFiles(`**/spmeesseman.vscode-taskexplorer/taskexplorer-${dateTag}.log`,
-                {
-                    nocase: false,
-                    ignore: "**/node_modules/**",
-                    cwd: vscodeLogPath
-                });
-                for (const relPath of paths)
-                {
-                    const fullPath = path.join(vscodeLogPath, relPath),
-                        dateModified = await getDateModified(fullPath);
-                    if (dateModified && (!lastDateModified || dateModified.getTime() > lastDateModified.getTime()))
-                    {
-                        logFile = fullPath;
-                        lastDateModified = dateModified;
-                    }
-                }
-                if (logFile) {
-
-                }
-            }
+            // let logFile: string | undefined;
+            // if (testControl.log.enabled && testControl.log.file && testControl.log.openFileOnFinish)
+            // {
+            //     let lastDateModified: Date | undefined;
+            //     const tzOffset = (new Date()).getTimezoneOffset() * 60000,
+            //         dateTag = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).split("T")[0].replace(/[\-]/g, ""),
+            //         vscodeLogPath = path.join(vscodeTestUserDataPath, "logs");
+            //     const paths = await findFiles(`**/spmeesseman.vscode-taskexplorer/taskexplorer-${dateTag}.log`,
+            //     {
+            //         nocase: false,
+            //         ignore: "**/node_modules/**",
+            //         cwd: vscodeLogPath
+            //     });
+            //     for (const relPath of paths)
+            //     {
+            //         const fullPath = path.join(vscodeLogPath, relPath),
+            //             dateModified = await getDateModified(fullPath);
+            //         if (dateModified && (!lastDateModified || dateModified.getTime() > lastDateModified.getTime()))
+            //         {
+            //             logFile = fullPath;
+            //             lastDateModified = dateModified;
+            //         }
+            //     }
+            //     if (logFile) {
+            //
+            //     }
+            // }
             //
             // Restore
             //
             console.log("restore package.json activation event");
-            execSync(`enable-full-coverage.sh --off${logFile ? ` --logfile "${logFile}` : ""}"`, { cwd: "tools" });
+            // execSync(`enable-full-coverage.sh --off${logFile ? ` --logfile "${logFile}` : ""}"`, { cwd: "tools" });
+            execSync("enable-full-coverage.sh --off", { cwd: "tools" });
             // if (settingsJsonOrig && !testControl.keepSettingsFileChanges) {
             if (!testControl.keepSettingsFileChanges)
             {

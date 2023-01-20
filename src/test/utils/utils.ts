@@ -69,6 +69,7 @@ export const activate = async (instance?: Mocha.Context) =>
             tc.tests.suiteResults[suiteKey] = {
                 timeStarted: Date.now(),
                 numTests: suite.tests.length,
+                successCount: 0,
                 suiteName: getSuiteFriendlyName(suite.title)
             };
         }
@@ -241,25 +242,30 @@ export const executeTeCommand = async (command: string, minWait?: number, maxWai
 export const executeTeCommand2 = (command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand(command, minWait, maxWait, ...args);
 
 
-export const exitRollingCount = (expectedCount: number, successCount: number) =>
+export const exitRollingCount = (instance: Mocha.Context) =>
 {
 
-    if (hasRollingCountError) {
-        const msg = `skip test ${expectedCount} due to rolling success count failure`;
-        console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
-        return hasRollingCountError;
+    const mTest = instance.test as Mocha.Runnable,
+          suite = mTest.parent as Mocha.Suite,
+          suiteKey = getSuiteKey(suite.title),
+          suiteResults = tc.tests.suiteResults[suiteKey],
+          testIdx = suite.tests.findIndex(t => t.title === mTest.title && !t.isFailed() && !t.isPassed());
+
+    try
+    {
+        expect(suiteResults.successCount).to.be.equal(testIdx);
+        ++suiteResults.successCount;
     }
-    try {
-        expect(successCount).to.be.equal(expectedCount);
-    }
-    catch (e) {
-        const msg = "skip test, rolling success count failure " + expectedCount;
+    catch (e: any)
+    {
+        const msg = `skip test ${testIdx} due to rolling success count failure`;
         console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
         hasRollingCountError = true;
-        // if (tc.tests.numTestsFail === 0) {
-        //     throw new Error("Rolling count error but no failed tests recorded, previous text failed but passed?");
-        // }
+        if (suite.tests.filter(t => t.isFailed).length === 0) {
+            throw new Error("Rolling count error: " + e.message);
+        }
     }
+
     return hasRollingCountError;
 };
 

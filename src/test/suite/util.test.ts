@@ -51,7 +51,7 @@ suite("Util Tests", () =>
 
     test("Hide / Show Output Window", async function()
     {
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(this)) return;
         await executeTeCommand("showOutput", 10, 50, false);
         await executeTeCommand("showOutput", 10, 50, true);
         ++successCount;
@@ -60,7 +60,7 @@ suite("Util Tests", () =>
 
     test("Logging (Error)", async function()
     {
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 2) + 150);
 
         log.error(`        ${creator}.${extension}`);
@@ -136,7 +136,7 @@ suite("Util Tests", () =>
 
 	test("Logging (File)", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 7) + 50);
 		await executeSettingsUpdate("logging.enableFile", false);
 		await executeSettingsUpdate("logging.enableFile", true);
@@ -181,7 +181,7 @@ suite("Util Tests", () =>
 
     test("Logging (Method)", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 2) + 50);
 
 		log.methodStart("methodName");
@@ -212,7 +212,7 @@ suite("Util Tests", () =>
 
 	test("Logging (Output Window)", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 2) + 50);
 		await executeSettingsUpdate("logging.enableOutputWindow", true);
 		log.write("Test1", 1);
@@ -239,7 +239,7 @@ suite("Util Tests", () =>
     {
 		this.slow((testControl.slowTime.config.event * 2) + 50);
 
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(this)) return;
 		log.dequeue("queueTestId");
 		log.write("test1", 1, "", "queueTestId");
 		log.write("test2", 1, "", "queueTestId");
@@ -270,7 +270,7 @@ suite("Util Tests", () =>
 
     test("Logging (Value)", async function()
     {
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 4) + 75);
         log.value(`        ${creator}.${extension}`, null);
         log.value(`        ${creator}.${extension}`, undefined);
@@ -329,7 +329,7 @@ suite("Util Tests", () =>
 
     test("Logging (Warn)", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 2) + 50);
 		log.warn("test1");
 		log.warn("test2");
@@ -355,7 +355,7 @@ suite("Util Tests", () =>
 
     test("Logging (Write)", async function()
     {
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 2) + 50);
 
         log.blank();
@@ -405,7 +405,7 @@ suite("Util Tests", () =>
 
     test("Miscellaneous", async function()
     {
-        if (exitRollingCount(9, successCount)) return;
+        if (exitRollingCount(this)) return;
         new InitScripts(); // it won't cover since no focus the view until after a bunch of test suites
         teApi.testsApi.explorer.isVisible();
         await util.getInstallPath();
@@ -415,7 +415,7 @@ suite("Util Tests", () =>
 
     test("Utilities", async function()
     {
-        if (exitRollingCount(10, successCount)) return;
+        if (exitRollingCount(this)) return;
 
         util.timeout(10);
 
@@ -506,7 +506,7 @@ suite("Util Tests", () =>
 
 	test("Data Paths", async function()
 	{
-        if (exitRollingCount(11, successCount)) return;
+        if (exitRollingCount(this)) return;
 		//
 		// The fs module on dev test will run through win32 path get.  Simulate
 		// path get here for linux and mac for increased coverage since we're only
@@ -648,7 +648,7 @@ suite("Util Tests", () =>
 
 	test("File System", async function()
     {
-        if (exitRollingCount(12, successCount)) return;
+        if (exitRollingCount(this)) return;
 		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
 		await afs.createDir(__dirname);
 		try {
@@ -682,7 +682,7 @@ suite("Util Tests", () =>
 
     test("Storage", async function()
     {
-        if (exitRollingCount(13, successCount)) return;
+        if (exitRollingCount(this)) return;
         if (teApi.testsApi.storage)
         {
             await teApi.testsApi.storage.update("TEST_KEY", "This is a test");

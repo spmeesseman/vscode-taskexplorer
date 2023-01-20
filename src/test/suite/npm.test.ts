@@ -49,7 +49,7 @@ suite("NPM Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (utils.exitRollingCount(0, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         if (utils.needsTreeBuild()) {
             await utils.focusExplorerView(this);
         }
@@ -59,7 +59,7 @@ suite("NPM Tests", () =>
 
     test("Create Package File (package.json)", async function()
     {
-        if (utils.exitRollingCount(1, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + (tc.waitTime.fs.createEvent * 2));
         // tagLog("NPM", "Create Package File (1: package.json)");
         //
@@ -88,7 +88,7 @@ suite("NPM Tests", () =>
 
     test("Verify NPM Task Count", async function()
     {   // npm task provider is slower than shit on a turtle
-        if (utils.exitRollingCount(2, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verifyNpm + tc.slowTime.min);
         await utils.verifyTaskCount(testsName, startTaskCount + 5, 2);
         await utils.waitForTeIdle(tc.waitTime.min);
@@ -98,7 +98,7 @@ suite("NPM Tests", () =>
 
     test("Get NPM Task Items", async function()
     {   // npm task provider is slower than shit on a turtle
-        if (utils.exitRollingCount(3, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.getTreeTasksNpm);
         // tagLog("NPM", "Get NPM Task Items [Start]");
         //
@@ -117,7 +117,7 @@ suite("NPM Tests", () =>
 
     test("Get Package Manager", function()
     {
-        if (utils.exitRollingCount(4, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.eventFast);
         getPackageManager();
         ++successCount;
@@ -126,7 +126,7 @@ suite("NPM Tests", () =>
 
     test("Document Position", async function()
     {
-        if (utils.exitRollingCount(5, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.findTaskPosition + (tc.slowTime.findTaskPositionDocOpen * (npmTaskItems.length - 1)) + (tc.slowTime.commandFast * npmTaskItems.length));
         for (const taskItem of npmTaskItems) {
             await utils.executeTeCommand2("open", [ taskItem ], tc.waitTime.commandFast);
@@ -137,7 +137,7 @@ suite("NPM Tests", () =>
 
     test("Install", async function()
     {
-        if (utils.exitRollingCount(6, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.tasks.npmInstallCommand);
         const exec = await utils.executeTeCommand2(
             "runInstall", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
@@ -149,7 +149,7 @@ suite("NPM Tests", () =>
 
     test("Update", async function()
     {
-        if (utils.exitRollingCount(7, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.tasks.npmCommand);
         const exec = await utils.executeTeCommand2(
             "runUpdate", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
@@ -161,7 +161,7 @@ suite("NPM Tests", () =>
 
     test("Update Specified Package", async function()
     {
-        if (utils.exitRollingCount(8, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.tasks.npmCommandPkg);
         utils.overrideNextShowInputBox("@spmeesseman/app-publisher");
         const exec = await utils.executeTeCommand2(
@@ -174,7 +174,7 @@ suite("NPM Tests", () =>
 
     test("Audit", async function()
     {
-        if (utils.exitRollingCount(9, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.tasks.npmCommand);
         const exec = await utils.executeTeCommand2(
             "runAudit", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
@@ -186,7 +186,7 @@ suite("NPM Tests", () =>
 
     test("Audit Fix", async function()
     {
-        if (utils.exitRollingCount(10, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.tasks.npmCommand);
         const exec = await utils.executeTeCommand2(
             "runAuditFix", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin

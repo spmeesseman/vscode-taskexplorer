@@ -53,7 +53,7 @@ suite("Ant Tests", () =>
 
     test("Build Tree", async function()
     {
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(this)) return;
         await treeUtils.refresh(this);
         ++successCount;
     });
@@ -61,7 +61,7 @@ suite("Ant Tests", () =>
 
     test("Start", async function()
     {
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verifyFirstCall);
         await verifyTaskCount("ant", 3);
         ++successCount;
@@ -70,7 +70,7 @@ suite("Ant Tests", () =>
 
     test("Document Position", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(this)) return;
         const xml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
@@ -84,7 +84,7 @@ suite("Ant Tests", () =>
 
     test("Disable", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.ant", false);
         await verifyTaskCount("ant", 0);
@@ -94,7 +94,7 @@ suite("Ant Tests", () =>
 
     test("Re-enable", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.ant", true);
         await verifyTaskCount("ant", 3);
@@ -104,7 +104,7 @@ suite("Ant Tests", () =>
 
     test("Enable Ansicon", async function()
     {
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.event * 5) + (tc.slowTime.commandFast * 4));
         await executeSettingsUpdate("pathToPrograms.ansicon", "ansicon\\x64\\ansicon.exe");
         overrideNextShowInfoBox(undefined);
@@ -122,7 +122,7 @@ suite("Ant Tests", () =>
 
     test("Disable Ansicon", async function()
     {
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.event * 3) + (tc.slowTime.commandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
         await executeSettingsUpdate("visual.enableAnsiconForAnt", false);
@@ -135,7 +135,7 @@ suite("Ant Tests", () =>
 
     test("Ansicon Path", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + tc.slowTime.commandFast);
         await executeSettingsUpdate("pathToPrograms.ansicon", undefined);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -146,7 +146,7 @@ suite("Ant Tests", () =>
 
     test("Win32 Create Task", async function()
     {
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.event * 2) + (tc.slowTime.commandFast * 2));
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -158,7 +158,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser", async function()
     {
-        if (exitRollingCount(9, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.config.pathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2, false, false);
@@ -168,7 +168,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Default", async function()
     {
-        if (exitRollingCount(10, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -186,7 +186,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser Invalid Target", async function()
     {
-        if (exitRollingCount(11, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -206,7 +206,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Target", async function()
     {
-        if (exitRollingCount(12, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -223,7 +223,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser No Project", async function()
     {
-        if (exitRollingCount(13, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
@@ -240,7 +240,7 @@ suite("Ant Tests", () =>
 
     test("Ant Parser Invalid Xml", async function()
     {
-        if (exitRollingCount(14, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,

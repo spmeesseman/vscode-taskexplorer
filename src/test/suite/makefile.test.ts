@@ -48,7 +48,7 @@ suite("Makefile Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(this)) return;
         if (needsTreeBuild()) {
             await focusExplorerView(this);
         }
@@ -58,7 +58,7 @@ suite("Makefile Tests", () =>
 
     test("Document Position", async function()
     {
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(this)) return;
         // provider.readTasks();
         let index = provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
@@ -83,7 +83,7 @@ suite("Makefile Tests", () =>
 
     test("Path to make", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.pathToProgramsEvent * 4);
         const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
               filePath = getWsPath(join(testsName, "makefile")),
@@ -107,7 +107,7 @@ suite("Makefile Tests", () =>
 
     test("Start", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount);
         successCount++;
@@ -116,7 +116,7 @@ suite("Makefile Tests", () =>
 
     test("Disable", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, false, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
@@ -126,7 +126,7 @@ suite("Makefile Tests", () =>
 
     test("Re-enable", async function()
     {
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -136,7 +136,7 @@ suite("Makefile Tests", () =>
 
     test("Create File", async function()
     {
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
@@ -174,7 +174,7 @@ suite("Makefile Tests", () =>
 
     test("Delete File", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.waitTime.fs.deleteFolderEvent + tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
@@ -187,7 +187,7 @@ suite("Makefile Tests", () =>
 
     test("Re-create File", async function()
     {
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
@@ -224,7 +224,7 @@ suite("Makefile Tests", () =>
 
     test("Delete Folder", async function()
     {
-        if (exitRollingCount(9, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);

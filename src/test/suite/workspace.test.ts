@@ -34,7 +34,7 @@ suite("Workspace / VSCode Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(this)) return;
         if (needsTreeBuild()) {
             await focusExplorerView(this);
         }
@@ -44,7 +44,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Show VSCode Tasks Marked Hidden", async function()
     {
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.event + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("showHiddenWsTasks", true);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
@@ -54,7 +54,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Hide VSCode Tasks Marked Hidden", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("showHiddenWsTasks", false);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount - 1);
@@ -64,7 +64,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Disable User Tasks", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.showHideUserTasks); // + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("specialFolders.showUserTasks", false, testControl.waitTime.config.showHideUserTasks);
         // TODO - I don't think verifyTaskCountByTree() returns User tasks.
@@ -75,7 +75,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Disable Workspace Tasks", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.workspace", false);
         await treeUtils.verifyTaskCountByTree(testsName, 0);
@@ -85,7 +85,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Re-enable Workspace Tasks", async function()
     {
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEventWorkspace + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.workspace", true);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount - 1);
@@ -95,7 +95,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Re-show VSCode Tasks Marked Hidden", async function()
     {
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("showHiddenWsTasks", true);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
@@ -105,7 +105,7 @@ suite("Workspace / VSCode Tests", () =>
 
     test("Re-enable User Tasks", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.showHideUserTasks + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("specialFolders.showUserTasks", true, testControl.waitTime.config.showHideUserTasks);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);

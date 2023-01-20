@@ -21,7 +21,7 @@ let fsApi: IFilesystemApi;
 let provider: NsisTaskProvider;
 let dirName: string;
 let fileUri: Uri;
-let successCount = 0;
+let successCount = -1;
 
 
 suite("Nullsoft NSIS Tests", () =>
@@ -44,7 +44,7 @@ suite("Nullsoft NSIS Tests", () =>
 
     test("Build Tree", async function()
     {
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(this)) return;
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
@@ -55,7 +55,7 @@ suite("Nullsoft NSIS Tests", () =>
 
     test("Document Position", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(this)) return;
         // provider.getDocumentPosition(undefined, undefined);
         // provider.getDocumentPosition("test", undefined);
         // provider.getDocumentPosition(undefined, "test");
@@ -65,7 +65,7 @@ suite("Nullsoft NSIS Tests", () =>
 
     test("Start", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.taskCount.verify + testControl.waitTime.min);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
@@ -75,7 +75,7 @@ suite("Nullsoft NSIS Tests", () =>
 
     test("Disable", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.nsis", false);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
@@ -87,7 +87,7 @@ suite("Nullsoft NSIS Tests", () =>
 
     test("Re-enable", async function()
     {
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
         // await teApi.config.updateWs("enabledTasks.nsis", true);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
@@ -99,7 +99,7 @@ suite("Nullsoft NSIS Tests", () =>
 
     test("Create File", async function()
     {
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.createEvent + testControl.waitTime.min);
         // if (!(await fsApi.pathExists(dirName))) {
         //     await fsApi.createDir(dirName);
@@ -120,7 +120,7 @@ suite("Nullsoft NSIS Tests", () =>
 
     test("Delete File", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.deleteEvent + testControl.waitTime.min);
         // await fsApi.deleteFile(fileUri.fsPath);
         // await fsApi.deleteDir(dirName);

@@ -45,7 +45,7 @@ suite("Info Report Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(this)) return;
 		if (needsTreeBuild()) {
             await focusExplorerView(this);
 		}
@@ -55,7 +55,7 @@ suite("Info Report Tests", () =>
 
 	test("Open Report Page (Single Project No User Tasks)", async function()
 	{
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.showHideUserTasks + 100);
 		await executeSettingsUpdate("specialFolders.showUserTasks", false, testControl.waitTime.config.showHideUserTasks);
 		const panel = await executeTeCommand2("viewReport", [ projectUri ], testControl.waitTime.viewReport) as WebviewPanel;
@@ -68,7 +68,7 @@ suite("Info Report Tests", () =>
 
 	test("Open Report Page (Single Project w/ User Tasks)", async function()
 	{
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.showHideUserTasks + 100);
 		await executeSettingsUpdate("specialFolders.showUserTasks", true, testControl.waitTime.config.showHideUserTasks);
 	    const panel = await executeTeCommand2("viewReport", [ projectUri, "", 5 ], testControl.waitTime.viewReport) as WebviewPanel;
@@ -81,7 +81,7 @@ suite("Info Report Tests", () =>
 
 	test("Open Report Page (All Projects)", async function()
 	{
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 100);
 	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport) as WebviewPanel;
 		await sleep(100);
@@ -93,7 +93,7 @@ suite("Info Report Tests", () =>
 
 	test("Open Report Page (All Projects, Yarn Enabled)", async function()
 	{
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.readEvent  + (testControl.slowTime.config.eventFast * 2) + 100);
 		const pkgMgr = teApi.config.getVs<string>("npm.packageManager");
         await teApi.config.updateVsWs("npm.packageManager", "yarn");
@@ -110,7 +110,7 @@ suite("Info Report Tests", () =>
 
 	test("View License Info from Webview", async function()
 	{
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgrOpenPageWithDetail + 500);
 	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport) as WebviewPanel;
 		await panel.webview.postMessage({ command: "viewLicense" });
@@ -123,7 +123,7 @@ suite("Info Report Tests", () =>
 
 	test("Open Report Page (Views Both Disabled)", async function()
 	{
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 100);
 		const oExplorer = teApi.explorer;
 		const oSidebar = teApi.sidebar;
@@ -141,7 +141,7 @@ suite("Info Report Tests", () =>
 
 	test("Open Report Page (Sidebar Enabled, Explorer Disabled)", async function()
 	{
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 100);
 		const oExplorer = teApi.explorer;
 		const oSidebar = teApi.sidebar;
@@ -159,7 +159,7 @@ suite("Info Report Tests", () =>
 
 	test("View License Info from Webview (Views Both Disabled)", async function()
 	{
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgrOpenPageWithDetail + 500);
 		const oExplorer = teApi.explorer;
 		const oSidebar = teApi.sidebar;
@@ -178,7 +178,7 @@ suite("Info Report Tests", () =>
 
 	test("View License Info from Webview (Sidebar Enabled, Explorer Disabled)", async function()
 	{
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgrOpenPageWithDetail + 500);
 		const oExplorer = teApi.explorer;
 		const oSidebar = teApi.sidebar;

@@ -54,7 +54,7 @@ suite("Bash Tests", () =>
 
     test("Build Tree", async function()
     {
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(this)) return;
         await treeUtils.refresh(this);
         successCount++;
     });
@@ -62,7 +62,7 @@ suite("Bash Tests", () =>
 
     test("Document Position", async function()
     {
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as BashTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
         successCount++;
@@ -71,7 +71,7 @@ suite("Bash Tests", () =>
 
     test("Invalid ScriptProvider Type", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as BashTaskProvider;
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("hello.sh"))),
                "ScriptProvider type should return position 1");
@@ -82,7 +82,7 @@ suite("Bash Tests", () =>
 
     test("Start", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount);
         successCount++;
@@ -91,7 +91,7 @@ suite("Bash Tests", () =>
 
     test("Disable", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
@@ -101,7 +101,7 @@ suite("Bash Tests", () =>
 
     test("Re-enable", async function()
     {
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
@@ -111,7 +111,7 @@ suite("Bash Tests", () =>
 
     test("Create File", async function()
     {
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.createFolderEvent + testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
@@ -124,7 +124,7 @@ suite("Bash Tests", () =>
 
     test("Delete File", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
@@ -137,7 +137,7 @@ suite("Bash Tests", () =>
 
     test("Re-create File", async function()
     {
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
@@ -150,7 +150,7 @@ suite("Bash Tests", () =>
 
     test("Delete Folder", async function()
     {
-        if (exitRollingCount(9, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.deleteFolderEvent + testControl.slowTime.taskCount.verify);
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);

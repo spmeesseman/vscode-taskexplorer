@@ -31,8 +31,6 @@ let batch: TaskItem[];
 let grunt: TaskItem[];
 let taskMap: TaskMap;
 let tempDirsDeleted = false;
-
-
 let successCount = -1;
 
 
@@ -71,7 +69,7 @@ suite("Provider Tests", () =>
 
     test("Create Empty Directories", async function()
     {
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent * 3);
         if (!await fsApi.pathExists(dirName)) {
             await fsApi.createDir(dirName);
@@ -91,7 +89,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree", async function()
     {
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(this)) return;
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
@@ -101,7 +99,7 @@ suite("Provider Tests", () =>
 
     test("Check Existing Bash Task Counts", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.command);
         batch = await treeUtils.getTreeTasks("bash", 1) as TaskItem[];
         ++successCount;
@@ -110,7 +108,7 @@ suite("Provider Tests", () =>
 
     test("Check Existing Batch Task Counts", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.command);
         batch = await treeUtils.getTreeTasks("batch", 2) as TaskItem[];
         ++successCount;
@@ -119,7 +117,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - App Publisher", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent);
         await setupAppPublisher();
         ++successCount;
@@ -128,7 +126,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Ant", async function()
     {
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 5);
         await setupAnt();
         ++successCount;
@@ -137,7 +135,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Bash", async function()
     {
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent);
         await setupBash();
         ++successCount;
@@ -146,7 +144,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Batch", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 3);
         await setupBatch();
         ++successCount;
@@ -155,7 +153,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Gradle", async function()
     {
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 3);
         await setupGradle();
         ++successCount;
@@ -164,7 +162,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Grunt", async function()
     {
-        if (exitRollingCount(9, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 4);
         await setupGrunt();
         ++successCount;
@@ -173,7 +171,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Gulp", async function()
     {
-        if (exitRollingCount(10, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 5);
         await setupGulp();
         ++successCount;
@@ -182,7 +180,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Makefile", async function()
     {
-        if (exitRollingCount(11, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 3);
         await setupMakefile();
         ++successCount;
@@ -191,7 +189,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Maven", async function()
     {
-        if (exitRollingCount(12, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent);
         await setupMaven();
         ++successCount;
@@ -200,7 +198,7 @@ suite("Provider Tests", () =>
 
     test("Create Temporary Task Files - Typescript", async function()
     {
-        if (exitRollingCount(13, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 2);
         await setupTsc();
         ++successCount;
@@ -209,7 +207,7 @@ suite("Provider Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(14, successCount)) return;
+        if (exitRollingCount(this)) return;
         // if (needsTreeBuild()) {
             await focusExplorerView(this);
         // }
@@ -219,7 +217,7 @@ suite("Provider Tests", () =>
 
     test("Enable App-Publisher Tasks (Off by Default)", async function()
     {
-        if (exitRollingCount(15, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.apppublisher", true);
         ++successCount;
@@ -228,7 +226,7 @@ suite("Provider Tests", () =>
 
     test("Enable Gradle Tasks (Off by Default)", async function()
     {
-        if (exitRollingCount(16, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.gradle", true);
         ++successCount;
@@ -237,7 +235,7 @@ suite("Provider Tests", () =>
 
     test("Enable Pipenv Tasks (Off by Default)", async function()
     {
-        if (exitRollingCount(17, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.pipenv", true);
         ++successCount;
@@ -246,7 +244,7 @@ suite("Provider Tests", () =>
 
     test("Enable Maven Tasks (Off by Default)", async function()
     {
-        if (exitRollingCount(18, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.maven", true);
         ++successCount;
@@ -255,7 +253,7 @@ suite("Provider Tests", () =>
 
     test("Enable Python Tasks (Turned Off in Configuration Suite)", async function()
     {
-        if (exitRollingCount(19, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.python", true);
         ++successCount;
@@ -264,7 +262,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree", async function()
     {
-        if (exitRollingCount(20, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.refreshCommand + (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.getTreeTasks * 2));
         await treeUtils.refresh();
         //
@@ -283,7 +281,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations  - Last Tasks Collapsed", async function()
     {
-        if (exitRollingCount(21, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 4) + (tc.slowTime.config.eventFast * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
@@ -308,7 +306,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations - Favorites Collapsed", async function()
     {
-        if (exitRollingCount(22, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 6) + (tc.slowTime.config.eventFast * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
@@ -333,7 +331,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations - Favorites Disabled", async function()
     {
-        if (exitRollingCount(23, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.event * 8) + (tc.slowTime.config.eventFast * 4));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
@@ -360,7 +358,7 @@ suite("Provider Tests", () =>
 
     test("Build Tree Variations - Last Tasks Disabled", async function()
     {
-        if (exitRollingCount(24, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.event * 6) + (tc.slowTime.config.eventFast * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
@@ -385,7 +383,7 @@ suite("Provider Tests", () =>
 
     test("Open Tasks for Edit", async function()
     {
-        if (exitRollingCount(25, successCount)) return;
+        if (exitRollingCount(this)) return;
         let numOpened: number;
         let numFilesOpened: number;
         ({ taskMap, numOpened, numFilesOpened } = await treeUtils.walkTreeItems(undefined, true));
@@ -397,7 +395,7 @@ suite("Provider Tests", () =>
 
     test("Resolve Task", async function()
     {
-        if (exitRollingCount(26, successCount)) return;
+        if (exitRollingCount(this)) return;
         const provider = teApi.providers.batch;
         provider.resolveTask(batch[0].task);
         ++successCount;
@@ -406,7 +404,7 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes - TaskItem", async function()
     {
-        if (exitRollingCount(27, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.config.excludeTasksEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length,
@@ -420,7 +418,7 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes - TaskItem (Script Type)", async function()
     {
-        if (exitRollingCount(28, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.excludeCommand);
         const taskItems = await tasks.fetchTasks({ type: "batch" }),
               scriptCt = taskItems.length,
@@ -433,7 +431,7 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes - TaskFile", async function()
     {
-        if (exitRollingCount(29, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.config.excludesEvent);
         const taskItems = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItems.length;
@@ -448,7 +446,7 @@ suite("Provider Tests", () =>
 
     test("App Publisher Delete / Add", async function()
     {
-        if (exitRollingCount(30, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent + (tc.slowTime.taskCount.verify * 2));
         const file = join(rootPath, ".publishrc.json");
         teApi.utilities.removeFromArray(tempFiles, file);
@@ -463,7 +461,7 @@ suite("Provider Tests", () =>
 
     test("Ant Delete / Add", async function()
     {
-        if (exitRollingCount(31, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(dirName, "build.xml");
         teApi.utilities.removeFromArray(tempFiles, file);
@@ -476,7 +474,7 @@ suite("Provider Tests", () =>
 
     test("Gradle Delete / Add", async function()
     {
-        if (exitRollingCount(32, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(dirName, "build.gradle");
         teApi.utilities.removeFromArray(tempFiles, file);
@@ -489,7 +487,7 @@ suite("Provider Tests", () =>
 
     test("Grunt Delete / Add", async function()
     {
-        if (exitRollingCount(33, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "GRUNTFILE.js");
         teApi.utilities.removeFromArray(tempFiles, file);
@@ -502,7 +500,7 @@ suite("Provider Tests", () =>
 
     test("Gulp Delete / Add", async function()
     {
-        if (exitRollingCount(34, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "gulpfile.js");
         teApi.utilities.removeFromArray(tempFiles, file);
@@ -515,7 +513,7 @@ suite("Provider Tests", () =>
 
     test("Makefile Delete / Add", async function()
     {
-        if (exitRollingCount(35, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent + tc.slowTime.config.event);
         const file = join(rootPath, "Makefile");
         teApi.utilities.removeFromArray(tempFiles, file);
@@ -529,7 +527,7 @@ suite("Provider Tests", () =>
 
     test("Maven Delete / Add", async function()
     {
-        if (exitRollingCount(36, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "pom.xml");
         teApi.utilities.removeFromArray(tempFiles, file);
@@ -542,7 +540,7 @@ suite("Provider Tests", () =>
 
     test("Batch Delete / Add", async function()
     {
-        if (exitRollingCount(37, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "test.bat");
         teApi.utilities.removeFromArray(tempFiles, file);
@@ -555,7 +553,7 @@ suite("Provider Tests", () =>
 
     test("Disable Pipenv (Off by Default)", async function()
     {
-        if (exitRollingCount(38, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.disableEvent);
         await executeSettingsUpdate("enabledTasks.pipenv", false);
         ++successCount;
@@ -564,7 +562,7 @@ suite("Provider Tests", () =>
 
     test("Refresh Tree", async function()
     {
-        if (exitRollingCount(39, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.refreshCommand + (tc.slowTime.config.event * 2));
         await executeSettingsUpdate("specialFolders.expanded.test-files", true);
         await executeTeCommand("refresh", tc.waitTime.refreshCommand);
@@ -575,7 +573,7 @@ suite("Provider Tests", () =>
 
     test("Invalidate Bash Tasks With New Bash Shell Setting", async function()
     {
-        if (exitRollingCount(40, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.build + tc.slowTime.config.event + tc.slowTime.min +
                   (tc.slowTime.refreshCommand* 2) + (tc.waitTime.refreshCommand* 2));
         await teApi.config.updateVsWs("terminal.integrated.shell.windows",
@@ -592,7 +590,7 @@ suite("Provider Tests", () =>
 
     test("Rebuild Gulp FileCache on Single Workspace Folder", async function()
     {
-        if (exitRollingCount(41, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.build + tc.slowTime.min);
         await teApi.testsApi.fileCache.buildTaskTypeCache("gulp", (workspace.workspaceFolders as WorkspaceFolder[])[0], true, "");
         await waitForTeIdle(tc.waitTime.min);
@@ -602,7 +600,7 @@ suite("Provider Tests", () =>
 
     test("Groups with Separator", async function()
     {
-        if (exitRollingCount(42, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent * 3);
         await executeSettingsUpdate("groupWithSeparator", true);
         await executeSettingsUpdate("groupSeparator", "-");
@@ -613,7 +611,7 @@ suite("Provider Tests", () =>
 
     test("Add to Excludes After Grouping", async function()
     {
-        if (exitRollingCount(43, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + tc.slowTime.config.globEvent + (tc.slowTime.fetchTasksCommand * 2) + tc.slowTime.min);
         const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
               gruntCt = taskItemsB4.length;
@@ -642,7 +640,7 @@ suite("Provider Tests", () =>
 
     test("Remove Temporary Files and Directories", async function()
     {
-        if (exitRollingCount(44, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.fs.deleteFolderEvent * 3) + (tc.slowTime.fs.deleteEvent * (tempFiles.length)) + 4000);
         await deleteTempFilesAndDirectories();
         ++successCount;

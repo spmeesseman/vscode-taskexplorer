@@ -94,7 +94,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Build Tree", async function()
     {
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(this)) return;
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
@@ -104,7 +104,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Add WS Folder (Cover Undefined Workspace)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.command);
         await teApi.testsApi.fileCache.addWsFolders(undefined);
         await waitForTeIdle(tc.waitTime.command);
@@ -114,7 +114,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Add WS Folder 1", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.addWorkspaceFolder);
         await testsApi.onWsFoldersChange({
             added: [ wsf[1] ],
@@ -127,7 +127,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Add WS Folders 2 and 3", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.addWorkspaceFolder * 2));
         await testsApi.onWsFoldersChange({
             added: [ wsf[2], wsf[3] ],
@@ -140,7 +140,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Add WS Folder 4", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.addWorkspaceFolder);
         await testsApi.onWsFoldersChange({
             added: [ wsf[4] ],
@@ -153,7 +153,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Remove WS Folder 1", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.removeWorkspaceFolder);
         await testsApi.onWsFoldersChange({
             added: [],
@@ -166,7 +166,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Remove WS Folder 2 and 3", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.removeWorkspaceFolder * 2));
         await testsApi.onWsFoldersChange({
             added: [],
@@ -179,7 +179,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Remove WS Folder 4", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.removeWorkspaceFolder);
         await testsApi.onWsFoldersChange({
             added: [],
@@ -192,7 +192,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Add WS Folder 1 (w/ File)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             join(wsf[1].uri.fsPath, "Gruntfile.js"),
@@ -226,7 +226,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Remove WS Folder 1 (w/ File)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(9, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
         await testsApi.onWsFoldersChange({
             added: [],
@@ -242,7 +242,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Add WS Folder 1 (Cache Builder Busy)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(10, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.cache.rebuild + 100);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
@@ -257,7 +257,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     test("Mimic Remove WS Folder 1 (Cache Builder Busy)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
-        if (exitRollingCount(11, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.cache.rebuildNoChanges + 100);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);

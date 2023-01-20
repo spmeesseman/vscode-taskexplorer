@@ -68,7 +68,7 @@ suite("API and Initialization", () =>
     test("Disable SideBar View", async function()
     {
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
-        await teApi.sidebar?.setEnabled(false, ""); // cover getChildren new InitScripts() || new NoScripts()
+        teApi.sidebar?.setEnabled(false, ""); // cover getChildren new InitScripts() || new NoScripts()
         await teApi.sidebar?.getChildren(); // cover getChildren new InitScripts() || new NoScripts()
         await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);

@@ -45,7 +45,7 @@ suite("Tree Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (utils.exitRollingCount(0, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         if (utils.needsTreeBuild()) {
             await utils.focusExplorerView(this);
         }
@@ -55,7 +55,7 @@ suite("Tree Tests", () =>
 
     test("Refresh", async function()
     {
-        if (utils.exitRollingCount(1, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.refreshCommand);
         await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
         ++successCount;
@@ -64,7 +64,7 @@ suite("Tree Tests", () =>
 
     test("Show Favorites", async function()
     {
-        if (utils.exitRollingCount(2, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.specialFolderEvent * 2) + (tc.waitTime.config.event * 2) +
                   (tc.slowTime.getTreeTasks * 4) + tc.slowTime.storageUpdate);
         ant = await utils.treeUtils.getTreeTasks("ant", 3);
@@ -83,7 +83,7 @@ suite("Tree Tests", () =>
 
     test("Remove from Favorites", async function()
     {
-        if (utils.exitRollingCount(3, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.command * 6);
         await utils.executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         await utils.executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
@@ -97,7 +97,7 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
-        if (utils.exitRollingCount(4, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.specialFolderEvent * 2) + (tc.waitTime.config.event * 2) + (tc.slowTime.getTreeTasks * 2));
         ant = await utils.treeUtils.getTreeTasks("ant", 3);
         batch = await utils.treeUtils.getTreeTasks("batch", 2);
@@ -113,7 +113,7 @@ suite("Tree Tests", () =>
 
     test("Add to Favorites", async function()
     {
-        if (utils.exitRollingCount(5, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.command * 13);
         let removed = await utils.executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         if (removed) {
@@ -145,7 +145,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 1", async function()
     {
-        if (utils.exitRollingCount(6, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
@@ -171,7 +171,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 2", async function()
     {
-        if (utils.exitRollingCount(7, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
@@ -197,7 +197,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 3", async function()
     {
-        if (utils.exitRollingCount(8, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
@@ -223,7 +223,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 4", async function()
     {
-        if (utils.exitRollingCount(9, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
@@ -249,7 +249,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 5", async function()
     {
-        if (utils.exitRollingCount(10, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
@@ -275,7 +275,7 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 6", async function()
     {
-        if (utils.exitRollingCount(11, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.command);
         const taskTree = explorer.getTaskTree();
         if (taskTree)
@@ -301,7 +301,7 @@ suite("Tree Tests", () =>
 
     test("Remove Custom Label 1", async function()
     {
-        if (utils.exitRollingCount(12, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         if (cstItem1) {
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
@@ -312,7 +312,7 @@ suite("Tree Tests", () =>
 
     test("Remove Custom Label 2", async function()
     {
-        if (utils.exitRollingCount(13, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         if (cstItem2) {
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
@@ -323,7 +323,7 @@ suite("Tree Tests", () =>
 
     test("Remove Custom Label 3", async function()
     {
-        if (utils.exitRollingCount(14, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         if (cstItem3) {
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
@@ -334,7 +334,7 @@ suite("Tree Tests", () =>
 
     test("Remove Custom Label 4", async function()
     {
-        if (utils.exitRollingCount(15, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         if (cstItem4) {
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem4 ]);
@@ -345,7 +345,7 @@ suite("Tree Tests", () =>
 
     test("Remove Custom Label 5", async function()
     {
-        if (utils.exitRollingCount(16, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         if (cstItem5) {
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem5 ]);
@@ -356,7 +356,7 @@ suite("Tree Tests", () =>
 
     test("Remove Custom Label 6", async function()
     {
-        if (utils.exitRollingCount(17, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         if (cstItem6) {
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem6 ]);
@@ -367,7 +367,7 @@ suite("Tree Tests", () =>
 
     test("Cancel Add Custom Label", async function()
     {
-        if (utils.exitRollingCount(18, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.command * 3) + (tc.waitTime.command * 3));
         utils.overrideNextShowInputBox(undefined);
         await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
@@ -387,7 +387,7 @@ suite("Tree Tests", () =>
 
     test("Hide Favorites", async function()
     {
-        if (utils.exitRollingCount(19, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.showHideSpecialFolder * 2) + (tc.waitTime.config.event  * 2));
         await utils.executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
@@ -397,7 +397,7 @@ suite("Tree Tests", () =>
 
     test("Hide Last Tasks", async function()
     {
-        if (utils.exitRollingCount(20, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
@@ -406,7 +406,7 @@ suite("Tree Tests", () =>
 
     test("Refresh", async function()
     {
-        if (utils.exitRollingCount(21, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.refreshCommand);
         await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
         ++successCount;
@@ -415,7 +415,7 @@ suite("Tree Tests", () =>
 
     test("Show Favorites", async function()
     {
-        if (utils.exitRollingCount(22, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
@@ -424,7 +424,7 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
-        if (utils.exitRollingCount(23, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
@@ -433,7 +433,7 @@ suite("Tree Tests", () =>
 
     test("Show Favorite Tasks w/ Last Tasks", async function()
     {
-        if (utils.exitRollingCount(24, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.showHideSpecialFolder * 4));
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
@@ -445,7 +445,7 @@ suite("Tree Tests", () =>
 
     test("Show Favorite Tasks Only", async function()
     {
-        if (utils.exitRollingCount(25, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
@@ -454,7 +454,7 @@ suite("Tree Tests", () =>
 
     test("Hide Favorite and Last Tasks", async function()
     {
-        if (utils.exitRollingCount(26, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.showHideSpecialFolder * 2));
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
@@ -464,7 +464,7 @@ suite("Tree Tests", () =>
 
     test("Show Favorite Tasks", async function()
     {
-        if (utils.exitRollingCount(27, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
@@ -473,7 +473,7 @@ suite("Tree Tests", () =>
 
     test("Show Last Tasks", async function()
     {
-        if (utils.exitRollingCount(28, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
         ++successCount;
@@ -482,7 +482,7 @@ suite("Tree Tests", () =>
 
     test("Hide User tasks", async function()
     {
-        if (utils.exitRollingCount(29, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideUserTasks);
         await utils.executeSettingsUpdate("specialFolders.showUserTasks", false, tc.waitTime.config.showHideUserTasks);
         ++successCount;
@@ -491,7 +491,7 @@ suite("Tree Tests", () =>
 
     test("Clear Special Folders", async function()
     {
-        if (utils.exitRollingCount(30, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         utils.clearOverrideShowInfoBox();
         this.slow(tc.slowTime.command * 4);
         utils.overrideNextShowInfoBox("No");
@@ -508,7 +508,7 @@ suite("Tree Tests", () =>
 
     test("Folder Sort Type Explorer Order", async function()
     {
-        if (utils.exitRollingCount(31, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.sortingEvent);
         await utils.executeSettingsUpdate("sortProjectFoldersAlpha", false, tc.waitTime.config.sortingEvent);
         ++successCount;
@@ -517,7 +517,7 @@ suite("Tree Tests", () =>
 
     test("Folder Sort Type Alphabetic Order", async function()
     {
-        if (utils.exitRollingCount(32, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.sortingEvent);
         await utils.executeSettingsUpdate("sortProjectFoldersAlpha", true, tc.waitTime.config.sortingEvent);
         ++successCount;
@@ -526,7 +526,7 @@ suite("Tree Tests", () =>
 
     test("Misc Sort Folders", function()
     {
-        if (utils.exitRollingCount(33, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         let map: IDictionary<TaskFolder>= {};
         map.frank = new TaskFolder("frank");
         map["richard face"] = new TaskFolder("richard face");

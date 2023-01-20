@@ -46,7 +46,7 @@ suite("External Provider Tests", () =>
 
     test("Build Tree", async function()
     {
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(this)) return;
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
@@ -56,7 +56,7 @@ suite("External Provider Tests", () =>
 
     test("Get API", async function()
     {
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.commandFast + 75);
         teApi = await executeTeCommand("getApi") as ITaskExplorerApi;
         ++successCount;
@@ -65,7 +65,7 @@ suite("External Provider Tests", () =>
 
     test("Register External Task Provider", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         taskProvider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         await teApi.register("external", taskProvider, "");
@@ -77,7 +77,7 @@ suite("External Provider Tests", () =>
 
     test("Access External Task Provider", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent);
         const provider = teApi.providersExternal.external as ExternalTaskProvider;
         const task = provider.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
@@ -89,7 +89,7 @@ suite("External Provider Tests", () =>
 
     test("Access Base External Task Provider", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent);
         const task = taskProvider2.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
         try {
@@ -104,7 +104,7 @@ suite("External Provider Tests", () =>
 
     test("Refresh External Task Provider", async function()
     {
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.refreshCommandNoChanges + testControl.slowTime.taskCount.verify);
         await teApi.refreshExternalProvider("external", "");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
@@ -115,7 +115,7 @@ suite("External Provider Tests", () =>
 
     test("Unregister External Task Provider", async function()
     {
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.event + testControl.slowTime.taskCount.verify);
         await teApi.unregister("external", "");
         await waitForTeIdle(testControl.waitTime.config.event);
@@ -126,7 +126,7 @@ suite("External Provider Tests", () =>
 
     test("Refresh Non-Existent External Task Provider", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(this)) return;
         await teApi.refreshExternalProvider("external_no_exist", ""); // cover
         ++successCount;
     });

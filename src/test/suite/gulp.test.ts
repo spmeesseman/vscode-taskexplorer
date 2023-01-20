@@ -54,7 +54,7 @@ suite("Gulp Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(0, successCount)) return;
+        if (exitRollingCount(this)) return;
 		if (needsTreeBuild()) {
             await focusExplorerView(this);
         }
@@ -64,7 +64,7 @@ suite("Gulp Tests", () =>
 
     test("Document Position", async function()
     {
-        if (exitRollingCount(1, successCount)) return;
+        if (exitRollingCount(this)) return;
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
@@ -74,7 +74,7 @@ suite("Gulp Tests", () =>
 
     test("Start", async function()
     {
-        if (exitRollingCount(2, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount);
         ++successCount;
@@ -83,7 +83,7 @@ suite("Gulp Tests", () =>
 
     test("Disable", async function()
     {
-        if (exitRollingCount(3, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
         await teApi.config.updateWs("enabledTasks.gulp", false);
         await waitForTeIdle(tc.waitTime.config.disableEvent);
@@ -94,7 +94,7 @@ suite("Gulp Tests", () =>
 
     test("Re-enable", async function()
     {
-        if (exitRollingCount(4, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await teApi.config.updateWs("enabledTasks.gulp", true);
         await waitForTeIdle(tc.waitTime.config.enableEvent);
@@ -105,7 +105,7 @@ suite("Gulp Tests", () =>
 
     test("Create JS File", async function()
     {
-        if (exitRollingCount(5, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
@@ -129,7 +129,7 @@ suite("Gulp Tests", () =>
 
     test("Add Task to JS File", async function()
     {
-        if (exitRollingCount(6, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -155,7 +155,7 @@ suite("Gulp Tests", () =>
 
     test("Remove 2 Tasks from JS File", async function()
     {
-        if (exitRollingCount(7, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
@@ -173,7 +173,7 @@ suite("Gulp Tests", () =>
 
     test("Delete JS File", async function()
     {
-        if (exitRollingCount(8, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
@@ -184,7 +184,7 @@ suite("Gulp Tests", () =>
 
     test("Create MJS File", async function()
     {
-        if (exitRollingCount(9, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
@@ -218,7 +218,7 @@ suite("Gulp Tests", () =>
 
     test("Delete Directory w/ MJS File", async function()
     {
-        if (exitRollingCount(10, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify + tc.waitTime.min);
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
@@ -230,7 +230,7 @@ suite("Gulp Tests", () =>
 
     test("Gulp Parser", async function()
     {
-        if (exitRollingCount(11, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.enableEvent * 2) + (tc.waitTime.config.event * 2) +
                   tc.waitTime.config.disableEvent + (tc.slowTime.taskCount.verify * 2) + (tc.slowTime.tasks.gulpParser * 4));
         //
@@ -253,7 +253,7 @@ suite("Gulp Tests", () =>
 
     test("Turn VSCode Gulp Provider On", async function()
     {
-        if (exitRollingCount(12, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.eventFast + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify + 3000);
         await configuration.updateVs("gulp.autoDetect", "on");
         await waitForTeIdle(tc.waitTime.config.enableEvent);
@@ -266,7 +266,7 @@ suite("Gulp Tests", () =>
 
     test("Turn VSCode Gulp Provider Off", async function()
     {
-        if (exitRollingCount(13, successCount)) return;
+        if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.eventFast + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify + 1500);
         await configuration.updateVs("gulp.autoDetect", "off");
         await waitForTeIdle(tc.waitTime.config.enableEvent);

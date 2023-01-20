@@ -47,7 +47,7 @@ suite("Task Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (utils.exitRollingCount(0, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         if (utils.needsTreeBuild()) {
             await utils.focusExplorerView(this);
         }
@@ -57,7 +57,7 @@ suite("Task Tests", () =>
 
     test("Check Task Counts", async function()
     {
-        if (utils.exitRollingCount(1, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.getTreeTasks * 4);
         bash = await utils.treeUtils.getTreeTasks("bash", 1);
         await utils.waitForTeIdle(tc.waitTime.getTreeTasks);
@@ -73,7 +73,7 @@ suite("Task Tests", () =>
 
     test("Run Non-Existent Last Task", async function()
     {
-        if (utils.exitRollingCount(2, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.runCommand + tc.slowTime.storageUpdate);
         const tree = explorer.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
@@ -86,7 +86,7 @@ suite("Task Tests", () =>
 
     test("Keep Terminal on Stop (OFF)", async function()
     {
-        if (utils.exitRollingCount(3, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + (tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 4000);
         await utils.executeSettingsUpdate("keepTermOnStop", false);
         let exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
@@ -104,7 +104,7 @@ suite("Task Tests", () =>
 
     test("Run Pause and Run", async function()
     {
-        if (utils.exitRollingCount(4, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 4500);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 3000);
@@ -120,7 +120,7 @@ suite("Task Tests", () =>
 
     test("Run Pause and Stop (Keep Terminal on Stop OFF)", async function()
     {
-        if (utils.exitRollingCount(5, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 4500);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 3000);
@@ -135,7 +135,7 @@ suite("Task Tests", () =>
 
     test("Keep Terminal on Stop (ON)", async function()
     {
-        if (utils.exitRollingCount(6, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand +
                   tc.slowTime.config.event + 4000);
         await utils.executeSettingsUpdate("keepTermOnStop", true);
@@ -150,7 +150,7 @@ suite("Task Tests", () =>
 
     test("Run Pause and Stop (Keep Terminal on Stop ON)", async function()
     {
-        if (utils.exitRollingCount(7, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 3500);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 3000);
@@ -164,7 +164,7 @@ suite("Task Tests", () =>
 
     test("Trigger Busy on Task Commands", async function()
     {
-        if (utils.exitRollingCount(8, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.refreshCommand + (tc.slowTime.command * 5) + 1200);
         utils.clearOverrideShowInfoBox();
         utils.executeTeCommand("refresh", 500, 2000);               // don't await
@@ -186,7 +186,7 @@ suite("Task Tests", () =>
 
     test("Pause", async function()
     {
-        if (utils.exitRollingCount(9, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.runCommand + tc.slowTime.runPauseCommand + tc.slowTime.runStopCommand + tc.slowTime.config.event + 3000);
         await utils.executeSettingsUpdate("keepTermOnStop", false);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
@@ -201,7 +201,7 @@ suite("Task Tests", () =>
 
     test("Run Ant Task (w/ Ansicon)", async function()
     {
-        if (utils.exitRollingCount(10, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.enableEvent * 2) + tc.slowTime.runCommand +
                   tc.slowTime.tasks.antTaskWithAnsicon + 250 + tc.slowTime.focusCommandChangeViews);
         antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
@@ -221,7 +221,7 @@ suite("Task Tests", () =>
 
     test("Run Ant Task (w/o Ansicon)", async function()
     {
-        if (utils.exitRollingCount(11, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.runCommand + tc.slowTime.tasks.antTask);
         await utils.executeSettingsUpdate("visual.enableAnsiconForAnt", false, tc.waitTime.config.enableEvent);
         await startTask(antTask, false);
@@ -236,7 +236,7 @@ suite("Task Tests", () =>
     {   //
         // There is only 1 bash file "task" - it utils.sleeps for 3 seconds, 1 second at a time
         //
-        if (utils.exitRollingCount(12, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.runCommand + tc.slowTime.command + (tc.slowTime.config.event * 3) + tc.slowTime.focusCommandChangeViews +
                   tc.slowTime.config.specialFolderEvent+ startTaskSlowTime + (tc.slowTime.tasks.bashScript * 2));
         utils.focusExplorerView(); // randomly show/hide view to test refresh event queue in tree/tree.ts
@@ -256,7 +256,7 @@ suite("Task Tests", () =>
     {   //
         // There are 2 batch file "tasks" - they both utils.sleep for 7 seconds, 1 second at a time
         //
-        if (utils.exitRollingCount(13, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         const slowTime = (tc.slowTime.runCommand * 1) + (tc.slowTime.runStopCommand * 2) + 7000 + // wait for task exec
                           startTaskSlowTime + tc.slowTime.runPauseCommand + (tc.waitTime.runCommandMin * 6) + (tc.slowTime.config.event * 4) +
                           (tc.slowTime.command * 2) + tc.slowTime.closeActiveDocument + (tc.slowTime.tasks.batchScript * 2) + (tc.waitTime.command * 4);
@@ -324,7 +324,7 @@ suite("Task Tests", () =>
     {   //
         // There are 2 batch file "tasks" - they both utils.sleep for 7 seconds, 1 second at a time
         //
-        if (utils.exitRollingCount(14, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         const slowTime = (tc.slowTime.runCommand * 1) + (tc.waitTime.runCommandMin * 2) + 2500 + // wait for task exec
                           startTaskSlowTime + tc.slowTime.runStopCommand + (tc.slowTime.command * 2) + (tc.slowTime.config.event * 4) +
                           (tc.slowTime.tasks.batchScript * 2) + 1000 + tc.slowTime.config.specialFolderEvent;
@@ -351,7 +351,7 @@ suite("Task Tests", () =>
 
     test("Run Batch Task (No Terminal)", async function()
     {
-        if (utils.exitRollingCount(15, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.runCommand + (tc.slowTime.tasks.batchScript * 2));
         const batchTask = batch[0];
         await startTask(batchTask as TaskItem, false);
@@ -365,7 +365,7 @@ suite("Task Tests", () =>
 
     test("Run Non-Existent Last Task 2", async function()
     {
-        if (utils.exitRollingCount(16, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.runCommand + (tc.slowTime.storageUpdate * 2));
         const tree = explorer.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
@@ -391,7 +391,7 @@ suite("Task Tests", () =>
 
     test("Surpass Max Last Tasks", async function()
     {
-        if (utils.exitRollingCount(17, successCount)) return;
+        if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.specialFolderEvent + (tc.slowTime.config.event * 2));
         const tree = explorer.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
