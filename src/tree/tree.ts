@@ -2002,6 +2002,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             {
                 if (configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
                 {
+                    const ctrlChar = configuration.get<string>("taskButtons.controlCharacter", "Y");
                     log.write("   keep terminal open", 1);
                     //
                     // TODO - see ticket.  I guess its not CTRL+C in some parts.  so make the control
@@ -2009,17 +2010,17 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     if (taskItem.paused)
                     {
                         taskItem.paused = false;
-                        log.value("   send to terminal", "Y", 1);
-                        terminal.sendText("Y");
+                        log.value("   send to terminal", ctrlChar, 1);
+                        terminal.sendText(ctrlChar);
                     }
                     else
                     {
                         log.value("   send sequence to terminal", "\\u0003", 1);
                         terminal.sendText("\u0003");
                         await util.timeout(50);
-                        log.value("   send to terminal", "Y", 1);
+                        log.value("   send to terminal", ctrlChar, 1);
                         // terminal = getTerminal(taskItem, "   ");
-                        try { /* istanbul ignore else */if (getTerminal(taskItem, "   ")) terminal.sendText("Y", true); } catch {}
+                        try { /* istanbul ignore else */if (getTerminal(taskItem, "   ")) terminal.sendText(ctrlChar, true); } catch {}
                     }
                 }
                 else {
