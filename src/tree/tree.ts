@@ -765,11 +765,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      */
     async getChildren(element?: TreeItem): Promise<TreeItem[]>
     {
-
         if (!this.enabled)
         {
             return [ !this.tasks && !this.taskTree ? new InitScripts() : /* istanbul ignore next */new NoScripts() ];
         }
+
+        this.getChildrenLogPad = "";  // just can't see a nice way to ever line this up unless we use the log queue
+        this.getChildrenLogLevel = 1; // just can't see a nice way to ever line this up unless we use the log queue
 
         let ctRmv = 0;
         let waited = 0;

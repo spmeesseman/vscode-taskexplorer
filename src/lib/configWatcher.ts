@@ -80,35 +80,35 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     }
 
     //
-    // Task Types
-    //
-    if (!refresh && e.affectsConfiguration("taskExplorer.enabledTasks"))
-    {
-        const newEnabledTasks = configuration.get<any>("enabledTasks");
-        for (const p in enabledTasks)
-        {   /* istanbul ignore else */
-            if ({}.hasOwnProperty.call(enabledTasks, p))
-            {
-                const taskType = util.getTaskTypeRealName(p),
-                      oldValue = enabledTasks[p],
-                      newValue = newEnabledTasks[p];
-                if (newValue !== oldValue)
-                {
-                    teApi.log.write(`   the 'enabledTasks.${taskType}' setting has changed`, 1);
-                    teApi.log.value("      new value", newValue, 1);
-                    await registerFileWatcher(ctx, taskType, false, newValue, "   ");
-                    registerChange(taskType);
-                }
-            }
-        }
-        Object.assign(enabledTasks, newEnabledTasks);
-    }
-
-    //
     // Path changes to task programs require task executions to be re-set up
     //
     if (!refresh)
     {
+        //
+        // Task Types
+        //
+        if (e.affectsConfiguration("taskExplorer.enabledTasks"))
+        {
+            const newEnabledTasks = configuration.get<any>("enabledTasks");
+            for (const p in enabledTasks)
+            {   /* istanbul ignore else */
+                if ({}.hasOwnProperty.call(enabledTasks, p))
+                {
+                    const taskType = util.getTaskTypeRealName(p),
+                          oldValue = enabledTasks[p],
+                          newValue = newEnabledTasks[p];
+                    if (newValue !== oldValue)
+                    {
+                        teApi.log.write(`   the 'enabledTasks.${taskType}' setting has changed`, 1);
+                        teApi.log.value("      new value", newValue, 1);
+                        await registerFileWatcher(ctx, taskType, false, newValue, "   ");
+                        registerChange(taskType);
+                    }
+                }
+            }
+            Object.assign(enabledTasks, newEnabledTasks);
+        }
+
         //
         // Groupings changes require global refresh
         //
