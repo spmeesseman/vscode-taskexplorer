@@ -17,7 +17,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
     private patternRuleTargets = /^(%\.\w+|%)$/;
     private ruleTargetExp = /^((?:\/|)[\w\-.]+)\s*:[^=]/gm;  // note does not disallow leading '.', this must be checked separately.
     // See: https://www.gnu.org/software/make/manual/html_node/Special-Targets.html
-    private specialTargets = new Set([
+    private specialTargets = [
         ".PHONY",
         ".SUFFIXES",
         ".DEFAULT",
@@ -34,7 +34,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         ".ONESHELL",
         ".POSIX",
         ".MAKE",
-    ]);
+    ];
 
     constructor() { super("make"); }
 
@@ -120,13 +120,8 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         while (match = this.ruleTargetExp.exec(contents))
         {
             const tgtName = match[1];
-            if (tgtName.startsWith(".")) // skip special targets
-            {
-                continue;
-            }
-            /* istanbul ignore else */
             if (!scripts.includes(tgtName)) // avoid duplicates
-            {   /* istanbul ignore else */
+            {
                 if (this.isNormalTarget(tgtName)) {
                     scripts.push(tgtName);
                     log.value("   found makefile task", tgtName, 4, logPad, this.logQueueId);
@@ -156,23 +151,8 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
 
     private isNormalTarget(target: string): boolean
     {
-        /* istanbul ignore if */
-        if (this.specialTargets.has(target))
-        {
-            return false;
-        }
-        /* istanbul ignore if */
-        if (this.suffixRuleTargets.test(target))
-        {
-            return false;
-        }
-        /* istanbul ignore if */
-        if (this.patternRuleTargets.test(target))
-        {
-            return false;
-        }
-
-        return true;
+        return !this.specialTargets.includes(target) && !this.suffixRuleTargets.test(target) &&
+               !this.patternRuleTargets.test(target) && !target.startsWith(".");
     }
 
 
