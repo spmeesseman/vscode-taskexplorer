@@ -1951,6 +1951,12 @@
                     "default": "Open",
                     "description": "%config.taskExplorer.taskButtons.clickAction%"
                 },
+                "taskExplorer.taskButtons.controlCharacter": {
+                    "type": "string",
+                    "default": "Y",
+                    "pattern": "[A-Z]{1}",
+                    "description": "%config.taskExplorer.taskButtons.controlCharacter%"
+                },
                 "taskExplorer.taskButtons.showExecuteWithArgumentsButton": {
                     "type": "boolean",
                     "default": false,

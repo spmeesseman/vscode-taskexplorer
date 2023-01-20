@@ -87,6 +87,7 @@
 	"config.taskExplorer.specialFolders.showUserTasks": "Display user workspace tasks from data directory.",
 	
 	"config.taskExplorer.taskButtons.clickAction": "Action to perform when clicking on the main body of a task tree entry",
+	"config.taskExplorer.taskButtons.controlCharacter": "The character to send to the terminal following the control character (i.e. *CTRL+C*) when `#keepTermOnStop#` is enabled.  In the U.S., this would be `Y`",
 	"config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton": "Show the `Execute with No Terminal` button inline with the Execute button.",
 	"config.taskExplorer.taskButtons.showExecuteWithArgumentsButton": "Show the `Execute with Arguments` button inline with the Execute button.",
 	"config.taskExplorer.taskButtons.showFavoritesButton": "Show the `Favorites` button inline with the Execute button. Has no effect if `#specialFolders.showFavorites#` is disabled.",
