@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
+import * as utils from "../utils/utils";
 import { expect } from "chai";
 import { ChildProcess, fork } from "child_process";
 import { ILicenseManager } from "../../interface/ILicenseManager";
@@ -8,10 +9,6 @@ import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
 import { testControl } from "../control";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {
-	activate, closeActiveDocument, overrideNextShowInfoBox, overrideNextShowInputBox, sleep,
-	executeTeCommand, focusExplorerView, getWsPath, setLicensed, suiteFinished, exitRollingCount, endRollingCount
-} from "../utils/utils";
 
 
 const licMgrMaxFreeTasks = 500;             // Should be set to what the constants are in lib/licenseManager
@@ -37,11 +34,11 @@ suite("License Manager Tests", () =>
 
 	suiteSetup(async function()
 	{
-        ({ teApi } = await activate(this));
+        ({ teApi } = await utils.activate(this));
         explorer = teApi.testsApi.explorer;
 		oLicenseKey = teApi.testsApi.storage.get<string>("license_key");
 		oVersion = teApi.testsApi.storage.get<string>("version");
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
@@ -49,10 +46,10 @@ suite("License Manager Tests", () =>
     {
 		teApi.setTests(true);
 		licMgr?.dispose();
-		await closeActiveDocument();
+		await utils.closeActiveDocument();
 		if (lsProcess) { // shut down local server
 			lsProcess.send("close");
-			await sleep(500);
+			await utils.sleep(500);
 		}
 		if (oLicenseKey) {
 			await teApi.testsApi.storage.update("license_key", oLicenseKey);
@@ -60,200 +57,210 @@ suite("License Manager Tests", () =>
 		if (oVersion) {
 			await teApi.testsApi.storage.update("version", oLicenseKey);
 		}
-        suiteFinished(this);
+		licMgr.setUseGlobalLicense(true, {
+			maxFreeTasks: licMgrMaxFreeTasks,
+			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
+			maxFreeTasksForTaskType: licMgrMaxFreeTasksForTaskType,
+			maxFreeTasksForScriptType: licMgrMaxFreeTasksForScriptType
+		});
+		utils.clearOverrideShowInfoBox();
+		utils.clearOverrideShowInputBox();
+        utils.suiteFinished(this);
 	});
 
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(this)) return;
-		await focusExplorerView(this);
-        endRollingCount(this);
+        if (utils.exitRollingCount(this)) return;
+		if (utils.needsTreeBuild(true)) {
+            await utils.focusExplorerView(this);
+		}
+        utils.endRollingCount(this);
 	});
 
 
 	test("Get License Manager", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		licMgr = getLicenseManager();
 		tasks = explorer.getTasks();
 		await licMgr.setTasks(tasks, "");
 		await licMgr.setTasks(tasks);
 		licMgr.dispose();
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Clear License Key", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.storageRead * 2) + testControl.slowTime.storageUpdate);
 		licenseKey = licMgr.getLicenseKey();
 		version = licMgr.getVersion(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Get Maximum # of Tasks", async function()
 	{
-        if (exitRollingCount(this)) return;
-		await setLicensed(true, licMgr);
+        if (utils.exitRollingCount(this)) return;
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks()).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks()).to.be.a("number").that.is.equal(licMgrMaxFreeTasks);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Get Maximum # of NPM Tasks", async function()
 	{
-        if (exitRollingCount(this)) return;
-		await setLicensed(true, licMgr);
+        if (utils.exitRollingCount(this)) return;
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("npm")).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("npm")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForTaskType);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Get Maximum # of Ant Tasks", async function()
 	{
-        if (exitRollingCount(this)) return;
-		await setLicensed(true, licMgr);
+        if (utils.exitRollingCount(this)) return;
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("ant")).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("ant")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForTaskType);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Get Maximum # of Bash Tasks (Scripts)", async function()
 	{
-        if (exitRollingCount(this)) return;
-		await setLicensed(true, licMgr);
+        if (utils.exitRollingCount(this)) return;
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("bash")).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("bash")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForScriptType);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Get Maximum # of Python Tasks (Scripts)", async function()
 	{
-        if (exitRollingCount(this)) return;
-		await setLicensed(true, licMgr);
+        if (utils.exitRollingCount(this)) return;
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("python")).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("python")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForScriptType);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Get Maximum # of Task Files", async function()
 	{
-        if (exitRollingCount(this)) return;
-		await setLicensed(true, licMgr);
+        if (utils.exitRollingCount(this)) return;
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTaskFiles()).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTaskFiles()).to.be.a("number").that.is.equal(licMgrMaxFreeTaskFiles);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("License Info Page - View Report (From Webview)", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.licenseMgrOpenPageWithDetail + 550 + (testControl.slowTime.storageUpdate * 2));
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		await teApi.testsApi.storage.update("version", undefined);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		await setTasks();
-		await sleep(50);
+		await utils.sleep(50);
 		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "viewReport" });
-		await sleep(500);
+		await utils.sleep(500);
 		licMgr.dispose();
-		await closeActiveDocument();
-        endRollingCount(this);
+		await utils.closeActiveDocument();
+        utils.endRollingCount(this);
 	});
 
 
 	test("License Info Page - Enter License Key (From Webview)", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.licenseMgrOpenPage + 550 + (testControl.slowTime.storageUpdate * 2));
 		await teApi.testsApi.storage.update("version", undefined);
 		await setTasks();
-		await sleep(50);
-		overrideNextShowInputBox("1234-5678-9098-0000000");
+		await utils.sleep(50);
+		utils.overrideNextShowInputBox("1234-5678-9098-0000000");
 		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "enterLicense" });
-		await sleep(500);
+		await utils.sleep(500);
 		licMgr.dispose();
-		await closeActiveDocument();
-        endRollingCount(this);
+		await utils.closeActiveDocument();
+        utils.endRollingCount(this);
 	});
 
 
 	test("Has License", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		//
 		// Has license
 		// 1111-2222-3333-4444-5555 for now.  When lic server is done, it will fail
 		//
-		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
+		this.slow(testControl.slowTime.licenseMgrOpenPage + (testControl.slowTime.storageUpdate * 2) + 400);
 		teApi.setTests(false);
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
 		teApi.setTests(true);
 		await licMgr.setTasks(tasks);
-		await sleep(400);
+		await utils.sleep(400);
 		licMgr.dispose();
-		await closeActiveDocument();
+		await utils.closeActiveDocument();
 		await licMgr.setLicenseKey(licenseKey);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("License Prompt (Enter Valid Key)", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		//
 		// If version is set, the prompt will show
 		//
 		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
-		overrideNextShowInfoBox("Enter License Key");
-		overrideNextShowInputBox("1234-5678-9098-7654321");
+		utils.overrideNextShowInfoBox("Enter License Key");
+		utils.overrideNextShowInputBox("1234-5678-9098-7654321");
 		await setTasks();
-		await sleep(400);
+		await utils.sleep(400);
 		licMgr.dispose();
-		await closeActiveDocument();
-        endRollingCount(this);
+		await utils.closeActiveDocument();
+        utils.endRollingCount(this);
 	});
 
 
 	test("License Prompt (Enter Invalid Key)", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		//
 		// If version is set, the prompt will show
 		//
 		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
-		overrideNextShowInfoBox("Enter License Key");
-		overrideNextShowInputBox("1111-2222-3333-4444-5555");
+		utils.overrideNextShowInfoBox("Enter License Key");
+		utils.overrideNextShowInputBox("1111-2222-3333-4444-5555");
 		await setTasks();
-		await sleep(400);
+		await utils.sleep(400);
 		licMgr.dispose();
-		await closeActiveDocument();
-        endRollingCount(this);
+		await utils.closeActiveDocument();
+        utils.endRollingCount(this);
 	});
 
 
 	test("License Page w/ No License Key", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		//
 		// If version is 'not' set, the lic page will show
 		//
@@ -261,17 +268,17 @@ suite("License Manager Tests", () =>
 		await teApi.testsApi.storage.update("version", undefined);
 		await licMgr.checkLicense();
 		await setTasks();
-		await sleep(400);
+		await utils.sleep(400);
 		licMgr.dispose();
-		await closeActiveDocument();
-        endRollingCount(this);
+		await utils.closeActiveDocument();
+        utils.endRollingCount(this);
 	});
 
 
 	test("License Page w/ Set License Key", async function()
 	{
-        if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + 400);
 		licenseKey = licMgr.getLicenseKey();
 		//
 		// If license is set, diff info page
@@ -279,155 +286,155 @@ suite("License Manager Tests", () =>
 		await licMgr.setLicenseKey(licenseKey);
 		await licMgr.checkLicense();
 		await setTasks();
-		await sleep(400);
+		await utils.sleep(400);
 		licMgr.dispose();
-		await closeActiveDocument();
-        endRollingCount(this);
+		await utils.closeActiveDocument();
+        utils.endRollingCount(this);
 	});
 
 
 	test("License Page w/ Set License Key", async function()
 	{
-        if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + 400);
 		const licenseKey = licMgr.getLicenseKey(),
 			  version = licMgr.getVersion(); // will be set on ext. startup
 		//
 		await teApi.testsApi.storage.update("version", version);
 		await licMgr.checkLicense();
 		await setTasks();
-		await sleep(400);
+		await utils.sleep(400);
 		licMgr.dispose();
-		await closeActiveDocument();
+		await utils.closeActiveDocument();
 		//
 		// Reset
 		//
 		await licMgr.setLicenseKey(licenseKey);
 		await teApi.testsApi.storage.update("version", version);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("License Page w/ Set License Key", async function()
 	{
-        if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + 400);
 		const licenseKey = licMgr.getLicenseKey(),
 			  version = licMgr.getVersion(); // will be set on ext. startup
 		//
 		await teApi.testsApi.storage.update("version", version);
 		await licMgr.checkLicense();
 		await setTasks();
-		await sleep(400);
+		await utils.sleep(400);
 		licMgr.dispose();
-		await closeActiveDocument();
+		await utils.closeActiveDocument();
 		//
 		// Reset
 		//
 		await licMgr.setLicenseKey(licenseKey);
 		await teApi.testsApi.storage.update("version", version);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Reset License Manager", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.storageUpdate * 2);
 		await licMgr.setLicenseKey(licenseKey);
 		await teApi.testsApi.storage.update("version", version);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 
-	test("License info", async function()
+	test("License Info", async function()
 	{
-        if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + 400);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		const licenseKey = licMgr.getLicenseKey(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
-		overrideNextShowInfoBox("Info");
+		utils.overrideNextShowInfoBox("Info");
 		await setTasks();
-		await sleep(400);
+		await utils.sleep(400);
 		licMgr.dispose();
-		await closeActiveDocument();
+		await utils.closeActiveDocument();
 		await licMgr.setLicenseKey(licenseKey);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("License Not Now", async function()
 	{
-        if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + 400);
 		const licenseKey = licMgr.getLicenseKey(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
-		overrideNextShowInfoBox("Not Now");
+		utils.overrideNextShowInfoBox("Not Now");
 		await setTasks();
-		await sleep(400);
+		await utils.sleep(400);
 		licMgr.dispose();
-		await closeActiveDocument();
+		await utils.closeActiveDocument();
 		await licMgr.setLicenseKey(licenseKey);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 
 	test("License Cancel", async function()
 	{
-        if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + 400);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		const licenseKey = licMgr.getLicenseKey(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
-		overrideNextShowInfoBox(undefined);
+		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
-		await sleep(400);
+		await utils.sleep(400);
 		licMgr.dispose();
-		await closeActiveDocument();
+		await utils.closeActiveDocument();
 		await licMgr.setLicenseKey(licenseKey);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Enter License key on Startup", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.licenseMgrOpenPage * 2) + 800);
-		overrideNextShowInfoBox("Enter License Key");
-		overrideNextShowInputBox("1111-2222-3333-4444-5555");
+		utils.overrideNextShowInfoBox("Enter License Key");
+		utils.overrideNextShowInputBox("1111-2222-3333-4444-5555");
 		await licMgr.enterLicenseKey();
-		await sleep(400);
-		overrideNextShowInfoBox("Enter License Key");
-		overrideNextShowInputBox("");
+		await utils.sleep(400);
+		utils.overrideNextShowInfoBox("Enter License Key");
+		utils.overrideNextShowInputBox("");
 		await setTasks();
-		await sleep(400);
-        endRollingCount(this);
+		await utils.sleep(400);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Enter License Key by Command Pallette", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.licenseMgrOpenPage * 3) + (testControl.waitTime.command * 6));
-		overrideNextShowInfoBox("Enter License Key");
-		overrideNextShowInputBox("1234-5678-9098-7654321");
-		await executeTeCommand("enterLicense", testControl.waitTime.command * 2);
-		overrideNextShowInfoBox("Enter License Key");
-		overrideNextShowInputBox("");
-		await executeTeCommand("enterLicense", testControl.waitTime.command * 2, 1100, "   ");
-		overrideNextShowInfoBox("Enter License Key");
-		overrideNextShowInputBox("");
-		await executeTeCommand("enterLicense", testControl.waitTime.command * 2, 1100, "   ", 1);
-        endRollingCount(this);
+		utils.overrideNextShowInfoBox("Enter License Key");
+		utils.overrideNextShowInputBox("1234-5678-9098-7654321");
+		await utils.executeTeCommand("enterLicense", testControl.waitTime.command * 2);
+		utils.overrideNextShowInfoBox("Enter License Key");
+		utils.overrideNextShowInputBox("");
+		await utils.executeTeCommand("enterLicense", testControl.waitTime.command * 2, 1100, "   ");
+		utils.overrideNextShowInfoBox("Enter License Key");
+		utils.overrideNextShowInputBox("");
+		await utils.executeTeCommand("enterLicense", testControl.waitTime.command * 2, 1100, "   ", 1);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Multi projects startup", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
 		// if (await pathExists(getProjectPath("extjs-pkg-server")))
 		// {
@@ -443,73 +450,170 @@ suite("License Manager Tests", () =>
 			// licMgr.setLicenseKey(undefined);
 			// await teApi.testsApi.storage.update("version", undefined);
 			// await licMgr.checkLicense();
-			// await sleep(1000);
-			// await closeActiveDocument();
+			// await utils.sleep(1000);
+			// await utils.closeActiveDocument();
 			// licMgr.setLicenseKey(licenseKey);
 			// await teApi.testsApi.storage.update("version", version);
 			// tasks.pop();
 		// }
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
-	test("Start License Server", async function()
+	test("Ping License Server", async function()
 	{
-        if (exitRollingCount(this)) return;
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseManagerRemoteCheck);
+		// TODO - Remote license server
+        utils.endRollingCount(this);
+	});
+
+
+	test("Start Local License Server", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.licenseManagerLocalStartServer + (4000 * 2));
 		lsProcess = fork("spm-license-server.js", {
-			cwd: getWsPath("../../spm-license-server/bin"), detached: true,
+			cwd: utils.getWsPath("../../spm-license-server/bin"), detached: true,
 		});
-		await sleep(4000);
-        endRollingCount(this);
+		await utils.sleep(4000);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Enter License key on Startup (1st Time, Server Live)", async function()
 	{
-        if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseManagerLocalCheck);
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseManagerLocalCheck + testControl.slowTime.storageUpdate);
 		await teApi.testsApi.storage.update("version", undefined);
 		const licenseKey = licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
 		await setTasks();
 		await licMgr.setLicenseKey(licenseKey);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Enter License key on Startup (> 1st Time, Server Live)", async function()
 	{
-        if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseManagerLocalCheck);
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseManagerLocalCheck + testControl.slowTime.storageUpdate);
 		const licenseKey = licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
 		await setTasks();
 		await licMgr.setLicenseKey(licenseKey);
-        endRollingCount(this);
+        utils.endRollingCount(this);
 	});
 
 
 	test("Invalid License key (Server Live)", async function()
 	{
-        if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseManagerLocalCheck);
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseManagerLocalCheck + testControl.slowTime.storageUpdate);
 		const licenseKey = licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-1234567");
 		await licMgr.checkLicense();
 		await setTasks();
 		await licMgr.setLicenseKey(licenseKey);
-        endRollingCount(this);
+        utils.endRollingCount(this);
+	});
+
+
+	test("Task Limit Reached (Non-Licensed)", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
+		this.slow((Math.round(testControl.slowTime.refreshCommand * 0.75)) + testControl.slowTime.storageUpdate);
+		await utils.setLicensed(false, licMgr);
+		licMgr.setUseGlobalLicense(false, {
+			maxFreeTasks: 25,
+			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
+			maxFreeTasksForTaskType: licMgrMaxFreeTasksForTaskType,
+			maxFreeTasksForScriptType: licMgrMaxFreeTasksForScriptType
+		});
+		utils.overrideNextShowInfoBox(undefined);
+		await utils.treeUtils.refresh();
+		expect(explorer.getTasks().length).to.be.equal(25);
+        utils.endRollingCount(this);
+	});
+
+
+	test("Task Type Limit Reached (Non-Licensed)", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
+		this.slow(Math.round(testControl.slowTime.refreshCommand * 0.9));
+		licMgr.setUseGlobalLicense(false, {
+			maxFreeTasks: licMgrMaxFreeTasks,
+			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
+			maxFreeTasksForTaskType: 10,
+			maxFreeTasksForScriptType: licMgrMaxFreeTasksForScriptType
+		});
+		utils.overrideNextShowInfoBox(undefined);
+		await utils.treeUtils.refresh();
+		expect(explorer.getTasks().filter(t => t.source === "gulp").length).to.be.equal(10);
+        utils.endRollingCount(this);
+	});
+
+
+	test("Task Script Type Limit Reached (Non-Licensed)", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
+		this.slow(Math.round(testControl.slowTime.refreshCommand * 0.9));
+		licMgr.setUseGlobalLicense(false, {
+			maxFreeTasks: licMgrMaxFreeTasks,
+			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
+			maxFreeTasksForTaskType: licMgrMaxFreeTasksForTaskType,
+			maxFreeTasksForScriptType: 1
+		});
+		utils.overrideNextShowInfoBox(undefined);
+		await utils.treeUtils.refresh();
+		expect(explorer.getTasks().filter(t => t.source === "batch").length).to.be.equal(1);
+        utils.endRollingCount(this);
+	});
+
+
+	test("Task File Limit Reached (Non-Licensed)", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
+		this.slow(Math.round(testControl.slowTime.refreshCommand * 0.9));
+		licMgr.setUseGlobalLicense(false, {
+			maxFreeTasks: licMgrMaxFreeTasks,
+			maxFreeTaskFiles: 5,
+			maxFreeTasksForTaskType: licMgrMaxFreeTasksForTaskType,
+			maxFreeTasksForScriptType: licMgrMaxFreeTasksForScriptType
+		});
+		utils.overrideNextShowInfoBox(undefined);
+		await utils.treeUtils.refresh();
+		expect(teApi.testsApi.fileCache.getTaskFileCount()).to.be.equal(5);
+        utils.endRollingCount(this);
+	});
+
+
+	test("Reset Max Limits (Non-Licensed)", async function()
+	{
+        // Don't utils.exitRollingCount(this)
+		this.slow(testControl.slowTime.refreshCommand);
+		await utils.setLicensed(true, licMgr);
+		licMgr.setUseGlobalLicense(true, {
+			maxFreeTasks: licMgrMaxFreeTasks,
+			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
+			maxFreeTasksForTaskType: licMgrMaxFreeTasksForTaskType,
+			maxFreeTasksForScriptType: licMgrMaxFreeTasksForScriptType
+		});
+		await utils.treeUtils.refresh();
+        utils.endRollingCount(this);
 	});
 
 
 	test("Stop License Server", async function()
 	{
-        if (lsProcess) { // shut down local server
+		// Don't utils.exitRollingCount(this)
+        if (lsProcess)
+		{   // shut down local server
+			this.slow(1100);
 			lsProcess.send("close");
-			await sleep(500);
+			await utils.sleep(500);
 			lsProcess = undefined;
 		}
 	});

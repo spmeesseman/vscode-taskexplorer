@@ -11,33 +11,6 @@ import { ITaskItem, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 let didRefresh = false;
 let didSetGroupLevel = false;
 
-/**
- * Pretty much mimics the tree construction in cases when we want to construct it
- * when the tree view is collapsed and not updating automatically via GUI events.
- * Once the view/shelf is focused/opened somewhere within the running tests, there'd
- * be no need to call this function anymore.
- *
- * @param instance The test instance to set the timeout and slow time on.
- */
-export const refresh = async(instance?: any) =>
-{
-    const tc = utils.testControl;
-    if (instance) {
-        instance.slow(tc.slowTime.refreshCommand +
-                      (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0) +
-                      (!didRefresh ? 1000 : 0));
-        instance.timeout((tc.slowTime.refreshCommand  * 2) + (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0));
-    }
-    if (!didSetGroupLevel)
-    {
-        await utils.executeSettingsUpdate("groupWithSeparator", true, tc.waitTime.config.groupingEvent);
-        await utils.executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.config.groupingEvent);
-        didSetGroupLevel = true;
-    }
-    await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
-    didRefresh = true;
-};
-
 
 export const hasRefreshed = () => didRefresh;
 
@@ -127,6 +100,38 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 
     return taskItems;
 };
+
+
+/**
+ * Pretty much mimics the tree construction in cases when we want to construct it
+ * when the tree view is collapsed and not updating automatically via GUI events.
+ * Once the view/shelf is focused/opened somewhere within the running tests, there'd
+ * be no need to call this function anymore.
+ *
+ * @param instance The test instance to set the timeout and slow time on.
+ */
+export const refresh = async(instance?: any) =>
+{
+    const tc = utils.testControl;
+    if (instance)
+    {
+        instance.slow(tc.slowTime.refreshCommand +
+                      (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0) +
+                      (!didRefresh ? 1000 : 0));
+        instance.timeout((tc.slowTime.refreshCommand  * 2) + (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0));
+        if (!didSetGroupLevel)
+        {
+            // utils.getTeApi().testsApi.enableConfigWatcher(false);
+            await utils.executeSettingsUpdate("groupWithSeparator", true, tc.waitTime.config.groupingEvent);
+            await utils.executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.config.groupingEvent);
+            // utils.getTeApi().testsApi.enableConfigWatcher(true);
+            didSetGroupLevel = true;
+        }
+    }
+    await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
+    didRefresh = true;
+};
+
 
 /**
  * @method walkTreeItems

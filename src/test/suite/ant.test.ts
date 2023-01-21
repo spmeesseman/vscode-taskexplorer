@@ -10,7 +10,7 @@ import { AntTaskProvider } from "../../providers/ant";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import {
     activate, executeSettingsUpdate, getWsPath, testControl as tc, verifyTaskCount, logErrorsAreFine,
-    suiteFinished, exitRollingCount, waitForTeIdle, treeUtils, overrideNextShowInfoBox, endRollingCount
+    suiteFinished, exitRollingCount, waitForTeIdle, treeUtils, overrideNextShowInfoBox, endRollingCount, needsTreeBuild
 } from "../utils/utils";
 
 const testsName = "ant";
@@ -53,7 +53,9 @@ suite("Ant Tests", () =>
     test("Build Tree", async function()
     {
         if (exitRollingCount(this)) return;
-        await treeUtils.refresh(this);
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
         endRollingCount(this);
     });
 

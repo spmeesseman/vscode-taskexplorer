@@ -35,6 +35,7 @@ suite("File Watcher Tests", () =>
         outsideWsDir = utils.getTestsPath("testA");
         excludes = configApi.get<string[]>("exclude");
         await utils.executeSettingsUpdate("exclude", [ ...excludes, ...[ "**/fwTestIgnore/**" ] ], tc.waitTime.config.globEvent);
+        utils.endRollingCount(this);
     });
 
 
@@ -56,6 +57,7 @@ suite("File Watcher Tests", () =>
         if (utils.needsTreeBuild()) {
             await utils.treeUtils.refresh(this);
         }
+        utils.endRollingCount(this);
     });
 
 
@@ -63,6 +65,7 @@ suite("File Watcher Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         await checkTaskCounts(this);
+        utils.endRollingCount(this);
     });
 
 
@@ -73,6 +76,7 @@ suite("File Watcher Tests", () =>
         await fsApi.createDir(insideWsDir);
         await fsApi.createDir(insideWsDir2);
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+        utils.endRollingCount(this);
     });
 
 
@@ -89,6 +93,7 @@ suite("File Watcher Tests", () =>
         );
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2);
+        utils.endRollingCount(this);
     });
 
 
@@ -99,6 +104,7 @@ suite("File Watcher Tests", () =>
         await fsApi.deleteFile(join(insideWsDir, "Gruntfile.js"));
         await utils.waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
+        utils.endRollingCount(this);
     });
 
 
@@ -109,6 +115,7 @@ suite("File Watcher Tests", () =>
         await fsApi.writeFile(join(insideWsDir, "Gruntfile.js"), "");
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
+        utils.endRollingCount(this);
     });
 
 
@@ -124,6 +131,7 @@ suite("File Watcher Tests", () =>
         );
         await utils.waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 1);
+        utils.endRollingCount(this);
     });
 
 
@@ -134,6 +142,7 @@ suite("File Watcher Tests", () =>
         await fsApi.deleteDir(insideWsDir);
         await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
+        utils.endRollingCount(this);
     });
 
 
@@ -143,6 +152,7 @@ suite("File Watcher Tests", () =>
         this.slow(tc.slowTime.fs.createFolderEvent);
         await fsApi.createDir(insideWsDirIgn);
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+        utils.endRollingCount(this);
     });
 
 
@@ -159,6 +169,7 @@ suite("File Watcher Tests", () =>
         );
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
+        utils.endRollingCount(this);
     });
 
 
@@ -184,6 +195,7 @@ suite("File Watcher Tests", () =>
         await utils.waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
         await utils.sleep(100);
+        utils.endRollingCount(this);
     });
 
 
@@ -194,6 +206,7 @@ suite("File Watcher Tests", () =>
         await fsApi.deleteFile(join(insideWsDirIgn, "Gruntfile.js"));
         await utils.waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
+        utils.endRollingCount(this);
     });
 
 
@@ -217,6 +230,7 @@ suite("File Watcher Tests", () =>
         await fsApi.copyDir(outsideWsDir, insideWsDir, /Gulpfile/); // cover filter yielding 0 files
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 4);
+        utils.endRollingCount(this);
     });
 
 
@@ -302,6 +316,7 @@ suite("File Watcher Tests", () =>
         await fsApi.deleteFile(join(insideWsDir2, "Gruntfile7.js"));
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2); // 2 less than previous test, blanked /_test_files/Gruntfile.js
+        utils.endRollingCount(this);
     });
 
 
@@ -315,6 +330,7 @@ suite("File Watcher Tests", () =>
         await fsApi.deleteDir(insideWsDirIgn);
         await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await checkTaskCounts(this);
+        utils.endRollingCount(this);
     });
 
 });

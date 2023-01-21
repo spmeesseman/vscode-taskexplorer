@@ -12,7 +12,7 @@ import { BashTaskProvider } from "../../providers/bash";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, getWsPath, testControl, treeUtils, verifyTaskCount,
-    logErrorsAreFine, suiteFinished, exitRollingCount, waitForTeIdle, endRollingCount
+    logErrorsAreFine, suiteFinished, exitRollingCount, waitForTeIdle, endRollingCount, needsTreeBuild
 } from "../utils/utils";
 
 const testsName = "bash";
@@ -54,7 +54,9 @@ suite("Bash Tests", () =>
     test("Build Tree", async function()
     {
         if (exitRollingCount(this)) return;
-        await treeUtils.refresh(this);
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
         endRollingCount(this);
     });
 

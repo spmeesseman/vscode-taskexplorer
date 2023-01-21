@@ -17,7 +17,6 @@ suite("File Cache Tests", () =>
         await testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
-        // await utils.executeSettingsUpdate("specialFolders.showUserTasks", false);
         utils.endRollingCount(this);
     });
 

@@ -13,4 +13,5 @@ export interface ILicenseManager
     isLicensed: () => boolean;
     setLicenseKey: (licenseKey: string | undefined) => Promise<void>;
     setTasks: (tasks: Task[], logPad?: string) => Promise<void>;
+    setUseGlobalLicense(useGlobal: boolean, taskCounts: any): void;
 }
