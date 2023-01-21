@@ -221,7 +221,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         // NPM Package Manager change (NPM / Yarn)
         // Do a global refresh since we don't provide the npm tasks, VSCode itself does
         //
-        if (e.affectsConfiguration("npm.packageManager", undefined)) {
+        if (e.affectsConfiguration("npm.packageManager")) {
             teApi.log.write("   the 'npm.packageManager' setting has changed", 1);
             teApi.log.value("      new value", configuration.getVs<boolean>("npm.packageManager"), 1);
             registerChange("npm");

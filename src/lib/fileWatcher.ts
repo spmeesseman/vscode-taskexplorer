@@ -98,33 +98,30 @@ export function disposeFileWatchers()
 }
 
 
-const eventNeedsProcessing = (eventKind: string, uri: Uri) =>
+const eventNeedsToBeQueued = (eventKind: string, uri: Uri) =>
 {
     let needs = true;
-    if (currentEvent)
+    if (eventKind === "modify file") // only check the queue for 'modify', not the current event
     {
-        if (eventKind === "modify file") // only check the queue for 'modify', not the current event
-        {
-            needs = !eventQueue.find(e => e.event === eventKind && e.fsPath === uri.fsPath);
-        }
-        else if (eventKind === "create file")
-        {
-            const events = [ currentEvent, ...eventQueue ];
-            needs = !events.find(e => e.event === "create directory" && uri.fsPath.startsWith(e.fsPath)) &&
-                    !events.find(e => e.event === eventKind && uri.fsPath === e.fsPath);
-        }
-        //
-        // VSCode doesn't trigger file delete event when a dir is deleted
-        //
-        // else if (eventKind === "delete file") {
-        //     const events = [ currentEvent, ...eventQueue ];
-        //     needs = !events.find(e => e.event === "delete directory" && uri.fsPath.startsWith(e.fsPath)) &&
-        //             !events.find(e => e.event === eventKind && uri.fsPath === e.fsPath);
-        // }
-        else {
-            const events = [ currentEvent, ...eventQueue ];
-            needs = !events.find(e => e.event === eventKind && uri.fsPath === e.fsPath);
-        }
+        needs = !eventQueue.find(e => e.event === eventKind && e.fsPath === uri.fsPath);
+    }
+    else if (eventKind === "create file")
+    {
+        const events = [ currentEvent, ...eventQueue ];
+        needs = !events.find(e => e.event === "create directory" && uri.fsPath.startsWith(e.fsPath)) &&
+                !events.find(e => e.event === eventKind && uri.fsPath === e.fsPath);
+    }
+    //
+    // VSCode doesn't trigger file delete event when a dir is deleted
+    //
+    // else if (eventKind === "delete file") {
+    //     const events = [ currentEvent, ...eventQueue ];
+    //     needs = !events.find(e => e.event === "delete directory" && uri.fsPath.startsWith(e.fsPath)) &&
+    //             !events.find(e => e.event === eventKind && uri.fsPath === e.fsPath);
+    // }
+    else {
+        const events = [ currentEvent, ...eventQueue ];
+        needs = !events.find(e => e.event === eventKind && uri.fsPath === e.fsPath);
     }
     return needs;
 };
@@ -219,7 +216,7 @@ const onFileChange = async(taskType: string, uri: Uri) =>
             currentEvent = e;
             await _procFileChangeEvent(taskType, uri, "");
         }
-        else if (eventNeedsProcessing("modify file", uri))
+        else if (eventNeedsToBeQueued(e.event, uri))
         {
             eventQueue.push(e);
         }
@@ -242,7 +239,7 @@ const onFileCreate = async(taskType: string, uri: Uri) =>
             currentEvent = e;
             await _procFileCreateEvent(taskType, uri, "");
         }
-        else if (eventNeedsProcessing("create file", uri))
+        else if (eventNeedsToBeQueued(e.event, uri))
         {
             eventQueue.push(e);
         }
@@ -265,7 +262,7 @@ const onFileDelete = async(taskType: string, uri: Uri) =>
             currentEvent = e;
             await _procFileDeleteEvent(taskType, uri, "");
         }
-        else if (eventNeedsProcessing("delete file", uri))
+        else if (eventNeedsToBeQueued(e.event, uri))
         {
             eventQueue.push(e);
         }

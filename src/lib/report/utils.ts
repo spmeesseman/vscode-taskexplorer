@@ -71,9 +71,6 @@ export const createTaskCountTable = async (api: ITaskExplorerApi, tasks: Task[],
         html = html.replace(`\${taskCounts.${tcKey}}`, taskCounts[tcKey] || "0");
     });
 
-    //
-    // TODO - yarn counts?
-    //
     if (configuration.getVs<string>("npm.packageManager") === "yarn") {
         html = html.replace(/\$\{taskCounts.yarn\}/g, taskCounts.npm || "0");
     }
