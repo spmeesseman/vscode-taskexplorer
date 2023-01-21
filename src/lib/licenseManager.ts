@@ -138,14 +138,15 @@ export class LicenseManager implements ILicenseManager
 	}
 
 
-	/* istanbul ignore next */
-	getLicenseKey = () => !this.useGlobalLicense || this.teApi.isTests() ? storage.get<string>("license_key") : "1234-5678-9098-7654321";
+	getLicenseKey = () => !this.useGlobalLicense || this.teApi.isTests() ?
+						  storage.get<string>("license_key") : /* istanbul ignore next */"1234-5678-9098-7654321";
 
 
 	getMaxNumberOfTasks = (taskType?: string) =>
 		(this.licensed ? Infinity : (!taskType ? this.maxFreeTasks :
 												 (isScriptType(taskType) ? this.maxFreeTasksForScriptType :
 																		   this.maxFreeTasksForTaskType)));
+
 
 	getMaxNumberOfTaskFiles = () =>  (this.licensed ? Infinity : this.maxFreeTaskFiles);
 
@@ -162,6 +163,19 @@ export class LicenseManager implements ILicenseManager
 	setLicenseKey = async (licenseKey: string | undefined) =>
 	{
 		await storage.update("license_key", licenseKey);
+	};
+
+
+	//
+	// Temporary / Tests only
+	//
+	setUseGlobalLicense = (useGlobal: boolean, taskCounts: any) =>
+	{
+		this.useGlobalLicense = useGlobal;
+		this.maxFreeTasks = taskCounts.maxFreeTasks;
+		this.maxFreeTaskFiles = taskCounts.maxFreeTaskFiles;
+		this.maxFreeTasksForTaskType = taskCounts.maxFreeTasksForTaskType;
+		this.maxFreeTasksForScriptType = taskCounts.maxFreeTasksForScriptType;
 	};
 
 

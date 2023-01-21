@@ -69,16 +69,12 @@ export async function addFolder(folder: Uri, logPad: string)
         for (const providerName of taskProviders)
         {
             const externalProvider = providersExternal[providerName];
-            //
-            // TODO - remove below ignore tags when test for copy/move folder w/files is implemented
-            //
             if (!cancel && numFilesFound < numFiles && (externalProvider || util.isTaskTypeEnabled(providerName)))
             {
                 let glob;
                 if (!util.isWatchTask(providerName))
                 {
                     const provider = providers[providerName] || /* istanbul ignore next */externalProvider;
-                    /* istanbul ignore next */
                     glob = provider?.getGlobPattern();
                 }
                 if (!glob) {
@@ -88,7 +84,6 @@ export async function addFolder(folder: Uri, logPad: string)
                 const dspTaskType = util.getTaskTypeFriendlyName(providerName);
                 statusBarSpace.text = getStatusString(`Scanning for ${dspTaskType} tasks in project ${wsFolder.name}`, 65);
 
-                /* istanbul ignore else */
                 if (!providersExternal[providerName])
                 {
                     let numFilesAdded = 0;
@@ -96,15 +91,10 @@ export async function addFolder(folder: Uri, logPad: string)
                     try
                     {   let maxFiles = Infinity;
                         log.write(`      Start folder scan for ${providerName} tasks`, 3, logPad);
-                        //
-                        // TODO - replace istanbul ignore tags when lic mgr test suite is done
-                        //
-                        /* istanbul ignore else */
                         if (licMgr && !licMgr.isLicensed())
                         {
                             const cachedFileCount = getTaskFileCount();
                             maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
-                            /* istanbul ignore if */
                             if (maxFiles <= 0) {
                                 util.showMaxTasksReachedMessage();
                                 return numFilesFound;
@@ -324,15 +314,10 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
         try {
             let maxFiles = Infinity;
             log.write(`   Start workspace folder scan for ${taskType} files`, 3, logPad);
-            //
-            // TODO - Replace istanbul ignore tags when mic mgr test suite is done.  Several below.
-            //
-            /* istanbul ignore else */
             if (licMgr && !licMgr.isLicensed())
             {
                 const cachedFileCount = getTaskFileCount();
                 maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
-                /* istanbul ignore if */
                 if (maxFiles <= 0) {
                     util.showMaxTasksReachedMessage();
                     return numFilesFound;
@@ -344,7 +329,6 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
             for (const fPath of paths)
             {
                 addToMappings(taskType, { uri: fPath, project: folder.name }, logPad + "   ");
-                /* istanbul ignore if */
                 if (++numFilesFound === maxFiles) {
                     log.write(`   Max files to scan reached at ${licMgr.getMaxNumberOfTaskFiles()} files (no license)`, 3, logPad);
                     break;
@@ -399,6 +383,10 @@ export async function cancelBuildCache()
 }
 
 
+/**
+ * @method clearMaps
+ * @since 3.0.0
+ */
 const clearMaps = () =>
 {
     taskFilesMap = {};
@@ -459,17 +447,21 @@ export const getTaskFiles = (taskType: string) => taskFilesMap[taskType];
  * @method getTaskFileCount
  * @since 3.0.0
  */
-const getTaskFileCount = () =>
+export const getTaskFileCount = () =>
 {
     let count = 0;
-    Object.keys(taskFilesMap).forEach((value, key) =>
+    Object.values(taskFilesMap).forEach((v) =>
     {
-        count += value.length;
+        count += v.length;
     });
     return count;
 };
 
 
+/**
+ * @method initMaps
+ * @since 3.0.0
+ */
 function initMaps(taskType: string, project: string)
 {
     if (!taskFilesMap[taskType]) {
@@ -493,6 +485,10 @@ function initMaps(taskType: string, project: string)
 export const isBusy = () => cacheBuilding === true ||  cacheBusy === true;
 
 
+/**
+ * @method isFsChanged
+ * @since 3.0.0
+ */
 function isFsChanged(taskType: string, project: string)
 {
     let fsChanged = true;
@@ -505,6 +501,10 @@ function isFsChanged(taskType: string, project: string)
 }
 
 
+/**
+ * @method isGlobChanged
+ * @since 3.0.0
+ */
 function isGlobChanged(taskType: string, fileGlob: string)
 {
     let globChanged = !taskGlobs[taskType];
@@ -516,6 +516,10 @@ function isGlobChanged(taskType: string, fileGlob: string)
 }
 
 
+/**
+ * @method persistCache
+ * @since 3.0.0
+ */
 export const persistCache = (clear?: boolean, force?: boolean) =>
 {   //
     // This all has to be synchronous because if it's not, the updates do not
@@ -543,6 +547,11 @@ export const persistCache = (clear?: boolean, force?: boolean) =>
 };
 
 
+/**
+ * @method registerFileCache
+ * Called on extension initialization only.
+ * @since 3.0.0
+ */
 export const registerFileCache = (context: ExtensionContext, api: ITaskExplorerApi) =>
 {
     teApi = api;
@@ -552,14 +561,31 @@ export const registerFileCache = (context: ExtensionContext, api: ITaskExplorerA
 };
 
 
+/**
+ * @method registerFileCache
+ * Clears the file cache, and either performs the workspace file scan to build/rebuild it,
+ * or loads it from storage.
+ */
 export async function rebuildCache(logPad: string, forceForTests?: boolean)
 {
     let numFilesFound = 0,
         loadedFromStorage = false;
 
     log.methodStart("rebuild cache", 1, logPad, logPad === "");
+    //
+    // Set 'cache busy' flag used in isBusy()
+    //
     cacheBusy = true;
+    //
+    // Clear the cache maps.  This sets all 3 IDictionary map objects and the task glob
+    // mapping to empty objects {}
+    //
     clearMaps();
+
+    //
+    // Load from storage maybe.  Storage-2 functions are used for persistence in the
+    // development environment and the tests.
+    //
     if (firstRun || forceForTests)
     {
         if (configuration.get<boolean>("enablePersistentFileCaching"))
@@ -579,6 +605,9 @@ export async function rebuildCache(logPad: string, forceForTests?: boolean)
         firstRun = false;
     }
 
+    //
+    // If we didn't load from storage, then start the scan to build to file cache
+    //
     if (!loadedFromStorage)
     {
         numFilesFound = await addWsFolders(workspace.workspaceFolders, logPad + "   ");

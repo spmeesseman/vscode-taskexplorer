@@ -1103,7 +1103,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     }
 
 
-    private async handleFileWatcherEvent(invalidate: any, opt: boolean | Uri | undefined, logPad: string)
+    private async handleRebuildEvent(invalidate: any, opt: boolean | Uri | undefined, logPad: string)
     {
         log.methodStart("handle filewatcher / settings change / test event", 1, logPad);
         if (invalidate === true && !opt)
@@ -1214,7 +1214,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             /* istanbul ignore next */
             log.error([ "Error invalidating task cache", e ]);
         }
-
         this.busy = false;
         log.methodDone("invalidate tasks cache", 1, logPad);
     }
@@ -1484,7 +1483,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         this.refreshPending = true;
 
         if (invalidate !== false) {
-            await this.handleFileWatcherEvent(invalidate, opt, logPad + "   ");
+            await this.handleRebuildEvent(invalidate, opt, logPad + "   ");
         }
 
         if (opt !== false && util.isString(invalidate, true))

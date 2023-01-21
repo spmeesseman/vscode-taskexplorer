@@ -35,6 +35,7 @@ import { IDictionary, IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITests
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/fileWatcher";
 import registerViewLicenseCommand from "./commands/viewLicense";
+import { IConfiguration } from "./interface/IConfiguration";
 
 
 let licenseManager: ILicenseManager;
@@ -81,7 +82,10 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     tests = await fs.pathExists(join(__dirname, "test", "runTest.js"));
     /* istanbul ignore if */
     if (!tests) {
-         teApi.testsApi = null as unknown as ITestsApi;
+        teApi.setTests = () => {};
+        teApi.testsApi = null as unknown as ITestsApi;
+        teApi.config = undefined as unknown as IConfiguration;
+        teApi.utilities = undefined;
     }
 
     //

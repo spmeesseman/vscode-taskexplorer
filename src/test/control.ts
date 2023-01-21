@@ -45,7 +45,7 @@ export const testControl: ITestControl =
         numTests: 0,
         numTestsFail: 0,
         numTestsSuccess: 0,
-        suiteResults: {} as IDictionary<any>
+        suiteResults: {}
     },
     //
     // These 2 properties are for using update() for coverage, see helper.initSettings
@@ -211,6 +211,18 @@ export const testControl: ITestControl =
 };
 
 
+interface ISuiteResults extends IDictionary<any>
+{
+    timeStarted: number;
+    numTests: number;
+    successCount: number;
+    suiteName: string;
+    success: boolean;
+    timeFinished: number;
+    numTestsFailed: number;
+}
+
+
 export interface ITestControl
 {   //
     // KEEP SETTINGS FILE CHANGES (@ test-files/.vscode/workspace.json)
@@ -253,7 +265,7 @@ export interface ITestControl
         numTests: number;
         numTestsFail: number;
         numTestsSuccess: number;
-        suiteResults: IDictionary<any>;
+        suiteResults: IDictionary<ISuiteResults>;
     };
     //
     // These 2 properties are for using update() for coverage; see helper.initSettings

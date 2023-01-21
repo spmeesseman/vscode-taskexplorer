@@ -31,9 +31,7 @@ const dirWatcher: {
 
 
 function createDirWatcher(context: ExtensionContext)
-{   //
-    // TODO - remove ignore tags when tests for adding/removing workspace is implemented
-    //
+{
     dirWatcher.onDidCreate?.dispose();
     dirWatcher.onDidDelete?.dispose();
     dirWatcher.watcher?.dispose();
@@ -154,7 +152,6 @@ async function onDirCreate(uri: Uri)
 {
     if (isDirectory(uri.fsPath) && !util.isExcluded(uri.fsPath))
     {
-console.log("DIR_CREATE: " + uri.fsPath);
         const wsf = workspace.getWorkspaceFolder(uri);
         /* istanbul ignore else */
         if (!wsf || wsf.uri.fsPath !== uri.fsPath)
@@ -166,16 +163,13 @@ console.log("DIR_CREATE: " + uri.fsPath);
                 fsPath: uri.fsPath
             };
             if (currentEvent) {
-console.log("   DIR_CREATE1");
                 eventQueue.push(e);
             }
             else {
-console.log("   DIR_CREATE2");
                 currentEvent = e;
                 await _procDirCreateEvent(uri, "");
             }
         }
-console.log("   DIR_CREATE4");
     }
 }
 
@@ -237,7 +231,6 @@ const onFileCreate = async(taskType: string, uri: Uri) =>
 {
     if (!util.isExcluded(uri.fsPath))
     {
-console.log("FILE_CREATE: " + uri.fsPath);
         const e = {
             fn: _procFileCreateEvent,
             args: [ taskType, uri, "   " ],
@@ -246,16 +239,13 @@ console.log("FILE_CREATE: " + uri.fsPath);
         };
         if (!currentEvent)
         {
-console.log("   FILE_CREATE1");
             currentEvent = e;
             await _procFileCreateEvent(taskType, uri, "");
         }
         else if (eventNeedsProcessing("create file", uri))
         {
-console.log("   FILE_CREATE2");
             eventQueue.push(e);
         }
-console.log("   FILE_CREATE3");
     }
 };
 

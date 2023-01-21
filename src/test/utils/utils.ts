@@ -6,24 +6,27 @@ import * as treeUtils from "./treeUtils";
 import figures from "../../lib/figures";
 import constants from "../../lib/constants";
 import { expect } from "chai";
-import { deactivate } from "../../extension";
+import { deactivate, getLicenseManager } from "../../extension";
 import { testControl } from "../control";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
 import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
-import { ITaskExplorer, ITaskExplorerApi, ITaskItem, IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
-import { isObject } from "../../lib/utils/utils";
+import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
+import initSettings from "./initSettings";
+import { getWsPath, getTestsPath } from "./sharedUtils";
 
 export { figures };
 export { testControl };
 export { treeUtils };
+export { getWsPath, getTestsPath };
 export let teApi: ITaskExplorerApi;
 
 let activated = false;
 let hasRollingCountError = false;
 let teExplorer: ITaskExplorer;
+let explorerHasFocused = false;
 let timeStarted: number;
 let overridesShowInputBox: any[] = [];
 let overridesShowInfoBox: any[] = [];
@@ -69,8 +72,11 @@ export const activate = async (instance?: Mocha.Context) =>
             tc.tests.suiteResults[suiteKey] = {
                 timeStarted: Date.now(),
                 numTests: suite.tests.length,
+                success: false,
                 successCount: -1,
-                suiteName: getSuiteFriendlyName(suite.title)
+                suiteName: getSuiteFriendlyName(suite.title),
+                timeFinished: 0,
+                numTestsFailed: 0
             };
         }
     }
@@ -117,6 +123,10 @@ export const activate = async (instance?: Mocha.Context) =>
         // Write to console is just a tests feature, it's not controlled by settings, set it here if needed
         //
         teApi.log.setWriteToConsole(tc.log.console, tc.log.level);
+        //
+        // Set to 'licensed mode'
+        //
+        setLicensed(true, getLicenseManager());
         //
         // All done
         //
@@ -253,10 +263,10 @@ export const getSuccessCount = (instance: Mocha.Context) =>
 };
 
 
-export const endRollingCount = (instance: Mocha.Context) =>
+export const endRollingCount = (instance: Mocha.Context, isSetup?: boolean) =>
 {
 
-    const mTest = instance.test as Mocha.Runnable,
+    const mTest = (!isSetup ? instance.test : instance.currentTest) as Mocha.Runnable,
           suite = mTest.parent as Mocha.Suite,
           suiteKey = getSuiteKey(suite.title),
           suiteResults = tc.tests.suiteResults[suiteKey];
@@ -301,6 +311,7 @@ export const focusExplorerView = async (instance?: any) =>
         }
         await executeTeCommand("focus", tc.waitTime.focusCommand);
         await waitForTeIdle(tc.waitTime.focusCommand);
+        explorerHasFocused = true;
     }
     else if (instance) {
         instance.slow(tc.slowTime.focusCommandAlreadyFocused);
@@ -319,179 +330,6 @@ export const getSpecialTaskItemId = (taskItem: ITaskItem) =>
 export const getTeApi = () => teApi;
 
 
-export const getTestsPath = (p: string) => path.normalize(path.resolve(__dirname, p));
-
-
-export const getWsPath = (p: string) => path.normalize(path.resolve(__dirname, "../../../test-files", p));
-
-
-const initSettings = async () =>
-{   //
-    // This function runs BEFORE the extension is initialized, so any updates have no immediate
-    // effect.  All settings set here will get read on on extension activation, coming up next.
-    //
-    // Create .vscode directory if it doesn't exist, so the we have perms to
-    // remove it after tests are done
-    //
-    // 1/5/23 - Removed and added to runTest.ts, before VSCoe is launched. leaving here
-    //          commented in case i realize i need it again, 'cause that never happens
-    //
-    // const dirNameCode = getWsPath(".vscode"),
-    //       settingsFile = path.join(dirNameCode, "settings.json");
-    //
-    // if (await pathExists(settingsFile)) {
-    //     settingsJsonOrig = await readFileAsync(settingsFile);
-    // }
-    // await writeFile(settingsFile, "{}");
-
-
-    tc.user.logLevel = configuration.get<number>("logging.level");
-    await configuration.updateVsWs("terminal.integrated.shell.windows", testControl.defaultWindowsShell);
-    //
-    // Grunt / Gulp VSCode internal task providers. Gulp suite will disable when done.
-    //
-    tc.vsCodeAutoDetectGrunt = configuration.getVs<string>("grunt.autoDetect", "off") as "on" | "off";
-    tc.vsCodeAutoDetectGulp = configuration.getVs<string>("gulp.autoDetect", "off") as "on" | "off";
-    await configuration.updateVs("grunt.autoDetect", "on");
-    await configuration.updateVs("gulp.autoDetect", "on");
-    //
-    // Enable views, use workspace level so that running this test from Code itself
-    // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
-    //
-    await configuration.updateWs("enableExplorerView", true);
-    await configuration.updateWs("enableSideBar", false);
-    //
-    // Persistent file caching off.  Pretty intensive when enabled in tests.  Adds 1+
-    // minute to overall tests completion time if set `true`.  Default is `false`.
-    //
-    await configuration.updateWs("enablePersistentFileCaching", false);
-    //
-    // Set misc settings, use workspace level so that running this test from Code itself
-    // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
-    //
-    await configuration.updateWs("enabledTasks",
-    {
-        ant: true,
-        apppublisher: false,
-        bash: true,
-        batch: true,
-        composer: false,
-        gradle: false,
-        grunt: true,
-        gulp: true,
-        make: true,
-        maven: false,
-        npm: true,
-        nsis: false,
-        perl: false,
-        pipenv: false,
-        powershell: false,
-        python: true,
-        ruby: false,
-        tsc: true,
-        workspace: true
-    });
-
-    await configuration.updateWs("pathToPrograms",
-    {
-        ant: getWsPath("..\\tools\\ant\\bin\\ant.bat"), // "c:\\Code\\ant\\bin\\ant.bat",
-        apppublisher: "",
-        ansicon: getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"), // "c:\\Code\\ansicon\\x64\\ansicon.exe",
-        bash: "bash",
-        composer: "composer",
-        gradle: "c:\\Code\\gradle\\bin\\gradle.bat",
-        make: "C:\\Code\\compilers\\c_c++\\9.0\\VC\\bin\\nmake.exe",
-        maven: "mvn",
-        nsis: "c:\\Code\\nsis\\makensis.exe",
-        perl: "perl",
-        pipenv: "pipenv",
-        powershell: "powershell",
-        python: "c:\\Code\\python\\python.exe",
-        ruby: "ruby"
-    });
-    // await configuration.updateWs("pathToPrograms.ant", tc.userPathToAnt);
-    // await configuration.updateWs("pathToPrograms.ansicon", tc.userPathToAnsicon);
-
-    await configuration.updateWs("logging.enable", tc.log.enabled);
-    if (!tc.log.enabled){
-        tc.log.file = false;
-        tc.log.output = false;
-    }
-    else if (!tc.log.output && !tc.log.file && !tc.log.console) {
-        tc.log.output = true;
-    }
-    await configuration.updateWs("logging.level", tc.log.level);
-    await configuration.updateWs("logging.enableFile", tc.log.file);
-    await configuration.updateWs("logging.enableFileSymbols", tc.log.fileSymbols);
-    await configuration.updateWs("logging.enableOutputWindow", tc.log.output);
-
-    await configuration.updateWs("specialFolders.numLastTasks", 10);
-    await configuration.updateWs("specialFolders.showFavorites", true);
-    await configuration.updateWs("specialFolders.showLastTasks", true);
-    await configuration.updateWs("specialFolders.showUserTasks", true);
-    // await configuration.updateWs("specialFolders.expanded", configuration.get<object>("specialFolders.expanded"));
-    await configuration.updateWs("specialFolders.expanded", {
-        favorites: true,
-        lastTasks: true,
-        userTasks: true
-    });
-
-    await configuration.updateWs("taskButtons.clickAction", "Open");
-    await configuration.updateWs("taskButtons.showFavoritesButton", true);
-    await configuration.updateWs("taskButtons.showExecuteWithArgumentsButton", false);
-    await configuration.updateWs("taskButtons.showExecuteWithNoTerminalButton", false);
-
-    await configuration.updateWs("visual.disableAnimatedIcons", true);
-    await configuration.updateWs("visual.enableAnsiconForAnt", false);
-
-    await configuration.updateWs("groupMaxLevel", 1);
-    await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("groupWithSeparator", true);
-    await configuration.updateWs("groupStripTaskLabel", true);
-
-    await configuration.updateWs("exclude", []);
-    await configuration.updateWs("includeAnt", []); // Deprecated, use `globPatternsAnt`
-    await configuration.updateWs("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
-    await configuration.updateWs("keepTermOnStop", false);
-    await configuration.updateWs("showHiddenWsTasks", true);
-    await configuration.updateWs("showRunningTask", true);
-    await configuration.updateWs("useGulp", false);
-    await configuration.updateWs("useAnt", false);
-
-    if (tc.log.enabled)
-    {
-        const slowTimes = tc.slowTime as IDictionary<any>;
-        // const waitTimes = tc.waitTime as IDictionary<number>;
-        let factor = 1.01;
-        if (tc.log.output) {
-            factor += 0.026;
-        }
-        if (tc.log.file) {
-            factor += 0.035;
-        }
-        if (tc.log.console) {
-            factor += 0.051;
-        }
-        // Object.keys(waitTimes).forEach((k) =>
-        // {
-        //     waitTimes[k] = Math.round(waitTimes[k] * factor);
-        // });
-        Object.keys(slowTimes).forEach((k) =>
-        {
-            if (!isObject(slowTimes[k])) {
-                slowTimes[k] = Math.round(slowTimes[k] * factor);
-            }
-            else {
-                Object.keys(slowTimes[k]).forEach((k2) =>
-                {
-                    slowTimes[k][k2] = Math.round(slowTimes[k][k2] * factor);
-                });
-            }
-        });
-    }
-};
-
-
 const isExecuting = (task: Task) =>
 {
     const execs = tasks.taskExecutions.filter(e => e.task.name === task.name && e.task.source === task.source &&
@@ -502,7 +340,7 @@ const isExecuting = (task: Task) =>
 };
 
 
-export const needsTreeBuild = () => true; // tc.tests.numSuites === 0 || !treeUtils.hasRefreshed();
+export const needsTreeBuild = (isFocus?: boolean) => (isFocus || !treeUtils.hasRefreshed()) && !explorerHasFocused;
 
 
 const isReady = (taskType?: string) =>
@@ -588,7 +426,7 @@ export const suiteFinished = (instance: Mocha.Context) =>
     {
         const numTestsFailedThisSuite = suite.tests.filter(t => t.isFailed()).length,
               suiteKey = getSuiteKey(suite.title),
-              suiteResults = tc.tests.suiteResults[suiteKey] || {};
+              suiteResults = tc.tests.suiteResults[suiteKey];
         tc.tests.numTestsFail += numTestsFailedThisSuite;
         tc.tests.numTestsSuccess += suite.tests.filter(t => t.isPassed()).length;
         tc.tests.numSuites++;
