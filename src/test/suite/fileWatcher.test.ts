@@ -16,11 +16,11 @@ const startTaskCountWs = 13; // 10 + 3 User Tasks
 let fsApi: IFilesystemApi;
 let configApi: IConfiguration;
 let insideWsDir: string;
+let insideWsDir2: string;
 let insideWsDirIgn: string;
 let outsideWsDir: string;
 let rootPath: string;
 let excludes: string[];
-let successCount = -1;
 
 
 suite("File Watcher Tests", () =>
@@ -30,11 +30,11 @@ suite("File Watcher Tests", () =>
         ({ fsApi, configApi } = await utils.activate(this));
         rootPath = utils.getWsPath(".");
         insideWsDir = join(rootPath, "tasks_test_");
+        insideWsDir2 = join(rootPath, "tasks_test2_");
         insideWsDirIgn = join(rootPath, "fwTestIgnore");
         outsideWsDir = utils.getTestsPath("testA");
         excludes = configApi.get<string[]>("exclude");
         await utils.executeSettingsUpdate("exclude", [ ...excludes, ...[ "**/fwTestIgnore/**" ] ], tc.waitTime.config.globEvent);
-        ++successCount;
     });
 
 
@@ -56,7 +56,6 @@ suite("File Watcher Tests", () =>
         if (utils.needsTreeBuild()) {
             await utils.treeUtils.refresh(this);
         }
-        ++successCount;
     });
 
 
@@ -64,17 +63,16 @@ suite("File Watcher Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         await checkTaskCounts(this);
-        ++successCount;
     });
 
 
-    test("Create Folder", async function()
+    test("Create Folders", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createFolderEvent);
+        this.slow(tc.slowTime.fs.createFolderEvent * 2);
         await fsApi.createDir(insideWsDir);
+        await fsApi.createDir(insideWsDir2);
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-        ++successCount;
     });
 
 
@@ -91,7 +89,6 @@ suite("File Watcher Tests", () =>
         );
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2);
-        ++successCount;
     });
 
 
@@ -102,7 +99,6 @@ suite("File Watcher Tests", () =>
         await fsApi.deleteFile(join(insideWsDir, "Gruntfile.js"));
         await utils.waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
-        ++successCount;
     });
 
 
@@ -113,7 +109,6 @@ suite("File Watcher Tests", () =>
         await fsApi.writeFile(join(insideWsDir, "Gruntfile.js"), "");
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
-        ++successCount;
     });
 
 
@@ -129,7 +124,6 @@ suite("File Watcher Tests", () =>
         );
         await utils.waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 1);
-        ++successCount;
     });
 
 
@@ -140,7 +134,6 @@ suite("File Watcher Tests", () =>
         await fsApi.deleteDir(insideWsDir);
         await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
-        ++successCount;
     });
 
 
@@ -150,7 +143,6 @@ suite("File Watcher Tests", () =>
         this.slow(tc.slowTime.fs.createFolderEvent);
         await fsApi.createDir(insideWsDirIgn);
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-        ++successCount;
     });
 
 
@@ -167,7 +159,6 @@ suite("File Watcher Tests", () =>
         );
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
-        ++successCount;
     });
 
 
@@ -193,7 +184,6 @@ suite("File Watcher Tests", () =>
         await utils.waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
         await utils.sleep(100);
-        ++successCount;
     });
 
 
@@ -204,7 +194,6 @@ suite("File Watcher Tests", () =>
         await fsApi.deleteFile(join(insideWsDirIgn, "Gruntfile.js"));
         await utils.waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt);
-        ++successCount;
     });
 
 
@@ -228,7 +217,91 @@ suite("File Watcher Tests", () =>
         await fsApi.copyDir(outsideWsDir, insideWsDir, /Gulpfile/); // cover filter yielding 0 files
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 4);
-        ++successCount;
+    });
+
+
+    test("Add/Modify New Files Repetitively", async function()
+    {
+        if (utils.exitRollingCount(this)) return;
+        this.slow((tc.slowTime.fs.createEvent * 2) + tc.slowTime.taskCount.verify);
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile1.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile2.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile3.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile4.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile5.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile7.js"), "");
+        await fsApi.writeFile(join(insideWsDir, "Gruntfile.js"), "");
+        await fsApi.writeFile(join(insideWsDir, "Gruntfile2.js"), "");
+        await fsApi.writeFile(join(insideWsDirIgn, "Gruntfile3.js"), "");
+        await fsApi.writeFile(join(insideWsDirIgn, "Gruntfile.js"), "");
+        await fsApi.writeFile(join(insideWsDirIgn, "Gruntfile3.js"), "");
+        await fsApi.writeFile(join(insideWsDir, "Gulpfile.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile.js"), "");
+        await fsApi.writeFile(
+            join(insideWsDir2, "Gruntfile.js"),
+            "module.exports = function(grunt) {\n" +
+            '    grunt.registerTask(\n"d45", ["jshint:m2"]);\n' +
+            "};\n"
+        );
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile.js"), " ");
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gulpfile1.js"), "");
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile.js"));
+        await fsApi.writeFile(
+            join(insideWsDir2, "Gruntfile.js"),
+            "module.exports = function(grunt) {\n" +
+            '    grunt.registerTask(\n"d45", ["jshint:m2"]);\n' +
+            '    grunt.registerTask(\n"d46", ["jshint:m2"]);\n' +
+            "};\n"
+        );
+        await fsApi.writeFile(join(insideWsDir2, "Gulpfile1.js"), " ");
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gulpfile1.js"), "");
+        await fsApi.writeFile(join(insideWsDir, "Gulpfile2.js"), "");
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile.js"));
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile.js"), "");
+        await fsApi.writeFile(join(insideWsDirIgn, "Gruntfile4.js"), "");
+        await fsApi.writeFile(join(insideWsDir, "Gruntfile5.js"), "");
+        await fsApi.writeFile(join(insideWsDir, "Gruntfile5.js"), " ");
+        await fsApi.writeFile(join(insideWsDir, "Gruntfile5.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile7.js"), "");
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile7.js"));
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile7.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
+        await fsApi.writeFile(join(insideWsDir2, "Gulpfile.js"), "");
+        await fsApi.writeFile(join(insideWsDir, "Gruntfile8.js"), "");
+        await fsApi.writeFile(join(insideWsDirIgn, "Gruntfile9.js"), "");
+        await fsApi.writeFile(join(insideWsDir, "Gulpfile2.js"), "");
+        await fsApi.writeFile(join(insideWsDir, "Gruntfile10.js"), "");
+        await fsApi.deleteFile(join(insideWsDir2, "Gulpfile.js"));
+        await fsApi.deleteFile(join(insideWsDir2, "Gulpfile1.js"));
+        await fsApi.deleteFile(join(insideWsDir2, "Gulpfile.js"));
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile.js"));
+        await fsApi.writeFile(join(insideWsDir, "Gruntfile2.js"), " ");
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile1.js"));
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile2.js"));
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile3.js"));
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile4.js"));
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile5.js"));
+        await fsApi.writeFile(join(insideWsDir, "Gruntfile2.js"), "");
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
+        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile7.js"));
+        await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
+        await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2); // 2 less than previous test, blanked /_test_files/Gruntfile.js
     });
 
 
@@ -238,10 +311,10 @@ suite("File Watcher Tests", () =>
         this.slow(tc.slowTime.fs.deleteFolderEvent + (tc.slowTime.taskCount.verify * 6));
         await fsApi.deleteDir(outsideWsDir);
         await fsApi.deleteDir(insideWsDir);
+        await fsApi.deleteDir(insideWsDir2);
         await fsApi.deleteDir(insideWsDirIgn);
         await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await checkTaskCounts(this);
-        ++successCount;
     });
 
 });
