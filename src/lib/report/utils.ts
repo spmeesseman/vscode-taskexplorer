@@ -1,10 +1,9 @@
 import { join } from "path";
 import { ITaskExplorerApi } from "../../interface";
 import { getTaskFiles } from "../fileCache";
-import { configuration } from "../utils/configuration";
 import { readFileAsync } from "../utils/fs";
-import { getInstallPath, getTaskTypes, lowerCaseFirstChar } from "../utils/utils";
 import { commands, Disposable, Task, ViewColumn, window, workspace } from "vscode";
+import { getInstallPath, getPackageManager, getTaskTypes, lowerCaseFirstChar } from "../utils/utils";
 
 
 export const createTaskCountTable = async (api: ITaskExplorerApi, tasks: Task[], title: string, project?: string) =>
@@ -71,7 +70,7 @@ export const createTaskCountTable = async (api: ITaskExplorerApi, tasks: Task[],
         html = html.replace(`\${taskCounts.${tcKey}}`, taskCounts[tcKey] || "0");
     });
 
-    if (configuration.getVs<string>("npm.packageManager") === "yarn") {
+    if (getPackageManager() === "yarn") {
         html = html.replace(/\$\{taskCounts.yarn\}/g, taskCounts.npm || "0");
     }
     else {

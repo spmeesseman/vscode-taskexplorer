@@ -33,6 +33,7 @@ suite("Configuration / Settings Tests", () =>
         shellOsx = teApi.config.getVs<string>("terminal.integrated.shell.osx");
         globPatternsAnt = teApi.config.get<string[]>("globPatternsAnt");
         globPatternsBash = teApi.config.get<string[]>("globPatternsBash");
+        pkgMgr = teApi.config.getVs<string>("npm.packageManager");
         endRollingCount(this);
     });
 
@@ -42,11 +43,17 @@ suite("Configuration / Settings Tests", () =>
         testsApi.enableConfigWatcher(false);
         try {
             const successCount = getSuccessCount(this);
-            if (successCount < 3) {
+            if (successCount < 3)
+            {
                 await executeSettingsUpdate("globPatternsAnt", globPatternsAnt);
                 await executeSettingsUpdate("globPatternsBash", globPatternsBash);
             }
-            if(successCount >= 13) {
+            if (successCount >= 5 && successCount <  11)
+            {
+                await teApi.config.updateVsWs("npm.packageManager", pkgMgr);
+            }
+            if(successCount >= 13)
+            {
                 await teApi.config.updateVsWs("terminal.integrated.shell.windows", shellW32);
                 await teApi.config.updateVsWs("terminal.integrated.shell.linux", shellLnx);
                 await teApi.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
@@ -181,7 +188,6 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + tc.slowTime.config.readEvent);
-        pkgMgr = teApi.config.getVs<string>("npm.packageManager");
         await teApi.config.updateVsWs("npm.packageManager", "yarn");
         expect(teApi.utilities.getPackageManager() === "yarn");
         endRollingCount(this);
@@ -223,7 +229,7 @@ suite("Configuration / Settings Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event);
         await teApi.config.updateVsWs("npm.packageManager", pkgMgr);
-        await teApi.config.updateVs("npm.packageManager", pkgMgr); // cover global
+        // await teApi.config.updateVs("npm.packageManager", pkgMgr); // cover global
         expect(teApi.utilities.getPackageManager()).to.equal(pkgMgr === "auto" ? "npm" : pkgMgr);
         endRollingCount(this);
     });

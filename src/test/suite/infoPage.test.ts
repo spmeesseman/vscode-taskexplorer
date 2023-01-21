@@ -93,15 +93,14 @@ suite("Info Report Tests", () =>
 	test("Open Report Page (All Projects, Yarn Enabled)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.readEvent  + (testControl.slowTime.config.eventFast * 2) + 100);
-		const pkgMgr = teApi.config.getVs<string>("npm.packageManager");
+		this.slow(testControl.slowTime.viewReport + (testControl.slowTime.config.enableEvent * 2) + 100);
         await teApi.config.updateVsWs("npm.packageManager", "yarn");
-        await waitForTeIdle(testControl.waitTime.config.eventFast);
+        await waitForTeIdle(testControl.waitTime.config.enableEvent);
 	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport) as WebviewPanel;
 		await sleep(100);
 		panel.dispose();
         await teApi.config.updateVsWs("npm.packageManager", pkgMgr);
-        await waitForTeIdle(testControl.waitTime.config.eventFast);
+        await waitForTeIdle(testControl.waitTime.config.enableEvent);
 		await closeActiveDocument();
         endRollingCount(this);
 	});
