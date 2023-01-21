@@ -140,7 +140,8 @@ export const testControl: ITestControl =
             antTask: 8910,
             antTaskWithAnsicon: 8940,
             bashScript: 3990,
-            batchScript: 8065,
+            batchScriptBat: 7065,
+            batchScriptCmd: 7565,
             gulpParser: 4110,
             npmCommand: 13945,
             npmCommandPkg: 11290,
@@ -357,7 +358,8 @@ export interface ITestControl
             antTask: number;
             antTaskWithAnsicon: number;
             bashScript: number;
-            batchScript: number;
+            batchScriptBat: number;
+            batchScriptCmd: number;
             gulpParser: number;
             npmCommand: number;
             npmCommandPkg: number;

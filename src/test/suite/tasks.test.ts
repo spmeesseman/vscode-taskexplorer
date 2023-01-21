@@ -258,7 +258,7 @@ suite("Task Tests", () =>
         if (utils.exitRollingCount(this)) return;
         const slowTime = (tc.slowTime.runCommand * 1) + (tc.slowTime.runStopCommand * 2) + 7000 + // wait for task exec
                           startTaskSlowTime + tc.slowTime.runPauseCommand + (tc.waitTime.runCommandMin * 6) + (tc.slowTime.config.event * 4) +
-                          (tc.slowTime.command * 2) + tc.slowTime.closeActiveDocument + (tc.slowTime.tasks.batchScript * 2) + (tc.waitTime.command * 4);
+                          (tc.slowTime.command * 2) + tc.slowTime.closeActiveDocument + (tc.slowTime.tasks.batchScriptCmd * 2) + (tc.waitTime.command * 4);
         this.slow(slowTime);
         this.timeout(45000);
         const batchTask = batch[0];
@@ -326,7 +326,7 @@ suite("Task Tests", () =>
         if (utils.exitRollingCount(this)) return;
         const slowTime = (tc.slowTime.runCommand * 1) + (tc.waitTime.runCommandMin * 2) + 2500 + // wait for task exec
                           startTaskSlowTime + tc.slowTime.runStopCommand + (tc.slowTime.command * 2) + (tc.slowTime.config.event * 4) +
-                          (tc.slowTime.tasks.batchScript * 2) + 1000 + tc.slowTime.config.specialFolderEvent;
+                          (tc.slowTime.tasks.batchScriptBat * 2) + 1000 + tc.slowTime.config.specialFolderEvent;
         this.slow(slowTime);
         this.timeout(35000);
         const batchTask = batch[1];
@@ -351,7 +351,7 @@ suite("Task Tests", () =>
     test("Run Batch Task (No Terminal)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + (tc.slowTime.tasks.batchScript * 2));
+        this.slow(tc.slowTime.runCommand + (tc.slowTime.tasks.batchScriptCmd * 2));
         const batchTask = batch[0];
         await startTask(batchTask as TaskItem, false);
         const exec = await utils.executeTeCommand2("runNoTerm", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
