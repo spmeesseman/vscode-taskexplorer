@@ -84,6 +84,7 @@ export async function addFolder(folder: Uri, logPad: string)
                 const dspTaskType = util.getTaskTypeFriendlyName(providerName);
                 statusBarSpace.text = getStatusString(`Scanning for ${dspTaskType} tasks in project ${wsFolder.name}`, 65);
 
+                /* istanbul ignore else */
                 if (!providersExternal[providerName])
                 {
                     let numFilesAdded = 0;
@@ -91,10 +92,12 @@ export async function addFolder(folder: Uri, logPad: string)
                     try
                     {   let maxFiles = Infinity;
                         log.write(`      Start folder scan for ${providerName} tasks`, 3, logPad);
+                        /* istanbul ignore else */
                         if (licMgr && !licMgr.isLicensed())
                         {
                             const cachedFileCount = getTaskFileCount();
                             maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
+                            /* istanbul ignore if */
                             if (maxFiles <= 0) {
                                 util.showMaxTasksReachedMessage();
                                 return numFilesFound;
@@ -104,6 +107,7 @@ export async function addFolder(folder: Uri, logPad: string)
                         const paths = await findFiles(glob, { nocase: true, ignore: getExcludesPatternGlob(), cwd: folder.fsPath  });
                         for (const fPath of paths)
                         {
+                            /* istanbul ignore if */
                             if (cancel) {
                                 break;
                             }

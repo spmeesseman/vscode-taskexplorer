@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as utils from "../utils/utils";
 import { join } from "path";
-import { IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IDictionary, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { IConfiguration } from "@spmeesseman/vscode-taskexplorer-types/lib/IConfiguration";
 
 const tc = utils.testControl;
@@ -22,6 +23,8 @@ let outsideWsDir: string;
 let rootPath: string;
 let excludes: string[];
 
+let files: IDictionary<string> = {};
+
 
 suite("File Watcher Tests", () =>
 {
@@ -34,6 +37,33 @@ suite("File Watcher Tests", () =>
         insideWsDirIgn = join(rootPath, "fwTestIgnore");
         outsideWsDir = utils.getTestsPath("testA");
         excludes = configApi.get<string[]>("exclude");
+        files = {
+            grunt1_0: join(insideWsDir, "Gruntfile.js"),
+            grunt1_1: join(insideWsDir, "Gruntfile1.js"),
+            grunt1_2: join(insideWsDir, "Gruntfile2.js"),
+            grunt1_3: join(insideWsDir, "Gruntfile3.js"),
+            grunt1_4: join(insideWsDir, "Gruntfile4.js"),
+            grunt1_5: join(insideWsDir, "Gruntfile5.js"),
+            grunt1_6: join(insideWsDir, "Gruntfile6.js"),
+            grunt1_7: join(insideWsDir, "Gruntfile7.js"),
+            grunt2_0: join(insideWsDir2, "Gruntfile.js"),
+            grunt2_1: join(insideWsDir2, "Gruntfile1.js"),
+            grunt2_2: join(insideWsDir2, "Gruntfile2.js"),
+            grunt2_3: join(insideWsDir2, "Gruntfile3.js"),
+            grunt2_4: join(insideWsDir2, "Gruntfile4.js"),
+            grunt2_5: join(insideWsDir2, "Gruntfile5.js"),
+            grunt2_6: join(insideWsDir2, "Gruntfile6.js"),
+            grunt2_7: join(insideWsDir2, "Gruntfile7.js"),
+            gruntIgn_0: join(insideWsDirIgn, "Gruntfile.js"),
+            gruntIgn_1: join(insideWsDirIgn, "Gruntfile1.js"),
+            gruntIgn_2: join(insideWsDirIgn, "Gruntfile2.js"),
+            gulp1_0: join(insideWsDir, "Gulpfile.js"),
+            gulp1_1: join(insideWsDir, "Gulpfile1.js"),
+            gulp2_0: join(insideWsDir2, "Gulpfile.js"),
+            gulp2_1: join(insideWsDir2, "Gulpfile1.js"),
+            gulpIgn_0: join(insideWsDirIgn, "Gulpfile.js"),
+            gulpIgn_1: join(insideWsDirIgn, "Gulpfile1.js")
+        };
         await utils.executeSettingsUpdate("exclude", [ ...excludes, ...[ "**/fwTestIgnore/**" ] ], tc.waitTime.config.globEvent);
         utils.endRollingCount(this);
     });
@@ -234,34 +264,37 @@ suite("File Watcher Tests", () =>
     });
 
 
-    test("Add/Modify New Files Repetitively", async function()
+    test("Add/Delete New Files Repetitively", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow((tc.slowTime.fs.createEvent * 2) + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile1.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile2.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile3.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile4.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile5.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile7.js"), "");
-        await fsApi.writeFile(join(insideWsDir, "Gruntfile.js"), "");
-        await fsApi.writeFile(join(insideWsDir, "Gruntfile2.js"), "");
-        await fsApi.writeFile(join(insideWsDirIgn, "Gruntfile3.js"), "");
-        await fsApi.writeFile(join(insideWsDirIgn, "Gruntfile.js"), "");
-        await fsApi.writeFile(join(insideWsDirIgn, "Gruntfile3.js"), "");
-        await fsApi.writeFile(join(insideWsDir, "Gulpfile.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile.js"), "");
+        this.slow((tc.slowTime.fs.createEvent * 2) + tc.slowTime.taskCount.verify + 1900);
+
+        await writeGruntFile("grunt2_0", 1, "");
+        await writeGruntFile("grunt2_1", 1, "");
+        await writeGruntFile("grunt2_2", 10, "");
+        await writeGruntFile("grunt2_3", 1, "");
+        await writeGruntFile("grunt2_4", 125, "");
+        await writeGruntFile("grunt2_5", 1, "");
+        await writeGruntFile("grunt2_6", 125, "");
+        await writeGruntFile("grunt2_7", 1, "");
+        await writeGruntFile("grunt1_0", 125, "");
+        await writeGruntFile("grunt1_2", 1, "");
+        await writeGruntFile("gruntIgn_0", 1, "");
+        await writeGruntFile("gruntIgn_1", 25, "");
+        await writeGruntFile("gruntIgn_2", 1, "");
+        await writeGulpFile("gulp1_0", 1, "");
+        await writeGulpFile("gulp2_0", 125, " ");
         await fsApi.writeFile(
             join(insideWsDir2, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"d45", ["jshint:m2"]);\n' +
             "};\n"
         );
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile.js"), " ");
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gulpfile1.js"), "");
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile.js"));
+        await utils.sleep(50);
+        await writeGruntFile("grunt2_0", 100, " ");
+        await writeGruntFile("grunt2_0", 1, "");
+        await writeGulpFile("gulp2_0", 50, "");
+        await writeGruntFile("grunt2_0", 1, " ");
         await fsApi.writeFile(
             join(insideWsDir2, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
@@ -269,53 +302,138 @@ suite("File Watcher Tests", () =>
             '    grunt.registerTask(\n"d46", ["jshint:m2"]);\n' +
             "};\n"
         );
-        await fsApi.writeFile(join(insideWsDir2, "Gulpfile1.js"), " ");
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gulpfile1.js"), "");
-        await fsApi.writeFile(join(insideWsDir, "Gulpfile2.js"), "");
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile.js"));
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile.js"), "");
-        await fsApi.writeFile(join(insideWsDirIgn, "Gruntfile4.js"), "");
-        await fsApi.writeFile(join(insideWsDir, "Gruntfile5.js"), "");
-        await fsApi.writeFile(join(insideWsDir, "Gruntfile5.js"), " ");
-        await fsApi.writeFile(join(insideWsDir, "Gruntfile5.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile7.js"), "");
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile7.js"));
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile7.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gruntfile6.js"), "");
-        await fsApi.writeFile(join(insideWsDir2, "Gulpfile.js"), "");
-        await fsApi.writeFile(join(insideWsDir, "Gruntfile8.js"), "");
-        await fsApi.writeFile(join(insideWsDirIgn, "Gruntfile9.js"), "");
-        await fsApi.writeFile(join(insideWsDir, "Gulpfile2.js"), "");
-        await fsApi.writeFile(join(insideWsDir, "Gruntfile10.js"), "");
-        await fsApi.deleteFile(join(insideWsDir2, "Gulpfile.js"));
-        await fsApi.deleteFile(join(insideWsDir2, "Gulpfile1.js"));
-        await fsApi.deleteFile(join(insideWsDir2, "Gulpfile.js"));
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile.js"));
-        await fsApi.writeFile(join(insideWsDir, "Gruntfile2.js"), " ");
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile1.js"));
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile2.js"));
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile3.js"));
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile4.js"));
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile5.js"));
-        await fsApi.writeFile(join(insideWsDir, "Gruntfile2.js"), "");
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile6.js"));
-        await fsApi.deleteFile(join(insideWsDir2, "Gruntfile7.js"));
+        await utils.sleep(50);
+        await writeGulpFile("gulp2_0", 1, " ");
+        await fsApi.deleteFile(files.grunt2_6);
+        await writeGruntFile("grunt2_0", 1, "  ");
+        await fsApi.deleteFile(files.grunt2_6);
+        await writeGruntFile("grunt2_0", 125, "");
+        await fsApi.deleteFile(files.grunt2_6);
+        await writeGruntFile("grunt2_0", 1, "");
+        await fsApi.deleteFile(files.grunt2_6);
+        await writeGruntFile("grunt2_0", 1, "");
+        await fsApi.deleteFile(files.grunt2_6);
+        await writeGruntFile("grunt2_0", 125, "");
+        await fsApi.deleteFile(files.grunt2_6);
+        await writeGruntFile("grunt2_0", 1, "");
+        await writeGruntFile("grunt2_1", 1, "");
+        await writeGulpFile("gulp2_1", 1, "");
+        await fsApi.deleteFile(files.grunt2_0);
+        await writeGruntFile("grunt2_1", 50, "");
+        await writeGruntFile("gruntIgn_0", 1, "  ");
+        await writeGruntFile("grunt1_5", 1, "");
+        await writeGruntFile("grunt1_5", 1, " ");
+        await writeGruntFile("grunt1_5", 50, "");
+        await writeGruntFile("grunt2_6", 1, "");
+        await writeGruntFile("grunt2_7", 50, "");
+        await fsApi.deleteFile(files.grunt2_6);
+        await fsApi.deleteFile(files.grunt2_7);
+        await writeGruntFile("grunt2_6", 1, "");
+        await writeGruntFile("grunt2_7", 125, "");
+        await writeGruntFile("grunt2_0", 1, "  ");
+        await writeGruntFile("grunt2_0", 1, "");
+        await writeGruntFile("gruntIgn_0", 1, "");
+        await writeGruntFile("grunt1_0", 125, "");
+        await writeGruntFile("grunt1_0", 125, " ");
+        await fsApi.deleteFile(files.grunt1_3);
+        await writeGruntFile("grunt1_0", 50, " ");
+        await fsApi.deleteFile(files.grunt1_3);
+        await writeGruntFile("grunt1_0", 125, " ");
+        await fsApi.deleteFile(files.grunt1_3);
+        await writeGruntFile("grunt1_0", 25, " ");
+        await fsApi.deleteFile(files.grunt1_3);
+        await writeGruntFile("grunt1_0", 25, " ");
+        await fsApi.deleteFile(files.grunt1_3);
+        await utils.sleep(500);
+        await fsApi.deleteFile(files.gulp1_0);
+        await fsApi.deleteFile(files.gulp2_1);
+        await utils.sleep(25);
+        await fsApi.deleteFile(files.gulp2_0);
+        await fsApi.deleteFile(files.grunt2_0);
+        await writeGruntFile("grunt2_0", 1, "");
+        await fsApi.deleteFile(files.grunt2_0);
+        await fsApi.deleteFile(files.grunt2_1);
+        await fsApi.deleteFile(files.grunt2_2);
+        await fsApi.deleteFile(files.grunt2_3);
+        await utils.sleep(25);
+        await fsApi.deleteFile(files.grunt2_4);
+        await fsApi.deleteFile(files.grunt2_5);
+        await fsApi.deleteFile(files.grunt2_6);
+        await utils.sleep(25);
+        await fsApi.deleteFile(files.grunt2_7);
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2); // 2 less than previous test, blanked /_test_files/Gruntfile.js
+        utils.endRollingCount(this);
+    });
+
+
+    test("Modify Files Repetitively", async function()
+    {
+        if (utils.exitRollingCount(this)) return;
+        this.slow((tc.slowTime.fs.createEvent * 2) + tc.slowTime.taskCount.verify + 1325);
+        await writeGruntFile("grunt2_0", 1, "");
+        await writeGruntFile("grunt2_0", 1, " ");
+        await writeGruntFile("grunt2_0", 1, "  ");
+        await writeGruntFile("grunt2_0", 125, "   ");
+        await writeGruntFile("grunt2_0", 125, "    ");
+        await writeGruntFile("grunt2_0", 25, "   ");
+        await writeGruntFile("grunt2_0", 1, "  ");
+        await writeGruntFile("grunt2_0", 125, " ");
+        await writeGruntFile("grunt2_0", 10, "");
+        await writeGruntFile("grunt2_1", 1, "");
+        await writeGruntFile("grunt2_2", 10, "");
+        await writeGruntFile("grunt2_1", 50, " ");
+        await writeGruntFile("grunt2_1", 1, "");
+        await writeGruntFile("grunt2_1", 125, " ");
+        await writeGruntFile("grunt2_3", 1, "");
+        await writeGruntFile("grunt2_1", 50, "");
+        await writeGruntFile("grunt2_5", 1, "");
+        await writeGruntFile("grunt2_6", 125, "");
+        await writeGruntFile("grunt2_7", 1, "");
+        await fsApi.writeFile(
+            join(insideWsDir2, "Gruntfile.js"),
+            "module.exports = function(grunt) {\n" +
+            '    grunt.registerTask(\n"d45", ["jshint:m2"]);\n' +
+            "};\n"
+        );
+        await utils.sleep(100);
+        await writeGruntFile("grunt2_5", 1, " ");
+        await writeGruntFile("grunt2_6", 1, " ");
+        await writeGruntFile("grunt2_0", 10, " ");
+        await writeGruntFile("grunt2_0", 10, "");
+        await writeGulpFile("gulp2_0", 10, "");
+        await writeGulpFile("gulp2_0", 1, " ");
+        await writeGulpFile("gulp2_0", 50, "");
+        await writeGruntFile("grunt2_0", 125, "  ");
+        await writeGulpFile("gulp2_0", 10, " ");
+        await writeGulpFile("gulp2_0", 50, " ");
+        await writeGruntFile("grunt2_0", 125, " ");
+        await writeGruntFile("grunt2_0", 1, "");
+        await writeGulpFile("gulp2_0", 1, "  ");
+        await writeGulpFile("gulp2_0", 125, "");
+        await writeGruntFile("grunt2_7", 1, " ");
+        await writeGruntFile("grunt2_5", 1, "");
+        await writeGruntFile("grunt2_6", 125, "");
+        await writeGruntFile("grunt2_7", 1, "");
+        await writeGruntFile("grunt2_1", 125, " ");
+        await writeGruntFile("grunt2_1", 1, "");
+        await writeGruntFile("grunt2_1", 125, " ");
+        await writeGruntFile("grunt2_1", 1, "");
+        await fsApi.deleteFile(files.grunt2_0);
+        await utils.sleep(25);
+        await fsApi.deleteFile(files.gulp2_0);
+        await utils.sleep(25);
+        await fsApi.deleteFile(files.grunt2_1);
+        await utils.sleep(500);
+        await fsApi.deleteFile(files.grunt2_2);
+        await fsApi.deleteFile(files.grunt2_3);
+        await utils.sleep(50);
+        await fsApi.deleteFile(files.grunt2_5);
+        await fsApi.deleteFile(files.grunt2_6);
+        await utils.sleep(50);
+        await fsApi.deleteFile(files.grunt2_7);
+        await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
+        await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2);
         utils.endRollingCount(this);
     });
 
@@ -345,4 +463,18 @@ const checkTaskCounts = async (instance: Mocha.Context) =>
     await utils.verifyTaskCount("grunt", startTaskCountGrunt);
     await utils.verifyTaskCount("gulp", startTaskCountGulp);
     await utils.verifyTaskCount("Workspace", startTaskCountWs);
+};
+
+
+const writeGruntFile = async(file: string, msSleep: number, content: string) =>
+{
+    await fsApi.writeFile(files[file], content);
+    await utils.sleep(msSleep);
+};
+
+
+const writeGulpFile = async(file: string, msSleep: number, content: string) =>
+{
+    await fsApi.writeFile(files[file], content);
+    await utils.sleep(msSleep);
 };
