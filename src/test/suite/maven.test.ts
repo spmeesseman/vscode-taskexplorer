@@ -11,7 +11,7 @@ import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, focusExplorerView,
+    activate, endRollingCount, executeSettingsUpdate, executeTeCommand, exitRollingCount, focusExplorerView,
     getWsPath, needsTreeBuild, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
@@ -23,7 +23,6 @@ let fsApi: IFilesystemApi;
 let pathToProgram: string;
 let rootPath: string;
 let fileUri: Uri;
-let successCount = -1;
 
 
 suite("Maven Tests", () =>
@@ -41,7 +40,7 @@ suite("Maven Tests", () =>
         //
         pathToProgram = teApi.config.get<string>(`pathToPrograms.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "java\\maven\\mvn.exe");
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -58,7 +57,7 @@ suite("Maven Tests", () =>
         if (needsTreeBuild()) {
             await focusExplorerView(this);
         }
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -73,7 +72,7 @@ suite("Maven Tests", () =>
             "</project>\n"
         );
         await waitForTeIdle(tc.waitTime.fs.createEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -82,7 +81,7 @@ suite("Maven Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -90,7 +89,7 @@ suite("Maven Tests", () =>
     {
         if (exitRollingCount(this)) return;
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -102,7 +101,7 @@ suite("Maven Tests", () =>
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -112,7 +111,7 @@ suite("Maven Tests", () =>
         this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -122,7 +121,7 @@ suite("Maven Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -143,7 +142,7 @@ suite("Maven Tests", () =>
         //
         await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await verifyTaskCount(testsName, 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -164,7 +163,7 @@ suite("Maven Tests", () =>
         //
         await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -175,7 +174,7 @@ suite("Maven Tests", () =>
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -185,7 +184,7 @@ suite("Maven Tests", () =>
         this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

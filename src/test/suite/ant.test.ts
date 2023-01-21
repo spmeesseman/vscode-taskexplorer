@@ -10,7 +10,7 @@ import { AntTaskProvider } from "../../providers/ant";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import {
     activate, executeSettingsUpdate, getWsPath, testControl as tc, verifyTaskCount, logErrorsAreFine,
-    suiteFinished, exitRollingCount, waitForTeIdle, treeUtils, overrideNextShowInfoBox
+    suiteFinished, exitRollingCount, waitForTeIdle, treeUtils, overrideNextShowInfoBox, endRollingCount
 } from "../utils/utils";
 
 const testsName = "ant";
@@ -24,7 +24,6 @@ let rootWorkspace: WorkspaceFolder;
 let buildXmlFile: string;
 let buildXmlFileUri: Uri;
 let buildFileXml: string;
-let successCount = -1;
 
 
 suite("Ant Tests", () =>
@@ -39,7 +38,7 @@ suite("Ant Tests", () =>
         buildXmlFile = getWsPath("build.xml");
         buildXmlFileUri = Uri.file(buildXmlFile);
         buildFileXml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -55,7 +54,7 @@ suite("Ant Tests", () =>
     {
         if (exitRollingCount(this)) return;
         await treeUtils.refresh(this);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -64,7 +63,7 @@ suite("Ant Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verifyFirstCall);
         await verifyTaskCount("ant", 3);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -78,7 +77,7 @@ suite("Ant Tests", () =>
         provider.getDocumentPosition("test_isnt_there", xml);
         const index = provider.getDocumentPosition("test-build2", xml);
         expect(index).to.be.a("number").that.is.equal(275, `test-build2 task position should be 275 (actual ${index}`);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -88,7 +87,7 @@ suite("Ant Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.ant", false);
         await verifyTaskCount("ant", 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -98,7 +97,7 @@ suite("Ant Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.ant", true);
         await verifyTaskCount("ant", 3);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -116,7 +115,7 @@ suite("Ant Tests", () =>
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -129,7 +128,7 @@ suite("Ant Tests", () =>
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -140,7 +139,7 @@ suite("Ant Tests", () =>
         await executeSettingsUpdate("pathToPrograms.ansicon", undefined);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -152,7 +151,7 @@ suite("Ant Tests", () =>
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -162,7 +161,7 @@ suite("Ant Tests", () =>
         this.slow(slowTimeforAntRunTasks + tc.slowTime.config.pathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         await runCheck(3, 2, 3, 2, false, false);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -180,7 +179,7 @@ suite("Ant Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await runCheck(2, 1, 2, 1, false, false);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -200,7 +199,7 @@ suite("Ant Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await runCheck(4, 3, 1, 0, true, false);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -217,7 +216,7 @@ suite("Ant Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await runCheck(1, 0, 1, 0, false, false);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -234,7 +233,7 @@ suite("Ant Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await runCheck(1, 0, 1, 0, true, false);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -255,7 +254,7 @@ suite("Ant Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await runCheck(1, 0, 1, 0, true, true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

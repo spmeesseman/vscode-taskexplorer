@@ -9,8 +9,8 @@ import { Task } from "vscode";
 import { testControl } from "../control";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-	activate, closeActiveDocument, overrideNextShowInfoBox, overrideNextShowInputBox,
-	sleep, executeTeCommand, focusExplorerView, getWsPath, setLicensed, suiteFinished, exitRollingCount
+	activate, closeActiveDocument, overrideNextShowInfoBox, overrideNextShowInputBox, sleep,
+	executeTeCommand, focusExplorerView, getWsPath, setLicensed, suiteFinished, exitRollingCount, endRollingCount
 } from "../utils/utils";
 
 
@@ -24,8 +24,7 @@ let explorer: ITaskExplorer;
 let licMgr: ILicenseManager;
 let tasks: Task[] = [];
 let setTasksCallCount = 0;
-let lsProcess: ChildProcess;
-let successCount = -1;
+let lsProcess: ChildProcess | undefined;
 
 
 suite("License Manager Tests", () =>
@@ -42,7 +41,7 @@ suite("License Manager Tests", () =>
         explorer = teApi.testsApi.explorer;
 		oLicenseKey = teApi.testsApi.storage.get<string>("license_key");
 		oVersion = teApi.testsApi.storage.get<string>("version");
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -69,7 +68,7 @@ suite("License Manager Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		await focusExplorerView(this);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -81,7 +80,7 @@ suite("License Manager Tests", () =>
 		await licMgr.setTasks(tasks, "");
 		await licMgr.setTasks(tasks);
 		licMgr.dispose();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -92,7 +91,7 @@ suite("License Manager Tests", () =>
 		licenseKey = licMgr.getLicenseKey();
 		version = licMgr.getVersion(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -103,7 +102,7 @@ suite("License Manager Tests", () =>
 		expect(licMgr.getMaxNumberOfTasks()).to.be.a("number").that.is.equal(Infinity);
 		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks()).to.be.a("number").that.is.equal(licMgrMaxFreeTasks);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -114,7 +113,7 @@ suite("License Manager Tests", () =>
 		expect(licMgr.getMaxNumberOfTasks("npm")).to.be.a("number").that.is.equal(Infinity);
 		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("npm")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForTaskType);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -125,7 +124,7 @@ suite("License Manager Tests", () =>
 		expect(licMgr.getMaxNumberOfTasks("ant")).to.be.a("number").that.is.equal(Infinity);
 		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("ant")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForTaskType);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -136,7 +135,7 @@ suite("License Manager Tests", () =>
 		expect(licMgr.getMaxNumberOfTasks("bash")).to.be.a("number").that.is.equal(Infinity);
 		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("bash")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForScriptType);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -147,7 +146,7 @@ suite("License Manager Tests", () =>
 		expect(licMgr.getMaxNumberOfTasks("python")).to.be.a("number").that.is.equal(Infinity);
 		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("python")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForScriptType);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -158,7 +157,7 @@ suite("License Manager Tests", () =>
 		expect(licMgr.getMaxNumberOfTaskFiles()).to.be.a("number").that.is.equal(Infinity);
 		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTaskFiles()).to.be.a("number").that.is.equal(licMgrMaxFreeTaskFiles);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -175,7 +174,7 @@ suite("License Manager Tests", () =>
 		await sleep(500);
 		licMgr.dispose();
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -191,7 +190,7 @@ suite("License Manager Tests", () =>
 		await sleep(500);
 		licMgr.dispose();
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -212,7 +211,7 @@ suite("License Manager Tests", () =>
 		licMgr.dispose();
 		await closeActiveDocument();
 		await licMgr.setLicenseKey(licenseKey);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -230,7 +229,7 @@ suite("License Manager Tests", () =>
 		await sleep(400);
 		licMgr.dispose();
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -248,7 +247,7 @@ suite("License Manager Tests", () =>
 		await sleep(400);
 		licMgr.dispose();
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -265,7 +264,7 @@ suite("License Manager Tests", () =>
 		await sleep(400);
 		licMgr.dispose();
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -283,7 +282,7 @@ suite("License Manager Tests", () =>
 		await sleep(400);
 		licMgr.dispose();
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -305,7 +304,7 @@ suite("License Manager Tests", () =>
 		//
 		await licMgr.setLicenseKey(licenseKey);
 		await teApi.testsApi.storage.update("version", version);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -327,7 +326,7 @@ suite("License Manager Tests", () =>
 		//
 		await licMgr.setLicenseKey(licenseKey);
 		await teApi.testsApi.storage.update("version", version);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -337,7 +336,7 @@ suite("License Manager Tests", () =>
 		this.slow(testControl.slowTime.storageUpdate * 2);
 		await licMgr.setLicenseKey(licenseKey);
 		await teApi.testsApi.storage.update("version", version);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -355,7 +354,7 @@ suite("License Manager Tests", () =>
 		licMgr.dispose();
 		await closeActiveDocument();
 		await licMgr.setLicenseKey(licenseKey);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -371,7 +370,7 @@ suite("License Manager Tests", () =>
 		licMgr.dispose();
 		await closeActiveDocument();
 		await licMgr.setLicenseKey(licenseKey);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -389,7 +388,7 @@ suite("License Manager Tests", () =>
 		licMgr.dispose();
 		await closeActiveDocument();
 		await licMgr.setLicenseKey(licenseKey);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -405,7 +404,7 @@ suite("License Manager Tests", () =>
 		overrideNextShowInputBox("");
 		await setTasks();
 		await sleep(400);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -422,7 +421,7 @@ suite("License Manager Tests", () =>
 		overrideNextShowInfoBox("Enter License Key");
 		overrideNextShowInputBox("");
 		await executeTeCommand("enterLicense", testControl.waitTime.command * 2, 1100, "   ", 1);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -450,7 +449,7 @@ suite("License Manager Tests", () =>
 			// await teApi.testsApi.storage.update("version", version);
 			// tasks.pop();
 		// }
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -462,7 +461,7 @@ suite("License Manager Tests", () =>
 			cwd: getWsPath("../../spm-license-server/bin"), detached: true,
 		});
 		await sleep(4000);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -476,7 +475,7 @@ suite("License Manager Tests", () =>
 		await licMgr.checkLicense();
 		await setTasks();
 		await licMgr.setLicenseKey(licenseKey);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -489,7 +488,7 @@ suite("License Manager Tests", () =>
 		await licMgr.checkLicense();
 		await setTasks();
 		await licMgr.setLicenseKey(licenseKey);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -502,7 +501,17 @@ suite("License Manager Tests", () =>
 		await licMgr.checkLicense();
 		await setTasks();
 		await licMgr.setLicenseKey(licenseKey);
-        ++successCount;
+        endRollingCount(this);
+	});
+
+
+	test("Stop License Server", async function()
+	{
+        if (lsProcess) { // shut down local server
+			lsProcess.send("close");
+			await sleep(500);
+			lsProcess = undefined;
+		}
 	});
 
 });

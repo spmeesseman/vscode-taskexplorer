@@ -4,14 +4,13 @@
 import { Uri, WebviewPanel } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-	activate, closeActiveDocument, executeTeCommand, focusExplorerView, executeSettingsUpdate,
-	testControl, suiteFinished, sleep, getWsPath, exitRollingCount, executeTeCommand2, needsTreeBuild, waitForTeIdle
+	activate, closeActiveDocument, executeTeCommand, focusExplorerView, executeSettingsUpdate, testControl,
+	suiteFinished, sleep, getWsPath, exitRollingCount, executeTeCommand2, needsTreeBuild, waitForTeIdle, endRollingCount
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
 let projectUri: Uri;
 let userTasks: boolean;
-let successCount = -1;
 let origExplorer: ITaskExplorer | undefined;
 let origSidebar: ITaskExplorer | undefined;
 let pkgMgr: string;
@@ -27,7 +26,7 @@ suite("Info Report Tests", () =>
 		origSidebar = teApi.sidebar;
 		pkgMgr = teApi.config.getVs<string>("npm.packageManager");
 		userTasks = teApi.config.get<boolean>("specialFolders.showUserTasks");
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -49,7 +48,7 @@ suite("Info Report Tests", () =>
 		if (needsTreeBuild()) {
             await focusExplorerView(this);
 		}
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -62,7 +61,7 @@ suite("Info Report Tests", () =>
 		await sleep(100);
 		panel.dispose();
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -75,7 +74,7 @@ suite("Info Report Tests", () =>
 		await sleep(100);
 		panel.dispose();
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -87,7 +86,7 @@ suite("Info Report Tests", () =>
 		await sleep(100);
 		panel.dispose();
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -104,7 +103,7 @@ suite("Info Report Tests", () =>
         await teApi.config.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.eventFast);
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -117,7 +116,7 @@ suite("Info Report Tests", () =>
 		await sleep(500);
 		panel.dispose();
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -135,7 +134,7 @@ suite("Info Report Tests", () =>
 		teApi.explorer = oExplorer;
 		teApi.sidebar = oSidebar;
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -153,7 +152,7 @@ suite("Info Report Tests", () =>
 		teApi.explorer = oExplorer;
 		teApi.sidebar = oSidebar;
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -172,7 +171,7 @@ suite("Info Report Tests", () =>
 		teApi.explorer = oExplorer;
 		teApi.sidebar = oSidebar;
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -191,7 +190,7 @@ suite("Info Report Tests", () =>
 		teApi.explorer = oExplorer;
 		teApi.sidebar = oSidebar;
 		await closeActiveDocument();
-        ++successCount;
+        endRollingCount(this);
 	});
 
 });

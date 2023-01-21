@@ -69,7 +69,7 @@ export const activate = async (instance?: Mocha.Context) =>
             tc.tests.suiteResults[suiteKey] = {
                 timeStarted: Date.now(),
                 numTests: suite.tests.length,
-                successCount: 0,
+                successCount: -1,
                 suiteName: getSuiteFriendlyName(suite.title)
             };
         }
@@ -242,6 +242,28 @@ export const executeTeCommand = async (command: string, minWait?: number, maxWai
 export const executeTeCommand2 = (command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand(command, minWait, maxWait, ...args);
 
 
+export const getSuccessCount = (instance: Mocha.Context) =>
+{
+
+    const mTest = instance.test || instance.currentTest as Mocha.Runnable,
+          suite = mTest.parent as Mocha.Suite,
+          suiteKey = getSuiteKey(suite.title),
+          suiteResults = tc.tests.suiteResults[suiteKey];
+    return suiteResults.successCount;
+};
+
+
+export const endRollingCount = (instance: Mocha.Context) =>
+{
+
+    const mTest = instance.test as Mocha.Runnable,
+          suite = mTest.parent as Mocha.Suite,
+          suiteKey = getSuiteKey(suite.title),
+          suiteResults = tc.tests.suiteResults[suiteKey];
+    ++suiteResults.successCount;
+};
+
+
 export const exitRollingCount = (instance: Mocha.Context) =>
 {
 
@@ -254,7 +276,6 @@ export const exitRollingCount = (instance: Mocha.Context) =>
     try
     {
         expect(suiteResults.successCount).to.be.equal(testIdx);
-        ++suiteResults.successCount;
     }
     catch (e: any)
     {
@@ -618,7 +639,10 @@ export const verifyTaskCount = async (taskType: string, expectedCount: number, r
             tTasks = tTasks.filter(t => t.source === "Workspace");
         }
     }
-    expect(tTasks.length).to.be.equal(expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
+    if (expectedCount >= 0) {
+        expect(tTasks.length).to.be.equal(expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
+    }
+    return tTasks.length;
 };
 
 

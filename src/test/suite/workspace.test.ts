@@ -3,14 +3,15 @@
 /* tslint:disable */
 
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, needsTreeBuild, suiteFinished, testControl, treeUtils } from "../utils/utils";
+import {
+    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView,
+    needsTreeBuild, suiteFinished, testControl, treeUtils} from "../utils/utils";
 
 const testsName = "Workspace";
 const startTaskCount = 10; // 10 + 3 'User' Tasks, but getTaskCountByTree() will not return the User tasks
 
 let teApi: ITaskExplorerApi;
 let wsEnable: boolean;
-let successCount = -1;
 
 
 suite("Workspace / VSCode Tests", () =>
@@ -21,7 +22,7 @@ suite("Workspace / VSCode Tests", () =>
         ({ teApi } = await activate(this));
         wsEnable = teApi.config.get<boolean>("showHiddenWsTasks");
         await executeSettingsUpdate("showHiddenWsTasks", true);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -38,7 +39,7 @@ suite("Workspace / VSCode Tests", () =>
         if (needsTreeBuild()) {
             await focusExplorerView(this);
         }
-        successCount++;
+        endRollingCount(this);
 	});
 
 
@@ -48,7 +49,7 @@ suite("Workspace / VSCode Tests", () =>
         this.slow(testControl.slowTime.config.event + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("showHiddenWsTasks", true);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -58,7 +59,7 @@ suite("Workspace / VSCode Tests", () =>
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("showHiddenWsTasks", false);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount - 1);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -69,7 +70,7 @@ suite("Workspace / VSCode Tests", () =>
         await executeSettingsUpdate("specialFolders.showUserTasks", false, testControl.waitTime.config.showHideUserTasks);
         // TODO - I don't think verifyTaskCountByTree() returns User tasks.
         // await treeUtils.verifyTaskCountByTree(testsName, startTaskCount - 4);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -79,7 +80,7 @@ suite("Workspace / VSCode Tests", () =>
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.workspace", false);
         await treeUtils.verifyTaskCountByTree(testsName, 0);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -89,7 +90,7 @@ suite("Workspace / VSCode Tests", () =>
         this.slow(testControl.slowTime.config.enableEventWorkspace + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.workspace", true);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount - 1);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -99,7 +100,7 @@ suite("Workspace / VSCode Tests", () =>
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("showHiddenWsTasks", true);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -109,7 +110,7 @@ suite("Workspace / VSCode Tests", () =>
         this.slow(testControl.slowTime.config.showHideUserTasks + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("specialFolders.showUserTasks", true, testControl.waitTime.config.showHideUserTasks);
         await treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
-        successCount++;
+        endRollingCount(this);
     });
 
 });

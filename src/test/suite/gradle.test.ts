@@ -7,8 +7,8 @@ import { Uri } from "vscode";
 import { GradleTaskProvider } from "../../providers/gradle";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, needsTreeBuild,
-    testControl, treeUtils, verifyTaskCount
+    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
+    testControl, treeUtils
 } from "../utils/utils";
 
 const testsName = "gradle";
@@ -19,7 +19,6 @@ let fsApi: IFilesystemApi;
 let provider: GradleTaskProvider;
 let dirName: string;
 let fileUri: Uri;
-let successCount = -1;
 
 
 suite("Gradle Tests", () =>
@@ -31,7 +30,7 @@ suite("Gradle Tests", () =>
         provider = teApi.providers[testsName] as GradleTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "new_build.gradle"));
-        ++successCount;
+        endRollingCount(this);
     });
 
     suiteTeardown(async function()
@@ -45,7 +44,7 @@ suite("Gradle Tests", () =>
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -56,7 +55,7 @@ suite("Gradle Tests", () =>
         // provider.getDocumentPosition(undefined, undefined);
         // provider.getDocumentPosition("test", undefined);
         // provider.getDocumentPosition(undefined, "test");
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -65,7 +64,7 @@ suite("Gradle Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.taskCount.verify);
         // await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -75,7 +74,7 @@ suite("Gradle Tests", () =>
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent);
         // await executeSettingsUpdate("enabledTasks.gradle", false, slowTime.config.enable);
         // await verifyTaskCount(testsName, 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -86,7 +85,7 @@ suite("Gradle Tests", () =>
         // await teApi.config.updateWs("enabledTasks.gradle", true);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -107,7 +106,7 @@ suite("Gradle Tests", () =>
         // await waitForTeIdle(testControl.waitTime.fs.createEvent);
         // await verifyTaskCount(testsName, startTaskCount + 2);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -129,7 +128,7 @@ suite("Gradle Tests", () =>
         // await waitForTeIdle(testControl.waitTime.fs.modifyEvent);
         // await verifyTaskCount(testsName, startTaskCount + 6);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -149,7 +148,7 @@ suite("Gradle Tests", () =>
         // await waitForTeIdle(testControl.waitTime.fs.modifyEvent);
         // await verifyTaskCount(testsName, startTaskCount + 4);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -162,7 +161,7 @@ suite("Gradle Tests", () =>
         // await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

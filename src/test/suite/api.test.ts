@@ -10,8 +10,8 @@ import { ExternalTaskProviderBase } from "./externalTaskProviderBase";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeTeCommand, exitRollingCount, needsTreeBuild, suiteFinished, testControl, treeUtils,
-    verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, executeTeCommand, exitRollingCount, needsTreeBuild, suiteFinished,
+    testControl, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
@@ -19,7 +19,6 @@ let dispose: Disposable;
 let dispose2: Disposable;
 let taskProvider: ExternalTaskProvider;
 let taskProvider2: ExternalTaskProviderBase;
-let successCount = -1;
 
 
 suite("External Provider Tests", () =>
@@ -32,7 +31,7 @@ suite("External Provider Tests", () =>
         taskProvider2 = new ExternalTaskProviderBase();
         dispose = tasks.registerTaskProvider("external", taskProvider);
         dispose2 = tasks.registerTaskProvider("external2", taskProvider2);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -50,7 +49,7 @@ suite("External Provider Tests", () =>
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -59,7 +58,7 @@ suite("External Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.commandFast + 75);
         teApi = await executeTeCommand("getApi") as ITaskExplorerApi;
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -71,7 +70,7 @@ suite("External Provider Tests", () =>
         await teApi.register("external", taskProvider, "");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
         await verifyTaskCount("external", 2);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -83,7 +82,7 @@ suite("External Provider Tests", () =>
         const task = provider.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
         provider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         provider.resolveTask(task);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -98,7 +97,7 @@ suite("External Provider Tests", () =>
         try {
             taskProvider2.provideTasks();
         } catch {}
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -109,7 +108,7 @@ suite("External Provider Tests", () =>
         await teApi.refreshExternalProvider("external", "");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
         await verifyTaskCount("external", 2);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -120,7 +119,7 @@ suite("External Provider Tests", () =>
         await teApi.unregister("external", "");
         await waitForTeIdle(testControl.waitTime.config.event);
         await verifyTaskCount("external", 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -128,7 +127,7 @@ suite("External Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         await teApi.refreshExternalProvider("external_no_exist", ""); // cover
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

@@ -12,8 +12,8 @@ import { MakeTaskProvider } from "../../providers/make";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, needsTreeBuild,
-    sleep, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
+    needsTreeBuild, sleep, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "make";
@@ -24,7 +24,6 @@ let fsApi: IFilesystemApi;
 let provider: MakeTaskProvider;
 let dirName: string;
 let fileUri: Uri;
-let successCount = -1;
 
 
 suite("Makefile Tests", () =>
@@ -36,7 +35,7 @@ suite("Makefile Tests", () =>
         provider = teApi.providers[testsName] as MakeTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(join(dirName, "makefile"));
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -52,7 +51,7 @@ suite("Makefile Tests", () =>
         if (needsTreeBuild()) {
             await focusExplorerView(this);
         }
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -77,7 +76,7 @@ suite("Makefile Tests", () =>
         expect(index).to.equal(730, `clean3 task position should be 730 (actual ${index}`);
         index = provider.getDocumentPosition("rule_does_not_exist", makefileContent);
         expect(index).to.equal(0, `rule_does_not_exist task position should be 0 (actual ${index}`);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -101,7 +100,7 @@ suite("Makefile Tests", () =>
         finally {
             await executeSettingsUpdate("pathToPrograms." + testsName, pathToMake);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -110,7 +109,7 @@ suite("Makefile Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -120,7 +119,7 @@ suite("Makefile Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, false, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -130,7 +129,7 @@ suite("Makefile Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -168,7 +167,7 @@ suite("Makefile Tests", () =>
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await sleep(1000);
         await verifyTaskCount(testsName, startTaskCount + 3);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -181,7 +180,7 @@ suite("Makefile Tests", () =>
         await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -218,7 +217,7 @@ suite("Makefile Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 3);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -229,7 +228,7 @@ suite("Makefile Tests", () =>
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        successCount++;
+        endRollingCount(this);
     });
 
 

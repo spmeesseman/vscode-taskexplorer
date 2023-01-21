@@ -8,8 +8,8 @@ import { GulpTaskProvider } from "../../providers/gulp";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, needsTreeBuild,
-    sleep, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
+    needsTreeBuild, sleep, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "gulp";
@@ -21,7 +21,6 @@ let provider: GulpTaskProvider;
 let dirName: string;
 let fileUri: Uri;
 let file2Uri: Uri;
-let successCount = -1;
 
 
 suite("Gulp Tests", () =>
@@ -34,7 +33,7 @@ suite("Gulp Tests", () =>
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "gulpfile.js"));
         file2Uri = Uri.file(path.join(dirName, "gulpfile.mjs"));
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -58,7 +57,7 @@ suite("Gulp Tests", () =>
 		if (needsTreeBuild()) {
             await focusExplorerView(this);
         }
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -68,7 +67,7 @@ suite("Gulp Tests", () =>
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -77,7 +76,7 @@ suite("Gulp Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -88,7 +87,7 @@ suite("Gulp Tests", () =>
         await teApi.config.updateWs("enabledTasks.gulp", false);
         await waitForTeIdle(tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -99,7 +98,7 @@ suite("Gulp Tests", () =>
         await teApi.config.updateWs("enabledTasks.gulp", true);
         await waitForTeIdle(tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -123,7 +122,7 @@ suite("Gulp Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -149,7 +148,7 @@ suite("Gulp Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 3);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -167,7 +166,7 @@ suite("Gulp Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -178,7 +177,7 @@ suite("Gulp Tests", () =>
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -212,7 +211,7 @@ suite("Gulp Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 5);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -224,7 +223,7 @@ suite("Gulp Tests", () =>
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await waitForTeIdle(tc.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -247,7 +246,7 @@ suite("Gulp Tests", () =>
         await executeSettingsUpdate("useGulp", false, tc.waitTime.config.event);
         await waitForTeIdle(tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -260,7 +259,7 @@ suite("Gulp Tests", () =>
         await sleep(3000);
         await treeUtils.refresh();
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -274,7 +273,7 @@ suite("Gulp Tests", () =>
         // await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await treeUtils.refresh();
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

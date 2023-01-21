@@ -12,7 +12,7 @@ import { BashTaskProvider } from "../../providers/bash";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, executeSettingsUpdate, getWsPath, testControl, treeUtils, verifyTaskCount,
-    logErrorsAreFine, suiteFinished, exitRollingCount, waitForTeIdle
+    logErrorsAreFine, suiteFinished, exitRollingCount, waitForTeIdle, endRollingCount
 } from "../utils/utils";
 
 const testsName = "bash";
@@ -24,7 +24,6 @@ let enableTaskType: boolean;
 let wsFolder: WorkspaceFolder;
 let dirName: string;
 let fileUri: Uri;
-let successCount = -1;
 
 
 suite("Bash Tests", () =>
@@ -38,7 +37,7 @@ suite("Bash Tests", () =>
         fileUri = Uri.file(path.join(dirName, "test_provider.sh"));
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.config.enableEvent);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -56,7 +55,7 @@ suite("Bash Tests", () =>
     {
         if (exitRollingCount(this)) return;
         await treeUtils.refresh(this);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -65,7 +64,7 @@ suite("Bash Tests", () =>
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as BashTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -76,7 +75,7 @@ suite("Bash Tests", () =>
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("hello.sh"))),
                "ScriptProvider type should return position 1");
         logErrorsAreFine(true);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -85,7 +84,7 @@ suite("Bash Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -95,7 +94,7 @@ suite("Bash Tests", () =>
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, false, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -105,7 +104,7 @@ suite("Bash Tests", () =>
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -118,7 +117,7 @@ suite("Bash Tests", () =>
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
         await waitForTeIdle(testControl.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -131,7 +130,7 @@ suite("Bash Tests", () =>
         await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -144,7 +143,7 @@ suite("Bash Tests", () =>
         await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
         await waitForTeIdle(testControl.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -155,7 +154,7 @@ suite("Bash Tests", () =>
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        successCount++;
+        endRollingCount(this);
     });
 
 });

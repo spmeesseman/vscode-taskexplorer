@@ -23,7 +23,6 @@ let batch: ITaskItem[];
 let python: ITaskItem[];
 let antTask: TaskItem;
 let clickAction: string;
-let successCount = -1;
 
 
 suite("Task Tests", () =>
@@ -34,7 +33,7 @@ suite("Task Tests", () =>
         ({ teApi, testsApi, explorer } = await utils.activate(this));
         clickAction = teApi.config.get<string>("taskButtons.clickAction");
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -51,7 +50,7 @@ suite("Task Tests", () =>
         if (utils.needsTreeBuild()) {
             await utils.focusExplorerView(this);
         }
-        ++successCount;
+        utils.endRollingCount(this);
 	});
 
 
@@ -67,7 +66,7 @@ suite("Task Tests", () =>
         await utils.waitForTeIdle(tc.waitTime.getTreeTasks);
         python = await utils.treeUtils.getTreeTasks("python", 2);
         await utils.waitForTeIdle(tc.waitTime.getTreeTasks);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -80,7 +79,7 @@ suite("Task Tests", () =>
         const lastTasksFolder = tree[0] as SpecialTaskFolder;
         lastTasksFolder.clearTaskItems();
         expect(await utils.executeTeCommand("runLastTask", tc.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -98,7 +97,7 @@ suite("Task Tests", () =>
         exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.taskCommand) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 2000);
         await utils.executeTeCommand2("stop", [ batch[0] ]);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -114,7 +113,7 @@ suite("Task Tests", () =>
         await utils.waitForTaskExecution(exec, 1000);
         await utils.executeTeCommand2("stop", [ batch[0] ]);
         await utils.waitForTaskExecution(exec, 500);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -129,7 +128,7 @@ suite("Task Tests", () =>
         await utils.waitForTaskExecution(exec, 500);
         await utils.executeTeCommand2("stop", [ batch[0] ]);
         await utils.waitForTaskExecution(exec, 500);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -144,7 +143,7 @@ suite("Task Tests", () =>
         await utils.waitForTaskExecution(exec, 3000);
         await utils.executeTeCommand2("stop", [ batch[0] ], tc.waitTime.runCommandMin);
         await utils.waitForTaskExecution(exec, 1000);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -158,7 +157,7 @@ suite("Task Tests", () =>
         await utils.sleep(500);
         await utils.waitForTaskExecution(exec, 500);
         await utils.executeTeCommand2("stop", [ batch[0] ]);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -180,7 +179,7 @@ suite("Task Tests", () =>
         utils.overrideNextShowInfoBox(undefined);
         utils.executeTeCommand2("pause", [ batch[0] ], 0);           // don't await
         await utils.waitForTeIdle(tc.waitTime.refreshCommand);      // now wait for refresh
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -195,7 +194,7 @@ suite("Task Tests", () =>
         await utils.executeTeCommand2("pause", [ batch[0] ], tc.waitTime.taskCommand);
         await utils.sleep(1000);
         await utils.executeTeCommand2("stop", [ batch[0] ], tc.waitTime.taskCommand);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -215,7 +214,7 @@ suite("Task Tests", () =>
         await utils.focusSearchView(); // randomly show/hide view to test refresh event queue in tree/tree.ts
         await utils.waitForTaskExecution(exec);
         lastTask = antTask;
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -228,7 +227,7 @@ suite("Task Tests", () =>
         const exec = await utils.executeTeCommand2("run", [ antTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec);
         lastTask = antTask;
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -248,7 +247,7 @@ suite("Task Tests", () =>
         await utils.executeTeCommand2("openTerminal", [ bash[0] ]);
         await utils.waitForTaskExecution(exec);
         lastTask = bash[0];
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -316,7 +315,7 @@ suite("Task Tests", () =>
         exec = await utils.executeTeCommand2("restart", [ batchTask ], tc.waitTime.runCommandMin + 1000) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec);
         lastTask = batchTask;
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -345,7 +344,7 @@ suite("Task Tests", () =>
         await utils.executeTeCommand2("openTerminal", [ batchTask ], tc.waitTime.command);
         await utils.waitForTaskExecution(exec);
         lastTask = batchTask;
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -359,7 +358,7 @@ suite("Task Tests", () =>
         await utils.waitForTaskExecution(exec);
         lastTask = batchTask;
         lastTask = batchTask;
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -385,7 +384,7 @@ suite("Task Tests", () =>
             item.id = item.id.replace("_noId", "");
             lastTasksStore.pop();
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -414,7 +413,7 @@ suite("Task Tests", () =>
             await utils.executeSettingsUpdate("specialFolders.numLastTasks", maxLastTasks);
             testsApi.enableConfigWatcher(true);
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 });

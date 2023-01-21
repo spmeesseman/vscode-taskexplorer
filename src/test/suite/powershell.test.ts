@@ -10,7 +10,7 @@ import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { PowershellTaskProvider } from "../../providers/powershell";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, exitRollingCount, getWsPath,
+import { activate, endRollingCount, executeSettingsUpdate, exitRollingCount, getWsPath,
     logErrorsAreFine, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
@@ -25,7 +25,6 @@ let wsFolder: WorkspaceFolder;
 let dirName: string;
 let fileUri: Uri;
 let fileUri2: Uri;
-let successCount = -1;
 
 
 suite("Powershell Tests", () =>
@@ -42,7 +41,7 @@ suite("Powershell Tests", () =>
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe", tc.waitTime.config.globEvent);
         await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -61,7 +60,7 @@ suite("Powershell Tests", () =>
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as PowershellTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -72,7 +71,7 @@ suite("Powershell Tests", () =>
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.ps1"))),
                "ScriptProvider type should return position 1");
         logErrorsAreFine();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -82,7 +81,7 @@ suite("Powershell Tests", () =>
         this.slow(tc.slowTime.taskCount.verify + tc.slowTime.min);
         await verifyTaskCount(testsName, startTaskCount);
         await waitForTeIdle(tc.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -92,7 +91,7 @@ suite("Powershell Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, false, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -102,7 +101,7 @@ suite("Powershell Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -113,7 +112,7 @@ suite("Powershell Tests", () =>
         await fsApi.writeFile(fileUri.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -124,7 +123,7 @@ suite("Powershell Tests", () =>
         await fsApi.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -135,7 +134,7 @@ suite("Powershell Tests", () =>
         await fsApi.writeFile(fileUri2.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -146,7 +145,7 @@ suite("Powershell Tests", () =>
         await fsApi.deleteFile(fileUri2.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -157,7 +156,7 @@ suite("Powershell Tests", () =>
         await fsApi.writeFile(fileUri2.fsPath, "Write-Host 'Hello Code 2'\r\n\r\n");
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -168,7 +167,7 @@ suite("Powershell Tests", () =>
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -179,7 +178,7 @@ suite("Powershell Tests", () =>
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

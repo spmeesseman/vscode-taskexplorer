@@ -10,8 +10,8 @@ import { Uri } from "vscode";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, needsTreeBuild,
-    suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath,
+    needsTreeBuild, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "apppublisher";
@@ -21,7 +21,6 @@ let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let rootPath: string;
 let fileUri: Uri;
-let successCount = -1;
 
 
 suite("App-Publisher Tests", () =>
@@ -34,7 +33,7 @@ suite("App-Publisher Tests", () =>
         ({ teApi, fsApi } = await activate(this));
         rootPath = getWsPath(".");
         fileUri = Uri.file(join(rootPath, ".publishrc.json"));
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -50,7 +49,7 @@ suite("App-Publisher Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.config.enableEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -60,7 +59,7 @@ suite("App-Publisher Tests", () =>
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -69,7 +68,7 @@ suite("App-Publisher Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount, 5);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -81,7 +80,7 @@ suite("App-Publisher Tests", () =>
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -103,7 +102,7 @@ suite("App-Publisher Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -113,7 +112,7 @@ suite("App-Publisher Tests", () =>
         this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -123,7 +122,7 @@ suite("App-Publisher Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount + 21);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -150,7 +149,7 @@ suite("App-Publisher Tests", () =>
         //
         await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -177,7 +176,7 @@ suite("App-Publisher Tests", () =>
         //
         await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await verifyTaskCount(testsName, startTaskCount + 21);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -188,7 +187,7 @@ suite("App-Publisher Tests", () =>
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -198,7 +197,7 @@ suite("App-Publisher Tests", () =>
         this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

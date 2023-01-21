@@ -19,8 +19,8 @@ import { join } from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, exitRollingCount, focusExplorerView, getTestsPath, needsTreeBuild, sleep, suiteFinished, testControl as tc,
-    treeUtils, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, getTestsPath, needsTreeBuild, sleep, suiteFinished,
+    testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const gruntCt = 7;
@@ -35,7 +35,6 @@ let wsf2DirName: string;
 let wsf3DirName: string;
 let wsf4DirName: string;
 let wsf: WorkspaceFolder[];
-let successCount = -1;
 
 
 suite("Multi-Root Workspace Tests", () =>
@@ -77,7 +76,7 @@ suite("Multi-Root Workspace Tests", () =>
             index: 4
         }];
 
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -98,7 +97,7 @@ suite("Multi-Root Workspace Tests", () =>
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -108,7 +107,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.command);
         await teApi.testsApi.fileCache.addWsFolders(undefined);
         await waitForTeIdle(tc.waitTime.command);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -121,7 +120,7 @@ suite("Multi-Root Workspace Tests", () =>
             removed: []
         });
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -134,7 +133,7 @@ suite("Multi-Root Workspace Tests", () =>
             removed: []
         });
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -147,7 +146,7 @@ suite("Multi-Root Workspace Tests", () =>
             removed: []
         });
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -160,7 +159,7 @@ suite("Multi-Root Workspace Tests", () =>
             removed: [ wsf[1] ]
         });
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -173,7 +172,7 @@ suite("Multi-Root Workspace Tests", () =>
             removed: [ wsf[2], wsf[3] ]
         });
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -186,7 +185,7 @@ suite("Multi-Root Workspace Tests", () =>
             removed: [ wsf[4] ]
         });
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -220,7 +219,7 @@ suite("Multi-Root Workspace Tests", () =>
         //
         // await verifyTaskCount("grunt", gruntCt + 2);
         await verifyTaskCount("grunt", gruntCt);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -236,7 +235,7 @@ suite("Multi-Root Workspace Tests", () =>
         await fsApi.deleteFile(join(wsf[1].uri.fsPath, "Gruntfile.js"));
         workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
         await verifyTaskCount("grunt", gruntCt);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -251,7 +250,7 @@ suite("Multi-Root Workspace Tests", () =>
             removed: []
         });
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -266,7 +265,7 @@ suite("Multi-Root Workspace Tests", () =>
             removed: [ wsf[1] ]
         });
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 /*

@@ -5,7 +5,6 @@ import * as utils from "../utils/utils";
 import { ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 let testsApi: ITestsApi;
-let successCount = -1;
 const tc = utils.testControl;
 const checkTaskCountsTime = (4 * tc.slowTime.taskCount.verify) + tc.slowTime.taskCount.verifyNpm + tc.slowTime.taskCount.verifyWorkspace;
 
@@ -19,7 +18,7 @@ suite("File Cache Tests", () =>
         await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
         // await utils.executeSettingsUpdate("specialFolders.showUserTasks", false);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -39,7 +38,7 @@ suite("File Cache Tests", () =>
         if (utils.needsTreeBuild()) {
             await utils.treeUtils.refresh(this);
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -47,7 +46,7 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         await checkTaskCounts(this);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -56,7 +55,7 @@ suite("File Cache Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + tc.slowTime.fileCachePersist);
         await utils.executeSettingsUpdate("enablePersistentFileCaching", true); // enabling setting willpersist *now*
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -67,7 +66,7 @@ suite("File Cache Tests", () =>
         // await treeUtils.refresh(this);
         await testsApi.fileCache.rebuildCache("", true);
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -75,7 +74,7 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         await checkTaskCounts(this);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -89,7 +88,7 @@ suite("File Cache Tests", () =>
         await testsApi.fileCache.rebuildCache("", true);
         await utils.sleep(tc.waitTime.min);
         await checkTaskCounts();
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -98,7 +97,7 @@ suite("File Cache Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + tc.slowTime.config.event);
         await utils.executeSettingsUpdate("enablePersistentFileCaching", false);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -109,7 +108,7 @@ suite("File Cache Tests", () =>
         // await treeUtils.refresh(this);
         await testsApi.fileCache.rebuildCache("", true);
         await utils.waitForTeIdle(tc.waitTime.commandFast);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -117,7 +116,7 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         await checkTaskCounts(this);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -126,7 +125,7 @@ suite("File Cache Tests", () =>
         if (utils.exitRollingCount(this)) return;
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -137,7 +136,7 @@ suite("File Cache Tests", () =>
         testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -149,7 +148,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(40);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -161,7 +160,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(75);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -173,7 +172,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(100);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -185,7 +184,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(250);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -197,7 +196,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(500);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -209,7 +208,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(750);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -221,7 +220,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(1000);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -232,7 +231,7 @@ suite("File Cache Tests", () =>
         testsApi.fileCache.buildTaskTypeCache("gulp", undefined, true, ""); // Don't 'await'
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -244,7 +243,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(tc.waitTime.min);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -256,7 +255,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(75);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -268,7 +267,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(100);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -280,7 +279,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(250);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -292,7 +291,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(500);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -304,7 +303,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(750);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -316,7 +315,7 @@ suite("File Cache Tests", () =>
         await utils.sleep(1000);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -326,7 +325,7 @@ suite("File Cache Tests", () =>
         this.slow(tc.slowTime.refreshCommand + 100);
         await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await utils.sleep(100);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -334,7 +333,7 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         await checkTaskCounts(this);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 });

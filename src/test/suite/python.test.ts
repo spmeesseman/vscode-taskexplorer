@@ -11,7 +11,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { PythonTaskProvider } from "../../providers/python";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, getWsPath,
+    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, getWsPath,
     logErrorsAreFine, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
@@ -25,7 +25,6 @@ let enableTaskType: boolean;
 let wsFolder: WorkspaceFolder;
 let dirName: string;
 let fileUri: Uri;
-let successCount = -1;
 
 
 suite("Python Tests", () =>
@@ -46,7 +45,7 @@ suite("Python Tests", () =>
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe", tc.waitTime.config.event);
         await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -64,7 +63,7 @@ suite("Python Tests", () =>
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as PythonTaskProvider;
         assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -75,7 +74,7 @@ suite("Python Tests", () =>
         assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.py"))),
                "ScriptProvider type should return position 1");
         logErrorsAreFine(true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -84,7 +83,7 @@ suite("Python Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount, 3);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -94,7 +93,7 @@ suite("Python Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, false, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -104,7 +103,7 @@ suite("Python Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -115,7 +114,7 @@ suite("Python Tests", () =>
         await fsApi.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -126,7 +125,7 @@ suite("Python Tests", () =>
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -137,7 +136,7 @@ suite("Python Tests", () =>
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -148,7 +147,7 @@ suite("Python Tests", () =>
         await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1, 1);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -160,7 +159,7 @@ suite("Python Tests", () =>
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent * 2);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

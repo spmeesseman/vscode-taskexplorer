@@ -4,13 +4,11 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
-import { expect } from "chai";
 import { NsisTaskProvider } from "../../providers/nsis";
-import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished,
-    testControl, treeUtils, verifyTaskCount
+    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished,
+    testControl, treeUtils
 } from "../utils/utils";
 
 const testsName = "nsis";
@@ -21,7 +19,6 @@ let fsApi: IFilesystemApi;
 let provider: NsisTaskProvider;
 let dirName: string;
 let fileUri: Uri;
-let successCount = -1;
 
 
 suite("Nullsoft NSIS Tests", () =>
@@ -33,7 +30,7 @@ suite("Nullsoft NSIS Tests", () =>
         provider = teApi.providers[testsName] as NsisTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "new_build.nsi"));
-        ++successCount;
+        endRollingCount(this);
     });
 
     suiteTeardown(async function()
@@ -48,7 +45,7 @@ suite("Nullsoft NSIS Tests", () =>
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -59,7 +56,7 @@ suite("Nullsoft NSIS Tests", () =>
         // provider.getDocumentPosition(undefined, undefined);
         // provider.getDocumentPosition("test", undefined);
         // provider.getDocumentPosition(undefined, "test");
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -69,7 +66,7 @@ suite("Nullsoft NSIS Tests", () =>
         this.slow(testControl.slowTime.taskCount.verify + testControl.waitTime.min);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -81,7 +78,7 @@ suite("Nullsoft NSIS Tests", () =>
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, 0);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -93,7 +90,7 @@ suite("Nullsoft NSIS Tests", () =>
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -114,7 +111,7 @@ suite("Nullsoft NSIS Tests", () =>
         // await waitForTeIdle(testControl.waitTime.fs.createEvent);
         // await verifyTaskCount(testsName, startTaskCount + 2);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -127,7 +124,7 @@ suite("Nullsoft NSIS Tests", () =>
         // await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

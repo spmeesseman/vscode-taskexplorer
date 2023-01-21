@@ -12,7 +12,7 @@ import { expect } from "chai";
 import { workspace, tasks, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi, ITaskFile } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, exitRollingCount, focusExplorerView,
+    activate, endRollingCount, executeSettingsUpdate, executeTeCommand, executeTeCommand2, exitRollingCount, focusExplorerView,
     getWsPath, needsTreeBuild, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
@@ -31,7 +31,6 @@ let batch: TaskItem[];
 let grunt: TaskItem[];
 let taskMap: TaskMap;
 let tempDirsDeleted = false;
-let successCount = -1;
 
 
 suite("Provider Tests", () =>
@@ -45,7 +44,7 @@ suite("Provider Tests", () =>
         dirNameL2 = join(dirName, "subfolder");
         dirNameIgn = join(rootPath, "tasks_test_ignore_");
         await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ], tc.waitTime.config.globEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -83,7 +82,7 @@ suite("Provider Tests", () =>
             await fsApi.createDir(dirNameIgn);
             await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -93,7 +92,7 @@ suite("Provider Tests", () =>
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -102,7 +101,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.command);
         batch = await treeUtils.getTreeTasks("bash", 1) as TaskItem[];
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -111,7 +110,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.command);
         batch = await treeUtils.getTreeTasks("batch", 2) as TaskItem[];
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -120,7 +119,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent);
         await setupAppPublisher();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -129,7 +128,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 5);
         await setupAnt();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -138,7 +137,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent);
         await setupBash();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -147,7 +146,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 3);
         await setupBatch();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -156,7 +155,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 3);
         await setupGradle();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -165,7 +164,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 4);
         await setupGrunt();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -174,7 +173,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 5);
         await setupGulp();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -183,7 +182,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 3);
         await setupMakefile();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -192,7 +191,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent);
         await setupMaven();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -201,7 +200,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 2);
         await setupTsc();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -211,7 +210,7 @@ suite("Provider Tests", () =>
         // if (needsTreeBuild()) {
             await focusExplorerView(this);
         // }
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -220,7 +219,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.apppublisher", true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -229,7 +228,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.gradle", true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -238,7 +237,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.pipenv", true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -247,7 +246,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.maven", true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -256,7 +255,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.python", true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -275,7 +274,7 @@ suite("Provider Tests", () =>
         batch = await treeUtils.getTreeTasks("batch", 4) as TaskItem[];
         grunt = await treeUtils.getTreeTasks("grunt", 13) as TaskItem[];
 
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -300,7 +299,7 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -325,7 +324,7 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -352,7 +351,7 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -377,7 +376,7 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -389,7 +388,7 @@ suite("Provider Tests", () =>
         ({ taskMap, numOpened, numFilesOpened } = await treeUtils.walkTreeItems(undefined, true));
         checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10); // There are 3 'User' Workspace/VSCode Tasks but they won't be in the TaskMap
         this.slow((numFilesOpened * tc.slowTime.findTaskPosition) + ((numOpened - numFilesOpened) * tc.slowTime.findTaskPositionDocOpen));
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -398,7 +397,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         const provider = teApi.providers.batch;
         provider.resolveTask(batch[0].task);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -412,7 +411,7 @@ suite("Provider Tests", () =>
         await executeTeCommand2("addToExcludes", [ taskItem ], tc.waitTime.config.excludeTasksEvent);
         await verifyTaskCount("grunt", gruntCt - 2); // there are 3 tasks that would getmasked by the task name regex 'default'
         taskFile = taskItem?.taskFile;               // but oe of them is already ignored as it is in an ignored folder
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -425,7 +424,7 @@ suite("Provider Tests", () =>
               taskItem = batch.find(t => t.taskSource === "batch" && t.taskFile.fileName.toLowerCase().includes("test2.bat"));
         await executeTeCommand2("addToExcludes", [ taskItem ], tc.waitTime.config.globEvent);
         await verifyTaskCount("batch", scriptCt - 1);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -440,7 +439,7 @@ suite("Provider Tests", () =>
         }
         taskFile = undefined;
         await verifyTaskCount("grunt", gruntCt - 1); // there's just oe more task left in the file we just ignored
-        ++successCount;                              // after excluding the task name regex 'default' a few tests above
+        endRollingCount(this);                              // after excluding the task name regex 'default' a few tests above
     });
 
 
@@ -455,7 +454,7 @@ suite("Provider Tests", () =>
         await verifyTaskCount("apppublisher", 21);
         await createAppPublisherFile();
         await verifyTaskCount("apppublisher", 42);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -468,7 +467,7 @@ suite("Provider Tests", () =>
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createAntFile();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -481,7 +480,7 @@ suite("Provider Tests", () =>
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createGradleFile();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -494,7 +493,7 @@ suite("Provider Tests", () =>
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createGruntFile();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -507,7 +506,7 @@ suite("Provider Tests", () =>
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createGulpFile();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -521,7 +520,7 @@ suite("Provider Tests", () =>
         await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createMakeFile();
         await executeSettingsUpdate("logging.enable", true); // hit tree.logTask()
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -534,7 +533,7 @@ suite("Provider Tests", () =>
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createMavenPomFile();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -547,7 +546,7 @@ suite("Provider Tests", () =>
         await fsApi.deleteFile(file);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
         await createBatchFile();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -556,7 +555,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.disableEvent);
         await executeSettingsUpdate("enabledTasks.pipenv", false);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -567,7 +566,7 @@ suite("Provider Tests", () =>
         await executeSettingsUpdate("specialFolders.expanded.test-files", true);
         await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -584,7 +583,7 @@ suite("Provider Tests", () =>
         await executeSettingsUpdate("specialFolders.expanded.test-files", false, tc.waitTime.config.event);
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
         await waitForTeIdle(tc.waitTime.refreshCommand);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -594,7 +593,7 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.cache.build + tc.slowTime.min);
         await teApi.testsApi.fileCache.buildTaskTypeCache("gulp", (workspace.workspaceFolders as WorkspaceFolder[])[0], true, "");
         await waitForTeIdle(tc.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -605,7 +604,7 @@ suite("Provider Tests", () =>
         await executeSettingsUpdate("groupWithSeparator", true);
         await executeSettingsUpdate("groupSeparator", "-");
         await executeSettingsUpdate("groupMaxLevel", 5);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -634,7 +633,7 @@ suite("Provider Tests", () =>
         const taskItems = await tasks.fetchTasks({ type: "grunt" });
         expect(taskItems.length).to.be.equal(gruntCt - 2, `Unexpected grunt task count (Found ${taskItems.length} of ${gruntCt - 2})`);
         await waitForTeIdle(tc.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -643,7 +642,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.fs.deleteFolderEvent * 3) + (tc.slowTime.fs.deleteEvent * (tempFiles.length)) + 4000);
         await deleteTempFilesAndDirectories();
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

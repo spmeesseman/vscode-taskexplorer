@@ -14,7 +14,6 @@ const tc = utils.testControl;
 let fsApi: IFilesystemApi;
 let packageJsonPath: string | undefined;
 let npmTaskItems: TaskItem[];
-let successCount = -1;
 
 
 suite("NPM Tests", () =>
@@ -23,7 +22,7 @@ suite("NPM Tests", () =>
     suiteSetup(async function()
     {
         ({ fsApi } = await utils.activate(this));
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -53,7 +52,7 @@ suite("NPM Tests", () =>
         if (utils.needsTreeBuild()) {
             await utils.focusExplorerView(this);
         }
-        ++successCount;
+        utils.endRollingCount(this);
 	});
 
 
@@ -82,7 +81,7 @@ suite("NPM Tests", () =>
         // tagLog("NPM", "Create Package File (2: package.json)");
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
         // tagLog("NPM", "Create Package File (3: package.json)");
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -92,7 +91,7 @@ suite("NPM Tests", () =>
         this.slow(tc.slowTime.taskCount.verifyNpm + tc.slowTime.min);
         await utils.verifyTaskCount(testsName, startTaskCount + 5, 2);
         await utils.waitForTeIdle(tc.waitTime.min);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -110,7 +109,7 @@ suite("NPM Tests", () =>
         // tagLog("NPM", "Get NPM Task Items [DoWorkSon]");
         npmTaskItems = await utils.treeUtils.getTreeTasks(testsName, 2) as TaskItem[];
         // tagLog("NPM", "Get NPM Task Items [Complete]");
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -120,7 +119,7 @@ suite("NPM Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.eventFast);
         getPackageManager();
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -131,7 +130,7 @@ suite("NPM Tests", () =>
         for (const taskItem of npmTaskItems) {
             await utils.executeTeCommand2("open", [ taskItem ], tc.waitTime.commandFast);
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -143,7 +142,7 @@ suite("NPM Tests", () =>
             "runInstall", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
         ) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -155,7 +154,7 @@ suite("NPM Tests", () =>
             "runUpdate", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
         ) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -168,7 +167,7 @@ suite("NPM Tests", () =>
             "runUpdatePackage", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
         ) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -180,7 +179,7 @@ suite("NPM Tests", () =>
             "runAudit", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
         ) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -192,7 +191,7 @@ suite("NPM Tests", () =>
             "runAuditFix", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
         ) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 });

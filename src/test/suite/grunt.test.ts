@@ -8,8 +8,8 @@ import { GruntTaskProvider } from "../../providers/grunt";
 import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, needsTreeBuild,
-    sleep, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
+    needsTreeBuild, sleep, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "grunt";
@@ -20,7 +20,6 @@ let fsApi: IFilesystemApi;
 let provider: GruntTaskProvider;
 let dirName: string;
 let fileUri: Uri;
-let successCount = -1;
 
 
 suite("Grunt Tests", () =>
@@ -33,7 +32,7 @@ suite("Grunt Tests", () =>
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "gruntfile.js"));
         // await executeSettingsUpdate("groupMaxLevel", 5); // this is just a random spot to bump the grouping level
-        ++successCount;
+        endRollingCount(this);
     });
 
     suiteTeardown(async function()
@@ -48,7 +47,7 @@ suite("Grunt Tests", () =>
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -59,7 +58,7 @@ suite("Grunt Tests", () =>
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -68,7 +67,7 @@ suite("Grunt Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -78,7 +77,7 @@ suite("Grunt Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.grunt", false, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, 0);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -88,7 +87,7 @@ suite("Grunt Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.grunt", true, tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -107,7 +106,7 @@ suite("Grunt Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -128,7 +127,7 @@ suite("Grunt Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 6);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -147,7 +146,7 @@ suite("Grunt Tests", () =>
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 4);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -160,7 +159,7 @@ suite("Grunt Tests", () =>
         await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -172,7 +171,7 @@ suite("Grunt Tests", () =>
         await sleep(3000);
         await treeUtils.refresh();
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -186,7 +185,7 @@ suite("Grunt Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		await focusExplorerView(this);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -198,7 +197,7 @@ suite("Grunt Tests", () =>
         await sleep(1500);
         await treeUtils.refresh();
         await verifyTaskCount(testsName, startTaskCount);
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

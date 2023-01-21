@@ -20,7 +20,6 @@ let rootPath: string;
 let dirName: string;
 let fileUri: Uri;
 let fileUri2: Uri;
-let successCount = -1;
 
 
 suite("Typescript Tests", () =>
@@ -34,7 +33,7 @@ suite("Typescript Tests", () =>
         dirName = join(rootPath, "tasks_test_ts_");
         fileUri = Uri.file(join(rootPath, "tsconfig.json"));
         fileUri2 = Uri.file(join(dirName, "tsconfig.json"));
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 
@@ -59,7 +58,7 @@ suite("Typescript Tests", () =>
         if (utils.needsTreeBuild()) {
             await utils.focusExplorerView(this);
         }
-        successCount++;
+        utils.endRollingCount(this);
 	});
 
 
@@ -68,7 +67,7 @@ suite("Typescript Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(testControl.slowTime.taskCount.verifyByTree);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 
@@ -79,7 +78,7 @@ suite("Typescript Tests", () =>
         await fsApi.createDir(dirName);
         await utils.waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 
@@ -109,7 +108,7 @@ suite("Typescript Tests", () =>
         // the 'create file 2' test fails 1/50 runs, so add a lil bit on to fs.createEvent here too
         await utils.waitForTeIdle(testControl.waitTime.fs.createEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 
@@ -125,7 +124,7 @@ suite("Typescript Tests", () =>
         await utils.closeActiveDocument();
         await utils.executeTeCommand2("open", [ tscItems[1] ]);
         await utils.closeActiveDocument();
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 
@@ -155,7 +154,7 @@ suite("Typescript Tests", () =>
         // the 'create file 2' test fails 1/50 runs, so add a lil bit on to fs.createEvent
         await utils.waitForTeIdle(testControl.waitTime.fs.createEvent + 100);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 
@@ -165,7 +164,7 @@ suite("Typescript Tests", () =>
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verifyByTree);
         await utils.executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.config.enableEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, 0);
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 
@@ -175,7 +174,7 @@ suite("Typescript Tests", () =>
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verifyByTree);
         await utils.executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.config.enableEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 
@@ -225,7 +224,7 @@ suite("Typescript Tests", () =>
         // if (resetLogging) { // turn scary error logging off
         //     executeSettingsUpdate("logging.enable", true);
         // }
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 
@@ -254,7 +253,7 @@ suite("Typescript Tests", () =>
         );
         await utils.waitForTeIdle(testControl.waitTime.fs.createEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 
@@ -265,7 +264,7 @@ suite("Typescript Tests", () =>
         await fsApi.deleteFile(fileUri.fsPath);
         await utils.waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 
@@ -276,7 +275,7 @@ suite("Typescript Tests", () =>
         await fsApi.deleteFile(fileUri2.fsPath);
         await utils.waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
-        successCount++;
+        utils.endRollingCount(this);
     });
 
 });

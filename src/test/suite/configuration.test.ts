@@ -5,7 +5,8 @@
 import { expect } from "chai";
 import { IDictionary, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, exitRollingCount, sleep, suiteFinished, testControl as tc, waitForTeIdle
+    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, getSuccessCount, sleep,
+    suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
@@ -16,7 +17,6 @@ let globPatternsBash: string[];
 let enabledTasks: IDictionary<boolean>;
 let pathToPrograms: IDictionary<string>;
 let shellW32: string, shellLnx: string, shellOsx: string, pkgMgr: string;
-let successCount = -1;
 
 
 suite("Configuration / Settings Tests", () =>
@@ -33,7 +33,7 @@ suite("Configuration / Settings Tests", () =>
         shellOsx = teApi.config.getVs<string>("terminal.integrated.shell.osx");
         globPatternsAnt = teApi.config.get<string[]>("globPatternsAnt");
         globPatternsBash = teApi.config.get<string[]>("globPatternsBash");
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -41,6 +41,7 @@ suite("Configuration / Settings Tests", () =>
     {
         testsApi.enableConfigWatcher(false);
         try {
+            const successCount = getSuccessCount(this);
             if (successCount < 3) {
                 await executeSettingsUpdate("globPatternsAnt", globPatternsAnt);
                 await executeSettingsUpdate("globPatternsBash", globPatternsBash);
@@ -125,7 +126,7 @@ suite("Configuration / Settings Tests", () =>
         // Re-enable config watcher
         //
         testsApi.enableConfigWatcher(true);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -138,7 +139,7 @@ suite("Configuration / Settings Tests", () =>
         await executeSettingsUpdate("enabledTasks.ant", false, tc.waitTime.config.enableEvent);
         globPatterns.push("**/dummy.xml");
         await executeSettingsUpdate("globPatternsAnt", globPatterns, tc.waitTime.config.globEvent);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -149,7 +150,7 @@ suite("Configuration / Settings Tests", () =>
         await executeSettingsUpdate("enabledTasks.ant", true, tc.waitTime.config.enableEvent);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsAnt", globPatterns, tc.waitTime.config.globEvent);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -161,7 +162,7 @@ suite("Configuration / Settings Tests", () =>
         await executeSettingsUpdate("enabledTasks.bash", false, tc.waitTime.config.enableEvent);
         globPatterns.push("**/extensionless/**");
         await executeSettingsUpdate("globPatternsBash", globPatterns);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -172,7 +173,7 @@ suite("Configuration / Settings Tests", () =>
         await executeSettingsUpdate("enabledTasks.bash", true, tc.waitTime.config.enableEvent);
         globPatterns.pop();
         await executeSettingsUpdate("globPatternsBash", globPatterns);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -183,7 +184,7 @@ suite("Configuration / Settings Tests", () =>
         pkgMgr = teApi.config.getVs<string>("npm.packageManager");
         await teApi.config.updateVsWs("npm.packageManager", "yarn");
         expect(teApi.utilities.getPackageManager() === "yarn");
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -193,7 +194,7 @@ suite("Configuration / Settings Tests", () =>
         this.slow(tc.slowTime.config.event);
         await teApi.config.updateVsWs("npm.packageManager", "npm");
         expect(teApi.utilities.getPackageManager()).to.equal("npm");
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -203,7 +204,7 @@ suite("Configuration / Settings Tests", () =>
         this.slow(tc.slowTime.config.event);
         await teApi.config.updateVsWs("npm.packageManager", "");
         expect(teApi.utilities.getPackageManager()).to.equal("npm");
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -213,7 +214,7 @@ suite("Configuration / Settings Tests", () =>
         this.slow(tc.slowTime.config.event);
         await teApi.config.updateVsWs("npm.packageManager", "auto");
         expect(teApi.utilities.getPackageManager()).to.equal("npm");
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -224,7 +225,7 @@ suite("Configuration / Settings Tests", () =>
         await teApi.config.updateVsWs("npm.packageManager", pkgMgr);
         await teApi.config.updateVs("npm.packageManager", pkgMgr); // cover global
         expect(teApi.utilities.getPackageManager()).to.equal(pkgMgr === "auto" ? "npm" : pkgMgr);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -234,7 +235,7 @@ suite("Configuration / Settings Tests", () =>
         this.slow(tc.slowTime.config.event + tc.slowTime.min);
         await teApi.config.updateVsWs("terminal.integrated.shell.osx", "/usr/bin/sh");
         await sleep(tc.waitTime.min);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -244,7 +245,7 @@ suite("Configuration / Settings Tests", () =>
         this.slow(tc.slowTime.config.event + tc.slowTime.min);
         await teApi.config.updateVsWs("terminal.integrated.shell.linux", "/bin/sh");
         await sleep(tc.waitTime.min);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -254,7 +255,7 @@ suite("Configuration / Settings Tests", () =>
         this.slow(tc.slowTime.config.event + (tc.waitTime.refreshCommand * 2));
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
         await waitForTeIdle(tc.waitTime.refreshCommand);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -276,7 +277,7 @@ suite("Configuration / Settings Tests", () =>
         testsApi.enableConfigWatcher(true);
         await teApi.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
         await waitForTeIdle(tc.waitTime.config.event);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -290,7 +291,7 @@ suite("Configuration / Settings Tests", () =>
         testsApi.enableConfigWatcher(true);
         await teApi.config.updateVsWs("terminal.integrated.shell.linux", shellLnx);
         await waitForTeIdle(tc.waitTime.refreshCommandNoChanges);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -304,7 +305,7 @@ suite("Configuration / Settings Tests", () =>
         testsApi.enableConfigWatcher(true);
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", shellW32);
         await waitForTeIdle(tc.waitTime.refreshCommandNoChanges); // setting with current enabled tasks will trigger a refresh
-        successCount++;                                  // but since no glob/file changes it'll be noticed by fcache and quick
+        endRollingCount(this);                                  // but since no glob/file changes it'll be noticed by fcache and quick
     });
 
 
@@ -313,7 +314,7 @@ suite("Configuration / Settings Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event);
         await executeSettingsUpdate("pathToPrograms.bash", "c:\\unix\\sh.exe");
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -322,7 +323,7 @@ suite("Configuration / Settings Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event);
         await executeSettingsUpdate("pathToPrograms.composer", "c:\\php5\\composer.exe");
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -331,7 +332,7 @@ suite("Configuration / Settings Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event);
         await executeSettingsUpdate("pathToPrograms.bash", undefined);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -340,7 +341,7 @@ suite("Configuration / Settings Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event);
         await executeSettingsUpdate("pathToPrograms.composer", undefined);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -349,7 +350,7 @@ suite("Configuration / Settings Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event);
         await executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -358,7 +359,7 @@ suite("Configuration / Settings Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event);
         await executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer);
-        successCount++;
+        endRollingCount(this);
     });
 
 
@@ -378,7 +379,7 @@ suite("Configuration / Settings Tests", () =>
         waitForTeIdle(tc.waitTime.config.event);
         await teApi.config.update("logging.level", logLevel);
         waitForTeIdle(tc.waitTime.config.event);
-        successCount++;
+        endRollingCount(this);
     });
 
 });

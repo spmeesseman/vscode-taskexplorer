@@ -6,7 +6,7 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { RubyTaskProvider } from "../../providers/ruby";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath, needsTreeBuild,
+import { activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
     suiteFinished, testControl, treeUtils
 } from "../utils/utils";
 
@@ -18,7 +18,6 @@ let fsApi: IFilesystemApi;
 let provider: RubyTaskProvider;
 let dirName: string;
 let fileUri: Uri;
-let successCount = -1;
 
 
 suite("Ruby Tests", () =>
@@ -30,7 +29,7 @@ suite("Ruby Tests", () =>
         provider = teApi.providers[testsName] as RubyTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "newscript.pl"));
-        ++successCount;
+        endRollingCount(this);
     });
 
     suiteTeardown(async function()
@@ -45,7 +44,7 @@ suite("Ruby Tests", () =>
         if (needsTreeBuild()) {
             await treeUtils.refresh(this);
         }
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -56,7 +55,7 @@ suite("Ruby Tests", () =>
         // provider.getDocumentPosition(undefined, undefined);
         // provider.getDocumentPosition("test", undefined);
         // provider.getDocumentPosition(undefined, "test");
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -66,7 +65,7 @@ suite("Ruby Tests", () =>
         this.slow(testControl.slowTime.taskCount.verify + testControl.waitTime.min);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -78,7 +77,7 @@ suite("Ruby Tests", () =>
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, 0);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -90,7 +89,7 @@ suite("Ruby Tests", () =>
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -111,7 +110,7 @@ suite("Ruby Tests", () =>
         // await waitForTeIdle(testControl.waitTime.fs.createEvent);
         // await verifyTaskCount(testsName, startTaskCount + 2);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -133,7 +132,7 @@ suite("Ruby Tests", () =>
         // await waitForTeIdle(testControl.waitTime.fs.modifyEvent);
         // await verifyTaskCount(testsName, startTaskCount + 6);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -153,7 +152,7 @@ suite("Ruby Tests", () =>
         // await waitForTeIdle(testControl.waitTime.fs.modifyEvent);
         // await verifyTaskCount(testsName, startTaskCount + 4);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -166,7 +165,7 @@ suite("Ruby Tests", () =>
         // await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);
-        ++successCount;
+        endRollingCount(this);
     });
 
 });

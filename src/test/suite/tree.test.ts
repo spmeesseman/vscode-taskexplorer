@@ -23,7 +23,6 @@ let cstItem3: TaskItem | undefined;
 let cstItem4: TaskItem | undefined;
 let cstItem5: TaskItem | undefined;
 let cstItem6: TaskItem | undefined;
-let successCount = -1;
 
 
 suite("Tree Tests", () =>
@@ -33,7 +32,7 @@ suite("Tree Tests", () =>
     {
         ({ teApi } = await utils.activate(this));
         explorer = teApi.testsApi.explorer;
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -49,7 +48,7 @@ suite("Tree Tests", () =>
         if (utils.needsTreeBuild()) {
             await utils.focusExplorerView(this);
         }
-        ++successCount;
+        utils.endRollingCount(this);
 	});
 
 
@@ -58,7 +57,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.refreshCommand);
         await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -77,7 +76,7 @@ suite("Tree Tests", () =>
         ]);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.event);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.event);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -91,7 +90,7 @@ suite("Tree Tests", () =>
         await utils.executeTeCommand2("addRemoveFavorite", [ bash[0] ]);
         await utils.executeTeCommand2("addRemoveFavorite", [ python[0] ]);
         await utils.executeTeCommand2("addRemoveFavorite", [ python[1] ]);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -107,7 +106,7 @@ suite("Tree Tests", () =>
         ]);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.event);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.event);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -139,7 +138,7 @@ suite("Tree Tests", () =>
         if (removed) {
             await utils.executeTeCommand2("addRemoveFavorite", [ python[1] ]);
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -165,7 +164,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -191,7 +190,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -217,7 +216,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -243,7 +242,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -269,7 +268,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -295,7 +294,7 @@ suite("Tree Tests", () =>
                 }
             }
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -306,7 +305,7 @@ suite("Tree Tests", () =>
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -317,7 +316,7 @@ suite("Tree Tests", () =>
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -328,7 +327,7 @@ suite("Tree Tests", () =>
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -339,7 +338,7 @@ suite("Tree Tests", () =>
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem4 ]);
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -350,7 +349,7 @@ suite("Tree Tests", () =>
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem5 ]);
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -361,7 +360,7 @@ suite("Tree Tests", () =>
             this.slow(tc.slowTime.command);
             await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem6 ]);
         }
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -381,7 +380,7 @@ suite("Tree Tests", () =>
         utils.clearOverrideShowInputBox();
         utils.overrideNextShowInputBox(undefined);
         await utils.executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -391,7 +390,7 @@ suite("Tree Tests", () =>
         this.slow((tc.slowTime.config.showHideSpecialFolder * 2) + (tc.waitTime.config.event  * 2));
         await utils.executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -400,7 +399,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -409,7 +408,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.refreshCommand);
         await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -418,7 +417,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -427,7 +426,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -439,7 +438,7 @@ suite("Tree Tests", () =>
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -448,7 +447,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -458,7 +457,7 @@ suite("Tree Tests", () =>
         this.slow((tc.slowTime.config.showHideSpecialFolder * 2));
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -467,7 +466,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -476,7 +475,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -485,7 +484,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideUserTasks);
         await utils.executeSettingsUpdate("specialFolders.showUserTasks", false, tc.waitTime.config.showHideUserTasks);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -502,7 +501,7 @@ suite("Tree Tests", () =>
         await utils.executeTeCommand("clearLastTasks");
         utils.overrideNextShowInfoBox("Yes");
         await utils.executeTeCommand("clearFavorites");
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -511,7 +510,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.sortingEvent);
         await utils.executeSettingsUpdate("sortProjectFoldersAlpha", false, tc.waitTime.config.sortingEvent);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -520,7 +519,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.sortingEvent);
         await utils.executeSettingsUpdate("sortProjectFoldersAlpha", true, tc.waitTime.config.sortingEvent);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 
@@ -653,7 +652,7 @@ suite("Tree Tests", () =>
         map.tired = new TaskFolder("tired2");
         map["dozing off"] = new TaskFolder("doze");
         sortFolders(map);
-        ++successCount;
+        utils.endRollingCount(this);
     });
 
 });

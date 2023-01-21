@@ -11,7 +11,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
-	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount, getWsPath, sleep, figures
+	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount, getWsPath, endRollingCount
 } from "../utils/utils";
 import { InitScripts } from "../../lib/noScripts";
 
@@ -20,7 +20,6 @@ const creator = "spmeesseman",
 
 let rootUri: Uri;
 let teApi: ITaskExplorerApi;
-let successCount = -1;
 
 
 suite("Util Tests", () =>
@@ -33,7 +32,7 @@ suite("Util Tests", () =>
         await executeSettingsUpdate("logging.enable", true);
         await executeSettingsUpdate("logging.enableOutputWindow", true);
 		await executeSettingsUpdate("logging.level", 3);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -54,7 +53,7 @@ suite("Util Tests", () =>
         if (exitRollingCount(this)) return;
         await executeTeCommand("showOutput", 10, 50, false);
         await executeTeCommand("showOutput", 10, 50, true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -130,7 +129,7 @@ suite("Util Tests", () =>
 		// Re-enable logging
 		//
 		await executeSettingsUpdate("logging.enable", true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -175,7 +174,7 @@ suite("Util Tests", () =>
 		// Re-enable logging
 		//
 		await executeSettingsUpdate("logging.enable", true);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -206,7 +205,7 @@ suite("Util Tests", () =>
 		// Re-enable logging
 		//
 		await executeSettingsUpdate("logging.enable", true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -231,7 +230,7 @@ suite("Util Tests", () =>
 		log.error(new Error("Test error object"));
 		log.error([ "Test error 1", "Test error 2" ]);
 		log.error("Test4 error", [[ "p1", "e1" ]]);
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -264,7 +263,7 @@ suite("Util Tests", () =>
 		log.dequeue("queueTest2Id");
 		await executeSettingsUpdate("logging.enableFile", false);
 
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -323,7 +322,7 @@ suite("Util Tests", () =>
 		// Re-enable logging
 		//
 		await executeSettingsUpdate("logging.enable", true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -349,7 +348,7 @@ suite("Util Tests", () =>
 		// Re-enable logging
 		//
 		await executeSettingsUpdate("logging.enable", true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -399,7 +398,7 @@ suite("Util Tests", () =>
 		// Re-enable logging
 		//
 		await executeSettingsUpdate("logging.enable", true);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -409,7 +408,7 @@ suite("Util Tests", () =>
         new InitScripts(); // it won't cover since no focus the view until after a bunch of test suites
         teApi.testsApi.explorer.isVisible();
         await util.getInstallPath();
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -500,7 +499,7 @@ suite("Util Tests", () =>
 		overrideNextShowInputBox("ok");
 		util.showMaxTasksReachedMessage("grunt");
 
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -642,7 +641,7 @@ suite("Util Tests", () =>
 		process.env.USERPROFILE = dataPath3;
 		process.env.VSCODE_APPDATA = dataPath4;
 
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -676,7 +675,7 @@ suite("Util Tests", () =>
 		await afs.getDateModified(null as unknown as string);
 		try { await afs.writeFile(getWsPath("."), "its a dir"); } catch {}
 		try { afs.writeFileSync(getWsPath("."), "its a dir"); } catch {}
-        ++successCount;
+        endRollingCount(this);
 	});
 
 

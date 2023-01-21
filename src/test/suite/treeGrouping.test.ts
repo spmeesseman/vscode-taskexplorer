@@ -1,10 +1,10 @@
 
 import {
-    activate, executeSettingsUpdate, exitRollingCount, focusExplorerView, needsTreeBuild,
-    suiteFinished, testControl as tc
+    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView,
+    getSuccessCount,
+    needsTreeBuild, suiteFinished, testControl as tc
 } from "../utils/utils";
 
-let successCount = -1;
 
 
 suite("Tree Grouping Tests", () =>
@@ -13,13 +13,13 @@ suite("Tree Grouping Tests", () =>
     suiteSetup(async function()
     {
         await activate(this);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
     suiteTeardown(async function()
     {
-        if (successCount < 10) {
+        if (getSuccessCount(this) < 10) {
             await executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.config.groupingEvent);
             await executeSettingsUpdate("groupSeparator", "-", tc.waitTime.config.groupingEvent);
             await executeSettingsUpdate("groupWithSeparator", true, tc.waitTime.config.groupingEvent);
@@ -35,7 +35,7 @@ suite("Tree Grouping Tests", () =>
         if (needsTreeBuild()) {
             await focusExplorerView(this);
         }
-        ++successCount;
+        endRollingCount(this);
 	});
 
 
@@ -44,7 +44,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupWithSeparator", false, tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -53,7 +53,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupWithSeparator", true, tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -62,7 +62,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupMaxLevel", 2, tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -71,7 +71,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupMaxLevel", 4, tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -80,7 +80,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupStripTaskLabel", false, tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -89,7 +89,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupMaxLevel", 3, tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -98,7 +98,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupMaxLevel", 1, tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -107,7 +107,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupStripTaskLabel", true, tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -116,7 +116,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupSeparator", "_", tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -125,7 +125,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupMaxLevel", 3, tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -134,7 +134,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupMaxLevel", 3, tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -143,7 +143,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupSeparator", "-", tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 
@@ -152,7 +152,7 @@ suite("Tree Grouping Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.groupingEvent);
         await executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.config.groupingEvent);
-        ++successCount;
+        endRollingCount(this);
     });
 
 });
