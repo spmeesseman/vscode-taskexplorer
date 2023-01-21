@@ -200,26 +200,26 @@ export const deleteFile = (file: string): Promise<void> =>
 };
 
 
-// /**
-//  * @method findFiles
-//  * @since 3.0.0
-//  */
-// export const findFiles = (pattern: string, options: any): Promise<string[]> =>
-// {
-//     return new Promise((resolve, reject) =>
-//     {
-//         glob(pattern, options, (err, files) =>
-//         {
-//             /* istanbul ignore else */
-//             if (!err) {
-//                 resolve(files);
-//             }
-//             else {
-//                 reject(err);
-//             }
-//         });
-//     });
-// };
+/**
+ * @method findFiles
+ * @since 3.0.0
+ */
+export const findFiles = (pattern: string, options: any): Promise<string[]> =>
+{
+    return new Promise((resolve, reject) =>
+    {
+        glob(pattern, options, (err, files) =>
+        {
+            /* istanbul ignore else */
+            if (!err) {
+                resolve(files);
+            }
+            else {
+                reject(err);
+            }
+        });
+    });
+};
 
 
 

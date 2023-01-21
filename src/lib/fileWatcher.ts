@@ -16,7 +16,6 @@ import { configuration } from "./utils/configuration";
 
 let extContext: ExtensionContext;
 let teApi: ITaskExplorerApi;
-let processingFsEvent = false;
 let rootPath: string | undefined;
 let currentNumWorkspaceFolders: number | undefined;
 let currentEvent: any;
@@ -42,10 +41,9 @@ function createDirWatcher(context: ExtensionContext)
     if (workspace.workspaceFolders)
     {
         dirWatcher.watcher = workspace.createFileSystemWatcher(getDirWatchGlob(workspace.workspaceFolders));
-        // dirWatcher.onDidCreate = dirWatcher.watcher.onDidCreate(async (e) => { await onDirCreate(e); }, null);
+        dirWatcher.onDidCreate = dirWatcher.watcher.onDidCreate(async (e) => { await onDirCreate(e); }, null);
         dirWatcher.onDidDelete = dirWatcher.watcher.onDidDelete(async (e) => { await onDirDelete(e); }, null);
-
-        // context.subscriptions.push(dirWatcher.onDidCreate);
+        context.subscriptions.push(dirWatcher.onDidCreate);
         context.subscriptions.push(dirWatcher.onDidDelete);
         context.subscriptions.push(dirWatcher.watcher);
     }
@@ -104,8 +102,33 @@ export function disposeFileWatchers()
 
 const eventNeedsProcessing = (eventKind: string, uri: Uri) =>
 {
-    return !currentEvent || (!eventQueue.find(e => e.event === eventKind && e.fsPath === uri.fsPath) &&
-                             currentEvent.event !== eventKind && currentEvent.fsPath !== uri.fsPath);
+    let needs = true;
+    if (currentEvent)
+    {
+        if (eventKind === "modify file") // only check the queue for 'modify', not the current event
+        {
+            needs = !eventQueue.find(e => e.event === eventKind && e.fsPath === uri.fsPath);
+        }
+        else if (eventKind === "create file")
+        {
+            const events = [ currentEvent, ...eventQueue ];
+            needs = !events.find(e => e.event === "create directory" && uri.fsPath.startsWith(e.fsPath)) &&
+                    !events.find(e => e.event === eventKind && uri.fsPath === e.fsPath);
+        }
+        //
+        // VSCode doesn't trigger file delete event when a dir is deleted
+        //
+        // else if (eventKind === "delete file") {
+        //     const events = [ currentEvent, ...eventQueue ];
+        //     needs = !events.find(e => e.event === "delete directory" && uri.fsPath.startsWith(e.fsPath)) &&
+        //             !events.find(e => e.event === eventKind && uri.fsPath === e.fsPath);
+        // }
+        else {
+            const events = [ currentEvent, ...eventQueue ];
+            needs = !events.find(e => e.event === eventKind && uri.fsPath === e.fsPath);
+        }
+    }
+    return needs;
 };
 
 
@@ -124,43 +147,62 @@ function getDirWatchGlob(wsFolders: readonly WorkspaceFolder[])
 }
 
 
-export const isProcessingFsEvent = () => processingFsEvent;
+export const isProcessingFsEvent = () => !!currentEvent;
 
 
-// async function onDirCreate(uri: Uri)
-// {
-//     if (isDirectory(uri.fsPath) && !util.isExcluded(uri.fsPath))
-//     {
-//         const wsf = workspace.getWorkspaceFolder(uri);
-//         /* istanbul ignore else */
-//         if (!wsf || wsf.uri.fsPath !== uri.fsPath)
-//         {
-//             if (processingFsEvent) {
-//                 eventQueue.push({ fn: _procDirCreateEvent, args: [ uri, "   " ] });
-//             }
-//             else {
-//                 processingFsEvent = true;
-//                 await _procDirCreateEvent(uri, "");
-//             }
-//         }
-//     }
-// }
+async function onDirCreate(uri: Uri)
+{
+    if (isDirectory(uri.fsPath) && !util.isExcluded(uri.fsPath))
+    {
+console.log("DIR_CREATE: " + uri.fsPath);
+        const wsf = workspace.getWorkspaceFolder(uri);
+        /* istanbul ignore else */
+        if (!wsf || wsf.uri.fsPath !== uri.fsPath)
+        {
+            const e = {
+                fn: _procDirCreateEvent,
+                args: [ uri, "   " ],
+                event: "create directory",
+                fsPath: uri.fsPath
+            };
+            if (currentEvent) {
+console.log("   DIR_CREATE1");
+                eventQueue.push(e);
+            }
+            else {
+console.log("   DIR_CREATE2");
+                currentEvent = e;
+                await _procDirCreateEvent(uri, "");
+            }
+        }
+console.log("   DIR_CREATE4");
+    }
+}
 
 
 async function onDirDelete(uri: Uri)
-{
+{   //
+    // The dir is gone already, so can't lstat it to see if it was a directory or file
+    // Rely on the fact if it has no extension, then it's a directory.  I supposed we
+    // can track existing directories, ut ugh.  Maybe someday.
+    //
     if (!extname(uri.fsPath) && !util.isExcluded(uri.fsPath)) // ouch
-    // if (isDirectory(uri.fsPath)) // it's gone, so we can't lstat it
     {
         const wsf = workspace.getWorkspaceFolder(uri);
         /* istanbul ignore else */
         if (wsf && wsf.uri.fsPath !== uri.fsPath)
         {
-            if (processingFsEvent) {
-                eventQueue.push({ fn: _procDirDeleteEvent, args: [ uri, "   " ] });
+            const e = {
+                fn: _procDirDeleteEvent,
+                args: [ uri, "   " ],
+                event: "delete directory",
+                fsPath: uri.fsPath
+            };
+            if (currentEvent) {
+                eventQueue.push(e);
             }
             else {
-                processingFsEvent = true;
+                currentEvent = e;
                 await _procDirDeleteEvent(uri, "");
             }
         }
@@ -176,16 +218,14 @@ const onFileChange = async(taskType: string, uri: Uri) =>
             fn: _procFileChangeEvent,
             args: [ taskType, uri, "   " ],
             event: "modify file",
-            timestamp: Date.now(),
             fsPath: uri.fsPath
         };
-        if (!processingFsEvent)
+        if (!currentEvent)
         {
             currentEvent = e;
-            processingFsEvent = true;
             await _procFileChangeEvent(taskType, uri, "");
         }
-        else /* istanbul ignore next */if (eventNeedsProcessing("modify file", uri))
+        else if (eventNeedsProcessing("modify file", uri))
         {
             eventQueue.push(e);
         }
@@ -197,23 +237,25 @@ const onFileCreate = async(taskType: string, uri: Uri) =>
 {
     if (!util.isExcluded(uri.fsPath))
     {
+console.log("FILE_CREATE: " + uri.fsPath);
         const e = {
             fn: _procFileCreateEvent,
             args: [ taskType, uri, "   " ],
             event: "create file",
-            timestamp: Date.now(),
             fsPath: uri.fsPath
         };
-        if (!processingFsEvent)
+        if (!currentEvent)
         {
+console.log("   FILE_CREATE1");
             currentEvent = e;
-            processingFsEvent = true;
             await _procFileCreateEvent(taskType, uri, "");
         }
-        else /* istanbul ignore if */if (eventNeedsProcessing("create file", uri))
+        else if (eventNeedsProcessing("create file", uri))
         {
+console.log("   FILE_CREATE2");
             eventQueue.push(e);
         }
+console.log("   FILE_CREATE3");
     }
 };
 
@@ -226,13 +268,11 @@ const onFileDelete = async(taskType: string, uri: Uri) =>
             fn: _procFileDeleteEvent,
             args: [ taskType, uri, "   " ],
             event: "delete file",
-            timestamp: Date.now(),
             fsPath: uri.fsPath
         };
-        if (!processingFsEvent)
+        if (!currentEvent)
         {
             currentEvent = e;
-            processingFsEvent = true;
             await _procFileDeleteEvent(taskType, uri, "");
         }
         else if (eventNeedsProcessing("delete file", uri))
@@ -300,13 +340,18 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     //
     else if (e.removed.length > 0 || e.added.length > 0)
     {
+        const fwEvent = {
+            fn: _procWsDirAddRemoveEvent,
+            args: [ e, "   " ],
+            event: "workspace change"
+        };
         log.write("   workspace folder has been added or removed, process/queue event", 1);
         /* istanbul ignore next */
-        if (processingFsEvent) {
-            eventQueue.push({ fn: _procWsDirAddRemoveEvent, args: [ e, "   " ] });
+        if (currentEvent) {
+            eventQueue.push(fwEvent);
         }
         else {
-            processingFsEvent = true;
+            currentEvent = fwEvent;
             await _procWsDirAddRemoveEvent(e, "   ");
         }
     }
@@ -344,13 +389,11 @@ const processQueue = async () =>
             [ "arg2", next.args[1] instanceof Uri ? next.args[1].fsPath : "none (log padding)" ],
             [ "# of events still pending", eventQueue.length ]
         ]);
-        processingFsEvent = true;
         await next.fn(...next.args);
         log.methodDone("file watcher event queue", 1, "");
     }
     else {
         currentEvent = undefined;
-        processingFsEvent = false;
     }
 };
 
@@ -434,13 +477,13 @@ export const registerFileWatchers = async(context: ExtensionContext, api: ITaskE
         [ "current # of workspace folders", currentNumWorkspaceFolders ]
     ]);
     //
-    // Watch individual task type files within the project folder
-    //
-    await createFileWatchers(context, logPad + "   ");
-    //
     // Watch for folder adds and deletes within the project folder
     //
     createDirWatcher(context);
+    //
+    // Watch individual task type files within the project folder
+    //
+    await createFileWatchers(context, logPad + "   ");
     //
     // Refresh tree when folders/projects are added/removed from the workspace, in a multi-root ws
     //
@@ -449,19 +492,19 @@ export const registerFileWatchers = async(context: ExtensionContext, api: ITaskE
 };
 
 
-// const _procDirCreateEvent = async(uri: Uri, logPad: string) =>
-// {
-//     try
-//     {   log.methodStart("[event] directory 'create'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
-//         const numFilesFound = await cache.addFolder(uri, logPad + "   ");
-//         if (numFilesFound > 0) {
-//             await refreshTree(teApi, undefined, uri, logPad + "   ");
-//         }
-//         log.methodDone("[event] directory 'create'", 1, logPad);
-//     }
-//     catch (e) {}
-//     finally { processQueue(); }
-// };
+const _procDirCreateEvent = async(uri: Uri, logPad: string) =>
+{
+    try
+    {   log.methodStart("[event] directory 'create'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
+        const numFilesFound = await cache.addFolder(uri, logPad + "   ");
+        if (numFilesFound > 0) {
+            await refreshTree(teApi, undefined, uri, logPad + "   ");
+        }
+        log.methodDone("[event] directory 'create'", 1, logPad);
+    }
+    catch (e) {}
+    finally { processQueue(); }
+};
 
 
 const _procDirDeleteEvent = async(uri: Uri, logPad: string) =>

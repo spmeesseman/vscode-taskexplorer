@@ -2,9 +2,9 @@
 
 import * as util from "./utils/utils";
 import log from "./log/log";
-// import { join } from "path";
+import { join } from "path";
 import { storage } from "./utils/storage";
-// import { findFiles, numFilesInDirectory } from "./utils/fs";
+import { findFiles, numFilesInDirectory } from "./utils/fs";
 import { configuration } from "./utils/configuration";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { IDictionary, ICacheItem, ITaskExplorerApi } from "../interface";
@@ -39,106 +39,106 @@ export function addFileToCache(taskType: string, uri: Uri, logPad: string)
 }
 
 
-// /**
-//  * @method addFolderToCache
-//  *
-//  * @param folder The folder to be added to the cache.  This folder should be a sub-folder within
-//  * a workspace folder.  Workspace folders are handled differently and are handled by the
-//  * 'addWsFolderToCache()` function.  This function is calledfrom thefileWatcher instance when
-//  * a new folder is created, or copied into a workspace.
-//  *
-//  * @since 3.0.0
-//  */
-// export async function addFolder(folder: Uri, logPad: string)
-// {
-//     let numFilesFound = 0;
-//     const licMgr = getLicenseManager();
-//     const wsFolder = workspace.getWorkspaceFolder(folder) as WorkspaceFolder;
-//
-//     log.methodStart("add folder to cache", 1, logPad, false, [[ "folder", folder.fsPath ]]);
-//
-//     const numFiles = await numFilesInDirectory(folder.fsPath);
-//     if (numFiles > 0)
-//     {
-//         await startBuild();
-//
-//         const taskProviders = ([ ...util.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
-//             return util.getTaskTypeFriendlyName(a).localeCompare(util.getTaskTypeFriendlyName(b));
-//         });
-//
-//         for (const providerName of taskProviders)
-//         {
-//             const externalProvider = providersExternal[providerName];
-//             //
-//             // TODO - remove below ignore tags when test for copy/move folder w/files is implemented
-//             //
-//             if (!cancel && numFilesFound < numFiles && (externalProvider || util.isTaskTypeEnabled(providerName)))
-//             {
-//                 let glob;
-//                 if (!util.isWatchTask(providerName))
-//                 {
-//                     const provider = providers[providerName] || /* istanbul ignore next */externalProvider;
-//                     /* istanbul ignore next */
-//                     glob = provider?.getGlobPattern();
-//                 }
-//                 if (!glob) {
-//                     glob = util.getGlobPattern(providerName);
-//                 }
-//
-//                 const dspTaskType = util.getTaskTypeFriendlyName(providerName);
-//                 statusBarSpace.text = getStatusString(`Scanning for ${dspTaskType} tasks in project ${wsFolder.name}`, 65);
-//
-//                 /* istanbul ignore else */
-//                 if (!providersExternal[providerName])
-//                 {
-//                     let numFilesAdded = 0;
-//                     log.write(`   adding new directory to '${providerName}' file cache`, 2, logPad);
-//                     try
-//                     {   let maxFiles = Infinity;
-//                         log.write(`      Start folder scan for ${providerName} tasks`, 3, logPad);
-//                         //
-//                         // TODO - replace istanbul ignore tags when lic mgr test suite is done
-//                         //
-//                         /* istanbul ignore else */
-//                         if (licMgr && !licMgr.isLicensed())
-//                         {
-//                             const cachedFileCount = getTaskFileCount();
-//                             maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
-//                             /* istanbul ignore if */
-//                             if (maxFiles <= 0) {
-//                                 util.showMaxTasksReachedMessage();
-//                                 return numFilesFound;
-//                             }
-//                             log.write(`      Set max files to scan at ${maxFiles} files (no license)`, 2, logPad);
-//                         }
-//                         const paths = await findFiles(glob, { nocase: true, ignore: getExcludesPatternGlob(), cwd: folder.fsPath  });
-//                         for (const fPath of paths)
-//                         {
-//                             if (cancel) {
-//                                 break;
-//                             }
-//                             const uriFile = Uri.file(join(folder.fsPath, fPath));
-//                             numFilesAdded += addToMappings(providerName, { uri: uriFile, project: wsFolder.name }, logPad + "      ");
-//                         }
-//                         projectToFileCountMap[wsFolder.name][providerName] += numFilesAdded;
-//                         log.write(`      Folder scan complete, found ${paths.length} ${providerName} file(s), added ${numFilesAdded} file(s)`, 3, logPad);
-//                     }
-//                     catch (e: any) { /* istanbul ignore next */ log.error(e); }
-//                     numFilesFound += numFilesAdded;
-//                     log.value("      # of files added", numFilesAdded, 3);
-//                     log.write(`   finished adding new directory to '${providerName}' file cache`, 3, logPad);
-//                 }
-//                 else {
-//                     await util.timeout(150);
-//                 }
-//             }
-//         }
-//         finishBuild();
-//     }
-//
-//     log.methodDone("add folder to cache", 1, logPad, [[ "# of files in directory", numFiles ], [ "# of files matched", numFiles ]]);
-//     return numFilesFound;
-// }
+/**
+ * @method addFolderToCache
+ *
+ * @param folder The folder to be added to the cache.  This folder should be a sub-folder within
+ * a workspace folder.  Workspace folders are handled differently and are handled by the
+ * 'addWsFolderToCache()` function.  This function is calledfrom thefileWatcher instance when
+ * a new folder is created, or copied into a workspace.
+ *
+ * @since 3.0.0
+ */
+export async function addFolder(folder: Uri, logPad: string)
+{
+    let numFilesFound = 0;
+    const licMgr = getLicenseManager();
+    const wsFolder = workspace.getWorkspaceFolder(folder) as WorkspaceFolder;
+
+    log.methodStart("add folder to cache", 1, logPad, false, [[ "folder", folder.fsPath ]]);
+
+    const numFiles = await numFilesInDirectory(folder.fsPath);
+    if (numFiles > 0)
+    {
+        await startBuild();
+
+        const taskProviders = ([ ...util.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
+            return util.getTaskTypeFriendlyName(a).localeCompare(util.getTaskTypeFriendlyName(b));
+        });
+
+        for (const providerName of taskProviders)
+        {
+            const externalProvider = providersExternal[providerName];
+            //
+            // TODO - remove below ignore tags when test for copy/move folder w/files is implemented
+            //
+            if (!cancel && numFilesFound < numFiles && (externalProvider || util.isTaskTypeEnabled(providerName)))
+            {
+                let glob;
+                if (!util.isWatchTask(providerName))
+                {
+                    const provider = providers[providerName] || /* istanbul ignore next */externalProvider;
+                    /* istanbul ignore next */
+                    glob = provider?.getGlobPattern();
+                }
+                if (!glob) {
+                    glob = util.getGlobPattern(providerName);
+                }
+
+                const dspTaskType = util.getTaskTypeFriendlyName(providerName);
+                statusBarSpace.text = getStatusString(`Scanning for ${dspTaskType} tasks in project ${wsFolder.name}`, 65);
+
+                /* istanbul ignore else */
+                if (!providersExternal[providerName])
+                {
+                    let numFilesAdded = 0;
+                    log.write(`   adding new directory to '${providerName}' file cache`, 2, logPad);
+                    try
+                    {   let maxFiles = Infinity;
+                        log.write(`      Start folder scan for ${providerName} tasks`, 3, logPad);
+                        //
+                        // TODO - replace istanbul ignore tags when lic mgr test suite is done
+                        //
+                        /* istanbul ignore else */
+                        if (licMgr && !licMgr.isLicensed())
+                        {
+                            const cachedFileCount = getTaskFileCount();
+                            maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
+                            /* istanbul ignore if */
+                            if (maxFiles <= 0) {
+                                util.showMaxTasksReachedMessage();
+                                return numFilesFound;
+                            }
+                            log.write(`      Set max files to scan at ${maxFiles} files (no license)`, 2, logPad);
+                        }
+                        const paths = await findFiles(glob, { nocase: true, ignore: getExcludesPatternGlob(), cwd: folder.fsPath  });
+                        for (const fPath of paths)
+                        {
+                            if (cancel) {
+                                break;
+                            }
+                            const uriFile = Uri.file(join(folder.fsPath, fPath));
+                            numFilesAdded += addToMappings(providerName, { uri: uriFile, project: wsFolder.name }, logPad + "      ");
+                        }
+                        projectToFileCountMap[wsFolder.name][providerName] += numFilesAdded;
+                        log.write(`      Folder scan complete, found ${paths.length} ${providerName} file(s), added ${numFilesAdded} file(s)`, 3, logPad);
+                    }
+                    catch (e: any) { /* istanbul ignore next */ log.error(e); }
+                    numFilesFound += numFilesAdded;
+                    log.value("      # of files added", numFilesAdded, 3);
+                    log.write(`   finished adding new directory to '${providerName}' file cache`, 3, logPad);
+                }
+                else {
+                    await util.timeout(150);
+                }
+            }
+        }
+        finishBuild();
+    }
+
+    log.methodDone("add folder to cache", 1, logPad, [[ "# of files in directory", numFiles ], [ "# of files matched", numFiles ]]);
+    return numFilesFound;
+}
 
 
 async function addWsFolder(folder: WorkspaceFolder, taskType: string, logPad: string)
@@ -417,15 +417,15 @@ const finishBuild = () =>
 };
 
 
-// /**
-//  * @method getExcludesPatternGlob
-//  * @since 3.0.0
-//  */
-// function getExcludesPatternGlob()
-// {
-//     const excludes: string[] = configuration.get("exclude");
-//     return [ "**/node_modules/**", "**/work/**", ...excludes ];
-// }
+/**
+ * @method getExcludesPatternGlob
+ * @since 3.0.0
+ */
+function getExcludesPatternGlob()
+{
+    const excludes: string[] = configuration.get("exclude");
+    return [ "**/node_modules/**", "**/work/**", ...excludes ];
+}
 
 
 function getExcludesPatternVsc(folder: string | WorkspaceFolder): RelativePattern
