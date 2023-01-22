@@ -16,6 +16,7 @@ import { commands, extensions, Task, TaskExecution, tasks, window, workspace } f
 import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import initSettings from "./initSettings";
 import { getWsPath, getTestsPath } from "./sharedUtils";
+import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
 
 export { figures };
 export { testControl };
@@ -455,6 +456,14 @@ export const tagLog = (test: string, suite: string) =>
     teApi.log.write("******************************************************************************************");
     teApi.log.write(" SUITE: " + suite.toUpperCase() + "  -  TEST : " + test);
     teApi.log.write("******************************************************************************************");
+};
+
+
+export const testInvDocPositions = (provider: ITaskExplorerProvider) =>
+{
+    provider.getDocumentPosition(undefined, undefined);
+    provider.getDocumentPosition("test", undefined);
+    provider.getDocumentPosition(undefined, "test");
 };
 
 

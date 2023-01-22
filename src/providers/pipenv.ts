@@ -21,14 +21,16 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
     {
-        const pipenv = configuration.get<string>("pathToPrograms.pipenv");
+        const pipenv = configuration.get<string>("pathToPrograms.pipenv", "pipenv");
         let pythonPath = pipenv;
 
         /* istanbul ignore else */
-        if (pipenv === "pipenv") {
+        if (pipenv === "pipenv")
+        {   //
             // If the user didn't explicitly set a pathToPrograms.pipenv (meaning it is the default value),
             // then use the python path from the environment to run pipenv as a module. This way it
-            // has the best chance of using the correct Python environment (virtual, global,...).
+            // has the best chance of using the correct Python environment (virtual, global,...)
+            //
             pythonPath = workspace.getConfiguration("python").get("pythonPath", "python");
         }
 
@@ -36,8 +38,10 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
         const cwd = dirname(uri.fsPath);
         const args = [ "run", target ];
         /* istanbul ignore else */
-        if (pythonPath) {
-            // If using python path, run pipenv as a module.
+        if (pythonPath)
+        {   //
+            // If using python path, run pipenv as a module
+            //
             args.unshift(...[ "-m", "pipenv" ]);
         }
         const options: ShellExecutionOptions = { cwd };
@@ -49,18 +53,20 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     private async findTargets(fsPath: string, logPad: string)
     {
-        const scripts: string[] = [];
-
         log.methodStart("find pipenv Pipfile targets", 4, logPad, false, [[ "path", fsPath ]], this.logQueueId);
 
+        const scripts: string[] = [];
         const contents = await readFileAsync(fsPath);
-
-        // Using @sgarciac/bombadil package to parse the TOML Pipfile.
+        //
+        // Using @sgarciac/bombadil package to parse the TOML Pipfile
+        //
         const pipfile = new bombadil.TomlReader();
         pipfile.readToml(contents);
 
-        Object.entries(/* istanbul ignore next */pipfile.result?.scripts ?? {}).forEach(([ scriptName, _scriptCmd ]) => {
+        Object.entries(pipfile.result?.scripts ?? {}).forEach(([ scriptName, _scriptCmd ]) =>
+        {   //
             // Only need the script name, not the whole command, since it is run as `pipenv run <scriptName>`
+            //
             scripts.push(scriptName);
             log.value("   found pipenv pipfile task", scriptName, 4, logPad, this.logQueueId);
         });
@@ -87,7 +93,6 @@ export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number
     {
-        /* istanbul ignore if */
         if (!taskName || !documentText) {
             return 0;
         }
