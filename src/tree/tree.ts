@@ -1,5 +1,6 @@
 
 import * as util from "../lib/utils/utils";
+import * as task from "./task";
 import * as sortTasks from "../lib/sortTasks";
 import TaskItem from "./item";
 import TaskFile from "./file";
@@ -93,28 +94,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         this.extensionContext = context;
         this.subscriptionStartIndex = -1;
 
-        this.disposables = [];
-        this.disposables.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => this.run(item), this));
-        this.disposables.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => this.run(item, true, false), this));
-        this.disposables.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args?: string) => this.run(item, false, true, args), this));
-        this.disposables.push(commands.registerCommand(name + ".runLastTask",  async () => this.runLastTask(), this));
-        this.disposables.push(commands.registerCommand(name + ".stop", async (item: TaskItem) => this.stop(item), this));
-        this.disposables.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => this.restart(item), this));
-        this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => this.pause(item), this));
-        this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick?: boolean) => this.open(item, itemClick), this));
-        this.disposables.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => this.openTerminal(item), this));
-        this.disposables.push(commands.registerCommand(name + ".refresh", () => this.refresh(true, false, ""), this));
-        this.disposables.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "install"), this));
-        this.disposables.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update"), this));
-        this.disposables.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "update <packagename>"), this));
-        this.disposables.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit"), this));
-        this.disposables.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => this.runNpmCommand(taskFile, "audit fix"), this));
-        this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem) => this.addToExcludes(taskFile), this));
-        this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this));
-
-        context.subscriptions.push(...this.disposables);
-        this.subscriptionStartIndex = context.subscriptions.length - (this.disposables.length + 1);
-
         const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
         const favoritesExpanded = nodeExpandedeMap.favorites !== false ?
                                   TreeItemCollapsibleState.Expanded : /* istanbul ignore next */TreeItemCollapsibleState.Collapsed;
@@ -126,6 +105,29 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         };
 
         this.taskWatcher = new TaskWatcher(this, this.specialFolders, context);
+
+        this.disposables = [];
+        // task.registerTreeTasks(this, this.specialFolders.lastTasks);
+        this.disposables.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => task.run(this, item, this.specialFolders.lastTasks), this));
+        this.disposables.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => task.run(this, item, this.specialFolders.lastTasks, true, false), this));
+        this.disposables.push(commands.registerCommand(name + ".runWithArgs",  async (item: TaskItem, args?: string) => task.run(this, item, this.specialFolders.lastTasks, false, true, args), this));
+        this.disposables.push(commands.registerCommand(name + ".runLastTask",  async () => task.runLastTask(this, this.taskMap, this.specialFolders.lastTasks), this));
+        this.disposables.push(commands.registerCommand(name + ".stop", async (item: TaskItem) => task.stop(this, item), this));
+        this.disposables.push(commands.registerCommand(name + ".restart",  async (item: TaskItem) => task.restart(this, item, this.specialFolders.lastTasks), this));
+        this.disposables.push(commands.registerCommand(name + ".pause",  (item: TaskItem) => task.pause(this, item), this));
+        this.disposables.push(commands.registerCommand(name + ".open", async (item: TaskItem, itemClick?: boolean) => task.open(this, item, this.specialFolders.lastTasks, itemClick), this));
+        this.disposables.push(commands.registerCommand(name + ".openTerminal", (item: TaskItem) => this.openTerminal(item), this));
+        this.disposables.push(commands.registerCommand(name + ".refresh", () => this.refresh(true, false, ""), this));
+        this.disposables.push(commands.registerCommand(name + ".runInstall", async (taskFile: TaskFile) => task.runNpmCommand(taskFile, "install"), this));
+        this.disposables.push(commands.registerCommand(name + ".runUpdate", async (taskFile: TaskFile) => task.runNpmCommand(taskFile, "update"), this));
+        this.disposables.push(commands.registerCommand(name + ".runUpdatePackage", async (taskFile: TaskFile) => task.runNpmCommand(taskFile, "update <packagename>"), this));
+        this.disposables.push(commands.registerCommand(name + ".runAudit", async (taskFile: TaskFile) => task.runNpmCommand(taskFile, "audit"), this));
+        this.disposables.push(commands.registerCommand(name + ".runAuditFix", async (taskFile: TaskFile) => task.runNpmCommand(taskFile, "audit fix"), this));
+        this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem) => this.addToExcludes(taskFile), this));
+        this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this));
+
+        context.subscriptions.push(...this.disposables);
+        this.subscriptionStartIndex = context.subscriptions.length - (this.disposables.length + 1);
     }
 
 
@@ -1044,7 +1046,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     public getName = () => this.name;
 
 
-    public getTasks = () => this.tasks ||  /* istanbul ignore next */ [];
+    public getTasks = () => this.tasks || /* istanbul ignore next */[];
 
 
     private async getTaskFileNode(task: Task, folder: TaskFolder, files: IDictionary<TaskFile>, relativePath: string, scopeName: string, logPad: string)
@@ -1326,79 +1328,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     }
 
 
-    private async open(selection: TaskItem, itemClick = false)
-    {
-        const clickAction = configuration.get<string>("taskButtons.clickAction", "Open");
-
-        //
-        // As of v1.30.0, added option to change the entry item click to execute.  In order to avoid having
-        // to re-register the handler when the setting changes, we just re-route the request here
-        //
-        if (clickAction === "Execute" && itemClick === true) {
-            return this.run(selection);
-        }
-
-        const uri = !util.isScriptType(selection.taskSource) ?
-                    selection.taskFile.resourceUri : Uri.file(selection.task.definition.uri.fsPath);
-
-        log.methodStart("open document at position", 1, "", true, [
-            [ "command", selection.command.command ], [ "source", selection.taskSource ],
-            [ "uri path", uri.path ], [ "fs path", uri.fsPath ]
-        ]);
-
-        /* istanbul ignore else */
-        if (await pathExists(uri.fsPath))
-        {
-            const document: TextDocument = await workspace.openTextDocument(uri);
-            const offset = findDocumentPosition(document, selection);
-            const position = document.positionAt(offset);
-            await window.showTextDocument(document, { selection: new Selection(position, position) });
-        }
-    }
-
-
     private openTerminal(taskItem: TaskItem)
     {
         const term = getTerminal(taskItem);
         if (term) {
             term.show();
         }
-    }
-
-
-    private pause(taskItem: TaskItem)
-    {
-        if (taskItem.paused || this.isBusy())
-        {
-            window.showInformationMessage("Busy, please wait...");
-            return;
-        }
-
-        log.methodStart("pause", 1, "", true);
-
-        /* istanbul ignore else */
-        if (taskItem.task.execution)
-        {
-            const terminal = getTerminal(taskItem, "   ");
-            /* istanbul ignore else */
-            if (terminal)
-            {   //
-                // TODO - see ticket.  I guess its not CTRL+C in some parts.
-                // so make the control chars a setting.  Also in stop().
-                //
-                taskItem.paused = true;
-                log.value("   send to terminal", "\\u0003", 1);
-                terminal.sendText("\u0003");
-            }
-            else {
-                window.showInformationMessage("Terminal not found");
-            }
-        }
-        else {
-            window.showInformationMessage("Executing task not found");
-        }
-
-        log.methodDone("pause", 1);
     }
 
 
@@ -1675,293 +1610,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     }
 
 
-    private async restart(taskItem: TaskItem)
-    {
-        let exec: TaskExecution | undefined;
-        log.methodStart("restart task", 1, "", true);
-        if (this.isBusy())
-        {
-            window.showInformationMessage("Busy, please wait...");
-        }
-        else {
-            await this.stop(taskItem);
-            exec = await this.run(taskItem);
-        }
-        log.methodDone("restart task", 1);
-        return exec;
-    }
-
-
-    private async resumeTask(taskItem: TaskItem)
-    {
-        let exec: TaskExecution | undefined;
-        log.methodStart("resume task", 1, "", true);
-        const term = getTerminal(taskItem, "   ");
-        if (term)
-        {   //
-            // TODO - see ticket.  I guess its not CTRL+C in some parts.
-            // so make the control chars a setting.  Also in stop().
-            //
-            log.value("   send to terminal", "N", 1);
-            term.sendText("N", true);
-            exec = taskItem.execution;
-        }
-        else {
-            window.showInformationMessage("Terminal not found");
-        }
-        taskItem.paused = false;
-        log.methodDone("resume task", 1);
-        return exec;
-    }
-
-
-    /**
-     * Run/execute a command.
-     * The refresh() function will eventually be called by the VSCode task engine when
-     * the task is launched
-     *
-     * @param taskItem TaskItem instance
-     * @param noTerminal Whether or not to show the terminal
-     * Note that the terminal will be shown if there is an error
-     * @param withArgs Whether or not to prompt for arguments
-     * Note that only script type tasks use arguments (and Gradle, ref ticket #88)
-     */
-    private async run(taskItem: TaskItem, noTerminal = false, withArgs = false, args?: string)
-    {
-        let exec: TaskExecution | undefined;
-
-        if (this.isBusy())
-        {
-            window.showInformationMessage("Busy, please wait...");
-            return exec;
-        }
-
-        log.methodStart("run task", 1, "", true, [[ "task name", taskItem.label ]]);
-        taskItem.taskDetached = undefined;
-
-        if (withArgs === true)
-		{
-            exec = await this.runWithArgs(taskItem, args, noTerminal);
-		}
-        else if (taskItem.paused)
-        {
-            exec = await this.resumeTask(taskItem);
-        }
-        else //
-        {   // Create a new instance of 'task' if this is to be ran with no terminal (see notes below)
-            //
-            let newTask = taskItem.task;
-            if (noTerminal && newTask)
-            {   //
-                // For some damn reason, setting task.presentationOptions.reveal = TaskRevealKind.Silent or
-                // task.presentationOptions.reveal = TaskRevealKind.Never does not work if we do it on the task
-                // that was instantiated when the providers were asked for tasks.  If we create a new instance
-                // here, same exact task, then it works.  Same kind of thing with running with args, but in that
-                // case I can understand it because a new execution class has to be instantiated with the command
-                // line arguments.  In this case, its simply a property task.presentationOption on an instantiated
-                // task.  No idea.  But this works fine for now.
-                //
-                const def = newTask.definition,
-                      folder = taskItem.getFolder(),
-                      p = providers[def.type] || /* istanbul ignore next */providersExternal[def.type];
-                /* istanbul ignore else */
-                if (folder && p)
-                {
-                    newTask = p.createTask(def.target, undefined, folder, def.uri, undefined, "   ") as Task;
-                    //
-                    // Since this task doesnt belong to a treeItem, then set the treeItem id that represents
-                    // an instance of this task.
-                    //
-                    /* istanbul ignore else */
-                    if (newTask) {
-                        newTask.definition.taskItemId = def.taskItemId;
-                        taskItem.taskDetached = newTask;
-                    }
-                    else {
-                        newTask = taskItem.task;
-                    }
-                }
-            }
-            exec = await this.runTask(newTask, noTerminal);
-            /* istanbul ignore else */
-            if (exec)
-            {
-                await this.specialFolders.lastTasks.saveTask(taskItem, "   ");
-            }
-        }
-
-        log.methodDone("run task", 1);
-        return exec;
-    }
-
-
-    private async runLastTask()
-    {
-        if (this.isBusy())
-        {
-            window.showInformationMessage("Busy, please wait...");
-            return;
-        }
-
-        const lastTaskId = this.specialFolders.lastTasks.getLastRanId();
-        if (!lastTaskId) { return; }
-
-        log.methodStart("run last task", 1, "", true, [[ "last task id", lastTaskId ]]);
-
-        const taskItem = this.taskMap[lastTaskId];
-        let exec: TaskExecution | undefined;
-
-        if (taskItem && taskItem instanceof TaskItem)
-        {
-            exec = await this.run(taskItem);
-        }
-        else {
-            window.showInformationMessage("Task not found!  Check log for details");
-            await this.specialFolders.lastTasks.removeTaskFile(lastTaskId, "   ", true);
-        }
-
-        log.methodDone("run last task", 1);
-        return exec;
-    }
-
-
-    private async runNpmCommand(taskFile: TaskFile, command: string)
-    {
-        const pkgMgr = util.getPackageManager(),
-              uri = taskFile.resourceUri;
-
-        const options = {
-            cwd: dirname(uri.fsPath)
-        };
-
-        const kind: TaskDefinition = {
-            type: "npm",
-            script: "install",
-            path: dirname(uri.fsPath)
-        };
-
-        if (command.indexOf("<packagename>") === -1)
-        {   /* istanbul ignore else */
-            if (taskFile.folder.workspaceFolder)
-            {
-                const execution = new ShellExecution(pkgMgr + " " + command, options);
-                const task = new Task(kind, taskFile.folder.workspaceFolder, command, "npm", execution, undefined);
-                return tasks.executeTask(task);
-            }
-        }
-        else
-        {
-            const opts: InputBoxOptions = { prompt: "Enter package name to " + command };
-            await window.showInputBox(opts).then(async (str) =>
-            {
-                /* istanbul ignore else */
-                if (str !== undefined && taskFile.folder.workspaceFolder)
-                {
-                    const execution = new ShellExecution(pkgMgr + " " + command.replace("<packagename>", "").trim() + " " + str.trim(), options);
-                    const task = new Task(kind, taskFile.folder.workspaceFolder, command.replace("<packagename>", "").trim() + str.trim(), "npm", execution, undefined);
-                    return tasks.executeTask(task);
-                }
-            });
-        }
-    }
-
-
-    private async runTask(task: Task, noTerminal?: boolean, logPad = "   ")
-    {
-        let exec: TaskExecution | undefined;
-        log.methodStart("run task", 1, logPad, false, [[ "no terminal", noTerminal ]]);
-
-        if (noTerminal === true) {
-            task.presentationOptions.reveal = TaskRevealKind.Silent;
-        }
-        else {
-            task.presentationOptions.reveal = TaskRevealKind.Always;
-        }
-
-        try {
-            exec = await tasks.executeTask(task);
-        }
-        catch (e: any) {
-            /* istanbul ignore next */
-            const err = e.toString();
-            /* istanbul ignore next */
-            if (err.indexOf("No workspace folder") !== -1)
-            {
-                /* istanbul ignore next */
-                window.showErrorMessage("Task execution failed:  No workspace folder.  NOTE: You must " +
-                                        "save your workspace first before running 'User' tasks");
-            }
-            else {
-                /* istanbul ignore next */
-                window.showErrorMessage("Task execution failed: " + err);
-            }
-            /* istanbul ignore next */
-            log.write("Task execution failed: " + err, 1, logPad);
-        }
-
-        log.methodDone("run task", 1, logPad, [[ "success", !!exec ]]);
-        return exec;
-    }
-
-
-    /**
-     * Run/execute a command, with arguments (prompt for args)
-     *
-     * @param taskItem TaskItem instance
-     * @param noTerminal Whether or not to show the terminal
-     * Note that the terminal will be shown if there is an error
-     */
-    public async runWithArgs(taskItem: TaskItem, args?: string, noTerminal?: boolean, logPad = "   ")
-    {
-        let exec: TaskExecution | undefined;
-        log.methodStart("run task with arguments", 1, logPad, false, [[ "no terminal", noTerminal ]]);
-        /* istanbul ignore else */
-        if (taskItem.task && !(taskItem.task.execution instanceof CustomExecution))
-        {
-            const opts: InputBoxOptions = { prompt: "Enter command line arguments separated by spaces"};
-
-            const _run = async (_args: string | undefined) =>
-            {
-                let exec: TaskExecution | undefined;
-                /* istanbul ignore else */
-                if (_args)
-                {
-                    let newTask = taskItem.task;
-                    const def = taskItem.task.definition,
-                          folder = taskItem.getFolder();
-                    /* istanbul ignore else */
-                    if (folder)
-                    {
-                        newTask = (new ScriptTaskProvider()).createTask(
-                            def.script, undefined, folder, def.uri, _args.trim().split(" "), logPad + "   "
-                        ) as Task;
-                        newTask.definition.taskItemId = def.taskItemId;
-                    }
-                    exec = await this.runTask(newTask, noTerminal, logPad + "   ");
-                    /* istanbul ignore else */
-                    if (exec) {
-                        await this.specialFolders.lastTasks.saveTask(taskItem, logPad);
-                    }
-                }
-                return exec;
-            };
-
-            taskItem.taskDetached = undefined;
-            if (!args) {
-                exec = await _run(await window.showInputBox(opts));
-            }
-            else {
-                exec = await _run(args);
-            }
-        }
-        else {
-            window.showInformationMessage("Custom execution tasks cannot have the cmd line altered");
-        }
-        log.methodDone("run task with arguments", 1, logPad);
-        return exec;
-    }
-
-
     public setEnabled(enable: boolean, logPad: string)
     {
         log.methodStart("set tree enabled", 1, logPad, false, [[ "enable", enable ]]);
@@ -1979,63 +1627,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             }
         }
         log.methodDone("set tree enabled", 1, logPad);
-    }
-
-
-    private async stop(taskItem: TaskItem)
-    {
-        log.methodStart("stop", 1, "", true);
-
-        if (this.isBusy())
-        {
-            window.showInformationMessage("Busy, please wait...");
-            return;
-        }
-
-        const exec = taskItem.isExecuting();
-        if (exec)
-        {
-            const terminal = getTerminal(taskItem, "   ");
-            if (terminal)
-            {
-                if (configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
-                {
-                    const ctrlChar = configuration.get<string>("taskButtons.controlCharacter", "Y");
-                    log.write("   keep terminal open", 1);
-                    //
-                    // TODO - see ticket.  I guess its not CTRL+C in some parts.  so make the control
-                    //                     chars a setting.  Also in pause().
-                    if (taskItem.paused)
-                    {
-                        taskItem.paused = false;
-                        log.value("   send to terminal", ctrlChar, 1);
-                        terminal.sendText(ctrlChar);
-                    }
-                    else
-                    {
-                        log.value("   send sequence to terminal", "\\u0003", 1);
-                        terminal.sendText("\u0003");
-                        await util.timeout(50);
-                        log.value("   send to terminal", ctrlChar, 1);
-                        // terminal = getTerminal(taskItem, "   ");
-                        try { /* istanbul ignore else */if (getTerminal(taskItem, "   ")) terminal.sendText(ctrlChar, true); } catch {}
-                    }
-                }
-                else {
-                    log.write("   kill task execution", 1);
-                    try { exec.terminate(); } catch {}
-                }
-            }
-            else {
-                window.showInformationMessage("Terminal not found");
-            }
-        }
-        else {
-            window.showInformationMessage("Executing task not found");
-        }
-
-        taskItem.paused = false;
-        log.methodDone("stop", 1);
     }
 
 
