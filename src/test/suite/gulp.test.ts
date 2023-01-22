@@ -9,7 +9,7 @@ import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
-    needsTreeBuild, sleep, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
+    needsTreeBuild, sleep, suiteFinished, testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "gulp";
@@ -64,9 +64,7 @@ suite("Gulp Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        provider.getDocumentPosition(undefined, undefined);
-        provider.getDocumentPosition("test", undefined);
-        provider.getDocumentPosition(undefined, "test");
+        testInvDocPositions(provider);
         endRollingCount(this);
     });
 

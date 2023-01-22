@@ -9,8 +9,8 @@ import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { AntTaskProvider } from "../../providers/ant";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import {
-    activate, executeSettingsUpdate, getWsPath, testControl as tc, verifyTaskCount, logErrorsAreFine,
-    suiteFinished, exitRollingCount, waitForTeIdle, treeUtils, overrideNextShowInfoBox, endRollingCount, needsTreeBuild
+    activate, executeSettingsUpdate, getWsPath, testControl as tc, verifyTaskCount, logErrorsAreFine, suiteFinished,
+    exitRollingCount, waitForTeIdle, treeUtils, overrideNextShowInfoBox, endRollingCount, needsTreeBuild, testInvDocPositions
 } from "../utils/utils";
 
 const testsName = "ant";
@@ -73,9 +73,7 @@ suite("Ant Tests", () =>
     {
         if (exitRollingCount(this)) return;
         const xml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
-        provider.getDocumentPosition(undefined, undefined);
-        provider.getDocumentPosition("test", undefined);
-        provider.getDocumentPosition(undefined, "test");
+        testInvDocPositions(provider);
         provider.getDocumentPosition("test_isnt_there", xml);
         let index = provider.getDocumentPosition("test-build", xml);
         expect(index).to.be.a("number").that.is.equal(104, `test-build2 task position should be 104 (actual ${index}`);

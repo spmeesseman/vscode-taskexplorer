@@ -9,7 +9,7 @@ import { configuration } from "../../lib/utils/configuration";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
-    needsTreeBuild, sleep, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
+    needsTreeBuild, sleep, suiteFinished, testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 import { expect } from "chai";
 
@@ -56,9 +56,7 @@ suite("Grunt Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        provider.getDocumentPosition(undefined, undefined);
-        provider.getDocumentPosition("test", undefined);
-        provider.getDocumentPosition(undefined, "test");
+        testInvDocPositions(provider);
         const docText = await fsApi.readFileAsync(path.join(getWsPath("."), "grunt", "GRUNTFILE.JS"));
         expect(provider.getDocumentPosition("grp-test-svr-build1", docText)).to.be.greaterThan(0);
         expect(provider.getDocumentPosition("run_tests", docText)).to.be.equal(0);

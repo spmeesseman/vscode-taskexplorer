@@ -464,6 +464,9 @@ export const testInvDocPositions = (provider: ITaskExplorerProvider) =>
     provider.getDocumentPosition(undefined, undefined);
     provider.getDocumentPosition("test", undefined);
     provider.getDocumentPosition(undefined, "test");
+    provider.getDocumentPosition("test", "");
+    provider.getDocumentPosition("test", " ");
+    provider.getDocumentPosition("test", "\n");
 };
 
 

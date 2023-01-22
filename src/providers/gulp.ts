@@ -36,10 +36,10 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         }
 
         let idx = this.getDocumentPositionLine("gulp.task(", scriptName, documentText);
-        if (idx === -1) {
+        if (idx === 0) {
             idx = this.getDocumentPositionLine("exports[", scriptName, documentText);
         }
-        if (idx === -1) {
+        if (idx === 0) {
             idx = this.getDocumentPositionLine("exports.", scriptName, documentText, 0, 0, true);
         }
         return idx;

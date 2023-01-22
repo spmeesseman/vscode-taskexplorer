@@ -97,7 +97,6 @@ suite("Maven Tests", () =>
     {
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as MavenTaskProvider;
-        // provider.readTasks();
         testInvDocPositions(provider);
         provider.createTask("publish", "publish", teApi.testsApi.wsFolder, Uri.file(getWsPath(".")), []);
         endRollingCount(this);

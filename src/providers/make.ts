@@ -67,7 +67,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         };
 
         const execution = new ShellExecution(getCommand(), args, options);
-        const problemMatcher = extensions.getExtension("ms-vscode.cpptools") ? "$gcc" : /* istanbul ignore next */"$gccte";
+        const problemMatcher = extensions.getExtension("ms-vscode.cpptools") ? /* istanbul ignore next */"$gcc" : "$gccte";
 
         log.methodDone("create make task", 4, logPad, undefined, this.logQueueId);
         return new Task(kind, folder, target, "make", execution, problemMatcher);
@@ -92,8 +92,10 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
                 idx = documentText.indexOf(taskName, idx + 1);
                 bLine = documentText.lastIndexOf("\n", idx) + 1;
                 eLine = documentText.indexOf("\n", idx);
+                /* istanbul ignore else */
                 if (bLine !== -1)
                 {
+                    /* istanbul ignore if */
                     if (eLine === -1) { eLine = documentText.length; }
                     line = documentText.substring(bLine, eLine).trim();
                 }

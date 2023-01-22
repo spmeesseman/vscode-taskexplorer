@@ -81,6 +81,7 @@
         "test-maven": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js maven xDeactivate",
         "test-multiRoot": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js multiRoot xDeactivate",
         "test-npm": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js npm xDeactivate",
+        "test-pipenv": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js pipenv xDeactivate",
         "test-powershell": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js powershell xDeactivate",
         "test-providers": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js providers xDeactivate",
         "test-python": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js python xDeactivate",

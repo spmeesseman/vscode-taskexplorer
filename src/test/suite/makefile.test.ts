@@ -13,7 +13,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
-    needsTreeBuild, sleep, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
+    needsTreeBuild, sleep, suiteFinished, testControl as tc, testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "make";
@@ -58,13 +58,9 @@ suite("Makefile Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        // provider.readTasks();
-        let index = provider.getDocumentPosition(undefined, undefined);
-        provider.getDocumentPosition("test", undefined);
-        expect(index).to.equal(0, `test task position should be 0 (actual ${index}`);
-        provider.getDocumentPosition(undefined, "test");
+        testInvDocPositions(provider);
         const makefileContent = teApi.testsApi.fs.readFileSync(getWsPath("make\\makefile"));
-        index = provider.getDocumentPosition("rule1", makefileContent);
+        let index = provider.getDocumentPosition("rule1", makefileContent);
         expect(index).to.equal(273, `rule1 task position should be 273 (actual ${index}`);
         index = provider.getDocumentPosition("rule2", makefileContent);
         expect(index).to.equal(306, `rule2 task position should be 306 (actual ${index}`);
