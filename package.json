@@ -72,6 +72,7 @@
         "test-configuration": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js configuration xDeactivate",
         "test-fileCache": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js fileCache xDeactivate",
         "test-fileWatcher": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js fileWatcher xDeactivate",
+        "test-gradle": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js gradle xDeactivate",
         "test-grunt": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js grunt xDeactivate",
         "test-gulp": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js gulp xDeactivate",
         "test-infopage": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js infoPage xDeactivate",

@@ -1,42 +1,37 @@
 
 import log from "../lib/log/log";
+import { basename, dirname } from "path";
+import { readFileAsync } from "../lib/utils/fs";
+import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/utils";
 import { configuration } from "../lib/utils/configuration";
-import { TaskExplorerProvider } from "./provider";
-import { ITaskDefinition } from "../interface/ITaskDefinition";
+import { IDictionary, ITaskDefinition } from "../interface";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
-import { readFileAsync } from "../lib/utils/fs";
-import { basename, dirname } from "path";
 
 
 export class GradleTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
+    private commands: IDictionary<string> = {
+        aix: "gradlew",
+        darwin: "gradlew",
+        freebsd: "gradlew",
+        linux: "gradlew",
+        openbsd: "gradlew",
+        sunos: "gradlew",
+        win32: "gradlew.bat"
+    };
 
     constructor() { super("gradle"); }
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
     {
-        const getCommand = (folder: WorkspaceFolder, cmd: string): string =>
-        {
-            let gradle = "gradlew";
-            /* istanbul ignore else */
-            if (process.platform === "win32") {
-                gradle = "gradlew.bat";
-            }
-            /* istanbul ignore else */
-            if (configuration.get<string>("pathToPrograms.gradle")) {
-                gradle = configuration.get("pathToPrograms.gradle");
-            }
-            return gradle;
-        };
-
+        const getCommand = (): string => configuration.get<string>("pathToPrograms.gradle", this.commands[process.platform]);
         const def = this.getDefaultDefinition(target, folder, uri);
         const cwd = dirname(uri.fsPath);
         const args = [ target ];
         const options = { cwd };
-        const execution = new ShellExecution(getCommand(folder, cmd), args, options);
-
+        const execution = new ShellExecution(getCommand(), args, options);
         return new Task(def, folder, target, "gradle", execution, undefined);
     }
 
@@ -56,30 +51,18 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
             const line: string = contents.substring(idx, eol).trim();
             if (line.length > 0 && line.toLowerCase().trimLeft().startsWith("task "))
             {
-                let idx1 = line.trimLeft().indexOf(" ");
-                /* istanbul ignore else */
-                if (idx1 !== -1)
+                const idx1 = line.trimLeft().indexOf(" ") + 1;
+                let idx2 = line.indexOf("(", idx1);
+                if (idx2 === -1) {
+                    idx2 = line.indexOf("{", idx1);
+                }
+                if (idx2 > idx1)
                 {
-                    idx1++;
-                    let idx2 = line.indexOf("(", idx1);
-                    /* istanbul ignore if */
-                    if (idx2 === -1) {
-                        idx2 = line.indexOf("{", idx1);
-                    }
-                    /* istanbul ignore else */
-                    if (idx2 !== -1)
-                    {
-                        const tgtName = line.substring(idx1, idx2).trim();
-                        /* istanbul ignore else */
-                        if (tgtName)
-                        {
-                            scripts.push(tgtName);
-                            log.value("   found gradle task", tgtName, 4, logPad, this.logQueueId);
-                        }
-                    }
+                    const tgtName = line.substring(idx1, idx2).trim();
+                    scripts.push(tgtName);
+                    log.value("   found gradle task", tgtName, 4, logPad, this.logQueueId);
                 }
             }
-
             idx = eol + 1;
             eol = contents.indexOf("\n", idx);
         }
@@ -105,7 +88,8 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public getDocumentPosition(scriptName: string | undefined, documentText: string | undefined): number
     {
-        return 0;
+        const idx = documentText?.indexOf("task " + (scriptName || ""));
+        return idx && idx !== -1 ? idx : 0;
     }
 
 

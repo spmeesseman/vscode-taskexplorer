@@ -7,12 +7,13 @@ import { Uri } from "vscode";
 import { GradleTaskProvider } from "../../providers/gradle";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
-    testControl, treeUtils
+    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, getWsPath, needsTreeBuild,
+    testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
+import { expect } from "chai";
 
 const testsName = "gradle";
-const startTaskCount = 7;
+const startTaskCount = 2;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -28,13 +29,22 @@ suite("Gradle Tests", () =>
     {
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as GradleTaskProvider;
-        dirName = getWsPath("tasks_test_");
-        fileUri = Uri.file(path.join(dirName, "new_build.gradle"));
+        dirName = getWsPath(".");
+        fileUri = Uri.file(path.join(dirName, "test2.gradle"));
         endRollingCount(this);
     });
 
     suiteTeardown(async function()
     {
+    });
+
+
+    test("Enable (Off by Default)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.config.enableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.config.enableEvent);
+        endRollingCount(this);
     });
 
 
@@ -48,13 +58,16 @@ suite("Gradle Tests", () =>
     });
 
 
-
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        // provider.getDocumentPosition(undefined, undefined);
-        // provider.getDocumentPosition("test", undefined);
-        // provider.getDocumentPosition(undefined, "test");
+        provider.getDocumentPosition(undefined, undefined);
+        provider.getDocumentPosition("test", undefined);
+        provider.getDocumentPosition(undefined, "test");
+        const docText = await fsApi.readFileAsync(path.join(getWsPath("."), "test.gradle"));
+        expect(provider.getDocumentPosition("fatJar", docText)).to.be.greaterThan(0);
+        expect(provider.getDocumentPosition("emptyTask", docText)).to.be.greaterThan(0);
+        expect(provider.getDocumentPosition("fatJar2", docText)).to.be.equal(0);
         endRollingCount(this);
     });
 
@@ -62,8 +75,8 @@ suite("Gradle Tests", () =>
     test("Start", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.taskCount.verify);
-        // await verifyTaskCount(testsName, startTaskCount);
+        this.slow(tc.slowTime.taskCount.verify);
+        await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });
 
@@ -71,9 +84,9 @@ suite("Gradle Tests", () =>
     test("Disable", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent);
-        // await executeSettingsUpdate("enabledTasks.gradle", false, slowTime.config.enable);
-        // await verifyTaskCount(testsName, 0);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.enableEvent);
+        await verifyTaskCount(testsName, 0);
         endRollingCount(this);
     });
 
@@ -81,10 +94,9 @@ suite("Gradle Tests", () =>
     test("Re-enable", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent);
-        // await teApi.config.updateWs("enabledTasks.gradle", true);
-        // await waitForTeIdle(testControl.waitTime.config.enableEvent);
-        // await verifyTaskCount(testsName, startTaskCount);
+        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, tc.waitTime.config.enableEvent);
+        await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });
 
@@ -92,62 +104,54 @@ suite("Gradle Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.createEvent + testControl.waitTime.min);
-        // if (!(await fsApi.pathExists(dirName))) {
-        //     await fsApi.createDir(dirName);
-        // }
-        // await fsApi.writeFile(
-        //     fileUri.fsPath,
-        //     "module.exports = function(gradle) {\n" +
-        //     '    gradle.registerTask(\n"default2", ["jshint:myproject"]);\n' +
-        //     '    gradle.registerTask("upload2", ["s3"]);\n' +
-        //     "};\n"
-        // );
-        // await waitForTeIdle(testControl.waitTime.fs.createEvent);
-        // await verifyTaskCount(testsName, startTaskCount + 2);
-        // await waitForTeIdle(testControl.waitTime.min);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
+        await fsApi.writeFile(
+            fileUri.fsPath,
+            "\ntask fatJar10(type: Jar) {\n" +
+            "    manifest {}\n" +
+            "    baseName = project.name + '-all'\n" +
+            "}\n"
+        );
+        await waitForTeIdle(tc.waitTime.fs.createEvent);
+        await verifyTaskCount(testsName, startTaskCount + 1);
         endRollingCount(this);
     });
 
 
-    test("Add 4 Tasks to File", async function()
+    test("Add Task to File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.fs.modifyEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.modifyEvent + testControl.waitTime.min);
-        // await fsApi.writeFile(
-        //     fileUri.fsPath,
-        //     "module.exports = function(gradle) {\n" +
-        //     '    gradle.registerTask(\n"default2", ["jshint:myproject"]);\n' +
-        //     '    gradle.registerTask("upload2", ["s3"]);\n' +
-        //     '    gradle.registerTask("upload3", ["s4"]);\n' +
-        //     '    gradle.registerTask("upload4", ["s5"]);\n' +
-        //     '    gradle.registerTask("upload5", ["s6"]);\n' +
-        //     '    gradle.registerTask("upload6", ["s7"]);\n' +
-        //     "};\n"
-        // );
-        // await waitForTeIdle(testControl.waitTime.fs.modifyEvent);
-        // await verifyTaskCount(testsName, startTaskCount + 6);
-        // await waitForTeIdle(testControl.waitTime.min);
+        this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
+        await fsApi.writeFile(
+            fileUri.fsPath,
+            "\ntask fatJar10(type: Jar) {\n" +
+            "    manifest {}\n" +
+            "    baseName = project.name + '-all'\n" +
+            "}\n" +
+            "\ntask fatJar11(type: Jar) {\n" +
+            "    manifest {}\n" +
+            "    baseName = project.name + '-all'\n" +
+            "}\n"
+        );
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
+        await verifyTaskCount(testsName, startTaskCount + 2);
         endRollingCount(this);
     });
 
 
-    test("Remove 2 Tasks from File", async function()
+    test("Remove Task from File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.modifyEvent + testControl.waitTime.min);
-        // await fsApi.writeFile(
-        //     fileUri.fsPath,
-        //     "module.exports = function(gradle) {\n" +
-        //     '    gradle.registerTask(\n"default2", ["jshint:myproject"]);\n' +
-        //     '    gradle.registerTask("upload2", ["s3"]);\n' +
-        //     '    gradle.registerTask("upload5", ["s5"]);\n' +
-        //     '    gradle.registerTask("upload6", ["s7"]);\n' +
-        //     "};\n"
-        // );
-        // await waitForTeIdle(testControl.waitTime.fs.modifyEvent);
-        // await verifyTaskCount(testsName, startTaskCount + 4);
-        // await waitForTeIdle(testControl.waitTime.min);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
+        await fsApi.writeFile(
+            fileUri.fsPath,
+            "\ntask fatJar10(type: Jar) {\n" +
+            "    manifest {}\n" +
+            "    baseName = project.name + '-all'\n" +
+            "}\n"
+        );
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
+        await verifyTaskCount(testsName, startTaskCount + 1);
         endRollingCount(this);
     });
 
@@ -155,12 +159,20 @@ suite("Gradle Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.deleteEvent + testControl.waitTime.min);
-        // await fsApi.deleteFile(fileUri.fsPath);
-        // await fsApi.deleteDir(dirName);
-        // await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
-        // await verifyTaskCount(testsName, startTaskCount);
-        // await waitForTeIdle(testControl.waitTime.min);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify + tc.waitTime.fs.deleteEvent + tc.waitTime.min);
+        await fsApi.deleteFile(fileUri.fsPath);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
+        await verifyTaskCount(testsName, startTaskCount);
+        endRollingCount(this);
+    });
+
+
+    test("Disable (Default is OFF)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, tc.waitTime.config.disableEvent);
+        await verifyTaskCount(testsName, 0);
         endRollingCount(this);
     });
 

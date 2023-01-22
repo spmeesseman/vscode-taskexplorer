@@ -17,6 +17,10 @@ task fatJar(type: Jar) {
     with jar
 }
 
+task emptyTask {}
+
+task empty
+
 //Get dependencies from Maven central repository
 repositories {
     mavenCentral()
