@@ -4,8 +4,8 @@ import { basename, dirname } from "path";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/utils";
-import { configuration } from "../lib/utils/configuration";
-import { ITaskDefinition } from "../interface/ITaskDefinition";
+import { configuration, } from "../lib/utils/configuration";
+import { IDictionary, ITaskDefinition } from "../interface";
 import {
     Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions, extensions
 } from "vscode";
@@ -36,6 +36,16 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         ".MAKE",
     ];
 
+    private commands: IDictionary<string> = {
+        aix: "make",
+        darwin: "make",
+        freebsd: "make",
+        linux: "make",
+        openbsd: "make",
+        sunos: "make",
+        win32: "nmake"
+    };
+
     constructor() { super("make"); }
 
 
@@ -45,21 +55,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
 
         const getCommand = (): string =>
         {
-            let make = "make";
-            /* istanbul ignore else */   // I don't text on anythingbut windows
-            if (process.platform === "win32") {
-                make = "nmake";
-            }
-            /* istanbul ignore else */
-            if (configuration.get("pathToPrograms.make")) {
-                make = configuration.get("pathToPrograms.make");
-                //
-                // Ref ticket #138 - temp logging
-                //
-                log.value("   set make program from settings", make, 5, logPad, this.logQueueId);
-            }
-            log.value("   make program", make, 5, logPad, this.logQueueId);
-            return make;
+             return configuration.get<string>("pathToPrograms.make", this.commands[process.platform]);
         };
 
         const kind = this.getDefaultDefinition(target, folder, uri);
@@ -71,8 +67,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         };
 
         const execution = new ShellExecution(getCommand(), args, options);
-        /* istanbul ignore next */
-        const problemMatcher = extensions.getExtension("ms-vscode.cpptools") ? "$gcc" : "$gccte";
+        const problemMatcher = extensions.getExtension("ms-vscode.cpptools") ? "$gcc" : /* istanbul ignore next */"$gccte";
 
         log.methodDone("create make task", 4, logPad, undefined, this.logQueueId);
         return new Task(kind, folder, target, "make", execution, problemMatcher);
@@ -90,7 +85,6 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
             idx = documentText.indexOf(taskName);
             let bLine = documentText.lastIndexOf("\n", idx) + 1;
             let eLine = documentText.indexOf("\n", idx);
-            /* istanbul ignore if */
             if (eLine === -1) { eLine = documentText.length; }
             let line = documentText.substring(bLine, eLine).trim();
             while (bLine !== -1 && bLine !== idx && idx !== -1 && line.indexOf(":") === -1)
@@ -98,9 +92,8 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
                 idx = documentText.indexOf(taskName, idx + 1);
                 bLine = documentText.lastIndexOf("\n", idx) + 1;
                 eLine = documentText.indexOf("\n", idx);
-                /* istanbul ignore else */
                 if (bLine !== -1)
-                {   /* istanbul ignore if */
+                {
                     if (eLine === -1) { eLine = documentText.length; }
                     line = documentText.substring(bLine, eLine).trim();
                 }

@@ -12,7 +12,7 @@ import { MavenTaskProvider } from "../../providers/maven";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import {
     activate, endRollingCount, executeSettingsUpdate, executeTeCommand, exitRollingCount, focusExplorerView,
-    getWsPath, needsTreeBuild, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
+    getWsPath, needsTreeBuild, suiteFinished, testControl as tc, testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "maven";
@@ -98,9 +98,8 @@ suite("Maven Tests", () =>
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as MavenTaskProvider;
         // provider.readTasks();
-        provider.getDocumentPosition(undefined, undefined);
-        provider.getDocumentPosition("test", undefined);
-        provider.getDocumentPosition(undefined, "test");
+        testInvDocPositions(provider);
+        provider.createTask("publish", "publish", teApi.testsApi.wsFolder, Uri.file(getWsPath(".")), []);
         endRollingCount(this);
     });
 

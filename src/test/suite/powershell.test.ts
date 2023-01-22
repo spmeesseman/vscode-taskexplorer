@@ -10,8 +10,8 @@ import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { PowershellTaskProvider } from "../../providers/powershell";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, endRollingCount, executeSettingsUpdate, exitRollingCount, getWsPath,
-    logErrorsAreFine, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
+import { activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
+    logErrorsAreFine, needsTreeBuild, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "powershell";
@@ -55,6 +55,16 @@ suite("Powershell Tests", () =>
     });
 
 
+	test("Focus Tree View", async function()
+	{
+        if (exitRollingCount(this)) return;
+        if (needsTreeBuild()) {
+            await focusExplorerView(this);
+        }
+        endRollingCount(this);
+	});
+
+
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
@@ -64,7 +74,7 @@ suite("Powershell Tests", () =>
     });
 
 
-    test("Invalid ScriptProvider Type", async function()
+    test("Invalid Script Provider Type", async function()
     {
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as PowershellTaskProvider;

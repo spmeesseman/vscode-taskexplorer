@@ -11,7 +11,7 @@ import { ComposerTaskProvider } from "../../providers/composer";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, executeSettingsUpdate, exitRollingCount, getWsPath, needsTreeBuild,
-    suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
+    suiteFinished, testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 import { expect } from "chai";
 
@@ -75,12 +75,10 @@ suite("Composer Tests", () =>
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as ComposerTaskProvider;
         // provider.readTasks();
-        expect(provider.getDocumentPosition(undefined, undefined)).to.be.equal(0);
-        expect(provider.getDocumentPosition("test", undefined)).to.be.equal(0);
-        expect(provider.getDocumentPosition(undefined, "test")).to.be.equal(0);
+        testInvDocPositions(provider);
         const docText = await fsApi.readFileAsync(path.join(getWsPath("."), "composer.json"));
         expect(provider.getDocumentPosition("doc", docText)).to.be.greaterThan(0);
-        expect(provider.getDocumentPosition("doc2", docText)).to.be.equal(1787); // Position of 'scripts' object
+        expect(provider.getDocumentPosition("doc2", docText)).to.be.equal(1787); // pos of scripts block
         endRollingCount(this);
     });
 

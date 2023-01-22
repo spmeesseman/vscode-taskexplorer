@@ -6,8 +6,8 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { RubyTaskProvider } from "../../providers/ruby";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
-    suiteFinished, testControl, treeUtils
+import { activate, endRollingCount, exitRollingCount, focusExplorerView, getWsPath, needsTreeBuild,
+    suiteFinished, testControl
 } from "../utils/utils";
 
 const testsName = "ruby";
@@ -38,14 +38,14 @@ suite("Ruby Tests", () =>
     });
 
 
-    test("Build Tree", async function()
-    {
+	test("Focus Tree View", async function()
+	{
         if (exitRollingCount(this)) return;
         if (needsTreeBuild()) {
-            await treeUtils.refresh(this);
+            await focusExplorerView(this);
         }
         endRollingCount(this);
-    });
+	});
 
 
 

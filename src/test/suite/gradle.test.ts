@@ -4,13 +4,13 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
+import { expect } from "chai";
 import { GradleTaskProvider } from "../../providers/gradle";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, executeSettingsUpdate, exitRollingCount, getWsPath, needsTreeBuild,
-    testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
+    testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
-import { expect } from "chai";
 
 const testsName = "gradle";
 const startTaskCount = 2;
@@ -61,10 +61,8 @@ suite("Gradle Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        provider.getDocumentPosition(undefined, undefined);
-        provider.getDocumentPosition("test", undefined);
-        provider.getDocumentPosition(undefined, "test");
-        const docText = await fsApi.readFileAsync(path.join(getWsPath("."), "test.gradle"));
+        testInvDocPositions(provider);
+        const docText = await fsApi.readFileAsync(path.join(dirName, "test.gradle"));
         expect(provider.getDocumentPosition("fatJar", docText)).to.be.greaterThan(0);
         expect(provider.getDocumentPosition("emptyTask", docText)).to.be.greaterThan(0);
         expect(provider.getDocumentPosition("fatJar2", docText)).to.be.equal(0);
@@ -159,7 +157,7 @@ suite("Gradle Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify + tc.waitTime.fs.deleteEvent + tc.waitTime.min);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);

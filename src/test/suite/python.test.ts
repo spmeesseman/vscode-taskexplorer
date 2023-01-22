@@ -11,8 +11,8 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { PythonTaskProvider } from "../../providers/python";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, getWsPath,
-    logErrorsAreFine, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
+    logErrorsAreFine, needsTreeBuild, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "python";
@@ -56,6 +56,16 @@ suite("Python Tests", () =>
         await fsApi.deleteDir(dirName);
         suiteFinished(this);
     });
+
+
+	test("Focus Tree View", async function()
+	{
+        if (exitRollingCount(this)) return;
+        if (needsTreeBuild()) {
+            await focusExplorerView(this);
+        }
+        endRollingCount(this);
+	});
 
 
     test("Document Position", async function()
