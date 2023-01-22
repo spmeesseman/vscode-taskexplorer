@@ -10,24 +10,20 @@ import constants from "../lib/constants";
 import SpecialTaskFolder from "./specialFolder";
 import { dirname, join } from "path";
 import { IEvent } from "../interface/IEvent";
-import { pathExists } from "../lib/utils/fs";
 import { rebuildCache } from "../lib/fileCache";
 import { TaskWatcher } from "../lib/taskWatcher";
 import { getTerminal } from "../lib/getTerminal";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
-import { ScriptTaskProvider } from "../providers/script";
 import { configuration } from "../lib/utils/configuration";
 import { enableConfigWatcher } from "../lib/configWatcher";
 import { TaskExplorerProvider } from "../providers/provider";
-import { findDocumentPosition } from "../lib/findDocumentPosition";
 import { ITaskExplorer, TaskMap } from "../interface/ITaskExplorer";
 import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { getLicenseManager, providers, providersExternal } from "../extension";
 import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition, IDictionary } from "../interface";
 import {
-    Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TaskRevealKind, TextDocument,
-    TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, commands, window, workspace, tasks,
-    Selection, InputBoxOptions, ShellExecution, CustomExecution, Disposable, TaskExecution
+    Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TreeDataProvider, TreeItem,
+    TreeItemCollapsibleState, Uri, commands, tasks, Disposable
 } from "vscode";
 
 
