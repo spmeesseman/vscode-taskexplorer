@@ -10,12 +10,22 @@ import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { pathExistsSync, readFileAsync } from "../lib/utils/fs";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace, ShellExecutionOptions } from "vscode";
+import { IDictionary } from "../interface";
 
 interface StringMap { [s: string]: string }
 
 
 export class AntTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
+    private commands: IDictionary<string> = {
+        aix: "ant",
+        darwin: "ant",
+        freebsd: "ant",
+        linux: "ant",
+        openbsd: "ant",
+        sunos: "ant",
+        win32: "ant.bat"
+    };
 
     constructor() { super("ant"); }
 
@@ -99,20 +109,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             return 0;
         }
         taskName = taskName.replace(" - Default", "");
-        let idx = this.getDocumentPositionLine("name=", taskName, documentText, 6);
-        if (idx > 0)
-        {   //
-            // Check to make sure this isnt the 'default task' position,i.e.:
-            //
-            //     <project basedir="." default="test-build">
-            //
-            const scriptOffset2 = this.getDocumentPositionLine("name=", taskName, documentText, 6, idx + 1);
-            /* istanbul ignore if */
-            if (scriptOffset2 > 0) {
-                idx = scriptOffset2;
-            }
-        }
-        return idx;
+        return this.getDocumentPositionLine("name=", taskName, documentText, 6);
     }
 
 
@@ -253,20 +250,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
     private getCommand(): string
     {
-        let ant = "ant";
-        /* istanbul ignore else */
-        if (process.platform === "win32") {
-            ant = "ant.bat";
-        }
-        /* istanbul ignore else */
-        if (configuration.get("pathToPrograms.ant"))
-        {
-            ant = configuration.get("pathToPrograms.ant");
-            if (process.platform === "win32" && ant.endsWith("\\ant")) {
-                ant += ".bat";
-            }
-        }
-        return ant;
+        return configuration.get("pathToPrograms.ant", this.commands[process.platform]);
     }
 
 
@@ -301,16 +285,12 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
             [ "path", uri.fsPath ], [ "project folder", folder.name ]
         ], this.logQueueId);
 
-        /* istanbul ignore else */
-        if (folder)
+        const scripts = await this.findAllAntScripts(uri.fsPath, logPad + "   ");
+        for (const s of Object.keys(scripts))
         {
-            const scripts = await this.findAllAntScripts(uri.fsPath, logPad + "   ");
-            for (const s of Object.keys(scripts))
-            {
-                const task = this.createTask(scripts[s], s, folder, uri);
-                task.group = TaskGroup.Build;
-                result.push(task);
-            }
+            const task = this.createTask(scripts[s], s, folder, uri);
+            task.group = TaskGroup.Build;
+            result.push(task);
         }
 
         log.methodDone("read ant file uri tasks", 3, logPad, [[ "# of tasks found", result.length ]], this.logQueueId);

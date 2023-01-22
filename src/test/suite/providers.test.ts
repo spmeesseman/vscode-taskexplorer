@@ -386,7 +386,7 @@ suite("Provider Tests", () =>
         let numOpened: number;
         let numFilesOpened: number;
         ({ taskMap, numOpened, numFilesOpened } = await treeUtils.walkTreeItems(undefined, true));
-        checkTasks(7, 42, 3, 4, 3, 13, 32, 2, 4, 10); // There are 3 'User' Workspace/VSCode Tasks but they won't be in the TaskMap
+        checkTasks(7, 42, 3, 4, 4, 13, 32, 2, 4, 10); // There are 3 'User' Workspace/VSCode Tasks but they won't be in the TaskMap
         this.slow((numFilesOpened * tc.slowTime.findTaskPosition) + ((numOpened - numFilesOpened) * tc.slowTime.findTaskPositionDocOpen));
         endRollingCount(this);
     });

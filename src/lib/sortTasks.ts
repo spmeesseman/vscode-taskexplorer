@@ -54,22 +54,25 @@ export const sortTasks = (items: (ITaskFile | ITaskItem)[] | undefined, logPad: 
     log.methodStart("sort tasks", logLevel, logPad);
     items?.sort((a: ITaskFile | ITaskItem, b: ITaskFile | ITaskItem) =>
     {
+        let s = 0;
         /* istanbul ignore else */
         if (a.label && b.label)
         {
-            if ((a instanceof TaskFile && b instanceof TaskFile || a instanceof TaskItem && b instanceof TaskItem)) {
-                return a.label?.toString()?.localeCompare(b.label?.toString());
+            if ((a instanceof TaskFile && b instanceof TaskFile || a instanceof TaskItem && b instanceof TaskItem))
+            {
+                s = a.label.toString()?.localeCompare(b.label.toString());
             } //
              // TaskFiles we keep at the top, like a folder in Windows Explorer
             //
             else /* istanbul ignore if */if (a instanceof TaskFile && /* istanbul ignore next */b instanceof TaskItem)
             {
-                return -1;
+                s = -1;
             }
-            return 1;
+            else {
+                s = 1;
+            }
         }
-        /* istanbul ignore next */
-        return 0;
+        return s;
     });
     log.methodDone("sort tasks", logLevel, logPad);
 };

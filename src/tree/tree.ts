@@ -1996,7 +1996,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         if (exec)
         {
             const terminal = getTerminal(taskItem, "   ");
-            /* istanbul ignore else */
             if (terminal)
             {
                 if (configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)

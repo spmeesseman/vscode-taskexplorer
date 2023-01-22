@@ -5,7 +5,6 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as assert from "assert";
 import * as path from "path";
 import { Uri } from "vscode";
 import { ComposerTaskProvider } from "../../providers/composer";
@@ -14,6 +13,7 @@ import {
     activate, endRollingCount, executeSettingsUpdate, exitRollingCount, getWsPath, needsTreeBuild,
     suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
+import { expect } from "chai";
 
 const testsName = "composer";
 const startTaskCount = 2;
@@ -75,10 +75,12 @@ suite("Composer Tests", () =>
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as ComposerTaskProvider;
         // provider.readTasks();
-        assert (provider.getDocumentPosition(undefined, undefined) === 0);
-        assert (provider.getDocumentPosition("test", undefined) === 0);
-        assert (provider.getDocumentPosition(undefined, "test") === 0);
-        assert (provider.getDocumentPosition("doc", await fsApi.readFileAsync(path.join(getWsPath("."), "composer.json"))) > 0);
+        expect(provider.getDocumentPosition(undefined, undefined)).to.be.equal(0);
+        expect(provider.getDocumentPosition("test", undefined)).to.be.equal(0);
+        expect(provider.getDocumentPosition(undefined, "test")).to.be.equal(0);
+        const docText = await fsApi.readFileAsync(path.join(getWsPath("."), "composer.json"));
+        expect(provider.getDocumentPosition("doc", docText)).to.be.greaterThan(0);
+        expect(provider.getDocumentPosition("doc2", docText)).to.be.equal(1787); // Position of 'scripts' object
         endRollingCount(this);
     });
 
@@ -140,7 +142,7 @@ suite("Composer Tests", () =>
     test("Add Task to File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -164,7 +166,7 @@ suite("Composer Tests", () =>
     test("Remove 2 Tasks from File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -183,17 +185,34 @@ suite("Composer Tests", () =>
     });
 
 
+    test("Remove Scripts Object from File", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
+        await fsApi.writeFile(
+            fileUri.fsPath,
+            "{\n" +
+            '  "include": ["**/*"],\n' +
+            '  "exclude": ["node_modules"]\n' +
+            "}\n"
+        );
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
+        await verifyTaskCount(testsName, startTaskCount);
+        endRollingCount(this);
+    });
+
+
     test("Invalid JSON", async function()
     {
         if (exitRollingCount(this)) return;
         let resetLogging = teApi.log.isLoggingEnabled();
         if (resetLogging) { // turn scary error logging off
-            this.slow(tc.slowTime.fs.createEvent + (tc.slowTime.config.event * 2) + tc.slowTime.taskCount.verify);
+            this.slow(tc.slowTime.fs.modifyEvent + (tc.slowTime.config.event * 2) + tc.slowTime.taskCount.verify);
             executeSettingsUpdate("logging.enable", false);
             resetLogging = true;
         }
         else {
-            this.slow(tc.slowTime.fs.createEvent);
+            this.slow(tc.slowTime.fs.modifyEvent);
         }
         await fsApi.writeFile(
             fileUri.fsPath,

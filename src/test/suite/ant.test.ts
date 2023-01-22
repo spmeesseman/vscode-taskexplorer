@@ -77,7 +77,9 @@ suite("Ant Tests", () =>
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
         provider.getDocumentPosition("test_isnt_there", xml);
-        const index = provider.getDocumentPosition("test-build2", xml);
+        let index = provider.getDocumentPosition("test-build", xml);
+        expect(index).to.be.a("number").that.is.equal(104, `test-build2 task position should be 104 (actual ${index}`);
+        index = provider.getDocumentPosition("test-build2", xml);
         expect(index).to.be.a("number").that.is.equal(275, `test-build2 task position should be 275 (actual ${index}`);
         endRollingCount(this);
     });

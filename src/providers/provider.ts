@@ -33,7 +33,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     }
 
 
-    getDocumentPositionLine(lineName: string, scriptName: string, documentText: string, advance = 0, start = 0, skipQuotes = false): number
+    protected getDocumentPositionLine(lineName: string, scriptName: string, documentText: string, advance = 0, start = 0, skipQuotes = false): number
     {
         //
         // TODO - This is crap, use regex to detect spaces between quotes
@@ -47,7 +47,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
         {
             idx += advance;
         }
-        return idx;
+        return idx !== -1 ? idx : 0;
     }
 
 

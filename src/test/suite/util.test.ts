@@ -660,9 +660,26 @@ suite("Util Tests", () =>
 			await afs.copyDir(join(getWsPath("."), "hello.bat"), join(__dirname, "folder2"));
 		} catch {}
 		await afs.createDir(join(__dirname, "folder1", "folder2", "folder3", "folder4"));
+		await afs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder5"), undefined, true);
+		await afs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder6"));
+		await afs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder7"), /folder/, true);
 		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
 		await afs.deleteDir(join(__dirname, "folder1"));
+		await afs.deleteDir(join(__dirname, "folder5"));
+		await afs.deleteDir(join(__dirname, "folder6"));
+		await afs.deleteDir(join(__dirname, "folder7"));
+		await afs.createDir(join(__dirname, "folder1"));
 		await afs.deleteFile(join(__dirname, "folder1", "file1.png"));
+		await afs.writeFile(join(__dirname, "folder1", "file1.png"), "");
+		try { await afs.readFileAsync(join(__dirname, "folder1", "file1.png")); } catch {}
+		try { await afs.readJsonAsync(join(__dirname, "folder1", "file1.png")); } catch {}
+		try { afs.readFileSync(join(__dirname, "folder1", "file1.png")); } catch {}
+		try { afs.readJsonSync(join(__dirname, "folder1", "file1.png")); } catch {}
+		await afs.copyFile(join(__dirname, "folder1", "file1.png"), join(__dirname, "folder1", "file2.png"));
+		await afs.copyFile(join(__dirname, "folder1", "file1.png"), join(__dirname, "folder1", "file2.png"));
+		await afs.deleteDir(join(__dirname, "folder1"));
+		try { await afs.readFileAsync(join(__dirname, "folder1", "file1.png")); } catch {}
+		try { afs.readFileSync(join(__dirname, "folder1", "file1.png")); } catch {}
 		await afs.numFilesInDirectory(rootUri.fsPath);
 		try {
 			await afs.numFilesInDirectory(join(rootUri.fsPath, "tasks_test_"));

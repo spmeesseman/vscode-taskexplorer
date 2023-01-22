@@ -92,7 +92,7 @@ export const testControl: ITestControl =
             groupingEvent: 1575,
             pathToProgramsEvent: 705,
             showHideSpecialFolder: 430,
-            showHideUserTasks: 1550,
+            showHideUserTasks: 1580,
             specialFolderEvent: 455,
             readEvent: 25,
             sortingEvent: 1500

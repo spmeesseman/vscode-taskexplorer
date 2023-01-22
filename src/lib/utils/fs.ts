@@ -61,7 +61,6 @@ export const copyDir = (src: string, dst: string, filter?: RegExp, copyWithBaseF
         for (const file of files)
         {
             const newSrc = path.join(srcDir, file);
-            /* istanbul ignore if */
             if (fs.existsSync(newSrc) && fs.lstatSync(newSrc).isDirectory())
             {
                 await copyDir(newSrc, tgtDir, filter, true);
@@ -100,10 +99,8 @@ export const copyFile = (src: string, dst: string) =>
         // If dst is a directory, a new file with the same name will be created
         //
         let fullPath = path.resolve(cwd, dst);
-        /* istanbul ignore else */
         if (await pathExists(fullPath))
         {
-            /* istanbul ignore else */
             if (fs.lstatSync(fullPath).isDirectory()) {
                 fullPath = path.join(fullPath, path.basename(src));
             }
@@ -291,7 +288,8 @@ export const pathExistsSync = (file: string) =>
 {
     try {
         fs.accessSync(path.resolve(process.cwd(), file));
-    } catch (err) {
+    }
+    catch {
         return false;
     }
     return true;
@@ -304,15 +302,9 @@ export const readFileAsync = (file: string): Promise<string> =>
     {
         try {
             const buf = await readFileBufAsync(file);
-            /* istanbul ignore else */
-            if (buf) {
-                resolve(buf.toString("utf8"));
-            }
-            else {
-                resolve("");
-            }
+            resolve(buf.toString("utf8"));
         }
-        catch (e) { /* istanbul ignore next */ reject(e); }
+        catch (e) { reject(e); }
     });
 };
 
@@ -322,7 +314,7 @@ export const readFileSync = (file: string) =>
     try {
         return fs.readFileSync(path.resolve(process.cwd(), file)).toString();
     }
-    catch { /* istanbul ignore next */ return ""; }
+    catch { return ""; }
 };
 
 
@@ -347,7 +339,7 @@ export const readJsonSync = <T>(file: string): T =>
               jso = JSON.parse(json);
         return jso;
     }
-    catch { /* istanbul ignore next */ return {} as T; }
+    catch { return {} as T; }
 };
 
 
@@ -357,7 +349,6 @@ const readFileBufAsync = (file: string): Promise<Buffer> =>
     {
         fs.readFile(path.resolve(cwd, file), (e, data) =>
         {
-            /* istanbul ignore else */
             if (!e) {
                 resolve(data);
             }

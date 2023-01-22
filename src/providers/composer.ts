@@ -1,6 +1,7 @@
 
 import log from "../lib/log/log";
 import { basename, dirname } from "path";
+import { IDictionary } from "../interface";
 import { getRelativePath } from "../lib/utils/utils";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
@@ -11,6 +12,16 @@ import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from
 
 export class ComposerTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
+    private commands: IDictionary<string> = {
+        aix: "composer",
+        darwin: "composer",
+        freebsd: "composer",
+        linux: "composer",
+        openbsd: "composer",
+        sunos: "composer",
+        win32: "composer.exe"
+    };
+
 
     constructor() { super("composer"); }
 
@@ -19,16 +30,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
     {
         const getCommand = (): string =>
         {
-            let composer = "composer";
-            /* istanbul ignore else */
-            if (process.platform === "win32") {
-                composer = "composer.exe";
-            }
-            /* istanbul ignore else */
-            if (configuration.get<string>("pathToPrograms.composer")) {
-                composer = configuration.get("pathToPrograms.composer");
-            }
-            return composer;
+            return configuration.get<string>("pathToPrograms.composer", this.commands[process.platform]);
         };
 
         const def = this.getDefaultDefinition(target, folder, uri);
@@ -50,7 +52,6 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
         try {
             const json = await readJsonAsync<any>(fsPath),
                   scripts = json.scripts;
-            /* istanbul ignore else */
             if (scripts) {
                 Object.keys(scripts).forEach((k) => {
                     targets.push(k);
@@ -88,7 +89,6 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
             if (idx !== -1 && scriptName)
             {
                 const idx2 = documentText.indexOf(`"${scriptName}"`);
-                /* istanbul ignore next */
                 return idx2 !== -1 ? idx2 : idx;
             }
         }

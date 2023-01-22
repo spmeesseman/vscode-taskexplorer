@@ -15,10 +15,22 @@ export class AppPublisherTaskProvider extends TaskExplorerProvider implements Ta
     constructor() { super("apppublisher"); }
 
 
-    /* istanbul ignore next */
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task | undefined
-    {   /* istanbul ignore next */
+    {
         return undefined;
+        // const cwd = dirname(uri.fsPath);
+        // const defaultDef = this.getDefaultDefinition(undefined, folder, uri),
+        //       options: ShellExecutionOptions = { cwd },
+        //       tasks: Task[] = [],
+        //       taskDefs: any = [];
+        // let apFmtLabel = "";
+        // if (apLabel) {
+        //     apFmtLabel = ` (${apLabel.toLowerCase()})`;
+        //     def.cmdLine += ` --config-name ${apLabel}`;
+        // }
+        // const exec = new ShellExecution(def.cmdLine, options);
+        // return new Task(this._getKind(def.cmdLine, defaultDef), folder,
+        //                 `${def.label}${apFmtLabel}`, "apppublisher", exec, undefined);
     }
 
 

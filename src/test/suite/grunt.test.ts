@@ -11,6 +11,7 @@ import {
     activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
     needsTreeBuild, sleep, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
+import { expect } from "chai";
 
 const testsName = "grunt";
 const startTaskCount = 7;
@@ -58,6 +59,9 @@ suite("Grunt Tests", () =>
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
+        const docText = await fsApi.readFileAsync(path.join(getWsPath("."), "grunt", "GRUNTFILE.JS"));
+        expect(provider.getDocumentPosition("grp-test-svr-build1", docText)).to.be.greaterThan(0);
+        expect(provider.getDocumentPosition("run_tests", docText)).to.be.equal(0);
         endRollingCount(this);
     });
 

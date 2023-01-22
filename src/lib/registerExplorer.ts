@@ -22,13 +22,9 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
             const treeDataProvider = new TaskTreeDataProvider(name, context, teApi.isTests()),
                   treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
             views[name] = treeView;
-            view = views[name];
-            /* istanbul ignore else */
-            if (view)
-            {
-                view.onDidChangeVisibility(e => { treeDataProvider.onVisibilityChanged(e.visible); }, treeDataProvider);
-                context.subscriptions.push(view);
-            }
+            view = views[name] as TreeView<TreeItem>;
+            view.onDidChangeVisibility(e => { treeDataProvider.onVisibilityChanged(e.visible); }, treeDataProvider);
+            context.subscriptions.push(view);
             if (name === "taskExplorer")
             {
                 teApi.explorer = treeDataProvider;
@@ -70,7 +66,7 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
 
     /* istanbul ignore else */
     if (teApi.testsApi) {
-        teApi.testsApi.explorer = teApi.explorer /* istanbul ignore next */|| teApi.sidebar || {} as ITaskExplorer;
+        teApi.testsApi.explorer = teApi.explorer || teApi.sidebar as ITaskExplorer;
     }
 
     log.methodDone("register explorer view / tree provider", 1, logPad);

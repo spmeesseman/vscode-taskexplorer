@@ -57,7 +57,7 @@ suite("License Manager Tests", () =>
 		if (oVersion) {
 			await teApi.testsApi.storage.update("version", oLicenseKey);
 		}
-		licMgr.setUseGlobalLicense(true, {
+		licMgr?.setUseGlobalLicense(true, {
 			maxFreeTasks: licMgrMaxFreeTasks,
 			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
 			maxFreeTasksForTaskType: licMgrMaxFreeTasksForTaskType,
@@ -593,15 +593,18 @@ suite("License Manager Tests", () =>
 	test("Reset Max Limits (Non-Licensed)", async function()
 	{
         // Don't utils.exitRollingCount(this)
-		this.slow(testControl.slowTime.refreshCommand);
-		await utils.setLicensed(true, licMgr);
-		licMgr.setUseGlobalLicense(true, {
-			maxFreeTasks: licMgrMaxFreeTasks,
-			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
-			maxFreeTasksForTaskType: licMgrMaxFreeTasksForTaskType,
-			maxFreeTasksForScriptType: licMgrMaxFreeTasksForScriptType
-		});
-		await utils.treeUtils.refresh();
+		if (licMgr)
+		{
+			this.slow(testControl.slowTime.refreshCommand);
+			await utils.setLicensed(true, licMgr);
+			licMgr.setUseGlobalLicense(true, {
+				maxFreeTasks: licMgrMaxFreeTasks,
+				maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
+				maxFreeTasksForTaskType: licMgrMaxFreeTasksForTaskType,
+				maxFreeTasksForScriptType: licMgrMaxFreeTasksForScriptType
+			});
+			await utils.treeUtils.refresh();
+		}
         utils.endRollingCount(this);
 	});
 

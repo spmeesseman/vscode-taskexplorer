@@ -80,6 +80,7 @@ suite("App-Publisher Tests", () =>
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
+        provider.createTask("publish", "publish", teApi.testsApi.wsFolder, Uri.file(getWsPath(".")), []);
         endRollingCount(this);
     });
 
