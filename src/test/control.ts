@@ -65,11 +65,11 @@ export const testControl: ITestControl =
         addWorkspaceFolder: 8440,
         buildTreeNoTasks: 360,
         cache: {
-            build: 870,
+            build: 800,
             buildCancel: 290,
-            rebuild: 7050,
+            rebuild: 6450,
             rebuildCancel: 490,
-            rebuildNoChanges: 1340,
+            rebuildNoChanges: 1240,
         },
         closeActiveDocument: 25,
         command: 850,
@@ -87,24 +87,24 @@ export const testControl: ITestControl =
             groupingEvent: 1080,
             pathToProgramsEvent: 705,
             showHideSpecialFolder: 340,
-            showHideUserTasks: 1120,
+            showHideUserTasks: 1110,
             readEvent: 25,
-            sortingEvent: 980
+            sortingEvent: 960
         },
-        excludeCommand: 1740,
-        explorerViewStartup: 10500,
-        fetchTasksCommand: 2160,
+        excludeCommand: 1710,
+        explorerViewStartup: 10200,
+        fetchTasksCommand: 2140,
         fileCachePersist: 350,
-        findTaskPosition: 565,
-        findTaskPositionDocOpen: 80,
+        findTaskPosition: 535,
+        findTaskPositionDocOpen: 75,
         focusCommand: 2450,
         focusCommandAlreadyFocused: 320,
         focusCommandChangeViews: 95,
         fs: {
-            createEvent: 1605,
+            createEvent: 1615,
             createEventTsc: 1785,
             createFolderEvent: 1665,
-            deleteEvent: 1360,
+            deleteEvent: 1370,
             deleteEventTsc: 1795,
             deleteFolderEvent: 1465,
             modifyEvent: 975,
@@ -114,47 +114,48 @@ export const testControl: ITestControl =
         licenseMgr: {
             page: 110,
             pageWithDetail: 325,
-            downCheck: 665,
+            downCheck: 225,
             enterKey: 845,
             localCheck: 1795,
             localStartServer: 1195,
             remoteCheck: 2315,
-            remoteStartServer: 3625
+            remoteStartServer: 3625,
+            setLicenseCmd: 210
         },
         min: 60,
-        refreshCommand: 12105,
+        refreshCommand: 11505,
         refreshCommandNoChanges: 250,
         removeWorkspaceFolder: 6470,
         runCommand: 5100,
-        runPauseCommand: 2815,
-        runStopCommand: 3060,
+        runPauseCommand: 2875,
+        runStopCommand: 3140,
         storageRead: 65,
         storageUpdate: 65,
-        storageSecretRead: 105,
-        storageSecretUpdate: 265,
-        taskCommand: 1445,
-        taskCommandStartupMax: 4550,
+        storageSecretRead: 95,
+        storageSecretUpdate: 205,
+        taskCommand: 1415,
+        taskCommandStartupMax: 4520,
         taskProviderReadUri: 95,
         tasks: {
-            antParser: 800,
-            antTask: 7010,
-            antTaskWithAnsicon: 7040,
-            bashScript: 3330,
-            batchScriptBat: 6500,
-            batchScriptCmd: 6875,
-            gulpParser: 3975,
-            npmCommand: 13340,
-            npmCommandPkg: 10060,
-            npmInstallCommand: 14630
+            antParser: 780,
+            antTask: 6910,
+            antTaskWithAnsicon: 6940,
+            bashScript: 3250,
+            batchScriptBat: 5300,
+            batchScriptCmd: 6375,
+            gulpParser: 3955,
+            npmCommand: 12340,
+            npmCommandPkg: 10000,
+            npmInstallCommand: 13630
         },
         taskCount: {
-            verify: 705,
-            verifyByTree: 750,
-            verifyFirstCall: 1185,
-            verifyNpm: 2615, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 2900,
+            verify: 675,
+            verifyByTree: 700,
+            verifyFirstCall: 1085,
+            verifyNpm: 2525, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 2750,
         },
-        viewReport: 900
+        viewReport: 700
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)
@@ -338,6 +339,7 @@ export interface ITestControl
             localStartServer: number;
             remoteCheck: number;
             remoteStartServer: number;
+            setLicenseCmd: number;
         };
         min: number;
         refreshCommand: number;

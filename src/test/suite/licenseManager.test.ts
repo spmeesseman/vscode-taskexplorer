@@ -120,7 +120,7 @@ suite("License Manager Tests", () =>
 	test("Get Maximum # of Tasks", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.storageSecretUpdate * 2);
+		this.slow(testControl.slowTime.licenseMgr.downCheck + (testControl.slowTime.licenseMgr.setLicenseCmd * 2));
 		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks()).to.be.a("number").that.is.equal(Infinity);
 		await utils.setLicensed(false, licMgr);
@@ -132,7 +132,7 @@ suite("License Manager Tests", () =>
 	test("Get Maximum # of NPM Tasks", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.storageSecretUpdate * 2);
+		this.slow(testControl.slowTime.licenseMgr.downCheck + (testControl.slowTime.licenseMgr.setLicenseCmd * 2));
 		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("npm")).to.be.a("number").that.is.equal(Infinity);
 		await utils.setLicensed(false, licMgr);
@@ -144,7 +144,7 @@ suite("License Manager Tests", () =>
 	test("Get Maximum # of Ant Tasks", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.storageSecretUpdate * 2);
+		this.slow(testControl.slowTime.licenseMgr.downCheck + (testControl.slowTime.licenseMgr.setLicenseCmd * 2));
 		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("ant")).to.be.a("number").that.is.equal(Infinity);
 		await utils.setLicensed(false, licMgr);
@@ -156,7 +156,7 @@ suite("License Manager Tests", () =>
 	test("Get Maximum # of Bash Tasks (Scripts)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.storageSecretUpdate * 2);
+		this.slow(testControl.slowTime.licenseMgr.downCheck + (testControl.slowTime.licenseMgr.setLicenseCmd * 2));
 		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("bash")).to.be.a("number").that.is.equal(Infinity);
 		await utils.setLicensed(false, licMgr);
@@ -168,7 +168,7 @@ suite("License Manager Tests", () =>
 	test("Get Maximum # of Python Tasks (Scripts)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.storageSecretUpdate * 2);
+		this.slow(testControl.slowTime.licenseMgr.downCheck + (testControl.slowTime.licenseMgr.setLicenseCmd * 2));
 		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("python")).to.be.a("number").that.is.equal(Infinity);
 		await utils.setLicensed(false, licMgr);
@@ -180,7 +180,7 @@ suite("License Manager Tests", () =>
 	test("Get Maximum # of Task Files", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.storageSecretUpdate * 2);
+		this.slow(testControl.slowTime.licenseMgr.downCheck + (testControl.slowTime.licenseMgr.setLicenseCmd * 2));
 		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTaskFiles()).to.be.a("number").that.is.equal(Infinity);
 		await utils.setLicensed(false, licMgr);
