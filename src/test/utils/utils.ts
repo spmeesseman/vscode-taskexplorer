@@ -31,10 +31,12 @@ let explorerHasFocused = false;
 let timeStarted: number;
 let overridesShowInputBox: any[] = [];
 let overridesShowInfoBox: any[] = [];
+let NODE_TLS_REJECT_UNAUTHORIZED: string | undefined;
 
 const tc = testControl;
 const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
+const disableSSLMsg = "Disabling certificate validation due to Electron Main Process Issue w/ LetsEncrypt DST Root CA X3 Expiry";
 
 window.showInputBox = (...args: any[]) =>
 {
@@ -98,6 +100,16 @@ export const activate = async (instance?: Mocha.Context) =>
         console.log(`    ${figures.color.info} ${figures.withColor("Initializing settings", figures.colors.grey)}`);
         await initSettings();
         //
+		// The LetsEncrypt certificate is rejected by VSCode/Electron Test Suite (?).
+		// See https://github.com/electron/electron/issues/31212. Expiry of DST Root CA X3.
+		// Works fine when debugging, works fine when the extension is installed, just fails in the
+		// tests with the "certificate is expired" error as explained in the link above.  For tests,
+		// and until this is resolved in vscode/test-electron (I think that's wherethe problem is?),
+		// we just disable TLS_REJECT_UNAUTHORIZED in the NodeJS environment.
+		//
+		NODE_TLS_REJECT_UNAUTHORIZED = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        //
         // Activate extension
         //
         console.log(`    ${figures.color.info} ${figures.withColor("Activating extension 'spmeesseman.vscode-taskexplorer'", figures.colors.grey)}`);
@@ -134,6 +146,7 @@ export const activate = async (instance?: Mocha.Context) =>
         activated = true;
         console.log(`    ${figures.color.info} ${figures.withColor("Tests ready", figures.colors.grey)}`);
         console.log(`    ${figures.color.info}`);
+		console.log(`    ${figures.color.warningTests} ${figures.withColor(disableSSLMsg, figures.colors.grey)}`);
     }
     return { teApi, testsApi: teApi.testsApi, fsApi: teApi.testsApi.fs, configApi: teApi.config, explorer: teApi.testsApi.explorer, utils: teApi.utilities };
 };
@@ -158,6 +171,7 @@ export const cleanup = async () =>
 
     window.showInputBox = originalShowInputBox;
     window.showInformationMessage = originalShowInfoBox;
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = NODE_TLS_REJECT_UNAUTHORIZED;
 
     console.log(`    ${figures.color.info} ${figures.withColor("Removing any leftover temporary files", figures.colors.grey)}`);
     try {

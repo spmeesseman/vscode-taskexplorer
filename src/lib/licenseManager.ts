@@ -42,17 +42,16 @@ export class LicenseManager implements ILicenseManager
 	async checkLicense(logPad = "   ")
 	{
 		const storedLicenseKey = await this.getLicenseKey();
-		log.methodStart("license manager check license", 1, logPad, false, [[ "stored license key", storedLicenseKey ]]);
+		log.methodStart("license manager check license", 1, logPad, false, [
+			[ "stored license key", storedLicenseKey ? "******************" : "no license key found" ]
+		]);
 		if (storedLicenseKey) {
-			try {
-				this.licensed = await this.validateLicense(storedLicenseKey, logPad + "   ");
-			}
-			catch {}
+			this.licensed = await this.validateLicense(storedLicenseKey, logPad + "   ");
 		}
 		else {
 			this.licensed = false;
 		}
-		log.methodDone("license manager check license", 1, logPad, [[ "is valid license", this.licensed ]]);
+		log.methodDone("license manager check license", 1, logPad, [[ "is licensed", this.licensed ]]);
 	}
 
 
@@ -204,16 +203,10 @@ export class LicenseManager implements ILicenseManager
 
 			const _onError = (e: any)  =>
 			{
-				/* istanbul ignore else */
-				if (e.message && e.message.includes("ECONNREFUSED"))
-				{
-					log.write("   it appears that the license server is down or offline", 1, logPad);
-					if (!this.teApi.isTests()) {
-						log.write("      licensed mode will be automatically enabled", 1, logPad);
-					}
-				}
-				else { log.error(e); }
-				log.methodDone("validate license", 1, logPad, [[ "is valid license", !this.teApi.isTests() ]]);
+				log.error(e);
+				log.write("   the license server is down, offline, or there is a connection issue", 1, logPad);
+				log.write("      licensed mode will be automatically enabled", 1, logPad);
+				log.methodDone("validate license", 1, logPad);
 				resolve(!this.teApi.isTests());
 			};
 
@@ -237,11 +230,12 @@ export class LicenseManager implements ILicenseManager
 						log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);
 						resolve(licensed);
 					}
-					catch (e) { /* istanbul ignore next */ _onError(e); }
+					catch (e) { _onError(e); }
 				});
 			});
+			/* istanbul ignore next*/
 			req.on("error", (e) => { _onError(e); });
-			req.write(JSON.stringify({ licensekey: licenseKey }), (e) =>
+			req.write(JSON.stringify({ licensekey: licenseKey }), () =>
 			{
 				req.end();
 			});

@@ -117,6 +117,7 @@ export const testControl: ITestControl =
         },
         getTreeTasks: 285,
         getTreeTasksNpm: 740, // npm task provider is slower than shit on a turtle
+        licenseManagerEnterKey: 750,
         licenseMgrOpenPage: 565,
         licenseMgrOpenPageWithDetail: 980,
         licenseManagerLocalCheck: 1990,
@@ -132,6 +133,7 @@ export const testControl: ITestControl =
         runStopCommand: 2505,
         storageRead: 50,
         storageUpdate: 50,
+        storageSecretUpdate: 150,
         taskCommand: 1575,
         taskCommandStartupMax: 4950,
         taskProviderReadUri: 100,
@@ -332,6 +334,7 @@ export interface ITestControl
         };
         getTreeTasks: number;
         getTreeTasksNpm: number; // npm task provider is slower than shit on a turtle
+        licenseManagerEnterKey: number;
         licenseMgrOpenPage: number;
         licenseMgrOpenPageWithDetail: number;
         licenseManagerLocalCheck: number;
@@ -350,6 +353,7 @@ export interface ITestControl
         runStopCommand: number;
         storageRead: number;
         storageUpdate: number;
+        storageSecretUpdate: number;
         taskCommand: number;
         taskCommandStartupMax: number;
         taskProviderReadUri: number;

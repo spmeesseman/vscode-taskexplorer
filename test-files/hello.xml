@@ -19,14 +19,12 @@
       <sleep milliseconds="100"/>
       <sleep milliseconds="25"/>
       <sleep milliseconds="100"/>
-      <sleep milliseconds="100"/>
       <sleep milliseconds="25"/>
       <sleep/>
       <sleep milliseconds="100"/>
       <sleep milliseconds="250"/>
       <echo message="Sleeping in 1..."/>
       <sleep milliseconds="25"/>
-      <sleep milliseconds="250"/>
       <sleep milliseconds="25"/>
       <sleep/>
       <sleep milliseconds="25"/>

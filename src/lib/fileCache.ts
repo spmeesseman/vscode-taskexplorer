@@ -92,12 +92,10 @@ export async function addFolder(folder: Uri, logPad: string)
                     try
                     {   let maxFiles = Infinity;
                         log.write(`      Start folder scan for ${providerName} tasks`, 3, logPad);
-                        /* istanbul ignore else */
                         if (licMgr && !licMgr.isLicensed())
                         {
                             const cachedFileCount = getTaskFileCount();
                             maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
-                            /* istanbul ignore if */
                             if (maxFiles <= 0) {
                                 util.showMaxTasksReachedMessage();
                                 return numFilesFound;
@@ -107,10 +105,6 @@ export async function addFolder(folder: Uri, logPad: string)
                         const paths = await findFiles(glob, { nocase: true, ignore: getExcludesPatternGlob(), cwd: folder.fsPath  });
                         for (const fPath of paths)
                         {
-                            /* istanbul ignore if */
-                            if (cancel) {
-                                break;
-                            }
                             const uriFile = Uri.file(join(folder.fsPath, fPath));
                             numFilesAdded += addToMappings(providerName, { uri: uriFile, project: wsFolder.name }, logPad + "      ");
                         }
@@ -703,57 +697,49 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
     {
         initMaps(taskType, wsf.name);
 
-        /* istanbul ignore else */
-        if (projectFilesMap[wsf.name] && projectFilesMap[wsf.name][taskType])
+        projectFilesMap[wsf.name][taskType].slice().reverse().forEach((fsPath, index, object) =>
         {
-            projectFilesMap[wsf.name][taskType].slice().reverse().forEach((fsPath, index, object) =>
+            if (folderUri !== undefined)
             {
-                if (folderUri !== undefined)
+                if (fsPath === folderUri.fsPath || (isFolder && fsPath.startsWith(folderUri.fsPath)))
                 {
-                    if (fsPath === folderUri.fsPath || (isFolder && fsPath.startsWith(folderUri.fsPath)))
-                    {
-                        log.value(`   remove from project files map (${index})`, fsPath, 3, logPad);
-                        projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
-                        ++removed.c1;
-                    }
+                    log.value(`   remove from project files map (${index})`, fsPath, 3, logPad);
+                    projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
+                    ++removed.c1;
                 }
-                else
-                {   /* istanbul ignore else */
-                    if (fsPath.startsWith(wsf.uri.fsPath))
-                    {
-                        log.value(`   remove from project files map (${index})`, fsPath, 3, logPad);
-                        projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
-                        ++removed.c1;
-                    }
+            }
+            else
+            {   /* istanbul ignore else */
+                if (fsPath.startsWith(wsf.uri.fsPath))
+                {
+                    log.value(`   remove from project files map (${index})`, fsPath, 3, logPad);
+                    projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
+                    ++removed.c1;
                 }
-            });
-        }
+            }
+        });
 
-        /* istanbul ignore else */
-        if (taskFilesMap[taskType])
+        taskFilesMap[taskType].slice().reverse().forEach((item, index, object) =>
         {
-            taskFilesMap[taskType].slice().reverse().forEach((item, index, object) =>
+            if (folderUri !== undefined)
             {
-                if (folderUri !== undefined)
+                if (item.uri.fsPath === folderUri.fsPath || (isFolder && item.uri.fsPath.startsWith(folderUri.fsPath)))
                 {
-                    if (item.uri.fsPath === folderUri.fsPath || (isFolder && item.uri.fsPath.startsWith(folderUri.fsPath)))
-                    {
-                        log.value(`   remove from task files map (${index})`, item.uri.fsPath, 3, logPad);
-                        taskFilesMap[taskType].splice(object.length - 1 - index, 1);
-                        ++removed.c2;
-                    }
+                    log.value(`   remove from task files map (${index})`, item.uri.fsPath, 3, logPad);
+                    taskFilesMap[taskType].splice(object.length - 1 - index, 1);
+                    ++removed.c2;
                 }
-                else
-                {   /* istanbul ignore else */
-                    if (item.project === wsf.name)
-                    {
-                        log.value(`   remove from task files map (${index})`, item.uri.fsPath, 3, logPad);
-                        projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
-                        ++removed.c2;
-                    }
+            }
+            else
+            {   /* istanbul ignore else */
+                if (item.project === wsf.name)
+                {
+                    log.value(`   remove from task files map (${index})`, item.uri.fsPath, 3, logPad);
+                    projectFilesMap[wsf.name][taskType].splice(object.length - 1 - index, 1);
+                    ++removed.c2;
                 }
-            });
-        }
+            }
+        });
     }
 
     log.values(4, logPad + "   ", [[ "cache1 rmv count", removed.c1 ], [ "cache2 rmv count", removed.c2 ]]);
@@ -770,10 +756,6 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
     }
     else if (folderUri) {
         log.write("   doesnt exist in cache", 4, logPad);
-    }
-    /* istanbul ignore if */
-    if (removed.c1 !== removed.c2) {
-        log.error("   the 'remove' counts in the mappings do not match, there is an issue in the file cache");
     }
 
     log.methodDone("remove item from mappings", 3, logPad);
@@ -796,11 +778,7 @@ export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad: string)
             log.value("   completed remove files from cache", taskType, 2, logPad);
         });
         delete projectToFileCountMap[f.name];
-        /* istanbul ignore else */
-        if (projectFilesMap[f.name])
-        {
-            delete projectFilesMap[f.name];
-        }
+        delete projectFilesMap[f.name];
         log.write("   workspace folder removed", 1, logPad);
     }
     log.methodDone("remove workspace folder", 1, logPad);

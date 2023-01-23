@@ -40,18 +40,6 @@ class Storage implements IStorage, Memento
     }
 
 
-    public getSecret(key: string): Thenable<string | undefined>
-    {
-        return this.secrets.get(this.getKey(key));
-    }
-
-
-    public updateSecret(key: string, value: any): Thenable<void>
-    {
-        return this.secrets.store(this.getKey(key), value);
-    }
-
-
     private getKey = (key: string) => (!this.isTests ? /* istanbul ignore next */"" : (this.isDev ? /* istanbul ignore next */"dev" : "tests")) + key;
 
 
@@ -66,6 +54,26 @@ class Storage implements IStorage, Memento
             return v;
         }
         return store[(!this.isTests ? /* istanbul ignore next */"" : "tests") + key];
+    }
+
+
+    public get<T>(key: string, defaultValue?: T): T | undefined
+    {
+        if (defaultValue || (isString(defaultValue) && defaultValue === "") || (isNumber(defaultValue) && defaultValue === 0))
+        {
+            let v = this.storage.get<T>(this.getKey(key), defaultValue);
+            //
+            // why have to do this?  In one case, passing a default of [] for a non-existent
+            // value, the VSCode memento does not return[]. It returns an empty string????
+            // So perform a double check if the value is falsy.
+            //
+            /* istanbul ignore if */
+            if (!v) {
+                v = defaultValue;
+            }
+            return v;
+        }
+        return this.storage.get<T>(this.getKey(key));
     }
 
 
@@ -89,6 +97,13 @@ class Storage implements IStorage, Memento
         catch { /* istanbul ignore next */store = {}; }
         return this._get2(key, store, defaultValue);
     }
+
+
+    public getSecret = (key: string) => this.secrets.get(this.getKey(key));
+
+
+    // update = (key: string, value: any) => this.storage.update(key, value);
+    public update = (key: string, value: any) => this.storage.update(this.getKey(key), value);
 
 
     public async update2(key: string, value: any)
@@ -125,29 +140,6 @@ class Storage implements IStorage, Memento
     }
 
 
-    public get<T>(key: string, defaultValue?: T): T | undefined
-    {
-        if (defaultValue || (isString(defaultValue) && defaultValue === "") || (isNumber(defaultValue) && defaultValue === 0))
-        {
-            let v = this.storage.get<T>(this.getKey(key), defaultValue);
-            //
-            // why have to do this?  In one case, passing a default of [] for a non-existent
-            // value, the VSCode memento does not return[]. It returns an empty string????
-            // So perform a double check if the value is falsy.
-            //
-            /* istanbul ignore if */
-            if (!v) {
-                v = defaultValue;
-            }
-            return v;
-        }
-        return this.storage.get<T>(this.getKey(key));
-    }
+    public updateSecret = (key: string, value: any) => this.secrets.store(this.getKey(key), value);
 
-
-    // update = (key: string, value: any) => this.storage.update(key, value);
-    public async update(key: string, value: any)
-    {
-        await this.storage.update((!this.isTests ? /* istanbul ignore next */"" : "tests") + key, value);
-    }
 }
