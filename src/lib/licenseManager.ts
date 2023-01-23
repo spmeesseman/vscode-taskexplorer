@@ -193,7 +193,7 @@ export class LicenseManager implements ILicenseManager
 				port: this.port,
 				path: "/api/license/validate/v1",
 				method: "POST",
-				timeout: 5000,
+				timeout: this.host !== "localhost" ? 4000 : 1250,
 				headers: {
 					"token": this.token,
 					// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -229,10 +229,11 @@ export class LicenseManager implements ILicenseManager
 						}
 						log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);
 						resolve(licensed);
-					}
+					} // Fails maybe if IIS/Apache server is running but the reverse proxied app server is not
 					catch (e) { _onError(e); }
 				});
 			});
+			// This isn't going to fail unless i birth a bug on the server app or IIS/Apache site is offline
 			/* istanbul ignore next*/
 			req.on("error", (e) => { _onError(e); });
 			req.write(JSON.stringify({ licensekey: licenseKey }), () =>

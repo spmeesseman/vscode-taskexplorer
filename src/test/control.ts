@@ -120,6 +120,7 @@ export const testControl: ITestControl =
             localStartServer: 1195,
             remoteCheck: 2315,
             remoteStartServer: 3625,
+            serverDownHostUp: 14100,
             setLicenseCmd: 210
         },
         min: 50,
@@ -339,6 +340,7 @@ export interface ITestControl
             localStartServer: number;
             remoteCheck: number;
             remoteStartServer: number;
+            serverDownHostUp: number;
             setLicenseCmd: number;
         };
         min: number;

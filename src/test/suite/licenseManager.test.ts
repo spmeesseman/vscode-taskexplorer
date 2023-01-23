@@ -528,7 +528,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		if (await fsApi.pathExists(join(localServerPath, "/spm-license-server.js")))
 		{
-			this.slow(testControl.slowTime.licenseMgr.localStartServer + (4000 * 2));
+			this.slow(testControl.slowTime.licenseMgr.localStartServer + 8000);
 			lsProcess = fork("spm-license-server.js", {
 				cwd: utils.getWsPath("../../spm-license-server/bin"), detached: true,
 			});
@@ -587,11 +587,6 @@ suite("License Manager Tests", () =>
 			await licMgr.checkLicense();
 			await setTasks();
 			await licMgr.setLicenseKey(licenseKey);
-			licMgr.setTestData({
-				host: "license.spmeesseman.com",
-				port: 443,
-				token: remoteServerToken
-			});
 		}
         utils.endRollingCount(this);
 	});
@@ -603,9 +598,9 @@ suite("License Manager Tests", () =>
 		// Don't utils.exitRollingCount(this)
         if (lsProcess)
 		{   // shut down local server
-			this.slow(2600);
+			this.slow(12000);
 			lsProcess.send("close");
-			await utils.sleep(2000);
+			await utils.sleep(5500);
 			lsProcess = undefined;
 		}
         utils.endRollingCount(this);
@@ -615,17 +610,13 @@ suite("License Manager Tests", () =>
 	test("Check License Key (Server Down)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgr.localCheck + testControl.slowTime.storageUpdate  + testControl.slowTime.storageSecretUpdate);
+		this.slow(testControl.slowTime.licenseMgr.serverDownHostUp + testControl.slowTime.licenseMgr.localCheck +
+			      testControl.slowTime.storageUpdate  + testControl.slowTime.storageSecretUpdate);
 		const licenseKey = await licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-1234567");
 		await licMgr.checkLicense();
 		await setTasks();
 		await licMgr.setLicenseKey(licenseKey);
-		licMgr.setTestData({
-			host: "license.spmeesseman.com",
-			port: 443,
-			token: remoteServerToken
-		});
         utils.endRollingCount(this);
 	});
 
@@ -634,6 +625,11 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow((Math.round(testControl.slowTime.refreshCommand * 0.75)) + testControl.slowTime.storageUpdate + testControl.slowTime.storageSecretUpdate);
+		licMgr.setTestData({
+			host: "license.spmeesseman.com",
+			port: 443,
+			token: remoteServerToken
+		});
 		await utils.setLicensed(false, licMgr);
 		licMgr.setTestData({
 			maxFreeTasks: 25,
