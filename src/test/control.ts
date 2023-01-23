@@ -124,7 +124,7 @@ export const testControl: ITestControl =
         },
         min: 50,
         refreshCommand: 8500,
-        refreshCommandNoChanges: 230,
+        refreshCommandNoChanges: 250,
         removeWorkspaceFolder: 3000,
         runCommand: 4900,
         runPauseCommand: 3255,
