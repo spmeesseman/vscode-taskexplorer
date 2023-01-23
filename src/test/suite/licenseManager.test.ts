@@ -3,7 +3,7 @@
 
 import * as utils from "../utils/utils";
 import { expect } from "chai";
-import { ChildProcess, fork } from "child_process";
+// import { ChildProcess, fork } from "child_process";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
@@ -21,7 +21,7 @@ let explorer: ITaskExplorer;
 let licMgr: ILicenseManager;
 let tasks: Task[] = [];
 let setTasksCallCount = 0;
-let lsProcess: ChildProcess | undefined;
+// let lsProcess: ChildProcess | undefined;
 
 
 suite("License Manager Tests", () =>
@@ -33,7 +33,15 @@ suite("License Manager Tests", () =>
 
 
 	suiteSetup(async function()
-	{
+	{   //
+		// The LetsEncrypt certificate is rejected by VSCode/Electron Test Suite (?).
+		// See https://github.com/electron/electron/issues/31212.
+		// Works fine when debugging, works fine when the extension is installed, just fails in the
+		// tests with the "certificate is expired" error as explained in the link above.  For tests,
+		// and until this is resolved in vscode/test-electron (I think that's wherethe problem is?),
+		// we just disable TLS_REJECT_UNAUTHORIZED in the NodeJS environment.
+		//
+		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         ({ teApi } = await utils.activate(this));
         explorer = teApi.testsApi.explorer;
 		oLicenseKey = teApi.testsApi.storage.get<string>("license_key");
@@ -47,10 +55,13 @@ suite("License Manager Tests", () =>
 		teApi.setTests(true);
 		licMgr?.dispose();
 		await utils.closeActiveDocument();
+		process.env.NODE_TLS_REJECT_UNAUTHORIZED = undefined;
+/*
 		if (lsProcess) { // shut down local server
 			lsProcess.send("close");
 			await utils.sleep(500);
 		}
+*/
 		if (oLicenseKey) {
 			await teApi.testsApi.storage.update("license_key", oLicenseKey);
 		}
@@ -204,10 +215,6 @@ suite("License Manager Tests", () =>
 	test("Has License", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		//
-		// Has license
-		// 1111-2222-3333-4444-5555 for now.  When lic server is done, it will fail
-		//
 		this.slow(testControl.slowTime.licenseMgrOpenPage + (testControl.slowTime.storageUpdate * 2) + 400);
 		teApi.setTests(false);
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
@@ -432,34 +439,34 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Multi projects startup", async function()
-	{
-        if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
-		// if (await pathExists(getProjectPath("extjs-pkg-server")))
-		// {
-			// const licenseKey = licMgr.getLicenseKey(),
-			// 	  version = licMgr.getVersion(),
-			// 	  fsPath = getProjectPath("extjs-pkg-server/src/csi"),
-			// 	  files = await utils.findFiles(fsPath, "{classic,modern,src}/**/*.js");
+// 	test("Multi projects startup", async function()
+// 	{
+//         if (utils.exitRollingCount(this)) return;
+// 		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
+// 		// if (await pathExists(getProjectPath("extjs-pkg-server")))
+// 		// {
+// 			// const licenseKey = licMgr.getLicenseKey(),
+// 			// 	  version = licMgr.getVersion(),
+// 			// 	  fsPath = getProjectPath("extjs-pkg-server/src/csi"),
+// 			// 	  files = await utils.findFiles(fsPath, "{classic,modern,src}/**/*.js");
+//
+// 			// const firstCmp = (await parseFiles(files, "extjs-pkg-server", "extjs-pkg-server"))[0];
+// 			// assert(firstCmp);
+// 			// tasks.push(firstCmp);
+//
+// 			// licMgr.setLicenseKey(undefined);
+// 			// await teApi.testsApi.storage.update("version", undefined);
+// 			// await licMgr.checkLicense();
+// 			// await utils.sleep(1000);
+// 			// await utils.closeActiveDocument();
+// 			// licMgr.setLicenseKey(licenseKey);
+// 			// await teApi.testsApi.storage.update("version", version);
+// 			// tasks.pop();
+// 		// }
+//         utils.endRollingCount(this);
+// 	});
 
-			// const firstCmp = (await parseFiles(files, "extjs-pkg-server", "extjs-pkg-server"))[0];
-			// assert(firstCmp);
-			// tasks.push(firstCmp);
-
-			// licMgr.setLicenseKey(undefined);
-			// await teApi.testsApi.storage.update("version", undefined);
-			// await licMgr.checkLicense();
-			// await utils.sleep(1000);
-			// await utils.closeActiveDocument();
-			// licMgr.setLicenseKey(licenseKey);
-			// await teApi.testsApi.storage.update("version", version);
-			// tasks.pop();
-		// }
-        utils.endRollingCount(this);
-	});
-
-
+/*
 	test("Ping License Server", async function()
 	{
         if (utils.exitRollingCount(this)) return;
@@ -479,7 +486,7 @@ suite("License Manager Tests", () =>
 		await utils.sleep(4000);
         utils.endRollingCount(this);
 	});
-
+*/
 
 	test("Enter License key on Startup (1st Time, Server Live)", async function()
 	{
@@ -608,7 +615,7 @@ suite("License Manager Tests", () =>
         utils.endRollingCount(this);
 	});
 
-
+/*
 	test("Stop License Server", async function()
 	{
 		// Don't utils.exitRollingCount(this)
@@ -620,7 +627,7 @@ suite("License Manager Tests", () =>
 			lsProcess = undefined;
 		}
 	});
-
+*/
 });
 
 

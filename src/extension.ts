@@ -6,7 +6,7 @@ import * as fileCache from "./lib/fileCache";
 import log from "./lib/log/log";
 import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerViewReportCommand from "./commands/viewReport";
-import { basename, join, resolve } from "path";
+import { join, resolve } from "path";
 import { AntTaskProvider } from "./providers/ant";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
 import { BashTaskProvider } from "./providers/bash";

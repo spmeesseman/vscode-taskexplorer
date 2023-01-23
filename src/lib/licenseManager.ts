@@ -1,6 +1,6 @@
 
-import * as https from "http";
-// import * as https from "https";
+// import * as https from "http";
+import * as https from "https";
 import log from "./log/log";
 import { storage } from "./utils/storage";
 import { isScriptType } from "./utils/utils";
@@ -12,6 +12,12 @@ import { ITaskExplorerApi } from "../interface";
 
 export class LicenseManager implements ILicenseManager
 {
+	// private host = "localhost";
+	// private port = 1924;
+	// private token = "HjkSgsR55WepsaWYtFoNmRMLiTJS4nKOhgXoPIuhd8zL3CVK694UXNw/n9e1GXiG9U5WiAmjGxAoETapHCjB67G0DkDZnXbbzYICr/tfpVc4NKNy1uM3GHuAVXLeKJQLtUMLfxgXYTJFNMU7H/vTaw==";
+	private host = "license.spmeesseman.com";
+	private port = 443;
+	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 	private useGlobalLicense = true; // Temp
 	private maxFreeTasks = 500;
 	private maxFreeTaskFiles = 100;
@@ -183,17 +189,17 @@ export class LicenseManager implements ILicenseManager
 	{
 		return new Promise<boolean>((resolve) =>
 		{
-			log.methodStart("validate license", 1, logPad, false, [[ "license key", licenseKey ]]);
+			log.methodStart("validate license", 1, logPad, false, [[ "license key", licenseKey ], [ "host", this.host ], [ "port", this.port ]]);
 
 			let rspData = "";
 			const options = {
-				hostname: "localhost",
-				port: 1924,
+				hostname: this.host,
+				port: this.port,
 				path: "/api/license/validate/v1",
 				method: "POST",
 				timeout: 5000,
 				headers: {
-					"token": "HjkSgsR55WepsaWYtFoNmRMLiTJS4nKOhgXoPIuhd8zL3CVK694UXNw/n9e1GXiG9U5WiAmjGxAoETapHCjB67G0DkDZnXbbzYICr/tfpVc4NKNy1uM3GHuAVXLeKJQLtUMLfxgXYTJFNMU7H/vTaw==",
+					"token": this.token,
 					// eslint-disable-next-line @typescript-eslint/naming-convention
 					"Content-Type": "application/json"
 				}
@@ -226,8 +232,8 @@ export class LicenseManager implements ILicenseManager
 					try
 					{   const jso = JSON.parse(rspData),
 							  licensed = res.statusCode === 200 && jso.success && jso.message === "Success";
-						log.value("      success", jso.success, 3, logPad);
-						log.value("      message", jso.message, 3, logPad);
+						log.value("      success", jso.success, 2, logPad);
+						log.value("      message", jso.message, 2, logPad);
 						if (licensed) {
 							await this.setLicenseKey(licenseKey);
 						}
@@ -238,8 +244,10 @@ export class LicenseManager implements ILicenseManager
 				});
 			});
 			req.on("error", (e) => { _onError(e); });
-			req.write(JSON.stringify({ licensekey: licenseKey }));
-			req.end();
+			req.write(JSON.stringify({ licensekey: licenseKey }), (e) =>
+			{
+				req.end();
+			});
 		});
 	};
 
