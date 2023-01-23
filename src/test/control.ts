@@ -92,25 +92,25 @@ export const testControl: ITestControl =
             sortingEvent: 700
         },
         excludeCommand: 1550,
-        explorerViewStartup: 7750,
-        fetchTasksCommand: 2000,
-        fileCachePersist: 300,
-        findTaskPosition: 490,
-        findTaskPositionDocOpen: 65,
-        focusCommand: 2400,
+        explorerViewStartup: 7600,
+        fetchTasksCommand: 1950,
+        fileCachePersist: 290,
+        findTaskPosition: 480,
+        findTaskPositionDocOpen: 60,
+        focusCommand: 2350,
         focusCommandAlreadyFocused: 320,
         focusCommandChangeViews: 90,
         fs: {
-            createEvent: 1615,
+            createEvent: 1610,
             createEventTsc: 1760,
-            createFolderEvent: 1665,
-            deleteEvent: 1370,
-            deleteEventTsc: 1700,
+            createFolderEvent: 1660,
+            deleteEvent: 1350,
+            deleteEventTsc: 1640,
             deleteFolderEvent: 1450,
-            modifyEvent: 975,
+            modifyEvent: 965,
         },
         getTreeTasks: 195,
-        getTreeTasksNpm: 560, // npm task provider is slower than shit on a turtle
+        getTreeTasksNpm: 520, // npm task provider is slower than shit on a turtle
         licenseMgr: {
             page: 125,
             pageWithDetail: 325,
@@ -123,9 +123,9 @@ export const testControl: ITestControl =
             setLicenseCmd: 210
         },
         min: 50,
-        refreshCommand: 8500,
+        refreshCommand: 8200,
         refreshCommandNoChanges: 250,
-        removeWorkspaceFolder: 3000,
+        removeWorkspaceFolder: 2800,
         runCommand: 4900,
         runPauseCommand: 3255,
         runStopCommand: 3510,
@@ -134,28 +134,28 @@ export const testControl: ITestControl =
         storageSecretRead: 90,
         storageSecretUpdate: 200,
         taskCommand: 1300,
-        taskCommandStartupMax: 4000,
+        taskCommandStartupMax: 3900,
         taskProviderReadUri: 90,
         tasks: {
-            antParser: 740,
-            antTask: 6000,
-            antTaskWithAnsicon: 6050,
-            bashScript: 3050,
-            batchScriptBat: 4500,
-            batchScriptCmd: 5525,
-            gulpParser: 3900,
+            antParser: 730,
+            antTask: 5500,
+            antTaskWithAnsicon: 5550,
+            bashScript: 3040,
+            batchScriptBat: 4300,
+            batchScriptCmd: 5325,
+            gulpParser: 3890,
             npmCommand: 12300,
-            npmCommandPkg: 9750,
-            npmInstallCommand: 13000
+            npmCommandPkg: 9740,
+            npmInstallCommand: 12950
         },
         taskCount: {
-            verify: 580,
-            verifyByTree: 630,
-            verifyFirstCall: 925,
-            verifyNpm: 2050, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 2350,
+            verify: 560,
+            verifyByTree: 620,
+            verifyFirstCall: 900,
+            verifyNpm: 2000, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 2300,
         },
-        viewReport: 375
+        viewReport: 395
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)

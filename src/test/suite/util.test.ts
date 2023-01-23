@@ -136,7 +136,7 @@ suite("Util Tests", () =>
 	test("Logging (File)", async function()
     {
         if (exitRollingCount(this)) return;
-		this.slow((testControl.slowTime.config.event * 7) + 50);
+		this.slow((testControl.slowTime.config.event * 7) + 75);
 		await executeSettingsUpdate("logging.enableFile", false);
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.write("Test1", 1);
