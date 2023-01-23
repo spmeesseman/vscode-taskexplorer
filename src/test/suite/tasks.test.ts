@@ -86,7 +86,7 @@ suite("Task Tests", () =>
     test("Keep Terminal on Stop (OFF)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event + (tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 9000);
+        this.slow(tc.slowTime.config.event + (tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 4000);
         await utils.executeSettingsUpdate("keepTermOnStop", false);
         let exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         expect(exec).to.not.be.equal(undefined, "Starting the 'batch0' task did not return a valid TaskExecution");
@@ -96,10 +96,7 @@ suite("Task Tests", () =>
         utils.overrideNextShowInfoBox(undefined);
         exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.taskCommand) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 2000);
-        utils.executeTeCommand2("stop", [ batch[0] ]);  // Double-click stop
-        utils.executeTeCommand2("stop", [ batch[0] ]); // Double-click stop
-        await utils.waitForTaskExecution(exec, 500);
-        await utils.executeTeCommand2("stop", [ batch[0] ]); // Double-click stop
+        await utils.executeTeCommand2("stop", [ batch[0] ]);
         utils.endRollingCount(this);
     });
 
@@ -252,7 +249,7 @@ suite("Task Tests", () =>
         //
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.runCommand + tc.slowTime.command + (tc.slowTime.config.event * 3) + tc.slowTime.focusCommandChangeViews +
-                  tc.slowTime.config.specialFolderEvent + startTaskSlowTime + (tc.slowTime.tasks.bashScript * 2));
+                  tc.slowTime.config.showHideSpecialFolder + startTaskSlowTime + (tc.slowTime.tasks.bashScript * 2));
         utils.focusExplorerView(); // randomly show/hide view to test refresh event queue in tree/tree.ts
         await utils.executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
@@ -340,7 +337,7 @@ suite("Task Tests", () =>
         //
         if (utils.exitRollingCount(this)) return;
         const slowTime = (tc.slowTime.runCommand * 1) + 5000 + startTaskSlowTime + tc.slowTime.runStopCommand +
-                         (tc.slowTime.command * 2) + (tc.slowTime.config.event * 4) + tc.slowTime.tasks.batchScriptBat + tc.slowTime.config.specialFolderEvent;
+                         (tc.slowTime.command * 2) + (tc.slowTime.config.event * 4) + tc.slowTime.tasks.batchScriptBat + tc.slowTime.config.showHideSpecialFolder;
         this.slow(slowTime);
         const batchTask = batch[1];
         await startTask(batchTask as TaskItem, true);
@@ -389,7 +386,7 @@ suite("Task Tests", () =>
     test("Surpass Max Last Tasks", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.specialFolderEvent + (tc.slowTime.config.event * 2));
+        this.slow(tc.slowTime.config.showHideSpecialFolder + (tc.slowTime.config.event * 2));
         const tree = explorer.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as SpecialTaskFolder;

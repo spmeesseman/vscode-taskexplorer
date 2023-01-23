@@ -62,19 +62,14 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 8640,
-        buildFileCache: 820,
-        buildFileCacheCancel: 635,
-        buildTreeNoTasks: 370,
-        rebuildFileCache: 8300,
-        rebuildFileCacheCancel: 920,
-        rebuildFileCacheNoChanges: 1700,
+        addWorkspaceFolder: 8440,
+        buildTreeNoTasks: 360,
         cache: {
             build: 870,
-            buildCancel: 650,
-            rebuild: 9050,
-            rebuildCancel: 1490,
-            rebuildNoChanges: 1740,
+            buildCancel: 290,
+            rebuild: 7050,
+            rebuildCancel: 490,
+            rebuildNoChanges: 1340,
         },
         closeActiveDocument: 25,
         command: 850,
@@ -91,15 +86,14 @@ export const testControl: ITestControl =
             globEvent: 1190,
             groupingEvent: 1080,
             pathToProgramsEvent: 705,
-            showHideSpecialFolder: 320,
+            showHideSpecialFolder: 340,
             showHideUserTasks: 1120,
-            specialFolderEvent: 370,
             readEvent: 25,
             sortingEvent: 980
         },
-        excludeCommand: 1760,
-        explorerViewStartup: 11000,
-        fetchTasksCommand: 2170,
+        excludeCommand: 1740,
+        explorerViewStartup: 10500,
+        fetchTasksCommand: 2160,
         fileCachePersist: 350,
         findTaskPosition: 565,
         findTaskPositionDocOpen: 80,
@@ -117,48 +111,50 @@ export const testControl: ITestControl =
         },
         getTreeTasks: 200,
         getTreeTasksNpm: 580, // npm task provider is slower than shit on a turtle
-        licenseManagerEnterKey: 845,
-        licenseMgrOpenPage: 110,
-        licenseMgrOpenPageWithDetail: 325,
-        licenseManagerDownCheck: 665,
-        licenseManagerLocalCheck: 1795,
-        licenseManagerLocalStartServer: 1195,
-        licenseManagerRemoteCheck: 2315,
-        licenseManagerRemoteStartServer: 3625,
+        licenseMgr: {
+            page: 110,
+            pageWithDetail: 325,
+            downCheck: 665,
+            enterKey: 845,
+            localCheck: 1795,
+            localStartServer: 1195,
+            remoteCheck: 2315,
+            remoteStartServer: 3625
+        },
         min: 60,
         refreshCommand: 12105,
         refreshCommandNoChanges: 250,
         removeWorkspaceFolder: 6470,
-        runCommand: 5350,
-        runPauseCommand: 2465,
-        runStopCommand: 2730,
+        runCommand: 5100,
+        runPauseCommand: 2815,
+        runStopCommand: 3060,
         storageRead: 65,
         storageUpdate: 65,
-        storageSecretRead: 95,
-        storageSecretUpdate: 250,
+        storageSecretRead: 105,
+        storageSecretUpdate: 265,
         taskCommand: 1445,
         taskCommandStartupMax: 4550,
         taskProviderReadUri: 95,
         tasks: {
-            antParser: 810,
-            antTask: 7310,
-            antTaskWithAnsicon: 7340,
-            bashScript: 3390,
-            batchScriptBat: 6700,
-            batchScriptCmd: 7075,
-            gulpParser: 3990,
-            npmCommand: 13345,
-            npmCommandPkg: 10090,
-            npmInstallCommand: 15630
+            antParser: 800,
+            antTask: 7010,
+            antTaskWithAnsicon: 7040,
+            bashScript: 3330,
+            batchScriptBat: 6500,
+            batchScriptCmd: 6875,
+            gulpParser: 3975,
+            npmCommand: 13340,
+            npmCommandPkg: 10060,
+            npmInstallCommand: 14630
         },
         taskCount: {
-            verify: 725,
-            verifyByTree: 770,
-            verifyFirstCall: 1225,
-            verifyNpm: 2715, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 3000,
+            verify: 705,
+            verifyByTree: 750,
+            verifyFirstCall: 1185,
+            verifyNpm: 2615, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 2900,
         },
-        viewReport: 1250
+        viewReport: 900
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)
@@ -285,8 +281,6 @@ export interface ITestControl
     //
     slowTime: {
         addWorkspaceFolder: number;
-        buildFileCache: number;
-        buildFileCacheCancel: number;
         buildTreeNoTasks: number;
         cache: {
             build: number;
@@ -314,7 +308,6 @@ export interface ITestControl
             showHideSpecialFolder: number;
             showHideUserTasks: number;
             sortingEvent: number;
-            specialFolderEvent: number;
         };
         excludeCommand: number;
         explorerViewStartup: number;
@@ -336,20 +329,19 @@ export interface ITestControl
         };
         getTreeTasks: number;
         getTreeTasksNpm: number; // npm task provider is slower than shit on a turtle
-        licenseManagerEnterKey: number;
-        licenseMgrOpenPage: number;
-        licenseMgrOpenPageWithDetail: number;
-        licenseManagerDownCheck: number;
-        licenseManagerLocalCheck: number;
-        licenseManagerLocalStartServer: number;
-        licenseManagerRemoteCheck: number;
-        licenseManagerRemoteStartServer: number;
+        licenseMgr: {
+            page: number;
+            pageWithDetail: number;
+            downCheck: number;
+            enterKey: number;
+            localCheck: number;
+            localStartServer: number;
+            remoteCheck: number;
+            remoteStartServer: number;
+        };
         min: number;
         refreshCommand: number;
         refreshCommandNoChanges: number;
-        rebuildFileCache: number;
-        rebuildFileCacheCancel: number;
-        rebuildFileCacheNoChanges: number;
         removeWorkspaceFolder: number;
         runCommand: number;
         runPauseCommand: number;

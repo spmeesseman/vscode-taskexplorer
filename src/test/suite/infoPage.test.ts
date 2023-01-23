@@ -109,7 +109,7 @@ suite("Info Report Tests", () =>
 	test("View License Info from Webview", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgrOpenPageWithDetail + 500);
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 500);
 	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport) as WebviewPanel;
 		await panel.webview.postMessage({ command: "viewLicense" });
 		await sleep(500);
@@ -158,7 +158,7 @@ suite("Info Report Tests", () =>
 	test("View License Info from Webview (Views Both Disabled)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgrOpenPageWithDetail + 500);
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 500);
 		const oExplorer = teApi.explorer;
 		const oSidebar = teApi.sidebar;
 		teApi.explorer = undefined;
@@ -177,7 +177,7 @@ suite("Info Report Tests", () =>
 	test("View License Info from Webview (Sidebar Enabled, Explorer Disabled)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgrOpenPageWithDetail + 500);
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 500);
 		const oExplorer = teApi.explorer;
 		const oSidebar = teApi.sidebar;
 		teApi.explorer = undefined;
