@@ -200,6 +200,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 2);
         await setupTsc();
+        await waitForTeIdle(tc.waitTime.min);
         endRollingCount(this);
     });
 
@@ -211,7 +212,7 @@ suite("Provider Tests", () =>
             await focusExplorerView(this);
         }
         else {
-            this.slow(tc.slowTime.focusCommandAlreadyFocused);
+            this.slow(tc.slowTime.focusCommandAlreadyFocused + tc.slowTime.min);
             await waitForTeIdle(tc.waitTime.min);
         }
         endRollingCount(this);
