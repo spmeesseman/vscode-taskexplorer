@@ -1,6 +1,6 @@
 
 import { join } from "path";
-import { Memento, ExtensionContext } from "vscode";
+import { Memento, ExtensionContext, SecretStorage } from "vscode";
 import { IDictionary } from "../../interface";
 import { IStorage } from "../../interface/IStorage";
 import { createDir, pathExists, readJsonAsync, readJsonSync, writeFile, writeFileSync } from "./fs";
@@ -24,6 +24,7 @@ export const initStorage = async (context: ExtensionContext, isDev: boolean, isT
 class Storage implements IStorage, Memento
 {
     private storage: Memento;
+    private secrets: SecretStorage;
     private isDev: boolean;
     private isTests: boolean;
     private storageFile: string;
@@ -32,9 +33,22 @@ class Storage implements IStorage, Memento
     constructor(context: ExtensionContext, storageFile: string, isDev: boolean, isTests: boolean)
     {
         this.storage = context.globalState;
+        this.secrets = context.secrets;
         this.isDev = isDev;
         this.isTests = isTests;
         this.storageFile = storageFile;
+    }
+
+
+    public getSecret(key: string): Thenable<string | undefined>
+    {
+        return this.secrets.get(this.getKey(key));
+    }
+
+
+    public updateSecret(key: string, value: any): Thenable<void>
+    {
+        return this.secrets.store(this.getKey(key), value);
     }
 
 
