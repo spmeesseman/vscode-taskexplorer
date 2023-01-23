@@ -167,7 +167,7 @@ suite("Task Tests", () =>
         this.slow(tc.slowTime.refreshCommand + (tc.slowTime.command * 5) + 1200);
         utils.clearOverrideShowInfoBox();
         utils.executeTeCommand("refresh", 500, 2000);               // don't await
-        await utils.sleep(1200);
+        await utils.sleep(2);
         utils.overrideNextShowInfoBox(undefined);
         utils.executeTeCommand("runLastTask", 0);                   // don't await
         utils.overrideNextShowInfoBox(undefined);

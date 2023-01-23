@@ -12,13 +12,9 @@ import { ITaskExplorerApi } from "../interface";
 
 export class LicenseManager implements ILicenseManager
 {
-	// private host = "localhost";
-	// private port = 1924;
-	// private token = "HjkSgsR55WepsaWYtFoNmRMLiTJS4nKOhgXoPIuhd8zL3CVK694UXNw/n9e1GXiG9U5WiAmjGxAoETapHCjB67G0DkDZnXbbzYICr/tfpVc4NKNy1uM3GHuAVXLeKJQLtUMLfxgXYTJFNMU7H/vTaw==";
 	private host = "license.spmeesseman.com";
 	private port = 443;
 	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
-	private useGlobalLicense = true; // Temp
 	private maxFreeTasks = 500;
 	private maxFreeTaskFiles = 100;
 	private maxFreeTasksForTaskType = 100;
@@ -45,7 +41,7 @@ export class LicenseManager implements ILicenseManager
 
 	async checkLicense(logPad = "   ")
 	{
-		const storedLicenseKey = this.getLicenseKey();
+		const storedLicenseKey = await this.getLicenseKey();
 		log.methodStart("license manager check license", 1, logPad, false, [[ "stored license key", storedLicenseKey ]]);
 		if (storedLicenseKey) {
 			try {
@@ -144,8 +140,7 @@ export class LicenseManager implements ILicenseManager
 	}
 
 
-	getLicenseKey = () => !this.useGlobalLicense || this.teApi.isTests() ?
-						  storage.get<string>("license_key") : /* istanbul ignore next */"1234-5678-9098-7654321";
+	getLicenseKey = async() => storage.getSecret("license_key"); // for now, "1234-5678-9098-7654321" is a valid license
 
 
 	getMaxNumberOfTasks = (taskType?: string) =>
@@ -168,20 +163,22 @@ export class LicenseManager implements ILicenseManager
 
 	setLicenseKey = async (licenseKey: string | undefined) =>
 	{
-		await storage.update("license_key", licenseKey);
+		await storage.updateSecret("license_key", licenseKey);
 	};
 
 
 	//
 	// Temporary / Tests only
 	//
-	setUseGlobalLicense = (useGlobal: boolean, taskCounts: any) =>
+	setTestData = (data: any) =>
 	{
-		this.useGlobalLicense = useGlobal;
-		this.maxFreeTasks = taskCounts.maxFreeTasks;
-		this.maxFreeTaskFiles = taskCounts.maxFreeTaskFiles;
-		this.maxFreeTasksForTaskType = taskCounts.maxFreeTasksForTaskType;
-		this.maxFreeTasksForScriptType = taskCounts.maxFreeTasksForScriptType;
+		this.maxFreeTasks = data.maxFreeTasks || this.maxFreeTasks;
+		this.maxFreeTaskFiles = data.maxFreeTaskFiles || this.maxFreeTaskFiles;
+		this.maxFreeTasksForTaskType = data.maxFreeTasksForTaskType || this.maxFreeTasksForTaskType;
+		this.maxFreeTasksForScriptType = data.maxFreeTasksForScriptType || this.maxFreeTasksForScriptType;
+		this.host = data.host || this.host;
+		this.port = data.port || this.port;
+		this.token = data.token || this.token;
 	};
 
 

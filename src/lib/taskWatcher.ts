@@ -5,7 +5,7 @@ import log from "./log/log";
 import TaskItem from "../tree/item";
 import SpecialTaskFolder from "../tree/specialFolder";
 import { ITaskExplorer } from "../interface";
-import { teApi } from "../extension";
+import { configuration } from "./utils/configuration";
 import {
     Disposable, ExtensionContext, WorkspaceFolder, tasks, TaskStartEvent,
     StatusBarItem, StatusBarAlignment, Task, window, TaskEndEvent
@@ -182,7 +182,7 @@ export class TaskWatcher
     private showStatusMessage(task: Task, logPad: string)
     {
         log.methodStart("task start/stop show/hide message", 2, logPad);
-        if (task && teApi.config.get<boolean>("showRunningTask") === true)
+        if (task && configuration.get<boolean>("showRunningTask") === true)
         {
             const exec = tasks.taskExecutions.find(e => e.task.name === task.name && e.task.source === task.source &&
                          e.task.scope === task.scope && e.task.definition.path === task.definition.path);

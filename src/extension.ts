@@ -85,6 +85,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     if (!tests) {
         teApi.setTests = () => {};
         teApi.testsApi = null as unknown as ITestsApi;
+        teApi.config = undefined as unknown as IConfiguration;
         teApi.utilities = undefined;
     }
 

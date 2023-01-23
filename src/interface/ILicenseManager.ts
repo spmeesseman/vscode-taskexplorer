@@ -5,7 +5,7 @@ export interface ILicenseManager
     checkLicense: (logPad?: string) => Promise<void>;
     dispose: () => void;
     enterLicenseKey: () => Promise<void>;
-    getLicenseKey: () => string | undefined;
+    getLicenseKey: () => Promise<string | undefined>;
     getMaxNumberOfTasks: (taskType?: string) => number;
     getMaxNumberOfTaskFiles: () => number;
     getVersion: () => string;
@@ -13,5 +13,5 @@ export interface ILicenseManager
     isLicensed: () => boolean;
     setLicenseKey: (licenseKey: string | undefined) => Promise<void>;
     setTasks: (tasks: Task[], logPad?: string) => Promise<void>;
-    setUseGlobalLicense(useGlobal: boolean, taskCounts: any): void;
+    setTestData(taskCounts: any): void;
 }

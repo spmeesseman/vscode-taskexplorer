@@ -249,39 +249,36 @@ export async function buildTaskTypeCache(taskType: string, wsFolder: WorkspaceFo
         await startBuild();
     }
 
-    if (!cancel)
+    // const glob = util.getGlobPattern(taskType);
+    let glob;
+    if (!util.isWatchTask(taskType))
     {
-        // const glob = util.getGlobPattern(taskType);
-        let glob;
-        if (!util.isWatchTask(taskType))
-        {
-            const externalProvider = providersExternal[taskType];
-            const provider = providers[taskType] || /* istanbul ignore next */externalProvider;
-            glob = provider.getGlobPattern();
-        }
-        if (!glob) {
-            glob = util.getGlobPattern(taskType);
-        }
-        log.value("   glob", glob, 1, logPad);
+        const externalProvider = providersExternal[taskType];
+        const provider = providers[taskType] || /* istanbul ignore next */externalProvider;
+        glob = provider.getGlobPattern();
+    }
+    if (!glob) {
+        glob = util.getGlobPattern(taskType);
+    }
+    log.value("   glob", glob, 1, logPad);
 
-        //
-        // If 'wsFolder' if falsey, build the entire cache.  If truthy, build the cache for the
-        // specified folder only
-        //
-        if (!wsFolder)
+    //
+    // If 'wsFolder' if falsey, build the entire cache.  If truthy, build the cache for the
+    // specified folder only
+    //
+    if (!wsFolder)
+    {
+        log.write("   Scan all projects for taskType '" + taskType + "' (" + providerType + ")", 1, logPad);
+        for (const folder of workspace.workspaceFolders as readonly WorkspaceFolder[])
         {
-            log.write("   Scan all projects for taskType '" + taskType + "' (" + providerType + ")", 1, logPad);
-            for (const folder of workspace.workspaceFolders as readonly WorkspaceFolder[])
-            {
-                numFilesFound += await buildFolderCache(folder, taskType, glob, logPad + "   ");
-                if (cancel) {
-                    break;
-                }
+            numFilesFound += await buildFolderCache(folder, taskType, glob, logPad + "   ");
+            if (cancel) {
+                break;
             }
         }
-        else {
-            numFilesFound = await buildFolderCache(wsFolder, taskType, glob, logPad + "   ");
-        }
+    }
+    else {
+        numFilesFound = await buildFolderCache(wsFolder, taskType, glob, logPad + "   ");
     }
 
     if (setCacheBuilding) {
