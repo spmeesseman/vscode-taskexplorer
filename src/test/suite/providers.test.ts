@@ -135,7 +135,7 @@ suite("Provider Tests", () =>
     test("Create Temporary Task Files - Bash", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent);
+        this.slow(tc.slowTime.fs.createEvent * 3);
         await setupBash();
         endRollingCount(this);
     });
