@@ -85,7 +85,6 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     if (!tests) {
         teApi.setTests = () => {};
         teApi.testsApi = null as unknown as ITestsApi;
-        teApi.config = undefined as unknown as IConfiguration;
         teApi.utilities = undefined;
     }
 
@@ -169,6 +168,10 @@ const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
 {
     log.methodStart("initialization", 1, "", true);
     //
+    // Check license
+    //
+    await licenseManager.checkLicense("   ");
+    //
     // Register file type watchers
     // This also starts the file scan to build the file task file cache
     //
@@ -210,10 +213,6 @@ const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
     api.explorer?.setEnabled(true, "   ");
     /* istanbul ignore next */
     api.sidebar?.setEnabled(true, "   ");
-    //
-    // Check license
-    //
-    await licenseManager.checkLicense("   ");
     //
     // Signal that first task load has completed
     //
