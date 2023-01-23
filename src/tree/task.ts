@@ -82,10 +82,7 @@ export const pause = (tree: TaskTreeDataProvider, taskItem: TaskItem) =>
         const terminal = getTerminal(taskItem, "   ");
         /* istanbul ignore else */
         if (terminal)
-        {   //
-            // TODO - see ticket.  I guess its not CTRL+C in some parts.
-            // so make the control chars a setting.  Also in stop().
-            //
+        {
             taskItem.paused = true;
             log.value("   send to terminal", "\\u0003", 1);
             terminal.sendText("\u0003");
@@ -402,16 +399,13 @@ export const stop = async(tree: TaskTreeDataProvider, taskItem: TaskItem) =>
     const exec = taskItem.isExecuting();
     if (exec)
     {
-        const terminal = getTerminal(taskItem, "   ");
-        if (terminal)
+        if (configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
         {
-            if (configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
+            const terminal = getTerminal(taskItem, "   ");
+            if (terminal)
             {
                 const ctrlChar = configuration.get<string>("taskButtons.controlCharacter", "Y");
                 log.write("   keep terminal open", 1);
-                //
-                // TODO - see ticket.  I guess its not CTRL+C in some parts.  so make the control
-                //                     chars a setting.  Also in pause().
                 if (taskItem.paused)
                 {
                     taskItem.paused = false;
@@ -429,12 +423,12 @@ export const stop = async(tree: TaskTreeDataProvider, taskItem: TaskItem) =>
                 }
             }
             else {
-                log.write("   kill task execution", 1);
-                try { exec.terminate(); } catch {}
+                window.showInformationMessage("Terminal not found");
             }
         }
         else {
-            window.showInformationMessage("Terminal not found");
+            log.write("   kill task execution", 1);
+            try { exec.terminate(); } catch {}
         }
     }
     else {

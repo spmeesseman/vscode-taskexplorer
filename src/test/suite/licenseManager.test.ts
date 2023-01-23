@@ -120,7 +120,7 @@ suite("License Manager Tests", () =>
 	test("Get Maximum # of Tasks", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.storageSecretUpdate * 2);
+		this.slow(testControl.slowTime.licenseManagerDownCheck + (testControl.slowTime.storageSecretUpdate * 2));
 		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks()).to.be.a("number").that.is.equal(Infinity);
 		await utils.setLicensed(false, licMgr);
@@ -132,7 +132,7 @@ suite("License Manager Tests", () =>
 	test("Get Maximum # of NPM Tasks", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.storageSecretUpdate * 2);
+		this.slow(testControl.slowTime.licenseManagerDownCheck + (testControl.slowTime.storageSecretUpdate * 2));
 		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("npm")).to.be.a("number").that.is.equal(Infinity);
 		await utils.setLicensed(false, licMgr);
@@ -156,7 +156,7 @@ suite("License Manager Tests", () =>
 	test("Get Maximum # of Bash Tasks (Scripts)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.storageSecretUpdate * 2);
+		this.slow(testControl.slowTime.licenseManagerDownCheck + (testControl.slowTime.storageSecretUpdate * 2));
 		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("bash")).to.be.a("number").that.is.equal(Infinity);
 		await utils.setLicensed(false, licMgr);
@@ -168,7 +168,7 @@ suite("License Manager Tests", () =>
 	test("Get Maximum # of Python Tasks (Scripts)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.storageSecretUpdate * 2);
+		this.slow(testControl.slowTime.licenseManagerDownCheck + (testControl.slowTime.storageSecretUpdate * 2));
 		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("python")).to.be.a("number").that.is.equal(Infinity);
 		await utils.setLicensed(false, licMgr);
@@ -180,7 +180,7 @@ suite("License Manager Tests", () =>
 	test("Get Maximum # of Task Files", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.storageSecretUpdate * 2);
+		this.slow(testControl.slowTime.licenseManagerDownCheck + (testControl.slowTime.storageSecretUpdate * 2));
 		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTaskFiles()).to.be.a("number").that.is.equal(Infinity);
 		await utils.setLicensed(false, licMgr);
@@ -192,7 +192,7 @@ suite("License Manager Tests", () =>
 	test("License Info Page - View Report (From Webview)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPageWithDetail + 550 + (testControl.slowTime.storageUpdate * 2) + testControl.slowTime.storageSecretUpdate);
+		this.slow(testControl.slowTime.licenseMgrOpenPageWithDetail + 1100 + (testControl.slowTime.storageUpdate * 2) + testControl.slowTime.storageSecretUpdate);
 		await utils.setLicensed(false, licMgr);
 		await teApi.testsApi.storage.update("version", undefined);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
@@ -209,7 +209,7 @@ suite("License Manager Tests", () =>
 	test("License Info Page - Enter License Key (From Webview)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + 550 + testControl.slowTime.storageUpdate);
+		this.slow(testControl.slowTime.licenseMgrOpenPage + 1100 + testControl.slowTime.storageUpdate);
 		await teApi.testsApi.storage.update("version", undefined);
 		await setTasks();
 		await utils.sleep(50);
@@ -225,7 +225,7 @@ suite("License Manager Tests", () =>
 	test("Has License", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + (testControl.slowTime.storageSecretUpdate * 2) + 400);
+		this.slow(testControl.slowTime.licenseManagerDownCheck + testControl.slowTime.licenseMgrOpenPage + (testControl.slowTime.storageSecretUpdate * 2) + 800);
 		teApi.setTests(false);
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
@@ -245,7 +245,7 @@ suite("License Manager Tests", () =>
 		//
 		// If version is set, the prompt will show
 		//
-		this.slow(testControl.slowTime.licenseMgrOpenPage + 400);
+		this.slow(testControl.slowTime.licenseMgrOpenPage + 800);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("1234-5678-9098-7654321");
@@ -263,7 +263,7 @@ suite("License Manager Tests", () =>
 		//
 		// If version is set, the prompt will show
 		//
-		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + 400);
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + 800);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("1111-2222-3333-4444-5555");
@@ -281,7 +281,7 @@ suite("License Manager Tests", () =>
 		//
 		// If version is 'not' set, the lic page will show
 		//
-		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + 400);
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + testControl.slowTime.licenseManagerDownCheck + 800);
 		await teApi.testsApi.storage.update("version", undefined);
 		await licMgr.checkLicense();
 		await setTasks();
@@ -295,7 +295,8 @@ suite("License Manager Tests", () =>
 	test("License Page w/ Set License Key", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageSecretUpdate + 400);
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageSecretRead + testControl.slowTime.storageSecretUpdate +
+			      testControl.slowTime.licenseManagerDownCheck + 800);
 		licenseKey = await licMgr.getLicenseKey();
 		//
 		// If license is set, diff info page
@@ -313,7 +314,8 @@ suite("License Manager Tests", () =>
 	test("License Page w/ Set License Key", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageSecretUpdate + (testControl.slowTime.storageUpdate * 2) + 400);
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageSecretRead + testControl.slowTime.licenseManagerDownCheck +
+			      testControl.slowTime.storageSecretUpdate + (testControl.slowTime.storageUpdate * 2) + 800);
 		const licenseKey = await licMgr.getLicenseKey(),
 			  version = licMgr.getVersion(); // will be set on ext. startup
 		//
@@ -335,7 +337,8 @@ suite("License Manager Tests", () =>
 	test("License Page w/ Set License Key", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageSecretUpdate + testControl.slowTime.storageUpdate + 400);
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageSecretRead + testControl.slowTime.licenseManagerDownCheck +
+				  testControl.slowTime.storageSecretUpdate + testControl.slowTime.storageUpdate + 800);
 		const licenseKey = await licMgr.getLicenseKey(),
 			  version = licMgr.getVersion(); // will be set on ext. startup
 		//
@@ -368,7 +371,7 @@ suite("License Manager Tests", () =>
 	test("License Info", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + testControl.slowTime.storageSecretUpdate + 400);
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageSecretRead + testControl.slowTime.storageUpdate + testControl.slowTime.storageSecretUpdate + 800);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		const licenseKey = await licMgr.getLicenseKey(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
@@ -385,7 +388,7 @@ suite("License Manager Tests", () =>
 	test("License Not Now", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageSecretUpdate + 400);
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageSecretRead + testControl.slowTime.storageSecretUpdate + 800);
 		const licenseKey = await licMgr.getLicenseKey(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox("Not Now");
@@ -402,7 +405,7 @@ suite("License Manager Tests", () =>
 	test("License Cancel", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageUpdate + testControl.slowTime.storageSecretUpdate + 400);
+		this.slow(testControl.slowTime.licenseMgrOpenPage + testControl.slowTime.storageSecretRead + testControl.slowTime.storageUpdate + testControl.slowTime.storageSecretUpdate + 800);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		const licenseKey = await licMgr.getLicenseKey(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
@@ -419,7 +422,7 @@ suite("License Manager Tests", () =>
 	test("Enter License key on Startup", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow((testControl.slowTime.licenseManagerEnterKey * 2) + 800);
+		this.slow((testControl.slowTime.licenseManagerEnterKey * 2) + 1600);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("1111-2222-3333-4444-5555");
 		await licMgr.enterLicenseKey();

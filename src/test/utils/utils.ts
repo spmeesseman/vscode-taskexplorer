@@ -321,8 +321,7 @@ export const focusExplorerView = async (instance?: any) =>
     if (!teExplorer.isVisible())
     {
         if (instance) {
-            instance.slow(tc.slowTime.focusCommand + tc.slowTime.refreshCommand +
-                          (tc.waitTime.focusCommand * 2) + tc.waitTime.min + 100);
+            instance.slow(tc.slowTime.focusCommand + tc.slowTime.refreshCommand);
         }
         await executeTeCommand("focus", tc.waitTime.focusCommand);
         await waitForTeIdle(tc.waitTime.focusCommand);

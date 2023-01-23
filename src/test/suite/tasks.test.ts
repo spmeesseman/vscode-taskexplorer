@@ -86,7 +86,7 @@ suite("Task Tests", () =>
     test("Keep Terminal on Stop (OFF)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event + (tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 4000);
+        this.slow(tc.slowTime.config.event + (tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 9000);
         await utils.executeSettingsUpdate("keepTermOnStop", false);
         let exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         expect(exec).to.not.be.equal(undefined, "Starting the 'batch0' task did not return a valid TaskExecution");
@@ -107,7 +107,7 @@ suite("Task Tests", () =>
     test("Run Pause and Run", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow((tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 3500);
+        this.slow((tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 8000);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 2000);
         await utils.executeTeCommand2("pause", [ batch[0] ], tc.waitTime.taskCommand);
@@ -123,7 +123,7 @@ suite("Task Tests", () =>
     test("Run Pause and Stop (Keep Terminal on Stop OFF)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 3500);
+        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 7000);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 2000);
         await utils.executeTeCommand2("pause", [ batch[0] ], tc.waitTime.taskCommand);
@@ -138,8 +138,7 @@ suite("Task Tests", () =>
     test("Keep Terminal on Stop (ON)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand +
-                  tc.slowTime.config.event + 3000);
+        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.config.event + 6000);
         await utils.executeSettingsUpdate("keepTermOnStop", true);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         expect(exec).to.not.be.equal(undefined, "Starting the 'batch0' task did not return a valid TaskExecution");
@@ -153,7 +152,7 @@ suite("Task Tests", () =>
     test("Run Pause and Stop (Keep Terminal on Stop ON)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 3000);
+        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 6000);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 2000);
         await utils.executeTeCommand2("pause", [ batch[0] ], tc.waitTime.taskCommand);
@@ -189,7 +188,7 @@ suite("Task Tests", () =>
     test("Pause", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.runPauseCommand + tc.slowTime.runStopCommand + tc.slowTime.config.event + 3000);
+        this.slow(tc.slowTime.runCommand + tc.slowTime.runPauseCommand + tc.slowTime.runStopCommand + tc.slowTime.config.event + 6000);
         await utils.executeSettingsUpdate("keepTermOnStop", false);
         const exec = await utils.executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 2000);
@@ -201,11 +200,26 @@ suite("Task Tests", () =>
     });
 
 
+    test("Run Task (No Terminal)", async function()
+    {
+        if (utils.exitRollingCount(this)) return;
+        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.tasks.batchScriptCmd);
+        const batchTask = batch[0];
+        await startTask(batchTask as TaskItem, false);
+        const exec = await utils.executeTeCommand2("runNoTerm", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
+        await utils.waitForTaskExecution(exec, 2000);
+        await utils.executeTeCommand2("stop", [ batch[0] ], tc.waitTime.taskCommand);
+        await utils.waitForTaskExecution(exec);
+        lastTask = batchTask;
+        utils.endRollingCount(this);
+    });
+
+
     test("Run Ant Task (w/ Ansicon)", async function()
     {
         if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.enableEvent * 2) + tc.slowTime.runCommand +
-                  tc.slowTime.tasks.antTaskWithAnsicon + 250 + tc.slowTime.focusCommandChangeViews);
+                  tc.slowTime.tasks.antTaskWithAnsicon + 500 + tc.slowTime.focusCommandChangeViews);
         antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
         expect(antTask).to.not.be.equal(undefined, "The 'hello' ant task was not found in the task tree");
         await utils.executeSettingsUpdate("pathToPrograms.ansicon", utils.getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"), tc.waitTime.config.enableEvent);
@@ -240,7 +254,7 @@ suite("Task Tests", () =>
         //
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.runCommand + tc.slowTime.command + (tc.slowTime.config.event * 3) + tc.slowTime.focusCommandChangeViews +
-                  tc.slowTime.config.specialFolderEvent+ startTaskSlowTime + (tc.slowTime.tasks.bashScript * 2));
+                  tc.slowTime.config.specialFolderEvent + startTaskSlowTime + (tc.slowTime.tasks.bashScript * 2));
         utils.focusExplorerView(); // randomly show/hide view to test refresh event queue in tree/tree.ts
         await utils.executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false);
@@ -259,9 +273,9 @@ suite("Task Tests", () =>
         // There are 2 batch file "tasks" - they both utils.sleep for 7 seconds, 1 second at a time
         //
         if (utils.exitRollingCount(this)) return;
-        const slowTime = (tc.slowTime.runCommand * 1) + (tc.slowTime.runStopCommand * 2) + 6000 + // wait for task exec
+        const slowTime = (tc.slowTime.runCommand * 1) + (tc.slowTime.runStopCommand * 2) + 12000 + // wait for task exec
                           startTaskSlowTime + tc.slowTime.runPauseCommand + (tc.slowTime.config.event * 4) +
-                          (tc.slowTime.command * 2) + tc.slowTime.closeActiveDocument + (tc.slowTime.tasks.batchScriptCmd * 2);
+                          (tc.slowTime.command * 2) + tc.slowTime.closeActiveDocument + tc.slowTime.tasks.batchScriptCmd;
         this.slow(slowTime);
         this.timeout(35000);
         const batchTask = batch[0];
@@ -327,8 +341,8 @@ suite("Task Tests", () =>
         // There are 2 batch file "tasks" - they both utils.sleep for 7 seconds, 1 second at a time
         //
         if (utils.exitRollingCount(this)) return;
-        const slowTime = (tc.slowTime.runCommand * 1) + 2500 + startTaskSlowTime + tc.slowTime.runStopCommand +
-                         (tc.slowTime.command * 2) + (tc.slowTime.config.event * 4) + (tc.slowTime.tasks.batchScriptBat * 2) + tc.slowTime.config.specialFolderEvent;
+        const slowTime = (tc.slowTime.runCommand * 1) + 5000 + startTaskSlowTime + tc.slowTime.runStopCommand +
+                         (tc.slowTime.command * 2) + (tc.slowTime.config.event * 4) + tc.slowTime.tasks.batchScriptBat + tc.slowTime.config.specialFolderEvent;
         this.slow(slowTime);
         const batchTask = batch[1];
         await startTask(batchTask as TaskItem, true);
@@ -342,19 +356,6 @@ suite("Task Tests", () =>
         exec = await utils.executeTeCommand2("runWithArgs", [ batchTask ], tc.waitTime.runCommandMin + 1000) as TaskExecution | undefined;
         await utils.executeSettingsUpdate("showRunningTask", true);
         await utils.executeTeCommand2("openTerminal", [ batchTask ], tc.waitTime.command);
-        await utils.waitForTaskExecution(exec);
-        lastTask = batchTask;
-        utils.endRollingCount(this);
-    });
-
-
-    test("Run Batch Task (No Terminal)", async function()
-    {
-        if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.tasks.batchScriptCmd);
-        const batchTask = batch[0];
-        await startTask(batchTask as TaskItem, false);
-        const exec = await utils.executeTeCommand2("runNoTerm", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec);
         lastTask = batchTask;
         utils.endRollingCount(this);
