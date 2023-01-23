@@ -80,7 +80,7 @@ suite("File Cache Tests", () =>
     test("Rebuild File Cache w Empty Persisted Cache (Mimic Startup)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.rebuild + (tc.slowTime.config.event * 3) + tc.slowTime.min + checkTaskCountsTime);
+        this.slow(tc.slowTime.cache.rebuild + (tc.slowTime.config.event * 3) + checkTaskCountsTime);
         await testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
@@ -131,7 +131,7 @@ suite("File Cache Tests", () =>
     test("Cancel Rebuild Cache (Busy No Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.rebuildCancel + tc.slowTime.min);
+        this.slow(tc.slowTime.cache.rebuildCancel);
         testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
@@ -142,7 +142,7 @@ suite("File Cache Tests", () =>
     test("Cancel Rebuild Cache (Busy 40ms Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.rebuildCancel + 40 + tc.slowTime.min);
+        this.slow(tc.slowTime.cache.rebuildCancel + 40);
         testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(40);
         await testsApi.fileCache.cancelBuildCache();
@@ -154,7 +154,7 @@ suite("File Cache Tests", () =>
     test("Cancel Rebuild Cache (Busy 75ms Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.rebuildCancel + 75 + tc.slowTime.min);
+        this.slow(tc.slowTime.cache.rebuildCancel + 75);
         testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(75);
         await testsApi.fileCache.cancelBuildCache();
@@ -166,7 +166,7 @@ suite("File Cache Tests", () =>
     test("Cancel Rebuild Cache (Busy 100ms Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.rebuildCancel + 100 + tc.slowTime.min);
+        this.slow(tc.slowTime.cache.rebuildCancel + 100);
         testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(100);
         await testsApi.fileCache.cancelBuildCache();
@@ -178,7 +178,7 @@ suite("File Cache Tests", () =>
     test("Cancel Rebuild Cache (Busy 250ms Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.rebuildCancel + 250 + tc.slowTime.min);
+        this.slow(tc.slowTime.cache.rebuildCancel + 250);
         testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(250);
         await testsApi.fileCache.cancelBuildCache();
@@ -190,7 +190,7 @@ suite("File Cache Tests", () =>
     test("Cancel Rebuild Cache (Busy 500ms Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.rebuildCancel + 500 + tc.slowTime.min);
+        this.slow(tc.slowTime.cache.rebuildCancel + 500);
         testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(500);
         await testsApi.fileCache.cancelBuildCache();
@@ -202,7 +202,7 @@ suite("File Cache Tests", () =>
     test("Cancel Rebuild Cache (Busy 750ms Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.rebuildCancel + 750 + tc.slowTime.min);
+        this.slow(tc.slowTime.cache.rebuildCancel + 750);
         testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(750);
         await testsApi.fileCache.cancelBuildCache();
@@ -214,7 +214,7 @@ suite("File Cache Tests", () =>
     test("Cancel Rebuild Cache (Busy 1s Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.rebuildCancel + 1000 + tc.slowTime.min);
+        this.slow(tc.slowTime.cache.rebuildCancel + 1000);
         testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await utils.sleep(1000);
         await testsApi.fileCache.cancelBuildCache();
@@ -226,7 +226,7 @@ suite("File Cache Tests", () =>
     test("Cancel Build Cache (FileWatcher Build) (No Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.buildCancel + tc.slowTime.min);
+        this.slow(tc.slowTime.cache.buildCancel);
         testsApi.fileCache.buildTaskTypeCache("gulp", undefined, true, ""); // Don't 'await'
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
@@ -234,12 +234,36 @@ suite("File Cache Tests", () =>
     });
 
 
-    test("Cancel Build Cache (FileWatcher Build) (Busy 40ms Delay)", async function()
+    test("Cancel Build Cache (FileWatcher Build) (Busy 10ms Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.buildCancel + (tc.slowTime.min * 2));
+        this.slow(tc.slowTime.cache.buildCancel + 10);
         testsApi.fileCache.buildTaskTypeCache("gulp", undefined, true, ""); // Don't 'await'
         await utils.sleep(tc.waitTime.min);
+        await testsApi.fileCache.cancelBuildCache();
+        await utils.sleep(10);
+        utils.endRollingCount(this);
+    });
+
+
+    test("Cancel Build Cache (FileWatcher Build) (Busy 20ms Delay)", async function()
+    {
+        if (utils.exitRollingCount(this)) return;
+        this.slow(tc.slowTime.cache.buildCancel + 20);
+        testsApi.fileCache.buildTaskTypeCache("python", undefined, true, ""); // Don't 'await'
+        await utils.sleep(20);
+        await testsApi.fileCache.cancelBuildCache();
+        await utils.sleep(tc.waitTime.min);
+        utils.endRollingCount(this);
+    });
+
+
+    test("Cancel Build Cache (FileWatcher Build) (Busy 50ms Delay)", async function()
+    {
+        if (utils.exitRollingCount(this)) return;
+        this.slow(tc.slowTime.cache.buildCancel + 50);
+        testsApi.fileCache.buildTaskTypeCache("batch", undefined, true, ""); // Don't 'await'
+        await utils.sleep(50);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
@@ -249,8 +273,8 @@ suite("File Cache Tests", () =>
     test("Cancel Build Cache (FileWatcher Build) (Busy 75ms Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.buildCancel + 75 + tc.slowTime.min);
-        testsApi.fileCache.buildTaskTypeCache("python", undefined, true, ""); // Don't 'await'
+        this.slow(tc.slowTime.cache.buildCancel + 75);
+        testsApi.fileCache.buildTaskTypeCache("bash", undefined, true, ""); // Don't 'await'
         await utils.sleep(75);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
@@ -258,12 +282,12 @@ suite("File Cache Tests", () =>
     });
 
 
-    test("Cancel Build Cache (FileWatcher Build) (Busy 100ms Delay)", async function()
+    test("Cancel Build Cache (FileWatcher Build) (Busy 150ms Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.buildCancel + 100 + tc.slowTime.min);
-        testsApi.fileCache.buildTaskTypeCache("batch", undefined, true, ""); // Don't 'await'
-        await utils.sleep(100);
+        this.slow(tc.slowTime.cache.buildCancel + 150);
+        testsApi.fileCache.buildTaskTypeCache("ant", undefined, true, ""); // Don't 'await'
+        await utils.sleep(150);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
@@ -273,8 +297,8 @@ suite("File Cache Tests", () =>
     test("Cancel Build Cache (FileWatcher Build) (Busy 250ms Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.buildCancel + 250 + tc.slowTime.min);
-        testsApi.fileCache.buildTaskTypeCache("bash", undefined, true, ""); // Don't 'await'
+        this.slow(tc.slowTime.cache.buildCancel + 250);
+        testsApi.fileCache.buildTaskTypeCache("npm", undefined, true, ""); // Don't 'await'
         await utils.sleep(250);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
@@ -285,33 +309,9 @@ suite("File Cache Tests", () =>
     test("Cancel Build Cache (FileWatcher Build) (Busy 500ms Delay)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.buildCancel + 500 + tc.slowTime.min);
-        testsApi.fileCache.buildTaskTypeCache("ant", undefined, true, ""); // Don't 'await'
-        await utils.sleep(500);
-        await testsApi.fileCache.cancelBuildCache();
-        await utils.sleep(tc.waitTime.min);
-        utils.endRollingCount(this);
-    });
-
-
-    test("Cancel Build Cache (FileWatcher Build) (Busy 750ms Delay)", async function()
-    {
-        if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.buildCancel + 750 + 25);
-        testsApi.fileCache.buildTaskTypeCache("npm", undefined, true, ""); // Don't 'await'
-        await utils.sleep(750);
-        await testsApi.fileCache.cancelBuildCache();
-        await utils.sleep(tc.waitTime.min);
-        utils.endRollingCount(this);
-    });
-
-
-    test("Cancel Build Cache (FileWatcher Build) (Busy 1s Delay)", async function()
-    {
-        if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.buildCancel + 1000 + tc.slowTime.min);
+        this.slow(tc.slowTime.cache.buildCancel + 500);
         testsApi.fileCache.buildTaskTypeCache("grunt", undefined, true, ""); // Don't 'await'
-        await utils.sleep(1000);
+        await utils.sleep(500);
         await testsApi.fileCache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
