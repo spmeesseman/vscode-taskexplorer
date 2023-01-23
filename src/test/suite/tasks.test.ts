@@ -207,8 +207,6 @@ suite("Task Tests", () =>
         const batchTask = batch[0];
         await startTask(batchTask as TaskItem, false);
         const exec = await utils.executeTeCommand2("runNoTerm", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
-        await utils.waitForTaskExecution(exec, 2000);
-        await utils.executeTeCommand2("stop", [ batch[0] ], tc.waitTime.taskCommand);
         await utils.waitForTaskExecution(exec);
         lastTask = batchTask;
         utils.endRollingCount(this);

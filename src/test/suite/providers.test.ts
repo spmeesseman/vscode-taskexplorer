@@ -210,6 +210,10 @@ suite("Provider Tests", () =>
         if (needsTreeBuild(true)) {
             await focusExplorerView(this);
         }
+        else {
+            this.slow(tc.slowTime.focusCommandAlreadyFocused);
+            await waitForTeIdle(tc.waitTime.min);
+        }
         endRollingCount(this);
 	});
 
