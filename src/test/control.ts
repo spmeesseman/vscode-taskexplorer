@@ -62,40 +62,40 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 7440,
-        buildTreeNoTasks: 340,
+        addWorkspaceFolder: 6040,
+        buildTreeNoTasks: 330,
         cache: {
-            build: 780,
+            build: 750,
             buildCancel: 290,
-            rebuild: 6410,
+            rebuild: 6100,
             rebuildCancel: 490,
-            rebuildNoChanges: 1220,
+            rebuildNoChanges: 1120,
         },
-        closeActiveDocument: 25,
-        command: 850,
-        commandFast: 305,
+        closeActiveDocument: 20,
+        command: 800,
+        commandFast: 300,
         config: {
             event: 270,
             eventFast: 90,
-            registerExplorerEvent: 430,
+            registerExplorerEvent: 420,
             disableEvent: 1160,
             enableEvent: 1885,
-            enableEventWorkspace: 2005,
-            excludesEvent: 2000,
-            excludeTasksEvent: 3015,
-            globEvent: 1190,
-            groupingEvent: 1080,
+            enableEventWorkspace: 1990,
+            excludesEvent: 1970,
+            excludeTasksEvent: 3000,
+            globEvent: 1180,
+            groupingEvent: 1060,
             pathToProgramsEvent: 705,
             showHideSpecialFolder: 340,
-            showHideUserTasks: 1100,
+            showHideUserTasks: 1090,
             readEvent: 25,
-            sortingEvent: 930
+            sortingEvent: 900
         },
         excludeCommand: 1670,
         explorerViewStartup: 9200,
         fetchTasksCommand: 2140,
-        fileCachePersist: 340,
-        findTaskPosition: 525,
+        fileCachePersist: 330,
+        findTaskPosition: 515,
         findTaskPositionDocOpen: 75,
         focusCommand: 2450,
         focusCommandAlreadyFocused: 320,
@@ -114,7 +114,7 @@ export const testControl: ITestControl =
         licenseMgr: {
             page: 110,
             pageWithDetail: 325,
-            downCheck: 250,
+            downCheck: 300,
             enterKey: 845,
             localCheck: 1795,
             localStartServer: 1195,
@@ -123,7 +123,7 @@ export const testControl: ITestControl =
             setLicenseCmd: 210
         },
         min: 50,
-        refreshCommand: 10600,
+        refreshCommand: 10000,
         refreshCommandNoChanges: 240,
         removeWorkspaceFolder: 6270,
         runCommand: 4930,
@@ -137,25 +137,25 @@ export const testControl: ITestControl =
         taskCommandStartupMax: 4520,
         taskProviderReadUri: 95,
         tasks: {
-            antParser: 770,
-            antTask: 6510,
-            antTaskWithAnsicon: 6540,
-            bashScript: 3150,
-            batchScriptBat: 5000,
-            batchScriptCmd: 6055,
-            gulpParser: 3940,
+            antParser: 760,
+            antTask: 6310,
+            antTaskWithAnsicon: 6340,
+            bashScript: 3100,
+            batchScriptBat: 4900,
+            batchScriptCmd: 5925,
+            gulpParser: 3930,
             npmCommand: 12320,
-            npmCommandPkg: 9910,
-            npmInstallCommand: 13530
+            npmCommandPkg: 9860,
+            npmInstallCommand: 13230
         },
         taskCount: {
-            verify: 665,
-            verifyByTree: 680,
-            verifyFirstCall: 1055,
-            verifyNpm: 2425, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 2650,
+            verify: 650,
+            verifyByTree: 670,
+            verifyFirstCall: 1040,
+            verifyNpm: 2400, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 2600,
         },
-        viewReport: 600
+        viewReport: 500
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)
