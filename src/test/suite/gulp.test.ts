@@ -28,12 +28,13 @@ suite("Gulp Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as GulpTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "gulpfile.js"));
         file2Uri = Uri.file(path.join(dirName, "gulpfile.mjs"));
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

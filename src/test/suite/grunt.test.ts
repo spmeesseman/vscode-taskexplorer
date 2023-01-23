@@ -28,12 +28,13 @@ suite("Grunt Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as GruntTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "gruntfile.js"));
         // await executeSettingsUpdate("groupMaxLevel", 5); // this is just a random spot to bump the grouping level
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
     suiteTeardown(async function()

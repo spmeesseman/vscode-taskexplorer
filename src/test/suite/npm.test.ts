@@ -21,8 +21,9 @@ suite("NPM Tests", () =>
 
     suiteSetup(async function()
     {
+        if (utils.exitRollingCount(this, true)) return;
         ({ fsApi } = await utils.activate(this));
-        utils.endRollingCount(this);
+        utils.endRollingCount(this, true);
     });
 
 

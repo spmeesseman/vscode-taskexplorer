@@ -19,10 +19,11 @@ suite("Workspace / VSCode Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi } = await activate(this));
         wsEnable = teApi.config.get<boolean>("showHiddenWsTasks");
         await executeSettingsUpdate("showHiddenWsTasks", true);
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

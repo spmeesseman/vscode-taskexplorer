@@ -31,6 +31,7 @@ suite("Ant Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi } = await activate(this));
         fsApi = teApi.testsApi.fs;
         provider = teApi.providers[testsName] as AntTaskProvider;
@@ -38,7 +39,7 @@ suite("Ant Tests", () =>
         buildXmlFile = getWsPath("build.xml");
         buildXmlFileUri = Uri.file(buildXmlFile);
         buildFileXml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

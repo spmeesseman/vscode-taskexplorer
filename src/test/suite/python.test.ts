@@ -31,7 +31,9 @@ suite("Python Tests", () =>
 {
 
     suiteSetup(async function()
-    {   //
+    {
+        if (exitRollingCount(this, true)) return;
+        //
         // Initialize
         //
         ({ teApi, fsApi } = await activate(this));
@@ -45,7 +47,7 @@ suite("Python Tests", () =>
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe", tc.waitTime.config.event);
         await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

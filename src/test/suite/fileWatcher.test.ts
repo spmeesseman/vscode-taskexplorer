@@ -31,6 +31,7 @@ suite("File Watcher Tests", () =>
 {
     suiteSetup(async function()
     {
+        if (utils.exitRollingCount(this, true)) return;
         ({ fsApi, configApi } = await utils.activate(this));
         rootPath = utils.getWsPath(".");
         insideWsDir = join(rootPath, "tasks_test_");
@@ -66,7 +67,7 @@ suite("File Watcher Tests", () =>
             gulpIgn_1: join(insideWsDirIgn, "Gulpfile1.js")
         };
         await utils.executeSettingsUpdate("exclude", [ ...excludes, ...[ "**/fwTestIgnore/**" ] ], tc.waitTime.config.globEvent);
-        utils.endRollingCount(this);
+        utils.endRollingCount(this, true);
     });
 
 

@@ -29,7 +29,9 @@ suite("Maven Tests", () =>
 {
 
     suiteSetup(async function()
-    {   //
+    {
+        if (exitRollingCount(this, true)) return;
+        //
         // Initialize
         //
         ({ teApi, fsApi } = await activate(this));
@@ -40,7 +42,7 @@ suite("Maven Tests", () =>
         //
         pathToProgram = teApi.config.get<string>(`pathToPrograms.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "java\\maven\\mvn.exe");
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

@@ -31,13 +31,14 @@ suite("Bash Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "test_provider.sh"));
         enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("enabledTasks." + testsName, true, testControl.waitTime.config.enableEvent);
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

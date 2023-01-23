@@ -27,11 +27,12 @@ suite("Gradle Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as GradleTaskProvider;
         dirName = getWsPath(".");
         fileUri = Uri.file(path.join(dirName, "test2.gradle"));
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
     suiteTeardown(async function()

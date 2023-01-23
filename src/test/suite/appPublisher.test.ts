@@ -30,10 +30,11 @@ suite("App-Publisher Tests", () =>
     {   //
         // Initialize
         //
+        if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         rootPath = getWsPath(".");
         fileUri = Uri.file(join(rootPath, ".publishrc.json"));
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

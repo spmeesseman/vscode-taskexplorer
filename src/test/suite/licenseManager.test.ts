@@ -37,7 +37,9 @@ suite("License Manager Tests", () =>
 
 
 	suiteSetup(async function()
-	{   //
+	{
+        if (utils.exitRollingCount(this, true)) return;
+		//
 		// The LetsEncrypt certificate is rejected by VSCode/Electron Test Suite (?).
 		// See https://github.com/electron/electron/issues/31212.
 		// TLS cert validation will be disabled in utils.activate()
@@ -50,7 +52,7 @@ suite("License Manager Tests", () =>
         explorer = teApi.testsApi.explorer;
 		oLicenseKey = teApi.testsApi.storage.get<string>("license_key");
 		oVersion = teApi.testsApi.storage.get<string>("version");
-        utils.endRollingCount(this);
+        utils.endRollingCount(this, true);
 	});
 
 
@@ -419,7 +421,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Enter License key on Startup", async function()
+	test("Enter License Key on Startup", async function()
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.licenseMgr.enterKey * 2) + 1600);
@@ -480,7 +482,7 @@ suite("License Manager Tests", () =>
 // 	});
 
 
-	test("Enter License key on Startup (1st Time, Remote Server)", async function()
+	test("Enter License Key on Startup (1st Time, Remote Server)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.licenseMgr.remoteCheck + testControl.slowTime.storageUpdate + testControl.slowTime.storageSecretUpdate);
@@ -494,7 +496,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Enter License key on Startup (> 1st Time, Remote Server)", async function()
+	test("Enter License Key on Startup (> 1st Time, Remote Server)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.licenseMgr.remoteCheck + testControl.slowTime.storageUpdate + testControl.slowTime.storageSecretUpdate);
@@ -507,7 +509,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Invalid License key (Remote Server)", async function()
+	test("Invalid License Key (Remote Server)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.licenseMgr.remoteCheck + testControl.slowTime.storageUpdate + testControl.slowTime.storageSecretUpdate);
@@ -536,7 +538,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Enter License key on Startup (1st Time, Local Server)", async function()
+	test("Enter License Key on Startup (1st Time, Local Server)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
 		if (lsProcess)
@@ -558,7 +560,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Enter License key on Startup (> 1st Time, Local Server)", async function()
+	test("Enter License Key on Startup (> 1st Time, Local Server)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
 		if (lsProcess)
@@ -574,7 +576,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Invalid License key (Local Server)", async function()
+	test("Invalid License Key (Local Server)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
 		if (lsProcess)
@@ -591,6 +593,39 @@ suite("License Manager Tests", () =>
 				token: remoteServerToken
 			});
 		}
+        utils.endRollingCount(this);
+	});
+
+
+	test("Stop License Server", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
+		// Don't utils.exitRollingCount(this)
+        if (lsProcess)
+		{   // shut down local server
+			this.slow(2500);
+			lsProcess.send("close");
+			await utils.sleep(2000);
+			lsProcess = undefined;
+		}
+        utils.endRollingCount(this);
+	});
+
+
+	test("Check License Key (Server Down)", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseMgr.localCheck + testControl.slowTime.storageUpdate  + testControl.slowTime.storageSecretUpdate);
+		const licenseKey = await licMgr.getLicenseKey();
+		await licMgr.setLicenseKey("1234-5678-9098-1234567");
+		await licMgr.checkLicense();
+		await setTasks();
+		await licMgr.setLicenseKey(licenseKey);
+		licMgr.setTestData({
+			host: "license.spmeesseman.com",
+			port: 443,
+			token: remoteServerToken
+		});
         utils.endRollingCount(this);
 	});
 
@@ -650,7 +685,16 @@ suite("License Manager Tests", () =>
 	test("Task File Limit Reached (Non-Licensed)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(Math.round(testControl.slowTime.refreshCommand * 0.9));
+		this.slow(Math.round(testControl.slowTime.refreshCommand * 0.9) + testControl.slowTime.fs.createFolderEvent);
+		const outsideWsDir = utils.getTestsPath("testA");
+		await fsApi.createDir(outsideWsDir);
+		await fsApi.writeFile(
+            join(outsideWsDir, "Gruntfile.js"),
+            "module.exports = function(grunt) {\n" +
+            '    grunt.registerTask(\n"default13", ["jshint:myproject"]);\n' +
+            '    grunt.registerTask("upload13", ["s3"]);\n' +
+            "};\n"
+        );
 		licMgr.setTestData({
 			maxFreeTasks: licMgrMaxFreeTasks,
 			maxFreeTaskFiles: 5,
@@ -659,7 +703,11 @@ suite("License Manager Tests", () =>
 		});
 		utils.overrideNextShowInfoBox(undefined);
 		await utils.treeUtils.refresh();
-		expect(teApi.testsApi.fileCache.getTaskFileCount()).to.be.equal(5);
+		await fsApi.copyDir(outsideWsDir, utils.getWsPath("."), undefined, true); // Cover fileCache.addFolder()
+        await utils.waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
+		await fsApi.deleteDir(join(utils.getWsPath("."), "testA"));
+        await utils.waitForTeIdle(testControl.waitTime.fs.deleteFolderEvent);
+		await fsApi.deleteDir(outsideWsDir);
         utils.endRollingCount(this);
 	});
 
@@ -680,19 +728,6 @@ suite("License Manager Tests", () =>
 			await utils.treeUtils.refresh();
 		}
         utils.endRollingCount(this);
-	});
-
-
-	test("Stop License Server", async function()
-	{
-		// Don't utils.exitRollingCount(this)
-        if (lsProcess)
-		{   // shut down local server
-			this.slow(1100);
-			lsProcess.send("close");
-			await utils.sleep(500);
-			lsProcess = undefined;
-		}
 	});
 
 });

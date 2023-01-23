@@ -30,9 +30,10 @@ suite("Tree Tests", () =>
 
     suiteSetup(async function()
     {
+        if (utils.exitRollingCount(this, true)) return;
         ({ teApi } = await utils.activate(this));
         explorer = teApi.testsApi.explorer;
-        utils.endRollingCount(this);
+        utils.endRollingCount(this, true);
     });
 
 

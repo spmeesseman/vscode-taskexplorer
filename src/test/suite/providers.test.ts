@@ -38,13 +38,14 @@ suite("Provider Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi, explorer } = await activate(this));
         rootPath = getWsPath(".");
         dirName = join(rootPath, "tasks_test_");
         dirNameL2 = join(dirName, "subfolder");
         dirNameIgn = join(rootPath, "tasks_test_ignore_");
         await executeSettingsUpdate("exclude", [ "**/tasks_test_ignore_/**", "**/ant/**" ], tc.waitTime.config.globEvent);
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

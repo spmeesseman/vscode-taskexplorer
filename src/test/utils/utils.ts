@@ -289,18 +289,18 @@ export const endRollingCount = (instance: Mocha.Context, isSetup?: boolean) =>
 };
 
 
-export const exitRollingCount = (instance: Mocha.Context) =>
+export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean) =>
 {
 
-    const mTest = instance.test as Mocha.Runnable,
+    const mTest = (!isSetup ? instance.test : instance.currentTest) as Mocha.Runnable,
           suite = mTest.parent as Mocha.Suite,
           suiteKey = getSuiteKey(suite.title),
           suiteResults = tc.tests.suiteResults[suiteKey],
-          testIdx = suite.tests.findIndex(t => t.title === mTest.title && !t.isFailed() && !t.isPassed());
+          testIdx = !isSetup ? suite.tests.findIndex(t => t.title === mTest.title && !t.isFailed() && !t.isPassed()) : undefined;
 
     try
     {
-        expect(suiteResults.successCount).to.be.equal(testIdx);
+        expect(suiteResults?.successCount).to.be.equal(testIdx);
     }
     catch (e: any)
     {
@@ -342,6 +342,9 @@ export const getSpecialTaskItemId = (taskItem: ITaskItem) =>
 
 
 export const getTeApi = () => teApi;
+
+
+export const isRollingCountError = () => hasRollingCountError;
 
 
 const isExecuting = (task: Task) =>

@@ -12,8 +12,9 @@ suite("Tree Grouping Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         await activate(this);
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

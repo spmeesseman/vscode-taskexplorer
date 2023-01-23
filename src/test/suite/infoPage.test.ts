@@ -20,13 +20,14 @@ suite("Info Report Tests", () =>
 {
 	suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi } = await activate(this));
 		projectUri = Uri.file(getWsPath("."));
 		origExplorer = teApi.explorer;
 		origSidebar = teApi.sidebar;
 		pkgMgr = teApi.config.getVs<string>("npm.packageManager");
 		userTasks = teApi.config.get<boolean>("specialFolders.showUserTasks");
-        endRollingCount(this);
+        endRollingCount(this, true);
 	});
 
 

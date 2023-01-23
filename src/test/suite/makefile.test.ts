@@ -31,11 +31,12 @@ suite("Makefile Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as MakeTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(join(dirName, "makefile"));
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

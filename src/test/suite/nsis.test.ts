@@ -26,11 +26,12 @@ suite("Nullsoft NSIS Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as NsisTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "new_build.nsi"));
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
     suiteTeardown(async function()

@@ -13,11 +13,12 @@ suite("File Cache Tests", () =>
 {
     suiteSetup(async function()
     {
+        if (utils.exitRollingCount(this, true)) return;
         ({ testsApi } = await utils.activate(this));
         await testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
-        utils.endRollingCount(this);
+        utils.endRollingCount(this, true);
     });
 
 

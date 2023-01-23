@@ -24,6 +24,7 @@ suite("Configuration / Settings Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi, testsApi } = await activate(this));
         testsApi = teApi.testsApi;
         enabledTasks = teApi.config.get<IDictionary<boolean>>("enabledTasks");
@@ -34,7 +35,7 @@ suite("Configuration / Settings Tests", () =>
         globPatternsAnt = teApi.config.get<string[]>("globPatternsAnt");
         globPatternsBash = teApi.config.get<string[]>("globPatternsBash");
         pkgMgr = teApi.config.getVs<string>("npm.packageManager");
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

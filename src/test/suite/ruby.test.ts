@@ -25,11 +25,12 @@ suite("Ruby Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as RubyTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "newscript.pl"));
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
     suiteTeardown(async function()

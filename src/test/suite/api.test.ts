@@ -26,12 +26,13 @@ suite("External Provider Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi } = await activate(this));
         taskProvider = new ExternalTaskProvider();
         taskProvider2 = new ExternalTaskProviderBase();
         dispose = tasks.registerTaskProvider("external", taskProvider);
         dispose2 = tasks.registerTaskProvider("external2", taskProvider2);
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

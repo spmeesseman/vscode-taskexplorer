@@ -30,10 +30,11 @@ suite("Task Tests", () =>
 
     suiteSetup(async function()
     {
+        if (utils.exitRollingCount(this, true)) return;
         ({ teApi, testsApi, explorer } = await utils.activate(this));
         clickAction = teApi.config.get<string>("taskButtons.clickAction");
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", true);
-        utils.endRollingCount(this);
+        utils.endRollingCount(this, true);
     });
 
 
@@ -200,11 +201,14 @@ suite("Task Tests", () =>
     test("Run Task (No Terminal)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.tasks.batchScriptCmd);
+        this.slow(tc.slowTime.runCommand + tc.slowTime.tasks.batchScriptCmd + tc.slowTime.runStopCommand  + 5000);
         const batchTask = batch[0];
         await startTask(batchTask as TaskItem, false);
         const exec = await utils.executeTeCommand2("runNoTerm", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
-        await utils.waitForTaskExecution(exec);
+        await utils.sleep(250);
+        await utils.waitForTaskExecution(exec, 2000);
+        await utils.executeTeCommand2("stop", [ batch[0] ], tc.waitTime.taskCommand);
+        await utils.waitForTaskExecution(exec, 500);
         lastTask = batchTask;
         utils.endRollingCount(this);
     });

@@ -27,13 +27,14 @@ suite("Pipenv Tests", () =>
 
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as GradleTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "Pipfile"));
         await fsApi.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

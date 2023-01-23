@@ -41,6 +41,7 @@ suite("Multi-Root Workspace Tests", () =>
 {
     suiteSetup(async function()
     {
+        if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi, testsApi } = await activate(this));
 
         testsPath = getTestsPath(".");
@@ -76,7 +77,7 @@ suite("Multi-Root Workspace Tests", () =>
             index: 4
         }];
 
-        endRollingCount(this);
+        endRollingCount(this, true);
     });
 
 

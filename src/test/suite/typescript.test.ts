@@ -27,13 +27,14 @@ suite("Typescript Tests", () =>
 
     suiteSetup(async function()
     {
+        if (utils.exitRollingCount(this, true)) return;
         ({ fsApi } = await utils.activate(this));
         testControl = utils.testControl;
         rootPath = utils.getWsPath(".");
         dirName = join(rootPath, "tasks_test_ts_");
         fileUri = Uri.file(join(rootPath, "tsconfig.json"));
         fileUri2 = Uri.file(join(dirName, "tsconfig.json"));
-        utils.endRollingCount(this);
+        utils.endRollingCount(this, true);
     });
 
 
