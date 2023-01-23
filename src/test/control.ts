@@ -62,41 +62,41 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 5040,
-        buildTreeNoTasks: 300,
+        addWorkspaceFolder: 4500,
+        buildTreeNoTasks: 295,
         cache: {
-            build: 700,
+            build: 650,
             buildCancel: 290,
-            rebuild: 5500,
+            rebuild: 5000,
             rebuildCancel: 490,
-            rebuildNoChanges: 1000,
+            rebuildNoChanges: 900,
         },
         closeActiveDocument: 20,
-        command: 750,
-        commandFast: 275,
+        command: 725,
+        commandFast: 270,
         config: {
             event: 270,
             eventFast: 90,
             registerExplorerEvent: 420,
             disableEvent: 1140,
             enableEvent: 1885,
-            enableEventWorkspace: 1990,
-            excludesEvent: 1970,
-            excludeTasksEvent: 2950,
+            enableEventWorkspace: 1980,
+            excludesEvent: 1950,
+            excludeTasksEvent: 2900,
             globEvent: 1170,
             groupingEvent: 1040,
             pathToProgramsEvent: 705,
             showHideSpecialFolder: 340,
-            showHideUserTasks: 1080,
+            showHideUserTasks: 1070,
             readEvent: 25,
-            sortingEvent: 800
+            sortingEvent: 700
         },
-        excludeCommand: 1670,
-        explorerViewStartup: 9200,
-        fetchTasksCommand: 2140,
-        fileCachePersist: 330,
-        findTaskPosition: 515,
-        findTaskPositionDocOpen: 75,
+        excludeCommand: 1590,
+        explorerViewStartup: 8200,
+        fetchTasksCommand: 2040,
+        fileCachePersist: 320,
+        findTaskPosition: 505,
+        findTaskPositionDocOpen: 70,
         focusCommand: 2450,
         focusCommandAlreadyFocused: 320,
         focusCommandChangeViews: 95,
@@ -112,7 +112,7 @@ export const testControl: ITestControl =
         getTreeTasks: 195,
         getTreeTasksNpm: 570, // npm task provider is slower than shit on a turtle
         licenseMgr: {
-            page: 110,
+            page: 125,
             pageWithDetail: 325,
             downCheck: 300,
             enterKey: 845,
@@ -123,9 +123,9 @@ export const testControl: ITestControl =
             setLicenseCmd: 210
         },
         min: 50,
-        refreshCommand: 9400,
-        refreshCommandNoChanges: 240,
-        removeWorkspaceFolder: 5270,
+        refreshCommand: 9000,
+        refreshCommandNoChanges: 230,
+        removeWorkspaceFolder: 5000,
         runCommand: 4930,
         runPauseCommand: 3235,
         runStopCommand: 3490,
@@ -133,9 +133,9 @@ export const testControl: ITestControl =
         storageUpdate: 60,
         storageSecretRead: 90,
         storageSecretUpdate: 200,
-        taskCommand: 1415,
-        taskCommandStartupMax: 4520,
-        taskProviderReadUri: 95,
+        taskCommand: 1400,
+        taskCommandStartupMax: 4300,
+        taskProviderReadUri: 90,
         tasks: {
             antParser: 750,
             antTask: 6210,
@@ -149,13 +149,13 @@ export const testControl: ITestControl =
             npmInstallCommand: 13100
         },
         taskCount: {
-            verify: 625,
-            verifyByTree: 650,
-            verifyFirstCall: 1000,
-            verifyNpm: 2300, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 2500,
+            verify: 600,
+            verifyByTree: 640,
+            verifyFirstCall: 950,
+            verifyNpm: 2100, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 2400,
         },
-        viewReport: 400
+        viewReport: 350
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)
@@ -164,50 +164,50 @@ export const testControl: ITestControl =
     {   //
         // MINIMUM WAIT TIMES
         //
-        addWorkspaceFolder: 170,
-        command: 90,
+        addWorkspaceFolder: 160,
+        command: 80,
         commandFast: 50,
         config: {
-            event: 95,
+            event: 85,
             eventFast: 45,
-            excludesEvent: 120,
-            excludeTasksEvent: 170,
-            disableEvent: 125,
-            enableEvent: 150,
-            globEvent: 120,
-            groupingEvent: 110,
-            registerExplorerEvent: 160,
-            showHideSpecialFolder: 100,
-            showHideUserTasks: 125,
-            sortingEvent: 125
+            excludesEvent: 110,
+            excludeTasksEvent: 160,
+            disableEvent: 115,
+            enableEvent: 140,
+            globEvent: 110,
+            groupingEvent: 100,
+            registerExplorerEvent: 150,
+            showHideSpecialFolder: 95,
+            showHideUserTasks: 115,
+            sortingEvent: 110
         },
-        explorerViewStartup: 3000,
-        focusCommand: 250,
+        explorerViewStartup: 2800,
+        focusCommand: 240,
         fs: {
-            createEvent: 195,
-            createFolderEvent: 210,
-            deleteEvent: 190,
-            deleteFolderEvent: 205,
-            modifyEvent: 190
+            createEvent: 185,
+            createFolderEvent: 200,
+            deleteEvent: 180,
+            deleteFolderEvent: 195,
+            modifyEvent: 180
         },
-        getTreeMin: 200,
+        getTreeMin: 190,
         getTreeTasks: 55,
         min: 40,
-        npmCommandMin: 1500,
-        refreshCommand: 175,
-        refreshCommandNoChanges: 80,
-        refreshTaskTypeCommand: 150,
-        removeWorkspaceFolder: 140,
-        runCommandMin: 620,
-        taskCommand: 520,
-        verifyTaskCountRetry: 75,
-        verifyTaskCountRetryInterval: 150,
+        npmCommandMin: 1425,
+        refreshCommand: 165,
+        refreshCommandNoChanges: 75,
+        refreshTaskTypeCommand: 140,
+        removeWorkspaceFolder: 130,
+        runCommandMin: 600,
+        taskCommand: 500,
+        verifyTaskCountRetry: 70,
+        verifyTaskCountRetryInterval: 140,
         viewReport: 90,
         //
         // MAXIMUM WAIT TIMES
         //
         max: 15000,
-        runCommandMax: 3500,
+        runCommandMax: 3400,
         waitTimeForNpmCommandMax: 12000
     }
 };
