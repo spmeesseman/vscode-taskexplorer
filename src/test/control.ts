@@ -123,7 +123,7 @@ export const testControl: ITestControl =
             setLicenseCmd: 210
         },
         min: 50,
-        refreshCommand: 11205,
+        refreshCommand: 10600,
         refreshCommandNoChanges: 240,
         removeWorkspaceFolder: 6270,
         runCommand: 4930,
@@ -137,15 +137,15 @@ export const testControl: ITestControl =
         taskCommandStartupMax: 4520,
         taskProviderReadUri: 95,
         tasks: {
-            antParser: 780,
-            antTask: 6910,
-            antTaskWithAnsicon: 6940,
+            antParser: 770,
+            antTask: 6510,
+            antTaskWithAnsicon: 6540,
             bashScript: 3150,
-            batchScriptBat: 5100,
-            batchScriptCmd: 6175,
-            gulpParser: 3950,
-            npmCommand: 12340,
-            npmCommandPkg: 9950,
+            batchScriptBat: 5000,
+            batchScriptCmd: 6055,
+            gulpParser: 3940,
+            npmCommand: 12320,
+            npmCommandPkg: 9910,
             npmInstallCommand: 13530
         },
         taskCount: {
