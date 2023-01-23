@@ -603,7 +603,7 @@ suite("License Manager Tests", () =>
 		// Don't utils.exitRollingCount(this)
         if (lsProcess)
 		{   // shut down local server
-			this.slow(2500);
+			this.slow(2600);
 			lsProcess.send("close");
 			await utils.sleep(2000);
 			lsProcess = undefined;
