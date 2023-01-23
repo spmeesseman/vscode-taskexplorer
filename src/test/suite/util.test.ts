@@ -60,7 +60,7 @@ suite("Util Tests", () =>
     test("Logging (Error)", async function()
     {
         if (exitRollingCount(this)) return;
-		this.slow((testControl.slowTime.config.event * 2) + 150);
+		this.slow((testControl.slowTime.config.event * 2) + 175);
 
         log.error(`        ${creator}.${extension}`);
         log.error([ `        ${creator}.${extension}`,
@@ -136,7 +136,7 @@ suite("Util Tests", () =>
 	test("Logging (File)", async function()
     {
         if (exitRollingCount(this)) return;
-		this.slow((testControl.slowTime.config.event * 7) + 75);
+		this.slow((testControl.slowTime.config.event * 7) + 150);
 		await executeSettingsUpdate("logging.enableFile", false);
 		await executeSettingsUpdate("logging.enableFile", true);
 		log.write("Test1", 1);
