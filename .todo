@@ -9,13 +9,15 @@ Bugs:
 
 Features:
 
-    ☐ Option persisted cache
+    ✔ Option persisted cache @done(23-01-22 18:34)
         For tasks to load from fs on startup
         Instant load time
+
     ☐ Auto detect ExtJS project
         Parse profiels from app.json
         Detect open tooling vs. command, create webpack and cmd tasks
         Task for debug output build
+
     ☐ Auto detect consecutive task usage
         If noticed that a particular task is always ran after another, provide AI to ask
         user to auto run that task
@@ -31,7 +33,7 @@ General Todos:
     ✔ Test visibility change event @done(23-01-13 22:22)
         Differences in tray open/closed, switching views, vscode minimized, etc
 
-    ☐ Folder/file create/delete events
+    ✔ Folder/file create/delete events @done(23-01-22 16:34)
         Dont process file if folder was just processed, and vice versa
     
     ✔ Clean up interface file names @done(23-01-13 22:21)
@@ -40,7 +42,7 @@ General Todos:
     ☐ add info box maybe monthly nag if grunt/gulp tasks VSCode provider(s) are 'on'
         Provide Yes/No to disable
     
-    ☐ The 'use gulp' feature needs to use async exec
+    ✔ The 'use gulp' feature needs to use async exec @done(23-01-22 16:34)
         WHen used, VSCode complains Task Explorer used 100&% resource for x seconds
 
 Tests:
@@ -48,22 +50,22 @@ Tests:
     ☐ Finish individual task Type suites
 
         ✔ Bash @done(23-01-06 01:24)
-        ☐ Batch
-        ☐ Grunt
+        ✔ Batch @done(23-01-22 16:34)
+        ✔ Grunt @done(23-01-22 16:34)
         ✔ Maven @done(23-01-01 13:02)
         ☐ NSIS
         ☐ Perl
-        ☐ Pipenv
+        ✔ Pipenv @done(23-01-22 16:34)
         ☐ Ruby
     
-    ☐ Tests for when license manager
+    ✔ Tests for when license manager @done(23-01-22 16:34)
         i.e. limiting task counts and extension is running in non-licensed mode
         adjust instanbul ignores in cache.ts
 
     ☐ Tests for external provider (via API)
         adjust instanbul ignores in cache.ts
     
-    ☐ Tests for adding folder with files in it
+    ✔ Tests for adding folder with files in it @done(23-01-21 22:07)
         i.e. a copy/move folder action by user, there's no other way.
         may or may not be from in-workspace, or same-project
         adjust instanbul ignores in cache.ts
