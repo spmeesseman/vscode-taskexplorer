@@ -21,6 +21,7 @@ const constants: IDictionary<string> =
     GLOB_GULP: "**/[Gg][Uu][Ll][Pp][Ff][Ii][Ll][Ee].{[Jj][Ss],[Tt][Ss],[Mm][Jj][Ss],[Bb][Aa][Bb][Ee][Ll].[Jj][Ss]}",
     GLOB_GRADLE: "**/*.[Gg][Rr][Aa][Dd][Ll][Ee]",
     GLOB_GRUNT: "**/[Gg][Rr][Uu][Nn][Tt][Ff][Ii][Ll][Ee].[Jj][Ss]",
+    GLOB_JENKINS: "**/[Jj]enkinsfile",
     GLOB_MAKE: "**/[Mm]akefile",
     GLOB_NPM: "**/package.json",
     GLOB_NSIS: "**/*.[Nn][Ss][Ii]",

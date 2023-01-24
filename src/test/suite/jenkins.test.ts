@@ -5,18 +5,18 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
-import { RubyTaskProvider } from "../../providers/ruby";
+import { JenkinsTaskProvider } from "../../providers/jenkins";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, needsTreeBuild,
     suiteFinished, testControl as tc, testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
-const testsName = "ruby";
-const startTaskCount = 1;
+const testsName = "jenkins";
+const startTaskCount = 0;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let provider: RubyTaskProvider;
+let provider: JenkinsTaskProvider;
 let fileUri: Uri;
 
 
@@ -27,8 +27,8 @@ suite("Ruby Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
-        provider = teApi.providers[testsName] as RubyTaskProvider;
-        fileUri = Uri.file(path.join(getWsPath("."), "ruby_script.rb"));
+        provider = teApi.providers[testsName] as JenkinsTaskProvider;
+        fileUri = Uri.file(path.join(getWsPath("."), "Jenkinsfile"));
         endRollingCount(this, true);
     });
 
@@ -56,14 +56,6 @@ suite("Ruby Tests", () =>
         }
         endRollingCount(this);
 	});
-
-
-    test("Document Position", async function()
-    {
-        if (exitRollingCount(this)) return;
-        expect(provider.getDocumentPosition()).to.be.equal(0);
-        endRollingCount(this);
-    });
 
 
     test("Start", async function()
@@ -99,9 +91,31 @@ suite("Ruby Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.waitTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/ruby\n\n");
+        await fsApi.writeFile(fileUri.fsPath,
+`
+pipeline {
+    agent any
+    stages {
+      stage("Prepare") {
+        steps {
+            echo "Start pipeline..."
+        }
+      }
+    }
+}
+`);
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
+        endRollingCount(this);
+    });
+
+
+    test("Document Position", async function()
+    {
+        if (exitRollingCount(this)) return;
+        testInvDocPositions(provider);
+        const docText = await fsApi.readFileAsync(path.join(getWsPath("."), "Jenkinsfile"));
+        expect(provider.getDocumentPosition("stage", docText)).to.be.equal(0);
         endRollingCount(this);
     });
 

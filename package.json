@@ -75,6 +75,7 @@
         "test-gradle": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js gradle xDeactivate",
         "test-grunt": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js grunt xDeactivate",
         "test-gulp": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js gulp xDeactivate",
+        "test-jenkins": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js jenkins xDeactivate",
         "test-infopage": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js infoPage xDeactivate",
         "test-licensemgr": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js licenseManager xDeactivate",
         "test-makefile": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js makefile xDeactivate",
@@ -1625,6 +1626,10 @@
                             "type": "boolean",
                             "description": "%config.taskExplorer.enableGulp%"
                         },
+                        "jenkins": {
+                            "type": "boolean",
+                            "description": "%config.taskExplorer.enableJenkins%"
+                        },
                         "make": {
                             "type": "boolean",
                             "description": "%config.taskExplorer.enableMake%"
@@ -1679,6 +1684,7 @@
                         "gradle": false,
                         "grunt": true,
                         "gulp": true,
+                        "jenkins": false,
                         "make": true,
                         "maven": false,
                         "npm": true,
@@ -1878,9 +1884,17 @@
                             "type": "string",
                             "description": "%config.taskExplorer.pathToComposer%"
                         },
+                        "curl": {
+                            "type": "string",
+                            "description": "%config.taskExplorer.pathToCurl%"
+                        },
                         "gradle": {
                             "type": "string",
                             "description": "%config.taskExplorer.pathToGradle%"
+                        },
+                        "jenkins": {
+                            "type": "string",
+                            "description": "%config.taskExplorer.pathToJenkins%"
                         },
                         "make": {
                             "type": "string",
@@ -1921,7 +1935,9 @@
                         "ansicon": "",
                         "bash": "bash",
                         "composer": "composer",
+                        "curl": "curl",
                         "gradle": "gradle.bat",
+                        "jenkins": "",
                         "make": "nmake",
                         "maven": "mvn",
                         "nsis": "makensis",
