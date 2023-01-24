@@ -17,6 +17,7 @@ import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-
 import initSettings from "./initSettings";
 import { getWsPath, getTestsPath } from "./sharedUtils";
 import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
+import { startInput, stopInput } from "./input";
 
 export { figures };
 export { testControl };
@@ -141,6 +142,10 @@ export const activate = async (instance?: Mocha.Context) =>
         //
         setLicensed(true, getLicenseManager());
         //
+        // Catch CTRL+C and set hasRollingCountError
+        //
+        startInput(setFailed);
+        //
         // All done
         //
         activated = true;
@@ -164,6 +169,11 @@ export const cleanup = async () =>
         console.log(`    ${figures.color.info} ${figures.withColor("   " + teApi.log.getLogFileName(), figures.colors.grey)}`);
         console.log(`    ${figures.color.info}`);
     }
+
+    //
+    // Stop CTRL+C and set hasRollingCountError
+    //
+    stopInput();
 
     console.log(`    ${figures.color.info} ${figures.withColor("Deactivating extension 'spmeesseman.vscode-taskexplorer'", figures.colors.grey)}`);
     await deactivate();
@@ -421,6 +431,12 @@ export const overrideNextShowInfoBox = (value: any) =>
 export const setExplorer = (explorer: ITaskExplorer) =>
 {
     teExplorer = explorer;
+};
+
+
+export const setFailed = () =>
+{
+    hasRollingCountError = true;
 };
 
 
