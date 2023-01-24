@@ -569,7 +569,7 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.refreshCommand + (tc.slowTime.config.event * 2));
-        await executeSettingsUpdate("specialFolders.expanded.test-files", true);
+        await executeSettingsUpdate("specialFolders.expanded.project1", true);
         await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
         endRollingCount(this);
@@ -586,7 +586,7 @@ suite("Provider Tests", () =>
         await waitForTeIdle(tc.waitTime.refreshCommand);
         await teApi.testsApi.fileCache.buildTaskTypeCache("bash", (workspace.workspaceFolders as WorkspaceFolder[])[0], true, "");
         await waitForTeIdle(tc.waitTime.min);
-        await executeSettingsUpdate("specialFolders.expanded.test-files", false, tc.waitTime.config.event);
+        await executeSettingsUpdate("specialFolders.expanded.project1", false, tc.waitTime.config.event);
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
         await waitForTeIdle(tc.waitTime.refreshCommand);
         endRollingCount(this);
