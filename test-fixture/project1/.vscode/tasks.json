@@ -6,7 +6,7 @@
         {
             "label": "Say Hello Bat",
             "type": "shell",
-            "command": "${workspaceFolder}\\test-fixture\\project1\\hello.bat",
+            "command": "${workspaceFolder}\\hello.bat",
             "group": "build",
             "presentation": {
                 "echo": true,
@@ -18,7 +18,7 @@
         {
             "label": "Say Hello Cmd",
             "type": "shell",
-            "command": "${workspaceFolder}\\test-fixture\\project1\\hello.cmd",
+            "command": "${workspaceFolder}\\hello.cmd",
             "group": "build",
             "hide": true,
             "presentation": {
@@ -31,7 +31,7 @@
         {
             "label": "Say Hello Sh",
             "type": "shell",
-            "command": "${workspaceFolder}\\test-fixture\\project1\\hello.sh",
+            "command": "${workspaceFolder}\\hello.sh",
             "group": "build",
             "presentation": {
                 "echo": true,
