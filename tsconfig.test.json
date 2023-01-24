@@ -3,6 +3,6 @@
     "exclude": [
         "node_modules",
         ".vscode-test",
-        "test-files"
+        "test-fixture"
     ]
 }

@@ -4,7 +4,7 @@ import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 
 export const testControl: ITestControl =
 {   //
-    // KEEP SETTINGS FILE CHANGES (@ test-files/.vscode/workspace.json)
+    // KEEP SETTINGS FILE CHANGES (@ test-fixture/project1/.vscode/workspace.json)
     //
     keepSettingsFileChanges: false,
     //
@@ -228,7 +228,7 @@ interface ISuiteResults extends IDictionary<any>
 
 export interface ITestControl
 {   //
-    // KEEP SETTINGS FILE CHANGES (@ test-files/.vscode/workspace.json)
+    // KEEP SETTINGS FILE CHANGES (@ test-fixture/project1/.vscode/workspace.json)
     //
     keepSettingsFileChanges: boolean;
     //

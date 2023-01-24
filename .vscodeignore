@@ -12,7 +12,7 @@ src
 **/test/**
 coverage
 .coverage
-test-files
+test-fixture
 testFixture
 *.yml
 *.vsix

@@ -49,10 +49,10 @@
                 "${workspaceFolder}/dist/**/*.js"
             ],
             "args": [
+                "${workspaceFolder}/test-fixture/project1",
 				"--disable-extensions",
                 "--disable-workspace-trust",
-				"--extensionDevelopmentPath=${workspaceFolder}",
-				"${workspaceFolder}/test-files"
+				"--extensionDevelopmentPath=${workspaceFolder}"
 			]
         },
         {
@@ -66,10 +66,10 @@
                 "${workspaceFolder}/dist/**/*.js"
             ],
             "args": [
+                "${workspaceRoot}/../GEMS2",
                 "--disable-extensions",
                 "--disable-workspace-trust",
-                "--extensionDevelopmentPath=${workspaceFolder}",
-                "${workspaceRoot}/../GEMS2"
+                "--extensionDevelopmentPath=${workspaceFolder}"
             ]
         },
         {
@@ -84,10 +84,10 @@
 			"preLaunchTask": "npm: webpack-watch",
             "cwd": "${workspaceFolder}/dist",
 			"args": [
+                "${workspaceFolder}/test-fixture/project1",
 				"--disable-extensions",
                 "--disable-workspace-trust",
-				"--extensionDevelopmentPath=${workspaceFolder}",
-				"${workspaceFolder}/test-files"
+				"--extensionDevelopmentPath=${workspaceFolder}"
 			]
 		},
         {
@@ -102,7 +102,7 @@
                 "${workspaceFolder}/dist/test/**/*.js"
             ],
             "args": [
-                "${workspaceFolder}/test-files",
+                "${workspaceFolder}/test-fixture/project1",
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "--extensionTestsPath=${workspaceFolder}/dist/test/suite",
                 "--disable-extensions",

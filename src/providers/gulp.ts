@@ -192,7 +192,7 @@ export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplor
         //
         // Sample Output of gulp --tasks :
         //
-        //     [13:17:46] Tasks for C:\Projects\vscode-taskexplorer\test-files\gulpfile.js
+        //     [13:17:46] Tasks for C:\Projects\vscode-taskexplorer\test-fixture\project1\gulpfile.js
         //     [13:17:46] ├── hello
         //     [13:17:46] └── build:test
         //

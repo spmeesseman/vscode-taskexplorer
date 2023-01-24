@@ -205,7 +205,7 @@ suite("Multi-Root Workspace Tests", () =>
         {   //
             // See note below.  Can't figuer out how to get VSCode to return the fake ws folder tasks
             //
-            return wsf[uri.fsPath.includes("test-files") ? 0 : 1];
+            return wsf[uri.fsPath.includes("test-fixture") ? 0 : 1];
         };
         await testsApi.onWsFoldersChange({
             added: [ wsf[1] ],

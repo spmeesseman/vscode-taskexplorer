@@ -23,7 +23,7 @@
         "node_modules",
         ".vscode-test",
         ".vscode",
-        "test-files",
+        "test-fixture",
         "tools",
         "types",
         "src/test",

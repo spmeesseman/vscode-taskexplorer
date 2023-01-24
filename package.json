@@ -1723,7 +1723,7 @@
                         "**/static/**",
                         "**/target/**",
                         "**/test/**",
-                        "**/test-files/**",
+                        "**/test-fixture/**",
                         "**/third_party/**",
                         "**/vendor/**",
                         "**/work/**"
