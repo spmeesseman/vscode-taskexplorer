@@ -512,15 +512,16 @@ export function showMaxTasksReachedMessage(licMgr: ILicenseManager, taskType?: s
 {
     if (force || ((!maxTasksMessageShown && !taskType) || (taskType && !maxTaskTypeMessageShown[taskType] && Object.keys(maxTaskTypeMessageShown).length < 3)))
     {
+        maxTasksMessageShown = true;
+        licMgr.setMaxTasksReached(true);
+        if (taskType)
+        {
+            maxTaskTypeMessageShown[taskType] = true;
+        }
         const msg = `The max # of parsed ${taskType ?? ""} tasks in un-licensed mode has been reached`;
         return window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now")
 		.then(async (action) =>
 		{
-            licMgr.setMaxTasksReached(true);
-            if (taskType)
-            {
-                maxTaskTypeMessageShown[taskType] = true;
-            }
 			if (action === "Enter License Key")
 			{
 				await commands.executeCommand("taskExplorer.enterLicense");
@@ -531,7 +532,6 @@ export function showMaxTasksReachedMessage(licMgr: ILicenseManager, taskType?: s
 			}
 		});
     }
-    maxTasksMessageShown = true;
 }
 
 
