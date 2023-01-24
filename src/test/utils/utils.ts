@@ -299,14 +299,15 @@ export const endRollingCount = (instance: Mocha.Context, isSetup?: boolean) =>
 };
 
 
-export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean) =>
+export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean, isTeardown?: boolean) =>
 {
 
-    const mTest = (!isSetup ? instance.test : instance.currentTest) as Mocha.Runnable,
+    const mTest = (!isSetup && !isTeardown ? instance.test : instance.currentTest) as Mocha.Runnable,
           suite = mTest.parent as Mocha.Suite,
           suiteKey = getSuiteKey(suite.title),
           suiteResults = tc.tests.suiteResults[suiteKey],
-          testIdx = !isSetup ? suite.tests.findIndex(t => t.title === mTest.title && !t.isFailed() && !t.isPassed()) : undefined;
+          testIdx = !isSetup && !isTeardown ? suite.tests.findIndex(t => t.title === mTest.title && !t.isFailed() && !t.isPassed()) :
+                                              (isSetup ? undefined : (suiteResults ? suite.tests.length : undefined));
 
     try
     {
@@ -314,7 +315,7 @@ export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean) =>
     }
     catch (e: any)
     {
-        const msg = `skip test ${testIdx} due to rolling success count failure`;
+        const msg = `skip test ${(testIdx || -1) + 1} due to rolling success count failure`;
         console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
         hasRollingCountError = true;
         if (suite.tests.filter(t => t.isFailed).length === 0) {
@@ -322,7 +323,7 @@ export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean) =>
         }
     }
 
-    return hasRollingCountError;
+    return !isTeardown ? hasRollingCountError : !suiteResults && hasRollingCountError;
 };
 
 

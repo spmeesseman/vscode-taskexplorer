@@ -9,7 +9,7 @@ import { GradleTaskProvider } from "../../providers/gradle";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, executeSettingsUpdate, exitRollingCount, getWsPath, needsTreeBuild,
-    testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
+    suiteFinished, testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "gradle";
@@ -37,6 +37,8 @@ suite("Gradle Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
+        suiteFinished(this);
     });
 
 

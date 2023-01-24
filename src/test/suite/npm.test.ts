@@ -29,6 +29,7 @@ suite("NPM Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (utils.exitRollingCount(this, false, true)) return;
         if (packageJsonPath)
         {
             const packageLockJsonPath = packageJsonPath.replace(".", "-lock.");

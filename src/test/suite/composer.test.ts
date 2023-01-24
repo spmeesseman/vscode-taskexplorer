@@ -39,6 +39,7 @@ suite("Composer Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         await fsApi.deleteDir(dirName);
         suiteFinished(this);
     });

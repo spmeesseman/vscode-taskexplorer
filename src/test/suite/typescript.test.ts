@@ -40,6 +40,7 @@ suite("Typescript Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (utils.exitRollingCount(this, false, true)) return;
         await utils.closeActiveDocument();
         if (await pathExists(fileUri.fsPath)) {
             await fsApi.deleteFile(fileUri.fsPath);

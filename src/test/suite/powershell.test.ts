@@ -48,6 +48,7 @@ suite("Powershell Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram, tc.waitTime.config.globEvent);
         await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, tc.waitTime.config.enableEvent);
         await fsApi.deleteFile(fileUri.fsPath);

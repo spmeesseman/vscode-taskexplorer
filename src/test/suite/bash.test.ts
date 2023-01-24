@@ -43,9 +43,8 @@ suite("Bash Tests", () =>
 
 
     suiteTeardown(async function()
-    {   //
-        // Reset settings
-        //
+    {
+        if (exitRollingCount(this, false, true)) return;
         await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, testControl.waitTime.config.enableEvent);
         await fsApi.deleteDir(dirName);
         suiteFinished(this);

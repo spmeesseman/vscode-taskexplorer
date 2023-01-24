@@ -45,6 +45,7 @@ suite("Ant Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         await fsApi.writeFile(buildXmlFileUri.fsPath, buildFileXml);
         await executeSettingsUpdate("useAnt", false);
         suiteFinished(this);

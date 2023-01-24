@@ -24,6 +24,7 @@ suite("File Cache Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (utils.exitRollingCount(this, false, true)) return;
         await utils.executeSettingsUpdate("enablePersistentFileCaching", false);
         await testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);

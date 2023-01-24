@@ -20,6 +20,7 @@ suite("Tree Grouping Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         if (getSuccessCount(this) < 10) {
             await executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.config.groupingEvent);
             await executeSettingsUpdate("groupSeparator", "-", tc.waitTime.config.groupingEvent);

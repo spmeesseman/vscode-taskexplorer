@@ -40,6 +40,7 @@ suite("Util Tests", () =>
 
 	suiteTeardown(async function()
 	{
+        if (exitRollingCount(this, false, true)) return;
 		log.setWriteToConsole(testControl.log.console, testControl.log.consoleLevel);
 		await executeSettingsUpdate("logging.enable", testControl.log.enabled);
 		await executeSettingsUpdate("logging.enableFile", testControl.log.file);

@@ -57,6 +57,7 @@ suite("License Manager Tests", () =>
 
 	suiteTeardown(async function()
     {
+        if (utils.exitRollingCount(this, false, true)) return;
 		teApi.setTests(true);
 		licMgr?.dispose();
 		await utils.closeActiveDocument();

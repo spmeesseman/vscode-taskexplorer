@@ -40,6 +40,7 @@ suite("Task Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (utils.exitRollingCount(this, false, true)) return;
         await utils.executeSettingsUpdate("taskButtons.clickAction", clickAction);
         utils.suiteFinished(this);
     });

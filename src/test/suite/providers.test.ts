@@ -51,6 +51,7 @@ suite("Provider Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
         await waitForTeIdle(tc.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", tc.log.enabled, tc.waitTime.config.event);

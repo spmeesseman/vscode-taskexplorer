@@ -39,6 +39,7 @@ suite("Tree Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (utils.exitRollingCount(this, false, true)) return;
         utils.suiteFinished(this);
     });
 

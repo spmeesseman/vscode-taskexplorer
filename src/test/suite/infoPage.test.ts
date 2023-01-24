@@ -33,6 +33,7 @@ suite("Info Report Tests", () =>
 
 	suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
 		teApi.explorer = origExplorer;
 		teApi.sidebar = origSidebar;
 		await closeActiveDocument();

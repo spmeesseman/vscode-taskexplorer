@@ -9,7 +9,7 @@ import { GradleTaskProvider } from "../../providers/gradle";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
-    needsTreeBuild, testControl as tc, testInvDocPositions, verifyTaskCount, waitForTeIdle
+    needsTreeBuild, suiteFinished, testControl as tc, testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "pipenv";
@@ -40,7 +40,9 @@ suite("Pipenv Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         await fsApi.deleteDir(dirName);
+        suiteFinished(this);
     });
 
 

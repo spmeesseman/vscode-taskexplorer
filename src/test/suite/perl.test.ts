@@ -36,6 +36,7 @@ suite("Perl Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         suiteFinished(this);
     });
 

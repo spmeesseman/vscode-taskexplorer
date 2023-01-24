@@ -41,6 +41,7 @@ suite("Configuration / Settings Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         testsApi.enableConfigWatcher(false);
         try {
             const successCount = getSuccessCount(this);

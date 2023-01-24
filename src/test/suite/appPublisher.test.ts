@@ -40,6 +40,7 @@ suite("App-Publisher Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         await fsApi.deleteFile(fileUri.fsPath);
         suiteFinished(this);
     });

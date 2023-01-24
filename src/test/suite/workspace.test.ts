@@ -29,6 +29,7 @@ suite("Workspace / VSCode Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         await teApi.config.updateWs("showHiddenWsTasks", wsEnable);
         suiteFinished(this);
     });

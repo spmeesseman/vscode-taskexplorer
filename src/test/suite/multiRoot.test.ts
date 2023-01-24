@@ -83,6 +83,7 @@ suite("Multi-Root Workspace Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
         await fsApi.deleteDir(wsf1DirName);
         await fsApi.deleteDir(wsf2DirName);

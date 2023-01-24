@@ -48,6 +48,7 @@ suite("Maven Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (exitRollingCount(this, false, true)) return;
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
         suiteFinished(this);
     });

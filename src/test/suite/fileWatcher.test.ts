@@ -73,6 +73,7 @@ suite("File Watcher Tests", () =>
 
     suiteTeardown(async function()
     {
+        if (utils.exitRollingCount(this, false, true)) return;
         await fsApi.deleteDir(insideWsDir);
         await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await fsApi.deleteDir(insideWsDirIgn);
