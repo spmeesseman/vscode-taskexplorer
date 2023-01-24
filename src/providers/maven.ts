@@ -3,7 +3,7 @@ import log from "../lib/log/log";
 import { parseStringPromise } from "xml2js";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
-import { getRelativePath } from "../lib/utils/utils";
+import { getRelativePath } from "../lib/utils/pathUtils";
 import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";

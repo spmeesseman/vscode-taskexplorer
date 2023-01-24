@@ -3,7 +3,7 @@ import log from "../lib/log/log";
 import constants from "../lib/constants";
 import { basename, dirname, sep, extname } from "path";
 import { TaskExplorerProvider } from "./provider";
-import { getRelativePath } from "../lib/utils/utils";
+import { getRelativePath } from "../lib/utils/pathUtils";
 import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { pathExistsSync, readFileSync } from "../lib/utils/fs";

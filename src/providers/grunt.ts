@@ -3,7 +3,7 @@ import log from "../lib/log/log";
 import { basename, dirname } from "path";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
-import { getRelativePath } from "../lib/utils/utils";
+import { getRelativePath } from "../lib/utils/pathUtils";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 

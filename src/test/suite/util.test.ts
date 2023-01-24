@@ -4,6 +4,7 @@
 
 import * as afs from "../../lib/utils/fs";
 import * as util from "../../lib/utils/utils";
+import * as pathUtils from "../../lib/utils/pathUtils";
 import log, { logControl } from "../../lib/log/log";
 import { join } from "path";
 import { expect } from "chai";
@@ -408,7 +409,7 @@ suite("Util Tests", () =>
         if (exitRollingCount(this)) return;
         new InitScripts(); // it won't cover since no focus the view until after a bunch of test suites
         teApi.testsApi.explorer.isVisible();
-        await util.getInstallPath();
+        await pathUtils.getInstallPath();
         endRollingCount(this);
     });
 
@@ -443,7 +444,7 @@ suite("Util Tests", () =>
         util.removeFromArray(arr, 1);
         expect(arr.length).to.be.equal(3);
 
-        expect(util.getCwd(rootUri)).to.not.be.equal(undefined);
+        expect(pathUtils.getCwd(rootUri)).to.not.be.equal(undefined);
         expect (util.getGroupSeparator()).to.be.equal("-");
 
 		expect(util.lowerCaseFirstChar("s", true)).to.be.equal("s");
@@ -502,26 +503,26 @@ suite("Util Tests", () =>
 		// path get here for linux and mac for increased coverage since we're only
 		// running the tests in a windows machine for release right now with ap.
 		//
-		let dataPath: string | undefined = util.getUserDataPath("darwin");
-		dataPath = util.getUserDataPath("linux");
+		let dataPath: string | undefined = pathUtils.getUserDataPath("darwin");
+		dataPath = pathUtils.getUserDataPath("linux");
 
-		util.getPortableDataPath();
+		pathUtils.getPortableDataPath();
 
 		//
 		// Simulate --user-data-dir vscode command line option
 		//
 		const oArgv = process.argv;
 		process.argv = [ "--user-data-dir", dataPath ];
-		dataPath = util.getUserDataPath("linux");
-		dataPath = util.getUserDataPath("win32");
-		dataPath = util.getUserDataPath("darwin");
+		dataPath = pathUtils.getUserDataPath("linux");
+		dataPath = pathUtils.getUserDataPath("win32");
+		dataPath = pathUtils.getUserDataPath("darwin");
 
 		//
-		// 0 args, which would probably never happen but the util.getUserDataPath() call
+		// 0 args, which would probably never happen but the pathUtils.getUserDataPath() call
 		// handles it an ;et's cover it
 		//
 		process.argv = [];
-		dataPath = util.getUserDataPath("win32");
+		dataPath = pathUtils.getUserDataPath("win32");
 
 		//
 		// Save current environment
@@ -534,10 +535,10 @@ suite("Util Tests", () =>
 		//
 		// Set environment variables for specific test
 		//
-		process.env.VSCODE_PORTABLE = util.getUserDataPath("win32");
+		process.env.VSCODE_PORTABLE = pathUtils.getUserDataPath("win32");
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "test";
-		dataPath = util.getUserDataPath("win32");
+		dataPath = pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1\\test\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
@@ -546,7 +547,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = dataPath;
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
-		dataPath = util.getUserDataPath("nothing");
+		dataPath = pathUtils.getUserDataPath("nothing");
 		expect(dataPath).to.be.oneOf([ `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1`, "C:\\Code\\data\\user-data\\User\\user-data\\User" ]);
 		//
 		// Set environment variables for specific test
@@ -554,7 +555,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = undefined;
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
-		dataPath = util.getUserDataPath("win32");
+		dataPath = pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal("C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
 		//
 		// Set environment variables for specific test
@@ -562,7 +563,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = "c:\\some\\invalid\\path";
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
-		dataPath = util.getUserDataPath("win32");
+		dataPath = pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal("C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
 		//
 		// Set environment variables for specific test
@@ -570,7 +571,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
-		dataPath = util.getUserDataPath("win32");
+		dataPath = pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
 		//
 		// Set environment variables for specific test
@@ -578,7 +579,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = "";
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
-		dataPath = util.getUserDataPath("win32");
+		dataPath = pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
@@ -587,38 +588,38 @@ suite("Util Tests", () =>
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
 		process.env.VSCODE_APPDATA = "";
-		dataPath = util.getUserDataPath("linux");
+		dataPath = pathUtils.getUserDataPath("linux");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1\\.config\\vscode`);
-		dataPath = util.getUserDataPath("win32");
+		dataPath = pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1\\AppData\\Roaming\\vscode`);
-		dataPath = util.getUserDataPath("darwin");
+		dataPath = pathUtils.getUserDataPath("darwin");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1\\Library\\Application Support\\vscode`);
-		dataPath = util.getUserDataPath("invalid_platform");
+		dataPath = pathUtils.getUserDataPath("invalid_platform");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1`);
 		//
 		// Set environment variables for specific test
 		//
 		process.env.VSCODE_APPDATA = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
-		dataPath = util.getUserDataPath("linux");
+		dataPath = pathUtils.getUserDataPath("linux");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
-		dataPath = util.getUserDataPath("win32");
+		dataPath = pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
-		dataPath = util.getUserDataPath("darwin");
+		dataPath = pathUtils.getUserDataPath("darwin");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
-		dataPath = util.getUserDataPath("invalid_platform");
+		dataPath = pathUtils.getUserDataPath("invalid_platform");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
 		//
 		// Set portable / invalid platform
 		//
 		process.env.VSCODE_PORTABLE = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
-		dataPath = util.getUserDataPath("invalid_platform");
+		dataPath = pathUtils.getUserDataPath("invalid_platform");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
 		//
 		// Empty platform
 		//
-		dataPath = util.getUserDataPath("");
+		dataPath = pathUtils.getUserDataPath("");
 		process.env.VSCODE_PORTABLE = "";
-		dataPath = util.getUserDataPath("");
+		dataPath = pathUtils.getUserDataPath("");
 		//
 		//
 		// Restore process argv

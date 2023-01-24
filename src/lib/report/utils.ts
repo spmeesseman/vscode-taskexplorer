@@ -1,9 +1,10 @@
 import { join } from "path";
-import { ITaskExplorerApi } from "../../interface";
 import { getTaskFiles } from "../fileCache";
 import { readFileAsync } from "../utils/fs";
+import { ITaskExplorerApi } from "../../interface";
+import { getInstallPath } from "../utils/pathUtils";
 import { commands, Disposable, Task, ViewColumn, window, workspace } from "vscode";
-import { getInstallPath, getPackageManager, getTaskTypes, lowerCaseFirstChar } from "../utils/utils";
+import { getPackageManager, getTaskTypes, lowerCaseFirstChar } from "../utils/utils";
 
 
 export const createTaskCountTable = async (api: ITaskExplorerApi, tasks: Task[], title: string, project?: string) =>

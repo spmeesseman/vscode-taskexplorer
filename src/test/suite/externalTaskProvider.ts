@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as path from "path";
-import * as util from "../../lib/utils/utils";
 import constants from "../../lib/constants";
-import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
+import { getRelativePath } from "../../lib/utils/pathUtils";
 import { IExternalProvider, ITaskDefinition } from "../../interface";
+import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 // import { ExternalExplorerProvider, TaskExplorerDefinition } from "@spmeesseman/vscode-taskexplorer-types";
 //  Test bombs with this reference ^^^
 
@@ -24,7 +24,7 @@ export class ExternalTaskProvider extends IExternalProvider implements IExternal
             script: target,
             target,
             icon: undefined,
-            path: util.getRelativePath(folder, uri),
+            path: getRelativePath(folder, uri),
             fileName: path.basename(uri.path),
             uri
         };

@@ -2,7 +2,7 @@
 import log from "../lib/log/log";
 import { basename, dirname } from "path";
 import { IDictionary } from "../interface";
-import { getRelativePath } from "../lib/utils/utils";
+import { getRelativePath } from "../lib/utils/pathUtils";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
 import { ITaskDefinition } from "../interface/ITaskDefinition";

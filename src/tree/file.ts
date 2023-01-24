@@ -3,8 +3,9 @@ import * as path from "path";
 import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import TaskFolder  from "./folder";
-import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface";
 import { pathExistsSync } from "../lib/utils/fs";
+import { getUserDataPath } from "../lib/utils/pathUtils";
+import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface";
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } from "vscode";
 
 
@@ -147,7 +148,7 @@ export default class TaskFile extends TreeItem implements ITaskFile
          // No resource uri means this file is 'user tasks', and not associated to a workspace folder
         //
         else {
-            this.resourceUri = Uri.file(path.join(util.getUserDataPath(undefined, logPad), this.fileName));
+            this.resourceUri = Uri.file(path.join(getUserDataPath(undefined, logPad), this.fileName));
             this.isUser = true;
         }
 

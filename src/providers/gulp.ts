@@ -3,12 +3,13 @@ import log from "../lib/log/log";
 import { exec } from "child_process";
 import { basename, dirname } from "path";
 import { promisify } from "util";
+import { timeout } from "../lib/utils/utils";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
+import { getRelativePath } from "../lib/utils/pathUtils";
 import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
-import { getRelativePath, timeout } from "../lib/utils/utils";
 
 
 export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider

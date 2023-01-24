@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as path from "path";
-import * as util from "../../lib/utils/utils";
 import constants from "../../lib/constants";
+import { getRelativePath } from "../../lib/utils/pathUtils";
 import { Task, WorkspaceFolder, ShellExecution, Uri } from "vscode";
 import { IExternalProvider, ITaskDefinition } from "../../interface";
 
@@ -19,7 +19,7 @@ export class ExternalTaskProviderBase extends IExternalProvider implements IExte
             script: target,
             target,
             icon: undefined,
-            path: util.getRelativePath(folder, uri),
+            path: getRelativePath(folder, uri),
             fileName: path.basename(uri.path),
             uri
         };
