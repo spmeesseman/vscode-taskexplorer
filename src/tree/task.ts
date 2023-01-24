@@ -402,6 +402,7 @@ export const stop = async(tree: TaskTreeDataProvider, taskItem: TaskItem) =>
         if (configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
         {
             const terminal = getTerminal(taskItem, "   ");
+            /* istanbul ignore else */
             if (terminal)
             {
                 const ctrlChar = configuration.get<string>("taskButtons.controlCharacter", "Y");

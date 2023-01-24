@@ -5,16 +5,15 @@
 import * as afs from "../../lib/utils/fs";
 import * as util from "../../lib/utils/utils";
 import log, { logControl } from "../../lib/log/log";
-import { expect } from "chai";
 import { join } from "path";
+import { expect } from "chai";
+import { InitScripts } from "../../lib/noScripts";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-	activate, executeSettingsUpdate, overrideNextShowInputBox, testControl,
-	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount, getWsPath, endRollingCount
+	activate, executeSettingsUpdate, testControl, logErrorsAreFine, executeTeCommand,
+	suiteFinished, exitRollingCount, getWsPath, endRollingCount
 } from "../utils/utils";
-import { InitScripts } from "../../lib/noScripts";
-import { getLicenseManager } from "../../extension";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
@@ -417,6 +416,7 @@ suite("Util Tests", () =>
     test("Utilities", async function()
     {
         if (exitRollingCount(this)) return;
+		this.slow((testControl.slowTime.config.event * 2) + 50);
 
         util.timeout(10);
 
@@ -489,18 +489,6 @@ suite("Util Tests", () =>
 		util.isObjectEmpty("aaa" as unknown as object);
 		util.isObjectEmpty("" as unknown as object);
 		util.isObjectEmpty(undefined as unknown as object);
-
-		const licMgr = getLicenseManager();
-		overrideNextShowInputBox("ok");
-		util.showMaxTasksReachedMessage(licMgr);
-		overrideNextShowInputBox("ok");
-		util.showMaxTasksReachedMessage(licMgr, "npm");
-		overrideNextShowInputBox("ok");
-		util.showMaxTasksReachedMessage(licMgr, "ant");
-		overrideNextShowInputBox("ok");
-		util.showMaxTasksReachedMessage(licMgr, "gulp");
-		overrideNextShowInputBox("ok");
-		util.showMaxTasksReachedMessage(licMgr, "grunt");
 
         endRollingCount(this);
 	});

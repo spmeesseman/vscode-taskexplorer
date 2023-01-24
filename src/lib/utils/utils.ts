@@ -508,14 +508,19 @@ export function removeFromArray(arr: any[], item: any)
 
 let maxTasksMessageShown = false;
 const maxTaskTypeMessageShown: any = {};
-export function showMaxTasksReachedMessage(licMgr: ILicenseManager, taskType?: string)
+export function showMaxTasksReachedMessage(licMgr: ILicenseManager, taskType?: string, force?: boolean)
 {
-    if ((!maxTasksMessageShown && !taskType) || (taskType && !maxTaskTypeMessageShown[taskType] && Object.keys(maxTaskTypeMessageShown).length < 3))
+    if (force || ((!maxTasksMessageShown && !taskType) || (taskType && !maxTaskTypeMessageShown[taskType] && Object.keys(maxTaskTypeMessageShown).length < 3)))
     {
         const msg = `The max # of parsed ${taskType ?? ""} tasks in un-licensed mode has been reached`;
-        window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now")
+        return window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now")
 		.then(async (action) =>
 		{
+            licMgr.setMaxTasksReached(true);
+            if (taskType)
+            {
+                maxTaskTypeMessageShown[taskType] = true;
+            }
 			if (action === "Enter License Key")
 			{
 				await commands.executeCommand("taskExplorer.enterLicense");
@@ -525,16 +530,9 @@ export function showMaxTasksReachedMessage(licMgr: ILicenseManager, taskType?: s
 				await commands.executeCommand("taskExplorer.viewLicense");
 			}
 		});
-        if (taskType) {
-            maxTaskTypeMessageShown[taskType] = true;
-        }
     }
     maxTasksMessageShown = true;
-    licMgr.setMaxTasksReached(true);
 }
 
 
-export function timeout(ms: number)
-{
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+export const timeout = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

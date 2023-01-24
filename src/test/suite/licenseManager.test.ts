@@ -2,7 +2,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as utils from "../utils/utils";
-import figures from "../../lib/figures";
 import { expect } from "chai";
 import { ChildProcess, fork } from "child_process";
 import { ILicenseManager } from "../../interface/ILicenseManager";
@@ -708,9 +707,27 @@ suite("License Manager Tests", () =>
 	});
 
 
+	test("Enter Valid License Key After Max Task Count Reached", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
+        if (licMgr)
+		{
+			this.slow(testControl.slowTime.refreshCommand);
+			const licenseKey = await licMgr.getLicenseKey();
+			await teApi.testsApi.storage.update("lastLicenseNag", undefined);
+			utils.overrideNextShowInfoBox("Enter License Key");
+			utils.overrideNextShowInputBox("1234-5678-9098-7654321");
+			utils.overrideNextShowInfoBox(undefined);
+			await licMgr.enterLicenseKey();
+			await licMgr.setLicenseKey(licenseKey);
+		}
+        utils.endRollingCount(this);
+	});
+
+
 	test("Reset Max Limits (Non-Licensed)", async function()
 	{
-        // Don't utils.exitRollingCount(this)
+        if (utils.exitRollingCount(this)) return;
 		if (licMgr)
 		{
 			this.slow(testControl.slowTime.refreshCommand);
@@ -723,6 +740,32 @@ suite("License Manager Tests", () =>
 			});
 			await utils.treeUtils.refresh();
 		}
+        utils.endRollingCount(this);
+	});
+
+
+    test("Max Task Reached MessageBox", async function()
+    {
+        if (utils.exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.licenseMgr.enterKey);
+		utils.clearOverrideShowInfoBox();
+		utils.clearOverrideShowInputBox();
+		utils.overrideNextShowInfoBox("Enter License Key");
+		utils.overrideNextShowInputBox(undefined);
+		await teApi.utilities.showMaxTasksReachedMessage(licMgr, undefined, true);
+		utils.overrideNextShowInfoBox("Info");
+		await teApi.utilities.showMaxTasksReachedMessage(licMgr, "npm", true);
+		utils.overrideNextShowInfoBox("Not Now");
+		await teApi.utilities.showMaxTasksReachedMessage(licMgr, "ant", true);
+		utils.overrideNextShowInfoBox(undefined);
+		await teApi.utilities.showMaxTasksReachedMessage(licMgr, "gulp", true);
+		utils.overrideNextShowInfoBox("Enter License Key");
+		utils.overrideNextShowInputBox(undefined);
+		await teApi.utilities.showMaxTasksReachedMessage(licMgr, "grunt", true);
+		utils.overrideNextShowInfoBox("Info");
+		await teApi.utilities.showMaxTasksReachedMessage(licMgr, "grunt", true);
+		utils.overrideNextShowInfoBox("Info");
+		await teApi.utilities.showMaxTasksReachedMessage(licMgr);
         utils.endRollingCount(this);
 	});
 
