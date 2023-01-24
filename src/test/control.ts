@@ -62,7 +62,7 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 3200,
+        addWorkspaceFolder: 3100,
         buildTreeNoTasks: 295,
         cache: {
             build: 600,
@@ -91,26 +91,26 @@ export const testControl: ITestControl =
             readEvent: 25,
             sortingEvent: 700
         },
-        excludeCommand: 1500,
+        excludeCommand: 1490,
         explorerViewStartup: 7575,
-        fetchTasksCommand: 1880,
+        fetchTasksCommand: 1860,
         fileCachePersist: 275,
-        findTaskPosition: 440,
-        findTaskPositionDocOpen: 50,
+        findTaskPosition: 420,
+        findTaskPositionDocOpen: 45,
         focusCommand: 2340,
         focusCommandAlreadyFocused: 320,
         focusCommandChangeViews: 90,
         fs: {
-            createEvent: 1600,
+            createEvent: 1605,
             createEventTsc: 1750,
             createFolderEvent: 1650,
-            deleteEvent: 1340,
+            deleteEvent: 1345,
             deleteEventTsc: 1630,
             deleteFolderEvent: 1440,
             modifyEvent: 960,
         },
-        getTreeTasks: 195,
-        getTreeTasksNpm: 520, // npm task provider is slower than shit on a turtle
+        getTreeTasks: 190,
+        getTreeTasksNpm: 510, // npm task provider is slower than shit on a turtle
         licenseMgr: {
             page: 150,
             pageWithDetail: 325,
@@ -124,9 +124,9 @@ export const testControl: ITestControl =
             setLicenseCmd: 210
         },
         min: 50,
-        refreshCommand: 7720,
+        refreshCommand: 7700,
         refreshCommandNoChanges: 250,
-        removeWorkspaceFolder: 2500,
+        removeWorkspaceFolder: 2400,
         runCommand: 4900,
         runPauseCommand: 3255,
         runStopCommand: 3510,
@@ -135,26 +135,26 @@ export const testControl: ITestControl =
         storageSecretRead: 90,
         storageSecretUpdate: 195,
         taskCommand: 1250,
-        taskCommandStartupMax: 3700,
+        taskCommandStartupMax: 3600,
         taskProviderReadUri: 90,
         tasks: {
-            antParser: 710,
-            antTask: 5340,
-            antTaskWithAnsicon: 5390,
+            antParser: 700,
+            antTask: 5140,
+            antTaskWithAnsicon: 5190,
             bashScript: 3025,
             batchScriptBat: 4250,
             batchScriptCmd: 5250,
-            gulpParser: 3875,
+            gulpParser: 3870,
             npmCommand: 12300,
             npmCommandPkg: 9700,
             npmInstallCommand: 12900
         },
         taskCount: {
-            verify: 530,
-            verifyByTree: 580,
-            verifyFirstCall: 840,
-            verifyNpm: 1900, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 2200,
+            verify: 525,
+            verifyByTree: 575,
+            verifyFirstCall: 825,
+            verifyNpm: 1800, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 2100,
         },
         viewReport: 410
     },
