@@ -8,8 +8,9 @@ import { homedir } from "os";
 import { configuration } from "./configuration";
 import { pathExists, pathExistsSync } from "./fs";
 import { basename, dirname, extname, join, resolve, sep } from "path";
-import { WorkspaceFolder, Uri, workspace, window } from "vscode";
+import { WorkspaceFolder, Uri, workspace, window, commands } from "vscode";
 import TaskFile from "../../tree/file";
+import { ILicenseManager } from "../../interface/ILicenseManager";
 
 
 /**
@@ -507,16 +508,29 @@ export function removeFromArray(arr: any[], item: any)
 
 let maxTasksMessageShown = false;
 const maxTaskTypeMessageShown: any = {};
-export function showMaxTasksReachedMessage(taskType?: string)
+export function showMaxTasksReachedMessage(licMgr: ILicenseManager, taskType?: string)
 {
     if ((!maxTasksMessageShown && !taskType) || (taskType && !maxTaskTypeMessageShown[taskType] && Object.keys(maxTaskTypeMessageShown).length < 3))
     {
-        window.showInformationMessage(`The max # of parsed ${taskType ?? ""} tasks in un-licensed mode has been reached`);
+        const msg = `The max # of parsed ${taskType ?? ""} tasks in un-licensed mode has been reached`;
+        window.showInformationMessage(msg, "Enter License Key", "Info", "Not Now")
+		.then(async (action) =>
+		{
+			if (action === "Enter License Key")
+			{
+				await commands.executeCommand("taskExplorer.enterLicense");
+			}
+			else if (action === "Info")
+			{
+				await commands.executeCommand("taskExplorer.viewLicense");
+			}
+		});
         if (taskType) {
             maxTaskTypeMessageShown[taskType] = true;
         }
     }
     maxTasksMessageShown = true;
+    licMgr.setMaxTasksReached(true);
 }
 
 

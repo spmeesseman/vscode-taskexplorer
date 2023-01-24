@@ -961,7 +961,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     ctRmv = this.tasks.length - maxTasks;
                     log.write(`      removing ${ctRmv} tasks, max count reached (no license)`, logLevel + 2, logPad);
                     this.tasks.splice(maxTasks, ctRmv);
-                    util.showMaxTasksReachedMessage();
+                    util.showMaxTasksReachedMessage(licMgr);
                 }
                 log.write("   finished license manager restriction check", logLevel + 1, logPad);
                 //

@@ -98,7 +98,7 @@ export async function addFolder(folder: Uri, logPad: string)
                             maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
                             if (maxFiles <= 0)
                             {
-                                util.showMaxTasksReachedMessage();
+                                util.showMaxTasksReachedMessage(licMgr);
                                 log.write(`      Max files limit (${licMgr.getMaxNumberOfTaskFiles()}) already reached (no license)`, 2, logPad);
                                 finishBuild();
                                 return numFilesFound;
@@ -318,7 +318,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
                 maxFiles = licMgr.getMaxNumberOfTaskFiles() - cachedFileCount;
                 if (maxFiles <= 0) {
                     log.write(`   Max files limit (${licMgr.getMaxNumberOfTaskFiles()}) already reached (no license)`, 2, logPad);
-                    util.showMaxTasksReachedMessage();
+                    util.showMaxTasksReachedMessage(licMgr);
                     return numFilesFound;
                 }
                 log.write(`   Set max files to scan at ${maxFiles} files (no license)`, 3, logPad);

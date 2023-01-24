@@ -79,7 +79,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                     rmvCount = this.cachedTasks.length - maxTasks;
                     log.write(`   removing ${rmvCount} tasks, max ${ this.providerName} task count reached (no license)`, 1, TaskExplorerProvider.logPad + "   ", this.logQueueId);
                     this.cachedTasks.splice(maxTasks, rmvCount);
-                    showMaxTasksReachedMessage(getTaskTypeFriendlyName(this.providerName, true));
+                    showMaxTasksReachedMessage(licMgr, getTaskTypeFriendlyName(this.providerName, true));
                 }
             }
         }

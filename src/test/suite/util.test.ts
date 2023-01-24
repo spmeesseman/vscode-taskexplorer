@@ -14,6 +14,7 @@ import {
 	logErrorsAreFine, executeTeCommand, suiteFinished, exitRollingCount, getWsPath, endRollingCount
 } from "../utils/utils";
 import { InitScripts } from "../../lib/noScripts";
+import { getLicenseManager } from "../../extension";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
@@ -489,16 +490,17 @@ suite("Util Tests", () =>
 		util.isObjectEmpty("" as unknown as object);
 		util.isObjectEmpty(undefined as unknown as object);
 
+		const licMgr = getLicenseManager();
 		overrideNextShowInputBox("ok");
-		util.showMaxTasksReachedMessage();
+		util.showMaxTasksReachedMessage(licMgr);
 		overrideNextShowInputBox("ok");
-		util.showMaxTasksReachedMessage("npm");
+		util.showMaxTasksReachedMessage(licMgr, "npm");
 		overrideNextShowInputBox("ok");
-		util.showMaxTasksReachedMessage("ant");
+		util.showMaxTasksReachedMessage(licMgr, "ant");
 		overrideNextShowInputBox("ok");
-		util.showMaxTasksReachedMessage("gulp");
+		util.showMaxTasksReachedMessage(licMgr, "gulp");
 		overrideNextShowInputBox("ok");
-		util.showMaxTasksReachedMessage("grunt");
+		util.showMaxTasksReachedMessage(licMgr, "grunt");
 
         endRollingCount(this);
 	});

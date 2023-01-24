@@ -12,6 +12,7 @@ export interface ILicenseManager
     getWebviewPanel: () => WebviewPanel | undefined;
     isLicensed: () => boolean;
     setLicenseKey: (licenseKey: string | undefined) => Promise<void>;
+    setMaxTasksReached: (maxReached: boolean) => void;
     setTasks: (tasks: Task[], logPad?: string) => Promise<void>;
     setTestData(taskCounts: any): void;
 }

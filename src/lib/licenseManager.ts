@@ -22,6 +22,7 @@ export class LicenseManager implements ILicenseManager
 	private licensed = false;
 	private version: string;
 	private numTasks = 0;
+	private maxTasksReached = false;
 	private panel: WebviewPanel | undefined;
 	private teApi: ITaskExplorerApi;
 	private context: ExtensionContext;
@@ -120,7 +121,7 @@ export class LicenseManager implements ILicenseManager
 			}
 			else if (action === "Info")
 			{
-				await commands.executeCommand("taskExplorer.viewReport");
+				await commands.executeCommand("taskExplorer.viewLicense");
 			}
 		});
 	};
@@ -133,6 +134,12 @@ export class LicenseManager implements ILicenseManager
 			const input = await window.showInputBox(opts);
 			if (input) {
 				this.licensed = await this.validateLicense(input);
+				if (this.licensed) {
+					window.showInformationMessage("License key validated, thank you for your support!");
+					if (this.maxTasksReached) {
+						await commands.executeCommand("taskExplorer.refresh");
+					}
+				}
 			}
 		}
 		catch (e) {}
@@ -163,6 +170,12 @@ export class LicenseManager implements ILicenseManager
 	setLicenseKey = async (licenseKey: string | undefined) =>
 	{
 		await storage.updateSecret("license_key", licenseKey);
+	};
+
+
+	setMaxTasksReached = (maxReached: boolean) =>
+	{
+		this.maxTasksReached = maxReached;
 	};
 
 
