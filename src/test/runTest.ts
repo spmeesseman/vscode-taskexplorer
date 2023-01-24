@@ -32,7 +32,7 @@ async function main(args: string[])
     try
     {   console.log("Arguments: " + (args && args.length > 0 ? args.toString() : "None"));
         console.log("clear package.json activation event");
-        execSync("enable-full-coverage.sh", { cwd: "tools" });
+        execSync("enable-full-coverage.sh", { cwd: "script" });
         //
         // Clear workspace settings file if it exists
         //
@@ -115,8 +115,8 @@ async function main(args: string[])
             // Restore
             //
             console.log("restore package.json activation event");
-            // execSync(`enable-full-coverage.sh --off${logFile ? ` --logfile "${logFile}` : ""}"`, { cwd: "tools" });
-            execSync("enable-full-coverage.sh --off", { cwd: "tools" });
+            // execSync(`enable-full-coverage.sh --off${logFile ? ` --logfile "${logFile}` : ""}"`, { cwd: "script" });
+            execSync("enable-full-coverage.sh --off", { cwd: "script" });
             // if (settingsJsonOrig && !testControl.keepSettingsFileChanges) {
             if (!testControl.keepSettingsFileChanges)
             {
