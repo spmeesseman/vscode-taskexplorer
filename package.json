@@ -2357,6 +2357,36 @@
                 }
             },
             {
+                "type": "jenkins",
+                "required": [],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.task.script%"
+                    },
+                    "target": {
+                        "type": "string",
+                        "description": "%taskdef.task.target%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.task.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.task.fileUri%"
+                    },
+                    "taskItemId": {
+                        "type": "string",
+                        "description": "%taskdef.task.taskItemId%"
+                    }
+                }
+            },
+            {
                 "type": "pipenv",
                 "required": [],
                 "properties": {

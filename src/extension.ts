@@ -15,6 +15,7 @@ import { ComposerTaskProvider } from "./providers/composer";
 import { GradleTaskProvider } from "./providers/gradle";
 import { GruntTaskProvider } from "./providers/grunt";
 import { GulpTaskProvider } from "./providers/gulp";
+import { JenkinsTaskProvider } from "./providers/jenkins";
 import { MakeTaskProvider } from "./providers/make";
 import { MavenTaskProvider } from "./providers/maven";
 import { NsisTaskProvider } from "./providers/nsis";
@@ -390,6 +391,7 @@ function registerTaskProviders(context: ExtensionContext)
     registerTaskProvider("gradle", new GradleTaskProvider(), context);              // Gradle multi-Language Automation Tool
     registerTaskProvider("grunt", new GruntTaskProvider(), context);                // Gulp JavaScript Toolkit
     registerTaskProvider("gulp", new GulpTaskProvider(), context);                  // Grunt JavaScript Task Runner
+    registerTaskProvider("jenkins", new JenkinsTaskProvider(), context);            // Jenkinsfile validation task
     registerTaskProvider("make", new MakeTaskProvider(), context);                  // C/C++ Makefile
     registerTaskProvider("maven", new MavenTaskProvider(), context);                // Apache Maven Toolset
     registerTaskProvider("pipenv", new PipenvTaskProvider(), context);              // Pipfile for Python pipenv package manager

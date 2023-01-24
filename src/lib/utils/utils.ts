@@ -117,7 +117,7 @@ export function getTaskTypeEnabledSettingName(taskType: string)
 export function getTaskTypes()
 {
     return [
-        "ant", "apppublisher", "bash", "batch", "composer",  "gradle", "grunt", "gulp", "make",
+        "ant", "apppublisher", "bash", "batch", "composer",  "gradle", "grunt", "gulp", "jenkins", "make",
         "maven", "npm", "nsis", "perl", "powershell", "python", "pipenv", "ruby", "tsc",  "Workspace"
     ];
 }

@@ -20,7 +20,7 @@ let provider: JenkinsTaskProvider;
 let fileUri: Uri;
 
 
-suite("Ruby Tests", () =>
+suite("Jenkins Tests", () =>
 {
 
     suiteSetup(async function()
@@ -29,12 +29,18 @@ suite("Ruby Tests", () =>
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as JenkinsTaskProvider;
         fileUri = Uri.file(path.join(getWsPath("."), "Jenkinsfile"));
+        teApi.testsApi.enableConfigWatcher(false);
+        await executeSettingsUpdate("pathToPrograms.jenkins", "https://jenkins.pjats.com");
+        teApi.testsApi.enableConfigWatcher(true);
         endRollingCount(this, true);
     });
 
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
+        teApi.testsApi.enableConfigWatcher(false);
+        await executeSettingsUpdate("pathToPrograms.jenkins", "");
+        teApi.testsApi.enableConfigWatcher(true);
         suiteFinished(this);
     });
 
