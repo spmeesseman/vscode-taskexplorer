@@ -258,7 +258,7 @@ async function tempRemapSettingsToNewLayout()
             let oldEnabledSetting = util.getTaskTypeSettingName(taskType, "enable"),
                 newEnabledSetting = util.getTaskTypeEnabledSettingName(taskType);
             /* istanbul ignore next */
-            if (taskType !== "ansicon")
+            if (taskType !== "ansicon" && taskType !== "curl")
             {   /* istanbul ignore next */
                 const oldSettingValue1 = configuration.get<boolean | undefined>(oldEnabledSetting, undefined);
                 /* istanbul ignore next */

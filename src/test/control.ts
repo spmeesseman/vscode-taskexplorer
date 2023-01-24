@@ -177,6 +177,7 @@ export const testControl: ITestControl =
             enableEvent: 125,
             globEvent: 105,
             groupingEvent: 95,
+            pathToProgramsEvent: 120,
             registerExplorerEvent: 130,
             showHideSpecialFolder: 95,
             showHideUserTasks: 105,
@@ -397,6 +398,7 @@ export interface ITestControl
             excludeTasksEvent: number;
             globEvent: number;
             groupingEvent: number;
+            pathToProgramsEvent: number;
             registerExplorerEvent: number;
             showHideSpecialFolder: number;
             showHideUserTasks: number;

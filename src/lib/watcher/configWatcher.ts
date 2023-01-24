@@ -150,8 +150,11 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
                     {
                         teApi.log.write(`   the 'pathToPrograms.${taskType}' setting has changed`, 1);
                         teApi.log.value("      new value", newValue, 1);
-                        if (taskType !== "ansicon") {
+                        if (taskType !== "ansicon" && taskType !== "curl") {// these paths are ont 'task types'
                             registerChange(taskType);
+                        }
+                        else if (taskType === "curl") {
+                            registerChange("jenkins");
                         }
                         else { registerChange("ant"); }
                     }

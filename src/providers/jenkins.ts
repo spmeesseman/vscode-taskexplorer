@@ -52,6 +52,10 @@ export class JenkinsTaskProvider extends TaskExplorerProvider implements TaskExp
                 pathToJenkins + "/pipeline-model-converter/validate"
             ];
 
+            // const shellW32 = configuration.getVs<string>("terminal.integrated.shell.windows"),
+            //       shellLnx = configuration.getVs<string>("terminal.integrated.shell.linux"),
+            //       shellOsx = configuration.getVs<string>("terminal.integrated.shell.osx");
+
             const options: ShellExecutionOptions = { cwd };
             if (process.platform === "win32")
             {
