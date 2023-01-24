@@ -1,13 +1,13 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as util from "./utils/utils";
-import { configuration } from "./utils/configuration";
+import * as util from "../utils/utils";
+import { configuration } from "../utils/configuration";
 import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "vscode";
 import { registerFileWatcher } from "./fileWatcher";
-import { refreshTree } from "./refreshTree";
-import { registerExplorer } from "./registerExplorer";
-import { ITaskExplorerApi } from "../interface";
-import { persistCache } from "./fileCache";
+import { refreshTree } from "../refreshTree";
+import { registerExplorer } from "../registerExplorer";
+import { ITaskExplorerApi } from "../../interface";
+import { persistCache } from "../fileCache";
 
 let teApi: ITaskExplorerApi;
 let watcherEnabled = true;

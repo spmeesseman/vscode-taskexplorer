@@ -1,18 +1,18 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as cache from "./fileCache";
-import * as util from "./utils/utils";
-import log from "./log/log";
+import * as cache from "../fileCache";
+import * as util from "../utils/utils";
+import log from "../log/log";
 import { extname } from "path";
-import { storage } from "./utils/storage";
-import { isDirectory } from "./utils/fs";
-import { isString } from "./utils/utils";
-import { refreshTree } from "./refreshTree";
-import { ITaskExplorerApi } from "../interface";
+import { storage } from "../utils/storage";
+import { isDirectory } from "../utils/fs";
+import { isString } from "../utils/utils";
+import { refreshTree } from "../refreshTree";
+import { ITaskExplorerApi } from "../../interface";
 import {
     Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri, WorkspaceFoldersChangeEvent
 } from "vscode";
-import { configuration } from "./utils/configuration";
+import { configuration } from "../utils/configuration";
 
 let extContext: ExtensionContext;
 let teApi: ITaskExplorerApi;

@@ -1,11 +1,11 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as util from "./utils/utils";
-import log from "./log/log";
-import TaskItem from "../tree/item";
-import SpecialTaskFolder from "../tree/specialFolder";
-import { ITaskExplorer } from "../interface";
-import { configuration } from "./utils/configuration";
+import * as util from "../utils/utils";
+import log from "../log/log";
+import TaskItem from "../../tree/item";
+import SpecialTaskFolder from "../../tree/specialFolder";
+import { ITaskExplorer } from "../../interface";
+import { configuration } from "../utils/configuration";
 import {
     Disposable, ExtensionContext, WorkspaceFolder, tasks, TaskStartEvent,
     StatusBarItem, StatusBarAlignment, Task, window, TaskEndEvent
