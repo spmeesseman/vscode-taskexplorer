@@ -1,7 +1,7 @@
 
 process.chdir(__dirname);
 
-var pkg = require("../../../package.json");
+var pkg = require("../../../../package.json");
 
 var gulp = require("gulp");
 // var uglify = require("gulp-uglify");
@@ -104,7 +104,7 @@ var  note = [
                 .pipe(gulp.dest(destDir));
         },
 
-        //压缩 JS
+        //
         minJs: function() {
             var src = [
                 "./src/**/*.js",

@@ -56,7 +56,7 @@ Tests:
         ☐ NSIS
         ☐ Perl
         ✔ Pipenv @done(23-01-22 16:34)
-        ☐ Ruby
+        ✔ Ruby @done(23-01-24 19:58)
     
     ✔ Tests for when license manager @done(23-01-22 16:34)
         i.e. limiting task counts and extension is running in non-licensed mode

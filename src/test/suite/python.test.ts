@@ -5,7 +5,6 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as assert from "assert";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { PythonTaskProvider } from "../../providers/python";
@@ -14,6 +13,7 @@ import {
     activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
     logErrorsAreFine, needsTreeBuild, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
+import { expect } from "chai";
 
 const testsName = "python";
 const startTaskCount = 2;
@@ -75,7 +75,7 @@ suite("Python Tests", () =>
     {
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as PythonTaskProvider;
-        assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
+        expect(provider.getDocumentPosition()).to.be.equal(0);
         endRollingCount(this);
     });
 
@@ -84,8 +84,8 @@ suite("Python Tests", () =>
     {
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as PythonTaskProvider;
-        assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.py"))),
-               "ScriptProvider type should return position 1");
+        expect(!provider.createTask("no_ext", undefined, wsFolder,
+               Uri.file(getWsPath("test.py")))).to.not.be.equal(undefined, "ScriptProvider returnned undefined task");
         logErrorsAreFine(true);
         endRollingCount(this);
     });

@@ -715,6 +715,7 @@ suite("Util Tests", () =>
 			expect(await teApi.testsApi.storage.get2<number>("TEST_KEY2_DOESNT_EXIST", 0)).to.be.equal(0);
 			expect(await teApi.testsApi.storage.get2<string>("TEST_KEY2_DOESNT_EXIST", "")).to.be.equal("");
         }
+        endRollingCount(this);
     });
 
 });
