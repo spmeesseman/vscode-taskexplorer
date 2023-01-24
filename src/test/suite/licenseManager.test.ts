@@ -523,13 +523,13 @@ suite("License Manager Tests", () =>
 
 	test("Start Local License Server", async function()
 	{
-		const localServerPath = utils.getWsPath("../../spm-license-server/bin");
+		const localServerPath = utils.getWsPath("../../../spm-license-server/bin");
         if (utils.exitRollingCount(this)) return;
 		if (await fsApi.pathExists(join(localServerPath, "/spm-license-server.js")))
 		{
 			this.slow(testControl.slowTime.licenseMgr.localStartServer + 8000);
 			lsProcess = fork("spm-license-server.js", {
-				cwd: utils.getWsPath("../../spm-license-server/bin"), detached: true,
+				cwd: utils.getWsPath("../../../spm-license-server/bin"), detached: true,
 			});
 			await utils.sleep(4000);
 		}

@@ -203,7 +203,7 @@ suite("Multi-Root Workspace Tests", () =>
         );
         workspace.getWorkspaceFolder = (uri: Uri) =>
         {   //
-            // See note below.  Can't figuer out how to get VSCode to return the fake ws folder tasks
+            // See note below.  Can't figure out how to get VSCode to return the fake ws folder tasks
             //
             return wsf[uri.fsPath.includes("test-fixture") ? 0 : 1];
         };
