@@ -21,13 +21,13 @@ async function main(args: string[])
     // The path to test runner
     // Passed to --extensionTestsPath
     //
-    const extensionTestsPath = path.resolve(__dirname, "./suite/index");
-    const extensionTestsWsPath = path.resolve(__dirname, "../../test-files");
+    const extensionTestsPath = path.resolve(__dirname, "./suite");
+    const testWorkspace = path.resolve(__dirname, "../../test-fixture/project1");
     const vscodeTestUserDataPath = path.join(extensionDevelopmentPath, ".vscode-test", "user-data");
     //
     // Setting file to clear and restore
     //
-    const settingsFile = path.join(extensionTestsWsPath, ".vscode", "settings.json");
+    const settingsFile = path.join(testWorkspace, ".vscode", "settings.json");
 
     try
     {   console.log("Arguments: " + (args && args.length > 0 ? args.toString() : "None"));
@@ -52,10 +52,29 @@ async function main(args: string[])
             version: "1.60.1",
             extensionDevelopmentPath,
             extensionTestsPath,
-            launchArgs: [ extensionTestsWsPath, "--disable-extensions", "--disable-workspace-trust" ],
+            launchArgs: [ testWorkspace, "--disable-extensions", "--disable-workspace-trust" ],
             // launchArgs: [ "--add " + extensionTestsWsPath, "--disable-extensions", "--disable-workspace-trust" ],
             extensionTestsEnv: { testArgs: args && args.length > 0 ? args.toString() : "" }
         });
+
+        // /**
+        //  * Install ExtJS extension
+        //  */
+        // const vscodeExecutablePath = await downloadAndUnzipVSCode("1.35.0")
+		// const [ cli, ...args ] = resolveCliArgsFromVSCodeExecutablePath(vscodeExecutablePath);
+		// spawnSync(cli, [ ...args, "--install-extension", "spmeesseman.vscode-extjs" ], {
+		// 	encoding: "utf-8",
+		// 	stdio: "inherit"
+		// });
+
+        // if (process.platform === "win32") {
+		// 	await runTests({
+		// 		extensionDevelopmentPath,
+		// 		extensionTestsPath,
+		// 		version: "1.40.0",
+		// 		platform: "win32-x64-archive"
+		// 	});
+		// }
     }
     catch (err: any) {
         console.error(`Failed to run tests: ${err}\n${err.stack ?? "No call stack details found"}`);
@@ -113,8 +132,8 @@ async function main(args: string[])
                 }, null, 4));
             }
             console.log("delete any leftover temporary files and/or directories");
-            await deleteDir(path.join(extensionTestsWsPath, "tasks_test_"));
-            await deleteDir(path.join(extensionTestsWsPath, "tasks_test_ignore_"));
+            await deleteDir(path.join(testWorkspace, "tasks_test_"));
+            await deleteDir(path.join(testWorkspace, "tasks_test_ignore_"));
         } catch {}
 
         if (failed) {
