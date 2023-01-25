@@ -71,15 +71,17 @@ export class JenkinsTaskProvider extends TaskExplorerProvider implements TaskExp
         const tasks: Task[] = [],
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
               pathToCurl = configuration.get<string>("pathToPrograms.curl"),
-              pathToJenkins = configuration.get<string>("pathToPrograms.jenkins");
+              pathToJenkins = configuration.get<string>("pathToPrograms.jenkins"),
+              envVariable = configuration.get<string>("environment.jenkinsApiToken", "JENKINS_API_TOKEN");
 
         log.methodStart("read jenkinsfile uri task", 3, logPad, false, [
-            [ "path", uri.fsPath ], [ "project folder", folder.name ], [ "path to jenkins", pathToJenkins ], [ "path to curl", pathToJenkins ]
+            [ "project folder", folder.name ], [ "path", uri.fsPath ], [ "path to curl", pathToCurl ],
+            [ "path to jenkins", pathToJenkins ], [ "token env variable", envVariable ]
         ], this.logQueueId);
 
-        if (pathToJenkins && pathToCurl && env.JENKINS_API_TOKEN)
+        if (pathToJenkins && pathToCurl && env[envVariable])
         {
-            tasks.push(this.createTask(pathToJenkins, pathToCurl, folder, uri, [ env.JENKINS_API_TOKEN ]));
+            tasks.push(this.createTask(pathToJenkins, pathToCurl, folder, uri, [ envVariable ]));
         }
 
         log.methodDone("read jenkinsfile uri tasks", 4, logPad, [[ "# of tasks found", tasks.length ]], this.logQueueId);
