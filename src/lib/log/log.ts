@@ -98,55 +98,6 @@ const enableLog = (enable: boolean) =>
 };
 
 
-const initLog = async(context: ExtensionContext, testsRunning: number) =>
-{
-    logControl.isTests = testsRunning > 0;
-    logControl.isTestsBlockScaryColors = testsRunning > 1;
-    logControl.enable = configuration.get<boolean>("logging.enable", false);
-    logControl.logLevel = configuration.get<number>("logging.level", 1);
-    logControl.enableOutputWindow = configuration.get<boolean>("logging.enableOutputWindow", true);
-    logControl.enableFile = configuration.get<boolean>("logging.enableFile", false);
-    logControl.enableFileSymbols = configuration.get<boolean>("logging.enableFileSymbols", true);
-    logControl.fileName = join(context.logUri.fsPath, getFileName());
-    await createDir(dirname(logControl.fileName));
-
-    //
-    // Set up a log in the Output window (even if enableOutputWindow is off)
-    //
-    logControl.logOutputChannel = window.createOutputChannel("Task Explorer");
-
-    //
-    // Register disposables
-    //
-    context.subscriptions.push(...[
-        logControl.logOutputChannel,
-        commands.registerCommand("vscode-taskexplorer.showOutput", showLogOutput),
-        workspace.onDidChangeConfiguration(e => processConfigChanges(context, e))
-    ]);
-
-    //
-    // If logging isn't enabled, then set all log function to empty functions. This
-    // function should only be called once, so don't let istanbul pop it
-    //
-    /* istanbul ignore next */
-    if (!logControl.enable) {
-        /* istanbul ignore next */
-        enableLog(logControl.enable);
-    }
-
-    //
-    // This function should only be called once, so blank it in the export
-    //
-    Object.assign(logFunctions,
-    {
-        initLog: /* istanbul ignore next */() => {},
-    });
-
-    write("Log has been initialized", 1);
-    logLogFileLocation();
-};
-
-
 const getFileName = () =>
 {
     const locISOTime = (new Date(Date.now() - logControl.tzOffset)).toISOString().slice(0, -1).split("T")[0].replace(/[\-]/g, "");
@@ -212,6 +163,55 @@ const processConfigChanges = (ctx: ExtensionContext, e: ConfigurationChangeEvent
 };
 
 
+const registerLog = async(context: ExtensionContext, testsRunning: number) =>
+{
+    logControl.isTests = testsRunning > 0;
+    logControl.isTestsBlockScaryColors = testsRunning > 1;
+    logControl.enable = configuration.get<boolean>("logging.enable", false);
+    logControl.logLevel = configuration.get<number>("logging.level", 1);
+    logControl.enableOutputWindow = configuration.get<boolean>("logging.enableOutputWindow", true);
+    logControl.enableFile = configuration.get<boolean>("logging.enableFile", false);
+    logControl.enableFileSymbols = configuration.get<boolean>("logging.enableFileSymbols", true);
+    logControl.fileName = join(context.logUri.fsPath, getFileName());
+    await createDir(dirname(logControl.fileName));
+
+    //
+    // Set up a log in the Output window (even if enableOutputWindow is off)
+    //
+    logControl.logOutputChannel = window.createOutputChannel("Task Explorer");
+
+    //
+    // Register disposables
+    //
+    context.subscriptions.push(...[
+        logControl.logOutputChannel,
+        commands.registerCommand("vscode-taskexplorer.showOutput", (show: boolean) => showLogOutput(show)),
+        workspace.onDidChangeConfiguration(e => processConfigChanges(context, e))
+    ]);
+
+    //
+    // If logging isn't enabled, then set all log function to empty functions. This
+    // function should only be called once, so don't let istanbul pop it
+    //
+    /* istanbul ignore next */
+    if (!logControl.enable) {
+        /* istanbul ignore next */
+        enableLog(logControl.enable);
+    }
+
+    //
+    // This function should only be called once, so blank it in the export
+    //
+    Object.assign(logFunctions,
+    {
+        registerLog: /* istanbul ignore next */() => {},
+    });
+
+    write("Log has been initialized", 1);
+    logLogFileLocation();
+};
+
+
 const setWriteToConsole = (set: boolean, level = 2) =>
 {
     logControl.writeToConsole = set;
@@ -219,15 +219,17 @@ const setWriteToConsole = (set: boolean, level = 2) =>
 };
 
 
-const showLogOutput = (show: boolean) =>
+const showLogOutput = async(show: boolean) =>
 {
     const channel: OutputChannel = logControl.logOutputChannel as OutputChannel;
     if (show) {
+        await commands.executeCommand("workbench.panel.output.focus");
         channel.show();
     }
     else {
         channel.hide();
     }
+    // await commands.executeCommand("taskExplorer.focus");
 };
 
 
@@ -241,7 +243,7 @@ const logFunctions =
     dequeue,
     enableLog,
     error,
-    initLog,
+    registerLog,
     getLogFileName,
     isLoggingEnabled,
     methodStart,

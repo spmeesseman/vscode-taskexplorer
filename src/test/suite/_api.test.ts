@@ -4,7 +4,7 @@
 import { refreshTree } from "../../lib/refreshTree";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, setExplorer, suiteFinished, testControl as tc, waitForTeIdle
+    activate, executeSettingsUpdate, executeTeCommand, setExplorer, sleep, suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
@@ -24,9 +24,14 @@ suite("API and Initialization", () =>
     });
 
 
-    test("Show Output Window", async function()
+    test("Show/Hide Output Window", async function()
     {
-        await executeTeCommand("showOutput", 10, 50, tc.log.enabled && tc.log.output);
+        this.slow((tc.slowTime.commandFast * 3) + 400);
+        await executeTeCommand("showOutput", tc.waitTime.commandFast, 1000, true);
+        await sleep(100);
+        await executeTeCommand("showOutput", tc.waitTime.commandFast, 1000, false);
+        await sleep(100);
+        await executeTeCommand("showOutput", tc.waitTime.commandFast, 1000, tc.log.enabled && tc.log.output);
     });
 
 

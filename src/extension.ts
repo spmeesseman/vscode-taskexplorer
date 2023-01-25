@@ -107,7 +107,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     // Initialize logging
     //
-    await log.initLog(context, tests ? 2 : /* istanbul ignore next */ 0); // 0=off | 1=on w/red&yellow | 2=on w/ no red/yellow
+    await log.registerLog(context, tests ? 2 : /* istanbul ignore next */ 0); // 0=off | 1=on w/red&yellow | 2=on w/ no red/yellow
 
     //
     // Initialize persistent storage

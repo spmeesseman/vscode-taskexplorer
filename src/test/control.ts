@@ -139,15 +139,15 @@ export const testControl: ITestControl =
         taskProviderReadUri: 90,
         tasks: {
             antParser: 550,
-            antTask: 3800,
-            antTaskWithAnsicon: 3850,
+            antTask: 3750,
+            antTaskWithAnsicon: 3800,
             bashScript: 3025,
             batchScriptBat: 4200,
             batchScriptCmd: 5200,
             gulpParser: 3850,
-            npmCommand: 12275,
-            npmCommandPkg: 9675,
-            npmInstallCommand: 12825
+            npmCommand: 12150,
+            npmCommandPkg: 9600,
+            npmInstallCommand: 12500
         },
         taskCount: {
             verify: 470,
@@ -195,7 +195,7 @@ export const testControl: ITestControl =
         getTreeMin: 170,
         getTreeTasks: 50,
         min: 35,
-        npmCommandMin: 1200,
+        npmCommandMin: 1100,
         refreshCommand: 140,
         refreshCommandNoChanges: 75,
         refreshTaskTypeCommand: 125,
@@ -208,8 +208,8 @@ export const testControl: ITestControl =
         //
         // MAXIMUM WAIT TIMES
         //
-        max: 15000,
-        runCommandMax: 3400,
+        max: 12000,
+        runCommandMax: 3200,
         waitTimeForNpmCommandMax: 12000
     }
 };

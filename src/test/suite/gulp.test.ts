@@ -39,7 +39,9 @@ suite("Gulp Tests", () =>
 
 
     suiteTeardown(async function()
-    {   //
+    {
+        if (exitRollingCount(this, false, true)) return;
+        //
         // Reset both Grunt / Gulp VSCode internal task providers, which we enabled b4 extension
         // activation in helper.test
         //

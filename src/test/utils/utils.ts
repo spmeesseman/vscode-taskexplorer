@@ -357,7 +357,7 @@ export const focusExplorerView = async (instance?: any) =>
 };
 
 
-export const focusSearchView = () => commands.executeCommand("workbench.view.search.focus", tc.waitTime.focusCommand) as Thenable<void>;
+export const focusSearchView = () => commands.executeCommand("workbench.view.search.focus");
 
 
 export const getSpecialTaskItemId = (taskItem: ITaskItem) =>
