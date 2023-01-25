@@ -138,9 +138,9 @@ export const testControl: ITestControl =
         taskCommandStartupMax: 3100,
         taskProviderReadUri: 90,
         tasks: {
-            antParser: 640,
-            antTask: 3900,
-            antTaskWithAnsicon: 3950,
+            antParser: 600,
+            antTask: 3850,
+            antTaskWithAnsicon: 3900,
             bashScript: 3025,
             batchScriptBat: 4200,
             batchScriptCmd: 5200,
@@ -150,11 +150,11 @@ export const testControl: ITestControl =
             npmInstallCommand: 12825
         },
         taskCount: {
-            verify: 480,
-            verifyByTree: 530,
-            verifyFirstCall: 750,
-            verifyNpm: 1600, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 1950,
+            verify: 475,
+            verifyByTree: 525,
+            verifyFirstCall: 740,
+            verifyNpm: 1550, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 1950
         },
         viewReport: 410
     },
