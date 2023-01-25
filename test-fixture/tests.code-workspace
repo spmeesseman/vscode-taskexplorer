@@ -1,42 +1,20 @@
 {
-	"folders": [
-		{
-			"name": "project1",
-			"path": "project1"
-		},
-		{
-			"name": "project2",
-			"path": "project2"
-		}
-	],
-	"settings": {
-		"taskExplorer.exclude": [
-			"**/tasks_test_ignore_/**"
-		],
-		"taskExplorer.globPatternsAnt": [
-			"**/hello.xml"
-		],
-		"taskExplorer.enabledTasks": {
-			"ant": true,
-			"apppublisher": true,
-			"bash": true,
-			"batch": true,
-			"composer": false,
-			"gradle": false,
-			"grunt": true,
-			"gulp": true,
-			"jenkins": true,
-			"make": true,
-			"maven": false,
-			"npm": true,
-			"nsis": true,
-			"perl": false,
-			"pipenv": false,
-			"powershell": false,
-			"python": false,
-			"ruby": false,
-			"tsc": true,
-			"workspace": true
-		}
-	}
+    "folders": [
+        {
+            "name": "project1",
+            "path": "project1"
+        },
+        {
+            "name": "project2",
+            "path": "project2"
+        }
+    ],
+    "settings": {
+        "taskExplorer.exclude": [
+            "**/tasks_test_ignore_/**"
+        ],
+        "taskExplorer.globPatternsAnt": [
+            "**/hello.xml"
+        ]
+    }
 }
