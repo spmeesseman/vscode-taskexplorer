@@ -374,11 +374,11 @@ export function showMaxTasksReachedMessage(licMgr: ILicenseManager, taskType?: s
 		{
 			if (action === "Enter License Key")
 			{
-				await commands.executeCommand("taskExplorer.enterLicense");
+				await commands.executeCommand("vscode-taskexplorer.enterLicense");
 			}
 			else if (action === "Info")
 			{
-				await commands.executeCommand("taskExplorer.viewLicense");
+				await commands.executeCommand("vscode-taskexplorer.viewLicense");
 			}
 		});
     }

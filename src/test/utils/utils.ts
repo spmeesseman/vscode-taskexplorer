@@ -256,13 +256,7 @@ export const executeSettingsUpdate = async (key: string, value?: any, minWait?: 
 
 export const executeTeCommandAsync = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
-    let cmdGroup  = "taskExplorer";
-    if (command === "addRemoveFavoriteEx" || command === "addToExcludesEx" || command === "enterLicense" || command === "getApi" || command === "disableTaskType" ||
-        command === "enableTaskType"  || command === "removeFromExcludesEx" || command === "runEx" || command === "showOutput" || command === "viewLicense" || command === "viewReport")
-    {
-        cmdGroup = "vscode-taskexplorer";
-    }
-    commands.executeCommand(`${cmdGroup}.${command}`, ...args);
+    commands.executeCommand(`${getCmdGroup(command)}.${command}`, ...args);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
 };
@@ -273,7 +267,7 @@ export const executeTeCommand2Async = (command: string, args: any[], minWait?: n
 
 export const executeTeCommand = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
-    const rc = await commands.executeCommand(`taskExplorer.${command}`, ...args);
+    const rc = await commands.executeCommand(`${getCmdGroup(command)}.${command}`, ...args);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;
@@ -281,6 +275,18 @@ export const executeTeCommand = async (command: string, minWait?: number, maxWai
 
 
 export const executeTeCommand2 = (command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand(command, minWait, maxWait, ...args);
+
+
+const getCmdGroup = (command: string) =>
+{
+    let cmdGroup = "taskExplorer";
+    if (command === "addRemoveFavoriteEx" || command === "addToExcludesEx" || command === "enterLicense" || command === "getApi" || command === "disableTaskType" ||
+        command === "enableTaskType"  || command === "removeFromExcludesEx" || command === "runEx" || command === "showOutput" || command === "viewLicense" || command === "viewReport")
+    {
+        cmdGroup = "vscode-taskexplorer";
+    }
+    return cmdGroup;
+};
 
 
 export const getSuccessCount = (instance: Mocha.Context) =>

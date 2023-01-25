@@ -3,11 +3,12 @@
 import * as https from "https";
 import log from "./log/log";
 import { storage } from "./utils/storage";
+import { refreshTree } from "./refreshTree";
 import { isScriptType } from "./utils/utils";
-import { ILicenseManager } from "../interface/ILicenseManager";
-import { commands, ExtensionContext, InputBoxOptions, Task, WebviewPanel,  window } from "vscode";
-import { displayLicenseReport } from "./report/licensePage";
 import { ITaskExplorerApi } from "../interface";
+import { displayLicenseReport } from "./report/licensePage";
+import { ILicenseManager } from "../interface/ILicenseManager";
+import { commands, ExtensionContext, InputBoxOptions, Task, WebviewPanel, window } from "vscode";
 
 
 export class LicenseManager implements ILicenseManager
@@ -32,11 +33,7 @@ export class LicenseManager implements ILicenseManager
     {
 		this.context = context;
 		this.teApi = api;
-        //
-        // Store extension version
-		// Note that `context.extension` is only in VSCode 1.55+
-        //
-        this.version = context.extension.packageJSON.version;
+        this.version = context.extension.packageJSON.version; // Note that `context.extension` is only VSCode 1.55+
     }
 
 
@@ -121,7 +118,7 @@ export class LicenseManager implements ILicenseManager
 			}
 			else if (action === "Info")
 			{
-				await commands.executeCommand("taskExplorer.viewLicense");
+				await commands.executeCommand("vscode-taskexplorer.viewLicense");
 			}
 		});
 	};
@@ -132,12 +129,14 @@ export class LicenseManager implements ILicenseManager
 		const opts: InputBoxOptions = { prompt: "Enter license key" };
 		try {
 			const input = await window.showInputBox(opts);
-			if (input) {
+			if (input)
+			{
 				this.licensed = await this.validateLicense(input);
-				if (this.licensed) {
+				if (this.licensed)
+				{
 					window.showInformationMessage("License key validated, thank you for your support!");
 					if (this.maxTasksReached) {
-						await commands.executeCommand("taskExplorer.refresh");
+						await refreshTree(this.teApi, true, false, "");
 					}
 				}
 			}

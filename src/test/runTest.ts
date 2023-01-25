@@ -31,7 +31,7 @@ async function main(args: string[])
     const projectSettingsFile = path.join(testWorkspace, ".vscode", "settings.json");
     const wsSettingsFile = path.join(testWorkspaceMultiRoot, "tests.code-workspace");
 
-    const defaultWsConfig = {
+    const wsConfig = {
         folders: [
             {
                 name: "project1",
@@ -50,14 +50,13 @@ async function main(args: string[])
         console.log("Arguments: " + (args && args.length > 0 ? args.toString() : "None"));
         console.log("clear package.json activation event");
         execSync("enable-full-coverage.sh", { cwd: "script" });
-        const defaultWsConfigJson = JSON.stringify(defaultWsConfig);
 
         //
         // Clear workspace settings file if it exists
         //
         // let settingsJsonOrig: string | undefined;
         await writeFile(projectSettingsFile, "{}");
-        await writeFile(wsSettingsFile, defaultWsConfigJson);
+        await writeFile(wsSettingsFile, JSON.stringify(wsConfig, null, 4));
 
         //
         // Copy a "User Tasks" file
@@ -153,16 +152,15 @@ async function main(args: string[])
                         "**/hello.xml"
                     ]
                 }, null, 4));
-                await writeFile(wsSettingsFile, JSON.stringify(Object.apply(defaultWsConfig, {
-                    settings: {
-                        "taskExplorer.exclude": [
-                            "**/tasks_test_ignore_/**",
-                        ],
-                        "taskExplorer.globPatternsAnt": [
-                            "**/hello.xml"
-                        ]
-                    }
-                }), null, 4));
+                wsConfig.settings = {
+                    "taskExplorer.exclude": [
+                        "**/tasks_test_ignore_/**",
+                    ],
+                    "taskExplorer.globPatternsAnt": [
+                        "**/hello.xml"
+                    ]
+                };
+                await writeFile(wsSettingsFile, JSON.stringify(wsConfig, null, 4));
             }
             console.log("delete any leftover temporary files and/or directories");
             await deleteDir(path.join(testWorkspace, "tasks_test_"));

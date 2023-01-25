@@ -6,12 +6,11 @@ import {
     ConfigurationChangeEvent, workspace, WorkspaceConfiguration, ConfigurationTarget, ExtensionContext
 } from "vscode";
 
-const pkgJsonCfgProps = require("../../../package.json").contributes.configuration.properties;
+let pkgJsonCfgProps = require("../../../package.json").contributes.configuration.properties;
 
 
 class Configuration implements IConfiguration
 {
-    private pkgJsonCfgProps: any;
     private configuration: WorkspaceConfiguration;
     private configurationGlobal: WorkspaceConfiguration;
     private isDev = false;
@@ -32,7 +31,7 @@ class Configuration implements IConfiguration
         this.configuration = workspace.getConfiguration(extensionName);
         this.configurationGlobal = workspace.getConfiguration();
         context.subscriptions.push(workspace.onDidChangeConfiguration(this.onConfigurationChanged, this));
-        this.pkgJsonCfgProps = pkgJsonCfgProps || /* istanbul ignore next */context.extension.packageJSON.contributes.configuration.properties;
+        pkgJsonCfgProps = pkgJsonCfgProps || /* istanbul ignore next */context.extension.packageJSON.contributes.configuration.properties;
     }
 
 
@@ -54,7 +53,7 @@ class Configuration implements IConfiguration
         let propertyKey = key,
             valueKey = key,
             isObject = false;
-        if (!this.pkgJsonCfgProps[propertyKey] && key.includes("."))
+        if (!pkgJsonCfgProps[propertyKey] && key.includes("."))
         {
             let propsKey = "";
             const keys = key.split(".");
@@ -62,7 +61,7 @@ class Configuration implements IConfiguration
                 propsKey += ((i > 0 ? "." : "") + keys[i]);
             }
             const pkgJsonPropsKey = extensionName + "." + propsKey;
-            if (this.pkgJsonCfgProps[pkgJsonPropsKey] && this.pkgJsonCfgProps[pkgJsonPropsKey].type === "object")
+            if (pkgJsonCfgProps[pkgJsonPropsKey] && pkgJsonCfgProps[pkgJsonPropsKey].type === "object")
             {
                 isObject = true;
                 propertyKey = propsKey;

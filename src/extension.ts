@@ -369,7 +369,7 @@ function registerCommands(context: ExtensionContext)
     //
     // Register GetAPI task
     //
-    context.subscriptions.push(commands.registerCommand("taskExplorer.getApi", () => teApi));
+    context.subscriptions.push(commands.registerCommand("vscode-taskexplorer.getApi", () => teApi));
 }
 
 

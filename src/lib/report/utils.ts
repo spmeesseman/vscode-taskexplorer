@@ -106,7 +106,7 @@ export const createWebviewPanel = async(title: string, html: string, disposables
 	(
 		message => {
             // don't await?
-			commands.executeCommand("taskExplorer." + message.command);
+			commands.executeCommand("vscode-taskexplorer." + message.command);
 		},
         undefined,
         disposables
