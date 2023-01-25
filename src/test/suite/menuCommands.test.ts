@@ -5,7 +5,7 @@ import { join } from "path";
 import { Uri } from "vscode";
 import {
     activate, endRollingCount, executeTeCommand2, exitRollingCount, focusExplorerView, getWsPath,
-    needsTreeBuild, suiteFinished, testControl as tc, verifyTaskCount
+    needsTreeBuild, overrideNextShowInfoBox, suiteFinished, testControl as tc, verifyTaskCount
 } from "../utils/utils";
 
 const antUri: Uri = Uri.file(getWsPath("build.xml"));
@@ -65,7 +65,8 @@ suite("Menu Command Tests", () =>
         await verifyTaskCount("python", pythonStartCount);
         await executeTeCommand2("enableTaskType", [ antUri ], tc.waitTime.config.enableEvent);
         await verifyTaskCount("ant", antStartCount);
-        await executeTeCommand2("readmeUri", [ antUri ], tc.waitTime.config.eventFast);
+        overrideNextShowInfoBox(undefined);
+        await executeTeCommand2("enableTaskType", [ readmeUri ], tc.waitTime.config.eventFast);
         endRollingCount(this);
     });
 
@@ -74,9 +75,9 @@ suite("Menu Command Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.taskCount.verify * 2) + (tc.slowTime.config.excludesEvent * 2));
-        await executeTeCommand2("addToExcludes", [ pythonUri ], tc.waitTime.config.excludesEvent);
+        await executeTeCommand2("addToExcludesEx", [ pythonUri ], tc.waitTime.config.excludesEvent);
         await verifyTaskCount("python", pythonStartCount - 1);
-        await executeTeCommand2("addToExcludes", [ antUri ], tc.waitTime.config.excludesEvent);
+        await executeTeCommand2("addToExcludesEx", [ antUri ], tc.waitTime.config.excludesEvent);
         await verifyTaskCount("ant", antStartCount - 2);
         endRollingCount(this);
     });
