@@ -200,18 +200,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         enableConfigWatcher(false);
-
-        /* istanbul ignore else */
-        if (this.isTests) {
-            await configuration.updateWs(excludesList, excludes);
-        }
-        else {
-            await configuration.update(excludesList, excludes);
-        }
+        await configuration.update(excludesList, excludes);
+        enableConfigWatcher(true);
 
         await this.refresh(selection.taskSource, uri, "   ");
 
-        enableConfigWatcher(true);
         log.methodDone("add to excludes", 1);
     }
 

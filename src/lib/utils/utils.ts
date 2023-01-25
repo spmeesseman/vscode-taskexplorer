@@ -181,11 +181,6 @@ export function isError(e: any): e is Error
 
 export function isExcluded(uriPath: string, logPad = "")
 {
-    function testForExclusionPattern(path: string, pattern: string): boolean
-    {
-        return minimatch(path, pattern, { dot: true, nocase: true });
-    }
-
     const exclude = configuration.get<string[]>("exclude", []);
 
     log.methodStart("Check exclusion", 4, logPad, false, [[ "path", uriPath ]]);
@@ -193,14 +188,14 @@ export function isExcluded(uriPath: string, logPad = "")
     for (const pattern of exclude)
     {
         log.value("   checking pattern", pattern, 5);
-        if (testForExclusionPattern(uriPath, pattern))
+        if (testPattern(uriPath, pattern))
         {
             log.methodDone("Check exclusion", 4, logPad, [[ "excluded", "yes" ]]);
             return true;
         }
         if (!extname(uriPath) && !uriPath.endsWith(sep))
         {
-            if (testForExclusionPattern(uriPath + sep, pattern))
+            if (testPattern(uriPath + sep, pattern))
             {
                 log.methodDone("Check exclusion", 4, logPad, [[ "excluded", "yes" ]]);
                 return true;
@@ -387,6 +382,12 @@ export function showMaxTasksReachedMessage(licMgr: ILicenseManager, taskType?: s
 			}
 		});
     }
+}
+
+
+export function testPattern(path: string, pattern: string): boolean
+{
+    return minimatch(path, pattern, { dot: true, nocase: true });
 }
 
 

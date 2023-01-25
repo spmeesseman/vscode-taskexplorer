@@ -23,27 +23,50 @@ async function main(args: string[])
     //
     const extensionTestsPath = path.resolve(__dirname, "./suite");
     const testWorkspace = path.resolve(__dirname, "../../test-fixture/project1");
+    const testWorkspaceMultiRoot = path.resolve(__dirname, "../../test-fixture");
     const vscodeTestUserDataPath = path.join(extensionDevelopmentPath, ".vscode-test", "user-data");
     //
     // Setting file to clear and restore
     //
-    const settingsFile = path.join(testWorkspace, ".vscode", "settings.json");
+    const projectSettingsFile = path.join(testWorkspace, ".vscode", "settings.json");
+    const wsSettingsFile = path.join(testWorkspaceMultiRoot, "tests.code-workspace");
+
+    const defaultWsConfig = {
+        folders: [
+            {
+                name: "project1",
+                path: "project1"
+            },
+            {
+                name: "project2",
+                path: "project2"
+            }
+        ],
+        settings: {}
+    };
 
     try
-    {   console.log("Arguments: " + (args && args.length > 0 ? args.toString() : "None"));
+    {
+        console.log("Arguments: " + (args && args.length > 0 ? args.toString() : "None"));
         console.log("clear package.json activation event");
         execSync("enable-full-coverage.sh", { cwd: "script" });
+        const defaultWsConfigJson = JSON.stringify(defaultWsConfig);
+
         //
         // Clear workspace settings file if it exists
         //
         // let settingsJsonOrig: string | undefined;
-        await writeFile(settingsFile, "{}");
+        await writeFile(projectSettingsFile, "{}");
+        await writeFile(wsSettingsFile, defaultWsConfigJson);
+
         //
         // Copy a "User Tasks" file
         //
-        await copyFile("C:\\Code\\data\\user-data\\User\\tasks.json", path.join(vscodeTestUserDataPath, "User"));
+        await copyFile(path.join(testWorkspaceMultiRoot, "user-tasks.json"), path.join(vscodeTestUserDataPath, "User", "tasks.json"));
+
         //
         // const runCfg = await runConfig();
+
         //
         // Download VS Code, unzip it and run the integration test
         //
@@ -121,7 +144,7 @@ async function main(args: string[])
             if (!testControl.keepSettingsFileChanges)
             {
                 console.log("restore tests workspace settings file settings.json");
-                await writeFile(settingsFile, JSON.stringify(
+                await writeFile(projectSettingsFile, JSON.stringify(
                 {
                     "taskExplorer.exclude": [
                         "**/tasks_test_ignore_/**",
@@ -130,6 +153,16 @@ async function main(args: string[])
                         "**/hello.xml"
                     ]
                 }, null, 4));
+                await writeFile(wsSettingsFile, JSON.stringify(Object.apply(defaultWsConfig, {
+                    settings: {
+                        "taskExplorer.exclude": [
+                            "**/tasks_test_ignore_/**",
+                        ],
+                        "taskExplorer.globPatternsAnt": [
+                            "**/hello.xml"
+                        ]
+                    }
+                }), null, 4));
             }
             console.log("delete any leftover temporary files and/or directories");
             await deleteDir(path.join(testWorkspace, "tasks_test_"));

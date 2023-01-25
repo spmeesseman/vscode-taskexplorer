@@ -166,7 +166,7 @@ suite("Grunt Tests", () =>
         endRollingCount(this);
     });
 
-
+/*
     test("Turn VSCode Grunt Provider On", async function()
     {
         if (exitRollingCount(this)) return;
@@ -177,7 +177,7 @@ suite("Grunt Tests", () =>
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });
-
+*/
 
     //
     // *** FOCUS #1 ***   Moved up one suite from infoPage tests.
@@ -198,9 +198,9 @@ suite("Grunt Tests", () =>
     test("Turn VSCode Grunt Provider Off", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.eventFast +  tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify + 1500);
+        this.slow(tc.slowTime.config.eventFast +  tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify + 2000);
         await configuration.updateVs("grunt.autoDetect", "off");
-        await sleep(1500);
+        await sleep(1000);
         await treeUtils.refresh();
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

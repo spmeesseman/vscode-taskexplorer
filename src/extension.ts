@@ -28,7 +28,7 @@ import { PipenvTaskProvider } from "./providers/pipenv";
 import { PowershellTaskProvider } from "./providers/powershell";
 import { PythonTaskProvider } from "./providers/python";
 import { RubyTaskProvider } from "./providers/ruby";
-import { configuration } from "./lib/utils/configuration";
+import { configuration, registerConfiguration } from "./lib/utils/configuration";
 import { initStorage, storage } from "./lib/utils/storage";
 import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/ILicenseManager";
@@ -98,6 +98,11 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     // Set 'dev' flag if running a debugging session from vSCode
     //
     dev = !tests && /* istanbul ignore next */await fs.pathExists(resolve(__dirname, "..", "src"));
+
+    //
+    // Initialize logging
+    //
+    registerConfiguration(context, dev, tests);
 
     //
     // Initialize logging

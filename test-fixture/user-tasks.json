@@ -1,0 +1,33 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "echo",
+            "type": "shell",
+            "command": "cmd /c timeout 5"
+        },
+        {
+            "label": "echo2",
+            "type": "shell",
+            "command": "cmd /c timeout 5"
+        },
+        {
+            "label": "Test composite",
+            "detail": "Test composite",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": ["echo", "echo2"],
+            "promptOnClose": true,
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true
+            }
+            
+        }
+    ]
+}

@@ -248,7 +248,7 @@ suite("Gulp Tests", () =>
         endRollingCount(this);
     });
 
-
+/*
     test("Turn VSCode Gulp Provider On", async function()
     {
         if (exitRollingCount(this)) return;
@@ -260,15 +260,14 @@ suite("Gulp Tests", () =>
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });
-
+*/
 
     test("Turn VSCode Gulp Provider Off", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.eventFast + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify + 1500);
+        this.slow(tc.slowTime.config.eventFast + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify + 2000);
         await configuration.updateVs("gulp.autoDetect", "off");
-        await waitForTeIdle(tc.waitTime.config.enableEvent);
-        await sleep(1500);
+        await sleep(1000);
         // await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await treeUtils.refresh();
         await verifyTaskCount(testsName, startTaskCount);

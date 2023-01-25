@@ -1,36 +1,38 @@
 
-const pkgJsonCfgProps = require("../../../package.json").contributes.configuration.properties;
-import {
-    ConfigurationChangeEvent, EventEmitter, workspace, WorkspaceConfiguration, ConfigurationTarget
-} from "vscode";
-import { IConfiguration } from "../../interface/IConfiguration";
 import { isObject } from "./utils";
-
+import { IConfiguration } from "../../interface/IConfiguration";
 const extensionName = "taskExplorer";
+import {
+    ConfigurationChangeEvent, workspace, WorkspaceConfiguration, ConfigurationTarget, ExtensionContext
+} from "vscode";
+
+const pkgJsonCfgProps = require("../../../package.json").contributes.configuration.properties;
 
 
 class Configuration implements IConfiguration
 {
-    // private pkgJsonCfgProps: any;
+    private pkgJsonCfgProps: any;
     private configuration: WorkspaceConfiguration;
-    private configurationWs: WorkspaceConfiguration;
-    private _onDidChange = new EventEmitter<ConfigurationChangeEvent>();
-
-
-    // get onDidChange(): Event<ConfigurationChangeEvent>
-    // {
-    //     return this._onDidChange.event;
-    // }
+    private configurationGlobal: WorkspaceConfiguration;
+    private isDev = false;
+    private isTests = false;
 
 
     constructor()
     {
-        // const pkgJsonFile = join(getInstallPath(), "package.json");
-        // const pkgJson = JSON.parse(readFileSync(pkgJsonFile));
-        // this.pkgJsonCfgProps = pkgJson.contributes.configuration.properties;
         this.configuration = workspace.getConfiguration(extensionName);
-        this.configurationWs = workspace.getConfiguration();
-        workspace.onDidChangeConfiguration(this.onConfigurationChanged, this);
+        this.configurationGlobal = workspace.getConfiguration();
+    }
+
+
+    public initialize(context: ExtensionContext, isDev: boolean, isTests: boolean)
+    {
+        this.isDev = isDev;
+        this.isTests = isTests;
+        this.configuration = workspace.getConfiguration(extensionName);
+        this.configurationGlobal = workspace.getConfiguration();
+        context.subscriptions.push(workspace.onDidChangeConfiguration(this.onConfigurationChanged, this));
+        this.pkgJsonCfgProps = pkgJsonCfgProps || /* istanbul ignore next */context.extension.packageJSON.contributes.configuration.properties;
     }
 
 
@@ -39,15 +41,12 @@ class Configuration implements IConfiguration
         if (event.affectsConfiguration(extensionName))
         {
             this.configuration = workspace.getConfiguration(extensionName);
-            this._onDidChange.fire(event);
+            this.configurationGlobal = workspace.getConfiguration();
         }
     }
 
 
-    public get<T>(key: string, defaultValue?: T): T
-    {
-        return this.configuration.get<T>(key, defaultValue!);
-    }
+    public get = <T>(key: string, defaultValue?: T) => this.configuration.get<T>(key, defaultValue!);
 
 
     private getSettingKeys(key: string)
@@ -55,7 +54,7 @@ class Configuration implements IConfiguration
         let propertyKey = key,
             valueKey = key,
             isObject = false;
-        if (!pkgJsonCfgProps[propertyKey] && key.includes("."))
+        if (!this.pkgJsonCfgProps[propertyKey] && key.includes("."))
         {
             let propsKey = "";
             const keys = key.split(".");
@@ -63,7 +62,7 @@ class Configuration implements IConfiguration
                 propsKey += ((i > 0 ? "." : "") + keys[i]);
             }
             const pkgJsonPropsKey = extensionName + "." + propsKey;
-            if (pkgJsonCfgProps[pkgJsonPropsKey] && pkgJsonCfgProps[pkgJsonPropsKey].type === "object")
+            if (this.pkgJsonCfgProps[pkgJsonPropsKey] && this.pkgJsonCfgProps[pkgJsonPropsKey].type === "object")
             {
                 isObject = true;
                 propertyKey = propsKey;
@@ -83,22 +82,13 @@ class Configuration implements IConfiguration
      * Example:
      *     getGlobal<string>("terminal.integrated.shell.windows", "")
      */
-    public getVs<T>(key: string, defaultValue?: T): T
-    {
-        return this.configurationWs.get<T>(key, defaultValue!);
-    }
+    public getVs = <T>(key: string, defaultValue?: T) => this.configurationGlobal.get<T>(key, defaultValue!);
 
 
-    public updateVs(key: string, value: any): Thenable<void>
-    {
-        return this.configurationWs.update(key, value, ConfigurationTarget.Global);
-    }
+    public updateVs = (key: string, value: any): Thenable<void> => this.configurationGlobal.update(key, value, ConfigurationTarget.Global);
 
 
-    public updateVsWs(key: string, value: any): Thenable<void>
-    {
-        return this.configurationWs.update(key, value, ConfigurationTarget.Workspace);
-    }
+    public updateVsWs = (key: string, value: any): Thenable<void> => this.configurationGlobal.update(key, value, ConfigurationTarget.Workspace);
 
 
     public update(key: string, value: any): Thenable<void>
@@ -115,7 +105,8 @@ class Configuration implements IConfiguration
             const v = this.get<object>(settingKeys.pKey, {});
             value = Object.assign(v, value);
         }
-        return this.configuration.update(settingKeys.pKey, value, ConfigurationTarget.Global);
+        return this.configuration.update(settingKeys.pKey, value, this.isDev || this.isTests ?
+                                         ConfigurationTarget.Workspace : /* istanbul ignore next */ConfigurationTarget.Global);
     }
 
 
@@ -152,3 +143,8 @@ class Configuration implements IConfiguration
 }
 
 export const configuration = new Configuration();
+
+export const registerConfiguration = (context: ExtensionContext, isDev: boolean, isTests: boolean) =>
+{
+    configuration.initialize(context, isDev, isTests);
+};
