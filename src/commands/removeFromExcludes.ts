@@ -32,7 +32,7 @@ const removeUriFromExcludes = async(uri: Uri) =>
         }
     }
     else {
-        await removeFromExcludes([ uri.path ], "exclude", false, "   ");
+        await removeFromExcludes([ uri.path + "/**" ], "exclude", false, "   ");
     }
     log.methodDone("remove from excludes file explorer command", 1, "");
 };
