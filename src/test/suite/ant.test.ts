@@ -2,7 +2,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import * as assert from "assert";
 import { expect } from "chai";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
@@ -16,7 +15,7 @@ import {
 const testsName = "ant";
 const startTaskCount = 3;
 const slowTimeforAntRunTasks = (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.config.event * 2) +
-                               (tc.slowTime.taskProviderReadUri * 2) + tc.slowTime.tasks.antParser;
+                               tc.slowTime.tasks.antParser;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;

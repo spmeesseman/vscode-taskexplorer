@@ -101,6 +101,8 @@ suite("Menu Command Tests", () =>
         this.slow(tc.slowTime.taskCount.verify + tc.slowTime.config.excludesEvent);
         await executeTeCommand2("addToExcludesEx", [ gruntFolderUri ], tc.waitTime.config.excludesEvent);
         await verifyTaskCount("grunt", 0);
+        overrideNextShowInfoBox(undefined);
+        await executeTeCommand2("addToExcludesEx", [ readmeUri ], tc.waitTime.config.eventFast);
         endRollingCount(this);
     });
 
@@ -111,6 +113,8 @@ suite("Menu Command Tests", () =>
         this.slow(tc.slowTime.taskCount.verify + tc.slowTime.config.excludesEvent);
         await executeTeCommand2("removeFromExcludes", [ gruntFolderUri ], tc.waitTime.config.excludesEvent);
         await verifyTaskCount("grunt", gruntStartCount);
+        overrideNextShowInfoBox(undefined);
+        await executeTeCommand2("removeFromExcludes", [ readmeUri ], tc.waitTime.config.eventFast);
         endRollingCount(this);
     });
 
