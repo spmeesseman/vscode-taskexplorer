@@ -115,13 +115,10 @@ const logLogFileLocation = () =>
 {
     if (logControl.enable && logControl.enableFile)
     {
-        /* istanbul ignore else */
-        if (logControl.logOutputChannel)
-        {
-            logControl.logOutputChannel.appendLine("***********************************************************************************************");
-            logControl.logOutputChannel.appendLine(" Log File: " + logControl.fileName);
-            logControl.logOutputChannel.appendLine("***********************************************************************************************");
-        }
+        const channel: OutputChannel = logControl.logOutputChannel as OutputChannel;
+        channel.appendLine("***********************************************************************************************");
+        channel.appendLine(" Log File: " + logControl.fileName);
+        channel.appendLine("***********************************************************************************************");
         /* istanbul ignore else */
         if (logControl.isTests)
         {
