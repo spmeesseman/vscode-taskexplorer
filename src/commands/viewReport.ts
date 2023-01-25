@@ -23,7 +23,7 @@ function registerViewReportCommand(ctx: ExtensionContext, api: ITaskExplorerApi)
     teApi = api;
     context = ctx;
 	ctx.subscriptions.push(
-        commands.registerCommand("taskExplorer.viewReport", async (uri?: Uri) => viewReport(uri))
+        commands.registerCommand("vscode-taskexplorer.viewReport", async (uri?: Uri) => viewReport(uri))
     );
 }
 

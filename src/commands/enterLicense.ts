@@ -16,7 +16,7 @@ async function enterLicense(logPad = "   ", logLevel = 3)
 function registerEnterLicenseCommand(context: ExtensionContext)
 {
 	context.subscriptions.push(
-        commands.registerCommand("taskExplorer.enterLicense", async (logPad?: string, logLevel?: number) => { await enterLicense(logPad, logLevel); })
+        commands.registerCommand("vscode-taskexplorer.enterLicense", async (logPad?: string, logLevel?: number) => { await enterLicense(logPad, logLevel); })
     );
 }
 

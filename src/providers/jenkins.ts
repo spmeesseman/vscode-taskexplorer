@@ -15,9 +15,48 @@ export class JenkinsTaskProvider extends TaskExplorerProvider implements TaskExp
     constructor() { super("jenkins"); }
 
 
-    public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task | undefined
+    public createTask(pathToJenkins: string, pathToCurl: string, folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task
     {
-        return undefined;
+        const args = [
+            "-X",
+            "POST",
+            "-L",
+            "-H",
+            "Authorization: basic " + xArgs[0],
+            "-F",
+            "jenkinsfile=<Jenkinsfile",
+            pathToJenkins + "/pipeline-model-converter/validate"
+        ];
+
+        // const shellW32 = configuration.getVs<string>("terminal.integrated.shell.windows"),
+        //       shellLnx = configuration.getVs<string>("terminal.integrated.shell.linux"),
+        //       shellOsx = configuration.getVs<string>("terminal.integrated.shell.osx");
+
+        const options: ShellExecutionOptions = { cwd: dirname(uri.fsPath) };
+        /* istanbul ignore else */
+        if (process.platform === "win32")
+        {
+            Object.assign(options, {
+                executable: "cmd.exe",
+                shellArgs: [ "/c" ],
+                // type: "process",
+            });
+        }
+
+        const definition: ITaskDefinition =
+        {
+            type: "jenkins",
+            script: undefined,
+            target: undefined,
+            fileName: basename(uri.fsPath),
+            path: getRelativePath(folder, uri),
+            cmdLine: "curl",
+            takesArgs: false,
+            uri
+        };
+
+        const exec = new ShellExecution(pathToCurl, args, options);
+        return new Task(definition, folder, "Validate Jenkinsfile", "jenkins", exec, "$msCompile");
     }
 
 
@@ -30,7 +69,6 @@ export class JenkinsTaskProvider extends TaskExplorerProvider implements TaskExp
     public async readUriTasks(uri: Uri, logPad: string): Promise<Task[]>
     {
         const tasks: Task[] = [],
-              cwd = dirname(uri.fsPath),
               folder = workspace.getWorkspaceFolder(uri) as WorkspaceFolder,
               pathToCurl = configuration.get<string>("pathToPrograms.curl"),
               pathToJenkins = configuration.get<string>("pathToPrograms.jenkins");
@@ -41,45 +79,7 @@ export class JenkinsTaskProvider extends TaskExplorerProvider implements TaskExp
 
         if (pathToJenkins && pathToCurl && env.JENKINS_API_TOKEN)
         {
-            const args = [
-                "-X",
-                "POST",
-                "-L",
-                "-H",
-                "Authorization: basic " + env.JENKINS_API_TOKEN,
-                "-F",
-                "jenkinsfile=<Jenkinsfile",
-                pathToJenkins + "/pipeline-model-converter/validate"
-            ];
-
-            // const shellW32 = configuration.getVs<string>("terminal.integrated.shell.windows"),
-            //       shellLnx = configuration.getVs<string>("terminal.integrated.shell.linux"),
-            //       shellOsx = configuration.getVs<string>("terminal.integrated.shell.osx");
-
-            const options: ShellExecutionOptions = { cwd };
-            if (process.platform === "win32")
-            {
-                Object.assign(options, {
-                    executable: "cmd.exe",
-                    shellArgs: [ "/c" ],
-                    // type: "process",
-                });
-            }
-
-            const definition: ITaskDefinition =
-            {
-                type: "jenkins",
-                script: undefined,
-                target: undefined,
-                fileName: basename(uri.fsPath),
-                path: getRelativePath(folder, uri),
-                cmdLine: "curl",
-                takesArgs: false,
-                uri
-            };
-
-            const exec = new ShellExecution(pathToCurl, args, options);
-            tasks.push(new Task(definition, folder, "Validate Jenkinsfile", "jenkins", exec, "$msCompile"));
+            tasks.push(this.createTask(pathToJenkins, pathToCurl, folder, uri, [ env.JENKINS_API_TOKEN ]));
         }
 
         log.methodDone("read jenkinsfile uri tasks", 4, logPad, [[ "# of tasks found", tasks.length ]], this.logQueueId);

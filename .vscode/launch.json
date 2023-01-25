@@ -49,7 +49,7 @@
                 "${workspaceFolder}/dist/**/*.js"
             ],
             "args": [
-                "${workspaceFolder}/test-fixture/project1",
+                "${workspaceFolder}/test-fixture/tests.code-workspace",
 				"--disable-extensions",
                 "--disable-workspace-trust",
 				"--extensionDevelopmentPath=${workspaceFolder}"
@@ -84,7 +84,7 @@
 			"preLaunchTask": "npm: webpack-watch",
             "cwd": "${workspaceFolder}/dist",
 			"args": [
-                "${workspaceFolder}/test-fixture/project1",
+                "${workspaceFolder}/test-fixture/tests.code-workspace",
 				"--disable-extensions",
                 "--disable-workspace-trust",
 				"--extensionDevelopmentPath=${workspaceFolder}"

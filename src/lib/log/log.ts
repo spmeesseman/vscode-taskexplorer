@@ -123,7 +123,7 @@ const initLog = async(context: ExtensionContext, testsRunning: number) =>
     logControl.logOutputChannel = window.createOutputChannel("Task Explorer");
     context.subscriptions.push(logControl.logOutputChannel);
     context.subscriptions.push(
-        commands.registerCommand("taskExplorer.showOutput", showLogOutput)
+        commands.registerCommand("vscode-taskexplorer.showOutput", showLogOutput)
     );
     const d = workspace.onDidChangeConfiguration(async e => {
         await processConfigChanges(context, e);

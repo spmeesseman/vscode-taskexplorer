@@ -256,7 +256,13 @@ export const executeSettingsUpdate = async (key: string, value?: any, minWait?: 
 
 export const executeTeCommandAsync = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
-    commands.executeCommand(`taskExplorer.${command}`, ...args);
+    let cmdGroup  = "taskExplorer";
+    if (command === "addRemoveFavoriteEx" || command === "addToExcludesEx" || command === "enterLicense" || command === "getApi" || command === "disableTaskType" ||
+        command === "enableTaskType"  || command === "removeFromExcludesEx" || command === "runEx" || command === "showOutput" || command === "viewLicense" || command === "viewReport")
+    {
+        cmdGroup = "vscode-taskexplorer";
+    }
+    commands.executeCommand(`${cmdGroup}.${command}`, ...args);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
 };

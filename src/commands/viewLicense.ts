@@ -23,7 +23,7 @@ function registerViewLicenseCommand(ctx: ExtensionContext, api: ITaskExplorerApi
     teApi = api;
     context = ctx;
 	ctx.subscriptions.push(
-        commands.registerCommand("taskExplorer.viewLicense", async () => viewLicense())
+        commands.registerCommand("vscode-taskexplorer.viewLicense", async () => viewLicense())
     );
 }
 

@@ -4,8 +4,12 @@ import * as util from "./lib/utils/utils";
 import * as fs from "./lib/utils/fs";
 import * as fileCache from "./lib/fileCache";
 import log from "./lib/log/log";
-import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerViewReportCommand from "./commands/viewReport";
+import registerEnterLicenseCommand from "./commands/enterLicense";
+import registerAddToExcludesCommand from "./commands/addToExcludes";
+import registerEnableTaskTypeCommand from "./commands/enableTaskType";
+import registerDisableTaskTypeCommand from "./commands/disableTaskType";
+import registerRemoveFromExcludesCommand from "./commands/removeFromExcludes";
 import { join, resolve } from "path";
 import { AntTaskProvider } from "./providers/ant";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
@@ -124,7 +128,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     // Register file cache
     //
-    fileCache.registerFileCache(context, teApi);
+    await fileCache.registerFileCache(context);
 
     //
     // Register internal task providers.  Npm, VScode type tasks are provided
@@ -350,7 +354,11 @@ async function refreshExternalProvider(providerName: string)
 
 function registerCommands(context: ExtensionContext)
 {
+    registerAddToExcludesCommand(context);
+    registerDisableTaskTypeCommand(context);
+    registerEnableTaskTypeCommand(context);
     registerEnterLicenseCommand(context);
+    registerRemoveFromExcludesCommand(context);
     registerViewLicenseCommand(context, teApi);
     registerViewReportCommand(context, teApi);
     //

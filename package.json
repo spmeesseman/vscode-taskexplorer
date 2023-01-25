@@ -2,7 +2,7 @@
     "name": "vscode-taskexplorer",
     "version": "2.13.2",
     "displayName": "Task Explorer",
-    "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash,php composer, make, maven, python, perl, powershell, ruby, pipenv, nsis.  Supports external task providers via API.",
+    "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash,php composer, make, maven, python, perl, powershell, ruby, pipenv, nsis, jenkins.  Supports external task providers via API.",
     "icon": "res/gears-r-colors.png",
     "publisher": "spmeesseman",
     "license": "See LICENSE",
@@ -210,21 +210,52 @@
         },
         "commands": [
             {
-                "command": "taskExplorer.enterLicense",
-                "title": "Task Explorer: Enter License Key"
-            },
-            {
-                "command": "taskExplorer.viewLicense",
-                "title": "Task Explorer: View License Information"
-            },
-            {
-                "command": "taskExplorer.getApi",
+                "command": "vscode-taskexplorer.getApi",
                 "title": "%command.getApi%",
                 "enablement": "false"
             },
             {
-                "command": "taskExplorer.viewReport",
-                "title": "Task Explorer: View Parsing Report"
+                "command": "vscode-taskexplorer.showOutput",
+                "title": "Task Explorer: Show Log in Output Window",
+                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+            },
+            {
+                "command": "vscode-taskexplorer.viewReport",
+                "title": "%command.viewReport%",
+                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+            },
+            {
+                "command": "vscode-taskexplorer.enterLicense",
+                "title": "%command.enterLicense%"
+            },
+            {
+                "command": "vscode-taskexplorer.viewLicense",
+                "title": "%command.viewLicense%"
+            },
+            {
+                "command": "vscode-taskexplorer.enableTaskType",
+                "title": "%command.enableTaskType%",
+                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+            },
+            {
+                "command": "vscode-taskexplorer.disableTaskType",
+                "title": "%command.disableTaskType%",
+                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+            },
+            {
+                "command": "vscode-taskexplorer.addToExcludesEx",
+                "title": "%command.addToExcludesEx%",
+                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+            },
+            {
+                "command": "vscode-taskexplorer.removeFromExcludes",
+                "title": "%command.removeFromExcludes%",
+                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+            },
+            {
+                "command": "taskExplorerSideBar.addToExcludes",
+                "title": "Add to Excludes List",
+                "when": "config.taskExplorer.enableSideBar"
             },
             {
                 "command": "taskExplorerSideBar.run",
@@ -261,11 +292,6 @@
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
                 }
-            },
-            {
-                "command": "taskExplorerSideBar.addToExcludes",
-                "title": "%command.addToExcludes%",
-                "when": "config.taskExplorer.enableSideBar"
             },
             {
                 "command": "taskExplorerSideBar.addRemoveFavorite",
@@ -371,6 +397,11 @@
                 }
             },
             {
+                "command": "taskExplorer.addToExcludes",
+                "title": "%command.addToExcludes%",
+                "when": "config.taskExplorer.enableExplorerView"
+            },
+            {
                 "command": "taskExplorer.run",
                 "title": "%command.run%",
                 "when": "config.taskExplorer.enableExplorerView",
@@ -405,11 +436,6 @@
                     "light": "res/light/continue.svg",
                     "dark": "res/dark/continue.svg"
                 }
-            },
-            {
-                "command": "taskExplorer.addToExcludes",
-                "title": "%command.addToExcludes%",
-                "when": "config.taskExplorer.enableExplorerView"
             },
             {
                 "command": "taskExplorer.addRemoveFavorite",
@@ -513,11 +539,6 @@
                     "light": "res/light/refresh.svg",
                     "dark": "res/dark/refresh.svg"
                 }
-            },
-            {
-                "command": "taskExplorer.showOutput",
-                "title": "%command.showOutput%",
-                "when": "config.taskExplorer.enableExplorerView"
             }
         ],
         "keybindings": [
@@ -533,6 +554,213 @@
             }
         ],
         "menus": {
+            "explorer/context": [
+                {
+                    "command": "vscode-taskexplorer.disableTaskType",
+                    "group": "9_taskexplorer",
+                    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourceScheme == file && resourcePath in vscodeTaskExplorer.taskFiles"
+                },
+                {
+                    "command": "vscode-taskexplorer.enableTaskType",
+                    "group": "9_taskexplorer",
+                    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourceScheme == file && resourcePath not in vscodeTaskExplorer.taskFiles"
+                },
+                {
+                    "command": "vscode-taskexplorer.addToExcludesEx",
+                    "group": "9_taskexplorer",
+                    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourceScheme == file && resourcePath in vscodeTaskExplorer.taskFiles"
+                },
+                {
+                    "command": "vscode-taskexplorer.addToExcludesEx",
+                    "group": "9_taskexplorer",
+                    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourcePath && resourceScheme == folder"
+                },
+                {
+                    "command": "vscode-taskexplorer.removeFromExcludes",
+                    "group": "9_taskexplorer",
+                    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourceScheme == file && resourcePath not in vscodeTaskExplorer.taskFiles"
+                },
+                {
+                    "command": "vscode-taskexplorer.removeFromExcludes",
+                    "group": "9_taskexplorer",
+                    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourcePath && resourceScheme == folder"
+                },
+                {
+                    "command": "vscode-taskexplorer.viewReport",
+                    "group": "9_taskexplorer",
+                    "when": "explorerViewletVisible && filesExplorerFocus && explorerResourceIsRoot && !inputFocus && resourcePath"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "vscode-taskexplorer.disableTaskType",
+                    "when": "false"
+                },
+                {
+                    "command": "vscode-taskexplorer.enableTaskType",
+                    "when": "false"
+                },
+                {
+                    "command": "vscode-taskexplorer.addToExcludesEx",
+                    "when": "false"
+                },
+                {
+                    "command": "vscode-taskexplorer.removeFromExcludes",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.run",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runNoTerm",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runWithArgs",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.addToExcludes",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.addRemoveFavorite",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.addRemoveCustomLabel",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.clearFavorites",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.clearLastTasks",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.pause",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.restart",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.stop",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.open",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.openTerminal",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runInstall",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runUpdate",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runUpdatePackage",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runAudit",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.runAuditFix",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorerSideBar.refresh",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.run",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runNoTerm",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runWithArgs",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.addToExcludes",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.addRemoveFavorite",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.addRemoveCustomLabel",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.clearFavorites",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.clearLastTasks",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.pause",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.restart",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.open",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.openTerminal",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.stop",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runInstall",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runUpdate",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runUpdatePackage",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runAudit",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.runAuditFix",
+                    "when": "false"
+                },
+                {
+                    "command": "taskExplorer.refresh",
+                    "when": "false"
+                }
+            ],
             "view/title": [
                 {
                     "command": "taskExplorer.runLastTask",
@@ -1398,171 +1626,6 @@
                     "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == lasttasks",
                     "group": "inline"
                 }
-            ],
-            "explorer/context": [
-                {
-                    "command": "taskExplorer.viewReport",
-                    "group": "9_taskexplorer",
-                    "when": "explorerViewletVisible && filesExplorerFocus && explorerResourceIsRoot && !inputFocus && resourcePath"
-                }
-            ],
-            "commandPalette": [
-                {
-                    "command": "taskExplorerSideBar.run",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.runNoTerm",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.runWithArgs",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.addToExcludes",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.addRemoveFavorite",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.addRemoveCustomLabel",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.clearFavorites",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.clearLastTasks",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.pause",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.restart",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.stop",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.open",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.openTerminal",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.runInstall",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.runUpdate",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.runUpdatePackage",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.runAudit",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.runAuditFix",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorerSideBar.refresh",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.run",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.runNoTerm",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.runWithArgs",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.addToExcludes",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.addRemoveFavorite",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.addRemoveCustomLabel",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.clearFavorites",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.clearLastTasks",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.pause",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.restart",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.open",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.openTerminal",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.stop",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.runInstall",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.runUpdate",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.runUpdatePackage",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.runAudit",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.runAuditFix",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.refresh",
-                    "when": "false"
-                },
-                {
-                    "command": "taskExplorer.showOutput",
-                    "when": "false"
-                }
             ]
         },
         "configuration": {
@@ -1696,6 +1759,15 @@
                         "ruby": false,
                         "tsc": true,
                         "workspace": true
+                    }
+                },
+                "taskExplorer.environment": {
+                    "type": "object",
+                    "order": 18,
+                    "additionalProperties": false,
+                    "markdownDescription": "%config.taskExplorer.environment%",
+                    "properties": {
+                        "jenkinsApiToken": "JENKINS_API_TOKEN"
                     }
                 },
                 "taskExplorer.exclude": {
