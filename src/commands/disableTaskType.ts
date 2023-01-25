@@ -1,12 +1,9 @@
 
 import log from "../lib/log/log";
 import constants from "../lib/constants";
-import { loadMessageBundle } from "vscode-nls";
 import { testPattern } from "../lib/utils/utils";
+import { commands, ExtensionContext, Uri } from "vscode";
 import { configuration } from "../lib/utils/configuration";
-import { commands, ExtensionContext, Uri, window } from "vscode";
-
-const localize = loadMessageBundle();
 
 
 const disableTaskType = async(uri: Uri) =>

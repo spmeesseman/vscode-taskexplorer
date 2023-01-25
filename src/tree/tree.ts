@@ -4,18 +4,18 @@ import * as task from "./task";
 import * as sortTasks from "../lib/sortTasks";
 import TaskItem from "./item";
 import TaskFile from "./file";
-import TaskFolder from "./folder";
 import log from "../lib/log/log";
+import TaskFolder from "./folder";
 import constants from "../lib/constants";
 import SpecialTaskFolder from "./specialFolder";
 import { dirname, join } from "path";
 import { IEvent } from "../interface/IEvent";
 import { rebuildCache } from "../lib/fileCache";
-import { TaskWatcher } from "../lib/watcher/taskWatcher";
 import { getTerminal } from "../lib/getTerminal";
+import { addToExcludes } from "../lib/addToExcludes";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
+import { TaskWatcher } from "../lib/watcher/taskWatcher";
 import { configuration } from "../lib/utils/configuration";
-import { enableConfigWatcher } from "../lib/watcher/configWatcher";
 import { TaskExplorerProvider } from "../providers/provider";
 import { ITaskExplorer, TaskMap } from "../interface/ITaskExplorer";
 import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
@@ -192,16 +192,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             }
         }
 
-        log.value("   path value(s)", pathValues.join(", "), 1);
-
-        const excludes = configuration.get<string[]>(excludesList);
-        for (const p of pathValues) {
-            util.pushIfNotExists(excludes, p);
-        }
-
-        enableConfigWatcher(false);
-        await configuration.update(excludesList, excludes);
-        enableConfigWatcher(true);
+        await addToExcludes(pathValues, excludesList, true, "   ");
 
         await this.refresh(selection.taskSource, uri, "   ");
 

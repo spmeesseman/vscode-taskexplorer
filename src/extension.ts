@@ -359,11 +359,11 @@ async function refreshExternalProvider(providerName: string)
 
 function registerCommands(context: ExtensionContext)
 {
-    registerAddToExcludesCommand(context);
+    registerAddToExcludesCommand(context, teApi);
     registerDisableTaskTypeCommand(context);
     registerEnableTaskTypeCommand(context);
     registerEnterLicenseCommand(context);
-    registerRemoveFromExcludesCommand(context);
+    registerRemoveFromExcludesCommand(context, teApi);
     registerViewLicenseCommand(context, teApi);
     registerViewReportCommand(context, teApi);
     //
