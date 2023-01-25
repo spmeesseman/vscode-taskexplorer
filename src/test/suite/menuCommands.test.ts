@@ -99,7 +99,7 @@ suite("Menu Command Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verify + tc.slowTime.config.excludesEvent);
-        await executeTeCommand2("addToExcludes", [ gruntFolderUri ], tc.waitTime.config.excludesEvent);
+        await executeTeCommand2("addToExcludesEx", [ gruntFolderUri ], tc.waitTime.config.excludesEvent);
         await verifyTaskCount("grunt", 0);
         endRollingCount(this);
     });

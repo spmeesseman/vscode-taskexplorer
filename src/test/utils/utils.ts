@@ -280,8 +280,8 @@ export const executeTeCommand2 = (command: string, args: any[], minWait?: number
 const getCmdGroup = (command: string) =>
 {
     let cmdGroup = "taskExplorer";
-    if (command === "addRemoveFavoriteEx" || command === "addToExcludesEx" || command === "enterLicense" || command === "getApi" || command === "disableTaskType" ||
-        command === "enableTaskType"  || command === "removeFromExcludesEx" || command === "runEx" || command === "showOutput" || command === "viewLicense" || command === "viewReport")
+    if (command === "addToExcludesEx" || command === "enterLicense" || command === "getApi" || command === "disableTaskType" ||
+        command === "enableTaskType"  || command === "removeFromExcludes" || command === "showOutput" || command === "viewLicense" || command === "viewReport")
     {
         cmdGroup = "vscode-taskexplorer";
     }
