@@ -74,6 +74,7 @@ export const testControl: ITestControl =
         closeActiveDocument: 20,
         command: 675,
         commandFast: 265,
+        commandShowOutput: 740,
         config: {
             event: 270,
             eventFast: 90,
@@ -93,7 +94,7 @@ export const testControl: ITestControl =
         },
         excludeCommand: 1450,
         explorerViewStartup: 7565,
-        fetchTasksCommand: 1875,
+        fetchTasksCommand: 1870,
         fileCachePersist: 270,
         findTaskPosition: 380,
         findTaskPositionDocOpen: 40,
@@ -138,23 +139,23 @@ export const testControl: ITestControl =
         taskCommandStartupMax: 3100,
         taskProviderReadUri: 90,
         tasks: {
-            antParser: 550,
-            antTask: 3750,
-            antTaskWithAnsicon: 3800,
+            antParser: 525,
+            antTask: 3700,
+            antTaskWithAnsicon: 3750,
             bashScript: 3025,
             batchScriptBat: 4200,
             batchScriptCmd: 5200,
             gulpParser: 3850,
-            npmCommand: 12150,
-            npmCommandPkg: 9600,
-            npmInstallCommand: 12500
+            npmCommand: 11000,
+            npmCommandPkg: 9000,
+            npmInstallCommand: 12000
         },
         taskCount: {
-            verify: 470,
-            verifyByTree: 520,
-            verifyFirstCall: 725,
-            verifyNpm: 1550, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 1925
+            verify: 460,
+            verifyByTree: 510,
+            verifyFirstCall: 700,
+            verifyNpm: 1500, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 1900
         },
         viewReport: 410
     },
@@ -295,6 +296,7 @@ export interface ITestControl
         closeActiveDocument: number;
         command: number;
         commandFast: number;
+        commandShowOutput: number;
         config: {
             event: number;
             eventFast: number;
