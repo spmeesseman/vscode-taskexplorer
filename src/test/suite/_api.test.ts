@@ -26,12 +26,12 @@ suite("API and Initialization", () =>
 
     test("Show/Hide Output Window", async function()
     {
-        this.slow((tc.slowTime.commandFast * 3) + 400);
-        await executeTeCommand("showOutput", tc.waitTime.commandFast, 1000, true);
+        this.slow((tc.slowTime.command * 3) + 400);
+        await executeTeCommand("showOutput", tc.waitTime.command, 1000, true);
         await sleep(100);
-        await executeTeCommand("showOutput", tc.waitTime.commandFast, 1000, false);
+        await executeTeCommand("showOutput", tc.waitTime.command, 1000, false);
         await sleep(100);
-        await executeTeCommand("showOutput", tc.waitTime.commandFast, 1000, tc.log.enabled && tc.log.output);
+        await executeTeCommand("showOutput", tc.waitTime.command, 1000, tc.log.enabled && tc.log.output);
     });
 
 
