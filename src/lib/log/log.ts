@@ -102,8 +102,14 @@ const initLog = async(context: ExtensionContext, testsRunning: number) =>
 {
     const showLogOutput = (show: boolean) =>
     {
-        if (logControl.logOutputChannel && show) {
-            logControl.logOutputChannel.show();
+        if (logControl.logOutputChannel)
+        {
+            if (show) {
+                logControl.logOutputChannel.show();
+            }
+            else {
+                logControl.logOutputChannel.hide();
+            }
         }
     };
 
@@ -121,22 +127,19 @@ const initLog = async(context: ExtensionContext, testsRunning: number) =>
     // Set up a log in the Output window (even if enableOutputWindow is off)
     //
     logControl.logOutputChannel = window.createOutputChannel("Task Explorer");
-    context.subscriptions.push(logControl.logOutputChannel);
-    context.subscriptions.push(
-        commands.registerCommand("vscode-taskexplorer.showOutput", showLogOutput)
-    );
-    const d = workspace.onDidChangeConfiguration(async e => {
-        await processConfigChanges(context, e);
-    });
-    context.subscriptions.push(d);
-    // showLogOutput(showLog || false);
+
+    context.subscriptions.push(...[
+        logControl.logOutputChannel,
+        commands.registerCommand("vscode-taskexplorer.showOutput", showLogOutput),
+        workspace.onDidChangeConfiguration(e => processConfigChanges(context, e))
+    ]);
 
     //
     // If logging isn't enabled, then set all log function to empty functions. This
     // function should only be called once, so don't let istanbul pop it
     //
     /* istanbul ignore next */
-    if (!logControl.enable){
+    if (!logControl.enable) {
         /* istanbul ignore next */
         enableLog(logControl.enable);
     }
