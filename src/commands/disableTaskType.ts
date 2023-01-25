@@ -12,17 +12,9 @@ const localize = loadMessageBundle();
 const disableTaskType = async(uri: Uri) =>
 {
     log.methodStart("disable task type file explorer command", 1, "", true, [[ "path", uri.fsPath ]]);
-    const globKey = Object.keys(constants).find((k => k.startsWith("GLOB_") && testPattern(uri.path, constants[k])));
-    if (globKey)
-    {
-        const taskType = globKey.replace("GLOB_", "").toLowerCase();
-        await configuration.update("enabledTasks." + taskType, false);
-    }
-    else{
-        const msg = "This file does not appear to be associated to any known task type";
-        log.write(msg, 1, "");
-        window.showInformationMessage(localize("messages.noAssociatedTaskType", msg));
-    }
+    const globKey = Object.keys(constants).find((k => k.startsWith("GLOB_") && testPattern(uri.path, constants[k]))) as string;
+    const taskType = globKey.replace("GLOB_", "").toLowerCase();
+    await configuration.update("enabledTasks." + taskType, false);
     log.methodDone("disable task type file explorer command", 1, "");
 };
 

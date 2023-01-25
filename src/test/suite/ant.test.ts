@@ -14,6 +14,7 @@ import {
 } from "../utils/utils";
 
 const testsName = "ant";
+const startTaskCount = 3;
 const slowTimeforAntRunTasks = (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.config.event * 2) +
                                (tc.slowTime.taskProviderReadUri * 2) + tc.slowTime.tasks.antParser;
 
@@ -24,6 +25,7 @@ let rootWorkspace: WorkspaceFolder;
 let buildXmlFile: string;
 let buildXmlFileUri: Uri;
 let buildFileXml: string;
+let buildFileXmlRestored = false;
 
 
 suite("Ant Tests", () =>
@@ -46,7 +48,9 @@ suite("Ant Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await fsApi.writeFile(buildXmlFileUri.fsPath, buildFileXml);
+        if (!buildFileXmlRestored) {
+            await fsApi.writeFile(buildXmlFileUri.fsPath, buildFileXml);
+        }
         await executeSettingsUpdate("useAnt", false);
         suiteFinished(this);
     });
@@ -66,7 +70,7 @@ suite("Ant Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.taskCount.verifyFirstCall);
-        await verifyTaskCount("ant", 3);
+        await verifyTaskCount("ant", startTaskCount);
         endRollingCount(this);
     });
 
@@ -100,7 +104,7 @@ suite("Ant Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
         await executeSettingsUpdate("enabledTasks.ant", true);
-        await verifyTaskCount("ant", 3);
+        await verifyTaskCount("ant", startTaskCount);
         endRollingCount(this);
     });
 
@@ -164,7 +168,7 @@ suite("Ant Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.config.pathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
-        await runCheck(3, 2, 3, 2, false, false);
+        await runCheck(startTaskCount, startTaskCount, false, false);
         endRollingCount(this);
     });
 
@@ -182,7 +186,7 @@ suite("Ant Tests", () =>
             "</project>\n"
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
-        await runCheck(2, 1, 2, 1, false, false);
+        await runCheck(startTaskCount - 1, startTaskCount - 1, false, false);
         endRollingCount(this);
     });
 
@@ -202,7 +206,7 @@ suite("Ant Tests", () =>
             "</project>\n"
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
-        await runCheck(4, 3, 1, 0, true, false);
+        await runCheck(startTaskCount + 1, startTaskCount - 2, true, false);
         endRollingCount(this);
     });
 
@@ -219,7 +223,7 @@ suite("Ant Tests", () =>
             "</project>\n"
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
-        await runCheck(1, 0, 1, 0, false, false);
+        await runCheck(startTaskCount - 2, startTaskCount - 2, false, false);
         endRollingCount(this);
     });
 
@@ -236,7 +240,7 @@ suite("Ant Tests", () =>
             "</some_node>\n"
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
-        await runCheck(1, 0, 1, 0, true, false);
+        await runCheck(startTaskCount - 2, startTaskCount - 2, true, false);
         endRollingCount(this);
     });
 
@@ -257,13 +261,23 @@ suite("Ant Tests", () =>
             "</project>\n"
         );
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
-        await runCheck(1, 0, 1, 0, true, true);
+        await runCheck(startTaskCount - 2, startTaskCount - 2, true, true);
+        endRollingCount(this);
+    });
+
+
+    test("Restore Build.xml File", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
+        await fsApi.writeFile(buildXmlFileUri.fsPath, buildFileXml);
+        buildFileXmlRestored = true;
+        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
+        await verifyTaskCount("ant", startTaskCount);
         endRollingCount(this);
     });
 
 });
-
-
 /**
  * <x>2 shouldalways be 1 less than <x>2.  The single task in hello.xml is not in
  * the count for readUriTasks()
@@ -273,23 +287,19 @@ suite("Ant Tests", () =>
  * @param withAnt1 # of tasks in fetchTasks() using ant parser
  * @param withAnt2 # of tasks in readUriTasks() using ant parser
  */
-async function runCheck(noAnt1: number, noAnt2: number, withAnt1: number, withAnt2: number, antWillFail: boolean, xml2jsWillFail: boolean)
+async function runCheck(expectedCountNoAnt: number, expectedCountWithAnt: number, antWillFail: boolean, xml2jsWillFail: boolean)
 {   //
     // Don't use Ant
     //
     await executeSettingsUpdate("useAnt", false);
     let antTasks = await tasks.fetchTasks({ type: "ant" });
-    assert(antTasks.length === noAnt1, `Did not read ${noAnt1} ant tasks(1)(actual ${antTasks ? antTasks.length : 0})`);
-    antTasks = await provider.readUriTasks(buildXmlFileUri, "");
-    assert(antTasks.length === noAnt2, `Did not read ${noAnt2} ant tasks (2)(actual ${antTasks ? antTasks.length : 0})`);
+    expect(antTasks.length).to.be.equal(expectedCountNoAnt, `Did not read ${expectedCountNoAnt} ant tasks(1)(actual ${antTasks ? antTasks.length : 0})`);
     logErrorsAreFine(xml2jsWillFail);
     //
     // Use Ant
     //
     await executeSettingsUpdate("useAnt", true);
     antTasks = await tasks.fetchTasks({ type: "ant" });
-    assert(antTasks.length === withAnt1, `Did not read ${withAnt1} ant tasks (3)(actual ${antTasks ? antTasks.length : 0})`);
-    antTasks = await provider.readUriTasks(buildXmlFileUri, "");
-    assert(antTasks.length === withAnt2, `Did not read ${withAnt2} ant tasks (4)(actual ${antTasks ? antTasks.length : 0})`);
+    expect(antTasks.length).to.be.equal(expectedCountWithAnt, `Did not read ${expectedCountWithAnt} ant tasks (3)(actual ${antTasks ? antTasks.length : 0})`);
     logErrorsAreFine(antWillFail);
 }

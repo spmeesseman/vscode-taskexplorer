@@ -54,15 +54,6 @@ suite("Tree Tests", () =>
 	});
 
 
-    test("Refresh", async function()
-    {
-        if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommand);
-        await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
-        utils.endRollingCount(this);
-    });
-
-
     test("Show Favorites", async function()
     {
         if (utils.exitRollingCount(this)) return;
@@ -401,15 +392,6 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder);
         await utils.executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
-        utils.endRollingCount(this);
-    });
-
-
-    test("Refresh", async function()
-    {
-        if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommand);
-        await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
         utils.endRollingCount(this);
     });
 

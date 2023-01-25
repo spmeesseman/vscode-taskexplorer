@@ -485,7 +485,7 @@ suite("License Manager Tests", () =>
 	test("Enter License Key on Startup (1st Time, Remote Server)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.licenseMgr.remoteCheck + testControl.slowTime.storageUpdate + testControl.slowTime.storageSecretUpdate);
+		this.slow(testControl.slowTime.licenseMgr.page + testControl.slowTime.licenseMgr.remoteCheck + testControl.slowTime.storageUpdate + testControl.slowTime.storageSecretUpdate);
 		await teApi.testsApi.storage.update("version", undefined);
 		const licenseKey = await licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
@@ -543,7 +543,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		if (lsProcess)
 		{
-			this.slow(testControl.slowTime.licenseMgr.localCheck + testControl.slowTime.storageUpdate + (testControl.slowTime.storageSecretUpdate * 2));
+			this.slow(testControl.slowTime.licenseMgr.page + testControl.slowTime.licenseMgr.localCheck + testControl.slowTime.storageUpdate + (testControl.slowTime.storageSecretUpdate * 2));
 			licMgr.setTestData({
 				host: "localhost",
 				port: 485,
