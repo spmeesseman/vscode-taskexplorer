@@ -12,6 +12,7 @@ import { commands, ExtensionContext, Uri, window } from "vscode";
 const localize = loadMessageBundle();
 let teApi: ITaskExplorerApi;
 
+
 const addUriToExcludes = async(uri: Uri) =>
 {
     log.methodStart("add to excludes file explorer command", 1, "", true, [[ "path", uri.fsPath ]]);
@@ -31,7 +32,7 @@ const addUriToExcludes = async(uri: Uri) =>
         }
     }
     else {
-        // TODO
+        await addToExcludes([ uri.path ], "exclude", false, "   ");
     }
     log.methodDone("add to excludes file explorer command", 1, "");
 };
