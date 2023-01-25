@@ -100,19 +100,6 @@ const enableLog = (enable: boolean) =>
 
 const initLog = async(context: ExtensionContext, testsRunning: number) =>
 {
-    const showLogOutput = (show: boolean) =>
-    {
-        if (logControl.logOutputChannel)
-        {
-            if (show) {
-                logControl.logOutputChannel.show();
-            }
-            else {
-                logControl.logOutputChannel.hide();
-            }
-        }
-    };
-
     logControl.isTests = testsRunning > 0;
     logControl.isTestsBlockScaryColors = testsRunning > 1;
     logControl.enable = configuration.get<boolean>("logging.enable", false);
@@ -128,6 +115,9 @@ const initLog = async(context: ExtensionContext, testsRunning: number) =>
     //
     logControl.logOutputChannel = window.createOutputChannel("Task Explorer");
 
+    //
+    // Register disposables
+    //
     context.subscriptions.push(...[
         logControl.logOutputChannel,
         commands.registerCommand("vscode-taskexplorer.showOutput", showLogOutput),
@@ -226,6 +216,18 @@ const setWriteToConsole = (set: boolean, level = 2) =>
 {
     logControl.writeToConsole = set;
     logControl.writeToConsoleLevel = level;
+};
+
+
+const showLogOutput = (show: boolean) =>
+{
+    const channel: OutputChannel = logControl.logOutputChannel as OutputChannel;
+    if (show) {
+        channel.show();
+    }
+    else {
+        channel.hide();
+    }
 };
 
 

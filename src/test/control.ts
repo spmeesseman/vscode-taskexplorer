@@ -62,7 +62,7 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 2600,
+        addWorkspaceFolder: 2500,
         buildTreeNoTasks: 295,
         cache: {
             build: 520,
@@ -138,9 +138,9 @@ export const testControl: ITestControl =
         taskCommandStartupMax: 3100,
         taskProviderReadUri: 90,
         tasks: {
-            antParser: 600,
-            antTask: 3850,
-            antTaskWithAnsicon: 3900,
+            antParser: 550,
+            antTask: 3800,
+            antTaskWithAnsicon: 3850,
             bashScript: 3025,
             batchScriptBat: 4200,
             batchScriptCmd: 5200,
@@ -150,11 +150,11 @@ export const testControl: ITestControl =
             npmInstallCommand: 12825
         },
         taskCount: {
-            verify: 475,
-            verifyByTree: 525,
-            verifyFirstCall: 740,
+            verify: 470,
+            verifyByTree: 520,
+            verifyFirstCall: 725,
             verifyNpm: 1550, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 1950
+            verifyWorkspace: 1925
         },
         viewReport: 410
     },
