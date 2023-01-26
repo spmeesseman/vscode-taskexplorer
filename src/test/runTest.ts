@@ -22,14 +22,14 @@ async function main(args: string[])
     // Passed to --extensionTestsPath
     //
     const extensionTestsPath = path.resolve(__dirname, "./suite");
-    const testWorkspace = path.resolve(__dirname, "../../test-fixture/project1");
-    const testWorkspaceMultiRoot = path.resolve(__dirname, "../../test-fixture");
+    const testWorkspace = path.resolve(__dirname, path.join("..", "..", "test-fixture", "project1"));
+    const testWorkspaceMultiRoot = path.resolve(__dirname, path.join("..", "..", "test-fixture"));
     const vscodeTestUserDataPath = path.join(extensionDevelopmentPath, ".vscode-test", "user-data");
     //
     // Setting file to clear and restore
     //
     const projectSettingsFile = path.join(testWorkspace, ".vscode", "settings.json");
-    const wsSettingsFile = path.join(testWorkspaceMultiRoot, "tests.code-workspace");
+    const wsFile = path.join(testWorkspaceMultiRoot, "tests.code-workspace");
 
     const wsConfig = {
         folders: [
@@ -56,7 +56,7 @@ async function main(args: string[])
         //
         // let settingsJsonOrig: string | undefined;
         await writeFile(projectSettingsFile, "{}");
-        await writeFile(wsSettingsFile, JSON.stringify(wsConfig, null, 4));
+        await writeFile(wsFile, JSON.stringify(wsConfig, null, 4));
 
         //
         // Copy a "User Tasks" file
@@ -74,7 +74,8 @@ async function main(args: string[])
             version: "1.60.1",
             extensionDevelopmentPath,
             extensionTestsPath,
-            launchArgs: [ testWorkspace, "--disable-extensions", "--disable-workspace-trust" ],
+            launchArgs: [ wsFile, "--disable-extensions", "--disable-workspace-trust" ],
+            // launchArgs: [ testWorkspace, "--disable-extensions", "--disable-workspace-trust" ],
             // launchArgs: [ "--add " + extensionTestsWsPath, "--disable-extensions", "--disable-workspace-trust" ],
             extensionTestsEnv: { testArgs: args && args.length > 0 ? args.toString() : "" }
         });
@@ -160,7 +161,7 @@ async function main(args: string[])
                         "**/hello.xml"
                     ]
                 };
-                await writeFile(wsSettingsFile, JSON.stringify(wsConfig, null, 4));
+                await writeFile(wsFile, JSON.stringify(wsConfig, null, 4));
             }
             console.log("delete any leftover temporary files and/or directories");
             await deleteDir(path.join(testWorkspace, "tasks_test_"));

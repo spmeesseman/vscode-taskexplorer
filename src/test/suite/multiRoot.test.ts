@@ -26,6 +26,7 @@ import {
 const gruntCt = 7;
 const originalGetWorkspaceFolder = workspace.getWorkspaceFolder;
 
+let fakeWsfStartIdx = 1;
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let testsApi: ITestsApi;
@@ -34,7 +35,7 @@ let wsf1DirName: string;
 let wsf2DirName: string;
 let wsf3DirName: string;
 let wsf4DirName: string;
-let wsf: WorkspaceFolder[];
+const wsf: WorkspaceFolder[] = [];
 
 
 suite("Multi-Root Workspace Tests", () =>
@@ -54,28 +55,32 @@ suite("Multi-Root Workspace Tests", () =>
         wsf4DirName = join(testsPath, "wsf4");
         await fsApi.createDir(wsf4DirName);
 
-        wsf = [
-        (workspace.workspaceFolders as WorkspaceFolder[])[0],
+        wsf.push((workspace.workspaceFolders as WorkspaceFolder[])[0]);
+        if (tc.isMultiRootWorkspace) {
+            fakeWsfStartIdx = 2;
+            wsf.push((workspace.workspaceFolders as WorkspaceFolder[])[1]);
+        }
+        wsf.push(...[
         {
             uri: Uri.file(wsf1DirName),
             name: "wsf1",
-            index: 1
+            index: fakeWsfStartIdx
         },
         {
             uri: Uri.file(wsf2DirName),
             name: "wsf2",
-            index: 2
+            index: fakeWsfStartIdx + 1
         },
         {
             uri: Uri.file(wsf3DirName),
             name: "wsf3",
-            index: 3
+            index: fakeWsfStartIdx + 2
         },
         {
             uri: Uri.file(wsf4DirName),
             name: "wsf4",
-            index: 4
-        }];
+            index: fakeWsfStartIdx + 3
+        }]);
 
         endRollingCount(this, true);
     });
@@ -118,7 +123,7 @@ suite("Multi-Root Workspace Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.addWorkspaceFolder);
         await testsApi.onWsFoldersChange({
-            added: [ wsf[1] ],
+            added: [ wsf[fakeWsfStartIdx] ],
             removed: []
         });
         await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
@@ -131,7 +136,7 @@ suite("Multi-Root Workspace Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.addWorkspaceFolder * 2));
         await testsApi.onWsFoldersChange({
-            added: [ wsf[2], wsf[3] ],
+            added: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ],
             removed: []
         });
         await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
@@ -144,7 +149,7 @@ suite("Multi-Root Workspace Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.addWorkspaceFolder);
         await testsApi.onWsFoldersChange({
-            added: [ wsf[4] ],
+            added: [ wsf[fakeWsfStartIdx + 3] ],
             removed: []
         });
         await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
@@ -158,7 +163,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.removeWorkspaceFolder);
         await testsApi.onWsFoldersChange({
             added: [],
-            removed: [ wsf[1] ]
+            removed: [ wsf[fakeWsfStartIdx] ]
         });
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         endRollingCount(this);
@@ -171,7 +176,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow((tc.slowTime.removeWorkspaceFolder * 2));
         await testsApi.onWsFoldersChange({
             added: [],
-            removed: [ wsf[2], wsf[3] ]
+            removed: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ]
         });
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         endRollingCount(this);
@@ -184,7 +189,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.removeWorkspaceFolder);
         await testsApi.onWsFoldersChange({
             added: [],
-            removed: [ wsf[4] ]
+            removed: [ wsf[fakeWsfStartIdx + 3] ]
         });
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         endRollingCount(this);
@@ -196,7 +201,7 @@ suite("Multi-Root Workspace Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
-            join(wsf[1].uri.fsPath, "Gruntfile.js"),
+            join(wsf[fakeWsfStartIdx].uri.fsPath, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
             '    grunt.registerTask("upload2", ["s3"]);\n' +
@@ -206,10 +211,10 @@ suite("Multi-Root Workspace Tests", () =>
         {   //
             // See note below.  Can't figure out how to get VSCode to return the fake ws folder tasks
             //
-            return wsf[uri.fsPath.includes("test-fixture") ? 0 : 1];
+            return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx];
         };
         await testsApi.onWsFoldersChange({
-            added: [ wsf[1] ],
+            added: [ wsf[fakeWsfStartIdx] ],
             removed: []
         });
         await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
@@ -230,7 +235,7 @@ suite("Multi-Root Workspace Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
-            join(wsf[2].uri.fsPath, "Gruntfile.js"),
+            join(wsf[fakeWsfStartIdx + 1].uri.fsPath, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"default3", ["jshint:myproject"]);\n' +
             '    grunt.registerTask("upload3", ["s3"]);\n' +
@@ -240,10 +245,10 @@ suite("Multi-Root Workspace Tests", () =>
         {   //
             // See note below.  Can't figure out how to get VSCode to return the fake ws folder tasks
             //
-            return wsf[uri.fsPath.includes("test-fixture") ? 0 : 2];
+            return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx + 1];
         };
         await testsApi.onWsFoldersChange({
-            added: [ wsf[2], wsf[3] ],
+            added: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ],
             removed: []
         });
         await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
@@ -266,10 +271,10 @@ suite("Multi-Root Workspace Tests", () =>
         workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
         await testsApi.onWsFoldersChange({
             added: [],
-            removed: [ wsf[1] ]
+            removed: [ wsf[fakeWsfStartIdx] ]
         });
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
-        await fsApi.deleteFile(join(wsf[1].uri.fsPath, "Gruntfile.js"));
+        await fsApi.deleteFile(join(wsf[fakeWsfStartIdx].uri.fsPath, "Gruntfile.js"));
         // await verifyTaskCount("grunt", gruntCt +2); // vscode knows the ws folders are fake and doesnt serve the tasks
         await verifyTaskCount("grunt", gruntCt);
         endRollingCount(this);
@@ -282,10 +287,10 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify);
         await testsApi.onWsFoldersChange({
             added: [],
-            removed: [ wsf[2], wsf[3] ]
+            removed: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ]
         });
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
-        await fsApi.deleteFile(join(wsf[2].uri.fsPath, "Gruntfile.js"));
+        await fsApi.deleteFile(join(wsf[fakeWsfStartIdx + 1].uri.fsPath, "Gruntfile.js"));
         await verifyTaskCount("grunt", gruntCt);
         endRollingCount(this);
     });
@@ -294,11 +299,11 @@ suite("Multi-Root Workspace Tests", () =>
     test("Mimic Add WS Folder 1 (Cache Builder Busy)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.cache.rebuild + 100);
+        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.cache.rebuild + 200);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
         await testsApi.onWsFoldersChange({ // event will wait for previous fil cache build
-            added: [ wsf[1] ],
+            added: [ wsf[fakeWsfStartIdx] ],
             removed: []
         });
         await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
@@ -309,12 +314,12 @@ suite("Multi-Root Workspace Tests", () =>
     test("Mimic Remove WS Folder 1 (Cache Builder Busy)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.cache.rebuildNoChanges + 100);
+        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.cache.rebuildNoChanges + 200);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
         await testsApi.onWsFoldersChange({ // event will wait for previous fil cache build
             added: [],
-            removed: [ wsf[1] ]
+            removed: [ wsf[fakeWsfStartIdx] ]
         });
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         endRollingCount(this);

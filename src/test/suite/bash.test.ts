@@ -131,7 +131,7 @@ suite("Bash Tests", () =>
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         await fsApi.deleteDir(dirName);
-        await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
+        await waitForTeIdle(testControl.waitTime.fs.deleteFolderEvent);
         endRollingCount(this);
     });
 

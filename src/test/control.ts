@@ -4,6 +4,10 @@ import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 
 export const testControl: ITestControl =
 {   //
+    // Is multi-root workspace - Populated by initSettings() on startup
+    //
+    isMultiRootWorkspace: false,
+    //
     // KEEP SETTINGS FILE CHANGES (@ test-fixture/project1/.vscode/workspace.json)
     //
     keepSettingsFileChanges: false,
@@ -184,11 +188,11 @@ export const testControl: ITestControl =
         explorerViewStartup: 2000,
         focusCommand: 220,
         fs: {
-            createEvent: 190,
-            createFolderEvent: 205,
-            deleteEvent: 180,
-            deleteFolderEvent: 180,
-            modifyEvent: 175
+            createEvent: 200,
+            createFolderEvent: 225,
+            deleteEvent: 190,
+            deleteFolderEvent: 210,
+            modifyEvent: 185
         },
         getTreeMin: 170,
         getTreeTasks: 50,
@@ -222,6 +226,10 @@ interface ISuiteResults extends IDictionary<any>
 
 export interface ITestControl
 {   //
+    // Is multi-root workspace - Populated by initSettings() on startup
+    //
+    isMultiRootWorkspace: boolean;
+    //
     // KEEP SETTINGS FILE CHANGES (@ test-fixture/project1/.vscode/workspace.json)
     //
     keepSettingsFileChanges: boolean;

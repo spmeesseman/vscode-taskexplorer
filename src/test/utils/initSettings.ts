@@ -1,10 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import { getWsPath } from "./sharedUtils";
-import { testControl as tc } from "../control";
+import { testControl as tc, testControl } from "../control";
 import { isObject } from "../../lib/utils/utils";
 import { configuration } from "../../lib/utils/configuration";
 import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
+import { workspace } from "vscode";
 
 
 const initSettings = async () =>
@@ -170,6 +171,31 @@ const initSettings = async () =>
                 Object.keys(slowTimes[k]).forEach((k2) =>
                 {
                     slowTimes[k][k2] = Math.round(slowTimes[k][k2] * factor);
+                });
+            }
+        });
+    }
+
+    if (workspace.workspaceFolders && workspace.workspaceFolders.length > 1)
+    {
+        tc.isMultiRootWorkspace = true;
+        const waitTimes = tc.waitTime as IDictionary<any>;
+        Object.keys(waitTimes).forEach((k) =>
+        {
+            if (!isObject(waitTimes[k])) {
+                waitTimes[k] = Math.round(waitTimes[k] * 1.75);
+            }
+            else {
+                Object.keys(waitTimes[k]).forEach((k2) =>
+                {
+                    if (k === "fs")
+                    {
+                        console.log("bumping fs wait time to " + Math.round(waitTimes[k][k2] * (k === "fs" ? 2.5 : 1.25)) + "  ms");
+                    }
+                    waitTimes[k][k2] = Math.round(waitTimes[k][k2] * (k === "fs" ? 2.5 : 1.25));
+                    if (k2 === "modifyEvent") {
+                        waitTimes[k][k2] += 50;
+                    }
                 });
             }
         });

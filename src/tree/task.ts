@@ -14,8 +14,8 @@ import { getPackageManager, isScriptType, timeout } from "../lib/utils/utils";
 import { providers, providersExternal } from "../extension";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import {
-    CustomExecution, InputBoxOptions, Selection, ShellExecution, Task, TaskDefinition, TaskExecution, TaskRevealKind, tasks,
-    TextDocument, Uri, window, workspace
+    CustomExecution, InputBoxOptions, Selection, ShellExecution, Task, TaskDefinition,
+    TaskExecution, TaskRevealKind, tasks, TextDocument, Uri, window, workspace
 } from "vscode";
 
 // const views: IDictionary<any> = {};
