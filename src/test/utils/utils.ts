@@ -542,7 +542,7 @@ export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxW
             hasExec = false,
             isExec = !!isExecuting(exec.task);
         console.log(`    ${figures.color.infoTask}   ${figures.withColor(`Waiting for '${taskName}' task execution`, figures.colors.grey)}`);
-        while ((isExec && (maxWait === undefined || waitedAfterStarted < maxWait)) || (!isExec && !hasExec && waitedHasNotStarted < tc.slowTime.taskCommandStartupMax))
+        while ((isExec && (maxWait === undefined || waitedAfterStarted < maxWait)) || (!isExec && !hasExec && waitedHasNotStarted < 3000))
         {
             await sleep(50);
             isExec = !!isExecuting(exec.task);

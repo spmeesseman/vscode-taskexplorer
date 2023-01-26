@@ -65,16 +65,16 @@ export const testControl: ITestControl =
         addWorkspaceFolder: 2500,
         buildTreeNoTasks: 295,
         cache: {
-            build: 520,
+            build: 500,
             buildCancel: 290,
-            rebuild: 4200,
+            rebuild: 4000,
             rebuildCancel: 490,
             rebuildNoChanges: 890,
         },
-        closeActiveDocument: 20,
+        closeEditors: 20,
         command: 675,
         commandFast: 265,
-        commandShowOutput: 765,
+        commandShowOutput: 785,
         config: {
             event: 270,
             eventFast: 90,
@@ -92,11 +92,11 @@ export const testControl: ITestControl =
             readEvent: 25,
             sortingEvent: 725
         },
-        excludeCommand: 1425,
+        excludeCommand: 1400,
         explorerViewStartup: 7565,
         fetchTasksCommand: 1850,
         fileCachePersist: 260,
-        findTaskPosition: 350,
+        findTaskPosition: 340,
         findTaskPositionDocOpen: 40,
         focusCommand: 2340,
         focusCommandAlreadyFocused: 320,
@@ -108,7 +108,7 @@ export const testControl: ITestControl =
             deleteEvent: 1350,
             deleteEventTsc: 1635,
             deleteFolderEvent: 1445,
-            modifyEvent: 970,
+            modifyEvent: 1075,
         },
         getTreeTasks: 205,
         getTreeTasksNpm: 495, // npm task provider is slower than shit on a turtle
@@ -125,7 +125,7 @@ export const testControl: ITestControl =
             setLicenseCmd: 210
         },
         min: 50,
-        refreshCommand: 6975,
+        refreshCommand: 6900,
         refreshCommandNoChanges: 245,
         removeWorkspaceFolder: 1975,
         runCommand: 4900,
@@ -135,25 +135,24 @@ export const testControl: ITestControl =
         storageUpdate: 60,
         storageSecretRead: 95,
         storageSecretUpdate: 200,
-        taskCommand: 1125,
-        taskCommandStartupMax: 3000,
+        taskCommand: 1100,
         taskProviderReadUri: 90,
         tasks: {
-            antParser: 500,
-            antTask: 3650,
-            antTaskWithAnsicon: 3700,
+            antParser: 490,
+            antTask: 3450,
+            antTaskWithAnsicon: 3500,
             bashScript: 3025,
-            batchScriptBat: 4200,
-            batchScriptCmd: 5200,
+            batchScriptBat: 4175,
+            batchScriptCmd: 5175,
             gulpParser: 3850,
-            npmCommand: 10000,
-            npmCommandPkg: 8500,
-            npmInstallCommand: 11000
+            npmCommand: 9000,
+            npmCommandPkg: 8000,
+            npmInstallCommand: 10000
         },
         taskCount: {
             verify: 460,
             verifyByTree: 500,
-            verifyFirstCall: 675,
+            verifyFirstCall: 680,
             verifyNpm: 1400, // internal vscode npm task provider is slower than shit wtf
             verifyWorkspace: 1800
         },
@@ -195,6 +194,7 @@ export const testControl: ITestControl =
         },
         getTreeMin: 170,
         getTreeTasks: 50,
+        max: 12000,
         min: 35,
         npmCommandMin: 1100,
         refreshCommand: 140,
@@ -206,12 +206,6 @@ export const testControl: ITestControl =
         verifyTaskCountRetry: 70,
         verifyTaskCountRetryInterval: 100,
         viewReport: 80,
-        //
-        // MAXIMUM WAIT TIMES
-        //
-        max: 12000,
-        runCommandMax: 3200,
-        waitTimeForNpmCommandMax: 12000
     }
 };
 
@@ -293,7 +287,7 @@ export interface ITestControl
             rebuildCancel: number;
             rebuildNoChanges: number;
         };
-        closeActiveDocument: number;
+        closeEditors: number;
         command: number;
         commandFast: number;
         commandShowOutput: number;
@@ -358,7 +352,6 @@ export interface ITestControl
         storageSecretRead: number;
         storageSecretUpdate: number;
         taskCommand: number;
-        taskCommandStartupMax: number;
         taskProviderReadUri: number;
         tasks: {
             antParser: number;
@@ -417,6 +410,7 @@ export interface ITestControl
         };
         getTreeMin: number;
         getTreeTasks: number;
+        max: number;
         min: number;
         npmCommandMin: number;
         refreshCommand: number;
@@ -428,11 +422,5 @@ export interface ITestControl
         verifyTaskCountRetry: number;
         verifyTaskCountRetryInterval: number;
         viewReport: number;
-        //
-        // MAXIMUM WAIT TIMES
-        //
-        max: number;
-        runCommandMax: number;
-        waitTimeForNpmCommandMax: number;
     };
 };
