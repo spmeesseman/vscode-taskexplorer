@@ -7,6 +7,7 @@ import TaskFile from "./file";
 import log from "../lib/log/log";
 import TaskFolder from "./folder";
 import constants from "../lib/constants";
+import statusBarItem from "../lib/statusBarItem";
 import SpecialTaskFolder from "./specialFolder";
 import { dirname, join } from "path";
 import { IEvent } from "../interface/IEvent";
@@ -25,6 +26,7 @@ import {
     Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TreeDataProvider, TreeItem,
     TreeItemCollapsibleState, Uri, commands, tasks, Disposable
 } from "vscode";
+import { ILicenseManager } from "../interface/ILicenseManager";
 
 
 /**
@@ -61,13 +63,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     private disposables: Disposable[];
     private subscriptionStartIndex: number;
     private tasks: Task[] | null = null;
-    private treeBuilding = false;
-    private isTests = false;
+    // private treeBuilding = false;
     private refreshPending = false;
+    // private fistTreeBuildComplete = false;
+    // private fistTreeBuildStarted = false;
     private visible = false;
     private enabled = false;
     private setEnableCalled = false;
     private busy = false;
+    private scanningFilesItem: InitScripts | undefined;
+    private buildingTreeItem: LoadScripts | undefined;
     private getChildrenLogLevel = this.defaultGetChildrenLogLevel;
     private getChildrenLogPad = this.defaultGetChildrenLogPad;
     private extensionContext: ExtensionContext;
@@ -83,10 +88,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         lastTasks: SpecialTaskFolder;
     };
 
-    constructor(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext, testsRunning: boolean)
+    constructor(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext)
     {
         this.name = name;
-        this.isTests = testsRunning;
         this.extensionContext = context;
         this.subscriptionStartIndex = -1;
 
@@ -127,7 +131,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     }
 
 
-    public dispose(context: ExtensionContext)
+    public dispose = (context: ExtensionContext) =>
     {
         this.disposables.forEach((d) => {
             d.dispose();
@@ -137,10 +141,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         this.specialFolders.lastTasks.dispose(context); // <-- must be in this order
         context.subscriptions.splice(this.subscriptionStartIndex, this.disposables.length);
         this.disposables = [];
-    }
+    };
 
 
-    private async addRemoveSpecialTaskLabel(taskItem: TaskItem)
+    private addRemoveSpecialTaskLabel = async(taskItem: TaskItem) =>
     {
         /* istanbul ignore else */
         if (taskItem.folder)
@@ -148,10 +152,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             const folderName = util.lowerCaseFirstChar(taskItem.folder.label as string, true) as "favorites"|"lastTasks";
             return this.specialFolders[folderName].addRemoveRenamedLabel(taskItem);
         }
-    }
+    };
 
 
-    private async addToExcludes(selection: TaskFile | TaskItem)
+    private addToExcludes = async(selection: TaskFile | TaskItem) =>
     {
         let uri: Uri | false;
         let excludesList = "exclude";
@@ -197,10 +201,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         await this.refresh(selection.taskSource, uri, "   ");
 
         log.methodDone("add to excludes", 1);
-    }
+    };
 
 
-    private async buildGroupings(folders: IDictionary<TaskFolder|SpecialTaskFolder>, logPad: string, logLevel: number)
+    private buildGroupings = async(folders: IDictionary<TaskFolder|SpecialTaskFolder>, logPad: string, logLevel: number) =>
     {
         const groupWithSep = configuration.get<boolean>("groupWithSeparator");
         log.methodStart("build tree node groupings", logLevel, logPad, false, [[ "group withseparator", groupWithSep ]]);
@@ -230,10 +234,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         log.methodDone("build tree node groupings", logLevel, logPad);
-    }
+    };
 
 
-    public async buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<TaskFolder[]|NoScripts[]>
+    public buildTaskTree = async(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<TaskFolder[]|NoScripts[]> =>
     {
         let taskCt = 0;
         const folders: IDictionary<TaskFolder> = {};
@@ -247,7 +251,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             return [ new NoScripts() ];
         }
 
-        this.treeBuilding = true;
+        // this.treeBuilding = true;
 
         //
         // The 'Last Tasks' folder will be 1st in the tree
@@ -293,10 +297,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         // Done!
         //
         log.methodDone("build task tree", logLevel, logPad);
-        this.treeBuilding = false;
+        // this.treeBuilding = false;
 
         return sortedFolders;
-    }
+    };
 
 
     /**
@@ -311,7 +315,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      * @param favTasks List of Task ID's currently in the "Favorites" TaskFolder.
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
-    private async buildTaskTreeList(each: Task, folders: IDictionary<TaskFolder>, files: IDictionary<TaskFile>, logPad: string)
+    private buildTaskTreeList = async(each: Task, folders: IDictionary<TaskFolder>, files: IDictionary<TaskFile>, logPad: string) =>
     {
         let folder: TaskFolder | undefined,
             scopeName: string;
@@ -410,7 +414,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         log.methodDone("build task tree list", 2, logPad);
-    }
+    };
 
 
     /**
@@ -421,7 +425,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      *
      * @param folder The TaskFolder to process
      */
-    private async createTaskGroupings(folder: TaskFolder, logPad: string, logLevel: number)
+    private createTaskGroupings = async(folder: TaskFolder, logPad: string, logLevel: number) =>
     {
         let prevTaskFile: TaskItem | TaskFile | undefined;
         const subfolders: IDictionary<TaskFile> = {};
@@ -495,7 +499,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         sortTasks.sortTaskFolder(folder, logPad + "   ", logLevel + 1);
 
         log.methodDone("create tree node folder grouping", logLevel, logPad);
-    }
+    };
 
 
     /**
@@ -539,7 +543,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      * @param subfolders Tree taskfile map
      * @param groupSeparator The group separator
      */
-    private async createTaskGroupingsBySep(folder: TaskFolder, taskFile: TaskFile, subfolders: IDictionary<TaskFile>, treeLevel: number, logPad: string, logLevel: number)
+    private createTaskGroupingsBySep = async(folder: TaskFolder, taskFile: TaskFile, subfolders: IDictionary<TaskFile>, treeLevel: number, logPad: string, logLevel: number) =>
     {
         let prevName: string[] | undefined;
         let prevTaskItem: TaskItem | undefined;
@@ -684,10 +688,132 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         log.methodDone("create task groupings by separator", logLevel, logPad);
-    }
+    };
 
 
-    public fireTreeRefreshEvent(logPad: string, logLevel: number, taskFile?: TreeItem)
+    private createTaskTree = async(licMgr: ILicenseManager, logPad: string, logLevel: number) =>
+    {
+        let ctRmv = 0;
+        TaskExplorerProvider.logPad = logPad + "   ";
+        statusBarItem.show();
+        //
+        // If 'tasks' is empty, then ask for all tasks.
+        // If 'tasks' is non-empty, and 'currentInvalidation' is set, then only ask for tasks
+        // of type specified by it's value.  The 'currentInvalidation' parameter is set by the
+        // refresh() function when a file modify/create/delete event has occurred, it will be
+        // set to the task type of the file that was modified.created/deleted, and at this point
+        // the provider's tasks cache will have been invalidated and rebuilt.
+        //
+        // Note that if 'currentInvalidation' is 'workspace', indicating tasks from a tasks.json
+        // file, there in actuality is no task type called 'workspace'.  Tasks found in these
+        // files can be of any type that is available to VSCode's task provider interface
+        // (including providers implemented in this extension).  In this case, we have to ask
+        // for all tasks.  Same goes for typescript tasks.
+        //
+        if (!this.tasks || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
+        {
+            log.write("   fetching all tasks via VSCode.fetchTasks", logLevel, logPad);
+            statusBarItem.update("Requesting all tasks from all providers");
+            this.tasks = await tasks.fetchTasks();
+            // .filter((t) => !util.isWatchTask(t.source) || !util.isExcluded(t.definition.path, logPad + "   "));
+        }
+        else // if (this.tasks && this.currentInvalidation)
+        {    // if 'tasks' is not null, then 'invalidation' is guaranteed to be set
+            const taskName = util.getTaskTypeFriendlyName(this.currentInvalidation as string);
+            log.write(`   fetching ${taskName} tasks via VSCode.fetchTasks`, logLevel, logPad);
+            statusBarItem.update("Requesting  tasks from " + taskName + " provider");
+            //
+            // Get all tasks of the type defined in 'currentInvalidation' from VSCode, remove
+            // all tasks of the type defined in 'currentInvalidation' from the tasks list cache,
+            // and add the new tasks from VSCode into the tasks list.
+            //
+            const taskItems = await tasks.fetchTasks(
+            {
+                type: this.currentInvalidation
+            });
+            // .filter((t) => this.currentInvalidation !== "npm" || !util.isExcluded(t.definition.path, logPad + "   "));
+            //
+            // Remove tasks of type '' from the 'tasks'array
+            //
+            log.write(`   removing current ${this.currentInvalidation} tasks from cache`, logLevel + 1, logPad);
+            this.tasks.slice().reverse().forEach((item, index, object) =>
+            {   //
+                // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
+                // if the script type set for the task in tasks.json is of type 'currentInvalidation'.
+                // Remove any Workspace type tasks returned as well, in this case the source type is
+                // != currentInvalidation, but the definition type == currentInvalidation
+                //
+                if (item.source === this.currentInvalidation || item.source === "Workspace")
+                {
+                    if (item.source !== "Workspace" || item.definition.type === this.currentInvalidation)
+                    {
+                        log.write(`      removing task '${item.source}/${item.name}'`, logLevel + 2, logPad);
+                        (this.tasks as Task[]).splice(object.length - 1 - index, 1);
+                        ++ctRmv;
+                    }
+                }
+            });
+            log.write(`   removed ${ctRmv} ${this.currentInvalidation} current tasks from cache`, logLevel + 1, logPad);
+            log.write(`   adding ${taskItems.length} new ${this.currentInvalidation} tasks from cache`, logLevel + 1, logPad);
+            this.tasks.push(...taskItems);
+        }
+
+        TaskExplorerProvider.logPad = "";
+
+        /* istanbul ignore else */
+        if (this.tasks)
+        {   //
+            // Remove User tasks if they're not enabled
+            //
+            if (!configuration.get<boolean>("specialFolders.showUserTasks"))
+            {
+                this.tasks.slice().reverse().forEach((item, index, object) =>
+                {
+                    if (item.source === "Workspace" && !util.isWorkspaceFolder(item.scope)) {
+                        (this.tasks as Task[]).splice(object.length - 1 - index, 1);
+                    }
+                });
+            }
+            //
+            // Check License Manager for any task count restrictions
+            //
+            const maxTasks = licMgr.getMaxNumberOfTasks();
+            log.write("   checking license manager for restrictions", logLevel + 1, logPad);
+            //
+            // TODO - remove below ignore tag when test for copy/move folder w/files is implemented
+            //
+            /* istanbul ignore if */
+            if (this.tasks.length > maxTasks)
+            {
+                ctRmv = this.tasks.length - maxTasks;
+                log.write(`      removing ${ctRmv} tasks, max count reached (no license)`, logLevel + 2, logPad);
+                this.tasks.splice(maxTasks, ctRmv);
+                util.showMaxTasksReachedMessage(licMgr);
+            }
+            log.write("   finished license manager restriction check", logLevel + 1, logPad);
+            statusBarItem.show();
+            statusBarItem.update("Building task explorer tree...");
+            //
+            // Build the entire task tree
+            // TODO - See notes above on the try/catch here 12/21/22
+            // Note 1-10-23 - The sweet lil queue stopped being filled up in provider interfaces, and it
+            // might be because of this?  Need to learn what the try/catch is actually doing,
+            // thought I knew, maybe not
+            //
+            // try {
+                this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
+            // }
+            // catch (e: any) { /* istanbul ignore next */ log.error(e); /* istanbul ignore next */ this.taskTree = [ new NoScripts() ]; }
+        }
+        else {
+            this.taskTree = [ new NoScripts() ];
+        }
+
+        statusBarItem.hide();
+    };
+
+
+    public fireTreeRefreshEvent = (logPad: string, logLevel: number, taskFile?: TreeItem) =>
     {
         const id = "pendingFireTreeRefreshEvent-" + (taskFile ? taskFile.id?.replace(/\W/g, "") : "g");
         log.methodStart("fire tree refresh event", logLevel, logPad, false, [[ "node id", id ]]);
@@ -735,7 +861,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             }
         }
         log.methodDone("fire tree refresh event", logLevel, logPad);
-    }
+    };
 
 
     /**
@@ -745,26 +871,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      * @param logPad Log padding
      * @param logLevel Log level
      */
-    async getChildren(element?: TreeItem): Promise<TreeItem[]>
+    public getChildren = async(element?: TreeItem): Promise<TreeItem[]> =>
     {
         if (!this.enabled)
         {
-            return [ !this.tasks && !this.taskTree ? new InitScripts() : /* istanbul ignore next */new NoScripts() ];
-        }
+            this.scanningFilesItem = this.scanningFilesItem || new InitScripts(this);
+            return [ this.scanningFilesItem ]; // 'scanningFilesItem' continually fires tree refresh events
+        }                                      // to roll it's elipsis
+        // this.scanningFilesItem?.dispose();
+        this.scanningFilesItem = undefined;
 
-        this.getChildrenLogPad = "";  // just can't see a nice way to ever line this up unless we use the log queue
-        this.getChildrenLogLevel = 1; // just can't see a nice way to ever line this up unless we use the log queue
-
-        let ctRmv = 0;
-        let waited = 0;
-        const logPad = this.getChildrenLogPad;
-        const logLevel = this.getChildrenLogLevel;
-        const licMgr = getLicenseManager();
-        const explorerViewEnabled = configuration.get<boolean>("enableExplorerView");
-        const firstRun = ((explorerViewEnabled && this.name === "taskExplorer") ||
-                          /* istanbul ignore next */(!explorerViewEnabled && this.name === "taskExplorerSideBar")) &&
-                          !this.tasks && this.enabled && (!this.taskTree ||
-                          /* istanbul ignore next */this.taskTree[0].contextValue === "initscripts");
+        // if (!this.fistTreeBuildComplete && this.fistTreeBuildStarted && this.buildingTreeItem) // && this.refreshPending)
+        // {
+        //     return [ this.buildingTreeItem ]; // 'buildingTreeItem' continually fires tree refresh events
+        // }                                     // to roll it's elipsis
         //
         //  Set pretty muy importante flag
         //
@@ -781,190 +901,53 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         //
         if (this.setEnableCalled && !this.taskTree && !element) // && this.visible)
         {
-            this.setEnableCalled = false;
+            this.setEnableCalled = false; // 'buildingTreeItem' continually fires tree refresh events
+            this.buildingTreeItem = new LoadScripts(this); // || new LoadScripts(this);
             setTimeout(() => this.fireTreeRefreshEvent("", 1), 10);
-            return [ new LoadScripts() ];
+            return [ this.buildingTreeItem ];
         }
 
-        log.methodStart("get tree children", logLevel, logPad, false, [
-            [ "task folder", element?.label ], [ "all tasks need to be retrieved", !this.tasks ],
-            [ "specific task type need to be retrieved", !!this.currentInvalidation ],
-            [ "current invalidation", this.currentInvalidation ], [ "tree needs rebuild", !this.taskTree ],
-            [ "first run", firstRun ], [ "view", this.name ]
-        ]);
+        this.getChildrenLogPad = "";  // just can't see a nice way to ever line this up unless we use the log queue
+        this.getChildrenLogLevel = 1; // just can't see a nice way to ever line this up unless we use the log queue
 
-        if (element instanceof TaskFile)
-        {
-            log.values(logLevel + 1, logPad + "   ", [
-                [ "tree item type", "task file" ], [ "label", element.label ], [ "id", element.id ],
-                [ "description", element.description ], [ "file name", element.fileName ], [ "is user", element.isUser ],
-                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
-            ]);
-        }
-        else if (element instanceof TaskFolder)
-        {
-            log.values(logLevel + 1, logPad + "   ", [
-                [ "tree item type", "task folder" ], [ "label", element.label ], [ "id", element.id ],
-                [ "description", element.description ], [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
-            ]);
-        }
-        else if (element instanceof TaskItem)
-        {
-            log.values(logLevel + 1, logPad + "   ", [
-                [ "tree item type", "task item" ], [ "label", element.label ], [ "id", element.id ],
-                [ "taskitem id", element.task.definition.taskItemId ], [ "description", element.description ],
-                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ],
-            ]);
-        }
-        else /* istanbul ignore else */ if (!element)
-        {
-            log.value("tree item type", "asking for all (null)", logLevel + 1, logPad + "   ");
-        }
-        else
-        {
-            log.values(logLevel + 1, logPad + "   ", [
-                [ "tree item type", "unknown" ], [ "label", element.label ], [ "id", element.id ],
-                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
-            ]);
-        }
+        const logPad = this.getChildrenLogPad,
+              logLevel = this.getChildrenLogLevel,
+              licMgr = getLicenseManager(),
+              explorerViewEnabled = configuration.get<boolean>("enableExplorerView"),
+              firstRun = ((explorerViewEnabled && this.name === "taskExplorer") ||
+                          /* istanbul ignore next */(!explorerViewEnabled && this.name === "taskExplorerSideBar")) &&
+                          !this.tasks && this.enabled && (!this.taskTree ||
+                          /* istanbul ignore next */this.taskTree[0].contextValue === "initscripts" ||
+                          /* istanbul ignore next */this.taskTree[0].contextValue === "loadscripts");
+
+        this.logGetChildrenStart(element, firstRun, logPad, logLevel);
 
         //
-        // The vscode task engine processing will call back in multiple time while we are awaiting
-        // the call to buildTaskTree().  This occurs on the await of buildGroupings() in buildTaskTree.
-        // To prevent bad. things. happening. sleep the call here until the tree has finished building.
-        // This "could"" be prevented by re-implementing the tree the "right way", where we don't build the
-        // whole tree if it doesnt exist and build it node by node as theyare expanded, but, because we
-        // have 'LastTasks' and 'Favorites', we need to load everything.  Oh well.
+        // Create/build the ui task tree if not built already
         //
-        // ^^^^^^ 1/2/23 -  WAIT?!?!  Was this because of the try/catch around the cll to buildTaskTree()???
-        //                            Commented the try/catch for now, look into side effects as we move on...
-        //
-        while (this.treeBuilding) {
-            /* istanbul ignore next */
-            await util.timeout(200);
-            /* istanbul ignore next */
-            waited += 200;
-        }
-        /* istanbul ignore if */
-        if (waited) {
-            log.write("   waited " + waited + " ms", logLevel, logPad);
-        }
-
-        //
-        // Build task tree if not built already.
-        //
-        if (!this.taskTree || /* istanbul ignore next */(this.taskTree.length === 1 && (this.taskTree[0].contextValue === "noscripts" || this.taskTree[0].contextValue === "initscripts")))
+        if (!this.taskTree)
         {
-            TaskExplorerProvider.logPad = logPad + "   ";
-            //
-            // If 'tasks' is empty, then ask for all tasks.
-            // If 'tasks' is non-empty, and 'currentInvalidation' is set, then only ask for tasks
-            // of type specified by it's value.  The 'currentInvalidation' parameter is set by the
-            // refresh() function when a file modify/create/delete event has occurred, it will be
-            // set to the task type of the file that was modified.created/deleted, and at this point
-            // the provider's tasks cache will have been invalidated and rebuilt.
-            //
-            // Note that if 'currentInvalidation' is 'workspace', indicating tasks from a tasks.json
-            // file, there in actuality is no task type called 'workspace'.  Tasks found in these
-            // files can be of any type that is available to VSCode's task provider interface
-            // (including providers implemented in this extension).  In this case, we have to ask
-            // for all tasks.  Same goes for typescript tasks.
-            //
-            if (!this.tasks || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
-            {
-                log.write("   fetching all tasks via VSCode.fetchTasks", logLevel, logPad);
-                this.tasks = await tasks.fetchTasks();
-                // .filter((t) => !util.isWatchTask(t.source) || !util.isExcluded(t.definition.path, logPad + "   "));
-            }
-            else /* istanbul ignore else */ if (this.tasks && this.currentInvalidation)
-            {
-                log.write(`   fetching ${this.currentInvalidation} tasks via VSCode.fetchTasks`, logLevel, logPad);
-                //
-                // Get all tasks of the type defined in 'currentInvalidation' from VSCode, remove
-                // all tasks of the type defined in 'currentInvalidation' from the tasks list cache,
-                // and add the new tasks from VSCode into the tasks list.
-                //
-                const taskItems = await tasks.fetchTasks(
-                {
-                    type: this.currentInvalidation
-                });
-                // .filter((t) => this.currentInvalidation !== "npm" || !util.isExcluded(t.definition.path, logPad + "   "));
-                //
-                // Remove tasks of type '' from the 'tasks'array
-                //
-                log.write(`   removing current ${this.currentInvalidation} tasks from cache`, logLevel + 1, logPad);
-                this.tasks.slice().reverse().forEach((item, index, object) =>
-                {   //
-                    // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
-                    // if the script type set for the task in tasks.json is of type 'currentInvalidation'.
-                    // Remove any Workspace type tasks returned as well, in this case the source type is
-                    // != currentInvalidation, but the definition type == currentInvalidation
-                    //
-                    if (item.source === this.currentInvalidation || item.source === "Workspace")
-                    {
-                        if (item.source !== "Workspace" || item.definition.type === this.currentInvalidation)
-                        {
-                            log.write(`      removing task '${item.source}/${item.name}'`, logLevel + 2, logPad);
-                            (this.tasks as Task[]).splice(object.length - 1 - index, 1);
-                            ++ctRmv;
-                        }
-                    }
-                });
-                log.write(`   removed ${ctRmv} ${this.currentInvalidation} current tasks from cache`, logLevel + 1, logPad);
-                log.write(`   adding ${taskItems.length} new ${this.currentInvalidation} tasks from cache`, logLevel + 1, logPad);
-                this.tasks.push(...taskItems);
-            }
-
-            TaskExplorerProvider.logPad = "";
-
-            /* istanbul ignore else */
-            if (this.tasks)
-            {   //
-                // Remove User tasks if they're not enabled
-                //
-                if (!configuration.get<boolean>("specialFolders.showUserTasks"))
-                {
-                    this.tasks.slice().reverse().forEach((item, index, object) =>
-                    {
-                        if (item.source === "Workspace" && !util.isWorkspaceFolder(item.scope)) {
-                            (this.tasks as Task[]).splice(object.length - 1 - index, 1);
-                        }
-                    });
-                }
-                //
-                // Check License Manager for any task count restrictions
-                //
-                const maxTasks = licMgr.getMaxNumberOfTasks();
-                log.write("   checking license manager for restrictions", logLevel + 1, logPad);
-                //
-                // TODO - remove below ignore tag when test for copy/move folder w/files is implemented
-                //
-                /* istanbul ignore if */
-                if (this.tasks.length > maxTasks)
-                {
-                    ctRmv = this.tasks.length - maxTasks;
-                    log.write(`      removing ${ctRmv} tasks, max count reached (no license)`, logLevel + 2, logPad);
-                    this.tasks.splice(maxTasks, ctRmv);
-                    util.showMaxTasksReachedMessage(licMgr);
-                }
-                log.write("   finished license manager restriction check", logLevel + 1, logPad);
-                //
-                // Build the entire task tree
-                // TODO - See notes above on the try/catch here 12/21/22
-                // Note 1-10-23 - The sweet lil queue stopped being filled up in provider interfaces, and it
-                // might be because of this?  Need to learn what the try/catch is actually doing,
-                // thought I knew, maybe not
-                //
-                // try {
-                    this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
-                // }
-                // catch (e: any) { /* istanbul ignore next */ log.error(e); /* istanbul ignore next */ this.taskTree = [ new NoScripts() ]; }
-            }
-            else {
-                this.taskTree = [ new NoScripts() ];
-            }
+            // if (!this.fistTreeBuildComplete && !this.fistTreeBuildStarted && this.buildingTreeItem)
+            // {
+            //     setTimeout(async() => {
+            //         await this.createTaskTree(licMgr, logPad, logLevel);
+            //         this.fireTreeRefreshEvent("", 1);
+            //     }, 10);
+            //     this.fistTreeBuildStarted = true;
+            //     log.write("   initializing first runtime tree build", logLevel, logPad);
+            //     log.methodDone("get tree children", logLevel, logPad);
+            //     return [ this.buildingTreeItem ]; // 'buildingTreeItem' continually fires tree refresh events
+            // }
+            // this.fistTreeBuildStarted = true;
+            await this.createTaskTree(licMgr, logPad, logLevel);
+            // this.fistTreeBuildComplete = true;
         }
+        // this.buildingTreeItem?.dispose();
+        this.buildingTreeItem = undefined;
 
+        //
+        // Set return tree items that were requested
+        //
         let items: TreeItem[] = [];
         if (element instanceof TaskFolder)
         {
@@ -979,7 +962,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         else if (!element)
         {
             log.write("   Return full task tree", logLevel + 1, logPad);
-            items = this.taskTree;
+            items = this.taskTree as TaskFolder[] | NoScripts[];
         }
 
         if (firstRun && licMgr)
@@ -989,7 +972,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             await licMgr.setTasks(this.tasks || /* istanbul ignore next */[], logPad + "   ");
         }
 
+        //
+        // Process event queue
+        //
         this.refreshPending = this.processEventQueue(logPad + "   ");
+
+        //
+        // Reset flags and refresh task variables
+        //
         this.currentInvalidation = undefined;
         this.currentRefreshEvent = undefined;
         this.getChildrenLogPad = this.defaultGetChildrenLogPad;
@@ -1000,16 +990,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             [ "# of tree task items returned", items.length ]
         ]);
 
+        //
+        // Callback to caller
+        //
         if (this.onTreeDataChangeEventComplete) {
             this.onTreeDataChangeEventComplete();
             this.onTreeDataChangeEventComplete = undefined;
         }
 
         return items;
-    }
+    };
 
 
-    private getGroupedId(folder: ITaskFolder, file: ITaskFile, label: string, treeLevel: number)
+    private getGroupedId = (folder: ITaskFolder, file: ITaskFile, label: string, treeLevel: number) =>
     {
         const groupSeparator = util.getGroupSeparator();
         const labelSplit = label.split(groupSeparator);
@@ -1020,7 +1013,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
         id += file.resourceUri.fsPath.replace(/\W/gi, "");
         return folder.label + file.taskSource + id + treeLevel.toString();
-    }
+    };
 
 
     public getName = () => this.name;
@@ -1029,7 +1022,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     public getTasks = () => this.tasks || /* istanbul ignore next */[];
 
 
-    private async getTaskFileNode(task: Task, folder: TaskFolder, files: IDictionary<TaskFile>, relativePath: string, scopeName: string, logPad: string)
+    private getTaskFileNode = async(task: Task, folder: TaskFolder, files: IDictionary<TaskFile>, relativePath: string, scopeName: string, logPad: string) =>
     {
         let taskFile: TaskFile;
         log.methodStart("get task file node", 2, logPad, false, [[ "relative path", relativePath ], [ "scope name", scopeName ]]);
@@ -1062,7 +1055,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
         log.methodDone("get task file node", 2, logPad);
         return taskFile;
-    }
+    };
 
 
     public getTaskMap = () => this.taskMap;
@@ -1071,7 +1064,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     public getTaskTree = () => this.taskTree;
 
 
-    public getTreeItem(element: TaskItem | TaskFile | TaskFolder): TreeItem
+    public getTreeItem = (element: TaskItem | TaskFile | TaskFolder) =>
     {
         /* istanbul ignore else */
         if (element instanceof TaskItem)
@@ -1082,10 +1075,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             log.methodDone("get tree item", 3);
         }
         return element;
-    }
+    };
 
 
-    private async handleRebuildEvent(invalidate: any, opt: boolean | Uri | undefined, logPad: string)
+    private handleRebuildEvent = async(invalidate: any, opt: boolean | Uri | undefined, logPad: string) =>
     {
         log.methodStart("handle filewatcher / settings change / test event", 1, logPad);
         if (invalidate === true && !opt)
@@ -1111,7 +1104,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         log.write("   handling 'invalidate tasks cache' event", 1, logPad);
         await this.invalidateTasksCache(invalidate !== true ? invalidate : undefined, opt, logPad + "   ");
         log.methodDone("   handle filewatcher / settings change / test event", 1, logPad);
-    }
+    };
 
 
     /**
@@ -1155,7 +1148,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      *     "Workspace"
      * @param opt2 The uri of the file that contains/owns the task
      */
-    private async invalidateTasksCache(opt1?: string, opt2?: Uri | boolean, logPad?: string)
+    private invalidateTasksCache = async(opt1?: string, opt2?: Uri | boolean, logPad?: string) =>
     {
         log.methodStart("invalidate tasks cache", 1, logPad, false, [
             [ "opt1", opt1 ], [ "opt2", opt2 && opt2 instanceof Uri ? opt2.fsPath : opt2 ]
@@ -1198,7 +1191,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
         this.busy = false;
         log.methodDone("invalidate tasks cache", 1, logPad);
-    }
+    };
 
 
     public isBusy = () => this.refreshPending || this.busy;
@@ -1207,7 +1200,53 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     public isVisible = () => this.visible;
 
 
-    private logTask(task: Task, scopeName: string, logPad: string)
+    private logGetChildrenStart = (element: TreeItem | undefined, firstRun: boolean, logPad: string, logLevel: number) =>
+    {
+        log.methodStart("get tree children", logLevel, logPad, false, [
+            [ "task folder", element?.label ], [ "all tasks need to be retrieved", !this.tasks ],
+            [ "specific task type need to be retrieved", !!this.currentInvalidation ],
+            [ "current invalidation", this.currentInvalidation ], [ "tree needs rebuild", !this.taskTree ],
+            [ "first run", firstRun ], [ "view", this.name ]
+        ]);
+
+        if (element instanceof TaskFile)
+        {
+            log.values(logLevel + 1, logPad + "   ", [
+                [ "tree item type", "task file" ], [ "label", element.label ], [ "id", element.id ],
+                [ "description", element.description ], [ "file name", element.fileName ], [ "is user", element.isUser ],
+                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
+            ]);
+        }
+        else if (element instanceof TaskFolder)
+        {
+            log.values(logLevel + 1, logPad + "   ", [
+                [ "tree item type", "task folder" ], [ "label", element.label ], [ "id", element.id ],
+                [ "description", element.description ], [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
+            ]);
+        }
+        else if (element instanceof TaskItem)
+        {
+            log.values(logLevel + 1, logPad + "   ", [
+                [ "tree item type", "task item" ], [ "label", element.label ], [ "id", element.id ],
+                [ "taskitem id", element.task.definition.taskItemId ], [ "description", element.description ],
+                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ],
+            ]);
+        }
+        else /* istanbul ignore else */ if (!element)
+        {
+            log.value("tree item type", "asking for all (null)", logLevel + 1, logPad + "   ");
+        }
+        else
+        {
+            log.values(logLevel + 1, logPad + "   ", [
+                [ "tree item type", "unknown" ], [ "label", element.label ], [ "id", element.id ],
+                [ "resource path", element.resourceUri?./* istanbul ignore next */fsPath ]
+            ]);
+        }
+    };
+
+
+    private logTask = (task: Task, scopeName: string, logPad: string) =>
     {
         const definition = task.definition;
 
@@ -1290,10 +1329,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             log.value("   icon dark", definition.iconDark, 4, logPad);
         }
         log.write("Task Details Done", 3, logPad);
-    }
+    };
 
 
-    public onVisibilityChanged(visible: boolean)
+    public onVisibilityChanged = (visible: boolean) =>
     {   //
         // VSCode engine calls getChildren() when the view changes to 'visible'
         //
@@ -1305,16 +1344,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
         log.methodDone("visibility event received", 1, "");
         log.blank(this.defaultGetChildrenLogLevel);
-    }
+    };
 
 
-    private openTerminal(taskItem: TaskItem)
+    private openTerminal = (taskItem: TaskItem) =>
     {
         const term = getTerminal(taskItem);
         if (term) {
             term.show();
         }
-    }
+    };
 
 
     private processEventQueue = (logPad: string) =>
@@ -1387,7 +1426,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      *
      * @param opt Uri of the invalidated resource
      */
-    public async refresh(invalidate: string | boolean | undefined, opt: Uri | false | undefined, logPad: string): Promise<void>
+    public refresh = async(invalidate: string | boolean | undefined, opt: Uri | false | undefined, logPad: string) =>
     {
         log.methodStart("refresh task tree", 1, logPad, logPad === "", [
             [ "invalidate", invalidate ], [ "opt fsPath", opt && opt instanceof Uri ? opt.fsPath : "n/a" ],
@@ -1433,10 +1472,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         log.methodDone("refresh task tree", 1, logPad);
-    }
+    };
 
 
-    private removeGroupedTasks(folder: TaskFolder, subfolders: IDictionary<TaskFile>, logPad: string, logLevel: number)
+    private removeGroupedTasks = (folder: TaskFolder, subfolders: IDictionary<TaskFile>, logPad: string, logLevel: number) =>
     {
         const taskTypesRmv: TaskFile[] = [];
 
@@ -1483,7 +1522,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         log.methodDone("remove grouped tasks", logLevel, logPad);
-    }
+    };
 
 
     /**
@@ -1495,7 +1534,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
      * @param subfolders Current tree subfolders map
      * @param level Current grouping level
      */
-    private removeTreeNodes(taskFile: ITaskFile, folder: TaskFolder, subfolders: IDictionary<TaskFile>, level: number, logPad: string, logLevel: number)
+    private removeTreeNodes = (taskFile: ITaskFile, folder: TaskFolder, subfolders: IDictionary<TaskFile>, level: number, logPad: string, logLevel: number) =>
     {
         const me = this;
         const taskTypesRmv: (ITaskFile | ITaskItem)[] = [];
@@ -1550,10 +1589,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         log.methodDone("remove tree nodes", logLevel, logPad);
-    }
+    };
 
 
-    private async renameGroupedTasks(taskFile: TaskFile)
+    private renameGroupedTasks = async(taskFile: TaskFile) =>
     {
         const groupStripTaskLabel = configuration.get<boolean>("groupStripTaskLabel", true);
         if (!groupStripTaskLabel || !taskFile.label) {
@@ -1587,10 +1626,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 await this.renameGroupedTasks(each2 as TaskFile);
             }
         }
-    }
+    };
 
 
-    public setEnabled(enable: boolean, logPad: string)
+    public setEnabled = (enable: boolean, logPad: string) =>
     {
         log.methodStart("set tree enabled", 1, logPad, false, [[ "enable", enable ]]);
         if (enable !== this.enabled)
@@ -1607,10 +1646,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             }
         }
         log.methodDone("set tree enabled", 1, logPad);
-    }
+    };
 
 
-    public async waitForRefreshComplete(maxWait = 15000, logPad = "   ")
+    public waitForRefreshComplete = async(maxWait = 15000, logPad = "   ") =>
     {
         let waited = 0;
         if (this.refreshPending) {
@@ -1620,6 +1659,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             await util.timeout(250);
             waited += 250;
         }
-    }
+    };
 
 }
