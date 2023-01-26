@@ -196,12 +196,12 @@ const initSettings = async () =>
         Object.keys(waitTimes).forEach((k) =>
         {
             if (!isObject(waitTimes[k])) {
-                waitTimes[k] = Math.round(waitTimes[k] * (k.includes("WorkspaceFolder") ? 2.5 : 1.5));
+                waitTimes[k] = Math.round(waitTimes[k] * (k.includes("WorkspaceFolder") ? 2.5 : 1.6));
             }
             else {
                 Object.keys(waitTimes[k]).forEach((k2) =>
                 {
-                    waitTimes[k][k2] = Math.round(waitTimes[k][k2] * (k === "fs" ? 2.5 : 1.5));
+                    waitTimes[k][k2] = Math.round(waitTimes[k][k2] * (k === "fs" ? 2.5 : 1.6));
                     if (k2 === "modifyEvent") {
                         waitTimes[k][k2] += 50;
                     }

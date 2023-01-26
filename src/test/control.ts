@@ -66,8 +66,9 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 2000,
-        addWorkspaceFolderEmpty: 925,
+        addWorkspaceFolder: 2500,
+        addWorkspaceFolderEmpty: 1000,
+        addWorkspaceFolderFake: 1500,
         buildTreeNoTasks: 295,
         cache: {
             build: 490,
@@ -79,7 +80,7 @@ export const testControl: ITestControl =
         closeEditors: 20,
         command: 675,
         commandFast: 265,
-        commandShowOutput: 800,
+        commandShowOutput: 950,
         config: {
             event: 270,
             eventFast: 90,
@@ -95,7 +96,8 @@ export const testControl: ITestControl =
             showHideSpecialFolder: 340,
             showHideUserTasks: 1000,
             readEvent: 25,
-            sortingEvent: 740
+            sortingEvent: 740,
+            terminalEvent: 280
         },
         excludeCommand: 1370,
         explorerViewStartup: 7565,
@@ -130,8 +132,115 @@ export const testControl: ITestControl =
         min: 50,
         refreshCommand: 6800,
         refreshCommandNoChanges: 245,
-        removeWorkspaceFolder: 1800,
-        removeWorkspaceFolderEmpty: 700,
+        removeWorkspaceFolder: 2000,
+        removeWorkspaceFolderEmpty: 1000,
+        removeWorkspaceFolderFake: 1250,
+        runCommand: 4900,
+        runPauseCommand: 3255,
+        runStopCommand: 3510,
+        storageRead: 55,
+        storageUpdate: 60,
+        storageSecretRead: 95,
+        storageSecretUpdate: 200,
+        taskCommand: 1050,
+        taskProviderReadUri: 90,
+        tasks: {
+            antParser: 490,
+            antTask: 3400,
+            antTaskWithAnsicon: 3450,
+            bashScript: 3075,
+            batchScriptBat: 4150,
+            batchScriptCmd: 5150,
+            gulpParser: 3875,
+            npmCommand: 8500,
+            npmCommandPkg: 7500,
+            npmInstallCommand: 9500
+        },
+        taskCount: {
+            verify: 460,
+            verifyByTree: 500,
+            verifyFirstCall: 680,
+            verifyNpm: 1400, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 1800
+        },
+        viewReport: 410
+    },
+    //
+    // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)
+    // Slow times are generally 2x the amount of time the command "should" take.  Mocha
+    // considers slow at 50% of MochaContext.slow() for each test instance, and coverage
+    // markers significantly reduce the overall speed of everything.
+    //
+    slowTimeMultiRoot: {
+        addWorkspaceFolder: 2500,
+        addWorkspaceFolderEmpty: 1000,
+        addWorkspaceFolderFake: 1500,
+        buildTreeNoTasks: 295,
+        cache: {
+            build: 490,
+            buildCancel: 295,
+            rebuild: 3900,
+            rebuildCancel: 490,
+            rebuildNoChanges: 890,
+        },
+        closeEditors: 20,
+        command: 675,
+        commandFast: 265,
+        commandShowOutput: 950,
+        config: {
+            event: 270,
+            eventFast: 90,
+            registerExplorerEvent: 390,
+            disableEvent: 1125,
+            enableEvent: 1860,
+            enableEventWorkspace: 1940,
+            excludesEvent: 1900,
+            excludeTasksEvent: 2800,
+            globEvent: 1125,
+            groupingEvent: 990,
+            pathToProgramsEvent: 710,
+            showHideSpecialFolder: 340,
+            showHideUserTasks: 1000,
+            readEvent: 25,
+            sortingEvent: 740,
+            terminalEvent: 300
+        },
+        excludeCommand: 1370,
+        explorerViewStartup: 7565,
+        fetchTasksCommand: 1840,
+        fileCachePersist: 250,
+        findTaskPosition: 325,
+        findTaskPositionDocOpen: 40,
+        focusCommand: 2340,
+        focusCommandAlreadyFocused: 320,
+        focusCommandChangeViews: 90,
+        fs: {
+            createEvent: 1610,
+            createEventTsc: 1755,
+            createFolderEvent: 1655,
+            deleteEvent: 1350,
+            deleteEventTsc: 1635,
+            deleteFolderEvent: 1445,
+            modifyEvent: 1075,
+        },
+        getTreeTasks: 205,
+        getTreeTasksNpm: 490, // npm task provider is slower than shit on a turtle
+        licenseMgr: {
+            page: 160,
+            pageWithDetail: 325,
+            checkLicense: 400,
+            enterKey: 845,
+            getMaxTasks: 360,
+            localStartServer: 1195,
+            serverDownHostUp: 14100,
+            setLicenseCmd: 210
+        },
+        min: 50,
+        refreshCommand: 6800,
+        refreshCommandNoChanges: 245,
+        removeWorkspaceFolder: 2000,
+        removeWorkspaceFolderEmpty: 1000,
+        removeWorkspaceFolderFake: 1250,
         runCommand: 4900,
         runPauseCommand: 3255,
         runStopCommand: 3510,
@@ -176,7 +285,53 @@ export const testControl: ITestControl =
             event: 75,
             eventFast: 40,
             excludesEvent: 95,
-            excludeTasksEvent: 145,
+            excludeTasksEvent: 165,
+            disableEvent: 105,
+            enableEvent: 125,
+            globEvent: 110,
+            groupingEvent: 95,
+            pathToProgramsEvent: 120,
+            registerExplorerEvent: 130,
+            showHideSpecialFolder: 95,
+            showHideUserTasks: 105,
+            sortingEvent: 95
+        },
+        explorerViewStartup: 2000,
+        focusCommand: 220,
+        fs: {
+            createEvent: 200,
+            createFolderEvent: 225,
+            deleteEvent: 190,
+            deleteFolderEvent: 210,
+            modifyEvent: 185
+        },
+        getTreeMin: 170,
+        getTreeTasks: 50,
+        max: 12000,
+        min: 35,
+        npmCommandMin: 1100,
+        refreshCommand: 140,
+        refreshCommandNoChanges: 75,
+        refreshTaskTypeCommand: 125,
+        removeWorkspaceFolder: 200,
+        runCommandMin: 500,
+        taskCommand: 450,
+        verifyTaskCountRetry: 70,
+        verifyTaskCountRetryInterval: 100,
+        viewReport: 80,
+    },
+    waitTimeMultiRoot:
+    {   //
+        // MINIMUM WAIT TIMES
+        //
+        addWorkspaceFolder: 225,
+        command: 70,
+        commandFast: 45,
+        config: {
+            event: 75,
+            eventFast: 40,
+            excludesEvent: 95,
+            excludeTasksEvent: 165,
             disableEvent: 105,
             enableEvent: 125,
             globEvent: 110,
@@ -226,7 +381,158 @@ interface ISuiteResults extends IDictionary<any>
 }
 
 
-export interface ITestControl
+export interface ISlowTimes
+{
+    addWorkspaceFolder: number;
+    addWorkspaceFolderEmpty: number;
+    addWorkspaceFolderFake: number;
+    buildTreeNoTasks: number;
+    cache: {
+        build: number;
+        buildCancel: number;
+        rebuild: number;
+        rebuildCancel: number;
+        rebuildNoChanges: number;
+    };
+    closeEditors: number;
+    command: number;
+    commandFast: number;
+    commandShowOutput: number;
+    config: {
+        event: number;
+        eventFast: number;
+        registerExplorerEvent: number;
+        disableEvent: number;
+        enableEvent: number;
+        enableEventWorkspace: number;
+        excludesEvent: number;
+        excludeTasksEvent: number;
+        globEvent: number;
+        groupingEvent: number;
+        pathToProgramsEvent: number;
+        readEvent: number;
+        showHideSpecialFolder: number;
+        showHideUserTasks: number;
+        sortingEvent: number;
+        terminalEvent: number;
+    };
+    excludeCommand: number;
+    explorerViewStartup: number;
+    fetchTasksCommand: number;
+    fileCachePersist: number;
+    findTaskPosition: number;
+    findTaskPositionDocOpen: number;
+    focusCommand: number;
+    focusCommandAlreadyFocused: number;
+    focusCommandChangeViews: number;
+    fs: {
+        createEvent: number;
+        createEventTsc: number;
+        createFolderEvent: number;
+        deleteEvent: number;
+        deleteEventTsc: number;
+        deleteFolderEvent: number;
+        modifyEvent: number;
+    };
+    getTreeTasks: number;
+    getTreeTasksNpm: number; // npm task provider is slower than shit on a turtle
+    licenseMgr: {
+        page: number;
+        pageWithDetail: number;
+        checkLicense: number;
+        enterKey: number;
+        getMaxTasks: number;
+        localStartServer: number;
+        serverDownHostUp: number;
+        setLicenseCmd: number;
+    };
+    min: number;
+    refreshCommand: number;
+    refreshCommandNoChanges: number;
+    removeWorkspaceFolder: number;
+    removeWorkspaceFolderEmpty: number;
+    removeWorkspaceFolderFake: number;
+    runCommand: number;
+    runPauseCommand: number;
+    runStopCommand: number;
+    storageRead: number;
+    storageUpdate: number;
+    storageSecretRead: number;
+    storageSecretUpdate: number;
+    taskCommand: number;
+    taskProviderReadUri: number;
+    tasks: {
+        antParser: number;
+        antTask: number;
+        antTaskWithAnsicon: number;
+        bashScript: number;
+        batchScriptBat: number;
+        batchScriptCmd: number;
+        gulpParser: number;
+        npmCommand: number;
+        npmCommandPkg: number;
+        npmInstallCommand: number;
+    };
+    taskCount: {
+        verify: number;
+        verifyByTree: number;
+        verifyFirstCall: number;
+        verifyNpm: number; // internal vscode npm task provider is slower than shit wtf
+        verifyWorkspace: number;
+    };
+    viewReport: number;
+};
+
+
+export interface IWaitTimes
+{   //
+    // MINIMUM WAIT TIMES
+    //
+    addWorkspaceFolder: number;
+    command: number;
+    commandFast: number;
+    config: {
+        event: number;
+        eventFast: number;
+        disableEvent: number;
+        enableEvent: number;
+        excludesEvent: number;
+        excludeTasksEvent: number;
+        globEvent: number;
+        groupingEvent: number;
+        pathToProgramsEvent: number;
+        registerExplorerEvent: number;
+        showHideSpecialFolder: number;
+        showHideUserTasks: number;
+        sortingEvent: number;
+    };
+    explorerViewStartup: number;
+    focusCommand: number;
+    fs: {
+        createEvent: number;
+        createFolderEvent: number;
+        deleteEvent: number;
+        deleteFolderEvent: number;
+        modifyEvent: number;
+    };
+    getTreeMin: number;
+    getTreeTasks: number;
+    max: number;
+    min: number;
+    npmCommandMin: number;
+    refreshCommand: number;
+    refreshCommandNoChanges: number;
+    refreshTaskTypeCommand: number;
+    removeWorkspaceFolder: number;
+    runCommandMin: number;
+    taskCommand: number;
+    verifyTaskCountRetry: number;
+    verifyTaskCountRetryInterval: number;
+    viewReport: number;
+};
+
+
+export interface ITestControl extends IDictionary<any>
 {   //
     // Is multi-root workspace - Populated by initSettings() on startup
     //
@@ -285,150 +591,9 @@ export interface ITestControl
     //
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)s
     //
-    slowTime: {
-        addWorkspaceFolder: number;
-        addWorkspaceFolderEmpty: number;
-        buildTreeNoTasks: number;
-        cache: {
-            build: number;
-            buildCancel: number;
-            rebuild: number;
-            rebuildCancel: number;
-            rebuildNoChanges: number;
-        };
-        closeEditors: number;
-        command: number;
-        commandFast: number;
-        commandShowOutput: number;
-        config: {
-            event: number;
-            eventFast: number;
-            registerExplorerEvent: number;
-            disableEvent: number;
-            enableEvent: number;
-            enableEventWorkspace: number;
-            excludesEvent: number;
-            excludeTasksEvent: number;
-            globEvent: number;
-            groupingEvent: number;
-            pathToProgramsEvent: number;
-            readEvent: number;
-            showHideSpecialFolder: number;
-            showHideUserTasks: number;
-            sortingEvent: number;
-        };
-        excludeCommand: number;
-        explorerViewStartup: number;
-        fetchTasksCommand: number;
-        fileCachePersist: number;
-        findTaskPosition: number;
-        findTaskPositionDocOpen: number;
-        focusCommand: number;
-        focusCommandAlreadyFocused: number;
-        focusCommandChangeViews: number;
-        fs: {
-            createEvent: number;
-            createEventTsc: number;
-            createFolderEvent: number;
-            deleteEvent: number;
-            deleteEventTsc: number;
-            deleteFolderEvent: number;
-            modifyEvent: number;
-        };
-        getTreeTasks: number;
-        getTreeTasksNpm: number; // npm task provider is slower than shit on a turtle
-        licenseMgr: {
-            page: number;
-            pageWithDetail: number;
-            checkLicense: number;
-            enterKey: number;
-            getMaxTasks: number;
-            localStartServer: number;
-            serverDownHostUp: number;
-            setLicenseCmd: number;
-        };
-        min: number;
-        refreshCommand: number;
-        refreshCommandNoChanges: number;
-        removeWorkspaceFolder: number;
-        removeWorkspaceFolderEmpty: number;
-        runCommand: number;
-        runPauseCommand: number;
-        runStopCommand: number;
-        storageRead: number;
-        storageUpdate: number;
-        storageSecretRead: number;
-        storageSecretUpdate: number;
-        taskCommand: number;
-        taskProviderReadUri: number;
-        tasks: {
-            antParser: number;
-            antTask: number;
-            antTaskWithAnsicon: number;
-            bashScript: number;
-            batchScriptBat: number;
-            batchScriptCmd: number;
-            gulpParser: number;
-            npmCommand: number;
-            npmCommandPkg: number;
-            npmInstallCommand: number;
-        };
-        taskCount: {
-            verify: number;
-            verifyByTree: number;
-            verifyFirstCall: number;
-            verifyNpm: number; // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: number;
-        };
-        viewReport: number;
-    };
+    slowTime: ISlowTimes;
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME; OR waitTime.max)
     //
-    waitTime:
-    {   //
-        // MINIMUM WAIT TIMES
-        //
-        addWorkspaceFolder: number;
-        command: number;
-        commandFast: number;
-        config: {
-            event: number;
-            eventFast: number;
-            disableEvent: number;
-            enableEvent: number;
-            excludesEvent: number;
-            excludeTasksEvent: number;
-            globEvent: number;
-            groupingEvent: number;
-            pathToProgramsEvent: number;
-            registerExplorerEvent: number;
-            showHideSpecialFolder: number;
-            showHideUserTasks: number;
-            sortingEvent: number;
-        };
-        explorerViewStartup: number;
-        focusCommand: number;
-        fs: {
-            createEvent: number;
-            createFolderEvent: number;
-            deleteEvent: number;
-            deleteFolderEvent: number;
-            modifyEvent: number;
-        };
-        getTreeMin: number;
-        getTreeTasks: number;
-        max: number;
-        min: number;
-        npmCommandMin: number;
-        refreshCommand: number;
-        refreshCommandNoChanges: number;
-        refreshTaskTypeCommand: number;
-        removeWorkspaceFolder: number;
-        runCommandMin: number;
-        taskCommand: number;
-        verifyTaskCountRetry: number;
-        verifyTaskCountRetryInterval: number;
-        viewReport: number;
-    };
+    waitTime: IWaitTimes;
 };

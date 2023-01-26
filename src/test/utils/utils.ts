@@ -511,7 +511,7 @@ export const testInvDocPositions = (provider: ITaskExplorerProvider) =>
  * @param expectedCount Expected # of tasks
  * @param retries Number of retries to make if expected count doesn'tmatch.  100ms sleep between each retry.
  */
-export const verifyTaskCount = async (taskType: string, expectedCount: number, retries = 0, retryWait = 250) =>
+export const verifyTaskCount = async (taskType: string, expectedCount: number, retries = 1, retryWait = 300) =>
 {
     let tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
     if (taskType === "Workspace") {

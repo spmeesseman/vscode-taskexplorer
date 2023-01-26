@@ -275,9 +275,9 @@ suite("Provider Tests", () =>
         //
         // Check VSCode provided task types for the hell of it
         //
-        let nTasks = await tasks.fetchTasks({ type: "grunt" });
+        let nTasks =(await tasks.fetchTasks({ type: "grunt" })).filter(t => !!t.definition.uri);
         expect(nTasks.length).to.be.a("number").that.is.greaterThan(0, "No grunt tasks registered");
-        nTasks = await tasks.fetchTasks({ type: "gulp" });
+        nTasks = (await tasks.fetchTasks({ type: "gulp" })).filter(t => !!t.definition.uri);
         expect(nTasks.length).to.be.a("number").that.is.greaterThan(0, "No gulp tasks registered");
         batch = await treeUtils.getTreeTasks("batch", 4) as TaskItem[];
         grunt = await treeUtils.getTreeTasks("grunt", 13) as TaskItem[];
@@ -413,7 +413,7 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.config.excludeTasksEvent);
-        const taskItems = await tasks.fetchTasks({ type: "grunt" }),
+        const taskItems = (await tasks.fetchTasks({ type: "grunt" })).filter(t => !!t.definition.uri),
               gruntCt = taskItems.length,
               taskItem = grunt.find(t => t.taskSource === "grunt" && !t.taskFile.path.startsWith("grunt") && t.task.name === "default" && t.taskFile.fileName === "GRUNTFILE.js");
         await executeTeCommand2("addToExcludes", [ taskItem ], tc.waitTime.config.excludeTasksEvent);
@@ -440,7 +440,7 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.config.excludesEvent);
-        const taskItems = await tasks.fetchTasks({ type: "grunt" }),
+        const taskItems = (await tasks.fetchTasks({ type: "grunt" })).filter(t => !!t.definition.uri),
               gruntCt = taskItems.length;
         if (taskFile) {
             await executeTeCommand2("addToExcludes", [ taskFile ], tc.waitTime.config.globEvent);
@@ -612,7 +612,7 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + tc.slowTime.config.globEvent + (tc.slowTime.fetchTasksCommand * 2) + tc.slowTime.min);
-        const taskItemsB4 = await tasks.fetchTasks({ type: "grunt" }),
+        const taskItemsB4 = (await tasks.fetchTasks({ type: "grunt" })).filter(t => !!t.definition.uri),
               gruntCt = taskItemsB4.length;
         for (const taskItem of Object.values(taskMap))
         {
@@ -630,7 +630,7 @@ suite("Provider Tests", () =>
                 }
             }
         }
-        const taskItems = await tasks.fetchTasks({ type: "grunt" });
+        const taskItems = (await tasks.fetchTasks({ type: "grunt" })).filter(t => !!t.definition.uri);
         expect(taskItems.length).to.be.equal(gruntCt - 2, `Unexpected grunt task count (Found ${taskItems.length} of ${gruntCt - 2})`);
         await waitForTeIdle(tc.waitTime.min);
         endRollingCount(this);
