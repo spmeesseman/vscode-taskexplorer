@@ -320,7 +320,7 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Set Bash", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event);
+        this.slow(tc.slowTime.config.pathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.bash", "c:\\unix\\sh.exe");
         endRollingCount(this);
     });
@@ -329,7 +329,7 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Set Composer", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event);
+        this.slow(tc.slowTime.config.pathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.composer", "c:\\php5\\composer.exe");
         endRollingCount(this);
     });
@@ -338,7 +338,7 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Clear Bash", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event);
+        this.slow(tc.slowTime.config.pathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.bash", undefined);
         endRollingCount(this);
     });
@@ -347,7 +347,7 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Clear Composer", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event);
+        this.slow(tc.slowTime.config.pathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.composer", undefined);
         endRollingCount(this);
     });
@@ -356,7 +356,7 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Restore Bash", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event);
+        this.slow(tc.slowTime.config.pathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash);
         endRollingCount(this);
     });
@@ -365,7 +365,7 @@ suite("Configuration / Settings Tests", () =>
     test("Path to Programs Restore Composer", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event);
+        this.slow(tc.slowTime.config.pathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.composer", pathToPrograms.composer);
         endRollingCount(this);
     });

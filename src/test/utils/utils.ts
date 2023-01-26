@@ -15,14 +15,14 @@ import { ILicenseManager } from "../../interface/ILicenseManager";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import initSettings from "./initSettings";
-import { getWsPath, getTestsPath } from "./sharedUtils";
+import { getWsPath, getProjectsPath } from "./sharedUtils";
 import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
 import { startInput, stopInput } from "./input";
 
 export { figures };
 export { testControl };
 export { treeUtils };
-export { getWsPath, getTestsPath };
+export { getWsPath, getProjectsPath };
 export let teApi: ITaskExplorerApi;
 
 let activated = false;
@@ -517,12 +517,18 @@ export const verifyTaskCount = async (taskType: string, expectedCount: number, r
     if (taskType === "Workspace") {
         tTasks = tTasks.filter(t => t.source === "Workspace");
     }
+    else if (taskType === "grunt" || taskType === "gulp") { // cheap.  we ignore internal grunt/gulp while building
+        tTasks = tTasks.filter(t => !!t.definition.uri);    // the task tree so ignore them here  too.
+    }
     while (--retries >= 0 && tTasks.length !== expectedCount)
     {
         await sleep(retryWait > 0 ? retryWait : tc.waitTime.verifyTaskCountRetryInterval);
         tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
         if (taskType === "Workspace") {
             tTasks = tTasks.filter(t => t.source === "Workspace");
+        }
+        else if (taskType === "grunt" || taskType === "gulp") {
+            tTasks = tTasks.filter(t => !!t.definition.uri);
         }
     }
     if (expectedCount >= 0) {

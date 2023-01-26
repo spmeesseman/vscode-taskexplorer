@@ -1,6 +1,13 @@
 
-import { normalize, resolve } from "path";
+import { join, normalize, resolve } from "path";
+import { existsSync, mkdirSync } from "fs";
 
-export const getWsPath = (p: string) => normalize(resolve(__dirname, "../../../test-fixture/project1", p));
+const testsProjectsDir = normalize(resolve(__dirname, join("..", "..", "..", ".vscode-test", "user-data", "projects")));
+if (!existsSync(testsProjectsDir)) {
+    mkdirSync(testsProjectsDir);
+}
 
-export const getTestsPath = (p: string) => normalize(resolve(__dirname, p));
+export const getWsPath = (p: string) => normalize(resolve(__dirname, join("..", "..", "..", "test-fixture", "project1"), p));
+
+
+export const getProjectsPath = (p: string) => normalize(resolve(testsProjectsDir, p));

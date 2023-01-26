@@ -67,6 +67,7 @@ export const testControl: ITestControl =
     //
     slowTime: {
         addWorkspaceFolder: 2000,
+        addWorkspaceFolderEmpty: 925,
         buildTreeNoTasks: 295,
         cache: {
             build: 490,
@@ -129,7 +130,8 @@ export const testControl: ITestControl =
         min: 50,
         refreshCommand: 6800,
         refreshCommandNoChanges: 245,
-        removeWorkspaceFolder: 500,
+        removeWorkspaceFolder: 1800,
+        removeWorkspaceFolderEmpty: 700,
         runCommand: 4900,
         runPauseCommand: 3255,
         runStopCommand: 3510,
@@ -167,7 +169,7 @@ export const testControl: ITestControl =
     {   //
         // MINIMUM WAIT TIMES
         //
-        addWorkspaceFolder: 210,
+        addWorkspaceFolder: 225,
         command: 70,
         commandFast: 45,
         config: {
@@ -177,7 +179,7 @@ export const testControl: ITestControl =
             excludeTasksEvent: 145,
             disableEvent: 105,
             enableEvent: 125,
-            globEvent: 105,
+            globEvent: 110,
             groupingEvent: 95,
             pathToProgramsEvent: 120,
             registerExplorerEvent: 130,
@@ -202,7 +204,7 @@ export const testControl: ITestControl =
         refreshCommand: 140,
         refreshCommandNoChanges: 75,
         refreshTaskTypeCommand: 125,
-        removeWorkspaceFolder: 115,
+        removeWorkspaceFolder: 200,
         runCommandMin: 500,
         taskCommand: 450,
         verifyTaskCountRetry: 70,
@@ -285,6 +287,7 @@ export interface ITestControl
     //
     slowTime: {
         addWorkspaceFolder: number;
+        addWorkspaceFolderEmpty: number;
         buildTreeNoTasks: number;
         cache: {
             build: number;
@@ -348,6 +351,7 @@ export interface ITestControl
         refreshCommand: number;
         refreshCommandNoChanges: number;
         removeWorkspaceFolder: number;
+        removeWorkspaceFolderEmpty: number;
         runCommand: number;
         runPauseCommand: number;
         runStopCommand: number;

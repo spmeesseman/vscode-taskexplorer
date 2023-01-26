@@ -37,7 +37,7 @@ suite("File Watcher Tests", () =>
         insideWsDir = join(rootPath, "tasks_test_");
         insideWsDir2 = join(rootPath, "tasks_test2_");
         insideWsDirIgn = join(rootPath, "fwTestIgnore");
-        outsideWsDir = utils.getTestsPath("testA");
+        outsideWsDir = utils.getProjectsPath("testA");
         excludes = configApi.get<string[]>("exclude");
         files = {
             grunt1_0: join(insideWsDir, "Gruntfile.js"),

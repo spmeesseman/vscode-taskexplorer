@@ -675,7 +675,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(Math.round(tc.slowTime.refreshCommand * 0.9) + tc.slowTime.fs.createFolderEvent);
-		const outsideWsDir = utils.getTestsPath("testA");
+		const outsideWsDir = utils.getProjectsPath("testA");
 		await fsApi.createDir(outsideWsDir);
 		await fsApi.writeFile(
             join(outsideWsDir, "Gruntfile.js"),

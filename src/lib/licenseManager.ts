@@ -253,19 +253,22 @@ export class LicenseManager implements ILicenseManager
 						this.testsLog("Request to license server completed  successfully", figures.color.success);
 						log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);
 						resolve(licensed);
-					} // Fails maybe if IIS/Apache server is running but the reverse proxied app server is not
-					catch (e) {
-						_onError(e);
-						log.error(rspData);
-						this.testsLog(rspData, figures.color.errorTests);
 					}
-				});
-			});
-			// This isn't going to fail unless i birth a bug on the server app or IIS/Apache site is offline
-			/* istanbul ignore next*/
-			req.on("error", (e) => { _onError(e); });
-			req.write(JSON.stringify({ licensekey: licenseKey }), () =>
-			{
+					catch (e) // Fails if IIS/Apache server is running but the reverse proxied app server is not, maybe
+					{
+						/* istanbul ignore next*/
+						_onError(e);
+						/* istanbul ignore next*/
+						log.error(rspData);
+						/* istanbul ignore next*/
+						this.testsLog(rspData, figures.color.errorTests);
+					}                                     //
+				});                                      //
+			});                                         //
+			/* istanbul ignore next*/                  //
+			req.on("error", (e) => { _onError(e); }); // Not going to fail unless i birth a bug on the server app
+			req.write(JSON.stringify({ licensekey: licenseKey }), () =>   //
+			{                                                            //
 				log.write("   output stream written, ending request and waiting for response...", 1, logPad);
 				this.testsLog("Output stream written, ending request and waiting for response...");
 				req.end();
