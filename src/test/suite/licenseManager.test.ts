@@ -60,7 +60,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this, false, true)) return;
 		teApi.setTests(true);
 		licMgr?.dispose();
-		await utils.closeActiveDocument();
+		await utils.closeEditors();
 		if (lsProcess) { // shut down local server
 			lsProcess.send("close");
 			await utils.sleep(500);
@@ -203,7 +203,7 @@ suite("License Manager Tests", () =>
 		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "viewReport" });
 		await utils.sleep(500);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
+		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
 
@@ -219,7 +219,7 @@ suite("License Manager Tests", () =>
 		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "enterLicense" });
 		await utils.sleep(500);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
+		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
 
@@ -235,7 +235,7 @@ suite("License Manager Tests", () =>
 		await licMgr.setTasks(tasks);
 		await utils.sleep(400);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
+		await utils.closeEditors();
 		await licMgr.setLicenseKey(licenseKey);
         utils.endRollingCount(this);
 	});
@@ -254,7 +254,7 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
+		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
 
@@ -272,7 +272,7 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
+		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
 
@@ -289,7 +289,7 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
+		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
 
@@ -308,7 +308,7 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
+		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
 
@@ -326,7 +326,7 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
+		await utils.closeEditors();
 		//
 		// Reset
 		//
@@ -349,7 +349,7 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
+		await utils.closeEditors();
 		//
 		// Reset
 		//
@@ -381,8 +381,8 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
 		await licMgr.setLicenseKey(licenseKey);
+		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
 
@@ -397,8 +397,8 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
 		await licMgr.setLicenseKey(licenseKey);
+		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
 
@@ -415,7 +415,7 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
-		await utils.closeActiveDocument();
+		await utils.closeEditors();
 		await licMgr.setLicenseKey(licenseKey);
         utils.endRollingCount(this);
 	});
@@ -473,7 +473,7 @@ suite("License Manager Tests", () =>
 // 			// await teApi.testsApi.storage.update("version", undefined);
 // 			// await licMgr.checkLicense();
 // 			// await utils.sleep(1000);
-// 			// await utils.closeActiveDocument();
+// 			// await utils.closeEditors();
 // 			// licMgr.setLicenseKey(licenseKey);
 // 			// await teApi.testsApi.storage.update("version", version);
 // 			// tasks.pop();

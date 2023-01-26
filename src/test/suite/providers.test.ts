@@ -5,6 +5,7 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
+import fsUtils from "../utils/fsUtils";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import { join } from "path";
@@ -292,8 +293,8 @@ suite("Provider Tests", () =>
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
-            await executeSettingsUpdate("specialFolders.showFavorites", true);
-            await executeSettingsUpdate("specialFolders.showLastTasks", true);
+            await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
+            await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
             expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(2);
@@ -303,8 +304,8 @@ suite("Provider Tests", () =>
         }
         finally {
             await executeSettingsUpdate("specialFolders.expanded.lastTasks", true);
-            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
-            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
+            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites, tc.waitTime.config.showHideSpecialFolder);
+            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks, tc.waitTime.config.showHideSpecialFolder);
         }
         endRollingCount(this);
     });
@@ -317,8 +318,8 @@ suite("Provider Tests", () =>
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
-            await executeSettingsUpdate("specialFolders.showFavorites", true);
-            await executeSettingsUpdate("specialFolders.showLastTasks", true);
+            await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
+            await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.expanded.favorites", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
             expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(2);
@@ -328,8 +329,8 @@ suite("Provider Tests", () =>
         }
         finally {
             await executeSettingsUpdate("specialFolders.expanded.favorites", true);
-            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
-            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
+            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks, tc.waitTime.config.showHideSpecialFolder);
+            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites, tc.waitTime.config.showHideSpecialFolder);
         }
         endRollingCount(this);
     });
@@ -342,8 +343,8 @@ suite("Provider Tests", () =>
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
-            await executeSettingsUpdate("specialFolders.showFavorites", false);
-            await executeSettingsUpdate("specialFolders.showLastTasks", true);
+            await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
+            await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.expanded.favorites", false);
             await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
@@ -355,8 +356,8 @@ suite("Provider Tests", () =>
         finally {
             await executeSettingsUpdate("specialFolders.expanded.favorites", true);
             await executeSettingsUpdate("specialFolders.expanded.lastTasks", true);
-            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
-            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
+            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks, tc.waitTime.config.showHideSpecialFolder);
+            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites, tc.waitTime.config.showHideSpecialFolder);
         }
         endRollingCount(this);
     });
@@ -369,8 +370,8 @@ suite("Provider Tests", () =>
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
-            await executeSettingsUpdate("specialFolders.showFavorites", true);
-            await executeSettingsUpdate("specialFolders.showLastTasks", false);
+            await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
+            await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.expanded.favorites", false);
             expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
             expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(1);
@@ -380,8 +381,8 @@ suite("Provider Tests", () =>
         }
         finally {
             await executeSettingsUpdate("specialFolders.expanded.favorites", true);
-            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks);
-            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites);
+            await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks, tc.waitTime.config.showHideSpecialFolder);
+            await executeSettingsUpdate("specialFolders.showFavorites", showFavorites, tc.waitTime.config.showHideSpecialFolder);
         }
         endRollingCount(this);
     });
@@ -456,8 +457,7 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent + (tc.slowTime.taskCount.verify * 2));
         const file = join(rootPath, ".publishrc.json");
         teApi.utilities.removeFromArray(tempFiles, file);
-        await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
+        await fsUtils.deleteFile(file);
         await verifyTaskCount("apppublisher", 21);
         await createAppPublisherFile();
         await verifyTaskCount("apppublisher", 42);
@@ -471,8 +471,7 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(dirName, "build.xml");
         teApi.utilities.removeFromArray(tempFiles, file);
-        await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
+        await fsUtils.deleteFile(file);
         await createAntFile();
         endRollingCount(this);
     });
@@ -484,8 +483,7 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(dirName, "build.gradle");
         teApi.utilities.removeFromArray(tempFiles, file);
-        await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
+        await fsUtils.deleteFile(file);
         await createGradleFile();
         endRollingCount(this);
     });
@@ -497,8 +495,7 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "GRUNTFILE.js");
         teApi.utilities.removeFromArray(tempFiles, file);
-        await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
+        await fsUtils.deleteFile(file);
         await createGruntFile();
         endRollingCount(this);
     });
@@ -510,8 +507,7 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "gulpfile.js");
         teApi.utilities.removeFromArray(tempFiles, file);
-        await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
+        await fsUtils.deleteFile(file);
         await createGulpFile();
         endRollingCount(this);
     });
@@ -523,8 +519,7 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent + tc.slowTime.config.event);
         const file = join(rootPath, "Makefile");
         teApi.utilities.removeFromArray(tempFiles, file);
-        await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
+        await fsUtils.deleteFile(file);
         await createMakeFile();
         await executeSettingsUpdate("logging.enable", true); // hit tree.logTask()
         endRollingCount(this);
@@ -537,8 +532,7 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "pom.xml");
         teApi.utilities.removeFromArray(tempFiles, file);
-        await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
+        await fsUtils.deleteFile(file);
         await createMavenPomFile();
         endRollingCount(this);
     });
@@ -550,8 +544,7 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
         const file = join(rootPath, "test.bat");
         teApi.utilities.removeFromArray(tempFiles, file);
-        await fsApi.deleteFile(file);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent, 1500);
+        await fsUtils.deleteFile(file);
         await createBatchFile();
         endRollingCount(this);
     });

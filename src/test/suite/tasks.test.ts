@@ -275,7 +275,7 @@ suite("Task Tests", () =>
         if (utils.exitRollingCount(this)) return;
         const slowTime = (tc.slowTime.runCommand * 1) + (tc.slowTime.runStopCommand * 2) + 12000 + // wait for task exec
                           startTaskSlowTime + tc.slowTime.runPauseCommand + (tc.slowTime.config.event * 4) +
-                          (tc.slowTime.command * 2) + tc.slowTime.closeActiveDocument + tc.slowTime.tasks.batchScriptCmd;
+                          (tc.slowTime.command * 2) + tc.slowTime.closeEditors + tc.slowTime.tasks.batchScriptCmd;
         this.slow(slowTime);
         this.timeout(35000);
         const batchTask = batch[0];
@@ -305,7 +305,7 @@ suite("Task Tests", () =>
         //
         await utils.executeSettingsUpdate("taskButtons.clickAction", "Open");
         await utils.executeTeCommand2("open", [ batchTask ], tc.waitTime.command);
-        await utils.closeActiveDocument();
+        await utils.closeEditors();
         //
         // Run (while paused)
         //

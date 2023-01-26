@@ -41,7 +41,7 @@ suite("Typescript Tests", () =>
     suiteTeardown(async function()
     {
         if (utils.exitRollingCount(this, false, true)) return;
-        await utils.closeActiveDocument();
+        await utils.closeEditors();
         if (await pathExists(fileUri.fsPath)) {
             await fsApi.deleteFile(fileUri.fsPath);
             await utils.waitForTeIdle(testControl.waitTime.fs.deleteEvent);
@@ -123,9 +123,9 @@ suite("Typescript Tests", () =>
         //
         const tscItems = await utils.treeUtils.getTreeTasks("tsc", startTaskCount + 2);
         await utils.executeTeCommand2("open", [ tscItems[0] ]);
-        await utils.closeActiveDocument();
+        await utils.closeEditors();
         await utils.executeTeCommand2("open", [ tscItems[1] ]);
-        await utils.closeActiveDocument();
+        await utils.closeEditors();
         utils.endRollingCount(this);
     });
 

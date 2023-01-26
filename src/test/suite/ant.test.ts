@@ -14,8 +14,7 @@ import {
 
 const testsName = "ant";
 const startTaskCount = 3;
-const slowTimeforAntRunTasks = (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.config.event * 2) +
-                               tc.slowTime.tasks.antParser;
+const slowTimeforAntRunTasks = (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.config.event * 2) + tc.slowTime.tasks.antParser;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -290,14 +289,14 @@ async function runCheck(expectedCountNoAnt: number, expectedCountWithAnt: number
 {   //
     // Don't use Ant
     //
-    await executeSettingsUpdate("useAnt", false);
+    await executeSettingsUpdate("useAnt", false, tc.waitTime.config.enableEvent);
     let antTasks = await tasks.fetchTasks({ type: "ant" });
     expect(antTasks.length).to.be.equal(expectedCountNoAnt, `Did not read ${expectedCountNoAnt} ant tasks(1)(actual ${antTasks ? antTasks.length : 0})`);
     logErrorsAreFine(xml2jsWillFail);
     //
     // Use Ant
     //
-    await executeSettingsUpdate("useAnt", true);
+    await executeSettingsUpdate("useAnt", true, tc.waitTime.config.enableEvent);
     antTasks = await tasks.fetchTasks({ type: "ant" });
     expect(antTasks.length).to.be.equal(expectedCountWithAnt, `Did not read ${expectedCountWithAnt} ant tasks (3)(actual ${antTasks ? antTasks.length : 0})`);
     logErrorsAreFine(antWillFail);
