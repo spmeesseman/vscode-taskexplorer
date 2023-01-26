@@ -74,7 +74,7 @@ export const testControl: ITestControl =
         closeActiveDocument: 20,
         command: 675,
         commandFast: 265,
-        commandShowOutput: 740,
+        commandShowOutput: 765,
         config: {
             event: 270,
             eventFast: 90,
@@ -92,26 +92,26 @@ export const testControl: ITestControl =
             readEvent: 25,
             sortingEvent: 725
         },
-        excludeCommand: 1450,
+        excludeCommand: 1425,
         explorerViewStartup: 7565,
-        fetchTasksCommand: 1870,
-        fileCachePersist: 270,
-        findTaskPosition: 380,
+        fetchTasksCommand: 1850,
+        fileCachePersist: 260,
+        findTaskPosition: 350,
         findTaskPositionDocOpen: 40,
         focusCommand: 2340,
         focusCommandAlreadyFocused: 320,
         focusCommandChangeViews: 90,
         fs: {
-            createEvent: 1605,
-            createEventTsc: 1750,
-            createFolderEvent: 1650,
-            deleteEvent: 1345,
-            deleteEventTsc: 1630,
-            deleteFolderEvent: 1440,
-            modifyEvent: 960,
+            createEvent: 1610,
+            createEventTsc: 1755,
+            createFolderEvent: 1655,
+            deleteEvent: 1350,
+            deleteEventTsc: 1635,
+            deleteFolderEvent: 1445,
+            modifyEvent: 970,
         },
         getTreeTasks: 205,
-        getTreeTasksNpm: 500, // npm task provider is slower than shit on a turtle
+        getTreeTasksNpm: 495, // npm task provider is slower than shit on a turtle
         licenseMgr: {
             page: 150,
             pageWithDetail: 325,
@@ -125,7 +125,7 @@ export const testControl: ITestControl =
             setLicenseCmd: 210
         },
         min: 50,
-        refreshCommand: 7000,
+        refreshCommand: 6975,
         refreshCommandNoChanges: 245,
         removeWorkspaceFolder: 1975,
         runCommand: 4900,
@@ -135,27 +135,27 @@ export const testControl: ITestControl =
         storageUpdate: 60,
         storageSecretRead: 95,
         storageSecretUpdate: 200,
-        taskCommand: 1150,
-        taskCommandStartupMax: 3100,
+        taskCommand: 1125,
+        taskCommandStartupMax: 3000,
         taskProviderReadUri: 90,
         tasks: {
-            antParser: 525,
-            antTask: 3700,
-            antTaskWithAnsicon: 3750,
+            antParser: 500,
+            antTask: 3650,
+            antTaskWithAnsicon: 3700,
             bashScript: 3025,
             batchScriptBat: 4200,
             batchScriptCmd: 5200,
             gulpParser: 3850,
-            npmCommand: 11000,
-            npmCommandPkg: 9000,
-            npmInstallCommand: 12000
+            npmCommand: 10000,
+            npmCommandPkg: 8500,
+            npmInstallCommand: 11000
         },
         taskCount: {
             verify: 460,
-            verifyByTree: 510,
-            verifyFirstCall: 700,
-            verifyNpm: 1500, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 1900
+            verifyByTree: 500,
+            verifyFirstCall: 675,
+            verifyNpm: 1400, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 1800
         },
         viewReport: 410
     },
@@ -188,7 +188,7 @@ export const testControl: ITestControl =
         focusCommand: 220,
         fs: {
             createEvent: 190,
-            createFolderEvent: 200,
+            createFolderEvent: 205,
             deleteEvent: 180,
             deleteFolderEvent: 180,
             modifyEvent: 175
