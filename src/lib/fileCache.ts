@@ -143,20 +143,20 @@ export async function addFolder(folder: Uri, logPad: string)
 async function addWsFolder(folder: WorkspaceFolder, taskType: string, logPad: string)
 {
     let numFilesFound = 0;
-    log.methodStart("add workspace project folder to cache", 1, logPad, logPad === "", [[ "folder", folder.name ]]);
+    log.methodStart(`scan workspace project folder for ${taskType} tasks`, 1, logPad, logPad === "", [[ "folder", folder.name ]]);
 
     const externalProvider = providersExternal[taskType];
     if (!cancel && (externalProvider || util.isTaskTypeEnabled(taskType)))
     {
-        log.value("   building workspace project cache", taskType, 3, logPad);
+        log.value(`   building workspace project ${taskType} task file cache`, taskType, 3, logPad);
         numFilesFound += await buildTaskTypeCache(taskType, folder, false, logPad + "   ");
-        log.value("   completed building workspace project cache", taskType, 3, logPad);
+        log.value(`   completed building project ${taskType} task file cache`, taskType, 3, logPad);
     }
 
     if (cancel) {
         log.write("   add workspace project folder to cache cancelled", 3, logPad);
     }
-    log.methodDone("add workspace project folder to cache", 1, logPad, [[ "# of files matched", numFilesFound ]]);
+    log.methodDone(`scan workspace project folder for ${taskType} tasks`, 1, logPad, [[ "# of files matched", numFilesFound ]]);
     return numFilesFound;
 }
 

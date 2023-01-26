@@ -373,7 +373,7 @@ const processQueue = async () =>
         const next = currentEvent = eventQueue.shift();
         log.methodStart("file watcher event queue", 1, "", true, [
             [ "event", next.event ], [ "arg1", isString(next.args[0]) ? next.args[0] : next.args[0].fsPath ],
-            [ "arg2", next.args[1] instanceof Uri ? next.args[1].fsPath : "none (log padding)" ],
+            [ "arg2", util.isUri(next.args[1]) ? next.args[1].fsPath : "none (log padding)" ],
             [ "# of events still pending", eventQueue.length ]
         ]);
         await next.fn(...next.args);
@@ -557,7 +557,9 @@ const _procWsDirAddRemoveEvent = async(e: WorkspaceFoldersChangeEvent, logPad: s
         const numFilesRemoved = cache.removeWsFolders(e.removed, logPad + "   ");
         createDirWatcher(extContext);
         if (numFilesFound > 0 || numFilesRemoved > 0) {
-            await refreshTree(teApi, undefined, undefined, logPad + "   ");
+            const all =  [ ...e.added, ...e.removed ];
+            await refreshTree(teApi, undefined, all.length === 1 ? all[0].uri : undefined, logPad + "   ");
+            // await refreshTree(teApi, undefined, undefined, logPad + "   ");
         }
         log.methodDone("workspace folder 'add/remove'", 1, logPad, [
             [ "# of files found", numFilesFound ], [ "# of files removed", numFilesRemoved ]

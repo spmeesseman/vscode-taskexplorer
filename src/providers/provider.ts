@@ -4,10 +4,10 @@ import constants from "../lib/constants";
 import { extname } from "path";
 import { getTaskFiles } from "../lib/fileCache";
 import { getLicenseManager } from "../extension";
-import { pathExistsSync } from "../lib/utils/fs";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { configuration } from "../lib/utils/configuration";
-import { Uri, Task, WorkspaceFolder, TaskProvider } from "vscode";
+import { isDirectory, pathExistsSync } from "../lib/utils/fs";
+import { Uri, Task, WorkspaceFolder, TaskProvider, workspace } from "vscode";
 import { getTaskTypeFriendlyName, isExcluded, isTaskTypeEnabled, showMaxTasksReachedMessage } from "../lib/utils/utils";
 
 
@@ -155,7 +155,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
             const enabled = isTaskTypeEnabled(this.providerName);
             if (enabled && uri)
             {
-                const pathExists = pathExistsSync(uri.fsPath);
+                const pathExists = pathExistsSync(uri.fsPath) && !!workspace.getWorkspaceFolder(uri) ;
                 //
                 // Remove tasks of type '' from the 'tasks'array
                 //
@@ -173,7 +173,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
                 // the the tree ui.  The check for excluded path patterns also found in the `excludes` array
                 // is done by the file caching layer.
                 //
-                if (pathExists && !configuration.get<string[]>("exclude", []).includes(uri.path))
+                if (pathExists && !isDirectory(uri.fsPath) && !configuration.get<string[]>("exclude", []).includes(uri.path))
                 {
                     const tasks = (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
                     //
@@ -204,7 +204,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     {
         const cstDef = item.definition;
         return !!(cstDef.uri &&
-                 (cstDef.uri.fsPath === uri.fsPath || !pathExistsSync(cstDef.uri.fsPath) ||
+                 (cstDef.uri.fsPath === uri.fsPath || !pathExistsSync(cstDef.uri.fsPath) || !workspace.getWorkspaceFolder(uri) ||
                  //
                  // If the directory wasdeleted, then isDirectory() fails, so for now rely on the fact
                  // that of the path doesn't have an extension, it's probably a directory.  FileWatcher
