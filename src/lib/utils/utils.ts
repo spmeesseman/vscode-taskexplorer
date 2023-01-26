@@ -273,6 +273,9 @@ export function isTaskTypeEnabled(taskType: string)
 }
 
 
+export const isUri = (u: any): u is Uri => u && u instanceof Uri;
+
+
 export function isWatchTask(source: string)
 {
     return [ "npm", "tsc", "Workspace" ].includes(source);
