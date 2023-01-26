@@ -13,7 +13,7 @@ class TeStatusBarItem
     hide = () => this.statusBarItem.hide();
     init = (context: ExtensionContext) => context.subscriptions.push(this.statusBarItem);
     show = () => this.statusBarItem.show();
-    tooltip = (msg: string) => this.statusBarItem.tooltip = msg;
+    // tooltip = (msg: string) => this.statusBarItem.tooltip = msg;
     update = (msg: string) => this.statusBarItem.text = this.getStatusString(msg);
     private getStatusString = (msg: string) =>
     {
