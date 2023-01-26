@@ -408,7 +408,8 @@ suite("Util Tests", () =>
     test("Miscellaneous", async function()
     {
         if (exitRollingCount(this)) return;
-        new InitScripts(); // it won't cover since no focus the view until after a bunch of test suites
+        const item = new InitScripts(teApi.testsApi.explorer); // it won't cover since no focus the view until after a bunch of test suites
+		// item.dispose();
         teApi.testsApi.explorer.isVisible();
         await pathUtils.getInstallPath();
         endRollingCount(this);
