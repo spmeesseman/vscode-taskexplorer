@@ -62,12 +62,12 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 2350,
+        addWorkspaceFolder: 2000,
         buildTreeNoTasks: 295,
         cache: {
-            build: 500,
+            build: 490,
             buildCancel: 295,
-            rebuild: 4000,
+            rebuild: 3900,
             rebuildCancel: 490,
             rebuildNoChanges: 890,
         },
@@ -113,19 +113,19 @@ export const testControl: ITestControl =
         getTreeTasks: 205,
         getTreeTasksNpm: 490, // npm task provider is slower than shit on a turtle
         licenseMgr: {
-            page: 270,
-            pageWithDetail: 375,
-            checkLicense: 425,
+            page: 160,
+            pageWithDetail: 325,
+            checkLicense: 400,
             enterKey: 845,
             getMaxTasks: 360,
             localStartServer: 1195,
-            serverDownHostUp: 14500,
-            setLicenseCmd: 225
+            serverDownHostUp: 14100,
+            setLicenseCmd: 210
         },
         min: 50,
-        refreshCommand: 6825,
+        refreshCommand: 6800,
         refreshCommandNoChanges: 245,
-        removeWorkspaceFolder: 600,
+        removeWorkspaceFolder: 500,
         runCommand: 4900,
         runPauseCommand: 3255,
         runStopCommand: 3510,
