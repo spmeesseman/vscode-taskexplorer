@@ -177,7 +177,7 @@ pipeline {
         this.slow((tc.slowTime.config.pathToProgramsEvent * 4) + (tc.slowTime.taskCount.verify * 4));
         try {
             await executeSettingsUpdate("pathToPrograms.curl", "", tc.waitTime.config.pathToProgramsEvent);
-            await verifyTaskCount(testsName, startTaskCount);
+            await verifyTaskCount(testsName, 0);
         }
         catch (e) { throw e; }
         finally {
@@ -186,7 +186,7 @@ pipeline {
         }
         try {
             await executeSettingsUpdate("pathToPrograms.jenkins", "", tc.waitTime.config.pathToProgramsEvent);
-            await verifyTaskCount(testsName, startTaskCount);
+            await verifyTaskCount(testsName, 0);
         }
         catch (e) { throw e; }
         finally {
