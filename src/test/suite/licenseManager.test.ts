@@ -535,7 +535,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		if (lsProcess)
 		{
-			this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.checkLicense +
+			this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageSecretRead +
 					  tc.slowTime.storageUpdate + (tc.slowTime.storageSecretUpdate * 2));
 			licMgr.setTestData({
 				host: "localhost",
@@ -558,7 +558,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		if (lsProcess)
 		{
-			this.slow(tc.slowTime.licenseMgr.checkLicense + (tc.slowTime.storageSecretUpdate * 2));
+			this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageSecretRead + (tc.slowTime.storageSecretUpdate * 2));
 			const licenseKey = await licMgr.getLicenseKey();
 			await licMgr.setLicenseKey("1234-5678-9098-7654321");
 			await licMgr.checkLicense();
@@ -574,7 +574,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		if (lsProcess)
 		{
-			this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageUpdate  + tc.slowTime.storageSecretUpdate);
+			this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageSecretRead + tc.slowTime.storageUpdate  + tc.slowTime.storageSecretUpdate);
 			const licenseKey = await licMgr.getLicenseKey();
 			await licMgr.setLicenseKey("1234-5678-9098-1234567");
 			await licMgr.checkLicense();

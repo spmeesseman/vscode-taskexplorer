@@ -90,7 +90,7 @@ export const testControl: ITestControl =
             showHideSpecialFolder: 340,
             showHideUserTasks: 1000,
             readEvent: 25,
-            sortingEvent: 725
+            sortingEvent: 740
         },
         excludeCommand: 1400,
         explorerViewStartup: 7565,
