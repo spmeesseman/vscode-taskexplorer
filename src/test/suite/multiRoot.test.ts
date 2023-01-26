@@ -121,7 +121,7 @@ suite("Multi-Root Workspace Tests", () =>
             added: [ wsf[1] ],
             removed: []
         });
-        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+        await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
         endRollingCount(this);
     });
 
@@ -134,7 +134,7 @@ suite("Multi-Root Workspace Tests", () =>
             added: [ wsf[2], wsf[3] ],
             removed: []
         });
-        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+        await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
         endRollingCount(this);
     });
 
@@ -147,7 +147,7 @@ suite("Multi-Root Workspace Tests", () =>
             added: [ wsf[4] ],
             removed: []
         });
-        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+        await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
         endRollingCount(this);
     });
 
@@ -160,7 +160,7 @@ suite("Multi-Root Workspace Tests", () =>
             added: [],
             removed: [ wsf[1] ]
         });
-        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
+        await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         endRollingCount(this);
     });
 
@@ -173,7 +173,7 @@ suite("Multi-Root Workspace Tests", () =>
             added: [],
             removed: [ wsf[2], wsf[3] ]
         });
-        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
+        await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         endRollingCount(this);
     });
 
@@ -186,12 +186,12 @@ suite("Multi-Root Workspace Tests", () =>
             added: [],
             removed: [ wsf[4] ]
         });
-        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
+        await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         endRollingCount(this);
     });
 
 
-    test("Mimic Add WS Folder 1 (w/ File)", async function()
+    test("Mimic Add WS Folder 1 and 2 (w/ File)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
@@ -209,10 +209,10 @@ suite("Multi-Root Workspace Tests", () =>
             return wsf[uri.fsPath.includes("test-fixture") ? 0 : 1];
         };
         await testsApi.onWsFoldersChange({
-            added: [ wsf[1] ],
+            added: [ wsf[1], wsf[2] ],
             removed: []
         });
-        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+        await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         //
         // For whatever reason, VSCode doesnt return the two "faked" tasks in fetchTasks(). Strange that
         // verything looks fine, it goes through provideTasks(), which returns 9 tasks (gruntCt + 2) to
@@ -225,15 +225,15 @@ suite("Multi-Root Workspace Tests", () =>
     });
 
 
-    test("Mimic Remove WS Folder 1 (w/ File)", async function()
+    test("Mimic Remove WS Folder 1 and 2 (w/ File)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify);
         await testsApi.onWsFoldersChange({
             added: [],
-            removed: [ wsf[1] ]
+            removed: [ wsf[1], wsf[2] ]
         });
-        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
+        await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         await fsApi.deleteFile(join(wsf[1].uri.fsPath, "Gruntfile.js"));
         workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
         await verifyTaskCount("grunt", gruntCt);
@@ -251,7 +251,7 @@ suite("Multi-Root Workspace Tests", () =>
             added: [ wsf[1] ],
             removed: []
         });
-        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+        await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
         endRollingCount(this);
     });
 
@@ -266,7 +266,7 @@ suite("Multi-Root Workspace Tests", () =>
             added: [],
             removed: [ wsf[1] ]
         });
-        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
+        await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         endRollingCount(this);
     });
 

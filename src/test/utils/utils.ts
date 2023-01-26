@@ -124,6 +124,10 @@ export const activate = async (instance?: Mocha.Context) =>
             assert.fail(`    ${figures.color.error} Explorer instance does not exist`);
         }
         //
+        // Cheap set to 'licensed mode'
+        //
+        await teApi.testsApi.storage.updateSecret("license_key", "1234-5678-9098-7654321");
+        //
         // _api pre-test suite will reset after disable/enable
         //
         console.log(`    ${figures.color.info} ${figures.withColor("Settings tests active explorer instance", figures.colors.grey)}`);
@@ -137,10 +141,6 @@ export const activate = async (instance?: Mocha.Context) =>
         // Write to console is just a tests feature, it's not controlled by settings, set it here if needed
         //
         teApi.log.setWriteToConsole(tc.log.console, tc.log.level);
-        //
-        // Set to 'licensed mode'
-        //
-        setLicensed(true, getLicenseManager());
         //
         // Catch CTRL+C and set hasRollingCountError
         //

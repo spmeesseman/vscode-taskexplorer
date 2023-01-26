@@ -62,7 +62,7 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 2500,
+        addWorkspaceFolder: 2450,
         buildTreeNoTasks: 295,
         cache: {
             build: 500,
@@ -96,7 +96,7 @@ export const testControl: ITestControl =
         explorerViewStartup: 7565,
         fetchTasksCommand: 1850,
         fileCachePersist: 260,
-        findTaskPosition: 340,
+        findTaskPosition: 335,
         findTaskPositionDocOpen: 40,
         focusCommand: 2340,
         focusCommandAlreadyFocused: 320,
@@ -115,19 +115,17 @@ export const testControl: ITestControl =
         licenseMgr: {
             page: 150,
             pageWithDetail: 325,
-            downCheck: 350,
+            checkLicense: 400,
             enterKey: 845,
-            localCheck: 1825,
+            getMaxTasks: 360,
             localStartServer: 1195,
-            remoteCheck: 2315,
-            remoteStartServer: 3625,
             serverDownHostUp: 14100,
             setLicenseCmd: 210
         },
         min: 50,
-        refreshCommand: 6900,
+        refreshCommand: 6875,
         refreshCommandNoChanges: 245,
-        removeWorkspaceFolder: 1975,
+        removeWorkspaceFolder: 1970,
         runCommand: 4900,
         runPauseCommand: 3255,
         runStopCommand: 3510,
@@ -144,7 +142,7 @@ export const testControl: ITestControl =
             bashScript: 3025,
             batchScriptBat: 4175,
             batchScriptCmd: 5175,
-            gulpParser: 3850,
+            gulpParser: 3875,
             npmCommand: 9000,
             npmCommandPkg: 8000,
             npmInstallCommand: 10000
@@ -165,7 +163,7 @@ export const testControl: ITestControl =
     {   //
         // MINIMUM WAIT TIMES
         //
-        addWorkspaceFolder: 145,
+        addWorkspaceFolder: 210,
         command: 70,
         commandFast: 45,
         config: {
@@ -331,12 +329,10 @@ export interface ITestControl
         licenseMgr: {
             page: number;
             pageWithDetail: number;
-            downCheck: number;
+            checkLicense: number;
             enterKey: number;
-            localCheck: number;
+            getMaxTasks: number;
             localStartServer: number;
-            remoteCheck: number;
-            remoteStartServer: number;
             serverDownHostUp: number;
             setLicenseCmd: number;
         };
