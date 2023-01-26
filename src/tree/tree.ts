@@ -81,7 +81,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     private taskTree: TaskFolder[] | NoScripts[] | undefined | null | void = null;
     private taskWatcher: TaskWatcher;
     private currentInvalidation: string | undefined;
-    private currentInvalidationUri: Uri | undefined;
+    // private currentInvalidationUri: Uri | undefined;
     private onTreeDataChangeEventComplete: any;
     private _onDidChangeTreeData: EventEmitter<TreeItem | undefined | null | void> = new EventEmitter<TreeItem | undefined | null | void>();
     readonly onDidChangeTreeData: Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
@@ -1353,6 +1353,34 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     };
 
 
+    private onWorkspaceFolderRemoved = (uri: Uri, logPad: string) =>
+    {
+        let ctRmv = 0;
+        log.write("   removing project tasks from cache", 1, logPad);
+        log.value("      path", uri.fsPath, 1, logPad);
+        statusBarItem.update("Deleting all tasks from removed project folder");
+        (this.tasks as Task[]).slice().reverse().forEach((item, index, object) =>
+        {
+            if (item.definition.uri && item.definition.uri.fsPath.startsWith(uri.fsPath))
+            {
+                log.write(`      removing task '${item.source}/${item.name}'`, 2, logPad);
+                (this.tasks as Task[]).splice(object.length - 1 - index, 1);
+                ++ctRmv;
+            }
+        });
+        const folderIdx = (this.taskTree as TaskFolder[]).findIndex((f: TaskFolder) => f.resourceUri?.fsPath === uri.fsPath);
+        (this.taskTree as TaskFolder[]).splice(folderIdx, 1);
+        for (const tId of Object.keys(this.taskMap))
+        {
+            const item = this.taskMap[tId] as TaskItem;
+            if  (item.resourceUri?.fsPath.startsWith(uri.fsPath)) {
+                delete this.taskMap[tId];
+            }
+        }
+        log.write(`   removed ${ctRmv} tasks from cache`, 1, logPad);
+    };
+
+
     public onVisibilityChanged = (visible: boolean) =>
     {   //
         // VSCode engine calls getChildren() when the view changes to 'visible'
@@ -1461,22 +1489,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
         if (this.tasks && this.taskTree && util.isUri(opt) && isDirectory(opt.fsPath) && !workspace.getWorkspaceFolder(opt))
         {
-            let ctRmv = 0;
-            log.write("   removing project tasks from cache", 1, logPad);
-            log.value("      path", opt.fsPath, 1, logPad);
-            statusBarItem.update("Deleting all tasks from removed project folder");
-            this.tasks.slice().reverse().forEach((item, index, object) =>
-            {
-                if (item.definition.uri && item.definition.uri.fsPath.startsWith(opt.fsPath))
-                {
-                    log.write(`      removing task '${item.source}/${item.name}'`, 2, logPad);
-                    (this.tasks as Task[]).splice(object.length - 1 - index, 1);
-                    ++ctRmv;
-                }
-            });
-            const folderIdx = (this.taskTree as TaskFolder[]).findIndex((f: TaskFolder) => f.resourceUri?.fsPath === opt.fsPath);
-            this.taskTree.splice(folderIdx, 1);
-            log.write(`   removed ${ctRmv} tasks from cache`, 1, logPad);
+            this.onWorkspaceFolderRemoved(opt, logPad);
         }
         else
         {
