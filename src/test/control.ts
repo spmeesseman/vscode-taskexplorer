@@ -62,7 +62,7 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 2450,
+        addWorkspaceFolder: 2350,
         buildTreeNoTasks: 295,
         cache: {
             build: 500,
@@ -74,7 +74,7 @@ export const testControl: ITestControl =
         closeEditors: 20,
         command: 675,
         commandFast: 265,
-        commandShowOutput: 785,
+        commandShowOutput: 800,
         config: {
             event: 270,
             eventFast: 90,
@@ -83,12 +83,12 @@ export const testControl: ITestControl =
             enableEvent: 1860,
             enableEventWorkspace: 1940,
             excludesEvent: 1900,
-            excludeTasksEvent: 2820,
-            globEvent: 1130,
+            excludeTasksEvent: 2800,
+            globEvent: 1125,
             groupingEvent: 990,
             pathToProgramsEvent: 710,
             showHideSpecialFolder: 340,
-            showHideUserTasks: 1020,
+            showHideUserTasks: 1000,
             readEvent: 25,
             sortingEvent: 725
         },
@@ -111,7 +111,7 @@ export const testControl: ITestControl =
             modifyEvent: 1075,
         },
         getTreeTasks: 205,
-        getTreeTasksNpm: 495, // npm task provider is slower than shit on a turtle
+        getTreeTasksNpm: 490, // npm task provider is slower than shit on a turtle
         licenseMgr: {
             page: 150,
             pageWithDetail: 325,
@@ -123,9 +123,9 @@ export const testControl: ITestControl =
             setLicenseCmd: 210
         },
         min: 50,
-        refreshCommand: 6875,
+        refreshCommand: 6850,
         refreshCommandNoChanges: 245,
-        removeWorkspaceFolder: 1970,
+        removeWorkspaceFolder: 600,
         runCommand: 4900,
         runPauseCommand: 3255,
         runStopCommand: 3510,
@@ -133,19 +133,19 @@ export const testControl: ITestControl =
         storageUpdate: 60,
         storageSecretRead: 95,
         storageSecretUpdate: 200,
-        taskCommand: 1100,
+        taskCommand: 1050,
         taskProviderReadUri: 90,
         tasks: {
             antParser: 490,
-            antTask: 3450,
-            antTaskWithAnsicon: 3500,
+            antTask: 3425,
+            antTaskWithAnsicon: 3475,
             bashScript: 3025,
-            batchScriptBat: 4175,
-            batchScriptCmd: 5175,
+            batchScriptBat: 4150,
+            batchScriptCmd: 5150,
             gulpParser: 3875,
-            npmCommand: 9000,
-            npmCommandPkg: 8000,
-            npmInstallCommand: 10000
+            npmCommand: 8500,
+            npmCommandPkg: 7500,
+            npmInstallCommand: 9500
         },
         taskCount: {
             verify: 460,
