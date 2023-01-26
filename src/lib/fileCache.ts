@@ -2,18 +2,16 @@
 
 import * as util from "./utils/utils";
 import log from "./log/log";
+import statusBarItem from "./statusBarItem";
 import { join } from "path";
 import { storage } from "./utils/storage";
-import { findFiles, numFilesInDirectory } from "./utils/fs";
 import { configuration } from "./utils/configuration";
+import { IDictionary, ICacheItem } from "../interface";
+import { findFiles, numFilesInDirectory } from "./utils/fs";
 import { getLicenseManager, providers, providersExternal } from "../extension";
-import { IDictionary, ICacheItem, ITaskExplorerApi } from "../interface";
-import {
-    workspace, window, RelativePattern, WorkspaceFolder, Uri, StatusBarAlignment, StatusBarItem, ExtensionContext, commands
-} from "vscode";
+import { workspace, RelativePattern, WorkspaceFolder, Uri, ExtensionContext, commands } from "vscode";
 
 
-let statusBarSpace: StatusBarItem;
 let cacheBuilding = false;
 let cacheBusy = false;
 let cancel = false;
@@ -41,7 +39,7 @@ export function addFileToCache(taskType: string, uri: Uri, logPad: string)
 const addFromStorage = async() =>
 {
     await startBuild();
-    statusBarSpace.text = "Loading tasks from file cache...";
+    statusBarItem.update("Loading tasks from file cache...");
     taskFilesMap = await storage.get2<IDictionary<ICacheItem[]>>("fileCacheTaskFilesMap", {});
     projectFilesMap = await storage.get2<IDictionary<IDictionary<string[]>>>("fileCacheProjectFilesMap", {});
     projectToFileCountMap = await storage.get2<IDictionary<IDictionary<number>>>("fileCacheProjectFileToFileCountMap", {});
@@ -92,7 +90,7 @@ export async function addFolder(folder: Uri, logPad: string)
                 }
 
                 const dspTaskType = util.getTaskTypeFriendlyName(providerName);
-                statusBarSpace.text = getStatusString(`Scanning for ${dspTaskType} tasks in project ${wsFolder.name}`, 65);
+                statusBarItem.update(`Scanning for ${dspTaskType} tasks in project ${wsFolder.name}`);
 
                 /* istanbul ignore else */
                 if (!providersExternal[providerName])
@@ -247,7 +245,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
           dspTaskType = util.getTaskTypeFriendlyName(taskType);
 
     log.methodStart(logMsg, 1, logPad);
-    statusBarSpace.text = getStatusString(`Scanning for ${dspTaskType} tasks in project ${folder.name}`, 65);
+    statusBarItem.update(`Scanning for ${dspTaskType} tasks in project ${folder.name}`);
 
     initMaps(taskType, folder.name);
 
@@ -404,7 +402,7 @@ const finishBuild = async(skipPersist?: boolean) =>
     taskFiles.sort();
     await commands.executeCommand("setContext", "vscodeTaskExplorer.taskFiles", taskFiles);
     // await commands.executeCommand("setContext", "vscodeTaskExplorer.taskTypes", taskTypes);
-    statusBarSpace.hide();
+    statusBarItem.hide();
     cacheBuilding = false;
     cancel = false;
 };
@@ -426,22 +424,6 @@ function getExcludesPatternVsc(folder: string | WorkspaceFolder): RelativePatter
     const excludes: string[] = configuration.get("exclude"),
           multiFilePattern = util.getCombinedGlobPattern("**/node_modules/**,**/work/**", excludes);
     return new RelativePattern(folder, multiFilePattern);
-}
-
-
-function getStatusString(msg: string, statusLength: number)
-{
-    /* istanbul ignore else */
-    if (msg.length < statusLength)
-    {
-        for (let i = msg.length; i < statusLength; i++) {
-            msg += " ";
-        }
-    }
-    else {
-        msg = msg.substring(0, statusLength - 3) + "...";
-    }
-    return "$(loading~spin) " + msg;
 }
 
 
@@ -536,12 +518,12 @@ export const persistCache = (clear?: boolean, force?: boolean) =>
     if (clear !== true && (force || configuration.get<boolean>("enablePersistentFileCaching")))
     // if (clear !== true && (!teApi.isTests() || configuration.get<boolean>("enablePersistentFileCaching")))
     {
-        const text = statusBarSpace.text;
-        statusBarSpace.text = "Persisting file cache...";
+        const text = statusBarItem.get();
+        statusBarItem.update("Persisting file cache...");
         storage.update2Sync("fileCacheTaskFilesMap", taskFilesMap);
         storage.update2Sync("fileCacheProjectFilesMap", projectFilesMap);
         storage.update2Sync("fileCacheProjectFileToFileCountMap", projectToFileCountMap);
-        statusBarSpace.text = text;
+        statusBarItem.update(text);
     }
     else if (clear === true)
     {
@@ -559,9 +541,6 @@ export const persistCache = (clear?: boolean, force?: boolean) =>
  */
 export const registerFileCache = async(context: ExtensionContext) =>
 {
-    statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
-    statusBarSpace.tooltip = "Task Explorer Status";
-    context.subscriptions.push(statusBarSpace);
     await commands.executeCommand("setContext", "vscodeTaskExplorer.parsedFiles", []);
 };
 
@@ -791,5 +770,5 @@ async function startBuild()
         await util.timeout(100);
     }
     cacheBuilding = true;
-    statusBarSpace.show();
+    statusBarItem.show();
 }

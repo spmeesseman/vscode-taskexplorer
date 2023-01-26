@@ -41,6 +41,7 @@ import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } 
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/watcher/fileWatcher";
 import registerViewLicenseCommand from "./commands/viewLicense";
 import { IConfiguration } from "./interface/IConfiguration";
+import { registerStatusBarItem } from "./lib/statusBarItem";
 
 
 let licenseManager: ILicenseManager;
@@ -108,6 +109,11 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     // Initialize logging
     //
     await log.registerLog(context, tests ? 2 : /* istanbul ignore next */ 0); // 0=off | 1=on w/red&yellow | 2=on w/ no red/yellow
+
+    //
+    // Initialize global status Bar Item
+    //
+    registerStatusBarItem(context);
 
     //
     // Initialize persistent storage

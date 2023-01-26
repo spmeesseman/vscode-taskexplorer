@@ -19,7 +19,7 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
         /* istanbul ignore else */
         if (!view)
         {
-            const treeDataProvider = new TaskTreeDataProvider(name, context, teApi.isTests()),
+            const treeDataProvider = new TaskTreeDataProvider(name, context), // , teApi.isTests()),
                   treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
             views[name] = treeView;
             view = views[name] as TreeView<TreeItem>;
