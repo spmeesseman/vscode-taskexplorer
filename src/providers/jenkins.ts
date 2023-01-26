@@ -50,8 +50,6 @@ export class JenkinsTaskProvider extends TaskExplorerProvider implements TaskExp
             target: undefined,
             fileName: basename(uri.fsPath),
             path: getRelativePath(folder, uri),
-            cmdLine: "curl",
-            takesArgs: false,
             uri
         };
 

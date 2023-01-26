@@ -28,6 +28,7 @@ import { PipenvTaskProvider } from "./providers/pipenv";
 import { PowershellTaskProvider } from "./providers/powershell";
 import { PythonTaskProvider } from "./providers/python";
 import { RubyTaskProvider } from "./providers/ruby";
+import { WebpackTaskProvider } from "./providers/webpack";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
 import { initStorage, storage } from "./lib/utils/storage";
 import { TaskExplorerProvider } from "./providers/provider";
@@ -414,6 +415,7 @@ function registerTaskProviders(context: ExtensionContext)
     registerTaskProvider("make", new MakeTaskProvider(), context);                  // C/C++ Makefile
     registerTaskProvider("maven", new MavenTaskProvider(), context);                // Apache Maven Toolset
     registerTaskProvider("pipenv", new PipenvTaskProvider(), context);              // Pipfile for Python pipenv package manager
+    registerTaskProvider("webpack", new WebpackTaskProvider(), context);
     // Script type tasks
     registerTaskProvider("bash", new BashTaskProvider(), context);
     registerTaskProvider("batch", new BatchTaskProvider(), context);

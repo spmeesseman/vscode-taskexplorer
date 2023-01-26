@@ -32,6 +32,7 @@ const constants: IDictionary<string> =
     GLOB_PIPENV: "**/[Pp][Ii][Pp][Ff][Ii][Ll][Ee]",
     GLOB_RUBY: "**/*.rb",
     GLOB_TSC: "**/tsconfig.{json,*.json}",
+    GLOB_WEBPACK: "**/[Ww][Ee][Bb][Pp][Aa][Cc][Kk].{js,*.js,json,*.json}",
     GLOB_WORKSPACE: "**/.vscode/tasks.json"
 };
 

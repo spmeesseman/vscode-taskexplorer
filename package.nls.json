@@ -28,6 +28,7 @@
 	"config.taskExplorer.enablePython": "Python",
 	"config.taskExplorer.enableRuby": "Ruby",
 	"config.taskExplorer.enableTsc": "Typescript",
+	"config.taskExplorer.enableWebpack": "Webpack",
 	"config.taskExplorer.enableWorkspace": "VSCode",
 
 	"config.taskExplorer.environment": "Configure Task Explorer specific environment variable names and values.  Used in specific cases only, e.g. the `Jenkins` task provider.",
