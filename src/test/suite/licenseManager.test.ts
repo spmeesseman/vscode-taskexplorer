@@ -520,11 +520,11 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		if (await fsApi.pathExists(join(localServerPath, "/spm-license-server.js")))
 		{
-			this.slow(tc.slowTime.licenseMgr.localStartServer + 8000);
+			this.slow(tc.slowTime.licenseMgr.localStartServer + 9000);
 			lsProcess = fork("spm-license-server.js", {
 				cwd: utils.getWsPath("../../../spm-license-server/bin"), detached: true,
 			});
-			await utils.sleep(4000);
+			await utils.sleep(4500);
 		}
         utils.endRollingCount(this);
 	});

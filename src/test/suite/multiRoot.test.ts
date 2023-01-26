@@ -191,7 +191,7 @@ suite("Multi-Root Workspace Tests", () =>
     });
 
 
-    test("Mimic Add WS Folder 1 and 2 (w/ File)", async function()
+    test("Mimic Add WS Folder 1 (w/ File)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
@@ -209,10 +209,10 @@ suite("Multi-Root Workspace Tests", () =>
             return wsf[uri.fsPath.includes("test-fixture") ? 0 : 1];
         };
         await testsApi.onWsFoldersChange({
-            added: [ wsf[1], wsf[2] ],
+            added: [ wsf[1] ],
             removed: []
         });
-        await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
+        await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
         //
         // For whatever reason, VSCode doesnt return the two "faked" tasks in fetchTasks(). Strange that
         // verything looks fine, it goes through provideTasks(), which returns 9 tasks (gruntCt + 2) to
@@ -225,17 +225,67 @@ suite("Multi-Root Workspace Tests", () =>
     });
 
 
-    test("Mimic Remove WS Folder 1 and 2 (w/ File)", async function()
+    test("Mimic Add WS Folder 2 and 3 (w/ File)", async function()
+    {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
+        await fsApi.writeFile(
+            join(wsf[2].uri.fsPath, "Gruntfile.js"),
+            "module.exports = function(grunt) {\n" +
+            '    grunt.registerTask(\n"default3", ["jshint:myproject"]);\n' +
+            '    grunt.registerTask("upload3", ["s3"]);\n' +
+            "};\n"
+        );
+        workspace.getWorkspaceFolder = (uri: Uri) =>
+        {   //
+            // See note below.  Can't figure out how to get VSCode to return the fake ws folder tasks
+            //
+            return wsf[uri.fsPath.includes("test-fixture") ? 0 : 2];
+        };
+        await testsApi.onWsFoldersChange({
+            added: [ wsf[2], wsf[3] ],
+            removed: []
+        });
+        await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
+        //
+        // For whatever reason, VSCode doesnt return the two "faked" tasks in fetchTasks(). Strange that
+        // verything looks fine, it goes through provideTasks(), which returns 9 tasks (gruntCt + 2) to
+        // VSCode, but yet the return result in fetchTasks() does not contain the 2.  It does contain the
+        // 7 "real" ws folder tasks.  WIll have to figure this one out another time.
+        //
+        // await verifyTaskCount("grunt", gruntCt + 4);
+        await verifyTaskCount("grunt", gruntCt);
+        endRollingCount(this);
+    });
+
+
+    test("Mimic Remove WS Folder 1 (w/ File)", async function()
+    {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify);
+        workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
+        await testsApi.onWsFoldersChange({
+            added: [],
+            removed: [ wsf[1] ]
+        });
+        await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
+        await fsApi.deleteFile(join(wsf[1].uri.fsPath, "Gruntfile.js"));
+        // await verifyTaskCount("grunt", gruntCt +2); // vscode knows the ws folders are fake and doesnt serve the tasks
+        await verifyTaskCount("grunt", gruntCt);
+        endRollingCount(this);
+    });
+
+
+    test("Mimic Remove WS Folder 2 and 3 (w/ File)", async function()
     {   //  Mimic fileWatcher.onWsFoldersChange() (see note top of file)
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify);
         await testsApi.onWsFoldersChange({
             added: [],
-            removed: [ wsf[1], wsf[2] ]
+            removed: [ wsf[2], wsf[3] ]
         });
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
-        await fsApi.deleteFile(join(wsf[1].uri.fsPath, "Gruntfile.js"));
-        workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
+        await fsApi.deleteFile(join(wsf[2].uri.fsPath, "Gruntfile.js"));
         await verifyTaskCount("grunt", gruntCt);
         endRollingCount(this);
     });
