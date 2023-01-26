@@ -81,7 +81,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     private taskTree: TaskFolder[] | NoScripts[] | undefined | null | void = null;
     private taskWatcher: TaskWatcher;
     private currentInvalidation: string | undefined;
-    // private currentInvalidationUri: Uri | undefined;
+    private currentInvalidationUri: Uri | undefined;
     private onTreeDataChangeEventComplete: any;
     private _onDidChangeTreeData: EventEmitter<TreeItem | undefined | null | void> = new EventEmitter<TreeItem | undefined | null | void>();
     readonly onDidChangeTreeData: Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
@@ -698,52 +698,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         let ctRmv = 0;
         TaskExplorerProvider.logPad = logPad + "   ";
         statusBarItem.show();
-        //
-        // For a removed workspace folder, there's no need to query VSCode for tasks, let's just
-        // hand pick the tasks list and task tree and remove what we need to in about 5% of the
-        // time it would take to re-ask for tasks from the providers.  We know it's a removed workspace
-        // folder if this event has fired, the path exists, but workspace.getWorkspaceFolder returns null.
-        //
-        // if (this.tasks && this.taskTree && this.currentInvalidationUri && isDirectory(this.currentInvalidationUri.fsPath) && !workspace.getWorkspaceFolder(this.currentInvalidationUri))
-        // {
-        //     const uri = this.currentInvalidationUri;
-        //     log.write("   removing project tasks from cache", logLevel + 1, logPad);
-        //     log.value("      path", uri.fsPath, logLevel + 1, logPad);
-        //     statusBarItem.update("Deleting all tasks from removed project folder");
-        //     this.tasks.slice().reverse().forEach((item, index, object) =>
-        //     {
-        //         if (item.definition.uri.fsPath.startsWith(uri.fsPath))
-        //         {
-        //             log.write(`      removing task '${item.source}/${item.name}'`, logLevel + 2, logPad);
-        //             (this.tasks as Task[]).splice(object.length - 1 - index, 1);
-        //             ++ctRmv;
-        //         }
-        //     });
-        //     const folderIdx = (this.taskTree as TaskFolder[]).findIndex((f: TaskFolder) => f.resourceUri?.fsPath === uri.fsPath);
-        //     this.taskTree.splice(folderIdx, 1);
-        //     log.write(`   removed ${ctRmv} tasks from cache`, logLevel + 1, logPad);
-        // }
-        //
-        // If 'tasks' is empty, then ask for all tasks.
-        // If 'tasks' is non-empty, and 'currentInvalidation' is set, then only ask for tasks
-        // of type specified by it's value.  The 'currentInvalidation' parameter is set by the
-        // refresh() function when a file modify/create/delete event has occurred, it will be
-        // set to the task type of the file that was modified.created/deleted, and at this point
-        // the provider's tasks cache will have been invalidated and rebuilt.
-        //
-        // Note that if 'currentInvalidation' is 'workspace', indicating tasks from a tasks.json
-        // file, there in actuality is no task type called 'workspace'.  Tasks found in these
-        // files can be of any type that is available to VSCode's task provider interface
-        // (including providers implemented in this extension).  In this case, we have to ask
-        // for all tasks.  Same goes for typescript tasks.
-        //
+
         if (!this.tasks || !this.currentInvalidation || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc") // || this.currentInvalidationUri)
         {
             log.write("   fetching all tasks via VSCode.fetchTasks", logLevel, logPad);
             statusBarItem.update("Requesting all tasks from all providers");
             this.tasks = await tasks.fetchTasks();
-            this.taskTree = null; // won't be null if this.currentInvalidationUri is set.  it's a todo, howcan speed improve with uri?
-            // .filter((t) => !util.isWatchTask(t.source) || !util.isExcluded(t.definition.path, logPad + "   "));
         }     //
         else // this.currentInvalidation guaranteed to be a string (task type) here
         {   //
@@ -755,15 +715,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             // all tasks of the type defined in 'currentInvalidation' from the tasks list cache,
             // and add the new tasks from VSCode into the tasks list.
             //
-            const taskItems = await tasks.fetchTasks(
-            {
-                type: this.currentInvalidation
-            });
-            // .filter((t) => this.currentInvalidation !== "npm" || !util.isExcluded(t.definition.path, logPad + "   "));
+            const taskItems = await tasks.fetchTasks({ type: this.currentInvalidation });
             //
             // Remove tasks of type '' from the 'tasks'array
             //
-            // ctRmv = 0;
             log.write(`   removing current ${this.currentInvalidation} tasks from cache`, logLevel + 1, logPad);
             this.tasks.slice().reverse().forEach((item, index, object) =>
             {   //
@@ -787,8 +742,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             this.tasks.push(...taskItems);
         }
 
-        TaskExplorerProvider.logPad = "";
-
         //
         // Remove User tasks if they're not enabled
         //
@@ -801,6 +754,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 }
             });
         }
+
         //
         // Check License Manager for any task count restrictions
         //
@@ -815,18 +769,19 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
         log.write("   completed un-licensed restriction check", logLevel + 1, logPad);
 
-        if (!this.taskTree)
+        //
+        // Instantiate/construct the ui tree
+        //
+        if (this.tasks.length > 0)
         {
-            if (this.tasks.length > 0)
-            {
-                this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
-            }
-            else {
-                this.taskTree = [ new NoScripts() ];
-            }
+            this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
+        }
+        else {
+            this.taskTree = [ new NoScripts() ];
         }
 
-        statusBarItem.update("Building task explorer tree...");
+        TaskExplorerProvider.logPad = "";
+        statusBarItem.update("Building task explorer tree");
         statusBarItem.hide();
     };
 
@@ -944,22 +899,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         //
         // Create/build the ui task tree if not built already
         //
-        if (!this.taskTree) // || this.currentInvalidationUri)
+        if (!this.taskTree || this.currentInvalidationUri)
         {
-            // if (!this.fistTreeBuildComplete && !this.fistTreeBuildStarted && this.buildingTreeItem)
-            // {
-            //     setTimeout(async() => {
-            //         await this.createTaskTree(licMgr, logPad, logLevel);
-            //         this.fireTreeRefreshEvent("", 1);
-            //     }, 10);
-            //     this.fistTreeBuildStarted = true;
-            //     log.write("   initializing first runtime tree build", logLevel, logPad);
-            //     log.methodDone("get tree children", logLevel, logPad);
-            //     return [ this.buildingTreeItem ]; // 'buildingTreeItem' continually fires tree refresh events
-            // }
-            // this.fistTreeBuildStarted = true;
             await this.createTaskTree(licMgr, logPad, logLevel);
-            // this.fistTreeBuildComplete = true;
         }
         // this.buildingTreeItem?.dispose();
         this.buildingTreeItem = undefined;
@@ -1001,7 +943,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         //
         this.currentInvalidation = undefined;
         this.currentRefreshEvent = undefined;
-        // this.currentInvalidationUri = undefined;
+        this.currentInvalidationUri = undefined;
         this.getChildrenLogPad = this.defaultGetChildrenLogPad;
         this.getChildrenLogLevel = this.defaultGetChildrenLogLevel;
 
@@ -1501,7 +1443,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             {
                 log.write(`   invalidation is for type '${invalidate}'`, 1, logPad);                                  //
                 this.currentInvalidation = invalidate; // 'invalidate' will be taskType if 'opt' is uri of add/remove resource
-                // this.currentInvalidationUri = opt;     // 'invalidate' will be undefined if 'opt' is uri of add/remove ws folder
+                this.currentInvalidationUri = opt;     // 'invalidate' will be undefined if 'opt' is uri of add/remove ws folder
                 this.taskTree = null;
                 this.taskMap = {};
             }
@@ -1513,7 +1455,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 this.taskTree = null;
                 this.taskMap = {};
                 this.currentInvalidation = undefined;
-                // this.currentInvalidationUri = util.isUri(opt)  ? opt : undefined;
+                this.currentInvalidationUri = util.isUri(opt)  ? opt : undefined;
             }
         }
 
