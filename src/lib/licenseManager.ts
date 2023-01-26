@@ -193,7 +193,7 @@ export class LicenseManager implements ILicenseManager
 	};
 
 
-	private validateLicense = async (licenseKey: string, logPad = "   ") =>
+	private validateLicense = (licenseKey: string, logPad = "   ") =>
 	{
 		return new Promise<boolean>((resolve) =>
 		{
