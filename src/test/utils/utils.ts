@@ -233,16 +233,7 @@ export const clearOverrideShowInfoBox = () =>
 };
 
 
-export const closeActiveDocument = async () =>
-{
-	try {
-		while (window.activeTextEditor) {
-			await commands.executeCommand("workbench.action.closeActiveEditor");
-            await sleep(10);
-		}
-	}
-	catch (e) { console.error(e); }
-};
+export const closeEditors = () => commands.executeCommand("openEditors.closeAll");
 
 
 export const executeSettingsUpdate = async (key: string, value?: any, minWait?: number, maxWait?: number) =>
@@ -279,11 +270,11 @@ export const executeTeCommand2 = (command: string, args: any[], minWait?: number
 
 const getCmdGroup = (command: string) =>
 {
-    let cmdGroup = "taskExplorer";
+    let cmdGroup = "taskExplorer";        // Tree command
     if (command === "addToExcludesEx" || command === "enterLicense" || command === "getApi" || command === "disableTaskType" ||
         command === "enableTaskType"  || command === "removeFromExcludes" || command === "showOutput" || command === "viewLicense" || command === "viewReport")
     {
-        cmdGroup = "vscode-taskexplorer";
+        cmdGroup = "vscode-taskexplorer"; // Global command
     }
     return cmdGroup;
 };
