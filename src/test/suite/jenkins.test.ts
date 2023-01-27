@@ -13,7 +13,7 @@ import { activate, endRollingCount, executeSettingsUpdate, exitRollingCount, foc
 import { env } from "process";
 
 const testsName = "jenkins";
-const startTaskCount = 1;
+const startTaskCount = tc.isMultiRootWorkspace ? 1 : 0;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;

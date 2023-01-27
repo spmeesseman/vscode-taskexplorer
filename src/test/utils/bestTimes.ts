@@ -2,10 +2,10 @@
 
 import figures from "../../lib/figures";
 import { lowerCaseFirstChar, properCase } from "../../lib/utils/utils";
-import { testControl } from "../control";
+import { testControl as tc } from "../control";
 import { teApi } from "./utils";
 
-const tct = testControl.tests;
+const tct = tc.tests;
 const timeSep = "----------------------------------------------------------------------------------------------------";
 
 
@@ -28,6 +28,9 @@ const clearProcessTimeStorage = async (storageKey: string, numTests: number) =>
         }
     }
 };
+
+
+const getStorageKey = (baseKey: string) => baseKey + (tc.isMultiRootWorkspace ? "MWS" : "");
 
 
 export const getSuiteFriendlyName = (suiteName: string) => suiteName.replace(" Tests", "");
@@ -118,7 +121,7 @@ const processSuiteTimes = async () =>
     for (const suiteResult of suiteResults)
     {
         const typeKey = tct.numSuites === 1 ? "Single" : "",
-              storageKey = getSuiteKey(suiteResult.suiteName, "bestTimeElapsedSuite" + typeKey);
+              storageKey = getSuiteKey(suiteResult.suiteName, getStorageKey("bestTimeElapsedSuite" + typeKey));
         if (tct.clearAllBestTimes) {
             await clearProcessTimeStorage(storageKey, tct.numTests);
         }
@@ -135,25 +138,25 @@ const processTimesWithLogEnabled = async (timeElapsed: number) =>
 {
     if (tct.clearAllBestTimes)
     {
-        await clearProcessTimeStorage("bestTimeElapsedWithLogging", tct.numTests);
-        await clearProcessTimeStorage("bestTimeElapsedWithLoggingFile", tct.numTests);
-        await clearProcessTimeStorage("bestTimeElapsedWithLoggingOutput", tct.numTests);
-        await clearProcessTimeStorage("bestTimeElapsedWithLoggingConsole", tct.numTests);
+        await clearProcessTimeStorage(getStorageKey("bestTimeElapsedWithLogging"), tct.numTests);
+        await clearProcessTimeStorage(getStorageKey("bestTimeElapsedWithLoggingFile"), tct.numTests);
+        await clearProcessTimeStorage(getStorageKey("bestTimeElapsedWithLoggingOutput"), tct.numTests);
+        await clearProcessTimeStorage(getStorageKey("bestTimeElapsedWithLoggingConsole"), tct.numTests);
     }
-    if (testControl.log.enabled)
+    if (tc.log.enabled)
     {
-        await processBestTime("Logging Enabled", "bestTimeElapsedWithLogging", timeElapsed, tct.numTests);
-        if (testControl.log.file)
+        await processBestTime("Logging Enabled", getStorageKey("bestTimeElapsedWithLogging"), timeElapsed, tct.numTests);
+        if (tc.log.file)
         {
-            await processBestTime("File Logging Enabled", "bestTimeElapsedWithLoggingFile", timeElapsed, tct.numTests);
+            await processBestTime("File Logging Enabled", getStorageKey("bestTimeElapsedWithLoggingFile"), timeElapsed, tct.numTests);
         }
-        if (testControl.log.output)
+        if (tc.log.output)
         {
-            await processBestTime("Output Window Logging Enabled", "bestTimeElapsedWithLoggingOutput", timeElapsed, tct.numTests);
+            await processBestTime("Output Window Logging Enabled", getStorageKey("bestTimeElapsedWithLoggingOutput"), timeElapsed, tct.numTests);
         }
-        if (testControl.log.console)
+        if (tc.log.console)
         {
-            await processBestTime("Console Logging Enabled", "bestTimeElapsedWithLoggingConsole", timeElapsed, tct.numTests);
+            await processBestTime("Console Logging Enabled", getStorageKey("bestTimeElapsedWithLoggingConsole"), timeElapsed, tct.numTests);
         }
     }
 };
@@ -172,7 +175,7 @@ export const processTimes = async (timeStarted: number, hadRollingCountError: bo
     if (tct.numTestsFail === 0 && !hadRollingCountError)
     {
         if (tct.numSuites > 3)  { // > 3, sometimes i string the single test together with a few others temp
-            await processBestTime("", "bestTimeElapsed", timeElapsed, tct.numTests);
+            await processBestTime("", getStorageKey("bestTimeElapsed"), timeElapsed, tct.numTests);
             await processTimesWithLogEnabled(timeElapsed);
         }
         await processSuiteTimes();

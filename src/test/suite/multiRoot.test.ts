@@ -272,12 +272,14 @@ suite("Multi-Root Workspace Tests", () =>
                 added: [ wsf[fakeWsfStartIdx] ],
                 removed: []
             });
+            await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
+            await verifyTaskCount("grunt", gruntCt); // vscode won't return the fake ws folder's tasks in fetchTasks()
         }
         else {
             workspace.updateWorkspaceFolders(2, null, wsf[fakeWsfStartIdx]);
+            await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
+            await verifyTaskCount("grunt", gruntCt + 2);
         }
-        await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
-        await verifyTaskCount("grunt", gruntCt + 2);
         endRollingCount(this);
     });
 
@@ -303,12 +305,14 @@ suite("Multi-Root Workspace Tests", () =>
                 added: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ],
                 removed: []
             });
+            await waitForTeIdle(tc.waitTime.addWorkspaceFolder * 2);
+            await verifyTaskCount("grunt", gruntCt); // vscode won't return the fake ws folder's tasks in fetchTasks()
         }
         else {
             workspace.updateWorkspaceFolders(3, null, wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2]);
+            await waitForTeIdle(tc.waitTime.addWorkspaceFolder * 2);
+            await verifyTaskCount("grunt", gruntCt + 4);
         }
-        await waitForTeIdle(tc.waitTime.addWorkspaceFolder * 2);
-        await verifyTaskCount("grunt", gruntCt + 4);
         endRollingCount(this);
     });
 
@@ -319,16 +323,22 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {
+            workspace.getWorkspaceFolder = (uri: Uri) =>
+            {
+                return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx];
+            };
             await testsApi.onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx] ]
             });
+            await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
+            await verifyTaskCount("grunt", gruntCt); // vscode doesn't return the fake ws folder's tasks in fetchTasks()
         }
         else {
             workspace.updateWorkspaceFolders(2, 1);
+            await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
+            await verifyTaskCount("grunt", gruntCt + 2);
         }
-        await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
-        await verifyTaskCount("grunt", gruntCt + 2);
         endRollingCount(this);
     });
 
@@ -350,6 +360,10 @@ suite("Multi-Root Workspace Tests", () =>
         await focusSearchView();
         if (!tc.isMultiRootWorkspace)
         {
+            workspace.getWorkspaceFolder = (uri: Uri) =>
+            {
+                return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx + 1];
+            };
             await testsApi.onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ]
@@ -383,16 +397,22 @@ suite("Multi-Root Workspace Tests", () =>
         await sleep(100);
         if (!tc.isMultiRootWorkspace)
         {
+            workspace.getWorkspaceFolder = (uri: Uri) =>
+            {
+                return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx];
+            };
             await testsApi.onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ]
             });
+            await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
+            await verifyTaskCount("grunt", gruntCt); // vscode doesn't return the fake ws folder's tasks in fetchTasks()
         }
         else {
             workspace.updateWorkspaceFolders(2, null, wsf[fakeWsfStartIdx]);
+            await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
+            await verifyTaskCount("grunt", gruntCt + 2);
         }
-        await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
-        await verifyTaskCount("grunt", gruntCt + 2);
         endRollingCount(this);
     });
 
@@ -413,10 +433,11 @@ suite("Multi-Root Workspace Tests", () =>
             workspace.updateWorkspaceFolders(2, 1);
         }
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
-        workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
         await verifyTaskCount("grunt", gruntCt);
+        if (!tc.isMultiRootWorkspace) {
+            workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
+        }
         endRollingCount(this);
     });
-
 
 });

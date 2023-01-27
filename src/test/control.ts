@@ -66,9 +66,9 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 2500,
-        addWorkspaceFolderEmpty: 1000,
-        addWorkspaceFolderFake: 2000,
+        addWorkspaceFolder: 2000,
+        addWorkspaceFolderEmpty: 1310,
+        addWorkspaceFolderFake: 1500,
         buildTreeNoTasks: 295,
         cache: {
             build: 490,
@@ -172,9 +172,9 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTimeMultiRoot: {
-        addWorkspaceFolder: 3000,
-        addWorkspaceFolderEmpty: 1200,
-        addWorkspaceFolderFake: 1750,
+        addWorkspaceFolder: 3200,
+        addWorkspaceFolderEmpty: 1510,
+        addWorkspaceFolderFake: 2500,
         buildTreeNoTasks: 325,
         cache: {
             build: 540,
