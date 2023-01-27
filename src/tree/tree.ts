@@ -71,7 +71,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     private visible = false;
     private enabled = false;
     private setEnableCalled = false;
-    private busy = false;
+    private treeBuilding = false;
     private scanningFilesItem: InitScripts | undefined;
     private buildingTreeItem: LoadScripts | undefined;
     private getChildrenLogLevel = this.defaultGetChildrenLogLevel;
@@ -253,7 +253,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             return [ new NoScripts() ];
         }
 
-        // this.treeBuilding = true;
+        //
+        // Set a busy flag for all external functions
+        //
+        this.treeBuilding = true;
 
         //
         // The 'Last Tasks' folder will be 1st in the tree
@@ -299,7 +302,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         // Done!
         //
         log.methodDone("build task tree", logLevel, logPad);
-        // this.treeBuilding = false;
+        this.treeBuilding = false;
 
         return sortedFolders;
     };
@@ -418,6 +421,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         log.methodDone("build task tree list", 2, logPad);
     };
 
+
+    private clearFlags = () =>
+    {
+        this.currentInvalidation = undefined;
+        this.currentRefreshEvent = undefined;
+        this.currentInvalidationUri = undefined;
+        this.getChildrenLogPad = this.defaultGetChildrenLogPad;
+        this.getChildrenLogLevel = this.defaultGetChildrenLogLevel;
+    };
 
     /**
      * @method createTaskGroupings
@@ -792,6 +804,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         log.methodStart("fire tree refresh event", logLevel, logPad, false, [[ "node id", id ]]);
         if (this.visible)
         {
+            this.refreshPending = true;
             this.getChildrenLogPad = logPad;
             this.getChildrenLogLevel = logLevel;
             this.currentRefreshEvent = id;
@@ -819,6 +832,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     this.eventQueue.push(
                     {
                         id,
+                        delay: 1,
                         fn: this.fireTreeRefreshEvent,
                         args: [ taskFile ],
                         type: "refresh"
@@ -859,8 +873,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         //     return [ this.buildingTreeItem ]; // 'buildingTreeItem' continually fires tree refresh events
         // }                                     // to roll it's elipsis
         //
-        //  Set pretty muy importante flag,  usually is set in refresh90, but other callers can enter
-        // here too, so we'll set in in any case.
+        // Set pretty muy importante flag,  usually is set in refresh() or fireTreeRefreshEvent(),
+        // but other callers can enter here too (tests), so we'll set in in any case.
         //
         this.refreshPending = true;
 
@@ -934,22 +948,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         //
+        // Reset flags and refresh task variables
+        //
+        this.clearFlags();
+
+        //
         // Process event queue
         //
         this.refreshPending = this.processEventQueue(logPad + "   ");
 
-        //
-        // Reset flags and refresh task variables
-        //
-        this.currentInvalidation = undefined;
-        this.currentRefreshEvent = undefined;
-        this.currentInvalidationUri = undefined;
-        this.getChildrenLogPad = this.defaultGetChildrenLogPad;
-        this.getChildrenLogLevel = this.defaultGetChildrenLogLevel;
-
         log.methodDone("get tree children", logLevel, logPad, [
             [ "# of tasks total", this.tasks ? this.tasks.length : /* istanbul ignore next */0 ],
-            [ "# of tree task items returned", items.length ]
+            [ "# of tree task items returned", items.length ], [ "pending event", this.refreshPending ]
         ]);
 
         //
@@ -1056,7 +1066,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             if (invalidate === true && !opt)
             {
                 log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
-                this.busy = true; // reset in invalidateTasksCache
                 await rebuildCache(logPad + "   ");
                 log.write("   handling 'rebuild cache' eventcomplete", 1, logPad + "   ");
             }
@@ -1117,8 +1126,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             [ "opt1", opt1 ], [ "opt2", opt2 && opt2 instanceof Uri ? opt2.fsPath : opt2 ]
         ]);
 
-        this.busy = true;
-
         try {
             if (opt1 && opt2 instanceof Uri)
             {
@@ -1152,12 +1159,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             /* istanbul ignore next */
             log.error([ "Error invalidating task cache", e ]);
         }
-        this.busy = false;
+
         log.methodDone("invalidate tasks cache", 1, logPad);
     };
 
 
-    public isBusy = () => this.refreshPending || this.busy;
+    public isBusy = () => this.refreshPending || this.treeBuilding;
 
 
     public isVisible = () => this.visible;
@@ -1328,6 +1335,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         else {
             this.eventQueue.push(
             {
+                delay: 1,
                 id: "wsFolderRemove-" + uri.fsPath,
                 fn: this.onWorkspaceFolderRemoved,
                 args: [ uri, logPad ],
@@ -1365,22 +1373,24 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
     private processEventQueue = (logPad: string) =>
     {
-        const delay = 1;
         let firedEvent = false;
         log.methodStart("process task explorer event queue", 1, logPad, true, [[ "# of queued events", this.eventQueue.length ]]);
 
         if (this.eventQueue.length > 0)
         {
             const next = this.eventQueue.shift() as IEvent; // get the next event
-            log.value("   event id", next.id, 1, logPad);
-            log.value("   event type", next.type, 1, logPad);
-            log.write(`   firing queued event task with ${next.args.length} args`, 2, logPad);
-            setTimeout(async () => {
+            log.write("   loaded next queued event", 2, logPad);
+            log.value("      id", next.id, 1, logPad);
+            log.value("      type", next.type, 1, logPad);
+            log.write(`   firing queued event with ${next.args.length} args and ${next.delay}ms delay`, 2, logPad);
+            if (next.type === "refresh") {
+                this.refreshPending = true;
                 this.currentRefreshEvent = next.id;
-                await next.fn.call(this, ...next.args);
-            }, delay);
-            log.write(`   fired queued event with ${delay}ms delay`, 2, logPad);
+            }
             firedEvent = true;
+            setTimeout(async () => {
+                await next.fn.call(this, ...next.args);
+            }, next.delay);
         }
 
         log.methodDone("process task explorer main event queue", 1, logPad);

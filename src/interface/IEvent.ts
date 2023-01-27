@@ -5,4 +5,5 @@ export interface IEvent
     fn: any;
     args: any[];
     type: string;
+    delay: number;
 }
