@@ -381,7 +381,7 @@ suite("Multi-Root Workspace Tests", () =>
     test("Switch Views (Show/Focus Explorer)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.focusCommandChangeViews + tc.slowTime.min);
+        this.slow(tc.slowTime.focusCommand + tc.slowTime.min);
         await focusExplorerView();
         await waitForTeIdle(tc.waitTime.min);
         endRollingCount(this);

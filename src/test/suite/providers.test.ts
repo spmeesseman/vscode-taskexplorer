@@ -290,7 +290,7 @@ suite("Provider Tests", () =>
     test("Build Tree Variations  - Last Tasks Collapsed", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4));
+        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -315,7 +315,7 @@ suite("Provider Tests", () =>
     test("Build Tree Variations - Favorites Collapsed", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4));
+        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -340,7 +340,7 @@ suite("Provider Tests", () =>
     test("Build Tree Variations - Favorites Disabled", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 4) + (tc.slowTime.config.showHideSpecialFolder * 4));
+        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 4) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
@@ -367,7 +367,7 @@ suite("Provider Tests", () =>
     test("Build Tree Variations - Last Tasks Disabled", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4));
+        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
