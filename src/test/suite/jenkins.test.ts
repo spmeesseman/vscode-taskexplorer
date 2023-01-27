@@ -13,7 +13,7 @@ import { activate, endRollingCount, executeSettingsUpdate, exitRollingCount, foc
 import { env } from "process";
 
 const testsName = "jenkins";
-const startTaskCount = tc.isMultiRootWorkspace ? 1 : 0;
+let startTaskCount = 0; // set in suiteSetup() as it will change depending on single or multi root ws
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -28,6 +28,7 @@ suite("Jenkins Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
+        startTaskCount = tc.isMultiRootWorkspace ? 1 : 0;
         provider = teApi.providers[testsName] as JenkinsTaskProvider;
         fileUri = Uri.file(path.join(getWsPath("."), "Jenkinsfile"));
         if (!env.JENKINS_API_TOKEN) {

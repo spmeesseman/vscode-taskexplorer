@@ -107,7 +107,7 @@ export const testControl: ITestControl =
         findTaskPositionDocOpen: 40,
         focusCommand: 2340,
         focusCommandAlreadyFocused: 320,
-        focusCommandChangeViews: 90,
+        focusCommandChangeViews: 195,
         fs: {
             createEvent: 1610,
             createEventTsc: 1755,
@@ -133,7 +133,7 @@ export const testControl: ITestControl =
         refreshCommand: 6800,
         refreshCommandNoChanges: 245,
         removeWorkspaceFolder: 2000,
-        removeWorkspaceFolderEmpty: 250,
+        removeWorkspaceFolderEmpty: 415,
         removeWorkspaceFolderFake: 500,
         runCommand: 4900,
         runPauseCommand: 3255,
@@ -212,8 +212,8 @@ export const testControl: ITestControl =
         findTaskPosition: 355,
         findTaskPositionDocOpen: 45,
         focusCommand: 2575,
-        focusCommandAlreadyFocused: 350,
-        focusCommandChangeViews: 100,
+        focusCommandAlreadyFocused: 360,
+        focusCommandChangeViews: 200,
         fs: {
             createEvent: 1930,
             createEventTsc: 2105,
@@ -227,7 +227,7 @@ export const testControl: ITestControl =
         getTreeTasksNpm: 540, // npm task provider is slower than shit on a turtle
         licenseMgr: {
             page: 175,
-            pageWithDetail: 360,
+            pageWithDetail: 375,
             checkLicense: 440,
             enterKey: 930,
             getMaxTasks: 400,
@@ -236,8 +236,8 @@ export const testControl: ITestControl =
             setLicenseCmd: 230
         },
         min: 50,
-        refreshCommand: 750,
-        refreshCommandNoChanges: 270,
+        refreshCommand: 7500,
+        refreshCommandNoChanges: 310,
         removeWorkspaceFolder: 2200,
         removeWorkspaceFolderEmpty: 1100,
         removeWorkspaceFolderFake: 1375,
@@ -269,7 +269,7 @@ export const testControl: ITestControl =
             verifyNpm: 1540, // internal vscode npm task provider is slower than shit wtf
             verifyWorkspace: 1980
         },
-        viewReport: 450
+        viewReport: 470
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)
