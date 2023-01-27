@@ -10,6 +10,7 @@ import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplor
 import { join } from "path";
 import { ITestControl } from "../control";
 import { pathExists } from "../../lib/utils/fs";
+import { executeSettingsUpdate, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
 
 const testsName = "tsc";
 const startTaskCount = 0;
@@ -58,7 +59,7 @@ suite("Typescript Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
         if (utils.needsTreeBuild(true)) {
-            await utils.focusExplorerView(this);
+            await focusExplorerView(this);
         }
         utils.endRollingCount(this);
 	});
@@ -122,9 +123,9 @@ suite("Typescript Tests", () =>
         // Typescript 'open' just opens the document, doesnt find the task position
         //
         const tscItems = await utils.treeUtils.getTreeTasks("tsc", startTaskCount + 2);
-        await utils.executeTeCommand2("open", [ tscItems[0] ]);
+        await executeTeCommand2("open", [ tscItems[0] ]);
         await utils.closeEditors();
-        await utils.executeTeCommand2("open", [ tscItems[1] ]);
+        await executeTeCommand2("open", [ tscItems[1] ]);
         await utils.closeEditors();
         utils.endRollingCount(this);
     });
@@ -164,7 +165,7 @@ suite("Typescript Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verifyByTree);
-        await utils.executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.config.enableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.config.enableEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, 0);
         utils.endRollingCount(this);
     });
@@ -174,7 +175,7 @@ suite("Typescript Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verifyByTree);
-        await utils.executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.config.enableEvent);
+        await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.config.enableEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         utils.endRollingCount(this);
     });

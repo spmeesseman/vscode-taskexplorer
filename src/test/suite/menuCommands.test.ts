@@ -1,10 +1,10 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import { join } from "path";
 import { Uri } from "vscode";
+import { executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
 import {
-    activate, endRollingCount, executeTeCommand2, exitRollingCount, focusExplorerView, getWsPath,
+    activate, endRollingCount, exitRollingCount, getWsPath,
     needsTreeBuild, overrideNextShowInfoBox, suiteFinished, testControl as tc, verifyTaskCount
 } from "../utils/utils";
 

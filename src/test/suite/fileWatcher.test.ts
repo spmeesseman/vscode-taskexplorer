@@ -113,7 +113,7 @@ suite("File Watcher Tests", () =>
     });
 
 
-    test("Add Existing File", async function()
+    test("Create File", async function()
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent +  tc.slowTime.taskCount.verify);
@@ -141,7 +141,7 @@ suite("File Watcher Tests", () =>
     });
 
 
-    test("Add New File", async function()
+    test("Create Empty File", async function()
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
@@ -375,7 +375,7 @@ suite("File Watcher Tests", () =>
         await utils.sleep(25);
         await fsApi.deleteFile(files.grunt2_7);
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
-        await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2); // 2 less than previous test, blanked /_test_files/Gruntfile.js
+        await utils.verifyTaskCount("grunt", startTaskCountGrunt); // 2 less than previous test, blanked /_test_files/Gruntfile.js
         utils.endRollingCount(this);
     });
 
@@ -446,7 +446,7 @@ suite("File Watcher Tests", () =>
         await utils.sleep(50);
         await fsApi.deleteFile(files.grunt2_7);
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
-        await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2);
+        await utils.verifyTaskCount("grunt", startTaskCountGrunt);
         utils.endRollingCount(this);
     });
 

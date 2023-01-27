@@ -7,6 +7,7 @@ import TaskFolder from "../../tree/folder";
 import { expect } from "chai";
 import { isObjectEmpty } from "../../lib/utils/utils";
 import { ITaskItem, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
+import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "./commandUtils";
 
 let didRefresh = false;
 let didSetGroupLevel = false;
@@ -122,13 +123,13 @@ export const refresh = async(instance?: any) =>
         if (!didSetGroupLevel)
         {
             // utils.getTeApi().testsApi.enableConfigWatcher(false);
-            await utils.executeSettingsUpdate("groupWithSeparator", true, tc.waitTime.config.groupingEvent);
-            await utils.executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.config.groupingEvent);
+            await executeSettingsUpdate("groupWithSeparator", true, tc.waitTime.config.groupingEvent);
+            await executeSettingsUpdate("groupMaxLevel", 5, tc.waitTime.config.groupingEvent);
             // utils.getTeApi().testsApi.enableConfigWatcher(true);
             didSetGroupLevel = true;
         }
     }
-    await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
+    await executeTeCommand("refresh", tc.waitTime.refreshCommand);
     didRefresh = true;
 };
 
@@ -212,7 +213,7 @@ export const walkTreeItems = async(taskId: string | undefined, executeOpenForTes
                 if (item3 instanceof TaskItem)
                 {
                     if (executeOpenForTests) {
-                        await utils.executeTeCommand2("open", [ item3 ], 4);
+                        await executeTeCommand2("open", [ item3 ], 4);
                         if (!filesOpened.includes(item3.taskFile.resourceUri.fsPath)) {
                             filesOpened.push(item3.taskFile.resourceUri.fsPath);
                             ++numFilesOpened;

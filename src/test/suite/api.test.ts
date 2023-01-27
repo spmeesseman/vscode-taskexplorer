@@ -5,12 +5,13 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
+import { executeTeCommand } from "../utils/commandUtils";
 import { ExternalTaskProvider } from "./externalTaskProvider";
 import { ExternalTaskProviderBase } from "./externalTaskProviderBase";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, executeTeCommand, exitRollingCount, needsTreeBuild, suiteFinished,
+    activate, endRollingCount, exitRollingCount, needsTreeBuild, suiteFinished,
     testControl, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 

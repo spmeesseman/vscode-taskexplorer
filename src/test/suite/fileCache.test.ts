@@ -3,6 +3,7 @@
 
 import * as utils from "../utils/utils";
 import { ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { executeSettingsUpdate, executeTeCommand } from "../utils/commandUtils";
 
 let testsApi: ITestsApi;
 const tc = utils.testControl;
@@ -25,7 +26,7 @@ suite("File Cache Tests", () =>
     suiteTeardown(async function()
     {
         if (utils.exitRollingCount(this, false, true)) return;
-        await utils.executeSettingsUpdate("enablePersistentFileCaching", false);
+        await executeSettingsUpdate("enablePersistentFileCaching", false);
         await testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
@@ -55,7 +56,7 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + tc.slowTime.fileCachePersist);
-        await utils.executeSettingsUpdate("enablePersistentFileCaching", true); // enabling setting willpersist *now*
+        await executeSettingsUpdate("enablePersistentFileCaching", true); // enabling setting willpersist *now*
         utils.endRollingCount(this);
     });
 
@@ -97,7 +98,7 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + tc.slowTime.config.event);
-        await utils.executeSettingsUpdate("enablePersistentFileCaching", false);
+        await executeSettingsUpdate("enablePersistentFileCaching", false);
         utils.endRollingCount(this);
     });
 
@@ -325,7 +326,7 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.refreshCommand + 200);
-        await utils.executeTeCommand("refresh", tc.waitTime.refreshCommand);
+        await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await utils.sleep(100);
         utils.endRollingCount(this);
     });

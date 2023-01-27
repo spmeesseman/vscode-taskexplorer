@@ -19,9 +19,10 @@ import { join } from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, focusExplorerView, focusSearchView, getProjectsPath, needsTreeBuild, sleep, suiteFinished,
-    testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, getProjectsPath, needsTreeBuild, sleep, suiteFinished,
+    testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
+import { focusExplorerView, focusSearchView } from "../utils/commandUtils";
 
 const gruntCt = 7;
 const originalGetWorkspaceFolder = workspace.getWorkspaceFolder;
@@ -357,7 +358,6 @@ suite("Multi-Root Workspace Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.removeWorkspaceFolderEmpty + tc.slowTime.taskCount.verify);
-        await focusSearchView();
         if (!tc.isMultiRootWorkspace)
         {
             workspace.getWorkspaceFolder = (uri: Uri) =>
@@ -374,7 +374,6 @@ suite("Multi-Root Workspace Tests", () =>
         }
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder * 2);
         await verifyTaskCount("grunt", gruntCt);
-        await focusExplorerView();
         endRollingCount(this);
     });
 
