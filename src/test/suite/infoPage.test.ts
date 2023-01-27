@@ -142,7 +142,7 @@ suite("Info Report Tests", () =>
 	test("Open Report Page (Sidebar Enabled, Explorer Disabled)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + 100);
+		this.slow(testControl.slowTime.viewReport + 200);
 		const oExplorer = teApi.explorer;
 		const oSidebar = teApi.sidebar;
 		teApi.explorer = undefined;

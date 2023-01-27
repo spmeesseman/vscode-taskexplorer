@@ -92,7 +92,7 @@ suite("Webpack Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.waitTime.fs.createEvent + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(fileUri.fsPath,
 `
 module.exports = (env) =>

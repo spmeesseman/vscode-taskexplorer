@@ -138,8 +138,8 @@ export const testControl: ITestControl =
         runCommand: 4900,
         runPauseCommand: 3255,
         runStopCommand: 3510,
-        storageRead: 55,
-        storageUpdate: 60,
+        storageRead: 60,
+        storageUpdate: 65,
         storageSecretRead: 95,
         storageSecretUpdate: 200,
         taskCommand: 1050,
@@ -221,14 +221,14 @@ export const testControl: ITestControl =
             deleteEvent: 1620,
             deleteEventTsc: 1920,
             deleteFolderEvent: 1735,
-            modifyEvent: 1290,
+            modifyEvent: 1430,
         },
         getTreeTasks: 225,
         getTreeTasksNpm: 540, // npm task provider is slower than shit on a turtle
         licenseMgr: {
-            page: 160,
+            page: 165,
             pageWithDetail: 275,
-            checkLicense: 400,
+            checkLicense: 405,
             enterKey: 845,
             getMaxTasks: 360,
             localStartServer: 1195,
@@ -244,8 +244,8 @@ export const testControl: ITestControl =
         runCommand: 5400,
         runPauseCommand: 3590,
         runStopCommand: 3860,
-        storageRead: 60,
-        storageUpdate: 65,
+        storageRead: 65,
+        storageUpdate: 70,
         storageSecretRead: 105,
         storageSecretUpdate: 220,
         taskCommand: 1155,
@@ -269,7 +269,7 @@ export const testControl: ITestControl =
             verifyNpm: 1540, // internal vscode npm task provider is slower than shit wtf
             verifyWorkspace: 1980
         },
-        viewReport: 400
+        viewReport: 390
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)
