@@ -186,7 +186,7 @@ export const testControl: ITestControl =
         closeEditors: 25,
         command: 725,
         commandFast: 290,
-        commandShowOutput: 950,
+        commandShowOutput: 1250,
         config: {
             event: 300,
             eventFast: 100,
@@ -226,20 +226,20 @@ export const testControl: ITestControl =
         getTreeTasks: 225,
         getTreeTasksNpm: 540, // npm task provider is slower than shit on a turtle
         licenseMgr: {
-            page: 175,
-            pageWithDetail: 325,
-            checkLicense: 440,
-            enterKey: 930,
-            getMaxTasks: 400,
-            localStartServer: 1315,
+            page: 160,
+            pageWithDetail: 275,
+            checkLicense: 400,
+            enterKey: 845,
+            getMaxTasks: 360,
+            localStartServer: 1195,
             serverDownHostUp: 14100,
-            setLicenseCmd: 230
+            setLicenseCmd: 210
         },
         min: 50,
         refreshCommand: 7500,
         refreshCommandNoChanges: 310,
-        removeWorkspaceFolder: 2200,
-        removeWorkspaceFolderEmpty: 1100,
+        removeWorkspaceFolder: 2225,
+        removeWorkspaceFolderEmpty: 1850,
         removeWorkspaceFolderFake: 1375,
         runCommand: 5400,
         runPauseCommand: 3590,
@@ -258,7 +258,7 @@ export const testControl: ITestControl =
             batchScriptBat: 4550,
             batchScriptCmd: 5650,
             gulpParser: 4275,
-            npmCommand: 9300,
+            npmCommand: 9500,
             npmCommandPkg: 8200,
             npmInstallCommand: 10400
         },

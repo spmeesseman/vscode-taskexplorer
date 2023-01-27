@@ -134,7 +134,7 @@ suite("Makefile Tests", () =>
     test("Create File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await fsApi.writeFile(
@@ -163,7 +163,6 @@ suite("Makefile Tests", () =>
             "   console.write(\"done\")\n"
         );
         await waitForTeIdle(tc.waitTime.fs.createEvent);
-        await sleep(1000);
         await verifyTaskCount(testsName, startTaskCount + 3);
         endRollingCount(this);
     });
