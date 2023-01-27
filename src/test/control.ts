@@ -68,7 +68,7 @@ export const testControl: ITestControl =
     slowTime: {
         addWorkspaceFolder: 2500,
         addWorkspaceFolderEmpty: 1000,
-        addWorkspaceFolderFake: 1500,
+        addWorkspaceFolderFake: 2000,
         buildTreeNoTasks: 295,
         cache: {
             build: 490,
@@ -80,7 +80,7 @@ export const testControl: ITestControl =
         closeEditors: 20,
         command: 675,
         commandFast: 265,
-        commandShowOutput: 900,
+        commandShowOutput: 800,
         config: {
             event: 270,
             eventFast: 90,
@@ -126,15 +126,15 @@ export const testControl: ITestControl =
             enterKey: 845,
             getMaxTasks: 360,
             localStartServer: 1195,
-            serverDownHostUp: 13100,
+            serverDownHostUp: 14100,
             setLicenseCmd: 210
         },
         min: 50,
         refreshCommand: 6800,
         refreshCommandNoChanges: 245,
         removeWorkspaceFolder: 2000,
-        removeWorkspaceFolderEmpty: 1000,
-        removeWorkspaceFolderFake: 1250,
+        removeWorkspaceFolderEmpty: 250,
+        removeWorkspaceFolderFake: 500,
         runCommand: 4900,
         runPauseCommand: 3255,
         runStopCommand: 3510,

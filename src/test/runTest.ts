@@ -12,6 +12,7 @@ import { copyFile, deleteDir, writeFile } from "../lib/utils/fs";
 async function main(args: string[])
 {
     let failed = false;
+    let multiRoot = false;
     //
     // The folder containing the Extension Manifest package.json
     // Passed to '--extensionDevelopmentPath'
@@ -22,14 +23,15 @@ async function main(args: string[])
     // Passed to --extensionTestsPath
     //
     const extensionTestsPath = path.resolve(__dirname, "./suite");
-    const testWorkspace = path.resolve(__dirname, path.join("..", "..", "test-fixture", "project1"));
+    const testWorkspaceSingleRoot = path.resolve(__dirname, path.join("..", "..", "test-fixture", "project1"));
     const testWorkspaceMultiRoot = path.resolve(__dirname, path.join("..", "..", "test-fixture"));
     const vscodeTestUserDataPath = path.join(extensionDevelopmentPath, ".vscode-test", "user-data");
     //
     // Setting file to clear and restore
     //
-    const projectSettingsFile = path.join(testWorkspace, ".vscode", "settings.json");
-    const wsFile = path.join(testWorkspaceMultiRoot, "tests.code-workspace");
+    const project1Path = testWorkspaceSingleRoot;
+    const projectSettingsFile = path.join(project1Path, ".vscode", "settings.json");
+    const multiRootWsFile = path.join(testWorkspaceMultiRoot, "tests.code-workspace");
 
     const wsConfig = {
         folders: [
@@ -47,7 +49,19 @@ async function main(args: string[])
 
     try
     {
-        console.log("Arguments: " + (args && args.length > 0 ? args.toString() : "None"));
+        if (args && args.length > 0)
+        {
+            console.log("Arguments: " + args.toString());
+            const idx = args.indexOf("--multi-root");
+            if (idx !== -1) {
+                multiRoot = true;
+                args.splice(idx, 1);
+            }
+        }
+        else {
+            console.log("Arguments: None");
+        }
+
         console.log("clear package.json activation event");
         execSync("enable-full-coverage.sh", { cwd: "script" });
 
@@ -56,7 +70,7 @@ async function main(args: string[])
         //
         // let settingsJsonOrig: string | undefined;
         await writeFile(projectSettingsFile, "{}");
-        await writeFile(wsFile, JSON.stringify(wsConfig, null, 4));
+        await writeFile(multiRootWsFile, JSON.stringify(wsConfig, null, 4));
 
         //
         // Copy a "User Tasks" file
@@ -66,23 +80,9 @@ async function main(args: string[])
         //
         // const runCfg = await runConfig();
 
-        //
-        // Download VS Code, unzip it and run the integration test
-        //
-        await runTests({
-            // version: process.env.CODE_VERSION,
-            version: "1.60.1",
-            extensionDevelopmentPath,
-            extensionTestsPath,
-            launchArgs: [ wsFile, "--disable-extensions", "--disable-workspace-trust" ],
-            // launchArgs: [ testWorkspace, "--disable-extensions", "--disable-workspace-trust" ],
-            // launchArgs: [ "--add " + extensionTestsWsPath, "--disable-extensions", "--disable-workspace-trust" ],
-            extensionTestsEnv: { testArgs: args && args.length > 0 ? args.toString() : "" }
-        });
-
-        // /**
-        //  * Install ExtJS extension
-        //  */
+        // //
+        // // Install ExtJS extension
+        // //
         // const vscodeExecutablePath = await downloadAndUnzipVSCode("1.35.0")
 		// const [ cli, ...args ] = resolveCliArgsFromVSCodeExecutablePath(vscodeExecutablePath);
 		// spawnSync(cli, [ ...args, "--install-extension", "spmeesseman.vscode-extjs" ], {
@@ -98,6 +98,19 @@ async function main(args: string[])
 		// 		platform: "win32-x64-archive"
 		// 	});
 		// }
+
+        //
+        // Download VS Code, unzip it and run the integration test
+        //
+        const testsWorkspace = !multiRoot ? testWorkspaceSingleRoot : multiRootWsFile;
+        await runTests(
+        {
+            version: "1.60.1", // process.env.CODE_VERSION,
+            extensionDevelopmentPath,
+            extensionTestsPath,
+            launchArgs: [ testsWorkspace, "--disable-extensions", "--disable-workspace-trust" ],
+            extensionTestsEnv: { testArgs: args && args.length > 0 ? args.toString() : "" }
+        });
     }
     catch (err: any) {
         console.error(`Failed to run tests: ${err}\n${err.stack ?? "No call stack details found"}`);
@@ -144,29 +157,36 @@ async function main(args: string[])
             if (!testControl.keepSettingsFileChanges)
             {
                 console.log("restore tests workspace settings file settings.json");
-                await writeFile(projectSettingsFile, JSON.stringify(
+                if (!multiRoot)
                 {
-                    "taskExplorer.exclude": [
-                        "**/tasks_test_ignore_/**",
-                    ],
-                    "taskExplorer.globPatternsAnt": [
-                        "**/hello.xml"
-                    ]
-                }, null, 4));
-                wsConfig.settings = {
-                    "taskExplorer.exclude": [
-                        "**/tasks_test_ignore_/**",
-                    ],
-                    "taskExplorer.globPatternsAnt": [
-                        "**/hello.xml"
-                    ]
-                };
-                await writeFile(wsFile, JSON.stringify(wsConfig, null, 4));
+                    await writeFile(projectSettingsFile, JSON.stringify(
+                    {
+                        "taskExplorer.exclude": [
+                            "**/tasks_test_ignore_/**",
+                        ],
+                        "taskExplorer.globPatternsAnt": [
+                            "**/hello.xml"
+                        ]
+                    }, null, 4));
+                }
+               else
+                {
+                    wsConfig.settings = {
+                        "taskExplorer.exclude": [
+                            "**/tasks_test_ignore_/**",
+                        ],
+                        "taskExplorer.globPatternsAnt": [
+                            "**/hello.xml"
+                        ]
+                    };
+                    await writeFile(multiRootWsFile, JSON.stringify(wsConfig, null, 4));
+                }
             }
             console.log("delete any leftover temporary files and/or directories");
-            await deleteDir(path.join(testWorkspace, "tasks_test_"));
-            await deleteDir(path.join(testWorkspace, "tasks_test_ignore_"));
-        } catch {}
+            await deleteDir(path.join(project1Path, "tasks_test_"));
+            await deleteDir(path.join(project1Path, "tasks_test_ignore_"));
+        }
+        catch {}
 
         if (failed) {
             process.exit(1);
