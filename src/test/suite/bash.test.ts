@@ -126,7 +126,7 @@ suite("Bash Tests", () =>
     test("Delete File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify);
+        this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.fs.deleteFolderEvent + testControl.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
