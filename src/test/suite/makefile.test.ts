@@ -10,9 +10,10 @@ import { join } from "path";
 import { expect } from "chai";
 import { MakeTaskProvider } from "../../providers/make";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
+import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
+    activate, endRollingCount, exitRollingCount, getWsPath,
     needsTreeBuild, sleep, suiteFinished, testControl as tc, testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 

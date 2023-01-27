@@ -9,9 +9,10 @@ import * as assert from "assert";
 import * as path from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { BashTaskProvider } from "../../providers/bash";
+import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, getWsPath, testControl, treeUtils, verifyTaskCount,
+    activate, getWsPath, testControl, treeUtils, verifyTaskCount,
     logErrorsAreFine, suiteFinished, exitRollingCount, waitForTeIdle, endRollingCount, needsTreeBuild
 } from "../utils/utils";
 

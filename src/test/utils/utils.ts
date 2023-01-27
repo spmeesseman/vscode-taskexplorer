@@ -11,24 +11,23 @@ import { testControl } from "../control";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
 import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
-import { ILicenseManager } from "../../interface/ILicenseManager";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import initSettings from "./initSettings";
 import { getWsPath, getProjectsPath } from "./sharedUtils";
 import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
 import { startInput, stopInput } from "./input";
+import { hasExplorerFocused } from "./commandUtils";
 
 export { figures };
 export { testControl };
 export { treeUtils };
 export { getWsPath, getProjectsPath };
 export let teApi: ITaskExplorerApi;
+export let teExplorer: ITaskExplorer;
 
 let activated = false;
 let hasRollingCountError = false;
-let teExplorer: ITaskExplorer;
-let explorerHasFocused = false;
 let timeStarted: number;
 let overridesShowInputBox: any[] = [];
 let overridesShowInfoBox: any[] = [];
@@ -38,6 +37,7 @@ const tc = testControl;
 const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
 const disableSSLMsg = "Disabling certificate validation due to Electron Main Process Issue w/ LetsEncrypt DST Root CA X3 Expiry";
+
 
 window.showInputBox = (...args: any[]) =>
 {
@@ -49,6 +49,7 @@ window.showInputBox = (...args: any[]) =>
     }
     return new Promise((resolve, reject) => { resolve(next); });
 };
+
 
 window.showInformationMessage = (str: string, ...args: any[]) =>
 {
@@ -221,63 +222,13 @@ export const cleanup = async () =>
 };
 
 
-export const clearOverrideShowInputBox = () =>
-{
-    overridesShowInputBox = [];
-};
+export const clearOverrideShowInputBox = () => overridesShowInputBox = [];
 
 
-export const clearOverrideShowInfoBox = () =>
-{
-    overridesShowInfoBox = [];
-};
+export const clearOverrideShowInfoBox = () => overridesShowInfoBox = [];
 
 
 export const closeEditors = () => commands.executeCommand("openEditors.closeAll");
-
-
-export const executeSettingsUpdate = async (key: string, value?: any, minWait?: number, maxWait?: number) =>
-{
-    const rc = await teApi.config.updateWs(key, value);
-    await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.config.event),
-                        maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
-    return rc;
-};
-
-
-export const executeTeCommandAsync = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
-{
-    commands.executeCommand(`${getCmdGroup(command)}.${command}`, ...args);
-    await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
-                        maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
-};
-
-
-export const executeTeCommand2Async = (command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommandAsync(command, minWait, maxWait, ...args);
-
-
-export const executeTeCommand = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
-{
-    const rc = await commands.executeCommand(`${getCmdGroup(command)}.${command}`, ...args);
-    await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
-                        maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
-    return rc;
-};
-
-
-export const executeTeCommand2 = (command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand(command, minWait, maxWait, ...args);
-
-
-const getCmdGroup = (command: string) =>
-{
-    let cmdGroup = "taskExplorer";        // Tree command
-    if (command === "addToExcludesEx" || command === "enterLicense" || command === "getApi" || command === "disableTaskType" ||
-        command === "enableTaskType"  || command === "removeFromExcludes" || command === "showOutput" || command === "viewLicense" || command === "viewReport")
-    {
-        cmdGroup = "vscode-taskexplorer"; // Global command
-    }
-    return cmdGroup;
-};
 
 
 export const getSuccessCount = (instance: Mocha.Context) =>
@@ -330,27 +281,6 @@ export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean, isT
 };
 
 
-export const focusExplorerView = async (instance?: any) =>
-{
-    if (!teExplorer.isVisible())
-    {
-        if (instance) {
-            instance.slow(tc.slowTime.focusCommand + tc.slowTime.refreshCommand);
-        }
-        await executeTeCommand("focus", tc.waitTime.focusCommand);
-        await waitForTeIdle(tc.waitTime.focusCommand);
-        explorerHasFocused = true;
-    }
-    else if (instance) {
-        instance.slow(tc.slowTime.focusCommandAlreadyFocused);
-        await waitForTeIdle(tc.waitTime.min);
-    }
-};
-
-
-export const focusSearchView = () => commands.executeCommand("workbench.view.search.focus");
-
-
 export const getSpecialTaskItemId = (taskItem: ITaskItem) =>
     taskItem.id.replace(constants.LAST_TASKS_LABEL + ":", "").replace(constants.FAV_TASKS_LABEL + ":", "").replace(constants.USER_TASKS_LABEL + ":", "");
 
@@ -371,7 +301,7 @@ const isExecuting = (task: Task) =>
 };
 
 
-export const needsTreeBuild = (isFocus?: boolean) => (isFocus || !treeUtils.hasRefreshed()) && !explorerHasFocused;
+export const needsTreeBuild = (isFocus?: boolean) => (isFocus || !treeUtils.hasRefreshed()) && !hasExplorerFocused();
 
 
 const isReady = (taskType?: string) =>
@@ -420,37 +350,16 @@ export const logErrorsAreFine = (willFail = true) =>
 };
 
 
-export const overrideNextShowInputBox = (value: any) =>
-{
-    overridesShowInputBox.push(value);
-};
+export const overrideNextShowInputBox = (value: any) => overridesShowInputBox.push(value);
 
 
-export const overrideNextShowInfoBox = (value: any) =>
-{
-    overridesShowInfoBox.push(value);
-};
+export const overrideNextShowInfoBox = (value: any) => overridesShowInfoBox.push(value);
 
 
-export const setExplorer = (explorer: ITaskExplorer) =>
-{
-    teExplorer = explorer;
-};
+export const setExplorer = (explorer: ITaskExplorer) => teExplorer = explorer;
 
 
-export const setFailed = () =>
-{
-    hasRollingCountError = true;
-};
-
-
-export const setLicensed = async (valid: boolean, licMgr: ILicenseManager) =>
-{
-    teApi.setTests(!valid);
-    await licMgr.setLicenseKey(valid ? "1234-5678-9098-7654321" : undefined);
-    await licMgr.checkLicense();
-    teApi.setTests(true);
-};
+export const setFailed = () => hasRollingCountError = true;
 
 
 export const sleep = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

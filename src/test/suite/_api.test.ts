@@ -4,7 +4,7 @@
 import { refreshTree } from "../../lib/refreshTree";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, executeSettingsUpdate, executeTeCommand, executeTeCommand2, setExplorer, sleep, suiteFinished, testControl as tc, waitForTeIdle
+    activate, executeTeCommand, executeTeCommand2, setExplorer, sleep, suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;

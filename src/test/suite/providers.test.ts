@@ -11,10 +11,11 @@ import TaskFile from "../../tree/file";
 import { join } from "path";
 import { expect } from "chai";
 import { workspace, tasks, WorkspaceFolder } from "vscode";
+import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
 import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi, ITaskFile } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, executeSettingsUpdate, executeTeCommand, executeTeCommand2, exitRollingCount, focusExplorerView,
-    getWsPath, needsTreeBuild, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
+    treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 

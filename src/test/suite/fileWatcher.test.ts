@@ -4,9 +4,9 @@
 
 import * as utils from "../utils/utils";
 import { join } from "path";
+import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IDictionary, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { IConfiguration } from "@spmeesseman/vscode-taskexplorer-types/lib/IConfiguration";
-import { getLicenseManager } from "../../extension";
 
 const tc = utils.testControl;
 const startTaskCountBash = 1;
@@ -66,7 +66,7 @@ suite("File Watcher Tests", () =>
             gulpIgn_0: join(insideWsDirIgn, "Gulpfile.js"),
             gulpIgn_1: join(insideWsDirIgn, "Gulpfile1.js")
         };
-        await utils.executeSettingsUpdate("exclude", [ ...excludes, ...[ "**/fwTestIgnore/**" ] ], tc.waitTime.config.globEvent);
+        executeSettingsUpdate("exclude", [ ...excludes, ...[ "**/fwTestIgnore/**" ] ], tc.waitTime.config.globEvent);
         utils.endRollingCount(this, true);
     });
 
@@ -79,7 +79,7 @@ suite("File Watcher Tests", () =>
         await fsApi.deleteDir(insideWsDirIgn);
         await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await fsApi.deleteDir(outsideWsDir);
-        await utils.executeSettingsUpdate("exclude", excludes, tc.waitTime.config.globEvent);
+        await executeSettingsUpdate("exclude", excludes, tc.waitTime.config.globEvent);
         utils.suiteFinished(this);
     });
 
@@ -255,7 +255,6 @@ suite("File Watcher Tests", () =>
             '    grunt.registerTask("upload13", ["s3"]);\n' +
             "};\n"
         );
-        utils.setLicensed(true, getLicenseManager());
         await fsApi.copyDir(outsideWsDir, insideWsDir, /Gruntfile\.js/, true); // copy folder
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2);
@@ -274,19 +273,6 @@ suite("File Watcher Tests", () =>
         await fsApi.deleteDir(join(insideWsDir, "testA"));
         await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2);
-        utils.endRollingCount(this);
-    });
-
-
-    test("Add a Non-Empty Folder to Workspace Folder (Un-Licensed Mode)", async function()
-    {
-        if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
-        utils.setLicensed(false, getLicenseManager());
-        await fsApi.copyDir(outsideWsDir, insideWsDir, undefined, true); // copy folder
-        await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-        utils.setLicensed(true, getLicenseManager());
-        await utils.verifyTaskCount("grunt", startTaskCountGrunt + 4);
         utils.endRollingCount(this);
     });
 

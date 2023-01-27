@@ -6,9 +6,11 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
 import { RubyTaskProvider } from "../../providers/ruby";
+import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, needsTreeBuild,
-    suiteFinished, testControl as tc, testInvDocPositions, verifyTaskCount, waitForTeIdle
+import {
+    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
+    verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "ruby";

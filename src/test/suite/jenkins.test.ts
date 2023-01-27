@@ -6,8 +6,9 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
 import { JenkinsTaskProvider } from "../../providers/jenkins";
+import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath, needsTreeBuild,
+import { activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
     suiteFinished, testControl as tc, testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 import { env } from "process";

@@ -3,9 +3,10 @@
 /* tslint:disable */
 
 import { expect } from "chai";
+import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IDictionary, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, getSuccessCount, sleep,
+    activate, endRollingCount, exitRollingCount, getSuccessCount, sleep,
     suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
 

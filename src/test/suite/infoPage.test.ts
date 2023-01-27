@@ -3,9 +3,9 @@
 
 import { Uri, WebviewPanel } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { executeSettingsUpdate, focusExplorerView, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import {
-	activate, closeEditors, executeTeCommand, focusExplorerView, executeSettingsUpdate, testControl,
-	suiteFinished, sleep, getWsPath, exitRollingCount, executeTeCommand2, needsTreeBuild, waitForTeIdle, endRollingCount
+	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, needsTreeBuild, waitForTeIdle, endRollingCount
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;

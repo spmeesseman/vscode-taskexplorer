@@ -3,12 +3,13 @@
 /* tslint:disable */
 
 import { expect } from "chai";
+import { AntTaskProvider } from "../../providers/ant";
+import { executeSettingsUpdate } from "../utils/commandUtils";
+import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { AntTaskProvider } from "../../providers/ant";
-import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import {
-    activate, executeSettingsUpdate, getWsPath, testControl as tc, verifyTaskCount, logErrorsAreFine, suiteFinished,
+    activate, getWsPath, testControl as tc, verifyTaskCount, logErrorsAreFine, suiteFinished,
     exitRollingCount, waitForTeIdle, treeUtils, overrideNextShowInfoBox, endRollingCount, needsTreeBuild, testInvDocPositions
 } from "../utils/utils";
 

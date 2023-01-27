@@ -8,9 +8,10 @@
 import { join } from "path";
 import { Uri } from "vscode";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
+import { executeSettingsUpdate, executeTeCommand } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, executeSettingsUpdate, executeTeCommand, exitRollingCount, getWsPath,
+    activate, endRollingCount, exitRollingCount, getWsPath,
     needsTreeBuild, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 

@@ -7,12 +7,13 @@
 //
 import * as path from "path";
 import { Uri } from "vscode";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { MavenTaskProvider } from "../../providers/maven";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { executeSettingsUpdate, focusExplorerView, executeTeCommand } from "../utils/commandUtils";
 import {
-    activate, endRollingCount, executeSettingsUpdate, executeTeCommand, exitRollingCount, focusExplorerView,
-    getWsPath, needsTreeBuild, suiteFinished, testControl as tc, testInvDocPositions, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount,  getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
+    testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "maven";

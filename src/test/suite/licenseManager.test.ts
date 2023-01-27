@@ -3,11 +3,12 @@
 
 import * as utils from "../utils/utils";
 import { expect } from "chai";
-import { ChildProcess, fork } from "child_process";
-import { ILicenseManager } from "../../interface/ILicenseManager";
-import { getLicenseManager } from "../../extension";
 import { Task } from "vscode";
+import { ChildProcess, fork } from "child_process";
+import { getLicenseManager } from "../../extension";
 import { testControl as tc } from "../control";
+import { ILicenseManager } from "../../interface/ILicenseManager";
+import { executeTeCommand, focusExplorerView } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { join } from "path";
 
@@ -90,7 +91,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		if (utils.needsTreeBuild(true)) {
-            await utils.focusExplorerView(this);
+            await focusExplorerView(this);
 		}
         utils.endRollingCount(this);
 	});
@@ -123,9 +124,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await utils.setLicensed(true, licMgr);
+		await setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks()).to.be.a("number").that.is.equal(Infinity);
-		await utils.setLicensed(false, licMgr);
+		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks()).to.be.a("number").that.is.equal(licMgrMaxFreeTasks);
         utils.endRollingCount(this);
 	});
@@ -135,9 +136,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await utils.setLicensed(true, licMgr);
+		await setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("npm")).to.be.a("number").that.is.equal(Infinity);
-		await utils.setLicensed(false, licMgr);
+		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("npm")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForTaskType);
         utils.endRollingCount(this);
 	});
@@ -147,9 +148,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await utils.setLicensed(true, licMgr);
+		await setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("ant")).to.be.a("number").that.is.equal(Infinity);
-		await utils.setLicensed(false, licMgr);
+		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("ant")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForTaskType);
         utils.endRollingCount(this);
 	});
@@ -159,9 +160,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await utils.setLicensed(true, licMgr);
+		await setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("bash")).to.be.a("number").that.is.equal(Infinity);
-		await utils.setLicensed(false, licMgr);
+		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("bash")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForScriptType);
         utils.endRollingCount(this);
 	});
@@ -171,9 +172,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await utils.setLicensed(true, licMgr);
+		await setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("python")).to.be.a("number").that.is.equal(Infinity);
-		await utils.setLicensed(false, licMgr);
+		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("python")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForScriptType);
         utils.endRollingCount(this);
 	});
@@ -183,9 +184,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await utils.setLicensed(true, licMgr);
+		await setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTaskFiles()).to.be.a("number").that.is.equal(Infinity);
-		await utils.setLicensed(false, licMgr);
+		await setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTaskFiles()).to.be.a("number").that.is.equal(licMgrMaxFreeTaskFiles);
         utils.endRollingCount(this);
 	});
@@ -195,7 +196,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.pageWithDetail + 1100 + (tc.slowTime.storageUpdate * 2) + tc.slowTime.storageSecretUpdate);
-		await utils.setLicensed(false, licMgr);
+		await setLicensed(false, licMgr);
 		await teApi.testsApi.storage.update("version", undefined);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		await setTasks();
@@ -434,13 +435,13 @@ suite("License Manager Tests", () =>
 		this.slow(tc.slowTime.licenseMgr.enterKey * 3);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("1234-5678-9098-7654321");
-		await utils.executeTeCommand("enterLicense", tc.waitTime.command * 2);
+		await executeTeCommand("enterLicense", tc.waitTime.command * 2);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("");
-		await utils.executeTeCommand("enterLicense", tc.waitTime.command * 2, 1100, "   ");
+		await executeTeCommand("enterLicense", tc.waitTime.command * 2, 1100, "   ");
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("");
-		await utils.executeTeCommand("enterLicense", tc.waitTime.command * 2, 1100, "   ", 1);
+		await executeTeCommand("enterLicense", tc.waitTime.command * 2, 1100, "   ", 1);
         utils.endRollingCount(this);
 	});
 
@@ -623,7 +624,7 @@ suite("License Manager Tests", () =>
 			port: 443,
 			token: remoteServerToken
 		});
-		await utils.setLicensed(false, licMgr);
+		await setLicensed(false, licMgr);
 		licMgr.setTestData({
 			maxFreeTasks: 25,
 			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
@@ -725,7 +726,7 @@ suite("License Manager Tests", () =>
 		if (licMgr)
 		{
 			this.slow(tc.slowTime.refreshCommand);
-			await utils.setLicensed(true, licMgr);
+			await setLicensed(true, licMgr);
 			licMgr.setTestData({
 				maxFreeTasks: licMgrMaxFreeTasks,
 				maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
@@ -764,6 +765,16 @@ suite("License Manager Tests", () =>
 	});
 
 });
+
+
+
+const setLicensed = async (valid: boolean, licMgr: ILicenseManager) =>
+{
+    teApi.setTests(!valid);
+    await licMgr.setLicenseKey(valid ? "1234-5678-9098-7654321" : undefined);
+    await licMgr.checkLicense();
+    teApi.setTests(true);
+};
 
 
 async function setTasks()

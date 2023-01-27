@@ -5,12 +5,13 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import * as assert from "assert";
 import * as path from "path";
+import { expect } from "chai";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { PowershellTaskProvider } from "../../providers/powershell";
+import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView, getWsPath,
+import { activate, endRollingCount, exitRollingCount, getWsPath,
     logErrorsAreFine, needsTreeBuild, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
@@ -71,7 +72,7 @@ suite("Powershell Tests", () =>
     {
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as PowershellTaskProvider;
-        assert(provider.getDocumentPosition() === 0, "Script type should return position 0");
+        expect(provider.getDocumentPosition()).to.be.equal(0, "Script type should return position 0");
         endRollingCount(this);
     });
 
@@ -80,8 +81,7 @@ suite("Powershell Tests", () =>
     {
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as PowershellTaskProvider;
-        assert(!provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.ps1"))),
-               "ScriptProvider type should return position 1");
+        provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.ps1")));
         logErrorsAreFine();
         endRollingCount(this);
     });

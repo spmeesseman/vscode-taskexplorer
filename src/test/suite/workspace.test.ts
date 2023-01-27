@@ -3,9 +3,11 @@
 /* tslint:disable */
 
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import {
-    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView,
-    needsTreeBuild, suiteFinished, testControl, treeUtils} from "../utils/utils";
+    activate, endRollingCount, exitRollingCount, needsTreeBuild, suiteFinished, testControl,
+    treeUtils
+} from "../utils/utils";
 
 const testsName = "Workspace";
 const startTaskCount = 10; // 10 + 3 'User' Tasks, but getTaskCountByTree() will not return the User tasks

@@ -1,8 +1,7 @@
 
+import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import {
-    activate, endRollingCount, executeSettingsUpdate, exitRollingCount, focusExplorerView,
-    getSuccessCount,
-    needsTreeBuild, suiteFinished, testControl as tc
+    activate, endRollingCount, exitRollingCount, getSuccessCount, needsTreeBuild, suiteFinished, testControl as tc
 } from "../utils/utils";
 
 

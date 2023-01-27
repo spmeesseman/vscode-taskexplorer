@@ -11,9 +11,10 @@ import { expect } from "chai";
 import { InitScripts } from "../../lib/noScripts";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
 import {
-	activate, executeSettingsUpdate, testControl, logErrorsAreFine, executeTeCommand,
-	suiteFinished, exitRollingCount, getWsPath, endRollingCount, executeTeCommand2, sleep
+	activate, testControl, logErrorsAreFine, suiteFinished, exitRollingCount,
+	getWsPath, endRollingCount, sleep
 } from "../utils/utils";
 
 const creator = "spmeesseman",
