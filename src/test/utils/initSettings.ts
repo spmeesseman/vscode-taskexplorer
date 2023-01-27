@@ -179,35 +179,8 @@ const initSettings = async () =>
     if (workspace.workspaceFolders && workspace.workspaceFolders.length > 1)
     {
         tc.isMultiRootWorkspace = true;
-        const slowTimes = tc.slowTime as IDictionary<any>;
-        const waitTimes = tc.waitTime as IDictionary<any>;
-        Object.keys(slowTimes).forEach((k) =>
-        {
-            if (!isObject(slowTimes[k])) {
-                slowTimes[k] = Math.round(slowTimes[k] * (k.includes("WorkspaceFolder") ? 1.2 : 1.1));
-            }
-            else {
-                Object.keys(slowTimes[k]).forEach((k2) =>
-                {
-                    slowTimes[k][k2] = Math.round(slowTimes[k][k2] * (k === "fs" ? 1.2 : 1.1));
-                });
-            }
-        });
-        Object.keys(waitTimes).forEach((k) =>
-        {
-            if (!isObject(waitTimes[k])) {
-                waitTimes[k] = Math.round(waitTimes[k] * (k.includes("WorkspaceFolder") ? 2.5 : 1.6));
-            }
-            else {
-                Object.keys(waitTimes[k]).forEach((k2) =>
-                {
-                    waitTimes[k][k2] = Math.round(waitTimes[k][k2] * (k === "fs" ? 2.5 : 1.6));
-                    if (k2 === "modifyEvent") {
-                        waitTimes[k][k2] += 50;
-                    }
-                });
-            }
-        });
+        Object.assign(tc.slowTime as IDictionary<any>, tc.slowTimeMultiRoot);
+        Object.assign(tc.waitTime as IDictionary<any>, tc.waitTimeMultiRoot);
     }
 };
 

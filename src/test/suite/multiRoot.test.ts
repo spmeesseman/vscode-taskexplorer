@@ -19,7 +19,7 @@ import { join } from "path";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { IFilesystemApi, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, getProjectsPath, needsTreeBuild, sleep, suiteFinished,
+    activate, endRollingCount, exitRollingCount, focusExplorerView, focusSearchView, getProjectsPath, needsTreeBuild, sleep, suiteFinished,
     testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
@@ -91,6 +91,9 @@ suite("Multi-Root Workspace Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
+        if (!testsApi.explorer.isVisible()) {
+            await focusExplorerView();
+        }
         await teApi.config.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
         if (!tc.isMultiRootWorkspace) {
             workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
@@ -103,14 +106,22 @@ suite("Multi-Root Workspace Tests", () =>
     });
 
 
-    test("Build Tree", async function()
-    {
+    // test("Build Tree", async function()
+    // {
+    //     if (exitRollingCount(this)) return;
+    //     if (needsTreeBuild()) {
+    //         await treeUtils.refresh(this);
+    //     }
+    //     endRollingCount(this);
+    // });
+	test("Focus Tree View", async function()
+	{
         if (exitRollingCount(this)) return;
-        if (needsTreeBuild()) {
-            await treeUtils.refresh(this);
+        if (needsTreeBuild(true)) {
+            await focusExplorerView(this);
         }
         endRollingCount(this);
-    });
+	});
 
 
     test("Add Undefined Workspace", async function()
@@ -157,7 +168,7 @@ suite("Multi-Root Workspace Tests", () =>
         else {
             workspace.updateWorkspaceFolders(3, null, wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2]);
         }
-        await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
+        await waitForTeIdle(tc.waitTime.addWorkspaceFolder * 2);
         endRollingCount(this);
     });
 
@@ -316,9 +327,18 @@ suite("Multi-Root Workspace Tests", () =>
         else {
             workspace.updateWorkspaceFolders(2, 1);
         }
-        waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         await verifyTaskCount("grunt", gruntCt + 2);
+        endRollingCount(this);
+    });
+
+
+    test("Switch Views (Hide/Blur Explorer)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.focusCommandChangeViews + tc.slowTime.min);
+        await focusSearchView();
+        await waitForTeIdle(tc.waitTime.min);
         endRollingCount(this);
     });
 
@@ -327,6 +347,7 @@ suite("Multi-Root Workspace Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.removeWorkspaceFolderEmpty + tc.slowTime.taskCount.verify);
+        await focusSearchView();
         if (!tc.isMultiRootWorkspace)
         {
             await testsApi.onWsFoldersChange({
@@ -339,6 +360,17 @@ suite("Multi-Root Workspace Tests", () =>
         }
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder * 2);
         await verifyTaskCount("grunt", gruntCt);
+        await focusExplorerView();
+        endRollingCount(this);
+    });
+
+
+    test("Switch Views (Show/Focus Explorer)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.focusCommandChangeViews + tc.slowTime.min);
+        await focusExplorerView();
+        await waitForTeIdle(tc.waitTime.min);
         endRollingCount(this);
     });
 
