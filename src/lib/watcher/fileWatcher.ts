@@ -490,7 +490,7 @@ const _procDirCreateEvent = async(uri: Uri, logPad: string) =>
         log.methodDone("[event] directory 'create'", 1, logPad);
     }
     catch (e) {}
-    finally { processQueue(); }
+    finally { /* don't await */ processQueue(); }
 };
 
 
@@ -505,7 +505,7 @@ const _procDirDeleteEvent = async(uri: Uri, logPad: string) =>
         log.methodDone("[event] directory 'delete'", 1, logPad);
     }
     catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'dir change' event error", e ]); }
-    finally { processQueue(); }
+    finally { /* don't await */ processQueue(); }
 };
 
 
@@ -517,7 +517,7 @@ const _procFileChangeEvent = async(taskType: string, uri: Uri, logPad: string) =
         log.methodDone("[event] file 'change'", 1, logPad);
     }
     catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'file change' event error", e ]); }
-    finally { processQueue(); }
+    finally { /* don't await */ processQueue(); }
 };
 
 
@@ -530,7 +530,7 @@ const _procFileCreateEvent = async(taskType: string, uri: Uri, logPad: string) =
         log.methodDone("[event] file 'create'", 1, logPad);
     }
     catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'file create' event error", e ]); }
-    finally { processQueue(); }
+    finally { /* don't await */ processQueue(); }
 };
 
 
@@ -543,7 +543,7 @@ const _procFileDeleteEvent = async(taskType: string, uri: Uri, logPad: string) =
         log.methodDone("[event] file 'delete'", 1, logPad);
     }
     catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'file delete' event error", e ]); }
-    finally { processQueue(); }
+    finally { /* don't await */ processQueue(); }
 };
 
 
@@ -553,18 +553,18 @@ const _procWsDirAddRemoveEvent = async(e: WorkspaceFoldersChangeEvent, logPad: s
     {   log.methodStart("workspace folder 'add/remove'", 1, logPad, true, [
             [ "# added", e.added.length ], [ "# removed", e.removed.length ]
         ]);
-        const numFilesFound = await cache.addWsFolders(e.added, logPad + "   ");
-        const numFilesRemoved = cache.removeWsFolders(e.removed, logPad + "   ");
+        const numFilesFound = await cache.addWsFolders(e.added, logPad + "   "),
+              numFilesRemoved = cache.removeWsFolders(e.removed, logPad + "   ");
         createDirWatcher(extContext);
-        if (numFilesFound > 0 || numFilesRemoved > 0) {
+        if (numFilesFound > 0 || numFilesRemoved > 0)
+        {
             const all =  [ ...e.added, ...e.removed ];
             await refreshTree(teApi, undefined, all.length === 1 ? all[0].uri : undefined, logPad + "   ");
-            // await refreshTree(teApi, undefined, undefined, logPad + "   ");
         }
         log.methodDone("workspace folder 'add/remove'", 1, logPad, [
             [ "# of files found", numFilesFound ], [ "# of files removed", numFilesRemoved ]
         ]);
     }
     catch (e) {}
-    finally { processQueue(); }
+    finally { /* don't await */ processQueue(); }
 };

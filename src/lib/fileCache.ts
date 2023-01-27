@@ -750,14 +750,13 @@ export function removeWsFolders(wsf: readonly WorkspaceFolder[], logPad: string)
         log.value("   workspace folder", f.name, 1, logPad);
         Object.keys(taskFilesMap).forEach((taskType) =>
         {
-            log.value("   start remove task files from cache", taskType, 2, logPad);
-            numFilesRemoved = removeFromMappings(taskType, f, true, logPad + "      ");
-            log.write(`      removed ${numFilesRemoved} files`, 2, logPad);
-            log.value("   completed remove files from cache", taskType, 2, logPad);
+            const taskFilesRemoved = removeFromMappings(taskType, f, true, logPad + "      ");
+            numFilesRemoved += taskFilesRemoved;
+            log.write(`   removed ${taskFilesRemoved} ${taskType} files`, 2, logPad);
         });
         delete projectToFileCountMap[f.name];
         delete projectFilesMap[f.name];
-        log.write("   workspace folder removed", 1, logPad);
+        log.write(`   removed ${numFilesRemoved} total files`, 1, logPad);
     }
     log.methodDone("remove workspace folder", 1, logPad);
     return numFilesRemoved;
