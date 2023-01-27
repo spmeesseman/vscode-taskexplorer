@@ -121,7 +121,7 @@ export const testControl: ITestControl =
         getTreeTasksNpm: 490, // npm task provider is slower than shit on a turtle
         licenseMgr: {
             page: 160,
-            pageWithDetail: 325,
+            pageWithDetail: 275,
             checkLicense: 400,
             enterKey: 845,
             getMaxTasks: 360,
@@ -163,7 +163,7 @@ export const testControl: ITestControl =
             verifyNpm: 1400, // internal vscode npm task provider is slower than shit wtf
             verifyWorkspace: 1800
         },
-        viewReport: 410
+        viewReport: 375
     },
     //
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)
@@ -227,7 +227,7 @@ export const testControl: ITestControl =
         getTreeTasksNpm: 540, // npm task provider is slower than shit on a turtle
         licenseMgr: {
             page: 175,
-            pageWithDetail: 375,
+            pageWithDetail: 325,
             checkLicense: 440,
             enterKey: 930,
             getMaxTasks: 400,
@@ -269,7 +269,7 @@ export const testControl: ITestControl =
             verifyNpm: 1540, // internal vscode npm task provider is slower than shit wtf
             verifyWorkspace: 1980
         },
-        viewReport: 470
+        viewReport: 400
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)

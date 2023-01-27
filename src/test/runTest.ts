@@ -69,8 +69,12 @@ async function main(args: string[])
         // Clear workspace settings file if it exists
         //
         // let settingsJsonOrig: string | undefined;
-        await writeFile(projectSettingsFile, "{}");
-        await writeFile(multiRootWsFile, JSON.stringify(wsConfig, null, 4));
+        if (!multiRoot) {
+            await writeFile(projectSettingsFile, "{}");
+        }
+        else {
+            await writeFile(multiRootWsFile, JSON.stringify(wsConfig, null, 4));
+        }
 
         //
         // Copy a "User Tasks" file

@@ -57,7 +57,7 @@ suite("Info Report Tests", () =>
 	test("Open Report Page (Single Project No User Tasks)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.showHideUserTasks + 100);
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.showHideUserTasks + 200);
 		await executeSettingsUpdate("specialFolders.showUserTasks", false, testControl.waitTime.config.showHideUserTasks);
 		const panel = await executeTeCommand2("viewReport", [ projectUri ], testControl.waitTime.viewReport) as WebviewPanel;
 		await sleep(100);
@@ -70,7 +70,7 @@ suite("Info Report Tests", () =>
 	test("Open Report Page (Single Project w/ User Tasks)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.showHideUserTasks + 100);
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.showHideUserTasks + 200);
 		await executeSettingsUpdate("specialFolders.showUserTasks", true, testControl.waitTime.config.showHideUserTasks);
 	    const panel = await executeTeCommand2("viewReport", [ projectUri, "", 5 ], testControl.waitTime.viewReport) as WebviewPanel;
 		await sleep(100);
@@ -83,7 +83,7 @@ suite("Info Report Tests", () =>
 	test("Open Report Page (All Projects)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + 100);
+		this.slow(testControl.slowTime.viewReport + 200);
 	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport) as WebviewPanel;
 		await sleep(100);
 		panel.dispose();
@@ -95,7 +95,7 @@ suite("Info Report Tests", () =>
 	test("Open Report Page (All Projects, Yarn Enabled)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + (testControl.slowTime.config.enableEvent * 2) + 100);
+		this.slow(testControl.slowTime.viewReport + (testControl.slowTime.config.enableEvent * 2) + 200);
         await teApi.config.updateVsWs("npm.packageManager", "yarn");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
 	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport) as WebviewPanel;
@@ -111,7 +111,7 @@ suite("Info Report Tests", () =>
 	test("View License Info from Webview", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 500);
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
 	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport) as WebviewPanel;
 		await panel.webview.postMessage({ command: "viewLicense" });
 		await sleep(500);
@@ -124,7 +124,7 @@ suite("Info Report Tests", () =>
 	test("Open Report Page (Views Both Disabled)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + 100);
+		this.slow(testControl.slowTime.viewReport + 200);
 		const oExplorer = teApi.explorer;
 		const oSidebar = teApi.sidebar;
 		teApi.explorer = undefined;
@@ -160,7 +160,7 @@ suite("Info Report Tests", () =>
 	test("View License Info from Webview (Views Both Disabled)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 500);
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
 		const oExplorer = teApi.explorer;
 		const oSidebar = teApi.sidebar;
 		teApi.explorer = undefined;
@@ -179,7 +179,7 @@ suite("Info Report Tests", () =>
 	test("View License Info from Webview (Sidebar Enabled, Explorer Disabled)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 500);
+		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
 		const oExplorer = teApi.explorer;
 		const oSidebar = teApi.sidebar;
 		teApi.explorer = undefined;

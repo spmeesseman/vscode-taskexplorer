@@ -5,6 +5,7 @@
     "buildPostCommand": [
         "npm run tsc-build_types",
         "npm run test-all",
+        "npm run test-all_mws_nc",
         "npm run webpack-rebuild",
         "npm run publish:types"
     ],

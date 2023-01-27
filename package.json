@@ -65,6 +65,7 @@
         "test-coverage-codecov-publish": "node_modules/.bin/codecov --disable=gcov --disable=detect",
         "test-all": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js",
         "test-all_mws": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js --multi-root",
+        "test-all_mws_nc": "node ./dist/test/runTest.js --multi-root",
         "test-ant": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js ant xDeactivate",
         "test-api": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js api xDeactivate",
         "test-app_publisher": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js appPublisher xDeactivate",
