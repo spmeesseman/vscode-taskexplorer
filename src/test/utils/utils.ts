@@ -1,23 +1,23 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as path from "path";
-import * as assert from "assert";
 import * as treeUtils from "./treeUtils";
 import figures from "../../lib/figures";
+import initSettings from "./initSettings";
 import constants from "../../lib/constants";
 import { expect } from "chai";
-import { deactivate, getLicenseManager } from "../../extension";
 import { testControl } from "../control";
-import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
-import { deleteFile, pathExists } from "../../lib/utils/fs";
-import { configuration } from "../../lib/utils/configuration";
-import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
-import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
-import initSettings from "./initSettings";
-import { getWsPath, getProjectsPath } from "./sharedUtils";
-import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
+import { deactivate } from "../../extension";
 import { startInput, stopInput } from "./input";
 import { hasExplorerFocused } from "./commandUtils";
+import { getWsPath, getProjectsPath } from "./sharedUtils";
+import { deleteFile, pathExists } from "../../lib/utils/fs";
+import { configuration } from "../../lib/utils/configuration";
+import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
+import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
+import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
+import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 
 export { figures };
 export { testControl };
@@ -27,6 +27,7 @@ export let teApi: ITaskExplorerApi;
 export let teExplorer: ITaskExplorer;
 
 let activated = false;
+let caughtControlC = false;
 let hasRollingCountError = false;
 let timeStarted: number;
 let overridesShowInputBox: any[] = [];
@@ -37,6 +38,23 @@ const tc = testControl;
 const originalShowInputBox = window.showInputBox;
 const originalShowInfoBox = window.showInformationMessage;
 const disableSSLMsg = "Disabling certificate validation due to Electron Main Process Issue w/ LetsEncrypt DST Root CA X3 Expiry";
+
+//
+// Suppress some stderr messages.  It's just tests.
+//
+// process.stderr.on("data", data => {
+//     if (!data.includes("UNRESPONSIVE ext") && !data.includes("(node:22580)")) {
+//         process.stdout.write(data);
+//     }
+// });
+// process.on("warning", (warning) => {
+//     if (!warning.message.includes("UNRESPONSIVE ext") && !warning.message.includes("(node:22580)")) {
+//         console.warn(warning.name);    // Print the warning name
+//         console.warn(warning.message); // Print the warning message
+//         console.warn(warning.stack);   // Print the stack trace
+//     }
+// });
+// process.on("warning", (warning) => {});
 
 
 window.showInputBox = (...args: any[]) =>
@@ -65,7 +83,7 @@ window.showInformationMessage = (str: string, ...args: any[]) =>
 export const activate = async (instance?: Mocha.Context) =>
 {
     const ext = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-    assert(ext, `    ${figures.color.error} Could not find extension`);
+    expect(ext).to.not.be.undefined;
 
     if (instance)
     {
@@ -96,10 +114,9 @@ export const activate = async (instance?: Mocha.Context) =>
         console.log(`    ${figures.color.info} ${figures.withColor("Tests startup", figures.colors.grey)}`);
         console.log(`    ${figures.color.info} ${figures.withColor("Time started: " + locISOTime, figures.colors.grey)}`);
         //
-        // Init settings
-        // Note that the '*' is removed from package.json[activationEvents] before the runTest() call
+        // Set startup settings for this tests run using workspace settings scope.
+        // The initSettings() functions does it's own logging to the console.
         //
-        console.log(`    ${figures.color.info} ${figures.withColor("Initializing settings", figures.colors.grey)}`);
         await initSettings();
         //
 		// The LetsEncrypt certificate is rejected by VSCode/Electron Test Suite (?).
@@ -113,26 +130,25 @@ export const activate = async (instance?: Mocha.Context) =>
 		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         //
         // Activate extension
+        // Note that the '*' is removed from package.json[activationEvents] before the runTest() call
         //
-        console.log(`    ${figures.color.info} ${figures.withColor("Activating extension 'spmeesseman.vscode-taskexplorer'", figures.colors.grey)}`);
-        teApi = await ext.activate();
-        console.log(`    ${figures.color.info} ${figures.withColor("Extension 'spmeesseman.vscode-taskexplorer' successfully activated", figures.colors.grey)}`);
+        console.log(`    ${figures.color.info} ${figures.withColor("Activating extension", figures.colors.grey)}`);
+        teApi = await (ext as any).activate();
+        console.log(`    ${figures.color.info} ${figures.withColor("Extension successfully activated", figures.colors.grey)}`);
         //
         // Ensure extension initialized successfully
         //
-        assert(isReady() === true, `    ${figures.color.error} TeApi not ready`);
-        if (!teApi.explorer) {
-            assert.fail(`    ${figures.color.error} Explorer instance does not exist`);
-        }
+        expect(isReady()).to.be.equal(true, `    ${figures.color.error} TeApi not ready`);
+        expect(teApi.explorer).to.not.be.empty;
         //
-        // Cheap set to 'licensed mode'
+        // Set a valid license key to run in 'licensed mode' at startup
         //
         await teApi.testsApi.storage.updateSecret("license_key", "1234-5678-9098-7654321");
         //
         // _api pre-test suite will reset after disable/enable
         //
         console.log(`    ${figures.color.info} ${figures.withColor("Settings tests active explorer instance", figures.colors.grey)}`);
-        setExplorer(teApi.explorer);
+        setExplorer(teApi.explorer as ITaskExplorer);
         //
         // waitForIdle() added 1/2/03 - Tree loads in delay 'after' activate()
         //
@@ -143,14 +159,14 @@ export const activate = async (instance?: Mocha.Context) =>
         //
         teApi.log.setWriteToConsole(tc.log.console, tc.log.level);
         //
-        // Catch CTRL+C and set hasRollingCountError
+        // Catch CTRL+C and set hasRollingCountError if caught
         //
         startInput(setFailed);
         //
         // All done
         //
         activated = true;
-        console.log(`    ${figures.color.info} ${figures.withColor("Tests ready", figures.colors.grey)}`);
+        console.log(`    ${figures.color.info} ${figures.withColor("Tests initialization completed, ready", figures.colors.grey)}`);
         console.log(`    ${figures.color.info}`);
 		console.log(`    ${figures.color.warningTests} ${figures.withColor(disableSSLMsg, figures.colors.grey)}`);
     }
@@ -162,6 +178,9 @@ export const cleanup = async () =>
 {
     console.log(`    ${figures.color.info}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Tests complete, clean up", figures.colors.grey)}`);
+    if (caughtControlC) {
+        console.log(`    ${figures.color.info} ${figures.withColor("User cancelled (caught CTRL+C)", figures.colors.grey)}`);
+    }
 
     if (tc.log.enabled && tc.log.file && tc.log.openFileOnFinish)
     {
@@ -359,7 +378,11 @@ export const overrideNextShowInfoBox = (value: any) => overridesShowInfoBox.push
 export const setExplorer = (explorer: ITaskExplorer) => teExplorer = explorer;
 
 
-export const setFailed = () => hasRollingCountError = true;
+export const setFailed = () =>
+{
+    caughtControlC = true;
+    hasRollingCountError = true;
+};
 
 
 export const sleep = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

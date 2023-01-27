@@ -1,15 +1,18 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
+import { workspace } from "vscode";
+import figures from "../../lib/figures";
 import { getWsPath } from "./sharedUtils";
-import { testControl as tc, testControl } from "../control";
+import { testControl as tc } from "../control";
 import { isObject } from "../../lib/utils/utils";
 import { configuration } from "../../lib/utils/configuration";
 import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
-import { workspace } from "vscode";
 
 
 const initSettings = async () =>
-{   //
+{
+    console.log(`    ${figures.color.info} ${figures.withColor("Initializing settings", figures.colors.grey)}`);
+    //
     // This function runs BEFORE the extension is initialized, so any updates have no immediate
     // effect.  All settings set here will get read on on extension activation, coming up next.
     //
@@ -174,6 +177,9 @@ const initSettings = async () =>
                 });
             }
         });
+
+        const msg = `Logging is enabled (level ${tc.log.level}) [ File: ${tc.log.file} | Output Window: ${tc.log.output} | console: ${tc.log.console} ]`;
+        console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
     }
 
     if (workspace.workspaceFolders && workspace.workspaceFolders.length > 1)
@@ -182,6 +188,10 @@ const initSettings = async () =>
         Object.assign(tc.slowTime as IDictionary<any>, tc.slowTimeMultiRoot);
         Object.assign(tc.waitTime as IDictionary<any>, tc.waitTimeMultiRoot);
     }
+
+    const msg = `The test environment is a '${tc.isMultiRootWorkspace ? "multi-root" : "single-root"}' workspace`;
+    console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
+    console.log(`    ${figures.color.info} ${figures.withColor("Settings initialization completed", figures.colors.grey)}`);
 };
 
 export default initSettings;
