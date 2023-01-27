@@ -273,7 +273,7 @@ suite("Task Tests", () =>
         // There are 2 batch file "tasks" - they both utils.sleep for 7 seconds, 1 second at a time
         //
         if (utils.exitRollingCount(this)) return;
-        const slowTime = (tc.slowTime.runCommand * 1) + (tc.slowTime.runStopCommand * 2) + 12000 + // wait for task exec
+        const slowTime = (tc.slowTime.runCommand * 2) + (tc.slowTime.runStopCommand * 2) + 12000 + // wait for task exec
                           startTaskSlowTime + tc.slowTime.runPauseCommand + (tc.slowTime.config.event * 4) +
                           (tc.slowTime.command * 2) + tc.slowTime.closeEditors + tc.slowTime.tasks.batchScriptCmd;
         this.slow(slowTime);

@@ -13,7 +13,7 @@ import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, executeSettingsUpdate, testControl, logErrorsAreFine, executeTeCommand,
-	suiteFinished, exitRollingCount, getWsPath, endRollingCount
+	suiteFinished, exitRollingCount, getWsPath, endRollingCount, executeTeCommand2, sleep
 } from "../utils/utils";
 
 const creator = "spmeesseman",
@@ -54,8 +54,10 @@ suite("Util Tests", () =>
     test("Hide / Show Output Window", async function()
     {
         if (exitRollingCount(this)) return;
-        await executeTeCommand("showOutput", 10, 50, false);
-        await executeTeCommand("showOutput", 10, 50, true);
+		this.slow((testControl.slowTime.commandShowOutput * 2) + 50);
+        await executeTeCommand2("showOutput", [ false ]);
+		await sleep(25);
+        await executeTeCommand2("showOutput", [ true ]);
         endRollingCount(this);
     });
 
@@ -358,7 +360,7 @@ suite("Util Tests", () =>
     test("Logging (Write)", async function()
     {
         if (exitRollingCount(this)) return;
-		this.slow((testControl.slowTime.config.event * 2) + 50);
+		this.slow((testControl.slowTime.config.event * 2) + 65);
 
         log.blank();
         log.blank(1);
