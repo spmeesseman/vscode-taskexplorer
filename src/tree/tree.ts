@@ -64,10 +64,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     private disposables: Disposable[];
     private subscriptionStartIndex: number;
     private tasks: Task[] | null = null;
-    // private treeBuilding = false;
     private refreshPending = false;
-    // private fistTreeBuildComplete = false;
-    // private fistTreeBuildStarted = false;
     private visible = false;
     private enabled = false;
     private setEnableCalled = false;
@@ -1383,7 +1380,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             log.value("      id", next.id, 1, logPad);
             log.value("      type", next.type, 1, logPad);
             log.write(`   firing queued event with ${next.args.length} args and ${next.delay}ms delay`, 2, logPad);
-            if (next.type === "refresh") {
+            if (next.type === "refresh" || next.type === "wsFolderRemove") {
                 this.refreshPending = true;
                 this.currentRefreshEvent = next.id;
             }
