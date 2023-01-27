@@ -57,25 +57,27 @@ const getTimeElapsedFmt = (timeElapsed: number) =>
 const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: string) =>
 {
     let msg: string;
+    let wsTypeMsg = tc.isMultiRootWorkspace ? "multi-root" : "single-root";
     const prevBestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
-          prevMsg = ` The previous fastest time recorded was ${prevBestTimeElapsedFmt}`,
+          prevMsg = ` The previous fastest time recorded for a ${wsTypeMsg} workspace was ${prevBestTimeElapsedFmt}`,
           preMsg = `    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`;
+    wsTypeMsg = tc.isMultiRootWorkspace ? "Multi-Root" : "Single-Root";
     if (title)
     {
         if (title.includes("Logging")) {
-            msg = ` New Fastest Time with ${title} ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+            msg = ` New Fastest Time with ${title} (${wsTypeMsg} workspace) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
         }
         else {
             if (tct.numSuites > 1) {
-                msg = ` New Fastest Time for Suite '${title}' ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+                msg = ` New Fastest Time for Suite '${title}' (${wsTypeMsg} workspace) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
             }
             else {
-                msg = ` New Fastest Time for Suite '${title}' (Single Test) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+                msg = ` New Fastest Time for Suite '${title}' (Single Test)(${wsTypeMsg} workspace) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
             }
         }
     }
     else {
-        msg = ` New Fastest Time for 'All Tests' ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+        msg = ` New Fastest Time for 'All Tests' (${wsTypeMsg} workspace) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
     }
     // console.log(preMsg);
     console.log(preMsg + figures.withColor(msg, figures.colors.grey));
@@ -106,9 +108,10 @@ const processBestTime = async (logTitle: string, storageKey: string, timeElapsed
         await saveProcessTimeToStorage(storageKey, timeElapsed, timeElapsedFmt, numTests);
     }
     else {
+        const wsTypeMsg = tc.isMultiRootWorkspace ? "multi-root" : "single-root";
         const bestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
               msg1 = `The time elapsed was ${timeElapsedFmt}`,
-              msg2 = `The fastest time recorded is ${bestTimeElapsedFmt}`;
+              msg2 = `The fastest time recorded for a ${wsTypeMsg} workspace is ${bestTimeElapsedFmt}`;
         console.log(`    ${figures.color.info} ${figures.withColor(msg1, figures.colors.grey)}`);
         console.log(`    ${figures.color.info} ${figures.withColor(msg2, figures.colors.grey)}`);
     }
