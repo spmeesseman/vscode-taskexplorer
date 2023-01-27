@@ -1297,29 +1297,45 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
     private onWorkspaceFolderRemoved = (uri: Uri, logPad: string) =>
     {
-        let ctRmv = 0;
-        log.write("   removing project tasks from cache", 1, logPad);
-        log.value("      path", uri.fsPath, 1, logPad);
-        statusBarItem.update("Deleting all tasks from removed project folder");
-        (this.tasks as Task[]).slice().reverse().forEach((item, index, object) =>
+        log.methodStart("workspace folder removed event", 1, logPad, false, [[ "path", uri.fsPath ]]);
+        if (this.visible)
         {
-            if (item.definition.uri && item.definition.uri.fsPath.startsWith(uri.fsPath))
+            let ctRmv = 0;
+            log.write("   removing project tasks from cache", 1, logPad);
+            log.value("      path", uri.fsPath, 1, logPad);
+            statusBarItem.update("Deleting all tasks from removed project folder");
+            (this.tasks as Task[]).slice().reverse().forEach((item, index, object) =>
             {
-                log.write(`      removing task '${item.source}/${item.name}'`, 2, logPad);
-                (this.tasks as Task[]).splice(object.length - 1 - index, 1);
-                ++ctRmv;
+                if (item.definition.uri && item.definition.uri.fsPath.startsWith(uri.fsPath))
+                {
+                    log.write(`      removing task '${item.source}/${item.name}' from task cache`, 2, logPad);
+                    (this.tasks as Task[]).splice(object.length - 1 - index, 1);
+                    ++ctRmv;
+                }
+            });
+            const folderIdx = (this.taskTree as TaskFolder[]).findIndex((f: TaskFolder) => f.resourceUri?.fsPath === uri.fsPath);
+            (this.taskTree as TaskFolder[]).splice(folderIdx, 1);
+            for (const tId of Object.keys(this.taskMap))
+            {
+                const item = this.taskMap[tId] as TaskItem;
+                if  (item.resourceUri?.fsPath.startsWith(uri.fsPath)) {
+                    delete this.taskMap[tId];
+                }
             }
-        });
-        const folderIdx = (this.taskTree as TaskFolder[]).findIndex((f: TaskFolder) => f.resourceUri?.fsPath === uri.fsPath);
-        (this.taskTree as TaskFolder[]).splice(folderIdx, 1);
-        for (const tId of Object.keys(this.taskMap))
-        {
-            const item = this.taskMap[tId] as TaskItem;
-            if  (item.resourceUri?.fsPath.startsWith(uri.fsPath)) {
-                delete this.taskMap[tId];
-            }
+            log.write(`      removed ${ctRmv} tasks from task cache`, 1, logPad);
+            log.write("   workspace folder event has been processed", 1, logPad);
         }
-        log.write(`   removed ${ctRmv} tasks from cache`, 1, logPad);
+        else {
+            this.eventQueue.push(
+            {
+                id: "wsFolderRemove-" + uri.fsPath,
+                fn: this.onWorkspaceFolderRemoved,
+                args: [ uri, logPad ],
+                type: "wsFolderRemove"
+            });
+            log.write("   workspace folder event has been queued", 1, logPad);
+        }
+        log.methodDone("workspace folder removed event", 1, logPad);
     };
 
 
@@ -1357,12 +1373,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         {
             const next = this.eventQueue.shift() as IEvent; // get the next event
             log.value("   event id", next.id, 1, logPad);
-            log.write(`   firing queued event task with ${next.args.length} args`, 1, logPad);
+            log.value("   event type", next.type, 1, logPad);
+            log.write(`   firing queued event task with ${next.args.length} args`, 2, logPad);
             setTimeout(async () => {
                 this.currentRefreshEvent = next.id;
                 await next.fn.call(this, ...next.args);
             }, delay);
-            log.write(`   fired queued event with ${delay}ms delay`, 1, logPad);
+            log.write(`   fired queued event with ${delay}ms delay`, 2, logPad);
             firedEvent = true;
         }
 
@@ -1429,8 +1446,14 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         await this.waitForRefreshComplete();
         this.refreshPending = true;
 
-        if (this.tasks && this.taskTree && util.isUri(opt) && isDirectory(opt.fsPath) && !workspace.getWorkspaceFolder(opt))
-        {
+        if (util.isUri(opt) && isDirectory(opt.fsPath) && !workspace.getWorkspaceFolder(opt))
+        {   //
+            // Workspace folder was removed.  We know it's a workspace folder because isDirectory()
+            // returned true and getWorkspaceFolder() returned false.  If it was a regular directory
+            // getting deleted from within a ws folder, then isDirecttory() will not return true due
+            // to no existing dir anymore to stat.  The getWorkspaceFolder() would also return a valid
+            // folder if it was just a dir delete or a dir add, or a ws folder add.
+            //
             this.onWorkspaceFolderRemoved(opt, logPad);
         }
         else
