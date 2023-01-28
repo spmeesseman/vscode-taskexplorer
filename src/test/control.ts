@@ -66,14 +66,14 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 1900,
-        addWorkspaceFolderEmpty: 1310,
-        addWorkspaceFolderFake: 1450,
+        addWorkspaceFolder: 0, // not used in single-root tests
+        addWorkspaceFolderEmpty: 1300,
+        addWorkspaceFolderFake: 1425,
         buildTreeNoTasks: 295,
         cache: {
-            build: 485,
+            build: 480,
             buildCancel: 290,
-            rebuild: 3850,
+            rebuild: 3825,
             rebuildCancel: 485,
             rebuildNoChanges: 880,
         },
@@ -99,7 +99,7 @@ export const testControl: ITestControl =
             sortingEvent: 740,
             terminalEvent: 250
         },
-        excludeCommand: 1365,
+        excludeCommand: 1360,
         explorerViewStartup: 7565,
         fetchTasksCommand: 1835,
         fileCachePersist: 245,
@@ -129,14 +129,14 @@ export const testControl: ITestControl =
             setLicenseCmd: 205
         },
         min: 50,
-        refreshCommand: 6700,
+        refreshCommand: 6650,
         refreshCommandNoChanges: 240,
-        removeWorkspaceFolder: 1800,
+        removeWorkspaceFolder: 0, // not used in single-root tests
         removeWorkspaceFolderEmpty: 415,
         removeWorkspaceFolderFake: 475,
         runCommand: 4890,
-        runPauseCommand: 3255,
-        runStopCommand: 3510,
+        runPauseCommand: 3250,
+        runStopCommand: 3505,
         storageRead: 60,
         storageUpdate: 65,
         storageSecretRead: 95,
@@ -145,8 +145,8 @@ export const testControl: ITestControl =
         taskProviderReadUri: 90,
         tasks: {
             antParser: 485,
-            antTask: 3375,
-            antTaskWithAnsicon: 3425,
+            antTask: 3350,
+            antTaskWithAnsicon: 3400,
             bashScript: 3075,
             batchScriptBat: 4140,
             batchScriptCmd: 5140,
@@ -156,11 +156,11 @@ export const testControl: ITestControl =
             npmInstallCommand: 9400
         },
         taskCount: {
-            verify: 455,
-            verifyByTree: 495,
-            verifyFirstCall: 670,
-            verifyNpm: 1375, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 1775
+            verify: 450,
+            verifyByTree: 490,
+            verifyFirstCall: 660,
+            verifyNpm: 1360, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 1760
         },
         viewReport: 375
     },

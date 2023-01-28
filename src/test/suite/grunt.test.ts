@@ -4,15 +4,15 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
+import { expect } from "chai";
 import { GruntTaskProvider } from "../../providers/grunt";
 import { configuration } from "../../lib/utils/configuration";
 import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, getWsPath,
-    needsTreeBuild, sleep, suiteFinished, testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, sleep, suiteFinished, testControl as tc,
+    testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
-import { expect } from "chai";
 
 const testsName = "grunt";
 const startTaskCount = 7;

@@ -46,8 +46,14 @@ suite("Gulp Tests", () =>
         // Reset both Grunt / Gulp VSCode internal task providers, which we enabled b4 extension
         // activation in helper.test
         //
-        await configuration.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
-        await configuration.updateVs("gulp.autoDetect", tc.vsCodeAutoDetectGulp);
+        if (teApi.config.getVs<string>("grunt.autoDetect") !== tc.vsCodeAutoDetectGrunt) {
+            await teApi.config.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
+            await waitForTeIdle(tc.waitTime.config.enableEvent);
+        }
+        if (teApi.config.getVs<string>("gulp.autoDetect") !== tc.vsCodeAutoDetectGulp) {
+            await teApi.config.updateVs("gulp.autoDetect", tc.vsCodeAutoDetectGulp);
+            await waitForTeIdle(tc.waitTime.config.enableEvent);
+        }
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteFile(file2Uri.fsPath);
         await waitForTeIdle(tc.waitTime.min);
