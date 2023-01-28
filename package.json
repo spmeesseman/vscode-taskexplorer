@@ -87,6 +87,7 @@
         "test-menuCommands": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js menuCommands xDeactivate",
         "test-multiRoot": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js multiRoot xDeactivate",
         "test-multiRoot_mws": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js multiRoot xDeactivate --multi-root",
+        "test-noScripts": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js noScripts xDeactivate",
         "test-npm": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js npm xDeactivate",
         "test-nsis": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js nsis xDeactivate",
         "test-perl": "npm run clean && npm run tsc-rebuild_test && node ./dist/test/runTest.js perl xDeactivate",
