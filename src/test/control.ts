@@ -67,8 +67,8 @@ export const testControl: ITestControl =
     //
     slowTime: {
         addWorkspaceFolder: 0, // not used in single-root tests
-        addWorkspaceFolderEmpty: 1300,
-        addWorkspaceFolderFake: 1425,
+        addWorkspaceFolderEmpty: 1310,
+        addWorkspaceFolderFake: 1500,
         buildTreeNoTasks: 295,
         cache: {
             build: 480,
@@ -133,7 +133,7 @@ export const testControl: ITestControl =
         refreshCommandNoChanges: 240,
         removeWorkspaceFolder: 0, // not used in single-root tests
         removeWorkspaceFolderEmpty: 415,
-        removeWorkspaceFolderFake: 475,
+        removeWorkspaceFolderFake: 500,
         runCommand: 4890,
         runPauseCommand: 3250,
         runStopCommand: 3505,
