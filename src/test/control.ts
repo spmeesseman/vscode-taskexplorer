@@ -66,9 +66,8 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 0, // not used in single-root tests
+        addWorkspaceFolder: 1400,
         addWorkspaceFolderEmpty: 1310,
-        addWorkspaceFolderFake: 1500,
         buildTreeNoTasks: 295,
         cache: {
             build: 480,
@@ -131,9 +130,8 @@ export const testControl: ITestControl =
         min: 50,
         refreshCommand: 6650,
         refreshCommandNoChanges: 240,
-        removeWorkspaceFolder: 0, // not used in single-root tests
+        removeWorkspaceFolder: 500,
         removeWorkspaceFolderEmpty: 415,
-        removeWorkspaceFolderFake: 500,
         runCommand: 4890,
         runPauseCommand: 3250,
         runStopCommand: 3505,
@@ -173,7 +171,6 @@ export const testControl: ITestControl =
     slowTimeMultiRoot: {
         addWorkspaceFolder: 3200,
         addWorkspaceFolderEmpty: 1510,
-        addWorkspaceFolderFake: 2500,
         buildTreeNoTasks: 325,
         cache: {
             build: 540,
@@ -238,7 +235,6 @@ export const testControl: ITestControl =
         refreshCommandNoChanges: 310,
         removeWorkspaceFolder: 2225,
         removeWorkspaceFolderEmpty: 1850,
-        removeWorkspaceFolderFake: 1375,
         runCommand: 5400,
         runPauseCommand: 3590,
         runStopCommand: 3860,
@@ -383,7 +379,6 @@ export interface ISlowTimes
 {
     addWorkspaceFolder: number;
     addWorkspaceFolderEmpty: number;
-    addWorkspaceFolderFake: number;
     buildTreeNoTasks: number;
     cache: {
         build: number;
@@ -448,7 +443,6 @@ export interface ISlowTimes
     refreshCommandNoChanges: number;
     removeWorkspaceFolder: number;
     removeWorkspaceFolderEmpty: number;
-    removeWorkspaceFolderFake: number;
     runCommand: number;
     runPauseCommand: number;
     runStopCommand: number;

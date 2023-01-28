@@ -114,7 +114,7 @@ async function main(args: string[])
             extensionTestsPath,
             launchArgs: [ testsWorkspace, "--disable-extensions", "--disable-workspace-trust" ],
             extensionTestsEnv: { testArgs: args && args.length > 0 ? args.toString() : "" }
-        });
+        }); // --upload-logs could be interesting (for prod).  look at it sometime.
     }
     catch (err: any) {
         console.error(`Failed to run tests: ${err}\n${err.stack ?? "No call stack details found"}`);
@@ -148,7 +148,8 @@ async function main(args: string[])
             //         }
             //     }
             //     if (logFile) {
-            //
+            //         const code = path.join(process.env.CODE_HOME || "c:\\Code", "Code.exe");
+            //         // execSync(`cmd /c ${code} "${logFile}" --reuse-window`, { cwd: extensionDevelopmentPath, stdio: "ignore" });//.unref();
             //     }
             // }
             //
