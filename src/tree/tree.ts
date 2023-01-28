@@ -241,6 +241,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         let taskCt = 0;
         const folders: IDictionary<TaskFolder> = {};
         const files: IDictionary<TaskFile> = {};
+        let sortedFolders: TaskFolder[]|NoScripts[];
 
         log.methodStart("build task tree", logLevel, logPad);
 
@@ -275,25 +276,35 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         //
-        // Loop through each task provided by the engine and build a task tree
+        // Loop through each task provided by the engine and build a task tree.  Use a slice() of the
+        // tasks cache array to iterate since the call to buildtaskTree might remove a task from the cache
+        // array if it is excluded by isTaskIncluded().  Would probably put the check here but the
+        // calculation of 'relativePath' needs to be done, and that's covered in the call to buildTaskTreeList.
         //
-        for (const each of tasksList)
+        for (const each of tasksList.slice())
         {
             log.blank(2);
             log.write(`   Processing task ${++taskCt} of ${tasksList.length} (${each.source})`, logLevel + 1, logPad);
             await this.buildTaskTreeList(each, folders, files, logPad + "   ");
         }
 
-        //
-        // Sort and build groupings
-        //
-        await this.buildGroupings(folders, logPad + "   ", logLevel);
-
-        //
-        // Get sorted root project folders (only project folders are sorted, special folders 'Favorites',
-        // 'User Tasks' and 'Last Tasks' are kept at the top of the list.
-        //
-        const sortedFolders = sortTasks.sortFolders(folders);
+        if (!util.isObjectEmpty(folders))
+        {   //
+            // Sort and build groupings
+            //
+            await this.buildGroupings(folders, logPad + "   ", logLevel);
+            //
+            // Get sorted root project folders (only project folders are sorted, special folders 'Favorites',
+            // 'User Tasks' and 'Last Tasks' are kept at the top of the list.
+            //
+            sortedFolders = sortTasks.sortFolders(folders);
+        }     //
+        else // If 'folders' is an empty map, or, all tasks are disabled but Workspace+NPM (and Gulp+Grunt
+        {   // if their respective 'autoDetect' settings are `on`) tasks are returned in fetchTasks() since
+            // they are internally provided, and we ignored them in buildTaskTreeList().
+            //
+            sortedFolders = [ new NoScripts() ];
+        }
 
         //
         // Done!
@@ -326,11 +337,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             [ "name", each.name ], [ "source", each.source ], [ "definition type", each.definition.type ],
             [ "definition path", each.definition.path ]
         ]);
-        log.value("   scope", each.scope, 3, logPad);
+        log.value("   scope", each.scope, 4, logPad);
 
-        const definition: ITaskDefinition | TaskDefinition = each.definition;
+        const definition: ITaskDefinition | TaskDefinition = each.definition,
+              nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
+
         let relativePath = definition.path ?? "";
-        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
         if (each.source === "tsc" && util.isWorkspaceFolder(each.scope))
         {
             if (each.name.indexOf(" - ") !== -1 && each.name.indexOf(" - tsconfig.json") === -1)
@@ -338,14 +350,21 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 relativePath = dirname(each.name.substring(each.name.indexOf(" - ") + 3));
             }
         }
+
         //
         // Make sure this task shouldn't be ignored based on various criteria...
         // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
         // By default, also ignore npm 'install' tasks, since its available in the context menu, ignore
-        // other providers unless it has registered as an external provider via Task Explorer API
+        // other providers unless it has registered as an external provider via Task Explorer API.
+        // Only internally provided tasks will be present in the this.tasks cache at this point, as extension
+        // provided tasks will have been skipped/ignored in the provideTasks() processing.
         //
-        const include: boolean | string = isTaskIncluded(each, relativePath, logPad + "   ");
-        if (!include) {
+        if (!isTaskIncluded(each, relativePath, logPad + "   "))
+        {
+            const tasksCache = this.tasks as Task[];
+            const tIdx = tasksCache.findIndex(t => t.name === each.name && t.source === each.source && t.definition.uri === each.definition.uri);
+            tasksCache.splice(tIdx, 1);
+            log.write("   ignored internally provided task", 3, logPad);
             log.methodDone("build task tree list", 2, logPad);
             return;
         }
@@ -781,13 +800,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         //
         // Instantiate/construct the ui tree
         //
-        if (this.tasks.length > 0)
-        {
-            this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
-        }
-        else {
-            this.taskTree = [ new NoScripts() ];
-        }
+        this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
 
         TaskExplorerProvider.logPad = "";
         statusBarItem.update("Building task explorer tree");
@@ -1064,7 +1077,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             {
                 log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
                 await rebuildCache(logPad + "   ");
-                log.write("   handling 'rebuild cache' eventcomplete", 1, logPad + "   ");
+                log.write("   handling 'rebuild cache' event complete", 1, logPad + "   ");
             }
             //
             // If this is not from unit testing, then invalidate the appropriate task cache/file

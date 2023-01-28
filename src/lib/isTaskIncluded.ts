@@ -9,7 +9,7 @@ import { pathExistsSync, readFileSync } from "./utils/fs";
 import { isString, isTaskTypeEnabled, isWorkspaceFolder } from "./utils/utils";
 
 
-export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", logQueueId?: string): boolean | string =>
+export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", logQueueId?: string) =>
 {
     const isScopeWsFolder = isWorkspaceFolder(task.scope);
 
