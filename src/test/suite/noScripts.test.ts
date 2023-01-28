@@ -3,10 +3,11 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import { focusExplorerView } from "../utils/commandUtils";
-import { ITaskExplorer, ITaskExplorerApi, ITaskFolder } from "@spmeesseman/vscode-taskexplorer-types";
+import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
+import { IDictionary, ITaskExplorer, ITaskExplorerApi, ITaskFolder } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, needsTreeBuild, suiteFinished, testControl as tc,
+    activate, endRollingCount, exitRollingCount, needsTreeBuild, sleep, suiteFinished, testControl as tc,
+    treeUtils,
     verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 import { expect } from "chai";
@@ -16,10 +17,15 @@ let teApi: ITaskExplorerApi;
 let explorer: ITaskExplorer;
 let didDisableTasks = false;
 let didResetEnabledTasks = false;
+let showFavorites = false;
+let showLastTasks = false;
+let showUserTasks = false;
+let enabledTasks: IDictionary<boolean>;
 const antStartCount = 3;
 const gruntStartCount = 7;
 const gulpStartCount = 17;
 const pythonStartCount = 2;
+
 
 suite("NoScripts TreeItem Tests", () =>
 {
@@ -28,6 +34,19 @@ suite("NoScripts TreeItem Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ explorer, teApi } = await activate(this));
+        showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
+        showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
+        showUserTasks = teApi.config.get<boolean>("specialFolders.showUserTasks");
+        enabledTasks = { ...teApi.config.get<IDictionary<boolean>>("enabledTasks") };
+        if (showUserTasks) {
+            await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
+        }
+        if (showLastTasks) {
+            await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
+        }
+        if (showUserTasks) {
+            await executeSettingsUpdate("specialFolders.showUserTasks", false, tc.waitTime.config.showHideSpecialFolder);
+        }
         endRollingCount(this, true);
     });
 
@@ -36,8 +55,11 @@ suite("NoScripts TreeItem Tests", () =>
     {
         if (exitRollingCount(this, false, true)) return;
         if (didDisableTasks && !didResetEnabledTasks) {
-            await enableDefaultTasks();
+            await executeSettingsUpdate("enabledTasks", enabledTasks, tc.waitTime.refreshCommand);
         }
+        await executeSettingsUpdate("specialFolders.showFavorites", showFavorites, tc.waitTime.config.showHideSpecialFolder);
+        await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks, tc.waitTime.config.showHideSpecialFolder);
+        await executeSettingsUpdate("specialFolders.showUserTasks", showUserTasks, tc.waitTime.config.showHideSpecialFolder);
         suiteFinished(this);
     });
 
@@ -55,7 +77,7 @@ suite("NoScripts TreeItem Tests", () =>
     test("Disable All Task Types", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.taskCount.verify * 4) + tc.slowTime.refreshCommand);
+        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.taskCount.verify * 4));
         await teApi.config.updateWs("enabledTasks",
         {
             ant: false,
@@ -97,12 +119,15 @@ suite("NoScripts TreeItem Tests", () =>
     test("Re-enable Task Types", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.taskCount.verify * 4) + tc.slowTime.refreshCommand);
-        await enableDefaultTasks();
-        const treeTasks = explorer.getTaskTree() as TreeItem[];
-        expect(treeTasks).to.not.be.undefined;
+        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.taskCount.verify * 4));
+        await executeSettingsUpdate("enabledTasks", enabledTasks, tc.waitTime.refreshCommand);
+        didResetEnabledTasks = true;
+        const treeTasks = explorer.getTasks();
+        const treeFolders = explorer.getTaskTree() as TreeItem[];
+        expect(treeFolders).to.not.be.undefined;
+        expect(treeFolders.length).to.be.equal(1);
+        expect(treeFolders[0].label).to.not.be.equal("No tasks found");
         expect(treeTasks.length).to.be.greaterThan(antStartCount + gruntStartCount + gulpStartCount + pythonStartCount);
-        await waitForTeIdle(tc.waitTime.refreshCommand);
         await verifyTaskCount("ant", antStartCount);
         await verifyTaskCount("grunt", gruntStartCount);
         await verifyTaskCount("gulp", gulpStartCount);
@@ -111,34 +136,4 @@ suite("NoScripts TreeItem Tests", () =>
     });
 
 });
-
-const enableDefaultTasks = async() =>
-{
-    await teApi.config.updateWs("enabledTasks",
-    {
-        ant: true,
-        apppublisher: false,
-        bash: true,
-        batch: true,
-        composer: false,
-        gradle: false,
-        grunt: true,
-        gulp: true,
-        jenkins: false,
-        make: true,
-        maven: false,
-        npm: true,
-        nsis: false,
-        perl: false,
-        pipenv: false,
-        powershell: false,
-        python: true,
-        ruby: false,
-        tsc: true,
-        webpack: false,
-        workspace: true
-    });
-    didResetEnabledTasks = true;
-    await waitForTeIdle(tc.waitTime.refreshCommand);
-};
 
