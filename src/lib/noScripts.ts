@@ -6,7 +6,7 @@ import { TreeItem, TreeItemCollapsibleState } from "vscode";
 const localize = nls.loadMessageBundle();
 const initScriptsLabel = localize("initScripts", "Scanning task files");
 const loadScriptsLabel = localize("loadScripts", "Building task tree");
-const noScriptsLabel = localize("noScripts", "No scripts found");
+const noScriptsLabel = localize("noScripts", "No tasks found");
 
 
 // abstract class AnimatedTreeItem extends TreeItem

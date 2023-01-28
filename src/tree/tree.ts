@@ -1380,7 +1380,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             log.value("      id", next.id, 1, logPad);
             log.value("      type", next.type, 1, logPad);
             log.write(`   firing queued event with ${next.args.length} args and ${next.delay}ms delay`, 2, logPad);
-            if (next.type === "refresh" || next.type === "wsFolderRemove") {
+            if (next.type === "wsFolderRemove" || next.type === "refresh") {
                 this.refreshPending = true;
                 this.currentRefreshEvent = next.id;
             }
