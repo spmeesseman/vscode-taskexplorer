@@ -255,7 +255,7 @@ suite("Multi-Root Workspace Tests", () =>
     test("Add Workspace Folder 1 (w/ File)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.taskCount.verify + 20); // +20 unawaited file write
         await fsApi.writeFile(
             join(wsf1DirName, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
@@ -288,7 +288,7 @@ suite("Multi-Root Workspace Tests", () =>
     test("Add Workspace Folder 2 and 3 (w/ File)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.addWorkspaceFolderEmpty + tc.slowTime.addWorkspaceFolder + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.addWorkspaceFolderEmpty + tc.slowTime.addWorkspaceFolder + tc.slowTime.taskCount.verify + 20); // +20 unawaited file write
         await fsApi.writeFile(
             join(wsf2DirName, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
@@ -391,7 +391,7 @@ suite("Multi-Root Workspace Tests", () =>
     test("Add WS Folder 1 (Cache Builder Busy)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.cache.rebuildCancel + 200);
+        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.taskCount.verify + tc.slowTime.cache.rebuildCancel + 200);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
         if (!tc.isMultiRootWorkspace)
@@ -419,7 +419,7 @@ suite("Multi-Root Workspace Tests", () =>
     test("Remove WS Folder 1 (Cache Builder Busy)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.cache.rebuildCancel + 200);
+        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify + (tc.slowTime.cache.rebuildCancel * 2) + 200);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
         if (!tc.isMultiRootWorkspace) {
