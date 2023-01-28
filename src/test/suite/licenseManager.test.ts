@@ -77,10 +77,7 @@ suite("License Manager Tests", () =>
 			maxFreeTasks: licMgrMaxFreeTasks,
 			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
 			maxFreeTasksForTaskType: licMgrMaxFreeTasksForTaskType,
-			maxFreeTasksForScriptType: licMgrMaxFreeTasksForScriptType,
-			host: "license.spmeesseman.com",
-			port: 443,
-			token: remoteServerToken
+			maxFreeTasksForScriptType: licMgrMaxFreeTasksForScriptType
 		});
 		utils.clearOverrideShowInfoBox();
 		utils.clearOverrideShowInputBox();
@@ -514,11 +511,6 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow((Math.round(tc.slowTime.refreshCommand * 0.75)) + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd);
-		licMgr.setTestData({
-			host: "license.spmeesseman.com",
-			port: 443,
-			token: remoteServerToken
-		});
 		await utils.setLicensed(false, licMgr);
 		licMgr.setTestData({
 			maxFreeTasks: 25,

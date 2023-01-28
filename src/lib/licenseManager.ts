@@ -222,7 +222,7 @@ export class LicenseManager implements ILicenseManager
 			else {
 				this.testsLog("      License key : " + jso.token.token);
 				this.testsLog("      Issued      : " + jso.token.issuedFmt);
-				this.testsLog("      Expires     : " + jso.token.expires);
+				this.testsLog("      Expires     : " + jso.token.expiresFmt || jso.expires);
 				await this.setLicenseKey(jso.token.token);
 			}
 			this.testsLog("   License key saved to secure storage");
@@ -287,7 +287,7 @@ export class LicenseManager implements ILicenseManager
 
 			let rspData = "";
 			log.write("   send get new license request", 1, logPad);
-			this.testsLog("Starting https request to license server");
+			this.testsLog("Starting https get 30-day license request to license server");
 
 			const req = https.request(this.getDefaultServerOptions("/token"), (res) =>
 			{
@@ -350,7 +350,7 @@ export class LicenseManager implements ILicenseManager
 
 			let rspData = "";
 			log.write("   send validation request", 1, logPad);
-			this.testsLog("Starting https request to license server");
+			this.testsLog("Starting https validate request to license server");
 
 			const req = https.request(this.getDefaultServerOptions("/api/license/validate/v1"), (res) =>
 			{
