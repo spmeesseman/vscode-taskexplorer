@@ -27,21 +27,12 @@ export const isProcessingConfigChange = () => processingConfigEvent;
 
 async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChangeEvent)
 {
-    const refreshTaskTypes: string[] = [];
-    //
-    // Uses 1st param 'undefined' in refresh(), for cases where task files have not
-    // changed but invalidation is necessary
-    //
-    let refresh = false;
-    //
-    // Uses 1st param 'false' in refresh(), for cases where task files have not changed
-    //
-    let refresh2 = false;
-
-    //
-    // Set flag used in isProcessingConfigChange()
-    //
+    // context = ctx;
     processingConfigEvent = true;
+
+    let refresh = false;
+    let refresh2 = false; // Uses 1st param 'false' in refresh(), for cases where task files have not changed
+    const refreshTaskTypes: string[] = [];
 
     const registerChange = (taskType: string) => {
         /* istanbul ignore else */
@@ -305,12 +296,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     // Refresh tree depending on specific settings changes
     //
     try
-    {
-        if (refreshTaskTypes.length > 2) // 1st param `true` performs cache rebuild
-        {
-            await refreshTree(teApi, true, undefined, "   ");
-        }
-        else if (refresh) // 1st param `undefined` performs provider invalidation
+    {   if (refresh || refreshTaskTypes.length > 3)
         {
             await refreshTree(teApi, undefined, undefined, "   ");
         }
@@ -320,8 +306,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
                 await refreshTree(teApi, t, undefined, "   ");
             }
         }
-        else if (refresh2) // 1st param `false` performs neither cache rebuild or provider invalidation
-        {
+        else if (refresh2) {
             await refreshTree(teApi, false, undefined, "   ");
         }
         else {
