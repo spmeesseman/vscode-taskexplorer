@@ -35,6 +35,14 @@
                     text: ''
                 });
             }
+            function getLicense()
+            {
+                vscode = vscode || acquireVsCodeApi();
+                vscode.postMessage({
+                    command: 'getLicense',
+                    text: ''
+                });
+            }
             function viewLicense()
             {
                 vscode = vscode || acquireVsCodeApi();
@@ -59,6 +67,9 @@
                 {
                     case 'enterLicense':
                         enterLicense();
+                        break;
+                    case 'getLicense':
+                        getLicense();
                         break;
                     case 'viewLicense':
                         viewLicense();
@@ -284,6 +295,11 @@
                             <button style="cursor:pointer;width:150px" onclick="enterLicense();">Enter License Key</button>
                         </div>
                         <!-- endEnterLicenseButton -->
+                        <!-- startGetLicenseButton -->
+                        <div style="margin-top:10px">
+                            <button style="cursor:pointer;width:150px" onclick="getLicense();">Get License Key</button>
+                        </div>
+                        <!-- endGetLicenseButton -->
                         <!-- startViewLicenseButton -->
                         <div style="margin-top:10px">
                             <button style="cursor:pointer;width:150px" onclick="viewLicense();">View License Info</button>

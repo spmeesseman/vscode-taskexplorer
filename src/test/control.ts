@@ -125,6 +125,7 @@ export const testControl: ITestControl =
             checkLicense: 400,
             enterKey: 845,
             getMaxTasks: 360,
+            getNewKey: 1000,
             localStartServer: 1195,
             serverDownHostUp: 14100,
             setLicenseCmd: 210
@@ -231,9 +232,10 @@ export const testControl: ITestControl =
             checkLicense: 405,
             enterKey: 845,
             getMaxTasks: 360,
+            getNewKey: 1000,
             localStartServer: 1195,
             serverDownHostUp: 14100,
-            setLicenseCmd: 210
+            setLicenseCmd: 220
         },
         min: 50,
         refreshCommand: 7500,
@@ -442,6 +444,7 @@ export interface ISlowTimes
         checkLicense: number;
         enterKey: number;
         getMaxTasks: number;
+        getNewKey: number;
         localStartServer: number;
         serverDownHostUp: number;
         setLicenseCmd: number;

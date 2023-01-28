@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
@@ -30,11 +31,9 @@ let lsProcess: ChildProcess | undefined;
 
 suite("License Manager Tests", () =>
 {
-	let licenseKey: string | undefined;
 	let oLicenseKey: string | undefined;
 	let version: string;
 	let oVersion: string | undefined;
-
 
 	suiteSetup(async function()
 	{
@@ -50,8 +49,9 @@ suite("License Manager Tests", () =>
 		//
         ({ teApi, fsApi } = await utils.activate(this));
         explorer = teApi.testsApi.explorer;
-		oLicenseKey = teApi.testsApi.storage.get<string>("license_key");
+		oLicenseKey = await teApi.testsApi.storage.getSecret("license_key");
 		oVersion = teApi.testsApi.storage.get<string>("version");
+		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
         utils.endRollingCount(this, true);
 	});
 
@@ -66,8 +66,9 @@ suite("License Manager Tests", () =>
 			lsProcess.send("close");
 			await utils.sleep(500);
 		}
+		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
 		if (oLicenseKey) {
-			await teApi.testsApi.storage.update("license_key", oLicenseKey);
+			await teApi.testsApi.storage.updateSecret("license_key", oLicenseKey);
 		}
 		if (oVersion) {
 			await teApi.testsApi.storage.update("version", oLicenseKey);
@@ -112,8 +113,7 @@ suite("License Manager Tests", () =>
 	test("Clear License Key", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow((tc.slowTime.storageRead * 2) + tc.slowTime.storageSecretUpdate);
-		licenseKey = await licMgr.getLicenseKey();
+		this.slow(tc.slowTime.storageRead + tc.slowTime.licenseMgr.setLicenseCmd);
 		version = licMgr.getVersion(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
         utils.endRollingCount(this);
@@ -195,7 +195,7 @@ suite("License Manager Tests", () =>
 	test("License Info Page - View Report (From Webview)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.pageWithDetail + 1100 + (tc.slowTime.storageUpdate * 2) + tc.slowTime.storageSecretUpdate);
+		this.slow(tc.slowTime.licenseMgr.pageWithDetail + 1100 + (tc.slowTime.storageUpdate * 2) + tc.slowTime.licenseMgr.setLicenseCmd);
 		await setLicensed(false, licMgr);
 		await teApi.testsApi.storage.update("version", undefined);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
@@ -228,7 +228,7 @@ suite("License Manager Tests", () =>
 	test("Has License", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.licenseMgr.page + (tc.slowTime.storageSecretUpdate * 2) + 800);
+		this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.licenseMgr.page + (tc.slowTime.licenseMgr.setLicenseCmd * 2) + 800);
 		teApi.setTests(false);
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
@@ -237,7 +237,6 @@ suite("License Manager Tests", () =>
 		await utils.sleep(400);
 		licMgr.dispose();
 		await utils.closeEditors();
-		await licMgr.setLicenseKey(licenseKey);
         utils.endRollingCount(this);
 	});
 
@@ -245,10 +244,13 @@ suite("License Manager Tests", () =>
 	test("License Prompt (Enter Valid Key)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 800);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
+		utils.clearOverrideShowInfoBox();
+		utils.clearOverrideShowInputBox();
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("1234-5678-9098-7654321");
+		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
@@ -260,10 +262,31 @@ suite("License Manager Tests", () =>
 	test("License Prompt (Enter Invalid Key)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 800);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
+		utils.clearOverrideShowInfoBox();
+		utils.clearOverrideShowInputBox();
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("1111-2222-3333-4444-5555");
+		utils.overrideNextShowInfoBox(undefined);
+		await setTasks();
+		await utils.sleep(400);
+		licMgr.dispose();
+		await utils.closeEditors();
+        utils.endRollingCount(this);
+	});
+
+
+	test("License Prompt (Enter Invalid Key Length)", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 800);
+		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
+		utils.clearOverrideShowInfoBox();
+		utils.clearOverrideShowInputBox();
+		utils.overrideNextShowInfoBox("Enter License Key");
+		utils.overrideNextShowInputBox("1234");
+		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
@@ -289,13 +312,8 @@ suite("License Manager Tests", () =>
 	test("License Page w/ Set License Key", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageSecretRead + tc.slowTime.storageSecretUpdate +
-			      tc.slowTime.licenseMgr.checkLicense + 800);
-		licenseKey = await licMgr.getLicenseKey();
-		//
-		// If license is set, diff info page
-		//
-		await licMgr.setLicenseKey(licenseKey);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.setLicenseCmd + tc.slowTime.licenseMgr.checkLicense + 800);
+		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
 		await setTasks();
 		await utils.sleep(400);
@@ -308,21 +326,14 @@ suite("License Manager Tests", () =>
 	test("License Page w/ Set License Key", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageSecretRead + tc.slowTime.licenseMgr.checkLicense +
-			      tc.slowTime.storageSecretUpdate + (tc.slowTime.storageUpdate * 2) + 800);
-		const licenseKey = await licMgr.getLicenseKey(),
-			  version = licMgr.getVersion(); // will be set on ext. startup
-		//
+		this.slow(tc.slowTime.licenseMgr.page  + tc.slowTime.licenseMgr.checkLicense + (tc.slowTime.storageUpdate * 2) + 800);
+		const version = licMgr.getVersion(); // will be set on ext. startup
 		await teApi.testsApi.storage.update("version", version);
 		await licMgr.checkLicense();
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
 		await utils.closeEditors();
-		//
-		// Reset
-		//
-		await licMgr.setLicenseKey(licenseKey);
 		await teApi.testsApi.storage.update("version", version);
         utils.endRollingCount(this);
 	});
@@ -331,21 +342,14 @@ suite("License Manager Tests", () =>
 	test("License Page w/ Set License Key", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageSecretRead + tc.slowTime.licenseMgr.checkLicense +
-				  tc.slowTime.storageSecretUpdate + tc.slowTime.storageUpdate + 800);
-		const licenseKey = await licMgr.getLicenseKey(),
-			  version = licMgr.getVersion(); // will be set on ext. startup
-		//
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageUpdate + 800);
+		const version = licMgr.getVersion(); // will be set on ext. startup
 		await teApi.testsApi.storage.update("version", version);
 		await licMgr.checkLicense();
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
 		await utils.closeEditors();
-		//
-		// Reset
-		//
-		await licMgr.setLicenseKey(licenseKey);
 		await teApi.testsApi.storage.update("version", version);
         utils.endRollingCount(this);
 	});
@@ -354,8 +358,8 @@ suite("License Manager Tests", () =>
 	test("Reset License Manager", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.storageUpdate + tc.slowTime.storageSecretUpdate);
-		await licMgr.setLicenseKey(licenseKey);
+		this.slow(tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd);
+		await licMgr.setLicenseKey(oLicenseKey);
 		await teApi.testsApi.storage.update("version", version);
         utils.endRollingCount(this);
 	});
@@ -365,15 +369,13 @@ suite("License Manager Tests", () =>
 	test("License Info", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageSecretRead + tc.slowTime.storageUpdate + tc.slowTime.storageSecretUpdate + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd + 800);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
-		const licenseKey = await licMgr.getLicenseKey(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox("Info");
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
-		await licMgr.setLicenseKey(licenseKey);
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -382,14 +384,12 @@ suite("License Manager Tests", () =>
 	test("License Not Now", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageSecretRead + tc.slowTime.storageSecretUpdate + 800);
-		const licenseKey = await licMgr.getLicenseKey(); // will be set on ext. startup
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.setLicenseCmd + 800);
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox("Not Now");
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
-		await licMgr.setLicenseKey(licenseKey);
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -399,16 +399,14 @@ suite("License Manager Tests", () =>
 	test("License Cancel", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageSecretRead + tc.slowTime.storageUpdate + tc.slowTime.storageSecretUpdate + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd + 800);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
-		const licenseKey = await licMgr.getLicenseKey(); // will be set on ext. startup
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
 		await utils.sleep(400);
 		licMgr.dispose();
 		await utils.closeEditors();
-		await licMgr.setLicenseKey(licenseKey);
         utils.endRollingCount(this);
 	});
 
@@ -429,7 +427,7 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Enter License Key by Command Pallette", async function()
+	test("Enter License Key by Command Palette", async function()
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.enterKey * 3);
@@ -446,171 +444,68 @@ suite("License Manager Tests", () =>
 	});
 
 
-// 	test("Multi projects startup", async function()
-// 	{
-//         if (utils.exitRollingCount(this)) return;
-// 		this.slow(tc.slowTime.licenseMgr.page + 400);
-// 		// if (await pathExists(getProjectPath("extjs-pkg-server")))
-// 		// {
-// 			// const licenseKey = await licMgr.getLicenseKey(),
-// 			// 	  version = licMgr.getVersion(),
-// 			// 	  fsPath = getProjectPath("extjs-pkg-server/src/csi"),
-// 			// 	  files = await utils.findFiles(fsPath, "{classic,modern,src}/**/*.js");
-//
-// 			// const firstCmp = (await parseFiles(files, "extjs-pkg-server", "extjs-pkg-server"))[0];
-// 			// assert(firstCmp);
-// 			// tasks.push(firstCmp);
-//
-// 			// licMgr.setLicenseKey(undefined);
-// 			// await teApi.testsApi.storage.update("version", undefined);
-// 			// await licMgr.checkLicense();
-// 			// await utils.sleep(1000);
-// 			// await utils.closeEditors();
-// 			// licMgr.setLicenseKey(licenseKey);
-// 			// await teApi.testsApi.storage.update("version", version);
-// 			// tasks.pop();
-// 		// }
-//         utils.endRollingCount(this);
-// 	});
-
-
-	test("Enter License Key on Startup (1st Time, Remote Server)", async function()
+	test("Enter License Key on Startup (1st Time)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.checkLicense +
-			      tc.slowTime.storageUpdate + tc.slowTime.storageSecretUpdate);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd);
 		await teApi.testsApi.storage.update("version", undefined);
-		const licenseKey = await licMgr.getLicenseKey();
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
 		await setTasks();
-		await licMgr.setLicenseKey(licenseKey);
         utils.endRollingCount(this);
 	});
 
 
-	test("Enter License Key on Startup (> 1st Time, Remote Server)", async function()
+	test("Enter License Key on Startup (> 1st Time)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageUpdate + tc.slowTime.storageSecretUpdate);
-		const licenseKey = await licMgr.getLicenseKey();
+		this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd);
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
 		await setTasks();
-		await licMgr.setLicenseKey(licenseKey);
         utils.endRollingCount(this);
 	});
 
 
-	test("Invalid License Key (Remote Server)", async function()
+	test("Invalid License Key", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageUpdate + tc.slowTime.storageSecretUpdate);
-		const licenseKey = await licMgr.getLicenseKey();
+		this.slow(tc.slowTime.licenseMgr.checkLicense +  tc.slowTime.licenseMgr.setLicenseCmd);
 		await licMgr.setLicenseKey("1234-5678-9098-1234567");
 		await licMgr.checkLicense();
 		await setTasks();
-		await licMgr.setLicenseKey(licenseKey);
         utils.endRollingCount(this);
 	});
 
 
-	test("Start Local License Server", async function()
-	{
-		const localServerPath = utils.getWsPath("../../../spm-license-server/bin");
-        if (utils.exitRollingCount(this)) return;
-		if (await fsApi.pathExists(join(localServerPath, "/spm-license-server.js")))
-		{
-			this.slow(tc.slowTime.licenseMgr.localStartServer + 9000);
-			lsProcess = fork("spm-license-server.js", {
-				cwd: utils.getWsPath("../../../spm-license-server/bin"), detached: true,
-			});
-			await utils.sleep(4500);
-		}
-        utils.endRollingCount(this);
-	});
-
-
-	test("Enter License Key on Startup (1st Time, Local Server)", async function()
+	test("Request 30-Day License (From Webview)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		if (lsProcess)
-		{
-			this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageSecretRead +
-					  tc.slowTime.storageUpdate + (tc.slowTime.storageSecretUpdate * 2));
-			licMgr.setTestData({
-				host: "localhost",
-				port: 485,
-				token: localServerToken
-			});
-			await teApi.testsApi.storage.update("version", undefined);
-			const licenseKey = await licMgr.getLicenseKey();
-			await licMgr.setLicenseKey("1234-5678-9098-7654321");
-			await licMgr.checkLicense();
-			await setTasks();
-			await licMgr.setLicenseKey(licenseKey);
-		}
-        utils.endRollingCount(this);
-	});
-
-
-	test("Enter License Key on Startup (> 1st Time, Local Server)", async function()
-	{
-        if (utils.exitRollingCount(this)) return;
-		if (lsProcess)
-		{
-			this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageSecretRead + (tc.slowTime.storageSecretUpdate * 2));
-			const licenseKey = await licMgr.getLicenseKey();
-			await licMgr.setLicenseKey("1234-5678-9098-7654321");
-			await licMgr.checkLicense();
-			await setTasks();
-			await licMgr.setLicenseKey(licenseKey);
-		}
-        utils.endRollingCount(this);
-	});
-
-
-	test("Invalid License Key (Local Server)", async function()
-	{
-        if (utils.exitRollingCount(this)) return;
-		if (lsProcess)
-		{
-			this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageSecretRead + tc.slowTime.storageUpdate  + tc.slowTime.storageSecretUpdate);
-			const licenseKey = await licMgr.getLicenseKey();
-			await licMgr.setLicenseKey("1234-5678-9098-1234567");
-			await licMgr.checkLicense();
-			await setTasks();
-			await licMgr.setLicenseKey(licenseKey);
-		}
-        utils.endRollingCount(this);
-	});
-
-
-	test("Stop License Server", async function()
-	{
-        if (utils.exitRollingCount(this)) return;
-		// Don't utils.exitRollingCount(this)
-        if (lsProcess)
-		{   // shut down local server
-			this.slow(12000);
-			lsProcess.send("close");
-			await utils.sleep(5500);
-			lsProcess = undefined;
-		}
-        utils.endRollingCount(this);
-	});
-
-
-	test("Check License Key (Server Down)", async function()
-	{
-        if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.serverDownHostUp + tc.slowTime.licenseMgr.checkLicense +
-			      tc.slowTime.storageUpdate  + tc.slowTime.storageSecretUpdate);
-		const licenseKey = await licMgr.getLicenseKey();
-		await licMgr.setLicenseKey("1234-5678-9098-1234567");
-		await licMgr.checkLicense();
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.getNewKey + (tc.slowTime.storageSecretRead * 2) + 1100);
+		await teApi.testsApi.storage.update("version", undefined);
 		await setTasks();
-		await licMgr.setLicenseKey(licenseKey);
+		await utils.sleep(50);
+		expect(await teApi.testsApi.storage.getSecret("license_key_30day")).to.be.undefined;
+		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "getLicense" });
+		await utils.sleep(500);
+		licMgr.dispose();
+		await utils.closeEditors();
+		expect(await teApi.testsApi.storage.getSecret("license_key_30day")).to.not.be.undefined;
+        utils.endRollingCount(this);
+	});
+
+
+	test("Re-request 30-Day License (From Command Palette)", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
+		this.slow(tc.slowTime.command + tc.slowTime.licenseMgr.getNewKey + tc.slowTime.storageSecretUpdate + tc.slowTime.storageSecretRead);
+		const result = await executeTeCommand("getLicense") as { panel: any; newKey: any };
+		expect(result).to.be.an("object");
+		expect(result.panel).to.not.be.undefined;
+		expect(result.newKey).to.be.undefined;
+		licMgr.dispose();
+		await utils.closeEditors();
+		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
         utils.endRollingCount(this);
 	});
 
@@ -618,7 +513,7 @@ suite("License Manager Tests", () =>
 	test("Task Limit Reached (Non-Licensed)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow((Math.round(tc.slowTime.refreshCommand * 0.75)) + tc.slowTime.storageUpdate + tc.slowTime.storageSecretUpdate);
+		this.slow((Math.round(tc.slowTime.refreshCommand * 0.75)) + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd);
 		licMgr.setTestData({
 			host: "license.spmeesseman.com",
 			port: 443,
@@ -708,13 +603,11 @@ suite("License Manager Tests", () =>
         if (licMgr)
 		{
 			this.slow(tc.slowTime.refreshCommand);
-			const licenseKey = await licMgr.getLicenseKey();
 			await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 			utils.overrideNextShowInfoBox("Enter License Key");
 			utils.overrideNextShowInputBox("1234-5678-9098-7654321");
 			utils.overrideNextShowInfoBox(undefined);
 			await licMgr.enterLicenseKey();
-			await licMgr.setLicenseKey(licenseKey);
 		}
         utils.endRollingCount(this);
 	});

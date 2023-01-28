@@ -5,6 +5,8 @@ import * as fs from "./lib/utils/fs";
 import * as fileCache from "./lib/fileCache";
 import log from "./lib/log/log";
 import registerViewReportCommand from "./commands/viewReport";
+import registerGetLicenseCommand from "./commands/getLicense";
+import registerViewLicenseCommand from "./commands/viewLicense";
 import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerAddToExcludesCommand from "./commands/addToExcludes";
 import registerEnableTaskTypeCommand from "./commands/enableTaskType";
@@ -40,7 +42,6 @@ import { ExtensionContext, tasks, commands, workspace, WorkspaceFolder } from "v
 import { IDictionary, IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITestsApi } from "./interface";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/watcher/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/watcher/fileWatcher";
-import registerViewLicenseCommand from "./commands/viewLicense";
 import { IConfiguration } from "./interface/IConfiguration";
 import { registerStatusBarItem } from "./lib/statusBarItem";
 
@@ -370,6 +371,7 @@ function registerCommands(context: ExtensionContext)
     registerDisableTaskTypeCommand(context);
     registerEnableTaskTypeCommand(context);
     registerEnterLicenseCommand(context);
+    registerGetLicenseCommand(context, teApi);
     registerRemoveFromExcludesCommand(context, teApi);
     registerViewLicenseCommand(context, teApi);
     registerViewReportCommand(context, teApi);

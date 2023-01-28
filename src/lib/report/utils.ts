@@ -84,8 +84,11 @@ export const createTaskCountTable = async (api: ITaskExplorerApi, tasks: Task[],
 
     if (api.isLicensed())
     {
-        const idx1 = html.indexOf("<!-- startEnterLicenseButton -->"),
-              idx2 = html.indexOf("<!-- endEnterLicenseButton -->") + 30;
+        let idx1 = html.indexOf("<!-- startEnterLicenseButton -->"),
+            idx2 = html.indexOf("<!-- endEnterLicenseButton -->") + 30;
+        html = html.replace(html.slice(idx1, idx2), "");
+        idx1 = html.indexOf("<!-- startGetLicenseButton -->");
+        idx2 = html.indexOf("<!-- endGetLicenseButton -->") + 28;
         html = html.replace(html.slice(idx1, idx2), "");
     }
 

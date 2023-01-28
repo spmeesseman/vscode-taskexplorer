@@ -7,17 +7,17 @@ import { ITaskExplorerApi } from "../../interface";
 let panel: WebviewPanel | undefined;
 
 
-export const displayLicenseReport = async(api: ITaskExplorerApi, disposables: Disposable[], logPad: string, tasks?: Task[]) =>
+export const displayLicenseReport = async(api: ITaskExplorerApi, disposables: Disposable[], logPad: string, tasks?: Task[], newKey?: string) =>
 {
 	log.methodStart("display license report", 1, logPad);
-	const html = await getPageContent(api, logPad + "   ", tasks);
+	const html = await getPageContent(api, logPad + "   ", tasks, newKey);
 	panel = await createWebviewPanel("Task Explorer Licensing", html, disposables);
     log.methodDone("display license report", 1, logPad);
     return panel;
 };
 
 
-const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Task[]) =>
+const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Task[], newKey?: string) =>
 {
 	let html = "";
 
@@ -35,7 +35,7 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Tas
 	{
 		html = await createTaskCountTable(api, tasks, "Welcome to Task Explorer");
 
-		let infoContent = getExtraContent(logPad + "   ");
+		let infoContent = getExtraContent(logPad + "   ", newKey);
 		html = html.replace("<!-- addtlContentTop -->", infoContent);
 
 		infoContent = getExtraContent2(logPad + "   ");
@@ -50,11 +50,11 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Tas
 };
 
 
-const getExtraContent = (logPad: string) =>
+const getExtraContent = (logPad: string, newKey?: string) =>
 {
     log.methodStart("get body content", 1, logPad);
 
-	const details = `
+	const details = !newKey ? `
 <table style="margin-top:15px;width:inherit">
 	<tr><td style="font-weight:bold;font-size:14px">
 		Licensing Note
@@ -71,7 +71,24 @@ const getExtraContent = (logPad: string) =>
 	command in the Explorer context menu for any project.  It can alternatively be ran from the
 	command pallette for "all projects".
 	<tr><td height="20"></td></tr>
-</table>`;
+</table>
+` : `
+<table style="margin-top:15px;width:inherit">
+	<tr><td style="font-weight:bold;font-size:14px">
+		30-Day License Key: &nbsp;${newKey}
+	</td></tr>
+	<tr><td>
+		This license key is valid for30 days from the time it was issued.  Please show your support for
+		the extension and purchase the license <a href="">here</a>.
+	</td></tr>
+</table>
+<table style="margin-top:20px">
+	<tr><td>You can view a detailed parsing report using the "<i>Task Explorer: View Parsing Report</i>"
+	command in the Explorer context menu for any project.  It can alternatively be ran from the
+	command pallette for "all projects" to see how many tasks the extension has parsed.
+	<tr><td height="20"></td></tr>
+</table>
+`;
 
 	log.methodDone("get body content", 1, logPad);
 

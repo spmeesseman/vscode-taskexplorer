@@ -144,6 +144,7 @@
 	"command.disableTaskType": "Task Explorer: Disable Tasks of this Type",
 	"command.enableTaskType": "Task Explorer: Enable Tasks of this Type",
 	"command.enterLicense" : "Task Explorer: Enter License Key",
+	"command.getLicense" : "Task Explorer: Get 30-Day license key",
 	"command.removeFromExcludes": "Task Explorer: Remove from Excludes List",
 	"command.showOutput": "Task Explorer: Show the log output window",
 	"command.viewLicense" : "Task Explorer: View licensing information",

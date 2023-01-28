@@ -236,6 +236,10 @@
                 "title": "%command.enterLicense%"
             },
             {
+                "command": "vscode-taskexplorer.getLicense",
+                "title": "%command.getLicense%"
+            },
+            {
                 "command": "vscode-taskexplorer.viewLicense",
                 "title": "%command.viewLicense%"
             },

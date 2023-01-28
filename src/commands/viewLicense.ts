@@ -2,7 +2,7 @@
 
 import log from "../lib/log/log";
 import { ITaskExplorerApi } from "../interface";
-import { commands, ExtensionContext, Uri } from "vscode";
+import { commands, ExtensionContext } from "vscode";
 import { displayLicenseReport } from "../lib/report/licensePage";
 
 let context: ExtensionContext;

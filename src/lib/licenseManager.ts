@@ -3,13 +3,14 @@
 import * as https from "https";
 import log from "./log/log";
 import figures from "./figures";
+import { IncomingMessage } from "http";
 import { storage } from "./utils/storage";
 import { refreshTree } from "./refreshTree";
-import { isScriptType } from "./utils/utils";
+import { isScriptType, isString } from "./utils/utils";
 import { ITaskExplorerApi } from "../interface";
 import { displayLicenseReport } from "./report/licensePage";
 import { ILicenseManager } from "../interface/ILicenseManager";
-import { commands, ExtensionContext, InputBoxOptions, Task, WebviewPanel, window } from "vscode";
+import { commands, env, ExtensionContext, InputBoxOptions, Task, WebviewPanel, window } from "vscode";
 
 
 export class LicenseManager implements ILicenseManager
@@ -24,7 +25,6 @@ export class LicenseManager implements ILicenseManager
 	private licensed = false;
 	private version: string;
 	private numTasks = 0;
-	private reqErrorCount = 0;
 	private maxTasksReached = false;
 	private panel: WebviewPanel | undefined;
 	private teApi: ITaskExplorerApi;
@@ -128,23 +128,48 @@ export class LicenseManager implements ILicenseManager
 
 	async enterLicenseKey()
 	{
+		log.methodStart("enter license key", 1);
 		const opts: InputBoxOptions = { prompt: "Enter license key" };
 		try {
 			const input = await window.showInputBox(opts);
 			if (input)
 			{
-				this.licensed = await this.validateLicense(input);
-				if (this.licensed)
+				if (input.length > 20)
 				{
-					window.showInformationMessage("License key validated, thank you for your support!");
-					if (this.maxTasksReached) {
-						await refreshTree(this.teApi, true, false, "");
+					this.licensed = await this.validateLicense(input, "   ");
+					if (this.licensed)
+					{
+						window.showInformationMessage("License key validated, thank you for your support!");
+						if (this.maxTasksReached) {
+							await refreshTree(this.teApi, true, false, "   ");
+						}
 					}
+				}
+				else {
+					window.showInformationMessage("This does not appear to be a valid license, validation skipped");
 				}
 			}
 		}
 		catch (e) {}
+		log.methodDone("enter license key", 1);
 	}
+
+
+	private getDefaultServerOptions = (apiEndpoint: string) =>
+	{
+		return {
+			hostname: this.host,
+			port: this.port,
+			path: apiEndpoint,
+			method: "POST",
+			timeout: this.host !== "localhost" ? 4000 : /* istanbul ignore next*/1250,
+			headers: {
+				"token": this.token,
+				// eslint-disable-next-line @typescript-eslint/naming-convention
+				"Content-Type": "application/json"
+			}
+		};
+	};
 
 
 	getLicenseKey = async() => storage.getSecret("license_key"); // for now, "1234-5678-9098-7654321" is a valid license
@@ -168,7 +193,42 @@ export class LicenseManager implements ILicenseManager
 	isLicensed = () => this.licensed;
 
 
+	private logServerResponse = (res: IncomingMessage, jso: any, rspData: string, logPad: string) =>
+	{
+		log.write("   response received", 1, logPad);
+		log.value("      status code", res.statusCode, 2, logPad);
+		this.testsLog("   Response received");
+		this.testsLog("      Status code : " + res.statusCode);
+		log.value("      length", res.statusCode, 2, logPad);
+		this.testsLog("      Length      : " + rspData.length);
+		log.value("      success", jso.success, 2, logPad);
+		log.value("      message", jso.message, 2, logPad);
+		this.testsLog("      Success     : " +  jso.success);
+	};
+
+
 	setLicenseKey = async (licenseKey: string | undefined) => storage.updateSecret("license_key", licenseKey);
+
+
+	private setLicenseKeyFromRsp = async(licensed: boolean, jso: any) =>
+	{
+		if (licensed && jso.token)
+		{
+			if (isString(jso.token))
+			{
+				this.testsLog("      License key : " + jso.token);
+				await this.setLicenseKey(jso.token);
+			}
+			else {
+				this.testsLog("      License key : " + jso.token.token);
+				this.testsLog("      Issued      : " + jso.token.issuedFmt);
+				this.testsLog("      Expires     : " + jso.token.expires);
+				await this.setLicenseKey(jso.token.token);
+			}
+			this.testsLog("   License key saved to secure storage");
+		}
+		this.testsLog("Request to license server completed  successfully", figures.color.success);
+	};
 
 
 	setMaxTasksReached = (maxReached: boolean) => this.maxTasksReached = maxReached;
@@ -194,81 +254,143 @@ export class LicenseManager implements ILicenseManager
 	};
 
 
-	private validateLicense = (licenseKey: string, logPad = "   ") =>
+	/* istanbul ignore next*/
+	private onServerError = (e: any, logPad: string, fn: string, rspData?: string) =>
+	{
+		this.testsLog("   Error", figures.color.errorTests);
+		this.testsLog("   " + e.message, figures.color.errorTests);
+		this.testsLog("Request to license server completed w/ a failure", figures.color.errorTests);
+		log.error(e);
+		log.write("   the license server is down, offline, or there is a connection issue", 1, logPad);
+		log.write("      licensed mode will be automatically enabled", 1, logPad);
+		if (rspData) {
+			log.error(rspData);
+			this.testsLog(rspData, figures.color.errorTests);
+		}
+		log.methodDone(fn + " license", 1, logPad);
+	};
+
+
+	requestLicense = (logPad: string) =>
+	{
+		return new Promise<string | undefined>(async(resolve) =>
+		{
+			log.methodStart("request license", 1, logPad, false, [[ "host", this.host ], [ "port", this.port ]]);
+
+			if (await storage.getSecret("license_key_30day") !== undefined)
+			{
+				log.write("   A 30-day license has already been this machine", 1, logPad);
+				log.methodDone("validate license", 1, logPad);
+				setTimeout(() => resolve(undefined), 1);
+				return;
+			}
+
+			let rspData = "";
+			log.write("   send get new license request", 1, logPad);
+			this.testsLog("Starting https request to license server");
+
+			const req = https.request(this.getDefaultServerOptions("/token"), (res) =>
+			{
+				res.on("data", (chunk) => { rspData += chunk; });
+				res.on("end", async() =>
+				{
+					try
+					{
+						const jso = JSON.parse(rspData),
+							  licensed = res.statusCode === 200 && jso.success && jso.message === "Success" && jso.token;
+						this.logServerResponse(res, jso, rspData, logPad);
+						await this.setLicenseKeyFromRsp(licensed, jso);
+						/* istanbul ignore else*/
+						if (licensed) {
+							await storage.updateSecret("license_key_30day", jso.token);
+						}
+						log.methodDone("request license", 1, logPad, [[ "30-day license key", jso.token ]]);
+						resolve(licensed ? jso.token : /* istanbul ignore next*/undefined);
+					}
+					catch (e)
+					{   // Fails if IIS/Apache server is running but the reverse proxied app server is not, maybe
+						/* istanbul ignore next*/
+						this.onServerError(e, "request", logPad, rspData);
+						/* istanbul ignore next*/
+						resolve(undefined);
+					}
+				});
+			});
+
+			/* istanbul ignore next*/
+			req.on("error", (e) =>
+			{   // Not going to fail unless i birth a bug on the server app
+				this.onServerError(e, "request", logPad);
+				resolve(undefined);
+			});
+
+			req.write(JSON.stringify(
+			{
+				ttl: 30,
+				appid: env.machineId,
+				appname: "vscode-taskexplorer",
+				ip: "*",
+				json: true,
+				license: true
+			}),
+			() => {
+				log.write("   output stream written, ending request and waiting for response...", 1, logPad);
+				this.testsLog("Output stream written, ending request and waiting for response...");
+				req.end();
+			});
+		});
+	};
+
+
+	private validateLicense = (licenseKey: string, logPad: string) =>
 	{
 		return new Promise<boolean>((resolve) =>
 		{
 			log.methodStart("validate license", 1, logPad, false, [[ "license key", licenseKey ], [ "host", this.host ], [ "port", this.port ]]);
 
 			let rspData = "";
-			const options = {
-				hostname: this.host,
-				port: this.port,
-				path: "/api/license/validate/v1",
-				method: "POST",
-				timeout: this.host !== "localhost" ? 4000 : 1250,
-				headers: {
-					"token": this.token,
-					// eslint-disable-next-line @typescript-eslint/naming-convention
-					"Content-Type": "application/json"
-				}
-			};
-
-			const _onError = (e: any)  =>
-			{
-				this.testsLog("   Error", figures.color.errorTests);
-				this.testsLog("   " + e.message, figures.color.errorTests);
-				this.testsLog("Request to license server completed w/ a failure", figures.color.errorTests);
-				log.error(e);
-				log.write("   the license server is down, offline, or there is a connection issue", 1, logPad);
-				log.write("      licensed mode will be automatically enabled", 1, logPad);
-				log.methodDone("validate license", 1, logPad);
-				resolve(!this.teApi.isTests() || ++this.reqErrorCount % 2 === 0);
-			};
-
 			log.write("   send validation request", 1, logPad);
 			this.testsLog("Starting https request to license server");
-			const req = https.request(options, (res) =>
+
+			const req = https.request(this.getDefaultServerOptions("/api/license/validate/v1"), (res) =>
 			{
-				log.write("   response received", 1, logPad);
-				log.value("      status code", res.statusCode, 2, logPad);
-				this.testsLog("   Response received");
-				this.testsLog("      Status code : " + res.statusCode);
 				res.on("data", (chunk) => { rspData += chunk; });
 				res.on("end", async() =>
 				{
-					log.value("      length", res.statusCode, 2, logPad);
-					this.testsLog("      Length      : " + rspData.length);
 					try
 					{   const jso = JSON.parse(rspData),
 							  licensed = res.statusCode === 200 && jso.success && jso.message === "Success";
-						log.value("      success", jso.success, 2, logPad);
-						log.value("      message", jso.message, 2, logPad);
-						this.testsLog("      Success     : " +  jso.success);
-						if (licensed) {
-							this.testsLog("      License key : " + licenseKey);
-							await this.setLicenseKey(licenseKey);
-							this.testsLog("   License key saved to secure storage");
-						}
-						this.testsLog("Request to license server completed  successfully", figures.color.success);
+						this.logServerResponse(res, jso, rspData, logPad);
+						jso.token = licenseKey;
+						await this.setLicenseKeyFromRsp(licensed, jso);
 						log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);
 						resolve(licensed);
 					}
-					catch (e) // Fails if IIS/Apache server is running but the reverse proxied app server is not, maybe
-					{
+					catch (e)
+					{   // Fails if IIS/Apache server is running but the reverse proxied app server is not, maybe
 						/* istanbul ignore next*/
-						_onError(e);
+						this.onServerError(e, "validate", logPad, rspData);
 						/* istanbul ignore next*/
-						log.error(rspData);
-						/* istanbul ignore next*/
-						this.testsLog(rspData, figures.color.errorTests);
-					}                                     //
-				});                                      //
-			});                                         //
-			/* istanbul ignore next*/                  //
-			req.on("error", (e) => { _onError(e); }); // Not going to fail unless i birth a bug on the server app
-			req.write(JSON.stringify({ licensekey: licenseKey }), () =>   //
-			{                                                            //
+						resolve(true);
+					}
+				});
+			});
+
+			/* istanbul ignore next*/
+			req.on("error", (e) =>
+			{   // Not going to fail unless i birth a bug on the server app
+				this.onServerError(e, "validate", logPad);
+				resolve(true);
+			});
+
+			req.write(JSON.stringify(
+			{
+				licensekey: licenseKey,
+				appid: env.machineId,
+				appname: "vscode-taskexplorer-prod",
+				ip: "*"
+			}),
+			() => {
 				log.write("   output stream written, ending request and waiting for response...", 1, logPad);
 				this.testsLog("Output stream written, ending request and waiting for response...");
 				req.end();

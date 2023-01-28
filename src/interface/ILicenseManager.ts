@@ -11,6 +11,7 @@ export interface ILicenseManager
     getVersion: () => string;
     getWebviewPanel: () => WebviewPanel | undefined;
     isLicensed: () => boolean;
+    requestLicense: (logPad: string) => Promise<string | undefined>;
     setLicenseKey: (licenseKey: string | undefined) => Promise<void>;
     setMaxTasksReached: (maxReached: boolean) => void;
     setTasks: (tasks: Task[], logPad?: string) => Promise<void>;
