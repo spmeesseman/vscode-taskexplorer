@@ -124,9 +124,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await setLicensed(true, licMgr);
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks()).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks()).to.be.a("number").that.is.equal(licMgrMaxFreeTasks);
         utils.endRollingCount(this);
 	});
@@ -136,9 +136,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await setLicensed(true, licMgr);
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("npm")).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("npm")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForTaskType);
         utils.endRollingCount(this);
 	});
@@ -148,9 +148,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await setLicensed(true, licMgr);
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("ant")).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("ant")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForTaskType);
         utils.endRollingCount(this);
 	});
@@ -160,9 +160,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await setLicensed(true, licMgr);
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("bash")).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("bash")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForScriptType);
         utils.endRollingCount(this);
 	});
@@ -172,9 +172,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await setLicensed(true, licMgr);
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("python")).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTasks("python")).to.be.a("number").that.is.equal(licMgrMaxFreeTasksForScriptType);
         utils.endRollingCount(this);
 	});
@@ -184,9 +184,9 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.getMaxTasks + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-		await setLicensed(true, licMgr);
+		await utils.setLicensed(true, licMgr);
 		expect(licMgr.getMaxNumberOfTaskFiles()).to.be.a("number").that.is.equal(Infinity);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		expect(licMgr.getMaxNumberOfTaskFiles()).to.be.a("number").that.is.equal(licMgrMaxFreeTaskFiles);
         utils.endRollingCount(this);
 	});
@@ -196,7 +196,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.pageWithDetail + 1100 + (tc.slowTime.storageUpdate * 2) + tc.slowTime.licenseMgr.setLicenseCmd);
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		await teApi.testsApi.storage.update("version", undefined);
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		await setTasks();
@@ -519,7 +519,7 @@ suite("License Manager Tests", () =>
 			port: 443,
 			token: remoteServerToken
 		});
-		await setLicensed(false, licMgr);
+		await utils.setLicensed(false, licMgr);
 		licMgr.setTestData({
 			maxFreeTasks: 25,
 			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
@@ -619,7 +619,7 @@ suite("License Manager Tests", () =>
 		if (licMgr)
 		{
 			this.slow(tc.slowTime.refreshCommand);
-			await setLicensed(true, licMgr);
+			await utils.setLicensed(true, licMgr);
 			licMgr.setTestData({
 				maxFreeTasks: licMgrMaxFreeTasks,
 				maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
@@ -658,16 +658,6 @@ suite("License Manager Tests", () =>
 	});
 
 });
-
-
-
-const setLicensed = async (valid: boolean, licMgr: ILicenseManager) =>
-{
-    teApi.setTests(!valid);
-    await licMgr.setLicenseKey(valid ? "1234-5678-9098-7654321" : undefined);
-    await licMgr.checkLicense();
-    teApi.setTests(true);
-};
 
 
 async function setTasks()

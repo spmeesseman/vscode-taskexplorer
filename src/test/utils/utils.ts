@@ -18,6 +18,7 @@ import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
 import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
+import { ILicenseManager } from "../../interface/ILicenseManager";
 
 export { figures };
 export { testControl };
@@ -382,6 +383,15 @@ export const setFailed = () =>
 {
     caughtControlC = true;
     hasRollingCountError = true;
+};
+
+
+export const setLicensed = async (valid: boolean, licMgr: ILicenseManager) =>
+{
+    teApi.setTests(!valid);
+    await licMgr.setLicenseKey(valid ? "1234-5678-9098-7654321" : undefined);
+    await licMgr.checkLicense();
+    teApi.setTests(true);
 };
 
 

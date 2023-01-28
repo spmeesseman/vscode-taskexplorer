@@ -7,6 +7,7 @@ import { join } from "path";
 import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IDictionary, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { IConfiguration } from "@spmeesseman/vscode-taskexplorer-types/lib/IConfiguration";
+import { getLicenseManager } from "../../extension";
 
 const tc = utils.testControl;
 const startTaskCountBash = 1;
@@ -277,6 +278,19 @@ suite("File Watcher Tests", () =>
     });
 
 
+    test("Add a Non-Empty Folder to Workspace Folder (Un-Licensed Mode)", async function()
+    {
+        if (utils.exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
+        utils.setLicensed(false, getLicenseManager());
+        await fsApi.copyDir(outsideWsDir, insideWsDir, undefined, true); // copy folder
+        await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+        utils.setLicensed(true, getLicenseManager());
+        await utils.verifyTaskCount("grunt", startTaskCountGrunt + 4);
+        utils.endRollingCount(this);
+    });
+
+
     test("Add/Delete New Files Repetitively", async function()
     {
         if (utils.exitRollingCount(this)) return;
@@ -375,7 +389,7 @@ suite("File Watcher Tests", () =>
         await utils.sleep(25);
         await fsApi.deleteFile(files.grunt2_7);
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
-        await utils.verifyTaskCount("grunt", startTaskCountGrunt); // 2 less than previous test, blanked /_test_files/Gruntfile.js
+        await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2); // 2 less than previous test, blanked /_test_files/Gruntfile.js
         utils.endRollingCount(this);
     });
 
@@ -446,7 +460,7 @@ suite("File Watcher Tests", () =>
         await utils.sleep(50);
         await fsApi.deleteFile(files.grunt2_7);
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
-        await utils.verifyTaskCount("grunt", startTaskCountGrunt);
+        await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2);
         utils.endRollingCount(this);
     });
 

@@ -66,16 +66,16 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 2000,
+        addWorkspaceFolder: 1900,
         addWorkspaceFolderEmpty: 1310,
-        addWorkspaceFolderFake: 1500,
+        addWorkspaceFolderFake: 1450,
         buildTreeNoTasks: 295,
         cache: {
-            build: 490,
-            buildCancel: 295,
-            rebuild: 3900,
-            rebuildCancel: 490,
-            rebuildNoChanges: 890,
+            build: 485,
+            buildCancel: 290,
+            rebuild: 3850,
+            rebuildCancel: 485,
+            rebuildNoChanges: 880,
         },
         closeEditors: 20,
         command: 675,
@@ -93,76 +93,74 @@ export const testControl: ITestControl =
             globEvent: 1125,
             groupingEvent: 990,
             pathToProgramsEvent: 710,
-            showHideSpecialFolder: 410,
+            showHideSpecialFolder: 450,
             showHideUserTasks: 1000,
             readEvent: 25,
             sortingEvent: 740,
             terminalEvent: 250
         },
-        excludeCommand: 1370,
+        excludeCommand: 1365,
         explorerViewStartup: 7565,
-        fetchTasksCommand: 1840,
-        fileCachePersist: 250,
-        findTaskPosition: 325,
+        fetchTasksCommand: 1835,
+        fileCachePersist: 245,
+        findTaskPosition: 320,
         findTaskPositionDocOpen: 40,
-        focusCommand: 2340,
-        focusCommandAlreadyFocused: 320,
-        focusCommandChangeViews: 195,
+        focusCommand: 2330,
+        focusCommandAlreadyFocused: 315,
+        focusCommandChangeViews: 190,
         fs: {
-            createEvent: 1610,
-            createEventTsc: 1755,
-            createFolderEvent: 1655,
-            deleteEvent: 1350,
-            deleteEventTsc: 1635,
-            deleteFolderEvent: 1445,
-            modifyEvent: 1075,
+            createEvent: 1600,
+            createEventTsc: 1725,
+            createFolderEvent: 1650,
+            deleteEvent: 1340,
+            deleteEventTsc: 1600,
+            deleteFolderEvent: 1440,
+            modifyEvent: 1070,
         },
-        getTreeTasks: 205,
-        getTreeTasksNpm: 490, // npm task provider is slower than shit on a turtle
+        getTreeTasks: 200,
+        getTreeTasksNpm: 480, // npm task provider is slower than shit on a turtle
         licenseMgr: {
-            page: 160,
-            pageWithDetail: 275,
-            checkLicense: 400,
-            enterKey: 845,
-            getMaxTasks: 360,
-            getNewKey: 1000,
-            localStartServer: 1195,
-            serverDownHostUp: 14100,
-            setLicenseCmd: 210
+            page: 155,
+            pageWithDetail: 270,
+            checkLicense: 395,
+            enterKey: 840,
+            getMaxTasks: 355,
+            getNewKey: 750,
+            setLicenseCmd: 205
         },
         min: 50,
-        refreshCommand: 6800,
-        refreshCommandNoChanges: 245,
-        removeWorkspaceFolder: 2000,
+        refreshCommand: 6700,
+        refreshCommandNoChanges: 240,
+        removeWorkspaceFolder: 1800,
         removeWorkspaceFolderEmpty: 415,
-        removeWorkspaceFolderFake: 500,
-        runCommand: 4900,
+        removeWorkspaceFolderFake: 475,
+        runCommand: 4890,
         runPauseCommand: 3255,
         runStopCommand: 3510,
         storageRead: 60,
         storageUpdate: 65,
         storageSecretRead: 95,
         storageSecretUpdate: 200,
-        taskCommand: 1050,
+        taskCommand: 1025,
         taskProviderReadUri: 90,
         tasks: {
-            antParser: 490,
-            antTask: 3400,
-            antTaskWithAnsicon: 3450,
+            antParser: 485,
+            antTask: 3375,
+            antTaskWithAnsicon: 3425,
             bashScript: 3075,
-            batchScriptBat: 4150,
-            batchScriptCmd: 5150,
-            gulpParser: 3875,
-            npmCommand: 8500,
-            npmCommandPkg: 7500,
-            npmInstallCommand: 9500
+            batchScriptBat: 4140,
+            batchScriptCmd: 5140,
+            gulpParser: 3870,
+            npmCommand: 8450,
+            npmCommandPkg: 7450,
+            npmInstallCommand: 9400
         },
         taskCount: {
-            verify: 460,
-            verifyByTree: 500,
-            verifyFirstCall: 680,
-            verifyNpm: 1400, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 1800
+            verify: 455,
+            verifyByTree: 495,
+            verifyFirstCall: 670,
+            verifyNpm: 1375, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 1775
         },
         viewReport: 375
     },
@@ -200,7 +198,7 @@ export const testControl: ITestControl =
             globEvent: 1240,
             groupingEvent: 1090,
             pathToProgramsEvent: 780,
-            showHideSpecialFolder: 445,
+            showHideSpecialFolder: 460,
             showHideUserTasks: 1100,
             readEvent: 30,
             sortingEvent: 800,
@@ -232,9 +230,7 @@ export const testControl: ITestControl =
             checkLicense: 405,
             enterKey: 845,
             getMaxTasks: 360,
-            getNewKey: 1000,
-            localStartServer: 1195,
-            serverDownHostUp: 14100,
+            getNewKey: 800,
             setLicenseCmd: 220
         },
         min: 50,
@@ -445,8 +441,6 @@ export interface ISlowTimes
         enterKey: number;
         getMaxTasks: number;
         getNewKey: number;
-        localStartServer: number;
-        serverDownHostUp: number;
         setLicenseCmd: number;
     };
     min: number;

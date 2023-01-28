@@ -76,6 +76,7 @@ const initSettings = async () =>
         python: true,
         ruby: false,
         tsc: true,
+        webpack: false,
         workspace: true
     });
 
