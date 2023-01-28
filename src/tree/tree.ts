@@ -276,14 +276,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         //
-        // Loop through each task provided by the engine and build a task tree.  Use a slice() of the
-        // tasks cache array to iterate since the call to buildtaskTree might remove a task from the cache
-        // array if it is excluded by isTaskIncluded().  Would probably put the check here but the
-        // calculation of 'relativePath' needs to be done, and that's covered in the call to buildTaskTreeList.
+        // Loop through each task provided by the engine and build a task tree
         //
-        for (const each of tasksList.slice())
+        for (const each of tasksList)
         {
-            log.blank(2);
+            log.blank(logLevel + 1);
             log.write(`   Processing task ${++taskCt} of ${tasksList.length} (${each.source})`, logLevel + 1, logPad);
             await this.buildTaskTreeList(each, folders, files, logPad + "   ");
         }
@@ -339,36 +336,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         ]);
         log.value("   scope", each.scope, 4, logPad);
 
-        const definition: ITaskDefinition | TaskDefinition = each.definition,
-              nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
-
-        let relativePath = definition.path ?? "";
-        if (each.source === "tsc" && util.isWorkspaceFolder(each.scope))
-        {
-            if (each.name.indexOf(" - ") !== -1 && each.name.indexOf(" - tsconfig.json") === -1)
-            {
-                relativePath = dirname(each.name.substring(each.name.indexOf(" - ") + 3));
-            }
-        }
-
-        //
-        // Make sure this task shouldn't be ignored based on various criteria...
-        // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
-        // By default, also ignore npm 'install' tasks, since its available in the context menu, ignore
-        // other providers unless it has registered as an external provider via Task Explorer API.
-        // Only internally provided tasks will be present in the this.tasks cache at this point, as extension
-        // provided tasks will have been skipped/ignored in the provideTasks() processing.
-        //
-        if (!isTaskIncluded(each, relativePath, logPad + "   "))
-        {
-            const tasksCache = this.tasks as Task[];
-            const tIdx = tasksCache.findIndex(t => t.name === each.name && t.source === each.source && t.definition.uri === each.definition.uri);
-            tasksCache.splice(tIdx, 1);
-            log.write("   ignored internally provided task", 3, logPad);
-            log.methodDone("build task tree list", 2, logPad);
-            return;
-        }
-
+        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded"),
+              relativePath = this.getTaskRelativePath(each);
         //
         // Set scope name and create the TaskFolder, a "user" task will have a TaskScope scope, not
         // a WorkspaceFolder scope.
@@ -729,14 +698,18 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
         if (!this.tasks || !this.currentInvalidation || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc") // || this.currentInvalidationUri)
         {
-            log.write("   fetching all tasks via VSCode.fetchTasks", logLevel, logPad);
+            log.write("   fetching all tasks via VSCode fetchTasks call", logLevel, logPad);
             statusBarItem.update("Requesting all tasks from all providers");
             this.tasks = await tasks.fetchTasks();
+            //
+            // Process the tasks cache array for any removals that might need to be made
+            //
+            this.doTaskCacheRemovals(undefined, logPad);
         }     //
         else // this.currentInvalidation guaranteed to be a string (task type) here
         {   //
             const taskName = util.getTaskTypeFriendlyName(this.currentInvalidation);
-            log.write(`   fetching ${taskName} tasks via VSCode.fetchTasks`, logLevel, logPad);
+            log.write(`   fetching ${taskName} tasks via VSCode fetchTasks call`, logLevel, logPad);
             statusBarItem.update("Requesting  tasks from " + taskName + " task provider");
             //
             // Get all tasks of the type defined in 'currentInvalidation' from VSCode, remove
@@ -745,42 +718,11 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             //
             const taskItems = await tasks.fetchTasks({ type: this.currentInvalidation });
             //
-            // Remove tasks of type '' from the 'tasks'array
+            // Process the tasks cache array for any removals that might need to be made
             //
-            log.write(`   removing current ${this.currentInvalidation} tasks from cache`, logLevel + 1, logPad);
-            this.tasks.slice().reverse().forEach((item, index, object) =>
-            {   //
-                // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
-                // if the script type set for the task in tasks.json is of type 'currentInvalidation'.
-                // Remove any Workspace type tasks returned as well, in this case the source type is
-                // != currentInvalidation, but the definition type == currentInvalidation
-                //
-                if (item.source === this.currentInvalidation || item.source === "Workspace")
-                {
-                    if (item.source !== "Workspace" || item.definition.type === this.currentInvalidation)
-                    {
-                        log.write(`      removing task '${item.source}/${item.name}'`, logLevel + 2, logPad);
-                        (this.tasks as Task[]).splice(object.length - 1 - index, 1);
-                        ++ctRmv;
-                    }
-                }
-            });
-            log.write(`   removed ${ctRmv} ${this.currentInvalidation} current tasks from cache`, logLevel + 1, logPad);
-            log.write(`   adding ${taskItems.length} new ${this.currentInvalidation} tasks from cache`, logLevel + 1, logPad);
+            this.doTaskCacheRemovals(this.currentInvalidation, logPad);
+            log.write(`   adding ${taskItems.length} new ${this.currentInvalidation} tasks`, logLevel + 1, logPad);
             this.tasks.push(...taskItems);
-        }
-
-        //
-        // Remove User tasks if they're not enabled
-        //
-        if (!configuration.get<boolean>("specialFolders.showUserTasks"))
-        {
-            this.tasks.slice().reverse().forEach((item, index, object) =>
-            {
-                if (item.source === "Workspace" && !util.isWorkspaceFolder(item.scope)) {
-                    (this.tasks as Task[]).splice(object.length - 1 - index, 1);
-                }
-            });
         }
 
         //
@@ -805,6 +747,53 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         TaskExplorerProvider.logPad = "";
         statusBarItem.update("Building task explorer tree");
         statusBarItem.hide();
+    };
+
+
+    private doTaskCacheRemovals = (invalidation: string | undefined, logPad: string) =>
+    {
+        let ctRmv = 0;
+        const tasksCache = this.tasks as Task[];
+        log.write("   removing current invalidated tasks from cache", 3, logPad);
+        const showUserTasks = configuration.get<boolean>("specialFolders.showUserTasks");
+        tasksCache.slice().reverse().forEach((item, index, object) =>
+        {   //
+            // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
+            // if the script type set for the task in tasks.json is of type 'currentInvalidation'.
+            // Remove any Workspace type tasks returned as well, in this case the source type is
+            // != currentInvalidation, but the definition type == currentInvalidation
+            //
+            if (invalidation && item.source === invalidation || item.source === "Workspace")
+            {
+                if (item.source !== "Workspace" || item.definition.type === invalidation)
+                {
+                    tasksCache.splice(object.length - 1 - index, 1);
+                    log.write(`      removed task '${item.source}/${item.name}'`, 3, logPad);
+                    ++ctRmv;
+                }
+            }
+            //
+            // Remove User tasks if they're not enabled
+            //
+            if (!showUserTasks && item.source === "Workspace" && !util.isWorkspaceFolder(item.scope))
+            {
+                tasksCache.splice(object.length - 1 - index, 1);
+            }
+            //
+            // Make sure this task shouldn't be ignored based on various criteria...
+            // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
+            // By default, also ignore npm 'install' tasks, since its available in the context menu, ignore
+            // other providers unless it has registered as an external provider via Task Explorer API.
+            // Only internally provided tasks will be present in the this.tasks cache at this point, as extension
+            // provided tasks will have been skipped/ignored in the provideTasks() processing.
+            //
+            if (!isTaskIncluded(item, this.getTaskRelativePath(item), logPad + "   "))
+            {
+                tasksCache.splice(object.length - 1 - index, 1);
+                log.write("   removed vscode internally provided task", 3, logPad);
+            }
+        });
+        log.write(`   removed ${ctRmv} ${this.currentInvalidation} current tasks from cache`, 3, logPad);
     };
 
 
@@ -1041,6 +1030,20 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
 
     public getTaskMap = () => this.taskMap;
+
+
+    private getTaskRelativePath = (task: Task) =>
+    {
+        let relativePath = task.definition.path ?? "";
+        if (task.source === "tsc" && util.isWorkspaceFolder(task.scope))
+        {
+            if (task.name.indexOf(" - ") !== -1 && task.name.indexOf(" - tsconfig.json") === -1)
+            {
+                relativePath = dirname(task.name.substring(task.name.indexOf(" - ") + 3));
+            }
+        }
+        return relativePath;
+    };
 
 
     public getTaskTree = () => this.taskTree;
