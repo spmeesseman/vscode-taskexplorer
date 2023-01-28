@@ -196,9 +196,9 @@ export const cleanup = async () =>
     //
     stopInput();
 
-    console.log(`    ${figures.color.info} ${figures.withColor("Deactivating extension 'spmeesseman.vscode-taskexplorer'", figures.colors.grey)}`);
+    console.log(`    ${figures.color.info} ${figures.withColor("Deactivating extension", figures.colors.grey)}`);
     await deactivate();
-    console.log(`    ${figures.color.info} ${figures.withColor("Extension 'spmeesseman.vscode-taskexplorer' successfully deactivated", figures.colors.grey)}`);
+    console.log(`    ${figures.color.info} ${figures.withColor("Extension successfully deactivated", figures.colors.grey)}`);
 
     window.showInputBox = originalShowInputBox;
     window.showInformationMessage = originalShowInfoBox;
