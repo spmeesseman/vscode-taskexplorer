@@ -71,6 +71,7 @@
         "test-api": "npm run tsc-rebuild_test && node ./dist/test/runTest.js api xDeactivate",
         "test-app_publisher": "npm run tsc-rebuild_test && node ./dist/test/runTest.js appPublisher xDeactivate",
         "test-bash": "npm run tsc-rebuild_test && node ./dist/test/runTest.js bash xDeactivate",
+        "test-batch": "npm run tsc-rebuild_test && node ./dist/test/runTest.js batch xDeactivate",
         "test-composer": "npm run tsc-rebuild_test && node ./dist/test/runTest.js composer xDeactivate",
         "test-configuration": "npm run tsc-rebuild_test && node ./dist/test/runTest.js configuration xDeactivate",
         "test-fileCache": "npm run tsc-rebuild_test && node ./dist/test/runTest.js fileCache xDeactivate",

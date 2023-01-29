@@ -17,11 +17,11 @@ import {
 
 const testsName = "apppublisher";
 const startTaskCount = 21;
+const rootPath = getWsPath(".");
+const fileUri = Uri.file(join(rootPath, ".publishrc.json"));
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let rootPath: string;
-let fileUri: Uri;
 
 
 suite("App-Publisher Tests", () =>
@@ -33,8 +33,6 @@ suite("App-Publisher Tests", () =>
         //
         if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
-        rootPath = getWsPath(".");
-        fileUri = Uri.file(join(rootPath, ".publishrc.json"));
         endRollingCount(this, true);
     });
 
