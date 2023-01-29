@@ -326,10 +326,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {
-            workspace.getWorkspaceFolder = (uri: Uri) =>
-            {
-                return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx];
-            };
+            workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
             await testsApi.onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx] ]
@@ -363,10 +360,6 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {
-            workspace.getWorkspaceFolder = (uri: Uri) =>
-            {
-                return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx + 1];
-            };
             await testsApi.onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 1] ]
@@ -389,10 +382,6 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow((tc.slowTime.removeWorkspaceFolder * 2) + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {
-            workspace.getWorkspaceFolder = (uri: Uri) =>
-            {
-                return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx + 2];
-            };
             await testsApi.onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 2], wsf[fakeWsfStartIdx + 3] ]
@@ -451,7 +440,9 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify + tc.slowTime.cache.rebuildCancel + 200);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
-        if (!tc.isMultiRootWorkspace) {
+        if (!tc.isMultiRootWorkspace)
+        {
+            workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
             await testsApi.onWsFoldersChange({ // event will wait for previous fil cache build
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx] ]
@@ -462,9 +453,6 @@ suite("Multi-Root Workspace Tests", () =>
         }
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         await verifyTaskCount("grunt", gruntCt);
-        if (!tc.isMultiRootWorkspace) {
-            workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
-        }
         endRollingCount(this);
     });
 
