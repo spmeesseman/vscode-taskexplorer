@@ -8,7 +8,6 @@ export type TaskMap = { [id: string]: ITaskItem | undefined };
 
 export interface ITaskExplorer
 {
-    buildTaskTree(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<ITaskFolder[] | TreeItem[]>;
     dispose(context: ExtensionContext): void;
     fireTreeRefreshEvent(logPad: string, logLevel: number, taskFile?: TreeItem): void;
     getChildren(element?: TreeItem): Promise<TreeItem[]>;

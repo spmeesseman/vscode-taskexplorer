@@ -272,7 +272,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + tc.slowTime.refreshCommandNoChanges);
-        // Set up coverage on if() statement in configWatcher ~ ln 240
+        // Set up coverage on if() statement in configWatcher ~ ln 260
         testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks", {
             bash: false,

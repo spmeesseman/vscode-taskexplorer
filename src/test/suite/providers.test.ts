@@ -297,8 +297,7 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
-            expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
-            expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(2);
+            await treeUtils.refresh();
         }
         catch (e) {
             throw e;
@@ -322,8 +321,7 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.expanded.favorites", false);
-            expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
-            expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(2);
+            await treeUtils.refresh();
         }
         catch (e) {
             throw e;
@@ -348,8 +346,7 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.expanded.favorites", false);
             await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
-            expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
-            expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(1);
+            await treeUtils.refresh();
         }
         catch (e) {
             throw e;
@@ -374,8 +371,7 @@ suite("Provider Tests", () =>
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.expanded.favorites", false);
-            expect(await explorer.buildTaskTree([], "   ", 5)).to.be.an("array").that.has.a.lengthOf(1); // (No Scripts)
-            expect(await explorer.buildTaskTree([], "   ", 5, true)).to.be.an("array").that.has.a.lengthOf(1);
+            await treeUtils.refresh();
         }
         catch (e) {
             throw e;

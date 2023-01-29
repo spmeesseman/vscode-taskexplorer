@@ -237,7 +237,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     };
 
 
-    buildTaskTree = async(tasksList: Task[], logPad: string, logLevel: number, force?: boolean): Promise<TaskFolder[]|NoScripts[]> =>
+    private buildTaskTree = async(tasksList: Task[], logPad: string, logLevel: number): Promise<TaskFolder[]|NoScripts[]> =>
     {
         let taskCt = 0;
         const folders: IDictionary<TaskFolder> = {};
@@ -245,12 +245,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         let sortedFolders: TaskFolder[]|NoScripts[];
 
         log.methodStart("build task tree", logLevel, logPad);
-
-        if (tasksList.length === 0 && force !== true)
-        {
-            log.methodDone("build task tree", logLevel, logPad);
-            return [ new NoScripts() ];
-        }
 
         //
         // Set a busy flag for all external functions
