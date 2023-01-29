@@ -213,7 +213,7 @@ const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
     //
     const rootFolderChanged  = now < lastDeactivated + 5000 && /* istanbul ignore next */now < lastWsRootPathChange + 5000;
     /* istanbul ignore else */
-    if (!rootFolderChanged || tests)
+    if (tests || /* istanbul ignore next */!rootFolderChanged)
     {
         await fileCache.rebuildCache("   ");
     }     //

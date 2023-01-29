@@ -285,7 +285,7 @@ suite("Multi-Root Workspace Tests", () =>
     });
 
 
-    test("Add Workspace Folder 2 and 3 (w/ File)", async function()
+    test("Add Workspace Folder 2, 3, and 4 (w/ File)", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.addWorkspaceFolderEmpty + tc.slowTime.addWorkspaceFolder + tc.slowTime.taskCount.verify + 20); // +20 unawaited file write
@@ -296,6 +296,8 @@ suite("Multi-Root Workspace Tests", () =>
             '    grunt.registerTask("upload3", ["s3"]);\n' +
             "};\n"
         );
+        await fsApi.copyFile(join(wsf2DirName, "Gruntfile.js"), join(wsf3DirName, "Gruntfile.JS"));
+        await fsApi.copyFile(join(wsf2DirName, "Gruntfile.js"), join(wsf4DirName, "GRUNTFILE.js"));
         if (!tc.isMultiRootWorkspace)
         {
             workspace.getWorkspaceFolder = (uri: Uri) =>
@@ -303,16 +305,16 @@ suite("Multi-Root Workspace Tests", () =>
                 return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx + 1];
             };
             await testsApi.onWsFoldersChange({
-                added: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ],
+                added: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2], wsf[fakeWsfStartIdx + 3] ],
                 removed: []
             });
             await waitForTeIdle(tc.waitTime.addWorkspaceFolder * 2);
             await verifyTaskCount("grunt", gruntCt); // vscode won't return the fake ws folder's tasks in fetchTasks()
         }
         else {
-            workspace.updateWorkspaceFolders(3, null, wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2]);
+            workspace.updateWorkspaceFolders(3, null, wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2], wsf[fakeWsfStartIdx + 3]);
             await waitForTeIdle(tc.waitTime.addWorkspaceFolder * 2);
-            await verifyTaskCount("grunt", gruntCt + 4);
+            await verifyTaskCount("grunt", gruntCt + 8);
         }
         endRollingCount(this);
     });
@@ -338,7 +340,7 @@ suite("Multi-Root Workspace Tests", () =>
         else {
             workspace.updateWorkspaceFolders(2, 1);
             await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
-            await verifyTaskCount("grunt", gruntCt + 2);
+            await verifyTaskCount("grunt", gruntCt + 6);
         }
         endRollingCount(this);
     });
@@ -355,10 +357,10 @@ suite("Multi-Root Workspace Tests", () =>
     });
 
 
-    test("Remove Workspace Folder 2 and 3 (w/ File)", async function()
+    test("Remove Workspace Folder 2 (w/ File)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.removeWorkspaceFolderEmpty + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {
             workspace.getWorkspaceFolder = (uri: Uri) =>
@@ -367,7 +369,33 @@ suite("Multi-Root Workspace Tests", () =>
             };
             await testsApi.onWsFoldersChange({
                 added: [],
-                removed: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ]
+                removed: [ wsf[fakeWsfStartIdx + 1] ]
+            });
+            await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
+            await verifyTaskCount("grunt", gruntCt); // vscode doesn't return the fake ws folder's tasks in fetchTasks()
+        }
+        else {
+            workspace.updateWorkspaceFolders(2, 1);
+            await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
+            await verifyTaskCount("grunt", gruntCt + 4);
+        }
+        endRollingCount(this);
+    });
+
+
+    test("Remove Workspace Folder 3 and 4 (w/ File)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow((tc.slowTime.removeWorkspaceFolder * 2) + tc.slowTime.taskCount.verify);
+        if (!tc.isMultiRootWorkspace)
+        {
+            workspace.getWorkspaceFolder = (uri: Uri) =>
+            {
+                return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx + 2];
+            };
+            await testsApi.onWsFoldersChange({
+                added: [],
+                removed: [ wsf[fakeWsfStartIdx + 2], wsf[fakeWsfStartIdx + 3] ]
             });
         }
         else {

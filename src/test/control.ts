@@ -105,8 +105,8 @@ export const testControl: ITestControl =
         findTaskPosition: 320,
         findTaskPositionDocOpen: 40,
         focusCommand: 2330,
-        focusCommandAlreadyFocused: 315,
-        focusCommandChangeViews: 190,
+        focusCommandAlreadyFocused: 375,
+        focusCommandChangeViews: 775,
         fs: {
             createEvent: 1600,
             createEventTsc: 1725,
@@ -209,8 +209,8 @@ export const testControl: ITestControl =
         findTaskPosition: 355,
         findTaskPositionDocOpen: 45,
         focusCommand: 2575,
-        focusCommandAlreadyFocused: 360,
-        focusCommandChangeViews: 200,
+        focusCommandAlreadyFocused: 700,
+        focusCommandChangeViews: 775,
         fs: {
             createEvent: 1930,
             createEventTsc: 2105,

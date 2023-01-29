@@ -40,8 +40,8 @@ suite("External Provider Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        dispose.dispose();
-        dispose2.dispose();
+        dispose?.dispose();
+        dispose2?.dispose();
         suiteFinished(this);
     });
 
