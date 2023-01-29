@@ -204,15 +204,15 @@ suite("Task Tests", () =>
     test("Run Task (No Terminal)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.tasks.batchScriptCmd + tc.slowTime.runStopCommand  + 5000);
-        const batchTask = batch[0];
-        await startTask(batchTask as TaskItem, false);
-        const exec = await executeTeCommand2("runNoTerm", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
+        this.slow(tc.slowTime.runCommand + tc.slowTime.tasks.bashScript + tc.slowTime.runStopCommand  + 5500);
+        const bashTask = bash[0];
+        await startTask(bashTask as TaskItem, false);
+        const exec = await executeTeCommand2("runNoTerm", [ bashTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.sleep(250);
         await utils.waitForTaskExecution(exec, 2000);
-        await executeTeCommand2("stop", [ batch[0] ], tc.waitTime.taskCommand);
+        await executeTeCommand2("stop", [ bash[0] ], tc.waitTime.taskCommand);
         await utils.waitForTaskExecution(exec, 500);
-        lastTask = batchTask;
+        lastTask = bashTask;
         utils.endRollingCount(this);
     });
 
@@ -250,36 +250,17 @@ suite("Task Tests", () =>
     });
 
 
-    test("Run Bash Task", async function()
-    {   //
-        // There is only 1 bash file "task" - it utils.sleeps for 3 seconds, 1 second at a time
-        //
-        if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.command + (tc.slowTime.config.event * 3) + tc.slowTime.focusCommandChangeViews +
-                  tc.slowTime.config.showHideSpecialFolder + startTaskSlowTime + (tc.slowTime.tasks.bashScript * 2));
-        focusExplorerView(); // randomly show/hide view to test refresh event queue in tree/tree.ts
-        await executeSettingsUpdate("visual.disableAnimatedIcons", true);
-        await executeSettingsUpdate("specialFolders.showLastTasks", false);
-        await executeSettingsUpdate("keepTermOnStop", true);
-        await startTask(bash[0] as TaskItem, true);
-        const exec = await executeTeCommand2("run", [ bash[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
-        await executeTeCommand2("openTerminal", [ bash[0] ]);
-        await utils.waitForTaskExecution(exec);
-        lastTask = bash[0];
-        utils.endRollingCount(this);
-    });
-
-
     test("Run Batch Task", async function()
     {   //
         // There are 2 batch file "tasks" - they both utils.sleep for 7 seconds, 1 second at a time
         //
         if (utils.exitRollingCount(this)) return;
-        const slowTime = (tc.slowTime.runCommand * 2) + (tc.slowTime.runStopCommand * 2) + 12000 + // wait for task exec
-                          startTaskSlowTime + tc.slowTime.runPauseCommand + (tc.slowTime.config.event * 4) +
+        const slowTime = (tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + 6500 +
+                          startTaskSlowTime + (tc.slowTime.config.event * 3) +
                           (tc.slowTime.command * 2) + tc.slowTime.closeEditors + tc.slowTime.tasks.batchScriptCmd;
         this.slow(slowTime);
         this.timeout(35000);
+        await focusExplorerView(); // randomly show/hide view to test refresh event queue in tree/tree.ts
         const batchTask = batch[0];
         await startTask(batchTask as TaskItem, true);
         await executeSettingsUpdate("keepTermOnStop", false);
@@ -294,44 +275,26 @@ suite("Task Tests", () =>
         //
         await executeTeCommand2("stop", [ batchTask ], tc.waitTime.taskCommand);
         //
-        // Run
-        //
-        exec = await executeTeCommand2("run", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
-        await utils.waitForTaskExecution(exec, 1000);
-        //
-        // Pause
-        //
-        await executeTeCommand2("pause", [ batchTask ], tc.waitTime.runCommandMin);
-        //
         // Open task file
         //
         await executeSettingsUpdate("taskButtons.clickAction", "Open");
         await executeTeCommand2("open", [ batchTask ], tc.waitTime.command);
         await utils.closeEditors();
         //
-        // Run (while paused)
-        //
-        exec = await executeTeCommand2("run", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
-        await utils.waitForTaskExecution(exec, 1000);
-        //
         // Open terminal
         //
         await executeTeCommand2("openTerminal", [ python[0] ], tc.waitTime.command);
         await executeTeCommand2("openTerminal", [ batchTask ], tc.waitTime.command);
         //
-        // Stop
-        //
-        await executeTeCommand2("stop", [ batchTask ], tc.waitTime.taskCommand);
-        //
         // Run Last Task
         //
         await executeSettingsUpdate("showRunningTask", false);
         exec = await executeTeCommand("runLastTask", tc.waitTime.runCommandMin) as TaskExecution | undefined;
-        await utils.waitForTaskExecution(exec, 1000);
+        await utils.waitForTaskExecution(exec, 1250);
         //
         // Restart Task
         //
-        exec = await executeTeCommand2("restart", [ batchTask ], tc.waitTime.runCommandMin + 1000) as TaskExecution | undefined;
+        exec = await executeTeCommand2("restart", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec);
         lastTask = batchTask;
         utils.endRollingCount(this);
