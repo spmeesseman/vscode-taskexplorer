@@ -87,14 +87,14 @@ suite("Provider Tests", () =>
     });
 
 
-	test("Focus Tree View", async function()
-	{
+    test("Build Tree", async function()
+    {
         if (exitRollingCount(this)) return;
         if (needsTreeBuild()) {
-            await focusExplorerView(this);
+            await treeUtils.refresh(this);
         }
         endRollingCount(this);
-	});
+    });
 
 
     test("Create Temporary Task Files - App Publisher", async function()
@@ -186,6 +186,20 @@ suite("Provider Tests", () =>
         await waitForTeIdle(tc.waitTime.min);
         endRollingCount(this);
     });
+
+
+	test("Focus Tree View", async function()
+	{
+        if (exitRollingCount(this)) return;
+        if (needsTreeBuild(true)) {
+            await focusExplorerView(this);
+        }
+        else {
+            this.slow(tc.slowTime.focusCommandAlreadyFocused + tc.slowTime.min);
+            await waitForTeIdle(tc.waitTime.min);
+        }
+        endRollingCount(this);
+	});
 
 
     test("Enable App-Publisher Tasks (Off by Default)", async function()
