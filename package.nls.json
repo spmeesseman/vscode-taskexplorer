@@ -148,6 +148,7 @@
 	"command.removeFromExcludes": "Task Explorer: Remove from Excludes List",
 	"command.showOutput": "Task Explorer: Show the log output window",
 	"command.viewLicense" : "Task Explorer: View licensing information",
+	"command.viewReleaseNotes" : "Task Explorer: View release notes",
 	"command.viewReport" : "Task Explorer: View parsing report",
 
 	"messages.noAssociatedTaskType": "This file does not appear to be associated to any known task type"

@@ -11,6 +11,7 @@ import registerEnterLicenseCommand from "./commands/enterLicense";
 import registerAddToExcludesCommand from "./commands/addToExcludes";
 import registerEnableTaskTypeCommand from "./commands/enableTaskType";
 import registerDisableTaskTypeCommand from "./commands/disableTaskType";
+import registerViewReleaseNotesCommand from "./commands/viewReleaseNotes";
 import registerRemoveFromExcludesCommand from "./commands/removeFromExcludes";
 import { join, resolve } from "path";
 import { AntTaskProvider } from "./providers/ant";
@@ -381,6 +382,7 @@ function registerCommands(context: ExtensionContext)
     registerRemoveFromExcludesCommand(context, teApi);
     registerViewLicenseCommand(context, teApi);
     registerViewReportCommand(context, teApi);
+    registerViewReleaseNotesCommand(context, teApi);
     //
     // Register GetAPI task
     //
