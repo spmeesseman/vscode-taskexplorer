@@ -1327,7 +1327,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             for (const tId of Object.keys(this.taskMap))
             {
                 const item = this.taskMap[tId] as TaskItem;
-                if  (item.resourceUri?.fsPath.startsWith(uri.fsPath)) {
+                if  (item.resourceUri?.fsPath.startsWith(uri.fsPath) || item.taskFile.resourceUri.fsPath.startsWith(uri.fsPath))
+                {
                     delete this.taskMap[tId];
                 }
             }
