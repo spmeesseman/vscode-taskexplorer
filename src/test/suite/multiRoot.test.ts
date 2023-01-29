@@ -16,8 +16,8 @@
 //        like its supported :(  SO this is the best we can do...
 
 import { join } from "path";
-import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { IFilesystemApi, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { Task, Uri, workspace, WorkspaceFolder } from "vscode";
+import { IFilesystemApi, ITaskExplorerApi, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getProjectsPath, needsTreeBuild, sleep, suiteFinished,
     testControl as tc, verifyTaskCount, waitForTeIdle
@@ -359,7 +359,19 @@ suite("Multi-Root Workspace Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
-        {
+        {   // Push task and task item, vscode knows they're fake and won't return them in fetchTasks()
+            const taskMap = testsApi.explorer.getTaskMap(),
+                  tasks = testsApi.explorer.getTasks();
+            tasks.push({
+                definition: {
+                    type: "grunt",
+                    uri: wsf[fakeWsfStartIdx].uri
+                }
+            } as unknown as Task);
+            taskMap.fakeTaskId1 = {
+                id: "fakeTaskId1",
+                resourceUri: wsf[fakeWsfStartIdx].uri
+            } as unknown as ITaskItem;
             workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
             await testsApi.onWsFoldersChange({
                 added: [],
@@ -393,7 +405,19 @@ suite("Multi-Root Workspace Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
-        {
+        {   // Push task and task item, vscode knows they're fake and won't return them in fetchTasks()
+            const taskMap = testsApi.explorer.getTaskMap(),
+                  tasks = testsApi.explorer.getTasks();
+            tasks.push({
+                definition: {
+                    type: "grunt",
+                    uri: wsf[fakeWsfStartIdx + 1].uri
+                }
+            } as unknown as Task);
+            taskMap.fakeTaskId2 = {
+                id: "fakeTaskId2",
+                resourceUri: wsf[fakeWsfStartIdx + 1].uri
+            } as unknown as ITaskItem;
             await testsApi.onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 1] ]
@@ -415,7 +439,29 @@ suite("Multi-Root Workspace Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.removeWorkspaceFolder * 2) + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
-        {
+        {   // Push tasks and task items, vscode knows they're fake and won't return them in fetchTasks()
+            const taskMap = testsApi.explorer.getTaskMap(),
+                  tasks = testsApi.explorer.getTasks();
+            tasks.push({
+                definition: {
+                    type: "grunt",
+                    uri: wsf[fakeWsfStartIdx + 2].uri
+                }
+            } as unknown as Task);
+            taskMap.fakeTaskId3 = {
+                id: "fakeTaskId3",
+                resourceUri: wsf[fakeWsfStartIdx + 2].uri
+            } as unknown as ITaskItem;
+            tasks.push({
+                definition: {
+                    type: "grunt",
+                    uri: wsf[fakeWsfStartIdx + 3].uri
+                }
+            } as unknown as Task);
+            taskMap.fakeTaskId4 = {
+                id: "fakeTaskId4",
+                resourceUri: wsf[fakeWsfStartIdx + 3].uri
+            } as unknown as ITaskItem;
             await testsApi.onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 2], wsf[fakeWsfStartIdx + 3] ]
