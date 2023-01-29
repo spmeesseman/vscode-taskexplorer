@@ -419,22 +419,6 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
-    // refreshState(taskItemId: string, logPad?: string, logLevel?: number)
-    // {
-    //     if (this.enabled)
-    //     {
-    //         if (doLog) log.methodStart("refresh taskitem states", logLevel, logPad);
-    //         // hasTask(taskItem)
-    //         const item = this.taskFiles.find(t =>  t.id === taskItemId);
-    //         if (item) {
-    //             log.write("   refreshing state on taskitem id " + item.id, logLevel, logPad + "   ");
-    //             item.refreshState(logPad + "   ", logLevel);
-    //         }
-    //         if (doLog) log.methodDone("refresh taskitem states", logLevel, logPad);
-    //     }
-    // }
-
-
     async saveTask(taskItem: TaskItem, logPad: string)
     {
         const taskId =  this.getTaskItemId(taskItem);

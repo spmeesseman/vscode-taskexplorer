@@ -98,45 +98,6 @@ export const pause = (tree: TaskTreeDataProvider, taskItem: TaskItem) =>
     log.methodDone("pause", 1);
 };
 
-
-export const runTask = async (task: Task, noTerminal?: boolean, logPad = "   ") =>
-{
-    let exec: TaskExecution | undefined;
-    log.methodStart("run task", 1, logPad, false, [[ "no terminal", noTerminal ]]);
-
-    if (noTerminal === true) {
-        task.presentationOptions.reveal = TaskRevealKind.Silent;
-    }
-    else {
-        task.presentationOptions.reveal = TaskRevealKind.Always;
-    }
-
-    try {
-        exec = await tasks.executeTask(task);
-    }
-    catch (e: any) {
-        /* istanbul ignore next */
-        const err = e.toString();
-        /* istanbul ignore next */
-        if (err.indexOf("No workspace folder") !== -1)
-        {
-            /* istanbul ignore next */
-            window.showErrorMessage("Task execution failed:  No workspace folder.  NOTE: You must " +
-                                    "save your workspace first before running 'User' tasks");
-        }
-        else {
-            /* istanbul ignore next */
-            window.showErrorMessage("Task execution failed: " + err);
-        }
-        /* istanbul ignore next */
-        log.write("Task execution failed: " + err, 1, logPad);
-    }
-
-    log.methodDone("run task", 1, logPad, [[ "success", !!exec ]]);
-    return exec;
-};
-
-
 export const restart = async(tree: TaskTreeDataProvider, taskItem: TaskItem, lastTasks: SpecialTaskFolder) =>
 {
     let exec: TaskExecution | undefined;
@@ -207,7 +168,7 @@ export const run = async(tree: TaskTreeDataProvider, taskItem: TaskItem, lastTas
     }
     else if (taskItem.paused)
     {
-        exec = await resumeTask(taskItem);
+        exec = resumeTask(taskItem);
     }
     else //
     {   // Create a new instance of 'task' if this is to be ran with no terminal (see notes below)
@@ -244,12 +205,7 @@ export const run = async(tree: TaskTreeDataProvider, taskItem: TaskItem, lastTas
                 }
             }
         }
-        exec = await runTask(newTask, noTerminal);
-        /* istanbul ignore else */
-        if (exec)
-        {
-            await lastTasks.saveTask(taskItem, "   ");
-        }
+        exec = await runTask(newTask, taskItem, lastTasks, noTerminal);
     }
 
     log.methodDone("run task", 1);
@@ -328,6 +284,17 @@ export const runLastTask = async(tree: TaskTreeDataProvider, taskMap: TaskMap, l
 };
 
 
+export const runTask = async (task: Task, taskItem: TaskItem, lastTasks: SpecialTaskFolder, noTerminal?: boolean, logPad = "   ") =>
+{
+    log.methodStart("run task", 1, logPad, false, [[ "no terminal", noTerminal ]]);
+    task.presentationOptions.reveal = noTerminal !== true ? TaskRevealKind.Always : TaskRevealKind.Silent;
+    const exec = await tasks.executeTask(task);
+    await lastTasks.saveTask(taskItem, logPad);
+    log.methodDone("run task", 1, logPad, [[ "success", !!exec ]]);
+    return exec;
+};
+
+
 /**
  * Run/execute a command, with arguments (prompt for args)
  *
@@ -361,11 +328,7 @@ export const runWithArgs = async(taskItem: TaskItem, lastTasks: SpecialTaskFolde
                     ) as Task;
                     newTask.definition.taskItemId = def.taskItemId;
                 }
-                exec = await runTask(newTask, noTerminal, logPad + "   ");
-                /* istanbul ignore else */
-                if (exec) {
-                    await lastTasks.saveTask(taskItem, logPad);
-                }
+                exec = await runTask(newTask, taskItem, lastTasks, noTerminal, logPad + "   ");
             }
             return exec;
         };
