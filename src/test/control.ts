@@ -66,8 +66,8 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 1460,
-        addWorkspaceFolderEmpty: 1380,
+        addWorkspaceFolder: 1350,
+        addWorkspaceFolderEmpty: 1325,
         cache: {
             build: 480,
             buildCancel: 290,
@@ -131,7 +131,8 @@ export const testControl: ITestControl =
         refreshCommand: 6550,
         refreshCommandNoChanges: 240,
         removeWorkspaceFolder: 500,
-        removeWorkspaceFolderEmpty: 415,
+        removeWorkspaceFolderEmpty: 425,
+        reorderWorkspaceFolders: 625,
         runCommand: 4890,
         runPauseCommand: 3250,
         runStopCommand: 3505,
@@ -235,6 +236,7 @@ export const testControl: ITestControl =
         refreshCommandNoChanges: 345,
         removeWorkspaceFolder: 2225,
         removeWorkspaceFolderEmpty: 1350,
+        reorderWorkspaceFolders: 1025,
         runCommand: 5400,
         runPauseCommand: 3590,
         runStopCommand: 3860,
@@ -312,6 +314,7 @@ export const testControl: ITestControl =
         refreshCommandNoChanges: 75,
         refreshTaskTypeCommand: 125,
         removeWorkspaceFolder: 200,
+        reorderWorkspaceFolders: 100,
         runCommandMin: 500,
         taskCommand: 450,
         verifyTaskCountRetry: 70,
@@ -362,6 +365,7 @@ export const testControl: ITestControl =
         refreshCommandNoChanges: 115,
         refreshTaskTypeCommand: 200,
         removeWorkspaceFolder: 500,
+        reorderWorkspaceFolders: 150,
         runCommandMin: 775,
         taskCommand: 700,
         verifyTaskCountRetry: 110,
@@ -451,6 +455,7 @@ export interface ISlowTimes
     refreshCommandNoChanges: number;
     removeWorkspaceFolder: number;
     removeWorkspaceFolderEmpty: number;
+    reorderWorkspaceFolders: number;
     runCommand: number;
     runPauseCommand: number;
     runStopCommand: number;
@@ -527,6 +532,7 @@ export interface IWaitTimes
     refreshCommandNoChanges: number;
     refreshTaskTypeCommand: number;
     removeWorkspaceFolder: number;
+    reorderWorkspaceFolders: number;
     runCommandMin: number;
     taskCommand: number;
     verifyTaskCountRetry: number;

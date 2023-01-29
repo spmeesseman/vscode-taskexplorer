@@ -301,23 +301,16 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     // cache so that the tree reload is much quicker, especially in large workspaces.  We'll do
     // it regardless of the 'enablePersistentFileCaching' settings.
     //
-    /* istanbul ignore next */
+    /* istanbul ignore if */
     if (rootPath !== workspace.rootPath)
     {
-        /* istanbul ignore next */
         log.write("   workspace deprecated 'root path' has changed", 1);
-        /* istanbul ignore next */
         log.values(1, "   ", [[ "new root path", workspace.rootPath ], [ "previous root path", rootPath ]]);
-        /* istanbul ignore next */
         if (rootPath === undefined) {
-            /* istanbul ignore next */
             log.write("   changing to a multi-root workspace");
         }
-        /* istanbul ignore next */
         log.write("   vscode will deactivate and re-activate the extension", 1);
-        /* istanbul ignore next */
         rootPath = workspace.rootPath;
-        /* istanbul ignore next */
         storage.update2Sync("lastWsRootPathChange", Date.now());
     }
 
@@ -333,7 +326,6 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
             event: "workspace change"
         };
         log.write("   workspace folder has been added or removed, process/queue event", 1);
-        /* istanbul ignore next */
         if (currentEvent) {
             eventQueue.push(fwEvent);
         }

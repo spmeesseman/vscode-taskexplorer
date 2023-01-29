@@ -22,7 +22,8 @@ import {
     activate, endRollingCount, exitRollingCount, getProjectsPath, needsTreeBuild, sleep, suiteFinished,
     testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
-import { focusExplorerView, focusSearchView } from "../utils/commandUtils";
+import { executeSettingsUpdate, focusExplorerView, focusSearchView } from "../utils/commandUtils";
+import { enableConfigWatcher } from "../../lib/watcher/configWatcher";
 
 const gruntCt = 7;
 const originalGetWorkspaceFolder = workspace.getWorkspaceFolder;
@@ -31,6 +32,8 @@ let fakeWsfStartIdx = 1;
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let testsApi: ITestsApi;
+let sortAlpha: boolean;
+let sortAlphaReset: boolean;
 let testsPath: string;
 let wsf1DirName: string;
 let wsf2DirName: string;
@@ -46,6 +49,7 @@ suite("Multi-Root Workspace Tests", () =>
         if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi, testsApi } = await activate(this));
 
+        sortAlpha = teApi.config.get<boolean>("sortProjectFoldersAlpha");
         await teApi.config.updateVs("grunt.autoDetect", false); // we ignore internally provided grunt tasks when building the tree
                                                                 // so make sure they're off for the verifyTaskCount() calls
         testsPath = getProjectsPath(".");
@@ -98,6 +102,9 @@ suite("Multi-Root Workspace Tests", () =>
         await teApi.config.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
         if (!tc.isMultiRootWorkspace) {
             workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
+        }
+        if (!sortAlphaReset){
+            await executeSettingsUpdate("sortProjectFoldersAlpha", sortAlpha);
         }
         await fsApi.deleteDir(wsf1DirName);
         await fsApi.deleteDir(wsf2DirName);
@@ -180,7 +187,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.addWorkspaceFolderEmpty);
         if (!tc.isMultiRootWorkspace)
         {
-                await testsApi.onWsFoldersChange({
+            await testsApi.onWsFoldersChange({
                 added: [ wsf[fakeWsfStartIdx + 3] ],
                 removed: []
             });
@@ -189,6 +196,34 @@ suite("Multi-Root Workspace Tests", () =>
             workspace.updateWorkspaceFolders(5, null, wsf[fakeWsfStartIdx + 3]);
         }
         await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
+        endRollingCount(this);
+    });
+
+
+    test("Re-order Workspace Folders", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.reorderWorkspaceFolders * 2);
+        enableConfigWatcher(false);
+        await executeSettingsUpdate("sortProjectFoldersAlpha", true);
+        enableConfigWatcher(true);
+        await testsApi.onWsFoldersChange({
+            added: [],
+            removed: []
+        });
+        await waitForTeIdle(tc.waitTime.reorderWorkspaceFolders);
+        enableConfigWatcher(false);
+        await executeSettingsUpdate("sortProjectFoldersAlpha", false);
+        enableConfigWatcher(true);
+        await testsApi.onWsFoldersChange({
+            added: [],
+            removed: []
+        });
+        await waitForTeIdle(tc.waitTime.reorderWorkspaceFolders);
+        enableConfigWatcher(false);
+        await executeSettingsUpdate("sortProjectFoldersAlpha", sortAlpha);
+        sortAlphaReset = true;
+        enableConfigWatcher(true);
         endRollingCount(this);
     });
 
@@ -224,9 +259,8 @@ suite("Multi-Root Workspace Tests", () =>
             });
         }
         else {
-            workspace.updateWorkspaceFolders(5, null, wsf[fakeWsfStartIdx + 3]);
+            workspace.updateWorkspaceFolders(2, 2);
         }
-        workspace.updateWorkspaceFolders(2, 2);
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         endRollingCount(this);
     });
@@ -248,6 +282,54 @@ suite("Multi-Root Workspace Tests", () =>
         }
         await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         await verifyTaskCount("grunt", gruntCt);
+        endRollingCount(this);
+    });
+
+
+    test("Add Workspace Folders 1 and 2 (Empty, Separate)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.addWorkspaceFolderEmpty * 2);
+        if (!tc.isMultiRootWorkspace)
+        {
+            testsApi.onWsFoldersChange({
+                added: [ wsf[fakeWsfStartIdx] ],
+                removed: []
+            });
+            await testsApi.onWsFoldersChange({
+                added: [ wsf[fakeWsfStartIdx + 1] ],
+                removed: []
+            });
+        }
+        else {
+            workspace.updateWorkspaceFolders(2, null, wsf[fakeWsfStartIdx]);
+            workspace.updateWorkspaceFolders(3, null, wsf[fakeWsfStartIdx + 1]);
+        }
+        await waitForTeIdle(tc.waitTime.addWorkspaceFolder * 2);
+        endRollingCount(this);
+    });
+
+
+    test("Remove Workspace Folder 1 and 2 (Empty, Separate)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.removeWorkspaceFolderEmpty * 2);
+        if (!tc.isMultiRootWorkspace)
+        {
+            testsApi.onWsFoldersChange({
+                added: [],
+                removed: [ wsf[fakeWsfStartIdx] ]
+            });
+            await testsApi.onWsFoldersChange({
+                added: [],
+                removed: [ wsf[fakeWsfStartIdx + 1] ]
+            });
+        }
+        else {
+            workspace.updateWorkspaceFolders(2, 1);
+            workspace.updateWorkspaceFolders(2, 1);
+        }
+        await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
         endRollingCount(this);
     });
 
@@ -288,7 +370,7 @@ suite("Multi-Root Workspace Tests", () =>
     test("Add Workspace Folder 2, 3, and 4 (w/ File)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.addWorkspaceFolderEmpty + tc.slowTime.addWorkspaceFolder + tc.slowTime.taskCount.verify + 20); // +20 unawaited file write
+        this.slow((tc.slowTime.addWorkspaceFolder * 3) + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             join(wsf2DirName, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
