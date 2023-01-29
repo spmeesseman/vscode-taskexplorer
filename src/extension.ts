@@ -38,7 +38,7 @@ import { ILicenseManager } from "./interface/ILicenseManager";
 import { LicenseManager } from "./lib/licenseManager";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
-import { ExtensionContext, tasks, commands, workspace, WorkspaceFolder } from "vscode";
+import { ExtensionContext, tasks, commands, workspace, WorkspaceFolder, env } from "vscode";
 import { IDictionary, IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITestsApi } from "./interface";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/watcher/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/watcher/fileWatcher";
@@ -185,6 +185,9 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
 
 const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
 {
+    const now = Date.now(),
+          lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
+          lastWsRootPathChange = await storage.get2<number>("lastWsRootPathChange", 0);
     log.methodStart("initialization", 1, "", true);
     //
     // Check license
@@ -192,16 +195,16 @@ const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
     await licenseManager.checkLicense("   ");
     //
     // Register file type watchers
-    // This also starts the file scan to build the file task file cache
+    // This "used" to also start the file scan to build the file task file cache. It now
+    // does not on startup.  We use rebuildCache() below, so as to initiate one scan as
+    // opposed to one scan per task type, like it did previously.  Note that if task types
+    // are enabled or disabled in settings after startup, then the individual calls to
+    // registerFileWatcher() will perform the scan for that task type.
     //
     await registerFileWatchers(context, api, "   ");
     //
-    // Build the file cache, this kicks off the whole process as refreshTree() will be called down
-    // the line in the initialization process.
-    //
-    const now = Date.now(),
-          lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
-          lastWsRootPathChange = await storage.get2<number>("lastWsRootPathChange", 0);
+    // Build the file cache, this kicks off the whole process as refreshTree() will be called
+    // down the line in the initialization process.
     //
     // On a workspace folder move that changes the 1st folder, VSCode restarts the extension.
     // To make the tree reload pain as light as possible, we now always persist the file cache
@@ -210,12 +213,12 @@ const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
     //
     const rootFolderChanged  = now < lastDeactivated + 5000 && /* istanbul ignore next */now < lastWsRootPathChange + 5000;
     /* istanbul ignore else */
-    if (tests || /* istanbul ignore next */!rootFolderChanged)
+    if (!rootFolderChanged || tests)
     {
         await fileCache.rebuildCache("   ");
-    }
-    else
-    {
+    }     //
+    else // See comments/notes above
+    {   //
         const enablePersistentFileCaching = configuration.get<boolean>("enablePersistentFileCaching");
         enableConfigWatcher(false);
         await configuration.update("enablePersistentFileCaching", true);
@@ -233,10 +236,16 @@ const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
     /* istanbul ignore next */
     api.sidebar?.setEnabled(true, "   ");
     //
+    // Log the environment
+    //
+    log.methodDone("initialization", 1, "", [
+        [ "machine id", env.machineId ], [ "session id", env.sessionId ], [ "app name", env.appName ],
+        [ "remote name", env.remoteName ], [ "is new ap install", env.isNewAppInstall ]
+    ]);
+    //
     // Signal that first task load has completed
     //
-    ready = true;
-    log.methodDone("initialization");
+    setTimeout(() => { ready = true; }, 1);
 };
 
 
