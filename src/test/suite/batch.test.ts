@@ -5,7 +5,7 @@
 import { join } from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
-import { BashTaskProvider } from "../../providers/bash";
+import { BatchTaskProvider } from "../../providers/batch";
 import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
@@ -55,7 +55,7 @@ suite("Batch Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        const provider = teApi.providers[testsName] as BashTaskProvider;
+        const provider = teApi.providers[testsName] as BatchTaskProvider;
         expect(provider.getDocumentPosition()).to.be.equal(0, "Script type should return position 0");
         endRollingCount(this);
     });
@@ -66,6 +66,15 @@ suite("Batch Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.taskCount.verify);
         await verifyTaskCount(testsName, startTaskCount);
+        endRollingCount(this);
+    });
+
+
+    test("Resolve Task", async function()
+    {
+        if (exitRollingCount(this)) return;
+        const provider = teApi.providers[testsName] as BatchTaskProvider;
+        provider.resolveTask((provider.cachedTasks as any[])[0]);
         endRollingCount(this);
     });
 

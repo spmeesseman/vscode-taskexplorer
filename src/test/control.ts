@@ -183,7 +183,7 @@ export const testControl: ITestControl =
         commandFast: 290,
         commandShowOutput: 1250,
         config: {
-            event: 300,
+            event: 310,
             eventFast: 105,
             registerExplorerEvent: 430,
             disableEvent: 1250,
@@ -232,7 +232,7 @@ export const testControl: ITestControl =
         },
         min: 50,
         refreshCommand: 7500,
-        refreshCommandNoChanges: 320,
+        refreshCommandNoChanges: 345,
         removeWorkspaceFolder: 2225,
         removeWorkspaceFolderEmpty: 1350,
         runCommand: 5400,

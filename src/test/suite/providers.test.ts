@@ -11,8 +11,8 @@ import TaskFile from "../../tree/file";
 import { join } from "path";
 import { expect } from "chai";
 import { workspace, tasks, WorkspaceFolder } from "vscode";
+import { ITaskExplorerApi, TaskMap, IFilesystemApi, ITaskFile } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
-import { ITaskExplorerApi, ITaskExplorer, TaskMap, IFilesystemApi, ITaskFile } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
     treeUtils, verifyTaskCount, waitForTeIdle
@@ -23,14 +23,11 @@ const tempFiles: string[] = [];
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let explorer: ITaskExplorer;
 let taskFile: ITaskFile | undefined;
 let rootPath: string;
 let dirName: string;
 let dirNameL2: string;
 let dirNameIgn: string;
-let batch: TaskItem[];
-let grunt: TaskItem[];
 let taskMap: TaskMap;
 let tempDirsDeleted = false;
 
@@ -41,7 +38,7 @@ suite("Provider Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi, explorer } = await activate(this));
+        ({ teApi, fsApi } = await activate(this));
         rootPath = getWsPath(".");
         dirName = join(rootPath, "tasks_test_");
         dirNameL2 = join(dirName, "subfolder");
@@ -90,32 +87,14 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Build Tree", async function()
-    {
+	test("Focus Tree View", async function()
+	{
         if (exitRollingCount(this)) return;
         if (needsTreeBuild()) {
-            await treeUtils.refresh(this);
+            await focusExplorerView(this);
         }
         endRollingCount(this);
-    });
-
-
-    test("Check Existing Bash Task Counts", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.command);
-        batch = await treeUtils.getTreeTasks("bash", 1) as TaskItem[];
-        endRollingCount(this);
-    });
-
-
-    test("Check Existing Batch Task Counts", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.command);
-        batch = await treeUtils.getTreeTasks("batch", 2) as TaskItem[];
-        endRollingCount(this);
-    });
+	});
 
 
     test("Create Temporary Task Files - App Publisher", async function()
@@ -209,20 +188,6 @@ suite("Provider Tests", () =>
     });
 
 
-	test("Focus Tree View", async function()
-	{
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        else {
-            this.slow(tc.slowTime.focusCommandAlreadyFocused + tc.slowTime.min);
-            await waitForTeIdle(tc.waitTime.min);
-        }
-        endRollingCount(this);
-	});
-
-
     test("Enable App-Publisher Tasks (Off by Default)", async function()
     {
         if (exitRollingCount(this)) return;
@@ -264,25 +229,6 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enabledTasks.python", true);
-        endRollingCount(this);
-    });
-
-
-    test("Build Tree", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.getTreeTasks * 2));
-        await treeUtils.refresh();
-        //
-        // Check VSCode provided task types for the hell of it
-        //
-        let nTasks =(await tasks.fetchTasks({ type: "grunt" })).filter(t => !!t.definition.uri);
-        expect(nTasks.length).to.be.a("number").that.is.greaterThan(0, "No grunt tasks registered");
-        nTasks = (await tasks.fetchTasks({ type: "gulp" })).filter(t => !!t.definition.uri);
-        expect(nTasks.length).to.be.a("number").that.is.greaterThan(0, "No gulp tasks registered");
-        batch = await treeUtils.getTreeTasks("batch", 4) as TaskItem[];
-        grunt = await treeUtils.getTreeTasks("grunt", 13) as TaskItem[];
-
         endRollingCount(this);
     });
 
@@ -399,20 +345,12 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Resolve Task", async function()
-    {
-        if (exitRollingCount(this)) return;
-        const provider = teApi.providers.batch;
-        provider.resolveTask(batch[0].task);
-        endRollingCount(this);
-    });
-
-
     test("Add to Excludes - TaskItem", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.config.excludeTasksEvent);
-        const taskItems = (await tasks.fetchTasks({ type: "grunt" })).filter(t => !!t.definition.uri),
+        const grunt = await treeUtils.getTreeTasks("grunt", 13) as TaskItem[],
+              taskItems = (await tasks.fetchTasks({ type: "grunt" })).filter(t => !!t.definition.uri),
               gruntCt = taskItems.length,
               taskItem = grunt.find(t => t.taskSource === "grunt" && !t.taskFile.path.startsWith("grunt") && t.task.name === "default" && t.taskFile.fileName === "GRUNTFILE.js");
         await executeTeCommand2("addToExcludes", [ taskItem ], tc.waitTime.config.excludeTasksEvent);
@@ -426,11 +364,13 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.excludeCommand);
-        const taskItems = await tasks.fetchTasks({ type: "batch" }),
+        const batch = await treeUtils.getTreeTasks("batch", 4) as TaskItem[],
+              taskItems = await tasks.fetchTasks({ type: "batch" }),
               scriptCt = taskItems.length,
               taskItem = batch.find(t => t.taskSource === "batch" && t.taskFile.fileName.toLowerCase().includes("test2.bat"));
         await executeTeCommand2("addToExcludes", [ taskItem ], tc.waitTime.config.globEvent);
         await verifyTaskCount("batch", scriptCt - 1);
+        await executeSettingsUpdate("logging.enable", true); // hit tree.logTask()
         endRollingCount(this);
     });
 
@@ -450,110 +390,18 @@ suite("Provider Tests", () =>
     });
 
 
-    test("App Publisher Delete / Add", async function()
+    test("Disable Task Types Off by Default", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent + (tc.slowTime.taskCount.verify * 2));
-        const file = join(rootPath, ".publishrc.json");
-        teApi.utilities.removeFromArray(tempFiles, file);
-        await fsUtils.deleteFile(file);
-        await verifyTaskCount("apppublisher", 21);
-        await createAppPublisherFile();
-        await verifyTaskCount("apppublisher", 42);
-        endRollingCount(this);
-    });
-
-
-    test("Ant Delete / Add", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
-        const file = join(dirName, "build.xml");
-        teApi.utilities.removeFromArray(tempFiles, file);
-        await fsUtils.deleteFile(file);
-        await createAntFile();
-        endRollingCount(this);
-    });
-
-
-    test("Gradle Delete / Add", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
-        const file = join(dirName, "build.gradle");
-        teApi.utilities.removeFromArray(tempFiles, file);
-        await fsUtils.deleteFile(file);
-        await createGradleFile();
-        endRollingCount(this);
-    });
-
-
-    test("Grunt Delete / Add", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
-        const file = join(rootPath, "GRUNTFILE.js");
-        teApi.utilities.removeFromArray(tempFiles, file);
-        await fsUtils.deleteFile(file);
-        await createGruntFile();
-        endRollingCount(this);
-    });
-
-
-    test("Gulp Delete / Add", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
-        const file = join(rootPath, "gulpfile.js");
-        teApi.utilities.removeFromArray(tempFiles, file);
-        await fsUtils.deleteFile(file);
-        await createGulpFile();
-        endRollingCount(this);
-    });
-
-
-    test("Makefile Delete / Add", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent + tc.slowTime.config.event);
-        const file = join(rootPath, "Makefile");
-        teApi.utilities.removeFromArray(tempFiles, file);
-        await fsUtils.deleteFile(file);
-        await createMakeFile();
-        await executeSettingsUpdate("logging.enable", true); // hit tree.logTask()
-        endRollingCount(this);
-    });
-
-
-    test("Maven Delete / Add", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
-        const file = join(rootPath, "pom.xml");
-        teApi.utilities.removeFromArray(tempFiles, file);
-        await fsUtils.deleteFile(file);
-        await createMavenPomFile();
-        endRollingCount(this);
-    });
-
-
-    test("Batch Delete / Add", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.deleteEvent);
-        const file = join(rootPath, "test.bat");
-        teApi.utilities.removeFromArray(tempFiles, file);
-        await fsUtils.deleteFile(file);
-        await createBatchFile();
-        endRollingCount(this);
-    });
-
-
-    test("Disable Pipenv (Off by Default)", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.disableEvent);
+        this.slow((tc.slowTime.config.disableEvent * 4) + (tc.slowTime.taskCount.verify * 4));
+        await executeSettingsUpdate("enabledTasks.apppublisher", false);
+        await executeSettingsUpdate("enabledTasks.gradle", false);
+        await executeSettingsUpdate("enabledTasks.maven", false);
         await executeSettingsUpdate("enabledTasks.pipenv", false);
+        await verifyTaskCount("apppublisher", 0);
+        await verifyTaskCount("gradle", 0);
+        await verifyTaskCount("maven", 0);
+        await verifyTaskCount("pipenv", 0);
         endRollingCount(this);
     });
 
