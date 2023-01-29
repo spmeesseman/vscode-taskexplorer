@@ -23,8 +23,8 @@ export const displayReleaseNotes = async(api: ITaskExplorerApi, context: Extensi
 const getPageContent = async (context: ExtensionContext, api: ITaskExplorerApi, logPad: string) =>
 {
 	const installPath = await getInstallPath(),
+	      releaseNotes = await readFileAsync(join(installPath, "res", "release-notes-html")),
 	      changeLogMd = await readFileAsync(join(installPath, "CHANGELOG.md")),
-		  // changeLogHtml = await readFileAsync(join(installPath, "res/license-manager.html")),
 		  changeLogHtml = await marked(changeLogMd, { async: true }),
 		  infoContent = getExtraContent(context, logPad + "   ");
 	const html = infoContent + changeLogHtml;

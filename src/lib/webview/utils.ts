@@ -12,7 +12,7 @@ export const createTaskCountTable = async (api: ITaskExplorerApi, tasks: Task[],
     const projects: string[] = [];
     const installPath = await getInstallPath();
     let fileCount = 0;
-    let html = await readFileAsync(join(installPath, "res/license-manager.html"));
+    let html = await readFileAsync(join(installPath, "res", "page", "license-manager.html"));
 
     html = html.replace("<!-- title -->", title);
 
