@@ -8,7 +8,7 @@ import { storage } from "./utils/storage";
 import { refreshTree } from "./refreshTree";
 import { isObject, isScriptType, isString } from "./utils/utils";
 import { ITaskExplorerApi } from "../interface";
-import { displayLicenseReport } from "./report/licensePage";
+import { displayLicenseReport } from "./webview/licensePage";
 import { ILicenseManager } from "../interface/ILicenseManager";
 import { commands, env, ExtensionContext, InputBoxOptions, Task, WebviewPanel, window } from "vscode";
 
