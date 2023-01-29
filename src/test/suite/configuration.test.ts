@@ -271,7 +271,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - OSX", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event * 2);
+        this.slow(tc.slowTime.config.event + tc.slowTime.refreshCommandNoChanges);
         // Set up coverage on if() statement in configWatcher ~ ln 240
         testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks", {
@@ -285,7 +285,7 @@ suite("Configuration / Settings Tests", () =>
         });
         testsApi.enableConfigWatcher(true);
         await teApi.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
-        await waitForTeIdle(tc.waitTime.config.event);
+        await waitForTeIdle(tc.waitTime.refreshCommandNoChanges);
         endRollingCount(this);
     });
 

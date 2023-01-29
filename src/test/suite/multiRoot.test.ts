@@ -347,9 +347,10 @@ suite("Multi-Root Workspace Tests", () =>
     test("Switch Views (Hide/Blur Explorer)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.focusCommandChangeViews + tc.slowTime.min);
+        this.slow(tc.slowTime.focusCommandChangeViews + 10);
         await focusSearchView();
-        await waitForTeIdle(tc.waitTime.min);
+        await sleep(5);
+        await waitForTeIdle(tc.waitTime.blurCommand);
         endRollingCount(this);
     });
 
@@ -381,9 +382,9 @@ suite("Multi-Root Workspace Tests", () =>
     test("Switch Views (Show/Focus Explorer)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.focusCommand + tc.slowTime.min);
+        this.slow(tc.slowTime.focusCommand);
         await focusExplorerView();
-        await waitForTeIdle(tc.waitTime.min);
+        await waitForTeIdle(tc.waitTime.focusCommand);
         endRollingCount(this);
     });
 

@@ -187,7 +187,7 @@ suite("Util Tests", () =>
     test("Logging (Method)", async function()
     {
         if (exitRollingCount(this)) return;
-		this.slow((testControl.slowTime.config.event * 2) + 50);
+		this.slow((testControl.slowTime.config.event * 2) + 75);
 
 		log.methodStart("methodName");
 		log.methodDone("methodName");

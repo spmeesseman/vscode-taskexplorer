@@ -175,7 +175,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Default", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEventAnt);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -193,7 +193,7 @@ suite("Ant Tests", () =>
     test("Ant Parser Invalid Target", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEventAnt);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -213,7 +213,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Target", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEventAnt);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -230,7 +230,7 @@ suite("Ant Tests", () =>
     test("Ant Parser No Project", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEventAnt);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -247,7 +247,7 @@ suite("Ant Tests", () =>
     test("Ant Parser Invalid Xml", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEvent);
+        this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEventAnt);
         await fsApi.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
@@ -268,7 +268,7 @@ suite("Ant Tests", () =>
     test("Restore Build.xml File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.modifyEventAnt + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(buildXmlFileUri.fsPath, buildFileXml);
         buildFileXmlRestored = true;
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);

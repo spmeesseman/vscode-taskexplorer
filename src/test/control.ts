@@ -115,6 +115,7 @@ export const testControl: ITestControl =
             deleteEventTsc: 1600,
             deleteFolderEvent: 1440,
             modifyEvent: 1125,
+            modifyEventAnt: 1225
         },
         getTreeTasks: 195,
         getTreeTasksNpm: 470, // npm task provider is slower than shit on a turtle
@@ -142,7 +143,7 @@ export const testControl: ITestControl =
         taskCommand: 1000,
         taskProviderReadUri: 90,
         tasks: {
-            antParser: 485,
+            antParser: 400,
             antTask: 3325,
             antTaskWithAnsicon: 3375,
             bashScript: 3075,
@@ -170,7 +171,7 @@ export const testControl: ITestControl =
     //
     slowTimeMultiRoot: {
         addWorkspaceFolder: 3200,
-        addWorkspaceFolderEmpty: 1510,
+        addWorkspaceFolderEmpty: 1525,
         buildTreeNoTasks: 325,
         cache: {
             build: 540,
@@ -218,6 +219,7 @@ export const testControl: ITestControl =
             deleteEventTsc: 1920,
             deleteFolderEvent: 1735,
             modifyEvent: 1430,
+            modifyEventAnt: 1590
         },
         getTreeTasks: 225,
         getTreeTasksNpm: 540, // npm task provider is slower than shit on a turtle
@@ -234,7 +236,7 @@ export const testControl: ITestControl =
         refreshCommand: 7500,
         refreshCommandNoChanges: 310,
         removeWorkspaceFolder: 2225,
-        removeWorkspaceFolderEmpty: 1850,
+        removeWorkspaceFolderEmpty: 1350,
         runCommand: 5400,
         runPauseCommand: 3590,
         runStopCommand: 3860,
@@ -245,7 +247,7 @@ export const testControl: ITestControl =
         taskCommand: 1155,
         taskProviderReadUri: 100,
         tasks: {
-            antParser: 540,
+            antParser: 440,
             antTask: 3740,
             antTaskWithAnsicon: 3795,
             bashScript: 3375,
@@ -273,6 +275,7 @@ export const testControl: ITestControl =
         // MINIMUM WAIT TIMES
         //
         addWorkspaceFolder: 225,
+        blurCommand: 250,
         command: 70,
         commandFast: 45,
         config: {
@@ -322,6 +325,7 @@ export const testControl: ITestControl =
         // MINIMUM WAIT TIMES
         //
         addWorkspaceFolder: 565,
+        blurCommand: 250,
         command: 115,
         commandFast: 70,
         config: {
@@ -432,6 +436,7 @@ export interface ISlowTimes
         deleteEventTsc: number;
         deleteFolderEvent: number;
         modifyEvent: number;
+        modifyEventAnt: number;
     };
     getTreeTasks: number;
     getTreeTasksNpm: number; // npm task provider is slower than shit on a turtle
@@ -486,6 +491,7 @@ export interface IWaitTimes
     // MINIMUM WAIT TIMES
     //
     addWorkspaceFolder: number;
+    blurCommand: number;
     command: number;
     commandFast: number;
     config: {
