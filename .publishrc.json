@@ -3,7 +3,8 @@
     "branch":                   "master",
     "buildCommand":             "npm run webpack-rebuild",
     "buildPostCommand": [
-        "npm run tsc-build_types",
+        "npm run tsc-rebuild_test",
+        "npm run tsc-rebuild_types",
         "npm run test-all",
         "npm run test-all_mws_nc",
         "npm run webpack-rebuild",

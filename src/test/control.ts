@@ -129,7 +129,7 @@ export const testControl: ITestControl =
             setLicenseCmd: 205
         },
         min: 50,
-        refreshCommand: 6575,
+        refreshCommand: 6550,
         refreshCommandNoChanges: 240,
         removeWorkspaceFolder: 500,
         removeWorkspaceFolderEmpty: 415,
