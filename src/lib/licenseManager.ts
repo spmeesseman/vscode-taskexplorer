@@ -1,7 +1,7 @@
 
 // import * as https from "http";
 import * as https from "https";
-import log from "./log/log";
+import log, { logControl } from "./log/log";
 import figures from "./figures";
 import { IncomingMessage } from "http";
 import { storage } from "./utils/storage";
@@ -53,50 +53,6 @@ export class LicenseManager implements ILicenseManager
 			this.licensed = false;
 		}
 		log.methodDone("license manager check license", 1, logPad, [[ "is licensed", this.licensed ]]);
-	}
-
-
-	async setTasks(tasks: Task[], logPad = "   ")
-	{
-		let displayPopup = !this.licensed;
-		const storedVersion = storage.get<string>("version"),
-			  lastNag = storage.get<string>("lastLicenseNag"),
-			  versionChange = this.version !== storedVersion;
-
-		if (this.numTasks === tasks.length) {
-			return;
-		}
-		this.numTasks = tasks.length;
-
-		log.methodStart("license manager set tasks", 1, logPad, false, [
-			[ "is licensed", this.licensed ], [ "stored version", storedVersion ], [ "current version", storedVersion ],
-			[ "is version change", versionChange ], [ "# of tasks", this.numTasks ], [ "last nag", lastNag ]
-		]);
-
-		//
-		// Only display the nag on startup once every 30 days.  If the version
-		// changed, the webview will be shown instead regardless of the nag state.
-		//
-		if (!this.licensed && lastNag)
-		{
-			const now = Date.now();
-			let lastNagDate = now;
-			lastNagDate = parseInt(lastNag, 10);
-			displayPopup = ((now - lastNagDate)  / 1000 / 60 / 60 / 24) > 30;
-		}
-
-		if (versionChange)
-		{
-			this.panel = await displayLicenseReport(this.teApi, this.context.subscriptions, "   ", tasks);
-			await storage.update("version", this.version);
-			await storage.update("lastLicenseNag", Date.now().toString());
-		}
-		else if (displayPopup)
-		{
-			this.displayPopup("Purchase a license to unlock unlimited parsed tasks.");
-		}
-
-		log.methodDone("license manager set tasks", 1, logPad);
 	}
 
 
@@ -197,80 +153,57 @@ export class LicenseManager implements ILicenseManager
 	isLicensed = () => this.licensed;
 
 
-	private logServerResponse = (res: IncomingMessage, jso: any, rspData: string, logPad: string) =>
-	{
-		log.write("   response received", 1, logPad);
-		log.value("      status code", res.statusCode, 2, logPad);
-		this.testsLog("   Response received");
-		this.testsLog("      Status code : " + res.statusCode);
-		log.value("      length", res.statusCode, 2, logPad);
-		this.testsLog("      Length      : " + rspData.length);
-		log.value("      success", jso.success, 2, logPad);
-		log.value("      message", jso.message, 2, logPad);
-		this.testsLog("      Success     : " +  jso.success);
-	};
-
-
-	setLicenseKey = async (licenseKey: string | undefined) => storage.updateSecret("license_key", licenseKey);
-
-
-	private setLicenseKeyFromRsp = async(licensed: boolean, jso: any) =>
-	{
-		if (licensed && jso.token)
+	private log = (msg: any, logPad?: string, value?: any, symbol?: string) => // for debugging the damn 'decryption failed' error
+	{                                                                            // I "think" it's coming from the https request below
+		if (this.teApi.isTests() && !logControl.writeToConsole)
 		{
-			if (isString(jso.token))
-			{
-				this.testsLog("      License key : " + jso.token);
-				await this.setLicenseKey(jso.token);
+			if (!value && value !== false) {
+				console.log(`       ${symbol || figures.color.infoTask} ${figures.withColor(msg.toString(), figures.colors.grey)}`);
 			}
 			else {
-				this.testsLog("      License key : " + jso.token.token);
-				this.testsLog("      Issued      : " + jso.token.issuedFmt);
-				this.testsLog("      Expires     : " + jso.token.expiresFmt || jso.expiresFmt);
-				await this.setLicenseKey(jso.token.token);
+				const valuePad = 18, diff = valuePad - msg.length;
+				for (let i = 0; i < diff; i++) {
+					msg += " ";
+				}
+				console.log(`       ${symbol || figures.color.infoTask} ${figures.withColor(msg + " : " + value, figures.colors.grey)}`);
 			}
-			this.testsLog("   License key saved to secure storage");
 		}
-		this.testsLog("Request to license server completed  successfully", figures.color.success);
+		/* istanbul ignore else */
+		if (isString(msg))
+		{
+			if (!value) {
+				log.write(msg, 1, logPad);
+			}
+			else {
+				log.value(msg, value, 1, logPad);
+			}
+		}
+		else {
+			log.error(msg);
+		}
 	};
 
 
-	setMaxTasksReached = (maxReached: boolean) => this.maxTasksReached = maxReached;
-
-
-	setTestData = (data: any) =>
+	private logServerResponse = (res: IncomingMessage, jso: any, rspData: string, logPad: string) =>
 	{
-		this.maxFreeTasks = data.maxFreeTasks || this.maxFreeTasks;
-		this.maxFreeTaskFiles = data.maxFreeTaskFiles || this.maxFreeTaskFiles;
-		this.maxFreeTasksForTaskType = data.maxFreeTasksForTaskType || this.maxFreeTasksForTaskType;
-		this.maxFreeTasksForScriptType = data.maxFreeTasksForScriptType || this.maxFreeTasksForScriptType;
-		this.host = data.host || this.host;
-		this.port = data.port || this.port;
-		this.token = data.token || this.token;
-	};
-
-
-	private testsLog = (msg: string, symbol: string = figures.color.infoTask) => // for debugging the damn 'decryption failed' error
-	{                                                                            // I "think" it's coming from the https request below
-		if (this.teApi.isTests()) {
-			console.log(`       ${symbol} ${figures.withColor(msg, figures.colors.grey)}`);
-		}
+		this.log("   response received", logPad);
+		this.log("      status code", logPad, res.statusCode);
+		this.log("      length", logPad, rspData.length);
+		this.log("      success", logPad, jso.success);
+		this.log("      message", logPad, jso.message);
 	};
 
 
 	/* istanbul ignore next*/
 	private onServerError = (e: any, logPad: string, fn: string, rspData?: string) =>
 	{
-		this.testsLog("   Error", figures.color.errorTests);
-		this.testsLog("   " + e.message, figures.color.errorTests);
-		this.testsLog("Request to license server completed w/ a failure", figures.color.errorTests);
-		log.error(e);
-		log.write("   the license server is down, offline, or there is a connection issue", 1, logPad);
-		log.write("      licensed mode will be automatically enabled", 1, logPad);
+		this.log(e, "", undefined, figures.color.errorTests);
 		if (rspData) {
-			log.error(rspData);
-			this.testsLog(rspData, figures.color.errorTests);
+			this.log(rspData, "", undefined, figures.color.errorTests);
 		}
+		this.log("   the license server is down, offline, or there is a connection issue", logPad, undefined, figures.color.errorTests);
+		this.log("   licensed mode will be automatically enabled", logPad, undefined, figures.color.errorTests);
+		this.log("request to license server completed w/ a failure", logPad + "   ", undefined, figures.color.errorTests);
 		log.methodDone(fn + " license", 1, logPad);
 	};
 
@@ -285,7 +218,7 @@ export class LicenseManager implements ILicenseManager
 
 			if (await storage.getSecret("license_key_30day") !== undefined)
 			{
-				log.write("   A 30-day license has already been this machine", 1, logPad);
+				this.log("   a 30-day license has already been allocated to this machine", logPad);
 				log.methodDone("validate license", 1, logPad);
 				setTimeout(() => resolve(undefined), 1);
 				this.busy = false;
@@ -293,43 +226,39 @@ export class LicenseManager implements ILicenseManager
 			}
 
 			let rspData = "";
-			log.write("   send get new license request", 1, logPad);
-			this.testsLog("Starting https get 30-day license request to license server");
+			this.log("starting https get 30-day license request to license server", logPad + "   ");
 
 			const req = https.request(this.getDefaultServerOptions("/token"), (res) =>
 			{
 				res.on("data", (chunk) => { rspData += chunk; });
 				res.on("end", async() =>
 				{
+					let token: string | undefined;
 					try
 					{
 						const jso = JSON.parse(rspData),
 							  licensed = res.statusCode === 200 && jso.success && jso.message === "Success" && isObject(jso.token);
 						this.logServerResponse(res, jso, rspData, logPad);
-						await this.setLicenseKeyFromRsp(licensed, jso);
-						/* istanbul ignore else*/
-						if (licensed) {
-							await storage.updateSecret("license_key_30day", jso.token.token);
-						}
-						this.busy = false;
-						log.methodDone("request license", 1, logPad, [[ "30-day license key", jso.token.token ]]);
-						resolve(licensed ? jso.token.token : /* istanbul ignore next*/undefined);
+						await this.setLicenseKeyFromRsp(licensed, jso, logPad);
+						token = jso.token.token;
+						await storage.updateSecret("license_key_30day", token);
+						log.methodDone("request license", 1, logPad, [[ "30-day license key", token ]]);
 					}
 					catch (e)
 					{   // Fails if IIS/Apache server is running but the reverse proxied app server is not, maybe
 						/* istanbul ignore next*/
 						this.onServerError(e, "request", logPad, rspData);
-						/* istanbul ignore next*/
+					}
+					finally {
 						this.busy = false;
-						/* istanbul ignore next*/
-						resolve(undefined);
+						resolve(token);
 					}
 				});
 			});
 
 			/* istanbul ignore next*/
 			req.on("error", (e) =>
-			{   // Not going to fail unless i birth a bug on the server app
+			{   // Not going to fail unless i birth a bug
 				this.onServerError(e, "request", logPad);
 				this.busy = false;
 				resolve(undefined);
@@ -346,11 +275,93 @@ export class LicenseManager implements ILicenseManager
 				tests: this.teApi.isTests()
 			}),
 			() => {
-				log.write("   output stream written, ending request and waiting for response...", 1, logPad);
-				this.testsLog("Output stream written, ending request and waiting for response...");
+				this.log("   output stream written, ending request and waiting for response...", logPad);
 				req.end();
 			});
 		});
+	};
+
+
+	setLicenseKey = async (licenseKey: string | undefined) => storage.updateSecret("license_key", licenseKey);
+
+
+	private setLicenseKeyFromRsp = async(licensed: boolean, jso: any, logPad: string) =>
+	{
+		if (licensed && jso.token)
+		{
+			if (isString(jso.token))
+			{
+				this.log("      license key", logPad, jso.token);
+				await this.setLicenseKey(jso.token);
+			}
+			else {
+				this.log("      license key", logPad, jso.token.token);
+				this.log("      issued", logPad, jso.token.issuedFmt);
+				this.log("      expires", logPad, jso.token.expiresFmt || jso.expiresFmt);
+				await this.setLicenseKey(jso.token.token);
+			}
+			this.log("   license key saved to secure storage", logPad);
+		}
+		else {
+			this.log("   license key will not be saved", logPad);
+		}
+		this.log("request to license server completed", logPad + "   ");
+	};
+
+
+	setMaxTasksReached = (maxReached: boolean) => this.maxTasksReached = maxReached;
+
+
+	async setTasks(tasks: Task[], logPad = "   ")
+	{
+		let displayPopup = !this.licensed;
+		const storedVersion = storage.get<string>("version"),
+			  lastNag = storage.get<string>("lastLicenseNag"),
+			  versionChange = this.version !== storedVersion;
+
+		if (this.numTasks === tasks.length) {
+			return;
+		}
+		this.numTasks = tasks.length;
+
+		log.methodStart("license manager set tasks", 1, logPad, false, [
+			[ "is licensed", this.licensed ], [ "stored version", storedVersion ], [ "current version", storedVersion ],
+			[ "is version change", versionChange ], [ "# of tasks", this.numTasks ], [ "last nag", lastNag ]
+		]);
+
+		//
+		// Only display the nag on startup once every 30 days.  If the version
+		// changed, the webview will be shown instead regardless of the nag state.
+		//
+		if (!this.licensed && lastNag)
+		{
+			const now = Date.now();
+			let lastNagDate = now;
+			lastNagDate = parseInt(lastNag, 10);
+			displayPopup = ((now - lastNagDate)  / 1000 / 60 / 60 / 24) > 30;
+		}
+
+		if (versionChange)
+		{
+			this.panel = await displayLicenseReport(this.teApi, this.context.subscriptions, "   ", tasks);
+			await storage.update("version", this.version);
+			await storage.update("lastLicenseNag", Date.now().toString());
+		}
+		else if (displayPopup)
+		{
+			this.displayPopup("Purchase a license to unlock unlimited parsed tasks.");
+		}
+
+		log.methodDone("license manager set tasks", 1, logPad);
+	}
+
+
+	setTestData = (data: any) =>
+	{
+		this.maxFreeTasks = data.maxFreeTasks;
+		this.maxFreeTaskFiles = data.maxFreeTaskFiles;
+		this.maxFreeTasksForTaskType = data.maxFreeTasksForTaskType;
+		this.maxFreeTasksForScriptType = data.maxFreeTasksForScriptType;
 	};
 
 
@@ -363,39 +374,37 @@ export class LicenseManager implements ILicenseManager
 			log.methodStart("validate license", 1, logPad, false, [[ "license key", licenseKey ], [ "host", this.host ], [ "port", this.port ]]);
 
 			let rspData = "";
-			log.write("   send validation request", 1, logPad);
-			this.testsLog("Starting https validate request to license server");
+			this.log("starting https validate request to license server", logPad);
 
 			const req = https.request(this.getDefaultServerOptions("/api/license/validate/v1"), (res) =>
 			{
 				res.on("data", (chunk) => { rspData += chunk; });
 				res.on("end", async() =>
 				{
+					let licensed = true;
 					try
-					{   const jso = JSON.parse(rspData),
-							  licensed = res.statusCode === 200 && jso.success && jso.message === "Success";
+					{   const jso = JSON.parse(rspData);
+						licensed = res.statusCode === 200 && jso.success && jso.message === "Success";
 						this.logServerResponse(res, jso, rspData, logPad);
 						jso.token = licenseKey;
-						await this.setLicenseKeyFromRsp(licensed, jso);
-						this.busy = false;
+						await this.setLicenseKeyFromRsp(licensed, jso, logPad);
 						log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);
-						resolve(licensed);
 					}
 					catch (e)
 					{   // Fails if IIS/Apache server is running but the reverse proxied app server is not, maybe
 						/* istanbul ignore next*/
 						this.onServerError(e, "validate", logPad, rspData);
-						/* istanbul ignore next*/
+					}
+					finally {
 						this.busy = false;
-						/* istanbul ignore next*/
-						resolve(true);
+						resolve(licensed);
 					}
 				});
 			});
 
 			/* istanbul ignore next*/
 			req.on("error", (e) =>
-			{   // Not going to fail unless i birth a bug on the server app
+			{   // Not going to fail unless i birth a bug
 				this.onServerError(e, "validate", logPad);
 				this.busy = false;
 				resolve(true);
@@ -409,8 +418,7 @@ export class LicenseManager implements ILicenseManager
 				ip: "*"
 			}),
 			() => {
-				log.write("   output stream written, ending request and waiting for response...", 1, logPad);
-				this.testsLog("Output stream written, ending request and waiting for response...");
+				this.log("   output stream written, ending request and waiting for response...", logPad);
 				req.end();
 			});
 		});
