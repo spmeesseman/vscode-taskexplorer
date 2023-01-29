@@ -288,8 +288,6 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     log.methodStart("[event] workspace folder change", 1);
 
     //
-    // TODO - remove ignore tags when tests for adding/removing workspace is implemented
-    //
     // Detect when a folder move occurs and the ext is about to deactivate/re-activate.  A
     // folder move that changes the first workspace folder will restart the extension
     // unfortunately.  Changing the first workspace folder modifies the deprecated `rootPath`
@@ -301,7 +299,7 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     // cache so that the tree reload is much quicker, especially in large workspaces.  We'll do
     // it regardless of the 'enablePersistentFileCaching' settings.
     //
-    /* istanbul ignore if */
+    /* istanbul ignore if */  // program flow can never fall here during tests as the ext reloads
     if (rootPath !== workspace.rootPath)
     {
         log.write("   workspace deprecated 'root path' has changed", 1);
@@ -316,7 +314,8 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
 
     //
     // If not a standard folder move not involving the 1st folder (in which case the `added`
-    // and `removed` count will be 0),and a folder was actually added or removed.
+    // and `removed` count will be 0) then a workspace folder was actually added or removed,
+    // and the 'removed' or 'added' count will be > 0.
     //
     else if (e.removed.length > 0 || e.added.length > 0)
     {
@@ -344,7 +343,8 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     }
 
     //
-    // Folders were moved/re-ordered but the 1st folder `rootPath` did not change
+    // The 'removed' and 'added' counts are both === 0, so folders were moved/re-ordered,
+    // and  the 1st folder `rootPath` did not change
     //
     else {
         log.write("   workspace folder order has changed", 1);
