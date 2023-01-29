@@ -59,7 +59,7 @@ suite("Pipenv Tests", () =>
 	test("Focus Tree View", async function()
 	{
         if (exitRollingCount(this)) return;
-        if (needsTreeBuild()) {
+        if (needsTreeBuild(true)) {
             await focusExplorerView(this);
         }
         endRollingCount(this);

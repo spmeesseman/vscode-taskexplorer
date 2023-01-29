@@ -10,6 +10,7 @@ import {
     activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished,
     testControl, treeUtils
 } from "../utils/utils";
+import { focusExplorerView } from "../utils/commandUtils";
 
 const testsName = "perl";
 const startTaskCount = 7;
@@ -41,14 +42,14 @@ suite("Perl Tests", () =>
     });
 
 
-    test("Build Tree", async function()
-    {
+    test("Focus Tree View", async function()
+	{
         if (exitRollingCount(this)) return;
-        if (needsTreeBuild()) {
-            await treeUtils.refresh(this);
+        if (needsTreeBuild(true)) {
+            await focusExplorerView(this);
         }
         endRollingCount(this);
-    });
+	});
 
 
 
