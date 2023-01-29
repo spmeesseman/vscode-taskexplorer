@@ -100,6 +100,7 @@
         "test-python": "npm run tsc-build_test && node ./dist/test/runTest.js python xDeactivate",
         "test-ruby": "npm run tsc-build_test && node ./dist/test/runTest.js ruby xDeactivate",
         "test-tasks": "npm run tsc-build_test && node ./dist/test/runTest.js tasks xDeactivate",
+        "test-tasks_mws": "npm run tsc-build_test && node ./dist/test/runTest.js tasks xDeactivate --multi-root",
         "test-tree": "npm run tsc-build_test && node ./dist/test/runTest.js tree xDeactivate",
         "test-tree_grouping": "npm run tsc-build_test && node ./dist/test/runTest.js treeGrouping xDeactivate",
         "test-typescript": "npm run tsc-build_test && node ./dist/test/runTest.js typescript xDeactivate",
