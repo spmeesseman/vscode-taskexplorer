@@ -154,10 +154,10 @@ export class LicenseManager implements ILicenseManager
 	isLicensed = () => this.licensed;
 
 
-	private log = (msg: any, logPad?: string, value?: any, symbol?: string) => // for debugging the damn 'decryption failed' error
+	private log = (msg: any, logPad?: string, value?: any, symbol?: string) =>
 	{
-		/* istanbul ignore if */                                                                        // I "think" it's coming from the https request below
-		if (this.teApi.isTests() && this.logRequestStepsTests && !logControl.writeToConsole)
+		/* istanbul ignore if */
+		if (this.teApi.isTests() && !logControl.writeToConsole && this.logRequestStepsTests)
 		{
 			if (!value && value !== false) {
 				console.log(`       ${symbol || figures.color.infoTask} ${figures.withColor(msg.toString(), figures.colors.grey)}`);

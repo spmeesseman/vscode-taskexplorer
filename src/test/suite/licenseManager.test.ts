@@ -92,6 +92,8 @@ suite("License Manager Tests", () =>
             await focusExplorerView(this);
 		}
 		tasks = explorer.getTasks();
+		await licMgr.setTasks(tasks, "");
+		await licMgr.setTasks(tasks);
         utils.endRollingCount(this);
 	});
 
