@@ -92,7 +92,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     /* istanbul ignore if */
     if (!tests) {
         teApi.setTests = () => {};
-        teApi.testsApi = null as unknown as ITestsApi;
+        teApi.testsApi = {} as unknown as ITestsApi;
         teApi.config = undefined as unknown as IConfiguration;
         teApi.utilities = undefined;
     }
