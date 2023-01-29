@@ -96,10 +96,10 @@ suite("Batch Tests", () =>
         this.slow(testControl.slowTime.fs.createFolderEvent + testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verify);
         await fsApi.createDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
-        await fsApi.writeFile(fileUriBat.fsPath, "echo test 123\n\n");
-        await fsApi.writeFile(fileUriCmd.fsPath, "echo test 123\n\n");
+        await fsApi.writeFile(fileUriBat.fsPath, "echo test 123\r\n\r\n");
+        await fsApi.writeFile(fileUriCmd.fsPath, "echo test 123\r\n");
         await waitForTeIdle(testControl.waitTime.fs.createEvent);
-        await verifyTaskCount(testsName, startTaskCount + 1);
+        await verifyTaskCount(testsName, startTaskCount + 2);
         endRollingCount(this);
     });
 
@@ -120,10 +120,10 @@ suite("Batch Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUriBat.fsPath, "echo test 123\n\n");
-        await fsApi.writeFile(fileUriCmd.fsPath, "echo test 123\n\n");
+        await fsApi.writeFile(fileUriBat.fsPath, "echo test 123\r\n\r\n");
+        await fsApi.writeFile(fileUriCmd.fsPath, "echo test 123\r\n");
         await waitForTeIdle(testControl.waitTime.fs.createEvent);
-        await verifyTaskCount(testsName, startTaskCount + 1);
+        await verifyTaskCount(testsName, startTaskCount + 2);
         endRollingCount(this);
     });
 
