@@ -493,13 +493,15 @@ export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxW
             waitedHasNotStarted = 0,
             hasExec = false,
             isExec = !!isExecuting(exec.task);
-        console.log(`    ${figures.color.infoTask}   ${figures.withColor(`Waiting for '${taskName}' task execution`, figures.colors.grey)}`);
+        if (tc.log.taskExecutionSteps) {
+            console.log(`    ${figures.color.infoTask}   ${figures.withColor(`Waiting for '${taskName}' task execution`, figures.colors.grey)}`);
+        }
         while ((isExec && (maxWait === undefined || waitedAfterStarted < maxWait)) || (!isExec && !hasExec && waitedHasNotStarted < 3000))
         {
             await sleep(50);
             isExec = !!isExecuting(exec.task);
             if (isExec) {
-                if (!hasExec) {
+                if (!hasExec && tc.log.taskExecutionSteps) {
                     console.log(`    ${figures.color.infoTask}     ${figures.withColor(`Task execution started, waited ${waitedAfterStarted + waitedHasNotStarted} ms`, figures.colors.grey)}`);
                 }
                 hasExec = isExec;
@@ -507,7 +509,9 @@ export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxW
             }
             else if (!hasExec) { waitedHasNotStarted += 50; }
         }
-        console.log(`    ${figures.color.infoTask}     ${figures.withColor(`Task execution wait finished, waited ${waitedAfterStarted + waitedHasNotStarted} ms`, figures.colors.grey)}`);
+        if (tc.log.taskExecutionSteps) {
+            console.log(`    ${figures.color.infoTask}     ${figures.withColor(`Task execution wait finished, waited ${waitedAfterStarted + waitedHasNotStarted} ms`, figures.colors.grey)}`);
+        }
     }
 };
 

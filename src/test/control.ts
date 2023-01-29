@@ -25,16 +25,17 @@ export const testControl: ITestControl =
     // LOGGING DEFAULTS
     //
     log: {
-        level: 2,
-        enabled: false,
-        errors: false,           // print errors to console regardless if logging is enabled or not
+        blockScaryColors: true,
         console: false,
         consoleLevel: 1,
+        enabled: false,
+        errors: false,          // print errors to console regardless if logging is enabled or not
         file: false,
         fileSymbols: false,
+        level: 2,
+        openFileOnFinish: true, // not yet. got it working opening a separate vscode instance but not existing one
         output: false,          // enabled automatically if enabled is `true` and all 3 output flags are `false`
-        openFileOnFinish: true, // nope. not yet
-        blockScaryColors: true
+        taskExecutionSteps: false
     },
     //
     // Rolling success count and failure flag
@@ -563,16 +564,17 @@ export interface ITestControl extends IDictionary<any>
     // LOGGING DEFAULTS
     //
     log: {
-        level: 1 | 2 | 3 | 4 | 5;
-        enabled: boolean;
-        errors: boolean;
+        blockScaryColors: boolean;
         console: boolean;
         consoleLevel: 1 | 2 | 3 | 4 | 5;
+        enabled: boolean;
+        errors: boolean;
         file: boolean;
         fileSymbols: boolean;
-        output: boolean;
+        level: 1 | 2 | 3 | 4 | 5;
         openFileOnFinish: boolean; // not yet
-        blockScaryColors: boolean;
+        output: boolean;
+        taskExecutionSteps: boolean;
     };
     //
     // Rolling success count and failure flag
