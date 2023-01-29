@@ -15,21 +15,22 @@ import { commands, env, ExtensionContext, InputBoxOptions, Task, WebviewPanel, w
 
 export class LicenseManager implements ILicenseManager
 {
-	private host = "license.spmeesseman.com";
-	private port = 443;
-	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 	private busy = false;
+	private context: ExtensionContext;
+	private host = "license.spmeesseman.com";
+	private licensed = false;
+	private logRequestStepsTests = false;
+	private numTasks = 0;
 	private maxFreeTasks = 500;
 	private maxFreeTaskFiles = 100;
 	private maxFreeTasksForTaskType = 100;
 	private maxFreeTasksForScriptType = 50;
-	private licensed = false;
-	private version: string;
-	private numTasks = 0;
 	private maxTasksReached = false;
 	private panel: WebviewPanel | undefined;
+	private port = 443;
 	private teApi: ITaskExplorerApi;
-	private context: ExtensionContext;
+	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
+	private version: string;
 
 
 	constructor(context: ExtensionContext, api: ITaskExplorerApi)
@@ -154,8 +155,9 @@ export class LicenseManager implements ILicenseManager
 
 
 	private log = (msg: any, logPad?: string, value?: any, symbol?: string) => // for debugging the damn 'decryption failed' error
-	{                                                                            // I "think" it's coming from the https request below
-		if (this.teApi.isTests() && !logControl.writeToConsole)
+	{
+		/* istanbul ignore if */                                                                        // I "think" it's coming from the https request below
+		if (this.teApi.isTests() && this.logRequestStepsTests && !logControl.writeToConsole)
 		{
 			if (!value && value !== false) {
 				console.log(`       ${symbol || figures.color.infoTask} ${figures.withColor(msg.toString(), figures.colors.grey)}`);
@@ -362,6 +364,7 @@ export class LicenseManager implements ILicenseManager
 		this.maxFreeTaskFiles = data.maxFreeTaskFiles;
 		this.maxFreeTasksForTaskType = data.maxFreeTasksForTaskType;
 		this.maxFreeTasksForScriptType = data.maxFreeTasksForScriptType;
+		this.logRequestStepsTests = !!data.logRequestSteps || this.logRequestStepsTests;
 	};
 
 

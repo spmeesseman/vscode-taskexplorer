@@ -33,6 +33,7 @@ export const testControl: ITestControl =
         file: false,
         fileSymbols: false,
         level: 2,
+        licServerReqSteps: false,
         openFileOnFinish: true, // not yet. got it working opening a separate vscode instance but not existing one
         output: false,          // enabled automatically if enabled is `true` and all 3 output flags are `false`
         taskExecutionSteps: false
@@ -572,6 +573,7 @@ export interface ITestControl extends IDictionary<any>
         file: boolean;
         fileSymbols: boolean;
         level: 1 | 2 | 3 | 4 | 5;
+        licServerReqSteps: boolean;
         openFileOnFinish: boolean; // not yet
         output: boolean;
         taskExecutionSteps: boolean;

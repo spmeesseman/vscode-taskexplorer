@@ -5,7 +5,6 @@
 import * as utils from "../utils/utils";
 import { expect } from "chai";
 import { Task } from "vscode";
-import { ChildProcess, fork } from "child_process";
 import { getLicenseManager } from "../../extension";
 import { testControl as tc } from "../control";
 import { ILicenseManager } from "../../interface/ILicenseManager";
@@ -13,9 +12,6 @@ import { executeTeCommand, focusExplorerView } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { join } from "path";
 
-
-const localServerToken = "HjkSgsR55WepsaWYtFoNmRMLiTJS4nKOhgXoPIuhd8zL3CVK694UXNw/n9e1GXiG9U5WiAmjGxAoETapHCjB67G0DkDZnXbbzYICr/tfpVc4NKNy1uM3GHuAVXLeKJQLtUMLfxgXYTJFNMU7H/vTaw==";
-const remoteServerToken = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 const licMgrMaxFreeTasks = 500;             // Should be set to what the constants are in lib/licenseManager
 const licMgrMaxFreeTaskFiles = 100;         // Should be set to what the constants are in lib/licenseManager
 const licMgrMaxFreeTasksForTaskType = 100;  // Should be set to what the constants are in lib/licenseManager
@@ -27,7 +23,7 @@ let explorer: ITaskExplorer;
 let licMgr: ILicenseManager;
 let tasks: Task[] = [];
 let setTasksCallCount = 0;
-let lsProcess: ChildProcess | undefined;
+
 
 suite("License Manager Tests", () =>
 {
@@ -52,6 +48,14 @@ suite("License Manager Tests", () =>
 		oLicenseKey = await teApi.testsApi.storage.getSecret("license_key");
 		oVersion = teApi.testsApi.storage.get<string>("version");
 		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
+		licMgr = getLicenseManager();
+		licMgr.setTestData({
+			logRequestSteps: tc.log.licServerReqSteps,
+			maxFreeTasks: licMgrMaxFreeTasks,
+			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
+			maxFreeTasksForTaskType: licMgrMaxFreeTasksForTaskType,
+			maxFreeTasksForScriptType: licMgrMaxFreeTasksForScriptType
+		});
         utils.endRollingCount(this, true);
 	});
 
@@ -62,10 +66,6 @@ suite("License Manager Tests", () =>
 		teApi.setTests(true);
 		licMgr?.dispose();
 		await utils.closeEditors();
-		if (lsProcess) { // shut down local server
-			lsProcess.send("close");
-			await utils.sleep(500);
-		}
 		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
 		if (oLicenseKey) {
 			await teApi.testsApi.storage.updateSecret("license_key", oLicenseKey);
@@ -91,18 +91,7 @@ suite("License Manager Tests", () =>
 		if (utils.needsTreeBuild(true)) {
             await focusExplorerView(this);
 		}
-        utils.endRollingCount(this);
-	});
-
-
-	test("Get License Manager", async function()
-	{
-        if (utils.exitRollingCount(this)) return;
-		licMgr = getLicenseManager();
 		tasks = explorer.getTasks();
-		await licMgr.setTasks(tasks, "");
-		await licMgr.setTasks(tasks);
-		licMgr.dispose();
         utils.endRollingCount(this);
 	});
 
