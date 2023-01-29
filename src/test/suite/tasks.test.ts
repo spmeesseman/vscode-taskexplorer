@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
@@ -343,18 +344,23 @@ suite("Task Tests", () =>
         //
         if (utils.exitRollingCount(this)) return;
         const slowTime = (tc.slowTime.runCommand * 1) + 5000 + startTaskSlowTime + tc.slowTime.runStopCommand +
-                         (tc.slowTime.command * 2) + (tc.slowTime.config.event * 4) + tc.slowTime.tasks.batchScriptBat + tc.slowTime.config.showHideSpecialFolder;
+                         (tc.slowTime.command * 3) + (tc.slowTime.config.event * 4) + tc.slowTime.tasks.batchScriptBat + tc.slowTime.config.showHideSpecialFolder;
         this.slow(slowTime);
         const batchTask = batch[1];
         await startTask(batchTask as TaskItem, true);
         await executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await executeSettingsUpdate("taskButtons.clickAction", "Execute");
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
-        let exec = await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
+        utils.overrideNextShowInputBox(undefined);
+        let exec = await executeTeCommand2("runWithArgs", [ batchTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
+        expect(exec).to.be.undefined;
+        exec = await executeTeCommand2("runWithArgs", [ batchTask, "--test --test2" ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
+        expect(exec).to.not.be.undefined;
         await utils.waitForTaskExecution(exec, 1500);
         await executeTeCommand2("stop", [ batchTask ], tc.waitTime.taskCommand);
         utils.overrideNextShowInputBox("--test --test2");
         exec = await executeTeCommand2("runWithArgs", [ batchTask ], tc.waitTime.runCommandMin + 1000) as TaskExecution | undefined;
+        expect(exec).to.not.be.undefined;
         await executeSettingsUpdate("showRunningTask", true);
         await executeTeCommand2("openTerminal", [ batchTask ], tc.waitTime.command);
         await utils.waitForTaskExecution(exec);

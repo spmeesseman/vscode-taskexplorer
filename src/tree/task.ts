@@ -314,7 +314,6 @@ export const runWithArgs = async(taskItem: TaskItem, lastTasks: SpecialTaskFolde
         const _run = async (_args: string | undefined) =>
         {
             let exec: TaskExecution | undefined;
-            /* istanbul ignore else */
             if (_args)
             {
                 let newTask = taskItem.task;
