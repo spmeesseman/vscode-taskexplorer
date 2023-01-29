@@ -401,8 +401,8 @@ suite("Multi-Root Workspace Tests", () =>
                 return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx];
             };
             await testsApi.onWsFoldersChange({
-                added: [],
-                removed: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ]
+                added: [ wsf[fakeWsfStartIdx] ],
+                removed: []
             });
             await waitForTeIdle(tc.waitTime.addWorkspaceFolder);
             await verifyTaskCount("grunt", gruntCt); // vscode doesn't return the fake ws folder's tasks in fetchTasks()
@@ -419,13 +419,13 @@ suite("Multi-Root Workspace Tests", () =>
     test("Remove WS Folder 1 (Cache Builder Busy)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify + (tc.slowTime.cache.rebuildCancel * 2) + 200);
+        this.slow(tc.slowTime.removeWorkspaceFolder + tc.slowTime.taskCount.verify + tc.slowTime.cache.rebuildCancel + 200);
         teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
         await sleep(100);
         if (!tc.isMultiRootWorkspace) {
             await testsApi.onWsFoldersChange({ // event will wait for previous fil cache build
-                added: [ wsf[fakeWsfStartIdx] ],
-                removed: []
+                added: [],
+                removed: [ wsf[fakeWsfStartIdx] ]
             });
         }
         else {

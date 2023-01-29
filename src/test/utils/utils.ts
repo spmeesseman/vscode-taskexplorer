@@ -289,8 +289,10 @@ export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean, isT
     }
     catch (e: any)
     {
-        const msg = `skip test ${(testIdx || -1) + 1} due to rolling success count failure`;
-        console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
+        if (!hasRollingCountError) {
+            const msg = `rolling success count failure @ test ${(testIdx || -1) + 1}, all further tests will be skipped`;
+            console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
+        }
         hasRollingCountError = true;
         if (suite.tests.filter(t => t.isFailed).length === 0) {
             throw new Error("Rolling count error: " + e.message);

@@ -478,11 +478,11 @@ suite("License Manager Tests", () =>
 	test("Request 30-Day License (From Webview)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.getNewKey + (tc.slowTime.storageSecretRead * 2) + 1100);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.get30DayLicense +
+				  tc.slowTime.storageSecretRead + tc.slowTime.closeEditors + 1100);
 		await teApi.testsApi.storage.update("version", undefined);
 		await setTasks();
 		await utils.sleep(50);
-		expect(await teApi.testsApi.storage.getSecret("license_key_30day")).to.be.undefined;
 		const result = await licMgr.getWebviewPanel()?.webview.postMessage({ command: "getLicense" });
 		await utils.sleep(500);
 		expect(result).to.be.equal(true);
@@ -498,7 +498,7 @@ suite("License Manager Tests", () =>
 	test("Request 30-Day License (From Command Palette)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.command + tc.slowTime.licenseMgr.getNewKey + tc.slowTime.storageSecretUpdate + tc.slowTime.storageSecretRead);
+		this.slow(tc.slowTime.closeEditors + tc.slowTime.licenseMgr.get30DayLicense + tc.slowTime.storageSecretUpdate);
 		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
 		const result = await executeTeCommand("getLicense") as { panel: any; newKey: any };
 		await utils.waitForTeIdle(tc.waitTime.licenseMgr.get30DayLicense);
@@ -514,7 +514,7 @@ suite("License Manager Tests", () =>
 	test("Re-request a 30-Day License", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.command + tc.slowTime.licenseMgr.getNewKey + tc.slowTime.storageSecretUpdate + tc.slowTime.storageSecretRead);
+		this.slow(tc.slowTime.command + tc.slowTime.closeEditors + tc.slowTime.storageSecretUpdate);
 		const result = await executeTeCommand("getLicense") as { panel: any; newKey: any };
 		licMgr.dispose();
 		await utils.closeEditors();

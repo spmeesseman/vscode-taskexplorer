@@ -108,7 +108,7 @@ export const createWebviewPanel = async(title: string, html: string, disposables
 	panel.webview.onDidReceiveMessage
 	(
 		message => {
-            // don't await?
+            // i think don't await, the caller can't get the final result anyway
 			commands.executeCommand("vscode-taskexplorer." + message.command);
 		},
         undefined,
