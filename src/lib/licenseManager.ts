@@ -6,7 +6,7 @@ import figures from "./figures";
 import { IncomingMessage } from "http";
 import { storage } from "./utils/storage";
 import { refreshTree } from "./refreshTree";
-import { isScriptType, isString } from "./utils/utils";
+import { isObject, isScriptType, isString } from "./utils/utils";
 import { ITaskExplorerApi } from "../interface";
 import { displayLicenseReport } from "./report/licensePage";
 import { ILicenseManager } from "../interface/ILicenseManager";
@@ -18,6 +18,7 @@ export class LicenseManager implements ILicenseManager
 	private host = "license.spmeesseman.com";
 	private port = 443;
 	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
+	private busy = false;
 	private maxFreeTasks = 500;
 	private maxFreeTaskFiles = 100;
 	private maxFreeTasksForTaskType = 100;
@@ -190,6 +191,9 @@ export class LicenseManager implements ILicenseManager
 	getWebviewPanel = () => this.panel;
 
 
+	isBusy = () => this.busy;
+
+
 	isLicensed = () => this.licensed;
 
 
@@ -222,7 +226,7 @@ export class LicenseManager implements ILicenseManager
 			else {
 				this.testsLog("      License key : " + jso.token.token);
 				this.testsLog("      Issued      : " + jso.token.issuedFmt);
-				this.testsLog("      Expires     : " + jso.token.expiresFmt || jso.expires);
+				this.testsLog("      Expires     : " + jso.token.expiresFmt || jso.expiresFmt);
 				await this.setLicenseKey(jso.token.token);
 			}
 			this.testsLog("   License key saved to secure storage");
@@ -273,6 +277,8 @@ export class LicenseManager implements ILicenseManager
 
 	requestLicense = (logPad: string) =>
 	{
+		this.busy = true;
+
 		return new Promise<string | undefined>(async(resolve) =>
 		{
 			log.methodStart("request license", 1, logPad, false, [[ "host", this.host ], [ "port", this.port ]]);
@@ -282,6 +288,7 @@ export class LicenseManager implements ILicenseManager
 				log.write("   A 30-day license has already been this machine", 1, logPad);
 				log.methodDone("validate license", 1, logPad);
 				setTimeout(() => resolve(undefined), 1);
+				this.busy = false;
 				return;
 			}
 
@@ -297,20 +304,23 @@ export class LicenseManager implements ILicenseManager
 					try
 					{
 						const jso = JSON.parse(rspData),
-							  licensed = res.statusCode === 200 && jso.success && jso.message === "Success" && jso.token;
+							  licensed = res.statusCode === 200 && jso.success && jso.message === "Success" && isObject(jso.token);
 						this.logServerResponse(res, jso, rspData, logPad);
 						await this.setLicenseKeyFromRsp(licensed, jso);
 						/* istanbul ignore else*/
 						if (licensed) {
-							await storage.updateSecret("license_key_30day", jso.token);
+							await storage.updateSecret("license_key_30day", jso.token.token);
 						}
-						log.methodDone("request license", 1, logPad, [[ "30-day license key", jso.token ]]);
-						resolve(licensed ? jso.token : /* istanbul ignore next*/undefined);
+						this.busy = false;
+						log.methodDone("request license", 1, logPad, [[ "30-day license key", jso.token.token ]]);
+						resolve(licensed ? jso.token.token : /* istanbul ignore next*/undefined);
 					}
 					catch (e)
 					{   // Fails if IIS/Apache server is running but the reverse proxied app server is not, maybe
 						/* istanbul ignore next*/
 						this.onServerError(e, "request", logPad, rspData);
+						/* istanbul ignore next*/
+						this.busy = false;
 						/* istanbul ignore next*/
 						resolve(undefined);
 					}
@@ -321,6 +331,7 @@ export class LicenseManager implements ILicenseManager
 			req.on("error", (e) =>
 			{   // Not going to fail unless i birth a bug on the server app
 				this.onServerError(e, "request", logPad);
+				this.busy = false;
 				resolve(undefined);
 			});
 
@@ -331,7 +342,8 @@ export class LicenseManager implements ILicenseManager
 				appname: "vscode-taskexplorer",
 				ip: "*",
 				json: true,
-				license: true
+				license: true,
+				tests: this.teApi.isTests()
 			}),
 			() => {
 				log.write("   output stream written, ending request and waiting for response...", 1, logPad);
@@ -344,6 +356,8 @@ export class LicenseManager implements ILicenseManager
 
 	private validateLicense = (licenseKey: string, logPad: string) =>
 	{
+		this.busy = true;
+
 		return new Promise<boolean>((resolve) =>
 		{
 			log.methodStart("validate license", 1, logPad, false, [[ "license key", licenseKey ], [ "host", this.host ], [ "port", this.port ]]);
@@ -363,6 +377,7 @@ export class LicenseManager implements ILicenseManager
 						this.logServerResponse(res, jso, rspData, logPad);
 						jso.token = licenseKey;
 						await this.setLicenseKeyFromRsp(licensed, jso);
+						this.busy = false;
 						log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);
 						resolve(licensed);
 					}
@@ -370,6 +385,8 @@ export class LicenseManager implements ILicenseManager
 					{   // Fails if IIS/Apache server is running but the reverse proxied app server is not, maybe
 						/* istanbul ignore next*/
 						this.onServerError(e, "validate", logPad, rspData);
+						/* istanbul ignore next*/
+						this.busy = false;
 						/* istanbul ignore next*/
 						resolve(true);
 					}
@@ -380,6 +397,7 @@ export class LicenseManager implements ILicenseManager
 			req.on("error", (e) =>
 			{   // Not going to fail unless i birth a bug on the server app
 				this.onServerError(e, "validate", logPad);
+				this.busy = false;
 				resolve(true);
 			});
 

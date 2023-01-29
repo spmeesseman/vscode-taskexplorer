@@ -343,16 +343,13 @@ export async function deactivate()
 }
 
 
-export function getLicenseManager()
-{
-    return licenseManager;
-}
+export const getLicenseManager = () => licenseManager;
 
 
 function isBusy()
 {
     return !ready || fileCache.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
-           isProcessingFsEvent() || isProcessingConfigChange();
+           isProcessingFsEvent() || isProcessingConfigChange() || licenseManager.isBusy();
 }
 
 

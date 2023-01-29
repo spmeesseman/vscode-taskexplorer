@@ -123,6 +123,7 @@ export const testControl: ITestControl =
             pageWithDetail: 270,
             checkLicense: 395,
             enterKey: 840,
+            get30DayLicense: 1000,
             getMaxTasks: 365,
             getNewKey: 750,
             setLicenseCmd: 205
@@ -226,6 +227,7 @@ export const testControl: ITestControl =
             pageWithDetail: 275,
             checkLicense: 405,
             enterKey: 845,
+            get30DayLicense: 1000,
             getMaxTasks: 370,
             getNewKey: 800,
             setLicenseCmd: 220
@@ -301,6 +303,9 @@ export const testControl: ITestControl =
         },
         getTreeMin: 170,
         getTreeTasks: 50,
+        licenseMgr: {
+            get30DayLicense: 250
+        },
         max: 12000,
         min: 35,
         npmCommandMin: 1100,
@@ -347,6 +352,9 @@ export const testControl: ITestControl =
         },
         getTreeMin: 250,
         getTreeTasks: 80,
+        licenseMgr: {
+            get30DayLicense: 300
+        },
         max: 15000,
         min: 55,
         npmCommandMin: 1700,
@@ -434,6 +442,7 @@ export interface ISlowTimes
         pageWithDetail: number;
         checkLicense: number;
         enterKey: number;
+        get30DayLicense: number;
         getMaxTasks: number;
         getNewKey: number;
         setLicenseCmd: number;
@@ -508,6 +517,9 @@ export interface IWaitTimes
     };
     getTreeMin: number;
     getTreeTasks: number;
+    licenseMgr: {
+        get30DayLicense: number;
+    };
     max: number;
     min: number;
     npmCommandMin: number;

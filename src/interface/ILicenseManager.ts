@@ -10,6 +10,7 @@ export interface ILicenseManager
     getMaxNumberOfTaskFiles: () => number;
     getVersion: () => string;
     getWebviewPanel: () => WebviewPanel | undefined;
+    isBusy: () => boolean;
     isLicensed: () => boolean;
     requestLicense: (logPad: string) => Promise<string | undefined>;
     setLicenseKey: (licenseKey: string | undefined) => Promise<void>;

@@ -483,26 +483,45 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(50);
 		expect(await teApi.testsApi.storage.getSecret("license_key_30day")).to.be.undefined;
-		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "getLicense" });
+		const result = await licMgr.getWebviewPanel()?.webview.postMessage({ command: "getLicense" });
 		await utils.sleep(500);
+		expect(result).to.be.equal(true);
+		await utils.waitForTeIdle(tc.waitTime.licenseMgr.get30DayLicense);
+		const newKey = await teApi.testsApi.storage.getSecret("license_key_30day");
 		licMgr.dispose();
 		await utils.closeEditors();
-		expect(await teApi.testsApi.storage.getSecret("license_key_30day")).to.not.be.undefined;
+		expect(newKey).to.be.a("string").with.length.that.is.greaterThan(20);
         utils.endRollingCount(this);
 	});
 
 
-	test("Re-request 30-Day License (From Command Palette)", async function()
+	test("Request 30-Day License (From Command Palette)", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
+		this.slow(tc.slowTime.command + tc.slowTime.licenseMgr.getNewKey + tc.slowTime.storageSecretUpdate + tc.slowTime.storageSecretRead);
+		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
+		const result = await executeTeCommand("getLicense") as { panel: any; newKey: any };
+		await utils.waitForTeIdle(tc.waitTime.licenseMgr.get30DayLicense);
+		licMgr.dispose();
+		await utils.closeEditors();
+		expect(result).to.be.an("object");
+		expect(result.panel).to.not.be.undefined;
+		expect(result.newKey).to.be.a("string").with.length.that.is.greaterThan(20);
+        utils.endRollingCount(this);
+	});
+
+
+	test("Re-request a 30-Day License", async function()
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.command + tc.slowTime.licenseMgr.getNewKey + tc.slowTime.storageSecretUpdate + tc.slowTime.storageSecretRead);
 		const result = await executeTeCommand("getLicense") as { panel: any; newKey: any };
-		expect(result).to.be.an("object");
-		expect(result.panel).to.not.be.undefined;
-		expect(result.newKey).to.be.undefined;
 		licMgr.dispose();
 		await utils.closeEditors();
 		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
+		expect(result).to.be.an("object");
+		expect(result.panel).to.not.be.undefined;
+		expect(result.newKey).to.be.undefined;
         utils.endRollingCount(this);
 	});
 
