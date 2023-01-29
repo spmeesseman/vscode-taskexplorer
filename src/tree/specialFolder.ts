@@ -411,10 +411,8 @@ export default class SpecialTaskFolder extends TaskFolder
             if (persist)
             {
                 const idx = this.store.findIndex(f => f === id);
-                if (idx !== -1) {
-                    this.store.splice(idx, 1);
-                    await storage.update(constants.LAST_TASKS_STORE, this.store);
-                }
+                this.store.splice(idx, 1);
+                await storage.update(constants.LAST_TASKS_STORE, this.store);
             }
             this.explorer.fireTreeRefreshEvent(logPad, 1, this);
         }
