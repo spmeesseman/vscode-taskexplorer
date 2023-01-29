@@ -144,7 +144,7 @@ suite("Task Tests", () =>
         const exec = await executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         expect(exec).to.not.be.equal(undefined, "Starting the 'batch0' task did not return a valid TaskExecution");
         await utils.waitForTaskExecution(exec, 2000);
-        await executeTeCommand2("stop", [ batch[0] ], tc.waitTime.runCommandMin);
+        await executeTeCommand2("stop", [ batch[0] ], tc.waitTime.taskCommand);
         await utils.waitForTaskExecution(exec, 1000);
         utils.endRollingCount(this);
     });
@@ -159,7 +159,7 @@ suite("Task Tests", () =>
         await executeTeCommand2("pause", [ batch[0] ], tc.waitTime.taskCommand);
         await utils.sleep(500);
         await utils.waitForTaskExecution(exec, 500);
-        await executeTeCommand2("stop", [ batch[0] ]);
+        await executeTeCommand2("stop", [ batch[0] ], tc.waitTime.taskCommand);
         utils.endRollingCount(this);
     });
 
