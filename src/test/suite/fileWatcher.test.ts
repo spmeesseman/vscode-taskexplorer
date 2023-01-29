@@ -399,7 +399,7 @@ suite("File Watcher Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.fs.createEvent * 2) + tc.slowTime.taskCount.verify + 3450);
         await writeGruntFile("grunt2_0", 1, "");
-        await writeGruntFile("grunt2_0", 1, " ");
+        writeGruntFile("grunt2_0", 1, " ");
         await writeGruntFile("grunt2_0", 1, "  ");
         await writeGruntFile("grunt2_0", 125, "   ");
         await writeGruntFile("grunt2_0", 125, "    ");
