@@ -343,7 +343,7 @@ suite("Task Tests", () =>
         // There are 2 batch file "tasks" - they both utils.sleep for 7 seconds, 1 second at a time
         //
         if (utils.exitRollingCount(this)) return;
-        const slowTime = (tc.slowTime.runCommand * 1) + 5000 + startTaskSlowTime + tc.slowTime.runStopCommand +
+        const slowTime = (tc.slowTime.runCommand * 1) + 5000 /* 7500 */ + startTaskSlowTime + (tc.slowTime.runStopCommand * 1 /* 2 */) +
                          (tc.slowTime.command * 3) + (tc.slowTime.config.event * 4) + tc.slowTime.tasks.batchScriptBat + tc.slowTime.config.showHideSpecialFolder;
         this.slow(slowTime);
         const batchTask = batch[1];
@@ -358,6 +358,15 @@ suite("Task Tests", () =>
         expect(exec).to.not.be.undefined;
         await utils.waitForTaskExecution(exec, 1500);
         await executeTeCommand2("stop", [ batchTask ], tc.waitTime.taskCommand);
+        // const tree = explorer.getTaskTree() as ITaskFolder[];
+        // expect(tree).to.not.be.oneOf([ undefined, null ]);
+        // const lastTasksFolder = tree[0] as SpecialTaskFolder;
+        // const lastTasksItem = lastTasksFolder.taskFiles[0];
+        // utils.overrideNextShowInputBox("--test --test2");
+        // exec = await executeTeCommand2("runWithArgs", [ lastTasksItem ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
+        // expect(exec).to.not.be.undefined;
+        // await utils.waitForTaskExecution(exec, 1250);
+        // await executeTeCommand2("stop", [ batchTask ], tc.waitTime.taskCommand);
         utils.overrideNextShowInputBox("--test --test2");
         exec = await executeTeCommand2("runWithArgs", [ batchTask ], tc.waitTime.runCommandMin + 1000) as TaskExecution | undefined;
         expect(exec).to.not.be.undefined;
@@ -437,7 +446,7 @@ async function startTask(taskItem: TaskItem, addToSpecial: boolean)
             await executeTeCommand2("addRemoveFavorite", [ taskItem ]);
         }
         const taskTree = explorer.getTaskTree();
-        if(taskTree)
+        if (taskTree)
         {
             const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
                            (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);

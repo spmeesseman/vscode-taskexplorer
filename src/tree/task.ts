@@ -15,7 +15,7 @@ import { providers, providersExternal } from "../extension";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import {
     CustomExecution, InputBoxOptions, Selection, ShellExecution, Task, TaskDefinition,
-    TaskExecution, TaskRevealKind, tasks, TextDocument, Uri, window, workspace
+    TaskExecution, TaskRevealKind, tasks, TextDocument, Uri, window, workspace, WorkspaceFolder
 } from "vscode";
 
 // const views: IDictionary<any> = {};
@@ -319,14 +319,13 @@ export const runWithArgs = async(taskItem: TaskItem, lastTasks: SpecialTaskFolde
                 let newTask = taskItem.task;
                 const def = taskItem.task.definition,
                       folder = taskItem.getFolder();
-                /* istanbul ignore else */
-                if (folder)
-                {
+                // if (folder)
+                // {
                     newTask = (new ScriptTaskProvider()).createTask(
-                        def.script, undefined, folder, def.uri, _args.trim().split(" "), logPad + "   "
+                        def.script, undefined, folder as WorkspaceFolder, def.uri, _args.trim().split(" "), logPad + "   "
                     ) as Task;
                     newTask.definition.taskItemId = def.taskItemId;
-                }
+                // }
                 exec = await runTask(newTask, taskItem, lastTasks, noTerminal, logPad + "   ");
             }
             return exec;
