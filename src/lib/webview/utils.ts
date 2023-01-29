@@ -82,6 +82,12 @@ export const createTaskCountTable = async (api: ITaskExplorerApi, tasks: Task[],
     html = html.replace(/\$\{taskTypes.length\}/g, Object.keys(taskCounts).length.toString());
     html = html.replace(/\$\{taskFiles.length\}/g, fileCount.toString());
 
+    return cleanLicenseButtons(html, api);
+};
+
+
+export const cleanLicenseButtons = (html: string, api: ITaskExplorerApi) =>
+{
     if (api.isLicensed())
     {
         let idx1 = html.indexOf("<!-- startEnterLicenseButton -->"),
@@ -91,7 +97,6 @@ export const createTaskCountTable = async (api: ITaskExplorerApi, tasks: Task[],
         idx2 = html.indexOf("<!-- endGetLicenseButton -->") + 28;
         html = html.replace(html.slice(idx1, idx2), "");
     }
-
     return html;
 };
 
