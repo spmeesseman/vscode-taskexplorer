@@ -2,7 +2,6 @@
     "projectName":              "vscode-taskexplorer",
     "branch":                   "master",
     "buildCommand":             "npm run webpack-rebuild",
-    "buildPreCommand":          "npm run create-release-notes-html",
     "buildPostCommand": [
         "npm run tsc-rebuild_test",
         "npm run tsc-rebuild_types",
