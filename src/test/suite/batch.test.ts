@@ -107,7 +107,7 @@ suite("Batch Tests", () =>
         await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
         await fsApi.writeFile(fileUriBat.fsPath, "echo test 123\r\n\r\n");
         await fsApi.writeFile(fileUriCmd.fsPath, "echo test 123\r\n");
-        await waitForTeIdle(testControl.waitTime.fs.createEvent);
+        await waitForTeIdle(testControl.waitTime.fs.createEvent + 50);
         await verifyTaskCount(testsName, startTaskCount + 2);
         endRollingCount(this);
     });
@@ -131,7 +131,7 @@ suite("Batch Tests", () =>
         this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify);
         await fsApi.writeFile(fileUriBat.fsPath, "echo test 123\r\n\r\n");
         await fsApi.writeFile(fileUriCmd.fsPath, "echo test 123\r\n");
-        await waitForTeIdle(testControl.waitTime.fs.createEvent);
+        await waitForTeIdle(testControl.waitTime.fs.createEvent + 50);
         await verifyTaskCount(testsName, startTaskCount + 2);
         endRollingCount(this);
     });
