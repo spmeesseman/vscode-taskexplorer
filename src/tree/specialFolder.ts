@@ -184,7 +184,7 @@ export default class SpecialTaskFolder extends TaskFolder
             return false;
         }
 
-        this.taskFiles = []; // insertTaskFile() rebuilds this.taskFiles
+        this.clearTaskItems();
         for (const tId of this.store)
         {
             const taskItem2 = this.explorer.getTaskMap()[tId];
@@ -383,18 +383,16 @@ export default class SpecialTaskFolder extends TaskFolder
             changed = this.build("   ");
         }
         else {
-            /* istanbul ignore else */
             if (tree[0].label === this.label) {
                 tree.splice(0, 1);
                 changed = true;
             }
-            else if (tree[1].label === this.label) {
+            else { // if (tree[1].label === this.label) {
                 tree.splice(1, 1);
                 changed = true;
             }
         }
 
-        /* istanbul ignore else */
         if (changed) {
             this.explorer.fireTreeRefreshEvent(logPad + "   ", 1);
         }
@@ -413,7 +411,6 @@ export default class SpecialTaskFolder extends TaskFolder
             if (persist)
             {
                 const idx = this.store.findIndex(f => f === id);
-                /* istanbul ignore else */
                 if (idx !== -1) {
                     this.store.splice(idx, 1);
                     await storage.update(constants.LAST_TASKS_STORE, this.store);
