@@ -25,6 +25,7 @@ export default
     color:
     {
         success: withColor("✔", colors.green),
+        successBlue: withColor("✔", colors.blue),
         info: withColor("ℹ", colors.magenta),
         infoTask: withColor("ℹ", colors.blue),
         warning: withColor("⚠", colors.yellow),

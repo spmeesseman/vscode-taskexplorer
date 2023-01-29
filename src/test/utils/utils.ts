@@ -293,7 +293,7 @@ export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean, isT
             const msg = `rolling success count failure @ test ${(testIdx || -1) + 1}, all further tests will be skipped`;
             console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
         }
-        hasRollingCountError = true;
+        setFailed(false);
         if (suite.tests.filter(t => t.isFailed).length === 0) {
             throw new Error("Rolling count error: " + e.message);
         }
@@ -381,10 +381,12 @@ export const overrideNextShowInfoBox = (value: any) => overridesShowInfoBox.push
 export const setExplorer = (explorer: ITaskExplorer) => teExplorer = explorer;
 
 
-export const setFailed = () =>
+export const setFailed = (ctrlc = true) =>
 {
-    caughtControlC = true;
+    caughtControlC = ctrlc;
     hasRollingCountError = true;
+    const { symbols } = require("mocha/lib/reporters/base");
+    symbols.ok = figures.withColor(figures.pointer, figures.colors.blue);
 };
 
 
