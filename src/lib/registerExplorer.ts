@@ -40,17 +40,19 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
     {
         if (view)
         {
-            if (name === "taskExplorer" && teApi.explorer)
+            if (name === "taskExplorer")
             {
-                teApi.explorer.setEnabled(false, logPad + "   ");
-                teApi.explorer.dispose(context);
+                const explorer = teApi.explorer as ITaskExplorer;
+                explorer.setEnabled(false, logPad + "   ");
+                explorer.dispose(context);
                 teApi.explorer = undefined;
                 teApi.explorerView = undefined;
             }
-            else /* istanbul ignore else */if (teApi.sidebar) // name === "taskExplorerSideBar"
+            else
             {
-                teApi.sidebar.setEnabled(false, logPad + "   ");
-                teApi.sidebar.dispose(context);
+                const sidebar = teApi.sidebar as ITaskExplorer;
+                sidebar.setEnabled(false, logPad + "   ");
+                sidebar.dispose(context);
                 teApi.sidebar = undefined;
                 teApi.sidebarView = undefined;
             }

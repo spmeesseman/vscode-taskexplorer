@@ -93,7 +93,7 @@ export const testControl: ITestControl =
             globEvent: 1125,
             groupingEvent: 990,
             pathToProgramsEvent: 710,
-            showHideSpecialFolder: 495,
+            showHideSpecialFolder: 500,
             showHideUserTasks: 1000,
             readEvent: 25,
             sortingEvent: 750,
