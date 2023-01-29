@@ -49,14 +49,24 @@ async function main(args: string[])
 
     try
     {
+        const xArgs: string[] = [],
+              testsArgs: string[] = [];
         if (args && args.length > 0)
         {
             console.log("Arguments: " + args.toString());
-            const idx = args.indexOf("--multi-root");
-            if (idx !== -1) {
-                multiRoot = true;
-                args.splice(idx, 1);
-            }
+            args.forEach((a) =>
+            {
+                if (a.startsWith("-"))
+                {
+                    xArgs.push(a);
+                    if (a === "--multi-root") {
+                        multiRoot = true;
+                    }
+                }
+                else {
+                    testsArgs.push(a);
+                }
+            });
         }
         else {
             console.log("Arguments: None");
@@ -113,7 +123,7 @@ async function main(args: string[])
             extensionDevelopmentPath,
             extensionTestsPath,
             launchArgs: [ testsWorkspace, "--disable-extensions", "--disable-workspace-trust" ],
-            extensionTestsEnv: { testArgs: args && args.length > 0 ? args.toString() : "" }
+            extensionTestsEnv: { xArgs: JSON.stringify(xArgs), testArgs: JSON.stringify(testsArgs) }
         }); // --upload-logs could be interesting (for prod).  look at it sometime.
     }
     catch (err: any) {

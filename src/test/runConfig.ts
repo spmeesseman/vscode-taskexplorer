@@ -24,9 +24,11 @@ import "source-map-support/register";
 //     return new Promise(resolve => setTimeout(resolve, ms));
 // };
 
-export default async() => {
-    // const testsRoot = path.resolve(__dirname, "..", "..");
-    const testsRoot = __dirname,
+export default async() =>
+{
+    const xArgs = JSON.parse(process.env.xArgs || "[]"),
+          testArgs = JSON.parse(process.env.testArgs || "[]"),
+          testsRoot = __dirname,
           nycRoot = path.resolve(__dirname, "..", "..");
 
     // Setup coverage pre-test, including post-test hook to report
@@ -68,7 +70,13 @@ export default async() => {
     // console.log('Glob verification', await nyc.exclude.glob(nyc.cwd));
     //
 
-    await nyc.createTempDirectory();
+    if (xArgs.includes("--no-clean"))
+    {
+        await nyc.createTempDirectory();
+    }
+    else {
+        await nyc.reset();
+    }
 
     //
     // Create the mocha test
@@ -90,18 +98,17 @@ export default async() => {
     });
 
     let filesToTest = "**/*.test.js";
-    if (process.env.testArgs)
+    if (testArgs.length > 0)
     {
-        const args = process.env.testArgs.split(",");
-        filesToTest = (args.length > 1 ? "{" : "");
-        args.forEach((a) =>
+        filesToTest = (testArgs.length > 1 ? "{" : "");
+        testArgs.forEach((a: string) =>
         {
             if (filesToTest.length > 1) {
                 filesToTest += ",";
             }
             filesToTest += `**/${a}.test.js`;
         });
-        filesToTest += (args.length > 1 ? "}" : "");
+        filesToTest += (testArgs.length > 1 ? "}" : "");
     }
 
     //
