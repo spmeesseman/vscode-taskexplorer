@@ -817,10 +817,10 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     if (!taskFile)
                     {   // if this is a global refresh, remove all other refresh events from the q
                         this.eventQueue.slice().reverse().forEach((value, index, obj) => {
-                            /* istanbul ignore else */
-                            if (value.type === "refresh" || value.type === "wsFolderRemove") { // As of v3.0, there's only one event type, "refresh"
+                            // As of v3.0, there's only one event type, "refresh"
+                            // if (value.type === "wsFolderRemove" || value.type === "refresh") {
                                 this.eventQueue.splice(obj.length - 1 - index, 1);
-                            }
+                            // }
                         });
                     }
                     this.eventQueue.push(
