@@ -68,7 +68,6 @@ export const testControl: ITestControl =
     slowTime: {
         addWorkspaceFolder: 1460,
         addWorkspaceFolderEmpty: 1380,
-        buildTreeNoTasks: 295,
         cache: {
             build: 480,
             buildCancel: 290,
@@ -172,7 +171,6 @@ export const testControl: ITestControl =
     slowTimeMultiRoot: {
         addWorkspaceFolder: 3200,
         addWorkspaceFolderEmpty: 1525,
-        buildTreeNoTasks: 325,
         cache: {
             build: 540,
             buildCancel: 330,
@@ -186,7 +184,7 @@ export const testControl: ITestControl =
         commandShowOutput: 1250,
         config: {
             event: 300,
-            eventFast: 100,
+            eventFast: 105,
             registerExplorerEvent: 430,
             disableEvent: 1250,
             enableEvent: 2040,
@@ -196,7 +194,7 @@ export const testControl: ITestControl =
             globEvent: 1240,
             groupingEvent: 1090,
             pathToProgramsEvent: 780,
-            showHideSpecialFolder: 480,
+            showHideSpecialFolder: 605,
             showHideUserTasks: 1100,
             readEvent: 30,
             sortingEvent: 800,
@@ -389,7 +387,6 @@ export interface ISlowTimes
 {
     addWorkspaceFolder: number;
     addWorkspaceFolderEmpty: number;
-    buildTreeNoTasks: number;
     cache: {
         build: number;
         buildCancel: number;

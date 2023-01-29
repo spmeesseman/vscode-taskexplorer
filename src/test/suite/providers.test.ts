@@ -287,17 +287,16 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Build Tree Variations  - Last Tasks Collapsed", async function()
+    test("Show Favorites Expanded and Last Tasks Collapsed", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
+        this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
+            await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
-            await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
-            await treeUtils.refresh();
         }
         catch (e) {
             throw e;
@@ -311,17 +310,16 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Build Tree Variations - Favorites Collapsed", async function()
+    test("Show Favorites and Last Tasks Collapsed", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
+        this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
+            await executeSettingsUpdate("specialFolders.expanded.favorites", false);
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
-            await executeSettingsUpdate("specialFolders.expanded.favorites", false);
-            await treeUtils.refresh();
         }
         catch (e) {
             throw e;
@@ -335,18 +333,17 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Build Tree Variations - Favorites Disabled", async function()
+    test("Show Last Tasks Collapsed and Favorites Disabled", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 4) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
+        this.slow((tc.slowTime.config.eventFast * 4) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
+            await executeSettingsUpdate("specialFolders.expanded.favorites", false);
+            await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
             await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
-            await executeSettingsUpdate("specialFolders.expanded.favorites", false);
-            await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
-            await treeUtils.refresh();
         }
         catch (e) {
             throw e;
@@ -361,17 +358,16 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Build Tree Variations - Last Tasks Disabled", async function()
+    test("Show Favorites Collapsed and Last Tasks Disabled", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.buildTreeNoTasks * 2) + (tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
+        this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 4) + (tc.slowTime.config.readEvent * 2));
         const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
         const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
         try {
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.expanded.favorites", false);
-            await treeUtils.refresh();
         }
         catch (e) {
             throw e;
