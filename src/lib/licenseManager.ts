@@ -44,7 +44,7 @@ export class LicenseManager implements ILicenseManager
 	{
 		const storedLicenseKey = await this.getLicenseKey();
 		log.methodStart("license manager check license", 1, logPad, false, [
-			[ "stored license key", storedLicenseKey ? "******************" : "no license key found" ]
+			[ "license key", storedLicenseKey ?? "n/a" ], [ "machine id", env.machineId ]
 		]);
 		if (storedLicenseKey) {
 			this.licensed = await this.validateLicense(storedLicenseKey, logPad + "   ");
