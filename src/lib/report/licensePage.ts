@@ -79,7 +79,7 @@ const getExtraContent = (logPad: string, newKey?: string) =>
 	</td></tr>
 	<tr><td>
 		This license key is valid for30 days from the time it was issued.  Please show your support for
-		the extension and purchase the license <a href="">here</a>.
+		the extension and purchase the license <a href="https://license.spmeesseman.com/purchase?key=${encodeURIComponent(newKey)}">here</a>.
 	</td></tr>
 </table>
 <table style="margin-top:20px">
