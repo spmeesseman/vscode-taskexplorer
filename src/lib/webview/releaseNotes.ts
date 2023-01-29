@@ -1,8 +1,7 @@
-/* eslint-disable import/no-extraneous-dependencies */
 
 import log from "../log/log";
 import { marked } from "marked";
-import { Disposable, ExtensionContext, WebviewPanel } from "vscode";
+import { ExtensionContext, WebviewPanel } from "vscode";
 import { createWebviewPanel } from "./utils";
 import { ITaskExplorerApi } from "../../interface";
 import { getInstallPath } from "../utils/pathUtils";
