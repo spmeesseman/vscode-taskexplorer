@@ -240,8 +240,9 @@ suite("Task Tests", () =>
     test("Run Ant Task (w/o Ansicon)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.enableEvent + tc.slowTime.runCommand + tc.slowTime.tasks.antTask);
+        this.slow((tc.slowTime.config.event * 2) + tc.slowTime.runCommand + tc.slowTime.tasks.antTask);
         await executeSettingsUpdate("visual.enableAnsiconForAnt", false, tc.waitTime.config.enableEvent);
+        await executeSettingsUpdate("keepTermOnStop", true);
         await startTask(antTask, false);
         const exec = await executeTeCommand2("run", [ antTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec);
@@ -251,20 +252,18 @@ suite("Task Tests", () =>
 
 
     test("Run Batch Task", async function()
-    {   //
-        // There are 2 batch file "tasks" - they both utils.sleep for 7 seconds, 1 second at a time
-        //
+    {
         if (utils.exitRollingCount(this)) return;
         const slowTime = (tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + 6500 +
-                          startTaskSlowTime + (tc.slowTime.config.event * 3) +
+                          startTaskSlowTime + (tc.slowTime.config.event * 5) +
                           (tc.slowTime.command * 2) + tc.slowTime.closeEditors + tc.slowTime.tasks.batchScriptCmd;
         this.slow(slowTime);
-        this.timeout(35000);
         await focusExplorerView(); // randomly show/hide view to test refresh event queue in tree/tree.ts
         const batchTask = batch[0];
         await startTask(batchTask as TaskItem, true);
         await executeSettingsUpdate("keepTermOnStop", false);
         await executeSettingsUpdate("visual.disableAnimatedIcons", false);
+        await executeSettingsUpdate("specialFolders.showLastTasks", false);
         //
         // Execute w/ open
         //
