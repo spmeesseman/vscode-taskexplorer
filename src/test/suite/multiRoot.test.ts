@@ -203,7 +203,7 @@ suite("Multi-Root Workspace Tests", () =>
     test("Re-order Workspace Folders", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.reorderWorkspaceFolders * 2);
+        this.slow((tc.slowTime.reorderWorkspaceFolders * 2) + (tc.waitTime.config.eventFast * 3));
         enableConfigWatcher(false);
         await executeSettingsUpdate("sortProjectFoldersAlpha", true);
         enableConfigWatcher(true);
