@@ -82,6 +82,7 @@ suite("Task Tests", () =>
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as SpecialTaskFolder;
         lastTasksFolder.clearTaskItems();
+        await utils.sleep(1);
         expect(await executeTeCommand("runLastTask", tc.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
         utils.endRollingCount(this);
     });
@@ -355,6 +356,7 @@ suite("Task Tests", () =>
             item.id = tempId;
             utils.overrideNextShowInfoBox(undefined);
             lastTasksStore.push(tempId);
+            await utils.sleep(1);
             expect(await executeTeCommand("runLastTask", tc.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
         }
         catch (e) { throw e; }
