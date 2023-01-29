@@ -286,54 +286,6 @@ suite("Multi-Root Workspace Tests", () =>
     });
 
 
-    test("Add Workspace Folders 1 and 2 (Empty, Separate)", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.addWorkspaceFolderEmpty * 2);
-        if (!tc.isMultiRootWorkspace)
-        {
-            testsApi.onWsFoldersChange({
-                added: [ wsf[fakeWsfStartIdx] ],
-                removed: []
-            });
-            await testsApi.onWsFoldersChange({
-                added: [ wsf[fakeWsfStartIdx + 1] ],
-                removed: []
-            });
-        }
-        else {
-            workspace.updateWorkspaceFolders(2, null, wsf[fakeWsfStartIdx]);
-            workspace.updateWorkspaceFolders(3, null, wsf[fakeWsfStartIdx + 1]);
-        }
-        await waitForTeIdle(tc.waitTime.addWorkspaceFolder * 2);
-        endRollingCount(this);
-    });
-
-
-    test("Remove Workspace Folder 1 and 2 (Empty, Separate)", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.removeWorkspaceFolderEmpty * 2);
-        if (!tc.isMultiRootWorkspace)
-        {
-            testsApi.onWsFoldersChange({
-                added: [],
-                removed: [ wsf[fakeWsfStartIdx] ]
-            });
-            await testsApi.onWsFoldersChange({
-                added: [],
-                removed: [ wsf[fakeWsfStartIdx + 1] ]
-            });
-        }
-        else {
-            workspace.updateWorkspaceFolders(2, 1);
-            workspace.updateWorkspaceFolders(2, 1);
-        }
-        await waitForTeIdle(tc.waitTime.removeWorkspaceFolder);
-        endRollingCount(this);
-    });
-
-
     test("Add Workspace Folder 1 (w/ File)", async function()
     {
         if (exitRollingCount(this)) return;

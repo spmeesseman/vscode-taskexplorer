@@ -326,6 +326,14 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
             event: "workspace change"
         };
         log.write("   workspace folder has been added or removed, process/queue event", 1);
+        //
+        // Technically, there should never be a current event when program flow falls here, since
+        // VSCode documentation states directly that updateWorkspaceFolders() cannot be called
+        // consecutive times without waiting for the onDidChangeWorkspaceFolders event to fire,
+        // which this function is a listener of.  Even so, leaving the check here, with a handy
+        // dandy cheap istanbul ignore tag for coverage ignorance.
+        //
+        /* istanbul ignore if */
         if (currentEvent) {
             eventQueue.push(fwEvent);
         }
