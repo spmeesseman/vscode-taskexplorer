@@ -25,7 +25,8 @@ export default class TaskFolder extends TreeItem implements ITaskFolder
 
         this.contextValue = "folder";
 
-        if (!isString(folder)) { // 'SpecialFolder' will have string type
+        if (!isString(folder))
+        {   // 'SpecialFolder' will have string type i.e. "Favorites", "Last Tasks", "User Tasks"
             this.workspaceFolder = folder;
             this.resourceUri = folder.uri;
         }
