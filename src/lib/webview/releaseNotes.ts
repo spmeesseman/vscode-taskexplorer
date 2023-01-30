@@ -40,7 +40,7 @@ const getPageContent = async (context: ExtensionContext, api: ITaskExplorerApi, 
 
 const getReleaseTitle = () =>
 {
-	return "MANY NEW FEATURES AND PERFORMANCE ENHANCEMENTS";
+	return "NEW FEATURES AND PERFORMANCE ENHANCEMENTS";
 };
 
 
