@@ -30,7 +30,7 @@ const getPageContent = async (context: ExtensionContext, api: ITaskExplorerApi, 
 		  changeLogHtml = await marked(changeLogMd, { async: true });
 	let html = releaseNotesHtml.replace("<!-- changelog -->", changeLogHtml)
 							   .replace("<!-- title -->", `Task Explorer ${context.extension.packageJSON.version} Release Notes`)
-							   .replace("<!-- subtitle -->", `TASK EXPLORER ${context.extension.packageJSON.version} RELEASE NOTES`)
+							   .replace("<!-- subtitle -->", getReleaseTitle())
 							   .replace("<!-- releasenotes -->", getReleaseNotes());
 	html = cleanLicenseButtons(html, api);
 	log.methodDone("get page content", 1, logPad);
@@ -38,11 +38,17 @@ const getPageContent = async (context: ExtensionContext, api: ITaskExplorerApi, 
 };
 
 
+const getReleaseTitle = () =>
+{
+	return "MANY NEW FEATURES AND PERFORMANCE ENHANCEMENTS";
+};
+
+
 const getReleaseNotes = () =>
 {
 return `
 <table style="margin-top:15px" width="100%" align="center">
-	${getReleaseNotesHdr("Features")}
+	${getReleaseNotesHdr("Features", "plus")}
 	<tr>
 		<td>
 			<ul>
@@ -50,7 +56,7 @@ return `
 			</ul>
 		</td>
 	</tr>
-	${getReleaseNotesHdr("Bug Fixes")}
+	${getReleaseNotesHdr("Bug Fixes", "bug")}
 	<tr>
 		<td>
 			<ul>
@@ -58,7 +64,7 @@ return `
 			</ul>
 		</td>
 	</tr>
-	${getReleaseNotesHdr("Refactoring")}
+	${getReleaseNotesHdr("Refactoring", "cog")}
 	<tr>
 		<td>
 			<ul>
@@ -66,7 +72,7 @@ return `
 			</ul>
 		</td>
 	</tr>
-	${getReleaseNotesHdr("Miscellaneous")}
+	${getReleaseNotesHdr("Miscellaneous", "asterisk")}
 	<tr>
 		<td>
 			<ul>
@@ -78,14 +84,14 @@ return `
 };
 
 
-const getReleaseNotesHdr = (title: string) =>
+const getReleaseNotesHdr = (title: string, icon: string) =>
 {
 	return `
 	<tr><td>
 		<hr>
 	</td></tr>
 	<tr style="font-size:16px;font-weight:bold">
-		<td style="padding-right:20px" nowrap>${title}</td>
+		<td style="padding-right:20px" nowrap>&nbsp;<span class=\"far fa-${icon}\"></span> &nbsp;${title}</td>
 	</tr>
 	<tr><td>
 		<hr>
