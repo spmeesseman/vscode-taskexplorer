@@ -3,8 +3,8 @@ button {
     background-color: var(--vscode-button-background);
     color: var(--vscode-button-foreground);
     padding: 8px 12px;
-    cursor:pointer;
-    width:150px
+    cursor: pointer;
+    width: 150px
 }
 
 button:hover {
@@ -13,13 +13,15 @@ button:hover {
 }
 
 hr {
-    background-color: var(--vscode-button-hoverBackground);
+    height: 2px;
+    border: none;
+    background-color: var(--vscode-button-background);
 }
 
 .button-panel {
-    padding-left:100px;
-    padding-top:7px;
-    width:-webkit-fill-available
+    padding-left: 100px;
+    padding-top: 7px;
+    width: -webkit-fill-available
 }
 
 .centered {
@@ -27,32 +29,77 @@ hr {
 }
 
 .content {
-    margin-top:15px;
-    display:flexbox;
-    width:-webkit-fill-available
+    margin-top: 15px;
+    display: flexbox;
+    width: -webkit-fill-available
+}
+
+.content-img {
+    height: 70px;
+}
+
+.content-section-fa-img {
+    color: gray
+}
+
+.content-section-header {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.content-subsection-header {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.content-section-subheader {
+    font-size:14px;
+    text-decoration: italic;
+    padding-right:20px
+}
+
+.content-section-header-nowrap {
+    padding-right: 20px
 }
 
 .content-subtitle {
-    font-size:28px;
+    font-size: 28px;
     text-align: center;
     color: var(--vscode-button-hoverBackground);
     text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
+}
+
+.content-text-medium {
+    font-size:14px;
+}
+
+.content-text-small {
+    font-size:12px;
 }
 
 .content-title {
     font-size: 48px;
     font-weight: bold;
     text-align: center;
+    vertical-align: middle;
+    padding-bottom: 10px;
     color: var(--vscode-button-hoverBackground);
     text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
 }
 
 .margin-top-10 {
-    margin-top:10px
+    margin-top: 10px;
+    width: inherit;
 }
 
 .margin-top-15 {
-    margin-top:15px
+    margin-top: 15px;
+    width: inherit;
+}
+
+.margin-top-20 {
+    margin-top: 20px;
+    width: inherit;
 }
 
 .task-count {

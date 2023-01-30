@@ -2,7 +2,7 @@
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta http-equiv="Content-Security-Policy" content="default-src https://ka-p.fontawesome.com 'self'; img-src [webview.cspSource]; script-src [webview.cspSource] 'self' 'unsafe-inline'; script-src-elem [webview.cspSource] https://kit.fontawesome.com; style-src [webview.cspSource] 'unsafe-inline' 'self';">
+        <meta http-equiv="Content-Security-Policy" content="default-src https://ka-p.fontawesome.com; img-src [webview.cspSource]; script-src [webview.cspSource] 'unsafe-inline'; script-src-elem [webview.cspSource] https://kit.fontawesome.com; style-src [webview.cspSource] 'unsafe-inline';">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task Explorer</title>
         <link href="[webview.pageDir]/page.css" rel="stylesheet">
@@ -19,10 +19,10 @@
                 <table>
                     <tr><td>
                         <table><tr>
-                            <td>
-                                <img src="[webview.resourceDir]/gears-r-colors.png" height="70" />
+                            <td class="content-img">
+                                <img src="[webview.resourceDir]/gears-r-colors.png" />
                             </td>
-                            <td valign="middle" class="content-title"> &nbsp;<!-- title --></td>
+                            <td class="content-title"> &nbsp;<!-- title --></td>
                         </tr></table>
                     </td></tr>
                     <tr><td>
@@ -93,7 +93,7 @@
                     <td>
                         <table>
                             <tr>
-                                <td class="content-subtitle" nowrap>
+                                <td class="content-subtitle">
                                     <!-- subtitle -->
                                 </td>
                             </tr>

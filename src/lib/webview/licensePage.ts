@@ -33,7 +33,7 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Tas
 	/* istanbul ignore else */
 	if (tasks)
 	{
-		html = await createTaskCountTable(api, tasks, "Welcome to Task Explorer");
+		html = await createTaskCountTable(api, tasks, "Task Explorer Licensing");
 
 		let infoContent = getExtraContent(logPad + "   ", newKey);
 		html = html.replace("<!-- addtlContentTop -->", infoContent);
@@ -55,8 +55,8 @@ const getExtraContent = (logPad: string, newKey?: string) =>
     log.methodStart("get body content", 1, logPad);
 
 	const details = !newKey ? `
-<table style="margin-top:15px;width:inherit">
-	<tr><td style="font-weight:bold;font-size:14px">
+<table class="margin-top-15">
+	<tr><td class="content-subsection-header">
 		Licensing Note
 	</td></tr>
 	<tr><td>
@@ -66,15 +66,15 @@ const getExtraContent = (logPad: string, newKey?: string) =>
 		<br><br>Hey Sencha, you can buy it and replace your own product if you want ;).
 	</td></tr>
 </table>
-<table style="margin-top:20px">
+<table class="margin-top-20">
 	<tr><td>You can view a detailed parsing report using the "<i>Task Explorer: View Parsing Report</i>"
 	command in the Explorer context menu for any project.  It can alternatively be ran from the
 	command pallette for "all projects".
 	<tr><td height="20"></td></tr>
 </table>
 ` : `
-<table style="margin-top:15px;width:inherit">
-	<tr><td style="font-weight:bold;font-size:14px">
+<table class="margin-top-15">
+	<tr><td class="content-subsection-header">
 		30-Day License Key: &nbsp;${newKey}
 	</td></tr>
 	<tr><td>
@@ -82,7 +82,7 @@ const getExtraContent = (logPad: string, newKey?: string) =>
 		the extension and purchase the license <a href="https://license.spmeesseman.com/purchase?key=${encodeURIComponent(newKey)}">here</a>.
 	</td></tr>
 </table>
-<table style="margin-top:20px">
+<table class="margin-top-20">
 	<tr><td>You can view a detailed parsing report using the "<i>Task Explorer: View Parsing Report</i>"
 	command in the Explorer context menu for any project.  It can alternatively be ran from the
 	command pallette for "all projects" to see how many tasks the extension has parsed.
@@ -101,10 +101,10 @@ const getExtraContent2 = (logPad: string) =>
     log.methodStart("get body content", 1, logPad);
 
 	const details = `<tr><td>
-<table style="margin-top:15px;width:inherit">
-	<tr><td style="font-size:16px;font-weight:bold">Example Parsing Report:</td></tr>
+<table class="margin-top-15">
+	<tr><td class="content-section-header">Example Parsing Report:</td></tr>
 	<tr><td>
-		<img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/readme/parsingreport.png">
+		<img src="[webview.resourceDir]/readme/parsingreport.png">
 	</td></tr>
 </td></tr>`;
 

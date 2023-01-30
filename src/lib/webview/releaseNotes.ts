@@ -90,8 +90,8 @@ const getReleaseNotesHdr = (title: string, icon: string) =>
 	<tr><td>
 		<hr>
 	</td></tr>
-	<tr style="font-size:16px;font-weight:bold">
-		<td style="padding-right:20px" nowrap>&nbsp;<span class=\"far fa-${icon}\"></span> &nbsp;${title}</td>
+	<tr class="content-section-header">
+		<td class="content-section-header-nowrap" nowrap>&nbsp;<span class=\"far fa-${icon} content-section-fa-img\"></span> &nbsp;${title}</td>
 	</tr>
 	<tr><td>
 		<hr>

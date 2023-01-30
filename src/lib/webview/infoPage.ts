@@ -50,14 +50,14 @@ const getExtraContent = (tasks: Task[], logPad: string, uri?: Uri) =>
 
 	let project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 
-	let details = `<table style="margin-top:15px" width="97%" align="center">
-	<tr style="font-size:16px;font-weight:bold">
-		<td style="padding-right:20px" nowrap>Source</td>
-		<td style="padding-right:20px" nowrap>Name</td>
-		<td style="padding-right:20px" nowrap>Project</td>
-		<td style="padding-right:20px" nowrap>Default</td>
-		<td style="padding-right:20px" nowrap>Provider</td>
-		<td style="padding-right:20px" nowrap>File</td>
+	let details = `<table class="margin-top-15" width="97%" align="center">
+	<tr class="content-section-header">
+		<td class="content-section-header-nowrap" nowrap>Source</td>
+		<td class="content-section-header-nowrap" nowrap>Name</td>
+		<td class="content-section-header-nowrap" nowrap>Project</td>
+		<td class="content-section-header-nowrap" nowrap>Default</td>
+		<td class="content-section-header-nowrap" nowrap>Provider</td>
+		<td class="content-section-header-nowrap" nowrap>File</td>
 	</tr><tr><td colspan="6"><hr></td></tr>`;
 
 	const projects: string[] = [];
@@ -97,13 +97,13 @@ const getExtraContent = (tasks: Task[], logPad: string, uri?: Uri) =>
 		}
 
 		details += `
-	<tr style="font-size:12px">
-		<td valign="top" style="font-size:14px;font-decoration:italic;padding-right:20px" nowrap>${t.source}</td>
-		<td valign="top" style="padding-right:20px" nowrap>${t.name}</td>
-		<td valign="top" style="padding-right:20px" nowrap>${project}</td>
-		<td valign="top" style="padding-right:20px" nowrap>${t.definition.isDefault || "N/A"}</td>
-		<td valign="top" style="padding-right:20px" nowrap>${t.source}</td>
-		<td valign="top" style="padding-right:20px" nowrap>${filePath}</td>
+	<tr class="content-text-small">
+		<td valign="top" class="content-section-subheader" nowrap>${t.source}</td>
+		<td valign="top" class="content-section-header-nowrap" nowrap>${t.name}</td>
+		<td valign="top" class="content-section-header-nowrap" nowrap>${project}</td>
+		<td valign="top" class="content-section-header-nowrap" nowrap>${t.definition.isDefault || "N/A"}</td>
+		<td valign="top" class="content-section-header-nowrap" nowrap>${t.source}</td>
+		<td valign="top" class="content-section-header-nowrap" nowrap>${filePath}</td>
 	</tr>
 	<tr><td height="10"></td></tr>`;
 
@@ -118,7 +118,7 @@ const getExtraContent = (tasks: Task[], logPad: string, uri?: Uri) =>
 
 	details += "</table>";
 
-	const summary = `<span style="font-size:14px"># of Tasks:</b> ${tasks.length}<br><br><b>Projects:</b> ${projects.join(", ")}</span>`;
+	const summary = `<span class="content-text-medium"># of Tasks:</b> ${tasks.length}<br><br><b>Projects:</b> ${projects.join(", ")}</span>`;
 
 	log.methodDone("get body content", 1, logPad);
 
