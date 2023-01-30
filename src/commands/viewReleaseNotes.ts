@@ -2,7 +2,7 @@
 
 import log from "../lib/log/log";
 import { commands, ExtensionContext, Uri } from "vscode";
-import { displayReleaseNotes } from "../lib/webview/releaseNotes";
+import { displayReleaseNotes } from "../lib/page/releaseNotes";
 import { ITaskExplorerApi } from "../interface";
 
 let context: ExtensionContext;

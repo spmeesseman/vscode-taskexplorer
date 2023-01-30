@@ -2,7 +2,7 @@
 
 import log from "../lib/log/log";
 import { commands, ExtensionContext, Uri } from "vscode";
-import { displayParsingReport } from "../lib/webview/infoPage";
+import { displayParsingReport } from "../lib/page/infoPage";
 import { ITaskExplorerApi } from "../interface";
 
 let context: ExtensionContext;
