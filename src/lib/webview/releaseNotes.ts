@@ -30,61 +30,53 @@ const getPageContent = async (context: ExtensionContext, api: ITaskExplorerApi, 
 		  changeLogHtml = await marked(changeLogMd, { async: true });
 	let html = releaseNotesHtml.replace("<!-- changelog -->", changeLogHtml)
 							   .replace("<!-- title -->", `Task Explorer ${context.extension.packageJSON.version} Release Notes`)
-							   .replace("<!-- subtitle -->", getReleaseTitle())
-							   .replace("<!-- releasenotes -->", getReleaseNotes());
+							   .replace("<!-- subtitle -->", getNewInThisReleaseShortDsc())
+							   .replace("<!-- releasenotes -->", getNewReleaseNotes(changeLogHtml));
 	html = cleanLicenseButtons(html, api);
 	log.methodDone("get page content", 1, logPad);
 	return html;
 };
 
 
-const getReleaseTitle = () =>
+const getNewInThisReleaseShortDsc = () =>
 {
-	return "NEW FEATURES AND PERFORMANCE ENHANCEMENTS";
+	return "MAJOR RELEASE - A PLETHORA OF NEW FEATURES, BUG FIXES AND PERFORMANCE ENHANCEMENTS !!";
 };
 
 
-const getReleaseNotes = () =>
+const getNewReleaseNotes = (changeLogHtml: string) =>
 {
 return `
 <table style="margin-top:15px" width="100%" align="center">
-	${getReleaseNotesHdr("Features", "plus")}
+	${getNewReleaseNotesHdr("Features", "plus")}
 	<tr>
 		<td>
-			<ul>
-				<li>
-			</ul>
+			${getReleaseNotes("Features", changeLogHtml)}
 		</td>
 	</tr>
-	${getReleaseNotesHdr("Bug Fixes", "bug")}
+	${getNewReleaseNotesHdr("Bug Fixes", "bug")}
 	<tr>
 		<td>
-			<ul>
-				<li>
-			</ul>
+			${getReleaseNotes("Bug Fixes", changeLogHtml)}
 		</td>
 	</tr>
-	${getReleaseNotesHdr("Refactoring", "cog")}
+	${getNewReleaseNotesHdr("Refactoring", "cog")}
 	<tr>
 		<td>
-			<ul>
-				<li>
-			</ul>
+			${getReleaseNotes("Refactoring", changeLogHtml)}
 		</td>
 	</tr>
-	${getReleaseNotesHdr("Miscellaneous", "asterisk")}
+	${getNewReleaseNotesHdr("Miscellaneous", "asterisk")}
 	<tr>
 		<td>
-			<ul>
-				<li>
-			</ul>
+			${getReleaseNotes("Miscellaneous", changeLogHtml)}
 		</td>
 	</tr>
 </table>`;
 };
 
 
-const getReleaseNotesHdr = (title: string, icon: string) =>
+const getNewReleaseNotesHdr = (title: string, icon: string) =>
 {
 	return `
 	<tr><td>
@@ -96,4 +88,16 @@ const getReleaseNotesHdr = (title: string, icon: string) =>
 	<tr><td>
 		<hr>
 	</td></tr>`;
+};
+
+
+const getReleaseNotes = (section: string, changeLogHtml: string) =>
+{
+	let html = "<ul>";
+	const notes: string[] = [];
+	notes.forEach(n => {
+		html += `<li>${n}</li>`;
+	});
+	html += "</ul>";
+	return html;
 };
