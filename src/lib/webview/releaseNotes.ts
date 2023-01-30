@@ -31,7 +31,7 @@ const getPageContent = async (context: ExtensionContext, api: ITaskExplorerApi, 
 	let html = releaseNotesHtml.replace("<!-- changelog -->", changeLogHtml)
 							   .replace("<!-- title -->", `Task Explorer ${context.extension.packageJSON.version} Release Notes`)
 							   .replace("<!-- subtitle -->", getNewInThisReleaseShortDsc())
-							   .replace("<!-- releasenotes -->", getNewReleaseNotes(changeLogMd));
+							   .replace("<!-- releasenotes -->", getNewReleaseNotes(context.extension.packageJSON.version, changeLogMd));
 	html = cleanLicenseButtons(html, api);
 	log.methodDone("get page content", 1, logPad);
 	return html;
@@ -41,32 +41,32 @@ const getPageContent = async (context: ExtensionContext, api: ITaskExplorerApi, 
 const getNewInThisReleaseShortDsc = () => "MAJOR RELEASE - A PLETHORA OF NEW FEATURES, BUG FIXES AND PERFORMANCE ENHANCEMENTS !!";
 
 
-const getNewReleaseNotes = (changeLogMd: string) =>
+const getNewReleaseNotes = (version: string, changeLogMd: string) =>
 {
 return `
 <table style="margin-top:15px" width="100%" align="center">
 	${getNewReleaseNotesHdr("Features", "plus")}
 	<tr>
 		<td>
-			${getReleaseNotes("Features", changeLogMd)}
+			${getReleaseNotes("Features", version, changeLogMd)}
 		</td>
 	</tr>
 	${getNewReleaseNotesHdr("Bug Fixes", "bug")}
 	<tr>
 		<td>
-			${getReleaseNotes("Bug Fixes", changeLogMd)}
+			${getReleaseNotes("Bug Fixes", version, changeLogMd)}
 		</td>
 	</tr>
 	${getNewReleaseNotesHdr("Refactoring", "cog")}
 	<tr>
 		<td>
-			${getReleaseNotes("Refactoring", changeLogMd)}
+			${getReleaseNotes("Refactoring", version, changeLogMd)}
 		</td>
 	</tr>
 	${getNewReleaseNotesHdr("Miscellaneous", "asterisk")}
 	<tr>
 		<td>
-			${getReleaseNotes("Miscellaneous", changeLogMd)}
+			${getReleaseNotes("Miscellaneous", version, changeLogMd)}
 		</td>
 	</tr>
 </table>`;
@@ -88,18 +88,28 @@ const getNewReleaseNotesHdr = (title: string, icon: string) =>
 };
 
 
-const getReleaseNotes = (section: string, changeLogMd: string) =>
+const getReleaseNotes = (section: string, version: string, changeLogMd: string) =>
 {
-	//
-	// TODO - Dynamically populate the 'lastest release notes' section with extracted
-	//        notes from the changelog.
-	//
-
 	let html = "<ul>";
-	const notes: string[] = [];
-	notes.forEach(n => {
-		html += `<li>${n}</li>`;
-	});
+	let match: RegExpExecArray | null;
+	const regex = new RegExp(`(?:^## Version ${version.replace(/\./g, "\\.")} (?:\\[([0-9a-zA-Z\\-\\.]{3,})\\])*\\s*\\([a-zA-Z0-9 ,:\\/\\.]+\\)[\\r\\n]+)([^]*?)(?=^## Version|###END###)`, "gm");
+	if ((match = regex.exec(changeLogMd + "###END###")) !== null)
+	{
+		const notes = match[0];
+		let match2: RegExpExecArray | null;
+		const regex2 = new RegExp(`(?:^### ${section}\\s+)([^]*?)(?=^###? |###END###)`, "gm");
+		if ((match2 = regex2.exec(notes + "###END###")) !== null)
+		{
+			const sectionNotes = match2[0];
+			let match3: RegExpExecArray | null;
+			const regex3 = new RegExp("\\- ([^]*?)(?=^\\- |###END###)", "gm");
+			while ((match3 = regex3.exec(sectionNotes + "###END###")) !== null)
+			{
+				const note = match3[1];
+				html += `<li>${note}</li>`;
+			}
+		}
+	}
 	html += "</ul>";
 	return html;
 };
