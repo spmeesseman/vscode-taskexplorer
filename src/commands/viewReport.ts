@@ -12,7 +12,7 @@ let teApi: ITaskExplorerApi;
 async function viewReport(uri?: Uri)
 {
     log.methodStart("view report command", 1, "", true);
-    const panel = await displayParsingReport(teApi, context.subscriptions, "   ", uri);
+    const panel = await displayParsingReport(teApi, context, "   ", uri);
     log.methodDone("view report command", 1);
     return panel;
 }

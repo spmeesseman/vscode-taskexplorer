@@ -12,7 +12,7 @@ let teApi: ITaskExplorerApi;
 async function viewLicense()
 {
     log.methodStart("view license command", 1, "", true);
-    const panel = await displayLicenseReport(teApi, context.subscriptions, "   ");
+    const panel = await displayLicenseReport(teApi, context, "   ");
     log.methodDone("view license command", 1);
     return panel;
 }

@@ -345,7 +345,7 @@ export class LicenseManager implements ILicenseManager
 
 		if (versionChange)
 		{
-			this.panel = await displayLicenseReport(this.teApi, this.context.subscriptions, "   ", tasks);
+			this.panel = await displayLicenseReport(this.teApi, this.context, "   ", tasks);
 			await storage.update("version", this.version);
 			await storage.update("lastLicenseNag", Date.now().toString());
 		}

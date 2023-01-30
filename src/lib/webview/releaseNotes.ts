@@ -15,7 +15,7 @@ export const displayReleaseNotes = async(api: ITaskExplorerApi, context: Extensi
 {
 	log.methodStart("display license report", 1, logPad);
 	const html = await getPageContent(context, api, logPad + "   ");
-	panel = await createWebviewPanel("Task Explorer Release Notes", html, context.subscriptions);
+	panel = await createWebviewPanel("Task Explorer Release Notes", html, context);
     log.methodDone("display license report", 1, logPad);
     return panel;
 };

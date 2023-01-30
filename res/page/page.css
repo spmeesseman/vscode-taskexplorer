@@ -3,6 +3,8 @@ button {
     background-color: var(--vscode-button-background);
     color: var(--vscode-button-foreground);
     padding: 8px 12px;
+    cursor:pointer;
+    width:150px
 }
 
 button:hover {
@@ -10,25 +12,47 @@ button:hover {
     background-color: var(--vscode-button-hoverBackground);
 }
 
-.shadow-title {
-    text-align: center;
-    color: #4286f4;
-    text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
+hr {
+    background-color: var(--vscode-button-hoverBackground);
 }
 
-.shadow-title-2 {
-    text-align: center;
-    color: #092a5e;
-    text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
+.button-panel {
+    padding-left:100px;
+    padding-top:7px;
+    width:-webkit-fill-available
 }
 
 .centered {
     text-align: center;
 }
 
-.container {
-    padding: 16px 0;
-    text-align: left;
+.content {
+    margin-top:15px;
+    display:flexbox;
+    width:-webkit-fill-available
+}
+
+.content-subtitle {
+    font-size:28px;
+    text-align: center;
+    color: var(--vscode-button-hoverBackground);
+    text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
+}
+
+.content-title {
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    color: var(--vscode-button-hoverBackground);
+    text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
+}
+
+.margin-top-10 {
+    margin-top:10px
+}
+
+.margin-top-15 {
+    margin-top:15px
 }
 
 .task-count {

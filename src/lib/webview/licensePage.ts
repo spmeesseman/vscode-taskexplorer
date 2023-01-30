@@ -1,17 +1,17 @@
 
 import log from "../log/log";
-import { Disposable, Task, WebviewPanel } from "vscode";
+import { Disposable, ExtensionContext, Task, WebviewPanel } from "vscode";
 import { createTaskCountTable, createWebviewPanel } from "./utils";
 import { ITaskExplorerApi } from "../../interface";
 
 let panel: WebviewPanel | undefined;
 
 
-export const displayLicenseReport = async(api: ITaskExplorerApi, disposables: Disposable[], logPad: string, tasks?: Task[], newKey?: string) =>
+export const displayLicenseReport = async(api: ITaskExplorerApi, context: ExtensionContext, logPad: string, tasks?: Task[], newKey?: string) =>
 {
 	log.methodStart("display license report", 1, logPad);
 	const html = await getPageContent(api, logPad + "   ", tasks, newKey);
-	panel = await createWebviewPanel("Task Explorer Licensing", html, disposables);
+	panel = await createWebviewPanel("Task Explorer Licensing", html, context);
     log.methodDone("display license report", 1, logPad);
     return panel;
 };

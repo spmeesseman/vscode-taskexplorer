@@ -2,18 +2,18 @@
 import * as path from "path";
 import log from "../log/log";
 import { ITaskExplorerApi } from "../../interface";
-import { Disposable, Task, Uri, WebviewPanel } from "vscode";
+import { Disposable, ExtensionContext, Task, Uri, WebviewPanel } from "vscode";
 import { createTaskCountTable, createWebviewPanel } from "./utils";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../utils/utils";
 
 let panel: WebviewPanel | undefined;
 
 
-export const displayParsingReport = async(api: ITaskExplorerApi, disposables: Disposable[], logPad: string, uri?: Uri) =>
+export const displayParsingReport = async(api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
 {
     log.methodStart("display parsing report", 1, logPad);
 	const html = await getPageContent(api, logPad, uri);
-	panel = await createWebviewPanel("Task Explorer", html, disposables);
+	panel = await createWebviewPanel("Task Explorer", html, context);
     log.methodDone("display parsing report", 1, logPad);
     return panel;
 };
@@ -30,7 +30,7 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, uri?: Uri) 
 		const tasks = explorer.getTasks() // Filter out 'User' tasks for project/folder reports
 							  .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
 					 			  				   project === getWorkspaceProjectName(t.scope.uri.fsPath)));
-		html = await createTaskCountTable(api, tasks, "Task Explorer", project);
+		html = await createTaskCountTable(api, tasks, "Task Explorer Parsing Report", project);
 
 		const infoContent = getExtraContent(tasks, logPad + "   ", uri);
 		html = html.replace("<!-- addtlContent -->", infoContent);

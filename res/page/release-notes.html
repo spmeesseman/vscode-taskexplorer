@@ -2,78 +2,12 @@
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta http-equiv="Content-Security-Policy" content="default-src https://ka-p.fontawesome.com 'self'; img-src ${webview.cspSource} https://raw.githubusercontent.com; script-src ${webview.cspSource} 'self' 'unsafe-inline'; script-src-elem https://kit.fontawesome.com 'self' 'unsafe-inline'; style-src ${webview.cspSource} 'unsafe-inline' 'self';">
+        <meta http-equiv="Content-Security-Policy" content="default-src https://ka-p.fontawesome.com 'self'; img-src [webview.cspSource]; script-src [webview.cspSource] 'self' 'unsafe-inline'; script-src-elem [webview.cspSource] https://kit.fontawesome.com; style-src [webview.cspSource] 'unsafe-inline' 'self';">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task Explorer</title>
-        <link rel="stylesheet" type="css" href="./page.css">
-        <!-- <link rel="stylesheet" href="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/page/page.css"> -->
-        <script src="https://kit.fontawesome.com/e5d9daff3c.js" crossorigin="anonymous" data-auto-add-css="false"></script>
-        <!--<link rel="stylesheet" href="/res/page/page.css">-->
-        <style>
-            button {
-                background-color: var(--vscode-button-background);
-                color: var(--vscode-button-foreground);
-                padding: 8px 12px;
-            }
-            button:hover {
-                background-color: var(--vscode-button-hoverBackground)
-            }
-        </style>
-        <script type="text/javascript">
-            let vscode;
-            function enterLicense()
-            {
-                vscode = vscode || acquireVsCodeApi();
-                vscode.postMessage({
-                    command: 'enterLicense',
-                    text: ''
-                });
-            }
-            function getLicense()
-            {
-                vscode = vscode || acquireVsCodeApi();
-                vscode.postMessage({
-                    command: 'getLicense',
-                    text: ''
-                });
-            }
-            function viewLicense()
-            {
-                vscode = vscode || acquireVsCodeApi();
-                vscode.postMessage({
-                    command: 'viewLicense',
-                    text: ''
-                });
-            }
-            function viewReport()
-            {
-                vscode = vscode || acquireVsCodeApi();
-                vscode.postMessage({
-                    command: 'viewReport',
-                    text: ''
-                });
-            }
-            // Handle message inside the webview
-            window.addEventListener('message', event =>
-            {
-                const message = event.data; // JSON data from tests
-                switch (message.command)
-                {
-                    case 'enterLicense':
-                        enterLicense();
-                        break;
-                    case 'getLicense':
-                        getLicense();
-                        break;
-                    case 'viewLicense':
-                        viewLicense();
-                        break;
-                    case 'viewReport':
-                        viewReport();
-                        break;
-                }
-            });
-        </script>
+        <link href="[webview.pageDir]/page.css" rel="stylesheet">
+        <script src="[webview.pageDir]/command.js"></script>
+        <script src="https://kit.fontawesome.com/e5d9daff3c.js" crossorigin="anonymous"></script>
     </head>
     <body style="padding:20px">
 
@@ -86,63 +20,63 @@
                     <tr><td>
                         <table><tr>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/gears-r-colors.png" height="70" />
+                                <img src="[webview.resourceDir]/gears-r-colors.png" height="70" />
                             </td>
-                            <td valign="middle" style="font-size:40px;font-weight:bold" class="shadow-title"> &nbsp;<!-- title --></td>
+                            <td valign="middle" class="content-title"> &nbsp;<!-- title --></td>
                         </tr></table>
                     </td></tr>
                     <tr><td>
-                        <table style="margin-top:15px"><tr>
+                        <table class="margin-top-15"><tr>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/npm.png" />
+                                <img src="[webview.sourceImgDir]/npm.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ant.png" />
+                                <img src="[webview.sourceImgDir]/ant.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/yarn.png" />
+                                <img src="[webview.sourceImgDir]/yarn.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/grunt.png" />
+                                <img src="[webview.sourceImgDir]/grunt.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/gulp.png" />
+                                <img src="[webview.sourceImgDir]/gulp.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/gradle.png" />
+                                <img src="[webview.sourceImgDir]/gradle.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/workspace.png" />
+                                <img src="[webview.sourceImgDir]/workspace.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/make.png" />
+                                <img src="[webview.sourceImgDir]/make.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ts.png" />
+                                <img src="[webview.sourceImgDir]/ts.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bat.png" />
+                                <img src="[webview.sourceImgDir]/bat.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/ruby.png" />
+                                <img src="[webview.sourceImgDir]/ruby.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/powershell.png" />
+                                <img src="[webview.sourceImgDir]/powershell.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/bash.png" />
+                                <img src="[webview.sourceImgDir]/bash.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/python.png" />
+                                <img src="[webview.sourceImgDir]/python.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/nsis.png" />
+                                <img src="[webview.sourceImgDir]/nsis.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/perl.png" />
+                                <img src="[webview.sourceImgDir]/perl.png" />
                             </td>
                             <td>
-                                <img src="https://raw.githubusercontent.com/spmeesseman/vscode-taskexplorer/master/res/sources/maven.png" />
+                                <img src="[webview.sourceImgDir]/maven.png" />
                             </td>
                         </tr></table>
                     </td></tr>
@@ -154,12 +88,12 @@
             <!-- startInfoContent -->
             <tr><td>
 
-                <table style="margin-top:15px;display:flexbox;width:-webkit-fill-available">
+                <table class="content-table">
                     <tr>
                     <td>
                         <table>
                             <tr>
-                                <td style="font-size:28px;font-weight:bold" nowrap>
+                                <td class="content-subtitle" nowrap>
                                     <!-- subtitle -->
                                 </td>
                             </tr>
@@ -173,25 +107,25 @@
                             </table></td></tr>
                         </table>
                     </td>
-                    <td valign="top" align="right" style="padding-left:100px;padding-top:7px;width:-webkit-fill-available">
+                    <td valign="top" align="right" class="button-panel">
                         <!-- startEnterLicenseButton -->
                         <div>
-                            <button style="cursor:pointer;width:150px" onclick="enterLicense();">Enter License Key</button>
+                            <button onclick="enterLicense();">Enter License Key</button>
                         </div>
                         <!-- endEnterLicenseButton -->
                         <!-- startGetLicenseButton -->
-                        <div style="margin-top:10px">
-                            <button style="cursor:pointer;width:150px" onclick="getLicense();">Get License Key</button>
+                        <div class="margin-top-10">
+                            <button onclick="getLicense();">Get License Key</button>
                         </div>
                         <!-- endGetLicenseButton -->
                         <!-- startViewLicenseButton -->
-                        <div style="margin-top:10px">
-                            <button style="cursor:pointer;width:150px" onclick="viewLicense();">View License Info</button>
+                        <div class="margin-top-10">
+                            <button onclick="viewLicense();">View License Info</button>
                         </div>
                         <!-- endViewLicenseButton -->
                         <!-- startParsingReportButton -->
-                        <div style="margin-top:10px">
-                            <button style="cursor:pointer;width:150px" onclick="viewReport();">View Parsing Report</button>
+                        <div class="margin-top-10">
+                            <button onclick="viewReport();">View Parsing Report</button>
                         </div>
                         <!-- endParsingReportButton -->
                     </td></tr>

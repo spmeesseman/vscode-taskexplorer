@@ -3,8 +3,8 @@ import { getTaskFiles } from "../fileCache";
 import { readFileAsync } from "../utils/fs";
 import { ITaskExplorerApi } from "../../interface";
 import { getInstallPath } from "../utils/pathUtils";
-import { commands, Disposable, Task, ViewColumn, window, workspace } from "vscode";
 import { getPackageManager, getTaskTypes, lowerCaseFirstChar } from "../utils/utils";
+import { commands, ExtensionContext, Task, Uri, ViewColumn, window, workspace } from "vscode";
 
 
 export const createTaskCountTable = async (api: ITaskExplorerApi, tasks: Task[], title: string, project?: string) =>
@@ -101,7 +101,7 @@ export const cleanLicenseButtons = (html: string, api: ITaskExplorerApi) =>
 };
 
 
-export const createWebviewPanel = async(title: string, html: string, disposables: Disposable[]) =>
+export const createWebviewPanel = async(title: string, html: string, context: ExtensionContext) =>
 {
     const panel = window.createWebviewPanel(
 		lowerCaseFirstChar(title, true), // Identifies the type of the webview. Used internally
@@ -109,17 +109,29 @@ export const createWebviewPanel = async(title: string, html: string, disposables
 		ViewColumn.One,                  // Editor column to show the new webview panel in.
 		{ enableScripts: true }
 	);
-	panel.webview.html = html;
+
+    const resourceDir = Uri.joinPath(context.extensionUri, "res"),
+          pagePath = Uri.joinPath(resourceDir, "page"),
+          sourceImgDir = Uri.joinPath(resourceDir, "sources"),
+          pageUri = panel.webview.asWebviewUri(pagePath),
+          resourceDirUri = panel.webview.asWebviewUri(resourceDir),
+          sourceImgDirUri = panel.webview.asWebviewUri(sourceImgDir);
+
+    panel.webview.html = html.replace(/\[webview\.cspSource\]/g, panel.webview.cspSource)
+                             .replace(/\[webview\.pageDir\]/g, pageUri.toString())
+                             .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
+                             .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString());
+
 	panel.webview.onDidReceiveMessage
 	(
 		message => {
             // i think don't await, the caller can't get the final result anyway
 			commands.executeCommand("vscode-taskexplorer." + message.command);
 		},
-        undefined,
-        disposables
+        undefined, context.subscriptions
 	);
+
 	panel.reveal();
-    disposables.push(panel);
+    context.subscriptions.push(panel);
     return panel;
 };

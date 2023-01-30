@@ -14,7 +14,7 @@ async function getLicense()
 {
     log.methodStart("get 30-day license command", 1, "", true);
     const newKey = await getLicenseManager().requestLicense("   ");
-    const panel = await displayLicenseReport(teApi, context.subscriptions, "   ", [], newKey);
+    const panel = await displayLicenseReport(teApi, context, "   ", [], newKey);
     log.methodDone("get 30-day license command", 1);
     return { panel, newKey };
 }
