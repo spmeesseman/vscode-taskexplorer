@@ -7,12 +7,13 @@
 //
 import * as path from "path";
 import { Uri } from "vscode";
+import { startupFocus } from "../utils/suiteUtils";
 import { MavenTaskProvider } from "../../providers/maven";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeSettingsUpdate, focusExplorerView, executeTeCommand } from "../utils/commandUtils";
+import { executeSettingsUpdate, executeTeCommand } from "../utils/commandUtils";
 import {
-    activate, endRollingCount, exitRollingCount,  getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
+    activate, endRollingCount, exitRollingCount,  getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
@@ -57,11 +58,7 @@ suite("Maven Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

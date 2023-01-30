@@ -75,7 +75,12 @@ export default async() =>
         await nyc.createTempDirectory();
     }
     else {
-        await nyc.reset();
+        try {
+            await nyc.reset();
+        }
+        catch {
+            await nyc.createTempDirectory();
+        }
     }
 
     //

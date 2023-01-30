@@ -2,10 +2,11 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { Uri, WebviewPanel } from "vscode";
+import { startupFocus } from "../utils/suiteUtils";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeSettingsUpdate, focusExplorerView, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
+import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import {
-	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, needsTreeBuild, waitForTeIdle, endRollingCount
+	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
@@ -46,11 +47,7 @@ suite("Info Report Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(this)) return;
-		if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-		}
-        endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

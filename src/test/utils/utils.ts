@@ -16,7 +16,7 @@ import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
 import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
-import { commands, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
+import { commands, Extension, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 
@@ -171,7 +171,15 @@ export const activate = async (instance?: Mocha.Context) =>
         console.log(`    ${figures.color.info}`);
 		console.log(`    ${figures.color.warningTests} ${figures.withColor(disableSSLMsg, figures.colors.grey)}`);
     }
-    return { teApi, testsApi: teApi.testsApi, fsApi: teApi.testsApi.fs, configApi: teApi.config, explorer: teApi.testsApi.explorer, utils: teApi.utilities };
+    return {
+        extension: ext as Extension<any>,
+        teApi, testsApi:
+        teApi.testsApi,
+        fsApi: teApi.testsApi.fs,
+        configApi: teApi.config,
+        explorer: teApi.testsApi.explorer,
+        utils: teApi.utilities
+    };
 };
 
 

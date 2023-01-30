@@ -5,12 +5,13 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
+import { startupBuildTree } from "../utils/suiteUtils";
 import { GradleTaskProvider } from "../../providers/gradle";
 import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
-    suiteFinished, testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
+    testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "gradle";
@@ -36,6 +37,7 @@ suite("Gradle Tests", () =>
         endRollingCount(this, true);
     });
 
+
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
@@ -54,11 +56,7 @@ suite("Gradle Tests", () =>
 
     test("Build Tree", async function()
     {
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild()) {
-            await treeUtils.refresh(this);
-        }
-        endRollingCount(this);
+        await startupBuildTree(this);
     });
 
 

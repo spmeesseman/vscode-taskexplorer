@@ -5,13 +5,14 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
-import { JenkinsTaskProvider } from "../../providers/jenkins";
-import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
-    suiteFinished, testControl as tc, testInvDocPositions, verifyTaskCount, waitForTeIdle
-} from "../utils/utils";
 import { env } from "process";
+import { startupFocus } from "../utils/suiteUtils";
+import { JenkinsTaskProvider } from "../../providers/jenkins";
+import { executeSettingsUpdate } from "../utils/commandUtils";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
+    testInvDocPositions, verifyTaskCount, waitForTeIdle
+} from "../utils/utils";
 
 const testsName = "jenkins";
 let startTaskCount = 0; // set in suiteSetup() as it will change depending on single or multi root ws
@@ -68,11 +69,7 @@ suite("Jenkins Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

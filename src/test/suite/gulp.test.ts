@@ -4,13 +4,14 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
+import { startupFocus } from "../utils/suiteUtils";
 import { GulpTaskProvider } from "../../providers/gulp";
 import { configuration } from "../../lib/utils/configuration";
-import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
+import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, getWsPath,
-    needsTreeBuild, sleep, suiteFinished, testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, getWsPath, sleep, suiteFinished, testControl as tc,
+    testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "gulp";
@@ -63,11 +64,7 @@ suite("Gulp Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(this)) return;
-		if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

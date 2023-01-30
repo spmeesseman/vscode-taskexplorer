@@ -3,15 +3,16 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as utils from "../utils/utils";
+import { join } from "path";
 import { expect } from "chai";
 import { Task } from "vscode";
+import { startupFocus } from "../utils/suiteUtils";
 import { getLicenseManager } from "../../extension";
-import { testControl as tc } from "../control";
 import { ILicenseManager } from "../../interface/ILicenseManager";
-import { executeTeCommand, focusExplorerView } from "../utils/commandUtils";
+import { executeTeCommand } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { join } from "path";
 
+const tc = utils.testControl;
 const licMgrMaxFreeTasks = 500;             // Should be set to what the constants are in lib/licenseManager
 const licMgrMaxFreeTaskFiles = 100;         // Should be set to what the constants are in lib/licenseManager
 const licMgrMaxFreeTasksForTaskType = 100;  // Should be set to what the constants are in lib/licenseManager
@@ -84,17 +85,13 @@ suite("License Manager Tests", () =>
         utils.suiteFinished(this);
 	});
 
-
 	test("Focus Tree View", async function()
 	{
-        if (utils.exitRollingCount(this)) return;
-		if (utils.needsTreeBuild(true)) {
-            await focusExplorerView(this);
-		}
-		tasks = explorer.getTasks();
-		await licMgr.setTasks(tasks, "");
-		await licMgr.setTasks(tasks);
-        utils.endRollingCount(this);
+        await startupFocus(this, async () => {
+			tasks = explorer.getTasks();
+			await licMgr.setTasks(tasks, "");
+			await licMgr.setTasks(tasks);
+		});
 	});
 
 

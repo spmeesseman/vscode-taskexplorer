@@ -5,11 +5,12 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
+import { startupFocus } from "../utils/suiteUtils";
 import { RubyTaskProvider } from "../../providers/ruby";
-import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
+import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
+    activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
@@ -53,11 +54,7 @@ suite("Ruby Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

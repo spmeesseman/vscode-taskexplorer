@@ -6,15 +6,16 @@
 // Documentation on https://mochajs.org/ for help.
 //
 import * as path from "path";
+import { expect } from "chai";
+import { startupFocus } from "../utils/suiteUtils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { PythonTaskProvider } from "../../providers/python";
-import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
+import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, getWsPath,
-    logErrorsAreFine, needsTreeBuild, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, getWsPath, logErrorsAreFine, suiteFinished,
+    testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
-import { expect } from "chai";
 
 const testsName = "python";
 const startTaskCount = 2;
@@ -64,11 +65,7 @@ suite("Python Tests", () =>
 
 	test("Focus Tree View", async function()
 	{
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

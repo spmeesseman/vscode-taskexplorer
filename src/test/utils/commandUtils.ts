@@ -60,8 +60,10 @@ export const focusSearchView = () => commands.executeCommand("workbench.view.sea
 const getCmdGroup = (command: string) =>
 {
     let cmdGroup = "taskExplorer";        // Tree command
-    if (command === "addToExcludesEx" || command === "enterLicense" || command === "getApi" || command === "disableTaskType" || command === "getLicense" ||
-        command === "enableTaskType"  || command === "removeFromExcludes" || command === "showOutput" || command === "viewLicense" || command === "viewReport")
+    if (command === "addToExcludesEx" || command === "enterLicense" || command === "getApi" ||
+        command === "disableTaskType" || command === "getLicense" || command === "enableTaskType" ||
+        command === "removeFromExcludes" || command === "showOutput" || command === "viewLicense" ||
+        command === "viewReleaseNotes" || command === "viewReport")
     {
         cmdGroup = "vscode-taskexplorer"; // Global command
     }
