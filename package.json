@@ -99,6 +99,7 @@
         "test-powershell": "npm run tsc-build_test && node ./dist/test/runTest.js powershell xDeactivate",
         "test-providers": "npm run tsc-build_test && node ./dist/test/runTest.js providers xDeactivate",
         "test-python": "npm run tsc-build_test && node ./dist/test/runTest.js python xDeactivate",
+        "test-release_notes": "npm run tsc-build_test && node ./dist/test/runTest.js releaseNotes xDeactivate",
         "test-ruby": "npm run tsc-build_test && node ./dist/test/runTest.js ruby xDeactivate",
         "test-tasks": "npm run tsc-build_test && node ./dist/test/runTest.js tasks xDeactivate",
         "test-tasks_mws": "npm run tsc-build_test && node ./dist/test/runTest.js tasks xDeactivate --multi-root",

@@ -109,6 +109,12 @@ const getReleaseNotes = (section: string, version: string, changeLogMd: string) 
 				html += `<li>${note}</li>`;
 			}
 		}
+		else {
+			html += `<li>there are no ${section.replace(/e?s$/, "")} changes in this release</li>`;
+		}
+	}
+	else {
+		html += "<li>error - the release notes for this version cannot be found</li>";
 	}
 	html += "</ul>";
 	return html;
